@@ -1,0 +1,546 @@
+fileFormatVersion: 2
+guid: 88e0146ee9ca50d43a170c2564f80a75
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 2198465497338515639
+    second: Skeleton_attack_hitbox_0
+  - first:
+      213: -4976162376973735555
+    second: Skeleton_attack_hitbox_1
+  - first:
+      213: 6158679146684271791
+    second: Skeleton_attack_hitbox_2
+  - first:
+      213: -2596751658525264149
+    second: Skeleton_attack_hitbox_3
+  - first:
+      213: 4604325881001484427
+    second: Skeleton_attack_hitbox_4
+  - first:
+      213: -7106273866923924811
+    second: Skeleton_attack_hitbox_5
+  - first:
+      213: -8695448596219859664
+    second: Skeleton_attack_hitbox_6
+  - first:
+      213: -7213183507404068143
+    second: Skeleton_attack_hitbox_7
+  - first:
+      213: -4672385450179778704
+    second: Skeleton_attack_hitbox_8
+  - first:
+      213: -3608844984837320952
+    second: Skeleton_attack_hitbox_9
+  - first:
+      213: -304045310618775831
+    second: Skeleton_attack_hitbox_10
+  - first:
+      213: -5321315500301351090
+    second: Skeleton_attack_hitbox_11
+  - first:
+      213: -2495149125697416640
+    second: Skeleton_attack_hitbox_12
+  - first:
+      213: -3604282703234718307
+    second: Skeleton_attack_hitbox_13
+  - first:
+      213: 1300006895359246820
+    second: Skeleton_attack_hitbox_14
+  - first:
+      213: -5809913506412239413
+    second: Skeleton_attack_hitbox_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Skeleton_attack_hitbox_0
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 431
+        width: 74
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7b090dbc8b4828e10800000000000000
+      internalID: 2198465497338515639
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Skeleton_attack_hitbox_1
+      rect:
+        serializedVersion: 2
+        x: 221
+        y: 443
+        width: 29
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d7921d7deae11fab0800000000000000
+      internalID: -4976162376973735555
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Skeleton_attack_hitbox_2
+      rect:
+        serializedVersion: 2
+        x: 365
+        y: 470
+        width: 26
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: facc8b7cd06087550800000000000000
+      internalID: 6158679146684271791
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Skeleton_attack_hitbox_3
+      rect:
+        serializedVersion: 2
+        x: 509
+        y: 494
+        width: 14
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: be6f1bfef1c76fbd0800000000000000
+      internalID: -2596751658525264149
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Skeleton_attack_hitbox_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 338
+        width: 82
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b802b377ef9d5ef30800000000000000
+      internalID: 4604325881001484427
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Skeleton_attack_hitbox_5
+      rect:
+        serializedVersion: 2
+        x: 158
+        y: 338
+        width: 68
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5b2ab559191716d90800000000000000
+      internalID: -7106273866923924811
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Skeleton_attack_hitbox_6
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 341
+        width: 35
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 03d65ab729f835780800000000000000
+      internalID: -8695448596219859664
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Skeleton_attack_hitbox_7
+      rect:
+        serializedVersion: 2
+        x: 500
+        y: 350
+        width: 14
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1da697d21df95eb90800000000000000
+      internalID: -7213183507404068143
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Skeleton_attack_hitbox_8
+      rect:
+        serializedVersion: 2
+        x: 62
+        y: 194
+        width: 83
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 077a45c303a582fb0800000000000000
+      internalID: -4672385450179778704
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Skeleton_attack_hitbox_9
+      rect:
+        serializedVersion: 2
+        x: 206
+        y: 194
+        width: 68
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 80f42555b9ecaedc0800000000000000
+      internalID: -3608844984837320952
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Skeleton_attack_hitbox_10
+      rect:
+        serializedVersion: 2
+        x: 350
+        y: 197
+        width: 35
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9eec1f0a660d7cbf0800000000000000
+      internalID: -304045310618775831
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Skeleton_attack_hitbox_11
+      rect:
+        serializedVersion: 2
+        x: 494
+        y: 206
+        width: 14
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e4702cafeb3e626b0800000000000000
+      internalID: -5321315500301351090
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Skeleton_attack_hitbox_12
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 68
+        width: 80
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 042dd2d07137f5dd0800000000000000
+      internalID: -2495149125697416640
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Skeleton_attack_hitbox_13
+      rect:
+        serializedVersion: 2
+        x: 179
+        y: 68
+        width: 26
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d952c9b4af30bfdc0800000000000000
+      internalID: -3604282703234718307
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Skeleton_attack_hitbox_14
+      rect:
+        serializedVersion: 2
+        x: 326
+        y: 68
+        width: 20
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4e14273326d8a0210800000000000000
+      internalID: 1300006895359246820
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Skeleton_attack_hitbox_15
+      rect:
+        serializedVersion: 2
+        x: 479
+        y: 68
+        width: 11
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bc5ed8ab27a0f5fa0800000000000000
+      internalID: -5809913506412239413
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Skeleton_attack_hitbox_0: 2198465497338515639
+      Skeleton_attack_hitbox_1: -4976162376973735555
+      Skeleton_attack_hitbox_10: -304045310618775831
+      Skeleton_attack_hitbox_11: -5321315500301351090
+      Skeleton_attack_hitbox_12: -2495149125697416640
+      Skeleton_attack_hitbox_13: -3604282703234718307
+      Skeleton_attack_hitbox_14: 1300006895359246820
+      Skeleton_attack_hitbox_15: -5809913506412239413
+      Skeleton_attack_hitbox_2: 6158679146684271791
+      Skeleton_attack_hitbox_3: -2596751658525264149
+      Skeleton_attack_hitbox_4: 4604325881001484427
+      Skeleton_attack_hitbox_5: -7106273866923924811
+      Skeleton_attack_hitbox_6: -8695448596219859664
+      Skeleton_attack_hitbox_7: -7213183507404068143
+      Skeleton_attack_hitbox_8: -4672385450179778704
+      Skeleton_attack_hitbox_9: -3608844984837320952
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

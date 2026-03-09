@@ -1,0 +1,546 @@
+fileFormatVersion: 2
+guid: faa9173946958794b869cefe9805f20b
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -3494209829625359657
+    second: Ronin_attack_hitbox_0
+  - first:
+      213: -1624182442997653757
+    second: Ronin_attack_hitbox_1
+  - first:
+      213: -6799623032408816861
+    second: Ronin_attack_hitbox_2
+  - first:
+      213: 5997145847508231168
+    second: Ronin_attack_hitbox_3
+  - first:
+      213: -5100064867395195229
+    second: Ronin_attack_hitbox_4
+  - first:
+      213: -6721307563694279026
+    second: Ronin_attack_hitbox_5
+  - first:
+      213: 3363280245625970049
+    second: Ronin_attack_hitbox_6
+  - first:
+      213: 7286771341979316456
+    second: Ronin_attack_hitbox_7
+  - first:
+      213: -1485424645364015948
+    second: Ronin_attack_hitbox_8
+  - first:
+      213: -8749801434111678188
+    second: Ronin_attack_hitbox_9
+  - first:
+      213: 6308696637137702589
+    second: Ronin_attack_hitbox_10
+  - first:
+      213: 9026918584527361798
+    second: Ronin_attack_hitbox_11
+  - first:
+      213: 5628463240115533254
+    second: Ronin_attack_hitbox_12
+  - first:
+      213: 6866661505739305141
+    second: Ronin_attack_hitbox_13
+  - first:
+      213: -3318596501091348419
+    second: Ronin_attack_hitbox_14
+  - first:
+      213: 6982398573698815930
+    second: Ronin_attack_hitbox_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Ronin_attack_hitbox_0
+      rect:
+        serializedVersion: 2
+        x: 29
+        y: 536
+        width: 68
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7d2908e4ca2128fc0800000000000000
+      internalID: -3494209829625359657
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ronin_attack_hitbox_1
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 545
+        width: 44
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 30fd2b26caeb579e0800000000000000
+      internalID: -1624182442997653757
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ronin_attack_hitbox_2
+      rect:
+        serializedVersion: 2
+        x: 359
+        y: 551
+        width: 20
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 32345b2c0e2e2a1a0800000000000000
+      internalID: -6799623032408816861
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ronin_attack_hitbox_3
+      rect:
+        serializedVersion: 2
+        x: 503
+        y: 557
+        width: 20
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 004efe2cf542a3350800000000000000
+      internalID: 5997145847508231168
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ronin_attack_hitbox_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 392
+        width: 73
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3aea57f360ee839b0800000000000000
+      internalID: -5100064867395195229
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ronin_attack_hitbox_5
+      rect:
+        serializedVersion: 2
+        x: 158
+        y: 392
+        width: 59
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e863bdfb16e19b2a0800000000000000
+      internalID: -6721307563694279026
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ronin_attack_hitbox_6
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 392
+        width: 41
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 18ddf906095ccae20800000000000000
+      internalID: 3363280245625970049
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ronin_attack_hitbox_7
+      rect:
+        serializedVersion: 2
+        x: 479
+        y: 392
+        width: 23
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8e07c26bdefcf1560800000000000000
+      internalID: 7286771341979316456
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ronin_attack_hitbox_8
+      rect:
+        serializedVersion: 2
+        x: 71
+        y: 224
+        width: 74
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4bc9778b726b26be0800000000000000
+      internalID: -1485424645364015948
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ronin_attack_hitbox_9
+      rect:
+        serializedVersion: 2
+        x: 215
+        y: 224
+        width: 59
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 419e19044f5729680800000000000000
+      internalID: -8749801434111678188
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ronin_attack_hitbox_10
+      rect:
+        serializedVersion: 2
+        x: 359
+        y: 224
+        width: 41
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dbe4b44aa2efc8750800000000000000
+      internalID: 6308696637137702589
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ronin_attack_hitbox_11
+      rect:
+        serializedVersion: 2
+        x: 506
+        y: 224
+        width: 23
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 607102f30ae064d70800000000000000
+      internalID: 9026918584527361798
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ronin_attack_hitbox_12
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 74
+        width: 80
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6c53e6afe715c1e40800000000000000
+      internalID: 5628463240115533254
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ronin_attack_hitbox_13
+      rect:
+        serializedVersion: 2
+        x: 176
+        y: 74
+        width: 26
+        height: 71
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5b0b07222484b4f50800000000000000
+      internalID: 6866661505739305141
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ronin_attack_hitbox_14
+      rect:
+        serializedVersion: 2
+        x: 323
+        y: 74
+        width: 23
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d30989f901af1f1d0800000000000000
+      internalID: -3318596501091348419
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ronin_attack_hitbox_15
+      rect:
+        serializedVersion: 2
+        x: 470
+        y: 74
+        width: 20
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab71389228676e060800000000000000
+      internalID: 6982398573698815930
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Ronin_attack_hitbox_0: -3494209829625359657
+      Ronin_attack_hitbox_1: -1624182442997653757
+      Ronin_attack_hitbox_10: 6308696637137702589
+      Ronin_attack_hitbox_11: 9026918584527361798
+      Ronin_attack_hitbox_12: 5628463240115533254
+      Ronin_attack_hitbox_13: 6866661505739305141
+      Ronin_attack_hitbox_14: -3318596501091348419
+      Ronin_attack_hitbox_15: 6982398573698815930
+      Ronin_attack_hitbox_2: -6799623032408816861
+      Ronin_attack_hitbox_3: 5997145847508231168
+      Ronin_attack_hitbox_4: -5100064867395195229
+      Ronin_attack_hitbox_5: -6721307563694279026
+      Ronin_attack_hitbox_6: 3363280245625970049
+      Ronin_attack_hitbox_7: 7286771341979316456
+      Ronin_attack_hitbox_8: -1485424645364015948
+      Ronin_attack_hitbox_9: -8749801434111678188
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

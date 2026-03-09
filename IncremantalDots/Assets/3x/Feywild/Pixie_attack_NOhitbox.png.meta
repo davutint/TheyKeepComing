@@ -1,0 +1,650 @@
+fileFormatVersion: 2
+guid: 7d9c1b19e194dec44be9b60c1844e755
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -2583557972096571649
+    second: Pixie_attack_NOhitbox_0
+  - first:
+      213: 8796380888770265733
+    second: Pixie_attack_NOhitbox_1
+  - first:
+      213: 6502458501306220468
+    second: Pixie_attack_NOhitbox_2
+  - first:
+      213: -3020509881338526048
+    second: Pixie_attack_NOhitbox_3
+  - first:
+      213: -7932713085266077745
+    second: Pixie_attack_NOhitbox_4
+  - first:
+      213: -1891404374717735496
+    second: Pixie_attack_NOhitbox_5
+  - first:
+      213: -1382064745965897746
+    second: Pixie_attack_NOhitbox_6
+  - first:
+      213: 2867571090473037150
+    second: Pixie_attack_NOhitbox_7
+  - first:
+      213: 3150088292908599494
+    second: Pixie_attack_NOhitbox_8
+  - first:
+      213: 2512964575091910659
+    second: Pixie_attack_NOhitbox_9
+  - first:
+      213: -5177543399259185410
+    second: Pixie_attack_NOhitbox_10
+  - first:
+      213: -7914346105830947172
+    second: Pixie_attack_NOhitbox_11
+  - first:
+      213: 5759683603701235156
+    second: Pixie_attack_NOhitbox_12
+  - first:
+      213: -1399918492852574711
+    second: Pixie_attack_NOhitbox_13
+  - first:
+      213: -6208317190179060012
+    second: Pixie_attack_NOhitbox_14
+  - first:
+      213: 7261270468681764727
+    second: Pixie_attack_NOhitbox_15
+  - first:
+      213: 8264450523245266449
+    second: Pixie_attack_NOhitbox_16
+  - first:
+      213: 5611785764257419715
+    second: Pixie_attack_NOhitbox_17
+  - first:
+      213: -5161823356252468553
+    second: Pixie_attack_NOhitbox_18
+  - first:
+      213: 5479341378896398075
+    second: Pixie_attack_NOhitbox_19
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Pixie_attack_NOhitbox_0
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 479
+        width: 50
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ff62e8076bb552cd0800000000000000
+      internalID: -2583557972096571649
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixie_attack_NOhitbox_1
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 479
+        width: 50
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 582cf2820d5031a70800000000000000
+      internalID: 8796380888770265733
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixie_attack_NOhitbox_2
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 479
+        width: 50
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4bf73113e8f5d3a50800000000000000
+      internalID: 6502458501306220468
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixie_attack_NOhitbox_3
+      rect:
+        serializedVersion: 2
+        x: 479
+        y: 479
+        width: 50
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0a6824a244ef416d0800000000000000
+      internalID: -3020509881338526048
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixie_attack_NOhitbox_4
+      rect:
+        serializedVersion: 2
+        x: 623
+        y: 479
+        width: 50
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fc75f9f6a7759e190800000000000000
+      internalID: -7932713085266077745
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixie_attack_NOhitbox_5
+      rect:
+        serializedVersion: 2
+        x: 53
+        y: 335
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8bd54560eb160c5e0800000000000000
+      internalID: -1891404374717735496
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixie_attack_NOhitbox_6
+      rect:
+        serializedVersion: 2
+        x: 197
+        y: 335
+        width: 44
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ee7bc10af6be1dce0800000000000000
+      internalID: -1382064745965897746
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixie_attack_NOhitbox_7
+      rect:
+        serializedVersion: 2
+        x: 341
+        y: 335
+        width: 44
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e5d23d7b6b8abc720800000000000000
+      internalID: 2867571090473037150
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixie_attack_NOhitbox_8
+      rect:
+        serializedVersion: 2
+        x: 485
+        y: 335
+        width: 44
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6c80fedcc9c57bb20800000000000000
+      internalID: 3150088292908599494
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixie_attack_NOhitbox_9
+      rect:
+        serializedVersion: 2
+        x: 629
+        y: 335
+        width: 44
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3086e7f77f7dfd220800000000000000
+      internalID: 2512964575091910659
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixie_attack_NOhitbox_10
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 191
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: efedcfdc5bba528b0800000000000000
+      internalID: -5177543399259185410
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixie_attack_NOhitbox_11
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 191
+        width: 44
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c96437416289a2290800000000000000
+      internalID: -7914346105830947172
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixie_attack_NOhitbox_12
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 191
+        width: 44
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4ddf041b8b18eef40800000000000000
+      internalID: 5759683603701235156
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixie_attack_NOhitbox_13
+      rect:
+        serializedVersion: 2
+        x: 479
+        y: 191
+        width: 44
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 906a50f3c8d729ce0800000000000000
+      internalID: -1399918492852574711
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixie_attack_NOhitbox_14
+      rect:
+        serializedVersion: 2
+        x: 623
+        y: 191
+        width: 44
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4d60d6a9860a7d9a0800000000000000
+      internalID: -6208317190179060012
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixie_attack_NOhitbox_15
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 47
+        width: 50
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 77f8fc7f40735c460800000000000000
+      internalID: 7261270468681764727
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixie_attack_NOhitbox_16
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 47
+        width: 50
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 11643d5c6f931b270800000000000000
+      internalID: 8264450523245266449
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixie_attack_NOhitbox_17
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 47
+        width: 50
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3c1582a8b6111ed40800000000000000
+      internalID: 5611785764257419715
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixie_attack_NOhitbox_18
+      rect:
+        serializedVersion: 2
+        x: 479
+        y: 47
+        width: 50
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7bac14981058d58b0800000000000000
+      internalID: -5161823356252468553
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixie_attack_NOhitbox_19
+      rect:
+        serializedVersion: 2
+        x: 623
+        y: 47
+        width: 50
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bf6083c04f78a0c40800000000000000
+      internalID: 5479341378896398075
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Pixie_attack_NOhitbox_0: -2583557972096571649
+      Pixie_attack_NOhitbox_1: 8796380888770265733
+      Pixie_attack_NOhitbox_10: -5177543399259185410
+      Pixie_attack_NOhitbox_11: -7914346105830947172
+      Pixie_attack_NOhitbox_12: 5759683603701235156
+      Pixie_attack_NOhitbox_13: -1399918492852574711
+      Pixie_attack_NOhitbox_14: -6208317190179060012
+      Pixie_attack_NOhitbox_15: 7261270468681764727
+      Pixie_attack_NOhitbox_16: 8264450523245266449
+      Pixie_attack_NOhitbox_17: 5611785764257419715
+      Pixie_attack_NOhitbox_18: -5161823356252468553
+      Pixie_attack_NOhitbox_19: 5479341378896398075
+      Pixie_attack_NOhitbox_2: 6502458501306220468
+      Pixie_attack_NOhitbox_3: -3020509881338526048
+      Pixie_attack_NOhitbox_4: -7932713085266077745
+      Pixie_attack_NOhitbox_5: -1891404374717735496
+      Pixie_attack_NOhitbox_6: -1382064745965897746
+      Pixie_attack_NOhitbox_7: 2867571090473037150
+      Pixie_attack_NOhitbox_8: 3150088292908599494
+      Pixie_attack_NOhitbox_9: 2512964575091910659
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

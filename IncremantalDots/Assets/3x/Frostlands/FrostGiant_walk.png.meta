@@ -1,0 +1,546 @@
+fileFormatVersion: 2
+guid: 1979d7bc1fed6304d93f855cff5f8202
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 5960456510676074344
+    second: FrostGiant_walk_0
+  - first:
+      213: 6844136613932746628
+    second: FrostGiant_walk_1
+  - first:
+      213: 5241008913873777520
+    second: FrostGiant_walk_2
+  - first:
+      213: 8947697746028955356
+    second: FrostGiant_walk_3
+  - first:
+      213: 1993766506591295963
+    second: FrostGiant_walk_4
+  - first:
+      213: 7930739198650659128
+    second: FrostGiant_walk_5
+  - first:
+      213: -3088305453173612066
+    second: FrostGiant_walk_6
+  - first:
+      213: 4268253837438508931
+    second: FrostGiant_walk_7
+  - first:
+      213: -8049986308419110541
+    second: FrostGiant_walk_8
+  - first:
+      213: 8694158613125180391
+    second: FrostGiant_walk_9
+  - first:
+      213: 1094785767609714427
+    second: FrostGiant_walk_10
+  - first:
+      213: -1648354702223034846
+    second: FrostGiant_walk_11
+  - first:
+      213: 4394474893203693746
+    second: FrostGiant_walk_12
+  - first:
+      213: 5252544905266945552
+    second: FrostGiant_walk_13
+  - first:
+      213: -2905482742030245138
+    second: FrostGiant_walk_14
+  - first:
+      213: -6867785142316946925
+    second: FrostGiant_walk_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: FrostGiant_walk_0
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 287
+        width: 77
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 86ff20add9bc7b250800000000000000
+      internalID: 5960456510676074344
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostGiant_walk_1
+      rect:
+        serializedVersion: 2
+        x: 95
+        y: 287
+        width: 92
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 487c4b31df14bfe50800000000000000
+      internalID: 6844136613932746628
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostGiant_walk_2
+      rect:
+        serializedVersion: 2
+        x: 197
+        y: 287
+        width: 83
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0733a10d6ddcbb840800000000000000
+      internalID: 5241008913873777520
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostGiant_walk_3
+      rect:
+        serializedVersion: 2
+        x: 287
+        y: 287
+        width: 92
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cd68e9d61bb9c2c70800000000000000
+      internalID: 8947697746028955356
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostGiant_walk_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 191
+        width: 79
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bd9127603184bab10800000000000000
+      internalID: 1993766506591295963
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostGiant_walk_5
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 191
+        width: 80
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 831b6d54845af0e60800000000000000
+      internalID: 7930739198650659128
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostGiant_walk_6
+      rect:
+        serializedVersion: 2
+        x: 197
+        y: 191
+        width: 80
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ed16fa98d822425d0800000000000000
+      internalID: -3088305453173612066
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostGiant_walk_7
+      rect:
+        serializedVersion: 2
+        x: 290
+        y: 191
+        width: 80
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 38f58bf3042eb3b30800000000000000
+      internalID: 4268253837438508931
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostGiant_walk_8
+      rect:
+        serializedVersion: 2
+        x: 17
+        y: 95
+        width: 80
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 379bbe76a14b84090800000000000000
+      internalID: -8049986308419110541
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostGiant_walk_9
+      rect:
+        serializedVersion: 2
+        x: 110
+        y: 95
+        width: 80
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7ebaa3ce13bd7a870800000000000000
+      internalID: 8694158613125180391
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostGiant_walk_10
+      rect:
+        serializedVersion: 2
+        x: 203
+        y: 95
+        width: 80
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bf6c78fead5713f00800000000000000
+      internalID: 1094785767609714427
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostGiant_walk_11
+      rect:
+        serializedVersion: 2
+        x: 302
+        y: 95
+        width: 80
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 226b626b12edf19e0800000000000000
+      internalID: -1648354702223034846
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostGiant_walk_12
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 0
+        width: 83
+        height: 91
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2b067c7e1af4cfc30800000000000000
+      internalID: 4394474893203693746
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostGiant_walk_13
+      rect:
+        serializedVersion: 2
+        x: 101
+        y: 0
+        width: 92
+        height: 88
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 01e593d13c9c4e840800000000000000
+      internalID: 5252544905266945552
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostGiant_walk_14
+      rect:
+        serializedVersion: 2
+        x: 203
+        y: 0
+        width: 80
+        height: 91
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ee2624c07d6ada7d0800000000000000
+      internalID: -2905482742030245138
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostGiant_walk_15
+      rect:
+        serializedVersion: 2
+        x: 293
+        y: 0
+        width: 91
+        height: 88
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 31a2e76dcc9b0b0a0800000000000000
+      internalID: -6867785142316946925
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      FrostGiant_walk_0: 5960456510676074344
+      FrostGiant_walk_1: 6844136613932746628
+      FrostGiant_walk_10: 1094785767609714427
+      FrostGiant_walk_11: -1648354702223034846
+      FrostGiant_walk_12: 4394474893203693746
+      FrostGiant_walk_13: 5252544905266945552
+      FrostGiant_walk_14: -2905482742030245138
+      FrostGiant_walk_15: -6867785142316946925
+      FrostGiant_walk_2: 5241008913873777520
+      FrostGiant_walk_3: 8947697746028955356
+      FrostGiant_walk_4: 1993766506591295963
+      FrostGiant_walk_5: 7930739198650659128
+      FrostGiant_walk_6: -3088305453173612066
+      FrostGiant_walk_7: 4268253837438508931
+      FrostGiant_walk_8: -8049986308419110541
+      FrostGiant_walk_9: 8694158613125180391
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

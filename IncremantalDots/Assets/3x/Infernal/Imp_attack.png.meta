@@ -1,0 +1,1170 @@
+fileFormatVersion: 2
+guid: 45cb353e6625e5943a498d3d52249f83
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 7814355260057943461
+    second: Imp_attack_0
+  - first:
+      213: -8612799192307492346
+    second: Imp_attack_1
+  - first:
+      213: -7070322053462498323
+    second: Imp_attack_2
+  - first:
+      213: -6846383248038207338
+    second: Imp_attack_3
+  - first:
+      213: 3979215175954148729
+    second: Imp_attack_4
+  - first:
+      213: 1750770211707460195
+    second: Imp_attack_5
+  - first:
+      213: -6738106439439038328
+    second: Imp_attack_6
+  - first:
+      213: -2836112140749879004
+    second: Imp_attack_7
+  - first:
+      213: -4002752828078186274
+    second: Imp_attack_8
+  - first:
+      213: -6907609468280060704
+    second: Imp_attack_9
+  - first:
+      213: -2778989841226766686
+    second: Imp_attack_10
+  - first:
+      213: -5323208568007777368
+    second: Imp_attack_11
+  - first:
+      213: 5142583598483878219
+    second: Imp_attack_12
+  - first:
+      213: 7297974481214981088
+    second: Imp_attack_13
+  - first:
+      213: -6229769447907515410
+    second: Imp_attack_14
+  - first:
+      213: -5368104493812067398
+    second: Imp_attack_15
+  - first:
+      213: 2764325147164913740
+    second: Imp_attack_16
+  - first:
+      213: 9060088187086574158
+    second: Imp_attack_17
+  - first:
+      213: -7502567166667077242
+    second: Imp_attack_18
+  - first:
+      213: -4437928232100736078
+    second: Imp_attack_19
+  - first:
+      213: -3775052608767166731
+    second: Imp_attack_20
+  - first:
+      213: -773308444872983956
+    second: Imp_attack_21
+  - first:
+      213: 7526368104742795524
+    second: Imp_attack_22
+  - first:
+      213: 5873677915731097235
+    second: Imp_attack_23
+  - first:
+      213: -9007376242385333696
+    second: Imp_attack_24
+  - first:
+      213: 5213159613651522336
+    second: Imp_attack_25
+  - first:
+      213: 7014847786455314938
+    second: Imp_attack_26
+  - first:
+      213: -436835682028405125
+    second: Imp_attack_27
+  - first:
+      213: 7477224204866087184
+    second: Imp_attack_28
+  - first:
+      213: 1189577222239213797
+    second: Imp_attack_29
+  - first:
+      213: -8099480972994308231
+    second: Imp_attack_30
+  - first:
+      213: -6765558052783011521
+    second: Imp_attack_31
+  - first:
+      213: 7979393660921092944
+    second: Imp_attack_32
+  - first:
+      213: 3685919091569471272
+    second: Imp_attack_33
+  - first:
+      213: 7524076203929788078
+    second: Imp_attack_34
+  - first:
+      213: 7682908805557911576
+    second: Imp_attack_35
+  - first:
+      213: -4799937946197625589
+    second: Imp_attack_36
+  - first:
+      213: -697543944658379932
+    second: Imp_attack_37
+  - first:
+      213: -5056539794475297603
+    second: Imp_attack_38
+  - first:
+      213: -710338994776143836
+    second: Imp_attack_39
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Imp_attack_0
+      rect:
+        serializedVersion: 2
+        x: 53
+        y: 479
+        width: 38
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5ad7570f4ba227c60800000000000000
+      internalID: 7814355260057943461
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_1
+      rect:
+        serializedVersion: 2
+        x: 188
+        y: 431
+        width: 56
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 60a9db464c0397880800000000000000
+      internalID: -8612799192307492346
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_2
+      rect:
+        serializedVersion: 2
+        x: 197
+        y: 479
+        width: 38
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: de3e1c37d8b21ed90800000000000000
+      internalID: -7070322053462498323
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_3
+      rect:
+        serializedVersion: 2
+        x: 341
+        y: 479
+        width: 38
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6906f78a5b2ccf0a0800000000000000
+      internalID: -6846383248038207338
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_4
+      rect:
+        serializedVersion: 2
+        x: 485
+        y: 479
+        width: 38
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 97d2797ae13093730800000000000000
+      internalID: 3979215175954148729
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_5
+      rect:
+        serializedVersion: 2
+        x: 629
+        y: 479
+        width: 38
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 36a98284b3cfb4810800000000000000
+      internalID: 1750770211707460195
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_6
+      rect:
+        serializedVersion: 2
+        x: 323
+        y: 431
+        width: 74
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 888c672b4ef6d72a0800000000000000
+      internalID: -6738106439439038328
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_7
+      rect:
+        serializedVersion: 2
+        x: 461
+        y: 431
+        width: 41
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4294e6bc80b14a8d0800000000000000
+      internalID: -2836112140749879004
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_8
+      rect:
+        serializedVersion: 2
+        x: 506
+        y: 431
+        width: 41
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ed0a5b6a28d5378c0800000000000000
+      internalID: -4002752828078186274
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_9
+      rect:
+        serializedVersion: 2
+        x: 605
+        y: 449
+        width: 11
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0e4ca0469cd3320a0800000000000000
+      internalID: -6907609468280060704
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_10
+      rect:
+        serializedVersion: 2
+        x: 680
+        y: 449
+        width: 11
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2a6624f867b0f69d0800000000000000
+      internalID: -2778989841226766686
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_11
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 335
+        width: 38
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8a3a49ec20a2026b0800000000000000
+      internalID: -5323208568007777368
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_12
+      rect:
+        serializedVersion: 2
+        x: 143
+        y: 332
+        width: 56
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b41b16749802e5740800000000000000
+      internalID: 5142583598483878219
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_13
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 335
+        width: 32
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0e34fa4df1d974560800000000000000
+      internalID: 7297974481214981088
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_14
+      rect:
+        serializedVersion: 2
+        x: 287
+        y: 323
+        width: 50
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ee324e0a1b96b89a0800000000000000
+      internalID: -6229769447907515410
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_15
+      rect:
+        serializedVersion: 2
+        x: 344
+        y: 335
+        width: 32
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab357218769a085b0800000000000000
+      internalID: -5368104493812067398
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_16
+      rect:
+        serializedVersion: 2
+        x: 440
+        y: 335
+        width: 80
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c40b178431bdc5620800000000000000
+      internalID: 2764325147164913740
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_17
+      rect:
+        serializedVersion: 2
+        x: 446
+        y: 323
+        width: 38
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e4212092436ebbd70800000000000000
+      internalID: 9060088187086574158
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_18
+      rect:
+        serializedVersion: 2
+        x: 614
+        y: 335
+        width: 50
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 689cc4789e681e790800000000000000
+      internalID: -7502567166667077242
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_19
+      rect:
+        serializedVersion: 2
+        x: 620
+        y: 323
+        width: 23
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2b355fa39cf4962c0800000000000000
+      internalID: -4437928232100736078
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_20
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 191
+        width: 38
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5f6750647a15c9bc0800000000000000
+      internalID: -3775052608767166731
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_21
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 191
+        width: 32
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c6a39890118a445f0800000000000000
+      internalID: -773308444872983956
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_22
+      rect:
+        serializedVersion: 2
+        x: 233
+        y: 188
+        width: 56
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 40936043ae7037860800000000000000
+      internalID: 7526368104742795524
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_23
+      rect:
+        serializedVersion: 2
+        x: 344
+        y: 191
+        width: 32
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 396753cb1fe738150800000000000000
+      internalID: 5873677915731097235
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_24
+      rect:
+        serializedVersion: 2
+        x: 383
+        y: 179
+        width: 50
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 042545ad70f5ff280800000000000000
+      internalID: -9007376242385333696
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_25
+      rect:
+        serializedVersion: 2
+        x: 488
+        y: 191
+        width: 80
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0239c115c0dd85840800000000000000
+      internalID: 5213159613651522336
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_26
+      rect:
+        serializedVersion: 2
+        x: 524
+        y: 179
+        width: 38
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: af1ba1145eeb95160800000000000000
+      internalID: 7014847786455314938
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_27
+      rect:
+        serializedVersion: 2
+        x: 632
+        y: 191
+        width: 50
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b7e3b7bf24c00f9f0800000000000000
+      internalID: -436835682028405125
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_28
+      rect:
+        serializedVersion: 2
+        x: 653
+        y: 179
+        width: 23
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 019eefc5ccf64c760800000000000000
+      internalID: 7477224204866087184
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_29
+      rect:
+        serializedVersion: 2
+        x: 188
+        y: 77
+        width: 56
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5e8d6745e2a328010800000000000000
+      internalID: 1189577222239213797
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_30
+      rect:
+        serializedVersion: 2
+        x: 323
+        y: 107
+        width: 74
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 97793abc7fcd89f80800000000000000
+      internalID: -8099480972994308231
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_31
+      rect:
+        serializedVersion: 2
+        x: 461
+        y: 116
+        width: 41
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f39c594ebc8eb12a0800000000000000
+      internalID: -6765558052783011521
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_32
+      rect:
+        serializedVersion: 2
+        x: 506
+        y: 116
+        width: 41
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 05b943a02408cbe60800000000000000
+      internalID: 7979393660921092944
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_33
+      rect:
+        serializedVersion: 2
+        x: 605
+        y: 107
+        width: 11
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 82f24db82e3072330800000000000000
+      internalID: 3685919091569471272
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_34
+      rect:
+        serializedVersion: 2
+        x: 680
+        y: 107
+        width: 11
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eae54367173ea6860800000000000000
+      internalID: 7524076203929788078
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_35
+      rect:
+        serializedVersion: 2
+        x: 53
+        y: 47
+        width: 38
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 81000055adc2f9a60800000000000000
+      internalID: 7682908805557911576
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_36
+      rect:
+        serializedVersion: 2
+        x: 197
+        y: 47
+        width: 38
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b05f8fc7ed1336db0800000000000000
+      internalID: -4799937946197625589
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_37
+      rect:
+        serializedVersion: 2
+        x: 341
+        y: 47
+        width: 38
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 46b99636a73d156f0800000000000000
+      internalID: -697543944658379932
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_38
+      rect:
+        serializedVersion: 2
+        x: 485
+        y: 47
+        width: 38
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: db45cadf8df83d9b0800000000000000
+      internalID: -5056539794475297603
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_39
+      rect:
+        serializedVersion: 2
+        x: 629
+        y: 47
+        width: 38
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4288242a27e5426f0800000000000000
+      internalID: -710338994776143836
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Imp_attack_0: 7814355260057943461
+      Imp_attack_1: -8612799192307492346
+      Imp_attack_10: -2778989841226766686
+      Imp_attack_11: -5323208568007777368
+      Imp_attack_12: 5142583598483878219
+      Imp_attack_13: 7297974481214981088
+      Imp_attack_14: -6229769447907515410
+      Imp_attack_15: -5368104493812067398
+      Imp_attack_16: 2764325147164913740
+      Imp_attack_17: 9060088187086574158
+      Imp_attack_18: -7502567166667077242
+      Imp_attack_19: -4437928232100736078
+      Imp_attack_2: -7070322053462498323
+      Imp_attack_20: -3775052608767166731
+      Imp_attack_21: -773308444872983956
+      Imp_attack_22: 7526368104742795524
+      Imp_attack_23: 5873677915731097235
+      Imp_attack_24: -9007376242385333696
+      Imp_attack_25: 5213159613651522336
+      Imp_attack_26: 7014847786455314938
+      Imp_attack_27: -436835682028405125
+      Imp_attack_28: 7477224204866087184
+      Imp_attack_29: 1189577222239213797
+      Imp_attack_3: -6846383248038207338
+      Imp_attack_30: -8099480972994308231
+      Imp_attack_31: -6765558052783011521
+      Imp_attack_32: 7979393660921092944
+      Imp_attack_33: 3685919091569471272
+      Imp_attack_34: 7524076203929788078
+      Imp_attack_35: 7682908805557911576
+      Imp_attack_36: -4799937946197625589
+      Imp_attack_37: -697543944658379932
+      Imp_attack_38: -5056539794475297603
+      Imp_attack_39: -710338994776143836
+      Imp_attack_4: 3979215175954148729
+      Imp_attack_5: 1750770211707460195
+      Imp_attack_6: -6738106439439038328
+      Imp_attack_7: -2836112140749879004
+      Imp_attack_8: -4002752828078186274
+      Imp_attack_9: -6907609468280060704
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

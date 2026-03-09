@@ -1,12 +1,12 @@
 # Unity Essential - Geçiçi ve Çalışma Anı Dosyaları
 .utmp/
-/[Ll]ibrary/
-/[Tt]emp/
-/[Oo]bj/
-/[Bb]uild/
-/[Bb]uilds/
-/[Ll]ogs/
-/[Uu]ser[Ss]ettings/
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
 *.log
 
 # Blender meta ve geçici dosyaları
@@ -14,14 +14,14 @@
 *.blend1.meta
 
 # Hafıza yakalamaları ve kayıtlar (MemoryCaptures/Recordings)
-/[Mm]emoryCaptures/
-/[Rr]ecordings/
-
-# Asset Store Tools plugin (Yorumu kaldırırsan ignore eder)
-# /[Aa]ssets/AssetStoreTools*
+[Mm]emoryCaptures/
+[Rr]ecordings/
+ProfilerCaptures/
 
 # IDE Ayarları (Rider, Visual Studio, VS Code vb.)
-/[Aa]ssets/Plugins/Editor/JetBrains*
+.idea/
+.claude/
+[Aa]ssets/Plugins/Editor/JetBrains*
 *.DotSettings.user
 .vs/
 .gradle/
@@ -68,17 +68,17 @@ crashlytics-build.properties
 InitTestScene*.unity*
 
 # Addressables varsayılan ignore kuralları
-/ServerData
-/[Aa]ssets/StreamingAssets/aa*
-/[Aa]ssets/AddressableAssetsData/link.xml*
-/[Aa]ssets/Addressables_Temp*
-/[Aa]ssets/AddressableAssetsData/*/*.bin*
+ServerData
+[Aa]ssets/StreamingAssets/aa*
+[Aa]ssets/AddressableAssetsData/link.xml*
+[Aa]ssets/Addressables_Temp*
+[Aa]ssets/AddressableAssetsData/*/*.bin*
 
 # Visual Scripting otomatik oluşturulan dosyalar
-/[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Flow/UnitOptions.db
-/[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Flow/UnitOptions.db.meta
-/[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Core/Property Providers
-/[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Core/Property Providers.meta
+[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Flow/UnitOptions.db
+[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Flow/UnitOptions.db.meta
+[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Core/Property Providers
+[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Core/Property Providers.meta
 
 # Test sahneleri
-/[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*

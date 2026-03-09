@@ -1,0 +1,650 @@
+fileFormatVersion: 2
+guid: 9c23f415b1f5a734b9f6d7922c19ad32
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 8169966473351399728
+    second: Tengu_attack_0
+  - first:
+      213: -3005566499989263645
+    second: Tengu_attack_1
+  - first:
+      213: 4147281345247231613
+    second: Tengu_attack_2
+  - first:
+      213: -2144700511594509291
+    second: Tengu_attack_3
+  - first:
+      213: 405152049952341073
+    second: Tengu_attack_4
+  - first:
+      213: -9116226339330939013
+    second: Tengu_attack_5
+  - first:
+      213: 2022512126004520619
+    second: Tengu_attack_6
+  - first:
+      213: 6979175051391671165
+    second: Tengu_attack_7
+  - first:
+      213: 6253450537223739515
+    second: Tengu_attack_8
+  - first:
+      213: -861839063601010276
+    second: Tengu_attack_9
+  - first:
+      213: 4501497359844204740
+    second: Tengu_attack_10
+  - first:
+      213: 6019714356983541112
+    second: Tengu_attack_11
+  - first:
+      213: 1191598904205783617
+    second: Tengu_attack_12
+  - first:
+      213: -1514303281038471740
+    second: Tengu_attack_13
+  - first:
+      213: 6124513748063834012
+    second: Tengu_attack_14
+  - first:
+      213: 418759656124821264
+    second: Tengu_attack_15
+  - first:
+      213: -8547950717438468159
+    second: Tengu_attack_16
+  - first:
+      213: 118956479527715946
+    second: Tengu_attack_17
+  - first:
+      213: -8698606050786724096
+    second: Tengu_attack_18
+  - first:
+      213: 782039376847632727
+    second: Tengu_attack_19
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Tengu_attack_0
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 623
+        width: 98
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 03906fe983d816170800000000000000
+      internalID: 8169966473351399728
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_1
+      rect:
+        serializedVersion: 2
+        x: 239
+        y: 575
+        width: 98
+        height: 122
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3ea635341351a46d0800000000000000
+      internalID: -3005566499989263645
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_2
+      rect:
+        serializedVersion: 2
+        x: 431
+        y: 584
+        width: 98
+        height: 113
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d7eb017096a1e8930800000000000000
+      internalID: 4147281345247231613
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_3
+      rect:
+        serializedVersion: 2
+        x: 623
+        y: 593
+        width: 98
+        height: 104
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 51c8fc07f3e7c32e0800000000000000
+      internalID: -2144700511594509291
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_4
+      rect:
+        serializedVersion: 2
+        x: 815
+        y: 620
+        width: 98
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 15c3e6194a36f9500800000000000000
+      internalID: 405152049952341073
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_5
+      rect:
+        serializedVersion: 2
+        x: 59
+        y: 431
+        width: 83
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b77ae18b178ac7180800000000000000
+      internalID: -9116226339330939013
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_6
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 428
+        width: 143
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ba66b681018611c10800000000000000
+      internalID: 2022512126004520619
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_7
+      rect:
+        serializedVersion: 2
+        x: 395
+        y: 428
+        width: 131
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d7b18736bb20bd060800000000000000
+      internalID: 6979175051391671165
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_8
+      rect:
+        serializedVersion: 2
+        x: 608
+        y: 428
+        width: 110
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b7852b3a128b8c650800000000000000
+      internalID: 6253450537223739515
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_9
+      rect:
+        serializedVersion: 2
+        x: 815
+        y: 428
+        width: 95
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c99a18810f12a04f0800000000000000
+      internalID: -861839063601010276
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_10
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 239
+        width: 83
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4c06fd2bff7887e30800000000000000
+      internalID: 4501497359844204740
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_11
+      rect:
+        serializedVersion: 2
+        x: 242
+        y: 236
+        width: 143
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 87da25950525a8350800000000000000
+      internalID: 6019714356983541112
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_12
+      rect:
+        serializedVersion: 2
+        x: 434
+        y: 236
+        width: 131
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1423ee7d3e8698010800000000000000
+      internalID: 1191598904205783617
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_13
+      rect:
+        serializedVersion: 2
+        x: 626
+        y: 236
+        width: 110
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4cd4e73603d1cfae0800000000000000
+      internalID: -1514303281038471740
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_14
+      rect:
+        serializedVersion: 2
+        x: 818
+        y: 236
+        width: 95
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c9f47570ec4aef450800000000000000
+      internalID: 6124513748063834012
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_15
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 47
+        width: 98
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 01fa59540bbbfc500800000000000000
+      internalID: 418759656124821264
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_16
+      rect:
+        serializedVersion: 2
+        x: 239
+        y: 47
+        width: 98
+        height: 137
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1cfd8898c149f5980800000000000000
+      internalID: -8547950717438468159
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_17
+      rect:
+        serializedVersion: 2
+        x: 431
+        y: 47
+        width: 98
+        height: 131
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a640bf1b94e96a100800000000000000
+      internalID: 118956479527715946
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_18
+      rect:
+        serializedVersion: 2
+        x: 623
+        y: 47
+        width: 98
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0073bcd42e7584780800000000000000
+      internalID: -8698606050786724096
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_19
+      rect:
+        serializedVersion: 2
+        x: 815
+        y: 47
+        width: 98
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 759fe597bac5ada00800000000000000
+      internalID: 782039376847632727
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Tengu_attack_0: 8169966473351399728
+      Tengu_attack_1: -3005566499989263645
+      Tengu_attack_10: 4501497359844204740
+      Tengu_attack_11: 6019714356983541112
+      Tengu_attack_12: 1191598904205783617
+      Tengu_attack_13: -1514303281038471740
+      Tengu_attack_14: 6124513748063834012
+      Tengu_attack_15: 418759656124821264
+      Tengu_attack_16: -8547950717438468159
+      Tengu_attack_17: 118956479527715946
+      Tengu_attack_18: -8698606050786724096
+      Tengu_attack_19: 782039376847632727
+      Tengu_attack_2: 4147281345247231613
+      Tengu_attack_3: -2144700511594509291
+      Tengu_attack_4: 405152049952341073
+      Tengu_attack_5: -9116226339330939013
+      Tengu_attack_6: 2022512126004520619
+      Tengu_attack_7: 6979175051391671165
+      Tengu_attack_8: 6253450537223739515
+      Tengu_attack_9: -861839063601010276
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,0 +1,546 @@
+fileFormatVersion: 2
+guid: 362866f98a0e5624f96622e571d79b6d
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 4476068413173146577
+    second: Sapper_01_Idle_0
+  - first:
+      213: -7276503762283040265
+    second: Sapper_01_Idle_1
+  - first:
+      213: 5115243757922718880
+    second: Sapper_01_Idle_2
+  - first:
+      213: 3426623625201509784
+    second: Sapper_01_Idle_3
+  - first:
+      213: 8774265866925945198
+    second: Sapper_01_Idle_4
+  - first:
+      213: 6673199790584255851
+    second: Sapper_01_Idle_5
+  - first:
+      213: 6730912772388720182
+    second: Sapper_01_Idle_6
+  - first:
+      213: 8948037502359300877
+    second: Sapper_01_Idle_7
+  - first:
+      213: 5175050094628763706
+    second: Sapper_01_Idle_8
+  - first:
+      213: 7939621908187017179
+    second: Sapper_01_Idle_9
+  - first:
+      213: 1397584709312987419
+    second: Sapper_01_Idle_10
+  - first:
+      213: 8432369119806028650
+    second: Sapper_01_Idle_11
+  - first:
+      213: -868825465304979214
+    second: Sapper_01_Idle_12
+  - first:
+      213: -6061840167766237605
+    second: Sapper_01_Idle_13
+  - first:
+      213: 5562785984296113456
+    second: Sapper_01_Idle_14
+  - first:
+      213: -4298587702340571643
+    second: Sapper_01_Idle_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Sapper_01_Idle_0
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 146
+        width: 44
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1d3288da1803e1e30800000000000000
+      internalID: 4476068413173146577
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Sapper_01_Idle_1
+      rect:
+        serializedVersion: 2
+        x: 53
+        y: 146
+        width: 44
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7f1735a716aa40b90800000000000000
+      internalID: -7276503762283040265
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Sapper_01_Idle_2
+      rect:
+        serializedVersion: 2
+        x: 101
+        y: 146
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0a4948a981ffcf640800000000000000
+      internalID: 5115243757922718880
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Sapper_01_Idle_3
+      rect:
+        serializedVersion: 2
+        x: 149
+        y: 146
+        width: 43
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 895e8173800dd8f20800000000000000
+      internalID: 3426623625201509784
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Sapper_01_Idle_4
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 98
+        width: 47
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e61b4f2615474c970800000000000000
+      internalID: 8774265866925945198
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Sapper_01_Idle_5
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 98
+        width: 47
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b655cf87ad7fb9c50800000000000000
+      internalID: 6673199790584255851
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Sapper_01_Idle_6
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 98
+        width: 47
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 63e8e5c2181096d50800000000000000
+      internalID: 6730912772388720182
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Sapper_01_Idle_7
+      rect:
+        serializedVersion: 2
+        x: 146
+        y: 98
+        width: 46
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d0beffc13b0dd2c70800000000000000
+      internalID: 8948037502359300877
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Sapper_01_Idle_8
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 50
+        width: 46
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a38f23974a871d740800000000000000
+      internalID: 5175050094628763706
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Sapper_01_Idle_9
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 50
+        width: 47
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bdf65604f043f2e60800000000000000
+      internalID: 7939621908187017179
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Sapper_01_Idle_10
+      rect:
+        serializedVersion: 2
+        x: 95
+        y: 50
+        width: 47
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b114e1e63e7356310800000000000000
+      internalID: 1397584709312987419
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Sapper_01_Idle_11
+      rect:
+        serializedVersion: 2
+        x: 143
+        y: 50
+        width: 47
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a6bf201b90bc50570800000000000000
+      internalID: 8432369119806028650
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Sapper_01_Idle_12
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 2
+        width: 43
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2f8eea0b7df41f3f0800000000000000
+      internalID: -868825465304979214
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Sapper_01_Idle_13
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 2
+        width: 44
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b5e59130c7400eba0800000000000000
+      internalID: -6061840167766237605
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Sapper_01_Idle_14
+      rect:
+        serializedVersion: 2
+        x: 95
+        y: 2
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 035dd7b316cf23d40800000000000000
+      internalID: 5562785984296113456
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Sapper_01_Idle_15
+      rect:
+        serializedVersion: 2
+        x: 143
+        y: 2
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 50ea02672495854c0800000000000000
+      internalID: -4298587702340571643
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Sapper_01_Idle_0: 4476068413173146577
+      Sapper_01_Idle_1: -7276503762283040265
+      Sapper_01_Idle_10: 1397584709312987419
+      Sapper_01_Idle_11: 8432369119806028650
+      Sapper_01_Idle_12: -868825465304979214
+      Sapper_01_Idle_13: -6061840167766237605
+      Sapper_01_Idle_14: 5562785984296113456
+      Sapper_01_Idle_15: -4298587702340571643
+      Sapper_01_Idle_2: 5115243757922718880
+      Sapper_01_Idle_3: 3426623625201509784
+      Sapper_01_Idle_4: 8774265866925945198
+      Sapper_01_Idle_5: 6673199790584255851
+      Sapper_01_Idle_6: 6730912772388720182
+      Sapper_01_Idle_7: 8948037502359300877
+      Sapper_01_Idle_8: 5175050094628763706
+      Sapper_01_Idle_9: 7939621908187017179
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

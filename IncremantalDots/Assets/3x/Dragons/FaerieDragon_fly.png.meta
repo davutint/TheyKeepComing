@@ -1,0 +1,754 @@
+fileFormatVersion: 2
+guid: 019defa5f116d6c4ca8c63b25c109688
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 6731346382697901967
+    second: FaerieDragon_fly_0
+  - first:
+      213: -5855583114178423628
+    second: FaerieDragon_fly_1
+  - first:
+      213: -6394629560385229341
+    second: FaerieDragon_fly_2
+  - first:
+      213: -2706413599751932486
+    second: FaerieDragon_fly_3
+  - first:
+      213: -5806648990723790085
+    second: FaerieDragon_fly_4
+  - first:
+      213: -2359000972238135292
+    second: FaerieDragon_fly_5
+  - first:
+      213: -8096804365264271
+    second: FaerieDragon_fly_6
+  - first:
+      213: -6068578741433652296
+    second: FaerieDragon_fly_7
+  - first:
+      213: -8197515919362805228
+    second: FaerieDragon_fly_8
+  - first:
+      213: -7654781696471503130
+    second: FaerieDragon_fly_9
+  - first:
+      213: -1876509033810581442
+    second: FaerieDragon_fly_10
+  - first:
+      213: -6318295608827618247
+    second: FaerieDragon_fly_11
+  - first:
+      213: -2697274781263218275
+    second: FaerieDragon_fly_12
+  - first:
+      213: 6083657792284782454
+    second: FaerieDragon_fly_13
+  - first:
+      213: -5588761716135064906
+    second: FaerieDragon_fly_14
+  - first:
+      213: -6732042749322410226
+    second: FaerieDragon_fly_15
+  - first:
+      213: 6402970885321103155
+    second: FaerieDragon_fly_16
+  - first:
+      213: -2055348291710349774
+    second: FaerieDragon_fly_17
+  - first:
+      213: 5956981460484868795
+    second: FaerieDragon_fly_18
+  - first:
+      213: -2216280066301233742
+    second: FaerieDragon_fly_19
+  - first:
+      213: -6076381002624461962
+    second: FaerieDragon_fly_20
+  - first:
+      213: 209524651763399776
+    second: FaerieDragon_fly_21
+  - first:
+      213: 8970303860416737461
+    second: FaerieDragon_fly_22
+  - first:
+      213: -1899629954733833263
+    second: FaerieDragon_fly_23
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: FaerieDragon_fly_0
+      rect:
+        serializedVersion: 2
+        x: 11
+        y: 296
+        width: 74
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f8fa1d0fedb8a6d50800000000000000
+      internalID: 6731346382697901967
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_fly_1
+      rect:
+        serializedVersion: 2
+        x: 110
+        y: 299
+        width: 68
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4b49e9e8e2accbea0800000000000000
+      internalID: -5855583114178423628
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_fly_2
+      rect:
+        serializedVersion: 2
+        x: 203
+        y: 296
+        width: 74
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3eda6078b46b147a0800000000000000
+      internalID: -6394629560385229341
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_fly_3
+      rect:
+        serializedVersion: 2
+        x: 302
+        y: 287
+        width: 68
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab5ff739b23e07ad0800000000000000
+      internalID: -2706413599751932486
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_fly_4
+      rect:
+        serializedVersion: 2
+        x: 29
+        y: 287
+        width: 38
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bfa27840283aa6fa0800000000000000
+      internalID: -5806648990723790085
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_fly_5
+      rect:
+        serializedVersion: 2
+        x: 125
+        y: 287
+        width: 38
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 400e1f04d15234fd0800000000000000
+      internalID: -2359000972238135292
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_fly_6
+      rect:
+        serializedVersion: 2
+        x: 221
+        y: 287
+        width: 38
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 17a1ef3dffb33eff0800000000000000
+      internalID: -8096804365264271
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_fly_7
+      rect:
+        serializedVersion: 2
+        x: 14
+        y: 191
+        width: 68
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8bb2c5199c318cba0800000000000000
+      internalID: -6068578741433652296
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_fly_8
+      rect:
+        serializedVersion: 2
+        x: 110
+        y: 200
+        width: 68
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 41235c124b29c3e80800000000000000
+      internalID: -8197515919362805228
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_fly_9
+      rect:
+        serializedVersion: 2
+        x: 206
+        y: 191
+        width: 68
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6ee67a49a90c4c590800000000000000
+      internalID: -7654781696471503130
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_fly_10
+      rect:
+        serializedVersion: 2
+        x: 302
+        y: 191
+        width: 68
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e38a8e5d9fc45f5e0800000000000000
+      internalID: -1876509033810581442
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_fly_11
+      rect:
+        serializedVersion: 2
+        x: 119
+        y: 191
+        width: 59
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 93c5be99e97e058a0800000000000000
+      internalID: -6318295608827618247
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_fly_12
+      rect:
+        serializedVersion: 2
+        x: 14
+        y: 95
+        width: 68
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d99bf2190ea519ad0800000000000000
+      internalID: -2697274781263218275
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_fly_13
+      rect:
+        serializedVersion: 2
+        x: 110
+        y: 104
+        width: 68
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 67feb2c878e7d6450800000000000000
+      internalID: 6083657792284782454
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_fly_14
+      rect:
+        serializedVersion: 2
+        x: 206
+        y: 95
+        width: 68
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6ba877764dab072b0800000000000000
+      internalID: -5588761716135064906
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_fly_15
+      rect:
+        serializedVersion: 2
+        x: 302
+        y: 95
+        width: 68
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e07c4e199caf292a0800000000000000
+      internalID: -6732042749322410226
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_fly_16
+      rect:
+        serializedVersion: 2
+        x: 110
+        y: 95
+        width: 59
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3379bb6881cebd850800000000000000
+      internalID: 6402970885321103155
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_fly_17
+      rect:
+        serializedVersion: 2
+        x: 11
+        y: 8
+        width: 74
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 23e06ee4e9fe973e0800000000000000
+      internalID: -2055348291710349774
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_fly_18
+      rect:
+        serializedVersion: 2
+        x: 110
+        y: 11
+        width: 68
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bbac9cda3137ba250800000000000000
+      internalID: 5956981460484868795
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_fly_19
+      rect:
+        serializedVersion: 2
+        x: 203
+        y: 8
+        width: 74
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2b5f555a5013e31e0800000000000000
+      internalID: -2216280066301233742
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_fly_20
+      rect:
+        serializedVersion: 2
+        x: 302
+        y: 0
+        width: 68
+        height: 61
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 67313a21cab5caba0800000000000000
+      internalID: -6076381002624461962
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_fly_21
+      rect:
+        serializedVersion: 2
+        x: 29
+        y: 0
+        width: 38
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 06c7b088f8168e200800000000000000
+      internalID: 209524651763399776
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_fly_22
+      rect:
+        serializedVersion: 2
+        x: 125
+        y: 0
+        width: 38
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5b0747795dbec7c70800000000000000
+      internalID: 8970303860416737461
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_fly_23
+      rect:
+        serializedVersion: 2
+        x: 221
+        y: 0
+        width: 38
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1d3066fee9823a5e0800000000000000
+      internalID: -1899629954733833263
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      FaerieDragon_fly_0: 6731346382697901967
+      FaerieDragon_fly_1: -5855583114178423628
+      FaerieDragon_fly_10: -1876509033810581442
+      FaerieDragon_fly_11: -6318295608827618247
+      FaerieDragon_fly_12: -2697274781263218275
+      FaerieDragon_fly_13: 6083657792284782454
+      FaerieDragon_fly_14: -5588761716135064906
+      FaerieDragon_fly_15: -6732042749322410226
+      FaerieDragon_fly_16: 6402970885321103155
+      FaerieDragon_fly_17: -2055348291710349774
+      FaerieDragon_fly_18: 5956981460484868795
+      FaerieDragon_fly_19: -2216280066301233742
+      FaerieDragon_fly_2: -6394629560385229341
+      FaerieDragon_fly_20: -6076381002624461962
+      FaerieDragon_fly_21: 209524651763399776
+      FaerieDragon_fly_22: 8970303860416737461
+      FaerieDragon_fly_23: -1899629954733833263
+      FaerieDragon_fly_3: -2706413599751932486
+      FaerieDragon_fly_4: -5806648990723790085
+      FaerieDragon_fly_5: -2359000972238135292
+      FaerieDragon_fly_6: -8096804365264271
+      FaerieDragon_fly_7: -6068578741433652296
+      FaerieDragon_fly_8: -8197515919362805228
+      FaerieDragon_fly_9: -7654781696471503130
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

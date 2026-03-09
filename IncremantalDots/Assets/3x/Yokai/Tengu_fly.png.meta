@@ -1,0 +1,910 @@
+fileFormatVersion: 2
+guid: eae916370c3043b42994de5168134a10
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 7051063537813632002
+    second: Tengu_fly_0
+  - first:
+      213: 9122394156717829682
+    second: Tengu_fly_1
+  - first:
+      213: -6412675454526444397
+    second: Tengu_fly_2
+  - first:
+      213: 185458254302367414
+    second: Tengu_fly_3
+  - first:
+      213: 5510386653800708256
+    second: Tengu_fly_4
+  - first:
+      213: 5726296014540428006
+    second: Tengu_fly_5
+  - first:
+      213: 7552870142989899181
+    second: Tengu_fly_6
+  - first:
+      213: 202001914441180922
+    second: Tengu_fly_7
+  - first:
+      213: 765343099209633419
+    second: Tengu_fly_8
+  - first:
+      213: 4021243444616514756
+    second: Tengu_fly_9
+  - first:
+      213: -8681556042062518020
+    second: Tengu_fly_10
+  - first:
+      213: 4327734294041094097
+    second: Tengu_fly_11
+  - first:
+      213: -9202445501535771037
+    second: Tengu_fly_12
+  - first:
+      213: -6556214409010080635
+    second: Tengu_fly_13
+  - first:
+      213: -7775100198575423110
+    second: Tengu_fly_14
+  - first:
+      213: 2263631444091275928
+    second: Tengu_fly_15
+  - first:
+      213: -4310284156527632796
+    second: Tengu_fly_16
+  - first:
+      213: 8421777744226194309
+    second: Tengu_fly_17
+  - first:
+      213: -226574565067089772
+    second: Tengu_fly_18
+  - first:
+      213: -7696914053965004036
+    second: Tengu_fly_19
+  - first:
+      213: -1037162107596209664
+    second: Tengu_fly_20
+  - first:
+      213: 9168518896325724358
+    second: Tengu_fly_21
+  - first:
+      213: -5860844378601240939
+    second: Tengu_fly_22
+  - first:
+      213: -6055376294733826520
+    second: Tengu_fly_23
+  - first:
+      213: -7058008194625630339
+    second: Tengu_fly_24
+  - first:
+      213: -4894089567215798306
+    second: Tengu_fly_25
+  - first:
+      213: -7287947265164589786
+    second: Tengu_fly_26
+  - first:
+      213: 1649991694053743019
+    second: Tengu_fly_27
+  - first:
+      213: -4953326536532782228
+    second: Tengu_fly_28
+  - first:
+      213: -5482824269677624388
+    second: Tengu_fly_29
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Tengu_fly_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 305
+        width: 97
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2043714fde86ad160800000000000000
+      internalID: 7051063537813632002
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_fly_1
+      rect:
+        serializedVersion: 2
+        x: 95
+        y: 308
+        width: 86
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 23ee34c2721499e70800000000000000
+      internalID: 9122394156717829682
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_fly_2
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 302
+        width: 193
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 39ca51166a99107a0800000000000000
+      internalID: -6412675454526444397
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_fly_3
+      rect:
+        serializedVersion: 2
+        x: 20
+        y: 287
+        width: 56
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6be4b58bc41e29200800000000000000
+      internalID: 185458254302367414
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_fly_4
+      rect:
+        serializedVersion: 2
+        x: 116
+        y: 287
+        width: 56
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0a838d26773d87c40800000000000000
+      internalID: 5510386653800708256
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_fly_5
+      rect:
+        serializedVersion: 2
+        x: 212
+        y: 287
+        width: 56
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6e2da61d2e3e77f40800000000000000
+      internalID: 5726296014540428006
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_fly_6
+      rect:
+        serializedVersion: 2
+        x: 308
+        y: 287
+        width: 56
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: da51193d06f21d860800000000000000
+      internalID: 7552870142989899181
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_fly_7
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 212
+        width: 97
+        height: 71
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: af62732cba7adc200800000000000000
+      internalID: 202001914441180922
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_fly_8
+      rect:
+        serializedVersion: 2
+        x: 95
+        y: 215
+        width: 92
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b8ecfa76e7b0f9a00800000000000000
+      internalID: 765343099209633419
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_fly_9
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 212
+        width: 98
+        height: 71
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4cc4cbf7b935ec730800000000000000
+      internalID: 4021243444616514756
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_fly_10
+      rect:
+        serializedVersion: 2
+        x: 287
+        y: 209
+        width: 97
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cf8a73fc6cae48780800000000000000
+      internalID: -8681556042062518020
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_fly_11
+      rect:
+        serializedVersion: 2
+        x: 17
+        y: 191
+        width: 65
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1d7689e39633f0c30800000000000000
+      internalID: 4327734294041094097
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_fly_12
+      rect:
+        serializedVersion: 2
+        x: 113
+        y: 191
+        width: 65
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 366a110b2985a4080800000000000000
+      internalID: -9202445501535771037
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_fly_13
+      rect:
+        serializedVersion: 2
+        x: 209
+        y: 191
+        width: 65
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 58418a73bb5a305a0800000000000000
+      internalID: -6556214409010080635
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_fly_14
+      rect:
+        serializedVersion: 2
+        x: 305
+        y: 191
+        width: 65
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a71c7da409b491490800000000000000
+      internalID: -7775100198575423110
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_fly_15
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 116
+        width: 97
+        height: 71
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 89a077f1ec80a6f10800000000000000
+      internalID: 2263631444091275928
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_fly_16
+      rect:
+        serializedVersion: 2
+        x: 101
+        y: 119
+        width: 92
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 46e1d21856bce24c0800000000000000
+      internalID: -4310284156527632796
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_fly_17
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 116
+        width: 98
+        height: 71
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 58394e5ec3a20e470800000000000000
+      internalID: 8421777744226194309
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_fly_18
+      rect:
+        serializedVersion: 2
+        x: 287
+        y: 113
+        width: 97
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 498990e22ab0bdcf0800000000000000
+      internalID: -226574565067089772
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_fly_19
+      rect:
+        serializedVersion: 2
+        x: 14
+        y: 95
+        width: 65
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cf244baa2711f2590800000000000000
+      internalID: -7696914053965004036
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_fly_20
+      rect:
+        serializedVersion: 2
+        x: 110
+        y: 95
+        width: 65
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0028b3aee824b91f0800000000000000
+      internalID: -1037162107596209664
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_fly_21
+      rect:
+        serializedVersion: 2
+        x: 206
+        y: 95
+        width: 65
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6c883fbfb5f1d3f70800000000000000
+      internalID: 9168518896325724358
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_fly_22
+      rect:
+        serializedVersion: 2
+        x: 302
+        y: 95
+        width: 65
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 596c0a9f6191aaea0800000000000000
+      internalID: -5860844378601240939
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_fly_23
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 20
+        width: 97
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 826b11bb75bf6fba0800000000000000
+      internalID: -6055376294733826520
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_fly_24
+      rect:
+        serializedVersion: 2
+        x: 107
+        y: 23
+        width: 83
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d7f0b8121faec0e90800000000000000
+      internalID: -7058008194625630339
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_fly_25
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 17
+        width: 193
+        height: 71
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ed73827f773b41cb0800000000000000
+      internalID: -4894089567215798306
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_fly_26
+      rect:
+        serializedVersion: 2
+        x: 20
+        y: 0
+        width: 56
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 625c51653920cda90800000000000000
+      internalID: -7287947265164589786
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_fly_27
+      rect:
+        serializedVersion: 2
+        x: 116
+        y: 0
+        width: 56
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ba91b6624b2f5e610800000000000000
+      internalID: 1649991694053743019
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_fly_28
+      rect:
+        serializedVersion: 2
+        x: 212
+        y: 0
+        width: 56
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c63927542cf324bb0800000000000000
+      internalID: -4953326536532782228
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_fly_29
+      rect:
+        serializedVersion: 2
+        x: 308
+        y: 0
+        width: 56
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cb389ff306819e3b0800000000000000
+      internalID: -5482824269677624388
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Tengu_fly_0: 7051063537813632002
+      Tengu_fly_1: 9122394156717829682
+      Tengu_fly_10: -8681556042062518020
+      Tengu_fly_11: 4327734294041094097
+      Tengu_fly_12: -9202445501535771037
+      Tengu_fly_13: -6556214409010080635
+      Tengu_fly_14: -7775100198575423110
+      Tengu_fly_15: 2263631444091275928
+      Tengu_fly_16: -4310284156527632796
+      Tengu_fly_17: 8421777744226194309
+      Tengu_fly_18: -226574565067089772
+      Tengu_fly_19: -7696914053965004036
+      Tengu_fly_2: -6412675454526444397
+      Tengu_fly_20: -1037162107596209664
+      Tengu_fly_21: 9168518896325724358
+      Tengu_fly_22: -5860844378601240939
+      Tengu_fly_23: -6055376294733826520
+      Tengu_fly_24: -7058008194625630339
+      Tengu_fly_25: -4894089567215798306
+      Tengu_fly_26: -7287947265164589786
+      Tengu_fly_27: 1649991694053743019
+      Tengu_fly_28: -4953326536532782228
+      Tengu_fly_29: -5482824269677624388
+      Tengu_fly_3: 185458254302367414
+      Tengu_fly_4: 5510386653800708256
+      Tengu_fly_5: 5726296014540428006
+      Tengu_fly_6: 7552870142989899181
+      Tengu_fly_7: 202001914441180922
+      Tengu_fly_8: 765343099209633419
+      Tengu_fly_9: 4021243444616514756
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

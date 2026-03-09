@@ -1,0 +1,650 @@
+fileFormatVersion: 2
+guid: 0a64726289b761e4889d482e025aad56
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 5246375047256121943
+    second: Imp_attack_NOhitbox_0
+  - first:
+      213: 2828500594753136857
+    second: Imp_attack_NOhitbox_1
+  - first:
+      213: 5881158990882717232
+    second: Imp_attack_NOhitbox_2
+  - first:
+      213: 8040699007947934483
+    second: Imp_attack_NOhitbox_3
+  - first:
+      213: -6229077943177086380
+    second: Imp_attack_NOhitbox_4
+  - first:
+      213: 4897273105332900770
+    second: Imp_attack_NOhitbox_5
+  - first:
+      213: -7229470752387519237
+    second: Imp_attack_NOhitbox_6
+  - first:
+      213: 7203164701428951249
+    second: Imp_attack_NOhitbox_7
+  - first:
+      213: 6583528613643804520
+    second: Imp_attack_NOhitbox_8
+  - first:
+      213: -3514251139358778351
+    second: Imp_attack_NOhitbox_9
+  - first:
+      213: -4686904186454674875
+    second: Imp_attack_NOhitbox_10
+  - first:
+      213: 5482322196961075065
+    second: Imp_attack_NOhitbox_11
+  - first:
+      213: 8521290683952525996
+    second: Imp_attack_NOhitbox_12
+  - first:
+      213: -6455570620310660857
+    second: Imp_attack_NOhitbox_13
+  - first:
+      213: -2965202511293695368
+    second: Imp_attack_NOhitbox_14
+  - first:
+      213: 8776560950031225396
+    second: Imp_attack_NOhitbox_15
+  - first:
+      213: -255380292890327813
+    second: Imp_attack_NOhitbox_16
+  - first:
+      213: 3275976006773941080
+    second: Imp_attack_NOhitbox_17
+  - first:
+      213: 4633447084052992822
+    second: Imp_attack_NOhitbox_18
+  - first:
+      213: -3018901992457243643
+    second: Imp_attack_NOhitbox_19
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Imp_attack_NOhitbox_0
+      rect:
+        serializedVersion: 2
+        x: 53
+        y: 479
+        width: 38
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 752ac2a1f4edec840800000000000000
+      internalID: 5246375047256121943
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_NOhitbox_1
+      rect:
+        serializedVersion: 2
+        x: 197
+        y: 479
+        width: 38
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9d8ed3d0e4ad04720800000000000000
+      internalID: 2828500594753136857
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_NOhitbox_2
+      rect:
+        serializedVersion: 2
+        x: 341
+        y: 479
+        width: 38
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 03eb82741f21e9150800000000000000
+      internalID: 5881158990882717232
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_NOhitbox_3
+      rect:
+        serializedVersion: 2
+        x: 485
+        y: 479
+        width: 38
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 31b8292752d469f60800000000000000
+      internalID: 8040699007947934483
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_NOhitbox_4
+      rect:
+        serializedVersion: 2
+        x: 629
+        y: 479
+        width: 38
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 45a75be1d9edd89a0800000000000000
+      internalID: -6229077943177086380
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_NOhitbox_5
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 335
+        width: 38
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2a3117341fb96f340800000000000000
+      internalID: 4897273105332900770
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_NOhitbox_6
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 335
+        width: 32
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bfcadd177a2cbab90800000000000000
+      internalID: -7229470752387519237
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_NOhitbox_7
+      rect:
+        serializedVersion: 2
+        x: 344
+        y: 335
+        width: 32
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1d82e47c128c6f360800000000000000
+      internalID: 7203164701428951249
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_NOhitbox_8
+      rect:
+        serializedVersion: 2
+        x: 488
+        y: 335
+        width: 32
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 86fdbd0a4646d5b50800000000000000
+      internalID: 6583528613643804520
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_NOhitbox_9
+      rect:
+        serializedVersion: 2
+        x: 632
+        y: 335
+        width: 32
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 11c1203453fda3fc0800000000000000
+      internalID: -3514251139358778351
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_NOhitbox_10
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 191
+        width: 38
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 542f3168975c4feb0800000000000000
+      internalID: -4686904186454674875
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_NOhitbox_11
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 191
+        width: 32
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 97f9a16ddfe151c40800000000000000
+      internalID: 5482322196961075065
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_NOhitbox_12
+      rect:
+        serializedVersion: 2
+        x: 344
+        y: 191
+        width: 32
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ca2f5d4bab4b14670800000000000000
+      internalID: 8521290683952525996
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_NOhitbox_13
+      rect:
+        serializedVersion: 2
+        x: 488
+        y: 191
+        width: 32
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7095fe159b43966a0800000000000000
+      internalID: -6455570620310660857
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_NOhitbox_14
+      rect:
+        serializedVersion: 2
+        x: 632
+        y: 191
+        width: 32
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 87a3e3bb60c79d6d0800000000000000
+      internalID: -2965202511293695368
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_NOhitbox_15
+      rect:
+        serializedVersion: 2
+        x: 53
+        y: 47
+        width: 38
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4321d201fab9cc970800000000000000
+      internalID: 8776560950031225396
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_NOhitbox_16
+      rect:
+        serializedVersion: 2
+        x: 197
+        y: 47
+        width: 38
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bf403a70af4b47cf0800000000000000
+      internalID: -255380292890327813
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_NOhitbox_17
+      rect:
+        serializedVersion: 2
+        x: 341
+        y: 47
+        width: 38
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 853a67042da967d20800000000000000
+      internalID: 3275976006773941080
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_NOhitbox_18
+      rect:
+        serializedVersion: 2
+        x: 485
+        y: 47
+        width: 38
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6335c8ae29f4d4040800000000000000
+      internalID: 4633447084052992822
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_NOhitbox_19
+      rect:
+        serializedVersion: 2
+        x: 629
+        y: 47
+        width: 38
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 504fdd7f1a4ba16d0800000000000000
+      internalID: -3018901992457243643
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Imp_attack_NOhitbox_0: 5246375047256121943
+      Imp_attack_NOhitbox_1: 2828500594753136857
+      Imp_attack_NOhitbox_10: -4686904186454674875
+      Imp_attack_NOhitbox_11: 5482322196961075065
+      Imp_attack_NOhitbox_12: 8521290683952525996
+      Imp_attack_NOhitbox_13: -6455570620310660857
+      Imp_attack_NOhitbox_14: -2965202511293695368
+      Imp_attack_NOhitbox_15: 8776560950031225396
+      Imp_attack_NOhitbox_16: -255380292890327813
+      Imp_attack_NOhitbox_17: 3275976006773941080
+      Imp_attack_NOhitbox_18: 4633447084052992822
+      Imp_attack_NOhitbox_19: -3018901992457243643
+      Imp_attack_NOhitbox_2: 5881158990882717232
+      Imp_attack_NOhitbox_3: 8040699007947934483
+      Imp_attack_NOhitbox_4: -6229077943177086380
+      Imp_attack_NOhitbox_5: 4897273105332900770
+      Imp_attack_NOhitbox_6: -7229470752387519237
+      Imp_attack_NOhitbox_7: 7203164701428951249
+      Imp_attack_NOhitbox_8: 6583528613643804520
+      Imp_attack_NOhitbox_9: -3514251139358778351
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

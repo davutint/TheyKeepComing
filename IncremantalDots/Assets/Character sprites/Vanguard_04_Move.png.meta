@@ -1,0 +1,546 @@
+fileFormatVersion: 2
+guid: 0d7576048de603840b17816a9676e331
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -3868071106047861318
+    second: Vanguard_04_Move_0
+  - first:
+      213: -5303827789518448057
+    second: Vanguard_04_Move_1
+  - first:
+      213: -8933387806122798029
+    second: Vanguard_04_Move_2
+  - first:
+      213: 2368852779847999130
+    second: Vanguard_04_Move_3
+  - first:
+      213: -5146635401233209370
+    second: Vanguard_04_Move_4
+  - first:
+      213: 4605972184684213894
+    second: Vanguard_04_Move_5
+  - first:
+      213: -244774852444655548
+    second: Vanguard_04_Move_6
+  - first:
+      213: -4445513732594270316
+    second: Vanguard_04_Move_7
+  - first:
+      213: -2988478094589178249
+    second: Vanguard_04_Move_8
+  - first:
+      213: 4438985863420739649
+    second: Vanguard_04_Move_9
+  - first:
+      213: 2719370584545735434
+    second: Vanguard_04_Move_10
+  - first:
+      213: 8670635873098225347
+    second: Vanguard_04_Move_11
+  - first:
+      213: -6384146922882775921
+    second: Vanguard_04_Move_12
+  - first:
+      213: -5417297735424641662
+    second: Vanguard_04_Move_13
+  - first:
+      213: 5177273039194137376
+    second: Vanguard_04_Move_14
+  - first:
+      213: 3702172128448350705
+    second: Vanguard_04_Move_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Vanguard_04_Move_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 146
+        width: 40
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: abd901ea2d9d15ac0800000000000000
+      internalID: -3868071106047861318
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vanguard_04_Move_1
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 143
+        width: 41
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 74a58efe9b40566b0800000000000000
+      internalID: -5303827789518448057
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vanguard_04_Move_2
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 143
+        width: 35
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3349e371f1b360480800000000000000
+      internalID: -8933387806122798029
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vanguard_04_Move_3
+      rect:
+        serializedVersion: 2
+        x: 143
+        y: 143
+        width: 41
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a9e59047d0bdfd020800000000000000
+      internalID: 2368852779847999130
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vanguard_04_Move_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 98
+        width: 40
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6e76b01ee5a7398b0800000000000000
+      internalID: -5146635401233209370
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vanguard_04_Move_5
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 95
+        width: 35
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 686be696c43bbef30800000000000000
+      internalID: 4605972184684213894
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vanguard_04_Move_6
+      rect:
+        serializedVersion: 2
+        x: 101
+        y: 98
+        width: 32
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 440761e81926a9cf0800000000000000
+      internalID: -244774852444655548
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vanguard_04_Move_7
+      rect:
+        serializedVersion: 2
+        x: 146
+        y: 95
+        width: 35
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 49ff89440dc5e42c0800000000000000
+      internalID: -4445513732594270316
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vanguard_04_Move_8
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 50
+        width: 41
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 77ec9f0b10bc686d0800000000000000
+      internalID: -2988478094589178249
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vanguard_04_Move_9
+      rect:
+        serializedVersion: 2
+        x: 59
+        y: 47
+        width: 35
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1408c20cf127a9d30800000000000000
+      internalID: 4438985863420739649
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vanguard_04_Move_10
+      rect:
+        serializedVersion: 2
+        x: 107
+        y: 50
+        width: 32
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a03be7883252db520800000000000000
+      internalID: 2719370584545735434
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vanguard_04_Move_11
+      rect:
+        serializedVersion: 2
+        x: 155
+        y: 47
+        width: 35
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3c657c83369445870800000000000000
+      internalID: 8670635873098225347
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vanguard_04_Move_12
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 2
+        width: 38
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f844ba3c234f667a0800000000000000
+      internalID: -6384146922882775921
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vanguard_04_Move_13
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 0
+        width: 41
+        height: 43
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2857c756964e1d4b0800000000000000
+      internalID: -5417297735424641662
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vanguard_04_Move_14
+      rect:
+        serializedVersion: 2
+        x: 104
+        y: 0
+        width: 38
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 023af56166e59d740800000000000000
+      internalID: 5177273039194137376
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vanguard_04_Move_15
+      rect:
+        serializedVersion: 2
+        x: 152
+        y: 0
+        width: 40
+        height: 43
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1f904859fe1c06330800000000000000
+      internalID: 3702172128448350705
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Vanguard_04_Move_0: -3868071106047861318
+      Vanguard_04_Move_1: -5303827789518448057
+      Vanguard_04_Move_10: 2719370584545735434
+      Vanguard_04_Move_11: 8670635873098225347
+      Vanguard_04_Move_12: -6384146922882775921
+      Vanguard_04_Move_13: -5417297735424641662
+      Vanguard_04_Move_14: 5177273039194137376
+      Vanguard_04_Move_15: 3702172128448350705
+      Vanguard_04_Move_2: -8933387806122798029
+      Vanguard_04_Move_3: 2368852779847999130
+      Vanguard_04_Move_4: -5146635401233209370
+      Vanguard_04_Move_5: 4605972184684213894
+      Vanguard_04_Move_6: -244774852444655548
+      Vanguard_04_Move_7: -4445513732594270316
+      Vanguard_04_Move_8: -2988478094589178249
+      Vanguard_04_Move_9: 4438985863420739649
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

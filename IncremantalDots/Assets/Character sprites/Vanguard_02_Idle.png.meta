@@ -1,0 +1,546 @@
+fileFormatVersion: 2
+guid: cad013094f2a39c44865cc6d4362c626
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 518502902971450094
+    second: Vanguard_02_Idle_0
+  - first:
+      213: -6551618582574689685
+    second: Vanguard_02_Idle_1
+  - first:
+      213: 1111937082625917937
+    second: Vanguard_02_Idle_2
+  - first:
+      213: -6662187943437951664
+    second: Vanguard_02_Idle_3
+  - first:
+      213: 2117718134464104528
+    second: Vanguard_02_Idle_4
+  - first:
+      213: 8677729191581754307
+    second: Vanguard_02_Idle_5
+  - first:
+      213: 2978124193547834786
+    second: Vanguard_02_Idle_6
+  - first:
+      213: 1949867401597983771
+    second: Vanguard_02_Idle_7
+  - first:
+      213: 6547921364654449743
+    second: Vanguard_02_Idle_8
+  - first:
+      213: -1331997347383433373
+    second: Vanguard_02_Idle_9
+  - first:
+      213: 6984724728788312783
+    second: Vanguard_02_Idle_10
+  - first:
+      213: 1720934045280478188
+    second: Vanguard_02_Idle_11
+  - first:
+      213: 5090764621544417446
+    second: Vanguard_02_Idle_12
+  - first:
+      213: 2782197773566572160
+    second: Vanguard_02_Idle_13
+  - first:
+      213: 966542613255053997
+    second: Vanguard_02_Idle_14
+  - first:
+      213: 7088752134116036536
+    second: Vanguard_02_Idle_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Vanguard_02_Idle_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 146
+        width: 43
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ee24f92a4a7123700800000000000000
+      internalID: 518502902971450094
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vanguard_02_Idle_1
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 143
+        width: 44
+        height: 49
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b6299c17c99f315a0800000000000000
+      internalID: -6551618582574689685
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vanguard_02_Idle_2
+      rect:
+        serializedVersion: 2
+        x: 95
+        y: 143
+        width: 44
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1f38086a2e46e6f00800000000000000
+      internalID: 1111937082625917937
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vanguard_02_Idle_3
+      rect:
+        serializedVersion: 2
+        x: 143
+        y: 146
+        width: 44
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 05d9d7cfc572b83a0800000000000000
+      internalID: -6662187943437951664
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vanguard_02_Idle_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 98
+        width: 43
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 058c2235c65a36d10800000000000000
+      internalID: 2117718134464104528
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vanguard_02_Idle_5
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 95
+        width: 44
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3c3a44129bc7d6870800000000000000
+      internalID: 8677729191581754307
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vanguard_02_Idle_6
+      rect:
+        serializedVersion: 2
+        x: 95
+        y: 95
+        width: 44
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2a55a6ddc2c645920800000000000000
+      internalID: 2978124193547834786
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vanguard_02_Idle_7
+      rect:
+        serializedVersion: 2
+        x: 143
+        y: 98
+        width: 44
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b1c9c5722125f0b10800000000000000
+      internalID: 1949867401597983771
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vanguard_02_Idle_8
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 50
+        width: 44
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f446b6de9c3eeda50800000000000000
+      internalID: 6547921364654449743
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vanguard_02_Idle_9
+      rect:
+        serializedVersion: 2
+        x: 53
+        y: 47
+        width: 44
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 367a273487bc38de0800000000000000
+      internalID: -1331997347383433373
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vanguard_02_Idle_10
+      rect:
+        serializedVersion: 2
+        x: 101
+        y: 47
+        width: 44
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fc26059522abee060800000000000000
+      internalID: 6984724728788312783
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vanguard_02_Idle_11
+      rect:
+        serializedVersion: 2
+        x: 149
+        y: 50
+        width: 43
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ce3a1d2756cf1e710800000000000000
+      internalID: 1720934045280478188
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vanguard_02_Idle_12
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 2
+        width: 44
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6a8e746837706a640800000000000000
+      internalID: 5090764621544417446
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vanguard_02_Idle_13
+      rect:
+        serializedVersion: 2
+        x: 53
+        y: 0
+        width: 44
+        height: 49
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0867154622a5c9620800000000000000
+      internalID: 2782197773566572160
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vanguard_02_Idle_14
+      rect:
+        serializedVersion: 2
+        x: 101
+        y: 0
+        width: 44
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: da26853c269d96d00800000000000000
+      internalID: 966542613255053997
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vanguard_02_Idle_15
+      rect:
+        serializedVersion: 2
+        x: 149
+        y: 2
+        width: 43
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8bf47c6128e406260800000000000000
+      internalID: 7088752134116036536
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Vanguard_02_Idle_0: 518502902971450094
+      Vanguard_02_Idle_1: -6551618582574689685
+      Vanguard_02_Idle_10: 6984724728788312783
+      Vanguard_02_Idle_11: 1720934045280478188
+      Vanguard_02_Idle_12: 5090764621544417446
+      Vanguard_02_Idle_13: 2782197773566572160
+      Vanguard_02_Idle_14: 966542613255053997
+      Vanguard_02_Idle_15: 7088752134116036536
+      Vanguard_02_Idle_2: 1111937082625917937
+      Vanguard_02_Idle_3: -6662187943437951664
+      Vanguard_02_Idle_4: 2117718134464104528
+      Vanguard_02_Idle_5: 8677729191581754307
+      Vanguard_02_Idle_6: 2978124193547834786
+      Vanguard_02_Idle_7: 1949867401597983771
+      Vanguard_02_Idle_8: 6547921364654449743
+      Vanguard_02_Idle_9: -1331997347383433373
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,0 +1,650 @@
+fileFormatVersion: 2
+guid: c8c1c0a1b0885bd48b6df32ec227779f
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 7325515177535771779
+    second: FaerieDragon_attack_NOhitbox_0
+  - first:
+      213: 6865996315604742599
+    second: FaerieDragon_attack_NOhitbox_1
+  - first:
+      213: 7677522311826832417
+    second: FaerieDragon_attack_NOhitbox_2
+  - first:
+      213: -1627981810970716641
+    second: FaerieDragon_attack_NOhitbox_3
+  - first:
+      213: 7781380519819676517
+    second: FaerieDragon_attack_NOhitbox_4
+  - first:
+      213: 7792645727365778126
+    second: FaerieDragon_attack_NOhitbox_5
+  - first:
+      213: 7597163903783918975
+    second: FaerieDragon_attack_NOhitbox_6
+  - first:
+      213: 786593108653169059
+    second: FaerieDragon_attack_NOhitbox_7
+  - first:
+      213: 8288796520136649412
+    second: FaerieDragon_attack_NOhitbox_8
+  - first:
+      213: 2551517987683883247
+    second: FaerieDragon_attack_NOhitbox_9
+  - first:
+      213: -2855920002963742385
+    second: FaerieDragon_attack_NOhitbox_10
+  - first:
+      213: 7980912594757534337
+    second: FaerieDragon_attack_NOhitbox_11
+  - first:
+      213: 2275076497246458856
+    second: FaerieDragon_attack_NOhitbox_12
+  - first:
+      213: -6999281282987738837
+    second: FaerieDragon_attack_NOhitbox_13
+  - first:
+      213: 6788230707782609420
+    second: FaerieDragon_attack_NOhitbox_14
+  - first:
+      213: 6820277543554120321
+    second: FaerieDragon_attack_NOhitbox_15
+  - first:
+      213: 3069165255876677025
+    second: FaerieDragon_attack_NOhitbox_16
+  - first:
+      213: -4255254150151924305
+    second: FaerieDragon_attack_NOhitbox_17
+  - first:
+      213: 2895502762913165429
+    second: FaerieDragon_attack_NOhitbox_18
+  - first:
+      213: 3407757149733981729
+    second: FaerieDragon_attack_NOhitbox_19
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: FaerieDragon_attack_NOhitbox_0
+      rect:
+        serializedVersion: 2
+        x: 62
+        y: 623
+        width: 68
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 38490c1ed3579a560800000000000000
+      internalID: 7325515177535771779
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_attack_NOhitbox_1
+      rect:
+        serializedVersion: 2
+        x: 254
+        y: 623
+        width: 68
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7c1f2cc754be84f50800000000000000
+      internalID: 6865996315604742599
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_attack_NOhitbox_2
+      rect:
+        serializedVersion: 2
+        x: 446
+        y: 623
+        width: 68
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 12cf2978dd90c8a60800000000000000
+      internalID: 7677522311826832417
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_attack_NOhitbox_3
+      rect:
+        serializedVersion: 2
+        x: 638
+        y: 623
+        width: 68
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f161b481b2f3869e0800000000000000
+      internalID: -1627981810970716641
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_attack_NOhitbox_4
+      rect:
+        serializedVersion: 2
+        x: 830
+        y: 623
+        width: 68
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 56b0ff1fa540dfb60800000000000000
+      internalID: 7781380519819676517
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_attack_NOhitbox_5
+      rect:
+        serializedVersion: 2
+        x: 71
+        y: 431
+        width: 59
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eca4a18700a052c60800000000000000
+      internalID: 7792645727365778126
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_attack_NOhitbox_6
+      rect:
+        serializedVersion: 2
+        x: 254
+        y: 431
+        width: 68
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f7dd579a15c8e6960800000000000000
+      internalID: 7597163903783918975
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_attack_NOhitbox_7
+      rect:
+        serializedVersion: 2
+        x: 446
+        y: 431
+        width: 68
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3a9da08c34a8aea00800000000000000
+      internalID: 786593108653169059
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_attack_NOhitbox_8
+      rect:
+        serializedVersion: 2
+        x: 638
+        y: 431
+        width: 68
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4ca2d36e488b70370800000000000000
+      internalID: 8288796520136649412
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_attack_NOhitbox_9
+      rect:
+        serializedVersion: 2
+        x: 833
+        y: 431
+        width: 65
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fe8daed5710d86320800000000000000
+      internalID: 2551517987683883247
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_attack_NOhitbox_10
+      rect:
+        serializedVersion: 2
+        x: 62
+        y: 239
+        width: 59
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f41e96c73ebbd58d0800000000000000
+      internalID: -2855920002963742385
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_attack_NOhitbox_11
+      rect:
+        serializedVersion: 2
+        x: 254
+        y: 239
+        width: 68
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 182c6f168b5e1ce60800000000000000
+      internalID: 7980912594757534337
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_attack_NOhitbox_12
+      rect:
+        serializedVersion: 2
+        x: 446
+        y: 239
+        width: 68
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8e317373502b29f10800000000000000
+      internalID: 2275076497246458856
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_attack_NOhitbox_13
+      rect:
+        serializedVersion: 2
+        x: 638
+        y: 239
+        width: 68
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b29b974c1ce8dde90800000000000000
+      internalID: -6999281282987738837
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_attack_NOhitbox_14
+      rect:
+        serializedVersion: 2
+        x: 830
+        y: 239
+        width: 65
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c0ae7c6fcd3a43e50800000000000000
+      internalID: 6788230707782609420
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_attack_NOhitbox_15
+      rect:
+        serializedVersion: 2
+        x: 62
+        y: 47
+        width: 68
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 18afd1d5a4e76ae50800000000000000
+      internalID: 6820277543554120321
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_attack_NOhitbox_16
+      rect:
+        serializedVersion: 2
+        x: 254
+        y: 47
+        width: 68
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1ad00810a8dd79a20800000000000000
+      internalID: 3069165255876677025
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_attack_NOhitbox_17
+      rect:
+        serializedVersion: 2
+        x: 446
+        y: 47
+        width: 68
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fa5103f45ec42f4c0800000000000000
+      internalID: -4255254150151924305
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_attack_NOhitbox_18
+      rect:
+        serializedVersion: 2
+        x: 638
+        y: 47
+        width: 68
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 570f99dfb64ee2820800000000000000
+      internalID: 2895502762913165429
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaerieDragon_attack_NOhitbox_19
+      rect:
+        serializedVersion: 2
+        x: 830
+        y: 47
+        width: 68
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 12e01b69219ca4f20800000000000000
+      internalID: 3407757149733981729
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      FaerieDragon_attack_NOhitbox_0: 7325515177535771779
+      FaerieDragon_attack_NOhitbox_1: 6865996315604742599
+      FaerieDragon_attack_NOhitbox_10: -2855920002963742385
+      FaerieDragon_attack_NOhitbox_11: 7980912594757534337
+      FaerieDragon_attack_NOhitbox_12: 2275076497246458856
+      FaerieDragon_attack_NOhitbox_13: -6999281282987738837
+      FaerieDragon_attack_NOhitbox_14: 6788230707782609420
+      FaerieDragon_attack_NOhitbox_15: 6820277543554120321
+      FaerieDragon_attack_NOhitbox_16: 3069165255876677025
+      FaerieDragon_attack_NOhitbox_17: -4255254150151924305
+      FaerieDragon_attack_NOhitbox_18: 2895502762913165429
+      FaerieDragon_attack_NOhitbox_19: 3407757149733981729
+      FaerieDragon_attack_NOhitbox_2: 7677522311826832417
+      FaerieDragon_attack_NOhitbox_3: -1627981810970716641
+      FaerieDragon_attack_NOhitbox_4: 7781380519819676517
+      FaerieDragon_attack_NOhitbox_5: 7792645727365778126
+      FaerieDragon_attack_NOhitbox_6: 7597163903783918975
+      FaerieDragon_attack_NOhitbox_7: 786593108653169059
+      FaerieDragon_attack_NOhitbox_8: 8288796520136649412
+      FaerieDragon_attack_NOhitbox_9: 2551517987683883247
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

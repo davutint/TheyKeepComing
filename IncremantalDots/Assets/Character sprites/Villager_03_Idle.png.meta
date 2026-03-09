@@ -1,0 +1,546 @@
+fileFormatVersion: 2
+guid: 5f5889797676a794f827d08bd3074d3a
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -5526772078302497655
+    second: Villager_03_Idle_0
+  - first:
+      213: 235918129393038491
+    second: Villager_03_Idle_1
+  - first:
+      213: -7851118215731445607
+    second: Villager_03_Idle_2
+  - first:
+      213: -7668106321254395415
+    second: Villager_03_Idle_3
+  - first:
+      213: 8088990744543498777
+    second: Villager_03_Idle_4
+  - first:
+      213: 3431972999774174405
+    second: Villager_03_Idle_5
+  - first:
+      213: -3025385916668792079
+    second: Villager_03_Idle_6
+  - first:
+      213: -9053244108826360954
+    second: Villager_03_Idle_7
+  - first:
+      213: -8266942152147087050
+    second: Villager_03_Idle_8
+  - first:
+      213: 3442344885759266355
+    second: Villager_03_Idle_9
+  - first:
+      213: 5255102009781242592
+    second: Villager_03_Idle_10
+  - first:
+      213: -3860635352609059464
+    second: Villager_03_Idle_11
+  - first:
+      213: 7770004904664511417
+    second: Villager_03_Idle_12
+  - first:
+      213: 656553116648465727
+    second: Villager_03_Idle_13
+  - first:
+      213: 7565285796471056672
+    second: Villager_03_Idle_14
+  - first:
+      213: -8839507634874468412
+    second: Villager_03_Idle_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Villager_03_Idle_0
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 146
+        width: 38
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9847b3ea316fc43b0800000000000000
+      internalID: -5526772078302497655
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Villager_03_Idle_1
+      rect:
+        serializedVersion: 2
+        x: 53
+        y: 146
+        width: 38
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b94fb8ae946264300800000000000000
+      internalID: 235918129393038491
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Villager_03_Idle_2
+      rect:
+        serializedVersion: 2
+        x: 101
+        y: 146
+        width: 38
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9908abd64993b0390800000000000000
+      internalID: -7851118215731445607
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Villager_03_Idle_3
+      rect:
+        serializedVersion: 2
+        x: 149
+        y: 146
+        width: 38
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9e154bd9de9659590800000000000000
+      internalID: -7668106321254395415
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Villager_03_Idle_4
+      rect:
+        serializedVersion: 2
+        x: 11
+        y: 98
+        width: 29
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 91210ff893ed14070800000000000000
+      internalID: 8088990744543498777
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Villager_03_Idle_5
+      rect:
+        serializedVersion: 2
+        x: 59
+        y: 98
+        width: 29
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5cc754a8241d0af20800000000000000
+      internalID: 3431972999774174405
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Villager_03_Idle_6
+      rect:
+        serializedVersion: 2
+        x: 107
+        y: 98
+        width: 29
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1f2bc78b98ba306d0800000000000000
+      internalID: -3025385916668792079
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Villager_03_Idle_7
+      rect:
+        serializedVersion: 2
+        x: 155
+        y: 98
+        width: 29
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 683c18cf27a6c5280800000000000000
+      internalID: -9053244108826360954
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Villager_03_Idle_8
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 50
+        width: 29
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 631d19aa9ebe54d80800000000000000
+      internalID: -8266942152147087050
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Villager_03_Idle_9
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 50
+        width: 29
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 33e401e6f6aa5cf20800000000000000
+      internalID: 3442344885759266355
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Villager_03_Idle_10
+      rect:
+        serializedVersion: 2
+        x: 104
+        y: 50
+        width: 29
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0eac3776f6fdde840800000000000000
+      internalID: 5255102009781242592
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Villager_03_Idle_11
+      rect:
+        serializedVersion: 2
+        x: 152
+        y: 50
+        width: 29
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 87d0c60f9944c6ac0800000000000000
+      internalID: -3860635352609059464
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Villager_03_Idle_12
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 2
+        width: 38
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9b332952b4a94db60800000000000000
+      internalID: 7770004904664511417
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Villager_03_Idle_13
+      rect:
+        serializedVersion: 2
+        x: 53
+        y: 2
+        width: 38
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f35e10eb49b8c1900800000000000000
+      internalID: 656553116648465727
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Villager_03_Idle_14
+      rect:
+        serializedVersion: 2
+        x: 101
+        y: 2
+        width: 38
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 02927fa695b4df860800000000000000
+      internalID: 7565285796471056672
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Villager_03_Idle_15
+      rect:
+        serializedVersion: 2
+        x: 149
+        y: 2
+        width: 38
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4c734f9c3a2c35580800000000000000
+      internalID: -8839507634874468412
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Villager_03_Idle_0: -5526772078302497655
+      Villager_03_Idle_1: 235918129393038491
+      Villager_03_Idle_10: 5255102009781242592
+      Villager_03_Idle_11: -3860635352609059464
+      Villager_03_Idle_12: 7770004904664511417
+      Villager_03_Idle_13: 656553116648465727
+      Villager_03_Idle_14: 7565285796471056672
+      Villager_03_Idle_15: -8839507634874468412
+      Villager_03_Idle_2: -7851118215731445607
+      Villager_03_Idle_3: -7668106321254395415
+      Villager_03_Idle_4: 8088990744543498777
+      Villager_03_Idle_5: 3431972999774174405
+      Villager_03_Idle_6: -3025385916668792079
+      Villager_03_Idle_7: -9053244108826360954
+      Villager_03_Idle_8: -8266942152147087050
+      Villager_03_Idle_9: 3442344885759266355
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,0 +1,650 @@
+fileFormatVersion: 2
+guid: 03f45ad4df5bd3b46935ea87762a5f96
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -5021568865537309755
+    second: ManticoreBishop_attack_NOhitbox_0
+  - first:
+      213: -1866605373542139976
+    second: ManticoreBishop_attack_NOhitbox_1
+  - first:
+      213: -4496079930304218783
+    second: ManticoreBishop_attack_NOhitbox_2
+  - first:
+      213: 966081138311078970
+    second: ManticoreBishop_attack_NOhitbox_3
+  - first:
+      213: 3420650402929198187
+    second: ManticoreBishop_attack_NOhitbox_4
+  - first:
+      213: 2998342502325064423
+    second: ManticoreBishop_attack_NOhitbox_5
+  - first:
+      213: -7684593831693326907
+    second: ManticoreBishop_attack_NOhitbox_6
+  - first:
+      213: 8948999053182912577
+    second: ManticoreBishop_attack_NOhitbox_7
+  - first:
+      213: -9037100928495884395
+    second: ManticoreBishop_attack_NOhitbox_8
+  - first:
+      213: 5820425283888335931
+    second: ManticoreBishop_attack_NOhitbox_9
+  - first:
+      213: 3736871188616837963
+    second: ManticoreBishop_attack_NOhitbox_10
+  - first:
+      213: -8229762262095726807
+    second: ManticoreBishop_attack_NOhitbox_11
+  - first:
+      213: 5347628853965965221
+    second: ManticoreBishop_attack_NOhitbox_12
+  - first:
+      213: 6158296667169107647
+    second: ManticoreBishop_attack_NOhitbox_13
+  - first:
+      213: 8157959587911971741
+    second: ManticoreBishop_attack_NOhitbox_14
+  - first:
+      213: 2150554348493798995
+    second: ManticoreBishop_attack_NOhitbox_15
+  - first:
+      213: -1773022790112253150
+    second: ManticoreBishop_attack_NOhitbox_16
+  - first:
+      213: 7125127851493101931
+    second: ManticoreBishop_attack_NOhitbox_17
+  - first:
+      213: -7264964981212184599
+    second: ManticoreBishop_attack_NOhitbox_18
+  - first:
+      213: -957775231286824402
+    second: ManticoreBishop_attack_NOhitbox_19
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: ManticoreBishop_attack_NOhitbox_0
+      rect:
+        serializedVersion: 2
+        x: 65
+        y: 623
+        width: 62
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5c3cc72e8bdcf4ab0800000000000000
+      internalID: -5021568865537309755
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_attack_NOhitbox_1
+      rect:
+        serializedVersion: 2
+        x: 257
+        y: 620
+        width: 62
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8b77f2e6d4c7816e0800000000000000
+      internalID: -1866605373542139976
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_attack_NOhitbox_2
+      rect:
+        serializedVersion: 2
+        x: 449
+        y: 620
+        width: 62
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1693478ef17ba91c0800000000000000
+      internalID: -4496079930304218783
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_attack_NOhitbox_3
+      rect:
+        serializedVersion: 2
+        x: 641
+        y: 620
+        width: 62
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a34ac314da5386d00800000000000000
+      internalID: 966081138311078970
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_attack_NOhitbox_4
+      rect:
+        serializedVersion: 2
+        x: 833
+        y: 620
+        width: 62
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b6444670b67987f20800000000000000
+      internalID: 3420650402929198187
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_attack_NOhitbox_5
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 431
+        width: 95
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7e29a06be904c9920800000000000000
+      internalID: 2998342502325064423
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_attack_NOhitbox_6
+      rect:
+        serializedVersion: 2
+        x: 206
+        y: 431
+        width: 128
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5c5e2c2ff96da5590800000000000000
+      internalID: -7684593831693326907
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_attack_NOhitbox_7
+      rect:
+        serializedVersion: 2
+        x: 398
+        y: 431
+        width: 128
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 148464c993b313c70800000000000000
+      internalID: 8948999053182912577
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_attack_NOhitbox_8
+      rect:
+        serializedVersion: 2
+        x: 590
+        y: 431
+        width: 128
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 59766ad0694c59280800000000000000
+      internalID: -9037100928495884395
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_attack_NOhitbox_9
+      rect:
+        serializedVersion: 2
+        x: 782
+        y: 431
+        width: 128
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b3ccddf25fd46c050800000000000000
+      internalID: 5820425283888335931
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_attack_NOhitbox_10
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 239
+        width: 95
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b4bf5e81c880cd330800000000000000
+      internalID: 3736871188616837963
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_attack_NOhitbox_11
+      rect:
+        serializedVersion: 2
+        x: 242
+        y: 239
+        width: 128
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9277ed563d20acd80800000000000000
+      internalID: -8229762262095726807
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_attack_NOhitbox_12
+      rect:
+        serializedVersion: 2
+        x: 434
+        y: 239
+        width: 128
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5a745471c18963a40800000000000000
+      internalID: 5347628853965965221
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_attack_NOhitbox_13
+      rect:
+        serializedVersion: 2
+        x: 626
+        y: 239
+        width: 128
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fbe2614d03aa67550800000000000000
+      internalID: 6158296667169107647
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_attack_NOhitbox_14
+      rect:
+        serializedVersion: 2
+        x: 818
+        y: 239
+        width: 128
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d933c71c505e63170800000000000000
+      internalID: 8157959587911971741
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_attack_NOhitbox_15
+      rect:
+        serializedVersion: 2
+        x: 65
+        y: 47
+        width: 62
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 35ef42c29cd48dd10800000000000000
+      internalID: 2150554348493798995
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_attack_NOhitbox_16
+      rect:
+        serializedVersion: 2
+        x: 257
+        y: 47
+        width: 62
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 22befa09a25f467e0800000000000000
+      internalID: -1773022790112253150
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_attack_NOhitbox_17
+      rect:
+        serializedVersion: 2
+        x: 449
+        y: 47
+        width: 62
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b611d77c70a81e260800000000000000
+      internalID: 7125127851493101931
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_attack_NOhitbox_18
+      rect:
+        serializedVersion: 2
+        x: 641
+        y: 47
+        width: 62
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9eff13d47d8ad2b90800000000000000
+      internalID: -7264964981212184599
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_attack_NOhitbox_19
+      rect:
+        serializedVersion: 2
+        x: 833
+        y: 47
+        width: 62
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e223b7c608c45b2f0800000000000000
+      internalID: -957775231286824402
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      ManticoreBishop_attack_NOhitbox_0: -5021568865537309755
+      ManticoreBishop_attack_NOhitbox_1: -1866605373542139976
+      ManticoreBishop_attack_NOhitbox_10: 3736871188616837963
+      ManticoreBishop_attack_NOhitbox_11: -8229762262095726807
+      ManticoreBishop_attack_NOhitbox_12: 5347628853965965221
+      ManticoreBishop_attack_NOhitbox_13: 6158296667169107647
+      ManticoreBishop_attack_NOhitbox_14: 8157959587911971741
+      ManticoreBishop_attack_NOhitbox_15: 2150554348493798995
+      ManticoreBishop_attack_NOhitbox_16: -1773022790112253150
+      ManticoreBishop_attack_NOhitbox_17: 7125127851493101931
+      ManticoreBishop_attack_NOhitbox_18: -7264964981212184599
+      ManticoreBishop_attack_NOhitbox_19: -957775231286824402
+      ManticoreBishop_attack_NOhitbox_2: -4496079930304218783
+      ManticoreBishop_attack_NOhitbox_3: 966081138311078970
+      ManticoreBishop_attack_NOhitbox_4: 3420650402929198187
+      ManticoreBishop_attack_NOhitbox_5: 2998342502325064423
+      ManticoreBishop_attack_NOhitbox_6: -7684593831693326907
+      ManticoreBishop_attack_NOhitbox_7: 8948999053182912577
+      ManticoreBishop_attack_NOhitbox_8: -9037100928495884395
+      ManticoreBishop_attack_NOhitbox_9: 5820425283888335931
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

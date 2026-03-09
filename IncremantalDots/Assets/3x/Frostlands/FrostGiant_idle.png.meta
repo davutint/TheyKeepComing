@@ -1,0 +1,546 @@
+fileFormatVersion: 2
+guid: d58843cb4df456744b7b186fa58a265d
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -3822033930904346042
+    second: FrostGiant_idle_0
+  - first:
+      213: 8330425018556374811
+    second: FrostGiant_idle_1
+  - first:
+      213: 3058820353016737412
+    second: FrostGiant_idle_2
+  - first:
+      213: -1245756600448359449
+    second: FrostGiant_idle_3
+  - first:
+      213: 5138597213906000686
+    second: FrostGiant_idle_4
+  - first:
+      213: -4512215620520670910
+    second: FrostGiant_idle_5
+  - first:
+      213: 3480028712654645284
+    second: FrostGiant_idle_6
+  - first:
+      213: 1906237438423820531
+    second: FrostGiant_idle_7
+  - first:
+      213: -7619030078263349784
+    second: FrostGiant_idle_8
+  - first:
+      213: 5879330567689455203
+    second: FrostGiant_idle_9
+  - first:
+      213: 4383740044453395437
+    second: FrostGiant_idle_10
+  - first:
+      213: 3202831151073977675
+    second: FrostGiant_idle_11
+  - first:
+      213: -1296791016548469878
+    second: FrostGiant_idle_12
+  - first:
+      213: 6400654236787332359
+    second: FrostGiant_idle_13
+  - first:
+      213: 8265136061081530982
+    second: FrostGiant_idle_14
+  - first:
+      213: -2804512037837041658
+    second: FrostGiant_idle_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: FrostGiant_idle_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 287
+        width: 91
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 642e4fcc36865fac0800000000000000
+      internalID: -3822033930904346042
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostGiant_idle_1
+      rect:
+        serializedVersion: 2
+        x: 95
+        y: 287
+        width: 92
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b1f541bfa6d9b9370800000000000000
+      internalID: 8330425018556374811
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostGiant_idle_2
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 287
+        width: 92
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 48e2c4d97ec137a20800000000000000
+      internalID: 3058820353016737412
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostGiant_idle_3
+      rect:
+        serializedVersion: 2
+        x: 287
+        y: 287
+        width: 92
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7e36da1e8fe26bee0800000000000000
+      internalID: -1245756600448359449
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostGiant_idle_4
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 191
+        width: 80
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e2bddaac0f6ff4740800000000000000
+      internalID: 5138597213906000686
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostGiant_idle_5
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 191
+        width: 80
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 24985e4ccc36161c0800000000000000
+      internalID: -4512215620520670910
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostGiant_idle_6
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 191
+        width: 80
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 428a0f91dab8b4030800000000000000
+      internalID: 3480028712654645284
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostGiant_idle_7
+      rect:
+        serializedVersion: 2
+        x: 290
+        y: 191
+        width: 80
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3f86dceb9d0547a10800000000000000
+      internalID: 1906237438423820531
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostGiant_idle_8
+      rect:
+        serializedVersion: 2
+        x: 14
+        y: 95
+        width: 80
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8eda81cd284c34690800000000000000
+      internalID: -7619030078263349784
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostGiant_idle_9
+      rect:
+        serializedVersion: 2
+        x: 110
+        y: 95
+        width: 80
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 366c9345004979150800000000000000
+      internalID: 5879330567689455203
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostGiant_idle_10
+      rect:
+        serializedVersion: 2
+        x: 206
+        y: 95
+        width: 80
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: debbc49285c26dc30800000000000000
+      internalID: 4383740044453395437
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostGiant_idle_11
+      rect:
+        serializedVersion: 2
+        x: 302
+        y: 95
+        width: 80
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b45e15b66fdb27c20800000000000000
+      internalID: 3202831151073977675
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostGiant_idle_12
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 0
+        width: 92
+        height: 91
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a83f5bee07fd00ee0800000000000000
+      internalID: -1296791016548469878
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostGiant_idle_13
+      rect:
+        serializedVersion: 2
+        x: 101
+        y: 0
+        width: 92
+        height: 91
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 705dec1cd11b3d850800000000000000
+      internalID: 6400654236787332359
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostGiant_idle_14
+      rect:
+        serializedVersion: 2
+        x: 197
+        y: 0
+        width: 92
+        height: 88
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 662390df479a3b270800000000000000
+      internalID: 8265136061081530982
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostGiant_idle_15
+      rect:
+        serializedVersion: 2
+        x: 293
+        y: 0
+        width: 91
+        height: 88
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6009a68192f5419d0800000000000000
+      internalID: -2804512037837041658
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      FrostGiant_idle_0: -3822033930904346042
+      FrostGiant_idle_1: 8330425018556374811
+      FrostGiant_idle_10: 4383740044453395437
+      FrostGiant_idle_11: 3202831151073977675
+      FrostGiant_idle_12: -1296791016548469878
+      FrostGiant_idle_13: 6400654236787332359
+      FrostGiant_idle_14: 8265136061081530982
+      FrostGiant_idle_15: -2804512037837041658
+      FrostGiant_idle_2: 3058820353016737412
+      FrostGiant_idle_3: -1245756600448359449
+      FrostGiant_idle_4: 5138597213906000686
+      FrostGiant_idle_5: -4512215620520670910
+      FrostGiant_idle_6: 3480028712654645284
+      FrostGiant_idle_7: 1906237438423820531
+      FrostGiant_idle_8: -7619030078263349784
+      FrostGiant_idle_9: 5879330567689455203
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

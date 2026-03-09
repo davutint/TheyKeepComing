@@ -1,0 +1,650 @@
+fileFormatVersion: 2
+guid: bf076e3cef9cc5b48a41c7da3f4e043d
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -9159605642941025582
+    second: AnubisWarrior_attack_NOhitbox_0
+  - first:
+      213: -4420848666372306558
+    second: AnubisWarrior_attack_NOhitbox_1
+  - first:
+      213: 646921139347305110
+    second: AnubisWarrior_attack_NOhitbox_2
+  - first:
+      213: -7114788772749570171
+    second: AnubisWarrior_attack_NOhitbox_3
+  - first:
+      213: 2560084310016426611
+    second: AnubisWarrior_attack_NOhitbox_4
+  - first:
+      213: -3426184480268352034
+    second: AnubisWarrior_attack_NOhitbox_5
+  - first:
+      213: -594054938373034579
+    second: AnubisWarrior_attack_NOhitbox_6
+  - first:
+      213: 7191133432026391767
+    second: AnubisWarrior_attack_NOhitbox_7
+  - first:
+      213: 717893586883836725
+    second: AnubisWarrior_attack_NOhitbox_8
+  - first:
+      213: 2038219101116533870
+    second: AnubisWarrior_attack_NOhitbox_9
+  - first:
+      213: -6695873347861417005
+    second: AnubisWarrior_attack_NOhitbox_10
+  - first:
+      213: -5196008745526093325
+    second: AnubisWarrior_attack_NOhitbox_11
+  - first:
+      213: 1807360438241530619
+    second: AnubisWarrior_attack_NOhitbox_12
+  - first:
+      213: -5501901584251826035
+    second: AnubisWarrior_attack_NOhitbox_13
+  - first:
+      213: -1481093312430352977
+    second: AnubisWarrior_attack_NOhitbox_14
+  - first:
+      213: 4235373281442417763
+    second: AnubisWarrior_attack_NOhitbox_15
+  - first:
+      213: -921670334984976335
+    second: AnubisWarrior_attack_NOhitbox_16
+  - first:
+      213: -3455174075697594223
+    second: AnubisWarrior_attack_NOhitbox_17
+  - first:
+      213: -5738671569724172855
+    second: AnubisWarrior_attack_NOhitbox_18
+  - first:
+      213: -3498338285001663571
+    second: AnubisWarrior_attack_NOhitbox_19
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: AnubisWarrior_attack_NOhitbox_0
+      rect:
+        serializedVersion: 2
+        x: 41
+        y: 575
+        width: 53
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2d236d9823b82e080800000000000000
+      internalID: -9159605642941025582
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AnubisWarrior_attack_NOhitbox_1
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 569
+        width: 50
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2898e138f8df5a2c0800000000000000
+      internalID: -4420848666372306558
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AnubisWarrior_attack_NOhitbox_2
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 569
+        width: 50
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 692bc7449535af800800000000000000
+      internalID: 646921139347305110
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AnubisWarrior_attack_NOhitbox_3
+      rect:
+        serializedVersion: 2
+        x: 479
+        y: 569
+        width: 50
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 58f03549e41334d90800000000000000
+      internalID: -7114788772749570171
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AnubisWarrior_attack_NOhitbox_4
+      rect:
+        serializedVersion: 2
+        x: 623
+        y: 569
+        width: 50
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3728495bd1f378320800000000000000
+      internalID: 2560084310016426611
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AnubisWarrior_attack_NOhitbox_5
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 407
+        width: 47
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ed506ae2e5fb370d0800000000000000
+      internalID: -3426184480268352034
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AnubisWarrior_attack_NOhitbox_6
+      rect:
+        serializedVersion: 2
+        x: 182
+        y: 407
+        width: 59
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dad65355e2e71c7f0800000000000000
+      internalID: -594054938373034579
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AnubisWarrior_attack_NOhitbox_7
+      rect:
+        serializedVersion: 2
+        x: 326
+        y: 407
+        width: 59
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7d46e5491c90cc360800000000000000
+      internalID: 7191133432026391767
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AnubisWarrior_attack_NOhitbox_8
+      rect:
+        serializedVersion: 2
+        x: 470
+        y: 407
+        width: 59
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 53bfdb8e96876f900800000000000000
+      internalID: 717893586883836725
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AnubisWarrior_attack_NOhitbox_9
+      rect:
+        serializedVersion: 2
+        x: 614
+        y: 407
+        width: 59
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e6c87783975394c10800000000000000
+      internalID: 2038219101116533870
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AnubisWarrior_attack_NOhitbox_10
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 239
+        width: 47
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3d3f6b79aaa7313a0800000000000000
+      internalID: -6695873347861417005
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AnubisWarrior_attack_NOhitbox_11
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 239
+        width: 59
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3f91819539114e7b0800000000000000
+      internalID: -5196008745526093325
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AnubisWarrior_attack_NOhitbox_12
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 239
+        width: 59
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bf21b762eb8051910800000000000000
+      internalID: 1807360438241530619
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AnubisWarrior_attack_NOhitbox_13
+      rect:
+        serializedVersion: 2
+        x: 479
+        y: 239
+        width: 59
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d80d281d8a155a3b0800000000000000
+      internalID: -5501901584251826035
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AnubisWarrior_attack_NOhitbox_14
+      rect:
+        serializedVersion: 2
+        x: 623
+        y: 239
+        width: 59
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fa5d161ca79127be0800000000000000
+      internalID: -1481093312430352977
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AnubisWarrior_attack_NOhitbox_15
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 71
+        width: 53
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 36c4e8b3f8117ca30800000000000000
+      internalID: 4235373281442417763
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AnubisWarrior_attack_NOhitbox_16
+      rect:
+        serializedVersion: 2
+        x: 176
+        y: 71
+        width: 65
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 138843ba6b19533f0800000000000000
+      internalID: -921670334984976335
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AnubisWarrior_attack_NOhitbox_17
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 71
+        width: 65
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 19008e40c71cc00d0800000000000000
+      internalID: -3455174075697594223
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AnubisWarrior_attack_NOhitbox_18
+      rect:
+        serializedVersion: 2
+        x: 464
+        y: 71
+        width: 65
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9c515f3bc942c50b0800000000000000
+      internalID: -5738671569724172855
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AnubisWarrior_attack_NOhitbox_19
+      rect:
+        serializedVersion: 2
+        x: 608
+        y: 71
+        width: 65
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dab93526dd7637fc0800000000000000
+      internalID: -3498338285001663571
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      AnubisWarrior_attack_NOhitbox_0: -9159605642941025582
+      AnubisWarrior_attack_NOhitbox_1: -4420848666372306558
+      AnubisWarrior_attack_NOhitbox_10: -6695873347861417005
+      AnubisWarrior_attack_NOhitbox_11: -5196008745526093325
+      AnubisWarrior_attack_NOhitbox_12: 1807360438241530619
+      AnubisWarrior_attack_NOhitbox_13: -5501901584251826035
+      AnubisWarrior_attack_NOhitbox_14: -1481093312430352977
+      AnubisWarrior_attack_NOhitbox_15: 4235373281442417763
+      AnubisWarrior_attack_NOhitbox_16: -921670334984976335
+      AnubisWarrior_attack_NOhitbox_17: -3455174075697594223
+      AnubisWarrior_attack_NOhitbox_18: -5738671569724172855
+      AnubisWarrior_attack_NOhitbox_19: -3498338285001663571
+      AnubisWarrior_attack_NOhitbox_2: 646921139347305110
+      AnubisWarrior_attack_NOhitbox_3: -7114788772749570171
+      AnubisWarrior_attack_NOhitbox_4: 2560084310016426611
+      AnubisWarrior_attack_NOhitbox_5: -3426184480268352034
+      AnubisWarrior_attack_NOhitbox_6: -594054938373034579
+      AnubisWarrior_attack_NOhitbox_7: 7191133432026391767
+      AnubisWarrior_attack_NOhitbox_8: 717893586883836725
+      AnubisWarrior_attack_NOhitbox_9: 2038219101116533870
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

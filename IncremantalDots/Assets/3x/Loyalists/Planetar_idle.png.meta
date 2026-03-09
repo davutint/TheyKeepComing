@@ -1,0 +1,728 @@
+fileFormatVersion: 2
+guid: 711347ba6bfb79244863fcc3f943ce36
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 6247006988322632248
+    second: Planetar_idle_0
+  - first:
+      213: -5875891897013174918
+    second: Planetar_idle_1
+  - first:
+      213: -7217519895852094947
+    second: Planetar_idle_2
+  - first:
+      213: -9150749127194850092
+    second: Planetar_idle_3
+  - first:
+      213: 5518216297222986903
+    second: Planetar_idle_4
+  - first:
+      213: -4102894713613760030
+    second: Planetar_idle_5
+  - first:
+      213: -7632066582696641706
+    second: Planetar_idle_6
+  - first:
+      213: 7360384194222397002
+    second: Planetar_idle_7
+  - first:
+      213: -7033363614108337966
+    second: Planetar_idle_8
+  - first:
+      213: 1362999961739867658
+    second: Planetar_idle_9
+  - first:
+      213: 6729210194840377178
+    second: Planetar_idle_10
+  - first:
+      213: 2140206058411144155
+    second: Planetar_idle_11
+  - first:
+      213: 9110486367117546016
+    second: Planetar_idle_12
+  - first:
+      213: 4876934907264068024
+    second: Planetar_idle_13
+  - first:
+      213: -978389532927315010
+    second: Planetar_idle_14
+  - first:
+      213: 8316532894761303728
+    second: Planetar_idle_15
+  - first:
+      213: 1919770213950654066
+    second: Planetar_idle_16
+  - first:
+      213: 5581218027222647870
+    second: Planetar_idle_17
+  - first:
+      213: -8590230932331553452
+    second: Planetar_idle_18
+  - first:
+      213: 8648845164230251515
+    second: Planetar_idle_19
+  - first:
+      213: -6678445095071388835
+    second: Planetar_idle_20
+  - first:
+      213: 825866737649018488
+    second: Planetar_idle_21
+  - first:
+      213: -2869999197577532525
+    second: Planetar_idle_22
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Planetar_idle_0
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 290
+        width: 92
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8327a5002c3d1b650800000000000000
+      internalID: 6247006988322632248
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_idle_1
+      rect:
+        serializedVersion: 2
+        x: 23
+        y: 287
+        width: 50
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a7dfee39373a47ea0800000000000000
+      internalID: -5875891897013174918
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_idle_2
+      rect:
+        serializedVersion: 2
+        x: 101
+        y: 293
+        width: 86
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d1aeb6015e736db90800000000000000
+      internalID: -7217519895852094947
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_idle_3
+      rect:
+        serializedVersion: 2
+        x: 119
+        y: 287
+        width: 50
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4dcc5dcc622020180800000000000000
+      internalID: -9150749127194850092
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_idle_4
+      rect:
+        serializedVersion: 2
+        x: 197
+        y: 296
+        width: 83
+        height: 88
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 79c5fbd4c74a49c40800000000000000
+      internalID: 5518216297222986903
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_idle_5
+      rect:
+        serializedVersion: 2
+        x: 209
+        y: 200
+        width: 68
+        height: 98
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2e9493cfef69f07c0800000000000000
+      internalID: -4102894713613760030
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_idle_6
+      rect:
+        serializedVersion: 2
+        x: 293
+        y: 293
+        width: 86
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 65bbc3421e3751690800000000000000
+      internalID: -7632066582696641706
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_idle_7
+      rect:
+        serializedVersion: 2
+        x: 311
+        y: 287
+        width: 50
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a46960b7d66552660800000000000000
+      internalID: 7360384194222397002
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_idle_8
+      rect:
+        serializedVersion: 2
+        x: 17
+        y: 191
+        width: 74
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2d83aecae09746e90800000000000000
+      internalID: -7033363614108337966
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_idle_9
+      rect:
+        serializedVersion: 2
+        x: 113
+        y: 191
+        width: 71
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a0630646e395ae210800000000000000
+      internalID: 1362999961739867658
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_idle_10
+      rect:
+        serializedVersion: 2
+        x: 203
+        y: 104
+        width: 68
+        height: 98
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a57d562f405f26d50800000000000000
+      internalID: 6729210194840377178
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_idle_11
+      rect:
+        serializedVersion: 2
+        x: 305
+        y: 191
+        width: 71
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bd33cb1221a83bd10800000000000000
+      internalID: 2140206058411144155
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_idle_12
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 95
+        width: 74
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 022941bd413fe6e70800000000000000
+      internalID: 9110486367117546016
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_idle_13
+      rect:
+        serializedVersion: 2
+        x: 104
+        y: 95
+        width: 71
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8b96d24857a5ea340800000000000000
+      internalID: 4876934907264068024
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_idle_14
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 8
+        width: 83
+        height: 98
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eb338ed47ef0c62f0800000000000000
+      internalID: -978389532927315010
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_idle_15
+      rect:
+        serializedVersion: 2
+        x: 296
+        y: 95
+        width: 71
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0be391bda924a6370800000000000000
+      internalID: 8316532894761303728
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_idle_16
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 2
+        width: 92
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 27687e496d464aa10800000000000000
+      internalID: 1919770213950654066
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_idle_17
+      rect:
+        serializedVersion: 2
+        x: 23
+        y: 0
+        width: 50
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e34cc96a938747d40800000000000000
+      internalID: 5581218027222647870
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_idle_18
+      rect:
+        serializedVersion: 2
+        x: 101
+        y: 5
+        width: 86
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 45d1ec3ea7e59c880800000000000000
+      internalID: -8590230932331553452
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_idle_19
+      rect:
+        serializedVersion: 2
+        x: 119
+        y: 0
+        width: 50
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bf39c437aded60870800000000000000
+      internalID: 8648845164230251515
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_idle_20
+      rect:
+        serializedVersion: 2
+        x: 215
+        y: 0
+        width: 50
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d5be158e1956153a0800000000000000
+      internalID: -6678445095071388835
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_idle_21
+      rect:
+        serializedVersion: 2
+        x: 293
+        y: 5
+        width: 86
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 87661691c61167b00800000000000000
+      internalID: 825866737649018488
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_idle_22
+      rect:
+        serializedVersion: 2
+        x: 311
+        y: 0
+        width: 50
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 39b2cba8fe6bb28d0800000000000000
+      internalID: -2869999197577532525
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Planetar_idle_0: 6247006988322632248
+      Planetar_idle_1: -5875891897013174918
+      Planetar_idle_10: 6729210194840377178
+      Planetar_idle_11: 2140206058411144155
+      Planetar_idle_12: 9110486367117546016
+      Planetar_idle_13: 4876934907264068024
+      Planetar_idle_14: -978389532927315010
+      Planetar_idle_15: 8316532894761303728
+      Planetar_idle_16: 1919770213950654066
+      Planetar_idle_17: 5581218027222647870
+      Planetar_idle_18: -8590230932331553452
+      Planetar_idle_19: 8648845164230251515
+      Planetar_idle_2: -7217519895852094947
+      Planetar_idle_20: -6678445095071388835
+      Planetar_idle_21: 825866737649018488
+      Planetar_idle_22: -2869999197577532525
+      Planetar_idle_3: -9150749127194850092
+      Planetar_idle_4: 5518216297222986903
+      Planetar_idle_5: -4102894713613760030
+      Planetar_idle_6: -7632066582696641706
+      Planetar_idle_7: 7360384194222397002
+      Planetar_idle_8: -7033363614108337966
+      Planetar_idle_9: 1362999961739867658
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,0 +1,650 @@
+fileFormatVersion: 2
+guid: 93e76cd738239984da4c38f6fba96aa2
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -6429686795741622509
+    second: SerpentFly_fly_0
+  - first:
+      213: 8420553648294908743
+    second: SerpentFly_fly_1
+  - first:
+      213: 4929944371308191947
+    second: SerpentFly_fly_2
+  - first:
+      213: 3867852832470325402
+    second: SerpentFly_fly_3
+  - first:
+      213: 7676681499539988422
+    second: SerpentFly_fly_4
+  - first:
+      213: 1712071118843540276
+    second: SerpentFly_fly_5
+  - first:
+      213: 301935549296419804
+    second: SerpentFly_fly_6
+  - first:
+      213: -3162992698013978192
+    second: SerpentFly_fly_7
+  - first:
+      213: 672676932648767966
+    second: SerpentFly_fly_8
+  - first:
+      213: -6159045404833877635
+    second: SerpentFly_fly_9
+  - first:
+      213: -1103267717332995040
+    second: SerpentFly_fly_10
+  - first:
+      213: 3827890536698844926
+    second: SerpentFly_fly_11
+  - first:
+      213: -8185920488433239415
+    second: SerpentFly_fly_12
+  - first:
+      213: 2641784171010147673
+    second: SerpentFly_fly_13
+  - first:
+      213: 1400133705752631040
+    second: SerpentFly_fly_14
+  - first:
+      213: 9081724241862693620
+    second: SerpentFly_fly_15
+  - first:
+      213: -1798147011144605989
+    second: SerpentFly_fly_16
+  - first:
+      213: 8362796544711356382
+    second: SerpentFly_fly_17
+  - first:
+      213: -9083005430136388455
+    second: SerpentFly_fly_18
+  - first:
+      213: -27036015370408644
+    second: SerpentFly_fly_19
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: SerpentFly_fly_0
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 152
+        width: 44
+        height: 40
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 31f0dcadce925c6a0800000000000000
+      internalID: -6429686795741622509
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SerpentFly_fly_1
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 155
+        width: 44
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 743dcbadde0dbd470800000000000000
+      internalID: 8420553648294908743
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SerpentFly_fly_2
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 152
+        width: 44
+        height: 40
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bc0e246294eaa6440800000000000000
+      internalID: 4929944371308191947
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SerpentFly_fly_3
+      rect:
+        serializedVersion: 2
+        x: 143
+        y: 47
+        width: 49
+        height: 143
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a98d1ea88af5da530800000000000000
+      internalID: 3867852832470325402
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SerpentFly_fly_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 104
+        width: 43
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6cfd4e9a62d098a60800000000000000
+      internalID: 7676681499539988422
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SerpentFly_fly_5
+      rect:
+        serializedVersion: 2
+        x: 59
+        y: 143
+        width: 26
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 433ffd49c9f72c710800000000000000
+      internalID: 1712071118843540276
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SerpentFly_fly_6
+      rect:
+        serializedVersion: 2
+        x: 95
+        y: 104
+        width: 44
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cd320e848c0b03400800000000000000
+      internalID: 301935549296419804
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SerpentFly_fly_7
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 107
+        width: 44
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0b1f8bf36eaca14d0800000000000000
+      internalID: -3162992698013978192
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SerpentFly_fly_8
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 56
+        width: 44
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ed111233b14d55900800000000000000
+      internalID: 672676932648767966
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SerpentFly_fly_9
+      rect:
+        serializedVersion: 2
+        x: 59
+        y: 95
+        width: 29
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d71ff5916dca68aa0800000000000000
+      internalID: -6159045404833877635
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SerpentFly_fly_10
+      rect:
+        serializedVersion: 2
+        x: 101
+        y: 56
+        width: 44
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 024f5304bd760b0f0800000000000000
+      internalID: -1103267717332995040
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SerpentFly_fly_11
+      rect:
+        serializedVersion: 2
+        x: 53
+        y: 59
+        width: 44
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ef6930f79266f1530800000000000000
+      internalID: 3827890536698844926
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SerpentFly_fly_12
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 8
+        width: 44
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 98a3857cfa4c56e80800000000000000
+      internalID: -8185920488433239415
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SerpentFly_fly_13
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 47
+        width: 29
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9554f4ee4b089a420800000000000000
+      internalID: 2641784171010147673
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SerpentFly_fly_14
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 8
+        width: 44
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 007df69ef264e6310800000000000000
+      internalID: 1400133705752631040
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SerpentFly_fly_15
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 11
+        width: 44
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4f29748b414c80e70800000000000000
+      internalID: 9081724241862693620
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SerpentFly_fly_16
+      rect:
+        serializedVersion: 2
+        x: 149
+        y: 0
+        width: 38
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bde9bc202d2bb07e0800000000000000
+      internalID: -1798147011144605989
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SerpentFly_fly_17
+      rect:
+        serializedVersion: 2
+        x: 11
+        y: 0
+        width: 26
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: edf6260462f9e0470800000000000000
+      internalID: 8362796544711356382
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SerpentFly_fly_18
+      rect:
+        serializedVersion: 2
+        x: 59
+        y: 0
+        width: 26
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 994c6c36faea2f180800000000000000
+      internalID: -9083005430136388455
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SerpentFly_fly_19
+      rect:
+        serializedVersion: 2
+        x: 107
+        y: 0
+        width: 26
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c3d64b323e2ff9ff0800000000000000
+      internalID: -27036015370408644
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      SerpentFly_fly_0: -6429686795741622509
+      SerpentFly_fly_1: 8420553648294908743
+      SerpentFly_fly_10: -1103267717332995040
+      SerpentFly_fly_11: 3827890536698844926
+      SerpentFly_fly_12: -8185920488433239415
+      SerpentFly_fly_13: 2641784171010147673
+      SerpentFly_fly_14: 1400133705752631040
+      SerpentFly_fly_15: 9081724241862693620
+      SerpentFly_fly_16: -1798147011144605989
+      SerpentFly_fly_17: 8362796544711356382
+      SerpentFly_fly_18: -9083005430136388455
+      SerpentFly_fly_19: -27036015370408644
+      SerpentFly_fly_2: 4929944371308191947
+      SerpentFly_fly_3: 3867852832470325402
+      SerpentFly_fly_4: 7676681499539988422
+      SerpentFly_fly_5: 1712071118843540276
+      SerpentFly_fly_6: 301935549296419804
+      SerpentFly_fly_7: -3162992698013978192
+      SerpentFly_fly_8: 672676932648767966
+      SerpentFly_fly_9: -6159045404833877635
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,0 +1,650 @@
+fileFormatVersion: 2
+guid: 5b1d96dc93ae7664894ae0d294a419d9
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -8379593603810378232
+    second: Medusa_attack_NOhitbox_0
+  - first:
+      213: -2263667826372122633
+    second: Medusa_attack_NOhitbox_1
+  - first:
+      213: 8769087040590101455
+    second: Medusa_attack_NOhitbox_2
+  - first:
+      213: -7011555539735422119
+    second: Medusa_attack_NOhitbox_3
+  - first:
+      213: 7039513747593347223
+    second: Medusa_attack_NOhitbox_4
+  - first:
+      213: -6904292912602275617
+    second: Medusa_attack_NOhitbox_5
+  - first:
+      213: 8054695442015493909
+    second: Medusa_attack_NOhitbox_6
+  - first:
+      213: -2990157507787416540
+    second: Medusa_attack_NOhitbox_7
+  - first:
+      213: -7132068499453037140
+    second: Medusa_attack_NOhitbox_8
+  - first:
+      213: -554278969155942198
+    second: Medusa_attack_NOhitbox_9
+  - first:
+      213: -8577899151936228310
+    second: Medusa_attack_NOhitbox_10
+  - first:
+      213: -170462691515820559
+    second: Medusa_attack_NOhitbox_11
+  - first:
+      213: 8947826317170980566
+    second: Medusa_attack_NOhitbox_12
+  - first:
+      213: 7703640630259214974
+    second: Medusa_attack_NOhitbox_13
+  - first:
+      213: -8525440166322048333
+    second: Medusa_attack_NOhitbox_14
+  - first:
+      213: -4295737660476809937
+    second: Medusa_attack_NOhitbox_15
+  - first:
+      213: -4584582663411487342
+    second: Medusa_attack_NOhitbox_16
+  - first:
+      213: 6062149502041708411
+    second: Medusa_attack_NOhitbox_17
+  - first:
+      213: -539838198680545828
+    second: Medusa_attack_NOhitbox_18
+  - first:
+      213: 1234442794438691406
+    second: Medusa_attack_NOhitbox_19
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Medusa_attack_NOhitbox_0
+      rect:
+        serializedVersion: 2
+        x: 71
+        y: 623
+        width: 53
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 80e3fbaa304b5bb80800000000000000
+      internalID: -8379593603810378232
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Medusa_attack_NOhitbox_1
+      rect:
+        serializedVersion: 2
+        x: 260
+        y: 623
+        width: 56
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7f7eb97fa16d590e0800000000000000
+      internalID: -2263667826372122633
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Medusa_attack_NOhitbox_2
+      rect:
+        serializedVersion: 2
+        x: 452
+        y: 623
+        width: 56
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fcbbadae33e02b970800000000000000
+      internalID: 8769087040590101455
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Medusa_attack_NOhitbox_3
+      rect:
+        serializedVersion: 2
+        x: 644
+        y: 623
+        width: 56
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 95bd52ba263f1be90800000000000000
+      internalID: -7011555539735422119
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Medusa_attack_NOhitbox_4
+      rect:
+        serializedVersion: 2
+        x: 839
+        y: 623
+        width: 53
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 790c7ccd47061b160800000000000000
+      internalID: 7039513747593347223
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Medusa_attack_NOhitbox_5
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 431
+        width: 74
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fd0281f2d260f20a0800000000000000
+      internalID: -6904292912602275617
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Medusa_attack_NOhitbox_6
+      rect:
+        serializedVersion: 2
+        x: 251
+        y: 431
+        width: 65
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 51f9a4334d608cf60800000000000000
+      internalID: 8054695442015493909
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Medusa_attack_NOhitbox_7
+      rect:
+        serializedVersion: 2
+        x: 443
+        y: 431
+        width: 65
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 42c1dd5d693d086d0800000000000000
+      internalID: -2990157507787416540
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Medusa_attack_NOhitbox_8
+      rect:
+        serializedVersion: 2
+        x: 635
+        y: 431
+        width: 65
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ca53950bc7dc50d90800000000000000
+      internalID: -7132068499453037140
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Medusa_attack_NOhitbox_9
+      rect:
+        serializedVersion: 2
+        x: 827
+        y: 431
+        width: 65
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ac88df8d63ece48f0800000000000000
+      internalID: -554278969155942198
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Medusa_attack_NOhitbox_10
+      rect:
+        serializedVersion: 2
+        x: 68
+        y: 239
+        width: 74
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a2477b14b2e25f880800000000000000
+      internalID: -8577899151936228310
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Medusa_attack_NOhitbox_11
+      rect:
+        serializedVersion: 2
+        x: 260
+        y: 239
+        width: 65
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1f51eb0d51562adf0800000000000000
+      internalID: -170462691515820559
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Medusa_attack_NOhitbox_12
+      rect:
+        serializedVersion: 2
+        x: 452
+        y: 239
+        width: 65
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6d63edab0a01d2c70800000000000000
+      internalID: 8947826317170980566
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Medusa_attack_NOhitbox_13
+      rect:
+        serializedVersion: 2
+        x: 644
+        y: 239
+        width: 65
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e7aeddb6654d8ea60800000000000000
+      internalID: 7703640630259214974
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Medusa_attack_NOhitbox_14
+      rect:
+        serializedVersion: 2
+        x: 836
+        y: 239
+        width: 65
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3b2f684a65d8fa980800000000000000
+      internalID: -8525440166322048333
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Medusa_attack_NOhitbox_15
+      rect:
+        serializedVersion: 2
+        x: 68
+        y: 47
+        width: 53
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f2d130b8b597264c0800000000000000
+      internalID: -4295737660476809937
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Medusa_attack_NOhitbox_16
+      rect:
+        serializedVersion: 2
+        x: 260
+        y: 47
+        width: 56
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 29da1f79b5a4060c0800000000000000
+      internalID: -4584582663411487342
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Medusa_attack_NOhitbox_17
+      rect:
+        serializedVersion: 2
+        x: 452
+        y: 47
+        width: 56
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b77d18c7ad4112450800000000000000
+      internalID: 6062149502041708411
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Medusa_attack_NOhitbox_18
+      rect:
+        serializedVersion: 2
+        x: 644
+        y: 47
+        width: 56
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cd5957bb40c1288f0800000000000000
+      internalID: -539838198680545828
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Medusa_attack_NOhitbox_19
+      rect:
+        serializedVersion: 2
+        x: 836
+        y: 47
+        width: 53
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e4a0f026e2f912110800000000000000
+      internalID: 1234442794438691406
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Medusa_attack_NOhitbox_0: -8379593603810378232
+      Medusa_attack_NOhitbox_1: -2263667826372122633
+      Medusa_attack_NOhitbox_10: -8577899151936228310
+      Medusa_attack_NOhitbox_11: -170462691515820559
+      Medusa_attack_NOhitbox_12: 8947826317170980566
+      Medusa_attack_NOhitbox_13: 7703640630259214974
+      Medusa_attack_NOhitbox_14: -8525440166322048333
+      Medusa_attack_NOhitbox_15: -4295737660476809937
+      Medusa_attack_NOhitbox_16: -4584582663411487342
+      Medusa_attack_NOhitbox_17: 6062149502041708411
+      Medusa_attack_NOhitbox_18: -539838198680545828
+      Medusa_attack_NOhitbox_19: 1234442794438691406
+      Medusa_attack_NOhitbox_2: 8769087040590101455
+      Medusa_attack_NOhitbox_3: -7011555539735422119
+      Medusa_attack_NOhitbox_4: 7039513747593347223
+      Medusa_attack_NOhitbox_5: -6904292912602275617
+      Medusa_attack_NOhitbox_6: 8054695442015493909
+      Medusa_attack_NOhitbox_7: -2990157507787416540
+      Medusa_attack_NOhitbox_8: -7132068499453037140
+      Medusa_attack_NOhitbox_9: -554278969155942198
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

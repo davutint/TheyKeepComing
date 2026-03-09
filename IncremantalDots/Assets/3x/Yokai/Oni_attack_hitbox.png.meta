@@ -1,0 +1,936 @@
+fileFormatVersion: 2
+guid: af6829dce8b57f440800264ef6f5446d
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 586135804367821311
+    second: Oni_attack_hitbox_0
+  - first:
+      213: -5704127574420999583
+    second: Oni_attack_hitbox_1
+  - first:
+      213: -5072346215108842291
+    second: Oni_attack_hitbox_2
+  - first:
+      213: -4662847197635828109
+    second: Oni_attack_hitbox_3
+  - first:
+      213: 8191690125666124567
+    second: Oni_attack_hitbox_4
+  - first:
+      213: -6464722519228910367
+    second: Oni_attack_hitbox_5
+  - first:
+      213: -6940656823429497555
+    second: Oni_attack_hitbox_6
+  - first:
+      213: -3394903639460496452
+    second: Oni_attack_hitbox_7
+  - first:
+      213: -4865385557290237708
+    second: Oni_attack_hitbox_8
+  - first:
+      213: -5125193765264875153
+    second: Oni_attack_hitbox_9
+  - first:
+      213: -4530740281233883312
+    second: Oni_attack_hitbox_10
+  - first:
+      213: 3776493933113757852
+    second: Oni_attack_hitbox_11
+  - first:
+      213: -6858355912996959760
+    second: Oni_attack_hitbox_12
+  - first:
+      213: -9118622681980020599
+    second: Oni_attack_hitbox_13
+  - first:
+      213: 617442772215669113
+    second: Oni_attack_hitbox_14
+  - first:
+      213: -4521061630568343434
+    second: Oni_attack_hitbox_15
+  - first:
+      213: 964597401413378388
+    second: Oni_attack_hitbox_16
+  - first:
+      213: 6254270779231063614
+    second: Oni_attack_hitbox_17
+  - first:
+      213: -8919789507910148579
+    second: Oni_attack_hitbox_18
+  - first:
+      213: -6158045670811950635
+    second: Oni_attack_hitbox_19
+  - first:
+      213: -4560404638069694702
+    second: Oni_attack_hitbox_20
+  - first:
+      213: -6886138564163783468
+    second: Oni_attack_hitbox_21
+  - first:
+      213: -1802947307459953408
+    second: Oni_attack_hitbox_22
+  - first:
+      213: 4728150719487838567
+    second: Oni_attack_hitbox_23
+  - first:
+      213: -131357196652533272
+    second: Oni_attack_hitbox_24
+  - first:
+      213: -8377474602639562003
+    second: Oni_attack_hitbox_25
+  - first:
+      213: 5051804257616737051
+    second: Oni_attack_hitbox_26
+  - first:
+      213: -7523760781051978482
+    second: Oni_attack_hitbox_27
+  - first:
+      213: 7965678658610291808
+    second: Oni_attack_hitbox_28
+  - first:
+      213: -7280989720418784614
+    second: Oni_attack_hitbox_29
+  - first:
+      213: -2887873669766663619
+    second: Oni_attack_hitbox_30
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Oni_attack_hitbox_0
+      rect:
+        serializedVersion: 2
+        x: 41
+        y: 320
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ff95b79986f522800800000000000000
+      internalID: 586135804367821311
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_attack_hitbox_1
+      rect:
+        serializedVersion: 2
+        x: 134
+        y: 290
+        width: 20
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 162302d513ed6d0b0800000000000000
+      internalID: -5704127574420999583
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_attack_hitbox_2
+      rect:
+        serializedVersion: 2
+        x: 224
+        y: 287
+        width: 32
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dcce3a6edf76b99b0800000000000000
+      internalID: -5072346215108842291
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_attack_hitbox_3
+      rect:
+        serializedVersion: 2
+        x: 317
+        y: 287
+        width: 17
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 376adf6bd2d3a4fb0800000000000000
+      internalID: -4662847197635828109
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_attack_hitbox_4
+      rect:
+        serializedVersion: 2
+        x: 332
+        y: 293
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 713876294cabea170800000000000000
+      internalID: 8191690125666124567
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_attack_hitbox_5
+      rect:
+        serializedVersion: 2
+        x: 338
+        y: 287
+        width: 17
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1e474edce11b846a0800000000000000
+      internalID: -6464722519228910367
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_attack_hitbox_6
+      rect:
+        serializedVersion: 2
+        x: 410
+        y: 296
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d2df79b6465ddaf90800000000000000
+      internalID: -6940656823429497555
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_attack_hitbox_7
+      rect:
+        serializedVersion: 2
+        x: 446
+        y: 296
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cbbb64b7021e2e0d0800000000000000
+      internalID: -3394903639460496452
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_attack_hitbox_8
+      rect:
+        serializedVersion: 2
+        x: 17
+        y: 221
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4f046621d9daa7cb0800000000000000
+      internalID: -4865385557290237708
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_attack_hitbox_9
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 197
+        width: 20
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f612758cc67afd8b0800000000000000
+      internalID: -5125193765264875153
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_attack_hitbox_10
+      rect:
+        serializedVersion: 2
+        x: 290
+        y: 215
+        width: 14
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 05f308718b39f11c0800000000000000
+      internalID: -4530740281233883312
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_attack_hitbox_11
+      rect:
+        serializedVersion: 2
+        x: 395
+        y: 227
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c90d9a3393dc86430800000000000000
+      internalID: 3776493933113757852
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_attack_hitbox_12
+      rect:
+        serializedVersion: 2
+        x: 101
+        y: 203
+        width: 17
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0f9cd9e52a932d0a0800000000000000
+      internalID: -6858355912996959760
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_attack_hitbox_13
+      rect:
+        serializedVersion: 2
+        x: 290
+        y: 194
+        width: 14
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 988d2c7bbf4247180800000000000000
+      internalID: -9118622681980020599
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_attack_hitbox_14
+      rect:
+        serializedVersion: 2
+        x: 296
+        y: 209
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9712c031ee8919800800000000000000
+      internalID: 617442772215669113
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_attack_hitbox_15
+      rect:
+        serializedVersion: 2
+        x: 395
+        y: 191
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 678535e8666f141c0800000000000000
+      internalID: -4521061630568343434
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_attack_hitbox_16
+      rect:
+        serializedVersion: 2
+        x: 65
+        y: 125
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4516286d930f26d00800000000000000
+      internalID: 964597401413378388
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_attack_hitbox_17
+      rect:
+        serializedVersion: 2
+        x: 266
+        y: 101
+        width: 20
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e3e4c2d1322abc650800000000000000
+      internalID: 6254270779231063614
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_attack_hitbox_18
+      rect:
+        serializedVersion: 2
+        x: 368
+        y: 119
+        width: 14
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d1e52cd93ba863480800000000000000
+      internalID: -8919789507910148579
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_attack_hitbox_19
+      rect:
+        serializedVersion: 2
+        x: 461
+        y: 131
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5d12f90d61a3a8aa0800000000000000
+      internalID: -6158045670811950635
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_attack_hitbox_20
+      rect:
+        serializedVersion: 2
+        x: 170
+        y: 107
+        width: 17
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 21fdfcbc42036b0c0800000000000000
+      internalID: -4560404638069694702
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_attack_hitbox_21
+      rect:
+        serializedVersion: 2
+        x: 368
+        y: 113
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4d436e0d5758f60a0800000000000000
+      internalID: -6886138564163783468
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_attack_hitbox_22
+      rect:
+        serializedVersion: 2
+        x: 368
+        y: 98
+        width: 14
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 00d3a1ee9f4aaf6e0800000000000000
+      internalID: -1802947307459953408
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_attack_hitbox_23
+      rect:
+        serializedVersion: 2
+        x: 224
+        y: 80
+        width: 32
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 769849f4704cd9140800000000000000
+      internalID: 4728150719487838567
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_attack_hitbox_24
+      rect:
+        serializedVersion: 2
+        x: 317
+        y: 83
+        width: 17
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8e9a5da53535d2ef0800000000000000
+      internalID: -131357196652533272
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_attack_hitbox_25
+      rect:
+        serializedVersion: 2
+        x: 338
+        y: 83
+        width: 17
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: deaefc21c3b3dbb80800000000000000
+      internalID: -8377474602639562003
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_attack_hitbox_26
+      rect:
+        serializedVersion: 2
+        x: 461
+        y: 95
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b133d0ae43d9b1640800000000000000
+      internalID: 5051804257616737051
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_attack_hitbox_27
+      rect:
+        serializedVersion: 2
+        x: 134
+        y: 80
+        width: 20
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e0d9166ae6b369790800000000000000
+      internalID: -7523760781051978482
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_attack_hitbox_28
+      rect:
+        serializedVersion: 2
+        x: 332
+        y: 83
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 06460693986cb8e60800000000000000
+      internalID: 7965678658610291808
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_attack_hitbox_29
+      rect:
+        serializedVersion: 2
+        x: 410
+        y: 80
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a9aea25fc6ab4fa90800000000000000
+      internalID: -7280989720418784614
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_attack_hitbox_30
+      rect:
+        serializedVersion: 2
+        x: 446
+        y: 80
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d32ba5da2363ce7d0800000000000000
+      internalID: -2887873669766663619
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Oni_attack_hitbox_0: 586135804367821311
+      Oni_attack_hitbox_1: -5704127574420999583
+      Oni_attack_hitbox_10: -4530740281233883312
+      Oni_attack_hitbox_11: 3776493933113757852
+      Oni_attack_hitbox_12: -6858355912996959760
+      Oni_attack_hitbox_13: -9118622681980020599
+      Oni_attack_hitbox_14: 617442772215669113
+      Oni_attack_hitbox_15: -4521061630568343434
+      Oni_attack_hitbox_16: 964597401413378388
+      Oni_attack_hitbox_17: 6254270779231063614
+      Oni_attack_hitbox_18: -8919789507910148579
+      Oni_attack_hitbox_19: -6158045670811950635
+      Oni_attack_hitbox_2: -5072346215108842291
+      Oni_attack_hitbox_20: -4560404638069694702
+      Oni_attack_hitbox_21: -6886138564163783468
+      Oni_attack_hitbox_22: -1802947307459953408
+      Oni_attack_hitbox_23: 4728150719487838567
+      Oni_attack_hitbox_24: -131357196652533272
+      Oni_attack_hitbox_25: -8377474602639562003
+      Oni_attack_hitbox_26: 5051804257616737051
+      Oni_attack_hitbox_27: -7523760781051978482
+      Oni_attack_hitbox_28: 7965678658610291808
+      Oni_attack_hitbox_29: -7280989720418784614
+      Oni_attack_hitbox_3: -4662847197635828109
+      Oni_attack_hitbox_30: -2887873669766663619
+      Oni_attack_hitbox_4: 8191690125666124567
+      Oni_attack_hitbox_5: -6464722519228910367
+      Oni_attack_hitbox_6: -6940656823429497555
+      Oni_attack_hitbox_7: -3394903639460496452
+      Oni_attack_hitbox_8: -4865385557290237708
+      Oni_attack_hitbox_9: -5125193765264875153
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

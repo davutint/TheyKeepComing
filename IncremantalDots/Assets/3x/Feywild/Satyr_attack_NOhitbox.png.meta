@@ -1,0 +1,650 @@
+fileFormatVersion: 2
+guid: 0a1aa236d13d61e42addd76b28edc2df
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 7615195861876180908
+    second: Satyr_attack_NOhitbox_0
+  - first:
+      213: -1886521097019729242
+    second: Satyr_attack_NOhitbox_1
+  - first:
+      213: 7262083419383625276
+    second: Satyr_attack_NOhitbox_2
+  - first:
+      213: 6630587433615207236
+    second: Satyr_attack_NOhitbox_3
+  - first:
+      213: -3952183704478505021
+    second: Satyr_attack_NOhitbox_4
+  - first:
+      213: -260110769766875126
+    second: Satyr_attack_NOhitbox_5
+  - first:
+      213: 9189124297634340849
+    second: Satyr_attack_NOhitbox_6
+  - first:
+      213: 6999522630606265047
+    second: Satyr_attack_NOhitbox_7
+  - first:
+      213: -5155102347722856614
+    second: Satyr_attack_NOhitbox_8
+  - first:
+      213: -7226693680047426246
+    second: Satyr_attack_NOhitbox_9
+  - first:
+      213: 8602420370672936825
+    second: Satyr_attack_NOhitbox_10
+  - first:
+      213: -3841707479737978205
+    second: Satyr_attack_NOhitbox_11
+  - first:
+      213: 5075686706447545150
+    second: Satyr_attack_NOhitbox_12
+  - first:
+      213: 1154639126893356779
+    second: Satyr_attack_NOhitbox_13
+  - first:
+      213: -4117808715269691947
+    second: Satyr_attack_NOhitbox_14
+  - first:
+      213: -7572864708522341144
+    second: Satyr_attack_NOhitbox_15
+  - first:
+      213: -1055310096637419349
+    second: Satyr_attack_NOhitbox_16
+  - first:
+      213: -976321497174139460
+    second: Satyr_attack_NOhitbox_17
+  - first:
+      213: 6096425658269705712
+    second: Satyr_attack_NOhitbox_18
+  - first:
+      213: -2645434325663157707
+    second: Satyr_attack_NOhitbox_19
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Satyr_attack_NOhitbox_0
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 575
+        width: 44
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ca787221a4c9ea960800000000000000
+      internalID: 7615195861876180908
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Satyr_attack_NOhitbox_1
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 575
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6aadbd6be0bb1d5e0800000000000000
+      internalID: -1886521097019729242
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Satyr_attack_NOhitbox_2
+      rect:
+        serializedVersion: 2
+        x: 338
+        y: 575
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c367d9dc46a18c460800000000000000
+      internalID: 7262083419383625276
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Satyr_attack_NOhitbox_3
+      rect:
+        serializedVersion: 2
+        x: 482
+        y: 575
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 44badc8f324940c50800000000000000
+      internalID: 6630587433615207236
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Satyr_attack_NOhitbox_4
+      rect:
+        serializedVersion: 2
+        x: 626
+        y: 575
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3c7a87f3cd50729c0800000000000000
+      internalID: -3952183704478505021
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Satyr_attack_NOhitbox_5
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 407
+        width: 35
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a00cacd02a6e36cf0800000000000000
+      internalID: -260110769766875126
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Satyr_attack_NOhitbox_6
+      rect:
+        serializedVersion: 2
+        x: 185
+        y: 407
+        width: 47
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1ffd765dcd3568f70800000000000000
+      internalID: 9189124297634340849
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Satyr_attack_NOhitbox_7
+      rect:
+        serializedVersion: 2
+        x: 329
+        y: 407
+        width: 47
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7da189a5fbc432160800000000000000
+      internalID: 6999522630606265047
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Satyr_attack_NOhitbox_8
+      rect:
+        serializedVersion: 2
+        x: 473
+        y: 407
+        width: 47
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a5762374ab56578b0800000000000000
+      internalID: -5155102347722856614
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Satyr_attack_NOhitbox_9
+      rect:
+        serializedVersion: 2
+        x: 617
+        y: 407
+        width: 47
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a35763cf260a5bb90800000000000000
+      internalID: -7226693680047426246
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Satyr_attack_NOhitbox_10
+      rect:
+        serializedVersion: 2
+        x: 53
+        y: 239
+        width: 35
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9776b82efbfe16770800000000000000
+      internalID: 8602420370672936825
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Satyr_attack_NOhitbox_11
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 239
+        width: 47
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3a2b143c6638faac0800000000000000
+      internalID: -3841707479737978205
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Satyr_attack_NOhitbox_12
+      rect:
+        serializedVersion: 2
+        x: 344
+        y: 239
+        width: 47
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e337af8da26707640800000000000000
+      internalID: 5075686706447545150
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Satyr_attack_NOhitbox_13
+      rect:
+        serializedVersion: 2
+        x: 488
+        y: 239
+        width: 47
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: be6ee3a1b2a160010800000000000000
+      internalID: 1154639126893356779
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Satyr_attack_NOhitbox_14
+      rect:
+        serializedVersion: 2
+        x: 632
+        y: 239
+        width: 47
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5d5a7516aca9ad6c0800000000000000
+      internalID: -4117808715269691947
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Satyr_attack_NOhitbox_15
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 71
+        width: 44
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8ec0f6c9ba7c7e690800000000000000
+      internalID: -7572864708522341144
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Satyr_attack_NOhitbox_16
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 71
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ba02b02fe09ca51f0800000000000000
+      internalID: -1055310096637419349
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Satyr_attack_NOhitbox_17
+      rect:
+        serializedVersion: 2
+        x: 338
+        y: 71
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cbd9b5665c86372f0800000000000000
+      internalID: -976321497174139460
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Satyr_attack_NOhitbox_18
+      rect:
+        serializedVersion: 2
+        x: 482
+        y: 71
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0f52eb006dada9450800000000000000
+      internalID: 6096425658269705712
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Satyr_attack_NOhitbox_19
+      rect:
+        serializedVersion: 2
+        x: 626
+        y: 71
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 532f8363f77894bd0800000000000000
+      internalID: -2645434325663157707
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Satyr_attack_NOhitbox_0: 7615195861876180908
+      Satyr_attack_NOhitbox_1: -1886521097019729242
+      Satyr_attack_NOhitbox_10: 8602420370672936825
+      Satyr_attack_NOhitbox_11: -3841707479737978205
+      Satyr_attack_NOhitbox_12: 5075686706447545150
+      Satyr_attack_NOhitbox_13: 1154639126893356779
+      Satyr_attack_NOhitbox_14: -4117808715269691947
+      Satyr_attack_NOhitbox_15: -7572864708522341144
+      Satyr_attack_NOhitbox_16: -1055310096637419349
+      Satyr_attack_NOhitbox_17: -976321497174139460
+      Satyr_attack_NOhitbox_18: 6096425658269705712
+      Satyr_attack_NOhitbox_19: -2645434325663157707
+      Satyr_attack_NOhitbox_2: 7262083419383625276
+      Satyr_attack_NOhitbox_3: 6630587433615207236
+      Satyr_attack_NOhitbox_4: -3952183704478505021
+      Satyr_attack_NOhitbox_5: -260110769766875126
+      Satyr_attack_NOhitbox_6: 9189124297634340849
+      Satyr_attack_NOhitbox_7: 6999522630606265047
+      Satyr_attack_NOhitbox_8: -5155102347722856614
+      Satyr_attack_NOhitbox_9: -7226693680047426246
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,0 +1,546 @@
+fileFormatVersion: 2
+guid: f90cdb9056564a14b9d877629c56fa5c
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 8597006106693601449
+    second: DeathKnight_walk_0
+  - first:
+      213: 5554216602644397573
+    second: DeathKnight_walk_1
+  - first:
+      213: -4297593528781038208
+    second: DeathKnight_walk_2
+  - first:
+      213: -2019030665441143211
+    second: DeathKnight_walk_3
+  - first:
+      213: -3181856908200172244
+    second: DeathKnight_walk_4
+  - first:
+      213: -3558227950361481087
+    second: DeathKnight_walk_5
+  - first:
+      213: 316904520132503108
+    second: DeathKnight_walk_6
+  - first:
+      213: -6186524397111676891
+    second: DeathKnight_walk_7
+  - first:
+      213: -462175661034294328
+    second: DeathKnight_walk_8
+  - first:
+      213: -1535805479432413622
+    second: DeathKnight_walk_9
+  - first:
+      213: -7886962080784855502
+    second: DeathKnight_walk_10
+  - first:
+      213: 4810507745441439798
+    second: DeathKnight_walk_11
+  - first:
+      213: 902466317833085423
+    second: DeathKnight_walk_12
+  - first:
+      213: 5645887073396136626
+    second: DeathKnight_walk_13
+  - first:
+      213: -6127826313203437950
+    second: DeathKnight_walk_14
+  - first:
+      213: -592242964060394798
+    second: DeathKnight_walk_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: DeathKnight_walk_0
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 287
+        width: 74
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9a806515183be4770800000000000000
+      internalID: 8597006106693601449
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_walk_1
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 287
+        width: 74
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 50e3236929a841d40800000000000000
+      internalID: 5554216602644397573
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_walk_2
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 287
+        width: 74
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 08d1df78471eb54c0800000000000000
+      internalID: -4297593528781038208
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_walk_3
+      rect:
+        serializedVersion: 2
+        x: 290
+        y: 287
+        width: 74
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 55692cb9e46faf3e0800000000000000
+      internalID: -2019030665441143211
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_walk_4
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 191
+        width: 89
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c252b9c0006c7d3d0800000000000000
+      internalID: -3181856908200172244
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_walk_5
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 191
+        width: 95
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 18076dc0882ae9ec0800000000000000
+      internalID: -3558227950361481087
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_walk_6
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 191
+        width: 95
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 446a6366bfed56400800000000000000
+      internalID: 316904520132503108
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_walk_7
+      rect:
+        serializedVersion: 2
+        x: 290
+        y: 191
+        width: 94
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 520fed3a6dc052aa0800000000000000
+      internalID: -6186524397111676891
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_walk_8
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 95
+        width: 89
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8c3383c5fa50699f0800000000000000
+      internalID: -462175661034294328
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_walk_9
+      rect:
+        serializedVersion: 2
+        x: 95
+        y: 95
+        width: 95
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a4e1552bd09bfaae0800000000000000
+      internalID: -1535805479432413622
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_walk_10
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 95
+        width: 95
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 23ec7d146c1eb8290800000000000000
+      internalID: -7886962080784855502
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_walk_11
+      rect:
+        serializedVersion: 2
+        x: 287
+        y: 95
+        width: 95
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6306d4cae4b52c240800000000000000
+      internalID: 4810507745441439798
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_walk_12
+      rect:
+        serializedVersion: 2
+        x: 20
+        y: 0
+        width: 74
+        height: 91
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fe12238a554368c00800000000000000
+      internalID: 902466317833085423
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_walk_13
+      rect:
+        serializedVersion: 2
+        x: 116
+        y: 0
+        width: 74
+        height: 88
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2ba1fbb41683a5e40800000000000000
+      internalID: 5645887073396136626
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_walk_14
+      rect:
+        serializedVersion: 2
+        x: 212
+        y: 0
+        width: 74
+        height: 91
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 28ea73c4f6695faa0800000000000000
+      internalID: -6127826313203437950
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_walk_15
+      rect:
+        serializedVersion: 2
+        x: 308
+        y: 0
+        width: 74
+        height: 88
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2daa47a792ee7c7f0800000000000000
+      internalID: -592242964060394798
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      DeathKnight_walk_0: 8597006106693601449
+      DeathKnight_walk_1: 5554216602644397573
+      DeathKnight_walk_10: -7886962080784855502
+      DeathKnight_walk_11: 4810507745441439798
+      DeathKnight_walk_12: 902466317833085423
+      DeathKnight_walk_13: 5645887073396136626
+      DeathKnight_walk_14: -6127826313203437950
+      DeathKnight_walk_15: -592242964060394798
+      DeathKnight_walk_2: -4297593528781038208
+      DeathKnight_walk_3: -2019030665441143211
+      DeathKnight_walk_4: -3181856908200172244
+      DeathKnight_walk_5: -3558227950361481087
+      DeathKnight_walk_6: 316904520132503108
+      DeathKnight_walk_7: -6186524397111676891
+      DeathKnight_walk_8: -462175661034294328
+      DeathKnight_walk_9: -1535805479432413622
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

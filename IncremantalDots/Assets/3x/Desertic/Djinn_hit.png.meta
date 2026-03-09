@@ -1,0 +1,962 @@
+fileFormatVersion: 2
+guid: 0136e563f1c38b049b885dc6cfa7bad5
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 974736780121266506
+    second: Djinn_hit_0
+  - first:
+      213: 6956334973138279891
+    second: Djinn_hit_1
+  - first:
+      213: 3899577218982326731
+    second: Djinn_hit_2
+  - first:
+      213: 945327637978861791
+    second: Djinn_hit_3
+  - first:
+      213: -5250841824540621244
+    second: Djinn_hit_4
+  - first:
+      213: -2920865426793439778
+    second: Djinn_hit_5
+  - first:
+      213: 2885446010690468186
+    second: Djinn_hit_6
+  - first:
+      213: -2215782413907427906
+    second: Djinn_hit_7
+  - first:
+      213: -6245586464053739016
+    second: Djinn_hit_8
+  - first:
+      213: 4338821341024562953
+    second: Djinn_hit_9
+  - first:
+      213: 7780851239001608191
+    second: Djinn_hit_10
+  - first:
+      213: 8753855702070929360
+    second: Djinn_hit_11
+  - first:
+      213: 5762320337072730135
+    second: Djinn_hit_12
+  - first:
+      213: 9112178830147057750
+    second: Djinn_hit_13
+  - first:
+      213: 6357713657275196430
+    second: Djinn_hit_14
+  - first:
+      213: -296542824341438745
+    second: Djinn_hit_15
+  - first:
+      213: 8333264851657070182
+    second: Djinn_hit_16
+  - first:
+      213: -5575428063545079433
+    second: Djinn_hit_17
+  - first:
+      213: -5663773201844598103
+    second: Djinn_hit_18
+  - first:
+      213: -518308881866869400
+    second: Djinn_hit_19
+  - first:
+      213: -2348155057108281367
+    second: Djinn_hit_20
+  - first:
+      213: -6103451029670343023
+    second: Djinn_hit_21
+  - first:
+      213: -3557601499562985153
+    second: Djinn_hit_22
+  - first:
+      213: -5328416434518108590
+    second: Djinn_hit_23
+  - first:
+      213: 708287159158463950
+    second: Djinn_hit_24
+  - first:
+      213: -1615527652207285375
+    second: Djinn_hit_25
+  - first:
+      213: -2974474287829674408
+    second: Djinn_hit_26
+  - first:
+      213: -7863138819988501981
+    second: Djinn_hit_27
+  - first:
+      213: 4689861201465249481
+    second: Djinn_hit_28
+  - first:
+      213: -5884372811917475561
+    second: Djinn_hit_29
+  - first:
+      213: 603990429942821026
+    second: Djinn_hit_30
+  - first:
+      213: 6141832174151496634
+    second: Djinn_hit_31
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Djinn_hit_0
+      rect:
+        serializedVersion: 2
+        x: 11
+        y: 305
+        width: 74
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a49d2a8efe5f68d00800000000000000
+      internalID: 974736780121266506
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Djinn_hit_1
+      rect:
+        serializedVersion: 2
+        x: 14
+        y: 311
+        width: 17
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3dd98844dcdd98060800000000000000
+      internalID: 6956334973138279891
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Djinn_hit_2
+      rect:
+        serializedVersion: 2
+        x: 65
+        y: 311
+        width: 17
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bc1b5afd1d41e1630800000000000000
+      internalID: 3899577218982326731
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Djinn_hit_3
+      rect:
+        serializedVersion: 2
+        x: 107
+        y: 305
+        width: 74
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fd0d61a6a7a7e1d00800000000000000
+      internalID: 945327637978861791
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Djinn_hit_4
+      rect:
+        serializedVersion: 2
+        x: 110
+        y: 311
+        width: 17
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4460e744e234127b0800000000000000
+      internalID: -5250841824540621244
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Djinn_hit_5
+      rect:
+        serializedVersion: 2
+        x: 161
+        y: 311
+        width: 17
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eddd147ae500777d0800000000000000
+      internalID: -2920865426793439778
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Djinn_hit_6
+      rect:
+        serializedVersion: 2
+        x: 29
+        y: 287
+        width: 38
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a59f5c5ebd92b0820800000000000000
+      internalID: 2885446010690468186
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Djinn_hit_7
+      rect:
+        serializedVersion: 2
+        x: 125
+        y: 287
+        width: 38
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ebd7d7f52a5ff31e0800000000000000
+      internalID: -2215782413907427906
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Djinn_hit_8
+      rect:
+        serializedVersion: 2
+        x: 17
+        y: 209
+        width: 59
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8f1c61493383359a0800000000000000
+      internalID: -6245586464053739016
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Djinn_hit_9
+      rect:
+        serializedVersion: 2
+        x: 71
+        y: 227
+        width: 17
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 90f27a78507963c30800000000000000
+      internalID: 4338821341024562953
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Djinn_hit_10
+      rect:
+        serializedVersion: 2
+        x: 113
+        y: 209
+        width: 59
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fff49d62af22bfb60800000000000000
+      internalID: 7780851239001608191
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Djinn_hit_11
+      rect:
+        serializedVersion: 2
+        x: 167
+        y: 227
+        width: 17
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0d727f09161fb7970800000000000000
+      internalID: 8753855702070929360
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Djinn_hit_12
+      rect:
+        serializedVersion: 2
+        x: 62
+        y: 215
+        width: 17
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 710ba3501dfd7ff40800000000000000
+      internalID: 5762320337072730135
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Djinn_hit_13
+      rect:
+        serializedVersion: 2
+        x: 158
+        y: 215
+        width: 17
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 658ffbc1e56f47e70800000000000000
+      internalID: 9112178830147057750
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Djinn_hit_14
+      rect:
+        serializedVersion: 2
+        x: 29
+        y: 191
+        width: 38
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e04a98df2e22b3850800000000000000
+      internalID: 6357713657275196430
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Djinn_hit_15
+      rect:
+        serializedVersion: 2
+        x: 125
+        y: 191
+        width: 38
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7eeff665fd772ebf0800000000000000
+      internalID: -296542824341438745
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Djinn_hit_16
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 131
+        width: 17
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 66694462b34b5a370800000000000000
+      internalID: 8333264851657070182
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Djinn_hit_17
+      rect:
+        serializedVersion: 2
+        x: 20
+        y: 113
+        width: 59
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 779c6a157b910a2b0800000000000000
+      internalID: -5575428063545079433
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Djinn_hit_18
+      rect:
+        serializedVersion: 2
+        x: 104
+        y: 131
+        width: 17
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9aa0da7e74c3661b0800000000000000
+      internalID: -5663773201844598103
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Djinn_hit_19
+      rect:
+        serializedVersion: 2
+        x: 116
+        y: 113
+        width: 59
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 865356c61d89ec8f0800000000000000
+      internalID: -518308881866869400
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Djinn_hit_20
+      rect:
+        serializedVersion: 2
+        x: 17
+        y: 119
+        width: 17
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9e71687aa6da96fd0800000000000000
+      internalID: -2348155057108281367
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Djinn_hit_21
+      rect:
+        serializedVersion: 2
+        x: 113
+        y: 119
+        width: 17
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 19ec18040af2c4ba0800000000000000
+      internalID: -6103451029670343023
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Djinn_hit_22
+      rect:
+        serializedVersion: 2
+        x: 29
+        y: 95
+        width: 38
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f39b62ef84cd0aec0800000000000000
+      internalID: -3557601499562985153
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Djinn_hit_23
+      rect:
+        serializedVersion: 2
+        x: 125
+        y: 95
+        width: 38
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 256d135eb79ad06b0800000000000000
+      internalID: -5328416434518108590
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Djinn_hit_24
+      rect:
+        serializedVersion: 2
+        x: 11
+        y: 17
+        width: 74
+        height: 71
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ecd5c982b6754d900800000000000000
+      internalID: 708287159158463950
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Djinn_hit_25
+      rect:
+        serializedVersion: 2
+        x: 14
+        y: 23
+        width: 17
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 18b2d55e82e7499e0800000000000000
+      internalID: -1615527652207285375
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Djinn_hit_26
+      rect:
+        serializedVersion: 2
+        x: 65
+        y: 23
+        width: 17
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8561168056b88b6d0800000000000000
+      internalID: -2974474287829674408
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Djinn_hit_27
+      rect:
+        serializedVersion: 2
+        x: 107
+        y: 17
+        width: 74
+        height: 71
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 32a400767e480e290800000000000000
+      internalID: -7863138819988501981
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Djinn_hit_28
+      rect:
+        serializedVersion: 2
+        x: 110
+        y: 23
+        width: 17
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9ce093f2aebb51140800000000000000
+      internalID: 4689861201465249481
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Djinn_hit_29
+      rect:
+        serializedVersion: 2
+        x: 161
+        y: 23
+        width: 17
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 71141b3ba12865ea0800000000000000
+      internalID: -5884372811917475561
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Djinn_hit_30
+      rect:
+        serializedVersion: 2
+        x: 29
+        y: 0
+        width: 38
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2a03a70981ec16800800000000000000
+      internalID: 603990429942821026
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Djinn_hit_31
+      rect:
+        serializedVersion: 2
+        x: 125
+        y: 0
+        width: 38
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab37d5252db2c3550800000000000000
+      internalID: 6141832174151496634
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Djinn_hit_0: 974736780121266506
+      Djinn_hit_1: 6956334973138279891
+      Djinn_hit_10: 7780851239001608191
+      Djinn_hit_11: 8753855702070929360
+      Djinn_hit_12: 5762320337072730135
+      Djinn_hit_13: 9112178830147057750
+      Djinn_hit_14: 6357713657275196430
+      Djinn_hit_15: -296542824341438745
+      Djinn_hit_16: 8333264851657070182
+      Djinn_hit_17: -5575428063545079433
+      Djinn_hit_18: -5663773201844598103
+      Djinn_hit_19: -518308881866869400
+      Djinn_hit_2: 3899577218982326731
+      Djinn_hit_20: -2348155057108281367
+      Djinn_hit_21: -6103451029670343023
+      Djinn_hit_22: -3557601499562985153
+      Djinn_hit_23: -5328416434518108590
+      Djinn_hit_24: 708287159158463950
+      Djinn_hit_25: -1615527652207285375
+      Djinn_hit_26: -2974474287829674408
+      Djinn_hit_27: -7863138819988501981
+      Djinn_hit_28: 4689861201465249481
+      Djinn_hit_29: -5884372811917475561
+      Djinn_hit_3: 945327637978861791
+      Djinn_hit_30: 603990429942821026
+      Djinn_hit_31: 6141832174151496634
+      Djinn_hit_4: -5250841824540621244
+      Djinn_hit_5: -2920865426793439778
+      Djinn_hit_6: 2885446010690468186
+      Djinn_hit_7: -2215782413907427906
+      Djinn_hit_8: -6245586464053739016
+      Djinn_hit_9: 4338821341024562953
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

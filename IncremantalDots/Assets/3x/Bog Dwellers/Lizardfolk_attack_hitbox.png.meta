@@ -1,0 +1,546 @@
+fileFormatVersion: 2
+guid: 71541ee9b5109ec4690b86a204b41de0
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -1030709864676807532
+    second: Lizardfolk_attack_hitbox_0
+  - first:
+      213: 2192153842197730575
+    second: Lizardfolk_attack_hitbox_1
+  - first:
+      213: -7685901322380300547
+    second: Lizardfolk_attack_hitbox_2
+  - first:
+      213: 439408755433707617
+    second: Lizardfolk_attack_hitbox_3
+  - first:
+      213: -1669484682319247413
+    second: Lizardfolk_attack_hitbox_4
+  - first:
+      213: -6209190867491628585
+    second: Lizardfolk_attack_hitbox_5
+  - first:
+      213: -2746695329739650417
+    second: Lizardfolk_attack_hitbox_6
+  - first:
+      213: 8847407767452509107
+    second: Lizardfolk_attack_hitbox_7
+  - first:
+      213: 7330789666262851948
+    second: Lizardfolk_attack_hitbox_8
+  - first:
+      213: 963229072234114763
+    second: Lizardfolk_attack_hitbox_9
+  - first:
+      213: -8833726160429066382
+    second: Lizardfolk_attack_hitbox_10
+  - first:
+      213: 1721305565196977007
+    second: Lizardfolk_attack_hitbox_11
+  - first:
+      213: 1000246940960203525
+    second: Lizardfolk_attack_hitbox_12
+  - first:
+      213: 2139904665549510092
+    second: Lizardfolk_attack_hitbox_13
+  - first:
+      213: 6312783025832006389
+    second: Lizardfolk_attack_hitbox_14
+  - first:
+      213: -1632152421371788013
+    second: Lizardfolk_attack_hitbox_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Lizardfolk_attack_hitbox_0
+      rect:
+        serializedVersion: 2
+        x: 41
+        y: 533
+        width: 56
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 49ca279c6de22b1f0800000000000000
+      internalID: -1030709864676807532
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lizardfolk_attack_hitbox_1
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 533
+        width: 44
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f0514311e481c6e10800000000000000
+      internalID: 2192153842197730575
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lizardfolk_attack_hitbox_2
+      rect:
+        serializedVersion: 2
+        x: 362
+        y: 539
+        width: 29
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dfe21dc0871365590800000000000000
+      internalID: -7685901322380300547
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lizardfolk_attack_hitbox_3
+      rect:
+        serializedVersion: 2
+        x: 524
+        y: 545
+        width: 14
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 16892da5fe7191600800000000000000
+      internalID: 439408755433707617
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lizardfolk_attack_hitbox_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 407
+        width: 76
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bc7c768d68cc4d8e0800000000000000
+      internalID: -1669484682319247413
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lizardfolk_attack_hitbox_5
+      rect:
+        serializedVersion: 2
+        x: 143
+        y: 404
+        width: 26
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7d9df80cdc584d9a0800000000000000
+      internalID: -6209190867491628585
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lizardfolk_attack_hitbox_6
+      rect:
+        serializedVersion: 2
+        x: 293
+        y: 401
+        width: 20
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f8ac4a47627c1e9d0800000000000000
+      internalID: -2746695329739650417
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lizardfolk_attack_hitbox_7
+      rect:
+        serializedVersion: 2
+        x: 443
+        y: 398
+        width: 17
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3b3e90a2d7e48ca70800000000000000
+      internalID: 8847407767452509107
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lizardfolk_attack_hitbox_8
+      rect:
+        serializedVersion: 2
+        x: 68
+        y: 239
+        width: 77
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c61a3bc7c523cb560800000000000000
+      internalID: 7330789666262851948
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lizardfolk_attack_hitbox_9
+      rect:
+        serializedVersion: 2
+        x: 263
+        y: 236
+        width: 26
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bcee7dfdcb31e5d00800000000000000
+      internalID: 963229072234114763
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lizardfolk_attack_hitbox_10
+      rect:
+        serializedVersion: 2
+        x: 407
+        y: 233
+        width: 20
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 277dc843cdc486580800000000000000
+      internalID: -8833726160429066382
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lizardfolk_attack_hitbox_11
+      rect:
+        serializedVersion: 2
+        x: 548
+        y: 230
+        width: 17
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f63087baa4e43e710800000000000000
+      internalID: 1721305565196977007
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lizardfolk_attack_hitbox_12
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 98
+        width: 56
+        height: 71
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 503aa931b4791ed00800000000000000
+      internalID: 1000246940960203525
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lizardfolk_attack_hitbox_13
+      rect:
+        serializedVersion: 2
+        x: 188
+        y: 143
+        width: 44
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cc59743a4f772bd10800000000000000
+      internalID: 2139904665549510092
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lizardfolk_attack_hitbox_14
+      rect:
+        serializedVersion: 2
+        x: 329
+        y: 143
+        width: 29
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5f215d627b28b9750800000000000000
+      internalID: 6312783025832006389
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lizardfolk_attack_hitbox_15
+      rect:
+        serializedVersion: 2
+        x: 470
+        y: 140
+        width: 14
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 31547d0350e6959e0800000000000000
+      internalID: -1632152421371788013
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Lizardfolk_attack_hitbox_0: -1030709864676807532
+      Lizardfolk_attack_hitbox_1: 2192153842197730575
+      Lizardfolk_attack_hitbox_10: -8833726160429066382
+      Lizardfolk_attack_hitbox_11: 1721305565196977007
+      Lizardfolk_attack_hitbox_12: 1000246940960203525
+      Lizardfolk_attack_hitbox_13: 2139904665549510092
+      Lizardfolk_attack_hitbox_14: 6312783025832006389
+      Lizardfolk_attack_hitbox_15: -1632152421371788013
+      Lizardfolk_attack_hitbox_2: -7685901322380300547
+      Lizardfolk_attack_hitbox_3: 439408755433707617
+      Lizardfolk_attack_hitbox_4: -1669484682319247413
+      Lizardfolk_attack_hitbox_5: -6209190867491628585
+      Lizardfolk_attack_hitbox_6: -2746695329739650417
+      Lizardfolk_attack_hitbox_7: 8847407767452509107
+      Lizardfolk_attack_hitbox_8: 7330789666262851948
+      Lizardfolk_attack_hitbox_9: 963229072234114763
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

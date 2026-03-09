@@ -1,0 +1,546 @@
+fileFormatVersion: 2
+guid: 627df0c1c0db9de4eb69b72076b73a46
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -5547212157858108082
+    second: ManticoreBishop_idle_0
+  - first:
+      213: 6946554741905145725
+    second: ManticoreBishop_idle_1
+  - first:
+      213: 817501631776381660
+    second: ManticoreBishop_idle_2
+  - first:
+      213: -1753941128659141269
+    second: ManticoreBishop_idle_3
+  - first:
+      213: 4785591321663544820
+    second: ManticoreBishop_idle_4
+  - first:
+      213: -5533477263676137059
+    second: ManticoreBishop_idle_5
+  - first:
+      213: 6948887784999295595
+    second: ManticoreBishop_idle_6
+  - first:
+      213: 2406489244217703271
+    second: ManticoreBishop_idle_7
+  - first:
+      213: -2433104021392954970
+    second: ManticoreBishop_idle_8
+  - first:
+      213: 1853373565372823284
+    second: ManticoreBishop_idle_9
+  - first:
+      213: 2157652862777270087
+    second: ManticoreBishop_idle_10
+  - first:
+      213: 1079358212929944813
+    second: ManticoreBishop_idle_11
+  - first:
+      213: -7620007164807220272
+    second: ManticoreBishop_idle_12
+  - first:
+      213: -4619489300453494090
+    second: ManticoreBishop_idle_13
+  - first:
+      213: 3578173618862058140
+    second: ManticoreBishop_idle_14
+  - first:
+      213: 1094644364948593558
+    second: ManticoreBishop_idle_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: ManticoreBishop_idle_0
+      rect:
+        serializedVersion: 2
+        x: 17
+        y: 287
+        width: 62
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e4da32dcee75403b0800000000000000
+      internalID: -5547212157858108082
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_idle_1
+      rect:
+        serializedVersion: 2
+        x: 113
+        y: 287
+        width: 62
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d7fbf0cbbbe176060800000000000000
+      internalID: 6946554741905145725
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_idle_2
+      rect:
+        serializedVersion: 2
+        x: 209
+        y: 287
+        width: 62
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cda555d1769585b00800000000000000
+      internalID: 817501631776381660
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_idle_3
+      rect:
+        serializedVersion: 2
+        x: 305
+        y: 287
+        width: 62
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b6df25516dfb8a7e0800000000000000
+      internalID: -1753941128659141269
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_idle_4
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 191
+        width: 95
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4fd92ffa3f5d96240800000000000000
+      internalID: 4785591321663544820
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_idle_5
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 191
+        width: 95
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d9122ed0fb32533b0800000000000000
+      internalID: -5533477263676137059
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_idle_6
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 191
+        width: 95
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b6a1fe8af986f6060800000000000000
+      internalID: 6948887784999295595
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_idle_7
+      rect:
+        serializedVersion: 2
+        x: 290
+        y: 191
+        width: 94
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 76bf46da731956120800000000000000
+      internalID: 2406489244217703271
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_idle_8
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 95
+        width: 94
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6a96c4f98c0eb3ed0800000000000000
+      internalID: -2433104021392954970
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_idle_9
+      rect:
+        serializedVersion: 2
+        x: 95
+        y: 95
+        width: 95
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4f67528207188b910800000000000000
+      internalID: 1853373565372823284
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_idle_10
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 95
+        width: 95
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 74f9172d8d581fd10800000000000000
+      internalID: 2157652862777270087
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_idle_11
+      rect:
+        serializedVersion: 2
+        x: 287
+        y: 95
+        width: 95
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: decf6137396aafe00800000000000000
+      internalID: 1079358212929944813
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_idle_12
+      rect:
+        serializedVersion: 2
+        x: 17
+        y: 0
+        width: 62
+        height: 94
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0d3fbbb2bdb404690800000000000000
+      internalID: -7620007164807220272
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_idle_13
+      rect:
+        serializedVersion: 2
+        x: 113
+        y: 0
+        width: 62
+        height: 91
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6b270c2d4f644efb0800000000000000
+      internalID: -4619489300453494090
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_idle_14
+      rect:
+        serializedVersion: 2
+        x: 209
+        y: 0
+        width: 62
+        height: 88
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c9a62f8c2f938a130800000000000000
+      internalID: 3578173618862058140
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_idle_15
+      rect:
+        serializedVersion: 2
+        x: 305
+        y: 0
+        width: 62
+        height: 91
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 69bd4201045f03f00800000000000000
+      internalID: 1094644364948593558
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      ManticoreBishop_idle_0: -5547212157858108082
+      ManticoreBishop_idle_1: 6946554741905145725
+      ManticoreBishop_idle_10: 2157652862777270087
+      ManticoreBishop_idle_11: 1079358212929944813
+      ManticoreBishop_idle_12: -7620007164807220272
+      ManticoreBishop_idle_13: -4619489300453494090
+      ManticoreBishop_idle_14: 3578173618862058140
+      ManticoreBishop_idle_15: 1094644364948593558
+      ManticoreBishop_idle_2: 817501631776381660
+      ManticoreBishop_idle_3: -1753941128659141269
+      ManticoreBishop_idle_4: 4785591321663544820
+      ManticoreBishop_idle_5: -5533477263676137059
+      ManticoreBishop_idle_6: 6948887784999295595
+      ManticoreBishop_idle_7: 2406489244217703271
+      ManticoreBishop_idle_8: -2433104021392954970
+      ManticoreBishop_idle_9: 1853373565372823284
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

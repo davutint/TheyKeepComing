@@ -1,0 +1,546 @@
+fileFormatVersion: 2
+guid: cab220a74bd3c2b4cb6a794cff73af9b
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 5060622514661721702
+    second: Owlbear_walk_0
+  - first:
+      213: -2161395307875044203
+    second: Owlbear_walk_1
+  - first:
+      213: -8046785920320855215
+    second: Owlbear_walk_2
+  - first:
+      213: 1766899916724158379
+    second: Owlbear_walk_3
+  - first:
+      213: 277679618324695920
+    second: Owlbear_walk_4
+  - first:
+      213: 1082498221249017119
+    second: Owlbear_walk_5
+  - first:
+      213: 7539939617543423122
+    second: Owlbear_walk_6
+  - first:
+      213: -5093088077107993968
+    second: Owlbear_walk_7
+  - first:
+      213: 5986819839609053559
+    second: Owlbear_walk_8
+  - first:
+      213: -6891967629227535995
+    second: Owlbear_walk_9
+  - first:
+      213: -3513311813422641724
+    second: Owlbear_walk_10
+  - first:
+      213: -5473986645936959651
+    second: Owlbear_walk_11
+  - first:
+      213: 7473947861028239011
+    second: Owlbear_walk_12
+  - first:
+      213: -5558385020766163273
+    second: Owlbear_walk_13
+  - first:
+      213: -2526896198335561720
+    second: Owlbear_walk_14
+  - first:
+      213: -8448378560926240912
+    second: Owlbear_walk_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Owlbear_walk_0
+      rect:
+        serializedVersion: 2
+        x: 14
+        y: 287
+        width: 68
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 66681c06d51fa3640800000000000000
+      internalID: 5060622514661721702
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Owlbear_walk_1
+      rect:
+        serializedVersion: 2
+        x: 110
+        y: 287
+        width: 68
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 59479e64b6e2102e0800000000000000
+      internalID: -2161395307875044203
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Owlbear_walk_2
+      rect:
+        serializedVersion: 2
+        x: 206
+        y: 287
+        width: 68
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 15329a3d6d2145090800000000000000
+      internalID: -8046785920320855215
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Owlbear_walk_3
+      rect:
+        serializedVersion: 2
+        x: 302
+        y: 287
+        width: 68
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bafb202ec1a458810800000000000000
+      internalID: 1766899916724158379
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Owlbear_walk_4
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 191
+        width: 92
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 07b0c9344248ad300800000000000000
+      internalID: 277679618324695920
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Owlbear_walk_5
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 191
+        width: 92
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f153a8b956ec50f00800000000000000
+      internalID: 1082498221249017119
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Owlbear_walk_6
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 191
+        width: 92
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2940293422f33a860800000000000000
+      internalID: 7539939617543423122
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Owlbear_walk_7
+      rect:
+        serializedVersion: 2
+        x: 290
+        y: 191
+        width: 92
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0926332d067b159b0800000000000000
+      internalID: -5093088077107993968
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Owlbear_walk_8
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 95
+        width: 92
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 771a822bce4751350800000000000000
+      internalID: 5986819839609053559
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Owlbear_walk_9
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 95
+        width: 92
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 581d668d4ffca50a0800000000000000
+      internalID: -6891967629227535995
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Owlbear_walk_10
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 95
+        width: 92
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4cd82cf15853e3fc0800000000000000
+      internalID: -3513311813422641724
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Owlbear_walk_11
+      rect:
+        serializedVersion: 2
+        x: 290
+        y: 95
+        width: 92
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d5f02bfd52e7804b0800000000000000
+      internalID: -5473986645936959651
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Owlbear_walk_12
+      rect:
+        serializedVersion: 2
+        x: 14
+        y: 0
+        width: 68
+        height: 76
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3a6f06e1bfbc8b760800000000000000
+      internalID: 7473947861028239011
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Owlbear_walk_13
+      rect:
+        serializedVersion: 2
+        x: 110
+        y: 0
+        width: 68
+        height: 73
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7be6160f546acd2b0800000000000000
+      internalID: -5558385020766163273
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Owlbear_walk_14
+      rect:
+        serializedVersion: 2
+        x: 206
+        y: 0
+        width: 68
+        height: 76
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8008ce1bb49aeecd0800000000000000
+      internalID: -2526896198335561720
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Owlbear_walk_15
+      rect:
+        serializedVersion: 2
+        x: 302
+        y: 0
+        width: 68
+        height: 73
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 07f27f3d57451ca80800000000000000
+      internalID: -8448378560926240912
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Owlbear_walk_0: 5060622514661721702
+      Owlbear_walk_1: -2161395307875044203
+      Owlbear_walk_10: -3513311813422641724
+      Owlbear_walk_11: -5473986645936959651
+      Owlbear_walk_12: 7473947861028239011
+      Owlbear_walk_13: -5558385020766163273
+      Owlbear_walk_14: -2526896198335561720
+      Owlbear_walk_15: -8448378560926240912
+      Owlbear_walk_2: -8046785920320855215
+      Owlbear_walk_3: 1766899916724158379
+      Owlbear_walk_4: 277679618324695920
+      Owlbear_walk_5: 1082498221249017119
+      Owlbear_walk_6: 7539939617543423122
+      Owlbear_walk_7: -5093088077107993968
+      Owlbear_walk_8: 5986819839609053559
+      Owlbear_walk_9: -6891967629227535995
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,0 +1,650 @@
+fileFormatVersion: 2
+guid: dd2b32e3687b92047bd743cd71861805
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 9054078299566984417
+    second: FrostSalamander_attack_NOhitbox_0
+  - first:
+      213: 495937020872788232
+    second: FrostSalamander_attack_NOhitbox_1
+  - first:
+      213: 3080165807679233987
+    second: FrostSalamander_attack_NOhitbox_2
+  - first:
+      213: 1632429658391592188
+    second: FrostSalamander_attack_NOhitbox_3
+  - first:
+      213: -4518990993026028949
+    second: FrostSalamander_attack_NOhitbox_4
+  - first:
+      213: -3633416527665293336
+    second: FrostSalamander_attack_NOhitbox_5
+  - first:
+      213: 7140788972208002857
+    second: FrostSalamander_attack_NOhitbox_6
+  - first:
+      213: 5384495383959359690
+    second: FrostSalamander_attack_NOhitbox_7
+  - first:
+      213: 7396333291077995135
+    second: FrostSalamander_attack_NOhitbox_8
+  - first:
+      213: 3077131318857465783
+    second: FrostSalamander_attack_NOhitbox_9
+  - first:
+      213: 790495238793152475
+    second: FrostSalamander_attack_NOhitbox_10
+  - first:
+      213: 4583242849727232464
+    second: FrostSalamander_attack_NOhitbox_11
+  - first:
+      213: 6006872352301055921
+    second: FrostSalamander_attack_NOhitbox_12
+  - first:
+      213: -6385087554967541244
+    second: FrostSalamander_attack_NOhitbox_13
+  - first:
+      213: 5744172889823401740
+    second: FrostSalamander_attack_NOhitbox_14
+  - first:
+      213: -6004309188627812695
+    second: FrostSalamander_attack_NOhitbox_15
+  - first:
+      213: -6243224079651653512
+    second: FrostSalamander_attack_NOhitbox_16
+  - first:
+      213: 7679339045874737771
+    second: FrostSalamander_attack_NOhitbox_17
+  - first:
+      213: 3020063766039327925
+    second: FrostSalamander_attack_NOhitbox_18
+  - first:
+      213: 8614459210847195744
+    second: FrostSalamander_attack_NOhitbox_19
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: FrostSalamander_attack_NOhitbox_0
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 479
+        width: 32
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1ec434e2e3c86ad70800000000000000
+      internalID: 9054078299566984417
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostSalamander_attack_NOhitbox_1
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 479
+        width: 32
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8098618c71ce1e600800000000000000
+      internalID: 495937020872788232
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostSalamander_attack_NOhitbox_2
+      rect:
+        serializedVersion: 2
+        x: 344
+        y: 479
+        width: 32
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3cf56009b72feba20800000000000000
+      internalID: 3080165807679233987
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostSalamander_attack_NOhitbox_3
+      rect:
+        serializedVersion: 2
+        x: 488
+        y: 479
+        width: 32
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cfc3e35102e87a610800000000000000
+      internalID: 1632429658391592188
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostSalamander_attack_NOhitbox_4
+      rect:
+        serializedVersion: 2
+        x: 632
+        y: 479
+        width: 32
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b6a6e7d62a15941c0800000000000000
+      internalID: -4518990993026028949
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostSalamander_attack_NOhitbox_5
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 335
+        width: 47
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8e71a733be2839dc0800000000000000
+      internalID: -3633416527665293336
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostSalamander_attack_NOhitbox_6
+      rect:
+        serializedVersion: 2
+        x: 188
+        y: 335
+        width: 53
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9271c789cbd291360800000000000000
+      internalID: 7140788972208002857
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostSalamander_attack_NOhitbox_7
+      rect:
+        serializedVersion: 2
+        x: 332
+        y: 335
+        width: 53
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ac0d0aff50299ba40800000000000000
+      internalID: 5384495383959359690
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostSalamander_attack_NOhitbox_8
+      rect:
+        serializedVersion: 2
+        x: 476
+        y: 335
+        width: 53
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f7a8917d0fd05a660800000000000000
+      internalID: 7396333291077995135
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostSalamander_attack_NOhitbox_9
+      rect:
+        serializedVersion: 2
+        x: 620
+        y: 335
+        width: 53
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7bf7ab391aa24ba20800000000000000
+      internalID: 3077131318857465783
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostSalamander_attack_NOhitbox_10
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 191
+        width: 47
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bd747e04b3768fa00800000000000000
+      internalID: 790495238793152475
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostSalamander_attack_NOhitbox_11
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 191
+        width: 53
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0d93759b613fa9f30800000000000000
+      internalID: 4583242849727232464
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostSalamander_attack_NOhitbox_12
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 191
+        width: 53
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1bff4022492bc5350800000000000000
+      internalID: 6006872352301055921
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostSalamander_attack_NOhitbox_13
+      rect:
+        serializedVersion: 2
+        x: 479
+        y: 191
+        width: 53
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 40a646ac2bc9367a0800000000000000
+      internalID: -6385087554967541244
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostSalamander_attack_NOhitbox_14
+      rect:
+        serializedVersion: 2
+        x: 623
+        y: 191
+        width: 53
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c075a523fc667bf40800000000000000
+      internalID: 5744172889823401740
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostSalamander_attack_NOhitbox_15
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 47
+        width: 32
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9aea93aea986caca0800000000000000
+      internalID: -6004309188627812695
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostSalamander_attack_NOhitbox_16
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 47
+        width: 32
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 878b23f07cc9b59a0800000000000000
+      internalID: -6243224079651653512
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostSalamander_attack_NOhitbox_17
+      rect:
+        serializedVersion: 2
+        x: 344
+        y: 47
+        width: 32
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b62a623ec2e729a60800000000000000
+      internalID: 7679339045874737771
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostSalamander_attack_NOhitbox_18
+      rect:
+        serializedVersion: 2
+        x: 488
+        y: 47
+        width: 32
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5b47dc58efb69e920800000000000000
+      internalID: 3020063766039327925
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FrostSalamander_attack_NOhitbox_19
+      rect:
+        serializedVersion: 2
+        x: 632
+        y: 47
+        width: 32
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 06293aac205bc8770800000000000000
+      internalID: 8614459210847195744
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      FrostSalamander_attack_NOhitbox_0: 9054078299566984417
+      FrostSalamander_attack_NOhitbox_1: 495937020872788232
+      FrostSalamander_attack_NOhitbox_10: 790495238793152475
+      FrostSalamander_attack_NOhitbox_11: 4583242849727232464
+      FrostSalamander_attack_NOhitbox_12: 6006872352301055921
+      FrostSalamander_attack_NOhitbox_13: -6385087554967541244
+      FrostSalamander_attack_NOhitbox_14: 5744172889823401740
+      FrostSalamander_attack_NOhitbox_15: -6004309188627812695
+      FrostSalamander_attack_NOhitbox_16: -6243224079651653512
+      FrostSalamander_attack_NOhitbox_17: 7679339045874737771
+      FrostSalamander_attack_NOhitbox_18: 3020063766039327925
+      FrostSalamander_attack_NOhitbox_19: 8614459210847195744
+      FrostSalamander_attack_NOhitbox_2: 3080165807679233987
+      FrostSalamander_attack_NOhitbox_3: 1632429658391592188
+      FrostSalamander_attack_NOhitbox_4: -4518990993026028949
+      FrostSalamander_attack_NOhitbox_5: -3633416527665293336
+      FrostSalamander_attack_NOhitbox_6: 7140788972208002857
+      FrostSalamander_attack_NOhitbox_7: 5384495383959359690
+      FrostSalamander_attack_NOhitbox_8: 7396333291077995135
+      FrostSalamander_attack_NOhitbox_9: 3077131318857465783
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

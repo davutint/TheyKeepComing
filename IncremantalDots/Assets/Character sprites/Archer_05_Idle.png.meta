@@ -1,0 +1,546 @@
+fileFormatVersion: 2
+guid: 2055fbd3218df034ca83782d801f811f
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 5861789324648562600
+    second: Archer_05_Idle_0
+  - first:
+      213: 8130529559107571573
+    second: Archer_05_Idle_1
+  - first:
+      213: -2459647900177988599
+    second: Archer_05_Idle_2
+  - first:
+      213: 615395475026696683
+    second: Archer_05_Idle_3
+  - first:
+      213: -5948714026044613844
+    second: Archer_05_Idle_4
+  - first:
+      213: 5892585294323689158
+    second: Archer_05_Idle_5
+  - first:
+      213: -2814895807179553843
+    second: Archer_05_Idle_6
+  - first:
+      213: -535511466136899463
+    second: Archer_05_Idle_7
+  - first:
+      213: 7193088980121626279
+    second: Archer_05_Idle_8
+  - first:
+      213: 8761555262835504464
+    second: Archer_05_Idle_9
+  - first:
+      213: 9123387831126311645
+    second: Archer_05_Idle_10
+  - first:
+      213: 1446049237601276129
+    second: Archer_05_Idle_11
+  - first:
+      213: 3235586939933007573
+    second: Archer_05_Idle_12
+  - first:
+      213: -4235561867423752364
+    second: Archer_05_Idle_13
+  - first:
+      213: 9012334679421688153
+    second: Archer_05_Idle_14
+  - first:
+      213: 4845539440119980244
+    second: Archer_05_Idle_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Archer_05_Idle_0
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 146
+        width: 47
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8afbadb6552495150800000000000000
+      internalID: 5861789324648562600
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_05_Idle_1
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 146
+        width: 47
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 57f8b6e7e8175d070800000000000000
+      internalID: 8130529559107571573
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_05_Idle_2
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 146
+        width: 47
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9040b5d34439dddd0800000000000000
+      internalID: -2459647900177988599
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_05_Idle_3
+      rect:
+        serializedVersion: 2
+        x: 146
+        y: 146
+        width: 46
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: be9595d8ce25a8800800000000000000
+      internalID: 615395475026696683
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_05_Idle_4
+      rect:
+        serializedVersion: 2
+        x: 11
+        y: 98
+        width: 35
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c2b1a376c1ce17da0800000000000000
+      internalID: -5948714026044613844
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_05_Idle_5
+      rect:
+        serializedVersion: 2
+        x: 59
+        y: 98
+        width: 35
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6c6aadcda1ba6c150800000000000000
+      internalID: 5892585294323689158
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_05_Idle_6
+      rect:
+        serializedVersion: 2
+        x: 107
+        y: 98
+        width: 35
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dc383556d2b7fe8d0800000000000000
+      internalID: -2814895807179553843
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_05_Idle_7
+      rect:
+        serializedVersion: 2
+        x: 155
+        y: 98
+        width: 35
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 970f2c7a82b7198f0800000000000000
+      internalID: -535511466136899463
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_05_Idle_8
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 50
+        width: 35
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7a62de9115cf2d360800000000000000
+      internalID: 7193088980121626279
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_05_Idle_9
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 50
+        width: 35
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 055b341471c479970800000000000000
+      internalID: 8761555262835504464
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_05_Idle_10
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 50
+        width: 35
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dd2c76605e8cc9e70800000000000000
+      internalID: 9123387831126311645
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_05_Idle_11
+      rect:
+        serializedVersion: 2
+        x: 146
+        y: 50
+        width: 35
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1e0d2febe16611410800000000000000
+      internalID: 1446049237601276129
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_05_Idle_12
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 2
+        width: 46
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5de9992dd2d17ec20800000000000000
+      internalID: 3235586939933007573
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_05_Idle_13
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 0
+        width: 47
+        height: 49
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 45f540c2ce24835c0800000000000000
+      internalID: -4235561867423752364
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_05_Idle_14
+      rect:
+        serializedVersion: 2
+        x: 95
+        y: 0
+        width: 47
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9591ddb34ae321d70800000000000000
+      internalID: 9012334679421688153
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_05_Idle_15
+      rect:
+        serializedVersion: 2
+        x: 143
+        y: 2
+        width: 47
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4d02f71b270de3340800000000000000
+      internalID: 4845539440119980244
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Archer_05_Idle_0: 5861789324648562600
+      Archer_05_Idle_1: 8130529559107571573
+      Archer_05_Idle_10: 9123387831126311645
+      Archer_05_Idle_11: 1446049237601276129
+      Archer_05_Idle_12: 3235586939933007573
+      Archer_05_Idle_13: -4235561867423752364
+      Archer_05_Idle_14: 9012334679421688153
+      Archer_05_Idle_15: 4845539440119980244
+      Archer_05_Idle_2: -2459647900177988599
+      Archer_05_Idle_3: 615395475026696683
+      Archer_05_Idle_4: -5948714026044613844
+      Archer_05_Idle_5: 5892585294323689158
+      Archer_05_Idle_6: -2814895807179553843
+      Archer_05_Idle_7: -535511466136899463
+      Archer_05_Idle_8: 7193088980121626279
+      Archer_05_Idle_9: 8761555262835504464
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

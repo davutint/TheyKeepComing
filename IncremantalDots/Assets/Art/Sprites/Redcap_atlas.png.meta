@@ -1,0 +1,962 @@
+fileFormatVersion: 2
+guid: e28c232c96513444f94615dd9d05fb4a
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 18702063048008075
+    second: Redcap_atlas_0
+  - first:
+      213: 8433354373662731646
+    second: Redcap_atlas_1
+  - first:
+      213: -2033605898413454074
+    second: Redcap_atlas_2
+  - first:
+      213: -4077506139997448292
+    second: Redcap_atlas_3
+  - first:
+      213: 5038379886707682497
+    second: Redcap_atlas_4
+  - first:
+      213: -590763558418937163
+    second: Redcap_atlas_5
+  - first:
+      213: -6489294991574181104
+    second: Redcap_atlas_6
+  - first:
+      213: -1459446853404521563
+    second: Redcap_atlas_7
+  - first:
+      213: -5227072514516267188
+    second: Redcap_atlas_8
+  - first:
+      213: -4794018623907736312
+    second: Redcap_atlas_9
+  - first:
+      213: -9136005097119977168
+    second: Redcap_atlas_10
+  - first:
+      213: -1816503044091971744
+    second: Redcap_atlas_11
+  - first:
+      213: 8331367979351478422
+    second: Redcap_atlas_12
+  - first:
+      213: 4092072333805422641
+    second: Redcap_atlas_13
+  - first:
+      213: 3934379288627314133
+    second: Redcap_atlas_14
+  - first:
+      213: -8688445045761917714
+    second: Redcap_atlas_15
+  - first:
+      213: 6160762026658410729
+    second: Redcap_atlas_16
+  - first:
+      213: -7757111917526781236
+    second: Redcap_atlas_17
+  - first:
+      213: -6513886889857034535
+    second: Redcap_atlas_18
+  - first:
+      213: -5857773859266679207
+    second: Redcap_atlas_19
+  - first:
+      213: -356571356946268163
+    second: Redcap_atlas_20
+  - first:
+      213: 4459246918446957688
+    second: Redcap_atlas_21
+  - first:
+      213: 3065402724073895026
+    second: Redcap_atlas_22
+  - first:
+      213: 3769335854539783114
+    second: Redcap_atlas_23
+  - first:
+      213: 8087194043043127978
+    second: Redcap_atlas_24
+  - first:
+      213: -1088942461844263919
+    second: Redcap_atlas_25
+  - first:
+      213: 3579364362108427649
+    second: Redcap_atlas_26
+  - first:
+      213: -5679705441167511589
+    second: Redcap_atlas_27
+  - first:
+      213: 5457169631168068778
+    second: Redcap_atlas_28
+  - first:
+      213: 1338690592353854556
+    second: Redcap_atlas_29
+  - first:
+      213: -6403485864365516667
+    second: Redcap_atlas_30
+  - first:
+      213: -4955091295838324371
+    second: Redcap_atlas_31
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Redcap_atlas_0
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 335
+        width: 38
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b812b806d61724000800000000000000
+      internalID: 18702063048008075
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_atlas_1
+      rect:
+        serializedVersion: 2
+        x: 53
+        y: 335
+        width: 38
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e7d672bfe1b490570800000000000000
+      internalID: 8433354373662731646
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_atlas_2
+      rect:
+        serializedVersion: 2
+        x: 101
+        y: 335
+        width: 38
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 60d4debb53e27c3e0800000000000000
+      internalID: -2033605898413454074
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_atlas_3
+      rect:
+        serializedVersion: 2
+        x: 149
+        y: 335
+        width: 38
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c975afbe4c9c967c0800000000000000
+      internalID: -4077506139997448292
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_atlas_4
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 287
+        width: 32
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1cc2faeffcbebe540800000000000000
+      internalID: 5038379886707682497
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_atlas_5
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 287
+        width: 32
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5ba81327caf2dc7f0800000000000000
+      internalID: -590763558418937163
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_atlas_6
+      rect:
+        serializedVersion: 2
+        x: 104
+        y: 287
+        width: 32
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 01bdf70469461f5a0800000000000000
+      internalID: -6489294991574181104
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_atlas_7
+      rect:
+        serializedVersion: 2
+        x: 152
+        y: 287
+        width: 32
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5ab034eb1d00fbbe0800000000000000
+      internalID: -1459446853404521563
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_atlas_8
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 239
+        width: 32
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c4fcc050e35b577b0800000000000000
+      internalID: -5227072514516267188
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_atlas_9
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 239
+        width: 32
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8055f5b1679387db0800000000000000
+      internalID: -4794018623907736312
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_atlas_10
+      rect:
+        serializedVersion: 2
+        x: 104
+        y: 239
+        width: 32
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0317100d4c3663180800000000000000
+      internalID: -9136005097119977168
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_atlas_11
+      rect:
+        serializedVersion: 2
+        x: 152
+        y: 239
+        width: 32
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0677b7b0b1c7ac6e0800000000000000
+      internalID: -1816503044091971744
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_atlas_12
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 191
+        width: 38
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6901f462907fe9370800000000000000
+      internalID: 8331367979351478422
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_atlas_13
+      rect:
+        serializedVersion: 2
+        x: 53
+        y: 191
+        width: 38
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1380dab5b16f9c830800000000000000
+      internalID: 4092072333805422641
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_atlas_14
+      rect:
+        serializedVersion: 2
+        x: 101
+        y: 191
+        width: 38
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5ddf8462e19b99630800000000000000
+      internalID: 3934379288627314133
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_atlas_15
+      rect:
+        serializedVersion: 2
+        x: 149
+        y: 191
+        width: 38
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eecbbd4a3417c6780800000000000000
+      internalID: -8688445045761917714
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_atlas_16
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 143
+        width: 38
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9e0b0b01c6c6f7550800000000000000
+      internalID: 6160762026658410729
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_atlas_17
+      rect:
+        serializedVersion: 2
+        x: 53
+        y: 143
+        width: 38
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cc2fdd85fc3395490800000000000000
+      internalID: -7757111917526781236
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_atlas_18
+      rect:
+        serializedVersion: 2
+        x: 101
+        y: 143
+        width: 38
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9d65ffeb2660a95a0800000000000000
+      internalID: -6513886889857034535
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_atlas_19
+      rect:
+        serializedVersion: 2
+        x: 149
+        y: 143
+        width: 38
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 95e27d7f5b105bea0800000000000000
+      internalID: -5857773859266679207
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_atlas_20
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 95
+        width: 32
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dff73247d343d0bf0800000000000000
+      internalID: -356571356946268163
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_atlas_21
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 95
+        width: 32
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 87449cb327d62ed30800000000000000
+      internalID: 4459246918446957688
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_atlas_22
+      rect:
+        serializedVersion: 2
+        x: 104
+        y: 95
+        width: 32
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 27470fd498f7a8a20800000000000000
+      internalID: 3065402724073895026
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_atlas_23
+      rect:
+        serializedVersion: 2
+        x: 152
+        y: 95
+        width: 32
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: acbbcf82dfe5f4430800000000000000
+      internalID: 3769335854539783114
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_atlas_24
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 47
+        width: 32
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aa2ad35622c7b3070800000000000000
+      internalID: 8087194043043127978
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_atlas_25
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 47
+        width: 32
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 11ceee4b99c43e0f0800000000000000
+      internalID: -1088942461844263919
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_atlas_26
+      rect:
+        serializedVersion: 2
+        x: 104
+        y: 47
+        width: 32
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 18d5a2d4ce47ca130800000000000000
+      internalID: 3579364362108427649
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_atlas_27
+      rect:
+        serializedVersion: 2
+        x: 152
+        y: 47
+        width: 32
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bdf6b5e5ef1ad21b0800000000000000
+      internalID: -5679705441167511589
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_atlas_28
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 0
+        width: 38
+        height: 43
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aac72d0cdd2cbbb40800000000000000
+      internalID: 5457169631168068778
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_atlas_29
+      rect:
+        serializedVersion: 2
+        x: 53
+        y: 0
+        width: 38
+        height: 40
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c54a865400cf39210800000000000000
+      internalID: 1338690592353854556
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_atlas_30
+      rect:
+        serializedVersion: 2
+        x: 101
+        y: 0
+        width: 38
+        height: 43
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5881242988f3227a0800000000000000
+      internalID: -6403485864365516667
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_atlas_31
+      rect:
+        serializedVersion: 2
+        x: 149
+        y: 0
+        width: 38
+        height: 40
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d693de938bafb3bb0800000000000000
+      internalID: -4955091295838324371
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Redcap_atlas_0: 18702063048008075
+      Redcap_atlas_1: 8433354373662731646
+      Redcap_atlas_10: -9136005097119977168
+      Redcap_atlas_11: -1816503044091971744
+      Redcap_atlas_12: 8331367979351478422
+      Redcap_atlas_13: 4092072333805422641
+      Redcap_atlas_14: 3934379288627314133
+      Redcap_atlas_15: -8688445045761917714
+      Redcap_atlas_16: 6160762026658410729
+      Redcap_atlas_17: -7757111917526781236
+      Redcap_atlas_18: -6513886889857034535
+      Redcap_atlas_19: -5857773859266679207
+      Redcap_atlas_2: -2033605898413454074
+      Redcap_atlas_20: -356571356946268163
+      Redcap_atlas_21: 4459246918446957688
+      Redcap_atlas_22: 3065402724073895026
+      Redcap_atlas_23: 3769335854539783114
+      Redcap_atlas_24: 8087194043043127978
+      Redcap_atlas_25: -1088942461844263919
+      Redcap_atlas_26: 3579364362108427649
+      Redcap_atlas_27: -5679705441167511589
+      Redcap_atlas_28: 5457169631168068778
+      Redcap_atlas_29: 1338690592353854556
+      Redcap_atlas_3: -4077506139997448292
+      Redcap_atlas_30: -6403485864365516667
+      Redcap_atlas_31: -4955091295838324371
+      Redcap_atlas_4: 5038379886707682497
+      Redcap_atlas_5: -590763558418937163
+      Redcap_atlas_6: -6489294991574181104
+      Redcap_atlas_7: -1459446853404521563
+      Redcap_atlas_8: -5227072514516267188
+      Redcap_atlas_9: -4794018623907736312
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

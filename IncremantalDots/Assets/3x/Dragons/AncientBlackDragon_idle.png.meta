@@ -1,0 +1,546 @@
+fileFormatVersion: 2
+guid: 924e03f6c038fee4ea9e64a34bd59a4f
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -7926587289484804038
+    second: AncientBlackDragon_idle_0
+  - first:
+      213: -1809436379925427547
+    second: AncientBlackDragon_idle_1
+  - first:
+      213: 2350298556799509824
+    second: AncientBlackDragon_idle_2
+  - first:
+      213: -3574265210873011169
+    second: AncientBlackDragon_idle_3
+  - first:
+      213: 3245398552460213250
+    second: AncientBlackDragon_idle_4
+  - first:
+      213: -7193116982737928409
+    second: AncientBlackDragon_idle_5
+  - first:
+      213: 8197228547995518508
+    second: AncientBlackDragon_idle_6
+  - first:
+      213: 1205919033646839406
+    second: AncientBlackDragon_idle_7
+  - first:
+      213: -7793964349358131580
+    second: AncientBlackDragon_idle_8
+  - first:
+      213: 7864408361785732669
+    second: AncientBlackDragon_idle_9
+  - first:
+      213: 8238596722779482828
+    second: AncientBlackDragon_idle_10
+  - first:
+      213: -1267237697762996802
+    second: AncientBlackDragon_idle_11
+  - first:
+      213: -3138581350056968223
+    second: AncientBlackDragon_idle_12
+  - first:
+      213: 3569552192654840712
+    second: AncientBlackDragon_idle_13
+  - first:
+      213: 4834460540146159435
+    second: AncientBlackDragon_idle_14
+  - first:
+      213: -3442269340483225668
+    second: AncientBlackDragon_idle_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: AncientBlackDragon_idle_0
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 431
+        width: 140
+        height: 143
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a30c1296bda1ff190800000000000000
+      internalID: -7926587289484804038
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AncientBlackDragon_idle_1
+      rect:
+        serializedVersion: 2
+        x: 146
+        y: 431
+        width: 140
+        height: 143
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5aa40e2033793e6e0800000000000000
+      internalID: -1809436379925427547
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AncientBlackDragon_idle_2
+      rect:
+        serializedVersion: 2
+        x: 290
+        y: 431
+        width: 140
+        height: 140
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 045e522c510fd9020800000000000000
+      internalID: 2350298556799509824
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AncientBlackDragon_idle_3
+      rect:
+        serializedVersion: 2
+        x: 434
+        y: 431
+        width: 140
+        height: 143
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f14a0ec5ab8a56ec0800000000000000
+      internalID: -3574265210873011169
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AncientBlackDragon_idle_4
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 287
+        width: 140
+        height: 143
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 20c35f1e9c8f90d20800000000000000
+      internalID: 3245398552460213250
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AncientBlackDragon_idle_5
+      rect:
+        serializedVersion: 2
+        x: 146
+        y: 287
+        width: 140
+        height: 143
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 72f7318073aec2c90800000000000000
+      internalID: -7193116982737928409
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AncientBlackDragon_idle_6
+      rect:
+        serializedVersion: 2
+        x: 290
+        y: 287
+        width: 140
+        height: 140
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c26c6f10fe762c170800000000000000
+      internalID: 8197228547995518508
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AncientBlackDragon_idle_7
+      rect:
+        serializedVersion: 2
+        x: 434
+        y: 287
+        width: 140
+        height: 143
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e66f66cc8f84cb010800000000000000
+      internalID: 1205919033646839406
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AncientBlackDragon_idle_8
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 143
+        width: 140
+        height: 143
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 486337ce7b646d390800000000000000
+      internalID: -7793964349358131580
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AncientBlackDragon_idle_9
+      rect:
+        serializedVersion: 2
+        x: 146
+        y: 143
+        width: 140
+        height: 143
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d3ea9d4dcbdf32d60800000000000000
+      internalID: 7864408361785732669
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AncientBlackDragon_idle_10
+      rect:
+        serializedVersion: 2
+        x: 290
+        y: 143
+        width: 140
+        height: 140
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ccae7f4c110655270800000000000000
+      internalID: 8238596722779482828
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AncientBlackDragon_idle_11
+      rect:
+        serializedVersion: 2
+        x: 434
+        y: 143
+        width: 140
+        height: 143
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ebd4ada270ed96ee0800000000000000
+      internalID: -1267237697762996802
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AncientBlackDragon_idle_12
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 0
+        width: 140
+        height: 142
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1ef303b14e48174d0800000000000000
+      internalID: -3138581350056968223
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AncientBlackDragon_idle_13
+      rect:
+        serializedVersion: 2
+        x: 146
+        y: 0
+        width: 140
+        height: 142
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 88398629ec8998130800000000000000
+      internalID: 3569552192654840712
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AncientBlackDragon_idle_14
+      rect:
+        serializedVersion: 2
+        x: 290
+        y: 0
+        width: 140
+        height: 139
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b4f0e084f34771340800000000000000
+      internalID: 4834460540146159435
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AncientBlackDragon_idle_15
+      rect:
+        serializedVersion: 2
+        x: 434
+        y: 0
+        width: 140
+        height: 142
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cb77743d54a9a30d0800000000000000
+      internalID: -3442269340483225668
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      AncientBlackDragon_idle_0: -7926587289484804038
+      AncientBlackDragon_idle_1: -1809436379925427547
+      AncientBlackDragon_idle_10: 8238596722779482828
+      AncientBlackDragon_idle_11: -1267237697762996802
+      AncientBlackDragon_idle_12: -3138581350056968223
+      AncientBlackDragon_idle_13: 3569552192654840712
+      AncientBlackDragon_idle_14: 4834460540146159435
+      AncientBlackDragon_idle_15: -3442269340483225668
+      AncientBlackDragon_idle_2: 2350298556799509824
+      AncientBlackDragon_idle_3: -3574265210873011169
+      AncientBlackDragon_idle_4: 3245398552460213250
+      AncientBlackDragon_idle_5: -7193116982737928409
+      AncientBlackDragon_idle_6: 8197228547995518508
+      AncientBlackDragon_idle_7: 1205919033646839406
+      AncientBlackDragon_idle_8: -7793964349358131580
+      AncientBlackDragon_idle_9: 7864408361785732669
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

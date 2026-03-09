@@ -1,0 +1,962 @@
+fileFormatVersion: 2
+guid: b3e16d97f579956408f6458188cf4b24
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -6477345973863924064
+    second: Archer_atlas_0
+  - first:
+      213: 84245085981111418
+    second: Archer_atlas_1
+  - first:
+      213: -8173138070159135466
+    second: Archer_atlas_2
+  - first:
+      213: 6762786913791354817
+    second: Archer_atlas_3
+  - first:
+      213: 4827477882882474123
+    second: Archer_atlas_4
+  - first:
+      213: 6487378989573498790
+    second: Archer_atlas_5
+  - first:
+      213: -7966415046653011559
+    second: Archer_atlas_6
+  - first:
+      213: 4341236168049938191
+    second: Archer_atlas_7
+  - first:
+      213: -5282046635745910530
+    second: Archer_atlas_8
+  - first:
+      213: 5617401403156415423
+    second: Archer_atlas_9
+  - first:
+      213: -4918259570943797648
+    second: Archer_atlas_10
+  - first:
+      213: 5556364756107443701
+    second: Archer_atlas_11
+  - first:
+      213: 2113047723844744518
+    second: Archer_atlas_12
+  - first:
+      213: -4478989991123565094
+    second: Archer_atlas_13
+  - first:
+      213: -4320769700386457976
+    second: Archer_atlas_14
+  - first:
+      213: 4614889498582009310
+    second: Archer_atlas_15
+  - first:
+      213: 5878973207369264549
+    second: Archer_atlas_16
+  - first:
+      213: 2990716969175421000
+    second: Archer_atlas_17
+  - first:
+      213: -954950780981108447
+    second: Archer_atlas_18
+  - first:
+      213: -129254927941556522
+    second: Archer_atlas_19
+  - first:
+      213: -9080696441552602166
+    second: Archer_atlas_20
+  - first:
+      213: 304829552755209935
+    second: Archer_atlas_21
+  - first:
+      213: 5156422686321195503
+    second: Archer_atlas_22
+  - first:
+      213: -3828209881520401617
+    second: Archer_atlas_23
+  - first:
+      213: -5657201097595837776
+    second: Archer_atlas_24
+  - first:
+      213: -9094610695694136936
+    second: Archer_atlas_25
+  - first:
+      213: -6197394340765767743
+    second: Archer_atlas_26
+  - first:
+      213: -8431612608304788688
+    second: Archer_atlas_27
+  - first:
+      213: -4165170662193086264
+    second: Archer_atlas_28
+  - first:
+      213: 5120026328666178665
+    second: Archer_atlas_29
+  - first:
+      213: -8553869425027783823
+    second: Archer_atlas_30
+  - first:
+      213: 7671492062456606956
+    second: Archer_atlas_31
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Archer_atlas_0
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 338
+        width: 47
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0aeb88cb728db16a0800000000000000
+      internalID: -6477345973863924064
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_atlas_1
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 338
+        width: 47
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a74f9f7957c4b2100800000000000000
+      internalID: 84245085981111418
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_atlas_2
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 338
+        width: 47
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 61d61f37a3e239e80800000000000000
+      internalID: -8173138070159135466
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_atlas_3
+      rect:
+        serializedVersion: 2
+        x: 146
+        y: 338
+        width: 46
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1c7a1380ede3add50800000000000000
+      internalID: 6762786913791354817
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_atlas_4
+      rect:
+        serializedVersion: 2
+        x: 11
+        y: 290
+        width: 35
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b80c342be85aef240800000000000000
+      internalID: 4827477882882474123
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_atlas_5
+      rect:
+        serializedVersion: 2
+        x: 59
+        y: 290
+        width: 35
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6a76cd4c1dcc70a50800000000000000
+      internalID: 6487378989573498790
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_atlas_6
+      rect:
+        serializedVersion: 2
+        x: 107
+        y: 290
+        width: 35
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9999be219bb917190800000000000000
+      internalID: -7966415046653011559
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_atlas_7
+      rect:
+        serializedVersion: 2
+        x: 155
+        y: 290
+        width: 35
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f0fc1b24b4b2f3c30800000000000000
+      internalID: 4341236168049938191
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_atlas_8
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 242
+        width: 35
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ef0615df19662b6b0800000000000000
+      internalID: -5282046635745910530
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_atlas_9
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 242
+        width: 35
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fb34beb50d405fd40800000000000000
+      internalID: 5617401403156415423
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_atlas_10
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 242
+        width: 35
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 076dab07af4debbb0800000000000000
+      internalID: -4918259570943797648
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_atlas_11
+      rect:
+        serializedVersion: 2
+        x: 146
+        y: 242
+        width: 35
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5fdb84a8e4c2c1d40800000000000000
+      internalID: 5556364756107443701
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_atlas_12
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 194
+        width: 46
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 645b63d95bd035d10800000000000000
+      internalID: 2113047723844744518
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_atlas_13
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 191
+        width: 47
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ad5cc82755e67d1c0800000000000000
+      internalID: -4478989991123565094
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_atlas_14
+      rect:
+        serializedVersion: 2
+        x: 95
+        y: 191
+        width: 47
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 886b13499da8904c0800000000000000
+      internalID: -4320769700386457976
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_atlas_15
+      rect:
+        serializedVersion: 2
+        x: 143
+        y: 194
+        width: 47
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ed549a85c816b0040800000000000000
+      internalID: 4614889498582009310
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_atlas_16
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 146
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5ada845ebfe469150800000000000000
+      internalID: 5878973207369264549
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_atlas_17
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 146
+        width: 47
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8401f6bec39218920800000000000000
+      internalID: 2990716969175421000
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_atlas_18
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 146
+        width: 47
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 121a3a103555fb2f0800000000000000
+      internalID: -954950780981108447
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_atlas_19
+      rect:
+        serializedVersion: 2
+        x: 146
+        y: 146
+        width: 46
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6d6239ee35bc43ef0800000000000000
+      internalID: -129254927941556522
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_atlas_20
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 98
+        width: 41
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: acb7a10b2b2eaf180800000000000000
+      internalID: -9080696441552602166
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_atlas_21
+      rect:
+        serializedVersion: 2
+        x: 59
+        y: 98
+        width: 35
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fc6f309fcd8fa3400800000000000000
+      internalID: 304829552755209935
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_atlas_22
+      rect:
+        serializedVersion: 2
+        x: 104
+        y: 98
+        width: 38
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fe9b0f10d1b4f8740800000000000000
+      internalID: 5156422686321195503
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_atlas_23
+      rect:
+        serializedVersion: 2
+        x: 155
+        y: 98
+        width: 35
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f23165e35677fdac0800000000000000
+      internalID: -3828209881520401617
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_atlas_24
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 50
+        width: 40
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0b2a9da23959d71b0800000000000000
+      internalID: -5657201097595837776
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_atlas_25
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 50
+        width: 35
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 899cea0f1c379c180800000000000000
+      internalID: -9094610695694136936
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_atlas_26
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 50
+        width: 38
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1c7e3a9aeae6ef9a0800000000000000
+      internalID: -6197394340765767743
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_atlas_27
+      rect:
+        serializedVersion: 2
+        x: 146
+        y: 50
+        width: 35
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 03bc94e5105ecfa80800000000000000
+      internalID: -8431612608304788688
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_atlas_28
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 0
+        width: 41
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8c04a1bc9575236c0800000000000000
+      internalID: -4165170662193086264
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_atlas_29
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 0
+        width: 47
+        height: 43
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9648bc0a1dcfd0740800000000000000
+      internalID: 5120026328666178665
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_atlas_30
+      rect:
+        serializedVersion: 2
+        x: 101
+        y: 0
+        width: 41
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 173e42a041d8a4980800000000000000
+      internalID: -8553869425027783823
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_atlas_31
+      rect:
+        serializedVersion: 2
+        x: 143
+        y: 0
+        width: 47
+        height: 43
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ce074ffa26d967a60800000000000000
+      internalID: 7671492062456606956
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Archer_atlas_0: -6477345973863924064
+      Archer_atlas_1: 84245085981111418
+      Archer_atlas_10: -4918259570943797648
+      Archer_atlas_11: 5556364756107443701
+      Archer_atlas_12: 2113047723844744518
+      Archer_atlas_13: -4478989991123565094
+      Archer_atlas_14: -4320769700386457976
+      Archer_atlas_15: 4614889498582009310
+      Archer_atlas_16: 5878973207369264549
+      Archer_atlas_17: 2990716969175421000
+      Archer_atlas_18: -954950780981108447
+      Archer_atlas_19: -129254927941556522
+      Archer_atlas_2: -8173138070159135466
+      Archer_atlas_20: -9080696441552602166
+      Archer_atlas_21: 304829552755209935
+      Archer_atlas_22: 5156422686321195503
+      Archer_atlas_23: -3828209881520401617
+      Archer_atlas_24: -5657201097595837776
+      Archer_atlas_25: -9094610695694136936
+      Archer_atlas_26: -6197394340765767743
+      Archer_atlas_27: -8431612608304788688
+      Archer_atlas_28: -4165170662193086264
+      Archer_atlas_29: 5120026328666178665
+      Archer_atlas_3: 6762786913791354817
+      Archer_atlas_30: -8553869425027783823
+      Archer_atlas_31: 7671492062456606956
+      Archer_atlas_4: 4827477882882474123
+      Archer_atlas_5: 6487378989573498790
+      Archer_atlas_6: -7966415046653011559
+      Archer_atlas_7: 4341236168049938191
+      Archer_atlas_8: -5282046635745910530
+      Archer_atlas_9: 5617401403156415423
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

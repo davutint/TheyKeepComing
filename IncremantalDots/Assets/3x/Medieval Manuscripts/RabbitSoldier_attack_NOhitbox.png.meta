@@ -1,0 +1,650 @@
+fileFormatVersion: 2
+guid: 92983f01d8a5ceb45b1e4ae9b3cca05f
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 3084419446877131184
+    second: RabbitSoldier_attack_NOhitbox_0
+  - first:
+      213: 6162624410509965665
+    second: RabbitSoldier_attack_NOhitbox_1
+  - first:
+      213: -5299716159117661091
+    second: RabbitSoldier_attack_NOhitbox_2
+  - first:
+      213: -6419194895397623128
+    second: RabbitSoldier_attack_NOhitbox_3
+  - first:
+      213: -6668544954554004159
+    second: RabbitSoldier_attack_NOhitbox_4
+  - first:
+      213: -5126997768012269259
+    second: RabbitSoldier_attack_NOhitbox_5
+  - first:
+      213: -7023217707134682416
+    second: RabbitSoldier_attack_NOhitbox_6
+  - first:
+      213: -2733625836865432298
+    second: RabbitSoldier_attack_NOhitbox_7
+  - first:
+      213: -2518965519661931224
+    second: RabbitSoldier_attack_NOhitbox_8
+  - first:
+      213: -914426937203721521
+    second: RabbitSoldier_attack_NOhitbox_9
+  - first:
+      213: 4252574309170476494
+    second: RabbitSoldier_attack_NOhitbox_10
+  - first:
+      213: -7198090868771201870
+    second: RabbitSoldier_attack_NOhitbox_11
+  - first:
+      213: 2654129820217499783
+    second: RabbitSoldier_attack_NOhitbox_12
+  - first:
+      213: -7406661773566544028
+    second: RabbitSoldier_attack_NOhitbox_13
+  - first:
+      213: -9138279749886926989
+    second: RabbitSoldier_attack_NOhitbox_14
+  - first:
+      213: 1050472406894501729
+    second: RabbitSoldier_attack_NOhitbox_15
+  - first:
+      213: -4342760867060641270
+    second: RabbitSoldier_attack_NOhitbox_16
+  - first:
+      213: 4266858085124148836
+    second: RabbitSoldier_attack_NOhitbox_17
+  - first:
+      213: -5521915467849557016
+    second: RabbitSoldier_attack_NOhitbox_18
+  - first:
+      213: -3577383997093650748
+    second: RabbitSoldier_attack_NOhitbox_19
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: RabbitSoldier_attack_NOhitbox_0
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 479
+        width: 44
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0b11b6d152f0eca20800000000000000
+      internalID: 3084419446877131184
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RabbitSoldier_attack_NOhitbox_1
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 479
+        width: 35
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 169f898104a068550800000000000000
+      internalID: 6162624410509965665
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RabbitSoldier_attack_NOhitbox_2
+      rect:
+        serializedVersion: 2
+        x: 344
+        y: 479
+        width: 35
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d5ce46d7b30a376b0800000000000000
+      internalID: -5299716159117661091
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RabbitSoldier_attack_NOhitbox_3
+      rect:
+        serializedVersion: 2
+        x: 488
+        y: 479
+        width: 35
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8aae2d3c0407ae6a0800000000000000
+      internalID: -6419194895397623128
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RabbitSoldier_attack_NOhitbox_4
+      rect:
+        serializedVersion: 2
+        x: 632
+        y: 479
+        width: 35
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 14dc51ff1b19473a0800000000000000
+      internalID: -6668544954554004159
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RabbitSoldier_attack_NOhitbox_5
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 335
+        width: 41
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5397869a1be39d8b0800000000000000
+      internalID: -5126997768012269259
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RabbitSoldier_attack_NOhitbox_6
+      rect:
+        serializedVersion: 2
+        x: 188
+        y: 335
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0daf00ab4b4888e90800000000000000
+      internalID: -7023217707134682416
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RabbitSoldier_attack_NOhitbox_7
+      rect:
+        serializedVersion: 2
+        x: 332
+        y: 335
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6155ec4e8c5301ad0800000000000000
+      internalID: -2733625836865432298
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RabbitSoldier_attack_NOhitbox_8
+      rect:
+        serializedVersion: 2
+        x: 476
+        y: 335
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 825e717b436da0dd0800000000000000
+      internalID: -2518965519661931224
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RabbitSoldier_attack_NOhitbox_9
+      rect:
+        serializedVersion: 2
+        x: 620
+        y: 335
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fca7ce2ab8d4f43f0800000000000000
+      internalID: -914426937203721521
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RabbitSoldier_attack_NOhitbox_10
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 191
+        width: 41
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ec5fe079dcd240b30800000000000000
+      internalID: 4252574309170476494
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RabbitSoldier_attack_NOhitbox_11
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 191
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2bcd8e1fd7e3b1c90800000000000000
+      internalID: -7198090868771201870
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RabbitSoldier_attack_NOhitbox_12
+      rect:
+        serializedVersion: 2
+        x: 344
+        y: 191
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 780e5d1620d55d420800000000000000
+      internalID: 2654129820217499783
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RabbitSoldier_attack_NOhitbox_13
+      rect:
+        serializedVersion: 2
+        x: 488
+        y: 191
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 467f91feb50463990800000000000000
+      internalID: -7406661773566544028
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RabbitSoldier_attack_NOhitbox_14
+      rect:
+        serializedVersion: 2
+        x: 632
+        y: 191
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 37f18d1fbfe4e2180800000000000000
+      internalID: -9138279749886926989
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RabbitSoldier_attack_NOhitbox_15
+      rect:
+        serializedVersion: 2
+        x: 53
+        y: 47
+        width: 44
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 16fdb43a617049e00800000000000000
+      internalID: 1050472406894501729
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RabbitSoldier_attack_NOhitbox_16
+      rect:
+        serializedVersion: 2
+        x: 188
+        y: 47
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a021266100a6bb3c0800000000000000
+      internalID: -4342760867060641270
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RabbitSoldier_attack_NOhitbox_17
+      rect:
+        serializedVersion: 2
+        x: 332
+        y: 47
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 46e04d652dce63b30800000000000000
+      internalID: 4266858085124148836
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RabbitSoldier_attack_NOhitbox_18
+      rect:
+        serializedVersion: 2
+        x: 476
+        y: 47
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8eb971b63273e53b0800000000000000
+      internalID: -5521915467849557016
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RabbitSoldier_attack_NOhitbox_19
+      rect:
+        serializedVersion: 2
+        x: 620
+        y: 47
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4ced01c55349a5ec0800000000000000
+      internalID: -3577383997093650748
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      RabbitSoldier_attack_NOhitbox_0: 3084419446877131184
+      RabbitSoldier_attack_NOhitbox_1: 6162624410509965665
+      RabbitSoldier_attack_NOhitbox_10: 4252574309170476494
+      RabbitSoldier_attack_NOhitbox_11: -7198090868771201870
+      RabbitSoldier_attack_NOhitbox_12: 2654129820217499783
+      RabbitSoldier_attack_NOhitbox_13: -7406661773566544028
+      RabbitSoldier_attack_NOhitbox_14: -9138279749886926989
+      RabbitSoldier_attack_NOhitbox_15: 1050472406894501729
+      RabbitSoldier_attack_NOhitbox_16: -4342760867060641270
+      RabbitSoldier_attack_NOhitbox_17: 4266858085124148836
+      RabbitSoldier_attack_NOhitbox_18: -5521915467849557016
+      RabbitSoldier_attack_NOhitbox_19: -3577383997093650748
+      RabbitSoldier_attack_NOhitbox_2: -5299716159117661091
+      RabbitSoldier_attack_NOhitbox_3: -6419194895397623128
+      RabbitSoldier_attack_NOhitbox_4: -6668544954554004159
+      RabbitSoldier_attack_NOhitbox_5: -5126997768012269259
+      RabbitSoldier_attack_NOhitbox_6: -7023217707134682416
+      RabbitSoldier_attack_NOhitbox_7: -2733625836865432298
+      RabbitSoldier_attack_NOhitbox_8: -2518965519661931224
+      RabbitSoldier_attack_NOhitbox_9: -914426937203721521
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

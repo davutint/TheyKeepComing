@@ -1,0 +1,754 @@
+fileFormatVersion: 2
+guid: 4ecf1199f2c53e247b06361e83bfc869
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 4347165852967038270
+    second: Imp_attack_hitbox_0
+  - first:
+      213: 2882574342685315784
+    second: Imp_attack_hitbox_1
+  - first:
+      213: -1489626298229443398
+    second: Imp_attack_hitbox_2
+  - first:
+      213: 8265286355741390694
+    second: Imp_attack_hitbox_3
+  - first:
+      213: 2692872069667925286
+    second: Imp_attack_hitbox_4
+  - first:
+      213: 5707450069812641018
+    second: Imp_attack_hitbox_5
+  - first:
+      213: -7658756309004829183
+    second: Imp_attack_hitbox_6
+  - first:
+      213: -2894224479353231946
+    second: Imp_attack_hitbox_7
+  - first:
+      213: 7974729385858678838
+    second: Imp_attack_hitbox_8
+  - first:
+      213: 3853653315589179907
+    second: Imp_attack_hitbox_9
+  - first:
+      213: 7964077352970158480
+    second: Imp_attack_hitbox_10
+  - first:
+      213: 6471588124626431630
+    second: Imp_attack_hitbox_11
+  - first:
+      213: 6438180651228930971
+    second: Imp_attack_hitbox_12
+  - first:
+      213: -967058238093053065
+    second: Imp_attack_hitbox_13
+  - first:
+      213: 5746990992581232900
+    second: Imp_attack_hitbox_14
+  - first:
+      213: 3727695896731786126
+    second: Imp_attack_hitbox_15
+  - first:
+      213: 3602292231131375933
+    second: Imp_attack_hitbox_16
+  - first:
+      213: -5750891397174335327
+    second: Imp_attack_hitbox_17
+  - first:
+      213: -3595668401034379156
+    second: Imp_attack_hitbox_18
+  - first:
+      213: -2033947075023645394
+    second: Imp_attack_hitbox_19
+  - first:
+      213: 1947885402439895623
+    second: Imp_attack_hitbox_20
+  - first:
+      213: -8004846267018504266
+    second: Imp_attack_hitbox_21
+  - first:
+      213: -8232088978011308462
+    second: Imp_attack_hitbox_22
+  - first:
+      213: -2983782875246267586
+    second: Imp_attack_hitbox_23
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Imp_attack_hitbox_0
+      rect:
+        serializedVersion: 2
+        x: 44
+        y: 431
+        width: 56
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e3deecd9f4c345c30800000000000000
+      internalID: 4347165852967038270
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_hitbox_1
+      rect:
+        serializedVersion: 2
+        x: 179
+        y: 431
+        width: 74
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8c2d9669716f00820800000000000000
+      internalID: 2882574342685315784
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_hitbox_2
+      rect:
+        serializedVersion: 2
+        x: 317
+        y: 431
+        width: 41
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab434fd26c8c35be0800000000000000
+      internalID: -1489626298229443398
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_hitbox_3
+      rect:
+        serializedVersion: 2
+        x: 362
+        y: 431
+        width: 41
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 66739d0362234b270800000000000000
+      internalID: 8265286355741390694
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_hitbox_4
+      rect:
+        serializedVersion: 2
+        x: 461
+        y: 449
+        width: 11
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 62da02241e00f5520800000000000000
+      internalID: 2692872069667925286
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_hitbox_5
+      rect:
+        serializedVersion: 2
+        x: 536
+        y: 449
+        width: 11
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: afcf570699fe43f40800000000000000
+      internalID: 5707450069812641018
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_hitbox_6
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 332
+        width: 55
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 10e3c7cf6b1a6b590800000000000000
+      internalID: -7658756309004829183
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_hitbox_7
+      rect:
+        serializedVersion: 2
+        x: 143
+        y: 323
+        width: 50
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6b529e79b26a5d7d0800000000000000
+      internalID: -2894224479353231946
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_hitbox_8
+      rect:
+        serializedVersion: 2
+        x: 296
+        y: 338
+        width: 53
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 630c9ffdf1eebae60800000000000000
+      internalID: 7974729385858678838
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_hitbox_9
+      rect:
+        serializedVersion: 2
+        x: 302
+        y: 323
+        width: 38
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 30a0333e54dea7530800000000000000
+      internalID: 3853653315589179907
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_hitbox_10
+      rect:
+        serializedVersion: 2
+        x: 470
+        y: 338
+        width: 26
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 09105833826168e60800000000000000
+      internalID: 7964077352970158480
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_hitbox_11
+      rect:
+        serializedVersion: 2
+        x: 476
+        y: 323
+        width: 23
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e8eaef48c13bfc950800000000000000
+      internalID: 6471588124626431630
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_hitbox_12
+      rect:
+        serializedVersion: 2
+        x: 89
+        y: 188
+        width: 56
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b932b4cf033095950800000000000000
+      internalID: 6438180651228930971
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_hitbox_13
+      rect:
+        serializedVersion: 2
+        x: 239
+        y: 179
+        width: 50
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7733959f7a15492f0800000000000000
+      internalID: -967058238093053065
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_hitbox_14
+      rect:
+        serializedVersion: 2
+        x: 371
+        y: 194
+        width: 53
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4098c20ebd961cf40800000000000000
+      internalID: 5746990992581232900
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_hitbox_15
+      rect:
+        serializedVersion: 2
+        x: 380
+        y: 179
+        width: 38
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e8b116bfaaf6bb330800000000000000
+      internalID: 3727695896731786126
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_hitbox_16
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 194
+        width: 26
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d392cbdc2b9edf130800000000000000
+      internalID: 3602292231131375933
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_hitbox_17
+      rect:
+        serializedVersion: 2
+        x: 509
+        y: 179
+        width: 23
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1a8e2996ebab030b0800000000000000
+      internalID: -5750891397174335327
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_hitbox_18
+      rect:
+        serializedVersion: 2
+        x: 44
+        y: 77
+        width: 56
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c60cf32d3ae991ec0800000000000000
+      internalID: -3595668401034379156
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_hitbox_19
+      rect:
+        serializedVersion: 2
+        x: 179
+        y: 107
+        width: 74
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e25554d59e7f5c3e0800000000000000
+      internalID: -2033947075023645394
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_hitbox_20
+      rect:
+        serializedVersion: 2
+        x: 317
+        y: 116
+        width: 41
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 74a49930477480b10800000000000000
+      internalID: 1947885402439895623
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_hitbox_21
+      rect:
+        serializedVersion: 2
+        x: 362
+        y: 116
+        width: 41
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6b710cc4bb219e090800000000000000
+      internalID: -8004846267018504266
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_hitbox_22
+      rect:
+        serializedVersion: 2
+        x: 461
+        y: 107
+        width: 11
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 25e3a32a0beb1cd80800000000000000
+      internalID: -8232088978011308462
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Imp_attack_hitbox_23
+      rect:
+        serializedVersion: 2
+        x: 536
+        y: 107
+        width: 11
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e337d02a8497796d0800000000000000
+      internalID: -2983782875246267586
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Imp_attack_hitbox_0: 4347165852967038270
+      Imp_attack_hitbox_1: 2882574342685315784
+      Imp_attack_hitbox_10: 7964077352970158480
+      Imp_attack_hitbox_11: 6471588124626431630
+      Imp_attack_hitbox_12: 6438180651228930971
+      Imp_attack_hitbox_13: -967058238093053065
+      Imp_attack_hitbox_14: 5746990992581232900
+      Imp_attack_hitbox_15: 3727695896731786126
+      Imp_attack_hitbox_16: 3602292231131375933
+      Imp_attack_hitbox_17: -5750891397174335327
+      Imp_attack_hitbox_18: -3595668401034379156
+      Imp_attack_hitbox_19: -2033947075023645394
+      Imp_attack_hitbox_2: -1489626298229443398
+      Imp_attack_hitbox_20: 1947885402439895623
+      Imp_attack_hitbox_21: -8004846267018504266
+      Imp_attack_hitbox_22: -8232088978011308462
+      Imp_attack_hitbox_23: -2983782875246267586
+      Imp_attack_hitbox_3: 8265286355741390694
+      Imp_attack_hitbox_4: 2692872069667925286
+      Imp_attack_hitbox_5: 5707450069812641018
+      Imp_attack_hitbox_6: -7658756309004829183
+      Imp_attack_hitbox_7: -2894224479353231946
+      Imp_attack_hitbox_8: 7974729385858678838
+      Imp_attack_hitbox_9: 3853653315589179907
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

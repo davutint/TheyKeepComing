@@ -1,0 +1,650 @@
+fileFormatVersion: 2
+guid: e181e0a3831d34f43af22eb661e5a07f
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 8545379490723236573
+    second: BheurHag_attack_NOhitbox_0
+  - first:
+      213: 8129545831690484574
+    second: BheurHag_attack_NOhitbox_1
+  - first:
+      213: 8500095379863696644
+    second: BheurHag_attack_NOhitbox_2
+  - first:
+      213: 7556034166610190871
+    second: BheurHag_attack_NOhitbox_3
+  - first:
+      213: 7676450783702309814
+    second: BheurHag_attack_NOhitbox_4
+  - first:
+      213: 6578404438922644724
+    second: BheurHag_attack_NOhitbox_5
+  - first:
+      213: 1503480064014161911
+    second: BheurHag_attack_NOhitbox_6
+  - first:
+      213: 2555372158173818684
+    second: BheurHag_attack_NOhitbox_7
+  - first:
+      213: -7229607581787153636
+    second: BheurHag_attack_NOhitbox_8
+  - first:
+      213: -6230017167367534944
+    second: BheurHag_attack_NOhitbox_9
+  - first:
+      213: -2407915842429611381
+    second: BheurHag_attack_NOhitbox_10
+  - first:
+      213: 7541513959892609597
+    second: BheurHag_attack_NOhitbox_11
+  - first:
+      213: -251203190954488280
+    second: BheurHag_attack_NOhitbox_12
+  - first:
+      213: 5648934152108837153
+    second: BheurHag_attack_NOhitbox_13
+  - first:
+      213: 7813253693497226894
+    second: BheurHag_attack_NOhitbox_14
+  - first:
+      213: 1862461079597482806
+    second: BheurHag_attack_NOhitbox_15
+  - first:
+      213: -5429703303090602947
+    second: BheurHag_attack_NOhitbox_16
+  - first:
+      213: 5945899828817279023
+    second: BheurHag_attack_NOhitbox_17
+  - first:
+      213: -4719069068930335072
+    second: BheurHag_attack_NOhitbox_18
+  - first:
+      213: 8075685656171788750
+    second: BheurHag_attack_NOhitbox_19
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: BheurHag_attack_NOhitbox_0
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 479
+        width: 50
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dda87771f59479670800000000000000
+      internalID: 8545379490723236573
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BheurHag_attack_NOhitbox_1
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 479
+        width: 50
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e5b3b2b9cd2f1d070800000000000000
+      internalID: 8129545831690484574
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BheurHag_attack_NOhitbox_2
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 479
+        width: 50
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 405f6b966b766f570800000000000000
+      internalID: 8500095379863696644
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BheurHag_attack_NOhitbox_3
+      rect:
+        serializedVersion: 2
+        x: 479
+        y: 479
+        width: 50
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 712e38b7a0d6cd860800000000000000
+      internalID: 7556034166610190871
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BheurHag_attack_NOhitbox_4
+      rect:
+        serializedVersion: 2
+        x: 623
+        y: 479
+        width: 50
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6bb5852f05b388a60800000000000000
+      internalID: 7676450783702309814
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BheurHag_attack_NOhitbox_5
+      rect:
+        serializedVersion: 2
+        x: 53
+        y: 335
+        width: 44
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4fc46dabbff2b4b50800000000000000
+      internalID: 6578404438922644724
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BheurHag_attack_NOhitbox_6
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 335
+        width: 44
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7f71276072f6dd410800000000000000
+      internalID: 1503480064014161911
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BheurHag_attack_NOhitbox_7
+      rect:
+        serializedVersion: 2
+        x: 338
+        y: 335
+        width: 44
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c3fafdc5071867320800000000000000
+      internalID: 2555372158173818684
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BheurHag_attack_NOhitbox_8
+      rect:
+        serializedVersion: 2
+        x: 482
+        y: 335
+        width: 44
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c1b1b1e55364bab90800000000000000
+      internalID: -7229607581787153636
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BheurHag_attack_NOhitbox_9
+      rect:
+        serializedVersion: 2
+        x: 626
+        y: 335
+        width: 44
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0a60972f4688a89a0800000000000000
+      internalID: -6230017167367534944
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BheurHag_attack_NOhitbox_10
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 191
+        width: 44
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b8292fa8c4d559ed0800000000000000
+      internalID: -2407915842429611381
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BheurHag_attack_NOhitbox_11
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 191
+        width: 44
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d3a6c086df6d8a860800000000000000
+      internalID: 7541513959892609597
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BheurHag_attack_NOhitbox_12
+      rect:
+        serializedVersion: 2
+        x: 338
+        y: 191
+        width: 44
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 82e86bc570c838cf0800000000000000
+      internalID: -251203190954488280
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BheurHag_attack_NOhitbox_13
+      rect:
+        serializedVersion: 2
+        x: 482
+        y: 191
+        width: 44
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 12905089eab056e40800000000000000
+      internalID: 5648934152108837153
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BheurHag_attack_NOhitbox_14
+      rect:
+        serializedVersion: 2
+        x: 626
+        y: 191
+        width: 44
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e8639ec76d04e6c60800000000000000
+      internalID: 7813253693497226894
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BheurHag_attack_NOhitbox_15
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 47
+        width: 50
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6330661fb7ac8d910800000000000000
+      internalID: 1862461079597482806
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BheurHag_attack_NOhitbox_16
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 47
+        width: 50
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d3cf4871d91d5a4b0800000000000000
+      internalID: -5429703303090602947
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BheurHag_attack_NOhitbox_17
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 47
+        width: 50
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f28b5be3464148250800000000000000
+      internalID: 5945899828817279023
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BheurHag_attack_NOhitbox_18
+      rect:
+        serializedVersion: 2
+        x: 479
+        y: 47
+        width: 50
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0aebfdb3faf728eb0800000000000000
+      internalID: -4719069068930335072
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BheurHag_attack_NOhitbox_19
+      rect:
+        serializedVersion: 2
+        x: 623
+        y: 47
+        width: 50
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ec936d54159921070800000000000000
+      internalID: 8075685656171788750
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      BheurHag_attack_NOhitbox_0: 8545379490723236573
+      BheurHag_attack_NOhitbox_1: 8129545831690484574
+      BheurHag_attack_NOhitbox_10: -2407915842429611381
+      BheurHag_attack_NOhitbox_11: 7541513959892609597
+      BheurHag_attack_NOhitbox_12: -251203190954488280
+      BheurHag_attack_NOhitbox_13: 5648934152108837153
+      BheurHag_attack_NOhitbox_14: 7813253693497226894
+      BheurHag_attack_NOhitbox_15: 1862461079597482806
+      BheurHag_attack_NOhitbox_16: -5429703303090602947
+      BheurHag_attack_NOhitbox_17: 5945899828817279023
+      BheurHag_attack_NOhitbox_18: -4719069068930335072
+      BheurHag_attack_NOhitbox_19: 8075685656171788750
+      BheurHag_attack_NOhitbox_2: 8500095379863696644
+      BheurHag_attack_NOhitbox_3: 7556034166610190871
+      BheurHag_attack_NOhitbox_4: 7676450783702309814
+      BheurHag_attack_NOhitbox_5: 6578404438922644724
+      BheurHag_attack_NOhitbox_6: 1503480064014161911
+      BheurHag_attack_NOhitbox_7: 2555372158173818684
+      BheurHag_attack_NOhitbox_8: -7229607581787153636
+      BheurHag_attack_NOhitbox_9: -6230017167367534944
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

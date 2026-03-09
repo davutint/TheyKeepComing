@@ -1,0 +1,1014 @@
+fileFormatVersion: 2
+guid: d4636b5248e36f44388b15248005d4b5
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -3984618828952715435
+    second: ManticoreBishop_death_0
+  - first:
+      213: -5679129229711298314
+    second: ManticoreBishop_death_1
+  - first:
+      213: 8957760013251646640
+    second: ManticoreBishop_death_2
+  - first:
+      213: -2107126484421266713
+    second: ManticoreBishop_death_3
+  - first:
+      213: 6229334774500651619
+    second: ManticoreBishop_death_4
+  - first:
+      213: 6463395531054745386
+    second: ManticoreBishop_death_5
+  - first:
+      213: -5547383936898462584
+    second: ManticoreBishop_death_6
+  - first:
+      213: 3830371963838044722
+    second: ManticoreBishop_death_7
+  - first:
+      213: -6356150697968219474
+    second: ManticoreBishop_death_8
+  - first:
+      213: 3350485745267189124
+    second: ManticoreBishop_death_9
+  - first:
+      213: 286743519473255847
+    second: ManticoreBishop_death_10
+  - first:
+      213: 3714617662733223368
+    second: ManticoreBishop_death_11
+  - first:
+      213: -2683651409130661991
+    second: ManticoreBishop_death_12
+  - first:
+      213: 210329919054517825
+    second: ManticoreBishop_death_13
+  - first:
+      213: 5735416878438406185
+    second: ManticoreBishop_death_14
+  - first:
+      213: -8793334189065183551
+    second: ManticoreBishop_death_15
+  - first:
+      213: 839068345984755372
+    second: ManticoreBishop_death_16
+  - first:
+      213: 8126420007795801174
+    second: ManticoreBishop_death_17
+  - first:
+      213: 4435826431875137209
+    second: ManticoreBishop_death_18
+  - first:
+      213: 2538631716255254277
+    second: ManticoreBishop_death_19
+  - first:
+      213: 1193014072750531034
+    second: ManticoreBishop_death_20
+  - first:
+      213: 7622632862000236973
+    second: ManticoreBishop_death_21
+  - first:
+      213: 4778867302161778128
+    second: ManticoreBishop_death_22
+  - first:
+      213: 8185234474536445519
+    second: ManticoreBishop_death_23
+  - first:
+      213: -8875684666963107578
+    second: ManticoreBishop_death_24
+  - first:
+      213: 8241464789587952977
+    second: ManticoreBishop_death_25
+  - first:
+      213: 1647050379332865168
+    second: ManticoreBishop_death_26
+  - first:
+      213: 4806301956062387108
+    second: ManticoreBishop_death_27
+  - first:
+      213: 47232258341775745
+    second: ManticoreBishop_death_28
+  - first:
+      213: -9159049367542422589
+    second: ManticoreBishop_death_29
+  - first:
+      213: 7970274075246173622
+    second: ManticoreBishop_death_30
+  - first:
+      213: 2540826617140472362
+    second: ManticoreBishop_death_31
+  - first:
+      213: -5941624336777040505
+    second: ManticoreBishop_death_32
+  - first:
+      213: -2682575746889586854
+    second: ManticoreBishop_death_33
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: ManticoreBishop_death_0
+      rect:
+        serializedVersion: 2
+        x: 17
+        y: 287
+        width: 62
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 55fb0f6594ac3b8c0800000000000000
+      internalID: -3984618828952715435
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_death_1
+      rect:
+        serializedVersion: 2
+        x: 113
+        y: 296
+        width: 62
+        height: 88
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6f0358d0e0eaf21b0800000000000000
+      internalID: -5679129229711298314
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_death_2
+      rect:
+        serializedVersion: 2
+        x: 206
+        y: 299
+        width: 68
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0b41015954b505c70800000000000000
+      internalID: 8957760013251646640
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_death_3
+      rect:
+        serializedVersion: 2
+        x: 299
+        y: 296
+        width: 74
+        height: 88
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7e2b04f50abf1c2e0800000000000000
+      internalID: -2107126484421266713
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_death_4
+      rect:
+        serializedVersion: 2
+        x: 386
+        y: 287
+        width: 92
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 362791519fa037650800000000000000
+      internalID: 6229334774500651619
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_death_5
+      rect:
+        serializedVersion: 2
+        x: 479
+        y: 287
+        width: 104
+        height: 71
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a278d5fadf792b950800000000000000
+      internalID: 6463395531054745386
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_death_6
+      rect:
+        serializedVersion: 2
+        x: 581
+        y: 287
+        width: 86
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 88c857063bbb303b0800000000000000
+      internalID: -5547383936898462584
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_death_7
+      rect:
+        serializedVersion: 2
+        x: 665
+        y: 299
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 23a9e26c107382530800000000000000
+      internalID: 3830371963838044722
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_death_8
+      rect:
+        serializedVersion: 2
+        x: 677
+        y: 287
+        width: 86
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eaac0c4dd9a6ac7a0800000000000000
+      internalID: -6356150697968219474
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_death_9
+      rect:
+        serializedVersion: 2
+        x: 95
+        y: 8
+        width: 98
+        height: 287
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 48529af98015f7e20800000000000000
+      internalID: 3350485745267189124
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_death_10
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 95
+        width: 98
+        height: 200
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7a549d336b7baf300800000000000000
+      internalID: 286743519473255847
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_death_11
+      rect:
+        serializedVersion: 2
+        x: 305
+        y: 287
+        width: 62
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8c50b975519fc8330800000000000000
+      internalID: 3714617662733223368
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_death_12
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 191
+        width: 95
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9975ac11341c1cad0800000000000000
+      internalID: -2683651409130661991
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_death_13
+      rect:
+        serializedVersion: 2
+        x: 290
+        y: 191
+        width: 95
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 14691ee62fd3be200800000000000000
+      internalID: 210329919054517825
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_death_14
+      rect:
+        serializedVersion: 2
+        x: 383
+        y: 191
+        width: 95
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 928d91e634b489f40800000000000000
+      internalID: 5735416878438406185
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_death_15
+      rect:
+        serializedVersion: 2
+        x: 479
+        y: 191
+        width: 95
+        height: 71
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1ced875e42dc7f580800000000000000
+      internalID: -8793334189065183551
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_death_16
+      rect:
+        serializedVersion: 2
+        x: 575
+        y: 191
+        width: 95
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ca622b01738f4ab00800000000000000
+      internalID: 839068345984755372
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_death_17
+      rect:
+        serializedVersion: 2
+        x: 671
+        y: 191
+        width: 95
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 65cbb4401f7d6c070800000000000000
+      internalID: 8126420007795801174
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_death_18
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 95
+        width: 94
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9beb43543a83f8d30800000000000000
+      internalID: 4435826431875137209
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_death_19
+      rect:
+        serializedVersion: 2
+        x: 287
+        y: 95
+        width: 95
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5074fee78180b3320800000000000000
+      internalID: 2538631716255254277
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_death_20
+      rect:
+        serializedVersion: 2
+        x: 386
+        y: 95
+        width: 95
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ad166527aff6e8010800000000000000
+      internalID: 1193014072750531034
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_death_21
+      rect:
+        serializedVersion: 2
+        x: 482
+        y: 95
+        width: 95
+        height: 71
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: da94eb8933809c960800000000000000
+      internalID: 7622632862000236973
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_death_22
+      rect:
+        serializedVersion: 2
+        x: 578
+        y: 95
+        width: 95
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0d50516ed72f15240800000000000000
+      internalID: 4778867302161778128
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_death_23
+      rect:
+        serializedVersion: 2
+        x: 674
+        y: 95
+        width: 94
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f46a60a236bc79170800000000000000
+      internalID: 8185234474536445519
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_death_24
+      rect:
+        serializedVersion: 2
+        x: 17
+        y: 0
+        width: 62
+        height: 94
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 601684f12db33d480800000000000000
+      internalID: -8875684666963107578
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_death_25
+      rect:
+        serializedVersion: 2
+        x: 209
+        y: 11
+        width: 62
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 155874c9f809f5270800000000000000
+      internalID: 8241464789587952977
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_death_26
+      rect:
+        serializedVersion: 2
+        x: 302
+        y: 8
+        width: 68
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 09cce43f79f7bd610800000000000000
+      internalID: 1647050379332865168
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_death_27
+      rect:
+        serializedVersion: 2
+        x: 383
+        y: 0
+        width: 200
+        height: 70
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4ab1d560a2a63b240800000000000000
+      internalID: 4806301956062387108
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_death_28
+      rect:
+        serializedVersion: 2
+        x: 578
+        y: 0
+        width: 92
+        height: 67
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 189a66c1d7dc7a000800000000000000
+      internalID: 47232258341775745
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_death_29
+      rect:
+        serializedVersion: 2
+        x: 665
+        y: 14
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3c32e5f702584e080800000000000000
+      internalID: -9159049367542422589
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_death_30
+      rect:
+        serializedVersion: 2
+        x: 674
+        y: 0
+        width: 92
+        height: 67
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6bd9d890b0a1c9e60800000000000000
+      internalID: 7970274075246173622
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_death_31
+      rect:
+        serializedVersion: 2
+        x: 113
+        y: 0
+        width: 62
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a2ae38ea854d24320800000000000000
+      internalID: 2540826617140472362
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_death_32
+      rect:
+        serializedVersion: 2
+        x: 209
+        y: 0
+        width: 62
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 78da691552c1b8da0800000000000000
+      internalID: -5941624336777040505
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ManticoreBishop_death_33
+      rect:
+        serializedVersion: 2
+        x: 305
+        y: 0
+        width: 62
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a576193329395cad0800000000000000
+      internalID: -2682575746889586854
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      ManticoreBishop_death_0: -3984618828952715435
+      ManticoreBishop_death_1: -5679129229711298314
+      ManticoreBishop_death_10: 286743519473255847
+      ManticoreBishop_death_11: 3714617662733223368
+      ManticoreBishop_death_12: -2683651409130661991
+      ManticoreBishop_death_13: 210329919054517825
+      ManticoreBishop_death_14: 5735416878438406185
+      ManticoreBishop_death_15: -8793334189065183551
+      ManticoreBishop_death_16: 839068345984755372
+      ManticoreBishop_death_17: 8126420007795801174
+      ManticoreBishop_death_18: 4435826431875137209
+      ManticoreBishop_death_19: 2538631716255254277
+      ManticoreBishop_death_2: 8957760013251646640
+      ManticoreBishop_death_20: 1193014072750531034
+      ManticoreBishop_death_21: 7622632862000236973
+      ManticoreBishop_death_22: 4778867302161778128
+      ManticoreBishop_death_23: 8185234474536445519
+      ManticoreBishop_death_24: -8875684666963107578
+      ManticoreBishop_death_25: 8241464789587952977
+      ManticoreBishop_death_26: 1647050379332865168
+      ManticoreBishop_death_27: 4806301956062387108
+      ManticoreBishop_death_28: 47232258341775745
+      ManticoreBishop_death_29: -9159049367542422589
+      ManticoreBishop_death_3: -2107126484421266713
+      ManticoreBishop_death_30: 7970274075246173622
+      ManticoreBishop_death_31: 2540826617140472362
+      ManticoreBishop_death_32: -5941624336777040505
+      ManticoreBishop_death_33: -2682575746889586854
+      ManticoreBishop_death_4: 6229334774500651619
+      ManticoreBishop_death_5: 6463395531054745386
+      ManticoreBishop_death_6: -5547383936898462584
+      ManticoreBishop_death_7: 3830371963838044722
+      ManticoreBishop_death_8: -6356150697968219474
+      ManticoreBishop_death_9: 3350485745267189124
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

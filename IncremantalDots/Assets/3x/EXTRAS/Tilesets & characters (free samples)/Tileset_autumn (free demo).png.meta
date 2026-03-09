@@ -1,0 +1,624 @@
+fileFormatVersion: 2
+guid: 67ce90ed93ad19949abc7a5b8c50f5db
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -7785919623701190450
+    second: Tileset_autumn (free demo)_0
+  - first:
+      213: 7635177928342068274
+    second: Tileset_autumn (free demo)_1
+  - first:
+      213: -3971070237557170652
+    second: Tileset_autumn (free demo)_2
+  - first:
+      213: -3500299219886704082
+    second: Tileset_autumn (free demo)_3
+  - first:
+      213: -2387089413952776975
+    second: Tileset_autumn (free demo)_4
+  - first:
+      213: 4126239257824970972
+    second: Tileset_autumn (free demo)_5
+  - first:
+      213: 3853908355460967131
+    second: Tileset_autumn (free demo)_6
+  - first:
+      213: 1223651461721587001
+    second: Tileset_autumn (free demo)_7
+  - first:
+      213: 1123444740294922460
+    second: Tileset_autumn (free demo)_8
+  - first:
+      213: -8348433680045936268
+    second: Tileset_autumn (free demo)_9
+  - first:
+      213: -2091014746402179270
+    second: Tileset_autumn (free demo)_10
+  - first:
+      213: -8532188593058690115
+    second: Tileset_autumn (free demo)_11
+  - first:
+      213: 7471960526961503604
+    second: Tileset_autumn (free demo)_12
+  - first:
+      213: 2094705905835501165
+    second: Tileset_autumn (free demo)_13
+  - first:
+      213: 7523925364807739043
+    second: Tileset_autumn (free demo)_14
+  - first:
+      213: 840347003368396912
+    second: Tileset_autumn (free demo)_15
+  - first:
+      213: 7610336680041250524
+    second: Tileset_autumn (free demo)_16
+  - first:
+      213: -120750288230682844
+    second: Tileset_autumn (free demo)_17
+  - first:
+      213: 7599991325021615608
+    second: Tileset_autumn (free demo)_18
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Tileset_autumn (free demo)_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 191
+        width: 289
+        height: 577
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ec82c839a5bd2f390800000000000000
+      internalID: -7785919623701190450
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tileset_autumn (free demo)_1
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 656
+        width: 50
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 23c5bb77fd995f960800000000000000
+      internalID: 7635177928342068274
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tileset_autumn (free demo)_2
+      rect:
+        serializedVersion: 2
+        x: 416
+        y: 719
+        width: 80
+        height: 49
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 42e574898ace3e8c0800000000000000
+      internalID: -3971070237557170652
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tileset_autumn (free demo)_3
+      rect:
+        serializedVersion: 2
+        x: 416
+        y: 623
+        width: 80
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e2a7317a7607c6fc0800000000000000
+      internalID: -3500299219886704082
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tileset_autumn (free demo)_4
+      rect:
+        serializedVersion: 2
+        x: 293
+        y: 590
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1f4df3a43da5fded0800000000000000
+      internalID: -2387089413952776975
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tileset_autumn (free demo)_5
+      rect:
+        serializedVersion: 2
+        x: 341
+        y: 593
+        width: 17
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cd8cde44eb8534930800000000000000
+      internalID: 4126239257824970972
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tileset_autumn (free demo)_6
+      rect:
+        serializedVersion: 2
+        x: 362
+        y: 587
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bda292cfa35db7530800000000000000
+      internalID: 3853908355460967131
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tileset_autumn (free demo)_7
+      rect:
+        serializedVersion: 2
+        x: 392
+        y: 596
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 93d7dc075884bf010800000000000000
+      internalID: 1223651461721587001
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tileset_autumn (free demo)_8
+      rect:
+        serializedVersion: 2
+        x: 404
+        y: 587
+        width: 14
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cd05f0ef907479f00800000000000000
+      internalID: 1123444740294922460
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tileset_autumn (free demo)_9
+      rect:
+        serializedVersion: 2
+        x: 413
+        y: 596
+        width: 17
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 47174f5ccc7642c80800000000000000
+      internalID: -8348433680045936268
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tileset_autumn (free demo)_10
+      rect:
+        serializedVersion: 2
+        x: 446
+        y: 587
+        width: 20
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a373894ba293bf2e0800000000000000
+      internalID: -2091014746402179270
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tileset_autumn (free demo)_11
+      rect:
+        serializedVersion: 2
+        x: 497
+        y: 590
+        width: 17
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dbbc81a1ea3979980800000000000000
+      internalID: -8532188593058690115
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tileset_autumn (free demo)_12
+      rect:
+        serializedVersion: 2
+        x: 323
+        y: 584
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 47de749d28cb1b760800000000000000
+      internalID: 7471960526961503604
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tileset_autumn (free demo)_13
+      rect:
+        serializedVersion: 2
+        x: 296
+        y: 533
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d66ec325ce3e11d10800000000000000
+      internalID: 2094705905835501165
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tileset_autumn (free demo)_14
+      rect:
+        serializedVersion: 2
+        x: 341
+        y: 533
+        width: 41
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3a6aaed714a5a6860800000000000000
+      internalID: 7523925364807739043
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tileset_autumn (free demo)_15
+      rect:
+        serializedVersion: 2
+        x: 386
+        y: 530
+        width: 44
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 07856dfa52389ab00800000000000000
+      internalID: 840347003368396912
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tileset_autumn (free demo)_16
+      rect:
+        serializedVersion: 2
+        x: 248
+        y: 434
+        width: 80
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cdefbf2a3e85d9960800000000000000
+      internalID: 7610336680041250524
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tileset_autumn (free demo)_17
+      rect:
+        serializedVersion: 2
+        x: 356
+        y: 434
+        width: 56
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 42feb7ba042035ef0800000000000000
+      internalID: -120750288230682844
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tileset_autumn (free demo)_18
+      rect:
+        serializedVersion: 2
+        x: 254
+        y: 395
+        width: 215
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8f5b6f7f7d7987960800000000000000
+      internalID: 7599991325021615608
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Tileset_autumn (free demo)_0: -7785919623701190450
+      Tileset_autumn (free demo)_1: 7635177928342068274
+      Tileset_autumn (free demo)_10: -2091014746402179270
+      Tileset_autumn (free demo)_11: -8532188593058690115
+      Tileset_autumn (free demo)_12: 7471960526961503604
+      Tileset_autumn (free demo)_13: 2094705905835501165
+      Tileset_autumn (free demo)_14: 7523925364807739043
+      Tileset_autumn (free demo)_15: 840347003368396912
+      Tileset_autumn (free demo)_16: 7610336680041250524
+      Tileset_autumn (free demo)_17: -120750288230682844
+      Tileset_autumn (free demo)_18: 7599991325021615608
+      Tileset_autumn (free demo)_2: -3971070237557170652
+      Tileset_autumn (free demo)_3: -3500299219886704082
+      Tileset_autumn (free demo)_4: -2387089413952776975
+      Tileset_autumn (free demo)_5: 4126239257824970972
+      Tileset_autumn (free demo)_6: 3853908355460967131
+      Tileset_autumn (free demo)_7: 1223651461721587001
+      Tileset_autumn (free demo)_8: 1123444740294922460
+      Tileset_autumn (free demo)_9: -8348433680045936268
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

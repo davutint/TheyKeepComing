@@ -1,0 +1,650 @@
+fileFormatVersion: 2
+guid: 8e51bc539940ba04a8901fd67cc22011
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 3571421357661453811
+    second: ElderSnail_attack_NOhitbox_0
+  - first:
+      213: -2705948661409666638
+    second: ElderSnail_attack_NOhitbox_1
+  - first:
+      213: -2748969799073793481
+    second: ElderSnail_attack_NOhitbox_2
+  - first:
+      213: -1133755136487720339
+    second: ElderSnail_attack_NOhitbox_3
+  - first:
+      213: 3651732076158433753
+    second: ElderSnail_attack_NOhitbox_4
+  - first:
+      213: -897214666241325828
+    second: ElderSnail_attack_NOhitbox_5
+  - first:
+      213: 5777491330297667316
+    second: ElderSnail_attack_NOhitbox_6
+  - first:
+      213: 4870192638804648885
+    second: ElderSnail_attack_NOhitbox_7
+  - first:
+      213: -7244082116889793630
+    second: ElderSnail_attack_NOhitbox_8
+  - first:
+      213: 4853157016058194029
+    second: ElderSnail_attack_NOhitbox_9
+  - first:
+      213: -412907872510182004
+    second: ElderSnail_attack_NOhitbox_10
+  - first:
+      213: 7291871896086992682
+    second: ElderSnail_attack_NOhitbox_11
+  - first:
+      213: -6537430235528047655
+    second: ElderSnail_attack_NOhitbox_12
+  - first:
+      213: 3445075960910258874
+    second: ElderSnail_attack_NOhitbox_13
+  - first:
+      213: 1351458692473001352
+    second: ElderSnail_attack_NOhitbox_14
+  - first:
+      213: -8868363047293795011
+    second: ElderSnail_attack_NOhitbox_15
+  - first:
+      213: 958997605260987692
+    second: ElderSnail_attack_NOhitbox_16
+  - first:
+      213: -7703339547859184284
+    second: ElderSnail_attack_NOhitbox_17
+  - first:
+      213: 1470445807676152664
+    second: ElderSnail_attack_NOhitbox_18
+  - first:
+      213: -6562845891091886073
+    second: ElderSnail_attack_NOhitbox_19
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: ElderSnail_attack_NOhitbox_0
+      rect:
+        serializedVersion: 2
+        x: 53
+        y: 479
+        width: 38
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3fd77a67dcc309130800000000000000
+      internalID: 3571421357661453811
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ElderSnail_attack_NOhitbox_1
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 479
+        width: 32
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2b9ab38770a827ad0800000000000000
+      internalID: -2705948661409666638
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ElderSnail_attack_NOhitbox_2
+      rect:
+        serializedVersion: 2
+        x: 344
+        y: 479
+        width: 32
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 73afdeb4882b9d9d0800000000000000
+      internalID: -2748969799073793481
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ElderSnail_attack_NOhitbox_3
+      rect:
+        serializedVersion: 2
+        x: 488
+        y: 479
+        width: 32
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d6aff53d5b71440f0800000000000000
+      internalID: -1133755136487720339
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ElderSnail_attack_NOhitbox_4
+      rect:
+        serializedVersion: 2
+        x: 632
+        y: 479
+        width: 32
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9d9b25eb9fe8da230800000000000000
+      internalID: 3651732076158433753
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ElderSnail_attack_NOhitbox_5
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 335
+        width: 50
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cf44a63c3047c83f0800000000000000
+      internalID: -897214666241325828
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ElderSnail_attack_NOhitbox_6
+      rect:
+        serializedVersion: 2
+        x: 188
+        y: 335
+        width: 53
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4fe9a4321c5cd2050800000000000000
+      internalID: 5777491330297667316
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ElderSnail_attack_NOhitbox_7
+      rect:
+        serializedVersion: 2
+        x: 332
+        y: 335
+        width: 53
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5b36cafc666669340800000000000000
+      internalID: 4870192638804648885
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ElderSnail_attack_NOhitbox_8
+      rect:
+        serializedVersion: 2
+        x: 476
+        y: 335
+        width: 53
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2ab260b02b9d77b90800000000000000
+      internalID: -7244082116889793630
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ElderSnail_attack_NOhitbox_9
+      rect:
+        serializedVersion: 2
+        x: 620
+        y: 335
+        width: 53
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d68e75dc790e95340800000000000000
+      internalID: 4853157016058194029
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ElderSnail_attack_NOhitbox_10
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 191
+        width: 50
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c8d71164a7e054af0800000000000000
+      internalID: -412907872510182004
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ElderSnail_attack_NOhitbox_11
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 191
+        width: 53
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a275be10bdee13560800000000000000
+      internalID: 7291871896086992682
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ElderSnail_attack_NOhitbox_12
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 191
+        width: 53
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9d3d37b66d16645a0800000000000000
+      internalID: -6537430235528047655
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ElderSnail_attack_NOhitbox_13
+      rect:
+        serializedVersion: 2
+        x: 479
+        y: 191
+        width: 53
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab22b4a655e5fcf20800000000000000
+      internalID: 3445075960910258874
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ElderSnail_attack_NOhitbox_14
+      rect:
+        serializedVersion: 2
+        x: 623
+        y: 191
+        width: 53
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 885977d358851c210800000000000000
+      internalID: 1351458692473001352
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ElderSnail_attack_NOhitbox_15
+      rect:
+        serializedVersion: 2
+        x: 53
+        y: 47
+        width: 38
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d354ada8bce3de480800000000000000
+      internalID: -8868363047293795011
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ElderSnail_attack_NOhitbox_16
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 47
+        width: 32
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c2d0802bd3b0f4d00800000000000000
+      internalID: 958997605260987692
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ElderSnail_attack_NOhitbox_17
+      rect:
+        serializedVersion: 2
+        x: 344
+        y: 47
+        width: 32
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 46592a9ce7d381590800000000000000
+      internalID: -7703339547859184284
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ElderSnail_attack_NOhitbox_18
+      rect:
+        serializedVersion: 2
+        x: 488
+        y: 47
+        width: 32
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 85bdffbdba2186410800000000000000
+      internalID: 1470445807676152664
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ElderSnail_attack_NOhitbox_19
+      rect:
+        serializedVersion: 2
+        x: 632
+        y: 47
+        width: 32
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 70016d9fe661ce4a0800000000000000
+      internalID: -6562845891091886073
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      ElderSnail_attack_NOhitbox_0: 3571421357661453811
+      ElderSnail_attack_NOhitbox_1: -2705948661409666638
+      ElderSnail_attack_NOhitbox_10: -412907872510182004
+      ElderSnail_attack_NOhitbox_11: 7291871896086992682
+      ElderSnail_attack_NOhitbox_12: -6537430235528047655
+      ElderSnail_attack_NOhitbox_13: 3445075960910258874
+      ElderSnail_attack_NOhitbox_14: 1351458692473001352
+      ElderSnail_attack_NOhitbox_15: -8868363047293795011
+      ElderSnail_attack_NOhitbox_16: 958997605260987692
+      ElderSnail_attack_NOhitbox_17: -7703339547859184284
+      ElderSnail_attack_NOhitbox_18: 1470445807676152664
+      ElderSnail_attack_NOhitbox_19: -6562845891091886073
+      ElderSnail_attack_NOhitbox_2: -2748969799073793481
+      ElderSnail_attack_NOhitbox_3: -1133755136487720339
+      ElderSnail_attack_NOhitbox_4: 3651732076158433753
+      ElderSnail_attack_NOhitbox_5: -897214666241325828
+      ElderSnail_attack_NOhitbox_6: 5777491330297667316
+      ElderSnail_attack_NOhitbox_7: 4870192638804648885
+      ElderSnail_attack_NOhitbox_8: -7244082116889793630
+      ElderSnail_attack_NOhitbox_9: 4853157016058194029
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

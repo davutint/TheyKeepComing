@@ -1,0 +1,962 @@
+fileFormatVersion: 2
+guid: e6ae97300b77e7847b2809b3cdffd030
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -2450791871255296803
+    second: Lich_charging_0
+  - first:
+      213: -3317976183959034359
+    second: Lich_charging_1
+  - first:
+      213: -6215257788703300329
+    second: Lich_charging_2
+  - first:
+      213: -8752525516763188576
+    second: Lich_charging_3
+  - first:
+      213: 6856466152729661241
+    second: Lich_charging_4
+  - first:
+      213: -2735091791239982811
+    second: Lich_charging_5
+  - first:
+      213: -2922972902114946843
+    second: Lich_charging_6
+  - first:
+      213: 1381593521326380910
+    second: Lich_charging_7
+  - first:
+      213: -1144967399398793912
+    second: Lich_charging_8
+  - first:
+      213: 7110950515699552694
+    second: Lich_charging_9
+  - first:
+      213: 534056681391999081
+    second: Lich_charging_10
+  - first:
+      213: -946693575975954294
+    second: Lich_charging_11
+  - first:
+      213: 4203421030087457083
+    second: Lich_charging_12
+  - first:
+      213: 2335665067717844550
+    second: Lich_charging_13
+  - first:
+      213: 1321615038581435876
+    second: Lich_charging_14
+  - first:
+      213: -7671768800265307360
+    second: Lich_charging_15
+  - first:
+      213: -4735180242848534621
+    second: Lich_charging_16
+  - first:
+      213: -9209354502892588977
+    second: Lich_charging_17
+  - first:
+      213: -2865646776089932030
+    second: Lich_charging_18
+  - first:
+      213: -1581344127561833048
+    second: Lich_charging_19
+  - first:
+      213: -319358903496715777
+    second: Lich_charging_20
+  - first:
+      213: -7185467813468389189
+    second: Lich_charging_21
+  - first:
+      213: 344165277806334446
+    second: Lich_charging_22
+  - first:
+      213: -5034742349379806928
+    second: Lich_charging_23
+  - first:
+      213: -4268245733718566775
+    second: Lich_charging_24
+  - first:
+      213: -4973053961162013219
+    second: Lich_charging_25
+  - first:
+      213: -8358561546724494374
+    second: Lich_charging_26
+  - first:
+      213: -1322774228206591458
+    second: Lich_charging_27
+  - first:
+      213: 2911849972807632894
+    second: Lich_charging_28
+  - first:
+      213: -3973664142181331678
+    second: Lich_charging_29
+  - first:
+      213: -6367473497909486920
+    second: Lich_charging_30
+  - first:
+      213: -6795375115799765566
+    second: Lich_charging_31
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Lich_charging_0
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 623
+        width: 20
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dd4c96727c90dfdd0800000000000000
+      internalID: -2450791871255296803
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lich_charging_1
+      rect:
+        serializedVersion: 2
+        x: 77
+        y: 623
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9066ae57d3e24f1d0800000000000000
+      internalID: -3317976183959034359
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lich_charging_2
+      rect:
+        serializedVersion: 2
+        x: 188
+        y: 551
+        width: 56
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7152cd498f7feb9a0800000000000000
+      internalID: -6215257788703300329
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lich_charging_3
+      rect:
+        serializedVersion: 2
+        x: 197
+        y: 626
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0a2b9c55a68c88680800000000000000
+      internalID: -8752525516763188576
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lich_charging_4
+      rect:
+        serializedVersion: 2
+        x: 227
+        y: 626
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 93fc0f783af072f50800000000000000
+      internalID: 6856466152729661241
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lich_charging_5
+      rect:
+        serializedVersion: 2
+        x: 332
+        y: 551
+        width: 56
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 521dd0bc1800b0ad0800000000000000
+      internalID: -2735091791239982811
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lich_charging_6
+      rect:
+        serializedVersion: 2
+        x: 476
+        y: 551
+        width: 56
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5e09851d1a38f67d0800000000000000
+      internalID: -2922972902114946843
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lich_charging_7
+      rect:
+        serializedVersion: 2
+        x: 44
+        y: 551
+        width: 56
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e67d3a6dcf76c2310800000000000000
+      internalID: 1381593521326380910
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lich_charging_8
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 455
+        width: 17
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 84d9e6f67324c10f0800000000000000
+      internalID: -1144967399398793912
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lich_charging_9
+      rect:
+        serializedVersion: 2
+        x: 74
+        y: 455
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6b117af81db2fa260800000000000000
+      internalID: 7110950515699552694
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lich_charging_10
+      rect:
+        serializedVersion: 2
+        x: 188
+        y: 383
+        width: 56
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9684b40e8b9596700800000000000000
+      internalID: 534056681391999081
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lich_charging_11
+      rect:
+        serializedVersion: 2
+        x: 197
+        y: 458
+        width: 20
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a881fcc553bacd2f0800000000000000
+      internalID: -946693575975954294
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lich_charging_12
+      rect:
+        serializedVersion: 2
+        x: 224
+        y: 458
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b39f4cbf72d855a30800000000000000
+      internalID: 4203421030087457083
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lich_charging_13
+      rect:
+        serializedVersion: 2
+        x: 332
+        y: 383
+        width: 53
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 64e5c931103f96020800000000000000
+      internalID: 2335665067717844550
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lich_charging_14
+      rect:
+        serializedVersion: 2
+        x: 476
+        y: 383
+        width: 53
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4ede57810e1575210800000000000000
+      internalID: 1321615038581435876
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lich_charging_15
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 383
+        width: 50
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 02bf2454ce6688590800000000000000
+      internalID: -7671768800265307360
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lich_charging_16
+      rect:
+        serializedVersion: 2
+        x: 59
+        y: 287
+        width: 20
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3afa09d38a2494eb0800000000000000
+      internalID: -4735180242848534621
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lich_charging_17
+      rect:
+        serializedVersion: 2
+        x: 80
+        y: 287
+        width: 8
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f4071747fdcc13080800000000000000
+      internalID: -9209354502892588977
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lich_charging_18
+      rect:
+        serializedVersion: 2
+        x: 188
+        y: 215
+        width: 56
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 20f8a63a07d2b38d0800000000000000
+      internalID: -2865646776089932030
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lich_charging_19
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 290
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8a5e601f4efed0ae0800000000000000
+      internalID: -1581344127561833048
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lich_charging_20
+      rect:
+        serializedVersion: 2
+        x: 215
+        y: 290
+        width: 20
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ff15831f4c8619bf0800000000000000
+      internalID: -319358903496715777
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lich_charging_21
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 215
+        width: 53
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bb0c6390817184c90800000000000000
+      internalID: -7185467813468389189
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lich_charging_22
+      rect:
+        serializedVersion: 2
+        x: 479
+        y: 215
+        width: 53
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ee19ba72f78b6c400800000000000000
+      internalID: 344165277806334446
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lich_charging_23
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 215
+        width: 50
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 039d9992280012ab0800000000000000
+      internalID: -5034742349379806928
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lich_charging_24
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 119
+        width: 20
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 988d0ab8e1524c4c0800000000000000
+      internalID: -4268245733718566775
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lich_charging_25
+      rect:
+        serializedVersion: 2
+        x: 77
+        y: 119
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dd5c61c45c92cfab0800000000000000
+      internalID: -4973053961162013219
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lich_charging_26
+      rect:
+        serializedVersion: 2
+        x: 188
+        y: 47
+        width: 56
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ad33f3e0f8c600c80800000000000000
+      internalID: -8358561546724494374
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lich_charging_27
+      rect:
+        serializedVersion: 2
+        x: 197
+        y: 122
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e1264b909df84ade0800000000000000
+      internalID: -1322774228206591458
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lich_charging_28
+      rect:
+        serializedVersion: 2
+        x: 227
+        y: 122
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ef70e646f18f86820800000000000000
+      internalID: 2911849972807632894
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lich_charging_29
+      rect:
+        serializedVersion: 2
+        x: 332
+        y: 47
+        width: 56
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 22d039c1485bad8c0800000000000000
+      internalID: -3973664142181331678
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lich_charging_30
+      rect:
+        serializedVersion: 2
+        x: 476
+        y: 47
+        width: 56
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8ba1468079032a7a0800000000000000
+      internalID: -6367473497909486920
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lich_charging_31
+      rect:
+        serializedVersion: 2
+        x: 44
+        y: 47
+        width: 56
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2cdd93be55af1b1a0800000000000000
+      internalID: -6795375115799765566
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Lich_charging_0: -2450791871255296803
+      Lich_charging_1: -3317976183959034359
+      Lich_charging_10: 534056681391999081
+      Lich_charging_11: -946693575975954294
+      Lich_charging_12: 4203421030087457083
+      Lich_charging_13: 2335665067717844550
+      Lich_charging_14: 1321615038581435876
+      Lich_charging_15: -7671768800265307360
+      Lich_charging_16: -4735180242848534621
+      Lich_charging_17: -9209354502892588977
+      Lich_charging_18: -2865646776089932030
+      Lich_charging_19: -1581344127561833048
+      Lich_charging_2: -6215257788703300329
+      Lich_charging_20: -319358903496715777
+      Lich_charging_21: -7185467813468389189
+      Lich_charging_22: 344165277806334446
+      Lich_charging_23: -5034742349379806928
+      Lich_charging_24: -4268245733718566775
+      Lich_charging_25: -4973053961162013219
+      Lich_charging_26: -8358561546724494374
+      Lich_charging_27: -1322774228206591458
+      Lich_charging_28: 2911849972807632894
+      Lich_charging_29: -3973664142181331678
+      Lich_charging_3: -8752525516763188576
+      Lich_charging_30: -6367473497909486920
+      Lich_charging_31: -6795375115799765566
+      Lich_charging_4: 6856466152729661241
+      Lich_charging_5: -2735091791239982811
+      Lich_charging_6: -2922972902114946843
+      Lich_charging_7: 1381593521326380910
+      Lich_charging_8: -1144967399398793912
+      Lich_charging_9: 7110950515699552694
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

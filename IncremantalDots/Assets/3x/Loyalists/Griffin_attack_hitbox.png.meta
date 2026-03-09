@@ -1,0 +1,754 @@
+fileFormatVersion: 2
+guid: 714cf2bf4f8eedf4493c9644a2a74b8f
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 5624153060819964405
+    second: Griffin_attack_hitbox_0
+  - first:
+      213: 7693941093600114782
+    second: Griffin_attack_hitbox_1
+  - first:
+      213: -4601513053790022137
+    second: Griffin_attack_hitbox_2
+  - first:
+      213: -8372473252065957156
+    second: Griffin_attack_hitbox_3
+  - first:
+      213: 6529011232198219157
+    second: Griffin_attack_hitbox_4
+  - first:
+      213: -4669836446523238413
+    second: Griffin_attack_hitbox_5
+  - first:
+      213: -8227268909546011071
+    second: Griffin_attack_hitbox_6
+  - first:
+      213: -3931500062442567750
+    second: Griffin_attack_hitbox_7
+  - first:
+      213: -359839765840705126
+    second: Griffin_attack_hitbox_8
+  - first:
+      213: -7500001920400103483
+    second: Griffin_attack_hitbox_9
+  - first:
+      213: -8446461922831926433
+    second: Griffin_attack_hitbox_10
+  - first:
+      213: 1897953697716382293
+    second: Griffin_attack_hitbox_11
+  - first:
+      213: 7036721856490581328
+    second: Griffin_attack_hitbox_12
+  - first:
+      213: 5469064842782415762
+    second: Griffin_attack_hitbox_13
+  - first:
+      213: -9106931309652642866
+    second: Griffin_attack_hitbox_14
+  - first:
+      213: -2731552148357855863
+    second: Griffin_attack_hitbox_15
+  - first:
+      213: -6566728104883262843
+    second: Griffin_attack_hitbox_16
+  - first:
+      213: 3662300214492549528
+    second: Griffin_attack_hitbox_17
+  - first:
+      213: -9132288613236623834
+    second: Griffin_attack_hitbox_18
+  - first:
+      213: -2726992875146757571
+    second: Griffin_attack_hitbox_19
+  - first:
+      213: 8845828788197069255
+    second: Griffin_attack_hitbox_20
+  - first:
+      213: -9204293930618747161
+    second: Griffin_attack_hitbox_21
+  - first:
+      213: -8409248256734375939
+    second: Griffin_attack_hitbox_22
+  - first:
+      213: -8723693228161528388
+    second: Griffin_attack_hitbox_23
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Griffin_attack_hitbox_0
+      rect:
+        serializedVersion: 2
+        x: 44
+        y: 431
+        width: 56
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5f1999829610d0e40800000000000000
+      internalID: 5624153060819964405
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Griffin_attack_hitbox_1
+      rect:
+        serializedVersion: 2
+        x: 179
+        y: 431
+        width: 74
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e58b0de09ae56ca60800000000000000
+      internalID: 7693941093600114782
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Griffin_attack_hitbox_2
+      rect:
+        serializedVersion: 2
+        x: 317
+        y: 431
+        width: 41
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 706d587e1442420c0800000000000000
+      internalID: -4601513053790022137
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Griffin_attack_hitbox_3
+      rect:
+        serializedVersion: 2
+        x: 362
+        y: 431
+        width: 41
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cda262fbfeffecb80800000000000000
+      internalID: -8372473252065957156
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Griffin_attack_hitbox_4
+      rect:
+        serializedVersion: 2
+        x: 461
+        y: 449
+        width: 11
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 595d5bd9f15bb9a50800000000000000
+      internalID: 6529011232198219157
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Griffin_attack_hitbox_5
+      rect:
+        serializedVersion: 2
+        x: 536
+        y: 449
+        width: 11
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3f75fc56e78613fb0800000000000000
+      internalID: -4669836446523238413
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Griffin_attack_hitbox_6
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 332
+        width: 55
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 14605e6448ed2dd80800000000000000
+      internalID: -8227268909546011071
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Griffin_attack_hitbox_7
+      rect:
+        serializedVersion: 2
+        x: 143
+        y: 323
+        width: 50
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab74fafe5818079c0800000000000000
+      internalID: -3931500062442567750
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Griffin_attack_hitbox_8
+      rect:
+        serializedVersion: 2
+        x: 296
+        y: 338
+        width: 53
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a994105b3a7910bf0800000000000000
+      internalID: -359839765840705126
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Griffin_attack_hitbox_9
+      rect:
+        serializedVersion: 2
+        x: 302
+        y: 323
+        width: 38
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5c7edc77df3aae790800000000000000
+      internalID: -7500001920400103483
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Griffin_attack_hitbox_10
+      rect:
+        serializedVersion: 2
+        x: 470
+        y: 338
+        width: 26
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f5b7db8e1a328ca80800000000000000
+      internalID: -8446461922831926433
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Griffin_attack_hitbox_11
+      rect:
+        serializedVersion: 2
+        x: 476
+        y: 323
+        width: 23
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 55a268015d2e65a10800000000000000
+      internalID: 1897953697716382293
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Griffin_attack_hitbox_12
+      rect:
+        serializedVersion: 2
+        x: 89
+        y: 188
+        width: 56
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 05d295f0f3577a160800000000000000
+      internalID: 7036721856490581328
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Griffin_attack_hitbox_13
+      rect:
+        serializedVersion: 2
+        x: 239
+        y: 179
+        width: 50
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 29b9f978f7506eb40800000000000000
+      internalID: 5469064842782415762
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Griffin_attack_hitbox_14
+      rect:
+        serializedVersion: 2
+        x: 371
+        y: 194
+        width: 53
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ec37546793ead9180800000000000000
+      internalID: -9106931309652642866
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Griffin_attack_hitbox_15
+      rect:
+        serializedVersion: 2
+        x: 380
+        y: 179
+        width: 38
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 985ccaf1bc3971ad0800000000000000
+      internalID: -2731552148357855863
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Griffin_attack_hitbox_16
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 194
+        width: 26
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 58aebd3a49b4ed4a0800000000000000
+      internalID: -6566728104883262843
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Griffin_attack_hitbox_17
+      rect:
+        serializedVersion: 2
+        x: 509
+        y: 179
+        width: 23
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8915aa134aa13d230800000000000000
+      internalID: 3662300214492549528
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Griffin_attack_hitbox_18
+      rect:
+        serializedVersion: 2
+        x: 44
+        y: 77
+        width: 56
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 626bfa524e7934180800000000000000
+      internalID: -9132288613236623834
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Griffin_attack_hitbox_19
+      rect:
+        serializedVersion: 2
+        x: 179
+        y: 107
+        width: 74
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d3a3bd3ad66c72ad0800000000000000
+      internalID: -2726992875146757571
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Griffin_attack_hitbox_20
+      rect:
+        serializedVersion: 2
+        x: 317
+        y: 116
+        width: 41
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7c119686a62b2ca70800000000000000
+      internalID: 8845828788197069255
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Griffin_attack_hitbox_21
+      rect:
+        serializedVersion: 2
+        x: 362
+        y: 116
+        width: 41
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7e68f21cf67c34080800000000000000
+      internalID: -9204293930618747161
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Griffin_attack_hitbox_22
+      rect:
+        serializedVersion: 2
+        x: 461
+        y: 107
+        width: 11
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dff464db3495c4b80800000000000000
+      internalID: -8409248256734375939
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Griffin_attack_hitbox_23
+      rect:
+        serializedVersion: 2
+        x: 536
+        y: 107
+        width: 11
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cbd83f5aa373fe680800000000000000
+      internalID: -8723693228161528388
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Griffin_attack_hitbox_0: 5624153060819964405
+      Griffin_attack_hitbox_1: 7693941093600114782
+      Griffin_attack_hitbox_10: -8446461922831926433
+      Griffin_attack_hitbox_11: 1897953697716382293
+      Griffin_attack_hitbox_12: 7036721856490581328
+      Griffin_attack_hitbox_13: 5469064842782415762
+      Griffin_attack_hitbox_14: -9106931309652642866
+      Griffin_attack_hitbox_15: -2731552148357855863
+      Griffin_attack_hitbox_16: -6566728104883262843
+      Griffin_attack_hitbox_17: 3662300214492549528
+      Griffin_attack_hitbox_18: -9132288613236623834
+      Griffin_attack_hitbox_19: -2726992875146757571
+      Griffin_attack_hitbox_2: -4601513053790022137
+      Griffin_attack_hitbox_20: 8845828788197069255
+      Griffin_attack_hitbox_21: -9204293930618747161
+      Griffin_attack_hitbox_22: -8409248256734375939
+      Griffin_attack_hitbox_23: -8723693228161528388
+      Griffin_attack_hitbox_3: -8372473252065957156
+      Griffin_attack_hitbox_4: 6529011232198219157
+      Griffin_attack_hitbox_5: -4669836446523238413
+      Griffin_attack_hitbox_6: -8227268909546011071
+      Griffin_attack_hitbox_7: -3931500062442567750
+      Griffin_attack_hitbox_8: -359839765840705126
+      Griffin_attack_hitbox_9: -7500001920400103483
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

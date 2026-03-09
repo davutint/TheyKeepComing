@@ -1,0 +1,754 @@
+fileFormatVersion: 2
+guid: ba46edc8ce1410047b40fa2332ce9a27
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -481683640859215469
+    second: Planetar_fly_0
+  - first:
+      213: -2554224114665888957
+    second: Planetar_fly_1
+  - first:
+      213: -6331024010865937315
+    second: Planetar_fly_2
+  - first:
+      213: -3983640127390641918
+    second: Planetar_fly_3
+  - first:
+      213: -7531665633498935974
+    second: Planetar_fly_4
+  - first:
+      213: 6940256469667128948
+    second: Planetar_fly_5
+  - first:
+      213: 5977271682655475167
+    second: Planetar_fly_6
+  - first:
+      213: 7937851798476403521
+    second: Planetar_fly_7
+  - first:
+      213: -1872972784523850632
+    second: Planetar_fly_8
+  - first:
+      213: -7751566209268030962
+    second: Planetar_fly_9
+  - first:
+      213: 8584498305610948434
+    second: Planetar_fly_10
+  - first:
+      213: 8260388148864581795
+    second: Planetar_fly_11
+  - first:
+      213: -4768674626744022384
+    second: Planetar_fly_12
+  - first:
+      213: 176728505860724443
+    second: Planetar_fly_13
+  - first:
+      213: -7461806467987697923
+    second: Planetar_fly_14
+  - first:
+      213: -7272775004716216604
+    second: Planetar_fly_15
+  - first:
+      213: -5678069442148038783
+    second: Planetar_fly_16
+  - first:
+      213: -3652120886055807013
+    second: Planetar_fly_17
+  - first:
+      213: -1868444077634425568
+    second: Planetar_fly_18
+  - first:
+      213: 1850819291185311211
+    second: Planetar_fly_19
+  - first:
+      213: 3161818269629807052
+    second: Planetar_fly_20
+  - first:
+      213: 7087084167202411636
+    second: Planetar_fly_21
+  - first:
+      213: -2347756649649941715
+    second: Planetar_fly_22
+  - first:
+      213: 1015425685298876093
+    second: Planetar_fly_23
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Planetar_fly_0
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 293
+        width: 92
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 399387cd747b059f0800000000000000
+      internalID: -481683640859215469
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_fly_1
+      rect:
+        serializedVersion: 2
+        x: 23
+        y: 287
+        width: 50
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3436a9853b29d8cd0800000000000000
+      internalID: -2554224114665888957
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_fly_2
+      rect:
+        serializedVersion: 2
+        x: 101
+        y: 296
+        width: 83
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d54fddf843fa328a0800000000000000
+      internalID: -6331024010865937315
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_fly_3
+      rect:
+        serializedVersion: 2
+        x: 119
+        y: 287
+        width: 50
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 20193ed096447b8c0800000000000000
+      internalID: -3983640127390641918
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_fly_4
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 293
+        width: 92
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a5d4744c2062a7790800000000000000
+      internalID: -7531665633498935974
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_fly_5
+      rect:
+        serializedVersion: 2
+        x: 215
+        y: 287
+        width: 50
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 476ad94fc7eb05060800000000000000
+      internalID: 6940256469667128948
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_fly_6
+      rect:
+        serializedVersion: 2
+        x: 287
+        y: 290
+        width: 97
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fd55eaa2de883f250800000000000000
+      internalID: 5977271682655475167
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_fly_7
+      rect:
+        serializedVersion: 2
+        x: 311
+        y: 287
+        width: 50
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 143b1e7772ae82e60800000000000000
+      internalID: 7937851798476403521
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_fly_8
+      rect:
+        serializedVersion: 2
+        x: 11
+        y: 191
+        width: 74
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 87c4b780d2dd106e0800000000000000
+      internalID: -1872972784523850632
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_fly_9
+      rect:
+        serializedVersion: 2
+        x: 107
+        y: 191
+        width: 62
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e0268ab2a97ec6490800000000000000
+      internalID: -7751566209268030962
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_fly_10
+      rect:
+        serializedVersion: 2
+        x: 203
+        y: 191
+        width: 74
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 25f12e0f9b3422770800000000000000
+      internalID: 8584498305610948434
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_fly_11
+      rect:
+        serializedVersion: 2
+        x: 299
+        y: 191
+        width: 77
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3a08be7814bc2a270800000000000000
+      internalID: 8260388148864581795
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_fly_12
+      rect:
+        serializedVersion: 2
+        x: 11
+        y: 95
+        width: 74
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 09a018741b342ddb0800000000000000
+      internalID: -4768674626744022384
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_fly_13
+      rect:
+        serializedVersion: 2
+        x: 119
+        y: 95
+        width: 62
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bd69385c3add37200800000000000000
+      internalID: 176728505860724443
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_fly_14
+      rect:
+        serializedVersion: 2
+        x: 203
+        y: 95
+        width: 74
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dfe81ec3d86527890800000000000000
+      internalID: -7461806467987697923
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_fly_15
+      rect:
+        serializedVersion: 2
+        x: 296
+        y: 95
+        width: 77
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4eecc808aa9e11b90800000000000000
+      internalID: -7272775004716216604
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_fly_16
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 5
+        width: 92
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 18704c21de17331b0800000000000000
+      internalID: -5678069442148038783
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_fly_17
+      rect:
+        serializedVersion: 2
+        x: 23
+        y: 0
+        width: 50
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bd7dbd5676f015dc0800000000000000
+      internalID: -3652120886055807013
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_fly_18
+      rect:
+        serializedVersion: 2
+        x: 104
+        y: 8
+        width: 83
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 02deae5c204f116e0800000000000000
+      internalID: -1868444077634425568
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_fly_19
+      rect:
+        serializedVersion: 2
+        x: 119
+        y: 0
+        width: 50
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bed6a8ad65e6fa910800000000000000
+      internalID: 1850819291185311211
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_fly_20
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 5
+        width: 92
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cc9ff95d6f801eb20800000000000000
+      internalID: 3161818269629807052
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_fly_21
+      rect:
+        serializedVersion: 2
+        x: 215
+        y: 0
+        width: 50
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 474156740816a5260800000000000000
+      internalID: 7087084167202411636
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_fly_22
+      rect:
+        serializedVersion: 2
+        x: 287
+        y: 2
+        width: 97
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d23dd8e14c71b6fd0800000000000000
+      internalID: -2347756649649941715
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Planetar_fly_23
+      rect:
+        serializedVersion: 2
+        x: 311
+        y: 0
+        width: 50
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dbe0c04e744871e00800000000000000
+      internalID: 1015425685298876093
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Planetar_fly_0: -481683640859215469
+      Planetar_fly_1: -2554224114665888957
+      Planetar_fly_10: 8584498305610948434
+      Planetar_fly_11: 8260388148864581795
+      Planetar_fly_12: -4768674626744022384
+      Planetar_fly_13: 176728505860724443
+      Planetar_fly_14: -7461806467987697923
+      Planetar_fly_15: -7272775004716216604
+      Planetar_fly_16: -5678069442148038783
+      Planetar_fly_17: -3652120886055807013
+      Planetar_fly_18: -1868444077634425568
+      Planetar_fly_19: 1850819291185311211
+      Planetar_fly_2: -6331024010865937315
+      Planetar_fly_20: 3161818269629807052
+      Planetar_fly_21: 7087084167202411636
+      Planetar_fly_22: -2347756649649941715
+      Planetar_fly_23: 1015425685298876093
+      Planetar_fly_3: -3983640127390641918
+      Planetar_fly_4: -7531665633498935974
+      Planetar_fly_5: 6940256469667128948
+      Planetar_fly_6: 5977271682655475167
+      Planetar_fly_7: 7937851798476403521
+      Planetar_fly_8: -1872972784523850632
+      Planetar_fly_9: -7751566209268030962
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

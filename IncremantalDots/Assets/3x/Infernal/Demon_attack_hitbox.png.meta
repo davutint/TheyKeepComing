@@ -1,0 +1,806 @@
+fileFormatVersion: 2
+guid: c01851d87fc43db458636132f3b40451
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 3909583290893079101
+    second: Demon_attack_hitbox_0
+  - first:
+      213: 8451736083337837114
+    second: Demon_attack_hitbox_1
+  - first:
+      213: 7819925835387249480
+    second: Demon_attack_hitbox_2
+  - first:
+      213: 3682790321555490726
+    second: Demon_attack_hitbox_3
+  - first:
+      213: -683904908535536794
+    second: Demon_attack_hitbox_4
+  - first:
+      213: -2176357137986211461
+    second: Demon_attack_hitbox_5
+  - first:
+      213: -1237987764444202435
+    second: Demon_attack_hitbox_6
+  - first:
+      213: -1461126738803295645
+    second: Demon_attack_hitbox_7
+  - first:
+      213: 3105730744654898513
+    second: Demon_attack_hitbox_8
+  - first:
+      213: -964682147027142621
+    second: Demon_attack_hitbox_9
+  - first:
+      213: -9011293541427554627
+    second: Demon_attack_hitbox_10
+  - first:
+      213: -2220605490867743431
+    second: Demon_attack_hitbox_11
+  - first:
+      213: 2871936767099223524
+    second: Demon_attack_hitbox_12
+  - first:
+      213: -7431123337340716971
+    second: Demon_attack_hitbox_13
+  - first:
+      213: -8868038046894182905
+    second: Demon_attack_hitbox_14
+  - first:
+      213: -615294187841779025
+    second: Demon_attack_hitbox_15
+  - first:
+      213: -6565715470844172636
+    second: Demon_attack_hitbox_16
+  - first:
+      213: -2845041774030666677
+    second: Demon_attack_hitbox_17
+  - first:
+      213: -5177933187937208313
+    second: Demon_attack_hitbox_18
+  - first:
+      213: 4668508153356699520
+    second: Demon_attack_hitbox_19
+  - first:
+      213: -5762641214852890676
+    second: Demon_attack_hitbox_20
+  - first:
+      213: 8038321226702805482
+    second: Demon_attack_hitbox_21
+  - first:
+      213: -8660431889998458124
+    second: Demon_attack_hitbox_22
+  - first:
+      213: 2629087352868817215
+    second: Demon_attack_hitbox_23
+  - first:
+      213: 1408127178995471477
+    second: Demon_attack_hitbox_24
+  - first:
+      213: 5917060477305981733
+    second: Demon_attack_hitbox_25
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Demon_attack_hitbox_0
+      rect:
+        serializedVersion: 2
+        x: 44
+        y: 539
+        width: 23
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d321c790a41a14630800000000000000
+      internalID: 3909583290893079101
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Demon_attack_hitbox_1
+      rect:
+        serializedVersion: 2
+        x: 77
+        y: 539
+        width: 23
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a3af3b640399a4570800000000000000
+      internalID: 8451736083337837114
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Demon_attack_hitbox_2
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 533
+        width: 14
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 84328249d15f58c60800000000000000
+      internalID: 7819925835387249480
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Demon_attack_hitbox_3
+      rect:
+        serializedVersion: 2
+        x: 224
+        y: 533
+        width: 14
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6a7cf820946eb1330800000000000000
+      internalID: 3682790321555490726
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Demon_attack_hitbox_4
+      rect:
+        serializedVersion: 2
+        x: 341
+        y: 530
+        width: 11
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 663e792fb184286f0800000000000000
+      internalID: -683904908535536794
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Demon_attack_hitbox_5
+      rect:
+        serializedVersion: 2
+        x: 368
+        y: 530
+        width: 11
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b7132fdb6b60cc1e0800000000000000
+      internalID: -2176357137986211461
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Demon_attack_hitbox_6
+      rect:
+        serializedVersion: 2
+        x: 488
+        y: 527
+        width: 8
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d3af508ffa8c1dee0800000000000000
+      internalID: -1237987764444202435
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Demon_attack_hitbox_7
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 527
+        width: 8
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 36afdc1f8f809bbe0800000000000000
+      internalID: -1461126738803295645
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Demon_attack_hitbox_8
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 425
+        width: 68
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1552a2b48a5c91b20800000000000000
+      internalID: 3105730744654898513
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Demon_attack_hitbox_9
+      rect:
+        serializedVersion: 2
+        x: 146
+        y: 428
+        width: 56
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3283949c2b2cc92f0800000000000000
+      internalID: -964682147027142621
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Demon_attack_hitbox_10
+      rect:
+        serializedVersion: 2
+        x: 287
+        y: 428
+        width: 32
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: db65078944471f280800000000000000
+      internalID: -9011293541427554627
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Demon_attack_hitbox_11
+      rect:
+        serializedVersion: 2
+        x: 431
+        y: 446
+        width: 11
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 935db824213de21e0800000000000000
+      internalID: -2220605490867743431
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Demon_attack_hitbox_12
+      rect:
+        serializedVersion: 2
+        x: 434
+        y: 431
+        width: 11
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4ed3554064b2bd720800000000000000
+      internalID: 2871936767099223524
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Demon_attack_hitbox_13
+      rect:
+        serializedVersion: 2
+        x: 71
+        y: 257
+        width: 68
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 558f0bb42b85fd890800000000000000
+      internalID: -7431123337340716971
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Demon_attack_hitbox_14
+      rect:
+        serializedVersion: 2
+        x: 230
+        y: 260
+        width: 56
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 70e293891666ee480800000000000000
+      internalID: -8868038046894182905
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Demon_attack_hitbox_15
+      rect:
+        serializedVersion: 2
+        x: 401
+        y: 260
+        width: 32
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: faa045532390677f0800000000000000
+      internalID: -615294187841779025
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Demon_attack_hitbox_16
+      rect:
+        serializedVersion: 2
+        x: 566
+        y: 278
+        width: 10
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4a6eb00e094e1e4a0800000000000000
+      internalID: -6565715470844172636
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Demon_attack_hitbox_17
+      rect:
+        serializedVersion: 2
+        x: 563
+        y: 263
+        width: 11
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b4441c784916488d0800000000000000
+      internalID: -2845041774030666677
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Demon_attack_hitbox_18
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 119
+        width: 14
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 708fb4e03394428b0800000000000000
+      internalID: -5177933187937208313
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Demon_attack_hitbox_19
+      rect:
+        serializedVersion: 2
+        x: 224
+        y: 119
+        width: 14
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 08747df3e6fd9c040800000000000000
+      internalID: 4668508153356699520
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Demon_attack_hitbox_20
+      rect:
+        serializedVersion: 2
+        x: 341
+        y: 137
+        width: 11
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ccffaacc85cf600b0800000000000000
+      internalID: -5762641214852890676
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Demon_attack_hitbox_21
+      rect:
+        serializedVersion: 2
+        x: 368
+        y: 137
+        width: 11
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ae95a1c119add8f60800000000000000
+      internalID: 8038321226702805482
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Demon_attack_hitbox_22
+      rect:
+        serializedVersion: 2
+        x: 488
+        y: 158
+        width: 8
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4f25d2bb417ffc780800000000000000
+      internalID: -8660431889998458124
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Demon_attack_hitbox_23
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 158
+        width: 8
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f39c73794056c7420800000000000000
+      internalID: 2629087352868817215
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Demon_attack_hitbox_24
+      rect:
+        serializedVersion: 2
+        x: 44
+        y: 95
+        width: 23
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 574199e653caa8310800000000000000
+      internalID: 1408127178995471477
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Demon_attack_hitbox_25
+      rect:
+        serializedVersion: 2
+        x: 77
+        y: 95
+        width: 23
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 52b8358772f9d1250800000000000000
+      internalID: 5917060477305981733
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Demon_attack_hitbox_0: 3909583290893079101
+      Demon_attack_hitbox_1: 8451736083337837114
+      Demon_attack_hitbox_10: -9011293541427554627
+      Demon_attack_hitbox_11: -2220605490867743431
+      Demon_attack_hitbox_12: 2871936767099223524
+      Demon_attack_hitbox_13: -7431123337340716971
+      Demon_attack_hitbox_14: -8868038046894182905
+      Demon_attack_hitbox_15: -615294187841779025
+      Demon_attack_hitbox_16: -6565715470844172636
+      Demon_attack_hitbox_17: -2845041774030666677
+      Demon_attack_hitbox_18: -5177933187937208313
+      Demon_attack_hitbox_19: 4668508153356699520
+      Demon_attack_hitbox_2: 7819925835387249480
+      Demon_attack_hitbox_20: -5762641214852890676
+      Demon_attack_hitbox_21: 8038321226702805482
+      Demon_attack_hitbox_22: -8660431889998458124
+      Demon_attack_hitbox_23: 2629087352868817215
+      Demon_attack_hitbox_24: 1408127178995471477
+      Demon_attack_hitbox_25: 5917060477305981733
+      Demon_attack_hitbox_3: 3682790321555490726
+      Demon_attack_hitbox_4: -683904908535536794
+      Demon_attack_hitbox_5: -2176357137986211461
+      Demon_attack_hitbox_6: -1237987764444202435
+      Demon_attack_hitbox_7: -1461126738803295645
+      Demon_attack_hitbox_8: 3105730744654898513
+      Demon_attack_hitbox_9: -964682147027142621
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

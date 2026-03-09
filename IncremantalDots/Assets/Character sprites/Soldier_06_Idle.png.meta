@@ -1,0 +1,546 @@
+fileFormatVersion: 2
+guid: c882705cc64052545850fae6045fa0b0
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -669833923724927676
+    second: Soldier_06_Idle_0
+  - first:
+      213: 5992926741582025993
+    second: Soldier_06_Idle_1
+  - first:
+      213: -5495831696291553719
+    second: Soldier_06_Idle_2
+  - first:
+      213: 3381903291960293839
+    second: Soldier_06_Idle_3
+  - first:
+      213: 2550714150493022064
+    second: Soldier_06_Idle_4
+  - first:
+      213: -2297865695998127822
+    second: Soldier_06_Idle_5
+  - first:
+      213: -5404763967501474971
+    second: Soldier_06_Idle_6
+  - first:
+      213: 7628064251343200005
+    second: Soldier_06_Idle_7
+  - first:
+      213: 5009663005118289055
+    second: Soldier_06_Idle_8
+  - first:
+      213: -4061655592932297158
+    second: Soldier_06_Idle_9
+  - first:
+      213: -7399222606792103519
+    second: Soldier_06_Idle_10
+  - first:
+      213: 3092057445512438215
+    second: Soldier_06_Idle_11
+  - first:
+      213: 8509779304275826591
+    second: Soldier_06_Idle_12
+  - first:
+      213: 6135272911542995988
+    second: Soldier_06_Idle_13
+  - first:
+      213: 2372886289834866597
+    second: Soldier_06_Idle_14
+  - first:
+      213: 5852744137359985196
+    second: Soldier_06_Idle_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Soldier_06_Idle_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 143
+        width: 43
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 44d9ed5689544b6f0800000000000000
+      internalID: -669833923724927676
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Soldier_06_Idle_1
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 143
+        width: 44
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9059fec9e172b2350800000000000000
+      internalID: 5992926741582025993
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Soldier_06_Idle_2
+      rect:
+        serializedVersion: 2
+        x: 95
+        y: 143
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 94e953db032eab3b0800000000000000
+      internalID: -5495831696291553719
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Soldier_06_Idle_3
+      rect:
+        serializedVersion: 2
+        x: 143
+        y: 143
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fc9740e302feeee20800000000000000
+      internalID: 3381903291960293839
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Soldier_06_Idle_4
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 95
+        width: 38
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 077e2bf6105f56320800000000000000
+      internalID: 2550714150493022064
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Soldier_06_Idle_5
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 95
+        width: 38
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 231d978f2575c10e0800000000000000
+      internalID: -2297865695998127822
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Soldier_06_Idle_6
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 95
+        width: 38
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5636e36aecb6ef4b0800000000000000
+      internalID: -5404763967501474971
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Soldier_06_Idle_7
+      rect:
+        serializedVersion: 2
+        x: 146
+        y: 95
+        width: 38
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 50fda2975045cd960800000000000000
+      internalID: 7628064251343200005
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Soldier_06_Idle_8
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 47
+        width: 38
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f94dd78f5f5e58540800000000000000
+      internalID: 5009663005118289055
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Soldier_06_Idle_9
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 47
+        width: 38
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a36ba4ff1c912a7c0800000000000000
+      internalID: -4061655592932297158
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Soldier_06_Idle_10
+      rect:
+        serializedVersion: 2
+        x: 104
+        y: 47
+        width: 38
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1a9ed1ced3ea05990800000000000000
+      internalID: -7399222606792103519
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Soldier_06_Idle_11
+      rect:
+        serializedVersion: 2
+        x: 152
+        y: 47
+        width: 38
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7c1eed04dd139ea20800000000000000
+      internalID: 3092057445512438215
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Soldier_06_Idle_12
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 2
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f97d454c03fc81670800000000000000
+      internalID: 8509779304275826591
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Soldier_06_Idle_13
+      rect:
+        serializedVersion: 2
+        x: 53
+        y: 0
+        width: 44
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 41cc89cf43ed42550800000000000000
+      internalID: 6135272911542995988
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Soldier_06_Idle_14
+      rect:
+        serializedVersion: 2
+        x: 101
+        y: 0
+        width: 44
+        height: 43
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5a7700e228f2ee020800000000000000
+      internalID: 2372886289834866597
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Soldier_06_Idle_15
+      rect:
+        serializedVersion: 2
+        x: 149
+        y: 2
+        width: 43
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c2a8794a8cf193150800000000000000
+      internalID: 5852744137359985196
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Soldier_06_Idle_0: -669833923724927676
+      Soldier_06_Idle_1: 5992926741582025993
+      Soldier_06_Idle_10: -7399222606792103519
+      Soldier_06_Idle_11: 3092057445512438215
+      Soldier_06_Idle_12: 8509779304275826591
+      Soldier_06_Idle_13: 6135272911542995988
+      Soldier_06_Idle_14: 2372886289834866597
+      Soldier_06_Idle_15: 5852744137359985196
+      Soldier_06_Idle_2: -5495831696291553719
+      Soldier_06_Idle_3: 3381903291960293839
+      Soldier_06_Idle_4: 2550714150493022064
+      Soldier_06_Idle_5: -2297865695998127822
+      Soldier_06_Idle_6: -5404763967501474971
+      Soldier_06_Idle_7: 7628064251343200005
+      Soldier_06_Idle_8: 5009663005118289055
+      Soldier_06_Idle_9: -4061655592932297158
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

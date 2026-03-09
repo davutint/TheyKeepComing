@@ -1,0 +1,806 @@
+fileFormatVersion: 2
+guid: d30cf359f9384144aba2c558a5b032b1
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -5124157621536756548
+    second: Oni_move_0
+  - first:
+      213: 2552180453109576465
+    second: Oni_move_1
+  - first:
+      213: -7157719487000779028
+    second: Oni_move_2
+  - first:
+      213: 4943494375711510288
+    second: Oni_move_3
+  - first:
+      213: -547218416385458727
+    second: Oni_move_4
+  - first:
+      213: 4715835468655888593
+    second: Oni_move_5
+  - first:
+      213: 2506007909258658143
+    second: Oni_move_6
+  - first:
+      213: 6174527240260256074
+    second: Oni_move_7
+  - first:
+      213: 6205162864626094328
+    second: Oni_move_8
+  - first:
+      213: 4049791306542117195
+    second: Oni_move_9
+  - first:
+      213: 5611626434717702326
+    second: Oni_move_10
+  - first:
+      213: 8655833274318348882
+    second: Oni_move_11
+  - first:
+      213: 8533156061549604272
+    second: Oni_move_12
+  - first:
+      213: -8079354243998037348
+    second: Oni_move_13
+  - first:
+      213: 8864032628225564269
+    second: Oni_move_14
+  - first:
+      213: -2538014837893994475
+    second: Oni_move_15
+  - first:
+      213: -7083053279283999124
+    second: Oni_move_16
+  - first:
+      213: -457195593537842556
+    second: Oni_move_17
+  - first:
+      213: -3229996785852874635
+    second: Oni_move_18
+  - first:
+      213: 5302077635388021361
+    second: Oni_move_19
+  - first:
+      213: -100064304211874123
+    second: Oni_move_20
+  - first:
+      213: -4727830412343004711
+    second: Oni_move_21
+  - first:
+      213: 8739182084570982794
+    second: Oni_move_22
+  - first:
+      213: -5520825453756446442
+    second: Oni_move_23
+  - first:
+      213: -5642089413523494680
+    second: Oni_move_24
+  - first:
+      213: -5033982285632439248
+    second: Oni_move_25
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Oni_move_0
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 299
+        width: 92
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cbce03bcac553e8b0800000000000000
+      internalID: -5124157621536756548
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_move_1
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 302
+        width: 92
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 113ba4e999a2b6320800000000000000
+      internalID: 2552180453109576465
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_move_2
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 305
+        width: 92
+        height: 79
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ce66d6fbc0caaac90800000000000000
+      internalID: -7157719487000779028
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_move_3
+      rect:
+        serializedVersion: 2
+        x: 290
+        y: 302
+        width: 92
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 01f0d6561f1da9440800000000000000
+      internalID: 4943494375711510288
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_move_4
+      rect:
+        serializedVersion: 2
+        x: 17
+        y: 287
+        width: 62
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9ddfac4efb3e768f0800000000000000
+      internalID: -547218416385458727
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_move_5
+      rect:
+        serializedVersion: 2
+        x: 113
+        y: 287
+        width: 62
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1d80c688f53027140800000000000000
+      internalID: 4715835468655888593
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_move_6
+      rect:
+        serializedVersion: 2
+        x: 209
+        y: 287
+        width: 62
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f518ea38ae027c220800000000000000
+      internalID: 2506007909258658143
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_move_7
+      rect:
+        serializedVersion: 2
+        x: 305
+        y: 287
+        width: 62
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a418fab9fc350b550800000000000000
+      internalID: 6174527240260256074
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_move_8
+      rect:
+        serializedVersion: 2
+        x: 11
+        y: 191
+        width: 80
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8f0db7fbfba2d1650800000000000000
+      internalID: 6205162864626094328
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_move_9
+      rect:
+        serializedVersion: 2
+        x: 107
+        y: 191
+        width: 80
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b4178e09cbfb33830800000000000000
+      internalID: 4049791306542117195
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_move_10
+      rect:
+        serializedVersion: 2
+        x: 203
+        y: 203
+        width: 80
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6b85a8db28080ed40800000000000000
+      internalID: 5611626434717702326
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_move_11
+      rect:
+        serializedVersion: 2
+        x: 299
+        y: 191
+        width: 80
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 25260ce9082bf1870800000000000000
+      internalID: 8655833274318348882
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_move_12
+      rect:
+        serializedVersion: 2
+        x: 206
+        y: 191
+        width: 68
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0bda2a53a3cdb6670800000000000000
+      internalID: 8533156061549604272
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_move_13
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 95
+        width: 80
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c9ac3ff0f1e50ef80800000000000000
+      internalID: -8079354243998037348
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_move_14
+      rect:
+        serializedVersion: 2
+        x: 101
+        y: 95
+        width: 80
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d6e5bd236be530b70800000000000000
+      internalID: 8864032628225564269
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_move_15
+      rect:
+        serializedVersion: 2
+        x: 197
+        y: 107
+        width: 80
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 51868a0b3f827ccd0800000000000000
+      internalID: -2538014837893994475
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_move_16
+      rect:
+        serializedVersion: 2
+        x: 293
+        y: 95
+        width: 80
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c6e8c13f190f3bd90800000000000000
+      internalID: -7083053279283999124
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_move_17
+      rect:
+        serializedVersion: 2
+        x: 206
+        y: 95
+        width: 68
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4829d4ea707b7a9f0800000000000000
+      internalID: -457195593537842556
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_move_18
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 11
+        width: 92
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5700699590fbc23d0800000000000000
+      internalID: -3229996785852874635
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_move_19
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 14
+        width: 92
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 17a98dc8483c49940800000000000000
+      internalID: 5302077635388021361
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_move_20
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 17
+        width: 92
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5be21c4ab008c9ef0800000000000000
+      internalID: -100064304211874123
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_move_21
+      rect:
+        serializedVersion: 2
+        x: 290
+        y: 14
+        width: 92
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9d1b1020a4f536eb0800000000000000
+      internalID: -4727830412343004711
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_move_22
+      rect:
+        serializedVersion: 2
+        x: 17
+        y: 0
+        width: 62
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a89af42cdcfc74970800000000000000
+      internalID: 8739182084570982794
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_move_23
+      rect:
+        serializedVersion: 2
+        x: 113
+        y: 0
+        width: 62
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 61989e910861263b0800000000000000
+      internalID: -5520825453756446442
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_move_24
+      rect:
+        serializedVersion: 2
+        x: 209
+        y: 0
+        width: 62
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8e8a0fb429543b1b0800000000000000
+      internalID: -5642089413523494680
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Oni_move_25
+      rect:
+        serializedVersion: 2
+        x: 305
+        y: 0
+        width: 62
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 03cf44b48c3b32ab0800000000000000
+      internalID: -5033982285632439248
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Oni_move_0: -5124157621536756548
+      Oni_move_1: 2552180453109576465
+      Oni_move_10: 5611626434717702326
+      Oni_move_11: 8655833274318348882
+      Oni_move_12: 8533156061549604272
+      Oni_move_13: -8079354243998037348
+      Oni_move_14: 8864032628225564269
+      Oni_move_15: -2538014837893994475
+      Oni_move_16: -7083053279283999124
+      Oni_move_17: -457195593537842556
+      Oni_move_18: -3229996785852874635
+      Oni_move_19: 5302077635388021361
+      Oni_move_2: -7157719487000779028
+      Oni_move_20: -100064304211874123
+      Oni_move_21: -4727830412343004711
+      Oni_move_22: 8739182084570982794
+      Oni_move_23: -5520825453756446442
+      Oni_move_24: -5642089413523494680
+      Oni_move_25: -5033982285632439248
+      Oni_move_3: 4943494375711510288
+      Oni_move_4: -547218416385458727
+      Oni_move_5: 4715835468655888593
+      Oni_move_6: 2506007909258658143
+      Oni_move_7: 6174527240260256074
+      Oni_move_8: 6205162864626094328
+      Oni_move_9: 4049791306542117195
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

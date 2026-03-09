@@ -1,0 +1,546 @@
+fileFormatVersion: 2
+guid: 6fc56d6d5359447439ae5430c03a4392
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 2961613481466980015
+    second: DeathKnight_idle_0
+  - first:
+      213: 6363299873760283673
+    second: DeathKnight_idle_1
+  - first:
+      213: 143580257857776096
+    second: DeathKnight_idle_2
+  - first:
+      213: 4924386375937612295
+    second: DeathKnight_idle_3
+  - first:
+      213: -2805326116583134380
+    second: DeathKnight_idle_4
+  - first:
+      213: -7074088602190412909
+    second: DeathKnight_idle_5
+  - first:
+      213: 592388315818032512
+    second: DeathKnight_idle_6
+  - first:
+      213: -4121942172374223563
+    second: DeathKnight_idle_7
+  - first:
+      213: 5078505258470513030
+    second: DeathKnight_idle_8
+  - first:
+      213: -7422594516441900745
+    second: DeathKnight_idle_9
+  - first:
+      213: -8417223431518018084
+    second: DeathKnight_idle_10
+  - first:
+      213: -2901006107190790300
+    second: DeathKnight_idle_11
+  - first:
+      213: 6212128745666204394
+    second: DeathKnight_idle_12
+  - first:
+      213: 6979410102785184568
+    second: DeathKnight_idle_13
+  - first:
+      213: -579895496866220612
+    second: DeathKnight_idle_14
+  - first:
+      213: 529487079351146530
+    second: DeathKnight_idle_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: DeathKnight_idle_0
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 287
+        width: 74
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fa6e8d425c3c91920800000000000000
+      internalID: 2961613481466980015
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_idle_1
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 287
+        width: 74
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 91c05ce558bfe4850800000000000000
+      internalID: 6363299873760283673
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_idle_2
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 287
+        width: 74
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0e92f5adb791ef100800000000000000
+      internalID: 143580257857776096
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_idle_3
+      rect:
+        serializedVersion: 2
+        x: 290
+        y: 287
+        width: 74
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 70ad882815fe65440800000000000000
+      internalID: 4924386375937612295
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_idle_4
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 191
+        width: 89
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 45bafed92ca7119d0800000000000000
+      internalID: -2805326116583134380
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_idle_5
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 191
+        width: 89
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3930dcc75e9c3dd90800000000000000
+      internalID: -7074088602190412909
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_idle_6
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 191
+        width: 89
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 08dfc6dd806983800800000000000000
+      internalID: 592388315818032512
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_idle_7
+      rect:
+        serializedVersion: 2
+        x: 290
+        y: 191
+        width: 89
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 535bee6ee6bebc6c0800000000000000
+      internalID: -4121942172374223563
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_idle_8
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 95
+        width: 89
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 689961120a97a7640800000000000000
+      internalID: 5078505258470513030
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_idle_9
+      rect:
+        serializedVersion: 2
+        x: 101
+        y: 95
+        width: 89
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 739d7b72d95adf890800000000000000
+      internalID: -7422594516441900745
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_idle_10
+      rect:
+        serializedVersion: 2
+        x: 197
+        y: 95
+        width: 89
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cd52649a2e3003b80800000000000000
+      internalID: -8417223431518018084
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_idle_11
+      rect:
+        serializedVersion: 2
+        x: 293
+        y: 95
+        width: 89
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 46777a1d05e8db7d0800000000000000
+      internalID: -2901006107190790300
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_idle_12
+      rect:
+        serializedVersion: 2
+        x: 20
+        y: 0
+        width: 74
+        height: 91
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ae25d605e2ae53650800000000000000
+      internalID: 6212128745666204394
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_idle_13
+      rect:
+        serializedVersion: 2
+        x: 116
+        y: 0
+        width: 74
+        height: 91
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 833984e8288dbd060800000000000000
+      internalID: 6979410102785184568
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_idle_14
+      rect:
+        serializedVersion: 2
+        x: 212
+        y: 0
+        width: 74
+        height: 88
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cb5b0763e1cc3f7f0800000000000000
+      internalID: -579895496866220612
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_idle_15
+      rect:
+        serializedVersion: 2
+        x: 308
+        y: 0
+        width: 74
+        height: 91
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 22852ed71bd195700800000000000000
+      internalID: 529487079351146530
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      DeathKnight_idle_0: 2961613481466980015
+      DeathKnight_idle_1: 6363299873760283673
+      DeathKnight_idle_10: -8417223431518018084
+      DeathKnight_idle_11: -2901006107190790300
+      DeathKnight_idle_12: 6212128745666204394
+      DeathKnight_idle_13: 6979410102785184568
+      DeathKnight_idle_14: -579895496866220612
+      DeathKnight_idle_15: 529487079351146530
+      DeathKnight_idle_2: 143580257857776096
+      DeathKnight_idle_3: 4924386375937612295
+      DeathKnight_idle_4: -2805326116583134380
+      DeathKnight_idle_5: -7074088602190412909
+      DeathKnight_idle_6: 592388315818032512
+      DeathKnight_idle_7: -4121942172374223563
+      DeathKnight_idle_8: 5078505258470513030
+      DeathKnight_idle_9: -7422594516441900745
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

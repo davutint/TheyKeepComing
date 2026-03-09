@@ -1,0 +1,962 @@
+fileFormatVersion: 2
+guid: 4f4dd4a7152718641a8ac0a9afd80681
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 2772434666302810032
+    second: Efreet_hit_0
+  - first:
+      213: 520958620368677855
+    second: Efreet_hit_1
+  - first:
+      213: -5126032525892741392
+    second: Efreet_hit_2
+  - first:
+      213: 5439868772085222561
+    second: Efreet_hit_3
+  - first:
+      213: -2432944634979512947
+    second: Efreet_hit_4
+  - first:
+      213: -5883668985940787849
+    second: Efreet_hit_5
+  - first:
+      213: 3388732540137433436
+    second: Efreet_hit_6
+  - first:
+      213: 5491906618775426124
+    second: Efreet_hit_7
+  - first:
+      213: -4828565832965214882
+    second: Efreet_hit_8
+  - first:
+      213: -8969973247282468537
+    second: Efreet_hit_9
+  - first:
+      213: -2530301026975619882
+    second: Efreet_hit_10
+  - first:
+      213: 6963775184918009600
+    second: Efreet_hit_11
+  - first:
+      213: -6690359395052506520
+    second: Efreet_hit_12
+  - first:
+      213: 3612654797188078206
+    second: Efreet_hit_13
+  - first:
+      213: -3966864693481416389
+    second: Efreet_hit_14
+  - first:
+      213: 6775096358402532195
+    second: Efreet_hit_15
+  - first:
+      213: -2868770467469150997
+    second: Efreet_hit_16
+  - first:
+      213: -8012964812374425677
+    second: Efreet_hit_17
+  - first:
+      213: -5473910418805749914
+    second: Efreet_hit_18
+  - first:
+      213: -4131010336695829879
+    second: Efreet_hit_19
+  - first:
+      213: 5367479131679241594
+    second: Efreet_hit_20
+  - first:
+      213: -1617103110072433624
+    second: Efreet_hit_21
+  - first:
+      213: 6124182971749233054
+    second: Efreet_hit_22
+  - first:
+      213: -7266483998478687688
+    second: Efreet_hit_23
+  - first:
+      213: 4148791831133796868
+    second: Efreet_hit_24
+  - first:
+      213: -4768081377190151301
+    second: Efreet_hit_25
+  - first:
+      213: -4186115117384661825
+    second: Efreet_hit_26
+  - first:
+      213: 694657054003324574
+    second: Efreet_hit_27
+  - first:
+      213: 4140368369369009100
+    second: Efreet_hit_28
+  - first:
+      213: -4205648015019306205
+    second: Efreet_hit_29
+  - first:
+      213: 1427737272897963361
+    second: Efreet_hit_30
+  - first:
+      213: 2369522289333514522
+    second: Efreet_hit_31
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Efreet_hit_0
+      rect:
+        serializedVersion: 2
+        x: 11
+        y: 302
+        width: 74
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0b725f7d3aaa97620800000000000000
+      internalID: 2772434666302810032
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_hit_1
+      rect:
+        serializedVersion: 2
+        x: 107
+        y: 302
+        width: 74
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fdba0c5ea11da3700800000000000000
+      internalID: 520958620368677855
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_hit_2
+      rect:
+        serializedVersion: 2
+        x: 29
+        y: 287
+        width: 38
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0f6901b939cacd8b0800000000000000
+      internalID: -5126032525892741392
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_hit_3
+      rect:
+        serializedVersion: 2
+        x: 125
+        y: 287
+        width: 38
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1ac41e893db4e7b40800000000000000
+      internalID: 5439868772085222561
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_hit_4
+      rect:
+        serializedVersion: 2
+        x: 11
+        y: 215
+        width: 20
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d8d8ad9aeb17c3ed0800000000000000
+      internalID: -2432944634979512947
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_hit_5
+      rect:
+        serializedVersion: 2
+        x: 20
+        y: 230
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 77d3405fa32095ea0800000000000000
+      internalID: -5883668985940787849
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_hit_6
+      rect:
+        serializedVersion: 2
+        x: 29
+        y: 206
+        width: 47
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c59e2bd7a42370f20800000000000000
+      internalID: 3388732540137433436
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_hit_7
+      rect:
+        serializedVersion: 2
+        x: 68
+        y: 215
+        width: 20
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c44d9bfe8fb273c40800000000000000
+      internalID: 5491906618775426124
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_hit_8
+      rect:
+        serializedVersion: 2
+        x: 71
+        y: 230
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e5d258f25fc7dfcb0800000000000000
+      internalID: -4828565832965214882
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_hit_9
+      rect:
+        serializedVersion: 2
+        x: 107
+        y: 215
+        width: 20
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 749a8f64bd0448380800000000000000
+      internalID: -8969973247282468537
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_hit_10
+      rect:
+        serializedVersion: 2
+        x: 116
+        y: 230
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6d4ef404f9092ecd0800000000000000
+      internalID: -2530301026975619882
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_hit_11
+      rect:
+        serializedVersion: 2
+        x: 125
+        y: 206
+        width: 47
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 007d7b092ac44a060800000000000000
+      internalID: 6963775184918009600
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_hit_12
+      rect:
+        serializedVersion: 2
+        x: 164
+        y: 215
+        width: 20
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 862b236c3911723a0800000000000000
+      internalID: -6690359395052506520
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_hit_13
+      rect:
+        serializedVersion: 2
+        x: 167
+        y: 230
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e7a918ab56ab22230800000000000000
+      internalID: 3612654797188078206
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_hit_14
+      rect:
+        serializedVersion: 2
+        x: 29
+        y: 191
+        width: 38
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b395001249dd2f8c0800000000000000
+      internalID: -3966864693481416389
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_hit_15
+      rect:
+        serializedVersion: 2
+        x: 125
+        y: 191
+        width: 38
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 36320a1fd3af50e50800000000000000
+      internalID: 6775096358402532195
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_hit_16
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 119
+        width: 20
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: be4be5095741038d0800000000000000
+      internalID: -2868770467469150997
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_hit_17
+      rect:
+        serializedVersion: 2
+        x: 17
+        y: 134
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3bfb7b825fa3cc090800000000000000
+      internalID: -8012964812374425677
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_hit_18
+      rect:
+        serializedVersion: 2
+        x: 20
+        y: 110
+        width: 47
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 66706c2e973c804b0800000000000000
+      internalID: -5473910418805749914
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_hit_19
+      rect:
+        serializedVersion: 2
+        x: 65
+        y: 119
+        width: 20
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 98a37cd5cf3bba6c0800000000000000
+      internalID: -4131010336695829879
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_hit_20
+      rect:
+        serializedVersion: 2
+        x: 68
+        y: 134
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a75301705dd1d7a40800000000000000
+      internalID: 5367479131679241594
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_hit_21
+      rect:
+        serializedVersion: 2
+        x: 104
+        y: 119
+        width: 20
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 82404f60a45ee89e0800000000000000
+      internalID: -1617103110072433624
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_hit_22
+      rect:
+        serializedVersion: 2
+        x: 113
+        y: 134
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e91fb9a27f77df450800000000000000
+      internalID: 6124182971749233054
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_hit_23
+      rect:
+        serializedVersion: 2
+        x: 116
+        y: 110
+        width: 47
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8322e988d43482b90800000000000000
+      internalID: -7266483998478687688
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_hit_24
+      rect:
+        serializedVersion: 2
+        x: 161
+        y: 119
+        width: 20
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 40ab5cd6038739930800000000000000
+      internalID: 4148791831133796868
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_hit_25
+      rect:
+        serializedVersion: 2
+        x: 164
+        y: 134
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b7bfc64ff3f54ddb0800000000000000
+      internalID: -4768081377190151301
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_hit_26
+      rect:
+        serializedVersion: 2
+        x: 29
+        y: 95
+        width: 38
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fb4056fca7ee7e5c0800000000000000
+      internalID: -4186115117384661825
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_hit_27
+      rect:
+        serializedVersion: 2
+        x: 125
+        y: 95
+        width: 38
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e96669009eae3a900800000000000000
+      internalID: 694657054003324574
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_hit_28
+      rect:
+        serializedVersion: 2
+        x: 11
+        y: 14
+        width: 74
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ccbc087681b857930800000000000000
+      internalID: 4140368369369009100
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_hit_29
+      rect:
+        serializedVersion: 2
+        x: 107
+        y: 14
+        width: 74
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 323927ea96982a5c0800000000000000
+      internalID: -4205648015019306205
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_hit_30
+      rect:
+        serializedVersion: 2
+        x: 29
+        y: 0
+        width: 38
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1650ba73c7750d310800000000000000
+      internalID: 1427737272897963361
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_hit_31
+      rect:
+        serializedVersion: 2
+        x: 125
+        y: 0
+        width: 38
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a113817c7fb32e020800000000000000
+      internalID: 2369522289333514522
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Efreet_hit_0: 2772434666302810032
+      Efreet_hit_1: 520958620368677855
+      Efreet_hit_10: -2530301026975619882
+      Efreet_hit_11: 6963775184918009600
+      Efreet_hit_12: -6690359395052506520
+      Efreet_hit_13: 3612654797188078206
+      Efreet_hit_14: -3966864693481416389
+      Efreet_hit_15: 6775096358402532195
+      Efreet_hit_16: -2868770467469150997
+      Efreet_hit_17: -8012964812374425677
+      Efreet_hit_18: -5473910418805749914
+      Efreet_hit_19: -4131010336695829879
+      Efreet_hit_2: -5126032525892741392
+      Efreet_hit_20: 5367479131679241594
+      Efreet_hit_21: -1617103110072433624
+      Efreet_hit_22: 6124182971749233054
+      Efreet_hit_23: -7266483998478687688
+      Efreet_hit_24: 4148791831133796868
+      Efreet_hit_25: -4768081377190151301
+      Efreet_hit_26: -4186115117384661825
+      Efreet_hit_27: 694657054003324574
+      Efreet_hit_28: 4140368369369009100
+      Efreet_hit_29: -4205648015019306205
+      Efreet_hit_3: 5439868772085222561
+      Efreet_hit_30: 1427737272897963361
+      Efreet_hit_31: 2369522289333514522
+      Efreet_hit_4: -2432944634979512947
+      Efreet_hit_5: -5883668985940787849
+      Efreet_hit_6: 3388732540137433436
+      Efreet_hit_7: 5491906618775426124
+      Efreet_hit_8: -4828565832965214882
+      Efreet_hit_9: -8969973247282468537
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

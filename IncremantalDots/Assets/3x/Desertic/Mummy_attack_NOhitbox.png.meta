@@ -1,0 +1,650 @@
+fileFormatVersion: 2
+guid: d97bc5cbe5b198748b5148271522a441
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -8077368077855007959
+    second: Mummy_attack_NOhitbox_0
+  - first:
+      213: 4882145831919960132
+    second: Mummy_attack_NOhitbox_1
+  - first:
+      213: 1040055536144019773
+    second: Mummy_attack_NOhitbox_2
+  - first:
+      213: -1559396388081171730
+    second: Mummy_attack_NOhitbox_3
+  - first:
+      213: -7858400402281307064
+    second: Mummy_attack_NOhitbox_4
+  - first:
+      213: -5715257049501238855
+    second: Mummy_attack_NOhitbox_5
+  - first:
+      213: 3633843450398373302
+    second: Mummy_attack_NOhitbox_6
+  - first:
+      213: 1781006377527794287
+    second: Mummy_attack_NOhitbox_7
+  - first:
+      213: -1236613394719837178
+    second: Mummy_attack_NOhitbox_8
+  - first:
+      213: -5637250923179982465
+    second: Mummy_attack_NOhitbox_9
+  - first:
+      213: -2318161431731895910
+    second: Mummy_attack_NOhitbox_10
+  - first:
+      213: 6700556286224077078
+    second: Mummy_attack_NOhitbox_11
+  - first:
+      213: 6881410381013566417
+    second: Mummy_attack_NOhitbox_12
+  - first:
+      213: 7437903284341230829
+    second: Mummy_attack_NOhitbox_13
+  - first:
+      213: 896751901182451269
+    second: Mummy_attack_NOhitbox_14
+  - first:
+      213: 7810948821145173516
+    second: Mummy_attack_NOhitbox_15
+  - first:
+      213: 8326738582853954711
+    second: Mummy_attack_NOhitbox_16
+  - first:
+      213: -9104630500070036786
+    second: Mummy_attack_NOhitbox_17
+  - first:
+      213: 818399131485654818
+    second: Mummy_attack_NOhitbox_18
+  - first:
+      213: -5061159882066377695
+    second: Mummy_attack_NOhitbox_19
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Mummy_attack_NOhitbox_0
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 479
+        width: 44
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 92b5f57678c67ef80800000000000000
+      internalID: -8077368077855007959
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Mummy_attack_NOhitbox_1
+      rect:
+        serializedVersion: 2
+        x: 197
+        y: 479
+        width: 38
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4404e3574cdd0c340800000000000000
+      internalID: 4882145831919960132
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Mummy_attack_NOhitbox_2
+      rect:
+        serializedVersion: 2
+        x: 341
+        y: 479
+        width: 38
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d31fa8aeff40f6e00800000000000000
+      internalID: 1040055536144019773
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Mummy_attack_NOhitbox_3
+      rect:
+        serializedVersion: 2
+        x: 485
+        y: 479
+        width: 38
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ee205604f39eb5ae0800000000000000
+      internalID: -1559396388081171730
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Mummy_attack_NOhitbox_4
+      rect:
+        serializedVersion: 2
+        x: 629
+        y: 479
+        width: 38
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8446c3f387a51f290800000000000000
+      internalID: -7858400402281307064
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Mummy_attack_NOhitbox_5
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 335
+        width: 35
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9b97e648ef35fa0b0800000000000000
+      internalID: -5715257049501238855
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Mummy_attack_NOhitbox_6
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 335
+        width: 38
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6b5ff5e7d510e6230800000000000000
+      internalID: 3633843450398373302
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Mummy_attack_NOhitbox_7
+      rect:
+        serializedVersion: 2
+        x: 338
+        y: 335
+        width: 38
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f6adf3b3dd767b810800000000000000
+      internalID: 1781006377527794287
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Mummy_attack_NOhitbox_8
+      rect:
+        serializedVersion: 2
+        x: 482
+        y: 335
+        width: 38
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 604fb3b5baaa6dee0800000000000000
+      internalID: -1236613394719837178
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Mummy_attack_NOhitbox_9
+      rect:
+        serializedVersion: 2
+        x: 626
+        y: 335
+        width: 38
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f714d1e172674c1b0800000000000000
+      internalID: -5637250923179982465
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Mummy_attack_NOhitbox_10
+      rect:
+        serializedVersion: 2
+        x: 53
+        y: 191
+        width: 35
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a910c91c57c34dfd0800000000000000
+      internalID: -2318161431731895910
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Mummy_attack_NOhitbox_11
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 191
+        width: 38
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 61195e5f0782dfc50800000000000000
+      internalID: 6700556286224077078
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Mummy_attack_NOhitbox_12
+      rect:
+        serializedVersion: 2
+        x: 344
+        y: 191
+        width: 38
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1d3cff1484eaf7f50800000000000000
+      internalID: 6881410381013566417
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Mummy_attack_NOhitbox_13
+      rect:
+        serializedVersion: 2
+        x: 488
+        y: 191
+        width: 38
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: decced021adb83760800000000000000
+      internalID: 7437903284341230829
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Mummy_attack_NOhitbox_14
+      rect:
+        serializedVersion: 2
+        x: 632
+        y: 191
+        width: 38
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 54ed2a95a17e17c00800000000000000
+      internalID: 896751901182451269
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Mummy_attack_NOhitbox_15
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 47
+        width: 44
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c0e3d139190166c60800000000000000
+      internalID: 7810948821145173516
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Mummy_attack_NOhitbox_16
+      rect:
+        serializedVersion: 2
+        x: 197
+        y: 47
+        width: 38
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 79cac88cf948e8370800000000000000
+      internalID: 8326738582853954711
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Mummy_attack_NOhitbox_17
+      rect:
+        serializedVersion: 2
+        x: 341
+        y: 47
+        width: 38
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eca63207ccad5a180800000000000000
+      internalID: -9104630500070036786
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Mummy_attack_NOhitbox_18
+      rect:
+        serializedVersion: 2
+        x: 485
+        y: 47
+        width: 38
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 22fc0bc8ca98b5b00800000000000000
+      internalID: 818399131485654818
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Mummy_attack_NOhitbox_19
+      rect:
+        serializedVersion: 2
+        x: 629
+        y: 47
+        width: 38
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 124c9f507e523c9b0800000000000000
+      internalID: -5061159882066377695
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Mummy_attack_NOhitbox_0: -8077368077855007959
+      Mummy_attack_NOhitbox_1: 4882145831919960132
+      Mummy_attack_NOhitbox_10: -2318161431731895910
+      Mummy_attack_NOhitbox_11: 6700556286224077078
+      Mummy_attack_NOhitbox_12: 6881410381013566417
+      Mummy_attack_NOhitbox_13: 7437903284341230829
+      Mummy_attack_NOhitbox_14: 896751901182451269
+      Mummy_attack_NOhitbox_15: 7810948821145173516
+      Mummy_attack_NOhitbox_16: 8326738582853954711
+      Mummy_attack_NOhitbox_17: -9104630500070036786
+      Mummy_attack_NOhitbox_18: 818399131485654818
+      Mummy_attack_NOhitbox_19: -5061159882066377695
+      Mummy_attack_NOhitbox_2: 1040055536144019773
+      Mummy_attack_NOhitbox_3: -1559396388081171730
+      Mummy_attack_NOhitbox_4: -7858400402281307064
+      Mummy_attack_NOhitbox_5: -5715257049501238855
+      Mummy_attack_NOhitbox_6: 3633843450398373302
+      Mummy_attack_NOhitbox_7: 1781006377527794287
+      Mummy_attack_NOhitbox_8: -1236613394719837178
+      Mummy_attack_NOhitbox_9: -5637250923179982465
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

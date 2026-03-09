@@ -1,0 +1,754 @@
+fileFormatVersion: 2
+guid: 1f5f103b19fbf0245942f56efd690021
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 3148250304935538882
+    second: Efreet_idle_0
+  - first:
+      213: 1119930240832407959
+    second: Efreet_idle_1
+  - first:
+      213: 2661615591699960189
+    second: Efreet_idle_2
+  - first:
+      213: 1475177020061502705
+    second: Efreet_idle_3
+  - first:
+      213: 2604037370129817489
+    second: Efreet_idle_4
+  - first:
+      213: 7835383562837826997
+    second: Efreet_idle_5
+  - first:
+      213: 8201205103244685176
+    second: Efreet_idle_6
+  - first:
+      213: -7746576751247248783
+    second: Efreet_idle_7
+  - first:
+      213: 6573057344309094796
+    second: Efreet_idle_8
+  - first:
+      213: -3423714414578223248
+    second: Efreet_idle_9
+  - first:
+      213: 5830039393763297461
+    second: Efreet_idle_10
+  - first:
+      213: -3120543735979756084
+    second: Efreet_idle_11
+  - first:
+      213: -6446671993623293899
+    second: Efreet_idle_12
+  - first:
+      213: -3439496732438011170
+    second: Efreet_idle_13
+  - first:
+      213: 4089248124186612283
+    second: Efreet_idle_14
+  - first:
+      213: 5473274277640272765
+    second: Efreet_idle_15
+  - first:
+      213: -5733198575136208721
+    second: Efreet_idle_16
+  - first:
+      213: -9144875264436794435
+    second: Efreet_idle_17
+  - first:
+      213: 6118549720720439135
+    second: Efreet_idle_18
+  - first:
+      213: -8434271606343707794
+    second: Efreet_idle_19
+  - first:
+      213: 6709835480329732034
+    second: Efreet_idle_20
+  - first:
+      213: 3175449160978090317
+    second: Efreet_idle_21
+  - first:
+      213: 1545023444316418397
+    second: Efreet_idle_22
+  - first:
+      213: -749561082942761812
+    second: Efreet_idle_23
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Efreet_idle_0
+      rect:
+        serializedVersion: 2
+        x: 14
+        y: 296
+        width: 68
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2c0b2b1e8f4d0bb20800000000000000
+      internalID: 3148250304935538882
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_idle_1
+      rect:
+        serializedVersion: 2
+        x: 110
+        y: 296
+        width: 68
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7998802de9aca8f00800000000000000
+      internalID: 1119930240832407959
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_idle_2
+      rect:
+        serializedVersion: 2
+        x: 206
+        y: 287
+        width: 68
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d71daef5745ffe420800000000000000
+      internalID: 2661615591699960189
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_idle_3
+      rect:
+        serializedVersion: 2
+        x: 302
+        y: 287
+        width: 68
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1fcc5951fa1e87410800000000000000
+      internalID: 1475177020061502705
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_idle_4
+      rect:
+        serializedVersion: 2
+        x: 29
+        y: 287
+        width: 41
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 19f1e6cf036632420800000000000000
+      internalID: 2604037370129817489
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_idle_5
+      rect:
+        serializedVersion: 2
+        x: 125
+        y: 287
+        width: 38
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5bd12e536dfdcbc60800000000000000
+      internalID: 7835383562837826997
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_idle_6
+      rect:
+        serializedVersion: 2
+        x: 26
+        y: 200
+        width: 44
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 87f250de69880d170800000000000000
+      internalID: 8201205103244685176
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_idle_7
+      rect:
+        serializedVersion: 2
+        x: 122
+        y: 200
+        width: 44
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 172bb94ec71ae7490800000000000000
+      internalID: -7746576751247248783
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_idle_8
+      rect:
+        serializedVersion: 2
+        x: 218
+        y: 191
+        width: 47
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c89e0df34d0383b50800000000000000
+      internalID: 6573057344309094796
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_idle_9
+      rect:
+        serializedVersion: 2
+        x: 314
+        y: 191
+        width: 50
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0773eaa21e58c70d0800000000000000
+      internalID: -3423714414578223248
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_idle_10
+      rect:
+        serializedVersion: 2
+        x: 29
+        y: 191
+        width: 38
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5b88bc390f578e050800000000000000
+      internalID: 5830039393763297461
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_idle_11
+      rect:
+        serializedVersion: 2
+        x: 125
+        y: 191
+        width: 38
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cc53bd6610a91b4d0800000000000000
+      internalID: -3120543735979756084
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_idle_12
+      rect:
+        serializedVersion: 2
+        x: 26
+        y: 104
+        width: 44
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 530df9c4af1d886a0800000000000000
+      internalID: -6446671993623293899
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_idle_13
+      rect:
+        serializedVersion: 2
+        x: 122
+        y: 104
+        width: 44
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ed26ae0f1f37440d0800000000000000
+      internalID: -3439496732438011170
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_idle_14
+      rect:
+        serializedVersion: 2
+        x: 215
+        y: 95
+        width: 47
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b325390d08defb830800000000000000
+      internalID: 4089248124186612283
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_idle_15
+      rect:
+        serializedVersion: 2
+        x: 308
+        y: 95
+        width: 50
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d7bf705f4f9f4fb40800000000000000
+      internalID: 5473274277640272765
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_idle_16
+      rect:
+        serializedVersion: 2
+        x: 29
+        y: 95
+        width: 38
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fa80b3e85469f60b0800000000000000
+      internalID: -5733198575136208721
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_idle_17
+      rect:
+        serializedVersion: 2
+        x: 125
+        y: 95
+        width: 38
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dbb0dfb0660e61180800000000000000
+      internalID: -9144875264436794435
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_idle_18
+      rect:
+        serializedVersion: 2
+        x: 14
+        y: 8
+        width: 68
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f577b14bd8479e450800000000000000
+      internalID: 6118549720720439135
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_idle_19
+      rect:
+        serializedVersion: 2
+        x: 110
+        y: 8
+        width: 68
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e6358b429a273fa80800000000000000
+      internalID: -8434271606343707794
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_idle_20
+      rect:
+        serializedVersion: 2
+        x: 206
+        y: 0
+        width: 68
+        height: 85
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2cfbd52b1df1e1d50800000000000000
+      internalID: 6709835480329732034
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_idle_21
+      rect:
+        serializedVersion: 2
+        x: 302
+        y: 0
+        width: 68
+        height: 85
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d49496a0036711c20800000000000000
+      internalID: 3175449160978090317
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_idle_22
+      rect:
+        serializedVersion: 2
+        x: 26
+        y: 0
+        width: 41
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d51712003a6017510800000000000000
+      internalID: 1545023444316418397
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Efreet_idle_23
+      rect:
+        serializedVersion: 2
+        x: 125
+        y: 0
+        width: 38
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ca45db99a260995f0800000000000000
+      internalID: -749561082942761812
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Efreet_idle_0: 3148250304935538882
+      Efreet_idle_1: 1119930240832407959
+      Efreet_idle_10: 5830039393763297461
+      Efreet_idle_11: -3120543735979756084
+      Efreet_idle_12: -6446671993623293899
+      Efreet_idle_13: -3439496732438011170
+      Efreet_idle_14: 4089248124186612283
+      Efreet_idle_15: 5473274277640272765
+      Efreet_idle_16: -5733198575136208721
+      Efreet_idle_17: -9144875264436794435
+      Efreet_idle_18: 6118549720720439135
+      Efreet_idle_19: -8434271606343707794
+      Efreet_idle_2: 2661615591699960189
+      Efreet_idle_20: 6709835480329732034
+      Efreet_idle_21: 3175449160978090317
+      Efreet_idle_22: 1545023444316418397
+      Efreet_idle_23: -749561082942761812
+      Efreet_idle_3: 1475177020061502705
+      Efreet_idle_4: 2604037370129817489
+      Efreet_idle_5: 7835383562837826997
+      Efreet_idle_6: 8201205103244685176
+      Efreet_idle_7: -7746576751247248783
+      Efreet_idle_8: 6573057344309094796
+      Efreet_idle_9: -3423714414578223248
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

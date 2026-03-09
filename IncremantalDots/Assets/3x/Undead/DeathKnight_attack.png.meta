@@ -1,0 +1,650 @@
+fileFormatVersion: 2
+guid: 88131c2add4cbf14b97a9aa688602bac
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 2483421816790074350
+    second: DeathKnight_attack_0
+  - first:
+      213: 2696638533056802126
+    second: DeathKnight_attack_1
+  - first:
+      213: -2839856942608267353
+    second: DeathKnight_attack_2
+  - first:
+      213: 4884507847441121230
+    second: DeathKnight_attack_3
+  - first:
+      213: -9173594553070838762
+    second: DeathKnight_attack_4
+  - first:
+      213: 901816076555303780
+    second: DeathKnight_attack_5
+  - first:
+      213: -7003453923708625337
+    second: DeathKnight_attack_6
+  - first:
+      213: -1638777735227370876
+    second: DeathKnight_attack_7
+  - first:
+      213: 8458235094414820956
+    second: DeathKnight_attack_8
+  - first:
+      213: 5669563322103272901
+    second: DeathKnight_attack_9
+  - first:
+      213: -2579236989718562819
+    second: DeathKnight_attack_10
+  - first:
+      213: 222374221602578245
+    second: DeathKnight_attack_11
+  - first:
+      213: 1808778776436607494
+    second: DeathKnight_attack_12
+  - first:
+      213: 2777206918333175075
+    second: DeathKnight_attack_13
+  - first:
+      213: -6789689726159663294
+    second: DeathKnight_attack_14
+  - first:
+      213: 3249429691910199207
+    second: DeathKnight_attack_15
+  - first:
+      213: 1612903237235617888
+    second: DeathKnight_attack_16
+  - first:
+      213: 5794806538062767474
+    second: DeathKnight_attack_17
+  - first:
+      213: 9060564062742439818
+    second: DeathKnight_attack_18
+  - first:
+      213: 389024179059314494
+    second: DeathKnight_attack_19
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: DeathKnight_attack_0
+      rect:
+        serializedVersion: 2
+        x: 38
+        y: 623
+        width: 86
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ee34a311cf2e67220800000000000000
+      internalID: 2483421816790074350
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_attack_1
+      rect:
+        serializedVersion: 2
+        x: 248
+        y: 575
+        width: 83
+        height: 134
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e4d2b7a55726c6520800000000000000
+      internalID: 2696638533056802126
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_attack_2
+      rect:
+        serializedVersion: 2
+        x: 452
+        y: 608
+        width: 71
+        height: 101
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7a748ea282dc698d0800000000000000
+      internalID: -2839856942608267353
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_attack_3
+      rect:
+        serializedVersion: 2
+        x: 644
+        y: 623
+        width: 71
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ecff55d020249c340800000000000000
+      internalID: 4884507847441121230
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_attack_4
+      rect:
+        serializedVersion: 2
+        x: 836
+        y: 623
+        width: 71
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 61c11c69b58d0b080800000000000000
+      internalID: -9173594553070838762
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_attack_5
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 431
+        width: 92
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 46bb0df81f4e38c00800000000000000
+      internalID: 901816076555303780
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_attack_6
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 431
+        width: 140
+        height: 98
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 74e188423cbbece90800000000000000
+      internalID: -7003453923708625337
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_attack_7
+      rect:
+        serializedVersion: 2
+        x: 389
+        y: 431
+        width: 134
+        height: 98
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 48214f91554e149e0800000000000000
+      internalID: -1638777735227370876
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_attack_8
+      rect:
+        serializedVersion: 2
+        x: 590
+        y: 431
+        width: 125
+        height: 98
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c5686553100b16570800000000000000
+      internalID: 8458235094414820956
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_attack_9
+      rect:
+        serializedVersion: 2
+        x: 809
+        y: 431
+        width: 98
+        height: 98
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5c59c858dc55eae40800000000000000
+      internalID: 5669563322103272901
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_attack_10
+      rect:
+        serializedVersion: 2
+        x: 44
+        y: 239
+        width: 92
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: df7f64c8f95b43cd0800000000000000
+      internalID: -2579236989718562819
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_attack_11
+      rect:
+        serializedVersion: 2
+        x: 245
+        y: 239
+        width: 140
+        height: 98
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 54f53d52d28061300800000000000000
+      internalID: 222374221602578245
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_attack_12
+      rect:
+        serializedVersion: 2
+        x: 437
+        y: 239
+        width: 134
+        height: 98
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 60a05ceb6b21a1910800000000000000
+      internalID: 1808778776436607494
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_attack_13
+      rect:
+        serializedVersion: 2
+        x: 629
+        y: 239
+        width: 125
+        height: 98
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 325910b5afe9a8620800000000000000
+      internalID: 2777206918333175075
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_attack_14
+      rect:
+        serializedVersion: 2
+        x: 821
+        y: 239
+        width: 98
+        height: 98
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 24f4229da2d26c1a0800000000000000
+      internalID: -6789689726159663294
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_attack_15
+      rect:
+        serializedVersion: 2
+        x: 68
+        y: 47
+        width: 83
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7a71aeca61b481d20800000000000000
+      internalID: 3249429691910199207
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_attack_16
+      rect:
+        serializedVersion: 2
+        x: 239
+        y: 47
+        width: 89
+        height: 143
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 060b180e2fe226610800000000000000
+      internalID: 1612903237235617888
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_attack_17
+      rect:
+        serializedVersion: 2
+        x: 431
+        y: 47
+        width: 77
+        height: 125
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 275a75b18d94b6050800000000000000
+      internalID: 5794806538062767474
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_attack_18
+      rect:
+        serializedVersion: 2
+        x: 623
+        y: 47
+        width: 77
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a87ee6892079dbd70800000000000000
+      internalID: 9060564062742439818
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DeathKnight_attack_19
+      rect:
+        serializedVersion: 2
+        x: 815
+        y: 47
+        width: 77
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e3f4ed10e67166500800000000000000
+      internalID: 389024179059314494
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      DeathKnight_attack_0: 2483421816790074350
+      DeathKnight_attack_1: 2696638533056802126
+      DeathKnight_attack_10: -2579236989718562819
+      DeathKnight_attack_11: 222374221602578245
+      DeathKnight_attack_12: 1808778776436607494
+      DeathKnight_attack_13: 2777206918333175075
+      DeathKnight_attack_14: -6789689726159663294
+      DeathKnight_attack_15: 3249429691910199207
+      DeathKnight_attack_16: 1612903237235617888
+      DeathKnight_attack_17: 5794806538062767474
+      DeathKnight_attack_18: 9060564062742439818
+      DeathKnight_attack_19: 389024179059314494
+      DeathKnight_attack_2: -2839856942608267353
+      DeathKnight_attack_3: 4884507847441121230
+      DeathKnight_attack_4: -9173594553070838762
+      DeathKnight_attack_5: 901816076555303780
+      DeathKnight_attack_6: -7003453923708625337
+      DeathKnight_attack_7: -1638777735227370876
+      DeathKnight_attack_8: 8458235094414820956
+      DeathKnight_attack_9: 5669563322103272901
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,0 +1,650 @@
+fileFormatVersion: 2
+guid: 2896ad545755ad24d9d7cbd3de1328dd
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -2255133156848864882
+    second: Kappa_attack_NOhitbox_0
+  - first:
+      213: 3001191654888805909
+    second: Kappa_attack_NOhitbox_1
+  - first:
+      213: 6559625399996825549
+    second: Kappa_attack_NOhitbox_2
+  - first:
+      213: -4821734348883516657
+    second: Kappa_attack_NOhitbox_3
+  - first:
+      213: 1152064109815394550
+    second: Kappa_attack_NOhitbox_4
+  - first:
+      213: 609894813690847428
+    second: Kappa_attack_NOhitbox_5
+  - first:
+      213: 7865058083899461378
+    second: Kappa_attack_NOhitbox_6
+  - first:
+      213: -273527519087705087
+    second: Kappa_attack_NOhitbox_7
+  - first:
+      213: -2425487478651023932
+    second: Kappa_attack_NOhitbox_8
+  - first:
+      213: 4117128801221988535
+    second: Kappa_attack_NOhitbox_9
+  - first:
+      213: 2974624710377638337
+    second: Kappa_attack_NOhitbox_10
+  - first:
+      213: -4635123837518510407
+    second: Kappa_attack_NOhitbox_11
+  - first:
+      213: 4303567493334634012
+    second: Kappa_attack_NOhitbox_12
+  - first:
+      213: -201703462231607323
+    second: Kappa_attack_NOhitbox_13
+  - first:
+      213: -5662451599326695028
+    second: Kappa_attack_NOhitbox_14
+  - first:
+      213: -2528352515230336965
+    second: Kappa_attack_NOhitbox_15
+  - first:
+      213: 5319614242111866285
+    second: Kappa_attack_NOhitbox_16
+  - first:
+      213: 2539531757590896758
+    second: Kappa_attack_NOhitbox_17
+  - first:
+      213: 4633561082295191308
+    second: Kappa_attack_NOhitbox_18
+  - first:
+      213: -6349259897252309829
+    second: Kappa_attack_NOhitbox_19
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Kappa_attack_NOhitbox_0
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 575
+        width: 44
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e8171d0975824b0e0800000000000000
+      internalID: -2255133156848864882
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kappa_attack_NOhitbox_1
+      rect:
+        serializedVersion: 2
+        x: 197
+        y: 575
+        width: 38
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 516938cb8ef56a920800000000000000
+      internalID: 3001191654888805909
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kappa_attack_NOhitbox_2
+      rect:
+        serializedVersion: 2
+        x: 341
+        y: 575
+        width: 38
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dcfb0720c88780b50800000000000000
+      internalID: 6559625399996825549
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kappa_attack_NOhitbox_3
+      rect:
+        serializedVersion: 2
+        x: 485
+        y: 575
+        width: 38
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f03af750822c51db0800000000000000
+      internalID: -4821734348883516657
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kappa_attack_NOhitbox_4
+      rect:
+        serializedVersion: 2
+        x: 629
+        y: 575
+        width: 38
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6f0f5083434fcff00800000000000000
+      internalID: 1152064109815394550
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kappa_attack_NOhitbox_5
+      rect:
+        serializedVersion: 2
+        x: 53
+        y: 407
+        width: 41
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4c065680a18c67800800000000000000
+      internalID: 609894813690847428
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kappa_attack_NOhitbox_6
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 407
+        width: 41
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 20f44ac08ac462d60800000000000000
+      internalID: 7865058083899461378
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kappa_attack_NOhitbox_7
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 407
+        width: 41
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 104cb7cab2c343cf0800000000000000
+      internalID: -273527519087705087
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kappa_attack_NOhitbox_8
+      rect:
+        serializedVersion: 2
+        x: 479
+        y: 407
+        width: 41
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4cd09db2dffe65ed0800000000000000
+      internalID: -2425487478651023932
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kappa_attack_NOhitbox_9
+      rect:
+        serializedVersion: 2
+        x: 623
+        y: 407
+        width: 41
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7b0dd5bc4daf22930800000000000000
+      internalID: 4117128801221988535
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kappa_attack_NOhitbox_10
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 239
+        width: 41
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1c98822f96df74920800000000000000
+      internalID: 2974624710377638337
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kappa_attack_NOhitbox_11
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 239
+        width: 41
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9b683ce7d6bbcafb0800000000000000
+      internalID: -4635123837518510407
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kappa_attack_NOhitbox_12
+      rect:
+        serializedVersion: 2
+        x: 344
+        y: 239
+        width: 41
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c1e012b75d759bb30800000000000000
+      internalID: 4303567493334634012
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kappa_attack_NOhitbox_13
+      rect:
+        serializedVersion: 2
+        x: 488
+        y: 239
+        width: 41
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5e7f7bf05c7633df0800000000000000
+      internalID: -201703462231607323
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kappa_attack_NOhitbox_14
+      rect:
+        serializedVersion: 2
+        x: 632
+        y: 239
+        width: 41
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c813a48754eea61b0800000000000000
+      internalID: -5662451599326695028
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kappa_attack_NOhitbox_15
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 71
+        width: 44
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b38fabe78cc79ecd0800000000000000
+      internalID: -2528352515230336965
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kappa_attack_NOhitbox_16
+      rect:
+        serializedVersion: 2
+        x: 197
+        y: 71
+        width: 38
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: da5cf2bf7f013d940800000000000000
+      internalID: 5319614242111866285
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kappa_attack_NOhitbox_17
+      rect:
+        serializedVersion: 2
+        x: 341
+        y: 71
+        width: 38
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6706703bdaa3e3320800000000000000
+      internalID: 2539531757590896758
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kappa_attack_NOhitbox_18
+      rect:
+        serializedVersion: 2
+        x: 485
+        y: 71
+        width: 38
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c0787433147bd4040800000000000000
+      internalID: 4633561082295191308
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kappa_attack_NOhitbox_19
+      rect:
+        serializedVersion: 2
+        x: 629
+        y: 71
+        width: 38
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bb494a563c5e2e7a0800000000000000
+      internalID: -6349259897252309829
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Kappa_attack_NOhitbox_0: -2255133156848864882
+      Kappa_attack_NOhitbox_1: 3001191654888805909
+      Kappa_attack_NOhitbox_10: 2974624710377638337
+      Kappa_attack_NOhitbox_11: -4635123837518510407
+      Kappa_attack_NOhitbox_12: 4303567493334634012
+      Kappa_attack_NOhitbox_13: -201703462231607323
+      Kappa_attack_NOhitbox_14: -5662451599326695028
+      Kappa_attack_NOhitbox_15: -2528352515230336965
+      Kappa_attack_NOhitbox_16: 5319614242111866285
+      Kappa_attack_NOhitbox_17: 2539531757590896758
+      Kappa_attack_NOhitbox_18: 4633561082295191308
+      Kappa_attack_NOhitbox_19: -6349259897252309829
+      Kappa_attack_NOhitbox_2: 6559625399996825549
+      Kappa_attack_NOhitbox_3: -4821734348883516657
+      Kappa_attack_NOhitbox_4: 1152064109815394550
+      Kappa_attack_NOhitbox_5: 609894813690847428
+      Kappa_attack_NOhitbox_6: 7865058083899461378
+      Kappa_attack_NOhitbox_7: -273527519087705087
+      Kappa_attack_NOhitbox_8: -2425487478651023932
+      Kappa_attack_NOhitbox_9: 4117128801221988535
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

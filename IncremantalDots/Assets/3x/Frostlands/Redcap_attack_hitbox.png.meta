@@ -1,0 +1,754 @@
+fileFormatVersion: 2
+guid: a7ad6e1fad157344cb0f4090fb999117
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 8574110245642175430
+    second: Redcap_attack_hitbox_0
+  - first:
+      213: 9018150791732493750
+    second: Redcap_attack_hitbox_1
+  - first:
+      213: -2110417570636754808
+    second: Redcap_attack_hitbox_2
+  - first:
+      213: 7485239345678167492
+    second: Redcap_attack_hitbox_3
+  - first:
+      213: 4866566484785431613
+    second: Redcap_attack_hitbox_4
+  - first:
+      213: -3286674452971867568
+    second: Redcap_attack_hitbox_5
+  - first:
+      213: -4474922470027777798
+    second: Redcap_attack_hitbox_6
+  - first:
+      213: -5150912317225682367
+    second: Redcap_attack_hitbox_7
+  - first:
+      213: -9017818831698172314
+    second: Redcap_attack_hitbox_8
+  - first:
+      213: -270980596189723308
+    second: Redcap_attack_hitbox_9
+  - first:
+      213: -6667704984403316227
+    second: Redcap_attack_hitbox_10
+  - first:
+      213: -1110157188514493570
+    second: Redcap_attack_hitbox_11
+  - first:
+      213: 7953241192250046835
+    second: Redcap_attack_hitbox_12
+  - first:
+      213: -5413182063574887722
+    second: Redcap_attack_hitbox_13
+  - first:
+      213: 3471873350397624022
+    second: Redcap_attack_hitbox_14
+  - first:
+      213: -3085062345663536418
+    second: Redcap_attack_hitbox_15
+  - first:
+      213: -5403132248632671267
+    second: Redcap_attack_hitbox_16
+  - first:
+      213: 1490262321845162599
+    second: Redcap_attack_hitbox_17
+  - first:
+      213: 1487323829033143521
+    second: Redcap_attack_hitbox_18
+  - first:
+      213: 4604891418938413929
+    second: Redcap_attack_hitbox_19
+  - first:
+      213: -1981985679399880452
+    second: Redcap_attack_hitbox_20
+  - first:
+      213: 6929356760419664758
+    second: Redcap_attack_hitbox_21
+  - first:
+      213: 3944846886951096643
+    second: Redcap_attack_hitbox_22
+  - first:
+      213: 306396953586826468
+    second: Redcap_attack_hitbox_23
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Redcap_attack_hitbox_0
+      rect:
+        serializedVersion: 2
+        x: 44
+        y: 431
+        width: 56
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6c30a8047db5df670800000000000000
+      internalID: 8574110245642175430
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_attack_hitbox_1
+      rect:
+        serializedVersion: 2
+        x: 179
+        y: 431
+        width: 74
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6bd7f186d58e62d70800000000000000
+      internalID: 9018150791732493750
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_attack_hitbox_2
+      rect:
+        serializedVersion: 2
+        x: 317
+        y: 431
+        width: 41
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8801476a66a46b2e0800000000000000
+      internalID: -2110417570636754808
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_attack_hitbox_3
+      rect:
+        serializedVersion: 2
+        x: 362
+        y: 431
+        width: 41
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4cdace1c689e0e760800000000000000
+      internalID: 7485239345678167492
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_attack_hitbox_4
+      rect:
+        serializedVersion: 2
+        x: 461
+        y: 449
+        width: 11
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d3405790f64898340800000000000000
+      internalID: 4866566484785431613
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_attack_hitbox_5
+      rect:
+        serializedVersion: 2
+        x: 536
+        y: 449
+        width: 11
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 052b242aff26362d0800000000000000
+      internalID: -3286674452971867568
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_attack_hitbox_6
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 332
+        width: 55
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: af8a49009b1e5e1c0800000000000000
+      internalID: -4474922470027777798
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_attack_hitbox_7
+      rect:
+        serializedVersion: 2
+        x: 143
+        y: 323
+        width: 50
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 14a3496c9884488b0800000000000000
+      internalID: -5150912317225682367
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_attack_hitbox_8
+      rect:
+        serializedVersion: 2
+        x: 296
+        y: 338
+        width: 53
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6666dcf0d854ad280800000000000000
+      internalID: -9017818831698172314
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_attack_hitbox_9
+      rect:
+        serializedVersion: 2
+        x: 302
+        y: 323
+        width: 38
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 455861f55984d3cf0800000000000000
+      internalID: -270980596189723308
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_attack_hitbox_10
+      rect:
+        serializedVersion: 2
+        x: 470
+        y: 338
+        width: 26
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: df1f989c4ad8773a0800000000000000
+      internalID: -6667704984403316227
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_attack_hitbox_11
+      rect:
+        serializedVersion: 2
+        x: 476
+        y: 323
+        width: 23
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e7b4fbd3bede790f0800000000000000
+      internalID: -1110157188514493570
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_attack_hitbox_12
+      rect:
+        serializedVersion: 2
+        x: 89
+        y: 188
+        width: 56
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 379711de9b69f5e60800000000000000
+      internalID: 7953241192250046835
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_attack_hitbox_13
+      rect:
+        serializedVersion: 2
+        x: 239
+        y: 179
+        width: 50
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6d25a1ce79380e4b0800000000000000
+      internalID: -5413182063574887722
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_attack_hitbox_14
+      rect:
+        serializedVersion: 2
+        x: 371
+        y: 194
+        width: 53
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6de789bda629e2030800000000000000
+      internalID: 3471873350397624022
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_attack_hitbox_15
+      rect:
+        serializedVersion: 2
+        x: 380
+        y: 179
+        width: 38
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ed2aac85428af25d0800000000000000
+      internalID: -3085062345663536418
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_attack_hitbox_16
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 194
+        width: 26
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dd3cacdc8d73405b0800000000000000
+      internalID: -5403132248632671267
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_attack_hitbox_17
+      rect:
+        serializedVersion: 2
+        x: 509
+        y: 179
+        width: 23
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 762dabb9fa97ea410800000000000000
+      internalID: 1490262321845162599
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_attack_hitbox_18
+      rect:
+        serializedVersion: 2
+        x: 44
+        y: 77
+        width: 56
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1ec8e7f642904a410800000000000000
+      internalID: 1487323829033143521
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_attack_hitbox_19
+      rect:
+        serializedVersion: 2
+        x: 179
+        y: 107
+        width: 74
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9639117095cd7ef30800000000000000
+      internalID: 4604891418938413929
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_attack_hitbox_20
+      rect:
+        serializedVersion: 2
+        x: 317
+        y: 116
+        width: 41
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cf8757d86829e74e0800000000000000
+      internalID: -1981985679399880452
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_attack_hitbox_21
+      rect:
+        serializedVersion: 2
+        x: 362
+        y: 116
+        width: 41
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 67304c2a2450a2060800000000000000
+      internalID: 6929356760419664758
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_attack_hitbox_22
+      rect:
+        serializedVersion: 2
+        x: 461
+        y: 107
+        width: 11
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 341960ec759eeb630800000000000000
+      internalID: 3944846886951096643
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Redcap_attack_hitbox_23
+      rect:
+        serializedVersion: 2
+        x: 536
+        y: 107
+        width: 11
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4ecfdcae76a804400800000000000000
+      internalID: 306396953586826468
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Redcap_attack_hitbox_0: 8574110245642175430
+      Redcap_attack_hitbox_1: 9018150791732493750
+      Redcap_attack_hitbox_10: -6667704984403316227
+      Redcap_attack_hitbox_11: -1110157188514493570
+      Redcap_attack_hitbox_12: 7953241192250046835
+      Redcap_attack_hitbox_13: -5413182063574887722
+      Redcap_attack_hitbox_14: 3471873350397624022
+      Redcap_attack_hitbox_15: -3085062345663536418
+      Redcap_attack_hitbox_16: -5403132248632671267
+      Redcap_attack_hitbox_17: 1490262321845162599
+      Redcap_attack_hitbox_18: 1487323829033143521
+      Redcap_attack_hitbox_19: 4604891418938413929
+      Redcap_attack_hitbox_2: -2110417570636754808
+      Redcap_attack_hitbox_20: -1981985679399880452
+      Redcap_attack_hitbox_21: 6929356760419664758
+      Redcap_attack_hitbox_22: 3944846886951096643
+      Redcap_attack_hitbox_23: 306396953586826468
+      Redcap_attack_hitbox_3: 7485239345678167492
+      Redcap_attack_hitbox_4: 4866566484785431613
+      Redcap_attack_hitbox_5: -3286674452971867568
+      Redcap_attack_hitbox_6: -4474922470027777798
+      Redcap_attack_hitbox_7: -5150912317225682367
+      Redcap_attack_hitbox_8: -9017818831698172314
+      Redcap_attack_hitbox_9: -270980596189723308
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

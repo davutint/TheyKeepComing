@@ -1,0 +1,235 @@
+using Unity.Entities;
+using Unity.Mathematics;
+using UnityEngine;
+
+namespace DeadWalls
+{
+    public class GameManager : MonoBehaviour
+    {
+        public static GameManager Instance { get; private set; }
+
+        private EntityManager _entityManager;
+        private Entity _gameStateEntity;
+        private Entity _waveStateEntity;
+        private Entity _castleEntity;
+        private Entity _archerPrefabEntity;
+        private bool _initialized;
+
+        public GameStateData GameState { get; private set; }
+        public WaveStateData WaveState { get; private set; }
+        public WallSegment Wall { get; private set; }
+        public GateComponent Gate { get; private set; }
+        public CastleHP Castle { get; private set; }
+
+        public event System.Action OnGameOver;
+        public event System.Action OnLevelUp;
+        public event System.Action OnWaveChanged;
+        public event System.Action OnGameStateChanged;
+
+        private void Awake()
+        {
+            if (Instance != null)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            Instance = this;
+        }
+
+        private void Update()
+        {
+            if (!TryInitialize())
+                return;
+
+            ReadECSData();
+        }
+
+        private bool TryInitialize()
+        {
+            if (_initialized) return true;
+
+            var world = World.DefaultGameObjectInjectionWorld;
+            if (world == null) return false;
+
+            _entityManager = world.EntityManager;
+
+            var query = _entityManager.CreateEntityQuery(typeof(GameStateData));
+            if (query.IsEmpty) return false;
+
+            _gameStateEntity = query.GetSingletonEntity();
+            _waveStateEntity = _gameStateEntity; // ayni entity uzerinde
+
+            var archerPrefabQuery = _entityManager.CreateEntityQuery(typeof(ArcherPrefabData));
+            if (archerPrefabQuery.IsEmpty) return false;
+
+            _archerPrefabEntity = _entityManager.GetComponentData<ArcherPrefabData>(
+                archerPrefabQuery.GetSingletonEntity()).ArcherPrefab;
+
+            var castleQuery = _entityManager.CreateEntityQuery(typeof(CastleHP));
+            if (castleQuery.IsEmpty) return false;
+
+            _castleEntity = castleQuery.GetSingletonEntity();
+            _initialized = true;
+            return true;
+        }
+
+        private void ReadECSData()
+        {
+            if (!_entityManager.Exists(_gameStateEntity) || !_entityManager.Exists(_castleEntity))
+            {
+                _initialized = false;
+                return;
+            }
+
+            var prevGameState = GameState;
+            var prevWaveState = WaveState;
+
+            GameState = _entityManager.GetComponentData<GameStateData>(_gameStateEntity);
+            WaveState = _entityManager.GetComponentData<WaveStateData>(_gameStateEntity);
+            Wall = _entityManager.GetComponentData<WallSegment>(_castleEntity);
+            Gate = _entityManager.GetComponentData<GateComponent>(_castleEntity);
+            Castle = _entityManager.GetComponentData<CastleHP>(_castleEntity);
+
+            OnGameStateChanged?.Invoke();
+
+            if (GameState.IsGameOver && !prevGameState.IsGameOver)
+                OnGameOver?.Invoke();
+
+            if (GameState.IsLevelUpPending && !prevGameState.IsLevelUpPending)
+                OnLevelUp?.Invoke();
+
+            if (WaveState.CurrentWave != prevWaveState.CurrentWave)
+                OnWaveChanged?.Invoke();
+        }
+
+        public void ApplyUpgrade(UpgradeType type)
+        {
+            if (!_initialized || !_entityManager.Exists(_gameStateEntity)) return;
+
+            var gameState = _entityManager.GetComponentData<GameStateData>(_gameStateEntity);
+            gameState.IsLevelUpPending = false;
+            gameState.Level++;
+            gameState.XP -= gameState.XPToNextLevel;
+            gameState.XPToNextLevel = (int)(gameState.XPToNextLevel * 1.5f);
+
+            switch (type)
+            {
+                case UpgradeType.AddArcher:
+                    SpawnArcher();
+                    break;
+
+                case UpgradeType.ArrowDamageUp:
+                    UpgradeArcherDamage(5f);
+                    break;
+
+                case UpgradeType.RepairGate:
+                    RepairGate();
+                    break;
+            }
+
+            _entityManager.SetComponentData(_gameStateEntity, gameState);
+        }
+
+        private void SpawnArcher()
+        {
+            var archerCount = _entityManager.CreateEntityQuery(typeof(ArcherUnit)).CalculateEntityCount();
+
+            var entity = _entityManager.Instantiate(_archerPrefabEntity);
+            _entityManager.SetComponentData(entity, new ArcherUnit
+            {
+                FireRate = 1.5f,
+                FireTimer = 0f,
+                ArrowDamage = 10f,
+                Range = 15f
+            });
+            _entityManager.SetComponentData(entity, Unity.Transforms.LocalTransform.FromPosition(
+                new float3(3.76f, -5f + archerCount * 2f, -1f)));
+        }
+
+        private void UpgradeArcherDamage(float amount)
+        {
+            var query = _entityManager.CreateEntityQuery(typeof(ArcherUnit));
+            var entities = query.ToEntityArray(Unity.Collections.Allocator.Temp);
+            foreach (var e in entities)
+            {
+                var archer = _entityManager.GetComponentData<ArcherUnit>(e);
+                archer.ArrowDamage += amount;
+                _entityManager.SetComponentData(e, archer);
+            }
+            entities.Dispose();
+        }
+
+        private void RepairGate()
+        {
+            if (!_entityManager.Exists(_castleEntity)) return;
+            var gate = _entityManager.GetComponentData<GateComponent>(_castleEntity);
+            gate.CurrentHP = gate.MaxHP;
+            _entityManager.SetComponentData(_castleEntity, gate);
+        }
+
+        public void RestartGame()
+        {
+            if (!_initialized || !_entityManager.Exists(_gameStateEntity) || !_entityManager.Exists(_castleEntity))
+            {
+                _initialized = false;
+                return;
+            }
+
+            // Tum zombileri sil
+            var zombieQuery = _entityManager.CreateEntityQuery(typeof(ZombieTag));
+            _entityManager.DestroyEntity(zombieQuery);
+
+            // Tum oklari sil
+            var arrowQuery = _entityManager.CreateEntityQuery(typeof(ArrowTag));
+            _entityManager.DestroyEntity(arrowQuery);
+
+            // Game state resetle
+            _entityManager.SetComponentData(_gameStateEntity, new GameStateData
+            {
+                Gold = 0,
+                XP = 0,
+                Level = 1,
+                XPToNextLevel = 100,
+                ClickDamage = 10f,
+                IsGameOver = false,
+                IsLevelUpPending = false
+            });
+
+            _entityManager.SetComponentData(_gameStateEntity, new WaveStateData
+            {
+                CurrentWave = 1,
+                ZombiesToSpawn = 500,
+                ZombiesSpawned = 0,
+                ZombiesAlive = 0,
+                SpawnTimer = 0f,
+                SpawnInterval = 0.05f,
+                ZombieHP = 20f,
+                ZombieDamage = 5f,
+                ZombieSpeed = 1.5f,
+                WaveActive = true,
+                WaveStartDelay = 3f,
+                WaveStartTimer = 3f
+            });
+
+            // Kale resetle
+            var castle = _entityManager.GetComponentData<WallSegment>(_castleEntity);
+            castle.CurrentHP = castle.MaxHP;
+            _entityManager.SetComponentData(_castleEntity, castle);
+
+            var gate = _entityManager.GetComponentData<GateComponent>(_castleEntity);
+            gate.CurrentHP = gate.MaxHP;
+            _entityManager.SetComponentData(_castleEntity, gate);
+
+            var castleHP = _entityManager.GetComponentData<CastleHP>(_castleEntity);
+            castleHP.CurrentHP = castleHP.MaxHP;
+            _entityManager.SetComponentData(_castleEntity, castleHP);
+        }
+    }
+
+    public enum UpgradeType
+    {
+        AddArcher,
+        ArrowDamageUp,
+        RepairGate
+    }
+}

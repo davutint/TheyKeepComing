@@ -1,0 +1,650 @@
+fileFormatVersion: 2
+guid: d2dd21627d70ef64eae10fa69eb59a3a
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 2717940125221938529
+    second: Gog_attack_NOhitbox_0
+  - first:
+      213: -413741277058281398
+    second: Gog_attack_NOhitbox_1
+  - first:
+      213: 3577128765400184611
+    second: Gog_attack_NOhitbox_2
+  - first:
+      213: 383710059142842518
+    second: Gog_attack_NOhitbox_3
+  - first:
+      213: 750562021872908914
+    second: Gog_attack_NOhitbox_4
+  - first:
+      213: 4735830717071417931
+    second: Gog_attack_NOhitbox_5
+  - first:
+      213: 7488168764801619277
+    second: Gog_attack_NOhitbox_6
+  - first:
+      213: -4816772606728881428
+    second: Gog_attack_NOhitbox_7
+  - first:
+      213: -36569880876239239
+    second: Gog_attack_NOhitbox_8
+  - first:
+      213: 7510566569919056457
+    second: Gog_attack_NOhitbox_9
+  - first:
+      213: 7646297772347435043
+    second: Gog_attack_NOhitbox_10
+  - first:
+      213: -3017542165801178979
+    second: Gog_attack_NOhitbox_11
+  - first:
+      213: 2367586799483405450
+    second: Gog_attack_NOhitbox_12
+  - first:
+      213: 2393306955095347752
+    second: Gog_attack_NOhitbox_13
+  - first:
+      213: 135641051159966399
+    second: Gog_attack_NOhitbox_14
+  - first:
+      213: -2841552718083134726
+    second: Gog_attack_NOhitbox_15
+  - first:
+      213: 6794840784480386830
+    second: Gog_attack_NOhitbox_16
+  - first:
+      213: 2789730292034291132
+    second: Gog_attack_NOhitbox_17
+  - first:
+      213: 1182281995690212594
+    second: Gog_attack_NOhitbox_18
+  - first:
+      213: -3644565320000047242
+    second: Gog_attack_NOhitbox_19
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Gog_attack_NOhitbox_0
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 479
+        width: 50
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 16562a4c42018b520800000000000000
+      internalID: 2717940125221938529
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gog_attack_NOhitbox_1
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 479
+        width: 50
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a4056082088124af0800000000000000
+      internalID: -413741277058281398
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gog_attack_NOhitbox_2
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 479
+        width: 50
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3277281e8a384a130800000000000000
+      internalID: 3577128765400184611
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gog_attack_NOhitbox_3
+      rect:
+        serializedVersion: 2
+        x: 479
+        y: 479
+        width: 50
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 69804fb0446335500800000000000000
+      internalID: 383710059142842518
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gog_attack_NOhitbox_4
+      rect:
+        serializedVersion: 2
+        x: 623
+        y: 479
+        width: 50
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 27a32a7ae288a6a00800000000000000
+      internalID: 750562021872908914
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gog_attack_NOhitbox_5
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 335
+        width: 38
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b42ec6712fc09b140800000000000000
+      internalID: 4735830717071417931
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gog_attack_NOhitbox_6
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 335
+        width: 35
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d451d2c41d15be760800000000000000
+      internalID: 7488168764801619277
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gog_attack_NOhitbox_7
+      rect:
+        serializedVersion: 2
+        x: 344
+        y: 335
+        width: 35
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ceab714a5d2672db0800000000000000
+      internalID: -4816772606728881428
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gog_attack_NOhitbox_8
+      rect:
+        serializedVersion: 2
+        x: 488
+        y: 335
+        width: 35
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 976b4e813e31e7ff0800000000000000
+      internalID: -36569880876239239
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gog_attack_NOhitbox_9
+      rect:
+        serializedVersion: 2
+        x: 632
+        y: 335
+        width: 35
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 94a03fda084ea3860800000000000000
+      internalID: 7510566569919056457
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gog_attack_NOhitbox_10
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 191
+        width: 38
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 32821a7ef4b1d1a60800000000000000
+      internalID: 7646297772347435043
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gog_attack_NOhitbox_11
+      rect:
+        serializedVersion: 2
+        x: 197
+        y: 191
+        width: 35
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d9868a843698f16d0800000000000000
+      internalID: -3017542165801178979
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gog_attack_NOhitbox_12
+      rect:
+        serializedVersion: 2
+        x: 341
+        y: 191
+        width: 35
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a84cc1e66ab5bd020800000000000000
+      internalID: 2367586799483405450
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gog_attack_NOhitbox_13
+      rect:
+        serializedVersion: 2
+        x: 485
+        y: 191
+        width: 35
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8221ee0defbb63120800000000000000
+      internalID: 2393306955095347752
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gog_attack_NOhitbox_14
+      rect:
+        serializedVersion: 2
+        x: 629
+        y: 191
+        width: 35
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fb2b95f31d4e1e100800000000000000
+      internalID: 135641051159966399
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gog_attack_NOhitbox_15
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 47
+        width: 50
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: afaeb1cabd6c098d0800000000000000
+      internalID: -2841552718083134726
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gog_attack_NOhitbox_16
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 47
+        width: 50
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e0f3a4061bf1c4e50800000000000000
+      internalID: 6794840784480386830
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gog_attack_NOhitbox_17
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 47
+        width: 50
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cb5c9d38bec17b620800000000000000
+      internalID: 2789730292034291132
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gog_attack_NOhitbox_18
+      rect:
+        serializedVersion: 2
+        x: 479
+        y: 47
+        width: 50
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2fc7479063f486010800000000000000
+      internalID: 1182281995690212594
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gog_attack_NOhitbox_19
+      rect:
+        serializedVersion: 2
+        x: 623
+        y: 47
+        width: 50
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 67770b4b627eb6dc0800000000000000
+      internalID: -3644565320000047242
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Gog_attack_NOhitbox_0: 2717940125221938529
+      Gog_attack_NOhitbox_1: -413741277058281398
+      Gog_attack_NOhitbox_10: 7646297772347435043
+      Gog_attack_NOhitbox_11: -3017542165801178979
+      Gog_attack_NOhitbox_12: 2367586799483405450
+      Gog_attack_NOhitbox_13: 2393306955095347752
+      Gog_attack_NOhitbox_14: 135641051159966399
+      Gog_attack_NOhitbox_15: -2841552718083134726
+      Gog_attack_NOhitbox_16: 6794840784480386830
+      Gog_attack_NOhitbox_17: 2789730292034291132
+      Gog_attack_NOhitbox_18: 1182281995690212594
+      Gog_attack_NOhitbox_19: -3644565320000047242
+      Gog_attack_NOhitbox_2: 3577128765400184611
+      Gog_attack_NOhitbox_3: 383710059142842518
+      Gog_attack_NOhitbox_4: 750562021872908914
+      Gog_attack_NOhitbox_5: 4735830717071417931
+      Gog_attack_NOhitbox_6: 7488168764801619277
+      Gog_attack_NOhitbox_7: -4816772606728881428
+      Gog_attack_NOhitbox_8: -36569880876239239
+      Gog_attack_NOhitbox_9: 7510566569919056457
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

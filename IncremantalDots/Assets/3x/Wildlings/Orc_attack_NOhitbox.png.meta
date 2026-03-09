@@ -1,0 +1,650 @@
+fileFormatVersion: 2
+guid: f6501484cff0bf541b2666ad1a98a1e5
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -1533849074448322196
+    second: Orc_attack_NOhitbox_0
+  - first:
+      213: -1469449944778935591
+    second: Orc_attack_NOhitbox_1
+  - first:
+      213: -4679752329770186933
+    second: Orc_attack_NOhitbox_2
+  - first:
+      213: 5055716368401583954
+    second: Orc_attack_NOhitbox_3
+  - first:
+      213: 2229457467811429078
+    second: Orc_attack_NOhitbox_4
+  - first:
+      213: 8514637342485410952
+    second: Orc_attack_NOhitbox_5
+  - first:
+      213: -6527892752678318700
+    second: Orc_attack_NOhitbox_6
+  - first:
+      213: 1795394080020803325
+    second: Orc_attack_NOhitbox_7
+  - first:
+      213: -7421379672836647397
+    second: Orc_attack_NOhitbox_8
+  - first:
+      213: 5213172549799894858
+    second: Orc_attack_NOhitbox_9
+  - first:
+      213: -6620056976749783824
+    second: Orc_attack_NOhitbox_10
+  - first:
+      213: 5883683527779228944
+    second: Orc_attack_NOhitbox_11
+  - first:
+      213: -942790912369369456
+    second: Orc_attack_NOhitbox_12
+  - first:
+      213: -6400417565080342057
+    second: Orc_attack_NOhitbox_13
+  - first:
+      213: -387761690343085315
+    second: Orc_attack_NOhitbox_14
+  - first:
+      213: -5071202102393869080
+    second: Orc_attack_NOhitbox_15
+  - first:
+      213: -8491848204032574408
+    second: Orc_attack_NOhitbox_16
+  - first:
+      213: 8248571391403421566
+    second: Orc_attack_NOhitbox_17
+  - first:
+      213: -4852507400651989465
+    second: Orc_attack_NOhitbox_18
+  - first:
+      213: 8081236506254672939
+    second: Orc_attack_NOhitbox_19
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Orc_attack_NOhitbox_0
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 575
+        width: 50
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c61327ab46ca6bae0800000000000000
+      internalID: -1533849074448322196
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Orc_attack_NOhitbox_1
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 575
+        width: 50
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9d2fb3a8f077b9be0800000000000000
+      internalID: -1469449944778935591
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Orc_attack_NOhitbox_2
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 575
+        width: 50
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b47cd3bec0e2e0fb0800000000000000
+      internalID: -4679752329770186933
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Orc_attack_NOhitbox_3
+      rect:
+        serializedVersion: 2
+        x: 479
+        y: 575
+        width: 50
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 25f44bf2043892640800000000000000
+      internalID: 5055716368401583954
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Orc_attack_NOhitbox_4
+      rect:
+        serializedVersion: 2
+        x: 623
+        y: 575
+        width: 50
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6dafdba31cf90fe10800000000000000
+      internalID: 2229457467811429078
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Orc_attack_NOhitbox_5
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 407
+        width: 41
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8847e1eec811a2670800000000000000
+      internalID: 8514637342485410952
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Orc_attack_NOhitbox_6
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 407
+        width: 44
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 49d03c0b0244865a0800000000000000
+      internalID: -6527892752678318700
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Orc_attack_NOhitbox_7
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 407
+        width: 44
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dfeaa7347658ae810800000000000000
+      internalID: 1795394080020803325
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Orc_attack_NOhitbox_8
+      rect:
+        serializedVersion: 2
+        x: 479
+        y: 407
+        width: 44
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b165449f186f10990800000000000000
+      internalID: -7421379672836647397
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Orc_attack_NOhitbox_9
+      rect:
+        serializedVersion: 2
+        x: 623
+        y: 407
+        width: 44
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a4fd3af30d8e85840800000000000000
+      internalID: 5213172549799894858
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Orc_attack_NOhitbox_10
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 239
+        width: 41
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0f49bf31145d024a0800000000000000
+      internalID: -6620056976749783824
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Orc_attack_NOhitbox_11
+      rect:
+        serializedVersion: 2
+        x: 197
+        y: 239
+        width: 44
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 01d1914defa07a150800000000000000
+      internalID: 5883683527779228944
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Orc_attack_NOhitbox_12
+      rect:
+        serializedVersion: 2
+        x: 341
+        y: 239
+        width: 44
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 09ed1ca09a88ae2f0800000000000000
+      internalID: -942790912369369456
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Orc_attack_NOhitbox_13
+      rect:
+        serializedVersion: 2
+        x: 485
+        y: 239
+        width: 44
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7d1373ba2262d27a0800000000000000
+      internalID: -6400417565080342057
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Orc_attack_NOhitbox_14
+      rect:
+        serializedVersion: 2
+        x: 629
+        y: 239
+        width: 44
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dfa689d0cc46e9af0800000000000000
+      internalID: -387761690343085315
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Orc_attack_NOhitbox_15
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 71
+        width: 50
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8ec69966e887f99b0800000000000000
+      internalID: -5071202102393869080
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Orc_attack_NOhitbox_16
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 71
+        width: 50
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 83c7918dc05e62a80800000000000000
+      internalID: -8491848204032574408
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Orc_attack_NOhitbox_17
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 71
+        width: 50
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e7fec094affc87270800000000000000
+      internalID: 8248571391403421566
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Orc_attack_NOhitbox_18
+      rect:
+        serializedVersion: 2
+        x: 479
+        y: 71
+        width: 50
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 72e1f229a3e68acb0800000000000000
+      internalID: -4852507400651989465
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Orc_attack_NOhitbox_19
+      rect:
+        serializedVersion: 2
+        x: 623
+        y: 71
+        width: 50
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b248a3549c1562070800000000000000
+      internalID: 8081236506254672939
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Orc_attack_NOhitbox_0: -1533849074448322196
+      Orc_attack_NOhitbox_1: -1469449944778935591
+      Orc_attack_NOhitbox_10: -6620056976749783824
+      Orc_attack_NOhitbox_11: 5883683527779228944
+      Orc_attack_NOhitbox_12: -942790912369369456
+      Orc_attack_NOhitbox_13: -6400417565080342057
+      Orc_attack_NOhitbox_14: -387761690343085315
+      Orc_attack_NOhitbox_15: -5071202102393869080
+      Orc_attack_NOhitbox_16: -8491848204032574408
+      Orc_attack_NOhitbox_17: 8248571391403421566
+      Orc_attack_NOhitbox_18: -4852507400651989465
+      Orc_attack_NOhitbox_19: 8081236506254672939
+      Orc_attack_NOhitbox_2: -4679752329770186933
+      Orc_attack_NOhitbox_3: 5055716368401583954
+      Orc_attack_NOhitbox_4: 2229457467811429078
+      Orc_attack_NOhitbox_5: 8514637342485410952
+      Orc_attack_NOhitbox_6: -6527892752678318700
+      Orc_attack_NOhitbox_7: 1795394080020803325
+      Orc_attack_NOhitbox_8: -7421379672836647397
+      Orc_attack_NOhitbox_9: 5213172549799894858
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

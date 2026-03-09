@@ -1,0 +1,546 @@
+fileFormatVersion: 2
+guid: 3f574373ebd949942b1a4bad7723398a
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -3522558181648320245
+    second: Peasant_attack_hitbox_0
+  - first:
+      213: -4352823972384110051
+    second: Peasant_attack_hitbox_1
+  - first:
+      213: -4950960286415122505
+    second: Peasant_attack_hitbox_2
+  - first:
+      213: 4442673036191049975
+    second: Peasant_attack_hitbox_3
+  - first:
+      213: 3534861076516693350
+    second: Peasant_attack_hitbox_4
+  - first:
+      213: 4088441212419485997
+    second: Peasant_attack_hitbox_5
+  - first:
+      213: -2622211852388773086
+    second: Peasant_attack_hitbox_6
+  - first:
+      213: -4190731113230620730
+    second: Peasant_attack_hitbox_7
+  - first:
+      213: 8668243560515899355
+    second: Peasant_attack_hitbox_8
+  - first:
+      213: 200217974236249609
+    second: Peasant_attack_hitbox_9
+  - first:
+      213: -4463571263130255208
+    second: Peasant_attack_hitbox_10
+  - first:
+      213: 7512339912661617000
+    second: Peasant_attack_hitbox_11
+  - first:
+      213: 4335283432356854153
+    second: Peasant_attack_hitbox_12
+  - first:
+      213: 4084439482278386594
+    second: Peasant_attack_hitbox_13
+  - first:
+      213: -6843864309104643867
+    second: Peasant_attack_hitbox_14
+  - first:
+      213: 7358576433277249779
+    second: Peasant_attack_hitbox_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Peasant_attack_hitbox_0
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 506
+        width: 32
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b09b4324ffb5d1fc0800000000000000
+      internalID: -3522558181648320245
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Peasant_attack_hitbox_1
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 503
+        width: 32
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d1a8d3cc8a9a793c0800000000000000
+      internalID: -4352823972384110051
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Peasant_attack_hitbox_2
+      rect:
+        serializedVersion: 2
+        x: 347
+        y: 503
+        width: 26
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7bf092fc9d7aa4bb0800000000000000
+      internalID: -4950960286415122505
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Peasant_attack_hitbox_3
+      rect:
+        serializedVersion: 2
+        x: 494
+        y: 503
+        width: 20
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7f8af5f869b87ad30800000000000000
+      internalID: 4442673036191049975
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Peasant_attack_hitbox_4
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 416
+        width: 74
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 665e12cab695e0130800000000000000
+      internalID: 3534861076516693350
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Peasant_attack_hitbox_5
+      rect:
+        serializedVersion: 2
+        x: 143
+        y: 416
+        width: 38
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d21b4570f9f0db830800000000000000
+      internalID: 4088441212419485997
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Peasant_attack_hitbox_6
+      rect:
+        serializedVersion: 2
+        x: 287
+        y: 419
+        width: 23
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2235c8c96380c9bd0800000000000000
+      internalID: -2622211852388773086
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Peasant_attack_hitbox_7
+      rect:
+        serializedVersion: 2
+        x: 431
+        y: 422
+        width: 11
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6c726b6814887d5c0800000000000000
+      internalID: -4190731113230620730
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Peasant_attack_hitbox_8
+      rect:
+        serializedVersion: 2
+        x: 68
+        y: 248
+        width: 74
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bdf0e1b8799cb4870800000000000000
+      internalID: 8668243560515899355
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Peasant_attack_hitbox_9
+      rect:
+        serializedVersion: 2
+        x: 251
+        y: 248
+        width: 38
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 90effffcf2157c200800000000000000
+      internalID: 200217974236249609
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Peasant_attack_hitbox_10
+      rect:
+        serializedVersion: 2
+        x: 410
+        y: 251
+        width: 23
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 890ca7fc5953e02c0800000000000000
+      internalID: -4463571263130255208
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Peasant_attack_hitbox_11
+      rect:
+        serializedVersion: 2
+        x: 566
+        y: 254
+        width: 10
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8694f263951314860800000000000000
+      internalID: 7512339912661617000
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Peasant_attack_hitbox_12
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 101
+        width: 32
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 989344aff450a2c30800000000000000
+      internalID: 4335283432356854153
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Peasant_attack_hitbox_13
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 131
+        width: 32
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2ab98cf9118dea830800000000000000
+      internalID: 4084439482278386594
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Peasant_attack_hitbox_14
+      rect:
+        serializedVersion: 2
+        x: 347
+        y: 146
+        width: 26
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5e0f7d4dba5b501a0800000000000000
+      internalID: -6843864309104643867
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Peasant_attack_hitbox_15
+      rect:
+        serializedVersion: 2
+        x: 494
+        y: 158
+        width: 20
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3f82d06574aee1660800000000000000
+      internalID: 7358576433277249779
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Peasant_attack_hitbox_0: -3522558181648320245
+      Peasant_attack_hitbox_1: -4352823972384110051
+      Peasant_attack_hitbox_10: -4463571263130255208
+      Peasant_attack_hitbox_11: 7512339912661617000
+      Peasant_attack_hitbox_12: 4335283432356854153
+      Peasant_attack_hitbox_13: 4084439482278386594
+      Peasant_attack_hitbox_14: -6843864309104643867
+      Peasant_attack_hitbox_15: 7358576433277249779
+      Peasant_attack_hitbox_2: -4950960286415122505
+      Peasant_attack_hitbox_3: 4442673036191049975
+      Peasant_attack_hitbox_4: 3534861076516693350
+      Peasant_attack_hitbox_5: 4088441212419485997
+      Peasant_attack_hitbox_6: -2622211852388773086
+      Peasant_attack_hitbox_7: -4190731113230620730
+      Peasant_attack_hitbox_8: 8668243560515899355
+      Peasant_attack_hitbox_9: 200217974236249609
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

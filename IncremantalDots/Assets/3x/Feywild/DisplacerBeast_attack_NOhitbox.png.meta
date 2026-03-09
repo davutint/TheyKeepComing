@@ -1,0 +1,676 @@
+fileFormatVersion: 2
+guid: db2d6a653b9e81846b43577d5bcf9f3d
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -2415003506582651033
+    second: DisplacerBeast_attack_NOhitbox_0
+  - first:
+      213: -453768268787698210
+    second: DisplacerBeast_attack_NOhitbox_1
+  - first:
+      213: -5170705373280842737
+    second: DisplacerBeast_attack_NOhitbox_2
+  - first:
+      213: 3009927305752502166
+    second: DisplacerBeast_attack_NOhitbox_3
+  - first:
+      213: -8857794168715470908
+    second: DisplacerBeast_attack_NOhitbox_4
+  - first:
+      213: 8352252507015418731
+    second: DisplacerBeast_attack_NOhitbox_5
+  - first:
+      213: 8243728677576782140
+    second: DisplacerBeast_attack_NOhitbox_6
+  - first:
+      213: -4612340528174293991
+    second: DisplacerBeast_attack_NOhitbox_7
+  - first:
+      213: -4992765844525420826
+    second: DisplacerBeast_attack_NOhitbox_8
+  - first:
+      213: -3312946588055028747
+    second: DisplacerBeast_attack_NOhitbox_9
+  - first:
+      213: -4490441029278771853
+    second: DisplacerBeast_attack_NOhitbox_10
+  - first:
+      213: 258791452007917802
+    second: DisplacerBeast_attack_NOhitbox_11
+  - first:
+      213: 278607848521350151
+    second: DisplacerBeast_attack_NOhitbox_12
+  - first:
+      213: 1807210209091135494
+    second: DisplacerBeast_attack_NOhitbox_13
+  - first:
+      213: 3699463554069456291
+    second: DisplacerBeast_attack_NOhitbox_14
+  - first:
+      213: 3256735542479342128
+    second: DisplacerBeast_attack_NOhitbox_15
+  - first:
+      213: -2638992053699459929
+    second: DisplacerBeast_attack_NOhitbox_16
+  - first:
+      213: -194773741182026477
+    second: DisplacerBeast_attack_NOhitbox_17
+  - first:
+      213: -8676412677456631159
+    second: DisplacerBeast_attack_NOhitbox_18
+  - first:
+      213: 3992806065523005709
+    second: DisplacerBeast_attack_NOhitbox_19
+  - first:
+      213: 3586232942654093058
+    second: DisplacerBeast_attack_NOhitbox_20
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: DisplacerBeast_attack_NOhitbox_0
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 479
+        width: 44
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 76f71d22b1f2c7ed0800000000000000
+      internalID: -2415003506582651033
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DisplacerBeast_attack_NOhitbox_1
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 479
+        width: 44
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ed5b098e924e3b9f0800000000000000
+      internalID: -453768268787698210
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DisplacerBeast_attack_NOhitbox_2
+      rect:
+        serializedVersion: 2
+        x: 338
+        y: 479
+        width: 44
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f0c446bcbd6fd38b0800000000000000
+      internalID: -5170705373280842737
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DisplacerBeast_attack_NOhitbox_3
+      rect:
+        serializedVersion: 2
+        x: 482
+        y: 479
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 69f5023ffe865c920800000000000000
+      internalID: 3009927305752502166
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DisplacerBeast_attack_NOhitbox_4
+      rect:
+        serializedVersion: 2
+        x: 626
+        y: 479
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4c71038522bc21580800000000000000
+      internalID: -8857794168715470908
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DisplacerBeast_attack_NOhitbox_5
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 335
+        width: 47
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b63150b276929e370800000000000000
+      internalID: 8352252507015418731
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DisplacerBeast_attack_NOhitbox_6
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 335
+        width: 47
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c313aab1e8b976270800000000000000
+      internalID: 8243728677576782140
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DisplacerBeast_attack_NOhitbox_7
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 335
+        width: 47
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 91c98031abcadffb0800000000000000
+      internalID: -4612340528174293991
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DisplacerBeast_attack_NOhitbox_8
+      rect:
+        serializedVersion: 2
+        x: 479
+        y: 335
+        width: 47
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6eeeb5ecae126bab0800000000000000
+      internalID: -4992765844525420826
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DisplacerBeast_attack_NOhitbox_9
+      rect:
+        serializedVersion: 2
+        x: 623
+        y: 335
+        width: 47
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5fb332381ac0602d0800000000000000
+      internalID: -3312946588055028747
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DisplacerBeast_attack_NOhitbox_10
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 191
+        width: 47
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 375dffcdcafbea1c0800000000000000
+      internalID: -4490441029278771853
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DisplacerBeast_attack_NOhitbox_11
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 191
+        width: 47
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ae8e6d75479679300800000000000000
+      internalID: 258791452007917802
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DisplacerBeast_attack_NOhitbox_12
+      rect:
+        serializedVersion: 2
+        x: 338
+        y: 191
+        width: 47
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 70c30c2bc50ddd300800000000000000
+      internalID: 278607848521350151
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DisplacerBeast_attack_NOhitbox_13
+      rect:
+        serializedVersion: 2
+        x: 482
+        y: 191
+        width: 47
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 60826533c10841910800000000000000
+      internalID: 1807210209091135494
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DisplacerBeast_attack_NOhitbox_14
+      rect:
+        serializedVersion: 2
+        x: 626
+        y: 191
+        width: 47
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3a560d77082275330800000000000000
+      internalID: 3699463554069456291
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DisplacerBeast_attack_NOhitbox_15
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 47
+        width: 44
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 03aced098bf323d20800000000000000
+      internalID: 3256735542479342128
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DisplacerBeast_attack_NOhitbox_16
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 47
+        width: 44
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7a44a2a85ba606bd0800000000000000
+      internalID: -2638992053699459929
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DisplacerBeast_attack_NOhitbox_17
+      rect:
+        serializedVersion: 2
+        x: 338
+        y: 56
+        width: 44
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 31d754970560c4df0800000000000000
+      internalID: -194773741182026477
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DisplacerBeast_attack_NOhitbox_18
+      rect:
+        serializedVersion: 2
+        x: 482
+        y: 47
+        width: 44
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 98a6083b3a0379780800000000000000
+      internalID: -8676412677456631159
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DisplacerBeast_attack_NOhitbox_19
+      rect:
+        serializedVersion: 2
+        x: 626
+        y: 47
+        width: 44
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d09168836fb496730800000000000000
+      internalID: 3992806065523005709
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DisplacerBeast_attack_NOhitbox_20
+      rect:
+        serializedVersion: 2
+        x: 344
+        y: 47
+        width: 32
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 20773b45cdbd4c130800000000000000
+      internalID: 3586232942654093058
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      DisplacerBeast_attack_NOhitbox_0: -2415003506582651033
+      DisplacerBeast_attack_NOhitbox_1: -453768268787698210
+      DisplacerBeast_attack_NOhitbox_10: -4490441029278771853
+      DisplacerBeast_attack_NOhitbox_11: 258791452007917802
+      DisplacerBeast_attack_NOhitbox_12: 278607848521350151
+      DisplacerBeast_attack_NOhitbox_13: 1807210209091135494
+      DisplacerBeast_attack_NOhitbox_14: 3699463554069456291
+      DisplacerBeast_attack_NOhitbox_15: 3256735542479342128
+      DisplacerBeast_attack_NOhitbox_16: -2638992053699459929
+      DisplacerBeast_attack_NOhitbox_17: -194773741182026477
+      DisplacerBeast_attack_NOhitbox_18: -8676412677456631159
+      DisplacerBeast_attack_NOhitbox_19: 3992806065523005709
+      DisplacerBeast_attack_NOhitbox_2: -5170705373280842737
+      DisplacerBeast_attack_NOhitbox_20: 3586232942654093058
+      DisplacerBeast_attack_NOhitbox_3: 3009927305752502166
+      DisplacerBeast_attack_NOhitbox_4: -8857794168715470908
+      DisplacerBeast_attack_NOhitbox_5: 8352252507015418731
+      DisplacerBeast_attack_NOhitbox_6: 8243728677576782140
+      DisplacerBeast_attack_NOhitbox_7: -4612340528174293991
+      DisplacerBeast_attack_NOhitbox_8: -4992765844525420826
+      DisplacerBeast_attack_NOhitbox_9: -3312946588055028747
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,0 +1,26 @@
+{
+    "name": "DeadWalls",
+    "rootNamespace": "DeadWalls",
+    "references": [
+        "Unity.Entities",
+        "Unity.Entities.Hybrid",
+        "Unity.Transforms",
+        "Unity.Mathematics",
+        "Unity.Burst",
+        "Unity.Collections",
+        "Unity.Rendering.Hybrid",
+        "Unity.Entities.Graphics",
+        "Unity.TextMeshPro",
+        "ProjectDawn.Navigation",
+        "ProjectDawn.Navigation.Hybrid"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

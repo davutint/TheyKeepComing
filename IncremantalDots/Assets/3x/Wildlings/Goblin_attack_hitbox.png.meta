@@ -1,0 +1,754 @@
+fileFormatVersion: 2
+guid: 1ee4294d528452740a3546dbc33083c5
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 5654089046855351745
+    second: Goblin_attack_hitbox_0
+  - first:
+      213: -2718185710037779705
+    second: Goblin_attack_hitbox_1
+  - first:
+      213: 378974826942519322
+    second: Goblin_attack_hitbox_2
+  - first:
+      213: 1946018536682360494
+    second: Goblin_attack_hitbox_3
+  - first:
+      213: 1089649618388813618
+    second: Goblin_attack_hitbox_4
+  - first:
+      213: 7332868117652222067
+    second: Goblin_attack_hitbox_5
+  - first:
+      213: 2467325574612047200
+    second: Goblin_attack_hitbox_6
+  - first:
+      213: -7923455319471677403
+    second: Goblin_attack_hitbox_7
+  - first:
+      213: 5180610963311333952
+    second: Goblin_attack_hitbox_8
+  - first:
+      213: -5995071089966761583
+    second: Goblin_attack_hitbox_9
+  - first:
+      213: 7067599124735245409
+    second: Goblin_attack_hitbox_10
+  - first:
+      213: 7899702790616883792
+    second: Goblin_attack_hitbox_11
+  - first:
+      213: 1455142446137821264
+    second: Goblin_attack_hitbox_12
+  - first:
+      213: -8857449771176909845
+    second: Goblin_attack_hitbox_13
+  - first:
+      213: -141287437719195825
+    second: Goblin_attack_hitbox_14
+  - first:
+      213: 6088588826781712205
+    second: Goblin_attack_hitbox_15
+  - first:
+      213: -5759572344415145788
+    second: Goblin_attack_hitbox_16
+  - first:
+      213: 2798797946269214829
+    second: Goblin_attack_hitbox_17
+  - first:
+      213: -9090240844366702874
+    second: Goblin_attack_hitbox_18
+  - first:
+      213: 5611562505441576491
+    second: Goblin_attack_hitbox_19
+  - first:
+      213: -6928193626826892001
+    second: Goblin_attack_hitbox_20
+  - first:
+      213: -6775849662820434691
+    second: Goblin_attack_hitbox_21
+  - first:
+      213: -8309915132969423478
+    second: Goblin_attack_hitbox_22
+  - first:
+      213: -996272990154867129
+    second: Goblin_attack_hitbox_23
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Goblin_attack_hitbox_0
+      rect:
+        serializedVersion: 2
+        x: 44
+        y: 431
+        width: 56
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1cd7d3e080c577e40800000000000000
+      internalID: 5654089046855351745
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_attack_hitbox_1
+      rect:
+        serializedVersion: 2
+        x: 179
+        y: 431
+        width: 74
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 70bb7af8f70174ad0800000000000000
+      internalID: -2718185710037779705
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_attack_hitbox_2
+      rect:
+        serializedVersion: 2
+        x: 317
+        y: 431
+        width: 41
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a1859b2e893624500800000000000000
+      internalID: 378974826942519322
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_attack_hitbox_3
+      rect:
+        serializedVersion: 2
+        x: 362
+        y: 431
+        width: 41
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eae07457c85a10b10800000000000000
+      internalID: 1946018536682360494
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_attack_hitbox_4
+      rect:
+        serializedVersion: 2
+        x: 461
+        y: 449
+        width: 11
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 23784b10e863f1f00800000000000000
+      internalID: 1089649618388813618
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_attack_hitbox_5
+      rect:
+        serializedVersion: 2
+        x: 536
+        y: 449
+        width: 11
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 370b279a3b493c560800000000000000
+      internalID: 7332868117652222067
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_attack_hitbox_6
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 332
+        width: 55
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 065dcf3a983bd3220800000000000000
+      internalID: 2467325574612047200
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_attack_hitbox_7
+      rect:
+        serializedVersion: 2
+        x: 143
+        y: 323
+        width: 50
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 52026310e5b3a0290800000000000000
+      internalID: -7923455319471677403
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_attack_hitbox_8
+      rect:
+        serializedVersion: 2
+        x: 296
+        y: 338
+        width: 53
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0429aab193a35e740800000000000000
+      internalID: 5180610963311333952
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_attack_hitbox_9
+      rect:
+        serializedVersion: 2
+        x: 302
+        y: 323
+        width: 38
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 199315f5b9a3dcca0800000000000000
+      internalID: -5995071089966761583
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_attack_hitbox_10
+      rect:
+        serializedVersion: 2
+        x: 470
+        y: 338
+        width: 26
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 16cb4bc45f7251260800000000000000
+      internalID: 7067599124735245409
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_attack_hitbox_11
+      rect:
+        serializedVersion: 2
+        x: 476
+        y: 323
+        width: 23
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 052a1e965d161ad60800000000000000
+      internalID: 7899702790616883792
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_attack_hitbox_12
+      rect:
+        serializedVersion: 2
+        x: 89
+        y: 188
+        width: 56
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 05843a75854b13410800000000000000
+      internalID: 1455142446137821264
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_attack_hitbox_13
+      rect:
+        serializedVersion: 2
+        x: 239
+        y: 179
+        width: 50
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: be3a225ac54041580800000000000000
+      internalID: -8857449771176909845
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_attack_hitbox_14
+      rect:
+        serializedVersion: 2
+        x: 371
+        y: 194
+        width: 53
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f4fa58fe2db0a0ef0800000000000000
+      internalID: -141287437719195825
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_attack_hitbox_15
+      rect:
+        serializedVersion: 2
+        x: 380
+        y: 179
+        width: 38
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d4f7cbb77430f7450800000000000000
+      internalID: 6088588826781712205
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_attack_hitbox_16
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 194
+        width: 26
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4c0b8f0e773e110b0800000000000000
+      internalID: -5759572344415145788
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_attack_hitbox_17
+      rect:
+        serializedVersion: 2
+        x: 509
+        y: 179
+        width: 23
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d68287947e357d620800000000000000
+      internalID: 2798797946269214829
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_attack_hitbox_18
+      rect:
+        serializedVersion: 2
+        x: 44
+        y: 77
+        width: 56
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6e696cc3d1af8d180800000000000000
+      internalID: -9090240844366702874
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_attack_hitbox_19
+      rect:
+        serializedVersion: 2
+        x: 179
+        y: 107
+        width: 74
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b260fbb0e5640ed40800000000000000
+      internalID: 5611562505441576491
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_attack_hitbox_20
+      rect:
+        serializedVersion: 2
+        x: 317
+        y: 116
+        width: 41
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f1d9bd18a9c1adf90800000000000000
+      internalID: -6928193626826892001
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_attack_hitbox_21
+      rect:
+        serializedVersion: 2
+        x: 362
+        y: 116
+        width: 41
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dfc3324b1a857f1a0800000000000000
+      internalID: -6775849662820434691
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_attack_hitbox_22
+      rect:
+        serializedVersion: 2
+        x: 461
+        y: 107
+        width: 11
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a8de6b1e6304dac80800000000000000
+      internalID: -8309915132969423478
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_attack_hitbox_23
+      rect:
+        serializedVersion: 2
+        x: 536
+        y: 107
+        width: 11
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 74eb0827ef68c22f0800000000000000
+      internalID: -996272990154867129
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Goblin_attack_hitbox_0: 5654089046855351745
+      Goblin_attack_hitbox_1: -2718185710037779705
+      Goblin_attack_hitbox_10: 7067599124735245409
+      Goblin_attack_hitbox_11: 7899702790616883792
+      Goblin_attack_hitbox_12: 1455142446137821264
+      Goblin_attack_hitbox_13: -8857449771176909845
+      Goblin_attack_hitbox_14: -141287437719195825
+      Goblin_attack_hitbox_15: 6088588826781712205
+      Goblin_attack_hitbox_16: -5759572344415145788
+      Goblin_attack_hitbox_17: 2798797946269214829
+      Goblin_attack_hitbox_18: -9090240844366702874
+      Goblin_attack_hitbox_19: 5611562505441576491
+      Goblin_attack_hitbox_2: 378974826942519322
+      Goblin_attack_hitbox_20: -6928193626826892001
+      Goblin_attack_hitbox_21: -6775849662820434691
+      Goblin_attack_hitbox_22: -8309915132969423478
+      Goblin_attack_hitbox_23: -996272990154867129
+      Goblin_attack_hitbox_3: 1946018536682360494
+      Goblin_attack_hitbox_4: 1089649618388813618
+      Goblin_attack_hitbox_5: 7332868117652222067
+      Goblin_attack_hitbox_6: 2467325574612047200
+      Goblin_attack_hitbox_7: -7923455319471677403
+      Goblin_attack_hitbox_8: 5180610963311333952
+      Goblin_attack_hitbox_9: -5995071089966761583
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

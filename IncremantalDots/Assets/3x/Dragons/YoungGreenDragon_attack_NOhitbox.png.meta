@@ -1,0 +1,754 @@
+fileFormatVersion: 2
+guid: 90aa7db0d0575444fa17abadfc81c906
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 7222624370683221380
+    second: YoungGreenDragon_attack_NOhitbox_0
+  - first:
+      213: 7480913716534035365
+    second: YoungGreenDragon_attack_NOhitbox_1
+  - first:
+      213: 71543249071657916
+    second: YoungGreenDragon_attack_NOhitbox_2
+  - first:
+      213: -5189052285015715329
+    second: YoungGreenDragon_attack_NOhitbox_3
+  - first:
+      213: 2280801066711483794
+    second: YoungGreenDragon_attack_NOhitbox_4
+  - first:
+      213: 2871159791226218861
+    second: YoungGreenDragon_attack_NOhitbox_5
+  - first:
+      213: -5005129315327917726
+    second: YoungGreenDragon_attack_NOhitbox_6
+  - first:
+      213: -8981012776247911370
+    second: YoungGreenDragon_attack_NOhitbox_7
+  - first:
+      213: -2365517983071407585
+    second: YoungGreenDragon_attack_NOhitbox_8
+  - first:
+      213: 6146690373322926456
+    second: YoungGreenDragon_attack_NOhitbox_9
+  - first:
+      213: 7667248000117530808
+    second: YoungGreenDragon_attack_NOhitbox_10
+  - first:
+      213: -392154256337820311
+    second: YoungGreenDragon_attack_NOhitbox_11
+  - first:
+      213: -2618904210990422199
+    second: YoungGreenDragon_attack_NOhitbox_12
+  - first:
+      213: -6235392611434508173
+    second: YoungGreenDragon_attack_NOhitbox_13
+  - first:
+      213: -966649913417712414
+    second: YoungGreenDragon_attack_NOhitbox_14
+  - first:
+      213: -8589580886049988873
+    second: YoungGreenDragon_attack_NOhitbox_15
+  - first:
+      213: 5503329296473108885
+    second: YoungGreenDragon_attack_NOhitbox_16
+  - first:
+      213: 1962356663460230550
+    second: YoungGreenDragon_attack_NOhitbox_17
+  - first:
+      213: 404789154461511795
+    second: YoungGreenDragon_attack_NOhitbox_18
+  - first:
+      213: -6339231933714742443
+    second: YoungGreenDragon_attack_NOhitbox_19
+  - first:
+      213: 8696179062184710252
+    second: YoungGreenDragon_attack_NOhitbox_20
+  - first:
+      213: -739712878677023579
+    second: YoungGreenDragon_attack_NOhitbox_21
+  - first:
+      213: -5849433460474063377
+    second: YoungGreenDragon_attack_NOhitbox_22
+  - first:
+      213: -8183620359094419192
+    second: YoungGreenDragon_attack_NOhitbox_23
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: YoungGreenDragon_attack_NOhitbox_0
+      rect:
+        serializedVersion: 2
+        x: 104
+        y: 959
+        width: 80
+        height: 71
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 48517a8199aeb3460800000000000000
+      internalID: 7222624370683221380
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: YoungGreenDragon_attack_NOhitbox_1
+      rect:
+        serializedVersion: 2
+        x: 386
+        y: 959
+        width: 92
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5a3cb5db36b81d760800000000000000
+      internalID: 7480913716534035365
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: YoungGreenDragon_attack_NOhitbox_2
+      rect:
+        serializedVersion: 2
+        x: 674
+        y: 959
+        width: 92
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cb35efab43c2ef000800000000000000
+      internalID: 71543249071657916
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: YoungGreenDragon_attack_NOhitbox_3
+      rect:
+        serializedVersion: 2
+        x: 962
+        y: 959
+        width: 92
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ff195b68078ccf7b0800000000000000
+      internalID: -5189052285015715329
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: YoungGreenDragon_attack_NOhitbox_4
+      rect:
+        serializedVersion: 2
+        x: 1250
+        y: 959
+        width: 92
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2958ba86c7807af10800000000000000
+      internalID: 2280801066711483794
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: YoungGreenDragon_attack_NOhitbox_5
+      rect:
+        serializedVersion: 2
+        x: 1541
+        y: 959
+        width: 86
+        height: 71
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d696c693e9868d720800000000000000
+      internalID: 2871159791226218861
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: YoungGreenDragon_attack_NOhitbox_6
+      rect:
+        serializedVersion: 2
+        x: 113
+        y: 671
+        width: 77
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2614cf0f7653a8ab0800000000000000
+      internalID: -5005129315327917726
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: YoungGreenDragon_attack_NOhitbox_7
+      rect:
+        serializedVersion: 2
+        x: 395
+        y: 671
+        width: 80
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 63c9f74a6780d5380800000000000000
+      internalID: -8981012776247911370
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: YoungGreenDragon_attack_NOhitbox_8
+      rect:
+        serializedVersion: 2
+        x: 683
+        y: 671
+        width: 80
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f12fa3d6dedfb2fd0800000000000000
+      internalID: -2365517983071407585
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: YoungGreenDragon_attack_NOhitbox_9
+      rect:
+        serializedVersion: 2
+        x: 971
+        y: 671
+        width: 80
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 879e936f35e6d4550800000000000000
+      internalID: 6146690373322926456
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: YoungGreenDragon_attack_NOhitbox_10
+      rect:
+        serializedVersion: 2
+        x: 1259
+        y: 671
+        width: 80
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8b064dbee69876a60800000000000000
+      internalID: 7667248000117530808
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: YoungGreenDragon_attack_NOhitbox_11
+      rect:
+        serializedVersion: 2
+        x: 1547
+        y: 671
+        width: 80
+        height: 71
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 965a3d518c9ce8af0800000000000000
+      internalID: -392154256337820311
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: YoungGreenDragon_attack_NOhitbox_12
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 383
+        width: 77
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9472423ee78c7abd0800000000000000
+      internalID: -2618904210990422199
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: YoungGreenDragon_attack_NOhitbox_13
+      rect:
+        serializedVersion: 2
+        x: 389
+        y: 383
+        width: 80
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 370d958d47f6779a0800000000000000
+      internalID: -6235392611434508173
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: YoungGreenDragon_attack_NOhitbox_14
+      rect:
+        serializedVersion: 2
+        x: 677
+        y: 383
+        width: 80
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2ec33987605c592f0800000000000000
+      internalID: -966649913417712414
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: YoungGreenDragon_attack_NOhitbox_15
+      rect:
+        serializedVersion: 2
+        x: 965
+        y: 383
+        width: 80
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7fe518591bdabc880800000000000000
+      internalID: -8589580886049988873
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: YoungGreenDragon_attack_NOhitbox_16
+      rect:
+        serializedVersion: 2
+        x: 1253
+        y: 383
+        width: 80
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 591b74656d0cf5c40800000000000000
+      internalID: 5503329296473108885
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: YoungGreenDragon_attack_NOhitbox_17
+      rect:
+        serializedVersion: 2
+        x: 1541
+        y: 383
+        width: 80
+        height: 71
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 695fa280df0bb3b10800000000000000
+      internalID: 1962356663460230550
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: YoungGreenDragon_attack_NOhitbox_18
+      rect:
+        serializedVersion: 2
+        x: 104
+        y: 95
+        width: 80
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 370fb9067991e9500800000000000000
+      internalID: 404789154461511795
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: YoungGreenDragon_attack_NOhitbox_19
+      rect:
+        serializedVersion: 2
+        x: 386
+        y: 95
+        width: 92
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 553ce1a94268608a0800000000000000
+      internalID: -6339231933714742443
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: YoungGreenDragon_attack_NOhitbox_20
+      rect:
+        serializedVersion: 2
+        x: 674
+        y: 95
+        width: 92
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c6095b068c80fa870800000000000000
+      internalID: 8696179062184710252
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: YoungGreenDragon_attack_NOhitbox_21
+      rect:
+        serializedVersion: 2
+        x: 962
+        y: 95
+        width: 92
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5a4aca65e030cb5f0800000000000000
+      internalID: -739712878677023579
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: YoungGreenDragon_attack_NOhitbox_22
+      rect:
+        serializedVersion: 2
+        x: 1250
+        y: 95
+        width: 92
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fe5d8236243a2dea0800000000000000
+      internalID: -5849433460474063377
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: YoungGreenDragon_attack_NOhitbox_23
+      rect:
+        serializedVersion: 2
+        x: 1538
+        y: 95
+        width: 92
+        height: 71
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 801c58f54a0fd6e80800000000000000
+      internalID: -8183620359094419192
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      YoungGreenDragon_attack_NOhitbox_0: 7222624370683221380
+      YoungGreenDragon_attack_NOhitbox_1: 7480913716534035365
+      YoungGreenDragon_attack_NOhitbox_10: 7667248000117530808
+      YoungGreenDragon_attack_NOhitbox_11: -392154256337820311
+      YoungGreenDragon_attack_NOhitbox_12: -2618904210990422199
+      YoungGreenDragon_attack_NOhitbox_13: -6235392611434508173
+      YoungGreenDragon_attack_NOhitbox_14: -966649913417712414
+      YoungGreenDragon_attack_NOhitbox_15: -8589580886049988873
+      YoungGreenDragon_attack_NOhitbox_16: 5503329296473108885
+      YoungGreenDragon_attack_NOhitbox_17: 1962356663460230550
+      YoungGreenDragon_attack_NOhitbox_18: 404789154461511795
+      YoungGreenDragon_attack_NOhitbox_19: -6339231933714742443
+      YoungGreenDragon_attack_NOhitbox_2: 71543249071657916
+      YoungGreenDragon_attack_NOhitbox_20: 8696179062184710252
+      YoungGreenDragon_attack_NOhitbox_21: -739712878677023579
+      YoungGreenDragon_attack_NOhitbox_22: -5849433460474063377
+      YoungGreenDragon_attack_NOhitbox_23: -8183620359094419192
+      YoungGreenDragon_attack_NOhitbox_3: -5189052285015715329
+      YoungGreenDragon_attack_NOhitbox_4: 2280801066711483794
+      YoungGreenDragon_attack_NOhitbox_5: 2871159791226218861
+      YoungGreenDragon_attack_NOhitbox_6: -5005129315327917726
+      YoungGreenDragon_attack_NOhitbox_7: -8981012776247911370
+      YoungGreenDragon_attack_NOhitbox_8: -2365517983071407585
+      YoungGreenDragon_attack_NOhitbox_9: 6146690373322926456
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

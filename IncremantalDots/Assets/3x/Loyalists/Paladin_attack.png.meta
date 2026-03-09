@@ -1,0 +1,650 @@
+fileFormatVersion: 2
+guid: 7acd451e959d811459605e5dfc711dfe
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 6105221573439621377
+    second: Paladin_attack_0
+  - first:
+      213: -4420446214191368344
+    second: Paladin_attack_1
+  - first:
+      213: 4124823819654213142
+    second: Paladin_attack_2
+  - first:
+      213: -1561757559193127502
+    second: Paladin_attack_3
+  - first:
+      213: 375098912462190310
+    second: Paladin_attack_4
+  - first:
+      213: -5290035581453366028
+    second: Paladin_attack_5
+  - first:
+      213: 5960023233288429893
+    second: Paladin_attack_6
+  - first:
+      213: 1866594202145527359
+    second: Paladin_attack_7
+  - first:
+      213: -3587075105684321632
+    second: Paladin_attack_8
+  - first:
+      213: -313348991365046097
+    second: Paladin_attack_9
+  - first:
+      213: 5442613465257728974
+    second: Paladin_attack_10
+  - first:
+      213: 1039037969208606489
+    second: Paladin_attack_11
+  - first:
+      213: 7341599216120226892
+    second: Paladin_attack_12
+  - first:
+      213: -2223495202838035163
+    second: Paladin_attack_13
+  - first:
+      213: -8168282193831267750
+    second: Paladin_attack_14
+  - first:
+      213: 178780460345117877
+    second: Paladin_attack_15
+  - first:
+      213: 2447379141302760383
+    second: Paladin_attack_16
+  - first:
+      213: -7439430597525397307
+    second: Paladin_attack_17
+  - first:
+      213: -4210773934345164265
+    second: Paladin_attack_18
+  - first:
+      213: -6986191117954494871
+    second: Paladin_attack_19
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Paladin_attack_0
+      rect:
+        serializedVersion: 2
+        x: 44
+        y: 575
+        width: 53
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1098be79caa1ab450800000000000000
+      internalID: 6105221573439621377
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Paladin_attack_1
+      rect:
+        serializedVersion: 2
+        x: 176
+        y: 536
+        width: 65
+        height: 98
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8673766b69b67a2c0800000000000000
+      internalID: -4420446214191368344
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Paladin_attack_2
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 545
+        width: 50
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 61e2f83e8615e3930800000000000000
+      internalID: 4124823819654213142
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Paladin_attack_3
+      rect:
+        serializedVersion: 2
+        x: 479
+        y: 554
+        width: 50
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2b5330346c5835ae0800000000000000
+      internalID: -1561757559193127502
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Paladin_attack_4
+      rect:
+        serializedVersion: 2
+        x: 623
+        y: 560
+        width: 50
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6e6b1f8397e943500800000000000000
+      internalID: 375098912462190310
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Paladin_attack_5
+      rect:
+        serializedVersion: 2
+        x: 53
+        y: 407
+        width: 53
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4fc8b4e9aa40696b0800000000000000
+      internalID: -5290035581453366028
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Paladin_attack_6
+      rect:
+        serializedVersion: 2
+        x: 143
+        y: 392
+        width: 95
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5416b399d8146b250800000000000000
+      internalID: 5960023233288429893
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Paladin_attack_7
+      rect:
+        serializedVersion: 2
+        x: 308
+        y: 392
+        width: 74
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f3610b6898977e910800000000000000
+      internalID: 1866594202145527359
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Paladin_attack_8
+      rect:
+        serializedVersion: 2
+        x: 461
+        y: 392
+        width: 65
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0aa0a0f4236283ec0800000000000000
+      internalID: -3587075105684321632
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Paladin_attack_9
+      rect:
+        serializedVersion: 2
+        x: 617
+        y: 392
+        width: 53
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fa0a5f6a0c2c6abf0800000000000000
+      internalID: -313348991365046097
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Paladin_attack_10
+      rect:
+        serializedVersion: 2
+        x: 38
+        y: 239
+        width: 53
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ecbd1764c1c088b40800000000000000
+      internalID: 5442613465257728974
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Paladin_attack_11
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 224
+        width: 95
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 91f72d627876b6e00800000000000000
+      internalID: 1039037969208606489
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Paladin_attack_12
+      rect:
+        serializedVersion: 2
+        x: 338
+        y: 224
+        width: 74
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c44e120f69992e560800000000000000
+      internalID: 7341599216120226892
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Paladin_attack_13
+      rect:
+        serializedVersion: 2
+        x: 482
+        y: 224
+        width: 65
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 525cd03c4ee8421e0800000000000000
+      internalID: -2223495202838035163
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Paladin_attack_14
+      rect:
+        serializedVersion: 2
+        x: 626
+        y: 224
+        width: 53
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a52f9834f9e64ae80800000000000000
+      internalID: -8168282193831267750
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Paladin_attack_15
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 71
+        width: 53
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5bcc6a7a1e72b7200800000000000000
+      internalID: 178780460345117877
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Paladin_attack_16
+      rect:
+        serializedVersion: 2
+        x: 176
+        y: 71
+        width: 77
+        height: 98
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fb33d0cbc56d6f120800000000000000
+      internalID: 2447379141302760383
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Paladin_attack_17
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 71
+        width: 68
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5c0a35f8945d1c890800000000000000
+      internalID: -7439430597525397307
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Paladin_attack_18
+      rect:
+        serializedVersion: 2
+        x: 464
+        y: 71
+        width: 68
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 71ae1e59a635095c0800000000000000
+      internalID: -4210773934345164265
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Paladin_attack_19
+      rect:
+        serializedVersion: 2
+        x: 608
+        y: 71
+        width: 68
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 96e455151301c0f90800000000000000
+      internalID: -6986191117954494871
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Paladin_attack_0: 6105221573439621377
+      Paladin_attack_1: -4420446214191368344
+      Paladin_attack_10: 5442613465257728974
+      Paladin_attack_11: 1039037969208606489
+      Paladin_attack_12: 7341599216120226892
+      Paladin_attack_13: -2223495202838035163
+      Paladin_attack_14: -8168282193831267750
+      Paladin_attack_15: 178780460345117877
+      Paladin_attack_16: 2447379141302760383
+      Paladin_attack_17: -7439430597525397307
+      Paladin_attack_18: -4210773934345164265
+      Paladin_attack_19: -6986191117954494871
+      Paladin_attack_2: 4124823819654213142
+      Paladin_attack_3: -1561757559193127502
+      Paladin_attack_4: 375098912462190310
+      Paladin_attack_5: -5290035581453366028
+      Paladin_attack_6: 5960023233288429893
+      Paladin_attack_7: 1866594202145527359
+      Paladin_attack_8: -3587075105684321632
+      Paladin_attack_9: -313348991365046097
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

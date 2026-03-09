@@ -1,0 +1,1066 @@
+fileFormatVersion: 2
+guid: 19cb023924254124ca6b847468f37532
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 2693681190407959728
+    second: Bat_attack_hitbox_0
+  - first:
+      213: -1727859111994706397
+    second: Bat_attack_hitbox_1
+  - first:
+      213: -5065818772547812237
+    second: Bat_attack_hitbox_2
+  - first:
+      213: -8602219770163756601
+    second: Bat_attack_hitbox_3
+  - first:
+      213: 4818493548130256205
+    second: Bat_attack_hitbox_4
+  - first:
+      213: 6721611500269076741
+    second: Bat_attack_hitbox_5
+  - first:
+      213: 5717502752727392752
+    second: Bat_attack_hitbox_6
+  - first:
+      213: 4313779568797441246
+    second: Bat_attack_hitbox_7
+  - first:
+      213: 3613754945932381177
+    second: Bat_attack_hitbox_8
+  - first:
+      213: 4455553160834126476
+    second: Bat_attack_hitbox_9
+  - first:
+      213: 7992160492434332599
+    second: Bat_attack_hitbox_10
+  - first:
+      213: -312971227430286347
+    second: Bat_attack_hitbox_11
+  - first:
+      213: -4979777099415489767
+    second: Bat_attack_hitbox_12
+  - first:
+      213: -2017583699003040963
+    second: Bat_attack_hitbox_13
+  - first:
+      213: 1489896501233373119
+    second: Bat_attack_hitbox_14
+  - first:
+      213: -1358939142734587605
+    second: Bat_attack_hitbox_15
+  - first:
+      213: 5028603716384815736
+    second: Bat_attack_hitbox_16
+  - first:
+      213: 2532367689850824028
+    second: Bat_attack_hitbox_17
+  - first:
+      213: 5689264947135014144
+    second: Bat_attack_hitbox_18
+  - first:
+      213: -8617793634483138628
+    second: Bat_attack_hitbox_19
+  - first:
+      213: -1897295815201565194
+    second: Bat_attack_hitbox_20
+  - first:
+      213: 7847891365740430956
+    second: Bat_attack_hitbox_21
+  - first:
+      213: 2599802628976531839
+    second: Bat_attack_hitbox_22
+  - first:
+      213: -7760878267715487676
+    second: Bat_attack_hitbox_23
+  - first:
+      213: 6240504226004341498
+    second: Bat_attack_hitbox_24
+  - first:
+      213: -8788342350837367880
+    second: Bat_attack_hitbox_25
+  - first:
+      213: 3222396752594998878
+    second: Bat_attack_hitbox_26
+  - first:
+      213: 2466671334265838296
+    second: Bat_attack_hitbox_27
+  - first:
+      213: -2809855070229673304
+    second: Bat_attack_hitbox_28
+  - first:
+      213: -6860946230935060596
+    second: Bat_attack_hitbox_29
+  - first:
+      213: -7720851027157356763
+    second: Bat_attack_hitbox_30
+  - first:
+      213: -6266758570537140258
+    second: Bat_attack_hitbox_31
+  - first:
+      213: 1845436551565967430
+    second: Bat_attack_hitbox_32
+  - first:
+      213: 4848897462599005728
+    second: Bat_attack_hitbox_33
+  - first:
+      213: -4873872004613915619
+    second: Bat_attack_hitbox_34
+  - first:
+      213: -4814494343388630522
+    second: Bat_attack_hitbox_35
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_0
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 455
+        width: 50
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0b4fa6c55c0e16520800000000000000
+      internalID: 2693681190407959728
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_1
+      rect:
+        serializedVersion: 2
+        x: 182
+        y: 440
+        width: 68
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 32632afca496508e0800000000000000
+      internalID: -1727859111994706397
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_2
+      rect:
+        serializedVersion: 2
+        x: 323
+        y: 452
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 37448cd8aa892b9b0800000000000000
+      internalID: -5065818772547812237
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_3
+      rect:
+        serializedVersion: 2
+        x: 338
+        y: 446
+        width: 44
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7c10c8f02b6ce9880800000000000000
+      internalID: -8602219770163756601
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_4
+      rect:
+        serializedVersion: 2
+        x: 389
+        y: 452
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d45c0d04a5abed240800000000000000
+      internalID: 4818493548130256205
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_5
+      rect:
+        serializedVersion: 2
+        x: 485
+        y: 449
+        width: 38
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 50108bffb06f74d50800000000000000
+      internalID: 6721611500269076741
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_6
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 434
+        width: 32
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0f162a20676a85f40800000000000000
+      internalID: 5717502752727392752
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_7
+      rect:
+        serializedVersion: 2
+        x: 353
+        y: 437
+        width: 14
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: edc528599af9ddb30800000000000000
+      internalID: 4313779568797441246
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_8
+      rect:
+        serializedVersion: 2
+        x: 497
+        y: 434
+        width: 14
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9fb4c911af2a62230800000000000000
+      internalID: 3613754945932381177
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_9
+      rect:
+        serializedVersion: 2
+        x: 152
+        y: 326
+        width: 38
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c8213654efd45dd30800000000000000
+      internalID: 4455553160834126476
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_10
+      rect:
+        serializedVersion: 2
+        x: 308
+        y: 389
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7bb9573af9bd9ee60800000000000000
+      internalID: 7992160492434332599
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_11
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 344
+        width: 14
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5fb891ca35a18abf0800000000000000
+      internalID: -312971227430286347
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_12
+      rect:
+        serializedVersion: 2
+        x: 23
+        y: 335
+        width: 29
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 913f6b0bc1744eab0800000000000000
+      internalID: -4979777099415489767
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_13
+      rect:
+        serializedVersion: 2
+        x: 293
+        y: 353
+        width: 8
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d3b1e4cb05a1004e0800000000000000
+      internalID: -2017583699003040963
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_14
+      rect:
+        serializedVersion: 2
+        x: 302
+        y: 338
+        width: 26
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fbfcc1c59fc2da410800000000000000
+      internalID: 1489896501233373119
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_15
+      rect:
+        serializedVersion: 2
+        x: 434
+        y: 353
+        width: 8
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b295ee5bc04142de0800000000000000
+      internalID: -1358939142734587605
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_16
+      rect:
+        serializedVersion: 2
+        x: 449
+        y: 341
+        width: 20
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 87a7357ff6039c540800000000000000
+      internalID: 5028603716384815736
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_17
+      rect:
+        serializedVersion: 2
+        x: 308
+        y: 323
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c552c323ff6c42320800000000000000
+      internalID: 2532367689850824028
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_18
+      rect:
+        serializedVersion: 2
+        x: 242
+        y: 182
+        width: 38
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 005601f835454fe40800000000000000
+      internalID: 5689264947135014144
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_19
+      rect:
+        serializedVersion: 2
+        x: 404
+        y: 245
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cbf82053952776880800000000000000
+      internalID: -8617793634483138628
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_20
+      rect:
+        serializedVersion: 2
+        x: 92
+        y: 191
+        width: 29
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6f5531522837ba5e0800000000000000
+      internalID: -1897295815201565194
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_21
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 200
+        width: 14
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c6640d20e9f49ec60800000000000000
+      internalID: 7847891365740430956
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_22
+      rect:
+        serializedVersion: 2
+        x: 392
+        y: 194
+        width: 26
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f79d54a77ba541420800000000000000
+      internalID: 2599802628976531839
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_23
+      rect:
+        serializedVersion: 2
+        x: 419
+        y: 209
+        width: 8
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 448f4cb9552db4490800000000000000
+      internalID: -7760878267715487676
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_24
+      rect:
+        serializedVersion: 2
+        x: 539
+        y: 197
+        width: 20
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: af2105aa789ba9650800000000000000
+      internalID: 6240504226004341498
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_25
+      rect:
+        serializedVersion: 2
+        x: 566
+        y: 209
+        width: 8
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8bb31ddc139890680800000000000000
+      internalID: -8788342350837367880
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_26
+      rect:
+        serializedVersion: 2
+        x: 404
+        y: 179
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e561cc306c048bc20800000000000000
+      internalID: 3222396752594998878
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_27
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 128
+        width: 32
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8dadd8072806b3220800000000000000
+      internalID: 2466671334265838296
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_28
+      rect:
+        serializedVersion: 2
+        x: 182
+        y: 98
+        width: 68
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8aa41ac63b36109d0800000000000000
+      internalID: -2809855070229673304
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_29
+      rect:
+        serializedVersion: 2
+        x: 353
+        y: 131
+        width: 14
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c8f7f0af0c509c0a0800000000000000
+      internalID: -6860946230935060596
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_30
+      rect:
+        serializedVersion: 2
+        x: 497
+        y: 134
+        width: 14
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 52f639ac5e60ad490800000000000000
+      internalID: -7720851027157356763
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_31
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 92
+        width: 50
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: edfbff568400809a0800000000000000
+      internalID: -6266758570537140258
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_32
+      rect:
+        serializedVersion: 2
+        x: 323
+        y: 116
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6408c9f14ce4c9910800000000000000
+      internalID: 1845436551565967430
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_33
+      rect:
+        serializedVersion: 2
+        x: 338
+        y: 104
+        width: 44
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 026b18a3d8eba4340800000000000000
+      internalID: 4848897462599005728
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_34
+      rect:
+        serializedVersion: 2
+        x: 389
+        y: 116
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d1c34441c378c5cb0800000000000000
+      internalID: -4873872004613915619
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat_attack_hitbox_35
+      rect:
+        serializedVersion: 2
+        x: 485
+        y: 107
+        width: 38
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 602713927ea7f2db0800000000000000
+      internalID: -4814494343388630522
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Bat_attack_hitbox_0: 2693681190407959728
+      Bat_attack_hitbox_1: -1727859111994706397
+      Bat_attack_hitbox_10: 7992160492434332599
+      Bat_attack_hitbox_11: -312971227430286347
+      Bat_attack_hitbox_12: -4979777099415489767
+      Bat_attack_hitbox_13: -2017583699003040963
+      Bat_attack_hitbox_14: 1489896501233373119
+      Bat_attack_hitbox_15: -1358939142734587605
+      Bat_attack_hitbox_16: 5028603716384815736
+      Bat_attack_hitbox_17: 2532367689850824028
+      Bat_attack_hitbox_18: 5689264947135014144
+      Bat_attack_hitbox_19: -8617793634483138628
+      Bat_attack_hitbox_2: -5065818772547812237
+      Bat_attack_hitbox_20: -1897295815201565194
+      Bat_attack_hitbox_21: 7847891365740430956
+      Bat_attack_hitbox_22: 2599802628976531839
+      Bat_attack_hitbox_23: -7760878267715487676
+      Bat_attack_hitbox_24: 6240504226004341498
+      Bat_attack_hitbox_25: -8788342350837367880
+      Bat_attack_hitbox_26: 3222396752594998878
+      Bat_attack_hitbox_27: 2466671334265838296
+      Bat_attack_hitbox_28: -2809855070229673304
+      Bat_attack_hitbox_29: -6860946230935060596
+      Bat_attack_hitbox_3: -8602219770163756601
+      Bat_attack_hitbox_30: -7720851027157356763
+      Bat_attack_hitbox_31: -6266758570537140258
+      Bat_attack_hitbox_32: 1845436551565967430
+      Bat_attack_hitbox_33: 4848897462599005728
+      Bat_attack_hitbox_34: -4873872004613915619
+      Bat_attack_hitbox_35: -4814494343388630522
+      Bat_attack_hitbox_4: 4818493548130256205
+      Bat_attack_hitbox_5: 6721611500269076741
+      Bat_attack_hitbox_6: 5717502752727392752
+      Bat_attack_hitbox_7: 4313779568797441246
+      Bat_attack_hitbox_8: 3613754945932381177
+      Bat_attack_hitbox_9: 4455553160834126476
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

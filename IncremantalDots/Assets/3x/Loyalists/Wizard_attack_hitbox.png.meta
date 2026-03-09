@@ -1,0 +1,1638 @@
+fileFormatVersion: 2
+guid: 39442cbde93fedf40afb31155a223813
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -3864316310627891205
+    second: Wizard_attack_hitbox_0
+  - first:
+      213: -47855245384314104
+    second: Wizard_attack_hitbox_1
+  - first:
+      213: 1554684424519735170
+    second: Wizard_attack_hitbox_2
+  - first:
+      213: 4039277677163536429
+    second: Wizard_attack_hitbox_3
+  - first:
+      213: -3713477273012053759
+    second: Wizard_attack_hitbox_4
+  - first:
+      213: 8235921369511671028
+    second: Wizard_attack_hitbox_5
+  - first:
+      213: -5839155863790868349
+    second: Wizard_attack_hitbox_6
+  - first:
+      213: -3066697011438752034
+    second: Wizard_attack_hitbox_7
+  - first:
+      213: -5021342385216613645
+    second: Wizard_attack_hitbox_8
+  - first:
+      213: -1961866376765137217
+    second: Wizard_attack_hitbox_9
+  - first:
+      213: -1150586725473214421
+    second: Wizard_attack_hitbox_10
+  - first:
+      213: -8318252461088787755
+    second: Wizard_attack_hitbox_11
+  - first:
+      213: 2462045107990271349
+    second: Wizard_attack_hitbox_12
+  - first:
+      213: -8399681168400086873
+    second: Wizard_attack_hitbox_13
+  - first:
+      213: 3792609195829484902
+    second: Wizard_attack_hitbox_14
+  - first:
+      213: -2506894166549734689
+    second: Wizard_attack_hitbox_15
+  - first:
+      213: 852427185517270611
+    second: Wizard_attack_hitbox_16
+  - first:
+      213: -7864195745667403951
+    second: Wizard_attack_hitbox_17
+  - first:
+      213: 8120558825026357968
+    second: Wizard_attack_hitbox_18
+  - first:
+      213: 2433195541095697409
+    second: Wizard_attack_hitbox_19
+  - first:
+      213: -2354791638891913207
+    second: Wizard_attack_hitbox_20
+  - first:
+      213: -3534787525661435446
+    second: Wizard_attack_hitbox_21
+  - first:
+      213: -7699146920669642374
+    second: Wizard_attack_hitbox_22
+  - first:
+      213: -8692458331168126841
+    second: Wizard_attack_hitbox_23
+  - first:
+      213: 3482617459919833927
+    second: Wizard_attack_hitbox_24
+  - first:
+      213: 3051838145351933809
+    second: Wizard_attack_hitbox_25
+  - first:
+      213: 1230340454693319121
+    second: Wizard_attack_hitbox_26
+  - first:
+      213: 954583458114417187
+    second: Wizard_attack_hitbox_27
+  - first:
+      213: -6428977351560689059
+    second: Wizard_attack_hitbox_28
+  - first:
+      213: -884811214423118773
+    second: Wizard_attack_hitbox_29
+  - first:
+      213: -1058637460296557494
+    second: Wizard_attack_hitbox_30
+  - first:
+      213: 865844755174179539
+    second: Wizard_attack_hitbox_31
+  - first:
+      213: -4763628526063171422
+    second: Wizard_attack_hitbox_32
+  - first:
+      213: 4845566594150808936
+    second: Wizard_attack_hitbox_33
+  - first:
+      213: 7459567538237652661
+    second: Wizard_attack_hitbox_34
+  - first:
+      213: -5241044606847024022
+    second: Wizard_attack_hitbox_35
+  - first:
+      213: -5687255008190388147
+    second: Wizard_attack_hitbox_36
+  - first:
+      213: 527073530434049268
+    second: Wizard_attack_hitbox_37
+  - first:
+      213: -5521766322484210341
+    second: Wizard_attack_hitbox_38
+  - first:
+      213: 5520984663299586997
+    second: Wizard_attack_hitbox_39
+  - first:
+      213: -6540150341781256007
+    second: Wizard_attack_hitbox_40
+  - first:
+      213: -4256715365131526234
+    second: Wizard_attack_hitbox_41
+  - first:
+      213: -1131057124818124082
+    second: Wizard_attack_hitbox_42
+  - first:
+      213: 3157177234362979392
+    second: Wizard_attack_hitbox_43
+  - first:
+      213: 8262022534728303808
+    second: Wizard_attack_hitbox_44
+  - first:
+      213: -8096803188587511341
+    second: Wizard_attack_hitbox_45
+  - first:
+      213: 2250009545839391030
+    second: Wizard_attack_hitbox_46
+  - first:
+      213: -719593242109305008
+    second: Wizard_attack_hitbox_47
+  - first:
+      213: -1714847743096600963
+    second: Wizard_attack_hitbox_48
+  - first:
+      213: -5935439311333166037
+    second: Wizard_attack_hitbox_49
+  - first:
+      213: 568211759718985804
+    second: Wizard_attack_hitbox_50
+  - first:
+      213: -3315421709872575160
+    second: Wizard_attack_hitbox_51
+  - first:
+      213: 1057088435248483654
+    second: Wizard_attack_hitbox_52
+  - first:
+      213: 2128778175527158548
+    second: Wizard_attack_hitbox_53
+  - first:
+      213: -8410443668231207719
+    second: Wizard_attack_hitbox_54
+  - first:
+      213: 565665984745713112
+    second: Wizard_attack_hitbox_55
+  - first:
+      213: -4822270434375962957
+    second: Wizard_attack_hitbox_56
+  - first:
+      213: -5597810163395991333
+    second: Wizard_attack_hitbox_57
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_0
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 389
+        width: 14
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bf7c64d1ac03f5ac0800000000000000
+      internalID: -3864316310627891205
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_1
+      rect:
+        serializedVersion: 2
+        x: 83
+        y: 389
+        width: 14
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8039a3a68ebf55ff0800000000000000
+      internalID: -47855245384314104
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_2
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 386
+        width: 11
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 287d45d3f39539510800000000000000
+      internalID: 1554684424519735170
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_3
+      rect:
+        serializedVersion: 2
+        x: 230
+        y: 386
+        width: 11
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d206f7875a56e0830800000000000000
+      internalID: 4039277677163536429
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_4
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 386
+        width: 14
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 10951a45814177cc0800000000000000
+      internalID: -3713477273012053759
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_5
+      rect:
+        serializedVersion: 2
+        x: 371
+        y: 386
+        width: 14
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4f4bacb89dedb4270800000000000000
+      internalID: 8235921369511671028
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_6
+      rect:
+        serializedVersion: 2
+        x: 482
+        y: 359
+        width: 29
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3882b96dda627fea0800000000000000
+      internalID: -5839155863790868349
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_7
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 362
+        width: 14
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: edee07fe057e075d0800000000000000
+      internalID: -3066697011438752034
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_8
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 371
+        width: 11
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3f21d8174bb905ab0800000000000000
+      internalID: -5021342385216613645
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_9
+      rect:
+        serializedVersion: 2
+        x: 65
+        y: 365
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fbe912cbcec06c4e0800000000000000
+      internalID: -1961866376765137217
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_10
+      rect:
+        serializedVersion: 2
+        x: 83
+        y: 371
+        width: 11
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b20a3e0287b4800f0800000000000000
+      internalID: -1150586725473214421
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_11
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 368
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5d2b8c86571af8c80800000000000000
+      internalID: -8318252461088787755
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_12
+      rect:
+        serializedVersion: 2
+        x: 227
+        y: 368
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5759fb23bf0fa2220800000000000000
+      internalID: 2462045107990271349
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_13
+      rect:
+        serializedVersion: 2
+        x: 338
+        y: 365
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7a889f21b765e6b80800000000000000
+      internalID: -8399681168400086873
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_14
+      rect:
+        serializedVersion: 2
+        x: 374
+        y: 365
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 66ddb4138fd02a430800000000000000
+      internalID: 3792609195829484902
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_15
+      rect:
+        serializedVersion: 2
+        x: 206
+        y: 362
+        width: 20
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fdadd41a909b53dd0800000000000000
+      internalID: -2506894166549734689
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_16
+      rect:
+        serializedVersion: 2
+        x: 347
+        y: 359
+        width: 26
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 35694a5420e64db00800000000000000
+      internalID: 852427185517270611
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_17
+      rect:
+        serializedVersion: 2
+        x: 29
+        y: 302
+        width: 17
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 15f2b57b2a3ccd290800000000000000
+      internalID: -7864195745667403951
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_18
+      rect:
+        serializedVersion: 2
+        x: 170
+        y: 302
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0da0c5f0a3502b070800000000000000
+      internalID: 8120558825026357968
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_19
+      rect:
+        serializedVersion: 2
+        x: 311
+        y: 305
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 10cc218f37274c120800000000000000
+      internalID: 2433195541095697409
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_20
+      rect:
+        serializedVersion: 2
+        x: 449
+        y: 269
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 900a9cb0b79125fd0800000000000000
+      internalID: -2354791638891913207
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_21
+      rect:
+        serializedVersion: 2
+        x: 23
+        y: 284
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ac9d7783979e1fec0800000000000000
+      internalID: -3534787525661435446
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_22
+      rect:
+        serializedVersion: 2
+        x: 164
+        y: 281
+        width: 8
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a7181ffdaa2272590800000000000000
+      internalID: -7699146920669642374
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_23
+      rect:
+        serializedVersion: 2
+        x: 305
+        y: 278
+        width: 8
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 788c6d1d33f2e5780800000000000000
+      internalID: -8692458331168126841
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_24
+      rect:
+        serializedVersion: 2
+        x: 29
+        y: 269
+        width: 17
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 74b481bc02eb45030800000000000000
+      internalID: 3482617459919833927
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_25
+      rect:
+        serializedVersion: 2
+        x: 59
+        y: 266
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 17f50b5bf9e4a5a20800000000000000
+      internalID: 3051838145351933809
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_26
+      rect:
+        serializedVersion: 2
+        x: 170
+        y: 269
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1d1b9caff1c031110800000000000000
+      internalID: 1230340454693319121
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_27
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 266
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 322bf59f89c5f3d00800000000000000
+      internalID: 954583458114417187
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_28
+      rect:
+        serializedVersion: 2
+        x: 311
+        y: 269
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d5a8133392fa7c6a0800000000000000
+      internalID: -6428977351560689059
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_29
+      rect:
+        serializedVersion: 2
+        x: 344
+        y: 266
+        width: 11
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b4c270f63e488b3f0800000000000000
+      internalID: -884811214423118773
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_30
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 182
+        width: 17
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a4c1a19b6d6fe41f0800000000000000
+      internalID: -1058637460296557494
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_31
+      rect:
+        serializedVersion: 2
+        x: 251
+        y: 182
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3d2cac6a739140c00800000000000000
+      internalID: 865844755174179539
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_32
+      rect:
+        serializedVersion: 2
+        x: 401
+        y: 185
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2a84616281134edb0800000000000000
+      internalID: -4763628526063171422
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_33
+      rect:
+        serializedVersion: 2
+        x: 482
+        y: 41
+        width: 77
+        height: 152
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 86dbbdbf429ee3340800000000000000
+      internalID: 4845566594150808936
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_34
+      rect:
+        serializedVersion: 2
+        x: 107
+        y: 164
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5beb0be4725b58760800000000000000
+      internalID: 7459567538237652661
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_35
+      rect:
+        serializedVersion: 2
+        x: 260
+        y: 161
+        width: 8
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a6408e4c2b11447b0800000000000000
+      internalID: -5241044606847024022
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_36
+      rect:
+        serializedVersion: 2
+        x: 407
+        y: 158
+        width: 8
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d4820c1d3bfc211b0800000000000000
+      internalID: -5687255008190388147
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_37
+      rect:
+        serializedVersion: 2
+        x: 71
+        y: 146
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4f45808559a805700800000000000000
+      internalID: 527073530434049268
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_38
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 149
+        width: 17
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b551d9709cebe53b0800000000000000
+      internalID: -5521766322484210341
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_39
+      rect:
+        serializedVersion: 2
+        x: 218
+        y: 146
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5bbf952cc4a7e9c40800000000000000
+      internalID: 5520984663299586997
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_40
+      rect:
+        serializedVersion: 2
+        x: 251
+        y: 149
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9b88a745ae7bc35a0800000000000000
+      internalID: -6540150341781256007
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_41
+      rect:
+        serializedVersion: 2
+        x: 365
+        y: 146
+        width: 11
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6af536fadeb1de4c0800000000000000
+      internalID: -4256715365131526234
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_42
+      rect:
+        serializedVersion: 2
+        x: 401
+        y: 149
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ec28a8e998dad40f0800000000000000
+      internalID: -1131057124818124082
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_43
+      rect:
+        serializedVersion: 2
+        x: 65
+        y: 92
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 044d72b97fb80db20800000000000000
+      internalID: 3157177234362979392
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_44
+      rect:
+        serializedVersion: 2
+        x: 206
+        y: 101
+        width: 20
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0c4c0c4a8b998a270800000000000000
+      internalID: 8262022534728303808
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_45
+      rect:
+        serializedVersion: 2
+        x: 338
+        y: 98
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3d1cdff066062af80800000000000000
+      internalID: -8096803188587511341
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_46
+      rect:
+        serializedVersion: 2
+        x: 347
+        y: 104
+        width: 26
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 631bef8c2c3a93f10800000000000000
+      internalID: 2250009545839391030
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_47
+      rect:
+        serializedVersion: 2
+        x: 374
+        y: 98
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 05f9d4542cd7306f0800000000000000
+      internalID: -719593242109305008
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_48
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 83
+        width: 11
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d76c8d43013a338e0800000000000000
+      internalID: -1714847743096600963
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_49
+      rect:
+        serializedVersion: 2
+        x: 83
+        y: 83
+        width: 11
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b24f816c46511ada0800000000000000
+      internalID: -5935439311333166037
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_50
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 92
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c40ff3fb591b2e700800000000000000
+      internalID: 568211759718985804
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_51
+      rect:
+        serializedVersion: 2
+        x: 227
+        y: 92
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 84d4d6e45814df1d0800000000000000
+      internalID: -3315421709872575160
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_52
+      rect:
+        serializedVersion: 2
+        x: 44
+        y: 29
+        width: 11
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 64dc827c4588bae00800000000000000
+      internalID: 1057088435248483654
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_53
+      rect:
+        serializedVersion: 2
+        x: 89
+        y: 29
+        width: 11
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 41386edc870fa8d10800000000000000
+      internalID: 2128778175527158548
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_54
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 35
+        width: 8
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9d445af4b0a184b80800000000000000
+      internalID: -8410443668231207719
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_55
+      rect:
+        serializedVersion: 2
+        x: 233
+        y: 35
+        width: 8
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8dd2a425736a9d700800000000000000
+      internalID: 565665984745713112
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_56
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 38
+        width: 8
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3bee624e69ad31db0800000000000000
+      internalID: -4822270434375962957
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wizard_attack_hitbox_57
+      rect:
+        serializedVersion: 2
+        x: 377
+        y: 38
+        width: 8
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bd8e5ba90559052b0800000000000000
+      internalID: -5597810163395991333
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Wizard_attack_hitbox_0: -3864316310627891205
+      Wizard_attack_hitbox_1: -47855245384314104
+      Wizard_attack_hitbox_10: -1150586725473214421
+      Wizard_attack_hitbox_11: -8318252461088787755
+      Wizard_attack_hitbox_12: 2462045107990271349
+      Wizard_attack_hitbox_13: -8399681168400086873
+      Wizard_attack_hitbox_14: 3792609195829484902
+      Wizard_attack_hitbox_15: -2506894166549734689
+      Wizard_attack_hitbox_16: 852427185517270611
+      Wizard_attack_hitbox_17: -7864195745667403951
+      Wizard_attack_hitbox_18: 8120558825026357968
+      Wizard_attack_hitbox_19: 2433195541095697409
+      Wizard_attack_hitbox_2: 1554684424519735170
+      Wizard_attack_hitbox_20: -2354791638891913207
+      Wizard_attack_hitbox_21: -3534787525661435446
+      Wizard_attack_hitbox_22: -7699146920669642374
+      Wizard_attack_hitbox_23: -8692458331168126841
+      Wizard_attack_hitbox_24: 3482617459919833927
+      Wizard_attack_hitbox_25: 3051838145351933809
+      Wizard_attack_hitbox_26: 1230340454693319121
+      Wizard_attack_hitbox_27: 954583458114417187
+      Wizard_attack_hitbox_28: -6428977351560689059
+      Wizard_attack_hitbox_29: -884811214423118773
+      Wizard_attack_hitbox_3: 4039277677163536429
+      Wizard_attack_hitbox_30: -1058637460296557494
+      Wizard_attack_hitbox_31: 865844755174179539
+      Wizard_attack_hitbox_32: -4763628526063171422
+      Wizard_attack_hitbox_33: 4845566594150808936
+      Wizard_attack_hitbox_34: 7459567538237652661
+      Wizard_attack_hitbox_35: -5241044606847024022
+      Wizard_attack_hitbox_36: -5687255008190388147
+      Wizard_attack_hitbox_37: 527073530434049268
+      Wizard_attack_hitbox_38: -5521766322484210341
+      Wizard_attack_hitbox_39: 5520984663299586997
+      Wizard_attack_hitbox_4: -3713477273012053759
+      Wizard_attack_hitbox_40: -6540150341781256007
+      Wizard_attack_hitbox_41: -4256715365131526234
+      Wizard_attack_hitbox_42: -1131057124818124082
+      Wizard_attack_hitbox_43: 3157177234362979392
+      Wizard_attack_hitbox_44: 8262022534728303808
+      Wizard_attack_hitbox_45: -8096803188587511341
+      Wizard_attack_hitbox_46: 2250009545839391030
+      Wizard_attack_hitbox_47: -719593242109305008
+      Wizard_attack_hitbox_48: -1714847743096600963
+      Wizard_attack_hitbox_49: -5935439311333166037
+      Wizard_attack_hitbox_5: 8235921369511671028
+      Wizard_attack_hitbox_50: 568211759718985804
+      Wizard_attack_hitbox_51: -3315421709872575160
+      Wizard_attack_hitbox_52: 1057088435248483654
+      Wizard_attack_hitbox_53: 2128778175527158548
+      Wizard_attack_hitbox_54: -8410443668231207719
+      Wizard_attack_hitbox_55: 565665984745713112
+      Wizard_attack_hitbox_56: -4822270434375962957
+      Wizard_attack_hitbox_57: -5597810163395991333
+      Wizard_attack_hitbox_6: -5839155863790868349
+      Wizard_attack_hitbox_7: -3066697011438752034
+      Wizard_attack_hitbox_8: -5021342385216613645
+      Wizard_attack_hitbox_9: -1961866376765137217
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

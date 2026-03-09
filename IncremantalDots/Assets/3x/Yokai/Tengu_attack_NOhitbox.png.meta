@@ -1,0 +1,650 @@
+fileFormatVersion: 2
+guid: 65188b27743f68c4e80a5b38a8091f2c
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -7904412785222704951
+    second: Tengu_attack_NOhitbox_0
+  - first:
+      213: 3301881434428259805
+    second: Tengu_attack_NOhitbox_1
+  - first:
+      213: -2938664989121432850
+    second: Tengu_attack_NOhitbox_2
+  - first:
+      213: -7607506352361542909
+    second: Tengu_attack_NOhitbox_3
+  - first:
+      213: 508234401991507808
+    second: Tengu_attack_NOhitbox_4
+  - first:
+      213: -1596710290708666873
+    second: Tengu_attack_NOhitbox_5
+  - first:
+      213: -1318668271308408245
+    second: Tengu_attack_NOhitbox_6
+  - first:
+      213: -7330822546289596585
+    second: Tengu_attack_NOhitbox_7
+  - first:
+      213: 1345854836342154998
+    second: Tengu_attack_NOhitbox_8
+  - first:
+      213: 2925064678895599645
+    second: Tengu_attack_NOhitbox_9
+  - first:
+      213: 3417314627605603327
+    second: Tengu_attack_NOhitbox_10
+  - first:
+      213: 5709178897244072916
+    second: Tengu_attack_NOhitbox_11
+  - first:
+      213: 340009263076292348
+    second: Tengu_attack_NOhitbox_12
+  - first:
+      213: -7442603690927390337
+    second: Tengu_attack_NOhitbox_13
+  - first:
+      213: -6430535372164417391
+    second: Tengu_attack_NOhitbox_14
+  - first:
+      213: -6891106772249101859
+    second: Tengu_attack_NOhitbox_15
+  - first:
+      213: -7508755018740204208
+    second: Tengu_attack_NOhitbox_16
+  - first:
+      213: 2896674365470974688
+    second: Tengu_attack_NOhitbox_17
+  - first:
+      213: -6545590974702618837
+    second: Tengu_attack_NOhitbox_18
+  - first:
+      213: -1937919348127802335
+    second: Tengu_attack_NOhitbox_19
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Tengu_attack_NOhitbox_0
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 623
+        width: 98
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9c0aeb28372ed4290800000000000000
+      internalID: -7904412785222704951
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_NOhitbox_1
+      rect:
+        serializedVersion: 2
+        x: 239
+        y: 623
+        width: 98
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dddbd85aba3a2dd20800000000000000
+      internalID: 3301881434428259805
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_NOhitbox_2
+      rect:
+        serializedVersion: 2
+        x: 431
+        y: 623
+        width: 98
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ee23a8913c3c737d0800000000000000
+      internalID: -2938664989121432850
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_NOhitbox_3
+      rect:
+        serializedVersion: 2
+        x: 623
+        y: 623
+        width: 98
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 30b66f06745bc6690800000000000000
+      internalID: -7607506352361542909
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_NOhitbox_4
+      rect:
+        serializedVersion: 2
+        x: 815
+        y: 623
+        width: 98
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 06f3651fe7c9d0700800000000000000
+      internalID: 508234401991507808
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_NOhitbox_5
+      rect:
+        serializedVersion: 2
+        x: 59
+        y: 431
+        width: 83
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7066919437857d9e0800000000000000
+      internalID: -1596710290708666873
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_NOhitbox_6
+      rect:
+        serializedVersion: 2
+        x: 239
+        y: 431
+        width: 95
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b4a7510a13623bde0800000000000000
+      internalID: -1318668271308408245
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_NOhitbox_7
+      rect:
+        serializedVersion: 2
+        x: 431
+        y: 431
+        width: 95
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 757ebf80cbfa34a90800000000000000
+      internalID: -7330822546289596585
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_NOhitbox_8
+      rect:
+        serializedVersion: 2
+        x: 623
+        y: 431
+        width: 95
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6f66a6fc7df6da210800000000000000
+      internalID: 1345854836342154998
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_NOhitbox_9
+      rect:
+        serializedVersion: 2
+        x: 815
+        y: 431
+        width: 95
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d104d9ae3dae79820800000000000000
+      internalID: 2925064678895599645
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_NOhitbox_10
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 239
+        width: 83
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ff3ad205c8dbc6f20800000000000000
+      internalID: 3417314627605603327
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_NOhitbox_11
+      rect:
+        serializedVersion: 2
+        x: 242
+        y: 239
+        width: 95
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4dba36165f31b3f40800000000000000
+      internalID: 5709178897244072916
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_NOhitbox_12
+      rect:
+        serializedVersion: 2
+        x: 434
+        y: 239
+        width: 95
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cf631029f94f7b400800000000000000
+      internalID: 340009263076292348
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_NOhitbox_13
+      rect:
+        serializedVersion: 2
+        x: 626
+        y: 239
+        width: 95
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f71034e206f86b890800000000000000
+      internalID: -7442603690927390337
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_NOhitbox_14
+      rect:
+        serializedVersion: 2
+        x: 818
+        y: 239
+        width: 95
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1983e82462622c6a0800000000000000
+      internalID: -6430535372164417391
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_NOhitbox_15
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 47
+        width: 98
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dd9bdcab6eedd50a0800000000000000
+      internalID: -6891106772249101859
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_NOhitbox_16
+      rect:
+        serializedVersion: 2
+        x: 239
+        y: 47
+        width: 98
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 05dfe82f71b8bc790800000000000000
+      internalID: -7508755018740204208
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_NOhitbox_17
+      rect:
+        serializedVersion: 2
+        x: 431
+        y: 47
+        width: 98
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0e2a0e7fcfd033820800000000000000
+      internalID: 2896674365470974688
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_NOhitbox_18
+      rect:
+        serializedVersion: 2
+        x: 623
+        y: 47
+        width: 98
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b27f8d340b36925a0800000000000000
+      internalID: -6545590974702618837
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tengu_attack_NOhitbox_19
+      rect:
+        serializedVersion: 2
+        x: 815
+        y: 47
+        width: 98
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 12c5c73de902b15e0800000000000000
+      internalID: -1937919348127802335
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Tengu_attack_NOhitbox_0: -7904412785222704951
+      Tengu_attack_NOhitbox_1: 3301881434428259805
+      Tengu_attack_NOhitbox_10: 3417314627605603327
+      Tengu_attack_NOhitbox_11: 5709178897244072916
+      Tengu_attack_NOhitbox_12: 340009263076292348
+      Tengu_attack_NOhitbox_13: -7442603690927390337
+      Tengu_attack_NOhitbox_14: -6430535372164417391
+      Tengu_attack_NOhitbox_15: -6891106772249101859
+      Tengu_attack_NOhitbox_16: -7508755018740204208
+      Tengu_attack_NOhitbox_17: 2896674365470974688
+      Tengu_attack_NOhitbox_18: -6545590974702618837
+      Tengu_attack_NOhitbox_19: -1937919348127802335
+      Tengu_attack_NOhitbox_2: -2938664989121432850
+      Tengu_attack_NOhitbox_3: -7607506352361542909
+      Tengu_attack_NOhitbox_4: 508234401991507808
+      Tengu_attack_NOhitbox_5: -1596710290708666873
+      Tengu_attack_NOhitbox_6: -1318668271308408245
+      Tengu_attack_NOhitbox_7: -7330822546289596585
+      Tengu_attack_NOhitbox_8: 1345854836342154998
+      Tengu_attack_NOhitbox_9: 2925064678895599645
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
