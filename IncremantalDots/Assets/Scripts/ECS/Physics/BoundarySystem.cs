@@ -49,7 +49,11 @@ namespace DeadWalls
                 switch (zombieState.Value)
                 {
                     case ZombieStateType.Moving:
-                        // Duvara yeterince yaklasti → Attacking
+                        // Duvara ulasti → Attacking
+                        // [DEVRE DISI] stopOffset: Eskiden zombiler wallX + stopOffset'te dururdu.
+                        // Bu, fizik yokken yapay yigilma dagilimi sagliyordu (front-heavy r² × maxDepth).
+                        // Artik custom fizik sistemi var — zombiler birbirine carparak dogal yayiliyor.
+                        // stopOffset hep 0 ataniyor, bu yuzden sadece wallX kontrolu yeterli.
                         if (pos.x <= WallX + stopOffset.Value)
                         {
                             zombieState.Value = ZombieStateType.Attacking;

@@ -39,8 +39,14 @@ namespace DeadWalls
 
     /// <summary>
     /// Zombinin duvara olan durma mesafesi.
-    /// Spawn aninda rastgele atanir (front-heavy dagilim).
     /// pos.x <= wallX + Value olunca Attacking'e gecer.
+    ///
+    /// [DEVRE DISI] Artik hep 0 ataniyor.
+    /// Eski yaklasim: Spawn aninda rastgele atanirdi (front-heavy r² × maxDepth dagilim).
+    /// Fizik sistemi yokken duvar onunde katmanli yigilma taklidi yapiyordu.
+    /// Neden kaldirildi: Custom circle physics (PhysicsCollisionSystem) eklendi.
+    /// Zombiler artik birbirine carparak dogal yayiliyor, yapay offset'e gerek kalmadi.
+    /// Component hala duruyor cunku BoundarySystem referans ediyor (Value=0).
     /// </summary>
     public struct ZombieStopOffset : IComponentData
     {
