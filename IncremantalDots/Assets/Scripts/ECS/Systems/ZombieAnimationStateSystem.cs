@@ -61,6 +61,17 @@ namespace DeadWalls
                         }
                         break;
 
+                    case ZombieStateType.Queued:
+                        // Queued: Yuruyus animasyonu (Moving ile ayni) — saldirmiyor, sadece bekliyor
+                        if (anim.ValueRO.DirectionRow != baseRow)
+                        {
+                            anim.ValueRW.DirectionRow = baseRow;
+                            anim.ValueRW.FrameCount = 4;
+                            anim.ValueRW.CurrentFrame = 0;
+                            anim.ValueRW.FrameTimer = 0f;
+                        }
+                        break;
+
                     case ZombieStateType.Dead:
                         // Die: Row 8-11, 1 frame
                         anim.ValueRW.DirectionRow = baseRow + 8;

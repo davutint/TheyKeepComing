@@ -13,7 +13,7 @@ PhysicsCollisionSystem      → Circle-circle carpisma + momentum transfer
         |
 IntegrateSystem             → velocity += force*dt, position += velocity*dt
         |
-BoundarySystem              → Duvar bariyeri, state transitions, Y siniri
+BoundarySystem              → Duvar bariyeri, domino attacking, state transitions, Y siniri
 ```
 
 ## Carpisma Response
@@ -27,6 +27,14 @@ Iki daire cakistiginda:
 - AgentBody.IsStopped = true → PD locomotion devre disi
 - Pozisyonu tamamen IntegrateSystem yaziyor
 - ApplyMovementForceSystem, PD Force varsa onu kullanir, yoksa Destination'dan yon hesaplar
+
+## Domino Queuing (BoundarySystem)
+Moving zombi, Attacking/Queued bir komsusuna cakisiyorsa **Queued** state'e gecer (saldirmaz, yuruyus animasyonu oynar, sadece bekler).
+- Spatial hash uzerinden 3x3 hucre taranir (ayni grid PhysicsCollisionSystem ile paylasiliyor)
+- Her frame sadece bir katman gecer → zincir halinde yayilir
+- Queued zombi her frame komsu kontrol eder: blocker gitti → Moving'e doner
+- Duvar onunde ic ice girme problemi cozulur — ondeki durdu, arkadaki de durur
+- State akisi: Moving → Queued (domino) → Attacking (duvara ulasinca) veya Moving (blocker gidince)
 
 ## Performans (100K zombi tahmini)
 | Sistem | Karmasiklik | Tahmini |

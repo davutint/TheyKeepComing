@@ -21,7 +21,12 @@ namespace DeadWalls
     {
         Moving,
         Attacking,
-        Dead
+        Dead,
+        /// <summary>
+        /// Domino etkisi: Onundeki Attacking/Queued zombiye cakisan zombi durur ama saldirmaz.
+        /// Onundeki zombi olurse/giderse tekrar Moving'e doner.
+        /// </summary>
+        Queued
     }
 
     public struct ZombieState : IComponentData
