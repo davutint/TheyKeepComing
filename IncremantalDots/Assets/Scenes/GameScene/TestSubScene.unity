@@ -423,8 +423,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: DeadWalls::DeadWalls.GameStateAuthoring
   ClickDamage: 10
   XPToNextLevel: 100
-  StressTestMode: 0
-  SpawnInterval: 10
+  StressTestMode: 1
+  SpawnInterval: -1
   WaveStartDelay: 3
   BaseZombieSpeed: 1.5
 --- !u!4 &1758718858

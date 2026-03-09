@@ -6,7 +6,7 @@ namespace DeadWalls
 {
     [BurstCompile]
     [UpdateInGroup(typeof(SimulationSystemGroup))]
-    [UpdateAfter(typeof(ZombieNavigationSystem))]
+    [UpdateAfter(typeof(BoundarySystem))]
     public partial struct ZombieAttackSystem : ISystem
     {
         [BurstCompile]

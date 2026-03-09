@@ -16,27 +16,38 @@ namespace DeadWalls
             var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
             var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
-            foreach (var (arrow, transform, entity) in
+            var statsLookup = SystemAPI.GetComponentLookup<ZombieStats>(false);
+            var transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
+
+            foreach (var (arrow, arrowTransform, entity) in
                 SystemAPI.Query<RefRO<ArrowProjectile>, RefRO<LocalTransform>>()
                     .WithAll<ArrowTag>()
                     .WithEntityAccess())
             {
-                if (arrow.ValueRO.Target == Entity.Null ||
-                    !state.EntityManager.Exists(arrow.ValueRO.Target))
+                var target = arrow.ValueRO.Target;
+
+                if (target == Entity.Null || !state.EntityManager.Exists(target))
                 {
                     ecb.DestroyEntity(entity);
                     continue;
                 }
 
-                var targetTransform = state.EntityManager.GetComponentData<LocalTransform>(arrow.ValueRO.Target);
-                float dist = math.distance(transform.ValueRO.Position, targetTransform.Position);
+                if (!transformLookup.HasComponent(target))
+                {
+                    ecb.DestroyEntity(entity);
+                    continue;
+                }
+
+                float dist = math.distance(arrowTransform.ValueRO.Position, transformLookup[target].Position);
 
                 if (dist < 0.5f)
                 {
-                    // Hasar uygula
-                    var zombieStats = state.EntityManager.GetComponentData<ZombieStats>(arrow.ValueRO.Target);
-                    zombieStats.CurrentHP -= arrow.ValueRO.Damage;
-                    state.EntityManager.SetComponentData(arrow.ValueRO.Target, zombieStats);
+                    if (statsLookup.HasComponent(target))
+                    {
+                        var zombieStats = statsLookup[target];
+                        zombieStats.CurrentHP -= arrow.ValueRO.Damage;
+                        statsLookup[target] = zombieStats;
+                    }
 
                     ecb.DestroyEntity(entity);
                 }

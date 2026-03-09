@@ -1,23 +1,21 @@
 using Unity.Burst;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 
 namespace DeadWalls
 {
-    [BurstCompile]
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     [UpdateAfter(typeof(ZombieAttackSystem))]
     public partial struct ArcherShootSystem : ISystem
     {
-        [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<ArrowPrefabData>();
             state.RequireForUpdate<GameStateData>();
         }
 
-        [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             var gameState = SystemAPI.GetSingleton<GameStateData>();
@@ -28,6 +26,10 @@ namespace DeadWalls
             var arrowPrefab = SystemAPI.GetSingleton<ArrowPrefabData>().ArrowPrefab;
             var ecb = new EntityCommandBuffer(Unity.Collections.Allocator.Temp);
 
+            var spatialMap = BuildSpatialHashSystem.SpatialMap;
+            var transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
+            var stateLookup = SystemAPI.GetComponentLookup<ZombieState>(true);
+
             foreach (var (archer, archerTransform) in
                 SystemAPI.Query<RefRW<ArcherUnit>, RefRO<LocalTransform>>())
             {
@@ -35,24 +37,62 @@ namespace DeadWalls
                 if (archer.ValueRO.FireTimer > 0f)
                     continue;
 
-                // En yakin zombiyi bul
+                float3 archerPos = archerTransform.ValueRO.Position;
+                float range = archer.ValueRO.Range;
+
                 Entity closestZombie = Entity.Null;
                 float closestDist = float.MaxValue;
-                float3 archerPos = archerTransform.ValueRO.Position;
 
-                foreach (var (zombieState, zombieTransform, zombieEntity) in
-                    SystemAPI.Query<RefRO<ZombieState>, RefRO<LocalTransform>>()
-                        .WithAll<ZombieTag>()
-                        .WithEntityAccess())
+                if (spatialMap.IsCreated && !spatialMap.IsEmpty)
                 {
-                    if (zombieState.ValueRO.Value == ZombieStateType.Dead)
-                        continue;
+                    float cellSize = SpatialHash.DefaultCellSize;
+                    int searchRadius = (int)math.ceil(range / cellSize);
+                    int2 centerCell = SpatialHash.GetCell(archerPos.xy, cellSize);
 
-                    float dist = math.distance(archerPos, zombieTransform.ValueRO.Position);
-                    if (dist < closestDist && dist <= archer.ValueRO.Range)
+                    for (int dx = -searchRadius; dx <= searchRadius; dx++)
                     {
-                        closestDist = dist;
-                        closestZombie = zombieEntity;
+                        for (int dy = -searchRadius; dy <= searchRadius; dy++)
+                        {
+                            int key = SpatialHash.CellToKey(centerCell + new int2(dx, dy));
+
+                            if (!spatialMap.TryGetFirstValue(key, out Entity zombie, out var it))
+                                continue;
+
+                            do
+                            {
+                                if (!transformLookup.HasComponent(zombie) || !stateLookup.HasComponent(zombie))
+                                    continue;
+
+                                if (stateLookup[zombie].Value == ZombieStateType.Dead)
+                                    continue;
+
+                                float dist = math.distance(archerPos, transformLookup[zombie].Position);
+                                if (dist < closestDist && dist <= range)
+                                {
+                                    closestDist = dist;
+                                    closestZombie = zombie;
+                                }
+                            } while (spatialMap.TryGetNextValue(out zombie, ref it));
+                        }
+                    }
+                }
+                else
+                {
+                    // Fallback: spatial hash yoksa brute-force
+                    foreach (var (zombieState, zombieTransform, zombieEntity) in
+                        SystemAPI.Query<RefRO<ZombieState>, RefRO<LocalTransform>>()
+                            .WithAll<ZombieTag>()
+                            .WithEntityAccess())
+                    {
+                        if (zombieState.ValueRO.Value == ZombieStateType.Dead)
+                            continue;
+
+                        float dist = math.distance(archerPos, zombieTransform.ValueRO.Position);
+                        if (dist < closestDist && dist <= range)
+                        {
+                            closestDist = dist;
+                            closestZombie = zombieEntity;
+                        }
                     }
                 }
 
@@ -61,7 +101,6 @@ namespace DeadWalls
 
                 archer.ValueRW.FireTimer = 1f / archer.ValueRO.FireRate;
 
-                // Ok spawn
                 var arrow = ecb.Instantiate(arrowPrefab);
                 ecb.SetComponent(arrow, LocalTransform.FromPosition(archerPos));
                 ecb.SetComponent(arrow, new ArrowProjectile

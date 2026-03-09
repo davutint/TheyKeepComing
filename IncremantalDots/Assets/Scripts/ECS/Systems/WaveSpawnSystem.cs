@@ -122,13 +122,14 @@ namespace DeadWalls
                 ecb.SetComponent(zombie, new ZombieStopOffset { Value = stopOffset });
 
                 // Agents Navigation: hedefe yonlendir
+                // IsStopped=true → ProjectDawn locomotion devre disi, pozisyonu biz yaziyoruz
                 ecb.SetComponent(zombie, new AgentBody
                 {
                     Force = float3.zero,
                     Velocity = float3.zero,
                     Destination = new float3(wallX, spawnY, -1f),
                     RemainingDistance = 0f,
-                    IsStopped = false
+                    IsStopped = true
                 });
 
                 // Crowd Extension: flow field routing icin CrowdGroup'a bagla

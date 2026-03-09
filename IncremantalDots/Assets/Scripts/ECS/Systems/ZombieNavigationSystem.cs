@@ -7,23 +7,15 @@ using Unity.Transforms;
 namespace DeadWalls
 {
     /// <summary>
-    /// Stop-offset bazli durma sistemi.
-    ///
-    /// Moving state:
-    ///   Crowd steering aktif — flow field ile duvara yonlendirilir.
-    ///   pos.x <= wallX + stopOffset olunca → Attacking'e gecer.
-    ///
-    /// Attacking state:
-    ///   Tamamen durdurulmus (IsStopped=true).
-    ///   Duvar bariyeri: zombi duvardan iceri giremez.
-    ///
-    /// Dead state:
-    ///   Hareketi durdur.
+    /// Artik sadece AgentBody senkronizasyonu yapar.
+    /// State transition ve duvar bariyeri BoundarySystem'e taşındı.
+    /// ProjectDawn locomotion devre disi (IsStopped=true) oldugu icin
+    /// bu sistem sadece AgentBody.Destination'i guncel tutar.
     /// </summary>
     [BurstCompile]
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     [UpdateAfter(typeof(WaveSpawnSystem))]
-    [UpdateBefore(typeof(ZombieAttackSystem))]
+    [UpdateBefore(typeof(ApplyMovementForceSystem))]
     public partial struct ZombieNavigationSystem : ISystem
     {
         [BurstCompile]
@@ -37,47 +29,17 @@ namespace DeadWalls
         {
             var wallX = SystemAPI.GetSingleton<WallXPosition>().Value;
 
-            foreach (var (body, zombieState, transform, stopOffset) in
-                SystemAPI.Query<RefRW<AgentBody>, RefRW<ZombieState>, RefRW<LocalTransform>, RefRO<ZombieStopOffset>>()
+            foreach (var (body, zombieState, transform) in
+                SystemAPI.Query<RefRW<AgentBody>, RefRO<ZombieState>, RefRO<LocalTransform>>()
                     .WithAll<ZombieTag>()
                     .WithNone<DeathTimer>())
             {
-                switch (zombieState.ValueRO.Value)
-                {
-                    case ZombieStateType.Moving:
-                        if (transform.ValueRO.Position.x <= wallX + stopOffset.ValueRO.Value)
-                        {
-                            zombieState.ValueRW.Value = ZombieStateType.Attacking;
-                            body.ValueRW.IsStopped = true;
-                            body.ValueRW.Velocity = float3.zero;
-                        }
-                        else if (body.ValueRO.IsStopped)
-                        {
-                            body.ValueRW.IsStopped = false;
-                        }
-                        break;
+                // IsStopped her zaman true — PD locomotion devre disi
+                if (!body.ValueRO.IsStopped)
+                    body.ValueRW.IsStopped = true;
 
-                    case ZombieStateType.Attacking:
-                        if (!body.ValueRO.IsStopped)
-                        {
-                            body.ValueRW.IsStopped = true;
-                            body.ValueRW.Velocity = float3.zero;
-                        }
-
-                        // Duvar bariyeri: zombi duvardan iceri giremez
-                        if (transform.ValueRO.Position.x < wallX)
-                        {
-                            var pos = transform.ValueRO.Position;
-                            pos.x = wallX;
-                            transform.ValueRW.Position = pos;
-                        }
-                        break;
-
-                    case ZombieStateType.Dead:
-                        body.ValueRW.IsStopped = true;
-                        body.ValueRW.Velocity = float3.zero;
-                        break;
-                }
+                // Destination'i guncel tut (CrowdSteering Force hesabi icin)
+                body.ValueRW.Destination = new float3(wallX, transform.ValueRO.Position.y, -1f);
             }
         }
     }

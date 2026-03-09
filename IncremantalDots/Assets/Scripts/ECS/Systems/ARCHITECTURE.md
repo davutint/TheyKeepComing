@@ -3,28 +3,63 @@
 ## Calisma Sirasi (UpdateOrder)
 ```
 SimulationSystemGroup icinde:
-1. WaveSpawnSystem       — Zombi spawn
-2. ZombieMoveSystem      — Hareket (WaveSpawnSystem'den sonra)
-3. ZombieAttackSystem    — Duvar/kapi/kale hasar (ZombieMoveSystem'den sonra)
-4. ArcherShootSystem     — Ok firlat (ZombieAttackSystem'den sonra)
-5. ArrowMoveSystem       — Ok hareket (ArcherShootSystem'den sonra)
-6. ArrowHitSystem        — Ok isabet + hasar (ArrowMoveSystem'den sonra)
-7. ZombieDeathSystem     — HP<=0 isaretleme (ArrowHitSystem'den sonra)
-8. DamageCleanupSystem   — Temizlik + gold/XP (ZombieDeathSystem'den sonra)
+ 1. WaveSpawnSystem              — Zombi spawn + PhysicsBody set
+ 2. ZombieNavigationSystem       — AgentBody.Destination sync
+ 3. ApplyMovementForceSystem  *  — Hedefe dogru kuvvet → PhysicsBody.Force
+ 4. BuildSpatialHashSystem    *  — Pozisyonlari hash grid'e yaz
+ 5. PhysicsCollisionSystem    *  — Circle-circle carpisma + momentum transfer
+ 6. IntegrateSystem           *  — velocity += force*dt, pos += vel*dt, damping
+ 7. BoundarySystem            *  — Duvar bariyeri, state transition, Y siniri
+ 8. ZombieAttackSystem           — Duvar/kapi/kale hasar
+ 9. ArcherShootSystem            — Spatial hash ile en yakin zombi, ok firlat
+10. ArrowMoveSystem              — Ok hareket
+11. ArrowHitSystem               — Ok isabet + hasar
+12. ClickDamageSystem         *  — Spatial hash ile click damage
+13. ZombieDeathSystem            — HP<=0 → Dead state
+14. ZombieAnimationStateSystem   — Sprite animasyon guncelle
+15. DamageCleanupSystem          — DeathTimer, gold/XP, entity sil
+
+* = Yeni fizik sistemleri
 ```
 
 ## System Detaylari
 
 ### WaveSpawnSystem
 - WaveStateData singleton'dan dalga bilgilerini okur
-- SpawnTimer ile periyodik zombi spawn
-- ZombiPrefabData'dan prefab klonlar
-- Wave bittikten sonra yeni wave baslatir
+- SpawnTimer ile periyodik zombi spawn (batch 20)
+- AgentBody.IsStopped = true (PD locomotion devre disi)
+- PhysicsBody + CollisionRadius component'lari eklenir
 
-### ZombieMoveSystem
-- Burstable IJobEntity ile paralel calisir
-- Moving state'deki zombileri sola hareket ettirir
-- WallX'e ulasinca Attacking state'e gecer
+### ZombieNavigationSystem
+- AgentBody.Destination'i guncel tutar (CrowdSteering Force hesabi icin)
+- IsStopped her zaman true — PD pozisyon yazmaz
+- State transition ve duvar bariyeri BoundarySystem'e tasindi
+
+### ApplyMovementForceSystem (FIZIK)
+- Moving zombilere hedefe dogru kuvvet uygular
+- Oncelik: PD Force > Destination yonu > fallback (-1,0)
+- Attacking/Dead → kuvvet sifir
+
+### BuildSpatialHashSystem (FIZIK)
+- NativeParallelMultiHashMap<int, Entity> rebuild eder
+- Paralel HashJob ile O(n) performans
+- Static field uzerinden diger sistemler erisiyor
+
+### PhysicsCollisionSystem (FIZIK)
+- Spatial hash ile broadphase (3x3 komsu hucre)
+- Circle-circle overlap test + pozisyon duzeltme + velocity impulse
+- Paralel: her entity sadece kendini gunceller
+
+### IntegrateSystem (FIZIK)
+- Semi-implicit Euler: velocity += force/mass*dt, pos += vel*dt
+- Damping: velocity *= (1 - damping*dt)
+- Force sifirlanir (sonraki frame icin)
+
+### BoundarySystem (FIZIK)
+- Moving → Attacking: pos.x <= wallX + stopOffset
+- Duvar bariyeri: pos.x clamp
+- Dead: velocity + force sifir
+- Y siniri: -15 ile +15 arasi
 
 ### ZombieAttackSystem
 - Attacking state'deki zombiler duvar/kapi/kale'ye hasar verir
@@ -32,22 +67,30 @@ SimulationSystemGroup icinde:
 - CastleHP 0 olunca GameOver isaretler
 
 ### ArcherShootSystem
-- Okcularin fire timer'ini gunceller
-- En yakin zombiyi hedef secer
-- ArrowPrefabData'dan ok spawn eder
+- Spatial hash ile en yakin zombiyi bulur (brute-force fallback var)
+- Fire timer'a gore ok spawn eder
 
 ### ArrowMoveSystem
 - Oklari hedeflerine dogru hareket ettirir
 - Hedef olmusse oku yok eder
 
 ### ArrowHitSystem
-- Oklar hedefe yeterince yaklasmisssa hasar uygular ve oku yok eder
+- ComponentLookup ile hedef kontrolu (Burst-uyumlu)
+- Mesafe < 0.5 → hasar uygula, oku sil
+
+### ClickDamageSystem (YENI)
+- ClickDamageRequest entity'lerini isler
+- Spatial hash ile en yakin zombiyi bulur
+- Hasar uygular, request entity'sini siler
 
 ### ZombieDeathSystem
 - HP <= 0 olan zombileri Dead state'e gecirir
 
+### ZombieAnimationStateSystem
+- State'e gore sprite animasyon satirini degistirir
+- Dead → DeathTimer ekler
+
 ### DamageCleanupSystem
-- Dead zombileri entity olarak siler
-- Gold ve XP ekler
-- Wave alive sayisini dusurur
-- Level up kontrolu yapar
+- DeathTimer geri sayar
+- Timer bitince: gold/XP + entity sil
+- Level up kontrolu

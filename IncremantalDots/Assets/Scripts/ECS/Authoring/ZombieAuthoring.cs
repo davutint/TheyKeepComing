@@ -1,4 +1,5 @@
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace DeadWalls
@@ -11,6 +12,8 @@ namespace DeadWalls
         public float AttackCooldown = 1f;
         public int GoldReward = 5;
         public int XPReward = 10;
+        public float CollisionRadius = 0.15f;
+        public float PhysicsDamping = 3f;
 
         public class Baker : Baker<ZombieAuthoring>
         {
@@ -35,6 +38,14 @@ namespace DeadWalls
                     Value = ZombieStateType.Moving
                 });
                 AddComponent(entity, new ZombieStopOffset { Value = 0f });
+                AddComponent(entity, new PhysicsBody
+                {
+                    Velocity = float2.zero,
+                    Force = float2.zero,
+                    Mass = 1f,
+                    Damping = authoring.PhysicsDamping
+                });
+                AddComponent(entity, new CollisionRadius { Value = authoring.CollisionRadius });
             }
         }
     }
