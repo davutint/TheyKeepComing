@@ -12,10 +12,15 @@ namespace DeadWalls
     public partial struct BuildSpatialHashSystem : ISystem
     {
         public static NativeParallelMultiHashMap<int, Entity> SpatialMap;
+        private EntityQuery _zombieQuery;
 
         public void OnCreate(ref SystemState state)
         {
             SpatialMap = new NativeParallelMultiHashMap<int, Entity>(1024, Allocator.Persistent);
+            _zombieQuery = SystemAPI.QueryBuilder()
+                .WithAll<ZombieTag, LocalTransform, PhysicsBody>()
+                .WithNone<DeathTimer>()
+                .Build();
             state.RequireForUpdate<ZombieTag>();
         }
 
@@ -27,12 +32,7 @@ namespace DeadWalls
 
         public void OnUpdate(ref SystemState state)
         {
-            var query = SystemAPI.QueryBuilder()
-                .WithAll<ZombieTag, LocalTransform, PhysicsBody>()
-                .WithNone<DeathTimer>()
-                .Build();
-
-            int count = query.CalculateEntityCount();
+            int count = _zombieQuery.CalculateEntityCount();
             if (count == 0)
             {
                 SpatialMap.Clear();
@@ -54,7 +54,7 @@ namespace DeadWalls
             {
                 CellSize = SpatialHash.DefaultCellSize,
                 Map = SpatialMap.AsParallelWriter()
-            }.ScheduleParallel(query, state.Dependency).Complete();
+            }.ScheduleParallel(_zombieQuery, state.Dependency).Complete();
         }
 
         [BurstCompile]

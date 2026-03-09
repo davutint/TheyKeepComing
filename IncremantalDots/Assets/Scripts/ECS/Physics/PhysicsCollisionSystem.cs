@@ -28,7 +28,6 @@ namespace DeadWalls
                 CellSize = SpatialHash.DefaultCellSize,
                 SpatialMap = spatialMap,
                 TransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true),
-                PhysicsLookup = SystemAPI.GetComponentLookup<PhysicsBody>(true),
                 RadiusLookup = SystemAPI.GetComponentLookup<CollisionRadius>(true)
             }.ScheduleParallel();
         }
@@ -40,7 +39,6 @@ namespace DeadWalls
 
             [ReadOnly] public NativeParallelMultiHashMap<int, Entity> SpatialMap;
             [ReadOnly] [NativeDisableContainerSafetyRestriction] public ComponentLookup<LocalTransform> TransformLookup;
-            [ReadOnly] [NativeDisableContainerSafetyRestriction] public ComponentLookup<PhysicsBody> PhysicsLookup;
             [ReadOnly] public ComponentLookup<CollisionRadius> RadiusLookup;
 
             void Execute(
@@ -51,11 +49,7 @@ namespace DeadWalls
             {
                 float2 myPos = transform.Position.xy;
                 float myRadius = radius.Value;
-                float2 myVel = body.Velocity;
-                float myMass = body.Mass;
-
                 float2 totalPosCorrection = float2.zero;
-                float2 totalVelImpulse = float2.zero;
                 int collisionCount = 0;
 
                 int2 myCell = SpatialHash.GetCell(myPos, CellSize);
@@ -95,35 +89,26 @@ namespace DeadWalls
 
                             // Yumusak pozisyon duzeltme (0.3 = yavas iteratif cozum)
                             totalPosCorrection += normal * overlap * 0.3f;
-
                             collisionCount++;
-                            // Max 8 carpisma isle — yigilmada patlama onle
-                            if (collisionCount >= 8)
-                                goto done;
 
                         } while (SpatialMap.TryGetNextValue(out other, ref it));
                     }
                 }
 
-                done:
+                // Cok fazla carpisma varsa duzeltmeyi olcekle (yigin icinde esit dagitim)
+                if (collisionCount > 6)
+                    totalPosCorrection *= 6f / collisionCount;
 
-                // Toplam duzeltmeleri sinirla — patlama onleme
+                // Toplam duzeltmeyi sinirla — patlama onleme
                 float maxCorrection = myRadius * 2f;
                 float corrLen = math.length(totalPosCorrection);
                 if (corrLen > maxCorrection)
                     totalPosCorrection = totalPosCorrection / corrLen * maxCorrection;
 
-                float maxImpulse = 5f;
-                float impLen = math.length(totalVelImpulse);
-                if (impLen > maxImpulse)
-                    totalVelImpulse = totalVelImpulse / impLen * maxImpulse;
-
                 var pos = transform.Position;
                 pos.x += totalPosCorrection.x;
                 pos.y += totalPosCorrection.y;
                 transform.Position = pos;
-
-                body.Velocity += totalVelImpulse;
             }
         }
     }
