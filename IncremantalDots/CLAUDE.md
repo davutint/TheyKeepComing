@@ -36,7 +36,7 @@ Assets/Scripts/
 - Component: sade data, logic yok
 - System: tek sorumluluk, `IJobEntity` ile parallel
 - `ComponentLookup` ile komsu okuma: `[ReadOnly] [NativeDisableContainerSafetyRestriction]`
-- Spatial hash: `BuildSpatialHashSystem.SpatialMap` (NativeParallelMultiHashMap, her frame yeniden olusur)
+- Spatial hash: `BuildSpatialHashSystem.ReadMap` / `WriteMap` (double-buffered NativeParallelMultiHashMap)
 
 ## Mimari Ozet
 

@@ -1,4 +1,6 @@
 using Unity.Burst;
+using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -13,43 +15,49 @@ namespace DeadWalls
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
-            var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
-
-            var statsLookup = SystemAPI.GetComponentLookup<ZombieStats>(false);
-            var transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
-
-            foreach (var (arrow, arrowTransform, entity) in
-                SystemAPI.Query<RefRO<ArrowProjectile>, RefRO<LocalTransform>>()
-                    .WithAll<ArrowTag>()
-                    .WithEntityAccess())
+            new ArrowHitJob
             {
-                var target = arrow.ValueRO.Target;
+                StatsLookup = SystemAPI.GetComponentLookup<ZombieStats>(false),
+                TransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true),
+                ECB = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>()
+                    .CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter()
+            }.ScheduleParallel();
+        }
 
-                if (target == Entity.Null || !state.EntityManager.Exists(target))
+        [BurstCompile]
+        [WithAll(typeof(ArrowTag))]
+        partial struct ArrowHitJob : IJobEntity
+        {
+            [NativeDisableContainerSafetyRestriction]
+            public ComponentLookup<ZombieStats> StatsLookup;
+
+            [ReadOnly] public ComponentLookup<LocalTransform> TransformLookup;
+
+            public EntityCommandBuffer.ParallelWriter ECB;
+
+            void Execute(Entity entity, [ChunkIndexInQuery] int sortKey,
+                in ArrowProjectile arrow, in LocalTransform arrowTransform)
+            {
+                var target = arrow.Target;
+
+                if (target == Entity.Null || !TransformLookup.HasComponent(target))
                 {
-                    ecb.DestroyEntity(entity);
-                    continue;
+                    ECB.DestroyEntity(sortKey, entity);
+                    return;
                 }
 
-                if (!transformLookup.HasComponent(target))
-                {
-                    ecb.DestroyEntity(entity);
-                    continue;
-                }
-
-                float dist = math.distance(arrowTransform.ValueRO.Position, transformLookup[target].Position);
+                float dist = math.distance(arrowTransform.Position, TransformLookup[target].Position);
 
                 if (dist < 0.5f)
                 {
-                    if (statsLookup.HasComponent(target))
+                    if (StatsLookup.HasComponent(target))
                     {
-                        var zombieStats = statsLookup[target];
-                        zombieStats.CurrentHP -= arrow.ValueRO.Damage;
-                        statsLookup[target] = zombieStats;
+                        var zombieStats = StatsLookup[target];
+                        zombieStats.CurrentHP -= arrow.Damage;
+                        StatsLookup[target] = zombieStats;
                     }
 
-                    ecb.DestroyEntity(entity);
+                    ECB.DestroyEntity(sortKey, entity);
                 }
             }
         }

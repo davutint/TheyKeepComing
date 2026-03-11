@@ -19,9 +19,7 @@ namespace DeadWalls
 
         public void OnUpdate(ref SystemState state)
         {
-            var spatialMap = BuildSpatialHashSystem.SpatialMap;
-            if (!spatialMap.IsCreated || spatialMap.IsEmpty)
-                return;
+            var spatialMap = BuildSpatialHashSystem.ReadMap;
 
             new CollisionJob
             {

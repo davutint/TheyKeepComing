@@ -7,11 +7,11 @@ namespace DeadWalls
     /// Zombi state degistiginde sprite animasyonunu gunceller.
     ///
     /// Vampire_atlas.png layout (4 col x 12 row):
-    ///   Row 0-3:  Walk (4 frame/yon)  ← Moving state
-    ///   Row 4-7:  Hit  (2 frame/yon)  ← Attacking state
-    ///   Row 8-11: Die  (1 frame/yon)  ← Dead state
+    ///   Row 0-3:  Walk (4 frame/yon)  <- Moving state
+    ///   Row 4-7:  Hit  (2 frame/yon)  <- Attacking state
+    ///   Row 8-11: Die  (1 frame/yon)  <- Dead state
     ///
-    /// Zombi sola bakar → base DirectionRow = 1 (Left)
+    /// Zombi sola bakar -> base DirectionRow = 1 (Left)
     ///   Walk Left = Row 1
     ///   Hit Left  = Row 5  (+4)
     ///   Die Left  = Row 9  (+8)
@@ -19,73 +19,79 @@ namespace DeadWalls
     [BurstCompile]
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     [UpdateAfter(typeof(ZombieDeathSystem))]
-    [UpdateBefore(typeof(DamageCleanupSystem))]
+    [UpdateBefore(typeof(DamageApplySystem))]
     public partial struct ZombieAnimationStateSystem : ISystem
     {
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            var ecb = new EntityCommandBuffer(Unity.Collections.Allocator.Temp);
+            new AnimationStateJob
+            {
+                ECB = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>()
+                    .CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter()
+            }.ScheduleParallel();
+        }
 
-            foreach (var (zombieState, anim, entity) in
-                SystemAPI.Query<RefRO<ZombieState>, RefRW<SpriteAnimation>>()
-                    .WithAll<ZombieTag>()
-                    .WithNone<DeathTimer>()
-                    .WithEntityAccess())
+        [BurstCompile]
+        [WithAll(typeof(ZombieTag))]
+        [WithNone(typeof(DeathTimer))]
+        partial struct AnimationStateJob : IJobEntity
+        {
+            public EntityCommandBuffer.ParallelWriter ECB;
+
+            void Execute(Entity entity, [ChunkIndexInQuery] int sortKey,
+                in ZombieState zombieState, ref SpriteAnimation anim)
             {
                 // Walk base row (0-3 arasi, zombi icin 1=Left)
-                int baseRow = anim.ValueRO.DirectionRow % 4;
+                int baseRow = anim.DirectionRow % 4;
 
-                switch (zombieState.ValueRO.Value)
+                switch (zombieState.Value)
                 {
                     case ZombieStateType.Moving:
                         // Walk: Row 0-3, 4 frame
-                        if (anim.ValueRO.DirectionRow != baseRow)
+                        if (anim.DirectionRow != baseRow)
                         {
-                            anim.ValueRW.DirectionRow = baseRow;
-                            anim.ValueRW.FrameCount = 4;
-                            anim.ValueRW.CurrentFrame = 0;
-                            anim.ValueRW.FrameTimer = 0f;
+                            anim.DirectionRow = baseRow;
+                            anim.FrameCount = 4;
+                            anim.CurrentFrame = 0;
+                            anim.FrameTimer = 0f;
                         }
                         break;
 
                     case ZombieStateType.Attacking:
                         // Hit: Row 4-7, 2 frame
                         int hitRow = baseRow + 4;
-                        if (anim.ValueRO.DirectionRow != hitRow)
+                        if (anim.DirectionRow != hitRow)
                         {
-                            anim.ValueRW.DirectionRow = hitRow;
-                            anim.ValueRW.FrameCount = 2;
-                            anim.ValueRW.CurrentFrame = 0;
-                            anim.ValueRW.FrameTimer = 0f;
+                            anim.DirectionRow = hitRow;
+                            anim.FrameCount = 2;
+                            anim.CurrentFrame = 0;
+                            anim.FrameTimer = 0f;
                         }
                         break;
 
                     case ZombieStateType.Queued:
-                        // Queued: Yuruyus animasyonu (Moving ile ayni) — saldirmiyor, sadece bekliyor
-                        if (anim.ValueRO.DirectionRow != baseRow)
+                        // Queued: Yuruyus animasyonu (Moving ile ayni)
+                        if (anim.DirectionRow != baseRow)
                         {
-                            anim.ValueRW.DirectionRow = baseRow;
-                            anim.ValueRW.FrameCount = 4;
-                            anim.ValueRW.CurrentFrame = 0;
-                            anim.ValueRW.FrameTimer = 0f;
+                            anim.DirectionRow = baseRow;
+                            anim.FrameCount = 4;
+                            anim.CurrentFrame = 0;
+                            anim.FrameTimer = 0f;
                         }
                         break;
 
                     case ZombieStateType.Dead:
                         // Die: Row 8-11, 1 frame
-                        anim.ValueRW.DirectionRow = baseRow + 8;
-                        anim.ValueRW.FrameCount = 1;
-                        anim.ValueRW.CurrentFrame = 0;
-                        anim.ValueRW.FrameTimer = 0f;
+                        anim.DirectionRow = baseRow + 8;
+                        anim.FrameCount = 1;
+                        anim.CurrentFrame = 0;
+                        anim.FrameTimer = 0f;
 
-                        ecb.AddComponent(entity, new DeathTimer { Value = 0.5f });
+                        ECB.AddComponent(sortKey, entity, new DeathTimer { Value = 0.5f });
                         break;
                 }
             }
-
-            ecb.Playback(state.EntityManager);
-            ecb.Dispose();
         }
     }
 }

@@ -1,65 +1,62 @@
 using Unity.Burst;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 
 namespace DeadWalls
 {
-    [BurstCompile]
+    /// <summary>
+    /// Attacking state'deki zombilerin saldiris timer'ini isler.
+    /// Timer dolunca hasar NativeQueue'ya yazilir (main thread beklemez).
+    /// Hasar DamageApplySystem'de uygulanir.
+    /// </summary>
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     [UpdateAfter(typeof(BoundarySystem))]
-    public partial struct ZombieAttackSystem : ISystem
+    public partial struct ZombieAttackTimerSystem : ISystem
     {
-        [BurstCompile]
+        // Static field: DamageApplySystem bu queue'yu okur
+        // [BurstCompile] struct'tan kaldirildi — static field erisimi
+        public static NativeQueue<float> DamageQueue;
+
         public void OnCreate(ref SystemState state)
         {
+            DamageQueue = new NativeQueue<float>(Allocator.Persistent);
             state.RequireForUpdate<WallSegment>();
-            state.RequireForUpdate<GameStateData>();
+        }
+
+        public void OnDestroy(ref SystemState state)
+        {
+            if (DamageQueue.IsCreated)
+                DamageQueue.Dispose();
+        }
+
+        public void OnUpdate(ref SystemState state)
+        {
+            DamageQueue.Clear();
+
+            new AttackTimerJob
+            {
+                Dt = SystemAPI.Time.DeltaTime,
+                DamageWriter = DamageQueue.AsParallelWriter()
+            }.ScheduleParallel();
         }
 
         [BurstCompile]
-        public void OnUpdate(ref SystemState state)
+        [WithAll(typeof(ZombieTag))]
+        partial struct AttackTimerJob : IJobEntity
         {
-            float dt = SystemAPI.Time.DeltaTime;
+            public float Dt;
+            public NativeQueue<float>.ParallelWriter DamageWriter;
 
-            var wallEntity = SystemAPI.GetSingletonEntity<WallSegment>();
-            var wall = SystemAPI.GetComponentRW<WallSegment>(wallEntity);
-            var gate = SystemAPI.GetComponentRW<GateComponent>(wallEntity);
-            var castle = SystemAPI.GetComponentRW<CastleHP>(wallEntity);
-
-            foreach (var (stats, zombieState) in
-                SystemAPI.Query<RefRW<ZombieStats>, RefRO<ZombieState>>()
-                    .WithAll<ZombieTag>())
+            void Execute(ref ZombieStats stats, in ZombieState state)
             {
-                if (zombieState.ValueRO.Value != ZombieStateType.Attacking)
-                    continue;
+                if (state.Value != ZombieStateType.Attacking) return;
 
-                stats.ValueRW.AttackTimer -= dt;
-                if (stats.ValueRW.AttackTimer > 0f)
-                    continue;
+                stats.AttackTimer -= Dt;
+                if (stats.AttackTimer > 0f) return;
 
-                stats.ValueRW.AttackTimer = stats.ValueRO.AttackCooldown;
-                float damage = stats.ValueRO.AttackDamage;
-
-                // Oncelik: Duvar → Kapi → Kale
-                if (wall.ValueRO.CurrentHP > 0f)
-                {
-                    wall.ValueRW.CurrentHP = math.max(0f, wall.ValueRO.CurrentHP - damage);
-                }
-                else if (gate.ValueRO.CurrentHP > 0f)
-                {
-                    gate.ValueRW.CurrentHP = math.max(0f, gate.ValueRO.CurrentHP - damage);
-                }
-                else
-                {
-                    castle.ValueRW.CurrentHP = math.max(0f, castle.ValueRO.CurrentHP - damage);
-                }
-            }
-
-            // Game Over kontrolu
-            if (castle.ValueRO.CurrentHP <= 0f)
-            {
-                var gameState = SystemAPI.GetSingletonRW<GameStateData>();
-                gameState.ValueRW.IsGameOver = true;
+                stats.AttackTimer = stats.AttackCooldown;
+                DamageWriter.Enqueue(stats.AttackDamage);
             }
         }
     }

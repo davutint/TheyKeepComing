@@ -1,4 +1,6 @@
 using Unity.Burst;
+using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -7,42 +9,53 @@ namespace DeadWalls
 {
     [BurstCompile]
     [UpdateInGroup(typeof(SimulationSystemGroup))]
-    [UpdateAfter(typeof(ArcherShootSystem))]
+    [UpdateAfter(typeof(ZombieAttackTimerSystem))]
     public partial struct ArrowMoveSystem : ISystem
     {
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            float dt = SystemAPI.Time.DeltaTime;
-            var ecb = new EntityCommandBuffer(Unity.Collections.Allocator.Temp);
+            new ArrowMoveJob
+            {
+                Dt = SystemAPI.Time.DeltaTime,
+                TransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true),
+                ECB = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>()
+                    .CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter()
+            }.ScheduleParallel();
+        }
 
-            foreach (var (arrow, transform, entity) in
-                SystemAPI.Query<RefRO<ArrowProjectile>, RefRW<LocalTransform>>()
-                    .WithAll<ArrowTag>()
-                    .WithEntityAccess())
+        [BurstCompile]
+        [WithAll(typeof(ArrowTag))]
+        partial struct ArrowMoveJob : IJobEntity
+        {
+            public float Dt;
+
+            [ReadOnly] [NativeDisableContainerSafetyRestriction]
+            public ComponentLookup<LocalTransform> TransformLookup;
+
+            public EntityCommandBuffer.ParallelWriter ECB;
+
+            void Execute(Entity entity, [ChunkIndexInQuery] int sortKey,
+                in ArrowProjectile arrow, ref LocalTransform transform)
             {
                 // Hedef hala var mi?
-                if (arrow.ValueRO.Target == Entity.Null ||
-                    !state.EntityManager.Exists(arrow.ValueRO.Target))
+                if (arrow.Target == Entity.Null || !TransformLookup.HasComponent(arrow.Target))
                 {
-                    ecb.DestroyEntity(entity);
-                    continue;
+                    ECB.DestroyEntity(sortKey, entity);
+                    return;
                 }
 
-                var targetTransform = state.EntityManager.GetComponentData<LocalTransform>(arrow.ValueRO.Target);
-                float3 direction = math.normalize(targetTransform.Position - transform.ValueRO.Position);
-                transform.ValueRW.Position += direction * arrow.ValueRO.Speed * dt;
+                float3 targetPos = TransformLookup[arrow.Target].Position;
+                float3 direction = math.normalize(targetPos - transform.Position);
+                transform.Position += direction * arrow.Speed * Dt;
 
                 // Yon hesaplasindan rotation
                 if (math.lengthsq(direction) > 0.001f)
                 {
                     float angle = math.atan2(direction.y, direction.x);
-                    transform.ValueRW.Rotation = quaternion.Euler(0f, 0f, angle);
+                    transform.Rotation = quaternion.Euler(0f, 0f, angle);
                 }
             }
-
-            ecb.Playback(state.EntityManager);
-            ecb.Dispose();
         }
     }
 }

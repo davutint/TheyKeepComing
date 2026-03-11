@@ -14,7 +14,7 @@ namespace DeadWalls
     /// </summary>
     [BurstCompile]
     [UpdateInGroup(typeof(SimulationSystemGroup))]
-    [UpdateAfter(typeof(ZombieAnimationStateSystem))]
+    [UpdateAfter(typeof(DamageApplySystem))]
     public partial struct DamageCleanupSystem : ISystem
     {
         [BurstCompile]

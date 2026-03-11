@@ -7,7 +7,8 @@ namespace DeadWalls
 {
     [BurstCompile]
     [UpdateInGroup(typeof(SimulationSystemGroup))]
-    [UpdateAfter(typeof(ZombieAttackSystem))]
+    [UpdateAfter(typeof(WaveSpawnSystem))]
+    [UpdateBefore(typeof(ZombieNavigationSystem))]
     public partial struct ArcherShootSystem : ISystem
     {
         public void OnCreate(ref SystemState state)

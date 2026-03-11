@@ -11,12 +11,22 @@ namespace DeadWalls
     [UpdateBefore(typeof(ZombieDeathSystem))]
     public partial struct ClickDamageSystem : ISystem
     {
+        public void OnCreate(ref SystemState state)
+        {
+            // ClickDamageRequest yoksa OnUpdate cagrilmaz → sync tetiklenmez
+            state.RequireForUpdate<ClickDamageRequest>();
+        }
+
         public void OnUpdate(ref SystemState state)
         {
+            // Sequential sistem — pending job'lari tamamla (BoundaryJob, ArrowMoveJob → LocalTransform yaziyorlar)
+            // RequireForUpdate<ClickDamageRequest> sayesinde sadece click frame'lerinde calisir (~%2)
+            state.CompleteDependency();
+
             var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
             var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
-            var spatialMap = BuildSpatialHashSystem.SpatialMap;
+            var spatialMap = BuildSpatialHashSystem.ReadMap;
             var transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
             var statsLookup = SystemAPI.GetComponentLookup<ZombieStats>(false);
             var stateLookup = SystemAPI.GetComponentLookup<ZombieState>(true);

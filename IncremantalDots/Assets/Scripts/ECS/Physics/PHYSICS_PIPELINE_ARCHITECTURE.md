@@ -7,20 +7,30 @@
 ```
 ApplyMovementForceSystem    → Zombiye hedefe dogru kuvvet uygula
         |
-BuildSpatialHashSystem      → Tum pozisyonlari hash grid'e yaz
+BuildSpatialHashSystem      → Double-buffered: WriteMap'e hash yaz, consumer'lar ReadMap okur
         |
-PhysicsCollisionSystem      → Circle-circle carpisma + momentum transfer
+PhysicsCollisionSystem      → Circle-circle carpisma + momentum transfer (ReadMap kullanir)
         |
 IntegrateSystem             → velocity += force*dt, position += velocity*dt
         |
-BoundarySystem              → Duvar bariyeri, domino attacking, state transitions, Y siniri
+BoundarySystem              → Duvar bariyeri, domino attacking, state transitions (ReadMap kullanir)
 ```
+
+## Double Buffer (BuildSpatialHashSystem)
+```
+ReadMap  ← onceki frame'in verisi, consumer'lar (Collision, Boundary, ClickDamage) okur
+WriteMap ← bu frame'de ClearMapJob + HashJob doldurur
+Her frame: swap(ReadMap, WriteMap) → .Complete() YOK → main thread bloklanmaz
+```
+- `state.Dependency = hashJobHandle` → ECS component dependency zinciri korunur
+- 1-frame-old spatial data: max pozisyon hatasi %14 radius, soft correction halleder
+- Nadir capacity resize: count > Capacity/2 ise rebuild (oyun boyunca 5-10 kez)
 
 ## Carpisma Response
 Iki daire cakistiginda:
 1. **Pozisyon duzeltme**: Her iki cisim overlap/2 kadar birbirinden itilir
 2. **Velocity impulse (momentum)**: Momentum transfer — arkadaki ondekine hizini aktarir
-3. **Velocity impulse (overlap)**: `body.Velocity += normal * overlap * 2.0f` — overlap kaliciligi azaltir, cisimleri daha hizli ayirir
+3. **Velocity impulse (overlap)**: `body.Velocity += normal * overlap * 2.0f` — overlap kaliciligi azaltir
 4. **Zincir reaksiyon**: Kuvvet crowd boyunca yayilir (her frame bir hop)
 
 ## ProjectDawn Entegrasyonu
@@ -31,19 +41,22 @@ Iki daire cakistiginda:
 
 ## Domino Queuing (BoundarySystem)
 Moving zombi, Attacking/Queued bir komsusuna cakisiyorsa **Queued** state'e gecer (saldirmaz, yuruyus animasyonu oynar, sadece bekler).
-- Spatial hash uzerinden 3x3 hucre taranir (ayni grid PhysicsCollisionSystem ile paylasiliyor)
+- Spatial hash (ReadMap) uzerinden 3x3 hucre taranir
 - Her frame sadece bir katman gecer → zincir halinde yayilir
 - Queued zombi her frame komsu kontrol eder: blocker gitti → Moving'e doner
-- Duvar onunde ic ice girme problemi cozulur — ondeki durdu, arkadaki de durur
-- State akisi: Moving → Queued (domino) → Attacking (duvara ulasinca) veya Moving (blocker gidince)
-- ZombieStopOffset kaldirildi — duvar kontrolu dogrudan `pos.x <= WallX` olarak basitlesti
-- HasComponent kontrolleri kaldirildi (spatial hash sadece gecerli entity icerir, gereksiz guard'lar performans dusuruyordu)
+- Duvar onunde ic ice girme problemi cozulur
+
+## Sync Point Stratejisi
+- BuildSpatialHashSystem: .Complete() YOK (double buffer sayesinde)
+- Physics pipeline tamamen job chain olarak calisir
+- Tek sync point: DamageApplySystem (SimulationSystemGroup sonunda)
+- Main thread sadece job dispatch yapar → ~0.5ms
 
 ## Performans (100K zombi tahmini)
 | Sistem | Karmasiklik | Tahmini |
 |--------|-------------|---------|
 | ApplyMovementForce | O(n) parallel | ~0.1ms |
-| BuildSpatialHash | O(n) parallel | ~0.3ms |
+| BuildSpatialHash | O(n) parallel + ClearMapJob | ~0.3ms |
 | PhysicsCollision | O(n*k) parallel, k~26 | ~3-5ms |
 | Integrate | O(n) parallel | ~0.1ms |
 | Boundary | O(n) parallel | ~0.1ms |

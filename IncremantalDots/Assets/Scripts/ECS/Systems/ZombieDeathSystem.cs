@@ -11,17 +11,17 @@ namespace DeadWalls
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            foreach (var (stats, zombieState) in
-                SystemAPI.Query<RefRO<ZombieStats>, RefRW<ZombieState>>()
-                    .WithAll<ZombieTag>())
-            {
-                if (zombieState.ValueRO.Value == ZombieStateType.Dead)
-                    continue;
+            new DeathCheckJob().ScheduleParallel();
+        }
 
-                if (stats.ValueRO.CurrentHP <= 0f)
-                {
-                    zombieState.ValueRW.Value = ZombieStateType.Dead;
-                }
+        [BurstCompile]
+        [WithAll(typeof(ZombieTag))]
+        partial struct DeathCheckJob : IJobEntity
+        {
+            void Execute(in ZombieStats stats, ref ZombieState zombieState)
+            {
+                if (zombieState.Value != ZombieStateType.Dead && stats.CurrentHP <= 0f)
+                    zombieState.Value = ZombieStateType.Dead;
             }
         }
     }

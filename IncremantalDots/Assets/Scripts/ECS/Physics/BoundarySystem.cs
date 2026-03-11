@@ -9,7 +9,7 @@ namespace DeadWalls
 {
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     [UpdateAfter(typeof(IntegrateSystem))]
-    [UpdateBefore(typeof(ZombieAttackSystem))]
+    [UpdateBefore(typeof(ZombieAttackTimerSystem))]
     public partial struct BoundarySystem : ISystem
     {
         public void OnCreate(ref SystemState state)
@@ -21,7 +21,7 @@ namespace DeadWalls
         {
             float wallX = SystemAPI.GetSingleton<WallXPosition>().Value;
 
-            var spatialMap = BuildSpatialHashSystem.SpatialMap;
+            var spatialMap = BuildSpatialHashSystem.ReadMap;
             bool hasSpatialMap = spatialMap.IsCreated && !spatialMap.IsEmpty;
 
             new BoundaryJob

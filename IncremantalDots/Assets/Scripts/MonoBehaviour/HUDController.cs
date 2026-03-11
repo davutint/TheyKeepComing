@@ -18,13 +18,16 @@ namespace DeadWalls
         public TMP_Text LevelText;
         public TMP_Text ZombiesAliveText;
 
+        // Onceki degerler — sadece degisince string alloc yap
+        private int _lastGold = -1, _lastXP = -1, _lastXPToNext = -1;
+        private int _lastWave = -1, _lastLevel = -1, _lastAlive = -1;
+
         private void Update()
         {
-            if (GameManager.Instance == null) return;
-
             var gm = GameManager.Instance;
+            if (gm == null) return;
 
-            // HP Bars
+            // HP Bars (float, her zaman guncelle — ucuz)
             if (WallHPBar != null)
             {
                 WallHPBar.maxValue = gm.Wall.MaxHP;
@@ -43,21 +46,37 @@ namespace DeadWalls
                 CastleHPBar.value = gm.Castle.CurrentHP;
             }
 
-            // Text
-            if (GoldText != null)
-                GoldText.text = $"Gold: {gm.GameState.Gold}";
+            // Text (string alloc — sadece degisince)
+            if (GoldText != null && _lastGold != gm.GameState.Gold)
+            {
+                _lastGold = gm.GameState.Gold;
+                GoldText.text = $"Gold: {_lastGold}";
+            }
 
-            if (XPText != null)
-                XPText.text = $"XP: {gm.GameState.XP}/{gm.GameState.XPToNextLevel}";
+            if (XPText != null && (_lastXP != gm.GameState.XP || _lastXPToNext != gm.GameState.XPToNextLevel))
+            {
+                _lastXP = gm.GameState.XP;
+                _lastXPToNext = gm.GameState.XPToNextLevel;
+                XPText.text = $"XP: {_lastXP}/{_lastXPToNext}";
+            }
 
-            if (WaveText != null)
-                WaveText.text = $"Wave: {gm.WaveState.CurrentWave}";
+            if (WaveText != null && _lastWave != gm.WaveState.CurrentWave)
+            {
+                _lastWave = gm.WaveState.CurrentWave;
+                WaveText.text = $"Wave: {_lastWave}";
+            }
 
-            if (LevelText != null)
-                LevelText.text = $"Level: {gm.GameState.Level}";
+            if (LevelText != null && _lastLevel != gm.GameState.Level)
+            {
+                _lastLevel = gm.GameState.Level;
+                LevelText.text = $"Level: {_lastLevel}";
+            }
 
-            if (ZombiesAliveText != null)
-                ZombiesAliveText.text = $"Zombies: {gm.WaveState.ZombiesAlive}";
+            if (ZombiesAliveText != null && _lastAlive != gm.WaveState.ZombiesAlive)
+            {
+                _lastAlive = gm.WaveState.ZombiesAlive;
+                ZombiesAliveText.text = $"Zombies: {_lastAlive}";
+            }
         }
     }
 }
