@@ -1,4 +1,3 @@
-using ProjectDawn.Navigation;
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -20,7 +19,6 @@ namespace DeadWalls
             state.RequireForUpdate<ZombiePrefabData>();
             state.RequireForUpdate<GameStateData>();
             state.RequireForUpdate<WallXPosition>();
-            state.RequireForUpdate<ZombieCrowdGroupTag>();
         }
 
         [BurstCompile]
@@ -94,8 +92,6 @@ namespace DeadWalls
         private void SpawnZombieBatch(ref SystemState state, ref WaveStateData wave, int count)
         {
             var prefabData = SystemAPI.GetSingleton<ZombiePrefabData>();
-            var wallX = SystemAPI.GetSingleton<WallXPosition>().Value;
-            var crowdGroupEntity = SystemAPI.GetSingletonEntity<ZombieCrowdGroupTag>();
             var ecb = new EntityCommandBuffer(Unity.Collections.Allocator.Temp);
 
             for (int i = 0; i < count; i++)
@@ -112,23 +108,6 @@ namespace DeadWalls
                 );
                 ecb.SetComponent(zombie, transform);
                 ecb.SetComponent(zombie, new ZombieState { Value = ZombieStateType.Moving });
-
-                // Agents Navigation: hedefe yonlendir
-                // IsStopped=true → ProjectDawn locomotion devre disi, pozisyonu biz yaziyoruz
-                ecb.SetComponent(zombie, new AgentBody
-                {
-                    Force = float3.zero,
-                    Velocity = float3.zero,
-                    Destination = new float3(wallX, spawnY, -1f),
-                    RemainingDistance = 0f,
-                    IsStopped = true
-                });
-
-                // Crowd Extension: flow field routing icin CrowdGroup'a bagla
-                ecb.AddSharedComponent(zombie, new AgentCrowdPath
-                {
-                    Group = crowdGroupEntity
-                });
 
                 wave.ZombiesSpawned++;
                 wave.ZombiesAlive++;

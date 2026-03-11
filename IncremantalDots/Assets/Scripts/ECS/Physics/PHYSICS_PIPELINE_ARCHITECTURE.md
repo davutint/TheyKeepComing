@@ -33,11 +33,10 @@ Iki daire cakistiginda:
 3. **Velocity impulse (overlap)**: `body.Velocity += normal * overlap * 2.0f` — overlap kaliciligi azaltir
 4. **Zincir reaksiyon**: Kuvvet crowd boyunca yayilir (her frame bir hop)
 
-## ProjectDawn Entegrasyonu
-- CrowdSteering → AgentBody.Force (yon hesabi, AYNI kaliyor)
-- AgentBody.IsStopped = true → PD locomotion devre disi
-- Pozisyonu tamamen IntegrateSystem yaziyor
-- ApplyMovementForceSystem, PD Force varsa onu kullanir, yoksa Destination'dan yon hesaplar
+## Hareket Yonu
+- ApplyMovementForceSystem, WallX singleton'dan duvar pozisyonunu okur
+- Moving zombilere duvara dogru kuvvet uygular (fallback: -X yonu)
+- PD Navigation kaldirildi — yon hesabi tamamen custom physics pipeline icinde
 
 ## Domino Queuing (BoundarySystem)
 Moving zombi, Attacking/Queued bir komsusuna cakisiyorsa **Queued** state'e gecer (saldirmaz, yuruyus animasyonu oynar, sadece bekler).

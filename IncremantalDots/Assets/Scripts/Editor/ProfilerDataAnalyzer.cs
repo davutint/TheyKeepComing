@@ -70,7 +70,6 @@ public class ProfilerDataAnalyzer : EditorWindow
     private static readonly Dictionary<string, string> KNOWN_ECS_SYSTEMS = new()
     {
         { "WaveSpawnSystem", "SimulationSystemGroup" },
-        { "ZombieNavigationSystem", "SimulationSystemGroup" },
         { "ApplyMovementForceSystem", "SimulationSystemGroup" },
         { "BuildSpatialHashSystem", "SimulationSystemGroup" },
         { "PhysicsCollisionSystem", "SimulationSystemGroup" },
@@ -95,7 +94,6 @@ public class ProfilerDataAnalyzer : EditorWindow
         { "CollisionJob", "PhysicsCollisionSystem" },
         { "IntegrateJob", "IntegrateSystem" },
         { "BoundaryJob", "BoundarySystem" },
-        { "NavSyncJob", "ZombieNavigationSystem" },
     };
 
     private static readonly string[] PHYSICS_PIPELINE_SYSTEMS =

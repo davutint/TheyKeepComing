@@ -10,8 +10,7 @@
 1. ZombieAuthoring prefab'inda yeni alanlar:
    - CollisionRadius = 0.15
    - PhysicsDamping = 3.0
-2. WaveSpawnSystem'de IsStopped = true (PD locomotion devre disi)
-3. Spatial hash otomatik olusur — ek setup gerekmez
+2. Spatial hash otomatik olusur — ek setup gerekmez
 
 ## Debug
 - Unity Editor → Window → Entities → Entity Debugger ile entity'leri goruntuleyebilirsiniz

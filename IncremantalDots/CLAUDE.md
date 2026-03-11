@@ -1,7 +1,7 @@
 # DeadWalls — Claude Code Proje Kurallari
 
 ## Proje Hakkinda
-- **Motor:** Unity 6 LTS + DOTS/ECS + ProjectDawn.Navigation
+- **Motor:** Unity 6 LTS + DOTS/ECS
 - **Namespace:** DeadWalls
 - **Tur:** Zombie tower defense
 - **Dil:** C# (Unity ECS pattern)
@@ -64,5 +64,5 @@ Queued ──→ Attacking    (duvara ulasti)
 
 ### Mevcut MD Dosyalari
 - `Components/` — ARCHITECTURE.md, EDITOR_SETUP.md
-- `Systems/` — ARCHITECTURE.md, EDITOR_SETUP.md, ZOMBIE_NAVIGATION_*, SPRITE_ANIMATION_*
+- `Systems/` — ARCHITECTURE.md, EDITOR_SETUP.md, SPRITE_ANIMATION_*
 - `Physics/` — PHYSICS_PIPELINE_ARCHITECTURE.md, PHYSICS_EDITOR_SETUP.md, SPATIAL_HASH_GRID_ARCHITECTURE.md, COLLISION_RESPONSE_ARCHITECTURE.md

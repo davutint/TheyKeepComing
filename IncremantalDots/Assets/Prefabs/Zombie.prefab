@@ -13,8 +13,6 @@ GameObject:
   - component: {fileID: 8739467798448439883}
   - component: {fileID: 132469109316187399}
   - component: {fileID: 2716291358035882495}
-  - component: {fileID: 4536138100542181696}
-  - component: {fileID: 4491926247022195898}
   m_Layer: 0
   m_Name: Zombie
   m_TagString: Untagged
@@ -131,35 +129,3 @@ MonoBehaviour:
   FPS: 7
   DirectionRow: 1
   FrameCount: 4
---- !u!114 &4536138100542181696
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2500375341052309922}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 825ee44755f2e4846a6229365ed8d44c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: ProjectDawn.Navigation.Hybrid::ProjectDawn.Navigation.Hybrid.AgentAuthoring
-  MotionType: 3
-  Speed: 1.5
-  Acceleration: 8
-  AngularSpeed: 0
-  StoppingDistance: 0.5
-  AutoBreaking: 1
-  m_Layers: 1
---- !u!114 &4491926247022195898
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2500375341052309922}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d100d0744d5954b4cb6bc1932de8472c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: ProjectDawn.Navigation.Hybrid::ProjectDawn.Navigation.Hybrid.AgentCircleShapeAuthoring
-  Radius: 0.3

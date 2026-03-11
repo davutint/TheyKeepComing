@@ -37,12 +37,6 @@ namespace DeadWalls
     public struct ReachedTarget : IComponentData { }
 
     /// <summary>
-    /// CrowdGroup entity'sini bulmak icin tag.
-    /// CrowdGroupAuthoring ile ayni GameObject'e eklenir.
-    /// </summary>
-    public struct ZombieCrowdGroupTag : IComponentData { }
-
-    /// <summary>
     /// Olum animasyonu suresi. 0'a dusunce entity silinir.
     /// </summary>
     public struct DeathTimer : IComponentData
