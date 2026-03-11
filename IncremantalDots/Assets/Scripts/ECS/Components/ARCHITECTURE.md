@@ -10,6 +10,7 @@ Tum component'lar `IComponentData` interface'ini implement eder (unmanaged struc
 - **ZombieStats** — HP, hareket hizi, saldiri hasari, odul bilgileri
 - **ZombieState** — Zombi durumu: Moving / Attacking / Dead
 - **ReachedTarget** — Duvara ulasan zombilere eklenir
+- ~~**ZombieStopOffset**~~ — Kaldirildi (her zaman 0'di, gereksiz bulundu)
 
 ### CastleComponents.cs
 - **WallSegment** — Duvar HP bilgisi

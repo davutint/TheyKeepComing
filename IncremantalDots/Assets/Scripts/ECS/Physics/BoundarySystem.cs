@@ -70,21 +70,13 @@ namespace DeadWalls
                             if (other == self)
                                 continue;
 
-                            if (!StateLookup.HasComponent(other))
-                                continue;
-
                             var otherState = StateLookup[other].Value;
                             if (otherState != ZombieStateType.Attacking && otherState != ZombieStateType.Queued)
                                 continue;
 
-                            if (!TransformLookup.HasComponent(other))
-                                continue;
-
                             float2 otherPos = TransformLookup[other].Position.xy;
                             float distSq = math.lengthsq(myPos - otherPos);
-                            float otherRadius = RadiusLookup.HasComponent(other)
-                                ? RadiusLookup[other].Value
-                                : 0.15f;
+                            float otherRadius = RadiusLookup[other].Value;
                             float minDist = myRadius + otherRadius;
 
                             if (distSq < minDist * minDist && distSq > 0.00001f)
@@ -102,7 +94,6 @@ namespace DeadWalls
                 ref LocalTransform transform,
                 ref PhysicsBody body,
                 ref ZombieState zombieState,
-                in ZombieStopOffset stopOffset,
                 in CollisionRadius radius)
             {
                 float3 pos = transform.Position;
@@ -111,7 +102,7 @@ namespace DeadWalls
                 {
                     case ZombieStateType.Moving:
                         // 1. Duvara ulasti → Attacking
-                        if (pos.x <= WallX + stopOffset.Value)
+                        if (pos.x <= WallX)
                         {
                             zombieState.Value = ZombieStateType.Attacking;
                             body.Velocity = float2.zero;
@@ -128,7 +119,7 @@ namespace DeadWalls
 
                     case ZombieStateType.Queued:
                         // 1. Duvara ulasti → Attacking
-                        if (pos.x <= WallX + stopOffset.Value)
+                        if (pos.x <= WallX)
                         {
                             zombieState.Value = ZombieStateType.Attacking;
                             body.Velocity = float2.zero;

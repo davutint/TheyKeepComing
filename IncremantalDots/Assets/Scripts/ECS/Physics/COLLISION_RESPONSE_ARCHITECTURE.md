@@ -28,6 +28,12 @@ A.vel += (impulse / A.mass) * normal
 B.vel -= (impulse / B.mass) * normal
 ```
 
+### 3. Overlap Velocity Impulse (Ayirma Hizlandirmasi)
+```
+A.vel += normal * overlap * 2.0f
+```
+Pozisyon duzeltme tek basina yetmeyebilir — ozellikle yogun crowd'larda overlap bir sonraki frame'e tasabilir. Bu ek impulse, cisimleri overlap yonunde hizlandirarak ayrilmayi hizlandirir. Sadece kendi entity'sine uygulanir (paralel guvenli).
+
 ## Ne Yapar
 - Arkadan gelen zombi ondekine carpar → hiz TRANSFER olur
 - Ondeki zombi itilir, o da onundekine carpar → ZINCIR REAKSIYON
@@ -38,6 +44,7 @@ B.vel -= (impulse / B.mass) * normal
 Her entity sadece kendi pozisyon + velocity'sini yazar.
 Komsularin degerleri frame basindaki snapshot'tan okunur ([ReadOnly] ComponentLookup).
 Bir-frame gecikme var ama birden fazla frame'de yakinsar.
+HasComponent kontrolleri kaldirildi — spatial hash sadece gecerli entity'ler icerir, bu nedenle guard gereksizdi ve CPU israf ediyordu.
 
 ## Inelastic Collision
 Restitution = 0 (zombiler ziplamaz). Impulse sadece birbirini itmek icin.

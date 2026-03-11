@@ -11,7 +11,7 @@ SimulationSystemGroup icinde:
  6. IntegrateSystem           *  — velocity += force*dt, pos += vel*dt, damping
  7. BoundarySystem            *  — Duvar bariyeri, state transition, Y siniri
  8. ZombieAttackSystem           — Duvar/kapi/kale hasar
- 9. ArcherShootSystem            — Spatial hash ile en yakin zombi, ok firlat
+ 9. ArcherShootSystem         *  — Burst + brute-force query ile en yakin zombi, ok firlat
 10. ArrowMoveSystem              — Ok hareket
 11. ArrowHitSystem               — Ok isabet + hasar
 12. ClickDamageSystem         *  — Spatial hash ile click damage
@@ -34,6 +34,7 @@ SimulationSystemGroup icinde:
 - AgentBody.Destination'i guncel tutar (CrowdSteering Force hesabi icin)
 - IsStopped her zaman true — PD pozisyon yazmaz
 - State transition ve duvar bariyeri BoundarySystem'e tasindi
+- `IJobEntity` (NavSyncJob) ile `ScheduleParallel` — tum zombiler paralel islenir
 
 ### ApplyMovementForceSystem (FIZIK)
 - Moving zombilere hedefe dogru kuvvet uygular
@@ -48,6 +49,8 @@ SimulationSystemGroup icinde:
 ### PhysicsCollisionSystem (FIZIK)
 - Spatial hash ile broadphase (3x3 komsu hucre)
 - Circle-circle overlap test + pozisyon duzeltme + velocity impulse
+- Velocity impulse eklendi: `body.Velocity += normal * overlap * 2.0f` — overlap'in frame'ler arasi kaliciligi azaltilir
+- HasComponent kontrolleri kaldirildi (spatial hash sadece gecerli entity icerir)
 - Paralel: her entity sadece kendini gunceller
 
 ### IntegrateSystem (FIZIK)
@@ -56,10 +59,11 @@ SimulationSystemGroup icinde:
 - Force sifirlanir (sonraki frame icin)
 
 ### BoundarySystem (FIZIK)
-- Moving → Attacking: pos.x <= wallX + stopOffset
+- Moving → Attacking: pos.x <= wallX (ZombieStopOffset kaldirildi, dogrudan wallX ile karsilastirilir)
 - Duvar bariyeri: pos.x clamp
 - Dead: velocity + force sifir
 - Y siniri: -15 ile +15 arasi
+- HasStoppedNeighborOverlap icinde HasComponent kontrolleri kaldirildi (spatial hash sadece gecerli entity icerir)
 
 ### ZombieAttackSystem
 - Attacking state'deki zombiler duvar/kapi/kale'ye hasar verir
@@ -67,7 +71,10 @@ SimulationSystemGroup icinde:
 - CastleHP 0 olunca GameOver isaretler
 
 ### ArcherShootSystem
-- Spatial hash ile en yakin zombiyi bulur (brute-force fallback var)
+- `[BurstCompile]` ile struct ve OnUpdate (Burst derleme aktif)
+- Brute-force SystemAPI.Query ile en yakin zombiyi bulur (~60K mesafe kontrolu, Burst ile spatial hash'ten hizli)
+- `math.distancesq` kullanir (sqrt maliyeti yok)
+- `EndSimulationEntityCommandBufferSystem` ECB kullanir (temp ECB yerine)
 - Fire timer'a gore ok spawn eder
 
 ### ArrowMoveSystem

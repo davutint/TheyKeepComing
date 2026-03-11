@@ -4,7 +4,7 @@
 O(n^2) brute-force yerine O(n*k) broadphase carpisma tespiti. k = ortalama komsu sayisi (~26).
 
 ## Nasil Calisiyor
-1. Dunya 2D grid'e bolunur (cell size = 0.5)
+1. Dunya 2D grid'e bolunur (cell size = 0.6, zombi capi 0.30 ile daha iyi eslesir)
 2. Her zombinin pozisyonu hash fonksiyonu ile bir hucreye eslesir
 3. Carpisma tespitinde sadece ayni + 8 komsu hucre kontrol edilir
 
@@ -24,7 +24,7 @@ Prime-based hash — uniform dagilim saglar.
 | Sistem | Kullanim |
 |--------|----------|
 | PhysicsCollisionSystem | 3x3 komsu hucre tarasi, circle-circle test |
-| ArcherShootSystem | Range icindeki hucreleri tara, en yakin zombi bul |
+| ArcherShootSystem | Artik spatial hash kullanmiyor — brute-force SystemAPI.Query ile Burst derlemeli |
 | ClickDamageSystem | Click pozisyonu etrafindaki hucreleri tara |
 
 ## Static Erisim

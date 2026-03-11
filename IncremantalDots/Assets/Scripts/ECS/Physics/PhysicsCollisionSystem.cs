@@ -68,15 +68,10 @@ namespace DeadWalls
                             if (other == self)
                                 continue;
 
-                            if (!TransformLookup.HasComponent(other))
-                                continue;
-
                             float2 otherPos = TransformLookup[other].Position.xy;
                             float2 delta = myPos - otherPos;
                             float distSq = math.lengthsq(delta);
-                            float otherRadius = RadiusLookup.HasComponent(other)
-                                ? RadiusLookup[other].Value
-                                : 0.15f;
+                            float otherRadius = RadiusLookup[other].Value;
                             float minDist = myRadius + otherRadius;
                             float minDistSq = minDist * minDist;
 
@@ -90,6 +85,9 @@ namespace DeadWalls
                             // Yumusak pozisyon duzeltme (0.3 = yavas iteratif cozum)
                             totalPosCorrection += normal * overlap * 0.3f;
                             collisionCount++;
+
+                            // Velocity impulse — overlap'i hizlandirarak cozer, gelecek frame'lerde daha az overlap
+                            body.Velocity += new float2(normal.x, normal.y) * overlap * 2.0f;
 
                         } while (SpatialMap.TryGetNextValue(out other, ref it));
                     }

@@ -19,8 +19,9 @@ BoundarySystem              → Duvar bariyeri, domino attacking, state transiti
 ## Carpisma Response
 Iki daire cakistiginda:
 1. **Pozisyon duzeltme**: Her iki cisim overlap/2 kadar birbirinden itilir
-2. **Velocity impulse**: Momentum transfer — arkadaki ondekine hizini aktarir
-3. **Zincir reaksiyon**: Kuvvet crowd boyunca yayilir (her frame bir hop)
+2. **Velocity impulse (momentum)**: Momentum transfer — arkadaki ondekine hizini aktarir
+3. **Velocity impulse (overlap)**: `body.Velocity += normal * overlap * 2.0f` — overlap kaliciligi azaltir, cisimleri daha hizli ayirir
+4. **Zincir reaksiyon**: Kuvvet crowd boyunca yayilir (her frame bir hop)
 
 ## ProjectDawn Entegrasyonu
 - CrowdSteering → AgentBody.Force (yon hesabi, AYNI kaliyor)
@@ -35,6 +36,8 @@ Moving zombi, Attacking/Queued bir komsusuna cakisiyorsa **Queued** state'e gece
 - Queued zombi her frame komsu kontrol eder: blocker gitti → Moving'e doner
 - Duvar onunde ic ice girme problemi cozulur — ondeki durdu, arkadaki de durur
 - State akisi: Moving → Queued (domino) → Attacking (duvara ulasinca) veya Moving (blocker gidince)
+- ZombieStopOffset kaldirildi — duvar kontrolu dogrudan `pos.x <= WallX` olarak basitlesti
+- HasComponent kontrolleri kaldirildi (spatial hash sadece gecerli entity icerir, gereksiz guard'lar performans dusuruyordu)
 
 ## Performans (100K zombi tahmini)
 | Sistem | Karmasiklik | Tahmini |

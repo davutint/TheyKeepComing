@@ -37,7 +37,6 @@ namespace DeadWalls
                 {
                     Value = ZombieStateType.Moving
                 });
-                AddComponent(entity, new ZombieStopOffset { Value = 0f });
                 AddComponent(entity, new PhysicsBody
                 {
                     Velocity = float2.zero,

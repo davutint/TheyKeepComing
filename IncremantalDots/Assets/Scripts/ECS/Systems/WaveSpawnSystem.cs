@@ -98,14 +98,6 @@ namespace DeadWalls
             var crowdGroupEntity = SystemAPI.GetSingletonEntity<ZombieCrowdGroupTag>();
             var ecb = new EntityCommandBuffer(Unity.Collections.Allocator.Temp);
 
-            // [DEVRE DISI] StopOffset — Fizik sistemi oncesi yapay yigilma dagilimi
-            // Eski yaklasim: Her zombiye rastgele bir durma mesafesi atanirdi (r² × maxDepth).
-            // Zombi wallX + stopOffset'e ulasinca Attacking'e gecerdi.
-            // Bu, fizik yokken duvar onunde katmanli yigilma taklidi yapiyordu.
-            // Artik custom fizik sistemi var — zombiler birbirine carparak dogal yayiliyor.
-            // StopOffset artik hep 0: tum zombiler duvara kadar yurur, fizik gerisini halleder.
-            // float maxDepth = math.clamp(math.sqrt(wave.ZombiesToSpawn * 0.05f), 2f, 20f);
-
             for (int i = 0; i < count; i++)
             {
                 var zombie = ecb.Instantiate(prefabData.ZombiePrefab);
@@ -120,12 +112,6 @@ namespace DeadWalls
                 );
                 ecb.SetComponent(zombie, transform);
                 ecb.SetComponent(zombie, new ZombieState { Value = ZombieStateType.Moving });
-
-                // [DEVRE DISI] StopOffset — artik hep 0
-                // Eski: float r = _random.NextFloat(0f, 1f); stopOffset = r * r * maxDepth;
-                // Neden kaldirildi: Custom fizik sistemi (PhysicsCollisionSystem) zombilerin
-                // birbirine carparak dogal yayilmasini sagliyor. Yapay offset'e gerek kalmadi.
-                ecb.SetComponent(zombie, new ZombieStopOffset { Value = 0f });
 
                 // Agents Navigation: hedefe yonlendir
                 // IsStopped=true → ProjectDawn locomotion devre disi, pozisyonu biz yaziyoruz

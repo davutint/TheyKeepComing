@@ -27,19 +27,25 @@ namespace DeadWalls
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            var wallX = SystemAPI.GetSingleton<WallXPosition>().Value;
+            float wallX = SystemAPI.GetSingleton<WallXPosition>().Value;
+            new NavSyncJob { WallX = wallX }.ScheduleParallel();
+        }
 
-            foreach (var (body, zombieState, transform) in
-                SystemAPI.Query<RefRW<AgentBody>, RefRO<ZombieState>, RefRO<LocalTransform>>()
-                    .WithAll<ZombieTag>()
-                    .WithNone<DeathTimer>())
+        [BurstCompile]
+        [WithAll(typeof(ZombieTag))]
+        [WithNone(typeof(DeathTimer))]
+        partial struct NavSyncJob : IJobEntity
+        {
+            public float WallX;
+
+            void Execute(ref AgentBody body, in LocalTransform transform)
             {
                 // IsStopped her zaman true — PD locomotion devre disi
-                if (!body.ValueRO.IsStopped)
-                    body.ValueRW.IsStopped = true;
+                if (!body.IsStopped)
+                    body.IsStopped = true;
 
                 // Destination'i guncel tut (CrowdSteering Force hesabi icin)
-                body.ValueRW.Destination = new float3(wallX, transform.ValueRO.Position.y, -1f);
+                body.Destination = new float3(WallX, transform.Position.y, -1f);
             }
         }
     }
