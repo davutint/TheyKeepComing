@@ -11,14 +11,19 @@ using UnityEngine;
 using UnityEngine.Profiling;
 
 // ═══════════════════════════════════════════════════════════════
-// PROFILER DATA ANALYZER V4
+// PROFILER DATA ANALYZER V6
 // Unity Profiler .raw dosyasını yükleyip kapsamlı performans
 // raporu üreten EditorWindow tabanlı analiz aracı.
-// 9 tab: Overview, Spikes, Functions, Update, User Code,
-//        Rendering, GC Analysis, Call Chains, Compare
+// 11 tab: Overview, Spikes, Functions, Update, User Code,
+//         Rendering, GC Analysis, Call Chains, Compare,
+//         ECS Pipeline, Physics
 // V3: Snapshot A/B comparison, file browser, delta analysis
 // V4: A/B/Both display mode (dual view), GC/Call metric,
 //     User Code GC section, selfTime=0 GC fix
+// V5: DeadWalls ECS/DOTS pipeline analizi, physics breakdown,
+//     ECS sistem bazli A/B karsilastirma
+// V6: Worker thread job taramasi — Burst job surelerini
+//     worker thread'lerden yakalar, Job Avg/Max kolonlari
 // ═══════════════════════════════════════════════════════════════
 
 public class ProfilerDataAnalyzer : EditorWindow
@@ -61,10 +66,49 @@ public class ProfilerDataAnalyzer : EditorWindow
         "FixedUpdate (FixedBehaviourUpdate)"
     };
 
+    // DeadWalls ECS sistemleri — profiler marker tespiti icin
+    private static readonly Dictionary<string, string> KNOWN_ECS_SYSTEMS = new()
+    {
+        { "WaveSpawnSystem", "SimulationSystemGroup" },
+        { "ZombieNavigationSystem", "SimulationSystemGroup" },
+        { "ApplyMovementForceSystem", "SimulationSystemGroup" },
+        { "BuildSpatialHashSystem", "SimulationSystemGroup" },
+        { "PhysicsCollisionSystem", "SimulationSystemGroup" },
+        { "IntegrateSystem", "SimulationSystemGroup" },
+        { "BoundarySystem", "SimulationSystemGroup" },
+        { "ZombieAttackSystem", "SimulationSystemGroup" },
+        { "ArcherShootSystem", "SimulationSystemGroup" },
+        { "ArrowMoveSystem", "SimulationSystemGroup" },
+        { "ArrowHitSystem", "SimulationSystemGroup" },
+        { "ClickDamageSystem", "SimulationSystemGroup" },
+        { "ZombieDeathSystem", "SimulationSystemGroup" },
+        { "ZombieAnimationStateSystem", "SimulationSystemGroup" },
+        { "DamageCleanupSystem", "SimulationSystemGroup" },
+        { "SpriteAnimationSystem", "PresentationSystemGroup" },
+    };
+
+    // Job struct adi → parent sistem adi eslestirmesi
+    private static readonly Dictionary<string, string> KNOWN_ECS_JOBS = new()
+    {
+        { "ApplyForceJob", "ApplyMovementForceSystem" },
+        { "HashJob", "BuildSpatialHashSystem" },
+        { "CollisionJob", "PhysicsCollisionSystem" },
+        { "IntegrateJob", "IntegrateSystem" },
+        { "BoundaryJob", "BoundarySystem" },
+        { "NavSyncJob", "ZombieNavigationSystem" },
+    };
+
+    private static readonly string[] PHYSICS_PIPELINE_SYSTEMS =
+    {
+        "ApplyMovementForceSystem", "BuildSpatialHashSystem",
+        "PhysicsCollisionSystem", "IntegrateSystem", "BoundarySystem"
+    };
+
     private static readonly string[] TAB_NAMES =
     {
         "Overview", "Spikes", "Functions", "Update",
-        "User Code", "Rendering", "GC Analysis", "Call Chains", "Compare"
+        "User Code", "Rendering", "GC Analysis", "Call Chains",
+        "Compare", "ECS Pipeline", "Physics"
     };
 
     // ═══════════════════════════════════════════════════════════
@@ -142,6 +186,33 @@ public class ProfilerDataAnalyzer : EditorWindow
         public List<GcCallChainEntry> children;
     }
 
+    private class EcsSystemEntry
+    {
+        public string systemName;
+        public string groupName;
+        public double totalTimeMs;
+        public double totalSelfTimeMs;
+        public float maxTimeMs;
+        public int frameCount;
+        public double totalGcBytes;
+        public bool hasSyncPoint;
+        public double syncPointTimeMs;
+        public float AvgTimeMs => frameCount > 0 ? (float)(totalTimeMs / frameCount) : 0f;
+
+        // Worker thread job sureleri
+        public double jobTimeMs;       // Worker thread'deki toplam job suresi
+        public float maxJobTimeMs;     // En yavas frame'deki job suresi
+        public float AvgJobTimeMs => frameCount > 0 ? (float)(jobTimeMs / frameCount) : 0f;
+    }
+
+    private class EcsFrameData
+    {
+        public int frameIndex;
+        public float totalPipelineTimeMs;
+        public Dictionary<string, float> systemTimesMs;
+        public Dictionary<string, float> jobTimesMs; // job bazinda worker thread sureleri
+    }
+
     // ═══════════════════════════════════════════════════════════
     // ANALYSIS SNAPSHOT (V3)
     // ═══════════════════════════════════════════════════════════
@@ -156,6 +227,8 @@ public class ProfilerDataAnalyzer : EditorWindow
         public List<RenderingFrameStats> renderingStats;
         public UpdateMethodStats[] updateMethodStats;
         public Dictionary<string, GcCallChainEntry> gcCallChains;
+        public Dictionary<string, EcsSystemEntry> ecsSystemMap;
+        public List<EcsFrameData> ecsFrameTimeline;
 
         // Summary stats
         public int totalFrames, skippedFrames, firstFrame, lastFrame;
@@ -173,6 +246,12 @@ public class ProfilerDataAnalyzer : EditorWindow
         public List<FrameTimingData> topGcFrames;
         public Dictionary<string, int> fpsDistribution;
         public List<GcCallChainGroup> gcCallChainGroups;
+
+        // ECS derived cache
+        public List<EcsSystemEntry> ecsSystemsSorted;
+        public List<EcsSystemEntry> physicsPipelineSystems;
+        public float avgPhysicsPipelineMs;
+        public float maxPhysicsPipelineMs;
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -185,7 +264,7 @@ public class ProfilerDataAnalyzer : EditorWindow
     private string _filePathB = "";
     private string _lastBrowseDir = "";
     private int _activeTab;
-    private Vector2[] _scrollPositions = new Vector2[9];
+    private Vector2[] _scrollPositions = new Vector2[11];
 
     // Foldout state for call chains
     private HashSet<string> _expandedChains = new HashSet<string>();
@@ -331,6 +410,8 @@ public class ProfilerDataAnalyzer : EditorWindow
             case 5: DrawRenderingContent(); break;
             case 6: DrawGcAnalysisContent(); break;
             case 7: DrawCallChainsContent(); break;
+            case 9: DrawEcsPipelineContent(); break;
+            case 10: DrawPhysicsBreakdownContent(); break;
         }
     }
 
@@ -466,10 +547,19 @@ public class ProfilerDataAnalyzer : EditorWindow
                 functionMap = new Dictionary<string, FunctionProfileEntry>(DICTIONARY_INITIAL_CAPACITY),
                 renderingStats = new List<RenderingFrameStats>(lastFrame - firstFrame + 1),
                 gcCallChains = new Dictionary<string, GcCallChainEntry>(DICTIONARY_INITIAL_CAPACITY),
+                ecsSystemMap = new Dictionary<string, EcsSystemEntry>(32),
+                ecsFrameTimeline = new List<EcsFrameData>(lastFrame - firstFrame + 1),
                 updateMethodStats = new UpdateMethodStats[UPDATE_METHOD_NAMES.Length]
             };
 
             Debug.Log($"[ProfilerAnalyzer][{label}] Analiz başlıyor: {snapshot.totalFrames} frame ({firstFrame} - {lastFrame})");
+
+            // Debug state sifirla
+            _workerThreadDebugLogged = false;
+            _discoveredThreadNames = new HashSet<string>();
+            _discoveredJobMarkers = new HashSet<string>();
+            _ecsChildDebugLogged = false;
+            _discoveredEcsChildren = new HashSet<string>();
 
             var childrenBuffer = new List<int>(256);
 
@@ -520,6 +610,23 @@ public class ProfilerDataAnalyzer : EditorWindow
                 Debug.LogWarning($"[ProfilerAnalyzer][{label}] Toplam {snapshot.skippedFrames} frame atlandı (hata nedeniyle).");
 
             CacheAnalysisResults(snapshot);
+
+            // Debug: ECS sistem altindaki child marker'larini logla
+            if (_discoveredEcsChildren.Count > 0)
+            {
+                var matches = _discoveredEcsChildren.Where(s => s.StartsWith("[MATCH]")).ToList();
+                var children = _discoveredEcsChildren.Where(s => s.StartsWith("[CHILD]")).ToList();
+                if (matches.Count > 0)
+                    Debug.Log($"[ProfilerAnalyzer V6] Eslesen job marker'lar ({matches.Count}):\n" +
+                        string.Join("\n", matches.Select(n => $"  {n}")));
+                if (children.Count > 0)
+                    Debug.Log($"[ProfilerAnalyzer V6] ECS sistem altindaki bilinmeyen child marker'lar ({children.Count}):\n" +
+                        string.Join("\n", children.OrderBy(s => s).Select(n => $"  {n}")));
+            }
+            else
+            {
+                Debug.Log("[ProfilerAnalyzer V6] Main thread'de ECS sistem altinda hicbir anlamli child marker bulunamadi.");
+            }
 
             int analyzedFrames = snapshot.totalFrames - snapshot.skippedFrames;
             Debug.Log($"[ProfilerAnalyzer][{label}] Analiz tamamlandı: {analyzedFrames} frame, " +
@@ -611,12 +718,20 @@ public class ProfilerDataAnalyzer : EditorWindow
             // Hierarchy traversal
             if (rootId != -1)
             {
-                TraverseHierarchy(frameData, rootId, childrenBuffer, 0, snapshot);
+                TraverseHierarchy(frameData, rootId, childrenBuffer, 0, snapshot, frameIndex);
             }
 
             // Rendering counters
             snapshot.renderingStats.Add(ReadRenderingCounters(frameData));
         }
+
+        // Worker thread taramasi — ileride Development Build profiling icin
+        // (Editor profiling'de worker thread'ler job verisi icermez)
+        ScanWorkerThreads(frameIndex, childrenBuffer, snapshot);
+
+        // Debug: Ilk frame sonrasi debug loglamayi kapat
+        if (!_ecsChildDebugLogged)
+            _ecsChildDebugLogged = true;
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -628,15 +743,16 @@ public class ProfilerDataAnalyzer : EditorWindow
         int rootId,
         List<int> childrenBuffer,
         int startDepth,
-        AnalysisSnapshot snapshot)
+        AnalysisSnapshot snapshot,
+        int currentFrameIndex)
     {
-        // BFS queue: (itemId, depth, nearestUserAncestor)
-        var queue = new Queue<(int id, int depth, string nearestUserAncestor)>();
-        queue.Enqueue((rootId, startDepth, null));
+        // BFS queue: (itemId, depth, nearestUserAncestor, nearestEcsSystem)
+        var queue = new Queue<(int id, int depth, string nearestUserAncestor, string nearestEcsSystem)>();
+        queue.Enqueue((rootId, startDepth, null, null));
 
         while (queue.Count > 0)
         {
-            var (itemId, depth, nearestUserAncestor) = queue.Dequeue();
+            var (itemId, depth, nearestUserAncestor, nearestEcsSystem) = queue.Dequeue();
 
             string name = frameData.GetItemName(itemId);
             float selfTimeMs = frameData.GetItemColumnDataAsFloat(itemId,
@@ -670,6 +786,55 @@ public class ProfilerDataAnalyzer : EditorWindow
                 entry.frameCount++;
                 if (selfTimeMs > entry.maxSelfTimeMs)
                     entry.maxSelfTimeMs = selfTimeMs;
+            }
+
+            // ECS sistem tespiti
+            string ecsName = ExtractSystemName(name);
+            string ecsForChildren = nearestEcsSystem;
+            if (ecsName != null)
+            {
+                ecsForChildren = ecsName;
+                if (!snapshot.ecsSystemMap.TryGetValue(ecsName, out var ecsEntry))
+                {
+                    ecsEntry = new EcsSystemEntry
+                    {
+                        systemName = ecsName,
+                        groupName = KNOWN_ECS_SYSTEMS[ecsName]
+                    };
+                    snapshot.ecsSystemMap[ecsName] = ecsEntry;
+                }
+                ecsEntry.totalTimeMs += totalTimeMs;
+                ecsEntry.totalSelfTimeMs += selfTimeMs;
+                ecsEntry.totalGcBytes += gcBytes;
+                ecsEntry.frameCount++;
+                if (totalTimeMs > ecsEntry.maxTimeMs) ecsEntry.maxTimeMs = (float)totalTimeMs;
+                RecordEcsFrameData(snapshot, currentFrameIndex, ecsName, totalTimeMs);
+
+                // Child time = Total - Self (job bekleme + ECB + diger child sureler)
+                float childTimeMs = totalTimeMs - selfTimeMs;
+                if (childTimeMs > 0)
+                {
+                    ecsEntry.jobTimeMs += childTimeMs;
+                    if (childTimeMs > ecsEntry.maxJobTimeMs)
+                        ecsEntry.maxJobTimeMs = childTimeMs;
+                    RecordEcsJobFrameData(snapshot, currentFrameIndex, ecsName, childTimeMs);
+                }
+            }
+
+            // Sync point tespiti (bilinen ECS sistem altindaysa)
+            if (nearestEcsSystem != null && IsSyncPointMarker(name) && selfTimeMs > 0)
+            {
+                if (snapshot.ecsSystemMap.TryGetValue(nearestEcsSystem, out var parentSys))
+                {
+                    parentSys.syncPointTimeMs += selfTimeMs;
+                }
+            }
+
+            // Debug: ECS sistem altindaki anlamli child marker'lari logla (ilk frame)
+            if (nearestEcsSystem != null && ecsName == null
+                && !_ecsChildDebugLogged && !string.IsNullOrEmpty(name) && totalTimeMs >= 0.05f)
+            {
+                _discoveredEcsChildren.Add($"[CHILD] {nearestEcsSystem} → \"{name}\" ({totalTimeMs:F3}ms)");
             }
 
             // GC Call Chain tracking
@@ -717,7 +882,7 @@ public class ProfilerDataAnalyzer : EditorWindow
 
                 for (int i = 0; i < childrenBuffer.Count; i++)
                 {
-                    queue.Enqueue((childrenBuffer[i], depth + 1, ancestorForChildren));
+                    queue.Enqueue((childrenBuffer[i], depth + 1, ancestorForChildren, ecsForChildren));
                 }
             }
         }
@@ -751,6 +916,147 @@ public class ProfilerDataAnalyzer : EditorWindow
                 });
             }
         }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // WORKER THREAD TARAMASI — Job surelerini yakala
+    // ═══════════════════════════════════════════════════════════
+
+    // Debug: Ilk analizde bulunan thread ve job bilgilerini logla
+    private bool _workerThreadDebugLogged;
+    private HashSet<string> _discoveredThreadNames = new();
+    private HashSet<string> _discoveredJobMarkers = new();
+
+    // Debug: Main thread'deki ECS sistem child marker'larini logla
+    private bool _ecsChildDebugLogged;
+    private HashSet<string> _discoveredEcsChildren = new();
+
+    private void ScanWorkerThreads(int frameIndex, List<int> childrenBuffer, AnalysisSnapshot snapshot)
+    {
+        int invalidCount = 0;
+        // Thread 1'den baslayarak tum thread'leri tara
+        for (int threadIdx = 1; threadIdx < 64; threadIdx++)
+        {
+            using (var threadData = ProfilerDriver.GetHierarchyFrameDataView(
+                frameIndex, threadIdx,
+                HierarchyFrameDataView.ViewModes.MergeSamplesWithTheSameName,
+                HierarchyFrameDataView.columnTotalTime, false))
+            {
+                if (threadData == null || !threadData.valid)
+                {
+                    invalidCount++;
+                    // Ardisik 5 invalid thread gorursek dur (gap'ler olabilir, break yerine tolerans)
+                    if (invalidCount >= 5)
+                        break;
+                    continue;
+                }
+                invalidCount = 0; // Valid thread goruldu, sayaci sifirla
+
+                string threadName = threadData.threadName ?? "";
+
+                // Debug: Thread isimlerini topla (sadece ilk frame)
+                if (!_workerThreadDebugLogged)
+                    _discoveredThreadNames.Add(threadName);
+
+                // Sadece worker/job thread'lerini tara
+                if (!threadName.Contains("Worker") && !threadName.Contains("Job"))
+                    continue;
+
+                int rootId = threadData.GetRootItemID();
+                if (rootId == -1) continue;
+
+                TraverseWorkerThread(threadData, rootId, childrenBuffer, snapshot, frameIndex);
+            }
+        }
+
+        // Debug log: Ilk frame'de bulunan thread ve marker bilgilerini logla
+        if (!_workerThreadDebugLogged)
+        {
+            _workerThreadDebugLogged = true;
+            Debug.Log($"[ProfilerAnalyzer V6] Worker thread taramasi — Bulunan thread'ler ({_discoveredThreadNames.Count}):\n" +
+                string.Join("\n", _discoveredThreadNames.Select(n => $"  - \"{n}\"")));
+            if (_discoveredJobMarkers.Count > 0)
+                Debug.Log($"[ProfilerAnalyzer V6] Eslesen job marker'lar:\n" +
+                    string.Join("\n", _discoveredJobMarkers.Select(n => $"  - \"{n}\"")));
+            else
+                Debug.Log("[ProfilerAnalyzer V6] Worker thread'lerde hicbir bilinen job marker bulunamadi.");
+        }
+    }
+
+    private void TraverseWorkerThread(
+        HierarchyFrameDataView threadData,
+        int rootId,
+        List<int> childrenBuffer,
+        AnalysisSnapshot snapshot,
+        int frameIndex)
+    {
+        var queue = new Queue<(int id, int depth)>();
+        queue.Enqueue((rootId, 0));
+
+        while (queue.Count > 0)
+        {
+            var (itemId, depth) = queue.Dequeue();
+            string name = threadData.GetItemName(itemId);
+            float totalTimeMs = threadData.GetItemColumnDataAsFloat(itemId,
+                HierarchyFrameDataView.columnTotalTime);
+
+            // Job marker tespiti
+            string jobName = ExtractJobName(name);
+            if (jobName != null && KNOWN_ECS_JOBS.TryGetValue(jobName, out string systemName))
+            {
+                // Debug: Eslesen marker'i kaydet
+                if (!_workerThreadDebugLogged)
+                    _discoveredJobMarkers.Add($"{name} → {jobName} → {systemName}");
+
+                if (snapshot.ecsSystemMap.TryGetValue(systemName, out var sysEntry))
+                {
+                    sysEntry.jobTimeMs += totalTimeMs;
+                    if (totalTimeMs > sysEntry.maxJobTimeMs)
+                        sysEntry.maxJobTimeMs = totalTimeMs;
+
+                    // Per-frame job timing
+                    RecordEcsJobFrameData(snapshot, frameIndex, systemName, totalTimeMs);
+                }
+            }
+            else if (!_workerThreadDebugLogged && !string.IsNullOrEmpty(name)
+                && totalTimeMs >= 0.1f) // Sadece anlamli sureleri logla
+            {
+                // Debug: Bilinmeyen ama anlamli marker'lari raporla
+                _discoveredJobMarkers.Add($"[UNKNOWN] \"{name}\" ({totalTimeMs:F3}ms)");
+            }
+
+            // Children (sadece 4 seviye yeterli — job hierarchy derin degil)
+            if (depth < 4 && totalTimeMs >= MIN_NODE_TIME_MS)
+            {
+                childrenBuffer.Clear();
+                threadData.GetItemChildren(itemId, childrenBuffer);
+                for (int i = 0; i < childrenBuffer.Count; i++)
+                    queue.Enqueue((childrenBuffer[i], depth + 1));
+            }
+        }
+    }
+
+    private static string ExtractJobName(string markerName)
+    {
+        if (string.IsNullOrEmpty(markerName)) return null;
+        string name = markerName;
+        // Namespace temizle: "DeadWalls.CollisionJob" → "CollisionJob"
+        int dotIdx = name.LastIndexOf('.');
+        if (dotIdx >= 0) name = name.Substring(dotIdx + 1);
+        // Suffix temizle: "CollisionJob.Execute()" → "CollisionJob"
+        int parenIdx = name.IndexOf('(');
+        if (parenIdx > 0) name = name.Substring(0, parenIdx);
+        return KNOWN_ECS_JOBS.ContainsKey(name) ? name : null;
+    }
+
+    private void RecordEcsJobFrameData(AnalysisSnapshot snapshot, int frameIndex, string systemName, float timeMs)
+    {
+        var list = snapshot.ecsFrameTimeline;
+        if (list.Count == 0 || list[list.Count - 1].frameIndex != frameIndex) return;
+        var fd = list[list.Count - 1];
+        if (fd.jobTimesMs == null) fd.jobTimesMs = new Dictionary<string, float>();
+        fd.jobTimesMs.TryGetValue(systemName, out float existing);
+        fd.jobTimesMs[systemName] = existing + timeMs; // Birden fazla worker'dan toplanabilir
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -867,6 +1173,24 @@ public class ProfilerDataAnalyzer : EditorWindow
             .OrderByDescending(g => g.totalGcBytes)
             .Take(TOP_GC_CHAIN_CALLERS)
             .ToList();
+
+        // ECS derived cache — sync point threshold hesapla
+        foreach (var entry in s.ecsSystemMap.Values)
+        {
+            float avgSync = entry.frameCount > 0 ? (float)(entry.syncPointTimeMs / entry.frameCount) : 0;
+            entry.hasSyncPoint = avgSync >= SYNC_POINT_THRESHOLD_MS;
+        }
+
+        s.ecsSystemsSorted = s.ecsSystemMap.Values
+            .OrderByDescending(e => e.totalTimeMs).ToList();
+        s.physicsPipelineSystems = new List<EcsSystemEntry>();
+        foreach (var n in PHYSICS_PIPELINE_SYSTEMS)
+            if (s.ecsSystemMap.TryGetValue(n, out var e)) s.physicsPipelineSystems.Add(e);
+        if (s.ecsFrameTimeline.Count > 0)
+        {
+            s.avgPhysicsPipelineMs = (float)s.ecsFrameTimeline.Average(f => f.totalPipelineTimeMs);
+            s.maxPhysicsPipelineMs = s.ecsFrameTimeline.Max(f => f.totalPipelineTimeMs);
+        }
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -902,6 +1226,49 @@ public class ProfilerDataAnalyzer : EditorWindow
             return false;
 
         return functionName.StartsWith(USER_CODE_PREFIX, StringComparison.Ordinal);
+    }
+
+    private static string ExtractSystemName(string markerName)
+    {
+        if (string.IsNullOrEmpty(markerName)) return null;
+        string name = markerName;
+        int nsIdx = name.LastIndexOf('.');
+        if (nsIdx >= 0) name = name.Substring(nsIdx + 1);
+        // "System.OnUpdate()" gibi suffix'leri temizle
+        int parenIdx = name.IndexOf('(');
+        if (parenIdx > 0) name = name.Substring(0, parenIdx);
+        return KNOWN_ECS_SYSTEMS.ContainsKey(name) ? name : null;
+    }
+
+    private const float SYNC_POINT_THRESHOLD_MS = 0.5f;
+
+    private static bool IsSyncPointMarker(string name)
+    {
+        if (name == null) return false;
+        // Sadece gercek sync/bekleme marker'larini yakala
+        // "JobHandle.Complete" standart ECS akisi — onu degil,
+        // CompleteDependency, Sync Point gibi blokleyici olanlari hedefle
+        return name.Contains("Sync Point")
+            || name.Contains("CompleteDependency")
+            || name.Contains("CompleteAllJobs");
+    }
+
+    private void RecordEcsFrameData(AnalysisSnapshot snapshot, int frameIndex, string systemName, float timeMs)
+    {
+        var list = snapshot.ecsFrameTimeline;
+        EcsFrameData fd;
+        if (list.Count > 0 && list[list.Count - 1].frameIndex == frameIndex)
+            fd = list[list.Count - 1];
+        else
+        {
+            fd = new EcsFrameData { frameIndex = frameIndex, systemTimesMs = new Dictionary<string, float>() };
+            list.Add(fd);
+        }
+        fd.systemTimesMs[systemName] = timeMs;
+        float total = 0f;
+        foreach (var ps in PHYSICS_PIPELINE_SYSTEMS)
+            if (fd.systemTimesMs.TryGetValue(ps, out float t)) total += t;
+        fd.totalPipelineTimeMs = total;
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -1553,6 +1920,346 @@ public class ProfilerDataAnalyzer : EditorWindow
     }
 
     // ═══════════════════════════════════════════════════════════
+    // TAB 9: ECS PIPELINE
+    // ═══════════════════════════════════════════════════════════
+
+    private void DrawEcsPipelineContent()
+    {
+        var snapshot = _activeSnapshot;
+        if (snapshot == null || snapshot.ecsSystemsSorted == null || snapshot.ecsSystemsSorted.Count == 0)
+        {
+            EditorGUILayout.HelpBox("ECS sistem verisi bulunamadi. Profiler verisinde bilinen DeadWalls ECS sistemi tespit edilemedi.", MessageType.Info);
+            return;
+        }
+
+        EditorGUILayout.LabelField($"ECS Sistemleri ({snapshot.ecsSystemsSorted.Count} sistem tespit edildi)", EditorStyles.boldLabel);
+        EditorGUILayout.HelpBox(
+            "Toplam/Ort/Max = main thread inclusive sure (dispatch + job bekleme dahil).\n" +
+            "Self = sadece sistemin kendi kodu (schedule, ECB, vs.).\n" +
+            "Child = Toplam - Self (job bekleme + child marker sureleri).\n" +
+            "Toplam >> Self ise zamanin cogu job beklemede harcaniyordur.",
+            MessageType.Info);
+        EditorGUILayout.Space(4);
+
+        // Grup bazli gosterim
+        var groups = snapshot.ecsSystemsSorted.GroupBy(e => e.groupName).OrderBy(g => g.Key);
+
+        foreach (var group in groups)
+        {
+            EditorGUILayout.LabelField($"  {group.Key}", EditorStyles.boldLabel);
+            EditorGUILayout.Space(2);
+
+            // Header
+            EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
+            GUILayout.Label("Sistem", EditorStyles.boldLabel, GUILayout.Width(200));
+            GUILayout.Label("Toplam (ms)", EditorStyles.boldLabel, GUILayout.Width(85));
+            GUILayout.Label("Ort (ms)", EditorStyles.boldLabel, GUILayout.Width(70));
+            GUILayout.Label("Max (ms)", EditorStyles.boldLabel, GUILayout.Width(70));
+            GUILayout.Label("Self (ms)", EditorStyles.boldLabel, GUILayout.Width(70));
+            GUILayout.Label("Child Avg", EditorStyles.boldLabel, GUILayout.Width(70));
+            GUILayout.Label("Child Max", EditorStyles.boldLabel, GUILayout.Width(70));
+            GUILayout.Label("GC", EditorStyles.boldLabel, GUILayout.Width(70));
+            GUILayout.Label("Sync", EditorStyles.boldLabel, GUILayout.Width(50));
+            EditorGUILayout.EndHorizontal();
+
+            foreach (var sys in group.OrderByDescending(e => e.totalTimeMs))
+            {
+                EditorGUILayout.BeginHorizontal();
+
+                GUILayout.Label(sys.systemName, GUILayout.Width(200));
+
+                GUI.color = GetSeverityColor((float)sys.totalTimeMs, CPU_WARNING_MS * 100, CPU_CRITICAL_MS * 100);
+                GUILayout.Label($"{sys.totalTimeMs:F2}", GUILayout.Width(85));
+                GUI.color = Color.white;
+
+                GUI.color = GetSeverityColor(sys.AvgTimeMs, CPU_WARNING_MS, CPU_CRITICAL_MS);
+                GUILayout.Label($"{sys.AvgTimeMs:F3}", GUILayout.Width(70));
+                GUI.color = Color.white;
+
+                GUI.color = GetSeverityColor(sys.maxTimeMs, CPU_WARNING_MS, CPU_CRITICAL_MS);
+                GUILayout.Label($"{sys.maxTimeMs:F3}", GUILayout.Width(70));
+                GUI.color = Color.white;
+
+                GUILayout.Label($"{sys.totalSelfTimeMs:F2}", GUILayout.Width(70));
+
+                // Child Avg
+                if (sys.jobTimeMs > 0)
+                {
+                    GUI.color = GetSeverityColor(sys.AvgJobTimeMs, CPU_WARNING_MS, CPU_CRITICAL_MS);
+                    GUILayout.Label($"{sys.AvgJobTimeMs:F3}", GUILayout.Width(70));
+                    GUI.color = Color.white;
+                }
+                else
+                {
+                    GUILayout.Label("-", GUILayout.Width(70));
+                }
+
+                // Child Max
+                if (sys.maxJobTimeMs > 0)
+                {
+                    GUI.color = GetSeverityColor(sys.maxJobTimeMs, CPU_WARNING_MS, CPU_CRITICAL_MS);
+                    GUILayout.Label($"{sys.maxJobTimeMs:F3}", GUILayout.Width(70));
+                    GUI.color = Color.white;
+                }
+                else
+                {
+                    GUILayout.Label("-", GUILayout.Width(70));
+                }
+
+                GUI.color = GetSeverityColor((float)sys.totalGcBytes, GC_WARNING_BYTES, GC_CRITICAL_BYTES);
+                GUILayout.Label(sys.totalGcBytes > 0 ? FormatBytes((long)sys.totalGcBytes) : "-", GUILayout.Width(70));
+                GUI.color = Color.white;
+
+                if (sys.hasSyncPoint)
+                {
+                    GUI.color = new Color(1f, 0.5f, 0.2f);
+                    GUILayout.Label("BLOCK", GUILayout.Width(50));
+                    GUI.color = Color.white;
+                }
+                else
+                {
+                    GUILayout.Label("-", GUILayout.Width(50));
+                }
+
+                EditorGUILayout.EndHorizontal();
+            }
+
+            EditorGUILayout.Space(8);
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // TAB 10: PHYSICS BREAKDOWN
+    // ═══════════════════════════════════════════════════════════
+
+    private static readonly Color[] PHYSICS_COLORS =
+    {
+        new Color(0.3f, 0.8f, 0.3f),   // ApplyMovementForce: yesil
+        new Color(0.9f, 0.9f, 0.2f),   // BuildSpatialHash: sari
+        new Color(0.9f, 0.3f, 0.3f),   // PhysicsCollision: kirmizi
+        new Color(0.3f, 0.5f, 0.9f),   // Integrate: mavi
+        new Color(0.9f, 0.6f, 0.2f),   // Boundary: turuncu
+    };
+
+    private void DrawPhysicsBreakdownContent()
+    {
+        var snapshot = _activeSnapshot;
+        if (snapshot == null || snapshot.physicsPipelineSystems == null || snapshot.physicsPipelineSystems.Count == 0)
+        {
+            EditorGUILayout.HelpBox("Physics pipeline verisi bulunamadi.", MessageType.Info);
+            return;
+        }
+
+        // Pipeline ozeti
+        EditorGUILayout.LabelField("Physics Pipeline Ozeti", EditorStyles.boldLabel);
+        EditorGUILayout.LabelField($"Ortalama pipeline suresi: {FormatMs(snapshot.avgPhysicsPipelineMs)} | Max: {FormatMs(snapshot.maxPhysicsPipelineMs)}");
+        EditorGUILayout.Space(8);
+
+        // Stacked bar chart
+        EditorGUILayout.LabelField("Pipeline Dagilimi (Stacked Bar)", EditorStyles.boldLabel);
+        EditorGUILayout.Space(4);
+
+        double totalPipelineTime = snapshot.physicsPipelineSystems.Sum(s => s.totalTimeMs);
+
+        // Renk aciklamasi
+        EditorGUILayout.BeginHorizontal();
+        for (int i = 0; i < snapshot.physicsPipelineSystems.Count && i < PHYSICS_COLORS.Length; i++)
+        {
+            var sys = snapshot.physicsPipelineSystems[i];
+            float pct = totalPipelineTime > 0 ? (float)(sys.totalTimeMs / totalPipelineTime * 100) : 0;
+            GUI.color = PHYSICS_COLORS[i];
+            GUILayout.Label($"  {sys.systemName} ({pct:F1}%)", GUILayout.Width(180));
+        }
+        GUI.color = Color.white;
+        EditorGUILayout.EndHorizontal();
+        EditorGUILayout.Space(2);
+
+        // Stacked bar
+        Rect barRect = GUILayoutUtility.GetRect(100, 28, GUILayout.ExpandWidth(true));
+        float barX = barRect.x;
+        for (int i = 0; i < snapshot.physicsPipelineSystems.Count && i < PHYSICS_COLORS.Length; i++)
+        {
+            var sys = snapshot.physicsPipelineSystems[i];
+            float pct = totalPipelineTime > 0 ? (float)(sys.totalTimeMs / totalPipelineTime) : 0;
+            float segmentWidth = barRect.width * pct;
+            if (segmentWidth > 0)
+            {
+                EditorGUI.DrawRect(new Rect(barX, barRect.y, segmentWidth, barRect.height), PHYSICS_COLORS[i]);
+                barX += segmentWidth;
+            }
+        }
+        // arka plan
+        EditorGUI.DrawRect(new Rect(barX, barRect.y, barRect.width - (barX - barRect.x), barRect.height),
+            new Color(0.2f, 0.2f, 0.2f, 0.3f));
+
+        EditorGUILayout.Space(12);
+
+        // Detay tablosu
+        EditorGUILayout.LabelField("Sistem Detaylari (calisma sirasina gore)", EditorStyles.boldLabel);
+        EditorGUILayout.Space(2);
+
+        EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
+        GUILayout.Label("#", EditorStyles.boldLabel, GUILayout.Width(30));
+        GUILayout.Label("Sistem", EditorStyles.boldLabel, GUILayout.Width(200));
+        GUILayout.Label("Ort (ms)", EditorStyles.boldLabel, GUILayout.Width(70));
+        GUILayout.Label("Max (ms)", EditorStyles.boldLabel, GUILayout.Width(70));
+        GUILayout.Label("Child Avg", EditorStyles.boldLabel, GUILayout.Width(70));
+        GUILayout.Label("Child Max", EditorStyles.boldLabel, GUILayout.Width(70));
+        GUILayout.Label("Toplam (ms)", EditorStyles.boldLabel, GUILayout.Width(85));
+        GUILayout.Label("%", EditorStyles.boldLabel, GUILayout.Width(50));
+        GUILayout.Label("Sync", EditorStyles.boldLabel, GUILayout.Width(50));
+        EditorGUILayout.EndHorizontal();
+
+        for (int i = 0; i < snapshot.physicsPipelineSystems.Count; i++)
+        {
+            var sys = snapshot.physicsPipelineSystems[i];
+            float pct = totalPipelineTime > 0 ? (float)(sys.totalTimeMs / totalPipelineTime * 100) : 0;
+
+            EditorGUILayout.BeginHorizontal();
+
+            GUI.color = (i < PHYSICS_COLORS.Length) ? PHYSICS_COLORS[i] : Color.white;
+            GUILayout.Label($"{i + 1}", GUILayout.Width(30));
+            GUILayout.Label(sys.systemName, GUILayout.Width(200));
+            GUI.color = Color.white;
+
+            GUI.color = GetSeverityColor(sys.AvgTimeMs, CPU_WARNING_MS, CPU_CRITICAL_MS);
+            GUILayout.Label($"{sys.AvgTimeMs:F3}", GUILayout.Width(70));
+            GUI.color = Color.white;
+
+            GUI.color = GetSeverityColor(sys.maxTimeMs, CPU_WARNING_MS, CPU_CRITICAL_MS);
+            GUILayout.Label($"{sys.maxTimeMs:F3}", GUILayout.Width(70));
+            GUI.color = Color.white;
+
+            // Child Avg (Total - Self)
+            if (sys.jobTimeMs > 0)
+            {
+                GUI.color = GetSeverityColor(sys.AvgJobTimeMs, CPU_WARNING_MS, CPU_CRITICAL_MS);
+                GUILayout.Label($"{sys.AvgJobTimeMs:F3}", GUILayout.Width(70));
+                GUI.color = Color.white;
+            }
+            else
+            {
+                GUILayout.Label("-", GUILayout.Width(70));
+            }
+
+            // Child Max
+            if (sys.maxJobTimeMs > 0)
+            {
+                GUI.color = GetSeverityColor(sys.maxJobTimeMs, CPU_WARNING_MS, CPU_CRITICAL_MS);
+                GUILayout.Label($"{sys.maxJobTimeMs:F3}", GUILayout.Width(70));
+                GUI.color = Color.white;
+            }
+            else
+            {
+                GUILayout.Label("-", GUILayout.Width(70));
+            }
+
+            GUILayout.Label($"{sys.totalTimeMs:F2}", GUILayout.Width(85));
+            GUILayout.Label($"{pct:F1}%", GUILayout.Width(50));
+
+            if (sys.hasSyncPoint)
+            {
+                GUI.color = new Color(1f, 0.5f, 0.2f);
+                GUILayout.Label("BLOCK", GUILayout.Width(50));
+                GUI.color = Color.white;
+            }
+            else
+            {
+                GUILayout.Label("-", GUILayout.Width(50));
+            }
+
+            EditorGUILayout.EndHorizontal();
+        }
+
+        // Sync point uyarisi
+        bool anySyncPoint = snapshot.physicsPipelineSystems.Any(s => s.hasSyncPoint);
+        if (anySyncPoint)
+        {
+            EditorGUILayout.Space(8);
+            var syncSystems = snapshot.physicsPipelineSystems.Where(s => s.hasSyncPoint).ToList();
+            string syncNames = string.Join(", ", syncSystems.Select(s => s.systemName));
+            double syncTotal = syncSystems.Sum(s => s.syncPointTimeMs);
+            EditorGUILayout.HelpBox(
+                $"Sync Point Tespit Edildi!\n\n" +
+                $"Sistemler: {syncNames}\n" +
+                $"Toplam sync bekleme: {FormatMs((float)syncTotal)}\n\n" +
+                "Bu sistemlerdeki .Complete() cagrilari main thread'i bloklayarak paralelligi kirabilir.",
+                MessageType.Warning);
+        }
+
+        EditorGUILayout.Space(12);
+
+        // Top 10 en yavas pipeline frame'leri
+        if (snapshot.ecsFrameTimeline != null && snapshot.ecsFrameTimeline.Count > 0)
+        {
+            EditorGUILayout.LabelField("Top 10 En Yavas Pipeline Frame", EditorStyles.boldLabel);
+            EditorGUILayout.Space(2);
+
+            var topFrames = snapshot.ecsFrameTimeline
+                .OrderByDescending(f => f.totalPipelineTimeMs)
+                .Take(10)
+                .ToList();
+
+            EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
+            GUILayout.Label("#", EditorStyles.boldLabel, GUILayout.Width(30));
+            GUILayout.Label("Frame", EditorStyles.boldLabel, GUILayout.Width(60));
+            GUILayout.Label("Pipeline", EditorStyles.boldLabel, GUILayout.Width(70));
+            foreach (var psName in PHYSICS_PIPELINE_SYSTEMS)
+            {
+                string shortName = psName.Replace("System", "");
+                GUILayout.Label(shortName, EditorStyles.boldLabel, GUILayout.Width(80));
+            }
+            GUILayout.Label("| Child Tot", EditorStyles.boldLabel, GUILayout.Width(80));
+            foreach (var psName in PHYSICS_PIPELINE_SYSTEMS)
+            {
+                string shortName = psName.Replace("System", "");
+                GUILayout.Label("C:" + shortName.Substring(0, Math.Min(6, shortName.Length)), EditorStyles.boldLabel, GUILayout.Width(70));
+            }
+            EditorGUILayout.EndHorizontal();
+
+            for (int i = 0; i < topFrames.Count; i++)
+            {
+                var fd = topFrames[i];
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.Label($"{i + 1}", GUILayout.Width(30));
+                GUILayout.Label($"{fd.frameIndex}", GUILayout.Width(60));
+
+                GUI.color = GetSeverityColor(fd.totalPipelineTimeMs, CPU_WARNING_MS * 5, CPU_CRITICAL_MS * 5);
+                GUILayout.Label(FormatMs(fd.totalPipelineTimeMs), GUILayout.Width(70));
+                GUI.color = Color.white;
+
+                foreach (var psName in PHYSICS_PIPELINE_SYSTEMS)
+                {
+                    fd.systemTimesMs.TryGetValue(psName, out float sysTime);
+                    GUI.color = GetSeverityColor(sysTime, CPU_WARNING_MS, CPU_CRITICAL_MS);
+                    GUILayout.Label(sysTime > 0 ? FormatMs(sysTime) : "-", GUILayout.Width(80));
+                    GUI.color = Color.white;
+                }
+
+                // Child timing kolonu (Total - Self)
+                float jobTotal = 0;
+                if (fd.jobTimesMs != null)
+                    foreach (var psName in PHYSICS_PIPELINE_SYSTEMS)
+                        if (fd.jobTimesMs.TryGetValue(psName, out float jt)) jobTotal += jt;
+                GUI.color = GetSeverityColor(jobTotal, CPU_WARNING_MS * 5, CPU_CRITICAL_MS * 5);
+                GUILayout.Label(jobTotal > 0 ? FormatMs(jobTotal) : "-", GUILayout.Width(80));
+                GUI.color = Color.white;
+
+                foreach (var psName in PHYSICS_PIPELINE_SYSTEMS)
+                {
+                    float jobTime = 0;
+                    if (fd.jobTimesMs != null) fd.jobTimesMs.TryGetValue(psName, out jobTime);
+                    GUI.color = GetSeverityColor(jobTime, CPU_WARNING_MS, CPU_CRITICAL_MS);
+                    GUILayout.Label(jobTime > 0 ? FormatMs(jobTime) : "-", GUILayout.Width(70));
+                    GUI.color = Color.white;
+                }
+
+                EditorGUILayout.EndHorizontal();
+            }
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════
     // TAB 8: COMPARE (V3)
     // ═══════════════════════════════════════════════════════════
 
@@ -1779,6 +2486,16 @@ public class ProfilerDataAnalyzer : EditorWindow
 
         // ── Section 11: Call Chain Delta ──
         DrawCompareCallChainDelta("Call Chain GC Delta (Top 15)", a, b, 15);
+
+        EditorGUILayout.Space(12);
+
+        // ── Section 12: ECS System Delta ──
+        DrawCompareEcsSystemDelta("ECS System Delta", a, b);
+
+        EditorGUILayout.Space(12);
+
+        // ── Section 13: Physics Pipeline Delta ──
+        DrawComparePhysicsPipelineDelta("Physics Pipeline Delta", a, b);
 
         EditorGUILayout.EndScrollView();
     }
@@ -2071,6 +2788,165 @@ public class ProfilerDataAnalyzer : EditorWindow
         }
     }
 
+    private void DrawCompareEcsSystemDelta(string title, AnalysisSnapshot a, AnalysisSnapshot b)
+    {
+        EditorGUILayout.LabelField(title, EditorStyles.boldLabel);
+        EditorGUILayout.Space(2);
+
+        if ((a.ecsSystemsSorted == null || a.ecsSystemsSorted.Count == 0) &&
+            (b.ecsSystemsSorted == null || b.ecsSystemsSorted.Count == 0))
+        {
+            EditorGUILayout.HelpBox("ECS sistem verisi yok.", MessageType.Info);
+            return;
+        }
+
+        // Tum sistem adlarini birlestir
+        var allNames = new HashSet<string>();
+        if (a.ecsSystemMap != null)
+            foreach (var k in a.ecsSystemMap.Keys) allNames.Add(k);
+        if (b.ecsSystemMap != null)
+            foreach (var k in b.ecsSystemMap.Keys) allNames.Add(k);
+
+        var deltas = new List<(string name, float aAvg, float bAvg, float delta, float aJobAvg, float bJobAvg, float jobDelta)>();
+        foreach (var name in allNames)
+        {
+            float aAvg = 0, bAvg = 0, aJobAvg = 0, bJobAvg = 0;
+            if (a.ecsSystemMap != null && a.ecsSystemMap.TryGetValue(name, out var ae)) { aAvg = ae.AvgTimeMs; aJobAvg = ae.AvgJobTimeMs; }
+            if (b.ecsSystemMap != null && b.ecsSystemMap.TryGetValue(name, out var be)) { bAvg = be.AvgTimeMs; bJobAvg = be.AvgJobTimeMs; }
+            deltas.Add((name, aAvg, bAvg, bAvg - aAvg, aJobAvg, bJobAvg, bJobAvg - aJobAvg));
+        }
+
+        deltas.Sort((x, y) => Math.Abs(y.delta).CompareTo(Math.Abs(x.delta)));
+
+        EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
+        GUILayout.Label("#", EditorStyles.boldLabel, GUILayout.Width(30));
+        GUILayout.Label("ECS Sistem", EditorStyles.boldLabel, GUILayout.Width(200));
+        GUILayout.Label("A Avg", EditorStyles.boldLabel, GUILayout.Width(70));
+        GUILayout.Label("B Avg", EditorStyles.boldLabel, GUILayout.Width(70));
+        GUILayout.Label("Delta", EditorStyles.boldLabel, GUILayout.Width(90));
+        GUILayout.Label("A Child", EditorStyles.boldLabel, GUILayout.Width(70));
+        GUILayout.Label("B Child", EditorStyles.boldLabel, GUILayout.Width(70));
+        GUILayout.Label("Child Δ", EditorStyles.boldLabel, GUILayout.Width(90));
+        EditorGUILayout.EndHorizontal();
+
+        for (int i = 0; i < deltas.Count; i++)
+        {
+            var d = deltas[i];
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Label($"{i + 1}", GUILayout.Width(30));
+            GUILayout.Label(d.name, GUILayout.Width(200));
+            GUILayout.Label(FormatMs(d.aAvg), GUILayout.Width(70));
+            GUILayout.Label(FormatMs(d.bAvg), GUILayout.Width(70));
+            DrawDeltaLabel(d.aAvg, d.bAvg, true, 90);
+
+            // Job Avg delta
+            GUILayout.Label(d.aJobAvg > 0 ? FormatMs(d.aJobAvg) : "-", GUILayout.Width(70));
+            GUILayout.Label(d.bJobAvg > 0 ? FormatMs(d.bJobAvg) : "-", GUILayout.Width(70));
+            if (d.aJobAvg > 0 || d.bJobAvg > 0)
+                DrawDeltaLabel(d.aJobAvg, d.bJobAvg, true, 90);
+            else
+                GUILayout.Label("-", GUILayout.Width(90));
+
+            EditorGUILayout.EndHorizontal();
+        }
+    }
+
+    private void DrawComparePhysicsPipelineDelta(string title, AnalysisSnapshot a, AnalysisSnapshot b)
+    {
+        EditorGUILayout.LabelField(title, EditorStyles.boldLabel);
+        EditorGUILayout.Space(2);
+
+        bool aHas = a.physicsPipelineSystems != null && a.physicsPipelineSystems.Count > 0;
+        bool bHas = b.physicsPipelineSystems != null && b.physicsPipelineSystems.Count > 0;
+
+        if (!aHas && !bHas)
+        {
+            EditorGUILayout.HelpBox("Physics pipeline verisi yok.", MessageType.Info);
+            return;
+        }
+
+        // Pipeline Avg/Max karsilastirma
+        DrawCompareRow("Pipeline Avg (ms)", a.avgPhysicsPipelineMs, b.avgPhysicsPipelineMs, true, FormatMs);
+        DrawCompareRow("Pipeline Max (ms)", a.maxPhysicsPipelineMs, b.maxPhysicsPipelineMs, true, FormatMs);
+
+        EditorGUILayout.Space(8);
+
+        // Sistem bazinda before/after delta (main thread + job)
+        EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
+        GUILayout.Label("Sistem", EditorStyles.boldLabel, GUILayout.Width(200));
+        GUILayout.Label("A Avg", EditorStyles.boldLabel, GUILayout.Width(70));
+        GUILayout.Label("B Avg", EditorStyles.boldLabel, GUILayout.Width(70));
+        GUILayout.Label("Delta", EditorStyles.boldLabel, GUILayout.Width(90));
+        GUILayout.Label("A Child", EditorStyles.boldLabel, GUILayout.Width(70));
+        GUILayout.Label("B Child", EditorStyles.boldLabel, GUILayout.Width(70));
+        GUILayout.Label("Child Δ", EditorStyles.boldLabel, GUILayout.Width(90));
+        EditorGUILayout.EndHorizontal();
+
+        foreach (var psName in PHYSICS_PIPELINE_SYSTEMS)
+        {
+            float aAvg = 0, bAvg = 0, aJobAvg = 0, bJobAvg = 0;
+            if (a.ecsSystemMap != null && a.ecsSystemMap.TryGetValue(psName, out var ae)) { aAvg = ae.AvgTimeMs; aJobAvg = ae.AvgJobTimeMs; }
+            if (b.ecsSystemMap != null && b.ecsSystemMap.TryGetValue(psName, out var be)) { bAvg = be.AvgTimeMs; bJobAvg = be.AvgJobTimeMs; }
+
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Label(psName, GUILayout.Width(200));
+            GUILayout.Label(FormatMs(aAvg), GUILayout.Width(70));
+            GUILayout.Label(FormatMs(bAvg), GUILayout.Width(70));
+            DrawDeltaLabel(aAvg, bAvg, true, 90);
+
+            GUILayout.Label(aJobAvg > 0 ? FormatMs(aJobAvg) : "-", GUILayout.Width(70));
+            GUILayout.Label(bJobAvg > 0 ? FormatMs(bJobAvg) : "-", GUILayout.Width(70));
+            if (aJobAvg > 0 || bJobAvg > 0)
+                DrawDeltaLabel(aJobAvg, bJobAvg, true, 90);
+            else
+                GUILayout.Label("-", GUILayout.Width(90));
+
+            EditorGUILayout.EndHorizontal();
+        }
+
+        EditorGUILayout.Space(4);
+
+        // Stacked bar A vs B yan yana
+        if (aHas && bHas)
+        {
+            EditorGUILayout.LabelField("Pipeline Dagilimi (A vs B)", EditorStyles.boldLabel);
+            EditorGUILayout.Space(2);
+
+            double aTotalPipeline = a.physicsPipelineSystems.Sum(s => s.totalTimeMs);
+            double bTotalPipeline = b.physicsPipelineSystems.Sum(s => s.totalTimeMs);
+
+            // Bar A
+            GUILayout.Label("A:", EditorStyles.miniLabel);
+            Rect barA = GUILayoutUtility.GetRect(100, 20, GUILayout.ExpandWidth(true));
+            float xA = barA.x;
+            for (int i = 0; i < PHYSICS_PIPELINE_SYSTEMS.Length && i < PHYSICS_COLORS.Length; i++)
+            {
+                float pct = 0;
+                if (a.ecsSystemMap != null && a.ecsSystemMap.TryGetValue(PHYSICS_PIPELINE_SYSTEMS[i], out var ae))
+                    pct = aTotalPipeline > 0 ? (float)(ae.totalTimeMs / aTotalPipeline) : 0;
+                float w = barA.width * pct;
+                if (w > 0) EditorGUI.DrawRect(new Rect(xA, barA.y, w, barA.height), PHYSICS_COLORS[i]);
+                xA += w;
+            }
+            EditorGUI.DrawRect(new Rect(xA, barA.y, barA.width - (xA - barA.x), barA.height), new Color(0.2f, 0.2f, 0.2f, 0.3f));
+
+            // Bar B
+            GUILayout.Label("B:", EditorStyles.miniLabel);
+            Rect barB = GUILayoutUtility.GetRect(100, 20, GUILayout.ExpandWidth(true));
+            float xB = barB.x;
+            for (int i = 0; i < PHYSICS_PIPELINE_SYSTEMS.Length && i < PHYSICS_COLORS.Length; i++)
+            {
+                float pct = 0;
+                if (b.ecsSystemMap != null && b.ecsSystemMap.TryGetValue(PHYSICS_PIPELINE_SYSTEMS[i], out var be))
+                    pct = bTotalPipeline > 0 ? (float)(be.totalTimeMs / bTotalPipeline) : 0;
+                float w = barB.width * pct;
+                if (w > 0) EditorGUI.DrawRect(new Rect(xB, barB.y, w, barB.height), PHYSICS_COLORS[i]);
+                xB += w;
+            }
+            EditorGUI.DrawRect(new Rect(xB, barB.y, barB.width - (xB - barB.x), barB.height), new Color(0.2f, 0.2f, 0.2f, 0.3f));
+        }
+    }
+
     // ═══════════════════════════════════════════════════════════
     // EXPORT REPORT
     // ═══════════════════════════════════════════════════════════
@@ -2106,13 +2982,22 @@ public class ProfilerDataAnalyzer : EditorWindow
         }
     }
 
+    private int _reportSectionCounter;
+
+    private string NextSectionNumber()
+    {
+        _reportSectionCounter++;
+        return _reportSectionCounter.ToString();
+    }
+
     private string GenerateTextReport()
     {
+        _reportSectionCounter = 0;
         var sb = new StringBuilder(32768);
 
         sb.AppendLine("╔═══════════════════════════════════════════════════════════════╗");
         sb.AppendLine("║           UNITY PROFILER DATA ANALYSIS REPORT                ║");
-        sb.AppendLine("║           Airport Security — Performance Analysis            ║");
+        sb.AppendLine("║           DeadWalls — Performance Analysis                   ║");
         sb.AppendLine("╚═══════════════════════════════════════════════════════════════╝");
         sb.AppendLine();
         sb.AppendLine($"  Tarih          : {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
@@ -2124,33 +3009,18 @@ public class ProfilerDataAnalyzer : EditorWindow
         sb.AppendLine($"  Analiz edilen  : {(_snapshotA?.totalFrames ?? 0) - (_snapshotA?.skippedFrames ?? 0)}");
         sb.AppendLine();
 
-        // Section 1: Frame Timing Overview
         AppendFrameTimingOverview(sb);
-
-        // Section 2: Top Slowest Frames
         AppendTopSlowestFrames(sb);
-
-        // Section 3: Top Most Expensive Functions
         AppendTopExpensiveFunctions(sb);
-
-        // Section 4: Update Breakdown
         AppendUpdateBreakdown(sb);
-
-        // Section 5: User Code
         AppendUserCodeFunctions(sb);
-
-        // Section 6: Rendering
         AppendRenderingStatistics(sb);
-
-        // Section 7: GC Analysis
         AppendGcAllocationAnalysis(sb);
-
-        // Section 8: Call Chains
         AppendCallChains(sb);
-
-        // Section 9: Compare (if B loaded)
         if (_snapshotB != null)
             AppendCompareSection(sb);
+        AppendEcsPipelineSection(sb);
+        AppendPhysicsBreakdownSection(sb);
 
         sb.AppendLine("═══════════════════════════════════════════════════════════════");
         sb.AppendLine("                      RAPOR SONU");
@@ -2166,7 +3036,7 @@ public class ProfilerDataAnalyzer : EditorWindow
     private void AppendFrameTimingOverview(StringBuilder sb)
     {
         sb.AppendLine("═══════════════════════════════════════════════════════════════");
-        sb.AppendLine("  1. FRAME TIMING OVERVIEW");
+        sb.AppendLine($"  {NextSectionNumber()}. FRAME TIMING OVERVIEW");
         sb.AppendLine("═══════════════════════════════════════════════════════════════");
         sb.AppendLine();
 
@@ -2214,7 +3084,7 @@ public class ProfilerDataAnalyzer : EditorWindow
     private void AppendTopSlowestFrames(StringBuilder sb)
     {
         sb.AppendLine("═══════════════════════════════════════════════════════════════");
-        sb.AppendLine("  2. TOP 20 SLOWEST FRAMES (SPIKE DETECTION)");
+        sb.AppendLine($"  {NextSectionNumber()}. TOP 20 SLOWEST FRAMES (SPIKE DETECTION)");
         sb.AppendLine("═══════════════════════════════════════════════════════════════");
         sb.AppendLine();
 
@@ -2247,7 +3117,7 @@ public class ProfilerDataAnalyzer : EditorWindow
     private void AppendTopExpensiveFunctions(StringBuilder sb)
     {
         sb.AppendLine("═══════════════════════════════════════════════════════════════");
-        sb.AppendLine("  3. TOP 30 MOST EXPENSIVE FUNCTIONS (by Self Time)");
+        sb.AppendLine($"  {NextSectionNumber()}. TOP 30 MOST EXPENSIVE FUNCTIONS (by Self Time)");
         sb.AppendLine("═══════════════════════════════════════════════════════════════");
         sb.AppendLine();
 
@@ -2274,7 +3144,7 @@ public class ProfilerDataAnalyzer : EditorWindow
     private void AppendUpdateBreakdown(StringBuilder sb)
     {
         sb.AppendLine("═══════════════════════════════════════════════════════════════");
-        sb.AppendLine("  4. UPDATE / LATEUPDATE / FIXEDUPDATE BREAKDOWN");
+        sb.AppendLine($"  {NextSectionNumber()}. UPDATE / LATEUPDATE / FIXEDUPDATE BREAKDOWN");
         sb.AppendLine("═══════════════════════════════════════════════════════════════");
         sb.AppendLine();
 
@@ -2322,7 +3192,7 @@ public class ProfilerDataAnalyzer : EditorWindow
     private void AppendUserCodeFunctions(StringBuilder sb)
     {
         sb.AppendLine("═══════════════════════════════════════════════════════════════");
-        sb.AppendLine("  5. ASSEMBLY-CSHARP FUNCTIONS (User Code Only)");
+        sb.AppendLine($"  {NextSectionNumber()}. ASSEMBLY-CSHARP FUNCTIONS (User Code Only)");
         sb.AppendLine("═══════════════════════════════════════════════════════════════");
         sb.AppendLine();
 
@@ -2352,7 +3222,7 @@ public class ProfilerDataAnalyzer : EditorWindow
     private void AppendRenderingStatistics(StringBuilder sb)
     {
         sb.AppendLine("═══════════════════════════════════════════════════════════════");
-        sb.AppendLine("  6. RENDERING STATISTICS");
+        sb.AppendLine($"  {NextSectionNumber()}. RENDERING STATISTICS");
         sb.AppendLine("═══════════════════════════════════════════════════════════════");
         sb.AppendLine();
 
@@ -2413,7 +3283,7 @@ public class ProfilerDataAnalyzer : EditorWindow
     private void AppendGcAllocationAnalysis(StringBuilder sb)
     {
         sb.AppendLine("═══════════════════════════════════════════════════════════════");
-        sb.AppendLine("  7. GC ALLOCATION ANALYSIS");
+        sb.AppendLine($"  {NextSectionNumber()}. GC ALLOCATION ANALYSIS");
         sb.AppendLine("═══════════════════════════════════════════════════════════════");
         sb.AppendLine();
 
@@ -2498,7 +3368,7 @@ public class ProfilerDataAnalyzer : EditorWindow
     private void AppendCallChains(StringBuilder sb)
     {
         sb.AppendLine("═══════════════════════════════════════════════════════════════");
-        sb.AppendLine("  8. GC CALL CHAINS (User Code → GC Producer)");
+        sb.AppendLine($"  {NextSectionNumber()}. GC CALL CHAINS (User Code → GC Producer)");
         sb.AppendLine("═══════════════════════════════════════════════════════════════");
         sb.AppendLine();
 
@@ -2531,6 +3401,115 @@ public class ProfilerDataAnalyzer : EditorWindow
         sb.AppendLine();
     }
 
+    private void AppendEcsPipelineSection(StringBuilder sb)
+    {
+        var snapshot = _snapshotA;
+        if (snapshot?.ecsSystemsSorted == null || snapshot.ecsSystemsSorted.Count == 0)
+            return;
+
+        sb.AppendLine("═══════════════════════════════════════════════════════════════");
+        sb.AppendLine($"  {NextSectionNumber()}. ECS PIPELINE ANALYSIS");
+        sb.AppendLine("═══════════════════════════════════════════════════════════════");
+        sb.AppendLine();
+
+        sb.AppendLine($"  Tespit edilen ECS sistem sayisi: {snapshot.ecsSystemsSorted.Count}");
+        sb.AppendLine("  Not: Toplam/Ort/Max = main thread inclusive sure (dispatch + job bekleme dahil)");
+        sb.AppendLine("        Self = sadece sistemin kendi kodu (schedule, ECB, vs.)");
+        sb.AppendLine("        Child = Toplam - Self (job bekleme + child marker sureleri)");
+        sb.AppendLine();
+
+        sb.AppendLine($"    {"Sistem",-30}{"Toplam(ms)",12}{"Ort(ms)",10}{"Child Avg",10}{"Child Max",10}{"Self(ms)",10}{"GC",10}{"Sync",8}");
+        sb.AppendLine($"    {"──────────────────────────────",-30}{"──────────",12}{"────────",10}{"────────",10}{"────────",10}{"────────",10}{"────────",10}{"──────",8}");
+
+        foreach (var sys in snapshot.ecsSystemsSorted)
+        {
+            string gc = sys.totalGcBytes > 0 ? FormatBytes((long)sys.totalGcBytes) : "-";
+            string sync = sys.hasSyncPoint ? "BLOCK" : "-";
+            string jobAvg = sys.jobTimeMs > 0 ? $"{sys.AvgJobTimeMs:F3}" : "-";
+            string jobMax = sys.maxJobTimeMs > 0 ? $"{sys.maxJobTimeMs:F3}" : "-";
+            sb.AppendLine($"    {sys.systemName,-30}{sys.totalTimeMs,12:F2}{sys.AvgTimeMs,10:F3}{jobAvg,10}{jobMax,10}{sys.totalSelfTimeMs,10:F2}{gc,10}{sync,8}");
+        }
+        sb.AppendLine();
+    }
+
+    private void AppendPhysicsBreakdownSection(StringBuilder sb)
+    {
+        var snapshot = _snapshotA;
+        if (snapshot?.physicsPipelineSystems == null || snapshot.physicsPipelineSystems.Count == 0)
+            return;
+
+        sb.AppendLine("═══════════════════════════════════════════════════════════════");
+        sb.AppendLine($"  {NextSectionNumber()}. PHYSICS PIPELINE BREAKDOWN");
+        sb.AppendLine("═══════════════════════════════════════════════════════════════");
+        sb.AppendLine();
+
+        sb.AppendLine($"  Pipeline Ortalama (main thread): {FormatMs(snapshot.avgPhysicsPipelineMs)}");
+        sb.AppendLine($"  Pipeline Max (main thread):      {FormatMs(snapshot.maxPhysicsPipelineMs)}");
+        sb.AppendLine();
+
+        double totalPipelineTime = snapshot.physicsPipelineSystems.Sum(s => s.totalTimeMs);
+
+        sb.AppendLine($"    {"#",-4}{"Sistem",-30}{"Ort(ms)",10}{"Max(ms)",10}{"Child Avg",10}{"Child Max",10}{"Toplam(ms)",12}{"%",8}");
+        sb.AppendLine($"    {"─",-4}{"──────────────────────────────",-30}{"────────",10}{"────────",10}{"────────",10}{"────────",10}{"──────────",12}{"──────",8}");
+
+        for (int i = 0; i < snapshot.physicsPipelineSystems.Count; i++)
+        {
+            var sys = snapshot.physicsPipelineSystems[i];
+            float pct = totalPipelineTime > 0 ? (float)(sys.totalTimeMs / totalPipelineTime * 100) : 0;
+            string jobAvg = sys.jobTimeMs > 0 ? $"{sys.AvgJobTimeMs:F3}" : "-";
+            string jobMax = sys.maxJobTimeMs > 0 ? $"{sys.maxJobTimeMs:F3}" : "-";
+            sb.AppendLine($"    {i + 1,-4}{sys.systemName,-30}{sys.AvgTimeMs,10:F3}{sys.maxTimeMs,10:F3}{jobAvg,10}{jobMax,10}{sys.totalTimeMs,12:F2}{pct,7:F1}%");
+        }
+        sb.AppendLine();
+
+        // Top 10 en yavas pipeline frame
+        if (snapshot.ecsFrameTimeline != null && snapshot.ecsFrameTimeline.Count > 0)
+        {
+            sb.AppendLine("  Top 10 En Yavas Pipeline Frame:");
+            sb.AppendLine();
+
+            var topFrames = snapshot.ecsFrameTimeline
+                .OrderByDescending(f => f.totalPipelineTimeMs)
+                .Take(10)
+                .ToList();
+
+            // Kisa kolon isimleri (text raporda okunabilirlik icin)
+            string[] shortNames = { "MovForce", "SpatHash", "Collision", "Integrate", "Boundary" };
+            sb.Append($"    {"#",-4}{"Frame",-10}{"Pipeline",12}");
+            foreach (var sn in shortNames)
+                sb.Append($"{sn,12}");
+            sb.Append($"{"| ChildTot",12}");
+            foreach (var sn in shortNames)
+                sb.Append($"{"C:" + sn,12}");
+            sb.AppendLine();
+
+            for (int i = 0; i < topFrames.Count; i++)
+            {
+                var fd = topFrames[i];
+                sb.Append($"    {i + 1,-4}{fd.frameIndex,-10}{FormatMs(fd.totalPipelineTimeMs),12}");
+                foreach (var psName in PHYSICS_PIPELINE_SYSTEMS)
+                {
+                    fd.systemTimesMs.TryGetValue(psName, out float sysTime);
+                    sb.Append($"{(sysTime > 0 ? FormatMs(sysTime) : "-"),12}");
+                }
+                // Job timing
+                float jobTotal = 0;
+                if (fd.jobTimesMs != null)
+                    foreach (var psName in PHYSICS_PIPELINE_SYSTEMS)
+                        if (fd.jobTimesMs.TryGetValue(psName, out float jt)) jobTotal += jt;
+                sb.Append($"{(jobTotal > 0 ? FormatMs(jobTotal) : "-"),12}");
+                foreach (var psName in PHYSICS_PIPELINE_SYSTEMS)
+                {
+                    float jobTime = 0;
+                    if (fd.jobTimesMs != null) fd.jobTimesMs.TryGetValue(psName, out jobTime);
+                    sb.Append($"{(jobTime > 0 ? FormatMs(jobTime) : "-"),12}");
+                }
+                sb.AppendLine();
+            }
+            sb.AppendLine();
+        }
+    }
+
     // ───────────────────────────────────────────────────────────
     // TEXT REPORT: COMPARE SECTION (V4)
     // ───────────────────────────────────────────────────────────
@@ -2542,7 +3521,7 @@ public class ProfilerDataAnalyzer : EditorWindow
         if (a == null || b == null) return;
 
         sb.AppendLine("═══════════════════════════════════════════════════════════════");
-        sb.AppendLine("  9. A/B KARŞILAŞTIRMA (COMPARE)");
+        sb.AppendLine($"  {NextSectionNumber()}. A/B KARŞILAŞTIRMA (COMPARE)");
         sb.AppendLine("═══════════════════════════════════════════════════════════════");
         sb.AppendLine();
 
@@ -2641,6 +3620,91 @@ public class ProfilerDataAnalyzer : EditorWindow
         // ── User Code Delta (Top 20) ──
         AppendCompareUserCodeDeltaText(sb, "User Code Delta (Top 20)", a, b, 20);
 
+        // ── ECS System Delta ──
+        AppendCompareEcsDeltaText(sb, a, b);
+
+        // ── Physics Pipeline Delta ──
+        AppendComparePhysicsPipelineDeltaText(sb, a, b);
+
+        sb.AppendLine();
+    }
+
+    private void AppendCompareEcsDeltaText(StringBuilder sb, AnalysisSnapshot a, AnalysisSnapshot b)
+    {
+        sb.AppendLine("  ECS System Delta:");
+        sb.AppendLine();
+
+        var allNames = new HashSet<string>();
+        if (a.ecsSystemMap != null) foreach (var k in a.ecsSystemMap.Keys) allNames.Add(k);
+        if (b.ecsSystemMap != null) foreach (var k in b.ecsSystemMap.Keys) allNames.Add(k);
+
+        if (allNames.Count == 0)
+        {
+            sb.AppendLine("    ECS sistem verisi yok.");
+            sb.AppendLine();
+            return;
+        }
+
+        var deltas = new List<(string name, float aAvg, float bAvg, float delta, float aJobAvg, float bJobAvg, float jobDelta)>();
+        foreach (var name in allNames)
+        {
+            float aAvg = 0, bAvg = 0, aJobAvg = 0, bJobAvg = 0;
+            if (a.ecsSystemMap != null && a.ecsSystemMap.TryGetValue(name, out var ae)) { aAvg = ae.AvgTimeMs; aJobAvg = ae.AvgJobTimeMs; }
+            if (b.ecsSystemMap != null && b.ecsSystemMap.TryGetValue(name, out var be)) { bAvg = be.AvgTimeMs; bJobAvg = be.AvgJobTimeMs; }
+            deltas.Add((name, aAvg, bAvg, bAvg - aAvg, aJobAvg, bJobAvg, bJobAvg - aJobAvg));
+        }
+        deltas.Sort((x, y) => Math.Abs(y.delta).CompareTo(Math.Abs(x.delta)));
+
+        sb.AppendLine($"    {"#",-4}{"ECS Sistem",-30}{"A Avg",10}{"B Avg",10}{"Delta",12}{"A Child",10}{"B Child",10}{"Child Δ",12}");
+        sb.AppendLine($"    {"─",-4}{"─".PadRight(29, '─'),-30}{"────────",10}{"────────",10}{"──────────",12}{"────────",10}{"────────",10}{"──────────",12}");
+
+        for (int i = 0; i < deltas.Count; i++)
+        {
+            var d = deltas[i];
+            string arrow = d.delta > 0.001f ? "↑" : d.delta < -0.001f ? "↓" : "—";
+            string jobArrow = d.jobDelta > 0.001f ? "↑" : d.jobDelta < -0.001f ? "↓" : "—";
+            string aJobStr = d.aJobAvg > 0 ? FormatMs(d.aJobAvg) : "-";
+            string bJobStr = d.bJobAvg > 0 ? FormatMs(d.bJobAvg) : "-";
+            string jobDeltaStr = (d.aJobAvg > 0 || d.bJobAvg > 0) ? jobArrow + " " + FormatMs(Math.Abs(d.jobDelta)) : "-";
+            sb.AppendLine($"    {i + 1,-4}{d.name,-30}{FormatMs(d.aAvg),10}{FormatMs(d.bAvg),10}{arrow + " " + FormatMs(Math.Abs(d.delta)),12}{aJobStr,10}{bJobStr,10}{jobDeltaStr,12}");
+        }
+        sb.AppendLine();
+    }
+
+    private void AppendComparePhysicsPipelineDeltaText(StringBuilder sb, AnalysisSnapshot a, AnalysisSnapshot b)
+    {
+        sb.AppendLine("  Physics Pipeline Delta:");
+        sb.AppendLine();
+
+        string arrow;
+        float delta;
+
+        delta = b.avgPhysicsPipelineMs - a.avgPhysicsPipelineMs;
+        arrow = delta > 0.001f ? "↑" : delta < -0.001f ? "↓" : "—";
+        sb.AppendLine($"    Pipeline Avg (main thread): A={FormatMs(a.avgPhysicsPipelineMs)}  B={FormatMs(b.avgPhysicsPipelineMs)}  {arrow} {FormatMs(Math.Abs(delta))}");
+
+        delta = b.maxPhysicsPipelineMs - a.maxPhysicsPipelineMs;
+        arrow = delta > 0.001f ? "↑" : delta < -0.001f ? "↓" : "—";
+        sb.AppendLine($"    Pipeline Max (main thread): A={FormatMs(a.maxPhysicsPipelineMs)}  B={FormatMs(b.maxPhysicsPipelineMs)}  {arrow} {FormatMs(Math.Abs(delta))}");
+        sb.AppendLine();
+
+        sb.AppendLine($"    {"Sistem",-30}{"A Avg",10}{"B Avg",10}{"Delta",12}{"A Child",10}{"B Child",10}{"Child Δ",12}");
+        sb.AppendLine($"    {"──────────────────────────────",-30}{"────────",10}{"────────",10}{"──────────",12}{"────────",10}{"────────",10}{"──────────",12}");
+
+        foreach (var psName in PHYSICS_PIPELINE_SYSTEMS)
+        {
+            float aAvg = 0, bAvg = 0, aJobAvg = 0, bJobAvg = 0;
+            if (a.ecsSystemMap != null && a.ecsSystemMap.TryGetValue(psName, out var ae)) { aAvg = ae.AvgTimeMs; aJobAvg = ae.AvgJobTimeMs; }
+            if (b.ecsSystemMap != null && b.ecsSystemMap.TryGetValue(psName, out var be)) { bAvg = be.AvgTimeMs; bJobAvg = be.AvgJobTimeMs; }
+            delta = bAvg - aAvg;
+            arrow = delta > 0.001f ? "↑" : delta < -0.001f ? "↓" : "—";
+            float jobDelta = bJobAvg - aJobAvg;
+            string jobArrow = jobDelta > 0.001f ? "↑" : jobDelta < -0.001f ? "↓" : "—";
+            string aJobStr = aJobAvg > 0 ? FormatMs(aJobAvg) : "-";
+            string bJobStr = bJobAvg > 0 ? FormatMs(bJobAvg) : "-";
+            string jobDeltaStr = (aJobAvg > 0 || bJobAvg > 0) ? jobArrow + " " + FormatMs(Math.Abs(jobDelta)) : "-";
+            sb.AppendLine($"    {psName,-30}{FormatMs(aAvg),10}{FormatMs(bAvg),10}{arrow + " " + FormatMs(Math.Abs(delta)),12}{aJobStr,10}{bJobStr,10}{jobDeltaStr,12}");
+        }
         sb.AppendLine();
     }
 

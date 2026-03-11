@@ -10,7 +10,7 @@ namespace DeadWalls
 
     public static class SpatialHash
     {
-        public const float DefaultCellSize = 0.5f;
+        public const float DefaultCellSize = 0.35f;
 
         public static int2 GetCell(float2 pos, float cellSize)
         {
