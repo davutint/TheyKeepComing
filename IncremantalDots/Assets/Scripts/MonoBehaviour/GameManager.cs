@@ -20,6 +20,10 @@ namespace DeadWalls
         public WallSegment Wall { get; private set; }
         public GateComponent Gate { get; private set; }
         public CastleHP Castle { get; private set; }
+        public ResourceData Resources { get; private set; }
+        public ResourceProductionRate ResourceProduction { get; private set; }
+        public ResourceConsumptionRate ResourceConsumption { get; private set; }
+        public PopulationState Population { get; private set; }
 
         public event System.Action OnGameOver;
         public event System.Action OnLevelUp;
@@ -86,6 +90,10 @@ namespace DeadWalls
 
             GameState = _entityManager.GetComponentData<GameStateData>(_gameStateEntity);
             WaveState = _entityManager.GetComponentData<WaveStateData>(_gameStateEntity);
+            Resources = _entityManager.GetComponentData<ResourceData>(_gameStateEntity);
+            ResourceProduction = _entityManager.GetComponentData<ResourceProductionRate>(_gameStateEntity);
+            ResourceConsumption = _entityManager.GetComponentData<ResourceConsumptionRate>(_gameStateEntity);
+            Population = _entityManager.GetComponentData<PopulationState>(_gameStateEntity);
             Wall = _entityManager.GetComponentData<WallSegment>(_castleEntity);
             Gate = _entityManager.GetComponentData<GateComponent>(_castleEntity);
             Castle = _entityManager.GetComponentData<CastleHP>(_castleEntity);
@@ -186,11 +194,9 @@ namespace DeadWalls
             // Game state resetle
             _entityManager.SetComponentData(_gameStateEntity, new GameStateData
             {
-                Gold = 0,
                 XP = 0,
                 Level = 1,
                 XPToNextLevel = 100,
-                ClickDamage = 10f,
                 IsGameOver = false,
                 IsLevelUpPending = false
             });
@@ -209,6 +215,50 @@ namespace DeadWalls
                 WaveActive = true,
                 WaveStartDelay = 3f,
                 WaveStartTimer = 3f
+            });
+
+            // Kaynak resetle
+            _entityManager.SetComponentData(_gameStateEntity, new ResourceData
+            {
+                Wood = 100,
+                Stone = 50,
+                Iron = 20,
+                Food = 100
+            });
+
+            _entityManager.SetComponentData(_gameStateEntity, new ResourceProductionRate
+            {
+                WoodPerMin = 5f,
+                StonePerMin = 3f,
+                IronPerMin = 2f,
+                FoodPerMin = 4f
+            });
+
+            _entityManager.SetComponentData(_gameStateEntity, new ResourceConsumptionRate
+            {
+                WoodPerMin = 0f,
+                StonePerMin = 0f,
+                IronPerMin = 0f,
+                FoodPerMin = 0f
+            });
+
+            _entityManager.SetComponentData(_gameStateEntity, new ResourceAccumulator
+            {
+                Wood = 0f,
+                Stone = 0f,
+                Iron = 0f,
+                Food = 0f
+            });
+
+            // Nufus resetle
+            _entityManager.SetComponentData(_gameStateEntity, new PopulationState
+            {
+                Total = 10,
+                Workers = 0,
+                Archers = 0,
+                Idle = 10,
+                Capacity = 20,
+                FoodPerAssignedPerMin = 2f
             });
 
             // Kale resetle

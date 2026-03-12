@@ -1,9 +1,11 @@
-# ECS Systems - Mimari
+# System Calisma Sirasi ve Sync Point Stratejisi
 
 ## Calisma Sirasi (UpdateOrder)
 ```
 SimulationSystemGroup icinde:
- 1. WaveSpawnSystem              — Zombi spawn + PhysicsBody set
+-1. PopulationTickSystem     *  — Nufus hesapla + FoodPerMin guncelle
+ 0. ResourceTickSystem        *  — Kaynak uretim/tuketim tick (net hiz * dt → accumulator → int)
+ 1. WaveSpawnSystem              — Zombi spawn + wave stats uygula (ZombieStats set)
  2. ArcherShootSystem         *  — Burst + brute-force query, physics oncesi (1-frame-old pozisyon)
  3. ApplyMovementForceSystem  *  — Hedefe dogru kuvvet → PhysicsBody.Force (WallX singleton ile yon)
  4. BuildSpatialHashSystem    *  — Double-buffered spatial hash (ReadMap/WriteMap)
@@ -13,30 +15,36 @@ SimulationSystemGroup icinde:
  8. ZombieAttackTimerSystem      — IJobEntity: attack timer + NativeQueue'ya hasar yaz
  9. ArrowMoveSystem           *  — IJobEntity: ok hareket
 10. ArrowHitSystem            *  — IJobEntity + ECB: ok isabet + hasar
-11. ClickDamageSystem         *  — Spatial hash ile click damage (RequireForUpdate ile skip)
-12. ZombieDeathSystem         *  — IJobEntity: HP<=0 → Dead state
-13. ZombieAnimationStateSystem*  — IJobEntity + ECB: sprite animasyon guncelle
-14. DamageApplySystem            — TEK SYNC POINT: damage queue drain + singleton yazma
-15. DamageCleanupSystem          — DeathTimer, gold/XP, entity sil
+11. ZombieDeathSystem         *  — IJobEntity: HP<=0 → Dead state
+12. ZombieAnimationStateSystem*  — IJobEntity + ECB: sprite animasyon guncelle
+13. DamageApplySystem            — TEK SYNC POINT: damage queue drain + singleton yazma
+14. DamageCleanupSystem          — DeathTimer, XP, entity sil
 
 PresentationSystemGroup icinde:
-16. SpriteAnimationSystem     *  — IJobEntity: UV rect hesapla
+15. SpriteAnimationSystem     *  — IJobEntity: UV rect hesapla
 
 * = IJobEntity (parallel job olarak calisir, main thread bloklamaz)
 ```
 
 ## Sync Point Stratejisi
-- Sistem 2-13 arasi main thread sadece job dispatch yapar (~0.5ms)
-- **Tek sync point: DamageApplySystem** (sistem 14) — tum physics + attack job'lari tamamlanir
-- ClickDamageSystem: RequireForUpdate<ClickDamageRequest> ile %98 frame skip → pratik sync yok
+- Sistem 2-12 arasi main thread sadece job dispatch yapar (~0.5ms)
+- **Tek sync point: DamageApplySystem** (sistem 13) — tum physics + attack job'lari tamamlanir
 - WaveSpawnSystem (sistem 1) sequential ama frame basinda → onceki frame'in job'lari zaten bitmis
 
 ## System Detaylari
 
+### PopulationTickSystem (M1.2)
+→ Detay: `POPULATION_TICK_SYSTEM_ARCHITECTURE.md`
+
+### ResourceTickSystem (M1.1)
+→ Detay: `RESOURCE_TICK_SYSTEM_ARCHITECTURE.md`
+
 ### WaveSpawnSystem
 - WaveStateData singleton'dan dalga bilgilerini okur
 - SpawnTimer ile periyodik zombi spawn (batch 20)
+- **Wave stats uygulanir:** Her zombiye wave'e ozel HP, Speed, Damage degerleri yazilir
 - PhysicsBody + CollisionRadius component'lari eklenir
+- StressTestMode: `false` default (Inspector'dan degistirilebilir)
 
 ### ArcherShootSystem
 - **Physics oncesine tasindi** — `[UpdateBefore(typeof(ApplyMovementForceSystem))]`
@@ -53,9 +61,9 @@ PresentationSystemGroup icinde:
 - Attacking/Dead/Queued → kuvvet sifir
 
 ### BuildSpatialHashSystem (FIZIK — DOUBLE BUFFER)
-- **ReadMap**: onceki frame'in verisi, consumer'lar okur
+- **ReadMap**: onceki frame'in verisi, consumer'lar (Collision, Boundary) okur
 - **WriteMap**: bu frame'de hash job doldurur
-- Her frame swap yapilir, .Complete() YOKU — main thread bloklanmaz
+- Her frame swap yapilir, .Complete() YOK — main thread bloklanmaz
 - ClearMapJob + HashJob dependency chain ile schedule edilir
 - Static field uzerinden diger sistemler ReadMap'e erisiyor
 
@@ -91,11 +99,6 @@ PresentationSystemGroup icinde:
 - ComponentLookup ile hedef kontrolu (Burst-uyumlu)
 - Mesafe < 0.5 → hasar uygula, oku sil
 
-### ClickDamageSystem
-- **RequireForUpdate<ClickDamageRequest>**: Click yoksa OnUpdate cagrilmaz → sync yok
-- Spatial hash (ReadMap) ile en yakin zombiyi bulur
-- Hasar uygular, request entity'sini siler
-
 ### ZombieDeathSystem
 - **IJobEntity**: HP <= 0 olan zombileri Dead state'e gecirir
 
@@ -111,10 +114,11 @@ PresentationSystemGroup icinde:
 
 ### DamageCleanupSystem
 - DeathTimer geri sayar
-- Timer bitince: gold/XP + entity sil
+- Timer bitince: XP + entity sil
 - Level up kontrolu
 
 ### SpriteAnimationSystem (PRESENTATION)
-- **IJobEntity**: Sprite sheet UV rect hesaplar
-- Timer ilerletir, frame degistirir
-- PresentationSystemGroup'ta calisir
+→ Detay: `SPRITE_ANIMATION_ARCHITECTURE.md`
+
+## Kaldirilan Sistemler
+- ~~**ClickDamageSystem**~~ — GDD v3.0'da yok, tamamen kaldirildi (M0 Bug Fix)

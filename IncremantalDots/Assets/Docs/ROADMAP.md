@@ -17,22 +17,22 @@ Asagidakiler **tamamlanmis ve calisan** sistemlerdir:
 | Double-Buffered Spatial Hash | ✅ Tamam | BuildSpatialHashSystem |
 | Domino Queuing (zincir etkisi) | ✅ Tamam | BoundarySystem |
 | Okcu Sistemi (hedefleme + ok atisi) | ✅ Tamam | ArcherShootSystem, ArrowMoveSystem, ArrowHitSystem |
-| Wave Spawn (stress test mode) | ✅ Tamam | WaveSpawnSystem |
+| Wave Spawn (normal + stress test mode) | ✅ Tamam | WaveSpawnSystem |
 | Duvar/Kapi/Kale HP + Hasar Zinciri | ✅ Tamam | CastleComponents, DamageApplySystem |
-| Zombi Olum + XP/Gold Odulu | ✅ Tamam | DamageCleanupSystem |
+| Zombi Olum + XP Odulu | ✅ Tamam | DamageCleanupSystem |
 | Sprite Sheet Animasyon Pipeline | ✅ Tamam | SpriteAnimationSystem, ZombieAnimationStateSystem |
-| Temel HUD (HP bar, Gold, XP, Wave, Level) | ✅ Tamam | HUDController |
+| Temel HUD (HP bar, XP, Wave, Level) | ✅ Tamam | HUDController |
 | Level-Up UI (3 hardcoded secenek) | ✅ Tamam | LevelUpUI, GameManager.ApplyUpgrade |
 | Game Over UI | ✅ Tamam | GameOverUI |
-| Click Damage | ✅ Tamam | ClickDamageSystem, ClickDamageHandler |
+| ~~Click Damage~~ | ❌ Kaldirildi | ~~ClickDamageSystem, ClickDamageHandler~~ |
 | Profiler Analyzer Editor Tool | ✅ Tamam | ProfilerDataAnalyzer |
 
 ### Bilinen Bug'lar ve Teknik Borc (M0)
-- [ ] **BUG:** WaveSpawnSystem per-wave stats (HP, Speed, Damage) hesaplaniyor ama spawn edilen zombilere **uygulanmiyor**
-- [ ] **BUG:** ProfilerDataAnalyzer "ZombieAttackSystem" referansi → gercek isim "ZombieAttackTimerSystem"
-- [ ] **Olu kod:** `ReachedTarget` component kullanilmiyor — silinmeli
-- [ ] **Test modu:** StressTestMode = true, normal wave akisi test edilmemis
-- [ ] **GDD uyumsuzluk:** Gold ve ClickDamage GDD v3.0'da yok — kaldirilacak (M1'de)
+- [x] **BUG:** WaveSpawnSystem per-wave stats (HP, Speed, Damage) spawn edilen zombilere uygulaniyordu — `SpawnZombieBatch`'de `ZombieStats` set edildi
+- [x] **BUG:** ProfilerDataAnalyzer "ZombieAttackSystem" → "ZombieAttackTimerSystem" + "DamageApplySystem" olarak duzeltildi
+- [x] **Olu kod:** `ReachedTarget` component silindi
+- [x] **Test modu:** StressTestMode default `false` yapildi, `ZombieDamage = 0f` bug'i duzeltildi
+- [x] **GDD uyumsuzluk:** Gold, ClickDamage, ClickDamageRequest, ClickDamageSystem, ClickDamageHandler tamamen kaldirildi
 
 ---
 
@@ -43,24 +43,21 @@ Asagidakiler **tamamlanmis ve calisan** sistemlerdir:
 
 ### M1.1 — Temel Kaynak Altyapisi
 
-- [ ] `GameStateData` icindeki `Gold` alanini kaldir → yeni `ResourceState` singleton component olustur
-  - [ ] `ResourceState`: Wood (int), Stone (int), Iron (int), Food (int)
-  - [ ] `ResourceProductionRate`: WoodPerMin, StonePerMin, IronPerMin, FoodPerMin (float)
-  - [ ] `ResourceConsumptionRate`: WoodPerMin, StonePerMin, IronPerMin, FoodPerMin (float)
-- [ ] `ResourceStateAuthoring` baker olustur (baslangic degerleri Inspector'dan)
-- [ ] `ResourceProductionSystem` olustur — her frame kaynak uretimini hesapla ve ResourceState'e ekle
-- [ ] `ResourceConsumptionSystem` olustur — her frame kaynak tuketimini hesapla ve ResourceState'den dus
-- [ ] HUD'da kaynak gosterimi guncelle: Gold yerine 4 kaynak + uretim/tuketim hizi
+- [x] Kaynak component'lari olustur: ResourceData (int), ResourceProductionRate, ResourceConsumptionRate, ResourceAccumulator (float)
+- [x] GameStateAuthoring'e kaynak field'lari + Baker ekle (baslangic degerleri + test uretim/tuketim hizlari Inspector'dan)
+- [x] ResourceTickSystem olustur — tek sistem, net hiz (uretim-tuketim) * dt → accumulator → int transfer
+- [x] GameManager'a Resources, ResourceProduction, ResourceConsumption property + ReadECSData + RestartGame ekle
+- [x] HUD'da 4 kaynak gosterimi: "Ahsap: 150 (+5.0/dk)" formati, string alloc caching
 
 ### M1.2 — Nufus Sistemi
 
-- [ ] `PopulationState` singleton component olustur
-  - [ ] Total, Assigned (isci + okcu), Idle, Capacity (int)
-- [ ] `PopulationStateAuthoring` baker olustur (baslangic nufus + kapasite)
-- [ ] `PopulationSystem` olustur — nufus hesaplamasini yonet (atanmis isci + okcu toplami)
-- [ ] Nufus kapasitesi kontrolu — kapasite asildiginda yeni atama yapilamamali
-- [ ] Yemek tuketimi: atanmis her birey (isci + okcu) yemek tuketir, bosta bekleyen tuketmez
-- [ ] HUD'da nufus gosterimi: "Nufus: 45/60 (23 isci, 12 okcu, 10 bos)"
+- [x] `PopulationState` singleton component olustur
+  - [x] Total, Workers, Archers, Idle, Capacity (int) + FoodPerAssignedPerMin (float)
+- [x] GameStateAuthoring baker'ina PopulationState ekle (baslangic nufus + kapasite + test atama)
+- [x] `PopulationTickSystem` olustur — Idle hesapla + FoodPerMin guncelle (ResourceTickSystem'den once)
+- [x] Nufus kapasitesi kontrolu — Idle negatif olamaz (clamp >= 0)
+- [x] Yemek tuketimi: atanmis her birey (isci + okcu) yemek tuketir, bosta bekleyen tuketmez
+- [x] HUD'da nufus gosterimi: "Nufus: 10/20 (0 isci, 0 okcu, 10 bos)"
 
 ### M1.3 — Grid ve Bina Yerlestirme Altyapisi
 
@@ -161,20 +158,20 @@ Asagidakiler **tamamlanmis ve calisan** sistemlerdir:
 
 ### M1.9 — Eski Sistemlerin Temizligi
 
-- [ ] `Gold` alanini `GameStateData`'dan kaldir
-- [ ] `ClickDamage` alanini `GameStateData`'dan kaldir
-- [ ] `ClickDamageSystem` ve `ClickDamageHandler` kaldir (GDD'de click damage yok)
-- [ ] `ClickDamageRequest` component kaldir
-- [ ] `GameManager.ApplyUpgrade` eski 3-buton sistemini kaldir
-- [ ] `LevelUpUI` eski hardcoded butonlari kaldir (M2'de kart sistemi ile degisecek)
-- [ ] `DamageCleanupSystem`'den Gold reward'i kaldir, XP reward kalsin
-- [ ] HUD'u yeni kaynak/nufus sistemine uyumlu hale getir
+- [x] `Gold` alanini `GameStateData`'dan kaldir
+- [x] `ClickDamage` alanini `GameStateData`'dan kaldir
+- [x] `ClickDamageSystem` ve `ClickDamageHandler` kaldir (GDD'de click damage yok)
+- [x] `ClickDamageRequest` component kaldir
+- [ ] `GameManager.ApplyUpgrade` eski 3-buton sistemini kaldir (M2.4 kart sistemiyle degisecek)
+- [ ] `LevelUpUI` eski hardcoded butonlari kaldir (M2.4'te kart sistemi ile degisecek)
+- [x] `DamageCleanupSystem`'den Gold reward'i kaldir, XP reward kalsin
+- [x] HUD'u yeni kaynak sistemine uyumlu hale getir (M1.1'de yapildi — 4 kaynak TMP_Text)
 
 ### M1.10 — MD Dokumantasyonu
 
-- [ ] `Components/ARCHITECTURE.md` guncelle (yeni building + resource + population componentleri)
+- [x] `Components/ARCHITECTURE.md` guncelle (Gold, ClickDamage, ReachedTarget kaldirildi)
 - [ ] `Components/EDITOR_SETUP.md` guncelle
-- [ ] `Systems/ARCHITECTURE.md` guncelle (yeni resource, population, building sistemleri)
+- [x] `Systems/ARCHITECTURE.md` guncelle (ClickDamageSystem kaldirildi, sistem sirasi guncellendi)
 - [ ] `Systems/EDITOR_SETUP.md` guncelle
 - [ ] Yeni klasor olusturulduysa o klasore ARCHITECTURE + EDITOR_SETUP md yaz
 
@@ -288,7 +285,7 @@ Asagidakiler **tamamlanmis ve calisan** sistemlerdir:
   - [ ] Gun 51-80: Her 2 gunde bir
   - [ ] Gun 81-99: Her gun
   - [ ] Gun 100: Final wave
-- [ ] **BUG FIX:** Per-wave stats (HP, Speed, Damage) spawn edilen zombilere uygula
+- [x] **BUG FIX:** Per-wave stats (HP, Speed, Damage) spawn edilen zombilere uygula (M0'da yapildi)
 - [ ] Zombi sayisi gun numarasina gore olcekle (Inspector'dan ayarlanabilir egri)
 - [ ] Zombi HP gun numarasina gore olcekle
 - [ ] Wave config'i Inspector/Editor Window'dan ayarlanabilir yap
@@ -440,31 +437,32 @@ Asagidakiler **tamamlanmis ve calisan** sistemlerdir:
 
 | Milestone | Toplam Gorev | Tamamlanan | Yuzde |
 |-----------|-------------|------------|-------|
-| M0 Bug Fix | 5 | 0 | %0 |
-| M1 Kaynak + Bina | ~50 | 0 | %0 |
+| M0 Bug Fix | 5 | 5 | %100 |
+| M1 Kaynak + Bina | ~50 | 19 | %38 |
 | M2 Savunma Derinligi | ~35 | 0 | %0 |
-| M3 Gun + Wave | ~20 | 0 | %0 |
+| M3 Gun + Wave | ~20 | 1 | %5 |
 | M4 Event + Polish | ~35 | 0 | %0 |
 | M5 Launch | ~12 | 0 | %0 |
-| **TOPLAM** | **~157** | **0** | **%0** |
+| **TOPLAM** | **~157** | **25** | **%16** |
 
 ---
 
 ## Oneri: Baslama Sirasi
 
 ```
-1. M0 Bug Fix (1-2 saat) — temiz bir baslangic icin
-2. M1.1 Kaynak Altyapisi → M1.2 Nufus → M1.9 Temizlik (Gold/Click kaldir)
-3. M1.3 Grid + Bina Yerlestirme (en buyuk teknik risk)
-4. M1.4-M1.8 Binalar (grid hazir olduktan sonra)
-5. M3.1-M3.2 Gun + Wave (kaynak sistemi bunu bekliyor)
-6. M2.4 Kart Sistemi (en cok gameplay etkisi olan M2 parcasi)
-7. M2.1-M2.3 Mancinik + Tuzak + Buyu
-8. M4 Polish (tum mekanikler hazir olduktan sonra)
-9. M5 Launch
+1. M0 Bug Fix ✅ TAMAMLANDI
+2. M1.9 Temizlik (Gold/Click kaldir) ✅ KISMEN TAMAMLANDI (LevelUpUI + ApplyUpgrade M2.4'e birakildi)
+3. M1.1 Kaynak Altyapisi → M1.2 Nufus
+4. M1.3 Grid + Bina Yerlestirme (en buyuk teknik risk)
+5. M1.4-M1.8 Binalar (grid hazir olduktan sonra)
+6. M3.1-M3.2 Gun + Wave (kaynak sistemi bunu bekliyor)
+7. M2.4 Kart Sistemi (en cok gameplay etkisi olan M2 parcasi)
+8. M2.1-M2.3 Mancinik + Tuzak + Buyu
+9. M4 Polish (tum mekanikler hazir olduktan sonra)
+10. M5 Launch
 ```
 
 ---
 
-*Son guncelleme: 2026-03-12*
+*Son guncelleme: 2026-03-12 (M0 Bug Fix tamamlandi, M1.1 tamamlandi, M1.2 tamamlandi, M1.9 kismen tamamlandi)*
 *GDD Referans: DEAD_WALLS_GDD_v3.0.md*

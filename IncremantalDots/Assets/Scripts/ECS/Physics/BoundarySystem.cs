@@ -70,6 +70,10 @@ namespace DeadWalls
                             if (other == self)
                                 continue;
 
+                            // Restart sonrasi yok edilmis entity kontrolu
+                            if (!StateLookup.HasComponent(other))
+                                continue;
+
                             var otherState = StateLookup[other].Value;
                             if (otherState != ZombieStateType.Attacking && otherState != ZombieStateType.Queued)
                                 continue;

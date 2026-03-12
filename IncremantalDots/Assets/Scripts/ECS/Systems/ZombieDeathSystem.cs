@@ -5,7 +5,7 @@ namespace DeadWalls
 {
     [BurstCompile]
     [UpdateInGroup(typeof(SimulationSystemGroup))]
-    [UpdateAfter(typeof(ClickDamageSystem))]
+    [UpdateAfter(typeof(ArrowHitSystem))]
     public partial struct ZombieDeathSystem : ISystem
     {
         [BurstCompile]

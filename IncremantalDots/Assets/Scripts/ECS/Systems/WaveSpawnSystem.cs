@@ -81,7 +81,7 @@ namespace DeadWalls
             // STRESS TEST: ZombiSayisi = 500 * wave
             wave.ZombiesToSpawn = 500 * w;
             wave.ZombieHP = 20f * math.pow(w, 1.4f);
-            wave.ZombieDamage = 0f; // TEST: hasar kapatildi
+            wave.ZombieDamage = 5f + (w - 1) * 0.5f;
             wave.ZombieSpeed = 1.5f + (w - 1) * 0.1f;
             wave.ZombiesSpawned = 0;
             wave.ZombiesAlive = 0;
@@ -108,6 +108,16 @@ namespace DeadWalls
                 );
                 ecb.SetComponent(zombie, transform);
                 ecb.SetComponent(zombie, new ZombieState { Value = ZombieStateType.Moving });
+                ecb.SetComponent(zombie, new ZombieStats
+                {
+                    MoveSpeed = wave.ZombieSpeed,
+                    MaxHP = wave.ZombieHP,
+                    CurrentHP = wave.ZombieHP,
+                    AttackDamage = wave.ZombieDamage,
+                    AttackCooldown = 1f,
+                    AttackTimer = 0f,
+                    XPReward = 10
+                });
 
                 wave.ZombiesSpawned++;
                 wave.ZombiesAlive++;

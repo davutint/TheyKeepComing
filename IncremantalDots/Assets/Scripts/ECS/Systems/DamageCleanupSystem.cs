@@ -42,7 +42,6 @@ namespace DeadWalls
                     continue;
 
                 // Timer bitti → odul ver + sil
-                gameState.ValueRW.Gold += stats.ValueRO.GoldReward;
                 gameState.ValueRW.XP += stats.ValueRO.XPReward;
                 waveState.ValueRW.ZombiesAlive--;
 

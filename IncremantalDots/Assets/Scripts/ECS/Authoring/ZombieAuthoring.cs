@@ -10,7 +10,6 @@ namespace DeadWalls
         public float MaxHP = 20f;
         public float AttackDamage = 5f;
         public float AttackCooldown = 1f;
-        public int GoldReward = 5;
         public int XPReward = 10;
         public float CollisionRadius = 0.15f;
         public float PhysicsDamping = 3f;
@@ -30,7 +29,6 @@ namespace DeadWalls
                     AttackDamage = authoring.AttackDamage,
                     AttackCooldown = authoring.AttackCooldown,
                     AttackTimer = 0f,
-                    GoldReward = authoring.GoldReward,
                     XPReward = authoring.XPReward
                 });
                 AddComponent(entity, new ZombieState

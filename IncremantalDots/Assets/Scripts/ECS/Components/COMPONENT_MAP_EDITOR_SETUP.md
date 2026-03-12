@@ -1,4 +1,4 @@
-# ECS Components - Editor Kurulum
+# ECS Component Haritasi - Editor Kurulum
 
 ## Gereksinimler
 - Unity 6 LTS
@@ -7,8 +7,12 @@
 
 ## Notlar
 - Component'lar dogrudan kullanilmaz, Authoring + Baker uzerinden entity'lere eklenir.
-- Singleton component'lar (GameStateData, WaveStateData) icin GameStateAuthoring kullanilir.
+- Singleton component'lar (GameStateData, WaveStateData, Resource*) icin GameStateAuthoring kullanilir.
 - Component degerlerini degistirmek icin ilgili Authoring component'inin Inspector degerlerini duzenleyin.
+
+## Spesifik Editor Setup Dosyalari
+- Kaynak component'lari → `RESOURCE_COMPONENTS_EDITOR_SETUP.md`
+- Fizik component'lari → `Physics/PHYSICS_EDITOR_SETUP.md`
 
 ## Fizik Component'lari (PhysicsComponents.cs)
 - PhysicsBody ve CollisionRadius, ZombieAuthoring Baker'i tarafindan zombi prefab'ina eklenir.

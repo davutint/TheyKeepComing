@@ -21,7 +21,7 @@ namespace DeadWalls
                 GameOverText.text = "GAME OVER";
 
             if (StatsText != null)
-                StatsText.text = $"Wave: {ws.CurrentWave}\nLevel: {gs.Level}\nGold: {gs.Gold}";
+                StatsText.text = $"Wave: {ws.CurrentWave}\nLevel: {gs.Level}";
 
             if (RestartButton != null)
             {

@@ -1,5 +1,4 @@
 using Unity.Entities;
-using Unity.Mathematics;
 
 namespace DeadWalls
 {
@@ -13,7 +12,6 @@ namespace DeadWalls
         public float AttackDamage;
         public float AttackCooldown;
         public float AttackTimer;
-        public int GoldReward;
         public int XPReward;
     }
 
@@ -33,8 +31,6 @@ namespace DeadWalls
     {
         public ZombieStateType Value;
     }
-
-    public struct ReachedTarget : IComponentData { }
 
     /// <summary>
     /// Olum animasyonu suresi. 0'a dusunce entity silinir.

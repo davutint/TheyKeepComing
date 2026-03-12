@@ -1,4 +1,4 @@
-# ECS Systems - Editor Kurulum
+# System Calisma Sirasi - Editor Kurulum
 
 ## Gereksinimler
 - Tum Authoring component'lari Sub Scene icinde bake edilmis olmali
@@ -23,7 +23,9 @@
 1. Sub Scene icinde GameState + Castle authoring oldugundan emin ol
 2. Prefab'lar WaveConfigAuthoring'e atanmis olmali
 3. ZombieAuthoring prefab'inda CollisionRadius ve PhysicsDamping gorunmeli
-4. Play'e bas — zombiler fiziksel olarak birbirini itmeli
-5. Duvar onunde organik yigilma olusmali
-6. Zombi olunce bosluk dogal dolmali
-7. Oklar ve click damage calismali (regression yok)
+4. GameStateAuthoring'de kaynak baslangic degerleri ve test uretim hizlari ayarli olmali
+5. HUDController'da WoodText, StoneText, IronText, FoodText atamalari yapilmis olmali
+6. Play'e bas — zombiler fiziksel olarak birbirini itmeli
+7. Duvar onunde organik yigilma olusmali
+8. Zombi olunce bosluk dogal dolmali
+9. Kaynak miktarlari HUD'da gorunmeli ve uretim hizina gore artmali

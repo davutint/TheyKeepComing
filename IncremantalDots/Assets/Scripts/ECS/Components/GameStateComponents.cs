@@ -1,15 +1,12 @@
 using Unity.Entities;
-using Unity.Mathematics;
 
 namespace DeadWalls
 {
     public struct GameStateData : IComponentData
     {
-        public int Gold;
         public int XP;
         public int Level;
         public int XPToNextLevel;
-        public float ClickDamage;
         public bool IsGameOver;
         public bool IsLevelUpPending;
     }
@@ -29,11 +26,5 @@ namespace DeadWalls
         public float WaveStartDelay;
         public float WaveStartTimer;
         public bool StressTestMode;
-    }
-
-    public struct ClickDamageRequest : IComponentData
-    {
-        public float3 WorldPosition;
-        public float Damage;
     }
 }

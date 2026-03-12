@@ -66,6 +66,10 @@ namespace DeadWalls
                             if (other == self)
                                 continue;
 
+                            // Restart sonrasi yok edilmis entity kontrolu
+                            if (!TransformLookup.HasComponent(other))
+                                continue;
+
                             float2 otherPos = TransformLookup[other].Position.xy;
                             float2 delta = myPos - otherPos;
                             float distSq = math.lengthsq(delta);

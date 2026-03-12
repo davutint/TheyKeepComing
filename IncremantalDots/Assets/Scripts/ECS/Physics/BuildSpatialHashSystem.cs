@@ -9,7 +9,7 @@ namespace DeadWalls
 {
     /// <summary>
     /// Double-buffered spatial hash grid.
-    /// ReadMap: onceki frame'in verisi, consumer'lar (Collision, Boundary, ClickDamage) okur.
+    /// ReadMap: onceki frame'in verisi, consumer'lar (Collision, Boundary) okur.
     /// WriteMap: bu frame'de hash job doldurur. Frame basinda swap edilir.
     /// .Complete() cagrilmaz — main thread bloklanmaz.
     /// </summary>
