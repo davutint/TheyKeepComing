@@ -191,6 +191,14 @@ namespace DeadWalls
             var arrowQuery = _entityManager.CreateEntityQuery(typeof(ArrowTag));
             _entityManager.DestroyEntity(arrowQuery);
 
+            // Tum bina entity'lerini sil
+            var buildingQuery = _entityManager.CreateEntityQuery(typeof(BuildingData));
+            _entityManager.DestroyEntity(buildingQuery);
+
+            // Grid'i sifirla
+            if (BuildingGridManager.Instance != null)
+                BuildingGridManager.Instance.ResetGrid();
+
             // Game state resetle
             _entityManager.SetComponentData(_gameStateEntity, new GameStateData
             {

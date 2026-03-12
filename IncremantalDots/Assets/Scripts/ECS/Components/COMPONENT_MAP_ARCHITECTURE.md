@@ -36,12 +36,21 @@ Tum component'lar `IComponentData` interface'ini implement eder (unmanaged struc
 ### PopulationComponents.cs (M1.2)
 → Detay: `POPULATION_STATE_ARCHITECTURE.md`
 
+### BuildingComponents.cs (M1.3)
+→ Detay: `BUILDING_COMPONENTS_ARCHITECTURE.md`
+
 ### PhysicsComponents.cs
 - **PhysicsBody** — Velocity (float2), Force (float2), Mass, Damping. Her fizik cismi icin.
 - **CollisionRadius** — Carpisma yaricapi (float). Circle-circle collision icin.
 
 ## Singleton Pattern
 GameStateData, WaveStateData, Resource* ve PopulationState component'lari tek entity uzerinde tutulur (GameStateAuthoring). SystemAPI.GetSingletonRW ile erisim saglanir.
+
+## Per-Entity Component'lar (Binalar)
+- **BuildingData** — Bina tipi, seviyesi, grid pozisyonu. Her bina entity'sinde bulunur.
+- **ResourceProducer** — Kaynak ureten binalar (Oduncu, Ciftlik vs.) — tip, hiz, isci sayisi.
+- **PopulationProvider** — Nufus kapasitesi artiran binalar (Ev).
+- **BuildingFoodCost** — Yemek tuketen binalar (Ev).
 
 ## Veri Akisi
 ```

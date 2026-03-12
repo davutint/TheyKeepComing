@@ -61,26 +61,28 @@ Asagidakiler **tamamlanmis ve calisan** sistemlerdir:
 
 ### M1.3 — Grid ve Bina Yerlestirme Altyapisi
 
-- [ ] Bina grid sistemi tasarla (Tilemap tabanli, sur ici alan)
-  - [ ] Grid boyutu ve hucre boyutu belirle
-  - [ ] Yerlestirilebilir/yerlestirilemez alan tanimi
-- [ ] `BuildingComponents.cs` olustur
-  - [ ] `BuildingTag` (IComponentData — tag)
-  - [ ] `BuildingType` enum: Lumberjack, Quarry, Mine, Farm, House, Castle, Barracks, Fletcher, Blacksmith, WizardTower
-  - [ ] `BuildingData` (IComponentData): Type, Level, GridPosition (int2), IsActive
-  - [ ] `ResourceProducer` (IComponentData): ResourceType, RatePerWorker, AssignedWorkers, MaxWorkers
-  - [ ] `PopulationCapacity` (IComponentData): Amount
-  - [ ] `FoodConsumer` (IComponentData): ConsumeRate
-- [ ] `BuildingAuthoring` baker olustur (her bina tipi icin prefab)
-- [ ] `BuildingPlacementSystem` olustur
-  - [ ] Grid uzerinde bos alan kontrolu (3x3 slot)
-  - [ ] Yerlestirme kurallari: Oduncu→orman yanina, Tas Ocagi→tas yanina, Maden→demir yanina
-  - [ ] Bina entity'si olustur + grid'i guncelle
-- [ ] Bina yerlestirme UI'i olustur (MonoBehaviour)
-  - [ ] Bina secim menusu
-  - [ ] Ghost/preview gosterimi (yerlestirme oncesi)
-  - [ ] Maliyet gosterimi + kaynak yeterliligi kontrolu
-  - [ ] Tikla-yerlestir mekanigi
+- [x] Bina grid sistemi tasarla (Tilemap tabanli, sur ici alan)
+  - [x] Grid boyutu ve hucre boyutu belirle (32x32, 1x1 hucre)
+  - [x] Yerlestirilebilir/yerlestirilemez alan tanimi (buildable_zone Tilemap)
+- [x] `BuildingComponents.cs` olustur
+  - [x] `BuildingType` enum: Lumberjack, Quarry, Mine, Farm, House, Barracks, Fletcher, Blacksmith, WizardTower
+  - [x] `BuildingData` (IComponentData): Type, Level, GridX, GridY
+  - [x] `ResourceProducer` (IComponentData): ResourceType, RatePerWorkerPerMin, AssignedWorkers, MaxWorkers
+  - [x] `PopulationProvider` (IComponentData): CapacityAmount
+  - [x] `BuildingFoodCost` (IComponentData): FoodPerMin
+- [x] `BuildingConfigSO` ScriptableObject olustur (prefab yerine SO + runtime entity)
+- [x] `BuildingGridManager` olustur (MonoBehaviour — grid truth source)
+  - [x] Grid uzerinde bos alan kontrolu (3x3 slot)
+  - [x] Maliyet kontrolu + kaynak dusme
+  - [x] Bina entity'si olustur + grid'i guncelle
+  - [x] Restart'ta bina temizligi (GameManager entegrasyonu)
+- [x] Bina yerlestirme UI'i olustur (`BuildingPlacementUI`)
+  - [x] Bina secim menusu (SO listesinden otomatik buton)
+  - [x] Ghost/preview gosterimi (yesil/kirmizi renk)
+  - [x] Maliyet gosterimi + kaynak yeterliligi kontrolu
+  - [x] Tikla-yerlestir mekanigi + sag tikla/Escape iptal
+- [ ] ~~`BuildingAuthoring` baker~~ — Iptal: prefab yerine runtime CreateEntity + Tilemap gorsel secildi
+- [ ] Yerlestirme kurallari: Oduncu→orman yanina vs. (M1.8 dogal kaynak zone'larina ertelendi)
 
 ### M1.4 — Kaynak Binalari (Oduncu, Tas Ocagi, Maden, Ciftlik)
 
@@ -438,12 +440,12 @@ Asagidakiler **tamamlanmis ve calisan** sistemlerdir:
 | Milestone | Toplam Gorev | Tamamlanan | Yuzde |
 |-----------|-------------|------------|-------|
 | M0 Bug Fix | 5 | 5 | %100 |
-| M1 Kaynak + Bina | ~50 | 19 | %38 |
+| M1 Kaynak + Bina | ~50 | 31 | %62 |
 | M2 Savunma Derinligi | ~35 | 0 | %0 |
 | M3 Gun + Wave | ~20 | 1 | %5 |
 | M4 Event + Polish | ~35 | 0 | %0 |
 | M5 Launch | ~12 | 0 | %0 |
-| **TOPLAM** | **~157** | **25** | **%16** |
+| **TOPLAM** | **~157** | **37** | **%24** |
 
 ---
 
@@ -464,5 +466,5 @@ Asagidakiler **tamamlanmis ve calisan** sistemlerdir:
 
 ---
 
-*Son guncelleme: 2026-03-12 (M0 Bug Fix tamamlandi, M1.1 tamamlandi, M1.2 tamamlandi, M1.9 kismen tamamlandi)*
+*Son guncelleme: 2026-03-12 (M0 Bug Fix tamamlandi, M1.1 tamamlandi, M1.2 tamamlandi, M1.3 tamamlandi, M1.9 kismen tamamlandi)*
 *GDD Referans: DEAD_WALLS_GDD_v3.0.md*
