@@ -48,7 +48,9 @@
 
 ### Adim 3: BuildingGridManager'a Ata
 1. Sahnedeki `BuildingGridManager` GameObject'ini sec
-2. **Building Configs** array'ine SO asset'lerini surukleDaha fazla SO M1.4+ milestone'larinda olusturulacak.
+2. **Building Configs** array'ine SO asset'lerini surukle
+
+> Daha fazla SO M1.4+ milestone'larinda olusturulacak.
 
 ## Entity Debugger'da Dogrulama
 1. Play mode'a gir

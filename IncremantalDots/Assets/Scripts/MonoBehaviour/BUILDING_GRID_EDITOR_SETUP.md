@@ -8,16 +8,27 @@
 3. Ayni sekilde bir tane daha ekle → adi: `building_visuals`
 
 ### Adim 2: buildable_zone Doldur
-1. `buildable_zone` Tilemap'i sec
-2. Tile Palette'ten herhangi bir tile sec (renk/sekil onemsiz — sadece varligi onemli)
-3. Sur ici bina yerlestirilecek alani tile ile doldur
-4. **Tilemap Renderer** component'inde → **Sorting Layer** / **Order** ayarla (diger layer'larin altinda)
-5. Runtime'da gorunmez yapmak icin: script'te veya `TilemapRenderer.enabled = false` Inspector'dan
+> **Amac:** `buildable_zone` gorunmez bir mantik katmanidir. Kod tarafinda BuildingGridManager bu
+> tilemap'i okuyarak "buraya bina yerlestirilebilir mi?" kontrolu yapar.
+> Tile olan hucre = yerlestirilebilir, bos hucre = yerlestirilemez.
+> Bu yuzden hangi tile oldugu onemsiz — sadece dolu olmasi yeterli.
+
+1. **Window → 2D → Tile Palette** penceresini ac
+2. Palette'den herhangi bir tile sec (rengi, gorseli farketmez)
+3. Brush araci ile **surlarinin ic tarafindaki alani boya** — zombilerin olmadigi, oyuncunun bina yapabilecegi bolgeyi tile'larla doldur
+4. `buildable_zone` Tilemap'i sec → Inspector'da **Tilemap Renderer** component'ini bul
+5. Oyuncu bu tile'lari gormemeli, sadece logic icin var. Iki yol:
+   - **Sorting Order** diger tum layer'larin altina cek, VEYA
+   - `TilemapRenderer.enabled = false` yaparak tamamen gizle
 
 ### Adim 3: building_visuals Ayarla
+> **Amac:** `building_visuals` binalarin gorsellerinin cizildigi katmandir.
+> Oyuncu bina yerlestirdiginde kod bu tilemap'e otomatik olarak bina tile'ini koyar.
+> Sen bu tilemap'e hicbir sey koymayacaksin — bos birakilacak.
+
 1. `building_visuals` Tilemap'i sec
-2. Bos birak — binalar yerlestirilince otomatik dolar
-3. **Sorting Layer** / **Order**: bina sprite'lari gorunecek sekilde (ground ustunde)
+2. Icerigini bos birak — binalar yerlestirilince kod otomatik doldurur
+3. Inspector'da **Tilemap Renderer → Order in Layer** degerini ground layer'indan yuksek yap (ornek: ground=0 ise building_visuals=5)
 
 ### Adim 4: BuildingGridManager GameObject
 1. Hierarchy'de bos GameObject olustur → adi: `BuildingGridManager`
@@ -25,39 +36,47 @@
 3. Inspector'dan ayarla:
    - **Buildable Zone Tilemap**: `buildable_zone` tilemap'i surukle
    - **Building Visual Tilemap**: `building_visuals` tilemap'i surukle
-   - **Grid Width**: 32 (veya harita boyutuna gore)
-   - **Grid Height**: 32
-   - **Grid Origin**: buildable_zone'un sol-alt kosesinin world pozisyonu (Vector3Int)
    - **Building Configs**: SO asset'lerini surukle (Farm_Config, House_Config vs.)
+> **Not:** GridWidth, GridHeight ve GridOrigin otomatik hesaplanir — `buildable_zone` tilemap'ini
+> boyadigin an cellBounds'tan alinir. Elle girmeye gerek yok, Inspector'da sadece debug icin gorunur.
 
-### Adim 5: BuildingPlacementUI GameObject
+### Adim 5: Ghost Preview Objesi
+> **Amac:** Ghost preview, bina yerlestirme sirasinda fare imlecini takip eden yari-saydam onizleme gorseli.
+> Yesil = buraya koyabilirsin, kirmizi = koyamazsin. Yerlestirme tamamlaninca kaybolur.
+
+1. Hierarchy'de bos GameObject olustur → adi: `GhostPreview`
+2. **Add Component → SpriteRenderer** ekle
+3. Inspector'da **Order in Layer** degerini en yuksek yap (ornek: 100) — her seyin ustunde gorunmeli
+4. Bu objeye dokunma, Adim 7'de BuildingPlacementUI'a atanacak
+
+### Adim 6: UI Buton Panel
+> **Amac:** Ekranin altinda/yaninda bina secim butonlari. Oyuncu bir butona tiklar,
+> sonra haritada istdigi yere tiklayarak binayi yerlestirir.
+
+1. Sahnede zaten bir **Canvas** yoksa olustur (Hierarchy → UI → Canvas)
+2. Canvas icinde sag tikla → **UI → Panel** → adi: `BuildingButtonPanel`
+3. Panel'e **Add Component → Horizontal Layout Group** (veya Grid Layout Group) ekle
+4. Buton prefab'i olustur:
+   - Canvas icinde sag tikla → **UI → Button** → adi: `BuildingButton`
+   - Button'un child'indaki **Text** (veya TMP_Text) → bina adini yazacak (kod otomatik set eder)
+   - (Opsiyonel) Button'a child **Image** ekle → adi `Icon` (bina ikonu icin)
+5. Bu Button'u Project paneline surukleyerek **prefab** olarak kaydet
+6. Sahnedeki ornek Button'u sil (prefab yeterli)
+
+### Adim 7: BuildingPlacementUI GameObject
+> **Not:** Bu adim Adim 5 ve 6'da olusturdugumuz objeleri baglar. Onlari once olusturman gerekiyor.
+
 1. Hierarchy'de bos GameObject olustur → adi: `BuildingPlacementUI`
 2. `BuildingPlacementUI` script'ini ekle
 3. Inspector'dan ayarla:
-   - **Building Button Panel**: bina butonlari iceren Canvas panel
-   - **Button Container**: butonlarin parent Transform'u
-   - **Building Button Prefab**: buton prefab'i (Text + Button + optional Icon)
-   - **Ghost Renderer**: sahnede bos bir SpriteRenderer objesi olustur, assign et
+   - **Building Button Panel**: Adim 6'da olusturdugum `BuildingButtonPanel` panel'ini surukle
+   - **Button Container**: `BuildingButtonPanel`'in kendi Transform'u (butonlar bunun child'i olacak)
+   - **Building Button Prefab**: Adim 6'da kaydettidign buton prefab'ini Project panelinden surukle
+   - **Ghost Renderer**: Adim 5'teki `GhostPreview` objesinin **SpriteRenderer** component'ini surukle
 
-### Adim 6: Ghost Preview Objesi
-1. Hierarchy'de bos GameObject olustur → adi: `GhostPreview`
-2. `SpriteRenderer` component'i ekle
-3. Sorting Order: tum tile'larin ustunde
-4. BuildingPlacementUI'daki **Ghost Renderer** alanina surukle
-
-### Adim 7: UI Buton Panel
-1. Canvas icinde yeni Panel olustur → adi: `BuildingButtonPanel`
-2. Icine `HorizontalLayoutGroup` veya `GridLayoutGroup` ekle
-3. Buton prefab'i olustur:
-   - Button component
-   - Child: Text (veya TMP_Text) → bina adi
-   - Child (opsiyonel): Image → adi `Icon` (bina ikonu)
-4. Prefab olarak kaydet, BuildingPlacementUI'a ata
-
-## Grid Origin Belirleme
-Grid Origin, tilemap koordinatlarini grid koordinatlarina cevirmek icin kullanilir:
-- `buildable_zone`'un sol-alt kosesi world'de (X, Y) ise → `GridOrigin = (X, Y, 0)`
-- Ornek: tilemap (-16, -16) ile basliyorsa → `GridOrigin = (-16, -16, 0)`
+## Grid Origin, Width, Height
+> Bu degerler `buildable_zone` tilemap'inin `cellBounds`'undan **otomatik hesaplanir**.
+> Elle girmeye gerek yok. Play mode'a girince Inspector'da debug amacli gorebilirsin.
 
 ## SO Asset Olusturma
 1. `Assets/ScriptableObject/` klasorune git
@@ -67,28 +86,34 @@ Grid Origin, tilemap koordinatlarini grid koordinatlarina cevirmek icin kullanil
 
 ## Test Proseduru
 
+> **Bina secmek:** Play mode'da ekranin altindaki/yanindaki **BuildingButtonPanel**'deki
+> butonlara tikla (ornek: "Ciftlik", "Ev"). Butona tiklayinca yerlestirme modu baslar
+> ve fare imlecini takip eden yari-saydam ghost onizleme gorunur.
+> Yerlestirmeyi iptal etmek icin **sag tikla** veya **Escape** bas.
+
 ### Test 1: Buildable Zone
 1. Play mode'a gir
-2. Bina sec → buildable zone icinde yesil ghost gorunmeli
-3. Zone disinda → kirmizi ghost
-4. Zone icinde tikla → bina yerlessin
-5. Zone disinda tikla → bina yerlesmemeli
+2. UI panelden bir bina butonuna tikla (ornek: "Ciftlik")
+3. Fare imlecini buildable zone icine getir → **yesil ghost** gorunmeli
+4. Fare imlecini zone disina cikar → **kirmizi ghost** gorunmeli
+5. Zone icinde sol tikla → bina yerlessin
+6. Zone disinda sol tikla → bina yerlesmemeli
 
 ### Test 2: 3x3 Overlap
-1. Bir bina yerlestir
-2. Ayni yere veya ustu uste gelecek sekilde ikinci bina koymaya calis
+1. UI panelden bina sec, zone icine yerlestir
+2. Ayni yere veya ustu uste gelecek sekilde tekrar bina koymaya calis
 3. Kirmizi gosterilmeli, yerlestirmeye izin vermemeli
 
 ### Test 3: Maliyet Kontrolu
-1. Kaynaklari tuketerek yetersiz hale getir
-2. Bina secmaya calis → kirmizi gosterilmeli
-3. Kaynak yeterse → yesil, yerlestirince kaynak azalmali
+1. Birden fazla bina yerlestirerek kaynaklari tuket
+2. Kaynak yetersizken bina sec → ghost **kirmizi** gorunmeli
+3. Kaynak yeterliyken → ghost **yesil**, yerlestirince kaynak azalmali
 
 ### Test 4: Restart
-1. Birkaç bina yerlestir
+1. Birkac bina yerlestir
 2. Game Over → Restart
 3. Grid sifirlanmali, bina entity'leri silinmeli, tilemap temizlenmeli
 
 ### Test 5: Iptal
-1. Bina sec → ghost gorunsun
+1. UI panelden bina sec → ghost gorunsun
 2. Sag tikla veya Escape → ghost kapansin, yerlestirme modu bitsin

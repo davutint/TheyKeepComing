@@ -15,9 +15,17 @@ namespace DeadWalls
         [Header("Grid Ayarlari")]
         public Tilemap BuildableZoneTilemap;   // buildable_zone layer referansi
         public Tilemap BuildingVisualTilemap;   // bina sprite gosterimi (yeni layer)
-        public int GridWidth = 32;
-        public int GridHeight = 32;
-        public Vector3Int GridOrigin;           // Grid'in world-space baslangic noktasi
+
+        // cellBounds'tan otomatik hesaplanir — elle girmeye gerek yok
+        [Header("Otomatik Hesaplanan (Debug)")]
+        [SerializeField] private int GridWidth;
+        [SerializeField] private int GridHeight;
+        [SerializeField] private Vector3Int GridOrigin;
+
+        // Debug erisim
+        public int GridWidthDebug => GridWidth;
+        public int GridHeightDebug => GridHeight;
+        public Vector3Int GridOriginDebug => GridOrigin;
 
         [Header("Bina Konfigurasyonlari")]
         public BuildingConfigSO[] BuildingConfigs;
@@ -57,6 +65,24 @@ namespace DeadWalls
             if (world != null)
                 _entityManager = world.EntityManager;
 
+            if (BuildableZoneTilemap == null)
+            {
+                Debug.LogError("BuildingGridManager: BuildableZoneTilemap atanmamis!");
+                return;
+            }
+
+            // cellBounds'tan GridOrigin, GridWidth, GridHeight otomatik hesapla
+            BoundsInt bounds = BuildableZoneTilemap.cellBounds;
+            if (bounds.size.x <= 0 || bounds.size.y <= 0)
+            {
+                Debug.LogError("BuildingGridManager: buildable_zone tilemap bos! Tile ile boyayin.");
+                return;
+            }
+
+            GridOrigin = new Vector3Int(bounds.xMin, bounds.yMin, 0);
+            GridWidth = bounds.size.x;
+            GridHeight = bounds.size.y;
+
             _grid = new int[GridWidth, GridHeight];
             _entityGrid = new Entity[GridWidth, GridHeight];
 
@@ -65,10 +91,8 @@ namespace DeadWalls
                 for (int y = 0; y < GridHeight; y++)
                     _grid[x, y] = -1;
 
-            if (BuildableZoneTilemap == null) return;
-
             // Buildable zone tilemap'teki tile'lari oku
-            BoundsInt bounds = BuildableZoneTilemap.cellBounds;
+            int buildableCount = 0;
             for (int x = bounds.xMin; x < bounds.xMax; x++)
             {
                 for (int y = bounds.yMin; y < bounds.yMax; y++)
@@ -76,14 +100,14 @@ namespace DeadWalls
                     var tilePos = new Vector3Int(x, y, 0);
                     if (BuildableZoneTilemap.HasTile(tilePos))
                     {
-                        // World → grid koordinat cevrimi
                         int gx = x - GridOrigin.x;
                         int gy = y - GridOrigin.y;
-                        if (gx >= 0 && gx < GridWidth && gy >= 0 && gy < GridHeight)
-                            _grid[gx, gy] = 0;
+                        _grid[gx, gy] = 0;
+                        buildableCount++;
                     }
                 }
             }
+            Debug.Log($"[BuildingGrid] Bounds: {bounds} | Origin: {GridOrigin} | Size: {GridWidth}x{GridHeight} | Buildable: {buildableCount}/{GridWidth * GridHeight}");
 
             _initialized = true;
         }

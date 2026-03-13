@@ -46,15 +46,39 @@ namespace DeadWalls
             var gridMgr = BuildingGridManager.Instance;
             if (gridMgr == null) return;
 
+            // Mouse hangi grid hucresindeyse orasi binanin sol-alt kosesi
+            // Ghost gorseli GridToWorld'de zaten merkezleniyor (+GridWidth*0.5)
             Vector2Int gridPos = gridMgr.WorldToGrid(mouseWorld);
+            _lastGridPos = gridPos;
 
-            // Ghost snap — grid pozisyonuna kilitle
-            Vector3 ghostWorld = gridMgr.GridToWorld(gridPos.x, gridPos.y, _selectedConfig);
-            if (GhostRenderer != null)
-                GhostRenderer.transform.position = ghostWorld;
+            // Ghost snap — grid alanina tam otur
+            if (GhostRenderer != null && GhostRenderer.sprite != null)
+            {
+                Sprite s = GhostRenderer.sprite;
+                float spriteW = s.rect.width / s.pixelsPerUnit;
+                float spriteH = s.rect.height / s.pixelsPerUnit;
+
+                // Sprite'i GridWidth x GridHeight'a olcekle
+                GhostRenderer.transform.localScale = new Vector3(
+                    _selectedConfig.GridWidth / spriteW,
+                    _selectedConfig.GridHeight / spriteH, 1f);
+
+                // Grid'in sol-alt kosesi (world space)
+                Vector3 bottomLeft = new Vector3(
+                    gridPos.x + gridMgr.GridOriginDebug.x,
+                    gridPos.y + gridMgr.GridOriginDebug.y, 0f);
+
+                // Sprite pivot'una gore offset (0,0=sol-alt, 0.5,0.5=merkez)
+                Vector2 pivotNorm = s.pivot / new Vector2(s.rect.width, s.rect.height);
+                GhostRenderer.transform.position = bottomLeft + new Vector3(
+                    pivotNorm.x * _selectedConfig.GridWidth,
+                    pivotNorm.y * _selectedConfig.GridHeight, 0f);
+            }
 
             // Renk — CanPlace kontrolu
             bool canPlace = gridMgr.CanPlace(_selectedConfig, gridPos.x, gridPos.y);
+            if (Input.GetKeyDown(KeyCode.F1))
+                Debug.Log($"[PlaceDebug] mouseWorld:{mouseWorld} gridPos:{gridPos} canPlace:{canPlace} gridSize:{gridMgr.GridWidthDebug}x{gridMgr.GridHeightDebug} origin:{gridMgr.GridOriginDebug}");
             if (GhostRenderer != null)
                 GhostRenderer.color = canPlace ? ValidColor : InvalidColor;
 
@@ -124,7 +148,16 @@ namespace DeadWalls
             {
                 GhostRenderer.gameObject.SetActive(true);
                 if (config.GhostSprite != null)
+                {
                     GhostRenderer.sprite = config.GhostSprite;
+
+                    // Sprite'i GridWidth x GridHeight alanina sigdir
+                    float spriteW = config.GhostSprite.rect.width / config.GhostSprite.pixelsPerUnit;
+                    float spriteH = config.GhostSprite.rect.height / config.GhostSprite.pixelsPerUnit;
+                    GhostRenderer.transform.localScale = new Vector3(
+                        config.GridWidth / spriteW,
+                        config.GridHeight / spriteH, 1f);
+                }
             }
         }
 
@@ -144,5 +177,37 @@ namespace DeadWalls
         /// Su an yerlestirme modunda mi?
         /// </summary>
         public bool IsPlacing => _isPlacing;
+
+        // Gizmos: yerleştirme sirasinda SO'nun GridWidth x GridHeight alanini ciz
+        private Vector2Int _lastGridPos;
+        private void OnDrawGizmos()
+        {
+            if (!_isPlacing || _selectedConfig == null) return;
+
+            var gridMgr = BuildingGridManager.Instance;
+            if (gridMgr == null) return;
+
+            // Grid'in sol-alt kosesi (sprite ile ayni hesaplama)
+            Vector3 bottomLeft = new Vector3(
+                _lastGridPos.x + gridMgr.GridOriginDebug.x,
+                _lastGridPos.y + gridMgr.GridOriginDebug.y, 0f);
+            Vector3 size = new Vector3(_selectedConfig.GridWidth, _selectedConfig.GridHeight, 0f);
+            Vector3 center = bottomLeft + size * 0.5f;
+
+            // Grid alani — sari wireframe
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireCube(center, size);
+
+            // Her hucreyi ciz
+            Gizmos.color = new Color(1f, 1f, 0f, 0.3f);
+            for (int x = 0; x < _selectedConfig.GridWidth; x++)
+            {
+                for (int y = 0; y < _selectedConfig.GridHeight; y++)
+                {
+                    Vector3 cellCenter = bottomLeft + new Vector3(x + 0.5f, y + 0.5f, 0f);
+                    Gizmos.DrawWireCube(cellCenter, Vector3.one);
+                }
+            }
+        }
     }
 }

@@ -294,12 +294,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9fbdee395a43c7419c921a8437a8642, type: 3}
   m_Name: 
   m_EditorClassIdentifier: DeadWalls::DeadWalls.GameStateAuthoring
-  ClickDamage: 10
   XPToNextLevel: 100
-  StressTestMode: 1
-  SpawnInterval: -0.8
+  StressTestMode: 0
+  SpawnInterval: 0.8
   WaveStartDelay: 3
   BaseZombieSpeed: 1.5
+  InitialWood: 100
+  InitialStone: 50
+  InitialIron: 20
+  InitialFood: 100
+  TestWoodProdRate: 5
+  TestStoneProdRate: 3
+  TestIronProdRate: 2
+  TestFoodProdRate: 4
+  TestWoodConsRate: 0
+  TestStoneConsRate: 0
+  TestIronConsRate: 0
+  TestFoodConsRate: 0
+  InitialPopulation: 10
+  InitialCapacity: 20
+  TestWorkers: 0
+  TestArchers: 0
+  FoodPerAssignedPerMin: 2
 --- !u!4 &1758718858
 Transform:
   m_ObjectHideFlags: 0
