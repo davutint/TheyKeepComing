@@ -26,6 +26,15 @@ Tum bina tipleri tek enum'da:
 Kaynak binalarinin urettigi kaynak tipi:
 - `Wood`, `Stone`, `Iron`, `Food`
 
+### ResourcePointType (byte)
+Dogal kaynak zone tipi — bina yerlestirmede zone yakinlik kontrolu icin:
+- `None` — Zone gereksinimi yok (Farm, House, Barracks vs.)
+- `Forest` — Orman zone'u (Lumberjack gerektirir)
+- `Stone` — Tas zone'u (Quarry gerektirir)
+- `Iron` — Demir zone'u (Mine gerektirir)
+
+> ECS component degil, sadece enum — zone verisi MonoBehaviour `_zoneGrid[,]` cache'inde yasar.
+
 ## Component'lar
 
 ### BuildingData (her binada VAR)
@@ -54,19 +63,38 @@ Kaynak binalarinin urettigi kaynak tipi:
 |------|-----|----------|
 | FoodPerMin | float | Dakika basina yemek tuketimi |
 
+### ArcherTrainer (sadece Kisla — M1.6)
+| Alan | Tip | Aciklama |
+|------|-----|----------|
+| TrainingDuration | float | Egitim suresi (saniye) |
+| FoodCostPerArcher | int | Okcu basina yemek maliyeti |
+| WoodCostPerArcher | int | Okcu basina ahsap maliyeti |
+| TrainingTimer | float | Su anki egitim zamanlayicisi |
+| IsTraining | bool | Egitim devam ediyor mu |
+
+> BarracksTrainingSystem tarafindan islenir. Idle nufus + yeterli kaynak varsa egitim baslatilir, timer bitince okcu spawn edilir.
+
+### ArrowProducer (sadece Fletcher — M1.6)
+| Alan | Tip | Aciklama |
+|------|-----|----------|
+| ArrowsPerWorkerPerMin | float | Isci basina dakikada uretilen ok |
+| WoodCostPerBatchPerMin | float | Isci basina dakikada tuketilen ahsap |
+
+> ArrowProductionSystem tarafindan islenir. Fletcher entity'sinde `ResourceProducer` de bulunur — `AssignedWorkers` / `MaxWorkers` icin.
+
 ## Bina Tipi → Component Matrisi
 
-| Bina | BuildingData | ResourceProducer | PopulationProvider | BuildingFoodCost |
-|------|:---:|:---:|:---:|:---:|
-| Lumberjack | ✅ | ✅ | - | - |
-| Quarry | ✅ | ✅ | - | - |
-| Mine | ✅ | ✅ | - | - |
-| Farm | ✅ | ✅ | - | - |
-| House | ✅ | - | ✅ | ✅ |
-| Barracks | ✅ | - | - | - |
-| Fletcher | ✅ | ✅ | - | - |
-| Blacksmith | ✅ | - | - | - |
-| WizardTower | ✅ | - | - | - |
+| Bina | BuildingData | ResourceProducer | PopulationProvider | BuildingFoodCost | ArcherTrainer | ArrowProducer | RequiredZone |
+|------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| Lumberjack | ✅ | ✅ | - | - | - | - | Forest |
+| Quarry | ✅ | ✅ | - | - | - | - | Stone |
+| Mine | ✅ | ✅ | - | - | - | - | Iron |
+| Farm | ✅ | ✅ | - | - | - | - | None |
+| House | ✅ | - | ✅ | ✅ | - | - | None |
+| Barracks | ✅ | - | - | - | ✅ | - | None |
+| Fletcher | ✅ | ✅ | - | - | - | ✅ | None |
+| Blacksmith | ✅ | - | - | - | - | - | None |
+| WizardTower | ✅ | - | - | - | - | - | None |
 
 ## Veri Akisi
 ```
@@ -74,6 +102,8 @@ BuildingGridManager.PlaceBuilding() → EntityManager.CreateEntity + AddComponen
   → BuildingData (her zaman)
   → ResourceProducer (config.MaxWorkers > 0 ise)
   → PopulationProvider + BuildingFoodCost (config.PopulationCapacity > 0 ise)
+  → ArcherTrainer (config.Type == Barracks ise)
+  → ArrowProducer (config.Type == Fletcher ise)
 ```
 
 ## CastleUpgradeData (Castle entity uzerinde)

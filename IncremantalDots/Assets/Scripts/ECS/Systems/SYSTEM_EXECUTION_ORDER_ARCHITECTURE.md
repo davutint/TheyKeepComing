@@ -3,12 +3,15 @@
 ## Calisma Sirasi (UpdateOrder)
 ```
 SimulationSystemGroup icinde:
--2. BuildingProductionSystem    — Bina uretim hizlarini topla → singleton'a yaz
--1½.BuildingPopulationSystem   — Kapasite + bina yemek tuketimi → singleton'a yaz
+-3. BuildingProductionSystem    — Bina uretim hizlarini topla → singleton'a yaz
+-2½.BuildingPopulationSystem   — Kapasite + bina yemek tuketimi → singleton'a yaz
+-2. ArrowProductionSystem    *  — Fletcher ok uretimi + WoodPerMin'e ekleme
 -1. PopulationTickSystem     *  — Nufus hesapla + FoodPerMin += nufus kismi
+-½. BarracksTrainingSystem      — Kisla okcu egitimi (idle nufus + kaynak → okcu spawn)
  0. ResourceTickSystem        *  — Kaynak uretim/tuketim tick (net hiz * dt → accumulator → int)
  1. WaveSpawnSystem              — Zombi spawn + wave stats uygula (ZombieStats set)
  2. ArcherShootSystem         *  — Burst + brute-force query, physics oncesi (1-frame-old pozisyon)
+ 2b.CatapultShootSystem       *  — Mancinik atis (brute-force hedefleme + tas tuketimi + mermi spawn)
  3. ApplyMovementForceSystem  *  — Hedefe dogru kuvvet → PhysicsBody.Force (WallX singleton ile yon)
  4. BuildSpatialHashSystem    *  — Double-buffered spatial hash (ReadMap/WriteMap)
  5. PhysicsCollisionSystem    *  — Circle-circle carpisma + momentum transfer
@@ -16,7 +19,9 @@ SimulationSystemGroup icinde:
  7. BoundarySystem            *  — Duvar bariyeri, state transition, Y siniri
  8. ZombieAttackTimerSystem      — IJobEntity: attack timer + NativeQueue'ya hasar yaz
  9. ArrowMoveSystem           *  — IJobEntity: ok hareket
+ 9b.CatapultProjectileMoveSystem * — IJobEntity: parabolik mermi hareketi
 10. ArrowHitSystem            *  — IJobEntity + ECB: ok isabet + hasar
+10b.CatapultProjectileHitSystem  — Main thread: AoE hasar (spatial hash + static field erisimi)
 11. ZombieDeathSystem         *  — IJobEntity: HP<=0 → Dead state
 12. ZombieAnimationStateSystem*  — IJobEntity + ECB: sprite animasyon guncelle
 13. DamageApplySystem            — TEK SYNC POINT: damage queue drain + singleton yazma
@@ -41,8 +46,27 @@ PresentationSystemGroup icinde:
 ### BuildingPopulationSystem (M1.5)
 → Detay: `BUILDING_POPULATION_SYSTEM_ARCHITECTURE.md`
 
+### ArrowProductionSystem (M1.6)
+- Fletcher binalarindaki isciler ok uretir
+- ArrowSupply singleton uzerinde accumulator pattern
+- WoodPerMin'e Fletcher ahsap tuketimini ekler (BuildingPopulationSystem sifirladiktan sonra)
+- `[BurstCompile]` destekli
+- `[UpdateAfter(typeof(BuildingPopulationSystem))]`
+- `[UpdateBefore(typeof(PopulationTickSystem))]`
+→ Detay: `ARROW_PRODUCTION_SYSTEM_ARCHITECTURE.md`
+
 ### PopulationTickSystem (M1.2)
 → Detay: `POPULATION_TICK_SYSTEM_ARCHITECTURE.md`
+
+### BarracksTrainingSystem (M1.6)
+- Kisla okcu egitim sistemi
+- Idle nufus + yeterli kaynak varsa egitim baslatir
+- Timer bitince okcu spawn eder (ArcherPrefabData + ECB)
+- PopulationState.Archers sayacini arttirir
+- BurstCompile YOK (ECB + singleton RW)
+- `[UpdateAfter(typeof(PopulationTickSystem))]`
+- `[UpdateBefore(typeof(ResourceTickSystem))]`
+→ Detay: `BARRACKS_TRAINING_SYSTEM_ARCHITECTURE.md`
 
 ### ResourceTickSystem (M1.1)
 → Detay: `RESOURCE_TICK_SYSTEM_ARCHITECTURE.md`
@@ -62,6 +86,29 @@ PresentationSystemGroup icinde:
 - `math.distancesq` kullanir (sqrt maliyeti yok)
 - `EndSimulationEntityCommandBufferSystem` ECB kullanir
 - Fire timer'a gore ok spawn eder
+
+### CatapultShootSystem (M2.1)
+- Mancinik atis sistemi — ArcherShootSystem pattern'i
+- Brute-force en yakin zombie bulur, parabolik mermi spawn eder
+- Tas tuketimi (ResourceData.Stone -= StoneCostPerShot)
+- `[BurstCompile]` destekli
+- `[UpdateAfter(typeof(WaveSpawnSystem))]`
+- `[UpdateBefore(typeof(ApplyMovementForceSystem))]`
+→ Detay: `CATAPULT_SYSTEM_ARCHITECTURE.md`
+
+### CatapultProjectileMoveSystem (M2.1)
+- IJobEntity: parabolik mermi hareketi
+- `lerp(Start,Target,t) + ArcHeight*4*t*(1-t)` ile parabol
+- `[BurstCompile]` destekli
+- `[UpdateAfter(typeof(ZombieAttackTimerSystem))]`
+→ Detay: `CATAPULT_SYSTEM_ARCHITECTURE.md`
+
+### CatapultProjectileHitSystem (M2.1)
+- Main thread (BurstCompile YOK — static field erisimi)
+- Spatial hash (ReadMap) uzerinden AoE tarama
+- Yaricap icindeki zombilere direkt HP dusurme
+- `[UpdateAfter(typeof(CatapultProjectileMoveSystem))]`
+→ Detay: `CATAPULT_SYSTEM_ARCHITECTURE.md`
 
 ### ApplyMovementForceSystem (FIZIK)
 - Moving zombilere hedefe dogru kuvvet uygular

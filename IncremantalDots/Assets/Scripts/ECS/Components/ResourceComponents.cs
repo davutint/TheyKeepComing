@@ -46,4 +46,14 @@ namespace DeadWalls
         public float Iron;
         public float Food;
     }
+
+    /// <summary>
+    /// Ok envanter singleton. GameState entity uzerinde tutulur.
+    /// Fletcher ok uretir, ArcherShootSystem ok tuketir.
+    /// </summary>
+    public struct ArrowSupply : IComponentData
+    {
+        public int Current;       // Mevcut ok sayisi
+        public float Accumulator; // Kesirli birikim (ResourceAccumulator benzeri)
+    }
 }

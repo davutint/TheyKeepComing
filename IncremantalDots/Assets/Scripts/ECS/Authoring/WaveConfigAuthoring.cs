@@ -18,11 +18,23 @@ namespace DeadWalls
         public Entity ArcherPrefab;
     }
 
+    public struct CatapultPrefabData : IComponentData
+    {
+        public Entity CatapultPrefab;
+    }
+
+    public struct CatapultProjectilePrefabData : IComponentData
+    {
+        public Entity CatapultProjectilePrefab;
+    }
+
     public class WaveConfigAuthoring : MonoBehaviour
     {
         public GameObject ZombiePrefab;
         public GameObject ArrowPrefab;
         public GameObject ArcherPrefab;
+        public GameObject CatapultPrefab;
+        public GameObject CatapultProjectilePrefab;
 
         public class Baker : Baker<WaveConfigAuthoring>
         {
@@ -42,6 +54,22 @@ namespace DeadWalls
                 {
                     ArcherPrefab = GetEntity(authoring.ArcherPrefab, TransformUsageFlags.Dynamic)
                 });
+
+                if (authoring.CatapultPrefab != null)
+                {
+                    AddComponent(entity, new CatapultPrefabData
+                    {
+                        CatapultPrefab = GetEntity(authoring.CatapultPrefab, TransformUsageFlags.Dynamic)
+                    });
+                }
+
+                if (authoring.CatapultProjectilePrefab != null)
+                {
+                    AddComponent(entity, new CatapultProjectilePrefabData
+                    {
+                        CatapultProjectilePrefab = GetEntity(authoring.CatapultProjectilePrefab, TransformUsageFlags.Dynamic)
+                    });
+                }
             }
         }
     }

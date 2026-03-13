@@ -24,6 +24,7 @@ namespace DeadWalls
         public ResourceProductionRate ResourceProduction { get; private set; }
         public ResourceConsumptionRate ResourceConsumption { get; private set; }
         public PopulationState Population { get; private set; }
+        public ArrowSupply ArrowSupply { get; private set; }
 
         public event System.Action OnGameOver;
         public event System.Action OnLevelUp;
@@ -94,6 +95,7 @@ namespace DeadWalls
             ResourceProduction = _entityManager.GetComponentData<ResourceProductionRate>(_gameStateEntity);
             ResourceConsumption = _entityManager.GetComponentData<ResourceConsumptionRate>(_gameStateEntity);
             Population = _entityManager.GetComponentData<PopulationState>(_gameStateEntity);
+            ArrowSupply = _entityManager.GetComponentData<ArrowSupply>(_gameStateEntity);
             Wall = _entityManager.GetComponentData<WallSegment>(_castleEntity);
             Gate = _entityManager.GetComponentData<GateComponent>(_castleEntity);
             Castle = _entityManager.GetComponentData<CastleHP>(_castleEntity);
@@ -191,6 +193,18 @@ namespace DeadWalls
             var arrowQuery = _entityManager.CreateEntityQuery(typeof(ArrowTag));
             _entityManager.DestroyEntity(arrowQuery);
 
+            // Tum mancinik mermilerini sil
+            var catapultProjectileQuery = _entityManager.CreateEntityQuery(typeof(CatapultProjectileTag));
+            _entityManager.DestroyEntity(catapultProjectileQuery);
+
+            // Tum mancinik entity'lerini sil
+            var catapultQuery = _entityManager.CreateEntityQuery(typeof(CatapultUnit));
+            _entityManager.DestroyEntity(catapultQuery);
+
+            // Sur slotlarini sifirla
+            if (WallSlotManager.Instance != null)
+                WallSlotManager.Instance.ResetSlots();
+
             // Tum bina entity'lerini sil
             var buildingQuery = _entityManager.CreateEntityQuery(typeof(BuildingData));
             _entityManager.DestroyEntity(buildingQuery);
@@ -260,6 +274,13 @@ namespace DeadWalls
                 Stone = 0f,
                 Iron = 0f,
                 Food = 0f
+            });
+
+            // Ok envanter resetle
+            _entityManager.SetComponentData(_gameStateEntity, new ArrowSupply
+            {
+                Current = 50,
+                Accumulator = 0f
             });
 
             // Nufus resetle

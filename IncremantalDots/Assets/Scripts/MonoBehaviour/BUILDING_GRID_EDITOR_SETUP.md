@@ -6,6 +6,7 @@
 1. Hierarchy'de **Grid** objesini sec (mevcut tilemap'lerin parent'i)
 2. Sag tikla → **2D Object → Tilemap → Rectangular** → adi: `buildable_zone`
 3. Ayni sekilde bir tane daha ekle → adi: `building_visuals`
+4. Bir tane daha ekle → adi: `resource_zones` (dogal kaynak zone'lari icin)
 
 ### Adim 2: buildable_zone Doldur
 > **Amac:** `buildable_zone` gorunmez bir mantik katmanidir. Kod tarafinda BuildingGridManager bu
@@ -30,12 +31,32 @@
 2. Icerigini bos birak — binalar yerlestirilince kod otomatik doldurur
 3. Inspector'da **Tilemap Renderer → Order in Layer** degerini ground layer'indan yuksek yap (ornek: ground=0 ise building_visuals=5)
 
+### Adim 3b: resource_zones Zone Boyama
+> **Amac:** `resource_zones` dogal kaynak zone'larini tanimlayan katmandir. Hangi bolgelerde
+> hangi kaynak binasi yerlestirilebilir kontrolu icin kullanilir. Zone gerektiren bina
+> secildiginde overlay olarak gorunur olur.
+
+1. 3 farkli tile asset olustur (Project → Create → 2D → Tiles → Tile):
+   - `ForestZoneTile` — yesil tonlarinda sprite
+   - `StoneZoneTile` — gri tonlarinda sprite
+   - `IronZoneTile` — kahverengi/turuncu sprite
+2. **Window → 2D → Tile Palette** → yeni palette: `ResourceZones`
+3. **Active Tilemap** olarak `resource_zones` sec
+4. Haritada ilgili alanlari boya (orman, tas, demir bolgeleri)
+5. `resource_zones` Tilemap → Inspector → **Tilemap Renderer**:
+   - `enabled` checkbox'ini **kapat** (baslangicta gorunmez, kod gerektiginde acar)
+   - **Order in Layer**: ground uzerinde, building_visuals altinda (ornek: 2)
+
 ### Adim 4: BuildingGridManager GameObject
 1. Hierarchy'de bos GameObject olustur → adi: `BuildingGridManager`
 2. `BuildingGridManager` script'ini ekle
 3. Inspector'dan ayarla:
    - **Buildable Zone Tilemap**: `buildable_zone` tilemap'i surukle
    - **Building Visual Tilemap**: `building_visuals` tilemap'i surukle
+   - **Resource Zone Tilemap**: `resource_zones` tilemap'i surukle
+   - **Forest Tile**: `ForestZoneTile` asset'ini surukle
+   - **Stone Tile**: `StoneZoneTile` asset'ini surukle
+   - **Iron Tile**: `IronZoneTile` asset'ini surukle
    - **Building Configs**: SO asset'lerini surukle (Farm_Config, House_Config vs.)
 > **Not:** GridWidth, GridHeight ve GridOrigin otomatik hesaplanir — `buildable_zone` tilemap'ini
 > boyadigin an cellBounds'tan alinir. Elle girmeye gerek yok, Inspector'da sadece debug icin gorunur.
@@ -117,3 +138,11 @@
 ### Test 5: Iptal
 1. UI panelden bina sec → ghost gorunsun
 2. Sag tikla veya Escape → ghost kapansin, yerlestirme modu bitsin
+
+### Test 6: Zone Yakinlik Kontrolu
+1. `resource_zones` tilemap'e orman/tas/demir zone'lari boya
+2. SO asset'lerde RequiredZone ayarla (Lumberjack→Forest, Quarry→Stone, Mine→Iron)
+3. Play mode'da Oduncu sec → zone overlay gorunur
+4. Orman yakininda → yesil ghost, uzaginda → kirmizi ghost
+5. Ciftlik sec → zone overlay gorunmez (RequiredZone = None)
+6. Yerlestir → kaynak duser, bina olusur

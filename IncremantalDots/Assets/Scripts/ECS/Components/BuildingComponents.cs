@@ -16,7 +16,8 @@ namespace DeadWalls
         Barracks,     // Kisla
         Fletcher,     // Ok Atolyesi
         Blacksmith,   // Demirci
-        WizardTower   // Buyucu Kulesi
+        WizardTower,  // Buyucu Kulesi
+        Catapult      // Mancinik
     }
 
     /// <summary>
@@ -28,6 +29,18 @@ namespace DeadWalls
         Stone,
         Iron,
         Food
+    }
+
+    /// <summary>
+    /// Dogal kaynak zone tipi — bina yerlestirmede zone yakinlik kontrolu icin.
+    /// None ise zone gereksinimi yok.
+    /// </summary>
+    public enum ResourcePointType : byte
+    {
+        None,    // Zone gereksinimi yok
+        Forest,  // Orman (Oduncu icin)
+        Stone,   // Tas kaynagi (Tas Ocagi icin)
+        Iron     // Demir kaynagi (Maden icin)
     }
 
     /// <summary>
@@ -66,5 +79,30 @@ namespace DeadWalls
     public struct BuildingFoodCost : IComponentData
     {
         public float FoodPerMin;
+    }
+
+    /// <summary>
+    /// Kisla icin — okcu egitim component'i.
+    /// Idle nufustan okcu egitir (kaynak harcar, zaman alir).
+    /// </summary>
+    public struct ArcherTrainer : IComponentData
+    {
+        public float TrainingTimer;      // Kalan egitim suresi
+        public float TrainingDuration;   // Tek okcu egitim suresi (sn)
+        public int FoodCostPerArcher;    // Egitim yemek maliyeti
+        public int WoodCostPerArcher;    // Egitim ahsap maliyeti
+        public bool IsTraining;          // Egitim devam ediyor mu
+    }
+
+    /// <summary>
+    /// Fletcher (Ok Atolyesi) icin — ok uretim component'i.
+    /// ResourceProducer KULLANILMAZ — ok 4 ana kaynaktan biri degil.
+    /// </summary>
+    public struct ArrowProducer : IComponentData
+    {
+        public float ArrowsPerWorkerPerMin;  // Isci basina ok/dk
+        public int AssignedWorkers;
+        public int MaxWorkers;
+        public float WoodCostPerBatchPerMin; // Isci basina ahsap tuketim/dk
     }
 }

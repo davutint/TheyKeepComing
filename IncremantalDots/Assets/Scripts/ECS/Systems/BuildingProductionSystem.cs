@@ -57,6 +57,12 @@ namespace DeadWalls
             prodRW.ValueRW.IronPerMin = ironRate;
             prodRW.ValueRW.FoodPerMin = foodRate;
 
+            // ArrowProducer (Fletcher) iscilerini de say
+            foreach (var arrowProducer in SystemAPI.Query<RefRO<ArrowProducer>>())
+            {
+                totalWorkers += arrowProducer.ValueRO.AssignedWorkers;
+            }
+
             // Toplam isci sayisini nufusa yaz
             var popRW = SystemAPI.GetSingletonRW<PopulationState>();
             popRW.ValueRW.Workers = totalWorkers;

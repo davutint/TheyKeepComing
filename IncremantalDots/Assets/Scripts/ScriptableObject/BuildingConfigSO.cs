@@ -27,8 +27,25 @@ namespace DeadWalls
         public float RatePerWorkerPerMin;
         public int MaxWorkers;
 
+        [Header("Dogal Kaynak Gereksinimi")]
+        public ResourcePointType RequiredZone = ResourcePointType.None;
+        public int ZoneProximityRadius = 3;
+
         [Header("Nufus (sadece Ev)")]
         public int PopulationCapacity;
         public float FoodCostPerMin;
+
+        [Header("Kisla (Barracks)")]
+        public float TrainingDuration;      // Saniye, default 30
+        public int FoodCostPerArcher;       // default 20
+        public int WoodCostPerArcher;       // default 10
+
+        [Header("Ok Atolyesi (Fletcher)")]
+        public float ArrowsPerWorkerPerMin; // default 10
+        public float WoodCostPerBatchPerMin; // Isci basina ahsap tuketim/dk, default 2
+
+        [Header("Sur Slot Binasi (Mancinik)")]
+        public bool IsWallSlotBuilding;    // true ise grid yerine sur slot'una yerlesir
+        public bool RequireBlacksmith;     // true ise Demirci binasi olmadan yapilamaz
     }
 }

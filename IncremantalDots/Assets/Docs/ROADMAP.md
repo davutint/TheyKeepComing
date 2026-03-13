@@ -82,7 +82,7 @@ Asagidakiler **tamamlanmis ve calisan** sistemlerdir:
   - [x] Maliyet gosterimi + kaynak yeterliligi kontrolu
   - [x] Tikla-yerlestir mekanigi + sag tikla/Escape iptal
 - [ ] ~~`BuildingAuthoring` baker~~ — Iptal: prefab yerine runtime CreateEntity + Tilemap gorsel secildi
-- [ ] Yerlestirme kurallari: Oduncu→orman yanina vs. (M1.8 dogal kaynak zone'larina ertelendi)
+- [x] Yerlestirme kurallari: Oduncu→orman yanina vs. (M1.8'de tamamlandi)
 
 ### M1.4 — Kaynak Binalari (Oduncu, Tas Ocagi, Maden, Ciftlik)
 
@@ -90,7 +90,7 @@ Asagidakiler **tamamlanmis ve calisan** sistemlerdir:
 - [x] Test uretim rate'lerini sifirla (GameStateAuthoring + GameManager.RestartGame) — uretim tamamen binalardan gelir
 - [x] `AssignedWorkers = 1` gecici cozum (M1.7'de isci atama UI gelecek)
 - [x] SO asset'leri olustur: Lumberjack (Wood 5/dk), Quarry (Stone 3/dk), Mine (Iron 2/dk), Farm (Food 4/dk)
-- [ ] Yerlestirme kurallari: Oduncu→orman, Ocak→tas vs. (M1.8'e ertelendi)
+- [x] Yerlestirme kurallari: Oduncu→orman, Ocak→tas vs. (M1.8'de tamamlandi)
 - [ ] Upgrade: uretim verimi artar (M1.7+ ile birlikte)
 
 ### M1.5 — Altyapi Binalari (Ev, Kale Upgrade) ✅
@@ -138,14 +138,17 @@ Asagidakiler **tamamlanmis ve calisan** sistemlerdir:
   - [ ] Upgrade butonu (maliyet gosterimi + kaynak kontrolu)
   - [ ] Yikma butonu
 
-### M1.8 — Dogal Kaynak Noktalari
+### M1.8 — Dogal Kaynak Noktalari ✅
 
-- [ ] Haritada sabit dogal kaynak konumlari olustur (Tilemap veya entity)
-  - [ ] Orman noktasi (Oduncu yerlestirme icin)
-  - [ ] Tas kaynagi noktasi (Tas Ocagi icin)
-  - [ ] Demir kaynagi noktasi (Maden icin)
-- [ ] Yerlestirme kurali: kaynak binasi ilgili dogal kaynaga yakin mi kontrolu
-- [ ] Gorsel gosterim (Tilemap sprite veya overlay)
+- [x] Haritada sabit dogal kaynak konumlari olustur (Tilemap tabanli)
+  - [x] ResourcePointType enum (Forest, Stone, Iron, None)
+  - [x] resource_zones Tilemap layer + tile asset'leri (ForestTile, StoneTile, IronTile)
+  - [x] _zoneGrid[,] cache (InitializeGrid'de doldurulur)
+- [x] Yerlestirme kurali: kaynak binasi ilgili dogal kaynaga yakin mi kontrolu
+  - [x] IsNearZone() proximity metodu (genisletilmis dikdortgen tarama)
+  - [x] CanPlace()'e zone yakinlik kontrolu eklendi
+  - [x] BuildingConfigSO'ya RequiredZone + ZoneProximityRadius field'lari eklendi
+- [x] Gorsel gosterim (TilemapRenderer toggle — zone gerektiren bina secildiginde overlay gorunur)
 
 ### M1.9 — Eski Sistemlerin Temizligi
 
@@ -173,18 +176,27 @@ Asagidakiler **tamamlanmis ve calisan** sistemlerdir:
 > **Hedef:** Mancinik, tuzaklar, buyuler, level-up kart sistemi.
 > **Bagimliliklari:** M1 (kaynak sistemi, Demirci unlock mekanigi)
 
-### M2.1 — Mancinik (Catapult)
+### M2.1 — Mancinik (Catapult) ✅
 
-- [ ] `CatapultComponents.cs` olustur
-  - [ ] `CatapultUnit`: Damage, SplashRadius, FireRate, FireTimer, AmmoCount
-  - [ ] `CatapultProjectile`: Speed, Damage, SplashRadius, TargetPos (float3)
-- [ ] `CatapultAuthoring` + prefab olustur
-- [ ] `CatapultShootSystem` olustur — en kalabalik zombi grubuna ates
-  - [ ] Spatial hash ile yogunluk tespiti
-  - [ ] Yavas atis hizi, buyuk AoE
-- [ ] `CatapultProjectileSystem` olustur — mermi hareketi + AoE hasar uygulama
-- [ ] Tas tuketimi: her atis Tas harcar (ResourceConsumption baglantisi)
-- [ ] Demirciden unlock mekanigi (M1.6 Demirci ile entegrasyon)
+- [x] `CatapultComponents.cs` olustur
+  - [x] `CatapultUnit`: Damage(40), SplashRadius(2), FireRate(0.2), FireTimer, Range(25), StoneCostPerShot(1)
+  - [x] `CatapultProjectile`: Damage, SplashRadius, StartPos, TargetPos, FlightDuration(1.2), FlightTimer, ArcHeight(5)
+  - [x] `CatapultProjectileTag`: filtreleme tag'i
+- [x] `CatapultAuthoring` + `CatapultProjectileAuthoring` olustur
+- [x] `WaveConfigAuthoring`'e CatapultPrefabData + CatapultProjectilePrefabData singleton ekle
+- [x] `CatapultShootSystem` olustur — brute-force en yakin zombie hedefleme + mermi spawn
+  - [x] Burst destekli, ArcherShootSystem pattern'i
+  - [x] Yavas atis hizi (5sn/atis), buyuk AoE (2.0 yaricap)
+- [x] `CatapultProjectileMoveSystem` olustur — parabolik hareket (IJobEntity + BurstCompile)
+- [x] `CatapultProjectileHitSystem` olustur — AoE hasar (spatial hash + ComponentLookup)
+- [x] Tas tuketimi: her atis ResourceData.Stone dusurur
+- [x] Demirciden unlock mekanigi (BuildingConfigSO.RequireBlacksmith + HasBuildingOfType)
+- [x] `WallSlotManager` olustur — sur slot yerlestirme (3 slot, maliyet, iade, restart)
+- [x] `BuildingPlacementUI` — IsWallSlotBuilding branch + slot snap ghost preview
+- [x] `GameManager.RestartGame` — mancinik entity cleanup + slot reset
+- [x] `BuildingType.Catapult` enum eklendi
+- [x] MD dosyalari: CATAPULT_COMPONENTS, CATAPULT_SYSTEM, WALL_SLOT (ARCHITECTURE + EDITOR_SETUP)
+- [x] SYSTEM_EXECUTION_ORDER_ARCHITECTURE.md guncellendi
 
 ### M2.2 — Tuzak Sistemi
 
@@ -429,12 +441,12 @@ Asagidakiler **tamamlanmis ve calisan** sistemlerdir:
 | Milestone | Toplam Gorev | Tamamlanan | Yuzde |
 |-----------|-------------|------------|-------|
 | M0 Bug Fix | 5 | 5 | %100 |
-| M1 Kaynak + Bina | ~50 | 42 | %84 |
-| M2 Savunma Derinligi | ~35 | 0 | %0 |
+| M1 Kaynak + Bina | ~50 | 45 | %90 |
+| M2 Savunma Derinligi | ~35 | 15 | %43 |
 | M3 Gun + Wave | ~20 | 1 | %5 |
 | M4 Event + Polish | ~35 | 0 | %0 |
 | M5 Launch | ~12 | 0 | %0 |
-| **TOPLAM** | **~157** | **48** | **%31** |
+| **TOPLAM** | **~157** | **66** | **%42** |
 
 ---
 
@@ -455,5 +467,5 @@ Asagidakiler **tamamlanmis ve calisan** sistemlerdir:
 
 ---
 
-*Son guncelleme: 2026-03-13 (M0 Bug Fix tamamlandi, M1.1 tamamlandi, M1.2 tamamlandi, M1.3 tamamlandi, M1.4 tamamlandi, M1.5 tamamlandi, M1.9 kismen tamamlandi)*
+*Son guncelleme: 2026-03-13 (M0 Bug Fix tamamlandi, M1.1-M1.8 tamamlandi, M1.9 kismen tamamlandi, M2.1 Mancinik tamamlandi)*
 *GDD Referans: DEAD_WALLS_GDD_v3.0.md*

@@ -27,6 +27,12 @@ namespace DeadWalls
         public int GridHeightDebug => GridHeight;
         public Vector3Int GridOriginDebug => GridOrigin;
 
+        [Header("Dogal Kaynak Zone'lari")]
+        public Tilemap ResourceZoneTilemap;   // resource_zones layer referansi
+        public TileBase ForestTile;           // Orman tile asset
+        public TileBase StoneTile;            // Tas tile asset
+        public TileBase IronTile;             // Demir tile asset
+
         [Header("Bina Konfigurasyonlari")]
         public BuildingConfigSO[] BuildingConfigs;
 
@@ -34,6 +40,7 @@ namespace DeadWalls
         // 0 = bos (yerlestirilebilir), 1 = dolu, -1 = yerlestirilemez
         private int[,] _grid;
         private Entity[,] _entityGrid;  // Hangi hucrede hangi bina entity'si var
+        private ResourcePointType[,] _zoneGrid;
 
         // ECS erisim
         private EntityManager _entityManager;
@@ -109,6 +116,33 @@ namespace DeadWalls
             }
             Debug.Log($"[BuildingGrid] Bounds: {bounds} | Origin: {GridOrigin} | Size: {GridWidth}x{GridHeight} | Buildable: {buildableCount}/{GridWidth * GridHeight}");
 
+            // Dogal kaynak zone'larini oku ve cache'le
+            _zoneGrid = new ResourcePointType[GridWidth, GridHeight];
+            if (ResourceZoneTilemap != null)
+            {
+                int zoneCount = 0;
+                for (int x = bounds.xMin; x < bounds.xMax; x++)
+                {
+                    for (int y = bounds.yMin; y < bounds.yMax; y++)
+                    {
+                        var tilePos = new Vector3Int(x, y, 0);
+                        var tile = ResourceZoneTilemap.GetTile(tilePos);
+                        if (tile == null) continue;
+
+                        int gx = x - GridOrigin.x;
+                        int gy = y - GridOrigin.y;
+                        if (gx < 0 || gy < 0 || gx >= GridWidth || gy >= GridHeight) continue;
+
+                        if (tile == ForestTile)      _zoneGrid[gx, gy] = ResourcePointType.Forest;
+                        else if (tile == StoneTile)   _zoneGrid[gx, gy] = ResourcePointType.Stone;
+                        else if (tile == IronTile)    _zoneGrid[gx, gy] = ResourcePointType.Iron;
+
+                        if (_zoneGrid[gx, gy] != ResourcePointType.None) zoneCount++;
+                    }
+                }
+                Debug.Log($"[BuildingGrid] Resource zones: {zoneCount} cells cached");
+            }
+
             _initialized = true;
         }
 
@@ -139,7 +173,33 @@ namespace DeadWalls
                 res.Iron < config.IronCost || res.Food < config.FoodCost)
                 return false;
 
+            // Dogal kaynak zone yakinlik kontrolu
+            if (!IsNearZone(config.RequiredZone, gridX, gridY, config.GridWidth, config.GridHeight, config.ZoneProximityRadius))
+                return false;
+
             return true;
+        }
+
+        /// <summary>
+        /// Bina footprint'i etrafinda belirtilen radius icerisinde zone tile var mi kontrol et.
+        /// zoneType == None ise hemen true doner.
+        /// </summary>
+        public bool IsNearZone(ResourcePointType zoneType, int gridX, int gridY, int width, int height, int radius)
+        {
+            if (zoneType == ResourcePointType.None) return true;
+            if (_zoneGrid == null) return false;
+
+            int minX = Mathf.Max(0, gridX - radius);
+            int minY = Mathf.Max(0, gridY - radius);
+            int maxX = Mathf.Min(GridWidth - 1, gridX + width - 1 + radius);
+            int maxY = Mathf.Min(GridHeight - 1, gridY + height - 1 + radius);
+
+            for (int x = minX; x <= maxX; x++)
+                for (int y = minY; y <= maxY; y++)
+                    if (_zoneGrid[x, y] == zoneType)
+                        return true;
+
+            return false;
         }
 
         /// <summary>
@@ -365,7 +425,78 @@ namespace DeadWalls
                 });
             }
 
+            // Kisla ise (TrainingDuration > 0)
+            if (config.TrainingDuration > 0f)
+            {
+                em.AddComponentData(entity, new ArcherTrainer
+                {
+                    TrainingTimer = 0f,
+                    TrainingDuration = config.TrainingDuration,
+                    FoodCostPerArcher = config.FoodCostPerArcher,
+                    WoodCostPerArcher = config.WoodCostPerArcher,
+                    IsTraining = false
+                });
+            }
+
+            // Fletcher ise (ArrowsPerWorkerPerMin > 0)
+            if (config.ArrowsPerWorkerPerMin > 0f)
+            {
+                em.AddComponentData(entity, new ArrowProducer
+                {
+                    ArrowsPerWorkerPerMin = config.ArrowsPerWorkerPerMin,
+                    AssignedWorkers = 0,
+                    MaxWorkers = config.MaxWorkers,
+                    WoodCostPerBatchPerMin = config.WoodCostPerBatchPerMin
+                });
+            }
+
             return entity;
+        }
+
+        /// <summary>
+        /// Belirtilen tipte en az bir bina var mi kontrol et.
+        /// </summary>
+        public bool HasBuildingOfType(BuildingType type)
+        {
+            var world = World.DefaultGameObjectInjectionWorld;
+            if (world == null) return false;
+
+            var em = world.EntityManager;
+            var query = em.CreateEntityQuery(typeof(BuildingData));
+            var entities = query.ToEntityArray(Unity.Collections.Allocator.Temp);
+
+            bool found = false;
+            for (int i = 0; i < entities.Length; i++)
+            {
+                if (em.GetComponentData<BuildingData>(entities[i]).Type == type)
+                {
+                    found = true;
+                    break;
+                }
+            }
+
+            entities.Dispose();
+            return found;
+        }
+
+        /// <summary>
+        /// Resource zone overlay'i goster (yerlestirme modunda).
+        /// </summary>
+        public void ShowResourceZones()
+        {
+            if (ResourceZoneTilemap == null) return;
+            var renderer = ResourceZoneTilemap.GetComponent<TilemapRenderer>();
+            if (renderer != null) renderer.enabled = true;
+        }
+
+        /// <summary>
+        /// Resource zone overlay'i gizle.
+        /// </summary>
+        public void HideResourceZones()
+        {
+            if (ResourceZoneTilemap == null) return;
+            var renderer = ResourceZoneTilemap.GetComponent<TilemapRenderer>();
+            if (renderer != null) renderer.enabled = false;
         }
 
         private void PlaceVisualTile(BuildingConfigSO config, int gridX, int gridY)

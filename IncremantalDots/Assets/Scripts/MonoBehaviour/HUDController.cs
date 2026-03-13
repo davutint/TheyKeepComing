@@ -26,12 +26,16 @@ namespace DeadWalls
         [Header("Population")]
         public TMP_Text PopulationText;
 
+        [Header("Arrow Supply")]
+        public TMP_Text ArrowText;
+
         // Onceki degerler — sadece degisince string alloc yap
         private int _lastXP = -1, _lastXPToNext = -1;
         private int _lastWave = -1, _lastLevel = -1, _lastAlive = -1;
         private int _lastWood = -1, _lastStone = -1, _lastIron = -1, _lastFood = -1;
         private float _lastWoodNet, _lastStoneNet, _lastIronNet, _lastFoodNet;
         private int _lastPopTotal = -1, _lastPopCapacity = -1, _lastWorkers = -1, _lastArchers = -1;
+        private int _lastArrowCurrent = -1;
 
         private void Update()
         {
@@ -119,6 +123,14 @@ namespace DeadWalls
                 _lastFood = res.Food;
                 _lastFoodNet = foodNet;
                 FoodText.text = FormatResource("Yemek", res.Food, foodNet);
+            }
+
+            // Ok envanter
+            var arrowSupply = gm.ArrowSupply;
+            if (ArrowText != null && _lastArrowCurrent != arrowSupply.Current)
+            {
+                _lastArrowCurrent = arrowSupply.Current;
+                ArrowText.text = $"Ok: {arrowSupply.Current}";
             }
 
             // Nufus

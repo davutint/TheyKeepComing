@@ -43,6 +43,9 @@ namespace DeadWalls
         [Header("Population — Tuketim")]
         public float FoodPerAssignedPerMin = 2f;
 
+        [Header("Arrow Supply — Baslangic")]
+        public int InitialArrows = 50;
+
         public class Baker : Baker<GameStateAuthoring>
         {
             public override void Bake(GameStateAuthoring authoring)
@@ -116,6 +119,12 @@ namespace DeadWalls
                     Capacity = authoring.InitialCapacity,
                     BaseCapacity = authoring.InitialCapacity,
                     FoodPerAssignedPerMin = authoring.FoodPerAssignedPerMin
+                });
+
+                AddComponent(entity, new ArrowSupply
+                {
+                    Current = authoring.InitialArrows,
+                    Accumulator = 0f
                 });
             }
         }

@@ -60,11 +60,46 @@ namespace DeadWalls
                 return;
             }
 
-            // Mouse → world → grid
+            // Mouse → world
             Vector3 mouseScreen = Input.mousePosition;
             mouseScreen.z = -_mainCamera.transform.position.z;
             Vector3 mouseWorld = _mainCamera.ScreenToWorldPoint(mouseScreen);
 
+            // Sur slot binasi ise (Mancinik) — slot snap mantigi
+            if (_selectedConfig.IsWallSlotBuilding)
+            {
+                var slotMgr = WallSlotManager.Instance;
+                if (slotMgr == null) { StopPlacement(); return; }
+
+                int nearestSlot = slotMgr.GetNearestEmptySlot(mouseWorld);
+                bool canPlace = nearestSlot >= 0;
+
+                // Ghost'u en yakin bos slot'a snap et
+                if (GhostRenderer != null)
+                {
+                    if (canPlace)
+                        GhostRenderer.transform.position = slotMgr.Slots[nearestSlot].Position;
+                    else
+                        GhostRenderer.transform.position = mouseWorld;
+
+                    GhostRenderer.color = canPlace ? ValidColor : InvalidColor;
+                }
+
+                // Sol tikla → yerlestir
+                if (Input.GetMouseButtonDown(0) && canPlace)
+                {
+                    slotMgr.PlaceCatapult(nearestSlot);
+                    StopPlacement();
+                }
+
+                // Sag tikla veya Escape → iptal
+                if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
+                    StopPlacement();
+
+                return;
+            }
+
+            // Normal grid yerlestirme
             var gridMgr = BuildingGridManager.Instance;
             if (gridMgr == null) return;
 
@@ -98,14 +133,14 @@ namespace DeadWalls
             }
 
             // Renk — CanPlace kontrolu
-            bool canPlace = gridMgr.CanPlace(_selectedConfig, gridPos.x, gridPos.y);
+            bool gridCanPlace = gridMgr.CanPlace(_selectedConfig, gridPos.x, gridPos.y);
             if (Input.GetKeyDown(KeyCode.F1))
-                Debug.Log($"[PlaceDebug] mouseWorld:{mouseWorld} gridPos:{gridPos} canPlace:{canPlace} gridSize:{gridMgr.GridWidthDebug}x{gridMgr.GridHeightDebug} origin:{gridMgr.GridOriginDebug}");
+                Debug.Log($"[PlaceDebug] mouseWorld:{mouseWorld} gridPos:{gridPos} canPlace:{gridCanPlace} gridSize:{gridMgr.GridWidthDebug}x{gridMgr.GridHeightDebug} origin:{gridMgr.GridOriginDebug}");
             if (GhostRenderer != null)
-                GhostRenderer.color = canPlace ? ValidColor : InvalidColor;
+                GhostRenderer.color = gridCanPlace ? ValidColor : InvalidColor;
 
             // Sol tikla → yerlestir
-            if (Input.GetMouseButtonDown(0) && canPlace)
+            if (Input.GetMouseButtonDown(0) && gridCanPlace)
             {
                 gridMgr.PlaceBuilding(_selectedConfig, gridPos.x, gridPos.y);
                 StopPlacement();
@@ -154,7 +189,20 @@ namespace DeadWalls
                 var capturedConfig = config;
                 var btn = btnObj.GetComponent<Button>();
                 if (btn != null)
-                    btn.onClick.AddListener(() => StartPlacement(capturedConfig));
+                {
+                    btn.onClick.AddListener(() =>
+                    {
+                        // Demirci gereksinimi kontrolu
+                        if (capturedConfig.RequireBlacksmith &&
+                            (BuildingGridManager.Instance == null ||
+                             !BuildingGridManager.Instance.HasBuildingOfType(BuildingType.Blacksmith)))
+                        {
+                            Debug.Log("[BuildingUI] Demirci binasi gerekli!");
+                            return;
+                        }
+                        StartPlacement(capturedConfig);
+                    });
+                }
             }
         }
 
@@ -181,6 +229,13 @@ namespace DeadWalls
                         config.GridHeight / spriteH, 1f);
                 }
             }
+
+            // Zone gerektiren bina icin overlay goster
+            if (config.RequiredZone != ResourcePointType.None)
+            {
+                var gridMgr = BuildingGridManager.Instance;
+                if (gridMgr != null) gridMgr.ShowResourceZones();
+            }
         }
 
         /// <summary>
@@ -188,6 +243,10 @@ namespace DeadWalls
         /// </summary>
         private void StopPlacement()
         {
+            // Zone overlay'i gizle
+            var gridMgr = BuildingGridManager.Instance;
+            if (gridMgr != null) gridMgr.HideResourceZones();
+
             _isPlacing = false;
             _selectedConfig = null;
 

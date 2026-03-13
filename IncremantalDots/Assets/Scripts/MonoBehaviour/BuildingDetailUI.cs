@@ -43,7 +43,7 @@ namespace DeadWalls
         // Turkce bina isimleri
         private static readonly string[] BuildingNames = {
             "Oduncu", "Tas Ocagi", "Maden", "Ciftlik", "Ev",
-            "Kisla", "Ok Atolyesi", "Demirci", "Buyucu Kulesi"
+            "Kisla", "Ok Atolyesi", "Demirci", "Buyucu Kulesi", "Mancinik"
         };
 
         // Turkce kaynak isimleri
@@ -94,13 +94,15 @@ namespace DeadWalls
             if (BuildingNameText != null)
                 BuildingNameText.text = $"{name} (Sv.{buildingData.Level})";
 
-            // Kaynak binasi mi?
+            // Bina tipi kontrolleri
             bool isProducer = _entityManager.HasComponent<ResourceProducer>(_selectedEntity);
             bool isHouse = _entityManager.HasComponent<PopulationProvider>(_selectedEntity);
+            bool isTrainer = _entityManager.HasComponent<ArcherTrainer>(_selectedEntity);
+            bool isArrowProducer = _entityManager.HasComponent<ArrowProducer>(_selectedEntity);
 
-            // Isci bolumu — sadece kaynak binalari icin
+            // Isci bolumu — kaynak binalari ve Fletcher icin
             if (WorkerSection != null)
-                WorkerSection.SetActive(isProducer);
+                WorkerSection.SetActive(isProducer || isArrowProducer);
 
             // Kapasite bolumu — sadece ev icin
             if (CapacitySection != null)
@@ -119,20 +121,75 @@ namespace DeadWalls
                 if (WorkersText != null)
                     WorkersText.text = $"Isci: {producer.AssignedWorkers} / {producer.MaxWorkers}";
 
-                // Idle isci sayisi
                 var pop = GameManager.Instance != null ? GameManager.Instance.Population : default;
                 int idle = pop.Idle;
                 if (IdleText != null)
                     IdleText.text = $"Bos Isci: {idle}";
 
-                // Buton durumu
                 if (AddWorkerButton != null)
                     AddWorkerButton.interactable = idle > 0 && producer.AssignedWorkers < producer.MaxWorkers;
                 if (RemoveWorkerButton != null)
                     RemoveWorkerButton.interactable = producer.AssignedWorkers > 0;
             }
+            else if (isArrowProducer)
+            {
+                // Fletcher — ok uretim bilgisi + isci atama
+                var ap = _entityManager.GetComponentData<ArrowProducer>(_selectedEntity);
+                float totalArrowRate = ap.ArrowsPerWorkerPerMin * ap.AssignedWorkers;
+                float totalWoodCost = ap.WoodCostPerBatchPerMin * ap.AssignedWorkers;
+
+                if (ProductionText != null)
+                {
+                    if (ap.AssignedWorkers > 0)
+                        ProductionText.text = $"Ok: {totalArrowRate:F1}/dk | Ahsap: -{totalWoodCost:F1}/dk";
+                    else
+                        ProductionText.text = "Isci atanmadi";
+                }
+
+                if (WorkersText != null)
+                    WorkersText.text = $"Isci: {ap.AssignedWorkers} / {ap.MaxWorkers}";
+
+                var pop = GameManager.Instance != null ? GameManager.Instance.Population : default;
+                int idle = pop.Idle;
+                if (IdleText != null)
+                    IdleText.text = $"Bos Isci: {idle}";
+
+                if (AddWorkerButton != null)
+                    AddWorkerButton.interactable = idle > 0 && ap.AssignedWorkers < ap.MaxWorkers;
+                if (RemoveWorkerButton != null)
+                    RemoveWorkerButton.interactable = ap.AssignedWorkers > 0;
+            }
+            else if (isTrainer)
+            {
+                // Kisla — egitim durumu gosterimi, isci bolumu gizle
+                if (WorkerSection != null)
+                    WorkerSection.SetActive(false);
+
+                var trainer = _entityManager.GetComponentData<ArcherTrainer>(_selectedEntity);
+                if (ProductionText != null)
+                {
+                    if (trainer.IsTraining)
+                        ProductionText.text = $"Egitim: {trainer.TrainingTimer:F1}s kaldi";
+                    else
+                    {
+                        var pop = GameManager.Instance != null ? GameManager.Instance.Population : default;
+                        bool hasIdle = pop.Idle > 0;
+                        var res = GameManager.Instance != null ? GameManager.Instance.Resources : default;
+                        bool hasFood = res.Food >= trainer.FoodCostPerArcher;
+                        bool hasWood = res.Wood >= trainer.WoodCostPerArcher;
+
+                        if (!hasIdle)
+                            ProductionText.text = "Bekleniyor (Bos nufus yok)";
+                        else if (!hasFood || !hasWood)
+                            ProductionText.text = $"Bekleniyor (Kaynak yetersiz: {trainer.FoodCostPerArcher}Y {trainer.WoodCostPerArcher}A)";
+                        else
+                            ProductionText.text = "Egitim basliyor...";
+                    }
+                }
+            }
             else
             {
+                // Demirci vs. — bos bilgi
                 if (ProductionText != null)
                     ProductionText.text = "";
             }
@@ -178,27 +235,51 @@ namespace DeadWalls
         private void OnAddWorker()
         {
             if (!_hasEntity || !_entityManager.Exists(_selectedEntity)) return;
-            if (!_entityManager.HasComponent<ResourceProducer>(_selectedEntity)) return;
-
-            var producer = _entityManager.GetComponentData<ResourceProducer>(_selectedEntity);
             var pop = GameManager.Instance != null ? GameManager.Instance.Population : default;
+            if (pop.Idle <= 0) return;
 
-            if (pop.Idle <= 0 || producer.AssignedWorkers >= producer.MaxWorkers) return;
+            // ResourceProducer (kaynak binalari)
+            if (_entityManager.HasComponent<ResourceProducer>(_selectedEntity))
+            {
+                var producer = _entityManager.GetComponentData<ResourceProducer>(_selectedEntity);
+                if (producer.AssignedWorkers >= producer.MaxWorkers) return;
+                producer.AssignedWorkers++;
+                _entityManager.SetComponentData(_selectedEntity, producer);
+                return;
+            }
 
-            producer.AssignedWorkers++;
-            _entityManager.SetComponentData(_selectedEntity, producer);
+            // ArrowProducer (Fletcher)
+            if (_entityManager.HasComponent<ArrowProducer>(_selectedEntity))
+            {
+                var ap = _entityManager.GetComponentData<ArrowProducer>(_selectedEntity);
+                if (ap.AssignedWorkers >= ap.MaxWorkers) return;
+                ap.AssignedWorkers++;
+                _entityManager.SetComponentData(_selectedEntity, ap);
+            }
         }
 
         private void OnRemoveWorker()
         {
             if (!_hasEntity || !_entityManager.Exists(_selectedEntity)) return;
-            if (!_entityManager.HasComponent<ResourceProducer>(_selectedEntity)) return;
 
-            var producer = _entityManager.GetComponentData<ResourceProducer>(_selectedEntity);
-            if (producer.AssignedWorkers <= 0) return;
+            // ResourceProducer (kaynak binalari)
+            if (_entityManager.HasComponent<ResourceProducer>(_selectedEntity))
+            {
+                var producer = _entityManager.GetComponentData<ResourceProducer>(_selectedEntity);
+                if (producer.AssignedWorkers <= 0) return;
+                producer.AssignedWorkers--;
+                _entityManager.SetComponentData(_selectedEntity, producer);
+                return;
+            }
 
-            producer.AssignedWorkers--;
-            _entityManager.SetComponentData(_selectedEntity, producer);
+            // ArrowProducer (Fletcher)
+            if (_entityManager.HasComponent<ArrowProducer>(_selectedEntity))
+            {
+                var ap = _entityManager.GetComponentData<ArrowProducer>(_selectedEntity);
+                if (ap.AssignedWorkers <= 0) return;
+                ap.AssignedWorkers--;
+                _entityManager.SetComponentData(_selectedEntity, ap);
+            }
         }
 
         private void OnDemolish()

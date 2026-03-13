@@ -32,6 +32,7 @@ Bina yerlestirme icin grid altyapisi. Hibrit yaklasim kullanir:
 |-------|------|-------------------|
 | `buildable_zone` | Yerlestirilebilir alan tanimlar | Gorunmez |
 | `building_visuals` | Bina sprite'lari gosterir | Gorunur |
+| `resource_zones` | Dogal kaynak zone'lari (Orman/Tas/Demir) | Sadece placement modunda (zone gerektiren bina) |
 
 ## BuildingGridManager (Singleton)
 
@@ -46,12 +47,15 @@ Start() → InitializeGrid()
 ### Ana API
 | Metod | Aciklama |
 |-------|----------|
-| `CanPlace(config, x, y)` | 3x3 alan bos mu + kaynak yeterli mi |
+| `CanPlace(config, x, y)` | 3x3 alan bos mu + kaynak yeterli mi + zone yakin mi |
+| `IsNearZone(zoneType, x, y, w, h, radius)` | Bina footprint'i etrafinda zone tile var mi |
 | `PlaceBuilding(config, x, y)` | Kaynak dus + grid isaretle + ECS entity olustur + gorsel koy |
 | `RemoveBuilding(x, y)` | Grid serbest + gorsel sil + %50 kaynak iade + entity sil |
 | `GetConfigByType(type)` | BuildingType'a gore BuildingConfigs'ten config bul |
 | `WorldToGrid(worldPos)` | World → grid koordinat cevrimi |
 | `GridToWorld(x, y, config)` | Grid → world (bina merkezi) |
+| `ShowResourceZones()` | Resource zone overlay'i goster (TilemapRenderer.enabled = true) |
+| `HideResourceZones()` | Resource zone overlay'i gizle (TilemapRenderer.enabled = false) |
 | `ResetGrid()` | Grid sifirla, entity'ler GameManager tarafindan silinir |
 
 ### Yerlestirme Akisi
@@ -59,7 +63,8 @@ Start() → InitializeGrid()
 1. CanPlace() kontrolu
    ├─ Grid sinir kontrolu
    ├─ 3x3 hucre bos mu? (_grid[x,y] == 0)
-   └─ Kaynak yeterli mi? (GameManager.Resources)
+   ├─ Kaynak yeterli mi? (GameManager.Resources)
+   └─ Zone yakin mi? (IsNearZone — RequiredZone != None ise)
 2. Kaynak dusur (ResourceData ECS singleton)
 3. _grid hucreleri = 1
 4. ECS entity olustur (CreateEntity + AddComponentData)
@@ -116,3 +121,5 @@ GameManager.RestartGame()
   → BuildingGridManager.ResetGrid()                   // Grid sifirla + tilemap temizle
   → BuildingDetailUI.CloseDetail()                    // Detay paneli kapat
 ```
+
+> **Not:** `_zoneGrid` ve `ResourceZoneTilemap` restart'ta temizlenmez — zone'lar kalici harita ozelligi.

@@ -15,6 +15,7 @@ namespace DeadWalls
         {
             state.RequireForUpdate<ArrowPrefabData>();
             state.RequireForUpdate<GameStateData>();
+            state.RequireForUpdate<ArrowSupply>();
         }
 
         [BurstCompile]
@@ -28,6 +29,7 @@ namespace DeadWalls
             var arrowPrefab = SystemAPI.GetSingleton<ArrowPrefabData>().ArrowPrefab;
             var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
             var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+            var arrowSupplyRW = SystemAPI.GetSingletonRW<ArrowSupply>();
 
             foreach (var (archer, archerTransform) in
                 SystemAPI.Query<RefRW<ArcherUnit>, RefRO<LocalTransform>>())
@@ -64,6 +66,11 @@ namespace DeadWalls
                 if (closestZombie == Entity.Null)
                     continue;
 
+                // Ok kontrolu — ok yoksa ates etme
+                if (arrowSupplyRW.ValueRO.Current <= 0)
+                    break;
+
+                arrowSupplyRW.ValueRW.Current--;
                 archer.ValueRW.FireTimer = 1f / archer.ValueRO.FireRate;
 
                 var arrow = ecb.Instantiate(arrowPrefab);
