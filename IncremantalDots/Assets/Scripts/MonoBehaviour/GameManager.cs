@@ -199,6 +199,10 @@ namespace DeadWalls
             if (BuildingGridManager.Instance != null)
                 BuildingGridManager.Instance.ResetGrid();
 
+            // Detay paneli kapat
+            if (BuildingDetailUI.Instance != null)
+                BuildingDetailUI.Instance.CloseDetail();
+
             // Game state resetle
             _entityManager.SetComponentData(_gameStateEntity, new GameStateData
             {

@@ -160,8 +160,10 @@ namespace DeadWalls
             // 3. ECS entity olustur
             var entity = CreateBuildingEntity(config, gridX, gridY);
 
-            // 4. Entity grid'e yaz (sol-alt kose referans)
-            _entityGrid[gridX, gridY] = entity;
+            // 4. Entity grid'e yaz (tum hucrelere — herhangi hucreye tiklaninca entity bulunabilsin)
+            for (int x = gridX; x < gridX + config.GridWidth; x++)
+                for (int y = gridY; y < gridY + config.GridHeight; y++)
+                    _entityGrid[x, y] = entity;
 
             // 5. Tilemap'e gorsel tile koy
             PlaceVisualTile(config, gridX, gridY);
@@ -170,11 +172,74 @@ namespace DeadWalls
         }
 
         /// <summary>
-        /// Bina kaldir. M1.7 icin — su an stub.
+        /// Bina kaldir — grid serbest birak + gorsel sil + %50 kaynak iade + ECS entity sil.
         /// </summary>
         public void RemoveBuilding(int gridX, int gridY)
         {
-            // M1.7'de implement edilecek
+            Entity entity = GetBuildingEntity(gridX, gridY);
+            if (entity == Entity.Null) return;
+
+            var buildingData = _entityManager.GetComponentData<BuildingData>(entity);
+            var config = GetConfigByType(buildingData.Type);
+            if (config == null) return;
+
+            int ox = buildingData.GridX, oy = buildingData.GridY;
+
+            // Grid hucreleri serbest birak + entity referanslari temizle
+            for (int x = ox; x < ox + config.GridWidth; x++)
+                for (int y = oy; y < oy + config.GridHeight; y++)
+                {
+                    _grid[x, y] = 0;
+                    _entityGrid[x, y] = Entity.Null;
+                }
+
+            // Gorsel tile kaldir
+            RemoveVisualTile(config, ox, oy);
+
+            // %50 kaynak iade
+            RefundResources(config);
+
+            // ECS entity sil
+            _entityManager.DestroyEntity(entity);
+        }
+
+        /// <summary>
+        /// BuildingType'a gore BuildingConfigs array'inden config bul.
+        /// </summary>
+        public BuildingConfigSO GetConfigByType(BuildingType type)
+        {
+            if (BuildingConfigs == null) return null;
+            foreach (var c in BuildingConfigs)
+                if (c != null && c.Type == type)
+                    return c;
+            return null;
+        }
+
+        private void RemoveVisualTile(BuildingConfigSO config, int gridX, int gridY)
+        {
+            if (BuildingVisualTilemap == null) return;
+
+            int centerX = gridX + config.GridWidth / 2 + GridOrigin.x;
+            int centerY = gridY + config.GridHeight / 2 + GridOrigin.y;
+            BuildingVisualTilemap.SetTile(new Vector3Int(centerX, centerY, 0), null);
+        }
+
+        private void RefundResources(BuildingConfigSO config)
+        {
+            var world = World.DefaultGameObjectInjectionWorld;
+            if (world == null) return;
+
+            var em = world.EntityManager;
+            var query = em.CreateEntityQuery(typeof(ResourceData));
+            if (query.IsEmpty) return;
+
+            var entity = query.GetSingletonEntity();
+            var res = em.GetComponentData<ResourceData>(entity);
+            res.Wood += config.WoodCost / 2;
+            res.Stone += config.StoneCost / 2;
+            res.Iron += config.IronCost / 2;
+            res.Food += config.FoodCost / 2;
+            em.SetComponentData(entity, res);
         }
 
         /// <summary>
@@ -282,7 +347,7 @@ namespace DeadWalls
                 {
                     ResourceType = config.ProducedResource,
                     RatePerWorkerPerMin = config.RatePerWorkerPerMin,
-                    AssignedWorkers = 1,
+                    AssignedWorkers = 0,
                     MaxWorkers = config.MaxWorkers
                 });
             }

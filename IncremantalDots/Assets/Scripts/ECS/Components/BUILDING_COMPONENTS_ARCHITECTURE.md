@@ -41,7 +41,7 @@ Kaynak binalarinin urettigi kaynak tipi:
 |------|-----|----------|
 | ResourceType | ResourceType | Uretilen kaynak |
 | RatePerWorkerPerMin | float | Isci basina dakika/kaynak |
-| AssignedWorkers | int | Atanmis isci sayisi |
+| AssignedWorkers | int | Atanmis isci sayisi (M1.7: UI'dan degistirilir, varsayilan 0) |
 | MaxWorkers | int | Maksimum isci kapasitesi |
 
 ### PopulationProvider (sadece Ev)

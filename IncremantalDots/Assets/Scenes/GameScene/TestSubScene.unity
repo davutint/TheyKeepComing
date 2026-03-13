@@ -155,6 +155,10 @@ MonoBehaviour:
   GateHP: 100
   CastleMaxHP: 500
   WallXPos: 4.76
+  MaxUpgradeLevel: 5
+  CapacityPerLevel: 10
+  UpgradeWoodCost: 20
+  UpgradeStoneCost: 30
 --- !u!64 &964771849
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -303,10 +307,10 @@ MonoBehaviour:
   InitialStone: 50
   InitialIron: 20
   InitialFood: 100
-  TestWoodProdRate: 5
-  TestStoneProdRate: 3
-  TestIronProdRate: 2
-  TestFoodProdRate: 4
+  TestWoodProdRate: 0
+  TestStoneProdRate: 0
+  TestIronProdRate: 0
+  TestFoodProdRate: 0
   TestWoodConsRate: 0
   TestStoneConsRate: 0
   TestIronConsRate: 0

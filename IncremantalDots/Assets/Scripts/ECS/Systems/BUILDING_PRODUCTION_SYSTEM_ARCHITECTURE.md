@@ -35,6 +35,7 @@ BuildingProductionSystem → PopulationTickSystem → ResourceTickSystem → ...
 - Query bos donerse tum rate'ler 0f olur, Workers 0 olur
 - Restart sonrasi bina entity'leri silinir → uretim otomatik durur
 
-## Gelecek (M1.7)
-- Isci atama UI gelince `AssignedWorkers` dinamik olacak
-- Su an gecici olarak `AssignedWorkers = 1` ile olusturuluyor (BuildingGridManager)
+## Isci Atama (M1.7)
+- `AssignedWorkers` varsayilan 0 — oyuncu BuildingDetailUI uzerinden +/- ile atar
+- `BuildingDetailUI.OnAddWorker/OnRemoveWorker` → `SetComponentData<ResourceProducer>`
+- BuildingProductionSystem sonraki frame'de toplam Workers'i otomatik yeniden hesaplar

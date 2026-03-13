@@ -1,3 +1,4 @@
+using Unity.Entities;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -36,7 +37,28 @@ namespace DeadWalls
 
         private void Update()
         {
-            if (!_isPlacing) return;
+            // Placement modu degil + sol tikla → bina detay paneli
+            if (!_isPlacing)
+            {
+                if (Input.GetMouseButtonDown(0)
+                    && (UnityEngine.EventSystems.EventSystem.current == null
+                        || !UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject()))
+                {
+                    Vector3 ms = Input.mousePosition;
+                    ms.z = -_mainCamera.transform.position.z;
+                    Vector3 mw = _mainCamera.ScreenToWorldPoint(ms);
+
+                    var gm = BuildingGridManager.Instance;
+                    if (gm != null)
+                    {
+                        Vector2Int gp = gm.WorldToGrid(mw);
+                        Entity entity = gm.GetBuildingEntity(gp.x, gp.y);
+                        if (entity != Entity.Null && BuildingDetailUI.Instance != null)
+                            BuildingDetailUI.Instance.ShowDetail(entity);
+                    }
+                }
+                return;
+            }
 
             // Mouse → world → grid
             Vector3 mouseScreen = Input.mousePosition;

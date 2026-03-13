@@ -8,7 +8,8 @@ Bina yerlestirme icin grid altyapisi. Hibrit yaklasim kullanir:
 
 ## Dosyalar
 - `Assets/Scripts/MonoBehaviour/BuildingGridManager.cs` — Grid truth source + yerlestirme mantigi
-- `Assets/Scripts/MonoBehaviour/BuildingPlacementUI.cs` — UI + ghost preview + input
+- `Assets/Scripts/MonoBehaviour/BuildingPlacementUI.cs` — UI + ghost preview + input + bina secim tiklama
+- `Assets/Scripts/MonoBehaviour/BuildingDetailUI.cs` — Bina detay paneli + isci atama + yikma
 - `Assets/Scripts/ScriptableObject/BuildingConfigSO.cs` — Bina config SO
 
 ## Grid Yapisi
@@ -47,7 +48,8 @@ Start() → InitializeGrid()
 |-------|----------|
 | `CanPlace(config, x, y)` | 3x3 alan bos mu + kaynak yeterli mi |
 | `PlaceBuilding(config, x, y)` | Kaynak dus + grid isaretle + ECS entity olustur + gorsel koy |
-| `RemoveBuilding(x, y)` | Stub — M1.7'de implement edilecek |
+| `RemoveBuilding(x, y)` | Grid serbest + gorsel sil + %50 kaynak iade + entity sil |
+| `GetConfigByType(type)` | BuildingType'a gore BuildingConfigs'ten config bul |
 | `WorldToGrid(worldPos)` | World → grid koordinat cevrimi |
 | `GridToWorld(x, y, config)` | Grid → world (bina merkezi) |
 | `ResetGrid()` | Grid sifirla, entity'ler GameManager tarafindan silinir |
@@ -62,7 +64,7 @@ Start() → InitializeGrid()
 3. _grid hucreleri = 1
 4. ECS entity olustur (CreateEntity + AddComponentData)
 5. Tilemap'e gorsel tile koy
-6. _entityGrid'e entity referansi yaz
+6. _entityGrid'e entity referansi yaz (TUM hucrelere — herhangi hucreye tiklaninca bulunabilsin)
 ```
 
 ## BuildingPlacementUI
@@ -96,9 +98,21 @@ Her bina tipi icin 1 ScriptableObject asset:
 - Uretim (ResourceType, RatePerWorkerPerMin, MaxWorkers)
 - Nufus (PopulationCapacity, FoodCostPerMin)
 
+## Yikma (RemoveBuilding) Akisi
+```
+RemoveBuilding(gridX, gridY)
+  → GetBuildingEntity → Entity al
+  → BuildingData'dan sol-alt kose + config bul
+  → Grid hucreleri = 0, _entityGrid = Null
+  → RemoveVisualTile (tilemap'ten sil)
+  → RefundResources (%50 kaynak iade)
+  → EntityManager.DestroyEntity
+```
+
 ## Restart Davranisi
 ```
 GameManager.RestartGame()
   → EntityManager.DestroyEntity(BuildingData query)  // Tum bina entity'leri sil
   → BuildingGridManager.ResetGrid()                   // Grid sifirla + tilemap temizle
+  → BuildingDetailUI.CloseDetail()                    // Detay paneli kapat
 ```
