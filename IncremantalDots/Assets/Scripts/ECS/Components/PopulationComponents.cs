@@ -13,6 +13,7 @@ namespace DeadWalls
         public int Archers;                 // Egitilmis okcu (M1.6+ gercek, simdi test)
         public int Idle;                    // Hesaplanan: Total - Workers - Archers
         public int Capacity;                // Maksimum nufus kapasitesi
+        public int BaseCapacity;            // Bina/upgrade olmadan temel kapasite (bake: 20)
         public float FoodPerAssignedPerMin; // Atanmis kisi basina yemek/dk
     }
 }

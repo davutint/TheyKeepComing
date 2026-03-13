@@ -13,17 +13,17 @@ MonoBehaviour:
   m_Name: BuildingConfig_Lumberjack
   m_EditorClassIdentifier: DeadWalls::DeadWalls.BuildingConfigSO
   Type: 0
-  DisplayName: 
-  Icon: {fileID: 0}
-  GhostSprite: {fileID: 0}
+  DisplayName: Lumberjack
+  Icon: {fileID: 21300000, guid: 5723c86b8baf921468776b28b7391891, type: 3}
+  GhostSprite: {fileID: 21300000, guid: 5723c86b8baf921468776b28b7391891, type: 3}
   GridWidth: 3
   GridHeight: 3
-  WoodCost: 0
-  StoneCost: 0
+  WoodCost: 30
+  StoneCost: 10
   IronCost: 0
   FoodCost: 0
   ProducedResource: 0
-  RatePerWorkerPerMin: 0
-  MaxWorkers: 0
+  RatePerWorkerPerMin: 5
+  MaxWorkers: 3
   PopulationCapacity: 0
   FoodCostPerMin: 0

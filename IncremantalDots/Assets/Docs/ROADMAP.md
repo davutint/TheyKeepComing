@@ -86,38 +86,27 @@ Asagidakiler **tamamlanmis ve calisan** sistemlerdir:
 
 ### M1.4 — Kaynak Binalari (Oduncu, Tas Ocagi, Maden, Ciftlik)
 
-- [ ] **Oduncu (Lumberjack)**
-  - [ ] Prefab + Authoring olustur
-  - [ ] Isci atanir → atanan isci sayisina gore Ahsap/dk uretir
-  - [ ] Yerlestirme kurali: Orman dogal kaynagi yanina
-  - [ ] Upgrade: uretim verimi artar (Level 1→2→3)
-- [ ] **Tas Ocagi (Quarry)**
-  - [ ] Prefab + Authoring olustur
-  - [ ] Isci atanir → Tas/dk uretir
-  - [ ] Yerlestirme kurali: Tas kaynagi yanina
-  - [ ] Upgrade: uretim verimi artar
-- [ ] **Maden (Mine)**
-  - [ ] Prefab + Authoring olustur
-  - [ ] Isci atanir → Demir/dk uretir
-  - [ ] Yerlestirme kurali: Demir kaynagi yanina
-  - [ ] Upgrade: uretim verimi artar
-- [ ] **Ciftlik (Farm)**
-  - [ ] Prefab + Authoring olustur
-  - [ ] Isci atanir → Yemek/dk uretir
-  - [ ] Yerlestirme kurali: Herhangi bir yer
-  - [ ] Upgrade: uretim verimi artar
+- [x] `BuildingProductionSystem` olustur — tum ResourceProducer entity'lerini tara, toplam uretim hizini singleton'a yaz
+- [x] Test uretim rate'lerini sifirla (GameStateAuthoring + GameManager.RestartGame) — uretim tamamen binalardan gelir
+- [x] `AssignedWorkers = 1` gecici cozum (M1.7'de isci atama UI gelecek)
+- [x] SO asset'leri olustur: Lumberjack (Wood 5/dk), Quarry (Stone 3/dk), Mine (Iron 2/dk), Farm (Food 4/dk)
+- [ ] Yerlestirme kurallari: Oduncu→orman, Ocak→tas vs. (M1.8'e ertelendi)
+- [ ] Upgrade: uretim verimi artar (M1.7+ ile birlikte)
 
-### M1.5 — Altyapi Binalari (Ev, Kale Upgrade)
+### M1.5 — Altyapi Binalari (Ev, Kale Upgrade) ✅
 
-- [ ] **Ev (House)**
-  - [ ] Prefab + Authoring olustur
-  - [ ] Nufus kapasitesi arttirir (+5/+10/+15 level bazli)
-  - [ ] Surekli yemek gideri vardir (icindekiler tuketir)
-  - [ ] Upgrade: daha fazla kapasite, daha fazla yemek gideri
-- [ ] **Kale Upgrade Mekanigi**
-  - [ ] Mevcut CastleAuthoring'e upgrade sistemi ekle
-  - [ ] Tas + Ahsap maliyet ile nufus kapasitesi arttir
-  - [ ] Grid slot harcamaz — pahalı ama verimli
+- [x] **Ev (House)**
+  - [x] PopulationState'e BaseCapacity field eklendi
+  - [x] BuildingPopulationSystem olusturuldu — Ev kapasite + yemek gideri hesaplar
+  - [x] Nufus kapasitesi arttirir (+5 per Ev, BuildingPopulationSystem hesaplar)
+  - [x] Surekli yemek gideri vardir (BuildingFoodCost → ResourceConsumptionRate.FoodPerMin)
+  - [ ] Upgrade: daha fazla kapasite, daha fazla yemek gideri (M1.7 ile birlikte)
+- [x] **Kale Upgrade Mekanigi**
+  - [x] CastleUpgradeData component eklendi (CastleComponents.cs)
+  - [x] CastleAuthoring'e upgrade field'lari + baker eklendi
+  - [x] GameManager.UpgradeCastle() metodu eklendi (Tas + Ahsap maliyet)
+  - [x] CastleUpgradeUI olusturuldu (buton + maliyet gosterimi)
+  - [x] Grid slot harcamaz — pahalı ama verimli
 
 ### M1.6 — Askeri Binalar (Kisla, Ok Atolyesi, Demirci)
 
@@ -440,12 +429,12 @@ Asagidakiler **tamamlanmis ve calisan** sistemlerdir:
 | Milestone | Toplam Gorev | Tamamlanan | Yuzde |
 |-----------|-------------|------------|-------|
 | M0 Bug Fix | 5 | 5 | %100 |
-| M1 Kaynak + Bina | ~50 | 31 | %62 |
+| M1 Kaynak + Bina | ~50 | 42 | %84 |
 | M2 Savunma Derinligi | ~35 | 0 | %0 |
 | M3 Gun + Wave | ~20 | 1 | %5 |
 | M4 Event + Polish | ~35 | 0 | %0 |
 | M5 Launch | ~12 | 0 | %0 |
-| **TOPLAM** | **~157** | **37** | **%24** |
+| **TOPLAM** | **~157** | **48** | **%31** |
 
 ---
 
@@ -466,5 +455,5 @@ Asagidakiler **tamamlanmis ve calisan** sistemlerdir:
 
 ---
 
-*Son guncelleme: 2026-03-12 (M0 Bug Fix tamamlandi, M1.1 tamamlandi, M1.2 tamamlandi, M1.3 tamamlandi, M1.9 kismen tamamlandi)*
+*Son guncelleme: 2026-03-13 (M0 Bug Fix tamamlandi, M1.1 tamamlandi, M1.2 tamamlandi, M1.3 tamamlandi, M1.4 tamamlandi, M1.5 tamamlandi, M1.9 kismen tamamlandi)*
 *GDD Referans: DEAD_WALLS_GDD_v3.0.md*

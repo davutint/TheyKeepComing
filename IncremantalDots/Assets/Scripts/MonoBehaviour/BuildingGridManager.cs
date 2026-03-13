@@ -282,7 +282,7 @@ namespace DeadWalls
                 {
                     ResourceType = config.ProducedResource,
                     RatePerWorkerPerMin = config.RatePerWorkerPerMin,
-                    AssignedWorkers = 0,
+                    AssignedWorkers = 1,
                     MaxWorkers = config.MaxWorkers
                 });
             }

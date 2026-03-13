@@ -3,7 +3,9 @@
 ## Calisma Sirasi (UpdateOrder)
 ```
 SimulationSystemGroup icinde:
--1. PopulationTickSystem     *  — Nufus hesapla + FoodPerMin guncelle
+-2. BuildingProductionSystem    — Bina uretim hizlarini topla → singleton'a yaz
+-1½.BuildingPopulationSystem   — Kapasite + bina yemek tuketimi → singleton'a yaz
+-1. PopulationTickSystem     *  — Nufus hesapla + FoodPerMin += nufus kismi
  0. ResourceTickSystem        *  — Kaynak uretim/tuketim tick (net hiz * dt → accumulator → int)
  1. WaveSpawnSystem              — Zombi spawn + wave stats uygula (ZombieStats set)
  2. ArcherShootSystem         *  — Burst + brute-force query, physics oncesi (1-frame-old pozisyon)
@@ -32,6 +34,12 @@ PresentationSystemGroup icinde:
 - WaveSpawnSystem (sistem 1) sequential ama frame basinda → onceki frame'in job'lari zaten bitmis
 
 ## System Detaylari
+
+### BuildingProductionSystem (M1.4)
+→ Detay: `BUILDING_PRODUCTION_SYSTEM_ARCHITECTURE.md`
+
+### BuildingPopulationSystem (M1.5)
+→ Detay: `BUILDING_POPULATION_SYSTEM_ARCHITECTURE.md`
 
 ### PopulationTickSystem (M1.2)
 → Detay: `POPULATION_TICK_SYSTEM_ARCHITECTURE.md`

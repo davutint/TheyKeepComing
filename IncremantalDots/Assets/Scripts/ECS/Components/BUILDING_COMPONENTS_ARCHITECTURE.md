@@ -76,5 +76,16 @@ BuildingGridManager.PlaceBuilding() → EntityManager.CreateEntity + AddComponen
   → PopulationProvider + BuildingFoodCost (config.PopulationCapacity > 0 ise)
 ```
 
+## CastleUpgradeData (Castle entity uzerinde)
+| Alan | Tip | Aciklama |
+|------|-----|----------|
+| Level | int | Su anki yukseltme seviyesi (0 = yukseltilmemis) |
+| MaxLevel | int | Maksimum seviye (5) |
+| CapacityPerLevel | int | Her seviye basina ek nufus kapasitesi (+10) |
+| WoodCostPerLevel | int | Her yukseltme icin ahsap maliyeti (20) |
+| StoneCostPerLevel | int | Her yukseltme icin tas maliyeti (30) |
+
+> Castle entity bina entity degil — sahnedeki CastleAuthoring baker'i ekler.
+
 ## ECS Entity Notu
 Bina entity'leri prefab'dan olusturulmuyor — runtime'da `EntityManager.CreateEntity()` ile olusturuluyor. Gorseller Tilemap uzerinden yonetildigi icin Transform/Renderer component'i yok.

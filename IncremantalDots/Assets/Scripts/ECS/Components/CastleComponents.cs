@@ -24,4 +24,16 @@ namespace DeadWalls
     {
         public float Value;
     }
+
+    /// <summary>
+    /// Kale yukseltme verisi. Castle entity uzerinde tutulur.
+    /// </summary>
+    public struct CastleUpgradeData : IComponentData
+    {
+        public int Level;             // Su anki yukseltme seviyesi (0 = yukseltilmemis)
+        public int MaxLevel;          // Maksimum seviye
+        public int CapacityPerLevel;  // Her seviye basina ek nufus kapasitesi
+        public int WoodCostPerLevel;  // Her yukseltme icin ahsap maliyeti
+        public int StoneCostPerLevel; // Her yukseltme icin tas maliyeti
+    }
 }

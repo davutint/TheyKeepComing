@@ -11,7 +11,8 @@
 | Workers | int | Binalara atanmis isci sayisi |
 | Archers | int | Egitilmis okcu sayisi |
 | Idle | int | Hesaplanan: Total - Workers - Archers (>=0) |
-| Capacity | int | Maksimum nufus kapasitesi |
+| Capacity | int | Maksimum nufus kapasitesi (BaseCapacity + evler + kale bonusu) |
+| BaseCapacity | int | Bina/upgrade olmadan temel kapasite (bake: 20) |
 | FoodPerAssignedPerMin | float | Atanmis kisi basina yemek tuketimi (dk basina) |
 
 ## Singleton Pattern
@@ -26,20 +27,32 @@ Tum insanlar = TEK HAVUZ
 ```
 
 ## Yemek Tuketimi Entegrasyonu
-- `PopulationTickSystem` her frame `Idle` hesaplar
+Toplam yemek tuketimi = bina gideri + nufus gideri. Iki asamali hesaplanir:
+1. `BuildingPopulationSystem`: `FoodPerMin = toplam bina yemek gideri` (Ev'lerin FoodCostPerMin toplami)
+2. `PopulationTickSystem`: `FoodPerMin += assigned * FoodPerAssignedPerMin` (nufus kismi eklenir)
+
 - `assigned = Workers + Archers`
-- `ResourceConsumptionRate.FoodPerMin = assigned * FoodPerAssignedPerMin`
 - Idle bireyler yemek **tuketmez**
 - ResourceTickSystem guncel FoodPerMin ile tuketim hesaplar
+
+## Kapasite Hesaplama
+`BuildingPopulationSystem` her frame hesaplar:
+```
+Capacity = BaseCapacity + evlerdenGelen + kaleUpgradeBonus
+```
+- `BaseCapacity`: Baslangic degeri (20)
+- `evlerdenGelen`: Tum PopulationProvider entity'lerinin CapacityAmount toplami
+- `kaleUpgradeBonus`: CastleUpgradeData.Level * CapacityPerLevel
 
 ## Tradeoff
 Daha cok okcu = Daha az isci = Daha az kaynak uretimi (ve daha fazla yemek tuketimi)
 
 ## Iliskili Dosyalar
 - `PopulationComponents.cs` — Component tanimi
-- `PopulationTickSystem.cs` — Idle hesaplama + yemek tuketimi guncelleme
-- `GameStateAuthoring.cs` — Baker (baslangic degerleri)
-- `GameManager.cs` — MonoBehaviour tarafi okuma
+- `BuildingPopulationSystem.cs` — Kapasite + bina yemek gideri hesaplama
+- `PopulationTickSystem.cs` — Idle hesaplama + nufus yemek tuketimi (+=)
+- `GameStateAuthoring.cs` — Baker (baslangic degerleri, BaseCapacity)
+- `GameManager.cs` — MonoBehaviour tarafi okuma + restart reset
 - `HUDController.cs` — HUD gosterimi
 
 ## M1.2 Scope

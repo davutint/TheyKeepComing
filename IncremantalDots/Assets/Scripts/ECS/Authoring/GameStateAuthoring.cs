@@ -21,10 +21,10 @@ namespace DeadWalls
         public int InitialFood = 100;
 
         [Header("Resources — Test Uretim (dk basina)")]
-        public float TestWoodProdRate = 5f;
-        public float TestStoneProdRate = 3f;
-        public float TestIronProdRate = 2f;
-        public float TestFoodProdRate = 4f;
+        public float TestWoodProdRate = 0f;
+        public float TestStoneProdRate = 0f;
+        public float TestIronProdRate = 0f;
+        public float TestFoodProdRate = 0f;
 
         [Header("Resources — Test Tuketim (dk basina)")]
         public float TestWoodConsRate = 0f;
@@ -114,6 +114,7 @@ namespace DeadWalls
                     Archers = authoring.TestArchers,
                     Idle = authoring.InitialPopulation - authoring.TestWorkers - authoring.TestArchers,
                     Capacity = authoring.InitialCapacity,
+                    BaseCapacity = authoring.InitialCapacity,
                     FoodPerAssignedPerMin = authoring.FoodPerAssignedPerMin
                 });
             }

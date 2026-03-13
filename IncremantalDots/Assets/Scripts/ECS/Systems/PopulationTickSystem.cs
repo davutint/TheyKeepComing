@@ -37,7 +37,7 @@ namespace DeadWalls
 
             // Yemek tuketim hizini guncelle — sadece atanmis bireyler tuketir
             var consumptionRW = SystemAPI.GetSingletonRW<ResourceConsumptionRate>();
-            consumptionRW.ValueRW.FoodPerMin = assigned * popRW.ValueRO.FoodPerAssignedPerMin;
+            consumptionRW.ValueRW.FoodPerMin += assigned * popRW.ValueRO.FoodPerAssignedPerMin;
         }
     }
 }

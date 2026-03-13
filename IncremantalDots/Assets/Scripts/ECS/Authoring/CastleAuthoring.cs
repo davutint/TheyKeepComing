@@ -10,6 +10,12 @@ namespace DeadWalls
         public float CastleMaxHP = 500f;
         public float WallXPos = 4.76f;
 
+        [Header("Kale Yukseltme")]
+        public int MaxUpgradeLevel = 5;
+        public int CapacityPerLevel = 10;
+        public int UpgradeWoodCost = 20;
+        public int UpgradeStoneCost = 30;
+
         public class Baker : Baker<CastleAuthoring>
         {
             public override void Bake(CastleAuthoring authoring)
@@ -34,6 +40,14 @@ namespace DeadWalls
                 AddComponent(entity, new WallXPosition
                 {
                     Value = authoring.WallXPos
+                });
+                AddComponent(entity, new CastleUpgradeData
+                {
+                    Level = 0,
+                    MaxLevel = authoring.MaxUpgradeLevel,
+                    CapacityPerLevel = authoring.CapacityPerLevel,
+                    WoodCostPerLevel = authoring.UpgradeWoodCost,
+                    StoneCostPerLevel = authoring.UpgradeStoneCost
                 });
             }
         }

@@ -236,10 +236,10 @@ namespace DeadWalls
 
             _entityManager.SetComponentData(_gameStateEntity, new ResourceProductionRate
             {
-                WoodPerMin = 5f,
-                StonePerMin = 3f,
-                IronPerMin = 2f,
-                FoodPerMin = 4f
+                WoodPerMin = 0f,
+                StonePerMin = 0f,
+                IronPerMin = 0f,
+                FoodPerMin = 0f
             });
 
             _entityManager.SetComponentData(_gameStateEntity, new ResourceConsumptionRate
@@ -266,6 +266,7 @@ namespace DeadWalls
                 Archers = 0,
                 Idle = 10,
                 Capacity = 20,
+                BaseCapacity = 20,
                 FoodPerAssignedPerMin = 2f
             });
 
@@ -281,6 +282,49 @@ namespace DeadWalls
             var castleHP = _entityManager.GetComponentData<CastleHP>(_castleEntity);
             castleHP.CurrentHP = castleHP.MaxHP;
             _entityManager.SetComponentData(_castleEntity, castleHP);
+
+            // Kale yukseltme resetle
+            if (_entityManager.HasComponent<CastleUpgradeData>(_castleEntity))
+            {
+                var upgrade = _entityManager.GetComponentData<CastleUpgradeData>(_castleEntity);
+                upgrade.Level = 0;
+                _entityManager.SetComponentData(_castleEntity, upgrade);
+            }
+        }
+
+        /// <summary>
+        /// Kaleyi bir seviye yukseltir. Basarili ise true doner.
+        /// </summary>
+        public bool UpgradeCastle()
+        {
+            if (!_initialized || !_entityManager.Exists(_castleEntity) || !_entityManager.Exists(_gameStateEntity))
+                return false;
+
+            // CastleUpgradeData oku
+            if (!_entityManager.HasComponent<CastleUpgradeData>(_castleEntity))
+                return false;
+
+            var upgrade = _entityManager.GetComponentData<CastleUpgradeData>(_castleEntity);
+
+            // Maks seviye kontrolu
+            if (upgrade.Level >= upgrade.MaxLevel)
+                return false;
+
+            // Kaynak yeterliligi kontrolu
+            var resources = _entityManager.GetComponentData<ResourceData>(_gameStateEntity);
+            if (resources.Wood < upgrade.WoodCostPerLevel || resources.Stone < upgrade.StoneCostPerLevel)
+                return false;
+
+            // Kaynaklari dus
+            resources.Wood -= upgrade.WoodCostPerLevel;
+            resources.Stone -= upgrade.StoneCostPerLevel;
+            _entityManager.SetComponentData(_gameStateEntity, resources);
+
+            // Seviye artir
+            upgrade.Level++;
+            _entityManager.SetComponentData(_castleEntity, upgrade);
+
+            return true;
         }
     }
 
