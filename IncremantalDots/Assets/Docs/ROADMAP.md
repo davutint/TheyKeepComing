@@ -108,25 +108,25 @@ Asagidakiler **tamamlanmis ve calisan** sistemlerdir:
   - [x] CastleUpgradeUI olusturuldu (buton + maliyet gosterimi)
   - [x] Grid slot harcamaz — pahalı ama verimli
 
-### M1.6 — Askeri Binalar (Kisla, Ok Atolyesi, Demirci)
+### M1.6 — Askeri Binalar (Kisla, Ok Atolyesi, Demirci) ✅
 
-- [ ] **Kisla (Barracks)**
-  - [ ] Prefab + Authoring olustur
-  - [ ] Nufustan okcu egitir (Yemek + Ahsap harcar)
-  - [ ] Egitim suresi + kuyruk sistemi
-  - [ ] Upgrade: daha hizli egitim
-- [ ] **Ok Atolyesi (Fletcher)**
-  - [ ] Prefab + Authoring olustur
-  - [ ] Isci atanir, Ahsap tuketir, Ok uretir
-  - [ ] Okcular ok olmadan ates edemez/cok yavas ates eder — ok envanteri sistemi
-  - [ ] `ArrowSupply` singleton component olustur (toplam ok miktari)
-  - [ ] ArcherShootSystem'i guncelle: ok yoksa ates etme
-  - [ ] Upgrade: daha hizli uretim
-- [ ] **Demirci (Blacksmith)**
-  - [ ] Prefab + Authoring olustur
-  - [ ] Demir tuketir, kalici upgrade'ler sunar (tech tree)
-  - [ ] Upgrade secenekleri: Ok hasari artis, Duvar guclendirme, Mancinik unlock, Ozel ok tipleri
-  - [ ] Upgrade UI paneli
+- [x] **Kisla (Barracks)**
+  - [x] ArcherTrainer component + BarracksTrainingSystem (runtime entity, Prefab/Authoring yok)
+  - [x] Nufustan okcu egitir (Yemek + Ahsap harcar)
+  - [x] Egitim suresi + timer (TrainingDuration, ECB ile okcu spawn)
+  - [ ] Upgrade: daha hizli egitim (M2.4)
+- [x] **Ok Atolyesi (Fletcher)**
+  - [x] ArrowProducer component + ArrowProductionSystem (runtime entity, Prefab/Authoring yok)
+  - [x] Isci atanir, Ahsap tuketir, Ok uretir
+  - [x] Okcular ok olmadan ates edemez — ok envanteri sistemi
+  - [x] `ArrowSupply` singleton component olusturuldu
+  - [x] ArcherShootSystem guncellendi: ok yoksa ates etme
+  - [ ] Upgrade: daha hizli uretim (M2.4)
+- [x] **Demirci (Blacksmith)**
+  - [x] Yerlestirilebilir placeholder (sadece BuildingData, baska component yok)
+  - [ ] Demir tuketir, kalici upgrade'ler sunar — tech tree (M2.4)
+  - [ ] Upgrade secenekleri: Ok hasari artis, Duvar guclendirme, Mancinik unlock, Ozel ok tipleri (M2.4)
+  - [ ] Upgrade UI paneli (M2.4)
 
 ### M1.7 — Isci Atama UI
 
