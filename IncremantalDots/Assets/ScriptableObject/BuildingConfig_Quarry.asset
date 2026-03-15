@@ -25,5 +25,14 @@ MonoBehaviour:
   ProducedResource: 1
   RatePerWorkerPerMin: 3
   MaxWorkers: 3
+  RequiredZone: 2
+  ZoneProximityRadius: 0
   PopulationCapacity: 0
   FoodCostPerMin: 0
+  TrainingDuration: 0
+  FoodCostPerArcher: 0
+  WoodCostPerArcher: 0
+  ArrowsPerWorkerPerMin: 0
+  WoodCostPerBatchPerMin: 0
+  IsWallSlotBuilding: 0
+  RequireBlacksmith: 0

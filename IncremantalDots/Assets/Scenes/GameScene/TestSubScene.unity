@@ -286,6 +286,8 @@ MonoBehaviour:
   ZombiePrefab: {fileID: 2500375341052309922, guid: fd6eb8dd364f3cc4392a976574891ebd, type: 3}
   ArrowPrefab: {fileID: 2471557889972456781, guid: 7abd38f61690f6b4cb37dcb57c14df16, type: 3}
   ArcherPrefab: {fileID: 4088403277454710420, guid: aad3e620ee6a20d4ba4ea7ea7c38cbaf, type: 3}
+  CatapultPrefab: {fileID: 0}
+  CatapultProjectilePrefab: {fileID: 0}
 --- !u!114 &1758718857
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -320,6 +322,7 @@ MonoBehaviour:
   TestWorkers: 0
   TestArchers: 0
   FoodPerAssignedPerMin: 2
+  InitialArrows: 50
 --- !u!4 &1758718858
 Transform:
   m_ObjectHideFlags: 0
