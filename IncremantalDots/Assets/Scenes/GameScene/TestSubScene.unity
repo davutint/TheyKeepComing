@@ -301,8 +301,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: DeadWalls::DeadWalls.GameStateAuthoring
   XPToNextLevel: 100
-  StressTestMode: 0
-  SpawnInterval: 0.8
+  StressTestMode: 1
+  SpawnInterval: -10
   WaveStartDelay: 3
   BaseZombieSpeed: 1.5
   InitialWood: 100

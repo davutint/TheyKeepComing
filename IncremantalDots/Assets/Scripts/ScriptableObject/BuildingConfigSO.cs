@@ -44,8 +44,7 @@ namespace DeadWalls
         public float ArrowsPerWorkerPerMin; // default 10
         public float WoodCostPerBatchPerMin; // Isci basina ahsap tuketim/dk, default 2
 
-        [Header("Sur Slot Binasi (Mancinik)")]
-        public bool IsWallSlotBuilding;    // true ise grid yerine sur slot'una yerlesir
+        [Header("On Kosullar")]
         public bool RequireBlacksmith;     // true ise Demirci binasi olmadan yapilamaz
     }
 }

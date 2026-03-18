@@ -1,0 +1,720 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d391f8ecd1a0ff49a5a5081708f4dfa, type: 3}
+  m_Name: GearPresetDatabase
+  m_EditorClassIdentifier: 
+  presets:
+  - bodyAnimator: {fileID: 9100000, guid: cc142ad7c841a4747bee09983b52dc9a, type: 2}
+    bodyColor: {r: 0.9019608, g: 0.7372549, b: 0.59607846, a: 1}
+    headAnimator: {fileID: 9100000, guid: 843d1907ec3fa284489befb050418e60, type: 2}
+    headColor: {r: 0.6, g: 0.24705882, b: 0, a: 1}
+    chestAnimator: {fileID: 9100000, guid: f4221f23148537044a15909798fd5a04, type: 2}
+    chestColor: {r: 0.69803923, g: 0.69803923, b: 0.69803923, a: 1}
+    legsAnimator: {fileID: 9100000, guid: aee68559cceea6e41975151c8d032075, type: 2}
+    legsColor: {r: 0.69803923, g: 0.69803923, b: 0.69803923, a: 1}
+    shoesAnimator: {fileID: 9100000, guid: 261ac5298fb75e74588cd4e3f13906d7, type: 2}
+    shoesColor: {r: 0.69803923, g: 0.69803923, b: 0.69803923, a: 1}
+    handsAnimator: {fileID: 9100000, guid: d9c9f867c1bd71f4f9e6faf295913a70, type: 2}
+    handsColor: {r: 0.69803923, g: 0.69803923, b: 0.69803923, a: 1}
+    beltAnimator: {fileID: 9100000, guid: a8d07e087aa1bad44a6ed4e212751385, type: 2}
+    beltColor: {r: 0.27450982, g: 0.40273696, b: 0.4627451, a: 1}
+    slashAnimator: {fileID: 9100000, guid: b36cd43cc72c96c48921cfd03b52dc42, type: 2}
+    slashColor: {r: 1, g: 1, b: 1, a: 1}
+    effectAnimator: {fileID: 9100000, guid: 46b6a1da6a0977443a9cc05175790ed1, type: 2}
+    effectColor: {r: 1, g: 1, b: 1, a: 1}
+    effect2Animator: {fileID: 9100000, guid: 46b6a1da6a0977443a9cc05175790ed1, type: 2}
+    effect2Color: {r: 1, g: 1, b: 1, a: 1}
+    bodyVisible: 1
+    headVisible: 1
+    chestVisible: 1
+    legsVisible: 1
+    shoesVisible: 1
+    handsVisible: 1
+    beltVisible: 1
+    slashVisible: 1
+    effectVisible: 0
+    effect2Visible: 0
+    weaponName: Melee14
+    backpackName: NoBag
+    shieldName: Shield5
+    backpackColor: {r: 1, g: 1, b: 1, a: 1}
+    shieldColor: {r: 1, g: 1, b: 1, a: 1}
+    mountColor: {r: 1, g: 1, b: 1, a: 1}
+    weaponColor: {r: 1, g: 1, b: 1, a: 1}
+    shadowOpacityName: Toggle (4)
+    sliceSpritesheet: 1
+    staticIdle: 0
+    outlineName: None
+    resolutionName: Toggle
+    frameName: MAXToggle (6)
+    mountName: None
+    idleName: 3
+    presetName: Knight
+    presetDate: Example 1
+  - bodyAnimator: {fileID: 9100000, guid: cc142ad7c841a4747bee09983b52dc9a, type: 2}
+    bodyColor: {r: 0, g: 0, b: 0, a: 1}
+    headAnimator: {fileID: 9100000, guid: aa739368d269e0b47838512718c0e4fb, type: 2}
+    headColor: {r: 0.2264151, g: 0.2264151, b: 0.2264151, a: 1}
+    chestAnimator: {fileID: 9100000, guid: 544e8d3ecace9314bbec957e2f227084, type: 2}
+    chestColor: {r: 0.2264151, g: 0.2264151, b: 0.2264151, a: 1}
+    legsAnimator: {fileID: 9100000, guid: 269df9c7657498548be9deca64018124, type: 2}
+    legsColor: {r: 0.2264151, g: 0.2264151, b: 0.2264151, a: 1}
+    shoesAnimator: {fileID: 9100000, guid: 78bdedf491e7f954098e07d90abf3270, type: 2}
+    shoesColor: {r: 0.2784314, g: 0.18823531, b: 0.11764707, a: 1}
+    handsAnimator: {fileID: 9100000, guid: d9c9f867c1bd71f4f9e6faf295913a70, type: 2}
+    handsColor: {r: 0.2264151, g: 0.2264151, b: 0.2264151, a: 1}
+    beltAnimator: {fileID: 9100000, guid: a8d07e087aa1bad44a6ed4e212751385, type: 2}
+    beltColor: {r: 0.36862746, g: 0.06666667, b: 0.27058825, a: 1}
+    slashAnimator: {fileID: 9100000, guid: b36cd43cc72c96c48921cfd03b52dc42, type: 2}
+    slashColor: {r: 1, g: 1, b: 1, a: 1}
+    effectAnimator: {fileID: 9100000, guid: 46b6a1da6a0977443a9cc05175790ed1, type: 2}
+    effectColor: {r: 1, g: 1, b: 1, a: 1}
+    effect2Animator: {fileID: 9100000, guid: 46b6a1da6a0977443a9cc05175790ed1, type: 2}
+    effect2Color: {r: 1, g: 1, b: 1, a: 1}
+    bodyVisible: 1
+    headVisible: 1
+    chestVisible: 1
+    legsVisible: 1
+    shoesVisible: 1
+    handsVisible: 1
+    beltVisible: 1
+    slashVisible: 1
+    effectVisible: 0
+    effect2Visible: 0
+    weaponName: Melee1
+    backpackName: NoBag
+    shieldName: Offhand2
+    backpackColor: {r: 1, g: 1, b: 1, a: 1}
+    shieldColor: {r: 1, g: 1, b: 1, a: 1}
+    mountColor: {r: 1, g: 1, b: 1, a: 1}
+    weaponColor: {r: 1, g: 1, b: 1, a: 1}
+    shadowOpacityName: Toggle (4)
+    sliceSpritesheet: 1
+    staticIdle: 0
+    outlineName: None
+    resolutionName: Toggle
+    frameName: MAXToggle (6)
+    mountName: None
+    idleName: 2
+    presetName: Assassin
+    presetDate: Example 2
+  - bodyAnimator: {fileID: 9100000, guid: cc142ad7c841a4747bee09983b52dc9a, type: 2}
+    bodyColor: {r: 1, g: 0.90588236, b: 0.81960785, a: 1}
+    headAnimator: {fileID: 9100000, guid: 2eff43a6f992da5449bcaab2b46d1472, type: 2}
+    headColor: {r: 0.42352945, g: 0.32156864, b: 0.19215688, a: 1}
+    chestAnimator: {fileID: 9100000, guid: f4221f23148537044a15909798fd5a04, type: 2}
+    chestColor: {r: 0.83921576, g: 0.654902, b: 0.14509805, a: 1}
+    legsAnimator: {fileID: 9100000, guid: 8c75f0cd6f12a364fb997fe4213cd0f8, type: 2}
+    legsColor: {r: 0.83921576, g: 0.654902, b: 0.14509805, a: 1}
+    shoesAnimator: {fileID: 9100000, guid: 78bdedf491e7f954098e07d90abf3270, type: 2}
+    shoesColor: {r: 0.83921576, g: 0.654902, b: 0.14509805, a: 1}
+    handsAnimator: {fileID: 9100000, guid: d9c9f867c1bd71f4f9e6faf295913a70, type: 2}
+    handsColor: {r: 0.83921576, g: 0.654902, b: 0.14509805, a: 1}
+    beltAnimator: {fileID: 9100000, guid: 8a8d7af89138f0d4eb1f365c2b5031c1, type: 2}
+    beltColor: {r: 0.8980393, g: 0.854902, b: 0.74509805, a: 1}
+    slashAnimator: {fileID: 9100000, guid: eb0a646f21d2eb647a9b7ccc2c71035a, type: 2}
+    slashColor: {r: 1, g: 1, b: 1, a: 1}
+    effectAnimator: {fileID: 9100000, guid: 46b6a1da6a0977443a9cc05175790ed1, type: 2}
+    effectColor: {r: 1, g: 1, b: 1, a: 1}
+    effect2Animator: {fileID: 9100000, guid: 46b6a1da6a0977443a9cc05175790ed1, type: 2}
+    effect2Color: {r: 1, g: 1, b: 1, a: 1}
+    bodyVisible: 1
+    headVisible: 1
+    chestVisible: 1
+    legsVisible: 1
+    shoesVisible: 1
+    handsVisible: 1
+    beltVisible: 1
+    slashVisible: 1
+    effectVisible: 1
+    effect2Visible: 0
+    weaponName: Melee11
+    backpackName: NoBag
+    shieldName: Shield4
+    backpackColor: {r: 1, g: 1, b: 1, a: 1}
+    shieldColor: {r: 0.8584906, g: 0.77594084, b: 0.5790762, a: 1}
+    mountColor: {r: 1, g: 1, b: 1, a: 1}
+    weaponColor: {r: 0.8392157, g: 0.654902, b: 0.14509805, a: 1}
+    shadowOpacityName: Toggle (4)
+    sliceSpritesheet: 1
+    staticIdle: 0
+    outlineName: None
+    resolutionName: Toggle
+    frameName: MAXToggle (6)
+    mountName: None
+    idleName: 1
+    presetName: Paladin
+    presetDate: Example 3
+  - bodyAnimator: {fileID: 9100000, guid: cc142ad7c841a4747bee09983b52dc9a, type: 2}
+    bodyColor: {r: 0.9333334, g: 0.90196085, b: 0.85098046, a: 1}
+    headAnimator: {fileID: 9100000, guid: 199b7c8c6229ed942afd824c28ed6f45, type: 2}
+    headColor: {r: 0.81568635, g: 0.7490196, b: 0.6313726, a: 1}
+    chestAnimator: {fileID: 9100000, guid: c4b854dcf21b97c4cad6c87f461ee129, type: 2}
+    chestColor: {r: 0.81568635, g: 0.7490196, b: 0.6313726, a: 1}
+    legsAnimator: {fileID: 9100000, guid: 269df9c7657498548be9deca64018124, type: 2}
+    legsColor: {r: 0.81568635, g: 0.7490196, b: 0.6313726, a: 1}
+    shoesAnimator: {fileID: 9100000, guid: f278cfff3f039bc40948a10cdda9f46c, type: 2}
+    shoesColor: {r: 0.509434, g: 0.35977742, b: 0.23309009, a: 1}
+    handsAnimator: {fileID: 9100000, guid: d9c9f867c1bd71f4f9e6faf295913a70, type: 2}
+    handsColor: {r: 0.42352945, g: 0.32156864, b: 0.19215688, a: 1}
+    beltAnimator: {fileID: 9100000, guid: a8d07e087aa1bad44a6ed4e212751385, type: 2}
+    beltColor: {r: 0.509434, g: 0.35977742, b: 0.23309009, a: 1}
+    slashAnimator: {fileID: 9100000, guid: eb0a646f21d2eb647a9b7ccc2c71035a, type: 2}
+    slashColor: {r: 1, g: 1, b: 1, a: 1}
+    effectAnimator: {fileID: 9100000, guid: 46b6a1da6a0977443a9cc05175790ed1, type: 2}
+    effectColor: {r: 1, g: 1, b: 1, a: 1}
+    effect2Animator: {fileID: 9100000, guid: 46b6a1da6a0977443a9cc05175790ed1, type: 2}
+    effect2Color: {r: 1, g: 1, b: 1, a: 1}
+    bodyVisible: 1
+    headVisible: 1
+    chestVisible: 1
+    legsVisible: 1
+    shoesVisible: 1
+    handsVisible: 1
+    beltVisible: 1
+    slashVisible: 1
+    effectVisible: 0
+    effect2Visible: 0
+    weaponName: Ranged7
+    backpackName: Bag2
+    shieldName: NoShield
+    backpackColor: {r: 0.5660378, g: 0.35084343, b: 0.21626917, a: 1}
+    shieldColor: {r: 1, g: 1, b: 1, a: 1}
+    mountColor: {r: 1, g: 1, b: 1, a: 1}
+    weaponColor: {r: 0.42352945, g: 0.32156864, b: 0.19215688, a: 1}
+    shadowOpacityName: Toggle (4)
+    sliceSpritesheet: 1
+    staticIdle: 0
+    outlineName: None
+    resolutionName: Toggle
+    frameName: MAXToggle (6)
+    mountName: None
+    idleName: 1
+    presetName: Archer
+    presetDate: Example 4
+  - bodyAnimator: {fileID: 9100000, guid: beaaa5e9bec0d294f8f9cb86a9688e54, type: 2}
+    bodyColor: {r: 1, g: 1, b: 1, a: 1}
+    headAnimator: {fileID: 9100000, guid: eadf1def64f06f64e9e4674f81808513, type: 2}
+    headColor: {r: 0.509434, g: 0.35977742, b: 0.23309009, a: 1}
+    chestAnimator: {fileID: 9100000, guid: 9b9efae451c84624fb12adc24f6b0656, type: 2}
+    chestColor: {r: 0.27450982, g: 0.40273696, b: 0.4627451, a: 1}
+    legsAnimator: {fileID: 9100000, guid: fca173c92f0ba9e479c2cf70c15d144c, type: 2}
+    legsColor: {r: 0.509434, g: 0.35977742, b: 0.23309009, a: 1}
+    shoesAnimator: {fileID: 9100000, guid: 78bdedf491e7f954098e07d90abf3270, type: 2}
+    shoesColor: {r: 0.2264151, g: 0.2264151, b: 0.2264151, a: 1}
+    handsAnimator: {fileID: 9100000, guid: d9c9f867c1bd71f4f9e6faf295913a70, type: 2}
+    handsColor: {r: 0.2784314, g: 0.18823531, b: 0.11764707, a: 1}
+    beltAnimator: {fileID: 9100000, guid: 8a8d7af89138f0d4eb1f365c2b5031c1, type: 2}
+    beltColor: {r: 0.4666667, g: 0, b: 0.058823533, a: 1}
+    slashAnimator: {fileID: 9100000, guid: eb0a646f21d2eb647a9b7ccc2c71035a, type: 2}
+    slashColor: {r: 1, g: 1, b: 1, a: 1}
+    effectAnimator: {fileID: 9100000, guid: 46b6a1da6a0977443a9cc05175790ed1, type: 2}
+    effectColor: {r: 1, g: 1, b: 1, a: 1}
+    effect2Animator: {fileID: 9100000, guid: 46b6a1da6a0977443a9cc05175790ed1, type: 2}
+    effect2Color: {r: 1, g: 1, b: 1, a: 1}
+    bodyVisible: 1
+    headVisible: 0
+    chestVisible: 1
+    legsVisible: 1
+    shoesVisible: 1
+    handsVisible: 0
+    beltVisible: 1
+    slashVisible: 1
+    effectVisible: 0
+    effect2Visible: 0
+    weaponName: Melee7
+    backpackName: NoBag
+    shieldName: NoShield
+    backpackColor: {r: 1, g: 1, b: 1, a: 1}
+    shieldColor: {r: 1, g: 1, b: 1, a: 1}
+    mountColor: {r: 1, g: 1, b: 1, a: 1}
+    weaponColor: {r: 1, g: 1, b: 1, a: 1}
+    shadowOpacityName: Toggle (4)
+    sliceSpritesheet: 1
+    staticIdle: 0
+    outlineName: None
+    resolutionName: Toggle
+    frameName: MAXToggle (6)
+    mountName: None
+    idleName: 1
+    presetName: Skeleton pirate
+    presetDate: Example 5
+  - bodyAnimator: {fileID: 9100000, guid: cc142ad7c841a4747bee09983b52dc9a, type: 2}
+    bodyColor: {r: 0.73333335, g: 0.882353, b: 0.9568628, a: 1}
+    headAnimator: {fileID: 9100000, guid: 2eff43a6f992da5449bcaab2b46d1472, type: 2}
+    headColor: {r: 0.227451, g: 0.4666667, b: 0.6392157, a: 1}
+    chestAnimator: {fileID: 9100000, guid: 544e8d3ecace9314bbec957e2f227084, type: 2}
+    chestColor: {r: 0.15686275, g: 0.24705884, b: 0.31764707, a: 1}
+    legsAnimator: {fileID: 9100000, guid: 221af266515a4214bb2535e09b747fde, type: 2}
+    legsColor: {r: 0.227451, g: 0.35686275, b: 0.4156863, a: 1}
+    shoesAnimator: {fileID: 9100000, guid: 78bdedf491e7f954098e07d90abf3270, type: 2}
+    shoesColor: {r: 0.15686275, g: 0.24705884, b: 0.31764707, a: 1}
+    handsAnimator: {fileID: 9100000, guid: d9c9f867c1bd71f4f9e6faf295913a70, type: 2}
+    handsColor: {r: 0.15686275, g: 0.24705884, b: 0.31764707, a: 1}
+    beltAnimator: {fileID: 9100000, guid: 8a8d7af89138f0d4eb1f365c2b5031c1, type: 2}
+    beltColor: {r: 0.4039216, g: 0.4039216, b: 0.4039216, a: 1}
+    slashAnimator: {fileID: 9100000, guid: eb0a646f21d2eb647a9b7ccc2c71035a, type: 2}
+    slashColor: {r: 1, g: 1, b: 1, a: 1}
+    effectAnimator: {fileID: 9100000, guid: d0455ebc0fdf22b47bd3170475b21952, type: 2}
+    effectColor: {r: 1, g: 1, b: 1, a: 1}
+    effect2Animator: {fileID: 9100000, guid: a101550136b33534891977e46b5d24d7, type: 2}
+    effect2Color: {r: 1, g: 1, b: 1, a: 1}
+    bodyVisible: 1
+    headVisible: 1
+    chestVisible: 1
+    legsVisible: 1
+    shoesVisible: 1
+    handsVisible: 1
+    beltVisible: 1
+    slashVisible: 1
+    effectVisible: 1
+    effect2Visible: 1
+    weaponName: Magic3
+    backpackName: NoBag
+    shieldName: NoShield
+    backpackColor: {r: 1, g: 1, b: 1, a: 1}
+    shieldColor: {r: 1, g: 1, b: 1, a: 1}
+    mountColor: {r: 1, g: 1, b: 1, a: 1}
+    weaponColor: {r: 1, g: 1, b: 1, a: 1}
+    shadowOpacityName: Toggle (4)
+    sliceSpritesheet: 1
+    staticIdle: 0
+    outlineName: None
+    resolutionName: Toggle
+    frameName: MAXToggle (6)
+    mountName: None
+    idleName: 3
+    presetName: Frost mage
+    presetDate: Example 6
+  - bodyAnimator: {fileID: 9100000, guid: cc142ad7c841a4747bee09983b52dc9a, type: 2}
+    bodyColor: {r: 0.83137256, g: 0.6666667, b: 0.47058824, a: 1}
+    headAnimator: {fileID: 9100000, guid: 843d1907ec3fa284489befb050418e60, type: 2}
+    headColor: {r: 0.81568635, g: 0.7490196, b: 0.6313726, a: 1}
+    chestAnimator: {fileID: 9100000, guid: 57b5c8d297fa3d84fbb9517c08edbbf7, type: 2}
+    chestColor: {r: 0.509434, g: 0.35977742, b: 0.23309009, a: 1}
+    legsAnimator: {fileID: 9100000, guid: 269df9c7657498548be9deca64018124, type: 2}
+    legsColor: {r: 0.37612003, g: 0.4811321, b: 0.33361518, a: 1}
+    shoesAnimator: {fileID: 9100000, guid: 78bdedf491e7f954098e07d90abf3270, type: 2}
+    shoesColor: {r: 0.509434, g: 0.35977742, b: 0.23309009, a: 1}
+    handsAnimator: {fileID: 9100000, guid: d9c9f867c1bd71f4f9e6faf295913a70, type: 2}
+    handsColor: {r: 0.15686275, g: 0.24705884, b: 0.31764707, a: 1}
+    beltAnimator: {fileID: 9100000, guid: a8d07e087aa1bad44a6ed4e212751385, type: 2}
+    beltColor: {r: 0.4666667, g: 0, b: 0.058823533, a: 1}
+    slashAnimator: {fileID: 9100000, guid: b36cd43cc72c96c48921cfd03b52dc42, type: 2}
+    slashColor: {r: 1, g: 1, b: 1, a: 1}
+    effectAnimator: {fileID: 9100000, guid: d0455ebc0fdf22b47bd3170475b21952, type: 2}
+    effectColor: {r: 1, g: 1, b: 1, a: 1}
+    effect2Animator: {fileID: 9100000, guid: 46b6a1da6a0977443a9cc05175790ed1, type: 2}
+    effect2Color: {r: 1, g: 1, b: 1, a: 1}
+    bodyVisible: 1
+    headVisible: 1
+    chestVisible: 1
+    legsVisible: 1
+    shoesVisible: 1
+    handsVisible: 0
+    beltVisible: 1
+    slashVisible: 1
+    effectVisible: 0
+    effect2Visible: 0
+    weaponName: Melee17
+    backpackName: NoBag
+    shieldName: Shield1
+    backpackColor: {r: 1, g: 1, b: 1, a: 1}
+    shieldColor: {r: 0.42352945, g: 0.32156864, b: 0.19215688, a: 1}
+    mountColor: {r: 1, g: 1, b: 1, a: 1}
+    weaponColor: {r: 1, g: 1, b: 1, a: 1}
+    shadowOpacityName: Toggle (4)
+    sliceSpritesheet: 1
+    staticIdle: 0
+    outlineName: None
+    resolutionName: Toggle
+    frameName: MAXToggle (6)
+    mountName: None
+    idleName: 1
+    presetName: Barbarian
+    presetDate: Example 7
+  - bodyAnimator: {fileID: 9100000, guid: cc142ad7c841a4747bee09983b52dc9a, type: 2}
+    bodyColor: {r: 0, g: 0, b: 0, a: 1}
+    headAnimator: {fileID: 9100000, guid: 843d1907ec3fa284489befb050418e60, type: 2}
+    headColor: {r: 0.2264151, g: 0.2264151, b: 0.2264151, a: 1}
+    chestAnimator: {fileID: 9100000, guid: 544e8d3ecace9314bbec957e2f227084, type: 2}
+    chestColor: {r: 0.2264151, g: 0.2264151, b: 0.2264151, a: 1}
+    legsAnimator: {fileID: 9100000, guid: 269df9c7657498548be9deca64018124, type: 2}
+    legsColor: {r: 0.2264151, g: 0.2264151, b: 0.2264151, a: 1}
+    shoesAnimator: {fileID: 9100000, guid: f278cfff3f039bc40948a10cdda9f46c, type: 2}
+    shoesColor: {r: 0.2264151, g: 0.2264151, b: 0.2264151, a: 1}
+    handsAnimator: {fileID: 9100000, guid: d9c9f867c1bd71f4f9e6faf295913a70, type: 2}
+    handsColor: {r: 0.2264151, g: 0.2264151, b: 0.2264151, a: 1}
+    beltAnimator: {fileID: 9100000, guid: a8d07e087aa1bad44a6ed4e212751385, type: 2}
+    beltColor: {r: 0.2264151, g: 0.2264151, b: 0.2264151, a: 1}
+    slashAnimator: {fileID: 9100000, guid: b36cd43cc72c96c48921cfd03b52dc42, type: 2}
+    slashColor: {r: 0.6039216, g: 0.3529412, b: 0.6431373, a: 1}
+    effectAnimator: {fileID: 9100000, guid: b9a2108c0cc05fd43975fbcea0ae5173, type: 2}
+    effectColor: {r: 1, g: 1, b: 1, a: 1}
+    effect2Animator: {fileID: 9100000, guid: 46b6a1da6a0977443a9cc05175790ed1, type: 2}
+    effect2Color: {r: 1, g: 1, b: 1, a: 1}
+    bodyVisible: 1
+    headVisible: 1
+    chestVisible: 1
+    legsVisible: 1
+    shoesVisible: 1
+    handsVisible: 1
+    beltVisible: 1
+    slashVisible: 1
+    effectVisible: 1
+    effect2Visible: 0
+    weaponName: Melee2
+    backpackName: Bag5
+    shieldName: Offhand2
+    backpackColor: {r: 0.2392157, g: 0.2392157, b: 0.2392157, a: 1}
+    shieldColor: {r: 0.34117648, g: 0.08627451, b: 0.4784314, a: 1}
+    mountColor: {r: 1, g: 1, b: 1, a: 1}
+    weaponColor: {r: 0.36862746, g: 0.06666667, b: 0.27058825, a: 1}
+    shadowOpacityName: Toggle (4)
+    sliceSpritesheet: 1
+    staticIdle: 0
+    outlineName: None
+    resolutionName: Toggle
+    frameName: MAXToggle (6)
+    mountName: None
+    idleName: 1
+    presetName: Dark lord
+    presetDate: Example 8
+  - bodyAnimator: {fileID: 9100000, guid: cc142ad7c841a4747bee09983b52dc9a, type: 2}
+    bodyColor: {r: 0.25490198, g: 0.3647059, b: 0.0627451, a: 1}
+    headAnimator: {fileID: 9100000, guid: a10e7c836cdf2794ca153fcbd88e5487, type: 2}
+    headColor: {r: 0.25490198, g: 0.3647059, b: 0.0627451, a: 1}
+    chestAnimator: {fileID: 9100000, guid: 4496b3f4bede97843bc0f93fee45fd5a, type: 2}
+    chestColor: {r: 0.25490198, g: 0.3647059, b: 0.0627451, a: 1}
+    legsAnimator: {fileID: 9100000, guid: 269df9c7657498548be9deca64018124, type: 2}
+    legsColor: {r: 0.25490198, g: 0.3647059, b: 0.0627451, a: 1}
+    shoesAnimator: {fileID: 9100000, guid: 78bdedf491e7f954098e07d90abf3270, type: 2}
+    shoesColor: {r: 0.2784314, g: 0.18823531, b: 0.11764707, a: 1}
+    handsAnimator: {fileID: 9100000, guid: d9c9f867c1bd71f4f9e6faf295913a70, type: 2}
+    handsColor: {r: 0.25490198, g: 0.3647059, b: 0.0627451, a: 1}
+    beltAnimator: {fileID: 9100000, guid: a8d07e087aa1bad44a6ed4e212751385, type: 2}
+    beltColor: {r: 0.37612003, g: 0.4811321, b: 0.33361518, a: 1}
+    slashAnimator: {fileID: 9100000, guid: b36cd43cc72c96c48921cfd03b52dc42, type: 2}
+    slashColor: {r: 1, g: 1, b: 1, a: 1}
+    effectAnimator: {fileID: 9100000, guid: 46b6a1da6a0977443a9cc05175790ed1, type: 2}
+    effectColor: {r: 1, g: 1, b: 1, a: 1}
+    effect2Animator: {fileID: 9100000, guid: 46b6a1da6a0977443a9cc05175790ed1, type: 2}
+    effect2Color: {r: 1, g: 1, b: 1, a: 1}
+    bodyVisible: 1
+    headVisible: 1
+    chestVisible: 1
+    legsVisible: 1
+    shoesVisible: 1
+    handsVisible: 1
+    beltVisible: 1
+    slashVisible: 1
+    effectVisible: 0
+    effect2Visible: 0
+    weaponName: Melee22
+    backpackName: NoBag
+    shieldName: NoShield
+    backpackColor: {r: 1, g: 1, b: 1, a: 1}
+    shieldColor: {r: 1, g: 1, b: 1, a: 1}
+    mountColor: {r: 1, g: 1, b: 1, a: 1}
+    weaponColor: {r: 0.42352945, g: 0.32156864, b: 0.19215688, a: 1}
+    shadowOpacityName: Toggle (4)
+    sliceSpritesheet: 1
+    staticIdle: 0
+    outlineName: None
+    resolutionName: Toggle
+    frameName: MAXToggle (6)
+    mountName: None
+    idleName: 2
+    presetName: Swamp thing
+    presetDate: Example 9
+  - bodyAnimator: {fileID: 9100000, guid: cc142ad7c841a4747bee09983b52dc9a, type: 2}
+    bodyColor: {r: 0.6313726, g: 0.43137255, b: 0.29411766, a: 1}
+    headAnimator: {fileID: 9100000, guid: a3be7df5261255f4cb55641cd8a1ad14, type: 2}
+    headColor: {r: 0.86666673, g: 0.86666673, b: 0.86666673, a: 1}
+    chestAnimator: {fileID: 9100000, guid: f4221f23148537044a15909798fd5a04, type: 2}
+    chestColor: {r: 0.86666673, g: 0.86666673, b: 0.86666673, a: 1}
+    legsAnimator: {fileID: 9100000, guid: aee68559cceea6e41975151c8d032075, type: 2}
+    legsColor: {r: 0.86666673, g: 0.86666673, b: 0.86666673, a: 1}
+    shoesAnimator: {fileID: 9100000, guid: b080eafddeb2a064db05e857a4a4a51f, type: 2}
+    shoesColor: {r: 0.69803923, g: 0.69803923, b: 0.69803923, a: 1}
+    handsAnimator: {fileID: 9100000, guid: d9c9f867c1bd71f4f9e6faf295913a70, type: 2}
+    handsColor: {r: 1, g: 1, b: 1, a: 1}
+    beltAnimator: {fileID: 9100000, guid: 8a8d7af89138f0d4eb1f365c2b5031c1, type: 2}
+    beltColor: {r: 0.27450982, g: 0.40273696, b: 0.4627451, a: 1}
+    slashAnimator: {fileID: 9100000, guid: b36cd43cc72c96c48921cfd03b52dc42, type: 2}
+    slashColor: {r: 1, g: 1, b: 1, a: 1}
+    effectAnimator: {fileID: 9100000, guid: 46b6a1da6a0977443a9cc05175790ed1, type: 2}
+    effectColor: {r: 1, g: 1, b: 1, a: 1}
+    effect2Animator: {fileID: 9100000, guid: 46b6a1da6a0977443a9cc05175790ed1, type: 2}
+    effect2Color: {r: 1, g: 1, b: 1, a: 1}
+    bodyVisible: 0
+    headVisible: 1
+    chestVisible: 1
+    legsVisible: 1
+    shoesVisible: 1
+    handsVisible: 1
+    beltVisible: 1
+    slashVisible: 1
+    effectVisible: 0
+    effect2Visible: 0
+    weaponName: Melee5
+    backpackName: NoBag
+    shieldName: Shield3
+    backpackColor: {r: 1, g: 1, b: 1, a: 1}
+    shieldColor: {r: 0.69803923, g: 0.69803923, b: 0.69803923, a: 1}
+    mountColor: {r: 1, g: 1, b: 1, a: 1}
+    weaponColor: {r: 0.86666673, g: 0.86666673, b: 0.86666673, a: 1}
+    shadowOpacityName: Toggle (4)
+    sliceSpritesheet: 1
+    staticIdle: 0
+    outlineName: None
+    resolutionName: Toggle
+    frameName: MAXToggle (6)
+    mountName: None
+    idleName: 4
+    presetName: Knight 2
+    presetDate: Example 10
+  - bodyAnimator: {fileID: 9100000, guid: cc142ad7c841a4747bee09983b52dc9a, type: 2}
+    bodyColor: {r: 0.61960787, g: 0, b: 0.10980393, a: 1}
+    headAnimator: {fileID: 9100000, guid: a10e7c836cdf2794ca153fcbd88e5487, type: 2}
+    headColor: {r: 0.4666667, g: 0, b: 0.058823533, a: 1}
+    chestAnimator: {fileID: 9100000, guid: 3a0f0467743efdc41872a43d1826e4d7, type: 2}
+    chestColor: {r: 0.4666667, g: 0, b: 0.058823533, a: 1}
+    legsAnimator: {fileID: 9100000, guid: 269df9c7657498548be9deca64018124, type: 2}
+    legsColor: {r: 0.2264151, g: 0.2264151, b: 0.2264151, a: 1}
+    shoesAnimator: {fileID: 9100000, guid: 78bdedf491e7f954098e07d90abf3270, type: 2}
+    shoesColor: {r: 0.2784314, g: 0.18823531, b: 0.11764707, a: 1}
+    handsAnimator: {fileID: 9100000, guid: 2a87f4a53881b8146a67f09f2c973bfe, type: 2}
+    handsColor: {r: 0.4666667, g: 0, b: 0.058823533, a: 1}
+    beltAnimator: {fileID: 9100000, guid: a8d07e087aa1bad44a6ed4e212751385, type: 2}
+    beltColor: {r: 0.36862746, g: 0.06666667, b: 0.27058825, a: 1}
+    slashAnimator: {fileID: 9100000, guid: b36cd43cc72c96c48921cfd03b52dc42, type: 2}
+    slashColor: {r: 0.46666667, g: 0, b: 0.05882353, a: 1}
+    effectAnimator: {fileID: 9100000, guid: b9a2108c0cc05fd43975fbcea0ae5173, type: 2}
+    effectColor: {r: 0.61960787, g: 0, b: 0.10980392, a: 1}
+    effect2Animator: {fileID: 9100000, guid: 46b6a1da6a0977443a9cc05175790ed1, type: 2}
+    effect2Color: {r: 1, g: 1, b: 1, a: 1}
+    bodyVisible: 0
+    headVisible: 1
+    chestVisible: 1
+    legsVisible: 0
+    shoesVisible: 0
+    handsVisible: 1
+    beltVisible: 0
+    slashVisible: 0
+    effectVisible: 1
+    effect2Visible: 0
+    weaponName: Magic2
+    backpackName: NoBag
+    shieldName: NoShield
+    backpackColor: {r: 1, g: 1, b: 1, a: 1}
+    shieldColor: {r: 1, g: 1, b: 1, a: 1}
+    mountColor: {r: 1, g: 1, b: 1, a: 1}
+    weaponColor: {r: 0.46666667, g: 0, b: 0.05882353, a: 1}
+    shadowOpacityName: Toggle (5)
+    sliceSpritesheet: 1
+    staticIdle: 0
+    outlineName: None
+    resolutionName: Toggle
+    frameName: MAXToggle (6)
+    mountName: None
+    idleName: 1
+    presetName: Monster
+    presetDate: Example 11
+  - bodyAnimator: {fileID: 9100000, guid: cc142ad7c841a4747bee09983b52dc9a, type: 2}
+    bodyColor: {r: 0.9019608, g: 0.7372549, b: 0.59607846, a: 1}
+    headAnimator: {fileID: 9100000, guid: 22c592d3f731b2d47839ac5a5138bcef, type: 2}
+    headColor: {r: 0.509434, g: 0.35977742, b: 0.23309009, a: 1}
+    chestAnimator: {fileID: 9100000, guid: 57b5c8d297fa3d84fbb9517c08edbbf7, type: 2}
+    chestColor: {r: 0.509434, g: 0.35977742, b: 0.23309009, a: 1}
+    legsAnimator: {fileID: 9100000, guid: 221af266515a4214bb2535e09b747fde, type: 2}
+    legsColor: {r: 0.16900258, g: 0.089395285, b: 0.18853846, a: 1}
+    shoesAnimator: {fileID: 9100000, guid: f278cfff3f039bc40948a10cdda9f46c, type: 2}
+    shoesColor: {r: 0.37612003, g: 0.4811321, b: 0.33361518, a: 1}
+    handsAnimator: {fileID: 9100000, guid: 220d8989df7cfed49bb9aea5acb0d4eb, type: 2}
+    handsColor: {r: 0.37612003, g: 0.4811321, b: 0.33361518, a: 1}
+    beltAnimator: {fileID: 9100000, guid: a8d07e087aa1bad44a6ed4e212751385, type: 2}
+    beltColor: {r: 0.013271334, g: 0.0039094873, b: 0.004077038, a: 1}
+    slashAnimator: {fileID: 9100000, guid: eb0a646f21d2eb647a9b7ccc2c71035a, type: 2}
+    slashColor: {r: 0.37254903, g: 0.5411765, b: 0.11764707, a: 1}
+    effectAnimator: {fileID: 9100000, guid: 46b6a1da6a0977443a9cc05175790ed1, type: 2}
+    effectColor: {r: 0, g: 0.63529414, b: 0.54509807, a: 1}
+    effect2Animator: {fileID: 9100000, guid: 46b6a1da6a0977443a9cc05175790ed1, type: 2}
+    effect2Color: {r: 1, g: 1, b: 1, a: 1}
+    bodyVisible: 1
+    headVisible: 1
+    chestVisible: 1
+    legsVisible: 1
+    shoesVisible: 1
+    handsVisible: 1
+    beltVisible: 1
+    slashVisible: 1
+    effectVisible: 1
+    effect2Visible: 0
+    weaponName: Melee19
+    backpackName: NoBag
+    shieldName: Offhand2
+    backpackColor: {r: 1, g: 1, b: 1, a: 1}
+    shieldColor: {r: 0.1764706, g: 0.28235295, b: 0.24705884, a: 1}
+    mountColor: {r: 0.42352945, g: 0.32156864, b: 0.19215688, a: 1}
+    weaponColor: {r: 0.6037736, g: 0.3482092, b: 0.20790316, a: 1}
+    shadowOpacityName: Toggle (4)
+    sliceSpritesheet: 1
+    staticIdle: 0
+    outlineName: None
+    resolutionName: Toggle
+    frameName: MAXToggle (6)
+    mountName: Mount3
+    idleName: 1
+    presetName: Shaman
+    presetDate: Example 12
+  - bodyAnimator: {fileID: 9100000, guid: beaaa5e9bec0d294f8f9cb86a9688e54, type: 2}
+    bodyColor: {r: 0.81568635, g: 0.7490196, b: 0.6313726, a: 1}
+    headAnimator: {fileID: 9100000, guid: 200f1718ec938b34a88a335be92420e6, type: 2}
+    headColor: {r: 0.69803923, g: 0.69803923, b: 0.69803923, a: 1}
+    chestAnimator: {fileID: 9100000, guid: d2aa1468b2c35054b8fc5b10e09b6861, type: 2}
+    chestColor: {r: 0.28339902, g: 0.023756122, b: 0.24310653, a: 1}
+    legsAnimator: {fileID: 9100000, guid: 6bd332f0ab20dbe4caee8d5acfa966b0, type: 2}
+    legsColor: {r: 0.4118105, g: 0.44445232, b: 0.5705362, a: 1}
+    shoesAnimator: {fileID: 9100000, guid: f278cfff3f039bc40948a10cdda9f46c, type: 2}
+    shoesColor: {r: 0.509434, g: 0.35977742, b: 0.23309009, a: 1}
+    handsAnimator: {fileID: 9100000, guid: 220d8989df7cfed49bb9aea5acb0d4eb, type: 2}
+    handsColor: {r: 0.5022584, g: 0.7277525, b: 0.14303768, a: 1}
+    beltAnimator: {fileID: 9100000, guid: a8d07e087aa1bad44a6ed4e212751385, type: 2}
+    beltColor: {r: 0.29411766, g: 0.11764707, b: 0.20000002, a: 1}
+    slashAnimator: {fileID: 9100000, guid: eb0a646f21d2eb647a9b7ccc2c71035a, type: 2}
+    slashColor: {r: 1, g: 1, b: 1, a: 1}
+    effectAnimator: {fileID: 9100000, guid: 46b6a1da6a0977443a9cc05175790ed1, type: 2}
+    effectColor: {r: 1, g: 1, b: 1, a: 1}
+    effect2Animator: {fileID: 9100000, guid: 46b6a1da6a0977443a9cc05175790ed1, type: 2}
+    effect2Color: {r: 1, g: 1, b: 1, a: 1}
+    bodyVisible: 1
+    headVisible: 0
+    chestVisible: 0
+    legsVisible: 0
+    shoesVisible: 1
+    handsVisible: 0
+    beltVisible: 1
+    slashVisible: 1
+    effectVisible: 0
+    effect2Visible: 0
+    weaponName: Melee4
+    backpackName: NoBag
+    shieldName: Shield7
+    backpackColor: {r: 1, g: 1, b: 1, a: 1}
+    shieldColor: {r: 0.2784314, g: 0.18823531, b: 0.11764707, a: 1}
+    mountColor: {r: 1, g: 1, b: 1, a: 1}
+    weaponColor: {r: 1, g: 1, b: 1, a: 1}
+    shadowOpacityName: Toggle (4)
+    sliceSpritesheet: 1
+    staticIdle: 0
+    outlineName: None
+    resolutionName: Toggle
+    frameName: MAXToggle (6)
+    mountName: None
+    idleName: 1
+    presetName: Skeleton
+    presetDate: Example 13
+  - bodyAnimator: {fileID: 9100000, guid: c841ce9fc8f45f24190ae593dd9e1ade, type: 2}
+    bodyColor: {r: 0, g: 0.3529415, b: 1, a: 1}
+    headAnimator: {fileID: 9100000, guid: 22c592d3f731b2d47839ac5a5138bcef, type: 2}
+    headColor: {r: 0.509434, g: 0.35977742, b: 0.23309009, a: 1}
+    chestAnimator: {fileID: 9100000, guid: 57b5c8d297fa3d84fbb9517c08edbbf7, type: 2}
+    chestColor: {r: 0.509434, g: 0.35977742, b: 0.23309009, a: 1}
+    legsAnimator: {fileID: 9100000, guid: 221af266515a4214bb2535e09b747fde, type: 2}
+    legsColor: {r: 0.16900258, g: 0.089395285, b: 0.18853846, a: 1}
+    shoesAnimator: {fileID: 9100000, guid: fe85f2a9fea6d8646b2b71892d5cefc7, type: 2}
+    shoesColor: {r: 0.509434, g: 0.35977742, b: 0.23309009, a: 1}
+    handsAnimator: {fileID: 9100000, guid: 9eaee90ee42a3894190533642d0fe4f0, type: 2}
+    handsColor: {r: 0.27450982, g: 0.40273696, b: 0.4627451, a: 1}
+    beltAnimator: {fileID: 9100000, guid: a8d07e087aa1bad44a6ed4e212751385, type: 2}
+    beltColor: {r: 0, g: 0.19215688, b: 0.41960788, a: 1}
+    slashAnimator: {fileID: 9100000, guid: eb0a646f21d2eb647a9b7ccc2c71035a, type: 2}
+    slashColor: {r: 0, g: 0.4326241, b: 1, a: 1}
+    effectAnimator: {fileID: 9100000, guid: d0455ebc0fdf22b47bd3170475b21952, type: 2}
+    effectColor: {r: 0, g: 0.59379387, b: 1, a: 1}
+    effect2Animator: {fileID: 9100000, guid: d0455ebc0fdf22b47bd3170475b21952, type: 2}
+    effect2Color: {r: 1, g: 1, b: 1, a: 1}
+    bodyVisible: 1
+    headVisible: 0
+    chestVisible: 0
+    legsVisible: 0
+    shoesVisible: 0
+    handsVisible: 0
+    beltVisible: 1
+    slashVisible: 1
+    effectVisible: 1
+    effect2Visible: 0
+    weaponName: Magic3
+    backpackName: NoBag
+    shieldName: NoShield
+    backpackColor: {r: 1, g: 1, b: 1, a: 1}
+    shieldColor: {r: 1, g: 1, b: 1, a: 1}
+    mountColor: {r: 1, g: 1, b: 1, a: 1}
+    weaponColor: {r: 0, g: 0.620383, b: 1, a: 1}
+    shadowOpacityName: Toggle (4)
+    sliceSpritesheet: 1
+    staticIdle: 0
+    outlineName: None
+    resolutionName: Toggle
+    frameName: MAXToggle (6)
+    mountName: None
+    idleName: 3
+    presetName: Spirit
+    presetDate: Example 14
+  - bodyAnimator: {fileID: 9100000, guid: cc142ad7c841a4747bee09983b52dc9a, type: 2}
+    bodyColor: {r: 0.9686275, g: 0.7607844, b: 0, a: 1}
+    headAnimator: {fileID: 9100000, guid: 3c9489a3ab0da9a4f8e62ea6c89ea5cf, type: 2}
+    headColor: {r: 0.42352945, g: 0.32156864, b: 0.19215688, a: 1}
+    chestAnimator: {fileID: 9100000, guid: c4b854dcf21b97c4cad6c87f461ee129, type: 2}
+    chestColor: {r: 0.509434, g: 0.35977742, b: 0.23309009, a: 1}
+    legsAnimator: {fileID: 9100000, guid: 221af266515a4214bb2535e09b747fde, type: 2}
+    legsColor: {r: 0.2992051, g: 0.23101315, b: 0.18631096, a: 1}
+    shoesAnimator: {fileID: 9100000, guid: fe85f2a9fea6d8646b2b71892d5cefc7, type: 2}
+    shoesColor: {r: 0.509434, g: 0.35977742, b: 0.23309009, a: 1}
+    handsAnimator: {fileID: 9100000, guid: 220d8989df7cfed49bb9aea5acb0d4eb, type: 2}
+    handsColor: {r: 0.6828715, g: 0.23049255, b: 0.0866711, a: 1}
+    beltAnimator: {fileID: 9100000, guid: a8d07e087aa1bad44a6ed4e212751385, type: 2}
+    beltColor: {r: 0.3951246, g: 0.14243765, b: 0.099855445, a: 1}
+    slashAnimator: {fileID: 9100000, guid: eb0a646f21d2eb647a9b7ccc2c71035a, type: 2}
+    slashColor: {r: 0.9686275, g: 0.7607844, b: 0, a: 1}
+    effectAnimator: {fileID: 9100000, guid: 3e78a034ad307e944ac61c50d6488dc4, type: 2}
+    effectColor: {r: 1, g: 1, b: 1, a: 1}
+    effect2Animator: {fileID: 9100000, guid: 46b6a1da6a0977443a9cc05175790ed1, type: 2}
+    effect2Color: {r: 1, g: 1, b: 1, a: 1}
+    bodyVisible: 1
+    headVisible: 1
+    chestVisible: 0
+    legsVisible: 1
+    shoesVisible: 0
+    handsVisible: 1
+    beltVisible: 1
+    slashVisible: 1
+    effectVisible: 1
+    effect2Visible: 1
+    weaponName: Magic2
+    backpackName: NoBag
+    shieldName: NoShield
+    backpackColor: {r: 1, g: 1, b: 1, a: 1}
+    shieldColor: {r: 1, g: 1, b: 1, a: 1}
+    mountColor: {r: 1, g: 1, b: 1, a: 1}
+    weaponColor: {r: 1, g: 1, b: 1, a: 1}
+    shadowOpacityName: Toggle (4)
+    sliceSpritesheet: 1
+    staticIdle: 0
+    outlineName: None
+    resolutionName: Toggle
+    frameName: MAXToggle (6)
+    mountName: None
+    idleName: 1
+    presetName: Fire mage
+    presetDate: Example 15

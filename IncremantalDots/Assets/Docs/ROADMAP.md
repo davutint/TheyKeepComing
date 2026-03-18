@@ -1,438 +1,472 @@
-# DEAD WALLS — Yol Haritasi ve Yapilacaklar Listesi
+# DEAD WALLS — Yol Haritasi ve Yapilacaklar Listesi (v4.0)
 
 > Bu dokuman projenin tek takip kaynagindir. Her gorev tamamlandiginda `[x]` ile isaretlenir.
-> GDD v3.0 referans alinir. Milestone siralama GDD Section 17'ye dayanir.
+> GDD v4.0 referans alinir. Her sistem icin yazilan EDITOR_SETUP md dosyasi UI kurulum talimatlarini da icerir.
+> Milestone siralama: M0 → M1 → M-CLN → M-ISO → M2 → M3 → M4 → M5
 
 ---
 
-## Mevcut Durum Ozeti (M0 — Prototype) ✅
+## M0 — Prototype ✅
 
 Asagidakiler **tamamlanmis ve calisan** sistemlerdir:
 
 | Sistem | Durum | Dosyalar |
 |--------|-------|----------|
-| Zombi ECS Entity | ✅ Tamam | ZombieComponents, ZombieAuthoring |
-| Zombi State Machine (Moving/Attacking/Queued/Dead) | ✅ Tamam | ZombieState, BoundarySystem, ZombieDeathSystem |
-| Physics Pipeline (force→hash→collision→integrate→boundary) | ✅ Tamam | Physics/ klasoru (5 system + SpatialHashGrid) |
-| Double-Buffered Spatial Hash | ✅ Tamam | BuildSpatialHashSystem |
-| Domino Queuing (zincir etkisi) | ✅ Tamam | BoundarySystem |
-| Okcu Sistemi (hedefleme + ok atisi) | ✅ Tamam | ArcherShootSystem, ArrowMoveSystem, ArrowHitSystem |
-| Wave Spawn (normal + stress test mode) | ✅ Tamam | WaveSpawnSystem |
-| Duvar/Kapi/Kale HP + Hasar Zinciri | ✅ Tamam | CastleComponents, DamageApplySystem |
-| Zombi Olum + XP Odulu | ✅ Tamam | DamageCleanupSystem |
-| Sprite Sheet Animasyon Pipeline | ✅ Tamam | SpriteAnimationSystem, ZombieAnimationStateSystem |
-| Temel HUD (HP bar, XP, Wave, Level) | ✅ Tamam | HUDController |
-| Level-Up UI (3 hardcoded secenek) | ✅ Tamam | LevelUpUI, GameManager.ApplyUpgrade |
-| Game Over UI | ✅ Tamam | GameOverUI |
-| ~~Click Damage~~ | ❌ Kaldirildi | ~~ClickDamageSystem, ClickDamageHandler~~ |
-| Profiler Analyzer Editor Tool | ✅ Tamam | ProfilerDataAnalyzer |
+| Zombi ECS Entity | ✅ | ZombieComponents, ZombieAuthoring |
+| Zombi State Machine (Moving/Attacking/Queued/Dead) | ✅ | ZombieState, BoundarySystem, ZombieDeathSystem |
+| Physics Pipeline (force→hash→collision→integrate→boundary) | ✅ | Physics/ (5 system + SpatialHashGrid) |
+| Double-Buffered Spatial Hash | ✅ | BuildSpatialHashSystem |
+| Domino Queuing (zincir etkisi) | ✅ | BoundarySystem |
+| Okcu Sistemi (hedefleme + ok atisi) | ✅ | ArcherShootSystem, ArrowMoveSystem, ArrowHitSystem |
+| Wave Spawn (normal + stress test mode) | ✅ | WaveSpawnSystem |
+| Duvar/Kapi/Kale HP + Hasar Zinciri | ✅ | CastleComponents, DamageApplySystem |
+| Zombi Olum + XP Odulu | ✅ | DamageCleanupSystem |
+| Sprite Sheet Animasyon Pipeline | ✅ | SpriteAnimationSystem, ZombieAnimationStateSystem |
+| Temel HUD (HP bar, XP, Wave, Level) | ✅ | HUDController |
+| Profiler Analyzer Editor Tool | ✅ | ProfilerDataAnalyzer |
 
-### Bilinen Bug'lar ve Teknik Borc (M0)
-- [x] **BUG:** WaveSpawnSystem per-wave stats (HP, Speed, Damage) spawn edilen zombilere uygulaniyordu — `SpawnZombieBatch`'de `ZombieStats` set edildi
-- [x] **BUG:** ProfilerDataAnalyzer "ZombieAttackSystem" → "ZombieAttackTimerSystem" + "DamageApplySystem" olarak duzeltildi
-- [x] **Olu kod:** `ReachedTarget` component silindi
-- [x] **Test modu:** StressTestMode default `false` yapildi, `ZombieDamage = 0f` bug'i duzeltildi
-- [x] **GDD uyumsuzluk:** Gold, ClickDamage, ClickDamageRequest, ClickDamageSystem, ClickDamageHandler tamamen kaldirildi
+### Bug Fix'ler (M0) ✅
+- [x] WaveSpawnSystem per-wave stats fix
+- [x] ProfilerDataAnalyzer sistem adi duzeltmesi
+- [x] `ReachedTarget` olu kod silindi
+- [x] StressTestMode default false, ZombieDamage bug fix
+- [x] Gold, ClickDamage tamamen kaldirildi
 
 ---
 
-## M1 — Kaynak + Bina Sistemi
+## M1 — Kaynak + Bina Sistemi (~%90 Tamamlandi)
 
 > **Hedef:** 4 kaynak ekonomisi, bina yerlestirme, isci atama, nufus yonetimi.
-> **Bagimliliklari:** Yok (M0 uzerine insa edilir)
 
-### M1.1 — Temel Kaynak Altyapisi
+### M1.1 — Temel Kaynak Altyapisi ✅
+- [x] ResourceData, ResourceProductionRate, ResourceConsumptionRate, ResourceAccumulator component'lari
+- [x] GameStateAuthoring kaynak baker
+- [x] ResourceTickSystem (net hiz * dt → accumulator → int)
+- [x] GameManager kaynak property'leri + RestartGame
+- [x] HUD 4 kaynak gosterimi
 
-- [x] Kaynak component'lari olustur: ResourceData (int), ResourceProductionRate, ResourceConsumptionRate, ResourceAccumulator (float)
-- [x] GameStateAuthoring'e kaynak field'lari + Baker ekle (baslangic degerleri + test uretim/tuketim hizlari Inspector'dan)
-- [x] ResourceTickSystem olustur — tek sistem, net hiz (uretim-tuketim) * dt → accumulator → int transfer
-- [x] GameManager'a Resources, ResourceProduction, ResourceConsumption property + ReadECSData + RestartGame ekle
-- [x] HUD'da 4 kaynak gosterimi: "Ahsap: 150 (+5.0/dk)" formati, string alloc caching
+### M1.2 — Nufus Sistemi ✅
+- [x] PopulationState singleton (Total, Workers, Archers, Idle, Capacity, FoodPerAssignedPerMin)
+- [x] PopulationTickSystem
+- [x] Kapasite kontrolu + yemek tuketimi
+- [x] HUD nufus gosterimi
 
-### M1.2 — Nufus Sistemi
+### M1.3 — Grid ve Bina Yerlestirme ✅
+- [x] Tilemap tabanli grid (32x32, 1x1 hucre)
+- [x] BuildingComponents (BuildingType enum, BuildingData, ResourceProducer, PopulationProvider, BuildingFoodCost)
+- [x] BuildingConfigSO (ScriptableObject)
+- [x] BuildingGridManager (grid truth source + entity olusturma)
+- [x] BuildingPlacementUI (secim menusu + ghost preview + tikla-yerlestir)
+- [x] Yerlestirme kurallari (M1.8'de tamamlandi)
 
-- [x] `PopulationState` singleton component olustur
-  - [x] Total, Workers, Archers, Idle, Capacity (int) + FoodPerAssignedPerMin (float)
-- [x] GameStateAuthoring baker'ina PopulationState ekle (baslangic nufus + kapasite + test atama)
-- [x] `PopulationTickSystem` olustur — Idle hesapla + FoodPerMin guncelle (ResourceTickSystem'den once)
-- [x] Nufus kapasitesi kontrolu — Idle negatif olamaz (clamp >= 0)
-- [x] Yemek tuketimi: atanmis her birey (isci + okcu) yemek tuketir, bosta bekleyen tuketmez
-- [x] HUD'da nufus gosterimi: "Nufus: 10/20 (0 isci, 0 okcu, 10 bos)"
+### M1.4 — Kaynak Binalari ✅
+- [x] BuildingProductionSystem
+- [x] Test rate'ler sifirlandi
+- [x] SO asset'leri (Lumberjack, Quarry, Mine, Farm)
+- [ ] Upgrade: uretim verimi artar (M2.5 kart sistemiyle)
 
-### M1.3 — Grid ve Bina Yerlestirme Altyapisi
+### M1.5 — Altyapi Binalari ✅
+- [x] Ev (House) — kapasite + yemek gideri
+- [x] BuildingPopulationSystem
+- [x] Kale Upgrade (CastleUpgradeData + CastleUpgradeUI)
+- [ ] Ev upgrade (M2.5 kart sistemiyle)
 
-- [x] Bina grid sistemi tasarla (Tilemap tabanli, sur ici alan)
-  - [x] Grid boyutu ve hucre boyutu belirle (32x32, 1x1 hucre)
-  - [x] Yerlestirilebilir/yerlestirilemez alan tanimi (buildable_zone Tilemap)
-- [x] `BuildingComponents.cs` olustur
-  - [x] `BuildingType` enum: Lumberjack, Quarry, Mine, Farm, House, Barracks, Fletcher, Blacksmith, WizardTower
-  - [x] `BuildingData` (IComponentData): Type, Level, GridX, GridY
-  - [x] `ResourceProducer` (IComponentData): ResourceType, RatePerWorkerPerMin, AssignedWorkers, MaxWorkers
-  - [x] `PopulationProvider` (IComponentData): CapacityAmount
-  - [x] `BuildingFoodCost` (IComponentData): FoodPerMin
-- [x] `BuildingConfigSO` ScriptableObject olustur (prefab yerine SO + runtime entity)
-- [x] `BuildingGridManager` olustur (MonoBehaviour — grid truth source)
-  - [x] Grid uzerinde bos alan kontrolu (3x3 slot)
-  - [x] Maliyet kontrolu + kaynak dusme
-  - [x] Bina entity'si olustur + grid'i guncelle
-  - [x] Restart'ta bina temizligi (GameManager entegrasyonu)
-- [x] Bina yerlestirme UI'i olustur (`BuildingPlacementUI`)
-  - [x] Bina secim menusu (SO listesinden otomatik buton)
-  - [x] Ghost/preview gosterimi (yesil/kirmizi renk)
-  - [x] Maliyet gosterimi + kaynak yeterliligi kontrolu
-  - [x] Tikla-yerlestir mekanigi + sag tikla/Escape iptal
-- [ ] ~~`BuildingAuthoring` baker~~ — Iptal: prefab yerine runtime CreateEntity + Tilemap gorsel secildi
-- [x] Yerlestirme kurallari: Oduncu→orman yanina vs. (M1.8'de tamamlandi)
+### M1.6 — Askeri Binalar ✅
+- [x] Kisla (ArcherTrainer + BarracksTrainingSystem)
+- [x] Ok Atolyesi (ArrowProducer + ArrowProductionSystem + ArrowSupply)
+- [x] Demirci (placeholder — tech tree M2.5'te)
+- [x] ~~Mancinik~~ (M-CLN'de kaldirilacak)
 
-### M1.4 — Kaynak Binalari (Oduncu, Tas Ocagi, Maden, Ciftlik)
-
-- [x] `BuildingProductionSystem` olustur — tum ResourceProducer entity'lerini tara, toplam uretim hizini singleton'a yaz
-- [x] Test uretim rate'lerini sifirla (GameStateAuthoring + GameManager.RestartGame) — uretim tamamen binalardan gelir
-- [x] `AssignedWorkers = 1` gecici cozum (M1.7'de isci atama UI gelecek)
-- [x] SO asset'leri olustur: Lumberjack (Wood 5/dk), Quarry (Stone 3/dk), Mine (Iron 2/dk), Farm (Food 4/dk)
-- [x] Yerlestirme kurallari: Oduncu→orman, Ocak→tas vs. (M1.8'de tamamlandi)
-- [ ] Upgrade: uretim verimi artar (M1.7+ ile birlikte)
-
-### M1.5 — Altyapi Binalari (Ev, Kale Upgrade) ✅
-
-- [x] **Ev (House)**
-  - [x] PopulationState'e BaseCapacity field eklendi
-  - [x] BuildingPopulationSystem olusturuldu — Ev kapasite + yemek gideri hesaplar
-  - [x] Nufus kapasitesi arttirir (+5 per Ev, BuildingPopulationSystem hesaplar)
-  - [x] Surekli yemek gideri vardir (BuildingFoodCost → ResourceConsumptionRate.FoodPerMin)
-  - [ ] Upgrade: daha fazla kapasite, daha fazla yemek gideri (M1.7 ile birlikte)
-- [x] **Kale Upgrade Mekanigi**
-  - [x] CastleUpgradeData component eklendi (CastleComponents.cs)
-  - [x] CastleAuthoring'e upgrade field'lari + baker eklendi
-  - [x] GameManager.UpgradeCastle() metodu eklendi (Tas + Ahsap maliyet)
-  - [x] CastleUpgradeUI olusturuldu (buton + maliyet gosterimi)
-  - [x] Grid slot harcamaz — pahalı ama verimli
-
-### M1.6 — Askeri Binalar (Kisla, Ok Atolyesi, Demirci) ✅
-
-- [x] **Kisla (Barracks)**
-  - [x] ArcherTrainer component + BarracksTrainingSystem (runtime entity, Prefab/Authoring yok)
-  - [x] Nufustan okcu egitir (Yemek + Ahsap harcar)
-  - [x] Egitim suresi + timer (TrainingDuration, ECB ile okcu spawn)
-  - [ ] Upgrade: daha hizli egitim (M2.4)
-- [x] **Ok Atolyesi (Fletcher)**
-  - [x] ArrowProducer component + ArrowProductionSystem (runtime entity, Prefab/Authoring yok)
-  - [x] Isci atanir, Ahsap tuketir, Ok uretir
-  - [x] Okcular ok olmadan ates edemez — ok envanteri sistemi
-  - [x] `ArrowSupply` singleton component olusturuldu
-  - [x] ArcherShootSystem guncellendi: ok yoksa ates etme
-  - [ ] Upgrade: daha hizli uretim (M2.4)
-- [x] **Demirci (Blacksmith)**
-  - [x] Yerlestirilebilir placeholder (sadece BuildingData, baska component yok)
-  - [ ] Demir tuketir, kalici upgrade'ler sunar — tech tree (M2.4)
-  - [ ] Upgrade secenekleri: Ok hasari artis, Duvar guclendirme, Mancinik unlock, Ozel ok tipleri (M2.4)
-  - [ ] Upgrade UI paneli (M2.4)
-
-### M1.7 — Isci Atama UI
-
-- [ ] Binaya tiklaninca acilan detay paneli olustur
-  - [ ] Bina adi, seviyesi, uretim hizi gosterimi
-  - [ ] Atanmis isci sayisi gosterimi
-  - [ ] Isci ekleme/cikarma butonlari (+/-)
-  - [ ] Idle nufustan isci cek / iscileri idle'a dondur
-  - [ ] Upgrade butonu (maliyet gosterimi + kaynak kontrolu)
-  - [ ] Yikma butonu
+### M1.7 — Isci Atama UI + Bina Detay Paneli ✅ (kod tamam)
+- [x] BuildingDetailUI sistemi yazildi
+- [ ] Editor kurulumu yapilmadi — BUILDING_DETAIL_UI_EDITOR_SETUP.md takip edilecek
 
 ### M1.8 — Dogal Kaynak Noktalari ✅
+- [x] ResourcePointType enum + zone tilemap + _zoneGrid cache
+- [x] IsNearZone proximity + CanPlace zone kontrolu
+- [x] BuildingConfigSO RequiredZone + ZoneProximityRadius
 
-- [x] Haritada sabit dogal kaynak konumlari olustur (Tilemap tabanli)
-  - [x] ResourcePointType enum (Forest, Stone, Iron, None)
-  - [x] resource_zones Tilemap layer + tile asset'leri (ForestTile, StoneTile, IronTile)
-  - [x] _zoneGrid[,] cache (InitializeGrid'de doldurulur)
-- [x] Yerlestirme kurali: kaynak binasi ilgili dogal kaynaga yakin mi kontrolu
-  - [x] IsNearZone() proximity metodu (genisletilmis dikdortgen tarama)
-  - [x] CanPlace()'e zone yakinlik kontrolu eklendi
-  - [x] BuildingConfigSO'ya RequiredZone + ZoneProximityRadius field'lari eklendi
-- [x] Gorsel gosterim (TilemapRenderer toggle — zone gerektiren bina secildiginde overlay gorunur)
+### M1.9 — Eski Sistem Temizligi (Kismi)
+- [x] Gold, ClickDamage, ClickDamageRequest, ClickDamageSystem kaldirildi
+- [x] DamageCleanupSystem'den Gold reward kaldirildi
+- [x] HUD yeni kaynak sistemine uyumlandi
+- [ ] `GameManager.ApplyUpgrade` eski 3-buton sistemi (M2.5 kart sistemiyle degisecek)
+- [ ] `LevelUpUI` eski hardcoded butonlar (M2.5 kart sistemiyle degisecek)
 
-### M1.9 — Eski Sistemlerin Temizligi
+---
 
-- [x] `Gold` alanini `GameStateData`'dan kaldir
-- [x] `ClickDamage` alanini `GameStateData`'dan kaldir
-- [x] `ClickDamageSystem` ve `ClickDamageHandler` kaldir (GDD'de click damage yok)
-- [x] `ClickDamageRequest` component kaldir
-- [ ] `GameManager.ApplyUpgrade` eski 3-buton sistemini kaldir (M2.4 kart sistemiyle degisecek)
-- [ ] `LevelUpUI` eski hardcoded butonlari kaldir (M2.4'te kart sistemi ile degisecek)
-- [x] `DamageCleanupSystem`'den Gold reward'i kaldir, XP reward kalsin
-- [x] HUD'u yeni kaynak sistemine uyumlu hale getir (M1.1'de yapildi — 4 kaynak TMP_Text)
+## M-CLN — Temizlik (Catapult + v3.0 Kalintilari)
 
-### M1.10 — MD Dokumantasyonu
+> **Hedef:** v4.0'da kaldirilan sistemleri temizle. Izometrik gecis oncesi temiz kod tabani.
+> **Bagimliliklari:** M1
 
-- [x] `Components/ARCHITECTURE.md` guncelle (Gold, ClickDamage, ReachedTarget kaldirildi)
-- [ ] `Components/EDITOR_SETUP.md` guncelle
-- [x] `Systems/ARCHITECTURE.md` guncelle (ClickDamageSystem kaldirildi, sistem sirasi guncellendi)
-- [ ] `Systems/EDITOR_SETUP.md` guncelle
-- [ ] Yeni klasor olusturulduysa o klasore ARCHITECTURE + EDITOR_SETUP md yaz
+### M-CLN.1 — Catapult/Mancinik Sistemi Kaldirma
+- [x] `CatapultComponents.cs` sil
+- [x] `CatapultAuthoring.cs` sil
+- [x] `CatapultProjectileAuthoring.cs` sil
+- [x] `CatapultShootSystem.cs` sil
+- [x] `CatapultProjectileMoveSystem.cs` sil
+- [x] `CatapultProjectileHitSystem.cs` sil
+- [x] `WallSlotManager.cs` sil
+- [x] `BuildingType.Catapult` enum degeri → `WizardAcademy` olarak degistirildi
+- [x] `WaveConfigAuthoring`'den CatapultPrefabData + CatapultProjectilePrefabData kaldirildi
+- [x] `BuildingPlacementUI`'dan IsWallSlotBuilding branch'i kaldirildi
+- [x] `GameManager.RestartGame`'den mancinik cleanup kodu kaldirildi
+- [x] `BuildingConfigSO`'dan IsWallSlotBuilding field'i kaldirildi (RequireBlacksmith korundu)
+- [ ] Catapult prefab'larini sahneden kaldir (Editor'de manuel yapilacak)
+- [ ] Catapult SO asset'ini sil (Editor'de manuel yapilacak)
+
+### M-CLN.2 — Demirci Referans Temizligi
+- [x] Demirci'den ~~Mancinik unlock~~ kaldirildi (BuildingConfigSO IsWallSlotBuilding silindi)
+- [x] ~~Ozel ok tipleri~~ referanslari kaldirildi (Ok Atolyesi sadece standart ok uretir)
+- [x] Kalan upgrade'ler: Ok hasari artis, Duvar guclendirme, Buyucu Kulesi unlock, Tuzak unlock
+
+### M-CLN.3 — MD Dosyalari Temizligi
+- [x] CATAPULT_COMPONENTS_ARCHITECTURE.md silindi
+- [x] CATAPULT_COMPONENTS_EDITOR_SETUP.md silindi
+- [x] CATAPULT_SYSTEM_ARCHITECTURE.md silindi
+- [x] CATAPULT_SYSTEM_EDITOR_SETUP.md silindi
+- [x] WALL_SLOT_ARCHITECTURE.md silindi
+- [x] WALL_SLOT_EDITOR_SETUP.md silindi
+- [x] SYSTEM_EXECUTION_ORDER_ARCHITECTURE.md guncellendi (catapult sistemleri cikarildi)
+- [x] COMPONENT_MAP_ARCHITECTURE.md guncellendi
+
+### M-CLN.4 — Ok Atolyesi Sadeleştirme
+- [x] Ok Atolyesi sadece standart ok uretir (ozel ok tipleri referanslari yoktu, sadece GDD'de vardi)
+- [x] Fletcher upgrade = hiz artisi (kart sistemiyle M2.5'te)
+
+---
+
+## M-ISO — Izometrik Gecis
+
+> **Hedef:** Rectangle grid → izometrik, WallX → perimeter, kamera, 8 yonlu sprite, tile/sprite gecisi.
+> **Bagimliliklari:** M-CLN (temiz kod tabani)
+
+### M-ISO.1 — Grid Sistemi Donusumu
+- [ ] Unity Grid component'ini Isometric'e cevir (CellLayout=2, CellSize=1,0.5,1)
+- [ ] `BuildingGridManager.WorldToGrid()` izometrik math'e guncelle
+- [ ] `BuildingGridManager.GridToWorld()` izometrik math'e guncelle
+- [ ] `BuildingPlacementUI` ghost preview → baklava (diamond) snap
+- [ ] `BuildingDetailUI` tiklama → izometrik grid'de dogru hucre tespiti
+- [ ] Tilemap layer'lari izometrik tile'larla yeniden boya (Fantasy Kingdom Tileset)
+- [ ] BUILDING_GRID_ARCHITECTURE.md + BUILDING_GRID_EDITOR_SETUP.md guncelle
+  - EDITOR_SETUP: Yeni Grid ayarlari (CellLayout, CellSize), Tilemap Palette olusturma, tile boyama adimlari
+
+### M-ISO.2 — Kamera Sistemi
+- [ ] `CameraSetup.cs` guncelle — izometrik gorunum icin pozisyon/boyut
+- [ ] Kaydirmali kamera (WASD veya edge scroll — buyuk harita icin)
+- [ ] Zoom in/out (scroll wheel)
+- [ ] Kamera sinir kontrolu (harita disina cikmasin)
+- [ ] CAMERA_SYSTEM_ARCHITECTURE.md + CAMERA_SYSTEM_EDITOR_SETUP.md yaz
+  - EDITOR_SETUP: Kamera objesine hangi component eklenir, zoom/pan parametreleri
+
+### M-ISO.3 — Perimeter Sur Sistemi
+- [ ] `WallXPosition` singleton → `PerimeterWall` sistemi (coklu segment)
+- [ ] `WallSegment` component'ine `DamageStage` (int, 0-4) ekle
+- [ ] `ApplyMovementForceSystem` guncelle: `WallX - pos.x` → `normalize(center - pos)`
+- [ ] `BoundarySystem` guncelle: `pos.x <= WallX` → mesafe/perimeter kontrolu
+- [ ] Sur segment HP'leri bagimsiz
+- [ ] Sur tile'larini Fantasy Kingdom Tileset'ten yerlestir
+- [ ] PERIMETER_WALL_ARCHITECTURE.md + PERIMETER_WALL_EDITOR_SETUP.md yaz
+  - EDITOR_SETUP: Sur segment'lerinin sahnede nasil yerlestirilecegi, tile referanslari
+
+### M-ISO.4 — Zombie Spawn 360°
+- [ ] `WaveSpawnSystem` guncelle: sag taraftan → harita kenarlari 360° spawn
+- [ ] Spawn pozisyonlari: harita kenarinda rastgele noktalar (cember veya dikdortgen kenar)
+- [ ] Taciz gruplari farkli yonlerden gelebilir
+- [ ] `BarracksTrainingSystem` okcu spawn pozisyonu → kale merkezine yakin
+- [ ] `GameManager.ApplyUpgrade` okcu spawn pozisyonu guncelle
+
+### M-ISO.5 — 8 Yonlu Sprite Sistemi
+- [ ] `SpriteAnimation` component'ine TotalRows=8 destegi (4→8)
+- [ ] Yon mapping tablosu: aci → satir (E=0, W=1, S=2, N=3, NE=4, NW=5, SE=6, SW=7)
+- [ ] `ZombieAnimationStateSystem` 8 yon hesaplama (hareket vektoru → aci → satir)
+- [ ] `SpriteSheetAuthoring` TotalRows default 8
+- [ ] Character Creator - Fantasy 2D'den zombie spritesheet export et ve import et
+- [ ] Character Creator'dan okcu spritesheet export et ve import et
+- [ ] SPRITE_ANIMATION_ARCHITECTURE.md + SPRITE_ANIMATION_EDITOR_SETUP.md guncelle
+  - EDITOR_SETUP: Character Creator'da karakter olusturma + export adimlari, spritesheet import ayarlari (PPU=128, slice 15x8)
+
+### M-ISO.6 — Y-Sorting (Derinlik Sıralama)
+- [ ] Renderer2D Transparency Sort Mode = Custom Axis (0, 1, 0) — zaten yapildi
+- [ ] ECS entity'ler icin sorting: LocalTransform.Position.y → SortingGroup veya material property
+- [ ] Tilemap sorting layer'lari duzenle (izometrik derinlik)
+- [ ] Test: yakin objeler onde, uzak objeler arkada gorunuyor mu
+
+### M-ISO.7 — Mevcut Sistemler Uyumluluk Testi
+- [ ] Fizik pipeline calisma kontrolu (collision, spatial hash, integrate — perspective-agnostic)
+- [ ] Okcu hedefleme + ok hareketi (ArrowMoveSystem rotation acisi duzeltme)
+- [ ] Kaynak sistemi (degisiklik yok — pure data)
+- [ ] Bina uretim/nufus sistemleri (degisiklik yok — pure data)
+- [ ] HUD gosterimi (degisiklik yok — UI overlay)
+- [ ] Restart/GameOver akisi
+
+### M-ISO.8 — MD Dokumantasyonu
+- [ ] ISOMETRIC_TRANSITION_ARCHITECTURE.md yaz (yapilan tum degisiklikler)
+- [ ] Mevcut tum md dosyalarini guncelle (izometrik referanslar)
 
 ---
 
 ## M2 — Savunma Derinligi
 
-> **Hedef:** Mancinik, tuzaklar, buyuler, level-up kart sistemi.
-> **Bagimliliklari:** M1 (kaynak sistemi, Demirci unlock mekanigi)
+> **Hedef:** RTS birim kontrolu, buyucu sistemi, tuzaklar, kart sistemi.
+> **Bagimliliklari:** M-ISO (izometrik grid + perimeter + 8 yon)
 
-### M2.1 — Mancinik (Catapult) ✅
+### M2.1 — RTS Birim Kontrolu
+- [ ] `UnitComponents.cs` olustur
+  - [ ] `MilitaryUnit` (UnitType enum: Archer/Wizard, IsSelected bool)
+  - [ ] `UnitMovement` (TargetPosition, MoveSpeed, IsMoving, HasPath)
+  - [ ] `UnitCombat` (Damage, AttackRange, AttackCooldown, AttackTimer)
+  - [ ] `PathBuffer` (DynamicBuffer<int2> — A* waypoint listesi)
+  - [ ] `Selectable` tag component
+- [ ] `UnitSelectionSystem` olustur (MonoBehaviour veya hibrit)
+  - [ ] Sol tikla → tek birim sec
+  - [ ] Kutu cizme (drag select) → coklu sec
+  - [ ] Secili birimlere gorsel indicator (highlight circle veya outline)
+- [ ] `UnitCommandSystem` olustur
+  - [ ] Sag tikla zemine → PathRequest olustur (hareket komutu)
+  - [ ] Sag tikla dusmana → saldiri komutu (yaklasma + ates)
+- [ ] `GridPathfindingSystem` olustur (Custom DOTS A*)
+  - [ ] 8 yonlu komsu tarama (izometrik grid)
+  - [ ] `_grid[,]` uzerinden engel okuma
+  - [ ] Octile distance heuristik
+  - [ ] [BurstCompile] IJobEntity
+  - [ ] Path sonucu → DynamicBuffer<int2>
+- [ ] `UnitMovementSystem` olustur
+  - [ ] Waypoint listesini takip et
+  - [ ] Sonraki waypoint'e yuru, ulasinca bir sonrakine gec
+  - [ ] Path bitince dur
+- [ ] Mevcut `ArcherShootSystem` guncelle
+  - [ ] Sabit pozisyon → hareket eden birim
+  - [ ] Menzildeki dusmana otomatik ates (idle davranis)
+  - [ ] Oyuncu komutuyla oncelikli hedef
+- [ ] Mevcut okcu spawn'u guncelle (sabit pozisyon → haritada serbest)
+- [ ] UNIT_CONTROL_ARCHITECTURE.md + UNIT_CONTROL_EDITOR_SETUP.md yaz
+  - EDITOR_SETUP: Selection indicator prefab, UI panel ayarlari, input binding, test adimlari
+- [ ] PATHFINDING_ARCHITECTURE.md + PATHFINDING_EDITOR_SETUP.md yaz
+  - EDITOR_SETUP: Grid boyut ayarlari, debug goruntuleme (path cizgisi), performans test
 
-- [x] `CatapultComponents.cs` olustur
-  - [x] `CatapultUnit`: Damage(40), SplashRadius(2), FireRate(0.2), FireTimer, Range(25), StoneCostPerShot(1)
-  - [x] `CatapultProjectile`: Damage, SplashRadius, StartPos, TargetPos, FlightDuration(1.2), FlightTimer, ArcHeight(5)
-  - [x] `CatapultProjectileTag`: filtreleme tag'i
-- [x] `CatapultAuthoring` + `CatapultProjectileAuthoring` olustur
-- [x] `WaveConfigAuthoring`'e CatapultPrefabData + CatapultProjectilePrefabData singleton ekle
-- [x] `CatapultShootSystem` olustur — brute-force en yakin zombie hedefleme + mermi spawn
-  - [x] Burst destekli, ArcherShootSystem pattern'i
-  - [x] Yavas atis hizi (5sn/atis), buyuk AoE (2.0 yaricap)
-- [x] `CatapultProjectileMoveSystem` olustur — parabolik hareket (IJobEntity + BurstCompile)
-- [x] `CatapultProjectileHitSystem` olustur — AoE hasar (spatial hash + ComponentLookup)
-- [x] Tas tuketimi: her atis ResourceData.Stone dusurur
-- [x] Demirciden unlock mekanigi (BuildingConfigSO.RequireBlacksmith + HasBuildingOfType)
-- [x] `WallSlotManager` olustur — sur slot yerlestirme (3 slot, maliyet, iade, restart)
-- [x] `BuildingPlacementUI` — IsWallSlotBuilding branch + slot snap ghost preview
-- [x] `GameManager.RestartGame` — mancinik entity cleanup + slot reset
-- [x] `BuildingType.Catapult` enum eklendi
-- [x] MD dosyalari: CATAPULT_COMPONENTS, CATAPULT_SYSTEM, WALL_SLOT (ARCHITECTURE + EDITOR_SETUP)
-- [x] SYSTEM_EXECUTION_ORDER_ARCHITECTURE.md guncellendi
+### M2.2 — Buyucu Sistemi
+- [ ] `WizardComponents.cs` olustur
+  - [ ] `WizardUnit` (SpellDamage, AoERadius, SpellCooldown, SpellTimer, Range)
+  - [ ] `WizardTrainer` (TrainingDuration, TrainingTimer, TrainingCost — kaynak maliyeti sonra belirlenir)
+  - [ ] `WizardTowerUnit` (Damage, AoERadius, Range, Cooldown, CooldownTimer)
+  - [ ] `FireballProjectile` (Damage, AoERadius, StartPos, TargetPos, FlightDuration, FlightTimer)
+- [ ] `BuildingType.WizardAcademy` enum degerini ekle
+- [ ] `WizardAcademyTrainingSystem` olustur
+  - [ ] Nufustan buyucu egitir
+  - [ ] Kaynak harcar (maliyet sonra belirlenecek)
+  - [ ] Egitim suresi + timer → ECB ile buyucu entity spawn
+  - [ ] BarracksTrainingSystem pattern'ini takip et
+- [ ] `WizardShootSystem` olustur
+  - [ ] Menzildeki en yakin zombie grubuna ates topu at
+  - [ ] Cooldown tabanli (ok tuketimi yok)
+  - [ ] Kucuk AoE radius
+  - [ ] Fireball entity spawn → hareket → isabet → AoE hasar
+- [ ] `FireballMoveSystem` olustur (ArrowMoveSystem benzeri, parabolik veya duz)
+- [ ] `FireballHitSystem` olustur (spatial hash ile AoE hasar)
+- [ ] `WizardTowerShootSystem` olustur
+  - [ ] Buyucu Kulesi bina entity'si otomatik ates eder
+  - [ ] Genis AoE, uzun menzil, yavas cooldown
+  - [ ] Ayri fireball entity spawn
+- [ ] Buyucu Akademisi SO asset olustur (BuildingConfigSO)
+- [ ] Buyucu Kulesi SO asset olustur (BuildingConfigSO, Demirciden unlock)
+- [ ] PopulationState'e Wizards field ekle
+- [ ] HUD nufus gosterimini guncelle: "X isci, Y okcu, Z buyucu, W bos"
+- [ ] Character Creator'dan buyucu spritesheet export et ve import et
+- [ ] WIZARD_SYSTEM_ARCHITECTURE.md + WIZARD_SYSTEM_EDITOR_SETUP.md yaz
+  - EDITOR_SETUP: Buyucu Akademisi + Buyucu Kulesi SO asset olusturma, prefab ayarlari, Character Creator export adimlari, HUD'a buyucu sayisi ekleme, test senaryolari
+- [ ] WIZARD_COMPONENTS_ARCHITECTURE.md + WIZARD_COMPONENTS_EDITOR_SETUP.md yaz
 
-### M2.2 — Tuzak Sistemi
-
+### M2.3 — Tuzak Sistemi
 - [ ] `TrapComponents.cs` olustur
   - [ ] `TrapData`: TrapType (enum), Damage, SlowAmount, Durability, MaxDurability
   - [ ] `TrapType` enum: SpikedStakes, Trench, BearTrap
-- [ ] `TrapAuthoring` + prefablar olustur (3 tuzak tipi)
-- [ ] `TrapPlacementSystem` — sur disina grid mantigi ile yerlestirme
 - [ ] `TrapTriggerSystem` olustur — zombi uzerinden gecince etki
-  - [ ] **Sivri Kaziklar:** Hasar verir, belirli sayida zombiden sonra kirilir (Ahsap maliyet)
-  - [ ] **Hendek:** Yavaslatma, kalici, kirilmaz (Tas maliyet)
-  - [ ] **Ayi Tuzagi:** Hasar + durdurma, tek kullanimlik (Demir maliyet)
-- [ ] Tuzak yerlestirme UI (sur disi alan icin)
+  - [ ] **Sivri Kaziklar:** Hasar, kirilabilir (Ahsap)
+  - [ ] **Hendek:** Yavaslatma, kalici (Tas)
+  - [ ] **Ayi Tuzagi:** Hasar + durdurma, tek kullanimlik (Demir)
+- [ ] Tuzak yerlestirme: sur disi grid alani (BuildingGridManager genisletme veya ayri grid)
+- [ ] Tuzak SO asset'leri olustur
+- [ ] Tuzak tile gorunumu (Fantasy Kingdom Tileset'ten)
+- [ ] TRAP_SYSTEM_ARCHITECTURE.md + TRAP_SYSTEM_EDITOR_SETUP.md yaz
+  - EDITOR_SETUP: Tuzak SO asset olusturma, tuzak tile atama, sur disi alan tanimlama, yerlestirme UI ayarlari
 
-### M2.3 — Buyu Sistemi
+### M2.4 — Demirci Tech Tree
+- [ ] Demirci upgrade sistemi olustur
+  - [ ] Ok hasari artisi (okcu damage modifier)
+  - [ ] Duvar guclendirme (sur maxHP artisi)
+  - [ ] Buyucu Kulesi unlock
+  - [ ] Tuzak unlock
+- [ ] Demir tuketimi: her upgrade demir harcar
+- [ ] Demirci UI paneli (upgrade listesi + maliyet gosterimi)
+- [ ] BLACKSMITH_TECH_ARCHITECTURE.md + BLACKSMITH_TECH_EDITOR_SETUP.md yaz
+  - EDITOR_SETUP: Demirci UI paneli olusturma (Canvas, Panel, Button listesi), upgrade SO asset'leri, maliyet ayarlari
 
-- [ ] `SpellComponents.cs` olustur
-  - [ ] `SpellData`: SpellType (enum), Tier, Cooldown, CooldownTimer, Damage/Effect
-  - [ ] `SpellType` enum: Fireball, IceWall, LightningChain, HealingAura
-  - [ ] `ActiveSpells` (IBufferElement veya singleton) — oyuncunun sahip oldugu buyuler
-- [ ] `SpellSystem` olustur — cooldown yonetimi + etki uygulama
-  - [ ] **Ates Topu:** AoE hasar (spatial hash ile zombi tespiti)
-  - [ ] **Buz Duvari:** AoE yavaslatma (zombi speed modifier)
-  - [ ] **Simsek Zinciri:** Zincirleme hasar (en yakin N zombiye sicar)
-  - [ ] **Iyilestirme Aurasi:** Duvar HP onarimi
-- [ ] Tier sistemi: ayni buyuyu tekrar secince guc artar
-- [ ] Buyucu Kulesi on kosulu: buyu kartlari sadece Buyucu Kulesi varsa havuzda
-- [ ] Buyu kullanma UI (cooldown gosterimi, hedef secimi)
-
-### M2.4 — Level-Up Kart Sistemi (Roguelike)
-
-- [ ] Mevcut LevelUpUI'yi tamamen yeniden tasarla
+### M2.5 — Level-Up Kart Sistemi (Roguelike)
+- [ ] `GameManager.ApplyUpgrade` eski 3-buton sistemini kaldir
+- [ ] `LevelUpUI` eski hardcoded butonlari kaldir
 - [ ] `CardComponents.cs` olustur
-  - [ ] `CardData` ScriptableObject: CardID, Name, Description, Icon, Category, Tier, PrerequisiteBuilding, Effect
-  - [ ] `CardCategory` enum: Population, Archer, Spell, Defense, Economy
+  - [ ] `CardData` ScriptableObject: CardID, Name, Description, Icon, Category, Tier, Effect
+  - [ ] `CardCategory` enum: Population, Archer, Wizard, Defense, Economy
 - [ ] Kart havuzu sistemi olustur
-  - [ ] Tum kartlar ScriptableObject olarak tanimla
+  - [ ] Tum kartlar SO olarak tanimla
   - [ ] Havuzdan 3 kart cek (on kosullari kontrol et)
-  - [ ] Secilen kartin tierini artir (ayni kart tekrar secilirse)
-- [ ] Kart secim UI olustur
-  - [ ] 3 kart gosterimi: ikon, baslik, aciklama, tier seviyesi
-  - [ ] On kosul karsilanmayan kartlar gri/kilitli
-  - [ ] Secim animasyonu + efekt
-- [ ] Kart etkileri uygulama sistemi:
-  - [ ] **Nufus Kartlari:** Multeciler (+X nufus, kapasite varsa)
-  - [ ] **Okcu Kartlari:** Ok hasari artisi, atis hizi artisi, coklu ok, atesli ok (DoT), buzlu ok (slow)
-  - [ ] **Buyu Kartlari:** Ates Topu, Buz Duvari, Simsek Zinciri, Iyilestirme Aurasi
-  - [ ] **Savunma Kartlari:** Duvar HP artisi, hendek, barikat
-  - [ ] **Ekonomi Kartlari:** Uretim hizi boost, verimli isciler
-- [ ] XP esigi her level'da artar (Inspector'dan ayarlanabilir egri)
-
-### M2.5 — Ozel Bina: Buyucu Kulesi
-
-- [ ] Buyucu Kulesi prefab + authoring olustur
-- [ ] Grid'de yer kaplar — stratejik yatirim karari
-- [ ] Insa edildiginde buyu kartlarini kart havuzuna ekle
-- [ ] Upgrade: buyu kartlarinin cikma olasiligini/gucunu artir
+  - [ ] Secilen kartin tierini artir
+- [ ] Kart etkileri uygulama:
+  - [ ] **Nufus:** Multeciler (+X nufus)
+  - [ ] **Okcu:** Ok hasari, atis hizi, coklu ok, menzil
+  - [ ] **Buyucu:** Ates topu guclendirme, cooldown azaltma, menzil
+  - [ ] **Savunma:** Duvar HP artisi, hendek, barikat
+  - [ ] **Ekonomi:** Uretim hizi boost, verimli isciler
+- [ ] XP esigi artan egri (Inspector'dan ayarlanabilir)
+- [ ] CARD_SYSTEM_ARCHITECTURE.md + CARD_SYSTEM_EDITOR_SETUP.md yaz
+  - EDITOR_SETUP: Kart SO asset olusturma (her kart icin), kart secim UI olusturma (3 kart paneli, ikon, baslik, aciklama, tier gosterimi), Canvas + Panel + Button hierarchy, animasyon ayarlari
 
 ### M2.6 — MD Dokumantasyonu
-
-- [ ] Yeni component/system dosyalari icin ARCHITECTURE + EDITOR_SETUP md'leri yaz
-- [ ] Mevcut md'leri guncelle
+- [ ] Tum yeni component/system dosyalari icin ARCHITECTURE + EDITOR_SETUP md
+- [ ] Mevcut md'leri guncelle (yeni sistemler, kaldirilan sistemler)
+- [ ] SYSTEM_EXECUTION_ORDER_ARCHITECTURE.md tamamen yeniden yaz
 
 ---
 
 ## M3 — Gun + Wave Sistemi
 
 > **Hedef:** 100 gun yapisi, gun dongusu, wave skalasyonu, taciz sistemi, final wave.
-> **Bagimliliklari:** M1 (kaynak uretimi gun bazli), M2 (savunma derinligi)
+> **Bagimliliklari:** M2 (savunma derinligi)
 
-### M3.1 — Gun Dongusu (DayCycleSystem)
-
+### M3.1 — Gun Dongusu
 - [ ] `DayCycleComponents.cs` olustur
-  - [ ] `DayState` singleton: CurrentDay (int), TotalDays (100), DayTimer (float), DayDuration (float), IsWaveDay (bool)
-- [ ] `DayCycleAuthoring` baker olustur (gun suresi Inspector'dan)
-- [ ] `DayCycleSystem` olustur
-  - [ ] Gun sayaci her frame ilerler
-  - [ ] Gun bittiginde sonraki gune gecis (otomatik, buton yok)
-  - [ ] Wave gunu ise gun uzar — wave bitene kadar devam
-  - [ ] Gun gecisinde kaynak uretimi/tuketimi tetiklenir
-- [ ] HUD'da gun sayaci: "Gun 34 / 100"
+  - [ ] `DayState` singleton: CurrentDay, TotalDays(100), DayTimer, DayDuration, IsWaveDay
+- [ ] `DayCycleAuthoring` baker
+- [ ] `DayCycleSystem` olustur (gun sayaci, gecis, wave gunu uzama)
+- [ ] HUD gun sayaci gosterimi
+- [ ] DAY_CYCLE_ARCHITECTURE.md + DAY_CYCLE_EDITOR_SETUP.md yaz
+  - EDITOR_SETUP: DayCycle authoring Inspector ayarlari, HUD'a gun sayaci ekleme (TMP_Text, pozisyon, format)
 
 ### M3.2 — Wave Skalasyonu
-
-- [ ] WaveSpawnSystem'i guncelle: StressTestMode → normal wave mode
-- [ ] Gun bazli wave sikligi:
-  - [ ] Gun 1-20: Her 5 gunde bir
-  - [ ] Gun 21-50: Her 3 gunde bir
-  - [ ] Gun 51-80: Her 2 gunde bir
-  - [ ] Gun 81-99: Her gun
-  - [ ] Gun 100: Final wave
-- [x] **BUG FIX:** Per-wave stats (HP, Speed, Damage) spawn edilen zombilere uygula (M0'da yapildi)
-- [ ] Zombi sayisi gun numarasina gore olcekle (Inspector'dan ayarlanabilir egri)
-- [ ] Zombi HP gun numarasina gore olcekle
-- [ ] Wave config'i Inspector/Editor Window'dan ayarlanabilir yap
+- [ ] WaveSpawnSystem guncelle: StressTestMode → normal wave mode
+- [ ] Gun bazli wave sikligi (5→3→2→1 gun aralik)
+- [ ] 360° spawn (M-ISO.4'te yapildi, burada fine-tune)
+- [ ] Zombi sayisi + HP gun numarasina gore olcekleme (Inspector egri)
+- [ ] Wave config Editor Window'dan ayarlanabilir
 
 ### M3.3 — Taciz Sistemi
-
-- [ ] Wave disi kucuk zombi gruplari surekli gelsin
-- [ ] Taciz sikligi ve kalabaligi gun ilerledikce artsin
-- [ ] `HarassmentSpawnSystem` olustur veya WaveSpawnSystem'e entegre et
-- [ ] Gun 1-20: cok seyrek, 1-3 zombi
-- [ ] Gun 81-99: sik, 10-20 zombi grubu
+- [ ] Wave disi kucuk gruplar (farkli yonlerden)
+- [ ] Taciz sikligi + kalabaligi gun ilerledikce artsin
+- [ ] `HarassmentSpawnSystem` veya WaveSpawnSystem'e entegre
 
 ### M3.4 — Final Wave (Gun 100)
-
-- [ ] 50.000 zombi hedefi
-- [ ] Ozel spawn paterni (belki dalgalar halinde, performans icin)
-- [ ] Performans testi: 50.000 zombi FPS kontrolu
+- [ ] 50.000 zombi (360° spawn)
+- [ ] Performans testi
 - [ ] Kazanma kosulu: final wave atlatilirsa → zafer ekrani
 
 ### M3.5 — Kazanma / Kaybetme Guncelleme
-
-- [ ] Kazanma: 100. gun dalgesini atlat → zafer ekrani olustur
-- [ ] Kaybetme: mevcut GameOver'i koru (Castle HP → 0)
-- [ ] Game Over ekranini guncelle: gun sayisi, oldurulen zombi, max nufus, toplam kaynak, secilen kartlar
-- [ ] Dramatik sahne: ciglik sesleri, ekran blur efekti (opsiyonel, M4'e birakılabilir)
+- [ ] Zafer ekrani olustur (100. gun basarisi)
+- [ ] Game Over ekrani istatistik tablosu genislet
+- [ ] VICTORY_GAMEOVER_EDITOR_SETUP.md yaz
+  - EDITOR_SETUP: Zafer ekrani UI olusturma (Canvas, Panel, istatistik TMP_Text'leri), Game Over ekrani guncellemesi
 
 ### M3.6 — MD Dokumantasyonu
-
-- [ ] DayCycle sistemi icin ARCHITECTURE + EDITOR_SETUP md yaz
-- [ ] Wave sistemi md'lerini guncelle
+- [ ] DayCycle + Wave md'leri guncelle
+- [ ] SYSTEM_EXECUTION_ORDER guncelle
 
 ---
 
 ## M4 — Event + Polish
 
-> **Hedef:** Rastgele eventler, gorsel canlilik, ses, UI/UX cilalama, denge.
-> **Bagimliliklari:** M1, M2, M3 (tum ana sistemler hazir olmali)
+> **Hedef:** Event sistemi, destruction VFX, gorsel canlilik, ses, UI/UX, denge.
+> **Bagimliliklari:** M3
 
-### M4.1 — Event Sistemi
+### M4.1 — Destruction VFX Sistemi
+- [ ] `DestructionVisualSystem` olustur
+  - [ ] Sur HP esikleri → DamageStage degisimi (%75, %50, %25, %0)
+  - [ ] Tile swap tetikleme (saglam → catlamis → kirik → harabe → enkaz)
+  - [ ] Impact VFX (Fantasy Kingdom Tileset destruction animasyonlari)
+  - [ ] Color flash (beyaz→kirmizi→normal)
+  - [ ] Screen shake (Perlin noise, tile bazinda)
+  - [ ] Enkaz kalintisi (BrokenObjects tilemap'e rubble tile)
+- [ ] DESTRUCTION_VFX_ARCHITECTURE.md + DESTRUCTION_VFX_EDITOR_SETUP.md yaz
+  - EDITOR_SETUP: Destruction tile asset'leri atama, VFX prefab olusturma, tilemap layer ayarlari (BrokenObjects), shake parametreleri
 
-- [ ] `EventComponents.cs` olustur
-  - [ ] `EventData` ScriptableObject: EventID, Name, Description, EffectType, EffectValue, MinDay, Probability, IsChoice
-- [ ] `EventSystem` olustur — gun basinda rastgele event tetikle
-- [ ] **Olumlu Eventler:**
-  - [ ] Komsu kasabadan erzak (+Tas, +Ahsap)
-  - [ ] Multeciler kapida (+Nufus, kapasite varsa)
-  - [ ] Gezgin tuccar (kaynak takasi)
-- [ ] **Olumsuz Eventler:**
-  - [ ] Firtina (Ciftlikler 1 gun uretmiyor)
-  - [ ] Maden coktu (Maden 2 gun devre disi)
-  - [ ] Veba (Nufus kaybi)
-- [ ] **Secimli Eventler:**
-  - [ ] Risk/odul karari popup'i
-  - [ ] Kabul et / reddet secenekleri
-- [ ] Event popup UI olustur
-- [ ] Event havuzu + olasiliklar Inspector/Editor Window'dan ayarlanabilir
+### M4.2 — Event Sistemi
+- [ ] `EventComponents.cs` olustur (EventData SO)
+- [ ] `EventSystem` olustur (gun basinda rastgele tetikleme)
+- [ ] Olumlu/olumsuz/secimli eventler
+- [ ] Event popup UI
+- [ ] EVENT_SYSTEM_ARCHITECTURE.md + EVENT_SYSTEM_EDITOR_SETUP.md yaz
+  - EDITOR_SETUP: Event SO asset olusturma, popup UI (Canvas, Panel, butonlar, ikon), event havuzu ayarlari
 
-### M4.2 — Gorsel Canlilik (Ambient)
+### M4.3 — Gorsel Canlilik (Ambient)
+- [ ] Ambient koylu entity'leri (kasaba icinde dolasan)
+- [ ] Isciler binalar arasinda yuruyen (gorsel)
+- [ ] Atmosfer kontrasti (sakin gun vs wave kaos)
 
-- [ ] Ambient koylu entity'leri olustur
-  - [ ] Kasaba icinde rastgele dolasan kucuk sprite'lar
-  - [ ] Binalar arasinda yuruyen isciler (gorsel, gercek isci sayisini yansitmak zorunda degil)
-  - [ ] Surda nobet tutan okcular (gorsel)
-- [ ] Atmosfer kontrasti: sakin gun vs wave kaos farki
+### M4.4 — Ses Tasarimi
+- [ ] AudioManager altyapisi
+- [ ] Zombie surusu, ok atisi, ates topu, sur vurma, duvar catlama/kirilma
+- [ ] Birim secim/komut sesleri
+- [ ] Level atlama fanfari, event bildirimi
+- [ ] Kasaba ambiyansi, dinamik muzik
 
-### M4.3 — Ses Tasarimi
-
-- [ ] Temel ses altyapisi olustur (AudioManager)
-- [ ] Zombi surusu ambiyansi (uzak/yakin pan)
-- [ ] Ok atisi sesi (randomize pitch)
-- [ ] Sur'a vurus impact sesi
-- [ ] Duvar kirilmasi dramatik sesi
-- [ ] Level atlama fanfari
-- [ ] Event bildirim sesi
-- [ ] Kasaba ambiyansi (kus, demirci, ciftlik)
-- [ ] Dinamik muzik: sakin gun vs wave muzigi
-
-### M4.4 — UI/UX Polish
-
-- [ ] Ana HUD'u GDD Section 14'e gore yeniden tasarla
-  - [ ] Sur HP bar (ust)
-  - [ ] Gun sayaci (ust orta)
-  - [ ] Kaynak paneli (sol ust) + uretim/tuketim hizi
-  - [ ] Nufus gostergesi (sol ust, kaynak altinda)
-  - [ ] XP bar (sag ust)
-  - [ ] Wave uyarisi animasyonu (orta)
-  - [ ] Minimap (sag alt, opsiyonel)
+### M4.5 — UI/UX Polish
+- [ ] Ana HUD yeniden tasarim (GDD Section 14)
+- [ ] RTS kontrol paneli cilalamasi
 - [ ] Bina menusu cilalamasi
-- [ ] Level atlama kart UI animasyonlari
-- [ ] Game over ekrani istatistik tablosu genisletme
-- [ ] Sur onarimi gorsel efekti
+- [ ] Kart secim UI animasyonlari
+- [ ] Minimap
+- [ ] UI_POLISH_EDITOR_SETUP.md yaz
+  - EDITOR_SETUP: Tum UI elementlerinin detayli kurulumu (anchor, pozisyon, boyut, font, renk)
 
-### M4.5 — Denge Ayarlari
-
-- [ ] Custom Editor Window olustur (GDD Section 16)
-  - [ ] Wave ayarlari: gun bazli wave sikligi, zombi sayisi egrisi
-  - [ ] Kaynak ayarlari: uretim/tuketim hizlari, baslangic degerleri
-  - [ ] Bina ayarlari: maliyet, verim, upgrade degerleri
-  - [ ] Nufus ayarlari: kapasite, yemek tuketim oranlari
-  - [ ] Zombi ayarlari: HP egrisi, hiz, hasar
-  - [ ] Kart ayarlari: havuz, olasiliklar, tier degerleri
-  - [ ] Event ayarlari: havuz, olasiliklar, etki degerleri
-  - [ ] Savunma ayarlari: okcu/mancinik/buyu/tuzak stats
-  - [ ] Sur ayarlari: HP, onarim hizi
+### M4.6 — Denge Ayarlari
+- [ ] Custom Editor Window (GDD Section 16)
+  - [ ] Wave, kaynak, bina, nufus, zombi, kart, event, savunma, sur, birim ayarlari
 - [ ] Playtest ve iterasyon
 
-### M4.6 — MD Dokumantasyonu
-
-- [ ] Tum yeni sistemler icin ARCHITECTURE + EDITOR_SETUP md
-- [ ] Mevcut md'lerin final guncellemesi
+### M4.7 — MD Dokumantasyonu
+- [ ] Tum md'lerin final guncellemesi
 
 ---
 
 ## M5 — Launch
 
 > **Hedef:** Steam hazirligi, lokalizasyon, son test.
-> **Bagimliliklari:** M1-M4 tamamlanmis olmali
+> **Bagimliliklari:** M4
 
 ### M5.1 — Steam Entegrasyonu
-
-- [ ] Steamworks SDK entegrasyonu
+- [ ] Steamworks SDK
 - [ ] Steam Cloud save
-- [ ] Steam Achievement tanimlari
-- [ ] Store page materyalleri (screenshot, trailer, aciklama)
+- [ ] Achievement tanimlari
+- [ ] Store page materyalleri
 
 ### M5.2 — Lokalizasyon
-
-- [ ] Lokalizasyon altyapisi (Unity Localization package veya custom)
-- [ ] Turkce (TR) tam ceviri
-- [ ] Ingilizce (EN) tam ceviri
+- [ ] Lokalizasyon altyapisi
+- [ ] Turkce (TR) + Ingilizce (EN)
 - [ ] Dil secme menusu
 
 ### M5.3 — Son Test ve Optimizasyon
-
 - [ ] 50.000 zombi performans testi (hedef: 30-40 FPS)
-- [ ] Bellek sızıntısı kontrolu (NativeContainer dispose)
-- [ ] 100 gunluk tam run testi (baslangiçtan sona)
-- [ ] Farkli build path'lerin denge testi
-- [ ] Edge case testleri (kaynak sifir, nufus sifir, tum binalar yikildi vs.)
+- [ ] Bellek sizintisi kontrolu
+- [ ] 100 gunluk tam run testi
+- [ ] Farkli build path denge testi
+- [ ] Edge case testleri
 
 ### M5.4 — MD Dokumantasyonu
-
 - [ ] Tum md dosyalarinin final revizyonu
-- [ ] Bu ROADMAP.md'yi final duruma getir
+
+---
+
+## Faz 2 — Post-Launch Genisleme (They Are Billions Seviyesi)
+
+> Bu bolum post-launch vizyondur. Detaylar gelistirme sirasinda netlesecektir.
+
+- [ ] Harita buyutme (32x32 → 64x64+)
+- [ ] Yeni bina turleri
+- [ ] Ek buyucu elementleri (Buz, Simsek)
+- [ ] Survari birimleri (mount sistemi — Character Creator'da mevcut)
+- [ ] Derin tech tree (Demirci genisletme)
+- [ ] Daha fazla zombi cesitliligi
+- [ ] Multiplayer/co-op (cok uzun vadeli)
 
 ---
 
@@ -440,32 +474,32 @@ Asagidakiler **tamamlanmis ve calisan** sistemlerdir:
 
 | Milestone | Toplam Gorev | Tamamlanan | Yuzde |
 |-----------|-------------|------------|-------|
-| M0 Bug Fix | 5 | 5 | %100 |
+| M0 Prototype + Bug Fix | 5 | 5 | %100 |
 | M1 Kaynak + Bina | ~50 | 45 | %90 |
-| M2 Savunma Derinligi | ~35 | 15 | %43 |
-| M3 Gun + Wave | ~20 | 1 | %5 |
-| M4 Event + Polish | ~35 | 0 | %0 |
+| M-CLN Temizlik | ~15 | 0 | %0 |
+| M-ISO Izometrik Gecis | ~25 | 0 | %0 |
+| M2 Savunma Derinligi | ~45 | 0 | %0 |
+| M3 Gun + Wave | ~20 | 0 | %0 |
+| M4 Event + Polish | ~30 | 0 | %0 |
 | M5 Launch | ~12 | 0 | %0 |
-| **TOPLAM** | **~157** | **66** | **%42** |
+| **TOPLAM** | **~202** | **50** | **~%25** |
 
 ---
 
-## Oneri: Baslama Sirasi
+## Ilerleme Sirasi
 
 ```
-1. M0 Bug Fix ✅ TAMAMLANDI
-2. M1.9 Temizlik (Gold/Click kaldir) ✅ KISMEN TAMAMLANDI (LevelUpUI + ApplyUpgrade M2.4'e birakildi)
-3. M1.1 Kaynak Altyapisi → M1.2 Nufus
-4. M1.3 Grid + Bina Yerlestirme (en buyuk teknik risk)
-5. M1.4-M1.8 Binalar (grid hazir olduktan sonra)
-6. M3.1-M3.2 Gun + Wave (kaynak sistemi bunu bekliyor)
-7. M2.4 Kart Sistemi (en cok gameplay etkisi olan M2 parcasi)
-8. M2.1-M2.3 Mancinik + Tuzak + Buyu
-9. M4 Polish (tum mekanikler hazir olduktan sonra)
-10. M5 Launch
+1. M0 Bug Fix          ✅ TAMAMLANDI
+2. M1 Kaynak + Bina    ✅ %90 TAMAMLANDI
+3. M-CLN Temizlik      ⬜ SIRADA — catapult + v3.0 kalintilari temizle
+4. M-ISO Izometrik     ⬜ — grid, kamera, perimeter, sprite, sorting
+5. M2 Savunma          ⬜ — RTS kontrol, buyucu, tuzak, kart
+6. M3 Gun + Wave       ⬜ — 100 gun, wave skalasyonu, 50K final
+7. M4 Event + Polish   ⬜ — event, destruction VFX, ses, UI, denge
+8. M5 Launch           ⬜ — Steam, lokalizasyon, test
 ```
 
 ---
 
-*Son guncelleme: 2026-03-13 (M0 Bug Fix tamamlandi, M1.1-M1.8 tamamlandi, M1.9 kismen tamamlandi, M2.1 Mancinik tamamlandi)*
-*GDD Referans: DEAD_WALLS_GDD_v3.0.md*
+*Son guncelleme: 2026-03-18*
+*GDD Referans: DEAD_WALLS_GDD_v4.0.md*

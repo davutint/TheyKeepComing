@@ -17,7 +17,7 @@ namespace DeadWalls
         Fletcher,     // Ok Atolyesi
         Blacksmith,   // Demirci
         WizardTower,  // Buyucu Kulesi
-        Catapult      // Mancinik
+        WizardAcademy // Buyucu Akademisi
     }
 
     /// <summary>

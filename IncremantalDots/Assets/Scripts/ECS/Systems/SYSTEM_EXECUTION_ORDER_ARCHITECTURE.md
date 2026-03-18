@@ -11,7 +11,6 @@ SimulationSystemGroup icinde:
  0. ResourceTickSystem        *  — Kaynak uretim/tuketim tick (net hiz * dt → accumulator → int)
  1. WaveSpawnSystem              — Zombi spawn + wave stats uygula (ZombieStats set)
  2. ArcherShootSystem         *  — Burst + brute-force query, physics oncesi (1-frame-old pozisyon)
- 2b.CatapultShootSystem       *  — Mancinik atis (brute-force hedefleme + tas tuketimi + mermi spawn)
  3. ApplyMovementForceSystem  *  — Hedefe dogru kuvvet → PhysicsBody.Force (WallX singleton ile yon)
  4. BuildSpatialHashSystem    *  — Double-buffered spatial hash (ReadMap/WriteMap)
  5. PhysicsCollisionSystem    *  — Circle-circle carpisma + momentum transfer
@@ -19,9 +18,7 @@ SimulationSystemGroup icinde:
  7. BoundarySystem            *  — Duvar bariyeri, state transition, Y siniri
  8. ZombieAttackTimerSystem      — IJobEntity: attack timer + NativeQueue'ya hasar yaz
  9. ArrowMoveSystem           *  — IJobEntity: ok hareket
- 9b.CatapultProjectileMoveSystem * — IJobEntity: parabolik mermi hareketi
 10. ArrowHitSystem            *  — IJobEntity + ECB: ok isabet + hasar
-10b.CatapultProjectileHitSystem  — Main thread: AoE hasar (spatial hash + static field erisimi)
 11. ZombieDeathSystem         *  — IJobEntity: HP<=0 → Dead state
 12. ZombieAnimationStateSystem*  — IJobEntity + ECB: sprite animasyon guncelle
 13. DamageApplySystem            — TEK SYNC POINT: damage queue drain + singleton yazma
@@ -86,29 +83,6 @@ PresentationSystemGroup icinde:
 - `math.distancesq` kullanir (sqrt maliyeti yok)
 - `EndSimulationEntityCommandBufferSystem` ECB kullanir
 - Fire timer'a gore ok spawn eder
-
-### CatapultShootSystem (M2.1)
-- Mancinik atis sistemi — ArcherShootSystem pattern'i
-- Brute-force en yakin zombie bulur, parabolik mermi spawn eder
-- Tas tuketimi (ResourceData.Stone -= StoneCostPerShot)
-- `[BurstCompile]` destekli
-- `[UpdateAfter(typeof(WaveSpawnSystem))]`
-- `[UpdateBefore(typeof(ApplyMovementForceSystem))]`
-→ Detay: `CATAPULT_SYSTEM_ARCHITECTURE.md`
-
-### CatapultProjectileMoveSystem (M2.1)
-- IJobEntity: parabolik mermi hareketi
-- `lerp(Start,Target,t) + ArcHeight*4*t*(1-t)` ile parabol
-- `[BurstCompile]` destekli
-- `[UpdateAfter(typeof(ZombieAttackTimerSystem))]`
-→ Detay: `CATAPULT_SYSTEM_ARCHITECTURE.md`
-
-### CatapultProjectileHitSystem (M2.1)
-- Main thread (BurstCompile YOK — static field erisimi)
-- Spatial hash (ReadMap) uzerinden AoE tarama
-- Yaricap icindeki zombilere direkt HP dusurme
-- `[UpdateAfter(typeof(CatapultProjectileMoveSystem))]`
-→ Detay: `CATAPULT_SYSTEM_ARCHITECTURE.md`
 
 ### ApplyMovementForceSystem (FIZIK)
 - Moving zombilere hedefe dogru kuvvet uygular
@@ -177,3 +151,6 @@ PresentationSystemGroup icinde:
 
 ## Kaldirilan Sistemler
 - ~~**ClickDamageSystem**~~ — GDD v3.0'da yok, tamamen kaldirildi (M0 Bug Fix)
+- ~~**CatapultShootSystem**~~ — GDD v4.0'da mancinik kaldirildi, buyucu sistemiyle degistirildi (M-CLN)
+- ~~**CatapultProjectileMoveSystem**~~ — GDD v4.0'da kaldirildi (M-CLN)
+- ~~**CatapultProjectileHitSystem**~~ — GDD v4.0'da kaldirildi (M-CLN)

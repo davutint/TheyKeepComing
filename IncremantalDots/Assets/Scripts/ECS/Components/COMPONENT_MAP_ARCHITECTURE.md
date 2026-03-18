@@ -23,6 +23,11 @@ Tum component'lar `IComponentData` interface'ini implement eder (unmanaged struc
 - **ArrowProjectile** — Okun hizi, hasari, hedef entity referansi
 - **ArrowTag** — Ok entity'lerini isaretler
 
+### ~~CatapultComponents.cs~~ — KALDIRILDI (GDD v4.0, M-CLN)
+- ~~**CatapultUnit**~~ — Kaldirildi
+- ~~**CatapultProjectile**~~ — Kaldirildi
+- ~~**CatapultProjectileTag**~~ — Kaldirildi
+
 ### GameStateComponents.cs
 - **GameStateData** — XP, Level (singleton)
 - **WaveStateData** — Dalga durumu, spawn timer, zombi sayilari (singleton)

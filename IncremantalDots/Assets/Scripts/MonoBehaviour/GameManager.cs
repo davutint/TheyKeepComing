@@ -193,18 +193,6 @@ namespace DeadWalls
             var arrowQuery = _entityManager.CreateEntityQuery(typeof(ArrowTag));
             _entityManager.DestroyEntity(arrowQuery);
 
-            // Tum mancinik mermilerini sil
-            var catapultProjectileQuery = _entityManager.CreateEntityQuery(typeof(CatapultProjectileTag));
-            _entityManager.DestroyEntity(catapultProjectileQuery);
-
-            // Tum mancinik entity'lerini sil
-            var catapultQuery = _entityManager.CreateEntityQuery(typeof(CatapultUnit));
-            _entityManager.DestroyEntity(catapultQuery);
-
-            // Sur slotlarini sifirla
-            if (WallSlotManager.Instance != null)
-                WallSlotManager.Instance.ResetSlots();
-
             // Tum bina entity'lerini sil
             var buildingQuery = _entityManager.CreateEntityQuery(typeof(BuildingData));
             _entityManager.DestroyEntity(buildingQuery);

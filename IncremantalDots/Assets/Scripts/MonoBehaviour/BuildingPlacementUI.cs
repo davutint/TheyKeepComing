@@ -65,41 +65,7 @@ namespace DeadWalls
             mouseScreen.z = -_mainCamera.transform.position.z;
             Vector3 mouseWorld = _mainCamera.ScreenToWorldPoint(mouseScreen);
 
-            // Sur slot binasi ise (Mancinik) — slot snap mantigi
-            if (_selectedConfig.IsWallSlotBuilding)
-            {
-                var slotMgr = WallSlotManager.Instance;
-                if (slotMgr == null) { StopPlacement(); return; }
-
-                int nearestSlot = slotMgr.GetNearestEmptySlot(mouseWorld);
-                bool canPlace = nearestSlot >= 0;
-
-                // Ghost'u en yakin bos slot'a snap et
-                if (GhostRenderer != null)
-                {
-                    if (canPlace)
-                        GhostRenderer.transform.position = slotMgr.Slots[nearestSlot].Position;
-                    else
-                        GhostRenderer.transform.position = mouseWorld;
-
-                    GhostRenderer.color = canPlace ? ValidColor : InvalidColor;
-                }
-
-                // Sol tikla → yerlestir
-                if (Input.GetMouseButtonDown(0) && canPlace)
-                {
-                    slotMgr.PlaceCatapult(nearestSlot);
-                    StopPlacement();
-                }
-
-                // Sag tikla veya Escape → iptal
-                if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
-                    StopPlacement();
-
-                return;
-            }
-
-            // Normal grid yerlestirme
+            // Grid yerlestirme
             var gridMgr = BuildingGridManager.Instance;
             if (gridMgr == null) return;
 
