@@ -94,6 +94,10 @@ namespace DeadWalls
             var prefabData = SystemAPI.GetSingleton<ZombiePrefabData>();
             var ecb = new EntityCommandBuffer(Unity.Collections.Allocator.Temp);
 
+            // Prefab'dan scale degerini oku — Inspector'da ayarlanan deger kullanilir
+            float prefabScale = state.EntityManager
+                .GetComponentData<LocalTransform>(prefabData.ZombiePrefab).Scale;
+
             for (int i = 0; i < count; i++)
             {
                 var zombie = ecb.Instantiate(prefabData.ZombiePrefab);
@@ -104,7 +108,7 @@ namespace DeadWalls
                 var transform = LocalTransform.FromPositionRotationScale(
                     new float3(spawnX, spawnY, -1f),
                     quaternion.identity,
-                    0.3f // kucuk zombi
+                    prefabScale
                 );
                 ecb.SetComponent(zombie, transform);
                 ecb.SetComponent(zombie, new ZombieState { Value = ZombieStateType.Moving });

@@ -74,28 +74,23 @@ namespace DeadWalls
             Vector2Int gridPos = gridMgr.WorldToGrid(mouseWorld);
             _lastGridPos = gridPos;
 
-            // Ghost snap — grid alanina tam otur
+            // Ghost snap — izometrik grid hucresine otur
             if (GhostRenderer != null && GhostRenderer.sprite != null)
             {
+                // GridToWorld ile binanin merkez world pozisyonunu al
+                Vector3 center = gridMgr.GridToWorld(gridPos.x, gridPos.y, _selectedConfig);
+                GhostRenderer.transform.position = center;
+
+                // Izometrik cell boyutlarina gore olcekle
                 Sprite s = GhostRenderer.sprite;
-                float spriteW = s.rect.width / s.pixelsPerUnit;
-                float spriteH = s.rect.height / s.pixelsPerUnit;
-
-                // Sprite'i GridWidth x GridHeight'a olcekle
+                float spriteWorldW = s.rect.width / s.pixelsPerUnit;
+                float spriteWorldH = s.rect.height / s.pixelsPerUnit;
+                Vector3 cellSize = gridMgr.IsoGrid.cellSize;
+                float footprintW = _selectedConfig.GridWidth * cellSize.x;
+                float footprintH = _selectedConfig.GridHeight * cellSize.y;
                 GhostRenderer.transform.localScale = new Vector3(
-                    _selectedConfig.GridWidth / spriteW,
-                    _selectedConfig.GridHeight / spriteH, 1f);
-
-                // Grid'in sol-alt kosesi (world space)
-                Vector3 bottomLeft = new Vector3(
-                    gridPos.x + gridMgr.GridOriginDebug.x,
-                    gridPos.y + gridMgr.GridOriginDebug.y, 0f);
-
-                // Sprite pivot'una gore offset (0,0=sol-alt, 0.5,0.5=merkez)
-                Vector2 pivotNorm = s.pivot / new Vector2(s.rect.width, s.rect.height);
-                GhostRenderer.transform.position = bottomLeft + new Vector3(
-                    pivotNorm.x * _selectedConfig.GridWidth,
-                    pivotNorm.y * _selectedConfig.GridHeight, 0f);
+                    footprintW / spriteWorldW,
+                    footprintH / spriteWorldH, 1f);
             }
 
             // Renk — CanPlace kontrolu
@@ -187,12 +182,17 @@ namespace DeadWalls
                 {
                     GhostRenderer.sprite = config.GhostSprite;
 
-                    // Sprite'i GridWidth x GridHeight alanina sigdir
+                    // Izometrik cell boyutlarina gore sprite olcekle
                     float spriteW = config.GhostSprite.rect.width / config.GhostSprite.pixelsPerUnit;
                     float spriteH = config.GhostSprite.rect.height / config.GhostSprite.pixelsPerUnit;
-                    GhostRenderer.transform.localScale = new Vector3(
-                        config.GridWidth / spriteW,
-                        config.GridHeight / spriteH, 1f);
+                    var gridMgr = BuildingGridManager.Instance;
+                    if (gridMgr != null && gridMgr.IsoGrid != null)
+                    {
+                        Vector3 cellSize = gridMgr.IsoGrid.cellSize;
+                        GhostRenderer.transform.localScale = new Vector3(
+                            config.GridWidth * cellSize.x / spriteW,
+                            config.GridHeight * cellSize.y / spriteH, 1f);
+                    }
                 }
             }
 
@@ -225,36 +225,49 @@ namespace DeadWalls
         /// </summary>
         public bool IsPlacing => _isPlacing;
 
-        // Gizmos: yerleştirme sirasinda SO'nun GridWidth x GridHeight alanini ciz
+        // Gizmos: yerleştirme sirasinda SO'nun GridWidth x GridHeight alanini diamond (baklava) olarak ciz
         private Vector2Int _lastGridPos;
         private void OnDrawGizmos()
         {
             if (!_isPlacing || _selectedConfig == null) return;
 
             var gridMgr = BuildingGridManager.Instance;
-            if (gridMgr == null) return;
+            if (gridMgr == null || gridMgr.IsoGrid == null) return;
 
-            // Grid'in sol-alt kosesi (sprite ile ayni hesaplama)
-            Vector3 bottomLeft = new Vector3(
-                _lastGridPos.x + gridMgr.GridOriginDebug.x,
-                _lastGridPos.y + gridMgr.GridOriginDebug.y, 0f);
-            Vector3 size = new Vector3(_selectedConfig.GridWidth, _selectedConfig.GridHeight, 0f);
-            Vector3 center = bottomLeft + size * 0.5f;
+            Grid grid = gridMgr.IsoGrid;
+            int ox = _lastGridPos.x + gridMgr.GridOriginDebug.x;
+            int oy = _lastGridPos.y + gridMgr.GridOriginDebug.y;
 
-            // Grid alani — sari wireframe
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawWireCube(center, size);
-
-            // Her hucreyi ciz
+            // Her hucreyi diamond olarak ciz
             Gizmos.color = new Color(1f, 1f, 0f, 0.3f);
             for (int x = 0; x < _selectedConfig.GridWidth; x++)
             {
                 for (int y = 0; y < _selectedConfig.GridHeight; y++)
                 {
-                    Vector3 cellCenter = bottomLeft + new Vector3(x + 0.5f, y + 0.5f, 0f);
-                    Gizmos.DrawWireCube(cellCenter, Vector3.one);
+                    int cx = ox + x;
+                    int cy = oy + y;
+                    // Diamond 4 kosesi: CellToWorld ile izometrik pozisyon
+                    Vector3 bot   = grid.CellToWorld(new Vector3Int(cx, cy, 0));
+                    Vector3 right = grid.CellToWorld(new Vector3Int(cx + 1, cy, 0));
+                    Vector3 top   = grid.CellToWorld(new Vector3Int(cx + 1, cy + 1, 0));
+                    Vector3 left  = grid.CellToWorld(new Vector3Int(cx, cy + 1, 0));
+                    Gizmos.DrawLine(bot, right);
+                    Gizmos.DrawLine(right, top);
+                    Gizmos.DrawLine(top, left);
+                    Gizmos.DrawLine(left, bot);
                 }
             }
+
+            // Dis ceper — sari wireframe (footprint siniri)
+            Gizmos.color = Color.yellow;
+            Vector3 fBot   = grid.CellToWorld(new Vector3Int(ox, oy, 0));
+            Vector3 fRight = grid.CellToWorld(new Vector3Int(ox + _selectedConfig.GridWidth, oy, 0));
+            Vector3 fTop   = grid.CellToWorld(new Vector3Int(ox + _selectedConfig.GridWidth, oy + _selectedConfig.GridHeight, 0));
+            Vector3 fLeft  = grid.CellToWorld(new Vector3Int(ox, oy + _selectedConfig.GridHeight, 0));
+            Gizmos.DrawLine(fBot, fRight);
+            Gizmos.DrawLine(fRight, fTop);
+            Gizmos.DrawLine(fTop, fLeft);
+            Gizmos.DrawLine(fLeft, fBot);
         }
     }
 }

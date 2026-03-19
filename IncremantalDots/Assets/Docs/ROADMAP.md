@@ -178,14 +178,16 @@ Asagidakiler **tamamlanmis ve calisan** sistemlerdir:
 - [ ] `GameManager.ApplyUpgrade` okcu spawn pozisyonu guncelle
 
 ### M-ISO.5 — 8 Yonlu Sprite Sistemi
-- [ ] `SpriteAnimation` component'ine TotalRows=8 destegi (4→8)
-- [ ] Yon mapping tablosu: aci → satir (E=0, W=1, S=2, N=3, NE=4, NW=5, SE=6, SW=7)
-- [ ] `ZombieAnimationStateSystem` 8 yon hesaplama (hareket vektoru → aci → satir)
-- [ ] `SpriteSheetAuthoring` TotalRows default 8
-- [ ] Character Creator - Fantasy 2D'den zombie spritesheet export et ve import et
-- [ ] Character Creator'dan okcu spritesheet export et ve import et
-- [ ] SPRITE_ANIMATION_ARCHITECTURE.md + SPRITE_ANIMATION_EDITOR_SETUP.md guncelle
-  - EDITOR_SETUP: Character Creator'da karakter olusturma + export adimlari, spritesheet import ayarlari (PPU=128, slice 15x8)
+- [x] `SpriteAnimation` component yorumu ve atlas layout dokumantasyonu guncellendi (15x32 grid)
+- [x] Yon mapping tablosu: saat yonu E=0, SE=1, S=2, SW=3, W=4, NW=5, N=6, NE=7
+- [x] `ZombieAnimationStateSystem` 8 yon hesaplama (dir = DirectionRow % 8, offset + dir)
+- [x] `SpriteSheetAuthoring` default'lar guncellendi (Columns=15, Rows=32, FPS=10, FrameCount=15)
+- [x] `SpriteAtlasGenerator` Editor tool yazildi (4 PNG → tek atlas birlestirme)
+- [x] Character Creator'dan skeleton(zombie), archer, fire_mage spritesheet export edildi
+- [x] Atlas'lar olusturuldu (skeleton_atlas, archer_atlas, fire_mage_atlas — Assets/Art/Atlases/)
+- [x] Material + prefab guncellendi (scale prefab'dan okunuyor, hardcoded degil)
+- [x] SPRITE_ANIMATION_ARCHITECTURE.md + SPRITE_ANIMATION_EDITOR_SETUP.md guncellendi
+  - EDITOR_SETUP: Character Creator'da karakter olusturma + export adimlari, atlas tool kullanimi, prefab ayarlari
 
 ### M-ISO.6 — Y-Sorting (Derinlik Sıralama)
 - [ ] Renderer2D Transparency Sort Mode = Custom Axis (0, 1, 0) — zaten yapildi
@@ -476,8 +478,8 @@ Asagidakiler **tamamlanmis ve calisan** sistemlerdir:
 |-----------|-------------|------------|-------|
 | M0 Prototype + Bug Fix | 5 | 5 | %100 |
 | M1 Kaynak + Bina | ~50 | 45 | %90 |
-| M-CLN Temizlik | ~15 | 0 | %0 |
-| M-ISO Izometrik Gecis | ~25 | 0 | %0 |
+| M-CLN Temizlik | ~15 | 13 | %87 |
+| M-ISO Izometrik Gecis | ~25 | 4 | %16 |
 | M2 Savunma Derinligi | ~45 | 0 | %0 |
 | M3 Gun + Wave | ~20 | 0 | %0 |
 | M4 Event + Polish | ~30 | 0 | %0 |
@@ -491,8 +493,8 @@ Asagidakiler **tamamlanmis ve calisan** sistemlerdir:
 ```
 1. M0 Bug Fix          ✅ TAMAMLANDI
 2. M1 Kaynak + Bina    ✅ %90 TAMAMLANDI
-3. M-CLN Temizlik      ⬜ SIRADA — catapult + v3.0 kalintilari temizle
-4. M-ISO Izometrik     ⬜ — grid, kamera, perimeter, sprite, sorting
+3. M-CLN Temizlik      ✅ %87 TAMAMLANDI (Editor isler kaldi)
+4. M-ISO Izometrik     🔧 DEVAM EDIYOR — M-ISO.5 sprite sistemi
 5. M2 Savunma          ⬜ — RTS kontrol, buyucu, tuzak, kart
 6. M3 Gun + Wave       ⬜ — 100 gun, wave skalasyonu, 50K final
 7. M4 Event + Polish   ⬜ — event, destruction VFX, ses, UI, denge

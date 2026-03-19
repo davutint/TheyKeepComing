@@ -8,28 +8,34 @@ namespace DeadWalls
     /// Sprite sheet animasyon verisi.
     /// System tarafindan her frame guncellenir.
     ///
-    /// Sprite sheet yapisi:
-    ///   ┌───┬───┬───┬───┐
-    ///   │ 0 │ 1 │ 2 │ 3 │  Row 0 (Down)   → UV Row 3
-    ///   ├───┼───┼───┼───┤
-    ///   │ 4 │ 5 │ 6 │ 7 │  Row 1 (Left)   → UV Row 2  ← Zombi
-    ///   ├───┼───┼───┼───┤
-    ///   │ 8 │ 9 │10 │11 │  Row 2 (Right)  → UV Row 1  ← Okcu
-    ///   ├───┼───┼───┼───┤
-    ///   │12 │13 │14 │15 │  Row 3 (Up)     → UV Row 0
-    ///   └───┴───┴───┴───┘
+    /// Atlas yapisi (15 col x 32 row, Character Creator - Fantasy 2D):
+    ///   Row  0- 7: Walk   (E, SE, S, SW, W, NW, N, NE)  ← Moving + Queued
+    ///   Row  8-15: Attack (E, SE, S, SW, W, NW, N, NE)  ← Attacking (melee)
+    ///   Row 16-23: Die    (E, SE, S, SW, W, NW, N, NE)  ← Dead
+    ///   Row 24-31: Idle   (E, SE, S, SW, W, NW, N, NE)  ← Bosta
+    ///
+    /// Yon indeksleri (saat yonu, East'ten baslayarak):
+    ///   0=E, 1=SE, 2=S, 3=SW, 4=W, 5=NW, 6=N, 7=NE
+    ///
+    /// DirectionRow = animOffset + directionIndex
+    ///   Walk:   0 + dir (0-7)
+    ///   Attack: 8 + dir (8-15)
+    ///   Die:   16 + dir (16-23)
+    ///   Idle:  24 + dir (24-31)
+    ///
+    /// UV flip: uvRow = (TotalRows - 1) - DirectionRow
     /// </summary>
     public struct SpriteAnimation : IComponentData
     {
         // Grid boyutlari
-        public int TotalColumns;    // sprite sheet sutun sayisi (genelde 4)
-        public int TotalRows;       // sprite sheet satir sayisi (genelde 4)
+        public int TotalColumns;    // sprite sheet sutun sayisi (15)
+        public int TotalRows;       // sprite sheet satir sayisi (32 = 4 anim x 8 yon)
 
-        // Yön satiri (sprite sheet'teki satir, 0=Down, 1=Left, 2=Right, 3=Up)
+        // Satir indeksi (animOffset + directionIndex, 0-31)
         public int DirectionRow;
 
         // Animasyon durumu
-        public int FrameCount;      // bu yondeki frame sayisi (genelde 4)
+        public int FrameCount;      // bu animasyondaki frame sayisi (genelde 15)
         public int CurrentFrame;    // su an gosterilen frame (0-based)
         public float FrameTimer;    // gecen sure
         public float FrameInterval; // frame basina sure (1.0 / FPS)

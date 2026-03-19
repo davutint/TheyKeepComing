@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 namespace DeadWalls
 {
@@ -46,5 +47,12 @@ namespace DeadWalls
 
         [Header("On Kosullar")]
         public bool RequireBlacksmith;     // true ise Demirci binasi olmadan yapilamaz
+
+        [Header("Tile Layout (Building Tile Composer ile doldurulur)")]
+        [Tooltip("Duvar, kapi, zemin tile'lari — base tilemap layer'ina konur")]
+        public TileBase[] TileLayoutBase;
+
+        [Tooltip("Cati, bayrak, detay tile'lari — top tilemap layer'ina konur")]
+        public TileBase[] TileLayoutTop;
     }
 }

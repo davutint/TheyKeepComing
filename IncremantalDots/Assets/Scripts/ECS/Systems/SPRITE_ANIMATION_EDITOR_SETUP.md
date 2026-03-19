@@ -1,177 +1,263 @@
 # Sprite Animation — Unity Editor Kurulum
 
-## 1. Texture Import Ayarlari
+## Genel Bakis
 
-Her atlas PNG icin (Vampire_atlas, Archer_atlas, Redcap_atlas):
-
-1. Project panelinde PNG dosyasini sec
-2. Inspector'da:
-   - **Texture Type:** Default (Sprite degil! Shader UV ile okuyor)
-   - **Filter Mode:** Point (no filter)  ← KRITIK! Pixel art icin
-   - **Compression:** None  ← piksel bozulmasi onlenir
-   - **Max Size:** 1024 (atlas boyutlari kucuk, yeterli)
-   - **Read/Write:** Kapali kalabilir
-3. Apply
-
-Arrow.png icin (Assets/Art/Projectiles/Arrow.png):
-   - Ayni ayarlar (Default, Point, None)
+Bu rehber Character Creator - Fantasy 2D asset'inden karakter export etmeyi,
+atlas olusturmayi ve Unity prefab'larini ayarlamayi ADIM ADIM anlatir.
 
 ---
 
-## 2. Material Olusturma
+## 1. Character Creator'dan Karakter Export Etme
 
-Materyaller `Assets/Materials/` klasorunde.
+### 1.1. Example Scene'i Ac
+
+1. Unity Editor'de **Project** panelinden su yolu takip et:
+   `Assets/SmallScaleInt/Character creator - Fantasy/Example Scene/`
+2. Scene dosyasini cift tikla (Character Creator scene)
+3. **Play** tusuna bas — Character Creator arayuzu acilacak
+
+### 1.2. Zombie Karakteri Olustur
+
+1. **Preset butonlari** (ust kisimda) varsa bunlardan birini secebilirsin
+2. Veya parcali olustur:
+   - **Head:** zombie/monster gorunumlu kask sec
+   - **Chest:** yirtik zirh veya parca
+   - **Legs:** basit pantol
+   - **Shoes:** basit ayakkabi veya cizme
+3. **Skin Color:** koyu/yesil/gri ton (zombie icin)
+4. **Weapon:** KAPALI brak (unarmed zombi — aktif weapon toggle'a tekrar tikla)
+5. **Shield:** KAPALI
+6. **Backpack:** KAPALI
+
+### 1.3. Spritesheet Export Et
+
+1. Sol taraftaki **Spritesheet paneline** gec (Generate butonu olan panel)
+2. Asagidaki ayarlari kontrol et:
+   - **Shadow:** %0 (shadow kapali — ECS'te kullanmiyoruz)
+   - **GunFire:** KAPALI (toggle OFF)
+   - **Skin:** ACIK (toggle ON)
+3. **"Generate"** butonuna tikla
+4. Bekleme ekrani cikacak — her animasyon icin ayri PNG uretiliyor
+5. Tamamlaninca dosyalar export klasorune kaydedilir
+
+### 1.4. Export Klasorunu Bul
+
+Export edilen dosyalar su konumda olacak (timestamp'li klasor):
+```
+Assets/SmallScaleInt/Character creator - Fantasy/Created Spritesheets/[KLASOR_ADI]/
+```
+
+Icindeki dosyalar (her biri 1920x1024 px, 15 col x 8 row):
+```
+Attack1.png          ← Ranged attack (KULLANMAYACAGIZ)
+Attack2.png          ← Throwing (KULLANMAYACAGIZ)
+Attack3.png          ← Melee swing 1 ★ BUNU KULLANACAGIZ
+Attack4.png          ← Melee swing 2 (alternatif)
+Attack5.png          ← Ek attack
+AttackRun.png        ← Kosan saldiri
+AttackRun2.png       ← Kosan saldiri 2
+CrouchIdle.png       ← Coemelme
+CrouchRun.png        ← Gizli yurume
+Die.png              ★ BUNU KULLANACAGIZ
+Idle.png             ← Silahli bekleme
+Idle2.png            ← Nisangah
+Idle3.png            ★ BUNU KULLANACAGIZ (silahsiz bekleme)
+Idle4.png            ← Ek idle
+RideIdle.png         ← Binekli bekleme
+RideRun.png          ← Binekli kos
+Run.png              ← Kosma (alternatif Walk)
+RunBackwards.png     ← Geri kosma
+Special1.png         ← Ozel yetenek
+StrafeLeft.png       ← Yana kayma
+StrafeRight.png      ← Yana kayma
+TakeDamage.png       ← Hasar alma
+Taunt.png            ← Dokunme/kullanma
+Walk.png             ★ BUNU KULLANACAGIZ
+```
+
+**Zombie icin kullanacagimiz 4 dosya:**
+- `Walk.png` → Moving + Queued state
+- `Attack3.png` → Attacking state (melee swing)
+- `Die.png` → Dead state
+- `Idle3.png` → Idle state (silahsiz)
+
+### 1.5. Okcu Karakteri Olustur (Ayri Export)
+
+1. Play'i durdur, tekrar Character Creator scene'i ac, tekrar Play
+2. Farkli bir karakter olustur:
+   - Zirh/kask: okcu gorunumlu
+   - **Weapon:** Yay (bow) sec
+   - Skin: normal ten rengi
+3. Ayni sekilde export et
+4. Okcu icin dosyalar:
+   - `Walk.png` → hareket
+   - `Attack1.png` → ranged attack (yay atisi)
+   - `Die.png` → olum
+   - `Idle.png` → silahli bekleme (yay tutarak)
+
+---
+
+## 2. Atlas Olusturma (Editor Tool)
+
+### 2.1. Tool'u Ac
+
+1. Unity Editor'de menu cubugunda: **Window > DeadWalls > Sprite Atlas Generator**
+2. Kucuk bir pencere acilacak
+
+### 2.2. Zombie Atlas Olustur
+
+1. **Walk (Row 0-7)** slot'una: export edilen `Walk.png` dosyasini surukle-birak
+2. **Attack (Row 8-15)** slot'una: `Attack3.png` dosyasini surukle-birak
+3. **Die (Row 16-23)** slot'una: `Die.png` dosyasini surukle-birak
+4. **Idle (Row 24-31)** slot'una: `Idle3.png` dosyasini surukle-birak
+5. **Klasor:** `Assets/Art/Atlases` (degistirmene gerek yok)
+6. **Dosya Adi:** `zombie_atlas`
+7. **"Generate Atlas"** tikla
+
+Sonuc:
+- `Assets/Art/Atlases/zombie_atlas.png` olusturulacak (1920x4096 px)
+- Import ayarlari otomatik set edilecek (PPU=128, Point filter, No compression)
+- Dosya otomatik Project panelinde secilecek
+
+### 2.3. Archer Atlas Olustur
+
+Ayni adimlari tekrarla:
+1. Walk: `Walk.png`
+2. Attack: `Attack1.png` (ranged attack — okcu icin)
+3. Die: `Die.png`
+4. Idle: `Idle.png` (silahli idle — okcu icin)
+5. Dosya Adi: `archer_atlas`
+6. Generate
+
+### 2.4. Boyut Dogrulama
+
+Her PNG 1920x1024 px olmali (15 frame x 128px = 1920, 8 yon x 128px = 1024).
+Eger boyut farkli ise hata mesaji cikacak — Character Creator'dan dogru
+export yapilip yapilmadigini kontrol et.
+
+---
+
+## 3. Texture Import Dogrulama
+
+Atlas Generator tool import ayarlarini otomatik set eder, ama kontrol etmek icin:
+
+1. Project panelinde `Assets/Art/Atlases/zombie_atlas.png` sec
+2. Inspector'da su degerleri dogrula:
+   - **Texture Type:** Sprite (2D and UI)
+   - **Sprite Mode:** Single
+   - **Pixels Per Unit:** 128
+   - **Filter Mode:** Point (no filter) ← KRITIK! Pixel art icin
+   - **Compression:** None ← piksel bozulmasi onlenir
+   - **Max Size:** 8192 (atlas 4096 yuksekliginde, 8192 yeterli)
+   - **Mipmap:** Kapali (Generate Mip Maps unchecked)
+
+Eger degerler farkli ise duzelt ve **Apply** tikla.
+
+---
+
+## 4. Material Guncelleme
 
 ### ZombieMat:
-1. Assets/Materials/ZombieMat.mat sec
-2. Shader: **DeadWalls/SpriteSheet**
-3. **Sprite Sheet:** `Vampire_atlas.png` ata (Assets/Art/Sprites/)
-4. **Alpha Cutoff:** 0.5
-5. **Tint:** Beyaz (1,1,1,1)
+1. Project panelinde `Assets/Materials/ZombieMat.mat` sec
+2. Inspector'da:
+   - Shader: **DeadWalls/SpriteSheet** (degismeli)
+   - **Sprite Sheet:** `zombie_atlas.png` ata (Assets/Art/Atlases/)
+   - **Alpha Cutoff:** 0.5
+   - **Tint:** Beyaz (1,1,1,1)
 
 ### ArcherMat:
-1. Assets/Materials/ArcherMat.mat sec
-2. Shader: **DeadWalls/SpriteSheet**
-3. **Sprite Sheet:** `Archer_atlas.png` ata (Assets/Art/Sprites/)
-4. **Alpha Cutoff:** 0.5
+1. `Assets/Materials/ArcherMat.mat` sec
+2. **Sprite Sheet:** `archer_atlas.png` ata
+3. Diger ayarlar ayni
 
 ### ArrowMat:
-1. Assets/Materials/ArrowMat.mat sec
-2. Shader: **DeadWalls/SpriteSheet**
-3. **Sprite Sheet:** `Arrow.png` ata (Assets/Art/Projectiles/)
-4. **Alpha Cutoff:** 0.5
+Degisiklik yok (Arrow.png statik, tek sprite).
 
 ---
 
-## 3. Prefab Ayarlari
+## 5. Prefab Guncelleme
 
 ### Zombie Prefab:
-1. Assets/Prefabs/Zombie.prefab ac
-2. **MeshFilter:** Mesh → **Quad** (Cube degil!)
-3. **MeshRenderer:** Material → ZombieMat
-4. **SpriteSheetAuthoring** component ekle:
-   - Columns: **4**
-   - Rows: **12**  ← Atlas: 4 walk + 4 hit + 4 die
-   - FPS: **7**
-   - Direction Row: **1** (Left — zombi sola yurur)
-   - Frame Count: **4** (walk frame sayisi)
-5. Apply
+1. `Assets/Prefabs/Zombie.prefab` ac (cift tikla veya Inspector'da Open)
+2. **SpriteSheetAuthoring** component'ini bul (Inspector'da)
+3. Degerleri guncelle:
+   - **Columns:** `15` (eski: 4)
+   - **Rows:** `32` (eski: 12)
+   - **FPS:** `10` (eski: 7 — 15 frame'lik animasyon icin 10 FPS iyi)
+   - **Direction Row:** `4` (West yonu — zombie sola bakar. Eski: 1)
+   - **Frame Count:** `15` (eski: 4)
+4. **Apply** tikla (Prefab uzerinde)
 
 ### Archer Prefab:
-1. Assets/Prefabs/Archer.prefab ac
-2. MeshFilter → **Quad**
-3. MeshRenderer → ArcherMat
-4. **SpriteSheetAuthoring** component ekle:
-   - Columns: **4**
-   - Rows: **8**  ← Atlas: 4 idle + 4 move
-   - FPS: **5** (idle daha yavas)
-   - Direction Row: **2** (Right — okcu saga bakar)
-   - Frame Count: **4**
-5. Apply
-
-### Arrow Prefab:
-1. Assets/Prefabs/Arrow.prefab ac
-2. MeshFilter → **Quad**
-3. MeshRenderer → ArrowMat
-4. **SpriteSheetAuthoring** component ekle:
-   - Columns: **1**
-   - Rows: **1**
-   - FPS: **1** (statik)
-   - Direction Row: **0**
-   - Frame Count: **1**
-5. Apply
-
----
-
-## 4. Atlas Referans Tablosu
-
-### Vampire_atlas.png (4 col x 12 row, 192x864 px)
-| Satir | Animasyon | Frame Sayisi | Kullanim |
-|-------|-----------|-------------|----------|
-| 0-3   | Walk      | 4/yon       | Moving state |
-| 4-7   | Hit       | 2/yon       | Attacking state |
-| 8-11  | Die       | 1/yon       | Dead state |
-
-Yon satirlari (her animasyon blogu icinde):
-- +0 = Down, +1 = Left, +2 = Right, +3 = Up
-
-Zombi sola bakar → base row = 1
-- Walk Left = Row 1, Hit Left = Row 5, Die Left = Row 9
-
-### Archer_atlas.png (4 col x 8 row, 192x384 px)
-| Satir | Animasyon | Frame Sayisi |
-|-------|-----------|-------------|
-| 0-3   | Idle      | 4/yon       |
-| 4-7   | Move      | 4/yon       |
-
-### Redcap_atlas.png (4 col x 8 row, 192x384 px)
-| Satir | Animasyon | Frame Sayisi |
-|-------|-----------|-------------|
-| 0-3   | Idle      | 4/yon       |
-| 4-7   | Walk      | 4/yon       |
-
-### Arrow.png (tek sprite, 42x9 px)
-Animasyon yok, statik.
-
----
-
-## 5. Yeni Karakter Ekleme — Adim Adim
-
-Yeni bir entity tipi (ornegin Boss, NPC, Pet vb.) eklerken:
-
-### 5.1. Sprite Sheet'leri Hazirla
-- Her animasyon blogu ayri PNG olarak hazirlanmali
-- Tum PNG'ler ayni sutun sayisinda (genelde 4)
-- Her 4 satir bir animasyon: Down(+0), Left(+1), Right(+2), Up(+3)
-
-### 5.2. Atlas Olustur (Python)
-```bash
-pip install Pillow
-python create_atlas.py
-```
-Animasyon bloklarini **alt alta** birlestir. Sirasi onemli:
-- En temel animasyon en ustte (Row 0-3)
-- Sonraki bloklar alta eklenir (Row 4-7, 8-11, ...)
-
-### 5.3. Unity'de Texture Import
-1. Atlas PNG'yi `Assets/Art/Sprites/` altina koy
-2. Inspector:
-   - Texture Type: **Default**
-   - Filter Mode: **Point (no filter)**
-   - Compression: **None**
+1. `Assets/Prefabs/Archer.prefab` ac
+2. SpriteSheetAuthoring:
+   - **Columns:** `15`
+   - **Rows:** `32`
+   - **FPS:** `10`
+   - **Direction Row:** `0` (East yonu — okcu saga bakar. Eski: 2)
+   - **Frame Count:** `15`
 3. Apply
 
-### 5.4. Material Olustur
-1. Assets/Materials/ altinda yeni material olustur
-2. Shader: **DeadWalls/SpriteSheet**
-3. Sprite Sheet: atlas PNG'yi ata
-4. Alpha Cutoff: 0.5, Tint: beyaz
-
-### 5.5. Prefab Ayarla
-1. Prefab'daki MeshFilter → **Quad**
-2. MeshRenderer → yeni material
-3. **SpriteSheetAuthoring** component ekle
-4. Rows = atlas **toplam** satir sayisi (ornegin 2 blok = 8, 3 blok = 12)
-5. FrameCount = varsayilan animasyondaki frame sayisi
-
-### 5.6. (Gerekirse) State Animasyon Sistemi
-Birden fazla animasyon blogu varsa, state degisimlerinde DirectionRow'u
-degistiren bir system yaz. Ornek: `ZombieAnimationStateSystem.cs`
+### Arrow Prefab:
+Degisiklik yok.
 
 ---
 
-## 6. Test
+## 6. Atlas Satir Referans Tablosu
 
-1. Play'e bas
-2. Zombiler → walk animasyonu (sola yurume)
-3. Zombi duvara ulasinca → hit animasyonu (saldiri)
-4. Zombi olunce → die sprite 0.5sn → kaybolur
-5. Okcular → idle animasyonu
-6. Oklar → statik sprite olarak ucmeli
+### zombie_atlas.png / archer_atlas.png (15 col x 32 row, 1920x4096 px)
+
+| Satir | Animasyon | Frame Sayisi | Kullanim |
+|-------|-----------|-------------|----------|
+| 0-7   | Walk      | 15/yon      | Moving + Queued state |
+| 8-15  | Attack    | 15/yon      | Attacking state |
+| 16-23 | Die       | 15/yon      | Dead state |
+| 24-31 | Idle      | 15/yon      | Bosta (ileride) |
+
+### Yon Indeksleri (her animasyon blogu icinde)
+
+```
++0 = East        (saga bakiyor)
++1 = SouthEast
++2 = South       (kameraya bakiyor, on)
++3 = SouthWest
++4 = West        (sola bakiyor) ← zombie default
++5 = NorthWest
++6 = North       (sirtini donmus)
++7 = NorthEast
+```
+
+### DirectionRow Ornekleri
+
+| Karakter | State | Yon | DirectionRow |
+|----------|-------|-----|-------------|
+| Zombie (Walk, West) | Moving | W=4 | 0 + 4 = **4** |
+| Zombie (Attack, West) | Attacking | W=4 | 8 + 4 = **12** |
+| Zombie (Die, West) | Dead | W=4 | 16 + 4 = **20** |
+| Okcu (Idle, East) | Idle | E=0 | 24 + 0 = **24** |
+| Zombie (Walk, South) | Moving | S=2 | 0 + 2 = **2** |
+| Zombie (Walk, NorthEast) | Moving | NE=7 | 0 + 7 = **7** |
 
 ---
 
-## 7. Sorun Giderme
+## 7. Test
+
+1. **Play** tusuna bas
+2. Zombiler → **Walk animasyonu** (15 frame, sola yurume, akici)
+3. Zombi duvara ulasinca → **Attack animasyonu** (melee swing)
+4. Zombi olunce → **Die animasyonu** (15 frame, sonra kaybolur)
+5. Okcular → **Walk/Idle animasyonu**
+6. Oklar → statik sprite (degisiklik yok)
+
+### Beklenen Sonuclar:
+- Animasyonlar 15 frame ile eskisine gore cok daha akici olmali
+- 8 yon destegi ile ileride (M-ISO.3/4) farkli yonlerden gelen zombiler
+  dogru yonde animasyon gosterecek
+- FPS=10 ile Walk animasyonu 1.5 saniyede bir dongu = dogal yurume hissi
+
+---
+
+## 8. Sorun Giderme
 
 | Sorun | Cozum |
 |-------|-------|
@@ -179,13 +265,14 @@ degistiren bir system yaz. Ornek: `ZombieAnimationStateSystem.cs`
 | Pembe/Magenta gorunuyor | Shader compile hatasi — Console kontrol et |
 | Sprite bulanik | Texture Filter Mode → Point |
 | Seffaf kisimlar siyah | Shader `DeadWalls/SpriteSheet` mi? Alpha Cutoff 0.5 mi? |
-| Animasyon cok hizli/yavas | Prefab FPS degerini ayarla |
-| Sprite ters gorunuyor | DirectionRow degistir (1=Left, 2=Right) |
-| Entity gorunmuyor | Quad mesh atanmis mi? Z=-1 mi? |
-| Olum animasyonu yok | Rows=12 mi kontrol et, atlas Vampire_atlas.png mi? |
-| Yanlis frame gorunuyor | Columns ve Rows degerlerini atlas tablosuyla karsilastir |
-| "Registering material null" hatasi | Shader tag'larini kontrol et (yukaridaki Sorun #1) |
-| Material Inspector'da onizleme bos | Normal, DOTS shader'larinda olabilir — Play modunda test et |
+| Animasyon cok hizli/yavas | Prefab FPS degerini ayarla (10 iyi baslangic) |
+| Yanlis yon gorunuyor | DirectionRow kontrol et. West=4, East=0 |
+| Yanlis animasyon gorunuyor | atlas siralama kontrol et: Walk(0-7), Attack(8-15), Die(16-23) |
+| Atlas boyut hatasi | Her kaynak PNG 1920x1024 olmali. Character Creator'dan tekrar export et |
+| Texture 8192'den buyuk uyarisi | Max Size=8192 olmali. Atlas 4096 yuksekliginde, sorun yok |
+| "Generate Atlas" buton kapali | 4 PNG slot'unun hepsi doldurulmali |
+| Entity gorunmuyor ama Frame Debugger'da var | Material'deki texture dogru atlas'a mi isaret ediyor? |
+| Olum animasyonu kesiliyor | DeathTimer cok kisa olabilir — FPS*15 frame kontrol et |
 
 ### Shader Debug Yontemi
 Entity'ler gorunmuyorsa, asagidaki siralamayla test et:
@@ -198,7 +285,7 @@ Her adimda entity'yi kontrol et. Gorunmeyen adimda sorun o katidir.
 
 ---
 
-## 8. Kritik Shader Kurallari (DOTS Entities Graphics)
+## 9. Kritik Shader Kurallari (DOTS Entities Graphics)
 
 Bu kurallar debug sirasinda kesfedildi. **UYULMAZSA ENTITY'LER GORUNMEZ:**
 
@@ -216,3 +303,17 @@ Tek Pass                            Ekstra DepthOnly pass
 
 Alpha seffaflik icin `clip(col.a - _Cutoff)` kullan ama render queue
 **Geometry** olarak kalsin. `AlphaTest` veya `TransparentCutout` KULLANMA.
+
+---
+
+## 10. Yeni Karakter Tipi Ekleme — Adim Adim Ozet
+
+1. Character Creator scene'i ac, Play bas
+2. Karakter olustur (gear, renk, silah sec)
+3. Generate ile export et (4 PNG: Walk, Attack, Die, Idle)
+4. Window > DeadWalls > Sprite Atlas Generator ac
+5. 4 PNG'yi slot'lara ata, isim ver, Generate tikla
+6. Material olustur (Shader: DeadWalls/SpriteSheet, atlas ata)
+7. Prefab'da SpriteSheetAuthoring: Columns=15, Rows=32, FPS=10, FrameCount=15
+8. DirectionRow'u varsayilan yonune ayarla (E=0, W=4 vb.)
+9. Test et

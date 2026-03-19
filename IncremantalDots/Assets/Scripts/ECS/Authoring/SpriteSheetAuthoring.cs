@@ -8,32 +8,38 @@ namespace DeadWalls
     /// Prefab'a eklenen sprite sheet animasyon ayarlari.
     /// Baker, bu verileri SpriteAnimation + SpriteUVRect component'larina donusturur.
     ///
+    /// Atlas yapisi (Character Creator - Fantasy 2D):
+    ///   15 sutun (frame), 32 satir (4 animasyon x 8 yon)
+    ///   Row  0- 7: Walk    Row  8-15: Attack
+    ///   Row 16-23: Die     Row 24-31: Idle
+    ///   Yon: 0=E, 1=SE, 2=S, 3=SW, 4=W, 5=NW, 6=N, 7=NE
+    ///
     /// Inspector'da gorunecek alanlar:
-    ///   Columns      — sprite sheet sutun sayisi (4)
-    ///   Rows         — sprite sheet satir sayisi (4)
-    ///   FPS          — animasyon hizi (7 = piksel art icin iyi)
-    ///   DirectionRow — hangi yon satiri (0=Down, 1=Left, 2=Right, 3=Up)
-    ///   FrameCount   — bu yondeki frame sayisi (genelde Columns kadar)
+    ///   Columns      — sutun sayisi (15)
+    ///   Rows         — satir sayisi (32)
+    ///   FPS          — animasyon hizi
+    ///   DirectionRow — baslangic satiri (animOffset + yonIndex)
+    ///   FrameCount   — bu animasyondaki frame sayisi (15)
     /// </summary>
     public class SpriteSheetAuthoring : MonoBehaviour
     {
         [Header("Sprite Sheet Grid")]
-        [Tooltip("Sprite sheet'teki sutun sayisi")]
-        public int Columns = 4;
+        [Tooltip("Atlas sutun sayisi (Character Creator: 15)")]
+        public int Columns = 15;
 
-        [Tooltip("Sprite sheet'teki satir sayisi")]
-        public int Rows = 4;
+        [Tooltip("Atlas satir sayisi (4 anim x 8 yon = 32)")]
+        public int Rows = 32;
 
         [Header("Animasyon")]
         [Tooltip("Saniyedeki frame sayisi")]
-        public float FPS = 7f;
+        public float FPS = 10f;
 
-        [Tooltip("Yon satiri: 0=Down, 1=Left, 2=Right, 3=Up")]
-        [Range(0, 3)]
-        public int DirectionRow = 1;
+        [Tooltip("Baslangic satiri: animOffset + yonIndex (Walk+West = 0+4 = 4)")]
+        [Range(0, 31)]
+        public int DirectionRow = 4;
 
-        [Tooltip("Bu yondeki frame sayisi (genelde Columns ile ayni)")]
-        public int FrameCount = 4;
+        [Tooltip("Bu animasyondaki frame sayisi (Character Creator: 15)")]
+        public int FrameCount = 15;
 
         public class Baker : Baker<SpriteSheetAuthoring>
         {

@@ -14,7 +14,8 @@ namespace DeadWalls
 
         [Header("Grid Ayarlari")]
         public Tilemap BuildableZoneTilemap;   // buildable_zone layer referansi
-        public Tilemap BuildingVisualTilemap;   // bina sprite gosterimi (yeni layer)
+        public Tilemap BuildingVisualTilemap;   // bina base layer (Order in Layer: 5)
+        public Tilemap BuildingTopTilemap;     // bina cati + detay layer (Order in Layer: 6)
 
         // cellBounds'tan otomatik hesaplanir — elle girmeye gerek yok
         [Header("Otomatik Hesaplanan (Debug)")]
@@ -41,6 +42,10 @@ namespace DeadWalls
         private int[,] _grid;
         private Entity[,] _entityGrid;  // Hangi hucrede hangi bina entity'si var
         private ResourcePointType[,] _zoneGrid;
+
+        // Izometrik grid donusumu icin Unity Grid component cache
+        private Grid _isoGrid;
+        public Grid IsoGrid => _isoGrid;
 
         // ECS erisim
         private EntityManager _entityManager;
@@ -77,6 +82,9 @@ namespace DeadWalls
                 Debug.LogError("BuildingGridManager: BuildableZoneTilemap atanmamis!");
                 return;
             }
+
+            // Unity Grid component'ini cache'le — izometrik donusum icin
+            _isoGrid = BuildableZoneTilemap.layoutGrid;
 
             // cellBounds'tan GridOrigin, GridWidth, GridHeight otomatik hesapla
             BoundsInt bounds = BuildableZoneTilemap.cellBounds;
@@ -279,9 +287,33 @@ namespace DeadWalls
         {
             if (BuildingVisualTilemap == null) return;
 
-            int centerX = gridX + config.GridWidth / 2 + GridOrigin.x;
-            int centerY = gridY + config.GridHeight / 2 + GridOrigin.y;
-            BuildingVisualTilemap.SetTile(new Vector3Int(centerX, centerY, 0), null);
+            bool hasLayout = config.TileLayoutBase != null &&
+                             config.TileLayoutBase.Length == config.GridWidth * config.GridHeight;
+
+            if (hasLayout)
+            {
+                // Tum hucrelerdeki tile'lari temizle (her iki layer)
+                for (int lx = 0; lx < config.GridWidth; lx++)
+                {
+                    for (int ly = 0; ly < config.GridHeight; ly++)
+                    {
+                        int cellX = gridX + lx + GridOrigin.x;
+                        int cellY = gridY + ly + GridOrigin.y;
+                        var pos = new Vector3Int(cellX, cellY, 0);
+
+                        BuildingVisualTilemap.SetTile(pos, null);
+                        if (BuildingTopTilemap != null)
+                            BuildingTopTilemap.SetTile(pos, null);
+                    }
+                }
+            }
+            else
+            {
+                // Fallback — eski tek-tile silme
+                int centerX = gridX + config.GridWidth / 2 + GridOrigin.x;
+                int centerY = gridY + config.GridHeight / 2 + GridOrigin.y;
+                BuildingVisualTilemap.SetTile(new Vector3Int(centerX, centerY, 0), null);
+            }
         }
 
         private void RefundResources(BuildingConfigSO config)
@@ -320,29 +352,44 @@ namespace DeadWalls
                 }
             }
 
-            // Gorsel tilemap'i temizle
+            // Gorsel tilemap'leri temizle
             if (BuildingVisualTilemap != null)
                 BuildingVisualTilemap.ClearAllTiles();
+            if (BuildingTopTilemap != null)
+                BuildingTopTilemap.ClearAllTiles();
         }
 
         /// <summary>
         /// World pozisyonunu grid koordinatina cevir.
+        /// Izometrik: Unity Grid.WorldToCell() diamond hucre hesabini otomatik yapar.
         /// </summary>
         public Vector2Int WorldToGrid(Vector3 worldPos)
         {
-            int gx = Mathf.FloorToInt(worldPos.x) - GridOrigin.x;
-            int gy = Mathf.FloorToInt(worldPos.y) - GridOrigin.y;
+            Vector3Int cell = _isoGrid.WorldToCell(worldPos);
+            int gx = cell.x - GridOrigin.x;
+            int gy = cell.y - GridOrigin.y;
             return new Vector2Int(gx, gy);
         }
 
         /// <summary>
         /// Grid koordinatini world pozisyonuna cevir (bina merkezine).
+        /// Izometrik: GetCellCenterWorld() diamond hucrenin tam merkezini verir.
         /// </summary>
         public Vector3 GridToWorld(int gridX, int gridY, BuildingConfigSO config)
         {
-            float worldX = gridX + GridOrigin.x + config.GridWidth * 0.5f;
-            float worldY = gridY + GridOrigin.y + config.GridHeight * 0.5f;
-            return new Vector3(worldX, worldY, 0f);
+            int centerCellX = gridX + GridOrigin.x + config.GridWidth / 2;
+            int centerCellY = gridY + GridOrigin.y + config.GridHeight / 2;
+            return _isoGrid.GetCellCenterWorld(new Vector3Int(centerCellX, centerCellY, 0));
+        }
+
+        /// <summary>
+        /// Tek hucre grid koordinatini world pozisyonuna cevir (config'siz).
+        /// Gizmo cizimi ve diger basit donusumler icin.
+        /// </summary>
+        public Vector3 CellToWorld(int gridX, int gridY)
+        {
+            return _isoGrid.GetCellCenterWorld(
+                new Vector3Int(gridX + GridOrigin.x, gridY + GridOrigin.y, 0));
         }
 
         /// <summary>
@@ -501,18 +548,54 @@ namespace DeadWalls
 
         private void PlaceVisualTile(BuildingConfigSO config, int gridX, int gridY)
         {
-            if (BuildingVisualTilemap == null || config.GhostSprite == null) return;
+            if (BuildingVisualTilemap == null) return;
 
-            // Binanin merkez hucresine gorsel koy
-            // Tam tile olusturma M1.4+'te yapilacak — su an sadece placeholder
-            int centerX = gridX + config.GridWidth / 2 + GridOrigin.x;
-            int centerY = gridY + config.GridHeight / 2 + GridOrigin.y;
+            // TileLayout varsa → 2-layer tile yerlesim
+            bool hasLayout = config.TileLayoutBase != null &&
+                             config.TileLayoutBase.Length == config.GridWidth * config.GridHeight;
 
-            // Sprite'tan Tile olustur (runtime)
-            var tile = ScriptableObject.CreateInstance<Tile>();
-            tile.sprite = config.GhostSprite;
-            tile.color = Color.white;
-            BuildingVisualTilemap.SetTile(new Vector3Int(centerX, centerY, 0), tile);
+            if (hasLayout)
+            {
+                bool hasTop = config.TileLayoutTop != null &&
+                              config.TileLayoutTop.Length == config.GridWidth * config.GridHeight;
+
+                for (int lx = 0; lx < config.GridWidth; lx++)
+                {
+                    for (int ly = 0; ly < config.GridHeight; ly++)
+                    {
+                        int idx = lx + ly * config.GridWidth;
+                        int cellX = gridX + lx + GridOrigin.x;
+                        int cellY = gridY + ly + GridOrigin.y;
+                        var pos = new Vector3Int(cellX, cellY, 0);
+
+                        // Base layer
+                        var baseTile = config.TileLayoutBase[idx];
+                        if (baseTile != null)
+                            BuildingVisualTilemap.SetTile(pos, baseTile);
+
+                        // Top layer
+                        if (hasTop && BuildingTopTilemap != null)
+                        {
+                            var topTile = config.TileLayoutTop[idx];
+                            if (topTile != null)
+                                BuildingTopTilemap.SetTile(pos, topTile);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // Fallback — eski placeholder GhostSprite kodu
+                if (config.GhostSprite == null) return;
+
+                int centerX = gridX + config.GridWidth / 2 + GridOrigin.x;
+                int centerY = gridY + config.GridHeight / 2 + GridOrigin.y;
+
+                var tile = ScriptableObject.CreateInstance<Tile>();
+                tile.sprite = config.GhostSprite;
+                tile.color = Color.white;
+                BuildingVisualTilemap.SetTile(new Vector3Int(centerX, centerY, 0), tile);
+            }
         }
     }
 }
