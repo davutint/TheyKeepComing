@@ -52,7 +52,18 @@ namespace DeadWalls
         [Tooltip("Duvar, kapi, zemin tile'lari — base tilemap layer'ina konur")]
         public TileBase[] TileLayoutBase;
 
+        // Top layer grid — otomatik hesaplanir (Tile Composer Save ile)
+        [HideInInspector] public int TopGridWidth;
+        [HideInInspector] public int TopGridHeight;
+        [HideInInspector] public int TopGridOffsetX;
+        [HideInInspector] public int TopGridOffsetY;
+
         [Tooltip("Cati, bayrak, detay tile'lari — top tilemap layer'ina konur")]
         public TileBase[] TileLayoutTop;
+
+        /// Efektif top grid genisligi. TopGridWidth == 0 ise base GridWidth doner.
+        public int EffectiveTopGridWidth => TopGridWidth > 0 ? TopGridWidth : GridWidth;
+        /// Efektif top grid yuksekligi. TopGridHeight == 0 ise base GridHeight doner.
+        public int EffectiveTopGridHeight => TopGridHeight > 0 ? TopGridHeight : GridHeight;
     }
 }

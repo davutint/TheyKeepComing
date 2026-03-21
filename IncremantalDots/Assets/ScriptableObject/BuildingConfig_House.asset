@@ -25,5 +25,44 @@ MonoBehaviour:
   ProducedResource: 0
   RatePerWorkerPerMin: 0
   MaxWorkers: 0
+  RequiredZone: 0
+  ZoneProximityRadius: 3
   PopulationCapacity: 5
   FoodCostPerMin: 1
+  TrainingDuration: 0
+  FoodCostPerArcher: 0
+  WoodCostPerArcher: 0
+  ArrowsPerWorkerPerMin: 0
+  WoodCostPerBatchPerMin: 0
+  RequireBlacksmith: 0
+  TileLayoutBase:
+  - {fileID: 11400000, guid: 459a738c940ccd0489cc15e15ba9b115, type: 2}
+  - {fileID: 11400000, guid: 96f0e3c20325f1b45b8dde639b728c5f, type: 2}
+  - {fileID: 11400000, guid: 53be8842955da2e449cb6e2211268061, type: 2}
+  - {fileID: 11400000, guid: 01e2968a5f475264ea7dd964f56a1d21, type: 2}
+  - {fileID: 11400000, guid: e2f8aa1440eaefc498296b4ccd191404, type: 2}
+  - {fileID: 11400000, guid: 49b79448f69ddc8458dd265e18fc982d, type: 2}
+  - {fileID: 11400000, guid: 9851e38434902fb4ebfc1809396fb7b2, type: 2}
+  - {fileID: 11400000, guid: 5402f0d42377efe4496e39a5ab3af4bf, type: 2}
+  - {fileID: 11400000, guid: 5192d2281bf5ba54990b72ce92f268bf, type: 2}
+  TopGridWidth: 4
+  TopGridHeight: 4
+  TopGridOffsetX: -2
+  TopGridOffsetY: -2
+  TileLayoutTop:
+  - {fileID: 11400000, guid: 8c0e952a9618b1f469244f2df0e7761a, type: 2}
+  - {fileID: 11400000, guid: e5e62946e64edbd4fa453fcec7d1de95, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 11400000, guid: e5e62946e64edbd4fa453fcec7d1de95, type: 2}
+  - {fileID: 0}
+  - {fileID: 11400000, guid: e5e62946e64edbd4fa453fcec7d1de95, type: 2}
+  - {fileID: 0}
+  - {fileID: 11400000, guid: e5e62946e64edbd4fa453fcec7d1de95, type: 2}
+  - {fileID: 11400000, guid: fa6e876b48be004409b2c920300f4d8c, type: 2}
+  - {fileID: 11400000, guid: a18ef3cf104745e4c948f61821c0ed06, type: 2}
+  - {fileID: 0}
+  - {fileID: 11400000, guid: a18ef3cf104745e4c948f61821c0ed06, type: 2}
+  - {fileID: 0}
+  - {fileID: 11400000, guid: a9597660db7c8f24b92f802debf12d9c, type: 2}

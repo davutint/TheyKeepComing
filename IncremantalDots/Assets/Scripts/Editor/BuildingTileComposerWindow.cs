@@ -180,9 +180,14 @@ namespace DeadWalls
                     LoadFromConfig();
 
                 if (_config != null)
+                {
                     EditorGUILayout.LabelField(
                         $"{_config.GridWidth}x{_config.GridHeight}  {_config.DisplayName}",
                         EditorStyles.miniLabel);
+
+                    // Top Grid bilgisi (otomatik hesaplanir, sadece gosterim)
+                    // Save sirasinda tile pozisyonlarindan turetilir
+                }
 
                 // Layer toggle
                 EditorGUILayout.BeginHorizontal();
@@ -458,11 +463,18 @@ namespace DeadWalls
                     "Sol tik: tile ata | Sag tik: tile sil | Surukle: boyama",
                     EditorStyles.miniLabel);
 
-                int gw = _config.GridWidth;
-                int gh = _config.GridHeight;
+                // Her iki layer icin ayni buyuk canvas
+                int canvasW = _config.GridWidth + 8;
+                int canvasH = _config.GridHeight + 8;
+                int canvasSize = canvasW * canvasH;
 
-                float totalW = (gw + gh) * CellW * 0.5f + CellW;
-                float totalH = (gw + gh) * CellH * 0.5f + CellH;
+                // Array boyutu canvas ile uyusmuyorsa yeniden yukle
+                if (_baseLayout == null || _baseLayout.Length != canvasSize ||
+                    _topLayout == null || _topLayout.Length != canvasSize)
+                    LoadFromConfig();
+
+                float totalW = (canvasW + canvasH) * CellW * 0.5f + CellW;
+                float totalH = (canvasW + canvasH) * CellH * 0.5f + CellH;
                 Rect gridRect = GUILayoutUtility.GetRect(totalW, totalH + 10);
                 EditorGUI.DrawRect(gridRect, new Color(0.15f, 0.15f, 0.15f, 1f));
 
@@ -474,9 +486,38 @@ namespace DeadWalls
                 _hoverX = -1;
                 _hoverY = -1;
 
-                for (int y = 0; y < gh; y++)
+                // Top layer seciliyken: base footprint'i ghost outline olarak goster
+                if (_selectedLayer == Layer.Top)
                 {
-                    for (int x = 0; x < gw; x++)
+                    Color ghostColor = new Color(0.4f, 0.7f, 1f, 0.3f);
+                    int pad = 4; // tuvalin padding miktari
+                    for (int y = 0; y < _config.GridHeight; y++)
+                    {
+                        for (int x = 0; x < _config.GridWidth; x++)
+                        {
+                            Vector2 center = GetDiamondCenter(origin, x + pad, y + pad);
+                            Vector2[] diamond = GetDiamondVerts(center, CellW, CellH);
+                            DrawDiamondOutline(diamond, ghostColor);
+
+                            // Base tile'lari soluk goster
+                            int baseIdx = x + y * _config.GridWidth;
+                            if (_baseLayout != null && baseIdx < _baseLayout.Length && _baseLayout[baseIdx] != null)
+                            {
+                                GUI.color = new Color(1f, 1f, 1f, 0.2f);
+                                DrawTileInDiamond(center, _baseLayout[baseIdx], CellW, CellH);
+                                GUI.color = Color.white;
+                            }
+                        }
+                    }
+                }
+
+                // Aktif layer hucreleri
+                TileBase[] activeLayout = _selectedLayer == Layer.Base ? _baseLayout : _topLayout;
+                int activeGW = canvasW; // tuval genisligi = aktif boyama alani
+
+                for (int y = 0; y < canvasH; y++)
+                {
+                    for (int x = 0; x < canvasW; x++)
                     {
                         Vector2 center = GetDiamondCenter(origin, x, y);
                         Vector2[] diamond = GetDiamondVerts(center, CellW, CellH);
@@ -487,53 +528,31 @@ namespace DeadWalls
                             _hoverY = y;
                         }
 
-                        int idx = x + y * gw;
+                        int idx = x + y * canvasW;
+                        bool hasTile = activeLayout != null && idx < activeLayout.Length && activeLayout[idx] != null;
 
-                        // Her iki layer'i goster — aktif layer tam opak, diger yari saydam
-                        bool hasBase = _baseLayout != null && idx < _baseLayout.Length && _baseLayout[idx] != null;
-                        bool hasTop = _topLayout != null && idx < _topLayout.Length && _topLayout[idx] != null;
+                        // Hucre arkaplan tinti
+                        Color tint = _selectedLayer == Layer.Top
+                            ? (hasTile ? new Color(1f, 0.7f, 0.3f, 0.15f) : new Color(1f, 0.8f, 0.4f, 0.04f))
+                            : (hasTile ? new Color(0.3f, 0.7f, 1f, 0.15f) : new Color(0.4f, 0.7f, 1f, 0.08f));
+                        DrawDiamondFill(diamond, tint);
 
-                        if (hasBase)
-                        {
-                            if (_selectedLayer != Layer.Base && hasTop)
-                                GUI.color = new Color(1f, 1f, 1f, 0.35f); // pasif layer soluk
-                            DrawTileInDiamond(center, _baseLayout[idx], CellW, CellH);
-                            GUI.color = Color.white;
-                        }
-                        if (hasTop)
-                        {
-                            if (_selectedLayer != Layer.Top && hasBase)
-                                GUI.color = new Color(1f, 1f, 1f, 0.35f);
-                            DrawTileInDiamond(center, _topLayout[idx], CellW, CellH);
-                            GUI.color = Color.white;
-                        }
+                        // Tile sprite ciz
+                        if (hasTile)
+                            DrawTileInDiamond(center, activeLayout[idx], CellW, CellH);
 
-                        // Hucre icerik gostergesi — hangi layer'larda tile var
-                        if (hasBase || hasTop)
-                        {
-                            string marker = (hasBase && hasTop) ? "B+T"
-                                : hasBase ? "B" : "T";
-                            Color markerCol = (hasBase && hasTop) ? new Color(0.5f, 1f, 0.5f, 0.6f)
-                                : hasBase ? new Color(0.5f, 0.8f, 1f, 0.5f)
-                                : new Color(1f, 0.8f, 0.5f, 0.5f);
-                            _cellLabelStyle.normal.textColor = markerCol;
-                            GUI.Label(new Rect(center.x - 12, center.y + 4, 24, 10),
-                                marker, _cellLabelStyle);
-                            _cellLabelStyle.normal.textColor = new Color(1f, 1f, 1f, 0.3f);
-                        }
-
-                        // Yon ipucu (kenar hucrelerinde)
-                        string dirHint = GetCellDirectionHint(x, y, gw, gh);
+                        // Yon ipucu (sadece base layer'da, base footprint icerisinde)
+                        string dirHint = (_selectedLayer == Layer.Base)
+                            ? GetCellDirectionHint(x, y, canvasW, canvasH) : "";
                         Color outlineColor;
                         if (_hoverX == x && _hoverY == y)
                             outlineColor = new Color(0.3f, 0.7f, 1f, 1f);
                         else if (!string.IsNullOrEmpty(dirHint))
                             outlineColor = GetDirectionColor(dirHint);
                         else
-                            outlineColor = new Color(0.4f, 0.4f, 0.4f, 0.8f);
+                            outlineColor = new Color(0.4f, 0.4f, 0.4f, _selectedLayer == Layer.Top ? 0.3f : 0.8f);
                         DrawDiamondOutline(diamond, outlineColor);
 
-                        // Yon etiketi (kenar hucrelerinde)
                         if (!string.IsNullOrEmpty(dirHint))
                         {
                             _dirHintStyle.normal.textColor = GetDirectionColor(dirHint);
@@ -549,7 +568,7 @@ namespace DeadWalls
                     if (e.type == EventType.MouseDown && _hoverX >= 0 && _hoverY >= 0)
                     {
                         _dragButton = e.button;
-                        PaintCell(_hoverX, _hoverY, gw, _dragButton);
+                        PaintCell(_hoverX, _hoverY, canvasW, _dragButton);
                         _isDragging = true;
                         _lastPaintedX = _hoverX;
                         _lastPaintedY = _hoverY;
@@ -561,7 +580,7 @@ namespace DeadWalls
                         _hoverX >= 0 && _hoverY >= 0 &&
                         (_hoverX != _lastPaintedX || _hoverY != _lastPaintedY))
                     {
-                        PaintCell(_hoverX, _hoverY, gw, _dragButton);
+                        PaintCell(_hoverX, _hoverY, canvasW, _dragButton);
                         _lastPaintedX = _hoverX;
                         _lastPaintedY = _hoverY;
                         e.Use();
@@ -696,16 +715,18 @@ namespace DeadWalls
             topRenderer.mode = TilemapRenderer.Mode.Individual;
 
             // ── 2. Tile'lari yerlestir ──
-            // Grid editor: yatay ∝ (x-y), dikey ∝ (x+y) asagi
-            // Tilemap:     yatay ∝ (tx-ty), dikey ∝ (tx+ty) yukari
-            // Eslestirme: tx = gh-1-y, ty = gw-1-x (swap + flip)
-            for (int y = 0; y < gh; y++)
+            // Canvas swap+flip: tx = cH-1-cy, ty = cW-1-cx
+            // Her iki layer ayni canvas'ta → offset otomatik dogru
+            int cW = gw + 8, cH = gh + 8;
+
+            for (int cy = 0; cy < cH; cy++)
             {
-                for (int x = 0; x < gw; x++)
+                for (int cx = 0; cx < cW; cx++)
                 {
-                    int idx = x + y * gw;
-                    var pos = new Vector3Int(gh - 1 - y, gw - 1 - x, 0);
-                    if (idx < _baseLayout.Length && _baseLayout[idx] != null)
+                    int idx = cx + cy * cW;
+                    var pos = new Vector3Int(cH - 1 - cy, cW - 1 - cx, 0);
+
+                    if (_baseLayout != null && idx < _baseLayout.Length && _baseLayout[idx] != null)
                         baseMap.SetTile(pos, _baseLayout[idx]);
                     if (_topLayout != null && idx < _topLayout.Length && _topLayout[idx] != null)
                         topMap.SetTile(pos, _topLayout[idx]);
@@ -726,19 +747,37 @@ namespace DeadWalls
 
             // Sprite yukseklik tasmasi (pivot ~0.19 → sprite'in %81'i yukariya tasar)
             float spriteWorldHeight = 256f / 127f; // ≈ 2.016 unit
-            float pivotY = 0.19f;
-            float topOverflow = spriteWorldHeight * (1f - pivotY); // ≈ 1.633
+            float pivotYNorm = 0.19f;
+            float topOverflow = spriteWorldHeight * (1f - pivotYNorm); // ≈ 1.633
 
-            // Tile'lar (0,0)-(gh-1, gw-1) araliginda — 4 kose ile sinirlari bul
-            Vector3 c0 = grid.CellToWorld(new Vector3Int(0, 0, 0));
-            Vector3 c1 = grid.CellToWorld(new Vector3Int(gh - 1, 0, 0));
-            Vector3 c2 = grid.CellToWorld(new Vector3Int(0, gw - 1, 0));
-            Vector3 c3 = grid.CellToWorld(new Vector3Int(gh - 1, gw - 1, 0));
+            // Tum dolu tile'larin world-space sinirlarini tara (base + top)
+            float minX = float.MaxValue, maxX = float.MinValue;
+            float minY = float.MaxValue, maxY = float.MinValue;
 
-            float minX = Mathf.Min(c0.x, c1.x, c2.x, c3.x) - spriteWorldHeight * 0.5f;
-            float maxX = Mathf.Max(c0.x, c1.x, c2.x, c3.x) + spriteWorldHeight * 0.5f;
-            float minY = Mathf.Min(c0.y, c1.y, c2.y, c3.y) - spriteWorldHeight * pivotY;
-            float maxY = Mathf.Max(c0.y, c1.y, c2.y, c3.y) + topOverflow;
+            for (int cy = 0; cy < cH; cy++)
+            {
+                for (int cx = 0; cx < cW; cx++)
+                {
+                    int ci = cx + cy * cW;
+                    bool hasBase = _baseLayout != null && ci < _baseLayout.Length && _baseLayout[ci] != null;
+                    bool hasTop = _topLayout != null && ci < _topLayout.Length && _topLayout[ci] != null;
+                    if (hasBase || hasTop)
+                    {
+                        var pos = new Vector3Int(cH - 1 - cy, cW - 1 - cx, 0);
+                        Vector3 wp = grid.CellToWorld(pos);
+                        minX = Mathf.Min(minX, wp.x);
+                        maxX = Mathf.Max(maxX, wp.x);
+                        minY = Mathf.Min(minY, wp.y);
+                        maxY = Mathf.Max(maxY, wp.y);
+                    }
+                }
+            }
+
+            // Sprite tasmasi icin margin ekle
+            minX -= spriteWorldHeight * 0.5f;
+            maxX += spriteWorldHeight * 0.5f;
+            minY -= spriteWorldHeight * pivotYNorm;
+            maxY += topOverflow;
 
             float worldW = maxX - minX;
             float worldH = maxY - minY;
@@ -746,8 +785,8 @@ namespace DeadWalls
             float centerY = (minY + maxY) * 0.5f;
 
             camera.transform.position = new Vector3(centerX, centerY, -10f);
-            float aspect = 1f; // kare render texture
-            camera.orthographicSize = Mathf.Max(worldH * 0.5f, worldW * 0.5f / aspect) + 0.3f;
+            float camAspect = 1f; // kare render texture
+            camera.orthographicSize = Mathf.Max(worldH * 0.5f, worldW * 0.5f / camAspect) + 0.3f;
 
             // ── 4. Render al ──
             int texSize = 512;
@@ -928,11 +967,54 @@ namespace DeadWalls
         private void LoadFromConfig()
         {
             if (_config == null) return;
-            int size = _config.GridWidth * _config.GridHeight;
-            _baseLayout = (_config.TileLayoutBase != null && _config.TileLayoutBase.Length == size)
-                ? (TileBase[])_config.TileLayoutBase.Clone() : new TileBase[size];
-            _topLayout = (_config.TileLayoutTop != null && _config.TileLayoutTop.Length == size)
-                ? (TileBase[])_config.TileLayoutTop.Clone() : new TileBase[size];
+
+            // Her iki layer icin ayni canvas boyutu
+            int canvasW = _config.GridWidth + 8;
+            int canvasH = _config.GridHeight + 8;
+            int pad = 4;
+
+            // Base: compact SO verisini canvas'a ac
+            _baseLayout = new TileBase[canvasW * canvasH];
+            int baseGW = _config.GridWidth;
+            int baseGH = _config.GridHeight;
+            if (_config.TileLayoutBase != null && _config.TileLayoutBase.Length == baseGW * baseGH)
+            {
+                for (int y = 0; y < baseGH; y++)
+                {
+                    for (int x = 0; x < baseGW; x++)
+                    {
+                        var tile = _config.TileLayoutBase[x + y * baseGW];
+                        if (tile == null) continue;
+                        int cx = x + pad;
+                        int cy = y + pad;
+                        if (cx < canvasW && cy < canvasH)
+                            _baseLayout[cx + cy * canvasW] = tile;
+                    }
+                }
+            }
+
+            // Top: compact SO verisini canvas'a ac
+            _topLayout = new TileBase[canvasW * canvasH];
+            int topGW = _config.EffectiveTopGridWidth;
+            int topGH = _config.EffectiveTopGridHeight;
+            int offX = _config.TopGridOffsetX;
+            int offY = _config.TopGridOffsetY;
+            if (_config.TileLayoutTop != null && _config.TileLayoutTop.Length == topGW * topGH)
+            {
+                for (int y = 0; y < topGH; y++)
+                {
+                    for (int x = 0; x < topGW; x++)
+                    {
+                        var tile = _config.TileLayoutTop[x + y * topGW];
+                        if (tile == null) continue;
+                        int cx = x + offX + pad;
+                        int cy = y + offY + pad;
+                        if (cx >= 0 && cx < canvasW && cy >= 0 && cy < canvasH)
+                            _topLayout[cx + cy * canvasW] = tile;
+                    }
+                }
+            }
+
             _previewDirty = true;
         }
 
@@ -940,11 +1022,100 @@ namespace DeadWalls
         {
             if (_config == null) return;
             Undo.RecordObject(_config, "Building Tile Composer - Save Layout");
-            _config.TileLayoutBase = (TileBase[])_baseLayout.Clone();
-            _config.TileLayoutTop = (TileBase[])_topLayout.Clone();
+
+            int canvasW = _config.GridWidth + 8;
+            int canvasH = _config.GridHeight + 8;
+            int pad = 4;
+
+            // ── Base: canvas'tan bounding box → GridWidth/Height + compact array ──
+            CompactLayer(_baseLayout, canvasW, canvasH, pad,
+                out int baseW, out int baseH, out int baseOffX, out int baseOffY, out TileBase[] baseCompact);
+
+            if (baseW > 0)
+            {
+                _config.GridWidth = baseW;
+                _config.GridHeight = baseH;
+                _config.TileLayoutBase = baseCompact;
+                // baseOffX/Y ihmal — base her zaman (0,0)'dan baslar
+            }
+            else
+            {
+                _config.TileLayoutBase = null;
+            }
+
+            // ── Top: canvas'tan bounding box → TopGrid* + compact array ──
+            CompactLayer(_topLayout, canvasW, canvasH, pad,
+                out int topW, out int topH, out int topOffX, out int topOffY, out TileBase[] topCompact);
+
+            if (topW > 0)
+            {
+                _config.TopGridWidth = topW;
+                _config.TopGridHeight = topH;
+                _config.TopGridOffsetX = topOffX;
+                _config.TopGridOffsetY = topOffY;
+                _config.TileLayoutTop = topCompact;
+            }
+            else
+            {
+                _config.TopGridWidth = 0;
+                _config.TopGridHeight = 0;
+                _config.TopGridOffsetX = 0;
+                _config.TopGridOffsetY = 0;
+                _config.TileLayoutTop = null;
+            }
+
             EditorUtility.SetDirty(_config);
             AssetDatabase.SaveAssets();
-            Debug.Log($"[TileComposer] {_config.DisplayName} layout kaydedildi.");
+            Debug.Log($"[TileComposer] {_config.DisplayName} kaydedildi. " +
+                      $"Base: {_config.GridWidth}x{_config.GridHeight} " +
+                      $"Top: {_config.TopGridWidth}x{_config.TopGridHeight} " +
+                      $"(+{_config.TopGridOffsetX},+{_config.TopGridOffsetY})");
+        }
+
+        /// <summary>
+        /// Canvas array'den dolu tile'larin bounding box'ini bulup compact array olusturur.
+        /// </summary>
+        private void CompactLayer(TileBase[] canvas, int canvasW, int canvasH, int pad,
+            out int compactW, out int compactH, out int offsetX, out int offsetY, out TileBase[] compact)
+        {
+            int minX = canvasW, minY = canvasH, maxX = -1, maxY = -1;
+            for (int y = 0; y < canvasH; y++)
+            {
+                for (int x = 0; x < canvasW; x++)
+                {
+                    int idx = x + y * canvasW;
+                    if (canvas != null && idx < canvas.Length && canvas[idx] != null)
+                    {
+                        minX = Mathf.Min(minX, x);
+                        minY = Mathf.Min(minY, y);
+                        maxX = Mathf.Max(maxX, x);
+                        maxY = Mathf.Max(maxY, y);
+                    }
+                }
+            }
+
+            if (maxX < 0)
+            {
+                compactW = 0; compactH = 0; offsetX = 0; offsetY = 0; compact = null;
+                return;
+            }
+
+            compactW = maxX - minX + 1;
+            compactH = maxY - minY + 1;
+            offsetX = minX - pad;
+            offsetY = minY - pad;
+
+            compact = new TileBase[compactW * compactH];
+            for (int y = minY; y <= maxY; y++)
+            {
+                for (int x = minX; x <= maxX; x++)
+                {
+                    int srcIdx = x + y * canvasW;
+                    int dstIdx = (x - minX) + (y - minY) * compactW;
+                    if (canvas != null && srcIdx < canvas.Length)
+                        compact[dstIdx] = canvas[srcIdx];
+                }
+            }
         }
 
         private void ClearAll()
@@ -1028,6 +1199,16 @@ namespace DeadWalls
                 if ((b.x - a.x) * (p.y - a.y) - (b.y - a.y) * (p.x - a.x) < 0) return false;
             }
             return true;
+        }
+
+        private void DrawDiamondFill(Vector2[] v, Color color)
+        {
+            Handles.color = color;
+            Handles.DrawAAConvexPolygon(
+                new Vector3(v[0].x, v[0].y, 0),
+                new Vector3(v[1].x, v[1].y, 0),
+                new Vector3(v[2].x, v[2].y, 0),
+                new Vector3(v[3].x, v[3].y, 0));
         }
 
         private void DrawDiamondOutline(Vector2[] v, Color color)

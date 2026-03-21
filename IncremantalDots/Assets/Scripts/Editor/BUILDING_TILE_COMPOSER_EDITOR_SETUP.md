@@ -35,6 +35,12 @@
 - Grid boyutu ve bina adi otomatik gosterilir
 - Mevcut tile layout varsa otomatik yuklenir
 
+### 4a2. Top Grid Boyutu Ayarla (cati icin zorunlu)
+- **Top Grid W/H**: Cati layer'inin grid boyutu (0 = base ile ayni)
+- **Top Grid OX/OY**: Cati'nin duvara gore offset'i (grid hucre cinsinden)
+- Ornek: Base 3x3, Top W=3 H=3, OX=0 OY=2 → cati duvarlardan 2 satir yukarida
+- Boyut degistiginde mevcut top tile atamalari sifirlanir (yeni bos grid olusur)
+
 ### 4b. Layer Sec
 - **Base (duvar/zemin)**: Binanin alt kismi — duvarlar, kapilar, zemin
 - **Top (cati/detay)**: Binanin ust kismi — catitar, bayraklar, dekorasyon

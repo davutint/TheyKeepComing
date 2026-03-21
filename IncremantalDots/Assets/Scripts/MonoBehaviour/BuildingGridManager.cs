@@ -292,18 +292,30 @@ namespace DeadWalls
 
             if (hasLayout)
             {
-                // Tum hucrelerdeki tile'lari temizle (her iki layer)
+                // Base layer tile'larini temizle
                 for (int lx = 0; lx < config.GridWidth; lx++)
                 {
                     for (int ly = 0; ly < config.GridHeight; ly++)
                     {
                         int cellX = gridX + lx + GridOrigin.x;
                         int cellY = gridY + ly + GridOrigin.y;
-                        var pos = new Vector3Int(cellX, cellY, 0);
+                        BuildingVisualTilemap.SetTile(new Vector3Int(cellX, cellY, 0), null);
+                    }
+                }
 
-                        BuildingVisualTilemap.SetTile(pos, null);
-                        if (BuildingTopTilemap != null)
-                            BuildingTopTilemap.SetTile(pos, null);
+                // Top layer tile'larini temizle — farkli boyut + offset
+                if (BuildingTopTilemap != null)
+                {
+                    int topGW = config.EffectiveTopGridWidth;
+                    int topGH = config.EffectiveTopGridHeight;
+                    for (int lx = 0; lx < topGW; lx++)
+                    {
+                        for (int ly = 0; ly < topGH; ly++)
+                        {
+                            int cellX = gridX + lx + config.TopGridOffsetX + GridOrigin.x;
+                            int cellY = gridY + ly + config.TopGridOffsetY + GridOrigin.y;
+                            BuildingTopTilemap.SetTile(new Vector3Int(cellX, cellY, 0), null);
+                        }
                     }
                 }
             }
@@ -556,9 +568,7 @@ namespace DeadWalls
 
             if (hasLayout)
             {
-                bool hasTop = config.TileLayoutTop != null &&
-                              config.TileLayoutTop.Length == config.GridWidth * config.GridHeight;
-
+                // Base layer
                 for (int lx = 0; lx < config.GridWidth; lx++)
                 {
                     for (int ly = 0; ly < config.GridHeight; ly++)
@@ -566,19 +576,33 @@ namespace DeadWalls
                         int idx = lx + ly * config.GridWidth;
                         int cellX = gridX + lx + GridOrigin.x;
                         int cellY = gridY + ly + GridOrigin.y;
-                        var pos = new Vector3Int(cellX, cellY, 0);
 
-                        // Base layer
                         var baseTile = config.TileLayoutBase[idx];
                         if (baseTile != null)
-                            BuildingVisualTilemap.SetTile(pos, baseTile);
+                            BuildingVisualTilemap.SetTile(new Vector3Int(cellX, cellY, 0), baseTile);
+                    }
+                }
 
-                        // Top layer
-                        if (hasTop && BuildingTopTilemap != null)
+                // Top layer — farkli grid boyutu ve offset
+                int topGW = config.EffectiveTopGridWidth;
+                int topGH = config.EffectiveTopGridHeight;
+                bool hasTop = config.TileLayoutTop != null &&
+                              config.TileLayoutTop.Length == topGW * topGH;
+
+                if (hasTop && BuildingTopTilemap != null)
+                {
+                    for (int lx = 0; lx < topGW; lx++)
+                    {
+                        for (int ly = 0; ly < topGH; ly++)
                         {
+                            int idx = lx + ly * topGW;
                             var topTile = config.TileLayoutTop[idx];
                             if (topTile != null)
-                                BuildingTopTilemap.SetTile(pos, topTile);
+                            {
+                                int cellX = gridX + lx + config.TopGridOffsetX + GridOrigin.x;
+                                int cellY = gridY + ly + config.TopGridOffsetY + GridOrigin.y;
+                                BuildingTopTilemap.SetTile(new Vector3Int(cellX, cellY, 0), topTile);
+                            }
                         }
                     }
                 }

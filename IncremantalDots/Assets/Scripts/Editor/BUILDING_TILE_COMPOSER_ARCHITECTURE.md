@@ -9,8 +9,11 @@ Her `BuildingConfigSO` icin izometrik tile layout compose eden Editor araci. Bin
 BuildingConfigSO
 ├── TileLayoutBase[]    → base tilemap layer (Order=5)
 ├── TileLayoutTop[]     → top tilemap layer (Order=6)
-├── GridWidth / GridHeight
-└── Index mapping: x + y * GridWidth (sol-alttan baslayarak)
+├── GridWidth / GridHeight         → base layer grid boyutu
+├── TopGridWidth / TopGridHeight   → top layer grid boyutu (0 = base ile ayni)
+├── TopGridOffsetX / TopGridOffsetY → top layer'in base'e gore offset'i
+├── EffectiveTopGridWidth/Height   → helper (0 ise base boyutuna fallback)
+└── Index mapping: x + y * GridWidth (base), x + y * TopGridWidth (top)
 
 Composer Window                        Runtime (BuildingGridManager)
 ┌───────────────┐                     ┌──────────────────────────┐
@@ -55,14 +58,21 @@ Hit testi: Cross product sign kontrolu ile 4 kenar testi.
 | Base | `BuildingVisualTilemap` | 5 | Duvar, kapi, zemin |
 | Top | `BuildingTopTilemap` | 6 | Cati, bayrak, detay |
 
-- `PlaceVisualTile`: TileLayout varsa → her hucreye base+top tile koyar. Yoksa → eski GhostSprite fallback.
-- `RemoveVisualTile`: Ayni logic ile her iki layer'dan tile siler.
+- `PlaceVisualTile`: Base tile'lar (x,y) pozisyonuna, Top tile'lar (x+TopGridOffsetX, y+TopGridOffsetY) pozisyonuna konur.
+- `RemoveVisualTile`: Her iki layer kendi grid boyutu ve offset'iyle temizlenir.
 - `ResetGrid`: Her iki tilemap'i `ClearAllTiles()` ile temizler.
 
 ## Array Boyut Kurali
 - `TileLayoutBase.Length == GridWidth * GridHeight` olmali. Aksi halde fallback'e duser.
-- `TileLayoutTop` null olabilir veya bos olabilir — sadece base yeterli.
+- `TileLayoutTop.Length == EffectiveTopGridWidth * EffectiveTopGridHeight` olmali.
+- `TopGridWidth/Height` = 0 → base boyutuna fallback (geriye uyumluluk).
 - null slot = o hucrede tile yok.
+
+## Top Layer Bagimsiz Grid
+- Top layer kendi grid boyutuna sahip olabilir (base'den farkli)
+- `TopGridOffsetX/Y`: top grid'in base grid'e gore konum farki (hucre cinsinden)
+- Ornek: Base 3x3 duvar, Top 3x3 cati, OffsetY=2 → cati duvarlardan 2 satir yukarida
+- Grid editor'da aktif layer kendi grid'ini gosterir, pasif layer ghost outline olarak gorunur
 
 ## Preview RenderTexture Sistemi
 
