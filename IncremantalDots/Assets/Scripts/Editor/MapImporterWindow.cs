@@ -99,6 +99,11 @@ namespace DeadWalls
         private float _forestEdgeBias = 0.3f;
         private float _rockyStoneBonus = 0.15f;
 
+        // ─── 2-Katman Ground ──────────────────────────
+        private Tilemap _groundBaseTilemap;    // base katman (A1 her hucreye)
+        private TileBase _grassOverlayTile;    // kullanicinin IsometricRuleTile'i
+        private TileBase _groundBaseTile;      // A1_E (otomatik yuklenir)
+
         // ─── EditorPrefs key prefix ─────────────────────
         private const string KeyPrefix = "DeadWalls_MapImporter_";
 
@@ -212,6 +217,9 @@ namespace DeadWalls
             EditorPrefs.SetFloat(KeyPrefix + "RockyStoneBonus", _rockyStoneBonus);
             EditorPrefs.SetFloat(KeyPrefix + "WarpStrength", _warpStrength);
             EditorPrefs.SetInt(KeyPrefix + "SmoothingPasses", _smoothingPasses);
+            // 2-Katman ground
+            SaveTilemapRef("GroundBaseTilemap", _groundBaseTilemap);
+            SaveTileRef("GrassOverlay", _grassOverlayTile);
         }
 
         private void LoadAllPrefs()
@@ -258,6 +266,9 @@ namespace DeadWalls
             _rockyStoneBonus = EditorPrefs.GetFloat(KeyPrefix + "RockyStoneBonus", 0.15f);
             _warpStrength = EditorPrefs.GetFloat(KeyPrefix + "WarpStrength", 30f);
             _smoothingPasses = EditorPrefs.GetInt(KeyPrefix + "SmoothingPasses", 1);
+            // 2-Katman ground
+            _groundBaseTilemap = LoadTilemapRef("GroundBaseTilemap");
+            _grassOverlayTile = LoadTileRef("GrassOverlay");
         }
 
         // ═══════════════════════════════════════════════
@@ -332,8 +343,10 @@ namespace DeadWalls
                 EditorGUILayout.BeginVertical(EditorStyles.helpBox);
 
                 EditorGUI.BeginChangeCheck();
+                _groundBaseTilemap = (Tilemap)EditorGUILayout.ObjectField(
+                    "Ground Base", _groundBaseTilemap, typeof(Tilemap), true);
                 _groundTilemap = (Tilemap)EditorGUILayout.ObjectField(
-                    "Ground", _groundTilemap, typeof(Tilemap), true);
+                    "Ground (Overlay)", _groundTilemap, typeof(Tilemap), true);
                 _buildableTilemap = (Tilemap)EditorGUILayout.ObjectField(
                     "Buildable", _buildableTilemap, typeof(Tilemap), true);
                 _resourcesTilemap = (Tilemap)EditorGUILayout.ObjectField(
@@ -358,6 +371,19 @@ namespace DeadWalls
                 EditorGUILayout.BeginVertical(EditorStyles.helpBox);
 
                 EditorGUI.BeginChangeCheck();
+
+                // 2-Katman modu: RuleTile slot
+                _grassOverlayTile = (TileBase)EditorGUILayout.ObjectField(
+                    "Grass Overlay (RuleTile)", _grassOverlayTile, typeof(TileBase), false);
+                EditorGUILayout.HelpBox(
+                    "IsometricRuleTile olusturup buraya surukle.\n" +
+                    "2-katman: base'e A1 toprak, overlay'e RuleTile cimen boyanir.\n" +
+                    "RuleTile atanmazsa asagidaki fallback slot'lar kullanilir.",
+                    MessageType.Info);
+
+                DrawSeparator();
+                EditorGUILayout.LabelField("Fallback Slot'lar (eski mod)", EditorStyles.miniLabel);
+
                 _tileGrass = (TileBase)EditorGUILayout.ObjectField(
                     "Grass", _tileGrass, typeof(TileBase), false);
                 _tileDarkGrass = (TileBase)EditorGUILayout.ObjectField(
@@ -493,12 +519,22 @@ namespace DeadWalls
 
                 // --- Ground ---
                 EditorGUILayout.BeginHorizontal();
-                GUI.enabled = parsed && _groundTilemap != null && HasAnyGroundTile();
+                bool hasMapper = GroundTileMapperWindow.HasAnyMapping();
+                bool has2Layer = _groundBaseTilemap != null && _groundTilemap != null
+                    && _grassOverlayTile != null;
+                bool canPaintGround = parsed && _groundTilemap != null
+                    && (hasMapper || has2Layer || HasAnyGroundTile());
+                GUI.enabled = canPaintGround;
                 if (GUILayout.Button("Paint Ground", GUILayout.Height(24)))
                     PaintGround();
-                GUI.enabled = _groundTilemap != null;
+                GUI.enabled = _groundTilemap != null || _groundBaseTilemap != null;
                 if (GUILayout.Button("Clear Ground", GUILayout.Height(24)))
-                    ClearLayer(_groundTilemap, "Clear Ground");
+                {
+                    if (_groundBaseTilemap != null)
+                        ClearLayer(_groundBaseTilemap, "Clear Ground Base");
+                    if (_groundTilemap != null)
+                        ClearLayer(_groundTilemap, "Clear Ground Overlay");
+                }
                 EditorGUILayout.EndHorizontal();
 
                 // --- Buildable ---
@@ -526,7 +562,7 @@ namespace DeadWalls
 
                 // --- Tumunu Boya ---
                 bool canPaintAll = parsed
-                    && _groundTilemap != null && HasAnyGroundTile()
+                    && _groundTilemap != null && (hasMapper || has2Layer || HasAnyGroundTile())
                     && _buildableTilemap != null && _tileBuildable != null
                     && _resourcesTilemap != null && HasAnyResourceTile();
 
@@ -672,6 +708,22 @@ namespace DeadWalls
 
         private void PaintGround()
         {
+            // Mapper modu: tek tilemap, A1 toprak + mapper cimen tile'lari
+            if (_groundTilemap != null && GroundTileMapperWindow.HasAnyMapping())
+            {
+                PaintGroundMapper();
+                return;
+            }
+
+            // 2-katman modu: base tilemap + overlay (RuleTile fallback)
+            if (_groundBaseTilemap != null && _groundTilemap != null
+                && _grassOverlayTile != null)
+            {
+                PaintGround2Layer();
+                return;
+            }
+
+            // Fallback: eski tek-tilemap modu (manual tile slot'lari)
             Undo.RecordObject(_groundTilemap, "Paint Ground Layer");
             int total = _mapHeight * _mapWidth;
             int count = 0;
@@ -785,6 +837,7 @@ namespace DeadWalls
 
             // Onceki boyamayi temizle — farkli seed/parametrelerle
             // degisen hucreler eski tile'lari birakmasin
+            if (_groundBaseTilemap != null) _groundBaseTilemap.ClearAllTiles();
             _groundTilemap.ClearAllTiles();
             _buildableTilemap.ClearAllTiles();
             _resourcesTilemap.ClearAllTiles();
@@ -849,6 +902,195 @@ namespace DeadWalls
         private bool HasAnyResourceTile()
         {
             return _tileForest != null || _tileStone != null || _tileIron != null;
+        }
+
+        // ═══════════════════════════════════════════════
+        // MAPPER GROUND — tek tilemap, A1 toprak + mapper cimen
+        // ═══════════════════════════════════════════════
+
+        /// <summary>
+        /// Tek tilemap ground boyama: toprak hucrelerine A1, cimen hucrelerine
+        /// mask-tabanli mapper tile. Izometrik sorting sorunu olmaz cunku
+        /// her sey ayni tilemap'te.
+        /// </summary>
+        private void PaintGroundMapper()
+        {
+            // Duz toprak tile'i yukle — J1_E (A2 ile ayni boyutta duz tile)
+            // A1_E kullanilMAZ cunku 3D blok, komsularin A2'si onu eziyor
+            {
+                string path = "Assets/SmallScaleInt/Fantasy kingdom Tileset/Environment/Tiles/Ground J1_E.asset";
+                _groundBaseTile = AssetDatabase.LoadAssetAtPath<TileBase>(path);
+                if (_groundBaseTile == null)
+                {
+                    Debug.LogError("[MapImporter] Ground J1_E.asset bulunamadi! Path: " + path);
+                    return;
+                }
+            }
+
+            TileBase[] mapperTiles = GroundTileMapperWindow.LoadMapperTiles();
+
+            Undo.RecordObject(_groundTilemap, "Paint Ground (Mapper)");
+
+            // Base tilemap varsa temizle (eski 2-katman kalintisi)
+            if (_groundBaseTilemap != null)
+            {
+                Undo.RecordObject(_groundBaseTilemap, "Clear Ground Base");
+                _groundBaseTilemap.ClearAllTiles();
+            }
+
+            int total = _mapHeight * _mapWidth;
+            int count = 0;
+
+            try
+            {
+                for (int r = 0; r < _mapHeight; r++)
+                {
+                    for (int c = 0; c < _mapWidth; c++)
+                    {
+                        var cell = JsonCellToTilemapCell(r, c);
+                        string terrain = _groundLayer[r][c];
+                        bool isGrass = (terrain == "grass" || terrain == "dark_grass");
+
+                        if (isGrass)
+                        {
+                            int mask = ComputeGrassNeighborMask(r, c);
+                            TileBase tile = mapperTiles[mask] ?? _groundBaseTile;
+                            _groundTilemap.SetTile(cell, tile);
+                        }
+                        else
+                        {
+                            // Toprak/rocky → A1 opak blok
+                            _groundTilemap.SetTile(cell, _groundBaseTile);
+                        }
+
+                        if (++count % 500 == 0)
+                            EditorUtility.DisplayProgressBar("Ground Boyaniyor (Mapper)",
+                                $"{count}/{total}", (float)count / total);
+                    }
+                }
+            }
+            finally
+            {
+                EditorUtility.ClearProgressBar();
+            }
+
+            EditorUtility.SetDirty(_groundTilemap);
+            Debug.Log($"[MapImporter] Ground boyandi (mapper, tek tilemap): {total} hucre");
+        }
+
+        // ═══════════════════════════════════════════════
+        // 2-KATMAN GROUND — base (A1) + overlay (RuleTile)
+        // ═══════════════════════════════════════════════
+
+        /// <summary>
+        /// 2-katman ground boyama: base tilemap'e A1 HER hucreye,
+        /// overlay tilemap'e cimen hucrelerine mask-tabanlı tile veya RuleTile fallback.
+        /// GroundTileMapper esleme varsa komsu mask'ina gore tile secer.
+        /// </summary>
+        private void PaintGround2Layer()
+        {
+            // A1 base tile'i yukle (ilk seferde)
+            if (_groundBaseTile == null)
+            {
+                string path = "Assets/SmallScaleInt/Fantasy kingdom Tileset/Environment/Tiles/Ground A1_E.asset";
+                _groundBaseTile = AssetDatabase.LoadAssetAtPath<TileBase>(path);
+                if (_groundBaseTile == null)
+                {
+                    Debug.LogError("[MapImporter] Ground A1_E.asset bulunamadi! Path: " + path);
+                    return;
+                }
+            }
+
+            // Ground mapper tile'larini yukle
+            TileBase[] mapperTiles = GroundTileMapperWindow.LoadMapperTiles();
+            bool hasMapper = false;
+            for (int i = 0; i < 16; i++)
+            {
+                if (mapperTiles[i] != null) { hasMapper = true; break; }
+            }
+
+            Undo.RecordObject(_groundBaseTilemap, "Paint Ground Base");
+            Undo.RecordObject(_groundTilemap, "Paint Ground Overlay");
+
+            int total = _mapHeight * _mapWidth;
+            int count = 0;
+
+            try
+            {
+                for (int r = 0; r < _mapHeight; r++)
+                {
+                    for (int c = 0; c < _mapWidth; c++)
+                    {
+                        var cell = JsonCellToTilemapCell(r, c);
+
+                        // Base: A1 HER hucreye
+                        _groundBaseTilemap.SetTile(cell, _groundBaseTile);
+
+                        // Overlay: cimen hucrelerine tile, toprak hucrelerine null
+                        string terrain = _groundLayer[r][c];
+                        bool isGrass = (terrain == "grass" || terrain == "dark_grass");
+
+                        TileBase overlayTile = null;
+                        if (isGrass)
+                        {
+                            if (hasMapper)
+                            {
+                                int mask = ComputeGrassNeighborMask(r, c);
+                                overlayTile = mapperTiles[mask] ?? _grassOverlayTile;
+                            }
+                            else
+                            {
+                                overlayTile = _grassOverlayTile;
+                            }
+                        }
+                        _groundTilemap.SetTile(cell, overlayTile);
+
+                        if (++count % 500 == 0)
+                            EditorUtility.DisplayProgressBar("Ground 2-Layer Boyaniyor",
+                                $"{count}/{total}", (float)count / total);
+                    }
+                }
+            }
+            finally
+            {
+                EditorUtility.ClearProgressBar();
+            }
+
+            EditorUtility.SetDirty(_groundBaseTilemap);
+            EditorUtility.SetDirty(_groundTilemap);
+            Debug.Log($"[MapImporter] Ground 2-layer boyandi: {total} hucre" +
+                (hasMapper ? " (mapper)" : " (fallback)"));
+        }
+
+        // ═══════════════════════════════════════════════
+        // KOMSU MASK HESAPLAMA
+        // ═══════════════════════════════════════════════
+
+        /// <summary>
+        /// Verilen hucrenin 4-bit komsu mask'ini hesaplar.
+        /// Bit 3=Kuzey(r-1), Bit 2=Dogu(c+1), Bit 1=Guney(r+1), Bit 0=Bati(c-1).
+        /// Sinir disindaki hucreler cimen sayilir (kenar temizligi).
+        /// </summary>
+        private int ComputeGrassNeighborMask(int r, int c)
+        {
+            int mask = 0;
+            if (IsGrassAt(r - 1, c)) mask |= 8; // Kuzey
+            if (IsGrassAt(r, c + 1)) mask |= 4; // Dogu
+            if (IsGrassAt(r + 1, c)) mask |= 2; // Guney
+            if (IsGrassAt(r, c - 1)) mask |= 1; // Bati
+            return mask;
+        }
+
+        /// <summary>
+        /// Verilen koordinat cimen mi kontrol eder.
+        /// Sinir disi → true (kenarlar temiz gorunsun).
+        /// </summary>
+        private bool IsGrassAt(int r, int c)
+        {
+            if (r < 0 || r >= _mapHeight || c < 0 || c >= _mapWidth)
+                return true;
+            string terrain = _groundLayer[r][c];
+            return terrain == "grass" || terrain == "dark_grass";
         }
 
         // ═══════════════════════════════════════════════
@@ -1168,7 +1410,11 @@ namespace DeadWalls
                 if (GUILayout.Button("SADECE GENERATE", GUILayout.Height(28)))
                     ProceduralGenerateAll();
 
-                bool hasTilemaps = _groundTilemap != null && HasAnyGroundTile()
+                bool procHasMapper = GroundTileMapperWindow.HasAnyMapping();
+                bool procHas2Layer = _groundBaseTilemap != null && _groundTilemap != null
+                    && _grassOverlayTile != null;
+                bool hasTilemaps = _groundTilemap != null
+                    && (procHasMapper || procHas2Layer || HasAnyGroundTile())
                     && _buildableTilemap != null && _tileBuildable != null
                     && _resourcesTilemap != null && HasAnyResourceTile();
 

@@ -27,12 +27,13 @@ Harita uretim ve tilemap boyama araci. Iki mod destekler:
 
 ## Katmanlar
 
-| Layer | Tile Slot'lari | Aciklama |
-|-------|---------------|----------|
-| Ground | grass, dark_grass, dirt, rocky | Her hucre boyanir (4 farkli zemin) |
-| Buildable | tek TileBase | Sadece `1` olan hucreler boyanir |
-| Resources | forest, stone, iron | Bos olmayan hucreler boyanir |
-| Strategic | — | Tilemap'e basilMAZ, sadece bilgi gosterilir |
+| Layer | Tilemap | Tile Slot'lari | Aciklama |
+|-------|---------|---------------|----------|
+| Ground Base | ground_base (sorting order -1) | A1_E (otomatik yuklenir) | HER hucreye opak toprak blok |
+| Ground Overlay | ground (sorting order 0) | IsometricRuleTile (kullanici atar) | Cimen hucrelerine RuleTile, toprak hucrelerine null |
+| Buildable | buildable_zone | tek TileBase | Sadece `1` olan hucreler boyanir |
+| Resources | resources_zones | forest, stone, iron | Bos olmayan hucreler boyanir |
+| Strategic | — | — | Tilemap'e basilMAZ, sadece bilgi gosterilir |
 
 ## Koordinat Donusumu
 ```
@@ -99,6 +100,39 @@ isBuildable = distFromCastle <= effectiveRadius && col < zombieBorderCol
 - **Iron**: daha siki noise scale (1.5x), 2 oktav → kucuk izole kumeler
 - Buildable zone icinde kaynak konmaz
 - Ayni hucrede cakisma → winner-take-all (en yuksek score kazanir)
+
+### 2-Katman Ground Sistemi
+Fantasy Kingdom tileset'inin Ground A serisi 2 katmanli calisir:
+- **A1** = opak 3D toprak blok (base zemin)
+- **A2+** = seffaf cimen overlay'leri (ust katman)
+
+Tek tilemap'te A2 koyulursa alti seffaf kalir — Unity arka plani gorunur. Cozum:
+```
+ground_base tilemap (sorting order -1)
+  └── A1_E tile HER hucreye → opak toprak, asla seffaf alan yok
+
+ground tilemap (sorting order 0 — overlay)
+  └── Cimen hucrelerine: kullanicinin IsometricRuleTile'i
+  └── Toprak hucrelerine: null (base'den A1 gorunur)
+  └── RuleTile komsulara bakarak otomatik dogru sprite secer
+```
+
+- `PaintGround2Layer()`: base + overlay ayri ayri boyanir
+- `_groundBaseTile` (A1_E): asset path'ten otomatik yuklenir (ilk seferde)
+- `_grassOverlayTile`: fallback tile (Inspector'da atanir)
+
+#### GroundTileMapper Entegrasyonu
+`PaintGround2Layer()` overlay tile seciminde 3 katmanli fallback zinciri kullanir:
+```
+1. GroundTileMapper esleme var mi?
+   EVET → ComputeGrassNeighborMask(r,c) ile 4-bit mask hesapla → mapperTiles[mask]
+   2. mapperTiles[mask] null mi? → _grassOverlayTile fallback
+   3. _grassOverlayTile da null mi? → null (base A1 gorunur)
+```
+- `ComputeGrassNeighborMask()`: K(r-1)=bit3, D(c+1)=bit2, G(r+1)=bit1, B(c-1)=bit0
+- `IsGrassAt()`: sinir disi = true (kenar temizligi)
+- Mapper esleme: `GroundTileMapperWindow` EditorPrefs uzerinden 16 mask→tile GUID saklar
+- Ayri editor window: `Window > DeadWalls > Ground Tile Mapper`
 
 ### Veri Kontrati
 `ProceduralGenerateAll()` ayni `_groundLayer`, `_buildableLayer`, `_resourcesLayer` dizilerini doldurur.
