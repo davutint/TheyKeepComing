@@ -28,6 +28,10 @@ namespace DeadWalls
         public Slider StoneWorkerSlider;
         public Slider IronWorkerSlider;
         public Slider FoodWorkerSlider;
+        public Button WoodAssignButton;
+        public Button StoneAssignButton;
+        public Button IronAssignButton;
+        public Button FoodAssignButton;
         public TMP_Text WoodWorkerText;
         public TMP_Text StoneWorkerText;
         public TMP_Text IronWorkerText;
@@ -145,6 +149,10 @@ namespace DeadWalls
             RefreshResourceRow(EconomyFocusType.Stone, StoneWorkerSlider, StoneWorkerText, StoneRateText, "Stone", gm);
             RefreshResourceRow(EconomyFocusType.Iron, IronWorkerSlider, IronWorkerText, IronRateText, "Iron", gm);
             RefreshResourceRow(EconomyFocusType.Food, FoodWorkerSlider, FoodWorkerText, FoodRateText, "Food", gm);
+            RefreshAssignButton(EconomyFocusType.Wood, WoodAssignButton, "Wood", gm);
+            RefreshAssignButton(EconomyFocusType.Stone, StoneAssignButton, "Stone", gm);
+            RefreshAssignButton(EconomyFocusType.Iron, IronAssignButton, "Iron", gm);
+            RefreshAssignButton(EconomyFocusType.Food, FoodAssignButton, "Food", gm);
 
             if (totalWorkers + idle + population.Archers > population.Total && PopulationIdleText != null)
                 PopulationIdleText.text = "Idle 0";
@@ -179,6 +187,17 @@ namespace DeadWalls
 
             SetText(workerText, $"{label} {value}");
             SetText(rateText, $"+{gm.GetWorkerProductionRate(resource):0}/min");
+        }
+
+        private static void RefreshAssignButton(EconomyFocusType resource, Button button, string label, GameManager gm)
+        {
+            if (button == null)
+                return;
+
+            button.interactable = gm.CanAssignResourceWorker(resource);
+            SetButtonText(button, gm.GetIdlePopulation() > 0 || gm.IsFreeEconomyTestMode
+                ? $"{label} +Worker"
+                : "NEED POP");
         }
 
         private void RefreshEvent(GameManager gm)
@@ -283,6 +302,10 @@ namespace DeadWalls
             CloseCastleEconomyButton?.onClick.AddListener(ClosePanel);
             ConfirmCastleEconomyButton?.onClick.AddListener(ClosePanel);
             CastleRepairButton?.onClick.AddListener(HandleRepairClicked);
+            WoodAssignButton?.onClick.AddListener(HandleWoodAssignClicked);
+            StoneAssignButton?.onClick.AddListener(HandleStoneAssignClicked);
+            IronAssignButton?.onClick.AddListener(HandleIronAssignClicked);
+            FoodAssignButton?.onClick.AddListener(HandleFoodAssignClicked);
             WoodWorkerSlider?.onValueChanged.AddListener(HandleWoodChanged);
             StoneWorkerSlider?.onValueChanged.AddListener(HandleStoneChanged);
             IronWorkerSlider?.onValueChanged.AddListener(HandleIronChanged);
@@ -296,6 +319,10 @@ namespace DeadWalls
             CloseCastleEconomyButton?.onClick.RemoveListener(ClosePanel);
             ConfirmCastleEconomyButton?.onClick.RemoveListener(ClosePanel);
             CastleRepairButton?.onClick.RemoveListener(HandleRepairClicked);
+            WoodAssignButton?.onClick.RemoveListener(HandleWoodAssignClicked);
+            StoneAssignButton?.onClick.RemoveListener(HandleStoneAssignClicked);
+            IronAssignButton?.onClick.RemoveListener(HandleIronAssignClicked);
+            FoodAssignButton?.onClick.RemoveListener(HandleFoodAssignClicked);
             WoodWorkerSlider?.onValueChanged.RemoveListener(HandleWoodChanged);
             StoneWorkerSlider?.onValueChanged.RemoveListener(HandleStoneChanged);
             IronWorkerSlider?.onValueChanged.RemoveListener(HandleIronChanged);
@@ -308,6 +335,10 @@ namespace DeadWalls
         private void HandleStoneChanged(float value) => SetWorkers(EconomyFocusType.Stone, value);
         private void HandleIronChanged(float value) => SetWorkers(EconomyFocusType.Iron, value);
         private void HandleFoodChanged(float value) => SetWorkers(EconomyFocusType.Food, value);
+        private void HandleWoodAssignClicked() => AssignWorker(EconomyFocusType.Wood);
+        private void HandleStoneAssignClicked() => AssignWorker(EconomyFocusType.Stone);
+        private void HandleIronAssignClicked() => AssignWorker(EconomyFocusType.Iron);
+        private void HandleFoodAssignClicked() => AssignWorker(EconomyFocusType.Food);
 
         private void SetWorkers(EconomyFocusType resource, float value)
         {
@@ -315,6 +346,12 @@ namespace DeadWalls
                 return;
 
             GameManager.Instance?.SetResourceWorkers(resource, Mathf.RoundToInt(value));
+            Refresh();
+        }
+
+        private void AssignWorker(EconomyFocusType resource)
+        {
+            GameManager.Instance?.AssignResourceWorker(resource);
             Refresh();
         }
 

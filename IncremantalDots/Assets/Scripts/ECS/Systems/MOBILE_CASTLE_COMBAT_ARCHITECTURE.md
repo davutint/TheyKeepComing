@@ -159,12 +159,17 @@ Mobile normal mode'da `DamageCleanupSystem`, death timer biten zombiler icin kil
 
 ## Castle Interior Economy
 
-`EconomyFocusUI` mobile loop'ta artik kullanilmaz; setup tool eski focus objelerini gizler. Ekonomi yonu DayPrep sirasinda kaleye tiklaninca acilan `CastleEconomyPanel` ile belirlenir.
+`EconomyFocusUI` mobile loop'ta artik kullanilmaz; setup tool eski focus objelerini gizler. Ekonomi yonu sol kale ici worker site'lari ve Castle Economy UI aksiyonlariyla belirlenir.
 
 - `CastleInteriorClickTarget` sadece DayPrep ve non-stress modda tiklamayi kabul eder.
 - `CastleEconomyUI` panel acikken `MobilePrepPauseState.IsPaused` yazar; `DayNightPrepSystem` sayaci azaltmaz.
-- Worker slider'lari `MobilePopulationAllocation` uzerindeki Wood/Stone/Iron/Food worker sayilarini degistirir.
-- Slider toplam worker sayisi `Population.Total - Population.Archers` ustune cikamaz.
+- `WoodAssignButton`, `StoneAssignButton`, `IronAssignButton`, `FoodAssignButton` varsa her basarili tap ilgili worker sayisini +1 yapar; tap progress yoktur.
+- Eski worker slider'lari debug/legacy olarak kalabilir ve ayni `MobilePopulationAllocation` verisini degistirir.
+- Worker assignment toplam worker sayisini `Population.Total - Population.Archers` ustune cikaramaz.
+- `GameManager`, worker allocation degisince `WorkerPrefabData.WorkerPrefab` uzerinden DOTS villager entity'leri spawn/destroy eder.
+- Villager worker pickup pozisyonlari main scene `CastleInteriorEconomyArea/*Site/WorkerSpawnPoints` marker'larindan gelir.
+- Delivery pozisyonlari `CastleInteriorEconomyArea/CastleWorkerHub/DeliveryPoints` marker'larindan gelir.
+- `WorkerLogisticsMovementSystem`, villagerlari pickup ile hub arasinda yuruturek kaynak tasima feedback'i verir.
 - Her completed wave sonrasi DayPrep basinda `PopulationGrowthPerDayPrep` kadar population eklenir.
 - Okcu satin almak `1` idle population kullanir; idle yoksa buy disabled olur ve drawer `NEED POP` yazar.
 - Editor testleri icin `GameManager.Free Economy Test Mode` acilirsa okcu satin alma population harcamaz ve resource/population eksigi aksiyonlari bloklamaz.

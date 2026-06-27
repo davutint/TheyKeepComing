@@ -23,6 +23,7 @@ namespace DeadWalls
         public GameObject ZombiePrefab;
         public GameObject ArrowPrefab;
         public GameObject ArcherPrefab;
+        public GameObject WorkerPrefab;
 
         public class Baker : Baker<WaveConfigAuthoring>
         {
@@ -42,6 +43,14 @@ namespace DeadWalls
                 {
                     ArcherPrefab = GetEntity(authoring.ArcherPrefab, TransformUsageFlags.Dynamic)
                 });
+
+                if (authoring.WorkerPrefab != null)
+                {
+                    AddComponent(entity, new WorkerPrefabData
+                    {
+                        WorkerPrefab = GetEntity(authoring.WorkerPrefab, TransformUsageFlags.Dynamic)
+                    });
+                }
             }
         }
     }

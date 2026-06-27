@@ -1,0 +1,41 @@
+# Worker Logistics Movement System - Architecture
+
+`WorkerLogisticsMovementSystem`, Castle Interior ekonomi alanindaki DOTS villager worker entity'lerini kaynak pickup noktalari ile merkezi hub delivery noktalari arasinda hareket ettirir.
+
+## Amac
+
+- Workerlar statik durmaz; kaynak noktasindan merkeze kaynak tasiyor gibi gorunur.
+- Ekonomi uretim hesabini degistirmez.
+- `MobilePopulationAllocation` halen resource worker sayisinin source-of-truth'udur.
+
+## Component Akisi
+
+```text
+GameManager worker visual sync
+-> ResourceWorkerVisual
+-> WorkerLogisticsRoute
+-> WorkerLogisticsMovementSystem
+-> LocalTransform + SpriteAnimation
+```
+
+`WorkerLogisticsRoute` sunlari tutar:
+
+- `PickupPosition`: Wood/Stone/Iron/Food site marker pozisyonu.
+- `DeliveryPosition`: `CastleWorkerHub/DeliveryPoints` marker pozisyonu.
+- `MovingToHub`: su an hub'a mi pickup'a mi gittigini belirler.
+- `WorkDuration` ve `DeliveryDuration`: rota ucundaki kisa bekleme sureleri.
+
+## Animasyon
+
+Villager spritesheet row duzeni Character Creator standardini kullanir:
+
+```text
+Walk: Row 0-7
+Idle: Row 24-31
+```
+
+Sistem hareket yonunden direction index hesaplar ve `SpriteAnimation.DirectionRow` degerini gunceller.
+
+## Scope
+
+Bu sistem kaynak tick'i, income math veya population allocation yapmaz. Sadece worker visual feedback layer'idir.

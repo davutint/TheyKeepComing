@@ -123,7 +123,8 @@ ECS Systems -> Entity Data -> GameManager.ReadECSData() -> Events -> UI Controll
 UI Input -> GameManager.CanApplyUpgrade()/ApplyUpgrade() -> EntityManager.SetComponentData -> ECS
 Drawer Input -> GameManager.BuyArcher()/UpgradeArcherType()/UnlockArcherType() -> EntityManager.SetComponentData -> ECS
 Castle Click -> CastleEconomyUI.OpenFromCastle() -> MobilePrepPauseState
-Worker Slider Input -> GameManager.SetResourceWorkers() -> MobilePopulationAllocation -> MobilePopulationEconomySystem
+Worker Assign Button -> GameManager.AssignResourceWorker() -> MobilePopulationAllocation -> DOTS VillagerWorker route visual sync -> MobilePopulationEconomySystem
+Legacy Worker Slider Input -> GameManager.SetResourceWorkers() -> MobilePopulationAllocation -> DOTS VillagerWorker visual sync
 Economy Event Input -> GameManager.ChooseEconomyEvent() -> Resources/Population/MobileEconomyEventState
 Castle Interior Repair -> GameManager.RepairDefenseFull() -> EntityManager.SetComponentData -> ECS
 DayNightOverlayController -> GameManager.WaveState + MobileCastleCombatConfig -> Overlay alpha

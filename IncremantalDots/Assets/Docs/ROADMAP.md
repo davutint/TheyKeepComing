@@ -1,7 +1,8 @@
 # DEAD WALLS — Yol Haritasi ve Yapilacaklar Listesi (v4.0)
 
+> **Guncel tasarim notu (2026-06-27):** Bu roadmap, eski v4.0 RTS/town-builder hedeflerini tarihsel olarak tutar. Guncel mobile castle-defense yonu icin ana referans artik `DEAD_WALLS_GDD_v5.0.md` dokumanidir.
 > Bu dokuman projenin tek takip kaynagindir. Her gorev tamamlandiginda `[x]` ile isaretlenir.
-> GDD v4.0 referans alinir. Her sistem icin yazilan EDITOR_SETUP md dosyasi UI kurulum talimatlarini da icerir.
+> Bu eski roadmap icin GDD v4.0 referans alinmisti. Her sistem icin yazilan EDITOR_SETUP md dosyasi UI kurulum talimatlarini da icerir.
 > Milestone siralama: M0 → M1 → M-CLN → M-ISO → M2 → M3 → M4 → M5
 
 ---
@@ -504,4 +505,4 @@ Asagidakiler **tamamlanmis ve calisan** sistemlerdir:
 ---
 
 *Son guncelleme: 2026-03-18*
-*GDD Referans: DEAD_WALLS_GDD_v4.0.md*
+*Legacy GDD Referans: DEAD_WALLS_GDD_v4.0.md*

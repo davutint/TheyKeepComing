@@ -25,6 +25,9 @@ namespace DeadWalls
         private const string ZombiePrefabPath = "Assets/Prefabs/Zombie.prefab";
         private const string ArrowPrefabPath = "Assets/Prefabs/Arrow.prefab";
         private const string ArcherPrefabPath = "Assets/Prefabs/Archer.prefab";
+        private const string WorkerPrefabPath = "Assets/Prefabs/VillagerWorker.prefab";
+        private const string WorkerMaterialPath = "Assets/Materials/Villager.mat";
+        private const string WorkerIdleSpritesheetPath = "Assets/SmallScaleInt/Character creator - Fantasy/Created Spritesheets/Character_villager/Idle.png";
         private const string GeneratedHudPrefabPath = "Assets/Prefabs/UI/Generated/MobileCastleHudRoot.prefab";
         private const string SmallScaleTilesRoot = "Assets/SmallScaleInt/Fantasy kingdom Tileset/Environment/Tiles";
         private const string ArrowMuzzleVfxPath = "Assets/VFX_Klaus/Prefabs/Stylized Shoot & Hit Vol.2/FX_Shoot_Arrow_muzzle.prefab";
@@ -90,6 +93,7 @@ namespace DeadWalls
 
             var canvas = EnsureCanvas(scene);
             EnsureManagers(scene, canvas);
+            EnsureCastleInteriorWorkerArea(scene);
             EnsureSubSceneRoot(scene, combatSubSceneAsset);
 
             EditorSceneManager.MarkSceneDirty(scene);
@@ -195,6 +199,7 @@ namespace DeadWalls
             var zombiePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(ZombiePrefabPath);
             var arrowPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(ArrowPrefabPath);
             var archerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(ArcherPrefabPath);
+            var workerPrefab = EnsureVillagerWorkerPrefab();
 
             var gameState = EnsureSceneRoot(subScene, "GameState");
             var gameStateAuthoring = EnsureComponent<GameStateAuthoring>(gameState);
@@ -225,6 +230,7 @@ namespace DeadWalls
             waveConfig.ZombiePrefab = zombiePrefab;
             waveConfig.ArrowPrefab = arrowPrefab;
             waveConfig.ArcherPrefab = archerPrefab;
+            waveConfig.WorkerPrefab = workerPrefab;
 
             var castle = EnsureSceneRoot(subScene, "CastleCore");
             castle.transform.position = Vector3.zero;
@@ -344,6 +350,79 @@ namespace DeadWalls
                 spriteSheet.FrameCount = 15;
                 spriteSheet.Tint = Color.white;
             }
+        }
+
+        private static GameObject EnsureVillagerWorkerPrefab()
+        {
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(WorkerPrefabPath);
+            if (prefab != null)
+            {
+                ConfigureVillagerWorkerPrefab(prefab);
+                PrefabUtility.SavePrefabAsset(prefab);
+                return prefab;
+            }
+
+            var temp = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            temp.name = "VillagerWorker";
+            var collider = temp.GetComponent<Collider>();
+            if (collider != null)
+                DestroyImmediate(collider);
+
+            ConfigureVillagerWorkerPrefab(temp);
+            PrefabUtility.SaveAsPrefabAsset(temp, WorkerPrefabPath);
+            DestroyImmediate(temp);
+            return AssetDatabase.LoadAssetAtPath<GameObject>(WorkerPrefabPath);
+        }
+
+        private static void ConfigureVillagerWorkerPrefab(GameObject worker)
+        {
+            if (worker == null)
+                return;
+
+            worker.transform.localScale = Vector3.one * 2.2f;
+
+            var meshFilter = EnsureComponent<MeshFilter>(worker);
+            if (meshFilter.sharedMesh == null)
+                meshFilter.sharedMesh = Resources.GetBuiltinResource<Mesh>("Quad.fbx");
+
+            var renderer = EnsureComponent<MeshRenderer>(worker);
+            var material = AssetDatabase.LoadAssetAtPath<Material>(WorkerMaterialPath);
+            if (material != null)
+            {
+                var idleTexture = AssetDatabase.LoadAssetAtPath<Texture2D>(WorkerIdleSpritesheetPath);
+                if (idleTexture != null)
+                {
+                    material.SetTexture("_MainTex", idleTexture);
+                    EditorUtility.SetDirty(material);
+                }
+                else
+                {
+                    Debug.LogWarning("[MobileCastleSceneSetup] Villager idle spritesheet bulunamadi: " + WorkerIdleSpritesheetPath);
+                }
+
+                renderer.sharedMaterial = material;
+            }
+            else
+            {
+                Debug.LogWarning("[MobileCastleSceneSetup] Villager worker material bulunamadi: " + WorkerMaterialPath);
+            }
+
+            renderer.sortingLayerName = "Wall";
+            renderer.sortingOrder = 3;
+
+            var spriteSheet = EnsureComponent<SpriteSheetAuthoring>(worker);
+            spriteSheet.Columns = 15;
+            spriteSheet.Rows = 8;
+            spriteSheet.FPS = 8f;
+            spriteSheet.DirectionRow = 2;
+            spriteSheet.FrameCount = 15;
+            spriteSheet.Tint = Color.white;
+
+            var workerAuthoring = EnsureComponent<VillagerWorkerAuthoring>(worker);
+            workerAuthoring.Resource = EconomyFocusType.Wood;
+            workerAuthoring.Index = 0;
+
+            EditorUtility.SetDirty(worker);
         }
 
         private static void EnsureAssetFolder()
@@ -624,6 +703,157 @@ namespace DeadWalls
             EnsureArcherTilePlacement(scene);
             EnsureCombatFeedbackRoot(scene);
             NormalizeCastleTilemapSorting(scene);
+        }
+
+        private static void EnsureCastleInteriorWorkerArea(Scene scene)
+        {
+            GameObject root = FindRoot(scene, CastleInteriorWorkerPlacement.RootName);
+            bool rootCreated = root == null;
+            if (root == null)
+            {
+                root = new GameObject(CastleInteriorWorkerPlacement.RootName);
+                Undo.RegisterCreatedObjectUndo(root, "Create Castle Interior Economy Area");
+                SceneManager.MoveGameObjectToScene(root, scene);
+            }
+
+            if (rootCreated)
+                root.transform.position = new Vector3(-5.8f, 0f, 0f);
+
+            var placement = EnsureComponent<CastleInteriorWorkerPlacement>(root);
+            Transform hubDeliveryRoot = EnsureWorkerHub(root.transform);
+            placement.HubDeliveryRoot = hubDeliveryRoot;
+            placement.WoodWorkerSpawnRoot = EnsureWorkerSite(root.transform, "WoodSite", EconomyFocusType.Wood, hubDeliveryRoot, new Vector3(-1.25f, 1.25f, 0f));
+            placement.StoneWorkerSpawnRoot = EnsureWorkerSite(root.transform, "StoneSite", EconomyFocusType.Stone, hubDeliveryRoot, new Vector3(1.25f, 1.25f, 0f));
+            placement.IronWorkerSpawnRoot = EnsureWorkerSite(root.transform, "IronSite", EconomyFocusType.Iron, hubDeliveryRoot, new Vector3(-1.25f, -1.25f, 0f));
+            placement.FoodWorkerSpawnRoot = EnsureWorkerSite(root.transform, "FoodSite", EconomyFocusType.Food, hubDeliveryRoot, new Vector3(1.25f, -1.25f, 0f));
+            placement.SpawnZ = MobileCastleRenderDepth.UnitZ;
+            placement.RepeatOffsetRadius = 0.12f;
+            EditorUtility.SetDirty(placement);
+        }
+
+        private static Transform EnsureWorkerHub(Transform parent)
+        {
+            GameObject hub = FindDirectChild(parent, CastleInteriorWorkerPlacement.HubName);
+            bool hubCreated = hub == null;
+            if (hub == null)
+            {
+                hub = new GameObject(CastleInteriorWorkerPlacement.HubName);
+                Undo.RegisterCreatedObjectUndo(hub, "Create Worker Hub");
+                hub.transform.SetParent(parent, false);
+            }
+
+            if (hubCreated)
+                hub.transform.localPosition = Vector3.zero;
+
+            EnsureDirectChild(hub.transform, "VisualRoot");
+            GameObject deliveryRoot = EnsureDirectChild(hub.transform, CastleInteriorWorkerPlacement.DeliveryRootName);
+            if (deliveryRoot.transform.childCount == 0)
+                CreateDefaultWorkerDeliveryMarkers(deliveryRoot.transform);
+
+            return deliveryRoot.transform;
+        }
+
+        private static Transform EnsureWorkerSite(Transform parent, string siteName, EconomyFocusType resource, Transform hubDeliveryRoot, Vector3 defaultLocalPosition)
+        {
+            GameObject site = FindDirectChild(parent, siteName);
+            bool siteCreated = site == null;
+            if (site == null)
+            {
+                site = new GameObject(siteName);
+                Undo.RegisterCreatedObjectUndo(site, "Create Worker Site");
+                site.transform.SetParent(parent, false);
+            }
+
+            if (siteCreated)
+                site.transform.localPosition = defaultLocalPosition;
+
+            EnsureDirectChild(site.transform, "VisualRoot");
+            GameObject spawnRoot = EnsureDirectChild(site.transform, CastleInteriorWorkerPlacement.SpawnRootName);
+            if (spawnRoot.transform.childCount == 0)
+                CreateDefaultWorkerSpawnMarkers(spawnRoot.transform);
+
+            var gizmo = EnsureComponent<CastleInteriorWorkerSiteGizmo>(site);
+            gizmo.Resource = resource;
+            gizmo.WorkerSpawnRoot = spawnRoot.transform;
+            gizmo.DeliveryRoot = hubDeliveryRoot;
+            gizmo.SiteRadius = 0.7f;
+            gizmo.MarkerRadius = 0.06f;
+            EditorUtility.SetDirty(gizmo);
+
+            return spawnRoot.transform;
+        }
+
+        private static void CreateDefaultWorkerSpawnMarkers(Transform parent)
+        {
+            const int columns = 4;
+            const int rows = 3;
+            const float spacingX = 0.28f;
+            const float spacingY = 0.22f;
+            int index = 0;
+            for (int row = 0; row < rows; row++)
+            {
+                for (int col = 0; col < columns; col++)
+                {
+                    var marker = new GameObject($"Spawn_{index:00}");
+                    Undo.RegisterCreatedObjectUndo(marker, "Create Worker Spawn Marker");
+                    marker.transform.SetParent(parent, false);
+                    marker.transform.localPosition = new Vector3(
+                        (col - (columns - 1) * 0.5f) * spacingX,
+                        (row - (rows - 1) * 0.5f) * spacingY,
+                        0f);
+                    index++;
+                }
+            }
+        }
+
+        private static void CreateDefaultWorkerDeliveryMarkers(Transform parent)
+        {
+            const int columns = 3;
+            const int rows = 2;
+            const float spacingX = 0.24f;
+            const float spacingY = 0.2f;
+            int index = 0;
+            for (int row = 0; row < rows; row++)
+            {
+                for (int col = 0; col < columns; col++)
+                {
+                    var marker = new GameObject($"Delivery_{index:00}");
+                    Undo.RegisterCreatedObjectUndo(marker, "Create Worker Delivery Marker");
+                    marker.transform.SetParent(parent, false);
+                    marker.transform.localPosition = new Vector3(
+                        (col - (columns - 1) * 0.5f) * spacingX,
+                        (row - (rows - 1) * 0.5f) * spacingY,
+                        0f);
+                    index++;
+                }
+            }
+        }
+
+        private static GameObject EnsureDirectChild(Transform parent, string name)
+        {
+            GameObject child = FindDirectChild(parent, name);
+            if (child != null)
+                return child;
+
+            child = new GameObject(name);
+            Undo.RegisterCreatedObjectUndo(child, "Create Child");
+            child.transform.SetParent(parent, false);
+            return child;
+        }
+
+        private static GameObject FindDirectChild(Transform parent, string name)
+        {
+            if (parent == null)
+                return null;
+
+            for (int i = 0; i < parent.childCount; i++)
+            {
+                Transform child = parent.GetChild(i);
+                if (child.name == name)
+                    return child.gameObject;
+            }
+
+            return null;
         }
 
         private static void EnsureCombatFeedbackRoot(Scene scene)
@@ -1109,6 +1339,10 @@ namespace DeadWalls
             castleEconomy.StoneWorkerSlider = FindComponentInChildrenByName<Slider>(hudRoot, "StoneWorkerSlider");
             castleEconomy.IronWorkerSlider = FindComponentInChildrenByName<Slider>(hudRoot, "IronWorkerSlider");
             castleEconomy.FoodWorkerSlider = FindComponentInChildrenByName<Slider>(hudRoot, "FoodWorkerSlider");
+            castleEconomy.WoodAssignButton = FindComponentInChildrenByName<Button>(hudRoot, "WoodAssignButton");
+            castleEconomy.StoneAssignButton = FindComponentInChildrenByName<Button>(hudRoot, "StoneAssignButton");
+            castleEconomy.IronAssignButton = FindComponentInChildrenByName<Button>(hudRoot, "IronAssignButton");
+            castleEconomy.FoodAssignButton = FindComponentInChildrenByName<Button>(hudRoot, "FoodAssignButton");
             castleEconomy.WoodWorkerText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "WoodWorkerText");
             castleEconomy.StoneWorkerText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "StoneWorkerText");
             castleEconomy.IronWorkerText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "IronWorkerText");

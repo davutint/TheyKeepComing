@@ -17,11 +17,14 @@ namespace DeadWalls
         private Entity _waveStateEntity;
         private Entity _castleEntity;
         private Entity _archerPrefabEntity;
+        private Entity _workerPrefabEntity;
         private bool _initialized;
         private bool _mobileInitialPrepApplied;
+        private bool _workerVisualSyncInitialized;
         private readonly Dictionary<UpgradeType, int> _upgradeTiers = new Dictionary<UpgradeType, int>();
         private readonly Dictionary<ArcherType, int> _archerTypeLevels = new Dictionary<ArcherType, int>();
         private readonly HashSet<ArcherType> _unlockedArcherTypes = new HashSet<ArcherType> { ArcherType.Basic };
+        private MobilePopulationAllocation _lastSyncedWorkerVisualAllocation;
         private UpgradeCard[] _currentUpgradeCards;
         private const int MobileArrowRefillTarget = 200;
         private const int LegacyArrowRefillTarget = 50;
@@ -44,6 +47,7 @@ namespace DeadWalls
         private float _globalArrowDamageBonus;
         private float _globalFireRateMultiplier = 1f;
         private bool _missingArcherPlacementWarningLogged;
+        private bool _missingWorkerPlacementWarningLogged;
 
         public GameStateData GameState { get; private set; }
         public WaveStateData WaveState { get; private set; }
@@ -112,6 +116,7 @@ namespace DeadWalls
 
             _archerPrefabEntity = _entityManager.GetComponentData<ArcherPrefabData>(
                 archerPrefabQuery.GetSingletonEntity()).ArcherPrefab;
+            TryResolveWorkerPrefabEntity();
 
             var castleQuery = _entityManager.CreateEntityQuery(typeof(CastleHP));
             if (castleQuery.IsEmpty) return false;
@@ -150,6 +155,7 @@ namespace DeadWalls
             Castle = _entityManager.GetComponentData<CastleHP>(_castleEntity);
             ReadArcherTypeCounts();
             ReadMobileRuntimeData();
+            SyncWorkerVisualsIfNeeded();
 
             OnGameStateChanged?.Invoke();
 
@@ -730,8 +736,31 @@ namespace DeadWalls
 
             _entityManager.SetComponentData(mobileConfigEntity, allocation);
             PopulationAllocation = allocation;
+            SyncWorkerVisualsToAllocation();
             OnGameStateChanged?.Invoke();
             return true;
+        }
+
+        public bool CanAssignResourceWorker(EconomyFocusType resource)
+        {
+            resource = EconomyFocusUtility.Normalize(resource);
+            return _initialized
+                && resource != EconomyFocusType.Balanced
+                && IsMobilePopulationEconomyEnabled()
+                && (freeEconomyTestMode || GetIdlePopulation() > 0);
+        }
+
+        public bool AssignResourceWorker(EconomyFocusType resource)
+        {
+            resource = EconomyFocusUtility.Normalize(resource);
+            if (!CanAssignResourceWorker(resource))
+                return false;
+
+            if (freeEconomyTestMode)
+                EnsurePopulationForDebugWorkerAssignment();
+
+            int current = GetResourceWorkers(resource);
+            return SetResourceWorkers(resource, current + 1);
         }
 
         public float GetDefensePercent()
@@ -1505,6 +1534,239 @@ namespace DeadWalls
             }
         }
 
+        private bool TryResolveWorkerPrefabEntity()
+        {
+            if (!CanAccessEntityManager())
+                return false;
+
+            if (_workerPrefabEntity != Entity.Null && _entityManager.Exists(_workerPrefabEntity))
+                return true;
+
+            var workerPrefabQuery = _entityManager.CreateEntityQuery(typeof(WorkerPrefabData));
+            if (workerPrefabQuery.IsEmpty)
+                return false;
+
+            _workerPrefabEntity = _entityManager.GetComponentData<WorkerPrefabData>(
+                workerPrefabQuery.GetSingletonEntity()).WorkerPrefab;
+            return _workerPrefabEntity != Entity.Null && _entityManager.Exists(_workerPrefabEntity);
+        }
+
+        private void SyncWorkerVisualsIfNeeded()
+        {
+            if (!IsMobilePopulationEconomyEnabled())
+                return;
+
+            if (_workerVisualSyncInitialized && SameWorkerAllocation(_lastSyncedWorkerVisualAllocation, PopulationAllocation))
+                return;
+
+            SyncWorkerVisualsToAllocation();
+        }
+
+        private void SyncWorkerVisualsToAllocation()
+        {
+            if (!CanAccessEntityManager() || !IsMobilePopulationEconomyEnabled())
+                return;
+
+            int targetTotal = PopulationAllocation.WoodWorkers
+                + PopulationAllocation.StoneWorkers
+                + PopulationAllocation.IronWorkers
+                + PopulationAllocation.FoodWorkers;
+            if (targetTotal > 0 && !TryResolveWorkerPrefabEntity())
+            {
+                LogMissingWorkerVisualWarning("WorkerPrefabData bulunamadi. Mobile Castle Scene Setup ile VillagerWorker prefab referansini kur.");
+                return;
+            }
+
+            if (targetTotal > 0 && CastleInteriorWorkerPlacement.GetOrCreateRuntime() == null)
+            {
+                LogMissingWorkerVisualWarning("CastleInteriorEconomyArea worker spawn point bulunamadi. Worker visual spawn atlandi.");
+                return;
+            }
+
+            SyncResourceWorkerVisuals(EconomyFocusType.Wood, PopulationAllocation.WoodWorkers);
+            SyncResourceWorkerVisuals(EconomyFocusType.Stone, PopulationAllocation.StoneWorkers);
+            SyncResourceWorkerVisuals(EconomyFocusType.Iron, PopulationAllocation.IronWorkers);
+            SyncResourceWorkerVisuals(EconomyFocusType.Food, PopulationAllocation.FoodWorkers);
+
+            _lastSyncedWorkerVisualAllocation = PopulationAllocation;
+            _workerVisualSyncInitialized = true;
+        }
+
+        private void SyncResourceWorkerVisuals(EconomyFocusType resource, int targetCount)
+        {
+            targetCount = Mathf.Max(0, targetCount);
+            int kept = 0;
+            var destroy = new List<Entity>();
+            var query = _entityManager.CreateEntityQuery(new EntityQueryDesc
+            {
+                All = new ComponentType[]
+                {
+                    typeof(ResourceWorkerVisual),
+                    typeof(Unity.Transforms.LocalTransform)
+                },
+                None = new ComponentType[]
+                {
+                    typeof(Prefab)
+                }
+            });
+            using var entities = query.ToEntityArray(Unity.Collections.Allocator.Temp);
+
+            for (int i = 0; i < entities.Length; i++)
+            {
+                var visual = _entityManager.GetComponentData<ResourceWorkerVisual>(entities[i]);
+                if (EconomyFocusUtility.Normalize(visual.Resource) != resource)
+                    continue;
+
+                if (kept >= targetCount)
+                {
+                    destroy.Add(entities[i]);
+                    continue;
+                }
+
+                visual.Resource = resource;
+                visual.Index = kept;
+                _entityManager.SetComponentData(entities[i], visual);
+                UpdateWorkerVisualRoute(entities[i], resource, kept, false);
+                ConfigureWorkerSprite(entities[i], resource, kept);
+                kept++;
+            }
+
+            foreach (var entity in destroy)
+                _entityManager.DestroyEntity(entity);
+
+            for (int index = kept; index < targetCount; index++)
+                SpawnWorkerVisual(resource, index);
+        }
+
+        private bool SpawnWorkerVisual(EconomyFocusType resource, int index)
+        {
+            if (!TryResolveWorkerPrefabEntity())
+            {
+                LogMissingWorkerVisualWarning("WorkerPrefabData bulunamadi. Mobile Castle Scene Setup ile VillagerWorker prefab referansini kur.");
+                return false;
+            }
+
+            if (!TryGetWorkerRoutePositions(resource, index, out float3 pickup, out float3 delivery))
+                return false;
+
+            var entity = _entityManager.Instantiate(_workerPrefabEntity);
+            _entityManager.SetComponentData(entity, new ResourceWorkerVisual
+            {
+                Resource = resource,
+                Index = index
+            });
+            _entityManager.SetComponentData(entity, Unity.Transforms.LocalTransform.FromPositionRotationScale(
+                pickup,
+                quaternion.identity,
+                1f));
+            ConfigureWorkerLogisticsRoute(entity, index, pickup, delivery, true);
+            ConfigureWorkerSprite(entity, resource, index);
+            return true;
+        }
+
+        private void UpdateWorkerVisualRoute(Entity entity, EconomyFocusType resource, int index, bool resetPosition)
+        {
+            if (!TryGetWorkerRoutePositions(resource, index, out float3 pickup, out float3 delivery))
+                return;
+
+            if (resetPosition)
+            {
+                var transform = _entityManager.GetComponentData<Unity.Transforms.LocalTransform>(entity);
+                transform.Position = pickup;
+                _entityManager.SetComponentData(entity, transform);
+            }
+
+            ConfigureWorkerLogisticsRoute(entity, index, pickup, delivery, resetPosition);
+        }
+
+        private bool TryGetWorkerRoutePositions(EconomyFocusType resource, int index, out float3 pickup, out float3 delivery)
+        {
+            pickup = default;
+            delivery = default;
+            CastleInteriorWorkerPlacement placement = CastleInteriorWorkerPlacement.GetOrCreateRuntime();
+            if (placement != null && placement.TryGetLogisticsPositions(resource, index, out pickup, out delivery))
+            {
+                _missingWorkerPlacementWarningLogged = false;
+                return true;
+            }
+
+            LogMissingWorkerVisualWarning("CastleInteriorEconomyArea worker pickup veya hub delivery point bulunamadi. Worker visual spawn atlandi.");
+            return false;
+        }
+
+        private void ConfigureWorkerLogisticsRoute(Entity entity, int index, float3 pickup, float3 delivery, bool resetRoute)
+        {
+            float2 direction = math.normalizesafe((delivery - pickup).xy, new float2(1f, 0f));
+            WorkerLogisticsRoute route = _entityManager.HasComponent<WorkerLogisticsRoute>(entity)
+                ? _entityManager.GetComponentData<WorkerLogisticsRoute>(entity)
+                : default;
+
+            route.PickupPosition = pickup;
+            route.DeliveryPosition = delivery;
+            route.Speed = 0.85f;
+            route.WorkDuration = 0.65f;
+            route.DeliveryDuration = 0.35f;
+            route.LastDirection = math.lengthsq(route.LastDirection) > 0.0001f ? route.LastDirection : direction;
+
+            if (resetRoute || !_entityManager.HasComponent<WorkerLogisticsRoute>(entity))
+            {
+                route.MovingToHub = 1;
+                route.WaitTimer = 0.12f + (index % 5) * 0.08f;
+                route.LastDirection = direction;
+            }
+
+            if (_entityManager.HasComponent<WorkerLogisticsRoute>(entity))
+                _entityManager.SetComponentData(entity, route);
+            else
+                _entityManager.AddComponentData(entity, route);
+        }
+
+        private void ConfigureWorkerSprite(Entity entity, EconomyFocusType resource, int index)
+        {
+            SetSpriteTint(entity, ResourceWorkerVisualStyle.GetTint(resource));
+
+            if (!_entityManager.HasComponent<SpriteAnimation>(entity))
+                return;
+
+            var anim = _entityManager.GetComponentData<SpriteAnimation>(entity);
+            int direction = index % math.max(1, anim.TotalRows);
+            anim.DirectionRow = math.clamp(direction, 0, math.max(0, anim.TotalRows - 1));
+            anim.FrameCount = math.max(1, anim.FrameCount);
+            anim.CurrentFrame = index % anim.FrameCount;
+            anim.FrameTimer = 0f;
+            _entityManager.SetComponentData(entity, anim);
+        }
+
+        private void EnsurePopulationForDebugWorkerAssignment()
+        {
+            if (!CanAccessEntityManager() || !_entityManager.Exists(_gameStateEntity))
+                return;
+
+            int assigned = PopulationAllocation.WoodWorkers
+                + PopulationAllocation.StoneWorkers
+                + PopulationAllocation.IronWorkers
+                + PopulationAllocation.FoodWorkers
+                + Population.Archers;
+            if (Population.Total > assigned)
+                return;
+
+            var population = _entityManager.GetComponentData<PopulationState>(_gameStateEntity);
+            population.Total = assigned + 1;
+            population.Capacity = Mathf.Max(population.Capacity, population.Total);
+            population.BaseCapacity = Mathf.Max(population.BaseCapacity, population.Capacity);
+            population.Idle = Mathf.Max(0, population.Total - population.Workers - population.Archers);
+            _entityManager.SetComponentData(_gameStateEntity, population);
+            Population = population;
+        }
+
+        private static bool SameWorkerAllocation(MobilePopulationAllocation a, MobilePopulationAllocation b)
+        {
+            return a.WoodWorkers == b.WoodWorkers
+                && a.StoneWorkers == b.StoneWorkers
+                && a.IronWorkers == b.IronWorkers
+                && a.FoodWorkers == b.FoodWorkers;
+        }
+
         private void LogMissingArcherPlacementWarning()
         {
             if (_missingArcherPlacementWarningLogged)
@@ -1512,6 +1774,15 @@ namespace DeadWalls
 
             _missingArcherPlacementWarningLogged = true;
             Debug.LogWarning("[GameManager] Mobile okcu spawn icin Grid/outside tilemap bulunamadi veya bos. Okcu spawn iptal edildi.");
+        }
+
+        private void LogMissingWorkerVisualWarning(string message)
+        {
+            if (_missingWorkerPlacementWarningLogged)
+                return;
+
+            _missingWorkerPlacementWarningLogged = true;
+            Debug.LogWarning("[GameManager] " + message);
         }
 
         public void RestartGame()
@@ -1539,6 +1810,14 @@ namespace DeadWalls
             {
                 var archerQuery = _entityManager.CreateEntityQuery(typeof(ArcherUnit));
                 _entityManager.DestroyEntity(archerQuery);
+
+                var workerQuery = _entityManager.CreateEntityQuery(new EntityQueryDesc
+                {
+                    All = new ComponentType[] { typeof(ResourceWorkerVisual) },
+                    None = new ComponentType[] { typeof(Prefab) }
+                });
+                _entityManager.DestroyEntity(workerQuery);
+                _workerVisualSyncInitialized = false;
             }
 
             // Tum bina entity'lerini sil
@@ -1725,6 +2004,9 @@ namespace DeadWalls
 
             if (mobileMode && SpawnArcher(ArcherType.Basic))
                 ConsumePopulationForNewArcher();
+
+            if (mobileMode)
+                SyncWorkerVisualsToAllocation();
 
             _upgradeTiers.Clear();
             _currentUpgradeCards = null;

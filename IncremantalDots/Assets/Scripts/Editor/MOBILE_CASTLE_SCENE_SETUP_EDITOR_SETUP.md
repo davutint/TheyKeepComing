@@ -21,6 +21,12 @@ Ana scene:
 - `GameManager`
 - `CombatFeedbackRoot`
 - `CastleClickTarget`
+- `CastleInteriorEconomyArea`
+  - `CastleWorkerHub/DeliveryPoints`
+  - `WoodSite/WorkerSpawnPoints`
+  - `StoneSite/WorkerSpawnPoints`
+  - `IronSite/WorkerSpawnPoints`
+  - `FoodSite/WorkerSpawnPoints`
 - `Grid` owner tarafindan kurulan world visual root'u olabilir
   - `inside`
   - `outside0`
@@ -42,7 +48,8 @@ SubScene:
 
 - `Main Camera`: Orthographic, size `8`, position `(0, 0, -10)`
 - `Canvas`: Scale With Screen Size, reference `1920 x 1080`, match `0.5`
-- `WaveConfigAuthoring`: `Zombie`, `Arrow`, `Archer` prefab referanslari dolu
+- `WaveConfigAuthoring`: `Zombie`, `Arrow`, `Archer`, `Worker` prefab referanslari dolu
+- `VillagerWorker.prefab`: `Villager.mat` + `Character_villager/Idle.png`, `SpriteSheetAuthoring` rows `8`, columns `15`, `VillagerWorkerAuthoring` ekli
 - `MobileCastleCombatAuthoring`: castle center `(0, 0)`, spawn radius `11`, attack radius `1.35`, wave enemy count `30`, wave basi `+10`, spawn batch `3`
 - `MobileCastleCombatAuthoring`: zombie scale `1.4`, base speed `0.85`, speed per wave `0.04`, stress batch `25`, stress interval `0.1`, stress max alive `1500`
 - `MobileCastleCombatAuthoring`: kill reward Wood/Food/Stone/Iron `1 / 0.6 / 0.25 / 0.15`, wave scale `0.05`
@@ -61,7 +68,8 @@ SubScene:
 - `HUDController`: `WoodText`, `StoneText`, `IronText`, `FoodText`, `PopulationText`, `ArrowText`, `WaveText`, `KillsText`, `WaveRewardText`, `DamageFlashImage` ve varsa defense module alanlari bagli
 - `HUDController` defense module: `DefensePercentText`, `DefenseWallFill`, `DefenseGateFill`, `DefenseCoreFill`, `DefenseWallText`, `DefenseGateText`, `DefenseCoreText`, opsiyonel `DefenseDamageGlow`
 - `MarketUI`: `ArcherDrawerPanel`, `DrawerToggleButton`, Basic/Rapid/Frost row text/button alanlari, tech unlock butonlari ve repair butonu bagli
-- `CastleEconomyUI`: `CastleEconomyPanel`, `CastleTapHint`, worker slider/text alanlari, projected gain text'leri, `CastleRepairButton`, event alanlari, event badge, close/confirm butonlari bagli
+- `CastleEconomyUI`: `CastleEconomyPanel`, `CastleTapHint`, worker slider/text alanlari, opsiyonel `WoodAssignButton`/`StoneAssignButton`/`IronAssignButton`/`FoodAssignButton`, projected gain text'leri, `CastleRepairButton`, event alanlari, event badge, close/confirm butonlari bagli
+- `CastleInteriorWorkerPlacement`: Wood/Stone/Iron/Food pickup root'lari ve `CastleWorkerHub/DeliveryPoints` delivery root'u bagli
 - `GameManager`: test icin `Free Economy Test Mode` acilirsa archer buy/upgrade/unlock ve prep aksiyonlari kaynak/population harcamadan calisir
 - `CastleTapHint`, `EconomyEventBadge` ve opsiyonel glow objelerinin raycast target'lari kapatilir; bu feedback objeleri kaleye tiklamayi engellemez
 - `CombatFeedbackBridge`: `fanfx2_cure_small_red/spritesheet.png` hit flipbook frame'leri, opsiyonel particle fallback referanslari, `Arrow & Bow*.wav` random shoot clip listesi, `Rock Impact 37.wav`, pool/rate limit defaultlari ve `DisableInStressMode` bagli. Shoot muzzle VFX V1'de event uretmedigi icin oynatilmaz.

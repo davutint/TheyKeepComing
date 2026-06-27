@@ -49,6 +49,13 @@ Tum component'lar unmanaged ECS struct olarak tutulur. Davranis sistemlerde, ver
 - `CastleYardPrepState`: `Fortify` ve `Rally` tek-gecelik prep buff state'ini tutar.
 - `ArcherSlotPosition`: legacy/manual pozisyon buffer'i. NewGameScene mobile tilemap spawn akisi bunu kullanmaz.
 
+## CastleInteriorWorkerComponents.cs
+
+- `WorkerPrefabData`: SubScene `WaveConfigAuthoring` tarafindan bake edilen DOTS villager worker prefab referansi.
+- `ResourceWorkerVisual`: sahnede gorunen DOTS villager entity'sinin Wood/Stone/Iron/Food kaynagini ve site icindeki index'ini tutar.
+- `WorkerLogisticsRoute`: DOTS villager'in kaynak pickup noktasi ile CastleWorkerHub delivery noktasi arasindaki rota state'ini tutar.
+- `ResourceWorkerVisualStyle`: kaynak tipine gore hafif worker tint degerlerini merkezi tutar.
+
 `MobileCastleCombatConfig` sahnede yoksa sistemler eski `WallXPosition` tabanli davranisi kullanir.
 
 ## PhysicsComponents.cs
@@ -65,6 +72,7 @@ WaveSpawnSystem -> Config varsa kale etrafindaki random 360 spawn cemberini ve o
 ApplyMovementForceSystem -> Config varsa zombiyi CastleCenter'a yonlendirir, ZombieSlow varsa hiz carpanini uygular
 BoundarySystem -> Config varsa AttackRadius icinde Attacking state'e gecirir
 GameManager.BuyArcher(type) -> main scene `Grid/outside` tilemap hucrelerine okcu spawn eder
+GameManager.AssignResourceWorker(resource) -> MobilePopulationAllocation artirir + DOTS villager worker route visual sync eder
 GameManager.BuyFortify()/BuyRally() -> CastleYardPrepState uzerine tek-gecelik buff yazar
 CastleYardPrepSystem -> Rally timer'i NightCombat sirasinda azaltir
 ArcherShootSystem -> Okcu tipine gore projectile effect datasini oka yazar, facing direction + attack timer set eder
