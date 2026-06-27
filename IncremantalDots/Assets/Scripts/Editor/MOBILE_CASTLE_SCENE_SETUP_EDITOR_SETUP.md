@@ -1,0 +1,123 @@
+# Mobile Castle Scene Setup - Editor Kurulum
+
+## Kullanma
+
+1. Unity Editor'de projeyi ac.
+2. Ust menuden `Window -> DeadWalls -> Mobile Castle Scene Setup` penceresini ac.
+3. `Setup NewGameScene` butonuna bas.
+4. Tool gerekirse `Assets/Scenes/NewGameScene.unity` sahnesini acar.
+5. Kurulum bittiginde `NewGameScene` kaydedilir ve `Assets/Scenes/NewGameScene/MobileCastleCombatSubScene.unity` olusur.
+
+## Beklenen Hierarchy
+
+Ana scene:
+
+- `Main Camera`
+- `Global Light 2D`
+- `EventSystem`
+- `Canvas`
+  - `DayNightOverlay`
+  - `MobileCastleHudRoot`
+- `GameManager`
+- `CombatFeedbackRoot`
+- `CastleClickTarget`
+- `Grid` owner tarafindan kurulan world visual root'u olabilir
+  - `inside`
+  - `outside0`
+  - `outside`
+  - `outside2`
+  - `Grass`
+  - `Tree`
+- `MobileCastleCombatSubScene`
+
+SubScene:
+
+- `GameState`
+- `CastleCore`
+- `MobileCastleConfig`
+  - `MobileCastleCombatAuthoring`
+- `BasicArcher_01`
+
+## Inspector Kontrolu
+
+- `Main Camera`: Orthographic, size `8`, position `(0, 0, -10)`
+- `Canvas`: Scale With Screen Size, reference `1920 x 1080`, match `0.5`
+- `WaveConfigAuthoring`: `Zombie`, `Arrow`, `Archer` prefab referanslari dolu
+- `MobileCastleCombatAuthoring`: castle center `(0, 0)`, spawn radius `11`, attack radius `1.35`, wave enemy count `30`, wave basi `+10`, spawn batch `3`
+- `MobileCastleCombatAuthoring`: zombie scale `1.4`, base speed `0.85`, speed per wave `0.04`, stress batch `25`, stress interval `0.1`, stress max alive `1500`
+- `MobileCastleCombatAuthoring`: kill reward Wood/Food/Stone/Iron `1 / 0.6 / 0.25 / 0.15`, wave scale `0.05`
+- `MobileCastleCombatAuthoring`: wave clear bonus base Wood/Food/Stone/Iron `20 / 15 / 10 / 6`, per wave `6 / 5 / 4 / 3`
+- `MobileCastleCombatAuthoring`: worker economy population growth `15`, initial workers Wood/Stone/Iron/Food `20 / 10 / 8 / 15`
+- `MobileCastleCombatAuthoring`: worker production Wood/Stone/Iron/Food `4.5 / 3 / 2 / 4` per minute, reward multiplier `0.45`
+- `MobileCastleCombatAuthoring`: economy event chance `0.15`, cooldown `2` waves
+- `MobileCastleCombatAuthoring`: initial day prep `12`, day prep `15`, day/night overlay alpha `0 / 0.50`, unlimited arrows enabled
+- `MobileCastleCombatAuthoring`: wave director base interval `0.8`, wave multiplier `0.96`, min interval `0.35`
+- `MobileCastleCombatAuthoring`: opening/final ratio `0.20 / 0.20`, interval multiplier `1.35 / 0.65`, batch delta `-1 / +1`
+- `MobileCastleCombatAuthoring`: Castle Yard defaults Fortify damage multiplier `0.70`, Rally duration `10`, Rally fire-rate multiplier `1.25`
+- `MobileCastleCombatAuthoring.ArcherSlots`: mobile tilemap spawn akisi tarafindan kullanilmaz; bos kalabilir
+- `MobileCastleArcherTilePlacement`: main scene `Grid` uzerinde bulunur ve `outside` tilemapini okcu spawn kaynagi olarak kullanir
+- `LevelUpUI`: legacy paneldir; mobile loop'ta acilmaz
+- `MobileCastleHudRoot`: generated prefab varsa `Assets/Prefabs/UI/Generated/MobileCastleHudRoot.prefab` instancelanir; yoksa fallback HUD/drawer kurulur
+- `HUDController`: `WoodText`, `StoneText`, `IronText`, `FoodText`, `PopulationText`, `ArrowText`, `WaveText`, `KillsText`, `WaveRewardText`, `DamageFlashImage` ve varsa defense module alanlari bagli
+- `HUDController` defense module: `DefensePercentText`, `DefenseWallFill`, `DefenseGateFill`, `DefenseCoreFill`, `DefenseWallText`, `DefenseGateText`, `DefenseCoreText`, opsiyonel `DefenseDamageGlow`
+- `MarketUI`: `ArcherDrawerPanel`, `DrawerToggleButton`, Basic/Rapid/Frost row text/button alanlari, tech unlock butonlari ve repair butonu bagli
+- `CastleEconomyUI`: `CastleEconomyPanel`, `CastleTapHint`, worker slider/text alanlari, projected gain text'leri, `CastleRepairButton`, event alanlari, event badge, close/confirm butonlari bagli
+- `GameManager`: test icin `Free Economy Test Mode` acilirsa archer buy/upgrade/unlock ve prep aksiyonlari kaynak/population harcamadan calisir
+- `CastleTapHint`, `EconomyEventBadge` ve opsiyonel glow objelerinin raycast target'lari kapatilir; bu feedback objeleri kaleye tiklamayi engellemez
+- `CombatFeedbackBridge`: `fanfx2_cure_small_red/spritesheet.png` hit flipbook frame'leri, opsiyonel particle fallback referanslari, `Arrow & Bow*.wav` random shoot clip listesi, `Rock Impact 37.wav`, pool/rate limit defaultlari ve `DisableInStressMode` bagli. Shoot muzzle VFX V1'de event uretmedigi icin oynatilmaz.
+- `CastleClickTarget`: position `(0,0,0)`, `CastleInteriorClickTarget.ClickRadius` `2.0`
+- `Grid/outside`: dolu hucreler okcu spawn noktalaridir; `inside` ve `outside2` sadece kale gorsel katmanidir
+- Castle tilemap render bandlari: `inside` Wall/1/z0, `outside0` Wall/2/z0, `outside` Wall/2/z0, `outside2` Wall/4/z-2; `Archer.prefab` Wall/3 ve runtime z `-1` bandinda olmalidir
+- Economy focus objeleri varsa gizli kalir; yeni ekonomi kontrolu Castle Interior panelindedir
+- `DayNightOverlay`: Canvas'in ilk child'i, full-screen siyah `Image`, raycast target kapali, `DayNightOverlayController.OverlayImage` bagli
+- `GameStateAuthoring`: mobile kaynak baslangici `150/80/45/150`, initial population `60`, initial workers `53`, initial archers `1`, initial arrows `200`
+- `BasicArcher_01`: legacy/seed basic okcudur; Play modunda runtime `Grid/outside` tilemapindeki ilk spawn noktasina yeniden yerlestirir
+- `BasicArcher_01`: `ArcherAuthoring.Tint` ve `SpriteSheetAuthoring.Tint` beyaz
+- `MobileCastleCombatSubScene`: Scene Asset alani `MobileCastleCombatSubScene.unity`
+
+## UI Importer Akisi
+
+Polish HUD gorseli owner tarafindan ayri Codex tabinda mockup/preview ile onaylanir. Implementer bu repoda kendi basina UI JSON/export uretmez. Onayli export geldikten sonra UI Importer ile hedef prefab uretilir:
+
+- Hedef prefab: `Assets/Prefabs/UI/Generated/MobileCastleHudRoot.prefab`
+- Beklenen root: `MobileCastleHudRoot`
+- Beklenen drawer: `ArcherDrawerPanel`
+- Economy focus objeleri artik opsiyoneldir ve setup tool tarafindan gizlenir
+- Beklenen Castle Interior paneli: `CastleEconomyPanel`, `CastleInteriorImage`, `CloseCastleEconomyButton`, `ConfirmCastleEconomyButton`, `CastleTapHint`, `CastleTapHintText`
+- Beklenen population alanlari: `PopulationTotalText`, `PopulationIdleText`, `PopulationArchersText`, `PopulationGrowthText`, `WorkerBudgetText`
+- Beklenen worker alanlari: `WoodWorkerSlider`, `StoneWorkerSlider`, `IronWorkerSlider`, `FoodWorkerSlider`, `WoodWorkerText`, `StoneWorkerText`, `IronWorkerText`, `FoodWorkerText`, `WoodRateText`, `StoneRateText`, `IronRateText`, `FoodRateText`
+- Beklenen projected gain alanlari: `ProjectedIncomeText`, `ProjectedWoodText`, `ProjectedStoneText`, `ProjectedIronText`, `ProjectedFoodText`
+- Beklenen Castle Interior repair alanlari: `CastleRepairButton`, `CastleRepairStatusText`, opsiyonel `CastleRepairCostText`
+- Beklenen event alanlari: `EconomyEventPanel`, `EconomyEventTitleText`, `EconomyEventDescriptionText`, `EconomyEventChoiceAButton`, `EconomyEventChoiceBButton`, `EconomyEventChoiceAText`, `EconomyEventChoiceBText`, `EconomyEventBadge`, `EconomyEventBadgeText`
+- Beklenen readability alanlari: `WaveRewardText`, `DefensePercentText`, `DefenseWallFill`, `DefenseGateFill`, `DefenseCoreFill`, `DefenseWallText`, `DefenseGateText`, `DefenseCoreText`
+- Opsiyonel defense feedback: `DefenseDamageGlow`, `DefenseWarningIcon`, fallback `DefenseText`
+- Opsiyonel Castle Interior feedback: `CastleTapHintPulse`, `ProjectedIncomeFrame`, `CastleRepairFrame`, `EconomyEventGlow`
+- Sag drawer archer progression icindir. `RepairButton`, `FortifyButton`, `RallyButton`, `RefillArrowsButton` ve `StartNextWaveButton` prefabda varsa setup tool bunlari player-facing olarak gizler.
+
+Import etmek icin `Window -> DeadWalls -> UI Importer` acilir, export folder yuklenir ve prefab yukaridaki hedefe uretilir. Runtime davranisi JSON icinde degildir; `MarketUI` ve scene setup tool baglar.
+
+Mobile day/night loop'ta `StartNextWaveButton` ve unlimited arrows acikken `RefillArrowsButton` player-facing UI'da gizlenir/disable edilir. Prefab bu objeleri iceriyorsa tool referansi baglar ama aktif kullanima acmaz.
+
+`CastleRepairButton` sadece `DayPrep` sirasinda aktif olur ve Castle Interior paneli icindedir. Sag drawer'in archer economy ve tech aksiyonlari combat sirasinda kullanilmaya devam eder. Castle Interior paneli yoksa setup tool polish fallback uretmez; owner onayli UI Importer export'u beklenir.
+
+## World Visuals
+
+World visuals owner tarafindan `NewGameScene` icinde kurulur. Setup tool artik world visual tilemap uretmez, boyamaz veya tasimaz; yalniz `Grid/outside` tilemapini bulursa `MobileCastleArcherTilePlacement` controller'ina baglar. Kale icin bilinen tilemap renderer sorting order'larini ve world z bandlarini normalize edebilir, tile icerigine dokunmaz.
+
+Onerilen tile aileleri:
+
+- Arena/avlu zeminleri: `Ground A...`, `Ground B...`, `Ground G...`
+- Kale footprint'i: `Wall A...`, `Wall D...`
+- Gate gorseli: `Door C1_S`
+- Hafif dekor: `BrokenStone...`, `BrokenWallStone1`, `Tree Shadow`
+
+Bu gorsel katman wall/gate/core HP verisi degildir; HP hala ECS `CastleAuthoring` ve runtime component'lerinden gelir. Okcu spawn icin tek istisna `outside` tilemapidir: dolu hucreler sinirsiz tekrar kullanilabilen spawn noktalaridir.
+
+## Bilerek Yapilmayanlar
+
+- Yeni coin eklenmez; Wood/Stone/Iron/Food/Population/Arrows mevcut resource akisini kullanir.
+- Eski town-building/grid UI bu sahneye tasinmaz.
+
+Scene setup tool slot objesi veya world visual tilemap uretmez; mobile HUD/drawer controller referanslarini baglar ve varsa main scene `Grid/outside` tilemapini `MobileCastleArcherTilePlacement` ile kullanir. Mobile gameplay artik level-up paneliyle durmaz.
+
+Script eklendikten sonra disaridan manuel compile komutu calistirma. Unity refresh sonrasi scriptleri kendisi derler.

@@ -14,21 +14,42 @@ namespace DeadWalls
     {
         public void OnCreate(ref SystemState state)
         {
-            state.RequireForUpdate<WallXPosition>();
+            state.RequireForUpdate<ZombieTag>();
         }
 
         public void OnUpdate(ref SystemState state)
         {
-            float wallX = SystemAPI.GetSingleton<WallXPosition>().Value;
+            if (SystemAPI.HasSingleton<GameStateData>())
+            {
+                var gameState = SystemAPI.GetSingleton<GameStateData>();
+                if (gameState.IsGameOver || gameState.IsLevelUpPending)
+                    return;
+            }
+
+            bool mobileMode = SystemAPI.HasSingleton<MobileCastleCombatConfig>();
+            if (!mobileMode && !SystemAPI.HasSingleton<WallXPosition>())
+                return;
+
+            float wallX = mobileMode ? 0f : SystemAPI.GetSingleton<WallXPosition>().Value;
+            var mobileConfig = mobileMode
+                ? SystemAPI.GetSingleton<MobileCastleCombatConfig>()
+                : default;
+
+            float mobileLimit = mobileConfig.SpawnRadius + 2f;
 
             var spatialMap = BuildSpatialHashSystem.ReadMap;
             bool hasSpatialMap = spatialMap.IsCreated && !spatialMap.IsEmpty;
 
             new BoundaryJob
             {
+                MobileMode = mobileMode,
                 WallX = wallX,
-                MinY = -15f,
-                MaxY = 15f,
+                CastleCenter = mobileConfig.CastleCenter,
+                AttackRadius = mobileConfig.AttackRadius,
+                MinX = mobileMode ? mobileConfig.CastleCenter.x - mobileLimit : -100000f,
+                MaxX = mobileMode ? mobileConfig.CastleCenter.x + mobileLimit : 40f,
+                MinY = mobileMode ? mobileConfig.CastleCenter.y - mobileLimit : -15f,
+                MaxY = mobileMode ? mobileConfig.CastleCenter.y + mobileLimit : 15f,
                 CellSize = SpatialHash.DefaultCellSize,
                 HasSpatialMap = hasSpatialMap,
                 SpatialMap = spatialMap,
@@ -41,7 +62,12 @@ namespace DeadWalls
         [BurstCompile]
         partial struct BoundaryJob : IJobEntity
         {
+            public bool MobileMode;
             public float WallX;
+            public float2 CastleCenter;
+            public float AttackRadius;
+            public float MinX;
+            public float MaxX;
             public float MinY;
             public float MaxY;
             public float CellSize;
@@ -106,7 +132,17 @@ namespace DeadWalls
                 {
                     case ZombieStateType.Moving:
                         // 1. Duvara ulasti → Attacking
-                        if (pos.x <= WallX)
+                        if (MobileMode)
+                        {
+                            float attackRadiusSq = AttackRadius * AttackRadius;
+                            if (math.distancesq(pos.xy, CastleCenter) <= attackRadiusSq)
+                            {
+                                zombieState.Value = ZombieStateType.Attacking;
+                                body.Velocity = float2.zero;
+                                break;
+                            }
+                        }
+                        else if (pos.x <= WallX)
                         {
                             zombieState.Value = ZombieStateType.Attacking;
                             body.Velocity = float2.zero;
@@ -123,7 +159,17 @@ namespace DeadWalls
 
                     case ZombieStateType.Queued:
                         // 1. Duvara ulasti → Attacking
-                        if (pos.x <= WallX)
+                        if (MobileMode)
+                        {
+                            float attackRadiusSq = AttackRadius * AttackRadius;
+                            if (math.distancesq(pos.xy, CastleCenter) <= attackRadiusSq)
+                            {
+                                zombieState.Value = ZombieStateType.Attacking;
+                                body.Velocity = float2.zero;
+                                break;
+                            }
+                        }
+                        else if (pos.x <= WallX)
                         {
                             zombieState.Value = ZombieStateType.Attacking;
                             body.Velocity = float2.zero;
@@ -138,8 +184,17 @@ namespace DeadWalls
                         break;
 
                     case ZombieStateType.Attacking:
+                        if (MobileMode)
+                        {
+                            body.Velocity = float2.zero;
+                            float2 fromCenter = pos.xy - CastleCenter;
+                            float2 dir = math.normalizesafe(fromCenter, new float2(1f, 0f));
+                            float2 clamped = CastleCenter + dir * AttackRadius;
+                            pos.x = clamped.x;
+                            pos.y = clamped.y;
+                        }
                         // Duvar bariyeri
-                        if (pos.x < WallX)
+                        else if (pos.x < WallX)
                         {
                             pos.x = WallX;
                             body.Velocity.x = math.max(body.Velocity.x, 0f);
@@ -152,11 +207,8 @@ namespace DeadWalls
                         break;
                 }
 
-                // Y siniri
+                pos.x = math.clamp(pos.x, MinX, MaxX);
                 pos.y = math.clamp(pos.y, MinY, MaxY);
-
-                // Sag sinir (spawn alanindan cikmasin)
-                pos.x = math.min(pos.x, 40f);
 
                 transform.Position = pos;
             }

@@ -9,6 +9,9 @@
 - Component'lar dogrudan kullanilmaz, Authoring + Baker uzerinden entity'lere eklenir.
 - Singleton component'lar (GameStateData, WaveStateData, Resource*) icin GameStateAuthoring kullanilir.
 - Component degerlerini degistirmek icin ilgili Authoring component'inin Inspector degerlerini duzenleyin.
+- ZombieSlow editor'de ayri kurulum istemez; ZombieAuthoring tarafindan disabled olarak bake edilir ve Frost ok isabetinde runtime'da enable edilir.
+- SpriteTint editor'de SpriteSheetAuthoring, ArcherAuthoring veya ArrowAuthoring tint alanindan bake edilir. Mobile combat'ta runtime Basic/Rapid/Frost tint'leri bu degeri override edebilir.
+- MobileCastleCombatConfig, EconomyFocusState, WaveClearRewardData, CastleYardPrepState ve ArcherSlotPosition `MobileCastleCombatAuthoring` baker'i tarafindan olusturulur. Fortify/Rally degerleri Inspector'daki Castle Yard Prep alanindan tune edilir.
 
 ## Spesifik Editor Setup Dosyalari
 - Kaynak component'lari → `RESOURCE_COMPONENTS_EDITOR_SETUP.md`

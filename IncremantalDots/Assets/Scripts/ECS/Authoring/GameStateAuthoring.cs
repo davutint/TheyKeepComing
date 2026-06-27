@@ -10,6 +10,9 @@ namespace DeadWalls
 
         [Header("Wave Config — STRESS TEST")]
         public bool StressTestMode = false;
+        public int InitialZombiesToSpawn = 500;
+        public float InitialZombieHP = 20f;
+        public float InitialZombieDamage = 5f;
         public float SpawnInterval = 0.05f;
         public float WaveStartDelay = 2f;
         public float BaseZombieSpeed = 2f;
@@ -64,15 +67,18 @@ namespace DeadWalls
                 AddComponent(entity, new WaveStateData
                 {
                     CurrentWave = 1,
-                    ZombiesToSpawn = 500,
+                    ZombiesToSpawn = authoring.InitialZombiesToSpawn,
                     ZombiesSpawned = 0,
                     ZombiesAlive = 0,
                     SpawnTimer = 0f,
                     SpawnInterval = authoring.SpawnInterval,
-                    ZombieHP = 20f,
-                    ZombieDamage = 5f,
+                    ZombieHP = authoring.InitialZombieHP,
+                    ZombieDamage = authoring.InitialZombieDamage,
                     ZombieSpeed = authoring.BaseZombieSpeed,
                     WaveActive = true,
+                    Phase = RunPhaseType.NightCombat,
+                    PrepTimer = 0f,
+                    PrepDuration = 0f,
                     WaveStartDelay = authoring.WaveStartDelay,
                     WaveStartTimer = authoring.WaveStartDelay,
                     StressTestMode = authoring.StressTestMode

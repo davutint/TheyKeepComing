@@ -11,6 +11,12 @@ namespace DeadWalls
         public bool IsLevelUpPending;
     }
 
+    public enum RunPhaseType : byte
+    {
+        DayPrep,
+        NightCombat
+    }
+
     public struct WaveStateData : IComponentData
     {
         public int CurrentWave;
@@ -23,6 +29,9 @@ namespace DeadWalls
         public float ZombieDamage;
         public float ZombieSpeed;
         public bool WaveActive;
+        public RunPhaseType Phase;
+        public float PrepTimer;
+        public float PrepDuration;
         public float WaveStartDelay;
         public float WaveStartTimer;
         public bool StressTestMode;

@@ -61,10 +61,15 @@ namespace DeadWalls
                             FireRate = 1.5f,
                             FireTimer = 0f,
                             ArrowDamage = 10f,
-                            Range = 15f
+                            Range = 15f,
+                            Type = ArcherType.Basic,
+                            SlowDuration = 0f,
+                            SlowMultiplier = 1f,
+                            FacingDirection = new float2(1f, 0f),
+                            AttackAnimTimer = 0f
                         });
                         ecb.SetComponent(archerEntity, LocalTransform.FromPosition(
-                            new float3(3.76f, -5f + archerCount * 2f, -1f)));
+                            new float3(3.76f, -5f + archerCount * 2f, MobileCastleRenderDepth.UnitZ)));
 
                         archerCount++;
                     }

@@ -30,6 +30,15 @@ namespace DeadWalls
             var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
             var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
             var arrowSupplyRW = SystemAPI.GetSingletonRW<ArrowSupply>();
+            bool unlimitedArrows = SystemAPI.HasSingleton<MobileCastleCombatConfig>()
+                && SystemAPI.GetSingleton<MobileCastleCombatConfig>().UnlimitedArrows;
+            float fireRateMultiplier = 1f;
+            if (SystemAPI.HasSingleton<CastleYardPrepState>())
+            {
+                var prep = SystemAPI.GetSingleton<CastleYardPrepState>();
+                if (prep.RallyTimer > 0f)
+                    fireRateMultiplier = math.max(0.01f, prep.RallyFireRateMultiplier);
+            }
 
             foreach (var (archer, archerTransform) in
                 SystemAPI.Query<RefRW<ArcherUnit>, RefRO<LocalTransform>>())
@@ -43,6 +52,7 @@ namespace DeadWalls
 
                 Entity closestZombie = Entity.Null;
                 float closestDistSq = float.MaxValue;
+                float3 closestZombiePosition = float3.zero;
 
                 // Brute-force — ~10 okcu x 6000 zombi = 60K distance check, Burst ile trivial
                 // Spatial hash 3721 hucre taramasi bundan DAHA YAVAS
@@ -60,6 +70,7 @@ namespace DeadWalls
                     {
                         closestDistSq = distSq;
                         closestZombie = zombieEntity;
+                        closestZombiePosition = zombieTransform.ValueRO.Position;
                     }
                 }
 
@@ -67,21 +78,65 @@ namespace DeadWalls
                     continue;
 
                 // Ok kontrolu — ok yoksa ates etme
-                if (arrowSupplyRW.ValueRO.Current <= 0)
-                    break;
+                if (!unlimitedArrows)
+                {
+                    if (arrowSupplyRW.ValueRO.Current <= 0)
+                        break;
 
-                arrowSupplyRW.ValueRW.Current--;
-                archer.ValueRW.FireTimer = 1f / archer.ValueRO.FireRate;
+                    arrowSupplyRW.ValueRW.Current--;
+                }
+                float effectiveFireRate = math.max(0.01f, archer.ValueRO.FireRate * fireRateMultiplier);
+                archer.ValueRW.FireTimer = 1f / effectiveFireRate;
+                float2 facingDirection = ResolveFacingDirection(
+                    closestZombiePosition.xy - archerPos.xy,
+                    archer.ValueRO.FacingDirection);
+                archer.ValueRW.FacingDirection = facingDirection;
+                archer.ValueRW.AttackAnimTimer = GetAttackAnimDuration(effectiveFireRate);
 
                 var arrow = ecb.Instantiate(arrowPrefab);
-                ecb.SetComponent(arrow, LocalTransform.FromPosition(archerPos));
+                float3 arrowPos = new float3(archerPos.x, archerPos.y, MobileCastleRenderDepth.ProjectileZ);
+                ecb.SetComponent(arrow, LocalTransform.FromPosition(arrowPos));
                 ecb.SetComponent(arrow, new ArrowProjectile
                 {
                     Speed = 12f,
                     Damage = archer.ValueRO.ArrowDamage,
-                    Target = closestZombie
+                    Target = closestZombie,
+                    ArcherType = archer.ValueRO.Type,
+                    SlowDuration = archer.ValueRO.SlowDuration,
+                    SlowMultiplier = archer.ValueRO.SlowMultiplier
+                });
+                ecb.SetComponent(arrow, new SpriteTint
+                {
+                    Value = ArcherVisualStyle.GetTint(archer.ValueRO.Type)
+                });
+
+                // Shoot particle kapali; okun cikis ani su an sadece SFX ile okunuyor.
+                var sfxEvent = ecb.CreateEntity();
+                ecb.AddComponent(sfxEvent, new CombatSfxEvent
+                {
+                    Position = arrowPos,
+                    Type = CombatSfxType.ArrowShoot,
+                    Volume = 0.35f,
+                    Pitch = 1f
                 });
             }
+        }
+
+        private static float2 ResolveFacingDirection(float2 aimDirection, float2 fallback)
+        {
+            if (math.lengthsq(aimDirection) > 0.0001f)
+                return math.normalize(aimDirection);
+
+            if (math.lengthsq(fallback) > 0.0001f)
+                return math.normalize(fallback);
+
+            return new float2(1f, 0f);
+        }
+
+        private static float GetAttackAnimDuration(float fireRate)
+        {
+            float shotInterval = 1f / math.max(0.01f, fireRate);
+            return math.clamp(shotInterval * 0.75f, 0.18f, 0.45f);
         }
     }
 }

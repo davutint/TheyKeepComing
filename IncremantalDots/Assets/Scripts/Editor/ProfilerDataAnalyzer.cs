@@ -70,6 +70,7 @@ public class ProfilerDataAnalyzer : EditorWindow
     private static readonly Dictionary<string, string> KNOWN_ECS_SYSTEMS = new()
     {
         { "WaveSpawnSystem", "SimulationSystemGroup" },
+        { "ZombieSlowTimerSystem", "SimulationSystemGroup" },
         { "ApplyMovementForceSystem", "SimulationSystemGroup" },
         { "BuildSpatialHashSystem", "SimulationSystemGroup" },
         { "PhysicsCollisionSystem", "SimulationSystemGroup" },

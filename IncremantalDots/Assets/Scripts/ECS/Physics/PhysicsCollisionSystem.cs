@@ -19,6 +19,13 @@ namespace DeadWalls
 
         public void OnUpdate(ref SystemState state)
         {
+            if (SystemAPI.HasSingleton<GameStateData>())
+            {
+                var gameState = SystemAPI.GetSingleton<GameStateData>();
+                if (gameState.IsGameOver || gameState.IsLevelUpPending)
+                    return;
+            }
+
             var spatialMap = BuildSpatialHashSystem.ReadMap;
 
             new CollisionJob

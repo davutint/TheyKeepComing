@@ -56,4 +56,14 @@ namespace DeadWalls
     {
         public float4 Value;
     }
+
+    /// <summary>
+    /// GPU'ya gonderilen per-instance sprite tint rengi.
+    /// DeadWalls/SpriteSheet shader'i _Color propertysini DOTS instancing ile okur.
+    /// </summary>
+    [MaterialProperty("_Color")]
+    public struct SpriteTint : IComponentData
+    {
+        public float4 Value;
+    }
 }

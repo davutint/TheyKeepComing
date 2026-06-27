@@ -34,6 +34,19 @@ namespace DeadWalls
         {
             DamageQueue.Clear();
 
+            if (SystemAPI.HasSingleton<WaveStateData>() &&
+                SystemAPI.GetSingleton<WaveStateData>().StressTestMode)
+            {
+                return;
+            }
+
+            if (SystemAPI.HasSingleton<GameStateData>())
+            {
+                var gameState = SystemAPI.GetSingleton<GameStateData>();
+                if (gameState.IsGameOver || gameState.IsLevelUpPending)
+                    return;
+            }
+
             new AttackTimerJob
             {
                 Dt = SystemAPI.Time.DeltaTime,

@@ -15,22 +15,46 @@ namespace DeadWalls
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<ZombieTag>();
-            state.RequireForUpdate<WallXPosition>();
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            float wallX = SystemAPI.GetSingleton<WallXPosition>().Value;
-            new ApplyForceJob { WallX = wallX }.ScheduleParallel();
+            if (SystemAPI.HasSingleton<GameStateData>())
+            {
+                var gameState = SystemAPI.GetSingleton<GameStateData>();
+                if (gameState.IsGameOver || gameState.IsLevelUpPending)
+                    return;
+            }
+
+            bool mobileMode = SystemAPI.HasSingleton<MobileCastleCombatConfig>();
+            if (!mobileMode && !SystemAPI.HasSingleton<WallXPosition>())
+                return;
+
+            float wallX = mobileMode ? 0f : SystemAPI.GetSingleton<WallXPosition>().Value;
+            float2 castleCenter = mobileMode
+                ? SystemAPI.GetSingleton<MobileCastleCombatConfig>().CastleCenter
+                : float2.zero;
+
+            new ApplyForceJob
+            {
+                MobileMode = mobileMode,
+                WallX = wallX,
+                CastleCenter = castleCenter,
+                SlowLookup = SystemAPI.GetComponentLookup<ZombieSlow>(true)
+            }.ScheduleParallel();
         }
 
         [BurstCompile]
         partial struct ApplyForceJob : IJobEntity
         {
+            public bool MobileMode;
             public float WallX;
+            public float2 CastleCenter;
+            [Unity.Collections.ReadOnly] public ComponentLookup<ZombieSlow> SlowLookup;
 
             void Execute(
+                Entity entity,
                 ref PhysicsBody physicsBody,
                 in ZombieStats stats,
                 in ZombieState zombieState,
@@ -43,14 +67,19 @@ namespace DeadWalls
                     return;
                 }
 
-                // Duvara dogru yatay yon (Y=0 cunku hedef hep zombinin Y'si)
-                float2 desiredDir = math.normalizesafe(new float2(WallX - transform.Position.x, 0f));
+                float2 desiredDir = MobileMode
+                    ? math.normalizesafe(CastleCenter - transform.Position.xy)
+                    : math.normalizesafe(new float2(WallX - transform.Position.x, 0f));
 
                 // Fallback: yon sifirsa sola git
                 if (math.lengthsq(desiredDir) < 0.001f)
                     desiredDir = new float2(-1f, 0f);
 
-                float moveForce = stats.MoveSpeed * 3f;
+                float speedMultiplier = 1f;
+                if (SlowLookup.HasComponent(entity) && SlowLookup.IsComponentEnabled(entity))
+                    speedMultiplier = math.clamp(SlowLookup[entity].SpeedMultiplier, 0.05f, 1f);
+
+                float moveForce = stats.MoveSpeed * speedMultiplier * 3f;
                 physicsBody.Force = desiredDir * moveForce;
             }
         }

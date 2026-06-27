@@ -1,5 +1,6 @@
 using Unity.Burst;
 using Unity.Entities;
+using Unity.Mathematics;
 
 namespace DeadWalls
 {
@@ -24,7 +25,27 @@ namespace DeadWalls
                 return;
 
             var gameState = SystemAPI.GetSingletonRW<GameStateData>();
+            if (gameState.ValueRO.IsGameOver || gameState.ValueRO.IsLevelUpPending)
+                return;
+
+            bool mobileMode = SystemAPI.HasSingleton<MobileCastleCombatConfig>();
             var waveState = SystemAPI.GetSingletonRW<WaveStateData>();
+            bool canApplyMobileReward = mobileMode
+                && !waveState.ValueRO.StressTestMode
+                && SystemAPI.HasSingleton<ResourceAccumulator>();
+            var mobileConfig = canApplyMobileReward
+                ? SystemAPI.GetSingleton<MobileCastleCombatConfig>()
+                : default;
+            EconomyFocusType economyFocus = canApplyMobileReward && SystemAPI.HasSingleton<EconomyFocusState>()
+                && !SystemAPI.HasSingleton<MobilePopulationAllocation>()
+                ? SystemAPI.GetSingleton<EconomyFocusState>().Type
+                : EconomyFocusType.Balanced;
+            float mobileRewardMultiplier = canApplyMobileReward && SystemAPI.HasSingleton<MobilePopulationAllocation>()
+                ? math.clamp(mobileConfig.WorkerEconomyRewardMultiplier, 0f, 1f)
+                : 1f;
+            var resourceAccumulator = canApplyMobileReward
+                ? SystemAPI.GetSingletonRW<ResourceAccumulator>()
+                : default;
             var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
             var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
             float dt = SystemAPI.Time.DeltaTime;
@@ -44,15 +65,33 @@ namespace DeadWalls
                 // Timer bitti → odul ver + sil
                 gameState.ValueRW.XP += stats.ValueRO.XPReward;
                 waveState.ValueRW.ZombiesAlive--;
+                if (canApplyMobileReward)
+                    AddKillReward(ref resourceAccumulator.ValueRW, mobileConfig, economyFocus,
+                        waveState.ValueRO.CurrentWave, mobileRewardMultiplier);
 
                 ecb.DestroyEntity(entity);
             }
 
-            // Level up kontrolu
-            if (gameState.ValueRO.XP >= gameState.ValueRO.XPToNextLevel && !gameState.ValueRO.IsLevelUpPending)
+            // Mobile castle loop artik level-up ile pause olmaz; XP sadece progress metric olarak kalir.
+            if (!mobileMode && gameState.ValueRO.XP >= gameState.ValueRO.XPToNextLevel && !gameState.ValueRO.IsLevelUpPending)
             {
                 gameState.ValueRW.IsLevelUpPending = true;
             }
+        }
+
+        private static void AddKillReward(ref ResourceAccumulator accumulator,
+            MobileCastleCombatConfig config, EconomyFocusType focus, int currentWave, float rewardMultiplier)
+        {
+            int completedWaveSteps = currentWave > 1 ? currentWave - 1 : 0;
+            float scale = (1f + completedWaveSteps * config.KillRewardWaveScale) * rewardMultiplier;
+            accumulator.Wood += config.KillRewardWood * scale
+                * EconomyFocusUtility.GetKillRewardMultiplier(config, focus, EconomyFocusType.Wood);
+            accumulator.Stone += config.KillRewardStone * scale
+                * EconomyFocusUtility.GetKillRewardMultiplier(config, focus, EconomyFocusType.Stone);
+            accumulator.Iron += config.KillRewardIron * scale
+                * EconomyFocusUtility.GetKillRewardMultiplier(config, focus, EconomyFocusType.Iron);
+            accumulator.Food += config.KillRewardFood * scale
+                * EconomyFocusUtility.GetKillRewardMultiplier(config, focus, EconomyFocusType.Food);
         }
     }
 }

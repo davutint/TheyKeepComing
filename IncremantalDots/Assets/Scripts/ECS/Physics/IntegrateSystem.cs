@@ -14,6 +14,13 @@ namespace DeadWalls
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
+            if (SystemAPI.HasSingleton<GameStateData>())
+            {
+                var gameState = SystemAPI.GetSingleton<GameStateData>();
+                if (gameState.IsGameOver || gameState.IsLevelUpPending)
+                    return;
+            }
+
             float dt = SystemAPI.Time.DeltaTime;
 
             new IntegrateJob

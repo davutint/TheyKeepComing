@@ -15,6 +15,13 @@ namespace DeadWalls
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
+            if (SystemAPI.HasSingleton<GameStateData>())
+            {
+                var gameState = SystemAPI.GetSingleton<GameStateData>();
+                if (gameState.IsGameOver || gameState.IsLevelUpPending)
+                    return;
+            }
+
             new ArrowMoveJob
             {
                 Dt = SystemAPI.Time.DeltaTime,
@@ -46,7 +53,13 @@ namespace DeadWalls
                 }
 
                 float3 targetPos = TransformLookup[arrow.Target].Position;
-                float3 direction = math.normalize(targetPos - transform.Position);
+                targetPos.z = transform.Position.z;
+
+                float3 toTarget = targetPos - transform.Position;
+                if (math.lengthsq(toTarget) <= 0.0001f)
+                    return;
+
+                float3 direction = math.normalize(toTarget);
                 transform.Position += direction * arrow.Speed * Dt;
 
                 // Yon hesaplasindan rotation

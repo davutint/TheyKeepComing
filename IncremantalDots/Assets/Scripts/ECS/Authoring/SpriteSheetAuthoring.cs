@@ -41,6 +41,10 @@ namespace DeadWalls
         [Tooltip("Bu animasyondaki frame sayisi (Character Creator: 15)")]
         public int FrameCount = 15;
 
+        [Header("Gorsel")]
+        [Tooltip("DeadWalls/SpriteSheet shader'indaki per-instance _Color tint.")]
+        public Color Tint = Color.white;
+
         public class Baker : Baker<SpriteSheetAuthoring>
         {
             public override void Bake(SpriteSheetAuthoring authoring)
@@ -68,6 +72,25 @@ namespace DeadWalls
                 {
                     Value = new float4(0f, uvRow * scaleY, scaleX, scaleY)
                 });
+
+                Color tint = ResolveTint(authoring);
+                AddComponent(entity, new SpriteTint
+                {
+                    Value = new float4(tint.r, tint.g, tint.b, tint.a)
+                });
+            }
+
+            private static Color ResolveTint(SpriteSheetAuthoring authoring)
+            {
+                var archer = authoring.GetComponent<ArcherAuthoring>();
+                if (archer != null)
+                    return archer.Tint;
+
+                var arrow = authoring.GetComponent<ArrowAuthoring>();
+                if (arrow != null)
+                    return arrow.Tint;
+
+                return authoring.Tint;
             }
         }
     }

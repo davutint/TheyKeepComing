@@ -1,0 +1,129 @@
+# Mobile Castle Combat v2 - Editor Setup
+
+## Kurulum
+
+1. Unity Editor'de projeyi ac.
+2. `Window -> DeadWalls -> Mobile Castle Scene Setup` penceresini ac.
+3. `Setup NewGameScene` butonuna bas.
+4. Tool `NewGameScene` ana sahnesini ve `MobileCastleCombatSubScene.unity` SubScene'ini gunceller.
+
+Script eklendikten sonra disaridan manuel compile komutu calistirma. Unity refresh sonrasi derlemeyi kendisi yapar.
+
+## Beklenen SubScene Hierarchy
+
+- `GameState`
+  - `GameStateAuthoring`
+  - `WaveConfigAuthoring`
+- `CastleCore`
+  - `CastleAuthoring`
+- `MobileCastleConfig`
+  - `MobileCastleCombatAuthoring`
+- `BasicArcher_01`
+  - `ArcherAuthoring`
+
+## Inspector Kontrolleri
+
+- `MobileCastleCombatAuthoring`
+  - Castle Center: `(0, 0)`
+  - Spawn Radius: `11`
+  - Attack Radius: `1.35`
+  - Base Wave Enemy Count: `30`
+  - Extra Enemies Per Wave: `10`
+  - Spawn Batch Size: `3`
+  - Zombie Scale: `1.4`
+  - Base Zombie Speed: `0.85`
+  - Zombie Speed Per Wave: `0.04`
+  - Stress Spawn Batch Size: `25`
+  - Stress Spawn Interval: `0.1`
+  - Stress Max Alive Zombies: `1500`
+  - Kill Reward Wood/Food/Stone/Iron: `1 / 0.6 / 0.25 / 0.15`
+  - Kill Reward Wave Scale: `0.05`
+  - Wave Clear Bonus Wood/Food/Stone/Iron Base: `20 / 15 / 10 / 6`
+  - Wave Clear Bonus Wood/Food/Stone/Iron Per Wave: `6 / 5 / 4 / 3`
+  - Initial Day Prep Duration: `12`
+  - Day Prep Duration: `15`
+  - Day/Night Overlay Alpha: `0 / 0.50`
+  - Unlimited Arrows: enabled
+  - Wave Director Base Spawn Interval: `0.8`
+  - Spawn Interval Wave Multiplier: `0.96`
+  - Min Spawn Interval: `0.35`
+  - Opening/Final Enemy Ratio: `0.20 / 0.20`
+  - Opening/Final Interval Multiplier: `1.35 / 0.65`
+  - Opening/Final Batch Delta: `-1 / +1`
+  - Fortify Damage Multiplier: `0.70`
+  - Rally Duration: `10`
+  - Rally Fire Rate Multiplier: `1.25`
+  - Archer Slots: mobile tilemap spawn akisi tarafindan kullanilmaz; bos kalabilir.
+- Main scene `Grid`
+  - `MobileCastleArcherTilePlacement` component'i `outside` tilemapini spawn kaynagi olarak kullanir.
+  - Scene view'da Gizmos acikken outside spawn hucreleri ve tekrar kullanim preview noktalar gorunur.
+- `GameStateAuthoring`
+  - Initial Zombies To Spawn: `30`
+  - Spawn Interval: `0.8`
+  - Base Zombie Speed: `0.85`
+  - Initial Wood/Stone/Iron/Food: `150 / 80 / 45 / 150`
+  - Passive income Wood/Stone/Iron/Food per min: `90 / 50 / 30 / 75`
+  - Initial Arrows: `200`
+- `WaveConfigAuthoring`
+  - Zombie, Arrow ve Archer prefab referanslari dolu olmali.
+- `BasicArcher_01`
+  - Type: `Basic`
+  - Fire Rate: `1.5`
+  - Arrow Damage: `10`
+  - Range: `15`
+  - Tint: beyaz
+  - Local Scale: `1`
+- `MobileCastleHudRoot`
+  - `HUDController`: economy text'leri, `WaveText`, `KillsText`, `WaveRewardText`, `DamageFlashImage` ve varsa defense module alanlari bagli olmali.
+  - Defense module: `DefensePercentText`, `DefenseWallFill`, `DefenseGateFill`, `DefenseCoreFill`, `DefenseWallText`, `DefenseGateText`, `DefenseCoreText`.
+  - `MarketUI`: `ArcherDrawerPanel`, `DrawerToggleButton`, Basic/Rapid/Frost row alanlari, tech unlock ve prep butonlari bagli olmali.
+  - Castle Yard: `RepairButton`; polish prefabda varsa `FortifyButton`, `RallyButton` ve cost/status text'leri.
+- `Canvas/DayNightOverlay`
+  - Full-screen black `Image`, raycast target kapali.
+  - `DayNightOverlayController.OverlayImage` ayni image'a bagli.
+  - Canvas'in ilk child'i olmali; world'u karartir, HUD/drawer ustte kalir.
+
+## Play Kontrolu
+
+`NewGameScene` Play modunda:
+
+- Basic okcu `Grid/outside` tilemapindeki bir spawn hucresinden ates eder.
+- Zombiler kalenin etrafindaki farkli acilardan gelir.
+- Zombi oldukce mobile resource reward artar; mobile loop'ta XP level-up pause tetiklemez.
+- Zombi oldukce Wood/Food/Stone/Iron reward'i accumulator uzerinden artar.
+- XP threshold oyunu durdurmaz; level-up paneli acilmaz.
+- Basic/Rapid/Frost okcular farkli tint ile okunur.
+- Basic/Rapid/Frost oklari okcu tipinin tint'ini miras alir.
+- Frost isabet eden zombi slow suresince mavi/soguk gorunur, sonra normale doner.
+- Okcular yalnizca `Grid/outside` tilemapindeki dolu hucrelere yerlestirilir; hucreler sinirsiz tekrar kullanilir.
+- Drawer toggle ile sag `Archer Progression` paneli acilip kapanir ve oyun pause olmaz.
+- Basic buy kaynak dusurup yeni Basic okcu spawn eder.
+- Rapid/Frost locked baslar; tech unlock sonrasi buy/upgrade aktif olur.
+- Kaynak yetmiyorsa ilgili row `CostText` alaninda `NEED ...` gorunur.
+- Type upgrade mevcut ve gelecekte spawn olacak ayni tip okculari guclendirir.
+- `ArrowDamageUp` mevcut ve future okculari guclendirir.
+- `FireRateUp` mevcut ve future okcularin atis hizini artirir.
+- Frost oklar hedef zombiyi yavaslatir.
+- `Repair` day prep sirasinda savunma HP'lerini onarir.
+- Oyun kisa `DAY 01` hazirligi ile baslar, sayac bitince `NIGHT 01` otomatik baslar.
+- Wave basi daha sakin, wave sonu daha baskili akar.
+- Spawn yonleri tam random 360 kalir.
+- Wave bitince 15 sn day prep baslar; `Start Next Wave` gerekmez ve button player-facing UI'da gizlidir.
+- Day prep boyunca overlay alpha `0 -> 0.50` artar, night combat'ta `0.50` sabit kalir.
+- Ok sayisi HUD'da `INF` gorunur ve mobile modda atis ok stogu dusurmez.
+- `Repair`, `Fortify` ve `Rally` sadece day prep sirasinda aktif olur.
+- HUD'da defense module barlari wall/gate/core HP'yi gosterir; wave clear bonusu kisa `Wave Cleared +...` feedback'i verir.
+- Wave son `20%` bolumunde wave/kills text'i threat rengine gecer; savunma hasarinda kisa red flash gorunur.
+- Wave bitince clear bonus tek sefer eklenir.
+
+## Stress Test
+
+1. SubScene'de `GameState` objesini sec.
+2. `GameStateAuthoring.StressTestMode` degerini `true` yap.
+3. `MobileCastleConfig` uzerindeki stress degerleriyle batch, interval ve alive cap'i ayarla.
+4. Play modunda HUD'daki `Zombies: alive (max X)` degerini takip et.
+
+Stress mode'da zombi hasari uygulanmaz; castle HP dusmeden max gorunen zombi sayisi olculebilir.
+Stress mode'da kill reward ve wave clear bonus verilmez.
+
+Stress test bitince `StressTestMode` tekrar `false` yapilmali.

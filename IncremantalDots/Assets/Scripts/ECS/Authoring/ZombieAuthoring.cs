@@ -35,6 +35,12 @@ namespace DeadWalls
                 {
                     Value = ZombieStateType.Moving
                 });
+                AddComponent(entity, new ZombieSlow
+                {
+                    Duration = 0f,
+                    SpeedMultiplier = 1f
+                });
+                SetComponentEnabled<ZombieSlow>(entity, false);
                 AddComponent(entity, new PhysicsBody
                 {
                     Velocity = float2.zero,

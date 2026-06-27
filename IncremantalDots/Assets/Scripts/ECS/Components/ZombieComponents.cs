@@ -15,6 +15,12 @@ namespace DeadWalls
         public int XPReward;
     }
 
+    public struct ZombieSlow : IComponentData, IEnableableComponent
+    {
+        public float Duration;
+        public float SpeedMultiplier;
+    }
+
     public enum ZombieStateType : byte
     {
         Moving,

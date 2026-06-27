@@ -1,0 +1,76 @@
+{
+  "version": "1.0",
+  "canvas": {
+    "referenceResolution": { "x": 1920, "y": 1080 },
+    "scaleMode": "ScaleWithScreenSize",
+    "matchWidthOrHeight": 0.5
+  },
+  "root": {
+    "type": "Panel",
+    "name": "SampleStatusPanel_Root",
+    "rectTransform": {
+      "anchorMin": { "x": 0.5, "y": 0.5 },
+      "anchorMax": { "x": 0.5, "y": 0.5 },
+      "pivot": { "x": 0.5, "y": 0.5 },
+      "anchoredPosition": { "x": 0, "y": 0 },
+      "sizeDelta": { "x": 560, "y": 260 }
+    },
+    "style": { "backgroundColor": "#20251DFF" },
+    "layoutGroup": {
+      "direction": "vertical",
+      "spacing": 14,
+      "padding": { "top": 24, "right": 28, "bottom": 24, "left": 28 },
+      "childAlignment": "UpperLeft",
+      "controlChildWidth": true,
+      "controlChildHeight": true,
+      "childForceExpandWidth": false,
+      "childForceExpandHeight": false
+    },
+    "children": [
+      {
+        "type": "Text",
+        "name": "TitleText",
+        "text": {
+          "content": "DeadWalls Status",
+          "fontSize": 34,
+          "fontStyle": "Bold",
+          "color": "#F1F5DFFF",
+          "alignment": "MiddleLeft",
+          "overflow": "Wrap"
+        },
+        "layoutElement": { "preferredHeight": 48, "flexibleWidth": 1 }
+      },
+      {
+        "type": "Text",
+        "name": "BodyText",
+        "text": {
+          "content": "Importer V2 preview sample. Runtime controller wiring is reported separately.",
+          "fontSize": 20,
+          "color": "#CBD5BDFF",
+          "alignment": "MiddleLeft",
+          "overflow": "Wrap"
+        },
+        "layoutElement": { "preferredHeight": 72, "flexibleWidth": 1 }
+      },
+      {
+        "type": "Button",
+        "name": "ConfirmButton",
+        "button": {
+          "interactable": true,
+          "transition": "ColorTint",
+          "onClick": "Confirm sample panel"
+        },
+        "text": {
+          "content": "Confirm",
+          "fontSize": 22,
+          "fontStyle": "Bold",
+          "color": "#1D1A10FF",
+          "alignment": "MiddleCenter",
+          "overflow": "Wrap"
+        },
+        "style": { "backgroundColor": "#D7B85BFF" },
+        "layoutElement": { "preferredWidth": 180, "preferredHeight": 48 }
+      }
+    ]
+  }
+}

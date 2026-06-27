@@ -1,69 +1,214 @@
-# DeadWalls — Claude Code Proje Kurallari
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+> Yazim kurali: bu dosya SADECE ASCII karakter kullanir (Turkce prose diakritiksiz: "Klasor", "Yapisi";
+> noktalama duz ASCII: `->`, `-`, `<->`). Tipografik karakter (em-dash, ok, vb.) KULLANMA -- diger
+> tool'larda mojibake olur. Operasyonel/surec kurallari (build/test/git/Turkce iletisim/derleme) icin
+> `AGENTS.md`'ye bak; bu dosya MIMARI + AKTIF YON pusulasidir.
+
+---
+
+## >>> Current Active Direction: NewGameScene Mobile Castle Defense <<<
+
+Proje ilk GDD'lerdeki grid town-building / RTS vizyonundan CIKTI. Su an aktif gelistirilen tek sey:
+**NewGameScene "Mobile Castle Combat" dongusu + dunya gorsel temeli (world-visual foundation) + ekonomi/savas polish.**
+(Eski RTS/town tarafi icin asagidaki "Legacy / Broader Repo Context" bolumune bak -- silinmedi, sadece geri cekildi.)
+
+### Aktif sahne yapisi (iki katman)
+- **`Assets/Scenes/NewGameScene.unity`** = AKTIF ana sahne -- MonoBehaviour/UI + gorsel kabuk.
+  Icerik: `Main Camera` (ortho, size 8), `Global Light 2D`, `WorldVisualRoot`, `Canvas`
+  (`DayNightOverlay` + `MobileCastleHudRoot` prefab + level/restart), `GameManager`,
+  `CastleClickTarget`, ve bir SubScene referansi.
+- **`Assets/Scenes/NewGameScene/MobileCastleCombatSubScene.unity`** = DOTS authoring tarafi (ECS'e bake).
+  Icerik: `GameState` (GameState+WaveConfig authoring), `CastleCore` (CastleAuthoring),
+  `MobileCastleConfig` (MobileCastleCombatAuthoring), `ArcherSlotRoot/ArcherSlot_01..03`.
+- Iki katman BILINCLI ayrik: Mono/UI ana sahnede, simulasyon datasi subscene'de.
+
+### Gorsel temel: `WorldVisualRoot` + SmallScaleInt
+- `WorldVisualRoot` = duz sahne GameObject (NewGameScene.unity:132, scale 0.35) -- prefab/ECS DEGIL,
+  gameplay'i ETKILEMEZ. `MobileCastleSceneSetupWindow.EnsureWorldVisuals` (MobileCastleSceneSetupWindow.cs:375)
+  idempotent kurar/normalize eder.
+- Altinda `MobileArenaGrid` (Unity `Grid`, Isometric, cellSize 4/2/4) -> 4 `Tilemap` katmani
+  (sortingOrder ile derinlik): `GroundTilemap` -50, `CastleGroundTilemap` -40, `CastleWallTilemap` -30,
+  `CastlePropsTilemap` -20. Yani: izometrik arena zemini + kale silueti + savas alani dekoru, salt okunabilirlik.
+- Tile'lar `Assets/SmallScaleInt/Fantasy kingdom Tileset/Environment/Tiles`'ten isimle yuklenir
+  (`SmallScaleInt/` = gorsel temel art: Fantasy kingdom Tileset + Character creator - Fantasy).
+
+### Aktif oyun dongusu (Mobile Castle Combat -- otoriter dok: `Systems/MOBILE_CASTLE_COMBAT_ARCHITECTURE.md`)
+360-derece merkezi kale savunmasi, OTOMATIK donen (manuel "Start Wave" YOK). `WaveStateData.Phase` ile:
+1. **DayPrep (ekonomi)** -- kisa hazirlik (`DayNightPrepSystem` timer). Nufus buyur, worker atamasi
+   Castle Interior panelinden, ekonomi event rolu. Gunduz overlay alpha 0 -> 0.50.
+2. **NightCombat (wave)** -- timer biter -> `CurrentWave++`, zombiler rastgele 360-ring'den spawn, okcular
+   otomatik ates. Intra-wave pacing (acilis %20 sakin, final %20 yogun; HUD tehdit rengi).
+3. **Wave-clear reward** -- bonus bir kez yazilir (`WaveClearRewardData`), `Phase=DayPrep`'e doner, dongu tekrar.
+4. **Economy events** (`MobileEconomyEventState`) -- sadece DayPrep basinda rollanir.
+- Anahtarlar `MobileCastleCombatConfig`'te: CastleCenter (0,0), SpawnRadius 11, AttackRadius 1.35,
+  `UnlimitedArrows=true`, worker uretim/odul carpani, wave director pacing (detay icin doc).
+- BIRAKILAN GDD ozellikleri: grid town-building, lane/telegraph wave, manuel RTS okcu yerlestirme,
+  XP level-up kartlari, ok stogu yonetimi -- hepsi mobile loop'ta YOK.
+
+### Aktif UI yuzeyleri (NewGameScene'de bagli; setup tool baglar)
+| Yuzey | Controller | Not |
+|---|---|---|
+| Mobile HUD (kaynak/wave/HP) | `HUDController.cs` | `MobileCastleHudRoot` prefab uzerinde |
+| Defense panel | `HUDController.cs` | AYRI controller YOK -- HUD alt modulu (`CastleDefensePanel`) |
+| Castle Interior ekonomi paneli | `CastleEconomyUI.cs` | DayPrep'te kaleye tiklayinca acilir |
+| Kaleye tikla-ac tetikleyici | `CastleInteriorClickTarget.cs` | dunya objesi, `OpenFromCastle()` cagirir |
+| Market / okcu + prep drawer | `MarketUI.cs` | okcu al/yukselt, Repair/Fortify/Rally |
+| Gun/Gece overlay | `DayNightOverlayController.cs` | faz alpha |
+
+### Su anki pusula (takip kaynaklari) -- ROADMAP DEGIL
+- **Canli takip:** milestone planlari + ozellik-bazli mobile docs:
+  `Systems/MOBILE_CASTLE_COMBAT_ARCHITECTURE.md`, `Systems/SYSTEM_EXECUTION_ORDER_ARCHITECTURE.md`,
+  `MonoBehaviour/CASTLE_ECONOMY_UI_ARCHITECTURE.md`, `Editor/MOBILE_CASTLE_SCENE_SETUP_ARCHITECTURE.md`.
+- **Aktif yon:** world-visual foundation + mobile castle economy/combat polish. **M-ISO (izometrik/perimeter) ARTIK AKTIF DEGIL.**
+- `Assets/Docs/ROADMAP.md` (son guncelleme 2026-03-18) + GDD'ler = LEGACY/genis baglam (asagi bak), guncel yon DEGIL.
+
+---
 
 ## Proje Hakkinda
-- **Motor:** Unity 6 LTS + DOTS/ECS
-- **Namespace:** DeadWalls
-- **Tur:** Zombie tower defense
-- **Dil:** C# (Unity ECS pattern)
+- **Motor:** Unity `6000.3.10f1` (Unity 6 LTS) + DOTS/ECS (`com.unity.entities` 1.3.9, Entities Graphics, URP 2D).
+- **Namespace:** `DeadWalls` (tek asmdef: `Assets/Scripts/DeadWalls.asmdef`, `allowUnsafeCode: true`).
+- **Tur:** Zombie castle-defense (360-derece, kaynak/nufus ekonomisi).
+
+## Komutlar (build / test) -- detay: `AGENTS.md`
+- **Ac:** Unity Hub -> `IncremantalDots`. Aktif sahne: `Assets/Scenes/NewGameScene.unity`.
+- **EditMode:** `Unity.exe -batchmode -projectPath . -runTests -testPlatform EditMode -quit -logFile Logs/EditModeTests.log`
+- **PlayMode:** `Unity.exe -batchmode -projectPath . -runTests -testPlatform PlayMode -quit -logFile Logs/PlayModeTests.log`
+- Checked-in build script YOK (Unity Build Settings).
+- **MANUEL DERLEME YAPMA** -- Unity editor refresh'te otomatik derler. "Derleniyor mu?" diye harici komut calistirma.
 
 ## Klasor Yapisi
 ```
 Assets/Scripts/
-  ECS/
-    Components/    — IComponentData struct'lari
-    Authoring/     — MonoBehaviour → ECS baker'lar
-    Systems/       — ISystem struct'lari (gameplay logic)
-    Physics/       — Custom 2D circle physics pipeline
-  MonoBehaviour/   — Klasik Unity script'leri
+  ECS/{Components, Authoring, Systems, Physics}  - ECS data/baker/sistem/custom physics
+  MonoBehaviour/                                 - manager + UI controller (ECS world'e kopru)
+  Editor/                                        - tool/analyzer + UIBuilder/ (UI import pipeline)
+  ScriptableObject/                              - BuildingConfigSO (LEGACY bina sistemi)
+Assets/Scenes/NewGameScene*                      - AKTIF sahne + DOTS subscene
+Assets/SmallScaleInt/                            - gorsel temel art (tileset + character creator)
+Assets/UIExports/<name>/                         - owner UI export'lari (ui.json + manifest + sprites)
+Assets/Prefabs/UI/Generated/                     - UIImporter ciktisi (uGUI prefab'lar)
+CodexPreviews/                                   - owner UI tasarim onizlemeleri (HTML)
+Assets/Docs/                                     - GDD + ROADMAP (LEGACY/baglam)
 ```
 
-## Kurallar
+## UI Uretim Is Akisi (ZORUNLU KURAL)
+**UI import edilir, ELLE YAZILMAZ/KURULMAZ.** Spec: `Editor/UIBuilder/CODEX_EXPORT_FORMAT.md`.
+1. **Owner** UI'yi ayri bir Codex tasarim aracinda (kendi tool'u / yan tab) tasarlar; onizleme `CodexPreviews/<name>/`.
+2. **Owner** paketi `Assets/UIExports/<name>/` altina export eder: `ui.json` (layout) + `manifest.json`
+   (sprite haritasi) + opsiyonel `sprites/`. Bu, UI layout'unun TEK dogruluk kaynagidir.
+3. **Implementer (sen)** UIImporter'i calistirir: `Window > DeadWalls > UI Importer` (veya export klasorune
+   sag-tik). Cikti: `Assets/Prefabs/UI/Generated/<Root>.prefab` + `Assets/Sprites/UI/Generated/<name>/`.
+4. **Implementer** sprite atar/auto-find yapar ve davranisi DeadWalls MonoBehaviour controller'larinda
+   (`HUDController`, `MarketUI`, `CastleEconomyUI`, ...) integration report'a gore baglar.
 
-### MD Dokumantasyonu (ZORUNLU)
-- Her yeni sistem veya klasor olusturuldiginda o klasore **ARCHITECTURE** ve **EDITOR_SETUP** md dosyalari yazilmali
-- Mevcut klasorlere yeni dosya eklendiginde mevcut md dosyalari guncellenmeli
-- MD dosya isimleri SPESIFIK olmali — neye tikladigini bilebilecek sekilde
-  - Ornek: `PHYSICS_PIPELINE_ARCHITECTURE.md`, `SPATIAL_HASH_GRID_ARCHITECTURE.md`
-  - Yanlis: `README.md`, `NOTES.md`
-
-### Kod Stili
-- Namespace: her zaman `DeadWalls`
-- ECS Systems: `partial struct` + `ISystem`, job'lar `[BurstCompile]` ile
-- Static field erisimi olan ISystem struct'lardan `[BurstCompile]` kaldirilir, job'da kalir
-- Turkce yorum yazilir (degisken/fonksiyon adlari Ingilizce)
-
-### ECS Pattern
-- Component: sade data, logic yok
-- System: tek sorumluluk, `IJobEntity` ile parallel
-- `ComponentLookup` ile komsu okuma: `[ReadOnly] [NativeDisableContainerSafetyRestriction]`
-- Spatial hash: `BuildSpatialHashSystem.ReadMap` / `WriteMap` (double-buffered NativeParallelMultiHashMap)
+> **IMPLEMENTER ASLA:** elle `ui.json`/`manifest.json` layout YAZMAZ, elle uGUI hiyerarsisi KURMAZ.
+> Layout eksik/yanlissa -> owner'dan YENI export iste. Implementer'in UI isi: importer'i calistir, sprite ata, controller bagla.
+> (Owner UI yapmaktan hoslanmaz; UI kurulum adimlari ilgili `*_EDITOR_SETUP.md`'ye yazilir.)
 
 ## Mimari Ozet
+> Otorite: gercek frame sirasi `[UpdateBefore]`/`[UpdateAfter]`/`OrderFirst` ozniteliklerinden gelir.
+> Kanonik kaynak: `Systems/SYSTEM_EXECUTION_ORDER_ARCHITECTURE.md`.
 
-### Physics Pipeline (her frame sirasi)
-```
-ApplyMovementForceSystem  → Hedefe dogru kuvvet
-BuildSpatialHashSystem    → Pozisyonlari hash grid'e yaz
-PhysicsCollisionSystem    → Circle-circle carpisma + pozisyon duzeltme
-IntegrateSystem           → velocity += force*dt, position += velocity*dt
-BoundarySystem            → Duvar bariyeri, domino queuing, state transitions
-```
+### Iki dunya: ECS <-> MonoBehaviour koprusu
+- Simulasyon ECS'te (`World.DefaultGameObjectInjectionWorld`); Mono katmani UI + input.
+- **Kopru:** Mono manager `EntityManager.CreateEntityQuery(typeof(T))` -> `GetSingletonEntity()`.
+  `TryInitialize()` singleton'lar bake edilene kadar her frame `false` (lazy init).
+- **`GameManager`** (singleton) merkez: her `Update()`'te `ReadECSData()` ECS singleton'larini public C#
+  property'lere kopyalar (UI cache snapshot) + degisimde C# event firlatir; UI'in cagirdigi TUM mutation metotlari burada.
+- **`UIManager`** panel orkestratoru (event'lere abone, panel ac/kapat).
+- **3 singleton hub:** (1) GameState entity (`GameStateData`+`WaveStateData`+`Resource*`+`PopulationState`+`ArrowSupply`),
+  (2) Castle entity (`WallSegment`+`GateComponent`+`CastleHP`), (3) `MobileCastleCombatConfig` entity
+  (+`MobilePopulationAllocation`/`MobilePrepPauseState`/`MobileEconomyEventState`/`CastleYardPrepState`/`EconomyFocusState`).
 
-### Zombie State Akisi
-```
-Moving ──→ Attacking    (duvara ulasti)
-Moving ──→ Queued       (domino: Attacking/Queued komsusuna cakisti)
-Queued ──→ Moving       (blocker gitti)
-Queued ──→ Attacking    (duvara ulasti)
-  *    ──→ Dead         (HP <= 0)
-```
-- **Moving:** Yuruyor, kuvvet uygulanir, walk animasyonu
-- **Attacking:** Duvarda, saldirir, hit animasyonu (kirmizi)
-- **Queued:** Durmus ama saldirmiyor, walk animasyonu, kuvvet yok
-- **Dead:** Olum animasyonu, DeathTimer ile entity silinir
+### Mod anahtari: Mobile/Kale vs Legacy WallX
+- `MobileCastleCombatConfig` singleton VARSA -> **mobil/kale modu** (AKTIF): CastleCenter'a yon, 360 spawn,
+  AttackRadius, gun/gece prep dongusu. `GameManager.TryGetMobileConfigEntity()` tum ekonomi/wave mantigini dallandirir.
+- Config YOKSA -> **legacy WallX modu** (fallback): zombiler sagdan, yon `WallXPosition` ile.
 
-### Mevcut MD Dosyalari
-- `Components/` — COMPONENT_MAP_*, RESOURCE_COMPONENTS_*, POPULATION_STATE_*
-- `Systems/` — SYSTEM_EXECUTION_ORDER_*, RESOURCE_TICK_SYSTEM_*, POPULATION_TICK_SYSTEM_*, SPRITE_ANIMATION_*
-- `Physics/` — PHYSICS_PIPELINE_*, PHYSICS_EDITOR_SETUP, SPATIAL_HASH_GRID_*, COLLISION_RESPONSE_*
-- `Editor/` — PROFILER_ANALYZER_*
+### Iki entity-olusturma pattern'i
+1. **Authoring + Baker:** Castle/GameState/WaveConfig/MobileCastleCombat = sahne singleton'lari (subscene'de bake).
+   Zombie/Arrow/Archer = bake edilmis PREFAB'lar (`*PrefabData` ref'i), runtime `Instantiate`.
+2. **Runtime `CreateEntity`** (prefab/baker YOK): bina entity'leri (`BuildingGridManager`, `BuildingConfigSO`) -- **LEGACY**.
+
+### Sistem yurutme sirasi (SimulationSystemGroup, ASCII)
+```
+# Frame basi (hepsi UpdateBefore WaveSpawn)
+DayNightPrepSystem            [OrderFirst, UpdateBefore WaveSpawn] gun/gece state
+BuildingProductionSystem  ->  BuildingPopulationSystem  ->  ArrowProductionSystem
+  ->  MobilePopulationEconomySystem  ->  PopulationTickSystem  ->  BarracksTrainingSystem  ->  ResourceTickSystem
+WaveSpawnSystem              [OrderFirst] wave spawn (stats her zombiye)
+# Combat prep (UpdateAfter WaveSpawn, UpdateBefore ApplyMovementForce)
+CastleYardPrepSystem -> ArcherShootSystem -> ArcherAnimationStateSystem ; ZombieSlowTimerSystem (frost)
+# Physics pipeline (kati lineer)
+ApplyMovementForceSystem -> BuildSpatialHashSystem -> PhysicsCollisionSystem -> IntegrateSystem -> BoundarySystem
+# Post-physics (kati lineer, IJobEntity)
+ZombieAttackTimerSystem(*) -> ArrowMoveSystem -> ArrowHitSystem -> ZombieDeathSystem
+  -> ZombieAnimationStateSystem -> DamageApplySystem [*** TEK SYNC POINT ***] -> DamageCleanupSystem
+# PresentationSystemGroup
+SpriteAnimationSystem
+```
+- (*) `ZombieAttackTimerSystem` struct'i `Systems/ZombieAttackSystem.cs` icindedir (dosya/tip ismi farkli).
+- **Pause guard:** `GameStateData.IsLevelUpPending` veya `IsGameOver` true iken combat durur (mobil modda XP esigi `IsLevelUpPending` TETIKLEMEZ).
+- **Helper'lar (ISystem DEGIL, `public static class`):** `Systems/EconomyFocusUtility`, `Systems/MobileWaveUtility`, `Physics/SpatialHashGrid`.
+
+### Sync point + spatial hash
+- Fizik/post-physics sistemlerinin HICBIRI `CompleteDependency()` cagirmaz (hepsi `ScheduleParallel`).
+  **TEK sync point** `DamageApplySystem` (sequential drain, Wall->Gate->Castle, GameOver).
+- `BuildSpatialHashSystem` double-buffer: `ReadMap` (consumer okur, 1-frame-eski) + `WriteMap` (bu frame yazilan),
+  her frame swap + `.Complete()` YOK. Consumer'lar (`PhysicsCollisionSystem`, `BoundarySystem`)
+  `BuildSpatialHashSystem.ReadMap` static field'ini `[ReadOnly]` alir. Bedel: 1-frame-eski uzaysal veri.
+
+### Zombie state akisi (`ZombieStateType`)
+```
+Moving --> Attacking   (kale/AttackRadius'a ulasti)
+Moving --> Queued      (domino: durmus komsuya cakisti)
+Queued --> Moving      (blocker gitti) ; Queued --> Attacking (kaleye ulasti)
+  *    --> Dead         (HP<=0, ZombieDeathSystem)
+```
+- Gecislerin sahibi `BoundarySystem` (->Dead haric). **Frost/slow:** `ZombieSlow` enableable + `ZombieSlowTimerSystem` -> speed multiplier + mavi tint.
+- **Domino queuing:** durmus komsuya cakisan Moving -> Queued; her frame 1 katman, dalga kaleden geri yayilir/cozulur (3x3 hash taramasi).
+
+## Kurallar
+### Kod Stili
+- Namespace her zaman `DeadWalls`. ECS Systems: `partial struct` + `ISystem`, job'lar `[BurstCompile]`.
+- **Static field erisimi olan ISystem struct'tan `[BurstCompile]` KALDIRILIR** (job'da kalir):
+  `BuildSpatialHashSystem`, `PhysicsCollisionSystem`, `BoundarySystem`.
+- Turkce yorum, Ingilizce identifier. Mimari kararda **once performansi** degerlendir.
+
+### ECS Pattern
+- Component sade data. System tek sorumluluk, mumkunse `IJobEntity`. Komsu okuma `ComponentLookup` +
+  `[ReadOnly] [NativeDisableContainerSafetyRestriction]` (her entity yalniz KENDI verisini yazar).
+
+### MD Dokumantasyonu (ZORUNLU)
+- Yeni sistem/klasor -> o klasore SPESIFIK `*_ARCHITECTURE.md` + `*_EDITOR_SETUP.md`. Mevcut klasore ekleme -> mevcut MD'leri GUNCELLE.
+- ASLA generic isim (`README.md`/`NOTES.md`) yok. Mevcutlari kesfet: `glob **/*_ARCHITECTURE.md`.
+
+## Editor Tool'lari (`Assets/Scripts/Editor`)
+- **MobileCastleSceneSetupWindow** -- NewGameScene + subscene + WorldVisualRoot iskeletini tek tikla (idempotent) kurar. (AKTIF is akisinin merkezi)
+- **ArenaMapGeneratorWindow** -- seed-tabanli tek-tik izometrik arena uretici (gorsel). WorldVisualRoot tilemap'lerine biome zemin + noise-blend gecis + dekor + dekoratif yapi boyar; canli-sahne onizleme, tek-undo. Tile = Fantasy kingdom Tileset (duz Tile asset). Bkz. `ARENA_MAP_GENERATOR_ARCHITECTURE.md`.
+- **UIBuilder/** -- owner UI export'unu (`Assets/UIExports/<name>/`) uGUI prefab'ina ceviren import pipeline.
+- **MapImporterWindow / GroundTileMapperWindow / BuildingTileComposerWindow** -- harita/zemin/bina tile araclari (cogu LEGACY town tarafi).
+- **SpriteAtlasGenerator** -- 4 karakter animasyon PNG'sini tek atlasa birlestir.
+- **ProfilerDataAnalyzer** -- `.raw` profiler dosyasini A/B karsilastirmali rapora donustur.
+
+## Onemli Surec Kurallari (tam liste: `AGENTS.md`)
+- **Iletisim her zaman Turkce.** ONCE PLAN sonra EXECUTE (sorma, otomatik yap). Soruya once CEVAP ver, sonra tool.
+- **GitHub/remote islem YOK** (push, PR, issue, release, tag, remote branch, upload, `gh`) -- sahip izin vermedikce.
+- **Yikici git YOK** (reset/checkout/clean/rebase/branch silme) -- acik istek olmadan. Read-only git serbest.
+- Gorsel/tile mapping'de TAHMIN YAPMA -- her tile'i dogrula.
+
+---
+
+## Legacy / Broader Repo Context (silinmedi -- guncel yon DEGIL)
+Asagidakiler tarihsel/genis baglamdir. Kod hala derde ama AKTIF mobile loop'ta KULLANILMAZ:
+- **RTS / town-building sistemi:** `BuildingGridManager` (hibrit `int[,]` truth source + Tilemap + runtime ECS entity),
+  `BuildingConfigSO`, `BuildingPlacementUI`, `BuildingDetailUI`, `EconomyFocusUI` -- bunlar **NewGameScene'de YOK**
+  (setup tool bazilarini destroy eder). Mobile ekonomi worker-slider'lara (`CastleEconomyUI`) gecti.
+- **`Assets/Docs/ROADMAP.md`** -- 2026-03-18'e kadar milestone gecmisi. "TEK takip kaynagi" ve "AKTIF M-ISO"
+  iddialari ARTIK GECERSIZ. Guncel yon icin yukaridaki "Current Active Direction"a guven.
+- **GDD v4.0/v3.0/v2.0** (`Assets/Docs/`) -- tasarim vizyonu/genis scope referansi, gorev takibi DEGIL.
+- **M-ISO (izometrik grid + perimeter wall)** -- terk edildi. M-ISO.5 (8-yonlu sprite atlas + `ZombieAnimationStateSystem`) gibi
+  bazi ciktilari mobile loop'ta kullaniliyor, ama izometrik gecis hedefi aktif degil.

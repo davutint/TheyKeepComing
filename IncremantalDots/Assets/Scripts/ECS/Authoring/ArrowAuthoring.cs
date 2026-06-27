@@ -1,4 +1,5 @@
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace DeadWalls
@@ -7,6 +8,10 @@ namespace DeadWalls
     {
         public float Speed = 12f;
         public float Damage = 10f;
+        public ArcherType ArcherType = ArcherType.Basic;
+        public float SlowDuration = 0f;
+        public float SlowMultiplier = 1f;
+        public Color Tint = Color.white;
 
         public class Baker : Baker<ArrowAuthoring>
         {
@@ -19,8 +24,19 @@ namespace DeadWalls
                 {
                     Speed = authoring.Speed,
                     Damage = authoring.Damage,
-                    Target = Entity.Null
+                    Target = Entity.Null,
+                    ArcherType = authoring.ArcherType,
+                    SlowDuration = authoring.SlowDuration,
+                    SlowMultiplier = authoring.SlowMultiplier
                 });
+
+                if (authoring.GetComponent<SpriteSheetAuthoring>() == null)
+                {
+                    AddComponent(entity, new SpriteTint
+                    {
+                        Value = new float4(authoring.Tint.r, authoring.Tint.g, authoring.Tint.b, authoring.Tint.a)
+                    });
+                }
             }
         }
     }

@@ -32,6 +32,23 @@ namespace DeadWalls
 
             var production = SystemAPI.GetSingleton<ResourceProductionRate>();
             var consumption = SystemAPI.GetSingleton<ResourceConsumptionRate>();
+            if (SystemAPI.HasSingleton<MobileCastleCombatConfig>())
+            {
+                if (SystemAPI.HasSingleton<MobilePrepPauseState>()
+                    && SystemAPI.GetSingleton<MobilePrepPauseState>().IsPaused)
+                {
+                    return;
+                }
+
+                if (!SystemAPI.HasSingleton<MobilePopulationAllocation>())
+                {
+                    var config = SystemAPI.GetSingleton<MobileCastleCombatConfig>();
+                    EconomyFocusType focus = SystemAPI.HasSingleton<EconomyFocusState>()
+                        ? SystemAPI.GetSingleton<EconomyFocusState>().Type
+                        : EconomyFocusType.Balanced;
+                    production = EconomyFocusUtility.ApplyPassiveFocus(production, config, focus);
+                }
+            }
 
             var resourceRW = SystemAPI.GetSingletonRW<ResourceData>();
             var accumulatorRW = SystemAPI.GetSingletonRW<ResourceAccumulator>();

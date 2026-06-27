@@ -118,6 +118,16 @@ Entities Graphics paketi, `[MaterialProperty]` attribute'u sayesinde bu componen
 degerini otomatik olarak GPU compute buffer'a yazar. Shader tarafinda `_UVRect`
 olarak okunur.
 
+### SpriteTint (IComponentData + [MaterialProperty("_Color")])
+Dosya: `Assets/Scripts/ECS/Components/SpriteComponents.cs`
+
+GPU'ya per-instance gonderilen renk tint'i.
+Value: `(r, g, b, a)`
+
+`DeadWalls/SpriteSheet` shader'i `_Color` propertysini DOTS instancing ile okur.
+Bu sayede ayni material/prefab korunurken Basic/Rapid/Frost okcu, ok projectile
+ve Frost slow feedback'i entity basina renklendirilebilir.
+
 ### DeathTimer (IComponentData)
 Dosya: `Assets/Scripts/ECS/Components/ZombieComponents.cs`
 
@@ -148,6 +158,10 @@ Bu yuzden `uvRow = (TotalRows-1) - DirectionRow` ile ceviriyoruz.
 
 ### ZombieAnimationStateSystem (SimulationSystemGroup)
 Dosya: `Assets/Scripts/ECS/Systems/ZombieAnimationStateSystem.cs`
+
+Mobile castle mode'da direction row artik velocity'den, velocity yoksa `CastleCenter` hedef yonunden hesaplanir. Bu sayede 360 spawn edilen zombiler tek yonde yurur gibi gorunmez.
+
+Okcular icin V1'de ayri `ArcherAnimationStateSystem` vardir; `ArcherUnit` entity'lerini idle row'da tutar ve prefab'in walk row'unda surekli yuruyor gibi gorunmesini engeller.
 
 ZombieState degisikligine gore animasyon degistirir:
 
@@ -191,25 +205,24 @@ Dosya: `Assets/Shaders/SpriteSheet.shader`
 - DOTS_INSTANCING_ON destegi
 - Per-instance: `_UVRect` (float4), `_Color` (float4)
 - UV transform: `uv = quad_uv * _UVRect.zw + _UVRect.xy`
+- Tint: sampled sprite color `_Color` ile carpilir
 - Cull Off (her iki yuzden gorunur)
 
 ### !!KRITIK!! Shader Kurallari (DOTS Entities Graphics ile)
 
-Bu kurallar debug sirasinda kesfedildi. Uyulmazsa entity'ler GORUNMEZ.
+Bu Unity/Entities Graphics surumunde transparent queue veya depth yazimini kapatma kullanildiginda entity'ler gorunmeyebilir. Bu yuzden shader gorunurluk icin `Opaque/Geometry` kalir; mobile castle occlusion shader'a dokunmadan cozulmalidir.
 
 | DOGRU | YANLIS | Sonuc |
 |-------|--------|-------|
-| `"RenderType" = "Opaque"` | `"RenderType" = "TransparentCutout"` | TransparentCutout → entity gorunmez |
-| `"Queue" = "Geometry"` | `"Queue" = "AlphaTest"` | AlphaTest → entity gorunmez |
-| LightMode tag'i OLMAMALI | `"LightMode" = "UniversalForward"` | LightMode → entity gorunmez |
-| Tek Pass (sadece ana pass) | Ekstra DepthOnly pass | DepthOnly → entity gorunmez |
+| `"RenderType" = "Opaque"` | `"RenderType" = "Transparent"` | Transparent entity'leri gizleyebilir |
+| `"Queue" = "Geometry"` | `"Queue" = "AlphaTest"` veya `"Transparent"` | Entity gorunmeyebilir |
+| LightMode tag'i OLMAMALI | `"LightMode" = "UniversalForward"` | LightMode entity renderini bozabilir |
+| Tek Pass (sadece ana pass) | Ekstra DepthOnly pass | DepthOnly siralamayi bozar |
 | `#pragma target 4.5` | Daha dusuk target | Compute buffer destegi yok |
 | `#pragma multi_compile_instancing` | Eksik | Instancing calismaz |
 | `#pragma multi_compile _ DOTS_INSTANCING_ON` | Eksik | Per-instance property calismaz |
 
-**Ozet:** Entities Graphics, sadece `Opaque/Geometry` tag'li, `LightMode` tag'i olmayan,
-tek pass'li shader'lari kabul eder. Alpha cutoff icin `clip()` fonksiyonu kullanilir
-ama render queue olarak `Geometry` kalir.
+**Ozet:** Entities Graphics icin DOTS instancing pragma'lari, `Opaque/Geometry` tag'leri ve LightMode'suz tek pass korunur. Transparent queue, AlphaTest/TransparentCutout veya `ZWrite Off` bu hatta kullanilmaz. Mobile castle on/arka iliskisi shader ile degil `MobileCastleRenderDepth` z bandlariyla yonetilir.
 
 ### CBUFFER Hizalama
 ```hlsl

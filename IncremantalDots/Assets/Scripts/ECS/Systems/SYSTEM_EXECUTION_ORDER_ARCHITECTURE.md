@@ -1,156 +1,137 @@
 # System Calisma Sirasi ve Sync Point Stratejisi
 
-## Calisma Sirasi (UpdateOrder)
-```
-SimulationSystemGroup icinde:
--3. BuildingProductionSystem    — Bina uretim hizlarini topla → singleton'a yaz
--2½.BuildingPopulationSystem   — Kapasite + bina yemek tuketimi → singleton'a yaz
--2. ArrowProductionSystem    *  — Fletcher ok uretimi + WoodPerMin'e ekleme
--1. PopulationTickSystem     *  — Nufus hesapla + FoodPerMin += nufus kismi
--½. BarracksTrainingSystem      — Kisla okcu egitimi (idle nufus + kaynak → okcu spawn)
- 0. ResourceTickSystem        *  — Kaynak uretim/tuketim tick (net hiz * dt → accumulator → int)
- 1. WaveSpawnSystem              — Zombi spawn + wave stats uygula (ZombieStats set)
- 2. ArcherShootSystem         *  — Burst + brute-force query, physics oncesi (1-frame-old pozisyon)
- 3. ApplyMovementForceSystem  *  — Hedefe dogru kuvvet → PhysicsBody.Force (WallX singleton ile yon)
- 4. BuildSpatialHashSystem    *  — Double-buffered spatial hash (ReadMap/WriteMap)
- 5. PhysicsCollisionSystem    *  — Circle-circle carpisma + momentum transfer
- 6. IntegrateSystem           *  — velocity += force*dt, pos += vel*dt, damping
- 7. BoundarySystem            *  — Duvar bariyeri, state transition, Y siniri
- 8. ZombieAttackTimerSystem      — IJobEntity: attack timer + NativeQueue'ya hasar yaz
- 9. ArrowMoveSystem           *  — IJobEntity: ok hareket
-10. ArrowHitSystem            *  — IJobEntity + ECB: ok isabet + hasar
-11. ZombieDeathSystem         *  — IJobEntity: HP<=0 → Dead state
-12. ZombieAnimationStateSystem*  — IJobEntity + ECB: sprite animasyon guncelle
-13. DamageApplySystem            — TEK SYNC POINT: damage queue drain + singleton yazma
-14. DamageCleanupSystem          — DeathTimer, XP, entity sil
+## SimulationSystemGroup Sirasi
 
-PresentationSystemGroup icinde:
-15. SpriteAnimationSystem     *  — IJobEntity: UV rect hesapla
-
-* = IJobEntity (parallel job olarak calisir, main thread bloklamaz)
 ```
+-4. DayNightPrepSystem
+-3. BuildingProductionSystem
+-2. BuildingPopulationSystem
+-1. ArrowProductionSystem
+ 0. PopulationTickSystem
+ 1. BarracksTrainingSystem
+ 2. ResourceTickSystem
+ 3. WaveSpawnSystem
+ 4. CastleYardPrepSystem / ZombieSlowTimerSystem
+    (ikisi de WaveSpawnSystem sonrasi; CastleYardPrepSystem ArcherShootSystem oncesi,
+     ZombieSlowTimerSystem ApplyMovementForceSystem oncesi garantilenir)
+ 5. ArcherShootSystem
+ 6. ApplyMovementForceSystem
+ 7. BuildSpatialHashSystem
+ 8. PhysicsCollisionSystem
+ 9. IntegrateSystem
+10. BoundarySystem
+11. ZombieAttackTimerSystem
+12. ArrowMoveSystem
+13. ArrowHitSystem
+14. ZombieDeathSystem
+15. ZombieAnimationStateSystem
+16. ArcherAnimationStateSystem
+17. DamageApplySystem
+18. DamageCleanupSystem
+```
+
+Presentation tarafinda `SpriteAnimationSystem` UV rect hesaplarini yapar.
+
+## Pause Guard
+
+`GameStateData.IsLevelUpPending` veya `IsGameOver` true iken combat update'leri pause edilir. Movement, collision, integrate, boundary, attack timer, arrow move/hit, slow timer ve cleanup yeni state kapanana kadar ilerlemez. Mobile castle mode'da XP threshold artik `IsLevelUpPending` yapmaz, bu yuzden run loop level-up paneliyle durmaz.
 
 ## Sync Point Stratejisi
-- Sistem 2-12 arasi main thread sadece job dispatch yapar (~0.5ms)
-- **Tek sync point: DamageApplySystem** (sistem 13) — tum physics + attack job'lari tamamlanir
-- WaveSpawnSystem (sistem 1) sequential ama frame basinda → onceki frame'in job'lari zaten bitmis
 
-## System Detaylari
+- Sistemlerin buyuk bolumu job schedule eder ve main thread'i bekletmez.
+- `DamageApplySystem` tek bilincli sync point'tir; attack damage queue drain etmek icin pending job'lari tamamlar.
+- `WaveSpawnSystem` frame basinda sequential calisir.
 
-### BuildingProductionSystem (M1.4)
-→ Detay: `BUILDING_PRODUCTION_SYSTEM_ARCHITECTURE.md`
+## Sistem Notlari
 
-### BuildingPopulationSystem (M1.5)
-→ Detay: `BUILDING_POPULATION_SYSTEM_ARCHITECTURE.md`
+### DayNightPrepSystem
 
-### ArrowProductionSystem (M1.6)
-- Fletcher binalarindaki isciler ok uretir
-- ArrowSupply singleton uzerinde accumulator pattern
-- WoodPerMin'e Fletcher ahsap tuketimini ekler (BuildingPopulationSystem sifirladiktan sonra)
-- `[BurstCompile]` destekli
-- `[UpdateAfter(typeof(BuildingPopulationSystem))]`
-- `[UpdateBefore(typeof(PopulationTickSystem))]`
-→ Detay: `ARROW_PRODUCTION_SYSTEM_ARCHITECTURE.md`
-
-### PopulationTickSystem (M1.2)
-→ Detay: `POPULATION_TICK_SYSTEM_ARCHITECTURE.md`
-
-### BarracksTrainingSystem (M1.6)
-- Kisla okcu egitim sistemi
-- Idle nufus + yeterli kaynak varsa egitim baslatir
-- Timer bitince okcu spawn eder (ArcherPrefabData + ECB)
-- PopulationState.Archers sayacini arttirir
-- BurstCompile YOK (ECB + singleton RW)
-- `[UpdateAfter(typeof(PopulationTickSystem))]`
-- `[UpdateBefore(typeof(ResourceTickSystem))]`
-→ Detay: `BARRACKS_TRAINING_SYSTEM_ARCHITECTURE.md`
-
-### ResourceTickSystem (M1.1)
-→ Detay: `RESOURCE_TICK_SYSTEM_ARCHITECTURE.md`
+- Mobile normal mode'da `DayPrep` sayacini azaltir.
+- Sayac bitince `CurrentWave` artar, wave stat'leri configure edilir ve `NightCombat` baslar.
+- Stress mode'da calismaz.
 
 ### WaveSpawnSystem
-- WaveStateData singleton'dan dalga bilgilerini okur
-- SpawnTimer ile periyodik zombi spawn (batch 20)
-- **Wave stats uygulanir:** Her zombiye wave'e ozel HP, Speed, Damage degerleri yazilir
-- PhysicsBody + CollisionRadius component'lari eklenir
-- StressTestMode: `false` default (Inspector'dan degistirilebilir)
+
+- Mobile castle mode'da `MobileCastleCombatConfig` varsa spawn kale merkezi etrafindaki cemberden random aciyla yapilir.
+- Mobile normal mode'da spawn yonu random 360 kalir, ama wave ici opening/mid/final fazlari interval ve batch'i degistirir.
+- Normal mobile modda wave temizlenince wave clear bonus'u ekler, `WaveClearRewardData` yazar ve `Phase = DayPrep`, `WaveActive = false`, `PrepTimer = DayPrepDuration` yazar.
+- Worker economy aktifse wave clear bonus `WorkerEconomyRewardMultiplier` ile azaltilir.
+- Yeni wave'i `DayNightPrepSystem` prep sayaci bitince otomatik baslatir.
+- Stress mode'da config'teki stress batch, interval ve max alive cap'i kullanilir.
+- Stress mode'da reward/bonus verilmez.
+- Spawn edilen zombilerde `ZombieSlow` disabled resetlenir.
+
+### ResourceTickSystem
+
+- Mobile castle mode'da `MobilePopulationAllocation` yoksa legacy `EconomyFocusState` ile effective production hesaplar.
+- Worker economy aktifken production zaten `MobilePopulationEconomySystem` tarafindan yazildigi icin focus multiplier uygulanmaz.
+- `MobilePrepPauseState.IsPaused` true ise resource accumulator ilerletilmez; Castle Interior ekrani acikken prep timer ile kaynak tick birlikte durur.
+
+### MobilePopulationEconomySystem
+
+- Mobile normal mode'da worker allocation'i clamp eder.
+- `ResourceProductionRate` ve `PopulationState.Workers/Idle` degerlerini yazar.
+- Completed wave sonrasi DayPrep basinda population growth uygular.
+- Nadir economy event roll eder ve secili production bonusunu rate'lere uygular.
+- Stress mode'da calismaz.
+
+### CastleYardPrepSystem
+
+- Mobile normal mode'da `CastleYardPrepState.RallyTimer` degerini sadece `NightCombat` sirasinda azaltir.
+- `FortifyActive` timer kullanmaz; wave bitince `WaveSpawnSystem` tarafindan temizlenir.
+- `ArcherShootSystem` oncesinde calisir ki rally fire-rate multiplier'i ayni frame okunabilsin.
+
+### ZombieSlowTimerSystem
+
+- Frost slow duration'ini azaltir.
+- Slow aktifken zombi `SpriteTint` rengini soguk/mavi yapar.
+- Duration bitince multiplier'i `1` yapar ve `ZombieSlow` component'ini pasifler.
+- Duration bitince veya zombi Dead state'e gecince tint'i normale dondurur.
+- `ApplyMovementForceSystem` oncesinde calisir.
 
 ### ArcherShootSystem
-- **Physics oncesine tasindi** — `[UpdateBefore(typeof(ApplyMovementForceSystem))]`
-- 1-frame-old zombie pozisyonlari ile hedefleme (ok ucus suresi >> 1 frame)
-- `[BurstCompile]` ile struct ve OnUpdate
-- Brute-force SystemAPI.Query ile en yakin zombiyi bulur (~60K mesafe kontrolu, Burst ile spatial hash'ten hizli)
-- `math.distancesq` kullanir (sqrt maliyeti yok)
-- `EndSimulationEntityCommandBufferSystem` ECB kullanir
-- Fire timer'a gore ok spawn eder
 
-### ApplyMovementForceSystem (FIZIK)
-- Moving zombilere hedefe dogru kuvvet uygular
-- WallX singleton'dan duvar pozisyonunu okur, zombiyi duvara dogru yonlendirir
-- Attacking/Dead/Queued → kuvvet sifir
+- Range icindeki en yakin zombiyi hedefler.
+- Mobile config ve `UnlimitedArrows = true` iken `ArrowSupply.Current` kontrolu/decrement yapmaz.
+- `CastleYardPrepState.RallyTimer > 0` iken fire-rate hesabina rally multiplier uygular.
+- Basic/Rapid/Frost okcu stat'lerini projectile'a tasir.
+- Spawn edilen oka okcu tipinin `SpriteTint` rengini yazar.
+- Okcunun hedefe bakan `FacingDirection` degerini ve `AttackAnimTimer` degerini yazar.
+- Fire timer'a gore ok spawn eder.
 
-### BuildSpatialHashSystem (FIZIK — DOUBLE BUFFER)
-- **ReadMap**: onceki frame'in verisi, consumer'lar (Collision, Boundary) okur
-- **WriteMap**: bu frame'de hash job doldurur
-- Her frame swap yapilir, .Complete() YOK — main thread bloklanmaz
-- ClearMapJob + HashJob dependency chain ile schedule edilir
-- Static field uzerinden diger sistemler ReadMap'e erisiyor
+### ApplyMovementForceSystem
 
-### PhysicsCollisionSystem (FIZIK)
-- Spatial hash (ReadMap) ile broadphase (3x3 komsu hucre)
-- Circle-circle overlap test + pozisyon duzeltme + velocity impulse
-- Paralel: her entity sadece kendini gunceller
+- Mobile mode'da hedef `CastleCenter`, eski mode'da `WallXPosition`.
+- Moving zombilere hedefe dogru kuvvet uygular.
+- `ZombieSlow` enabled ise hareket kuvvetini slow multiplier ile carpar.
+- Attacking/Dead/Queued state'lerinde kuvvet sifirlanir.
 
-### IntegrateSystem (FIZIK)
-- Semi-implicit Euler: velocity += force/mass*dt, pos += vel*dt
-- Damping: velocity *= (1 - damping*dt)
-- Force sifirlanir (sonraki frame icin)
+### BoundarySystem
 
-### BoundarySystem (FIZIK)
-- Moving → Attacking: pos.x <= wallX
-- Domino queuing: Moving → Queued (komsuda Attacking/Queued varsa)
-- Queued → Moving: blocker gidince
-- Duvar bariyeri + Y siniri
-
-### ZombieAttackTimerSystem
-- **IJobEntity**: Attacking state'deki zombilerin timer'ini isler
-- Timer dolunca hasar `NativeQueue<float>.ParallelWriter`'a yazilir
-- Main thread beklemez — hasar DamageApplySystem'de uygulanir
-- Static field `DamageQueue` uzerinden DamageApplySystem erisir
+- Mobile mode'da `AttackRadius` icine giren zombiler `Attacking` olur.
+- Eski mode'da `WallXPosition` bariyeri korunur.
 
 ### ArrowMoveSystem
-- **IJobEntity**: Oklari hedeflerine dogru hareket ettirir
-- ComponentLookup<LocalTransform> ile hedef pozisyon okur
-- ECB.ParallelWriter ile hedefi olmayan oklari siler
+
+- Oklari hedeflerine dogru hareket ettirir.
+- Hedefi olmayan oklari ECB ile siler.
 
 ### ArrowHitSystem
-- **IJobEntity + ECB.ParallelWriter**: Ok isabet kontrolu
-- ComponentLookup ile hedef kontrolu (Burst-uyumlu)
-- Mesafe < 0.5 → hasar uygula, oku sil
 
-### ZombieDeathSystem
-- **IJobEntity**: HP <= 0 olan zombileri Dead state'e gecirir
+- Mesafe `< 0.5` ise hasar uygular ve oku siler.
+- Frost ok isabetinde hedefteki `ZombieSlow` duration'ini refresh eder.
 
-### ZombieAnimationStateSystem
-- **IJobEntity + ECB.ParallelWriter**: State'e gore sprite animasyon satirini degistirir
-- Dead → DeathTimer ekler (ECB ile)
+### DamageApplySystem
 
-### DamageApplySystem (TEK SYNC POINT)
-- `state.CompleteDependency()` cagrilir — tum pending job'lar tamamlanir
-- ZombieAttackTimerSystem'in DamageQueue'sunu drain eder
-- Hasar: Wall → Gate → Castle onceligi
-- CastleHP <= 0 → GameOver
+- Stress mode acikken damage queue temizlenir ve kale HP dusmez.
+- Mobile normal mode'da `FortifyActive` ise wall/gate/castle hasari Fortify damage multiplier ile carpilir.
+- Hasar onceligi: Wall -> Gate -> Castle.
+- Castle HP sifira inerse game over yazar.
 
 ### DamageCleanupSystem
-- DeathTimer geri sayar
-- Timer bitince: XP + entity sil
-- Level up kontrolu
 
-### SpriteAnimationSystem (PRESENTATION)
-→ Detay: `SPRITE_ANIMATION_ARCHITECTURE.md`
-
-## Kaldirilan Sistemler
-- ~~**ClickDamageSystem**~~ — GDD v3.0'da yok, tamamen kaldirildi (M0 Bug Fix)
-- ~~**CatapultShootSystem**~~ — GDD v4.0'da mancinik kaldirildi, buyucu sistemiyle degistirildi (M-CLN)
-- ~~**CatapultProjectileMoveSystem**~~ — GDD v4.0'da kaldirildi (M-CLN)
-- ~~**CatapultProjectileHitSystem**~~ — GDD v4.0'da kaldirildi (M-CLN)
+- Death timer biterse XP ekler ve zombi entity'sini siler.
+- Mobile normal mode'da kill reward'i `ResourceAccumulator` uzerine ekler.
+- Worker economy aktifse kill reward `WorkerEconomyRewardMultiplier` ile azaltilir.
+- Legacy mode'da XP threshold asilirsa `IsLevelUpPending` true olur.
+- Mobile castle mode'da XP threshold sadece progress olarak kalir; level-up pause yoktur.

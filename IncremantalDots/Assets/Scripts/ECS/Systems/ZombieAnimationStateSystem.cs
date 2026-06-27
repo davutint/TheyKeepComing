@@ -1,5 +1,7 @@
 using Unity.Burst;
 using Unity.Entities;
+using Unity.Mathematics;
+using Unity.Transforms;
 
 namespace DeadWalls
 {
@@ -40,8 +42,23 @@ namespace DeadWalls
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
+            bool mobileMode = SystemAPI.HasSingleton<MobileCastleCombatConfig>();
+            bool hasWallTarget = SystemAPI.HasSingleton<WallXPosition>();
+            float2 targetPoint = float2.zero;
+
+            if (mobileMode)
+            {
+                targetPoint = SystemAPI.GetSingleton<MobileCastleCombatConfig>().CastleCenter;
+            }
+            else if (hasWallTarget)
+            {
+                targetPoint = new float2(SystemAPI.GetSingleton<WallXPosition>().Value, 0f);
+            }
+
             new AnimationStateJob
             {
+                HasTargetPoint = mobileMode || hasWallTarget,
+                TargetPoint = targetPoint,
                 ECB = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>()
                     .CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter()
             }.ScheduleParallel();
@@ -52,13 +69,17 @@ namespace DeadWalls
         [WithNone(typeof(DeathTimer))]
         partial struct AnimationStateJob : IJobEntity
         {
+            public bool HasTargetPoint;
+            public float2 TargetPoint;
             public EntityCommandBuffer.ParallelWriter ECB;
 
             void Execute(Entity entity, [ChunkIndexInQuery] int sortKey,
-                in ZombieState zombieState, ref SpriteAnimation anim)
+                in ZombieState zombieState,
+                in LocalTransform transform,
+                in PhysicsBody physicsBody,
+                ref SpriteAnimation anim)
             {
-                // Yon indeksini extract et (0-7: E, SE, S, SW, W, NW, N, NE)
-                int dir = anim.DirectionRow % 8;
+                int dir = ResolveDirection(transform.Position.xy, physicsBody.Velocity, anim.DirectionRow % 8);
 
                 switch (zombieState.Value)
                 {
@@ -119,6 +140,24 @@ namespace DeadWalls
                         break;
                     }
                 }
+            }
+
+            private int ResolveDirection(float2 position, float2 velocity, int fallbackDirection)
+            {
+                float2 direction = velocity;
+                if (math.lengthsq(direction) < 0.0001f && HasTargetPoint)
+                    direction = TargetPoint - position;
+
+                if (math.lengthsq(direction) < 0.0001f)
+                    return fallbackDirection;
+
+                float angle = math.atan2(direction.y, direction.x);
+                int index = (int)math.round((-angle) / (math.PI * 0.25f));
+                index %= 8;
+                if (index < 0)
+                    index += 8;
+
+                return index;
             }
         }
     }

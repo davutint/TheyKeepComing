@@ -173,6 +173,10 @@ Eger degerler farkli ise duzelt ve **Apply** tikla.
 ### ArrowMat:
 Degisiklik yok (Arrow.png statik, tek sprite).
 
+Tint notu: `DeadWalls/SpriteSheet` shader'inda `_Color` propertysi per-instance
+olarak override edilir. Material tint beyaz kalmali; Basic/Rapid/Frost renk farki
+runtime'da `SpriteTint` component'i ile verilir.
+
 ---
 
 ## 5. Prefab Guncelleme
@@ -196,10 +200,14 @@ Degisiklik yok (Arrow.png statik, tek sprite).
    - **FPS:** `10`
    - **Direction Row:** `0` (East yonu — okcu saga bakar. Eski: 2)
    - **Frame Count:** `15`
-3. Apply
+   - **Tint:** beyaz
+3. ArcherAuthoring:
+   - **Tint:** beyaz. Spawn edilen Rapid/Frost okcular bu degeri runtime'da type-specific tint ile override eder.
+4. Apply
 
 ### Arrow Prefab:
-Degisiklik yok.
+ArrowAuthoring ve SpriteSheetAuthoring tint degerleri beyaz kalir. Projectile tint'i
+`ArcherShootSystem` tarafindan atanir; ok prefab/material cogaltilmaz.
 
 ---
 
@@ -249,6 +257,10 @@ Degisiklik yok.
 5. Okcular → **Walk/Idle animasyonu**
 6. Oklar → statik sprite (degisiklik yok)
 
+Ek readability kontrolu:
+- Oklar okcu tipine gore tint alir.
+- Frost slow alan zombiler slow suresince soguk/mavi tint alir, sonra normal tinte doner.
+
 ### Beklenen Sonuclar:
 - Animasyonlar 15 frame ile eskisine gore cok daha akici olmali
 - 8 yon destegi ile ileride (M-ISO.3/4) farkli yonlerden gelen zombiler
@@ -261,7 +273,7 @@ Degisiklik yok.
 
 | Sorun | Cozum |
 |-------|-------|
-| Entity tamamen gorunmuyor | Shader Tags kontrol: `Opaque`/`Geometry` olmali. `TransparentCutout`/`AlphaTest` kullanilMAmali. LightMode tag'i olmamali. |
+| Entity tamamen gorunmuyor | Shader Tags kontrol: `Opaque`/`Geometry` olmali. `Transparent`/`TransparentCutout`/`AlphaTest` kullanilmamali. LightMode tag'i olmamali. |
 | Pembe/Magenta gorunuyor | Shader compile hatasi — Console kontrol et |
 | Sprite bulanik | Texture Filter Mode → Point |
 | Seffaf kisimlar siyah | Shader `DeadWalls/SpriteSheet` mi? Alpha Cutoff 0.5 mi? |
@@ -287,13 +299,13 @@ Her adimda entity'yi kontrol et. Gorunmeyen adimda sorun o katidir.
 
 ## 9. Kritik Shader Kurallari (DOTS Entities Graphics)
 
-Bu kurallar debug sirasinda kesfedildi. **UYULMAZSA ENTITY'LER GORUNMEZ:**
+Bu kurallar bu Unity/Entities Graphics surumu icin gunceldir:
 
 ```
 DOGRU:                              YANLIS:
 ─────────────────────────────────   ─────────────────────────────────
-"RenderType" = "Opaque"             "RenderType" = "TransparentCutout"
-"Queue" = "Geometry"                "Queue" = "AlphaTest"
+"RenderType" = "Opaque"             "RenderType" = "Transparent"
+"Queue" = "Geometry"                "Queue" = "AlphaTest" veya "Transparent"
 LightMode tag'i YOK                 "LightMode" = "UniversalForward"
 Tek Pass                            Ekstra DepthOnly pass
 #pragma target 4.5                  Daha dusuk target
@@ -302,7 +314,7 @@ Tek Pass                            Ekstra DepthOnly pass
 ```
 
 Alpha seffaflik icin `clip(col.a - _Cutoff)` kullan ama render queue
-**Geometry** olarak kalsin. `AlphaTest` veya `TransparentCutout` KULLANMA.
+**Geometry** olarak kalsin. `Transparent`, `AlphaTest`, `TransparentCutout` veya `ZWrite Off` KULLANMA. Mobile castle okcu/duvar on-arka iliskisi `MobileCastleRenderDepth` z bandlariyla cozulur.
 
 ---
 
