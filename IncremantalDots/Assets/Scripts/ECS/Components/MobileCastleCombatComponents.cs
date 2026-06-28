@@ -58,6 +58,38 @@ namespace DeadWalls
         public float WorkerEconomyRewardMultiplier;
         public float EconomyEventChance;
         public int EconomyEventCooldownWaves;
+        public bool ContinuousSiegeEnabled;
+        public float SiegeCycleDuration;
+        public float SiegeDayDuration;
+        public float SiegeDuskDuration;
+        public float SiegeNightDuration;
+        public float SiegeDayIntensityMultiplier;
+        public float SiegeDuskStartIntensityMultiplier;
+        public float SiegeDuskEndIntensityMultiplier;
+        public float SiegeNightIntensityMultiplier;
+    }
+
+    public enum SiegeCyclePhase : byte
+    {
+        Day,
+        Dusk,
+        Night
+    }
+
+    public struct ContinuousSiegeCycleData : IComponentData
+    {
+        public bool Enabled;
+        public float CycleTimer;
+        public float CycleDuration;
+        public float DayDuration;
+        public float DuskDuration;
+        public float NightDuration;
+        public float CycleProgress01;
+        public float PhaseProgress01;
+        public float SpawnIntensityMultiplier;
+        public float HordePressure01;
+        public int CycleIndex;
+        public SiegeCyclePhase Phase;
     }
 
     public struct WaveClearRewardData : IComponentData

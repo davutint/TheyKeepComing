@@ -1,0 +1,110 @@
+using Unity.Burst;
+using Unity.Entities;
+using Unity.Mathematics;
+
+namespace DeadWalls
+{
+    [BurstCompile]
+    [UpdateInGroup(typeof(SimulationSystemGroup), OrderFirst = true)]
+    [UpdateBefore(typeof(DayNightPrepSystem))]
+    public partial struct ContinuousSiegeCycleSystem : ISystem
+    {
+        [BurstCompile]
+        public void OnCreate(ref SystemState state)
+        {
+            state.RequireForUpdate<GameStateData>();
+            state.RequireForUpdate<WaveStateData>();
+            state.RequireForUpdate<MobileCastleCombatConfig>();
+            state.RequireForUpdate<ContinuousSiegeCycleData>();
+        }
+
+        [BurstCompile]
+        public void OnUpdate(ref SystemState state)
+        {
+            var gameState = SystemAPI.GetSingleton<GameStateData>();
+            var wave = SystemAPI.GetSingletonRW<WaveStateData>();
+            var config = SystemAPI.GetSingleton<MobileCastleCombatConfig>();
+            var cycle = SystemAPI.GetSingletonRW<ContinuousSiegeCycleData>();
+
+            if (!cycle.ValueRO.Enabled || gameState.IsGameOver || gameState.IsLevelUpPending || wave.ValueRO.StressTestMode)
+                return;
+
+            float dayDuration = math.max(0.1f, config.SiegeDayDuration);
+            float duskDuration = math.max(0.1f, config.SiegeDuskDuration);
+            float nightDuration = math.max(0.1f, config.SiegeNightDuration);
+            float authoredDuration = math.max(0.1f, dayDuration + duskDuration + nightDuration);
+            float cycleDuration = math.max(1f, config.SiegeCycleDuration);
+            float durationScale = cycleDuration / authoredDuration;
+
+            dayDuration *= durationScale;
+            duskDuration *= durationScale;
+            nightDuration *= durationScale;
+
+            float timer = cycle.ValueRO.CycleTimer + SystemAPI.Time.DeltaTime;
+            int wrappedCycles = 0;
+            while (timer >= cycleDuration)
+            {
+                timer -= cycleDuration;
+                wrappedCycles++;
+            }
+
+            if (timer < 0f)
+                timer = 0f;
+
+            SiegeCyclePhase phase;
+            float phaseProgress;
+            float intensity;
+            if (timer < dayDuration)
+            {
+                phase = SiegeCyclePhase.Day;
+                phaseProgress = math.saturate(timer / math.max(0.01f, dayDuration));
+                intensity = math.max(0.01f, config.SiegeDayIntensityMultiplier);
+            }
+            else if (timer < dayDuration + duskDuration)
+            {
+                phase = SiegeCyclePhase.Dusk;
+                phaseProgress = math.saturate((timer - dayDuration) / math.max(0.01f, duskDuration));
+                intensity = math.lerp(
+                    math.max(0.01f, config.SiegeDuskStartIntensityMultiplier),
+                    math.max(0.01f, config.SiegeDuskEndIntensityMultiplier),
+                    phaseProgress);
+            }
+            else
+            {
+                phase = SiegeCyclePhase.Night;
+                phaseProgress = math.saturate((timer - dayDuration - duskDuration) / math.max(0.01f, nightDuration));
+                intensity = math.max(0.01f, config.SiegeNightIntensityMultiplier);
+            }
+
+            int cycleIndex = math.max(0, cycle.ValueRO.CycleIndex + wrappedCycles);
+            cycle.ValueRW.Enabled = true;
+            cycle.ValueRW.CycleTimer = timer;
+            cycle.ValueRW.CycleDuration = cycleDuration;
+            cycle.ValueRW.DayDuration = dayDuration;
+            cycle.ValueRW.DuskDuration = duskDuration;
+            cycle.ValueRW.NightDuration = nightDuration;
+            cycle.ValueRW.CycleProgress01 = math.saturate(timer / cycleDuration);
+            cycle.ValueRW.PhaseProgress01 = phaseProgress;
+            cycle.ValueRW.SpawnIntensityMultiplier = intensity;
+            cycle.ValueRW.HordePressure01 = ResolvePressure01(intensity, config);
+            cycle.ValueRW.CycleIndex = cycleIndex;
+            cycle.ValueRW.Phase = phase;
+
+            wave.ValueRW.CurrentWave = math.max(1, cycleIndex + 1);
+            MobileWaveUtility.ConfigureMobileWave(ref wave.ValueRW, config);
+            wave.ValueRW.WaveActive = true;
+            wave.ValueRW.Phase = RunPhaseType.NightCombat;
+            wave.ValueRW.PrepTimer = 0f;
+            wave.ValueRW.PrepDuration = 0f;
+            wave.ValueRW.WaveStartTimer = 0f;
+        }
+
+        private static float ResolvePressure01(float intensity, MobileCastleCombatConfig config)
+        {
+            float minIntensity = math.max(0.01f, config.SiegeDayIntensityMultiplier);
+            float maxIntensity = math.max(config.SiegeNightIntensityMultiplier,
+                math.max(config.SiegeDuskEndIntensityMultiplier, config.SiegeDuskStartIntensityMultiplier));
+            return math.saturate((intensity - minIntensity) / math.max(0.01f, maxIntensity - minIntensity));
+        }
+    }
+}

@@ -2,7 +2,7 @@
 
 ## Amac
 
-`NewGameScene` icin merkezi kale combat akisini, otomatik day/night prep fazini ve mobile archer economy drawer davranisini tasir. Mobil davranis sadece sahnede `MobileCastleCombatConfig` singleton'i bake edildiginde aktif olur.
+`NewGameScene` icin merkezi kale combat akisini, continuous day/dusk/night kusatma dongusunu ve mobile archer/worker economy drawer davranisini tasir. Mobil davranis sadece sahnede `MobileCastleCombatConfig` singleton'i bake edildiginde aktif olur.
 
 ## Mode Switch
 
@@ -12,8 +12,9 @@
 
 ## ECS Verisi
 
-- `MobileCastleCombatConfig`: kale merkezi, spawn radius, attack radius, wave sayilari, spawn batch, zombie scale/speed, wave director tuning, reward tuning, worker economy tuning, event tuning, day/night prep tuning, unlimited arrow flag'i ve stress test limitlerini tutar.
-- `WaveStateData.Phase`: mobile run loop icin `DayPrep` veya `NightCombat` fazini tutar. `WaveActive` uyum flag'i olarak `NightCombat=true`, `DayPrep=false` davranisina devam eder.
+- `MobileCastleCombatConfig`: kale merkezi, spawn radius, attack radius, wave/siege sayilari, spawn batch, zombie scale/speed, continuous siege tuning, reward tuning, worker economy tuning, event tuning, unlimited arrow flag'i ve stress test limitlerini tutar.
+- `ContinuousSiegeCycleData`: player-facing `DAY / DUSK / NIGHT` fazini, 60s cycle progress'ini, spawn intensity multiplier'i ve horde pressure degerini tutar.
+- `WaveStateData.Phase`: mobile continuous modda uyumluluk icin `NightCombat` aktif tutulur. Eski DayPrep akisi component seviyesinde kalir ama `ContinuousSiegeCycleData.Enabled` true iken player-facing akisi yonetmez.
 - `EconomyFocusState`: eski focus akisi icin korunur. Worker economy aktifken player-facing UI bunu kullanmaz.
 - `WaveClearRewardData`: son wave clear bonusunu HUD toast'i icin saklar.
 - `CastleYardPrepState`: day prep'te alinan `Fortify` ve `Rally` tek-gecelik buff state'ini tutar.
@@ -41,12 +42,13 @@ Varsayilan mobile degerleri:
 - Stress max alive zombies: `1500`
 - Kill reward: Wood `1.0`, Food `0.6`, Stone `0.25`, Iron `0.15`, wave scale `+5%`
 - Wave clear bonus: Wood `20 + 6 per wave`, Food `15 + 5 per wave`, Stone `10 + 4 per wave`, Iron `6 + 3 per wave`
-- Worker economy: population growth `15`, initial workers Wood/Stone/Iron/Food `20 / 10 / 8 / 15`
+- Worker economy: population growth legacy DayPrep akisi icin `15`, initial workers Wood/Stone/Iron/Food `6 / 3 / 2 / 5`
 - Worker production: Wood `4.5/min`, Stone `3/min`, Iron `2/min`, Food `4/min` per worker
 - Worker economy reward multiplier: `0.45`
 - Economy event chance `15%`, cooldown `2` waves
-- Initial day prep duration: `12s`
-- Day prep duration: `15s`
+- Continuous siege cycle: total `60s`, Day `25s`, Dusk `10s`, Night `25s`
+- Continuous siege intensity: Day `0.55`, Dusk `1.00 -> 1.35`, Night `1.65`
+- Initial/day prep duration fields legacy/debug akis icin korunur
 - Day overlay alpha: `0`
 - Night overlay alpha: `0.50`
 - Unlimited arrows: `true`
@@ -54,18 +56,17 @@ Varsayilan mobile degerleri:
 - Wave director phases: opening `20%` at interval `x1.35` and batch `-1`, final `20%` at interval `x0.65` and batch `+1`
 - Castle Yard: Fortify/Rally runtime state korunur, player-facing drawer'da gizlenir
 
-## Day/Night Run Loop
+## Continuous Day/Dusk/Night Run Loop
 
-Mobile normal mode artik manuel wave start beklemez:
+Mobile normal mode artik player-facing wave clear veya `Start Next Wave` beklemez:
 
-1. Ilk run `CurrentWave = 0`, `Phase = DayPrep`, `WaveActive = false` ile kisa gunduz hazirliginda baslar.
-2. `DayNightPrepSystem`, `PrepTimer` sayacini azaltir. `MobilePrepPauseState.IsPaused` true ise sayac bekler.
-3. Sayac bitince `CurrentWave++` yapilir, wave stat'leri configure edilir ve `Phase = NightCombat`, `WaveActive = true` olur.
-4. `WaveSpawnSystem` gece combat boyunca zombileri spawn eder.
-5. Wave temizlenince wave clear bonus'u bir kez eklenir, `Phase = DayPrep`, `WaveActive = false`, `PrepTimer = DayPrepDuration` yazilir.
-6. Sonraki gece wave sayac bitince otomatik baslar.
+1. `ContinuousSiegeCycleSystem`, 60 saniyelik cycle timer'i ilerletir.
+2. UI fazi sadece `DAY`, `DUSK`, `NIGHT` olarak gosterilir; `DAY 03` gibi wave numarasi yazilmaz.
+3. Day fazinda spawn dusuk tempo akar, Dusk fazinda kararir ve tempo yukselir, Night fazinda baski yuksek kalir.
+4. `WaveStateData.WaveActive = true` tutulur; eski market/prep dur-kalk akisi tetiklenmez.
+5. `WaveSpawnSystem`, continuous cycle intensity degerine gore interval ve batch size ayarlar.
 
-Stress mode bu akisi atlar; surekli spawn davranisi korunur.
+Stress mode bu akisi atlar; stress spawn davranisi korunur.
 
 ## Render Depth Bands
 
@@ -75,9 +76,9 @@ Mobile castle render sirasi shader degistirilerek degil, world z bandlariyla coz
 
 ### WaveSpawnSystem
 
-Mobile mode'da zombileri kale merkezi etrafindaki cemberden random aciyla spawn eder. Spawn yonu tam random 360 kalir; lane, cephe veya telegraph yoktur. Wave sayisi `30 + waveIndex * 10` temposuna iner ve base spawn batch `3` olur. `MobileWaveUtility.ConfigureMobileWave()` wave basinda spawn interval'i wave sayisina gore `BaseSpawnInterval * SpawnIntervalWaveMultiplier^(wave-1)` ile hesaplar ve `MinSpawnInterval` altina indirmez.
+Mobile mode'da zombileri kale merkezi etrafindaki cemberden random aciyla spawn eder. Spawn yonu tam random 360 kalir; lane, cephe veya telegraph yoktur. Continuous siege aktifken `WaveSpawnSystem`, wave clear kontrolune girmez; `ContinuousSiegeCycleData.SpawnIntensityMultiplier` ile interval'i kisa/uzun, batch'i kucuk/buyuk yapar. Ic tarafta `CurrentWave` cycle index olarak tutulur ve `MobileWaveUtility.ConfigureMobileWave()` zombi HP/speed gibi scaling degerlerini hesaplamaya devam eder, fakat UI wave numarasi gostermez.
 
-Normal mobile wave icinde `WaveSpawnSystem`, `ZombiesSpawned / ZombiesToSpawn` oranindan faz secer. Ilk `OpeningEnemyRatio` bolumunde spawn daha sakin akar; orta bolum baseline kalir; son `FinalEnemyRatio` bolumunde interval kisa, batch biraz buyuk olur. Wave temizlenince wave clear bonus'u bir kez resource'a ekler, otomatik yeni wave baslatmaz; bunun yerine `Phase = DayPrep`, `WaveActive = false`, `PrepTimer = DayPrepDuration` yazar. Yeni wave'i `DayNightPrepSystem` sayac bitince otomatik baslatir. Stress mode aciksa mobile config'teki stress batch/interval/cap kullanilir, reward verilmez ve wave director fazlari calismaz.
+Legacy mobile wave director akisi `ContinuousSiegeCycleData.Enabled` false yapilirsa hala calisabilir: opening/mid/final fazlari `ZombiesSpawned / ZombiesToSpawn` oranindan hesaplanir ve wave temizlenince DayPrep'e doner. Varsayilan NewGameScene akisi continuous siege'dir. Stress mode aciksa mobile config'teki stress batch/interval/cap kullanilir, reward verilmez ve continuous/legacy wave director fazlari calismaz.
 
 Wave clear bonus normal mobile modda bir kez verilir. Worker economy aktifken bonus `WorkerEconomyRewardMultiplier` ile azaltilir. Bonus miktari `WaveClearRewardData` uzerine de yazilir; HUD bu veriyi kisa `Wave Cleared +...` feedback'i icin kullanir.
 
@@ -134,19 +135,20 @@ Isabet aninda Basic/Rapid icin `CombatVfxEvent.ArrowHit`, Frost icin `CombatVfxE
 `GameManager`, mevcut `ArcherUnit` entity'lerinden Basic/Rapid/Frost sayilarini okur.
 Archer count bilgisi sag drawer row'larinda okunur. `ArcherTypeText` eski HUD placeholder'i imported drawer UI ile cakisabildigi icin mobile setup tarafindan kullanilmaz.
 
-HUD wave text'i run phase bilgisini gosterir:
+Yeni imported HUD varsa cycle paneli player-facing zaman bilgisini gosterir:
 
-- Day prep: `DAY 07 - 24s`
-- Night combat: `NIGHT 07`
-- Day prep kills text: `PREPARE DEFENSE`
-- Night combat kills text: `KILLS x / y`
+- `CyclePhaseText`: `DAY`, `DUSK` veya `NIGHT`
+- `CycleDayLabelText`, `CycleDuskLabelText`, `CycleNightLabelText`: segment label'lari
+- `CycleProgressFill` ve `CycleProgressMarker`: 60s dongu progress'i
+- `HordePressurePanel`: prefabda bulunsa bile player-facing olarak kapali tutulur
+- Fallback eski HUD varsa wave text sadece `DAY/DUSK/NIGHT`, kills text ise hedef sayi olmadan `KILLS x` yazar.
 
-HUD varsa `CastleDefensePanel` uzerindeki `DefenseWallFill`, `DefenseGateFill`, `DefenseCoreFill` ve yuzde text'lerini gunceller. Toplam defense yuzdesi wall, gate ve castle current/max HP toplamindan hesaplanir; eski `DefenseText` sadece fallback olarak kalir. Wave son `FinalEnemyRatio` bolumune girdiginde wave/kills text'i sicak threat rengine gecer; savunma hasar aldiginda kisa red flash feedback'i verilir.
+HUD varsa `CastleDefensePanel` uzerindeki `DefenseWallFill`, `DefenseGateFill`, `DefenseCoreFill` ve yuzde text'lerini gunceller. Toplam defense yuzdesi wall, gate ve castle current/max HP toplamindan hesaplanir; eski `DefenseText` sadece fallback olarak kalir. Night/high pressure durumunda threat rengi kullanilabilir; savunma hasar aldiginda kisa red flash feedback'i verilir.
 
 Sol ust economy HUD mevcut kaynaklari gosterir: Wood, Stone, Iron, Food, Population, Arrows. Runtime text'ler label tekrar etmez; kutu basligi UI'da, value/rate text'i kod tarafindadir. HUD rate degeri mobile population allocation tarafindan yazilan worker production'dir. NewGameScene mobile default'lari:
 
-- Wood `150`, Stone `80`, Iron `45`, Food `150`, Population `60`, Arrows `INF`
-- Initial workers: Wood `20`, Stone `10`, Iron `8`, Food `15`
+- Wood `120`, Stone `60`, Iron `35`, Food `90`, Population `24`, Arrows `INF`
+- Initial workers: Wood `6`, Stone `3`, Iron `2`, Food `5`
 - Worker income: Wood `4.5/min`, Stone `3/min`, Iron `2/min`, Food `4/min` per assigned worker
 
 ## Continuous Upgrade Loop
@@ -155,22 +157,22 @@ Mobile castle mode'da XP level-up pause veya kart paneli tetiklemez. Oyun dongus
 
 Legacy level-up kart API'si eski akis icin kodda durabilir, ama `MobileCastleCombatConfig` varken `DamageCleanupSystem` XP threshold'u `IsLevelUpPending` yapmaz.
 
-Mobile normal mode'da `DamageCleanupSystem`, death timer biten zombiler icin kill reward'i `ResourceAccumulator` uzerine yazar. Worker economy aktifken kill reward ve wave clear bonus `WorkerEconomyRewardMultiplier` ile azaltildi; ana gelir kaynagi worker allocation'dir. Stress mode'da reward verilmez.
+Mobile normal mode'da `DamageCleanupSystem`, death timer biten zombiler icin kill reward'i `ResourceAccumulator` uzerine yazar. Worker economy aktifken kill reward `WorkerEconomyRewardMultiplier` ile azaltilir; ana gelir kaynagi worker allocation'dir. Continuous siege varsayilaninda wave clear bonus/player-facing clear akisi tetiklenmez. Stress mode'da reward verilmez.
 
 ## Castle Interior Economy
 
-`EconomyFocusUI` mobile loop'ta artik kullanilmaz; setup tool eski focus objelerini gizler. Ekonomi yonu sol kale ici worker site'lari ve Castle Economy UI aksiyonlariyla belirlenir.
+`EconomyFocusUI` mobile loop'ta artik kullanilmaz; setup tool eski focus objelerini gizler. Ekonomi yonu sol worker drawer ve kale ici worker site gorselleriyle belirlenir.
 
-- `CastleInteriorClickTarget` sadece DayPrep ve non-stress modda tiklamayi kabul eder.
-- `CastleEconomyUI` panel acikken `MobilePrepPauseState.IsPaused` yazar; `DayNightPrepSystem` sayaci azaltmaz.
-- `WoodAssignButton`, `StoneAssignButton`, `IronAssignButton`, `FoodAssignButton` varsa her basarili tap ilgili worker sayisini +1 yapar; tap progress yoktur.
+- `CastleInteriorClickTarget` ve `CastleEconomyUI` legacy/debug akisi olarak kalir; player-facing ana worker kontrolu sol drawer'dadir.
+- `WorkerEconomyDrawerUI` her zaman acilip kapanabilir; DayPrep sartina bagli degildir.
+- Wood/Stone/Iron/Food `+ WORKER` butonlari her basarili tiklamada ilgili worker sayisini +1 yapar; tap progress yoktur.
 - Eski worker slider'lari debug/legacy olarak kalabilir ve ayni `MobilePopulationAllocation` verisini degistirir.
 - Worker assignment toplam worker sayisini `Population.Total - Population.Archers` ustune cikaramaz.
 - `GameManager`, worker allocation degisince `WorkerPrefabData.WorkerPrefab` uzerinden DOTS villager entity'leri spawn/destroy eder.
 - Villager worker pickup pozisyonlari main scene `CastleInteriorEconomyArea/*Site/WorkerSpawnPoints` marker'larindan gelir.
 - Delivery pozisyonlari `CastleInteriorEconomyArea/CastleWorkerHub/DeliveryPoints` marker'larindan gelir.
 - `WorkerLogisticsMovementSystem`, villagerlari pickup ile hub arasinda yuruturek kaynak tasima feedback'i verir.
-- Her completed wave sonrasi DayPrep basinda `PopulationGrowthPerDayPrep` kadar population eklenir.
+- `PopulationGrowthPerDayPrep` legacy DayPrep akisi icindir; continuous siege varsayilaninda otomatik wave arasi population growth calismaz.
 - Okcu satin almak `1` idle population kullanir; idle yoksa buy disabled olur ve drawer `NEED POP` yazar.
 - Editor testleri icin `GameManager.Free Economy Test Mode` acilirsa okcu satin alma population harcamaz ve resource/population eksigi aksiyonlari bloklamaz.
 - Nadir eventler `MobileEconomyEventState` ile tutulur; secilmezse gece baslarken expire eder.
@@ -195,16 +197,14 @@ Type level `1` baslar. Her type upgrade ayni tip mevcut ve future okculara uygul
 - Frost SlowDuration `+0.15s / level`
 - Frost SlowMultiplier her level `-0.02`, minimum `0.40`
 
-## Wave Arasi Prep
+## Legacy Prep API'leri
 
-Wave bittiginde `GameManager.OnWaveCompleted` tetiklenir ve `UIManager.ShowMarket()` drawer'i acar. Drawer acikken oyun pause olmaz. Prep artik otomatik sayaclidir; oyuncu `Start Next Wave` basmak zorunda degildir.
+Continuous siege varsayilaninda wave bittiginde oyun durmaz, `GameManager.OnWaveCompleted` tetiklenmez ve player-facing `Start Next Wave` yoktur. Asagidaki API'ler legacy/debug veya ileride farkli mode icin kodda kalabilir:
 
-- `Repair`: sadece `DayPrep` sirasinda aktiftir ve `GameManager.RepairDefenseFull()` ile wall/gate/castle HP full olur.
+- `Repair`: legacy DayPrep sirasinda aktiftir ve `GameManager.RepairDefenseFull()` ile wall/gate/castle HP full olur.
 - `Fortify` ve `Rally`: runtime API olarak kalir, fakat Castle Interior economy ekrani geldikten sonra player-facing drawer'da gizlenir.
 - `Arrow Refill`: unlimited arrow mobile akista oyuncuya gosterilmez.
 - `Start Next Wave`: debug/public API olarak kalir, player-facing UI'da gizlidir.
-
-Wave clear sonrasi drawer acilabilir; kart onceligi yoktur cunku mobile loop'ta level-up paneli kullanilmaz.
 
 ## Okcu Yerlesimi
 

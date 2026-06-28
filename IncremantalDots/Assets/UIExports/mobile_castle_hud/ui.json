@@ -968,6 +968,1374 @@
       },
       {
         "type": "Image",
+        "name": "WorkerEconomyDrawerPanel",
+        "raycastTarget": true,
+        "rectTransform": {
+          "anchorMin": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "anchorMax": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "anchoredPosition": {
+            "x": -656,
+            "y": 348
+          },
+          "sizeDelta": {
+            "x": 560,
+            "y": 176
+          }
+        },
+        "image": {
+          "spriteName": null,
+          "color": "#FFFFFFFF",
+          "imageType": "Simple",
+          "preserveAspect": false
+        },
+        "children": [
+          {
+            "type": "Image",
+            "name": "WorkerDrawerHeader",
+            "raycastTarget": false,
+            "rectTransform": {
+              "anchorMin": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchorMax": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "pivot": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchoredPosition": {
+                "x": -142,
+                "y": 62
+              },
+              "sizeDelta": {
+                "x": 260,
+                "y": 34
+              }
+            },
+            "image": {
+              "spriteName": null,
+              "color": "#FFFFFFFF",
+              "imageType": "Simple",
+              "preserveAspect": false
+            },
+            "children": [
+              {
+                "type": "Text",
+                "name": "WorkerDrawerTitleText",
+                "raycastTarget": false,
+                "rectTransform": {
+                  "anchorMin": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchorMax": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchoredPosition": {
+                    "x": -68,
+                    "y": 0
+                  },
+                  "sizeDelta": {
+                    "x": 110,
+                    "y": 22
+                  }
+                },
+                "text": {
+                  "content": "WORKERS",
+                  "fontSize": 15,
+                  "fontStyle": "Bold",
+                  "color": "#F0D27AFF",
+                  "alignment": "MiddleLeft",
+                  "overflow": "Overflow"
+                }
+              },
+              {
+                "type": "Text",
+                "name": "WorkerDrawerSubtitleText",
+                "raycastTarget": false,
+                "rectTransform": {
+                  "anchorMin": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchorMax": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchoredPosition": {
+                    "x": 58,
+                    "y": 0
+                  },
+                  "sizeDelta": {
+                    "x": 116,
+                    "y": 18
+                  }
+                },
+                "text": {
+                  "content": "CITY WORKFORCE",
+                  "fontSize": 10,
+                  "fontStyle": "Bold",
+                  "color": "#BBAE83FF",
+                  "alignment": "MiddleRight",
+                  "overflow": "Overflow"
+                }
+              }
+            ],
+            "spriteSlot": {
+              "category": "background",
+              "hint": "drawer_header_clean_v4.png",
+              "suggestedSize": "260x34"
+            }
+          },
+          {
+            "type": "Image",
+            "name": "WorkerIdlePopulationBadge",
+            "raycastTarget": false,
+            "rectTransform": {
+              "anchorMin": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchorMax": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "pivot": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchoredPosition": {
+                "x": 38,
+                "y": 62
+              },
+              "sizeDelta": {
+                "x": 76,
+                "y": 32
+              }
+            },
+            "image": {
+              "spriteName": null,
+              "color": "#FFFFFFFF",
+              "imageType": "Simple",
+              "preserveAspect": false
+            },
+            "children": [
+              {
+                "type": "Text",
+                "name": "WorkerIdlePopulationText",
+                "raycastTarget": false,
+                "rectTransform": {
+                  "anchorMin": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchorMax": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchoredPosition": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "sizeDelta": {
+                    "x": 68,
+                    "y": 24
+                  }
+                },
+                "text": {
+                  "content": "IDLE 4",
+                  "fontSize": 10.5,
+                  "fontStyle": "Bold",
+                  "color": "#F5EACDFF",
+                  "alignment": "MiddleCenter",
+                  "overflow": "Overflow"
+                }
+              }
+            ],
+            "spriteSlot": {
+              "category": "background",
+              "hint": "resource_chip_clean_v4.png",
+              "suggestedSize": "76x32"
+            }
+          },
+          {
+            "type": "Image",
+            "name": "WorkerTotalBadge",
+            "raycastTarget": false,
+            "rectTransform": {
+              "anchorMin": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchorMax": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "pivot": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchoredPosition": {
+                "x": 124,
+                "y": 62
+              },
+              "sizeDelta": {
+                "x": 82,
+                "y": 32
+              }
+            },
+            "image": {
+              "spriteName": null,
+              "color": "#FFFFFFFF",
+              "imageType": "Simple",
+              "preserveAspect": false
+            },
+            "children": [
+              {
+                "type": "Text",
+                "name": "WorkerTotalText",
+                "raycastTarget": false,
+                "rectTransform": {
+                  "anchorMin": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchorMax": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchoredPosition": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "sizeDelta": {
+                    "x": 76,
+                    "y": 24
+                  }
+                },
+                "text": {
+                  "content": "TOTAL 24",
+                  "fontSize": 10.5,
+                  "fontStyle": "Bold",
+                  "color": "#F5EACDFF",
+                  "alignment": "MiddleCenter",
+                  "overflow": "Overflow"
+                }
+              }
+            ],
+            "spriteSlot": {
+              "category": "background",
+              "hint": "resource_chip_clean_v4.png",
+              "suggestedSize": "82x32"
+            }
+          },
+          {
+            "type": "Image",
+            "name": "WorkerArcherPopulationBadge",
+            "raycastTarget": false,
+            "rectTransform": {
+              "anchorMin": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchorMax": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "pivot": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchoredPosition": {
+                "x": 220,
+                "y": 62
+              },
+              "sizeDelta": {
+                "x": 96,
+                "y": 32
+              }
+            },
+            "image": {
+              "spriteName": null,
+              "color": "#FFFFFFFF",
+              "imageType": "Simple",
+              "preserveAspect": false
+            },
+            "children": [
+              {
+                "type": "Text",
+                "name": "WorkerArcherPopulationText",
+                "raycastTarget": false,
+                "rectTransform": {
+                  "anchorMin": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchorMax": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchoredPosition": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "sizeDelta": {
+                    "x": 88,
+                    "y": 24
+                  }
+                },
+                "text": {
+                  "content": "ARCHERS 4",
+                  "fontSize": 10.5,
+                  "fontStyle": "Bold",
+                  "color": "#F5EACDFF",
+                  "alignment": "MiddleCenter",
+                  "overflow": "Overflow"
+                }
+              }
+            ],
+            "spriteSlot": {
+              "category": "background",
+              "hint": "resource_chip_clean_v4.png",
+              "suggestedSize": "96x32"
+            }
+          },
+          {
+            "type": "Image",
+            "name": "WoodWorkerRow",
+            "raycastTarget": false,
+            "rectTransform": {
+              "anchorMin": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchorMax": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "pivot": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchoredPosition": {
+                "x": -135,
+                "y": 10
+              },
+              "sizeDelta": {
+                "x": 258,
+                "y": 50
+              }
+            },
+            "image": {
+              "spriteName": null,
+              "color": "#11100DE8",
+              "imageType": "Simple",
+              "preserveAspect": false
+            },
+            "children": [
+              {
+                "type": "Image",
+                "name": "WoodWorkerIcon",
+                "raycastTarget": false,
+                "rectTransform": {
+                  "anchorMin": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchorMax": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchoredPosition": {
+                    "x": -114,
+                    "y": 0
+                  },
+                  "sizeDelta": {
+                    "x": 24,
+                    "y": 24
+                  }
+                },
+                "image": {
+                  "spriteName": null,
+                  "color": "#FFFFFFFF",
+                  "imageType": "Simple",
+                  "preserveAspect": true
+                },
+                "spriteSlot": {
+                  "category": "icon",
+                  "hint": "wood_loot_v4.png",
+                  "suggestedSize": "24x24"
+                }
+              },
+              {
+                "type": "Text",
+                "name": "WoodWorkerCountText",
+                "raycastTarget": false,
+                "rectTransform": {
+                  "anchorMin": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchorMax": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchoredPosition": {
+                    "x": -70,
+                    "y": 9
+                  },
+                  "sizeDelta": {
+                    "x": 82,
+                    "y": 16
+                  }
+                },
+                "text": {
+                  "content": "WOOD x6",
+                  "fontSize": 12.5,
+                  "fontStyle": "Bold",
+                  "color": "#EFE4C4FF",
+                  "alignment": "MiddleLeft",
+                  "overflow": "Overflow"
+                }
+              },
+              {
+                "type": "Text",
+                "name": "WoodWorkerRateText",
+                "raycastTarget": false,
+                "rectTransform": {
+                  "anchorMin": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchorMax": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchoredPosition": {
+                    "x": -70,
+                    "y": -10
+                  },
+                  "sizeDelta": {
+                    "x": 82,
+                    "y": 14
+                  }
+                },
+                "text": {
+                  "content": "+54/min",
+                  "fontSize": 10.5,
+                  "fontStyle": "Bold",
+                  "color": "#D6B45BFF",
+                  "alignment": "MiddleLeft",
+                  "overflow": "Overflow"
+                }
+              },
+              {
+                "type": "Button",
+                "name": "WoodWorkerAddButton",
+                "rectTransform": {
+                  "anchorMin": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchorMax": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchoredPosition": {
+                    "x": 44,
+                    "y": 0
+                  },
+                  "sizeDelta": {
+                    "x": 82,
+                    "y": 38
+                  }
+                },
+                "button": {
+                  "interactable": true,
+                  "transition": "ColorTint",
+                  "colors": {
+                    "normal": "#FFFFFFFF",
+                    "highlighted": "#FFF3C7F0",
+                    "pressed": "#00000030",
+                    "disabled": "#707070AA"
+                  }
+                },
+                "spriteSlot": {
+                  "category": "button",
+                  "hint": "button_buy_clean_v4.png",
+                  "suggestedSize": "82x38"
+                },
+                "text": {
+                  "content": "+ WORKER",
+                  "fontSize": 10.5,
+                  "fontStyle": "Bold",
+                  "color": "#FFF3C7FF",
+                  "alignment": "MiddleCenter",
+                  "overflow": "Overflow"
+                },
+                "style": {
+                  "backgroundColor": "#FFFFFFFF"
+                }
+              },
+              {
+                "type": "Text",
+                "name": "WoodWorkerStatusText",
+                "raycastTarget": false,
+                "rectTransform": {
+                  "anchorMin": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchorMax": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchoredPosition": {
+                    "x": 105,
+                    "y": 0
+                  },
+                  "sizeDelta": {
+                    "x": 46,
+                    "y": 18
+                  }
+                },
+                "text": {
+                  "content": "READY",
+                  "fontSize": 9.5,
+                  "fontStyle": "Bold",
+                  "color": "#91D879FF",
+                  "alignment": "MiddleCenter",
+                  "overflow": "Overflow"
+                }
+              }
+            ],
+            "spriteSlot": {
+              "category": "background",
+              "hint": "resource_chip_clean_v4.png",
+              "suggestedSize": "258x50"
+            }
+          },
+          {
+            "type": "Image",
+            "name": "StoneWorkerRow",
+            "raycastTarget": false,
+            "rectTransform": {
+              "anchorMin": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchorMax": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "pivot": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchoredPosition": {
+                "x": 135,
+                "y": 10
+              },
+              "sizeDelta": {
+                "x": 258,
+                "y": 50
+              }
+            },
+            "image": {
+              "spriteName": null,
+              "color": "#11100DE8",
+              "imageType": "Simple",
+              "preserveAspect": false
+            },
+            "children": [
+              {
+                "type": "Image",
+                "name": "StoneWorkerIcon",
+                "raycastTarget": false,
+                "rectTransform": {
+                  "anchorMin": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchorMax": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchoredPosition": {
+                    "x": -114,
+                    "y": 0
+                  },
+                  "sizeDelta": {
+                    "x": 24,
+                    "y": 24
+                  }
+                },
+                "image": {
+                  "spriteName": null,
+                  "color": "#FFFFFFFF",
+                  "imageType": "Simple",
+                  "preserveAspect": true
+                },
+                "spriteSlot": {
+                  "category": "icon",
+                  "hint": "stone_loot_v4.png",
+                  "suggestedSize": "24x24"
+                }
+              },
+              {
+                "type": "Text",
+                "name": "StoneWorkerCountText",
+                "raycastTarget": false,
+                "rectTransform": {
+                  "anchorMin": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchorMax": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchoredPosition": {
+                    "x": -70,
+                    "y": 9
+                  },
+                  "sizeDelta": {
+                    "x": 82,
+                    "y": 16
+                  }
+                },
+                "text": {
+                  "content": "STONE x4",
+                  "fontSize": 12.5,
+                  "fontStyle": "Bold",
+                  "color": "#EFE4C4FF",
+                  "alignment": "MiddleLeft",
+                  "overflow": "Overflow"
+                }
+              },
+              {
+                "type": "Text",
+                "name": "StoneWorkerRateText",
+                "raycastTarget": false,
+                "rectTransform": {
+                  "anchorMin": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchorMax": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchoredPosition": {
+                    "x": -70,
+                    "y": -10
+                  },
+                  "sizeDelta": {
+                    "x": 82,
+                    "y": 14
+                  }
+                },
+                "text": {
+                  "content": "+32/min",
+                  "fontSize": 10.5,
+                  "fontStyle": "Bold",
+                  "color": "#C9C7B9FF",
+                  "alignment": "MiddleLeft",
+                  "overflow": "Overflow"
+                }
+              },
+              {
+                "type": "Button",
+                "name": "StoneWorkerAddButton",
+                "rectTransform": {
+                  "anchorMin": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchorMax": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchoredPosition": {
+                    "x": 44,
+                    "y": 0
+                  },
+                  "sizeDelta": {
+                    "x": 82,
+                    "y": 38
+                  }
+                },
+                "button": {
+                  "interactable": true,
+                  "transition": "ColorTint",
+                  "colors": {
+                    "normal": "#FFFFFFFF",
+                    "highlighted": "#FFF3C7F0",
+                    "pressed": "#00000030",
+                    "disabled": "#707070AA"
+                  }
+                },
+                "spriteSlot": {
+                  "category": "button",
+                  "hint": "button_buy_clean_v4.png",
+                  "suggestedSize": "82x38"
+                },
+                "text": {
+                  "content": "+ WORKER",
+                  "fontSize": 10.5,
+                  "fontStyle": "Bold",
+                  "color": "#FFF3C7FF",
+                  "alignment": "MiddleCenter",
+                  "overflow": "Overflow"
+                },
+                "style": {
+                  "backgroundColor": "#FFFFFFFF"
+                }
+              },
+              {
+                "type": "Text",
+                "name": "StoneWorkerStatusText",
+                "raycastTarget": false,
+                "rectTransform": {
+                  "anchorMin": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchorMax": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchoredPosition": {
+                    "x": 105,
+                    "y": 0
+                  },
+                  "sizeDelta": {
+                    "x": 46,
+                    "y": 18
+                  }
+                },
+                "text": {
+                  "content": "READY",
+                  "fontSize": 9.5,
+                  "fontStyle": "Bold",
+                  "color": "#91D879FF",
+                  "alignment": "MiddleCenter",
+                  "overflow": "Overflow"
+                }
+              }
+            ],
+            "spriteSlot": {
+              "category": "background",
+              "hint": "resource_chip_clean_v4.png",
+              "suggestedSize": "258x50"
+            }
+          },
+          {
+            "type": "Image",
+            "name": "IronWorkerRow",
+            "raycastTarget": false,
+            "rectTransform": {
+              "anchorMin": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchorMax": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "pivot": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchoredPosition": {
+                "x": -135,
+                "y": -48
+              },
+              "sizeDelta": {
+                "x": 258,
+                "y": 50
+              }
+            },
+            "image": {
+              "spriteName": null,
+              "color": "#11100DE8",
+              "imageType": "Simple",
+              "preserveAspect": false
+            },
+            "children": [
+              {
+                "type": "Image",
+                "name": "IronWorkerIcon",
+                "raycastTarget": false,
+                "rectTransform": {
+                  "anchorMin": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchorMax": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchoredPosition": {
+                    "x": -114,
+                    "y": 0
+                  },
+                  "sizeDelta": {
+                    "x": 24,
+                    "y": 24
+                  }
+                },
+                "image": {
+                  "spriteName": null,
+                  "color": "#FFFFFFFF",
+                  "imageType": "Simple",
+                  "preserveAspect": true
+                },
+                "spriteSlot": {
+                  "category": "icon",
+                  "hint": "iron_loot_v4.png",
+                  "suggestedSize": "24x24"
+                }
+              },
+              {
+                "type": "Text",
+                "name": "IronWorkerCountText",
+                "raycastTarget": false,
+                "rectTransform": {
+                  "anchorMin": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchorMax": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchoredPosition": {
+                    "x": -70,
+                    "y": 9
+                  },
+                  "sizeDelta": {
+                    "x": 82,
+                    "y": 16
+                  }
+                },
+                "text": {
+                  "content": "IRON x2",
+                  "fontSize": 12.5,
+                  "fontStyle": "Bold",
+                  "color": "#EFE4C4FF",
+                  "alignment": "MiddleLeft",
+                  "overflow": "Overflow"
+                }
+              },
+              {
+                "type": "Text",
+                "name": "IronWorkerRateText",
+                "raycastTarget": false,
+                "rectTransform": {
+                  "anchorMin": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchorMax": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchoredPosition": {
+                    "x": -70,
+                    "y": -10
+                  },
+                  "sizeDelta": {
+                    "x": 82,
+                    "y": 14
+                  }
+                },
+                "text": {
+                  "content": "+18/min",
+                  "fontSize": 10.5,
+                  "fontStyle": "Bold",
+                  "color": "#B9B7AAFF",
+                  "alignment": "MiddleLeft",
+                  "overflow": "Overflow"
+                }
+              },
+              {
+                "type": "Button",
+                "name": "IronWorkerAddButton",
+                "rectTransform": {
+                  "anchorMin": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchorMax": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchoredPosition": {
+                    "x": 44,
+                    "y": 0
+                  },
+                  "sizeDelta": {
+                    "x": 82,
+                    "y": 38
+                  }
+                },
+                "button": {
+                  "interactable": true,
+                  "transition": "ColorTint",
+                  "colors": {
+                    "normal": "#FFFFFFFF",
+                    "highlighted": "#FFF3C7F0",
+                    "pressed": "#00000030",
+                    "disabled": "#707070AA"
+                  }
+                },
+                "spriteSlot": {
+                  "category": "button",
+                  "hint": "button_buy_clean_v4.png",
+                  "suggestedSize": "82x38"
+                },
+                "text": {
+                  "content": "+ WORKER",
+                  "fontSize": 10.5,
+                  "fontStyle": "Bold",
+                  "color": "#FFF3C7FF",
+                  "alignment": "MiddleCenter",
+                  "overflow": "Overflow"
+                },
+                "style": {
+                  "backgroundColor": "#FFFFFFFF"
+                }
+              },
+              {
+                "type": "Text",
+                "name": "IronWorkerStatusText",
+                "raycastTarget": false,
+                "rectTransform": {
+                  "anchorMin": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchorMax": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchoredPosition": {
+                    "x": 105,
+                    "y": 0
+                  },
+                  "sizeDelta": {
+                    "x": 46,
+                    "y": 18
+                  }
+                },
+                "text": {
+                  "content": "NEED POP",
+                  "fontSize": 9.5,
+                  "fontStyle": "Bold",
+                  "color": "#D9A35BFF",
+                  "alignment": "MiddleCenter",
+                  "overflow": "Overflow"
+                }
+              }
+            ],
+            "spriteSlot": {
+              "category": "background",
+              "hint": "resource_chip_clean_v4.png",
+              "suggestedSize": "258x50"
+            }
+          },
+          {
+            "type": "Image",
+            "name": "FoodWorkerRow",
+            "raycastTarget": false,
+            "rectTransform": {
+              "anchorMin": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchorMax": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "pivot": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchoredPosition": {
+                "x": 135,
+                "y": -48
+              },
+              "sizeDelta": {
+                "x": 258,
+                "y": 50
+              }
+            },
+            "image": {
+              "spriteName": null,
+              "color": "#11100DE8",
+              "imageType": "Simple",
+              "preserveAspect": false
+            },
+            "children": [
+              {
+                "type": "Image",
+                "name": "FoodWorkerIcon",
+                "raycastTarget": false,
+                "rectTransform": {
+                  "anchorMin": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchorMax": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchoredPosition": {
+                    "x": -114,
+                    "y": 0
+                  },
+                  "sizeDelta": {
+                    "x": 24,
+                    "y": 24
+                  }
+                },
+                "image": {
+                  "spriteName": null,
+                  "color": "#FFFFFFFF",
+                  "imageType": "Simple",
+                  "preserveAspect": true
+                },
+                "spriteSlot": {
+                  "category": "icon",
+                  "hint": "food_wheat_v4.png",
+                  "suggestedSize": "24x24"
+                }
+              },
+              {
+                "type": "Text",
+                "name": "FoodWorkerCountText",
+                "raycastTarget": false,
+                "rectTransform": {
+                  "anchorMin": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchorMax": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchoredPosition": {
+                    "x": -70,
+                    "y": 9
+                  },
+                  "sizeDelta": {
+                    "x": 82,
+                    "y": 16
+                  }
+                },
+                "text": {
+                  "content": "FOOD x8",
+                  "fontSize": 12.5,
+                  "fontStyle": "Bold",
+                  "color": "#EFE4C4FF",
+                  "alignment": "MiddleLeft",
+                  "overflow": "Overflow"
+                }
+              },
+              {
+                "type": "Text",
+                "name": "FoodWorkerRateText",
+                "raycastTarget": false,
+                "rectTransform": {
+                  "anchorMin": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchorMax": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchoredPosition": {
+                    "x": -70,
+                    "y": -10
+                  },
+                  "sizeDelta": {
+                    "x": 82,
+                    "y": 14
+                  }
+                },
+                "text": {
+                  "content": "+48/min",
+                  "fontSize": 10.5,
+                  "fontStyle": "Bold",
+                  "color": "#D6B45BFF",
+                  "alignment": "MiddleLeft",
+                  "overflow": "Overflow"
+                }
+              },
+              {
+                "type": "Button",
+                "name": "FoodWorkerAddButton",
+                "rectTransform": {
+                  "anchorMin": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchorMax": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchoredPosition": {
+                    "x": 44,
+                    "y": 0
+                  },
+                  "sizeDelta": {
+                    "x": 82,
+                    "y": 38
+                  }
+                },
+                "button": {
+                  "interactable": true,
+                  "transition": "ColorTint",
+                  "colors": {
+                    "normal": "#FFFFFFFF",
+                    "highlighted": "#FFF3C7F0",
+                    "pressed": "#00000030",
+                    "disabled": "#707070AA"
+                  }
+                },
+                "spriteSlot": {
+                  "category": "button",
+                  "hint": "button_buy_clean_v4.png",
+                  "suggestedSize": "82x38"
+                },
+                "text": {
+                  "content": "+ WORKER",
+                  "fontSize": 10.5,
+                  "fontStyle": "Bold",
+                  "color": "#FFF3C7FF",
+                  "alignment": "MiddleCenter",
+                  "overflow": "Overflow"
+                },
+                "style": {
+                  "backgroundColor": "#FFFFFFFF"
+                }
+              },
+              {
+                "type": "Text",
+                "name": "FoodWorkerStatusText",
+                "raycastTarget": false,
+                "rectTransform": {
+                  "anchorMin": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchorMax": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchoredPosition": {
+                    "x": 105,
+                    "y": 0
+                  },
+                  "sizeDelta": {
+                    "x": 46,
+                    "y": 18
+                  }
+                },
+                "text": {
+                  "content": "READY",
+                  "fontSize": 9.5,
+                  "fontStyle": "Bold",
+                  "color": "#91D879FF",
+                  "alignment": "MiddleCenter",
+                  "overflow": "Overflow"
+                }
+              }
+            ],
+            "spriteSlot": {
+              "category": "background",
+              "hint": "resource_chip_clean_v4.png",
+              "suggestedSize": "258x50"
+            }
+          }
+        ],
+        "spriteSlot": {
+          "category": "background",
+          "hint": "drawer_panel_clean_v4.png",
+          "suggestedSize": "560x176"
+        },
+        "active": true
+      },
+      {
+        "type": "Button",
+        "name": "WorkerDrawerToggleButton",
+        "rectTransform": {
+          "anchorMin": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "anchorMax": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "anchoredPosition": {
+            "x": -861,
+            "y": 410
+          },
+          "sizeDelta": {
+            "x": 126,
+            "y": 38
+          }
+        },
+        "button": {
+          "interactable": true,
+          "transition": "ColorTint",
+          "colors": {
+            "normal": "#FFFFFFFF",
+            "highlighted": "#FFFFFFE8",
+            "pressed": "#2B1D0F66",
+            "disabled": "#707070AA"
+          }
+        },
+        "spriteSlot": {
+          "category": "button",
+          "hint": "button_secondary_clean_v4.png",
+          "suggestedSize": "126x38"
+        },
+        "text": {
+          "content": "WORKERS",
+          "fontSize": 12,
+          "fontStyle": "Bold",
+          "color": "#F7E9C9FF",
+          "alignment": "MiddleCenter",
+          "overflow": "Overflow"
+        },
+        "style": {
+          "backgroundColor": "#FFFFFFFF"
+        }
+      },
+      {
+        "type": "Image",
         "name": "EconomyFocusPanel",
         "raycastTarget": false,
         "rectTransform": {
@@ -1489,6 +2857,564 @@
               "suggestedSize": "96x38"
             }
           }
+        ],
+        "active": false
+      },
+      {
+        "type": "Image",
+        "name": "CyclePanel",
+        "raycastTarget": false,
+        "rectTransform": {
+          "anchorMin": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "anchorMax": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "anchoredPosition": {
+            "x": 6,
+            "y": 466
+          },
+          "sizeDelta": {
+            "x": 384,
+            "y": 106
+          }
+        },
+        "image": {
+          "spriteName": null,
+          "color": "#FFFFFFFF",
+          "imageType": "Simple",
+          "preserveAspect": false
+        },
+        "spriteSlot": {
+          "category": "background",
+          "hint": "drawer_panel_clean_v4.png",
+          "suggestedSize": "384x106"
+        },
+        "children": [
+          {
+            "type": "Image",
+            "name": "CycleFrame",
+            "raycastTarget": false,
+            "rectTransform": {
+              "anchorMin": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchorMax": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "pivot": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchoredPosition": {
+                "x": 0,
+                "y": 0
+              },
+              "sizeDelta": {
+                "x": 366,
+                "y": 88
+              }
+            },
+            "image": {
+              "spriteName": null,
+              "color": "#FFFFFFFF",
+              "imageType": "Simple",
+              "preserveAspect": false
+            },
+            "spriteSlot": {
+              "category": "decoration",
+              "hint": "defense_frame_clean_v1.png",
+              "suggestedSize": "366x88"
+            }
+          },
+          {
+            "type": "Text",
+            "name": "CyclePhaseText",
+            "raycastTarget": false,
+            "rectTransform": {
+              "anchorMin": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchorMax": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "pivot": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchoredPosition": {
+                "x": 0,
+                "y": 28
+              },
+              "sizeDelta": {
+                "x": 318,
+                "y": 34
+              }
+            },
+            "text": {
+              "content": "DUSK",
+              "fontSize": 27,
+              "fontStyle": "Bold",
+              "color": "#F0D27AFF",
+              "alignment": "MiddleCenter",
+              "overflow": "Overflow"
+            }
+          },
+          {
+            "type": "Text",
+            "name": "CycleDayLabelText",
+            "raycastTarget": false,
+            "rectTransform": {
+              "anchorMin": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchorMax": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "pivot": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchoredPosition": {
+                "x": -112,
+                "y": -4
+              },
+              "sizeDelta": {
+                "x": 82,
+                "y": 18
+              }
+            },
+            "text": {
+              "content": "DAY",
+              "fontSize": 11.5,
+              "fontStyle": "Bold",
+              "color": "#EDE1BAFF",
+              "alignment": "MiddleCenter",
+              "overflow": "Overflow"
+            }
+          },
+          {
+            "type": "Text",
+            "name": "CycleDuskLabelText",
+            "raycastTarget": false,
+            "rectTransform": {
+              "anchorMin": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchorMax": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "pivot": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchoredPosition": {
+                "x": 0,
+                "y": -4
+              },
+              "sizeDelta": {
+                "x": 82,
+                "y": 18
+              }
+            },
+            "text": {
+              "content": "DUSK",
+              "fontSize": 11.5,
+              "fontStyle": "Bold",
+              "color": "#F0D27AFF",
+              "alignment": "MiddleCenter",
+              "overflow": "Overflow"
+            }
+          },
+          {
+            "type": "Text",
+            "name": "CycleNightLabelText",
+            "raycastTarget": false,
+            "rectTransform": {
+              "anchorMin": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchorMax": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "pivot": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchoredPosition": {
+                "x": 112,
+                "y": -4
+              },
+              "sizeDelta": {
+                "x": 82,
+                "y": 18
+              }
+            },
+            "text": {
+              "content": "NIGHT",
+              "fontSize": 11.5,
+              "fontStyle": "Bold",
+              "color": "#EDE1BAFF",
+              "alignment": "MiddleCenter",
+              "overflow": "Overflow"
+            }
+          },
+          {
+            "type": "Image",
+            "name": "CycleProgressTrack",
+            "raycastTarget": false,
+            "rectTransform": {
+              "anchorMin": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchorMax": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "pivot": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchoredPosition": {
+                "x": 0,
+                "y": -34
+              },
+              "sizeDelta": {
+                "x": 300,
+                "y": 14
+              }
+            },
+            "image": {
+              "spriteName": null,
+              "color": "#FFFFFFFF",
+              "imageType": "Simple",
+              "preserveAspect": false
+            },
+            "spriteSlot": {
+              "category": "background",
+              "hint": "progress_track_clean_v4.png",
+              "suggestedSize": "300x14"
+            },
+            "children": [
+              {
+                "type": "Image",
+                "name": "CycleProgressFill",
+                "raycastTarget": false,
+                "rectTransform": {
+                  "anchorMin": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchorMax": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchoredPosition": {
+                    "x": -56,
+                    "y": 0
+                  },
+                  "sizeDelta": {
+                    "x": 184,
+                    "y": 8
+                  }
+                },
+                "image": {
+                  "spriteName": null,
+                  "color": "#F0B65AFF",
+                  "imageType": "Simple",
+                  "preserveAspect": false
+                },
+                "spriteSlot": {
+                  "category": "decoration",
+                  "hint": "progress_fill_v4.png",
+                  "suggestedSize": "184x8"
+                }
+              },
+              {
+                "type": "Image",
+                "name": "CycleProgressMarker",
+                "raycastTarget": false,
+                "rectTransform": {
+                  "anchorMin": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchorMax": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchoredPosition": {
+                    "x": 36,
+                    "y": 0
+                  },
+                  "sizeDelta": {
+                    "x": 10,
+                    "y": 26
+                  }
+                },
+                "image": {
+                  "spriteName": null,
+                  "color": "#FFF1B9FF",
+                  "imageType": "Simple",
+                  "preserveAspect": false
+                },
+                "spriteSlot": {
+                  "category": "decoration",
+                  "hint": "resource_chip_clean_v4.png",
+                  "suggestedSize": "10x26"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Image",
+        "name": "HordePressurePanel",
+        "raycastTarget": false,
+        "rectTransform": {
+          "anchorMin": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "anchorMax": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "anchoredPosition": {
+            "x": 200,
+            "y": -340
+          },
+          "sizeDelta": {
+            "x": 330,
+            "y": 78
+          }
+        },
+        "image": {
+          "spriteName": null,
+          "color": "#FFFFFFFF",
+          "imageType": "Simple",
+          "preserveAspect": false
+        },
+        "spriteSlot": {
+          "category": "background",
+          "hint": "drawer_panel_clean_v4.png",
+          "suggestedSize": "330x78"
+        },
+        "children": [
+          {
+            "type": "Text",
+            "name": "HordePressureTitleText",
+            "raycastTarget": false,
+            "rectTransform": {
+              "anchorMin": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchorMax": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "pivot": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchoredPosition": {
+                "x": -80,
+                "y": 22
+              },
+              "sizeDelta": {
+                "x": 158,
+                "y": 22
+              }
+            },
+            "text": {
+              "content": "HORDE PRESSURE",
+              "fontSize": 13.5,
+              "fontStyle": "Bold",
+              "color": "#F0D27AFF",
+              "alignment": "MiddleLeft",
+              "overflow": "Overflow"
+            }
+          },
+          {
+            "type": "Text",
+            "name": "HordePressureLevelText",
+            "raycastTarget": false,
+            "rectTransform": {
+              "anchorMin": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchorMax": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "pivot": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchoredPosition": {
+                "x": 110,
+                "y": 22
+              },
+              "sizeDelta": {
+                "x": 96,
+                "y": 22
+              }
+            },
+            "text": {
+              "content": "RISING",
+              "fontSize": 13,
+              "fontStyle": "Bold",
+              "color": "#E57C39FF",
+              "alignment": "MiddleCenter",
+              "overflow": "Overflow"
+            }
+          },
+          {
+            "type": "Image",
+            "name": "HordePressureTrack",
+            "raycastTarget": false,
+            "rectTransform": {
+              "anchorMin": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchorMax": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "pivot": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchoredPosition": {
+                "x": 0,
+                "y": -7
+              },
+              "sizeDelta": {
+                "x": 282,
+                "y": 18
+              }
+            },
+            "image": {
+              "spriteName": null,
+              "color": "#FFFFFFFF",
+              "imageType": "Simple",
+              "preserveAspect": false
+            },
+            "spriteSlot": {
+              "category": "background",
+              "hint": "defense_track_clean_v1.png",
+              "suggestedSize": "282x18"
+            },
+            "children": [
+              {
+                "type": "Image",
+                "name": "HordePressureFill",
+                "raycastTarget": false,
+                "rectTransform": {
+                  "anchorMin": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchorMax": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "anchoredPosition": {
+                    "x": -50,
+                    "y": 0
+                  },
+                  "sizeDelta": {
+                    "x": 182,
+                    "y": 10
+                  }
+                },
+                "image": {
+                  "spriteName": null,
+                  "color": "#D65B2CFF",
+                  "imageType": "Simple",
+                  "preserveAspect": false
+                },
+                "spriteSlot": {
+                  "category": "decoration",
+                  "hint": "defense_fill_gate_v1.png",
+                  "suggestedSize": "182x10"
+                }
+              }
+            ]
+          },
+          {
+            "type": "Text",
+            "name": "HordePressureText",
+            "raycastTarget": false,
+            "rectTransform": {
+              "anchorMin": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchorMax": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "pivot": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchoredPosition": {
+                "x": 0,
+                "y": -28
+              },
+              "sizeDelta": {
+                "x": 260,
+                "y": 18
+              }
+            },
+            "text": {
+              "content": "Pressure 64%",
+              "fontSize": 10.5,
+              "fontStyle": "Bold",
+              "color": "#EDE1BAFF",
+              "alignment": "MiddleCenter",
+              "overflow": "Overflow"
+            }
+          }
         ]
       },
       {
@@ -1509,24 +3435,24 @@
             "y": 0.5
           },
           "anchoredPosition": {
-            "x": 6,
-            "y": 466
+            "x": -2400,
+            "y": -1400
           },
           "sizeDelta": {
-            "x": 470,
-            "y": 112
+            "x": 1,
+            "y": 1
           }
         },
         "image": {
           "spriteName": null,
-          "color": "#FFFFFFFF",
+          "color": "#FFFFFF00",
           "imageType": "Simple",
           "preserveAspect": false
         },
         "spriteSlot": {
           "category": "background",
           "hint": "wave_plate_clean_v4.png",
-          "suggestedSize": "470x112"
+          "suggestedSize": "1x1"
         },
         "children": [
           {
@@ -1548,18 +3474,18 @@
               },
               "anchoredPosition": {
                 "x": 0,
-                "y": 20
+                "y": 0
               },
               "sizeDelta": {
-                "x": 438,
-                "y": 48
+                "x": 1,
+                "y": 1
               }
             },
             "text": {
-              "content": "WAVE 01 STARTING",
-              "fontSize": 34,
+              "content": "",
+              "fontSize": 1,
               "fontStyle": "Bold",
-              "color": "#F3D985FF",
+              "color": "#FFFFFF00",
               "alignment": "MiddleCenter",
               "overflow": "Overflow"
             }
@@ -1583,23 +3509,24 @@
               },
               "anchoredPosition": {
                 "x": 0,
-                "y": -28
+                "y": 0
               },
               "sizeDelta": {
-                "x": 380,
-                "y": 34
+                "x": 1,
+                "y": 1
               }
             },
             "text": {
-              "content": "KILLS 128 / 300",
-              "fontSize": 23,
+              "content": "",
+              "fontSize": 1,
               "fontStyle": "Bold",
-              "color": "#F7EED7FF",
+              "color": "#FFFFFF00",
               "alignment": "MiddleCenter",
               "overflow": "Overflow"
             }
           }
-        ]
+        ],
+        "active": false
       },
       {
         "type": "Image",
@@ -1620,11 +3547,11 @@
           },
           "anchoredPosition": {
             "x": 6,
-            "y": 334
+            "y": 350
           },
           "sizeDelta": {
-            "x": 360,
-            "y": 124
+            "x": 340,
+            "y": 92
           }
         },
         "image": {
@@ -1636,7 +3563,7 @@
         "spriteSlot": {
           "category": "background",
           "hint": "defense_panel_clean_v1.png",
-          "suggestedSize": "360x124"
+          "suggestedSize": "340x92"
         },
         "children": [
           {
@@ -1661,8 +3588,8 @@
                 "y": 0
               },
               "sizeDelta": {
-                "x": 348,
-                "y": 112
+                "x": 328,
+                "y": 82
               }
             },
             "image": {
@@ -1674,7 +3601,7 @@
             "spriteSlot": {
               "category": "decoration",
               "hint": "defense_frame_clean_v1.png",
-              "suggestedSize": "348x112"
+              "suggestedSize": "328x82"
             }
           },
           {
@@ -1695,12 +3622,12 @@
                 "y": 0.5
               },
               "anchoredPosition": {
-                "x": 111,
-                "y": -12
+                "x": 102,
+                "y": -7
               },
               "sizeDelta": {
-                "x": 96,
-                "y": 72
+                "x": 72,
+                "y": 52
               }
             },
             "image": {
@@ -1712,7 +3639,7 @@
             "spriteSlot": {
               "category": "decoration",
               "hint": "defense_damage_glow_v1.png",
-              "suggestedSize": "96x72"
+              "suggestedSize": "72x52"
             }
           },
           {
@@ -1733,12 +3660,12 @@
                 "y": 0.5
               },
               "anchoredPosition": {
-                "x": -150,
-                "y": 42
+                "x": -147,
+                "y": 28
               },
               "sizeDelta": {
-                "x": 28,
-                "y": 28
+                "x": 22,
+                "y": 22
               }
             },
             "image": {
@@ -1750,7 +3677,7 @@
             "spriteSlot": {
               "category": "icon",
               "hint": "defense_shield_icon_v1.png",
-              "suggestedSize": "28x28"
+              "suggestedSize": "22x22"
             }
           },
           {
@@ -1771,17 +3698,17 @@
                 "y": 0.5
               },
               "anchoredPosition": {
-                "x": -58,
-                "y": 43
+                "x": -72,
+                "y": 28
               },
               "sizeDelta": {
-                "x": 188,
-                "y": 28
+                "x": 150,
+                "y": 22
               }
             },
             "text": {
               "content": "DEFENSE",
-              "fontSize": 20,
+              "fontSize": 15,
               "fontStyle": "Bold",
               "color": "#F0D27AFF",
               "alignment": "MiddleLeft",
@@ -1806,12 +3733,12 @@
                 "y": 0.5
               },
               "anchoredPosition": {
-                "x": 138,
-                "y": 42
+                "x": 134,
+                "y": 28
               },
               "sizeDelta": {
-                "x": 70,
-                "y": 30
+                "x": 58,
+                "y": 26
               }
             },
             "image": {
@@ -1823,7 +3750,7 @@
             "spriteSlot": {
               "category": "background",
               "hint": "defense_percent_badge_v1.png",
-              "suggestedSize": "70x30"
+              "suggestedSize": "58x26"
             },
             "children": [
               {
@@ -1848,13 +3775,13 @@
                     "y": 0
                   },
                   "sizeDelta": {
-                    "x": 64,
-                    "y": 26
+                    "x": 52,
+                    "y": 22
                   }
                 },
                 "text": {
                   "content": "84%",
-                  "fontSize": 20,
+                  "fontSize": 15,
                   "fontStyle": "Bold",
                   "color": "#F4E0A0FF",
                   "alignment": "MiddleCenter",
@@ -1882,16 +3809,16 @@
               },
               "anchoredPosition": {
                 "x": -122,
-                "y": 13
+                "y": 4
               },
               "sizeDelta": {
-                "x": 94,
-                "y": 20
+                "x": 88,
+                "y": 16
               }
             },
             "text": {
               "content": "WALL 92%",
-              "fontSize": 14,
+              "fontSize": 10.5,
               "fontStyle": "Bold",
               "color": "#EEE4C8FF",
               "alignment": "MiddleLeft",
@@ -1916,12 +3843,12 @@
                 "y": 0.5
               },
               "anchoredPosition": {
-                "x": 58,
-                "y": 13
+                "x": 55,
+                "y": 4
               },
               "sizeDelta": {
-                "x": 222,
-                "y": 17
+                "x": 210,
+                "y": 12
               }
             },
             "image": {
@@ -1933,7 +3860,7 @@
             "spriteSlot": {
               "category": "background",
               "hint": "defense_track_clean_v1.png",
-              "suggestedSize": "222x17"
+              "suggestedSize": "210x12"
             },
             "children": [
               {
@@ -1954,12 +3881,12 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": 3,
+                    "x": 2,
                     "y": 0
                   },
                   "sizeDelta": {
-                    "x": 204,
-                    "y": 11
+                    "x": 193,
+                    "y": 7
                   }
                 },
                 "image": {
@@ -1971,7 +3898,7 @@
                 "spriteSlot": {
                   "category": "decoration",
                   "hint": "defense_fill_wall_v1.png",
-                  "suggestedSize": "204x11"
+                  "suggestedSize": "193x7"
                 }
               }
             ]
@@ -1995,16 +3922,16 @@
               },
               "anchoredPosition": {
                 "x": -122,
-                "y": -14
+                "y": -18
               },
               "sizeDelta": {
-                "x": 94,
-                "y": 20
+                "x": 88,
+                "y": 16
               }
             },
             "text": {
               "content": "GATE 76%",
-              "fontSize": 14,
+              "fontSize": 10.5,
               "fontStyle": "Bold",
               "color": "#EEE4C8FF",
               "alignment": "MiddleLeft",
@@ -2029,12 +3956,12 @@
                 "y": 0.5
               },
               "anchoredPosition": {
-                "x": 58,
-                "y": -14
+                "x": 55,
+                "y": -18
               },
               "sizeDelta": {
-                "x": 222,
-                "y": 17
+                "x": 210,
+                "y": 12
               }
             },
             "image": {
@@ -2046,7 +3973,7 @@
             "spriteSlot": {
               "category": "background",
               "hint": "defense_track_clean_v1.png",
-              "suggestedSize": "222x17"
+              "suggestedSize": "210x12"
             },
             "children": [
               {
@@ -2067,12 +3994,12 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": 3,
+                    "x": 2,
                     "y": 0
                   },
                   "sizeDelta": {
-                    "x": 169,
-                    "y": 11
+                    "x": 160,
+                    "y": 7
                   }
                 },
                 "image": {
@@ -2084,7 +4011,7 @@
                 "spriteSlot": {
                   "category": "decoration",
                   "hint": "defense_fill_gate_v1.png",
-                  "suggestedSize": "169x11"
+                  "suggestedSize": "160x7"
                 }
               }
             ]
@@ -2108,16 +4035,16 @@
               },
               "anchoredPosition": {
                 "x": -122,
-                "y": -41
+                "y": -40
               },
               "sizeDelta": {
-                "x": 94,
-                "y": 20
+                "x": 88,
+                "y": 16
               }
             },
             "text": {
               "content": "CORE 100%",
-              "fontSize": 14,
+              "fontSize": 10.5,
               "fontStyle": "Bold",
               "color": "#EEE4C8FF",
               "alignment": "MiddleLeft",
@@ -2142,12 +4069,12 @@
                 "y": 0.5
               },
               "anchoredPosition": {
-                "x": 58,
-                "y": -41
+                "x": 55,
+                "y": -40
               },
               "sizeDelta": {
-                "x": 222,
-                "y": 17
+                "x": 210,
+                "y": 12
               }
             },
             "image": {
@@ -2159,7 +4086,7 @@
             "spriteSlot": {
               "category": "background",
               "hint": "defense_track_clean_v1.png",
-              "suggestedSize": "222x17"
+              "suggestedSize": "210x12"
             },
             "children": [
               {
@@ -2180,12 +4107,12 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": 3,
+                    "x": 2,
                     "y": 0
                   },
                   "sizeDelta": {
-                    "x": 216,
-                    "y": 11
+                    "x": 204,
+                    "y": 7
                   }
                 },
                 "image": {
@@ -2197,7 +4124,7 @@
                 "spriteSlot": {
                   "category": "decoration",
                   "hint": "defense_fill_core_v1.png",
-                  "suggestedSize": "216x11"
+                  "suggestedSize": "204x7"
                 }
               }
             ]
@@ -4876,7 +6803,7 @@
                   }
                 },
                 "text": {
-                  "content": "Between wave actions",
+                  "content": "Ongoing siege actions",
                   "fontSize": 11,
                   "fontStyle": "Bold",
                   "color": "#C7B98FFF",
@@ -5599,7 +7526,8 @@
               "overflow": "Overflow"
             }
           }
-        ]
+        ],
+        "active": false
       },
       {
         "type": "Panel",

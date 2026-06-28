@@ -9,6 +9,7 @@ namespace DeadWalls
         public static CastleEconomyUI Instance { get; private set; }
 
         [Header("Panel")]
+        public bool PlayerFacingPanelEnabled;
         public GameObject CastleEconomyPanel;
         public Button CloseCastleEconomyButton;
         public Button ConfirmCastleEconomyButton;
@@ -79,6 +80,7 @@ namespace DeadWalls
             BindControls();
             if (CastleEconomyPanel != null)
                 CastleEconomyPanel.SetActive(false);
+            HideEntryFeedback();
         }
 
         private void OnDisable()
@@ -92,6 +94,13 @@ namespace DeadWalls
         private void Update()
         {
             RefreshEntryFeedback();
+
+            if (!PlayerFacingPanelEnabled)
+            {
+                if (CastleEconomyPanel != null && CastleEconomyPanel.activeSelf)
+                    ClosePanel();
+                return;
+            }
 
             if (CastleEconomyPanel == null || !CastleEconomyPanel.activeSelf)
                 return;
@@ -113,7 +122,7 @@ namespace DeadWalls
         public bool OpenFromCastle()
         {
             var gm = GameManager.Instance;
-            if (gm == null || CastleEconomyPanel == null || !gm.OpenCastleEconomy())
+            if (!PlayerFacingPanelEnabled || gm == null || CastleEconomyPanel == null || !gm.OpenCastleEconomy())
                 return false;
 
             CastleEconomyPanel.SetActive(true);
@@ -223,6 +232,12 @@ namespace DeadWalls
 
         private void RefreshEntryFeedback()
         {
+            if (!PlayerFacingPanelEnabled)
+            {
+                HideEntryFeedback();
+                return;
+            }
+
             var gm = GameManager.Instance;
             bool panelOpen = CastleEconomyPanel != null && CastleEconomyPanel.activeSelf;
             bool canOpen = gm != null
@@ -240,6 +255,18 @@ namespace DeadWalls
                 CastleTapHintText.text = hasEvent ? "COUNCIL EVENT" : "TAP CASTLE";
 
             RefreshEventBadge(gm, hasEvent && gm != null && gm.IsMobilePopulationEconomyEnabled() && gm.CanOpenCastleEconomy());
+        }
+
+        private void HideEntryFeedback()
+        {
+            if (CastleTapHint != null)
+                CastleTapHint.SetActive(false);
+            if (CastleTapHintPulse != null)
+                CastleTapHintPulse.SetActive(false);
+            if (EconomyEventBadge != null)
+                EconomyEventBadge.SetActive(false);
+            if (EconomyEventGlow != null)
+                EconomyEventGlow.SetActive(false);
         }
 
         private void RefreshEventBadge(GameManager gm, bool show)

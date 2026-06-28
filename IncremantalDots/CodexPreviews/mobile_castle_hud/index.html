@@ -97,8 +97,13 @@
     .resource-bar,
     .economy-focus,
     .wave-plate,
+    .cycle-panel,
+    .horde-pressure-panel,
     .defense-panel,
     .drawer,
+    #WorkerDrawerToggleButton,
+    #WorkerEconomyDrawerPanel,
+    .worker-drawer-row,
     .spell-slot,
     .prep-button,
     .archer-row,
@@ -210,6 +215,220 @@
 
     .economy-focus-button.is-selected .economy-selected {
       opacity: 1;
+    }
+
+    .economy-focus {
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    #WorkerDrawerToggleButton {
+      left: 36px;
+      top: 111px;
+      width: 126px;
+      height: 38px;
+      z-index: 10;
+      border: 2px solid rgba(206, 176, 98, 0.72);
+      border-radius: 7px 7px 5px 5px;
+      color: #f7e9c9;
+      background:
+        linear-gradient(180deg, rgba(53, 48, 39, 0.98), rgba(16, 15, 13, 0.98)),
+        linear-gradient(90deg, rgba(255, 236, 173, 0.1), transparent 45%, rgba(214, 180, 91, 0.08));
+      box-shadow:
+        0 8px 18px rgba(0, 0, 0, 0.34),
+        inset 0 1px 0 rgba(255, 237, 183, 0.18),
+        inset 0 -3px 0 rgba(0, 0, 0, 0.46);
+      font-size: 12px;
+      line-height: 34px;
+      font-weight: 900;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0;
+      text-shadow: 0 2px 0 rgba(0, 0, 0, 0.78);
+    }
+
+    #WorkerDrawerToggleButton::before {
+      content: "";
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      margin-right: 6px;
+      vertical-align: -4px;
+      border-radius: 4px;
+      border: 1px solid rgba(240, 210, 122, 0.42);
+      background:
+        linear-gradient(180deg, rgba(151, 104, 43, 0.95), rgba(77, 48, 24, 0.95));
+      box-shadow:
+        inset 0 1px 0 rgba(255, 242, 184, 0.24),
+        inset 0 -3px 0 rgba(0, 0, 0, 0.28);
+    }
+
+    #WorkerEconomyDrawerPanel {
+      left: 24px;
+      top: 104px;
+      width: 560px;
+      height: 176px;
+      z-index: 8;
+      padding: 10px 12px;
+      border: 2px solid rgba(132, 113, 78, 0.82);
+      border-radius: 8px;
+      background:
+        linear-gradient(180deg, rgba(38, 34, 24, 0.96), rgba(11, 11, 9, 0.97)),
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.025) 0 2px, transparent 2px 9px);
+      box-shadow:
+        0 15px 30px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 236, 173, 0.13),
+        inset 0 -4px 0 rgba(0, 0, 0, 0.48);
+      backdrop-filter: blur(7px);
+    }
+
+    .worker-drawer-header {
+      height: 34px;
+      margin-left: 136px;
+      width: 128px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      border: 1px solid rgba(214, 180, 91, 0.34);
+      border-radius: 6px;
+      background: linear-gradient(180deg, rgba(75, 55, 25, 0.8), rgba(18, 16, 12, 0.84));
+      box-shadow: inset 0 1px 0 rgba(255, 236, 173, 0.12);
+    }
+
+    #WorkerDrawerTitleText {
+      color: #f0d27a;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 15px;
+      line-height: 22px;
+      font-weight: 900;
+      text-transform: uppercase;
+      text-shadow: 0 2px 0 rgba(0, 0, 0, 0.74);
+      white-space: nowrap;
+    }
+
+    .worker-drawer-subtitle {
+      display: none;
+      color: #bbae83;
+      font-size: 10px;
+      line-height: 14px;
+      font-weight: 900;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .worker-summary {
+      display: grid;
+      grid-template-columns: repeat(3, 70px);
+      gap: 6px;
+      position: absolute;
+      left: 316px;
+      top: 12px;
+    }
+
+    .worker-summary span {
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(214, 180, 91, 0.24);
+      border-radius: 6px;
+      background: linear-gradient(180deg, rgba(17, 16, 13, 0.92), rgba(7, 7, 6, 0.84));
+      color: #f5eacd;
+      font-size: 9.8px;
+      line-height: 16px;
+      font-weight: 900;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .worker-drawer-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px 8px;
+      margin-top: 8px;
+      margin-left: 0;
+    }
+
+    .worker-drawer-row {
+      position: relative;
+      width: 258px;
+      height: 50px;
+      display: grid;
+      grid-template-columns: 26px 74px 82px 48px;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 6px;
+      border: 1px solid rgba(214, 180, 91, 0.2);
+      border-radius: 6px;
+      background:
+        linear-gradient(180deg, rgba(19, 18, 15, 0.94), rgba(8, 8, 7, 0.88)),
+        linear-gradient(90deg, rgba(214, 180, 91, 0.04), transparent 42%);
+      box-shadow: inset 0 1px 0 rgba(255, 236, 173, 0.06);
+    }
+
+    .worker-resource-icon {
+      width: 24px;
+      height: 24px;
+      justify-self: center;
+      transform: scale(0.9);
+    }
+
+    .worker-copy {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .worker-count-text {
+      color: #efe4c4;
+      font-size: 12.5px;
+      line-height: 16px;
+      font-weight: 900;
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .worker-rate-text {
+      margin-top: 1px;
+      color: #d6b45b;
+      font-size: 10.5px;
+      line-height: 14px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .worker-add-button {
+      width: 82px;
+      height: 38px;
+      border: 1px solid rgba(240, 210, 122, 0.62);
+      border-radius: 6px;
+      color: #fff3c7;
+      background: linear-gradient(180deg, rgba(112, 78, 30, 0.98), rgba(35, 25, 14, 0.98));
+      box-shadow:
+        inset 0 1px 0 rgba(255, 239, 181, 0.22),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.36);
+      font-size: 10.5px;
+      line-height: 36px;
+      font-weight: 900;
+      text-align: center;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .worker-status-text {
+      color: #91d879;
+      font-size: 9.5px;
+      line-height: 13px;
+      font-weight: 900;
+      text-align: center;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .worker-status-text.need-pop {
+      color: #d9a35b;
     }
 
     .resource-chip {
@@ -341,96 +560,211 @@
       text-shadow: 0 2px 0 rgba(0, 0, 0, 0.72);
     }
 
-    .wave-plate {
-      left: 782px;
-      top: 14px;
-      width: 360px;
-      height: 118px;
-      display: grid;
-      grid-template-rows: 58px 38px;
-      align-content: center;
-      justify-items: center;
-      padding: 11px 22px;
-      border: 2px solid rgba(130, 112, 81, 0.88);
+    .cycle-panel {
+      left: 768px;
+      top: 20px;
+      width: 384px;
+      height: 106px;
+      padding: 10px 18px;
+      border: 1px solid rgba(130, 112, 81, 0.88);
       border-radius: 7px;
       background:
-        linear-gradient(180deg, rgba(91, 26, 19, 0.94), rgba(34, 12, 9, 0.98) 58%, rgba(16, 12, 9, 0.96)),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.08), transparent 18%, transparent 82%, rgba(255, 255, 255, 0.05));
+        linear-gradient(180deg, rgba(43, 36, 26, 0.97), rgba(18, 17, 14, 0.98)),
+        repeating-linear-gradient(0deg, rgba(239, 210, 122, 0.06) 0 1px, transparent 1px 8px);
       box-shadow:
-        0 18px 34px rgba(0, 0, 0, 0.54),
-        0 0 0 5px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(255, 230, 164, 0.2),
-        inset 0 -4px 0 rgba(0, 0, 0, 0.4);
-      z-index: 6;
+        0 16px 30px rgba(0, 0, 0, 0.48),
+        inset 0 1px 0 rgba(255, 232, 165, 0.16),
+        inset 0 -4px 0 rgba(0, 0, 0, 0.34);
+      z-index: 7;
     }
 
-    .wave-plate::before,
-    .wave-plate::after {
+    .cycle-panel::before {
       content: "";
       position: absolute;
-      top: 20px;
-      width: 34px;
-      height: 76px;
-      background:
-        linear-gradient(180deg, rgba(214, 180, 91, 0.22), transparent),
-        repeating-linear-gradient(180deg, rgba(0, 0, 0, 0.28) 0 7px, transparent 7px 14px);
-      border: 1px solid rgba(214, 180, 91, 0.24);
-      border-radius: 3px;
+      inset: 8px;
+      border: 1px solid rgba(214, 180, 91, 0.26);
+      border-radius: 5px;
+      pointer-events: none;
     }
 
-    .wave-plate::before {
-      left: 14px;
-    }
-
-    .wave-plate::after {
-      right: 14px;
-    }
-
-    #WaveText {
-      width: 100%;
-      text-align: center;
-      color: #f4dd91;
+    #CyclePhaseText {
+      position: absolute;
+      left: 30px;
+      right: 30px;
+      top: 12px;
+      height: 34px;
+      color: #f0d27a;
       font-family: Georgia, "Times New Roman", serif;
-      font-size: 42px;
-      line-height: 52px;
-      font-weight: 900;
-      text-transform: uppercase;
-      text-shadow: 0 3px 0 #110704, 0 0 18px rgba(214, 180, 91, 0.3);
-    }
-
-    #KillsText {
-      width: 100%;
-      text-align: center;
-      color: #eee4c8;
-      font-size: 25px;
+      font-size: 32px;
       line-height: 34px;
       font-weight: 900;
-      text-shadow: 0 2px 0 rgba(0, 0, 0, 0.7);
+      text-align: center;
+      text-transform: uppercase;
+      text-shadow: 0 2px 0 #0f0804, 0 0 16px rgba(214, 180, 91, 0.24);
+    }
+
+    .cycle-labels {
+      position: absolute;
+      left: 52px;
+      right: 52px;
+      top: 50px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      text-align: center;
+      color: #ede1ba;
+      font-size: 12px;
+      line-height: 16px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+
+    #CycleDuskLabelText {
+      color: #f0d27a;
+    }
+
+    .cycle-track {
+      position: absolute;
+      left: 42px;
+      right: 42px;
+      bottom: 18px;
+      height: 14px;
+      border: 1px solid rgba(214, 180, 91, 0.28);
+      border-radius: 7px;
+      background: linear-gradient(180deg, rgba(9, 8, 7, 0.96), rgba(24, 21, 15, 0.96));
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.72);
+      overflow: visible;
+    }
+
+    #CycleProgressFill {
+      position: absolute;
+      left: 4px;
+      top: 3px;
+      width: 61%;
+      height: 8px;
+      border-radius: 5px;
+      background: linear-gradient(90deg, #6d8d50, #d7a954 58%, #c05f2b);
+      box-shadow: 0 0 10px rgba(214, 180, 91, 0.28);
+    }
+
+    #CycleProgressMarker {
+      position: absolute;
+      left: calc(61% - 5px);
+      top: -6px;
+      width: 10px;
+      height: 26px;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 241, 185, 0.9);
+      background: linear-gradient(180deg, #fff1b9, #bb8d39);
+      box-shadow: 0 0 12px rgba(255, 223, 124, 0.36);
+    }
+
+    .legacy-wave {
+      display: none;
+    }
+
+    .horde-pressure-panel {
+      left: 995px;
+      top: 841px;
+      width: 330px;
+      height: 78px;
+      padding: 10px 22px;
+      border: 1px solid rgba(130, 112, 81, 0.82);
+      border-radius: 7px;
+      background:
+        linear-gradient(180deg, rgba(38, 31, 24, 0.94), rgba(13, 12, 10, 0.97)),
+        repeating-linear-gradient(90deg, rgba(214, 180, 91, 0.04) 0 2px, transparent 2px 10px);
+      box-shadow:
+        0 14px 26px rgba(0, 0, 0, 0.42),
+        inset 0 1px 0 rgba(255, 231, 166, 0.12),
+        inset 0 -3px 0 rgba(0, 0, 0, 0.36);
+      z-index: 5;
+    }
+
+    .horde-pressure-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 22px;
+      margin-bottom: 6px;
+    }
+
+    #HordePressureTitleText {
+      color: #f0d27a;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 16px;
+      line-height: 20px;
+      font-weight: 900;
+      text-transform: uppercase;
+      text-shadow: 0 2px 0 rgba(0, 0, 0, 0.72);
+    }
+
+    #HordePressureLevelText {
+      min-width: 82px;
+      padding: 2px 8px;
+      border: 1px solid rgba(220, 101, 45, 0.46);
+      border-radius: 4px;
+      color: #e57c39;
+      background: rgba(80, 31, 18, 0.62);
+      font-size: 13px;
+      line-height: 16px;
+      font-weight: 900;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .horde-pressure-track {
+      position: relative;
+      height: 18px;
+      border: 1px solid rgba(214, 180, 91, 0.22);
+      border-radius: 5px;
+      background:
+        linear-gradient(180deg, rgba(8, 7, 6, 0.95), rgba(23, 17, 13, 0.96)),
+        repeating-linear-gradient(90deg, transparent 0 67px, rgba(214, 180, 91, 0.24) 67px 69px);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.7);
+      overflow: hidden;
+    }
+
+    #HordePressureFill {
+      width: 64%;
+      height: 100%;
+      border-radius: 4px;
+      background: linear-gradient(90deg, #74441f, #d65b2c 58%, #ff9b43);
+      box-shadow: 0 0 14px rgba(214, 91, 44, 0.32);
+    }
+
+    #HordePressureText {
+      margin-top: 4px;
+      color: #ede1ba;
+      font-size: 11px;
+      line-height: 14px;
+      font-weight: 800;
+      text-align: center;
     }
 
     .defense-panel {
-      left: 782px;
-      top: 144px;
-      width: 360px;
-      height: 124px;
-      padding: 12px 14px 11px;
+      left: 792px;
+      top: 146px;
+      width: 340px;
+      height: 92px;
+      padding: 8px 12px;
       border-radius: 7px;
-      border: 2px solid rgba(125, 112, 78, 0.88);
+      border: 1px solid rgba(125, 112, 78, 0.84);
       background:
-        linear-gradient(180deg, rgba(42, 39, 31, 0.96), rgba(18, 17, 14, 0.98) 52%, rgba(12, 11, 9, 0.98)),
-        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0 2px, transparent 2px 8px);
+        linear-gradient(180deg, rgba(35, 33, 27, 0.94), rgba(14, 14, 12, 0.96)),
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.025) 0 2px, transparent 2px 9px);
       box-shadow:
-        0 18px 34px rgba(0, 0, 0, 0.52),
-        0 0 0 4px rgba(0, 0, 0, 0.2),
+        0 12px 24px rgba(0, 0, 0, 0.42),
         inset 0 1px 0 rgba(255, 231, 166, 0.13),
-        inset 0 -4px 0 rgba(0, 0, 0, 0.44);
+        inset 0 -3px 0 rgba(0, 0, 0, 0.38);
       z-index: 6;
     }
 
     #DefenseFrame {
       position: absolute;
-      inset: 6px;
-      border: 1px solid rgba(214, 180, 91, 0.35);
+      inset: 5px;
+      border: 1px solid rgba(214, 180, 91, 0.24);
       border-radius: 5px;
       pointer-events: none;
     }
@@ -446,22 +780,22 @@
     }
 
     #DefenseFrame::before {
-      top: 30px;
+      top: 24px;
     }
 
     #DefenseFrame::after {
-      bottom: 8px;
+      bottom: 7px;
       opacity: 0.45;
     }
 
     #DefenseDamageGlow {
       position: absolute;
-      right: 12px;
-      top: 32px;
-      width: 96px;
-      height: 72px;
+      right: 18px;
+      top: 28px;
+      width: 72px;
+      height: 48px;
       border-radius: 50%;
-      opacity: 0.22;
+      opacity: 0.16;
       background:
         radial-gradient(circle, rgba(177, 68, 37, 0.6), rgba(177, 68, 37, 0.08) 52%, transparent 72%);
       pointer-events: none;
@@ -471,20 +805,20 @@
     .defense-head {
       position: relative;
       z-index: 1;
-      height: 29px;
+      height: 24px;
       display: grid;
-      grid-template-columns: 34px 1fr auto;
+      grid-template-columns: 28px 1fr auto;
       align-items: center;
-      gap: 8px;
-      padding: 0 6px 3px 3px;
+      gap: 6px;
+      padding: 0 4px 2px 2px;
     }
 
     #DefenseWarningIcon {
       position: relative;
-      width: 25px;
-      height: 25px;
+      width: 22px;
+      height: 22px;
       border-radius: 5px 5px 8px 8px;
-      border: 2px solid rgba(214, 180, 91, 0.86);
+      border: 1px solid rgba(214, 180, 91, 0.82);
       background:
         linear-gradient(180deg, rgba(96, 110, 69, 0.88), rgba(40, 51, 34, 0.92));
       box-shadow:
@@ -497,8 +831,8 @@
       position: absolute;
       left: 9px;
       top: 4px;
-      width: 3px;
-      height: 12px;
+      width: 2px;
+      height: 10px;
       background: rgba(238, 228, 200, 0.9);
       box-shadow: 0 4px 0 rgba(20, 14, 8, 0.55);
     }
@@ -509,7 +843,7 @@
       left: 6px;
       right: 6px;
       bottom: 1px;
-      height: 6px;
+      height: 5px;
       border-radius: 0 0 9px 9px;
       background: rgba(214, 180, 91, 0.82);
       clip-path: polygon(0 0, 100% 0, 50% 100%);
@@ -519,8 +853,8 @@
       overflow: hidden;
       color: #f0d27a;
       font-family: Georgia, "Times New Roman", serif;
-      font-size: 21px;
-      line-height: 25px;
+      font-size: 15px;
+      line-height: 20px;
       font-weight: 900;
       text-transform: uppercase;
       text-shadow: 0 2px 0 #090604, 0 0 12px rgba(214, 180, 91, 0.24);
@@ -528,14 +862,14 @@
     }
 
     #DefensePercentText {
-      min-width: 64px;
-      padding: 2px 8px 3px;
+      min-width: 58px;
+      padding: 1px 7px 2px;
       border-radius: 4px;
       border: 1px solid rgba(214, 180, 91, 0.34);
       background: linear-gradient(180deg, rgba(47, 32, 18, 0.84), rgba(18, 13, 9, 0.88));
       color: #f4e0a0;
-      font-size: 22px;
-      line-height: 24px;
+      font-size: 16px;
+      line-height: 20px;
       font-weight: 900;
       text-align: center;
       text-shadow: 0 2px 0 rgba(0, 0, 0, 0.66);
@@ -545,23 +879,23 @@
       position: relative;
       z-index: 1;
       display: grid;
-      gap: 7px;
-      padding: 5px 6px 0;
+      gap: 4px;
+      padding: 2px 5px 0;
     }
 
     .defense-row {
       display: grid;
-      grid-template-columns: 84px 1fr;
+      grid-template-columns: 76px 1fr;
       align-items: center;
-      gap: 8px;
-      height: 20px;
+      gap: 7px;
+      height: 16px;
     }
 
     .defense-label {
       overflow: hidden;
       color: #d8ceb2;
-      font-size: 14px;
-      line-height: 18px;
+      font-size: 10.5px;
+      line-height: 14px;
       font-weight: 900;
       white-space: nowrap;
       text-transform: uppercase;
@@ -569,13 +903,13 @@
     }
 
     .defense-track {
-      height: 15px;
+      height: 12px;
       padding: 2px;
       border-radius: 3px;
       border: 1px solid rgba(214, 180, 91, 0.28);
       background:
         linear-gradient(180deg, rgba(5, 5, 4, 0.95), rgba(20, 17, 12, 0.92)),
-        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.04) 0 14px, transparent 14px 28px);
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.04) 0 12px, transparent 12px 24px);
       box-shadow:
         inset 0 1px 3px rgba(0, 0, 0, 0.9),
         0 1px 0 rgba(255, 230, 160, 0.08);
@@ -596,7 +930,7 @@
       content: "";
       position: absolute;
       inset: 0;
-      background: repeating-linear-gradient(90deg, transparent 0 21px, rgba(0, 0, 0, 0.26) 21px 24px);
+      background: repeating-linear-gradient(90deg, transparent 0 18px, rgba(0, 0, 0, 0.22) 18px 21px);
       border-radius: inherit;
       opacity: 0.5;
     }
@@ -1486,7 +1820,7 @@
       width: 234px;
       height: 54px;
       z-index: 7;
-      display: grid;
+      display: none;
       place-items: center;
       border: 1px solid rgba(240, 210, 122, 0.56);
       border-radius: 7px;
@@ -1525,6 +1859,7 @@
       position: absolute;
       inset: 0;
       z-index: 30;
+      display: none;
       overflow: hidden;
       background:
         linear-gradient(90deg, rgba(3, 3, 2, 0.4), rgba(3, 3, 2, 0.22) 58%, rgba(3, 3, 2, 0.82) 100%),
@@ -2010,6 +2345,58 @@
         </div>
       </div>
 
+      <button id="WorkerDrawerToggleButton" aria-label="Toggle worker economy drawer">WORKERS</button>
+
+      <section id="WorkerEconomyDrawerPanel" aria-label="Worker economy drawer">
+        <div class="worker-drawer-header">
+          <div id="WorkerDrawerTitleText">WORKERS</div>
+          <div class="worker-drawer-subtitle">CITY WORKFORCE</div>
+        </div>
+        <div class="worker-summary" aria-label="Worker population summary">
+          <span id="WorkerIdlePopulationText">IDLE 4</span>
+          <span id="WorkerTotalText">TOTAL 24</span>
+          <span id="WorkerArcherPopulationText">ARCHERS 4</span>
+        </div>
+        <div class="worker-drawer-list">
+          <article id="WoodWorkerRow" class="worker-drawer-row">
+            <div class="resource-icon icon-wood worker-resource-icon" aria-hidden="true"></div>
+            <div class="worker-copy">
+              <div id="WoodWorkerCountText" class="worker-count-text">WOOD x6</div>
+              <div id="WoodWorkerRateText" class="worker-rate-text">+54/min</div>
+            </div>
+            <button id="WoodWorkerAddButton" class="worker-add-button">+ WORKER</button>
+            <div id="WoodWorkerStatusText" class="worker-status-text">READY</div>
+          </article>
+          <article id="StoneWorkerRow" class="worker-drawer-row">
+            <div class="resource-icon icon-stone worker-resource-icon" aria-hidden="true"></div>
+            <div class="worker-copy">
+              <div id="StoneWorkerCountText" class="worker-count-text">STONE x4</div>
+              <div id="StoneWorkerRateText" class="worker-rate-text">+32/min</div>
+            </div>
+            <button id="StoneWorkerAddButton" class="worker-add-button">+ WORKER</button>
+            <div id="StoneWorkerStatusText" class="worker-status-text">READY</div>
+          </article>
+          <article id="IronWorkerRow" class="worker-drawer-row">
+            <div class="resource-icon icon-iron worker-resource-icon" aria-hidden="true"></div>
+            <div class="worker-copy">
+              <div id="IronWorkerCountText" class="worker-count-text">IRON x2</div>
+              <div id="IronWorkerRateText" class="worker-rate-text">+18/min</div>
+            </div>
+            <button id="IronWorkerAddButton" class="worker-add-button">+ WORKER</button>
+            <div id="IronWorkerStatusText" class="worker-status-text need-pop">NEED POP</div>
+          </article>
+          <article id="FoodWorkerRow" class="worker-drawer-row">
+            <div class="resource-icon icon-food worker-resource-icon" aria-hidden="true"></div>
+            <div class="worker-copy">
+              <div id="FoodWorkerCountText" class="worker-count-text">FOOD x8</div>
+              <div id="FoodWorkerRateText" class="worker-rate-text">+48/min</div>
+            </div>
+            <button id="FoodWorkerAddButton" class="worker-add-button">+ WORKER</button>
+            <div id="FoodWorkerStatusText" class="worker-status-text">READY</div>
+          </article>
+        </div>
+      </section>
+
       <div class="economy-focus" aria-label="Economy focus">
         <div id="EconomyFocusText">Economy Focus</div>
         <button id="EconomyBalancedButton" class="economy-focus-button is-selected">
@@ -2034,9 +2421,22 @@
         </button>
       </div>
 
-      <div class="wave-plate" aria-label="Wave status">
-        <div id="WaveText">WAVE 07</div>
-        <div id="KillsText">KILLS 128 / 300</div>
+      <section id="CyclePanel" class="cycle-panel" aria-label="Day dusk night cycle">
+        <div id="CyclePhaseText">DUSK</div>
+        <div class="cycle-labels" aria-label="Cycle phases">
+          <span id="CycleDayLabelText">DAY</span>
+          <span id="CycleDuskLabelText">DUSK</span>
+          <span id="CycleNightLabelText">NIGHT</span>
+        </div>
+        <div class="cycle-track" aria-hidden="true">
+          <span id="CycleProgressFill"></span>
+          <span id="CycleProgressMarker"></span>
+        </div>
+      </section>
+
+      <div class="wave-plate legacy-wave" aria-hidden="true">
+        <div id="WaveText"></div>
+        <div id="KillsText"></div>
       </div>
 
       <section id="CastleDefensePanel" class="defense-panel" aria-label="Castle defense health">
@@ -2067,6 +2467,17 @@
             </div>
           </div>
         </div>
+      </section>
+
+      <section id="HordePressurePanel" class="horde-pressure-panel" aria-label="Horde pressure">
+        <div class="horde-pressure-head">
+          <div id="HordePressureTitleText">HORDE PRESSURE</div>
+          <div id="HordePressureLevelText">RISING</div>
+        </div>
+        <div class="horde-pressure-track" aria-hidden="true">
+          <div id="HordePressureFill"></div>
+        </div>
+        <div id="HordePressureText">Pressure 64%</div>
       </section>
 
       <aside id="ArcherDrawerPanel" class="drawer" aria-label="Archer progression drawer">
@@ -2166,7 +2577,7 @@
         <section id="CastleYardPanel" aria-label="Castle yard actions">
           <div class="section-title">
             <span id="CastleYardTitleText">Castle Yard</span>
-            <small id="CastleYardSubtitleText">Between wave actions</small>
+            <small id="CastleYardSubtitleText">Ongoing siege actions</small>
           </div>
           <div class="yard-actions">
             <article class="yard-action">
@@ -2197,7 +2608,7 @@
         </section>
       </aside>
 
-      <div class="bottom-slots" aria-hidden="true">
+      <div id="BottomSkillBar" class="bottom-slots" aria-hidden="true">
         <div class="spell-slot" data-slot="1"><div class="spell-glyph"></div></div>
         <div class="spell-slot" data-slot="2"><div class="spell-glyph"></div></div>
         <div class="spell-slot" data-slot="3"><div class="spell-glyph"></div></div>
@@ -2308,6 +2719,32 @@
           "FoodText",
           "PopulationText",
           "ArrowText",
+          "WorkerDrawerToggleButton",
+          "WorkerEconomyDrawerPanel",
+          "WorkerDrawerTitleText",
+          "WorkerIdlePopulationText",
+          "WorkerTotalText",
+          "WorkerArcherPopulationText",
+          "WoodWorkerRow",
+          "WoodWorkerCountText",
+          "WoodWorkerRateText",
+          "WoodWorkerAddButton",
+          "WoodWorkerStatusText",
+          "StoneWorkerRow",
+          "StoneWorkerCountText",
+          "StoneWorkerRateText",
+          "StoneWorkerAddButton",
+          "StoneWorkerStatusText",
+          "IronWorkerRow",
+          "IronWorkerCountText",
+          "IronWorkerRateText",
+          "IronWorkerAddButton",
+          "IronWorkerStatusText",
+          "FoodWorkerRow",
+          "FoodWorkerCountText",
+          "FoodWorkerRateText",
+          "FoodWorkerAddButton",
+          "FoodWorkerStatusText",
           "CastleTapHint",
           "CastleTapHintText",
           "CastleTapHintPulse",
@@ -2363,6 +2800,18 @@
           "EconomyStoneSelected",
           "EconomyIronSelected",
           "EconomyFoodSelected",
+          "CyclePanel",
+          "CyclePhaseText",
+          "CycleDayLabelText",
+          "CycleDuskLabelText",
+          "CycleNightLabelText",
+          "CycleProgressFill",
+          "CycleProgressMarker",
+          "HordePressurePanel",
+          "HordePressureTitleText",
+          "HordePressureFill",
+          "HordePressureText",
+          "HordePressureLevelText",
           "WaveText",
           "KillsText",
           "CastleDefensePanel",
@@ -2424,7 +2873,15 @@
           return id.endsWith("Button");
         });
 
-        var buttonSizes = buttonIds.map(function (id) {
+        function isRendered(el) {
+          return !!el && el.getClientRects().length > 0;
+        }
+
+        var visibleButtonIds = buttonIds.filter(function (id) {
+          return isRendered(document.getElementById(id));
+        });
+
+        var buttonSizes = visibleButtonIds.map(function (id) {
           var rect = document.getElementById(id).getBoundingClientRect();
           return {
             id: id,
@@ -2439,11 +2896,22 @@
 
         var overflow = requiredIds.filter(function (id) {
           var el = document.getElementById(id);
+          if (!isRendered(el)) {
+            return false;
+          }
           return el.scrollWidth > el.clientWidth + 2 || el.scrollHeight > el.clientHeight + 2;
         });
 
         var root = document.getElementById("MobileCastleHudRoot").getBoundingClientRect();
         var drawer = document.getElementById("ArcherDrawerPanel").getBoundingClientRect();
+        var workerDrawer = document.getElementById("WorkerEconomyDrawerPanel").getBoundingClientRect();
+        var cycle = document.getElementById("CyclePanel").getBoundingClientRect();
+        var horde = document.getElementById("HordePressurePanel").getBoundingClientRect();
+        var bottomSkill = document.getElementById("BottomSkillBar").getBoundingClientRect();
+        var defense = document.getElementById("CastleDefensePanel").getBoundingClientRect();
+        function overlaps(a, b) {
+          return !(a.right <= b.left || a.left >= b.right || a.bottom <= b.top || a.top >= b.bottom);
+        }
         var report = {
           requiredCount: requiredIds.length,
           missing: missing,
@@ -2456,6 +2924,25 @@
           drawer: {
             width: Math.round(drawer.width),
             height: Math.round(drawer.height)
+          },
+          workerDrawer: {
+            width: Math.round(workerDrawer.width),
+            height: Math.round(workerDrawer.height),
+            overlapsCycle: overlaps(workerDrawer, cycle),
+            overlapsArcherDrawer: overlaps(workerDrawer, drawer)
+          },
+          cyclePanel: {
+            width: Math.round(cycle.width),
+            height: Math.round(cycle.height),
+            overlapsArcherDrawer: overlaps(cycle, drawer),
+            overlapsWorkerDrawer: overlaps(cycle, workerDrawer),
+            overlapsDefense: overlaps(cycle, defense)
+          },
+          hordePressurePanel: {
+            width: Math.round(horde.width),
+            height: Math.round(horde.height),
+            overlapsArcherDrawer: overlaps(horde, drawer),
+            overlapsBottomSkillBar: overlaps(horde, bottomSkill)
           },
           buttonSizes: buttonSizes
         };

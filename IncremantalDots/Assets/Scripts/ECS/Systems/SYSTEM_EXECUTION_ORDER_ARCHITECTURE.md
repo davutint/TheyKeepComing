@@ -3,6 +3,7 @@
 ## SimulationSystemGroup Sirasi
 
 ```
+-5. ContinuousSiegeCycleSystem
 -4. DayNightPrepSystem
 -3. BuildingProductionSystem
 -2. BuildingPopulationSystem
@@ -46,15 +47,24 @@ Presentation tarafinda `SpriteAnimationSystem` UV rect hesaplarini yapar.
 
 ### DayNightPrepSystem
 
-- Mobile normal mode'da `DayPrep` sayacini azaltir.
+- `ContinuousSiegeCycleData.Enabled` true ise erken cikar.
+- Legacy mobile mode'da `DayPrep` sayacini azaltir.
 - Sayac bitince `CurrentWave` artar, wave stat'leri configure edilir ve `NightCombat` baslar.
+- Stress mode'da calismaz.
+
+### ContinuousSiegeCycleSystem
+
+- Mobile continuous siege mode'da 60s `DAY / DUSK / NIGHT` cycle datasini yazar.
+- `WaveStateData.WaveActive` degerini uyumluluk icin true tutar ve eski DayPrep dur-kalk akisinin tetiklenmesini engeller.
+- `SpawnIntensityMultiplier` ve `HordePressure01` degerlerini `WaveSpawnSystem` ve HUD icin uretir.
 - Stress mode'da calismaz.
 
 ### WaveSpawnSystem
 
 - Mobile castle mode'da `MobileCastleCombatConfig` varsa spawn kale merkezi etrafindaki cemberden random aciyla yapilir.
-- Mobile normal mode'da spawn yonu random 360 kalir, ama wave ici opening/mid/final fazlari interval ve batch'i degistirir.
-- Normal mobile modda wave temizlenince wave clear bonus'u ekler, `WaveClearRewardData` yazar ve `Phase = DayPrep`, `WaveActive = false`, `PrepTimer = DayPrepDuration` yazar.
+- Continuous siege aktifken spawn yonu random 360 kalir ve interval/batch `ContinuousSiegeCycleData.SpawnIntensityMultiplier` ile akar; wave clear kontrolu calismaz.
+- Legacy mobile mode'da wave ici opening/mid/final fazlari interval ve batch'i degistirir.
+- Legacy mobile modda wave temizlenince wave clear bonus'u ekler, `WaveClearRewardData` yazar ve `Phase = DayPrep`, `WaveActive = false`, `PrepTimer = DayPrepDuration` yazar.
 - Worker economy aktifse wave clear bonus `WorkerEconomyRewardMultiplier` ile azaltilir.
 - Yeni wave'i `DayNightPrepSystem` prep sayaci bitince otomatik baslatir.
 - Stress mode'da config'teki stress batch, interval ve max alive cap'i kullanilir.

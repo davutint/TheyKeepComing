@@ -42,6 +42,17 @@ namespace DeadWalls
             if (gm == null || !gm.TryGetMobileCombatConfig(out var config) || gm.WaveState.StressTestMode)
                 return 0f;
 
+            if (gm.TryGetContinuousSiegeCycle(out var cycle))
+            {
+                if (cycle.Phase == SiegeCyclePhase.Day)
+                    return config.DayOverlayAlpha;
+
+                if (cycle.Phase == SiegeCyclePhase.Dusk)
+                    return Mathf.Lerp(config.DayOverlayAlpha, config.NightOverlayAlpha, cycle.PhaseProgress01);
+
+                return config.NightOverlayAlpha;
+            }
+
             var wave = gm.WaveState;
             if (wave.Phase == RunPhaseType.DayPrep && !wave.WaveActive)
             {

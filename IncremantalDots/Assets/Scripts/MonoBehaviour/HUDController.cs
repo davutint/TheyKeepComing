@@ -42,6 +42,20 @@ namespace DeadWalls
         [Header("Arrow Supply")]
         public TMP_Text ArrowText;
 
+        [Header("Continuous Siege")]
+        public GameObject CyclePanel;
+        public TMP_Text CyclePhaseText;
+        public TMP_Text CycleDayLabelText;
+        public TMP_Text CycleDuskLabelText;
+        public TMP_Text CycleNightLabelText;
+        public Image CycleProgressFill;
+        public RectTransform CycleProgressMarker;
+        public GameObject HordePressurePanel;
+        public TMP_Text HordePressureTitleText;
+        public Image HordePressureFill;
+        public TMP_Text HordePressureText;
+        public TMP_Text HordePressureLevelText;
+
         // Onceki degerler — sadece degisince string alloc yap
         private int _lastXP = -1, _lastXPToNext = -1;
         private int _lastWave = -1, _lastLevel = -1, _lastAlive = -1;
@@ -124,6 +138,8 @@ namespace DeadWalls
                 _lastKillsLabel = killsLabel;
                 KillsText.text = killsLabel;
             }
+
+            UpdateContinuousSiegeHud(gm);
 
             if (LevelText != null && _lastLevel != gm.GameState.Level)
             {
@@ -292,6 +308,46 @@ namespace DeadWalls
             UpdateDefenseFill(DefenseCoreFill, coreRatio);
         }
 
+        private void UpdateContinuousSiegeHud(GameManager gm)
+        {
+            ContinuousSiegeCycleData cycle = default;
+            bool active = CyclePanel != null
+                && !gm.WaveState.StressTestMode
+                && gm.TryGetContinuousSiegeCycle(out cycle);
+
+            if (CyclePanel != null)
+                CyclePanel.SetActive(active);
+            if (HordePressurePanel != null)
+                HordePressurePanel.SetActive(false);
+
+            if (!active)
+            {
+                if (CyclePanel == null && WaveText != null)
+                    WaveText.gameObject.SetActive(true);
+                if (CyclePanel == null && KillsText != null)
+                    KillsText.gameObject.SetActive(true);
+                return;
+            }
+
+            if (WaveText != null)
+                WaveText.gameObject.SetActive(false);
+            if (KillsText != null)
+                KillsText.gameObject.SetActive(false);
+
+            string phase = FormatSiegePhase(cycle.Phase);
+            if (CyclePhaseText != null)
+                CyclePhaseText.text = phase;
+            if (CycleDayLabelText != null)
+                CycleDayLabelText.text = "DAY";
+            if (CycleDuskLabelText != null)
+                CycleDuskLabelText.text = "DUSK";
+            if (CycleNightLabelText != null)
+                CycleNightLabelText.text = "NIGHT";
+
+            UpdateProgressFill(CycleProgressFill, cycle.CycleProgress01);
+            UpdateProgressMarker(CycleProgressMarker, cycle.CycleProgress01);
+        }
+
         private void UpdateWaveReward(GameManager gm)
         {
             if (WaveRewardText == null)
@@ -379,6 +435,44 @@ namespace DeadWalls
             fill.color = GetDefenseFillColor(ratio);
         }
 
+        private static void UpdateProgressFill(Image fill, float ratio)
+        {
+            if (fill == null)
+                return;
+
+            ratio = Mathf.Clamp01(ratio);
+            fill.type = Image.Type.Simple;
+
+            RectTransform rect = fill.rectTransform;
+            RectTransform parent = rect.parent as RectTransform;
+            float fullWidth = parent != null && parent.rect.width > 0.1f
+                ? parent.rect.width
+                : Mathf.Max(1f, rect.sizeDelta.x);
+
+            rect.anchorMin = new Vector2(0f, 0.5f);
+            rect.anchorMax = new Vector2(0f, 0.5f);
+            rect.pivot = new Vector2(0f, 0.5f);
+            rect.anchoredPosition = new Vector2(0f, rect.anchoredPosition.y);
+            rect.sizeDelta = new Vector2(fullWidth * ratio, rect.sizeDelta.y);
+        }
+
+        private static void UpdateProgressMarker(RectTransform marker, float ratio)
+        {
+            if (marker == null)
+                return;
+
+            ratio = Mathf.Clamp01(ratio);
+            RectTransform parent = marker.parent as RectTransform;
+            float fullWidth = parent != null && parent.rect.width > 0.1f
+                ? parent.rect.width
+                : 300f;
+
+            marker.anchorMin = new Vector2(0f, 0.5f);
+            marker.anchorMax = new Vector2(0f, 0.5f);
+            marker.pivot = new Vector2(0.5f, 0.5f);
+            marker.anchoredPosition = new Vector2(fullWidth * ratio, marker.anchoredPosition.y);
+        }
+
         private static Color GetDefenseFillColor(float ratio)
         {
             if (ratio > 0.55f)
@@ -403,6 +497,9 @@ namespace DeadWalls
             if (wave.StressTestMode)
                 return $"WAVE {wave.CurrentWave:00} STRESS";
 
+            if (gm.TryGetContinuousSiegeCycle(out var cycle))
+                return FormatSiegePhase(cycle.Phase);
+
             if (gm.IsMobileMode && wave.Phase == RunPhaseType.DayPrep && !wave.WaveActive)
                 return $"DAY {wave.CurrentWave + 1:00} - {Mathf.CeilToInt(wave.PrepTimer)}s";
 
@@ -421,10 +518,26 @@ namespace DeadWalls
         private static string FormatKillsState(GameManager gm)
         {
             WaveStateData wave = gm.WaveState;
+            if (!wave.StressTestMode && gm.TryGetContinuousSiegeCycle(out _))
+                return $"KILLS {gm.KillsThisWave}";
+
             if (gm.IsMobileMode && wave.Phase == RunPhaseType.DayPrep && !wave.WaveActive && !wave.StressTestMode)
                 return "PREPARE DEFENSE";
 
             return $"KILLS {gm.KillsThisWave} / {wave.ZombiesToSpawn}";
+        }
+
+        private static string FormatSiegePhase(SiegeCyclePhase phase)
+        {
+            switch (phase)
+            {
+                case SiegeCyclePhase.Dusk:
+                    return "DUSK";
+                case SiegeCyclePhase.Night:
+                    return "NIGHT";
+                default:
+                    return "DAY";
+            }
         }
 
         private static string FormatArrowSupply(GameManager gm)

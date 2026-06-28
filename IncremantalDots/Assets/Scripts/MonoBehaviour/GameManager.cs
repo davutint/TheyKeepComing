@@ -37,12 +37,13 @@ namespace DeadWalls
         private const float GlobalDamageCardBonus = 5f;
         private static readonly ResourceCost FortifyCost = new ResourceCost(0, 50, 25, 0);
         private static readonly ResourceCost RallyCost = new ResourceCost(35, 0, 0, 45);
-        private const int MobileInitialPopulation = 60;
+        private const int MobileInitialPopulation = 24;
         private const int MobileInternalPopulationCapacity = 999999;
-        private const int MobileInitialWoodWorkers = 20;
-        private const int MobileInitialStoneWorkers = 10;
-        private const int MobileInitialIronWorkers = 8;
-        private const int MobileInitialFoodWorkers = 15;
+        private const int MobileInitialWoodWorkers = 6;
+        private const int MobileInitialStoneWorkers = 3;
+        private const int MobileInitialIronWorkers = 2;
+        private const int MobileInitialFoodWorkers = 5;
+        private const int MobileInitialBasicArchers = 4;
         private const float EconomyEventProductionMultiplier = 1.5f;
         private float _globalArrowDamageBonus;
         private float _globalFireRateMultiplier = 1f;
@@ -62,6 +63,7 @@ namespace DeadWalls
         public ArrowSupply ArrowSupply { get; private set; }
         public WaveClearRewardData WaveClearReward { get; private set; }
         public CastleYardPrepState CastleYardPrep { get; private set; }
+        public ContinuousSiegeCycleData ContinuousSiegeCycle { get; private set; }
         public MobilePopulationAllocation PopulationAllocation { get; private set; }
         public MobilePrepPauseState PrepPause { get; private set; }
         public MobileEconomyEventState EconomyEvent { get; private set; }
@@ -549,6 +551,22 @@ namespace DeadWalls
             return true;
         }
 
+        public bool TryGetContinuousSiegeCycle(out ContinuousSiegeCycleData cycle)
+        {
+            cycle = default;
+            if (!_initialized
+                || !CanAccessEntityManager()
+                || !TryGetMobileConfigEntity(out var mobileConfigEntity)
+                || !_entityManager.HasComponent<ContinuousSiegeCycleData>(mobileConfigEntity))
+            {
+                return false;
+            }
+
+            cycle = _entityManager.GetComponentData<ContinuousSiegeCycleData>(mobileConfigEntity);
+            ContinuousSiegeCycle = cycle;
+            return cycle.Enabled;
+        }
+
         public bool IsUnlimitedArrowsEnabled()
         {
             return TryGetMobileCombatConfig(out var config) && config.UnlimitedArrows;
@@ -775,6 +793,9 @@ namespace DeadWalls
 
         public bool IsMobileFinalWavePressure()
         {
+            if (TryGetContinuousSiegeCycle(out var cycle))
+                return cycle.Phase == SiegeCyclePhase.Night || cycle.HordePressure01 >= 0.75f;
+
             if (!TryGetMobileCombatConfig(out var config))
                 return false;
 
@@ -1159,7 +1180,11 @@ namespace DeadWalls
 
         private void ApplyScaledStatsToArchers(ArcherType typeFilter, bool useFilter)
         {
-            var query = _entityManager.CreateEntityQuery(typeof(ArcherUnit));
+            var query = _entityManager.CreateEntityQuery(new EntityQueryDesc
+            {
+                All = new ComponentType[] { typeof(ArcherUnit) },
+                None = new ComponentType[] { typeof(Prefab) }
+            });
             var entities = query.ToEntityArray(Unity.Collections.Allocator.Temp);
 
             foreach (var e in entities)
@@ -1310,7 +1335,11 @@ namespace DeadWalls
 
         private int GetArcherCount()
         {
-            return _entityManager.CreateEntityQuery(typeof(ArcherUnit)).CalculateEntityCount();
+            return _entityManager.CreateEntityQuery(new EntityQueryDesc
+            {
+                All = new ComponentType[] { typeof(ArcherUnit) },
+                None = new ComponentType[] { typeof(Prefab) }
+            }).CalculateEntityCount();
         }
 
         private void ReadArcherTypeCounts()
@@ -1319,7 +1348,11 @@ namespace DeadWalls
             RapidArcherCount = 0;
             FrostArcherCount = 0;
 
-            var query = _entityManager.CreateEntityQuery(typeof(ArcherUnit));
+            var query = _entityManager.CreateEntityQuery(new EntityQueryDesc
+            {
+                All = new ComponentType[] { typeof(ArcherUnit) },
+                None = new ComponentType[] { typeof(Prefab) }
+            });
             var entities = query.ToEntityArray(Unity.Collections.Allocator.Temp);
             foreach (var entity in entities)
             {
@@ -1435,11 +1468,25 @@ namespace DeadWalls
                 return;
 
             RepositionExistingMobileArchersToOutside();
+            EnsureInitialMobileArcherCount();
+
+            var mobileConfig = _entityManager.GetComponentData<MobileCastleCombatConfig>(mobileConfigEntity);
+            if (mobileConfig.ContinuousSiegeEnabled)
+            {
+                wave.CurrentWave = math.max(1, wave.CurrentWave);
+                MobileWaveUtility.ConfigureMobileWave(ref wave, mobileConfig);
+                wave.WaveActive = true;
+                wave.Phase = RunPhaseType.NightCombat;
+                wave.PrepTimer = 0f;
+                wave.PrepDuration = 0f;
+                wave.WaveStartTimer = 0f;
+                _entityManager.SetComponentData(_gameStateEntity, wave);
+                return;
+            }
 
             if (!wave.WaveActive && wave.Phase == RunPhaseType.DayPrep && wave.CurrentWave == 0)
                 return;
 
-            var mobileConfig = _entityManager.GetComponentData<MobileCastleCombatConfig>(mobileConfigEntity);
             if (wave.CurrentWave > 1 || wave.ZombiesSpawned > 0 || wave.ZombiesAlive > 0)
                 return;
 
@@ -1471,6 +1518,7 @@ namespace DeadWalls
         {
             WaveClearReward = default;
             CastleYardPrep = default;
+            ContinuousSiegeCycle = default;
             PopulationAllocation = default;
             PrepPause = default;
             EconomyEvent = default;
@@ -1483,6 +1531,9 @@ namespace DeadWalls
 
             if (_entityManager.HasComponent<CastleYardPrepState>(mobileConfigEntity))
                 CastleYardPrep = _entityManager.GetComponentData<CastleYardPrepState>(mobileConfigEntity);
+
+            if (_entityManager.HasComponent<ContinuousSiegeCycleData>(mobileConfigEntity))
+                ContinuousSiegeCycle = _entityManager.GetComponentData<ContinuousSiegeCycleData>(mobileConfigEntity);
 
             if (_entityManager.HasComponent<MobilePopulationAllocation>(mobileConfigEntity))
                 PopulationAllocation = _entityManager.GetComponentData<MobilePopulationAllocation>(mobileConfigEntity);
@@ -1521,7 +1572,11 @@ namespace DeadWalls
                 return;
             }
 
-            var query = _entityManager.CreateEntityQuery(typeof(ArcherUnit), typeof(Unity.Transforms.LocalTransform));
+            var query = _entityManager.CreateEntityQuery(new EntityQueryDesc
+            {
+                All = new ComponentType[] { typeof(ArcherUnit), typeof(Unity.Transforms.LocalTransform) },
+                None = new ComponentType[] { typeof(Prefab) }
+            });
             using var entities = query.ToEntityArray(Unity.Collections.Allocator.Temp);
             for (int i = 0; i < entities.Length; i++)
             {
@@ -1532,6 +1587,32 @@ namespace DeadWalls
                 transform.Position = position;
                 _entityManager.SetComponentData(entities[i], transform);
             }
+        }
+
+        private void EnsureInitialMobileArcherCount()
+        {
+            int currentCount = GetArcherCount();
+            for (int i = currentCount; i < MobileInitialBasicArchers; i++)
+                SpawnArcher(ArcherType.Basic);
+
+            int actualCount = GetArcherCount();
+            if (!_entityManager.Exists(_gameStateEntity) || !_entityManager.HasComponent<PopulationState>(_gameStateEntity))
+                return;
+
+            MobilePopulationAllocation allocation = TryGetMobileConfigEntity(out var mobileConfigEntity)
+                && _entityManager.HasComponent<MobilePopulationAllocation>(mobileConfigEntity)
+                    ? _entityManager.GetComponentData<MobilePopulationAllocation>(mobileConfigEntity)
+                    : PopulationAllocation;
+            var population = _entityManager.GetComponentData<PopulationState>(_gameStateEntity);
+            int workerCount = allocation.WoodWorkers
+                + allocation.StoneWorkers
+                + allocation.IronWorkers
+                + allocation.FoodWorkers;
+            population.Workers = workerCount;
+            population.Archers = math.min(actualCount, math.max(0, population.Total - workerCount));
+            population.Idle = math.max(0, population.Total - population.Workers - population.Archers);
+            _entityManager.SetComponentData(_gameStateEntity, population);
+            Population = population;
         }
 
         private bool TryResolveWorkerPrefabEntity()
@@ -1797,6 +1878,7 @@ namespace DeadWalls
             var mobileConfig = mobileMode
                 ? _entityManager.GetComponentData<MobileCastleCombatConfig>(mobileConfigEntity)
                 : default;
+            bool continuousSiege = mobileMode && mobileConfig.ContinuousSiegeEnabled;
 
             // Tum zombileri sil
             var zombieQuery = _entityManager.CreateEntityQuery(typeof(ZombieTag));
@@ -1808,7 +1890,11 @@ namespace DeadWalls
 
             if (mobileMode)
             {
-                var archerQuery = _entityManager.CreateEntityQuery(typeof(ArcherUnit));
+                var archerQuery = _entityManager.CreateEntityQuery(new EntityQueryDesc
+                {
+                    All = new ComponentType[] { typeof(ArcherUnit) },
+                    None = new ComponentType[] { typeof(Prefab) }
+                });
                 _entityManager.DestroyEntity(archerQuery);
 
                 var workerQuery = _entityManager.CreateEntityQuery(new EntityQueryDesc
@@ -1894,6 +1980,24 @@ namespace DeadWalls
                 _entityManager.SetComponentData(mobileConfigEntity, economyEvent);
                 EconomyEvent = economyEvent;
             }
+            if (mobileMode && _entityManager.HasComponent<ContinuousSiegeCycleData>(mobileConfigEntity))
+            {
+                var cycle = _entityManager.GetComponentData<ContinuousSiegeCycleData>(mobileConfigEntity);
+                cycle.Enabled = mobileConfig.ContinuousSiegeEnabled;
+                cycle.CycleTimer = 0f;
+                cycle.CycleDuration = Mathf.Max(1f, mobileConfig.SiegeCycleDuration);
+                cycle.DayDuration = Mathf.Max(0.1f, mobileConfig.SiegeDayDuration);
+                cycle.DuskDuration = Mathf.Max(0.1f, mobileConfig.SiegeDuskDuration);
+                cycle.NightDuration = Mathf.Max(0.1f, mobileConfig.SiegeNightDuration);
+                cycle.CycleProgress01 = 0f;
+                cycle.PhaseProgress01 = 0f;
+                cycle.SpawnIntensityMultiplier = Mathf.Max(0.01f, mobileConfig.SiegeDayIntensityMultiplier);
+                cycle.HordePressure01 = 0f;
+                cycle.CycleIndex = 0;
+                cycle.Phase = SiegeCyclePhase.Day;
+                _entityManager.SetComponentData(mobileConfigEntity, cycle);
+                ContinuousSiegeCycle = cycle;
+            }
 
             // Game state resetle
             _entityManager.SetComponentData(_gameStateEntity, new GameStateData
@@ -1907,19 +2011,19 @@ namespace DeadWalls
 
             _entityManager.SetComponentData(_gameStateEntity, new WaveStateData
             {
-                CurrentWave = mobileMode ? 0 : 1,
-                ZombiesToSpawn = mobileMode ? 0 : 500,
+                CurrentWave = continuousSiege ? 1 : mobileMode ? 0 : 1,
+                ZombiesToSpawn = continuousSiege ? mobileConfig.BaseWaveEnemyCount : mobileMode ? 0 : 500,
                 ZombiesSpawned = 0,
                 ZombiesAlive = 0,
                 SpawnTimer = 0f,
-                SpawnInterval = mobileMode ? 0.8f : 0.05f,
+                SpawnInterval = mobileMode ? mobileConfig.BaseSpawnInterval : 0.05f,
                 ZombieHP = 20f,
                 ZombieDamage = 5f,
                 ZombieSpeed = mobileMode ? mobileConfig.BaseZombieSpeed : 1.5f,
-                WaveActive = !mobileMode,
-                Phase = mobileMode ? RunPhaseType.DayPrep : RunPhaseType.NightCombat,
-                PrepTimer = mobileMode ? math.max(0f, mobileConfig.InitialDayPrepDuration) : 0f,
-                PrepDuration = mobileMode ? math.max(0f, mobileConfig.InitialDayPrepDuration) : 0f,
+                WaveActive = continuousSiege || !mobileMode,
+                Phase = mobileMode && !continuousSiege ? RunPhaseType.DayPrep : RunPhaseType.NightCombat,
+                PrepTimer = mobileMode && !continuousSiege ? math.max(0f, mobileConfig.InitialDayPrepDuration) : 0f,
+                PrepDuration = mobileMode && !continuousSiege ? math.max(0f, mobileConfig.InitialDayPrepDuration) : 0f,
                 WaveStartDelay = mobileMode ? 0f : 3f,
                 WaveStartTimer = mobileMode ? 0f : 3f,
                 StressTestMode = false
@@ -1928,10 +2032,10 @@ namespace DeadWalls
             // Kaynak resetle
             _entityManager.SetComponentData(_gameStateEntity, new ResourceData
             {
-                Wood = mobileMode ? 150 : 100,
-                Stone = mobileMode ? 80 : 50,
-                Iron = mobileMode ? 45 : 20,
-                Food = mobileMode ? 150 : 100
+                Wood = mobileMode ? 120 : 100,
+                Stone = mobileMode ? 60 : 50,
+                Iron = mobileMode ? 35 : 20,
+                Food = mobileMode ? 90 : 100
             });
 
             _entityManager.SetComponentData(_gameStateEntity, new ResourceProductionRate
@@ -2002,8 +2106,14 @@ namespace DeadWalls
                 _entityManager.SetComponentData(_castleEntity, upgrade);
             }
 
-            if (mobileMode && SpawnArcher(ArcherType.Basic))
-                ConsumePopulationForNewArcher();
+            if (mobileMode)
+            {
+                for (int i = 0; i < MobileInitialBasicArchers; i++)
+                {
+                    if (SpawnArcher(ArcherType.Basic))
+                        ConsumePopulationForNewArcher();
+                }
+            }
 
             if (mobileMode)
                 SyncWorkerVisualsToAllocation();

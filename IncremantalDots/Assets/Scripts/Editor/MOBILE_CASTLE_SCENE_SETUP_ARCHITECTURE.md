@@ -26,7 +26,7 @@ Tool ayni isimli root ve child objeleri yeniden kullanir. Tekrar calistirildigin
 
 World visual tilemap'leri owner tarafindan yonetilir. Tool `Grid/outside` tilemapini bulursa sadece `MobileCastleArcherTilePlacement` controller'ina baglar; tile icerigine dokunmaz. Kale occlusion icin renderer sorting ve z-depth band'larini normalize eder: `inside` Wall/1/z0, `outside0` ve `outside` Wall/2/z0, `outside2` Wall/4/z-2.
 
-`Assets/Prefabs/UI/Generated/MobileCastleHudRoot.prefab` varsa `MobileCastleHudRoot` bu prefabdan instancelanir. Prefab yoksa fallback HUD ayni runtime isimleriyle kurulur: economy text'leri, `WaveText`, `KillsText`, fallback `DefenseText`, `WaveRewardText`, `DamageFlashOverlay`, `ArcherDrawerPanel`, Basic/Rapid/Frost row alanlari, tech unlock butonlari ve `RepairButton`. Castle Interior economy paneli icin fallback polish UI uretilmez; owner onayli UI Importer export'u beklenir.
+`Assets/Prefabs/UI/Generated/MobileCastleHudRoot.prefab` varsa `MobileCastleHudRoot` bu prefabdan instancelanir. Prefab yoksa fallback HUD ayni runtime isimleriyle kurulur: economy text'leri, fallback `WaveText`, fallback `KillsText`, fallback `DefenseText`, `WaveRewardText`, `DamageFlashOverlay`, `ArcherDrawerPanel`, Basic/Rapid/Frost row alanlari, tech unlock butonlari ve `RepairButton`. Onayli prefabda `CyclePanel` varsa fallback `WaveText/KillsText` uretilmez ve varsa kapatilir. Castle Interior economy paneli icin fallback polish UI uretilmez; owner onayli UI Importer export'u beklenir.
 
 Onayli polish prefab gelirse tool `CastleDefensePanel` altindaki `DefensePercentText`, `DefenseWallFill`, `DefenseGateFill`, `DefenseCoreFill`, `DefenseWallText`, `DefenseGateText`, `DefenseCoreText` ve opsiyonel `DefenseDamageGlow` alanlarini baglar. Fill image'lari setup sirasinda horizontal left fill moduna alinir.
 
@@ -38,7 +38,7 @@ DOTS authoring objeleri SubScene icinde tutulur. `GameStateAuthoring`, `WaveConf
 
 `BasicArcher_01` legacy/seed authoring objesi olarak kalabilir; runtime mobile ilk acilista mevcut okculari `Grid/outside` tilemap spawn hucrelerine yeniden yerlestirir. Sonraki okcular da ayni tilemap hucre listesini kullanir.
 
-Tool mobile combat degerlerini de normalize eder: zombi scale/speed eski prefab degerlerinden ayrilir, wave director tuning, kill/wave reward tuning, worker economy tuning, economy event tuning, day/night prep tuning, unlimited arrow flag'i ve stress test batch/interval/cap degerleri `MobileCastleCombatAuthoring` uzerinden tutulur. LevelUpPanel legacy olarak durabilir, fakat mobile loop'ta kullanilmaz.
+Tool mobile combat degerlerini de normalize eder: zombi scale/speed eski prefab degerlerinden ayrilir, continuous siege cycle tuning, legacy wave director tuning, kill/wave reward tuning, worker economy tuning, economy event tuning, unlimited arrow flag'i ve stress test batch/interval/cap degerleri `MobileCastleCombatAuthoring` uzerinden tutulur. LevelUpPanel legacy olarak durabilir, fakat mobile loop'ta kullanilmaz.
 
 World visual foundation main scene MonoBehaviour/Tilemap tarafinda ve owner kontrolundedir. Gorsel kale `(0,0)` gameplay center ile hizalanir. `inside/outside/outside2` tilemap'leri gorsel katmandir; yalniz `outside` tilemap'indeki dolu hucreler okcu spawn kaynagi olarak okunur. `outside2` front-wall/occluder katmanidir ve okculardan onde cizilmek icin z `-2` bandinda tutulur. Bir tilemap hem ust yurume yuzeyi hem on duvar yuzu icerirse partial occlusion beklenmez; front-wall pikselleri ayri ondeki tilemapte tutulmalidir.
 
@@ -46,7 +46,7 @@ Readability polish icin `MobileCastleArcherTilePlacement` Scene view'da `outside
 
 Wave/run loop icin drawer oyun akisi controller'i degil, yalnizca gorsel ve referans root'udur. Davranis `MarketUI`, `UIManager`, `GameManager` ve ECS `DayNightPrepSystem` tarafindan uygulanir. UI Importer JSON'u runtime event barindirmaz. Yeni UI ihtiyaci dogarsa implementer final JSON uretmez; owner'a ayri Codex tabinda mockup/preview icin prompt verilir.
 
-Castle Yard prep aksiyonlari sag drawer'da player-facing degildir. Tool `RepairButton`, `FortifyButton`, `RallyButton`, `RefillArrowsButton` ve `StartNextWaveButton` bulursa gizler; sag drawer archer buy/upgrade ve tech unlock icin kullanilir. Repair aksiyonu `CastleRepairButton` ile Castle Interior paneline tasinmistir ve sadece `DayPrep` sirasinda aktif olur.
+Castle Yard prep aksiyonlari sag drawer'da player-facing degildir. Tool `RepairButton`, `FortifyButton`, `RallyButton`, `RefillArrowsButton` ve `StartNextWaveButton` bulursa gizler; sag drawer archer buy/upgrade ve tech unlock icin kullanilir. `CastleRepairButton` legacy Castle Interior akisi icin bagli kalabilir, fakat continuous siege varsayilaninda Castle Interior player-facing kapali tutulur.
 
 `DayNightOverlay` Canvas'in ilk child'i olarak kurulur. Full-screen siyah Image sadece world'u karartir; `MobileCastleHudRoot` sonradan geldigi icin HUD/drawer overlay'in ustunde kalir. Overlay alpha runtime'da `DayNightOverlayController` tarafindan mobile config'teki day/night alpha ve `WaveStateData.PrepTimer` degerlerine gore guncellenir.
 
@@ -54,8 +54,8 @@ Castle Yard prep aksiyonlari sag drawer'da player-facing degildir. Tool `RepairB
 
 Mobile HUD economy varsayilanlari NewGameScene setup tarafindan GameStateAuthoring'e yazilir:
 
-- Wood `150`, Stone `80`, Iron `45`, Food `150`, Population `60`, Arrows `200`
+- Wood `120`, Stone `60`, Iron `35`, Food `90`, Population `24`, Arrows `200`
 - Initial workers: Wood `20`, Stone `10`, Iron `8`, Food `15`
 - Worker production: Wood `4.5/min`, Stone `3/min`, Iron `2/min`, Food `4/min`
 
-Economy focus UI mobile worker economy ile kullanilmaz. Tool eski `EconomyFocusText` ve `EconomyBalanced/Wood/Stone/Iron/FoodButton` objelerini gizler. `CastleEconomyUI` isim tabanli olarak `CastleEconomyPanel`, `CastleTapHint`, worker slider/text alanlari, `WorkerBudgetText`, projected gain text'leri, `CastleRepairButton`, event secim butonlari ve `EconomyEventBadge` alanlarini baglar. Hint/badge feedback objelerinin raycast target'lari kapatilir; kaleye tiklamayi bloklamazlar. Runtime davranis UI JSON icine gomulmez.
+Economy focus UI mobile worker economy ile kullanilmaz. Tool eski `EconomyFocusText` ve `EconomyBalanced/Wood/Stone/Iron/FoodButton` objelerini gizler. Yeni player-facing worker kontrolu `WorkerEconomyDrawerUI` uzerinden sol ust resource bar altindaki drawer ile yapilir. `CastleEconomyUI` legacy full-screen panel olarak bagli kalabilir ama `PlayerFacingPanelEnabled = false` ile kapali tutulur. Runtime davranis UI JSON icine gomulmez.

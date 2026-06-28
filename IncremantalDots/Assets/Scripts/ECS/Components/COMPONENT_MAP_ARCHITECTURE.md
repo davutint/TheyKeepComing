@@ -38,12 +38,13 @@ Tum component'lar unmanaged ECS struct olarak tutulur. Davranis sistemlerde, ver
 ## GameStateComponents.cs
 
 - `GameStateData`: XP, level, level-up pending ve game-over state.
-- `RunPhaseType`: mobile run phase enum'u. `DayPrep` hazirlik sayaci, `NightCombat` aktif gece wave'idir.
-- `WaveStateData`: dalga durumu, spawn timer, zombi sayilari ve wave stat'leri. `Phase`, `PrepTimer` ve `PrepDuration` mobile day/night prep loop'unu tutar. `WaveActive` uyum flag'i olarak aktif combat'i gosterir; `StressTestMode` bu prep akisini atlar.
+- `RunPhaseType`: legacy mobile run phase enum'u. Continuous siege aktifken uyumluluk icin `NightCombat` tutulur.
+- `WaveStateData`: dalga/spawn durumu, spawn timer, zombi sayilari ve wave stat'leri. Continuous siege aktifken `WaveActive` true kalir; `StressTestMode` normal mobile akislarini atlar.
 
 ## MobileCastleCombatComponents.cs
 
-- `MobileCastleCombatConfig`: `NewGameScene` mobile castle mode singleton'i. Kale merkezi, spawn radius, attack radius, mobile wave sayilari, spawn batch, zombie scale/speed, wave director tuning, reward/focus tuning, day/night prep tuning, unlimited arrow flag'i ve stress test limitlerini tutar.
+- `MobileCastleCombatConfig`: `NewGameScene` mobile castle mode singleton'i. Kale merkezi, spawn radius, attack radius, mobile wave/siege sayilari, spawn batch, zombie scale/speed, continuous siege tuning, reward/focus tuning, legacy day/night prep tuning, unlimited arrow flag'i ve stress test limitlerini tutar.
+- `ContinuousSiegeCycleData`: player-facing `DAY / DUSK / NIGHT` fazini, 60s cycle progress'ini, horde pressure ve spawn intensity degerlerini tutar.
 - `EconomyFocusState`: aktif mobile ekonomi focus'unu tutar. `Balanced` default'tur; Wood/Stone/Iron/Food secimleri passive income, kill reward ve wave clear bonus'u yonlendirir.
 - `WaveClearRewardData`: son wave clear bonusunu HUD feedback'i icin saklar.
 - `CastleYardPrepState`: `Fortify` ve `Rally` tek-gecelik prep buff state'ini tutar.
@@ -66,9 +67,10 @@ Tum component'lar unmanaged ECS struct olarak tutulur. Davranis sistemlerde, ver
 ## Mobile Castle Mode Akisi
 
 ```
-MobileCastleCombatAuthoring -> MobileCastleCombatConfig + EconomyFocusState + WaveClearRewardData + CastleYardPrepState + ArcherSlotPosition buffer bake eder
-DayNightPrepSystem -> DayPrep sayacini azaltir ve bitince NightCombat wave'ini baslatir
-WaveSpawnSystem -> Config varsa kale etrafindaki random 360 spawn cemberini ve opening/mid/final spawn ritmini kullanir
+MobileCastleCombatAuthoring -> MobileCastleCombatConfig + ContinuousSiegeCycleData + EconomyFocusState + WaveClearRewardData + CastleYardPrepState + ArcherSlotPosition buffer bake eder
+ContinuousSiegeCycleSystem -> 60s DAY/DUSK/NIGHT cycle, horde pressure ve spawn intensity yazar
+DayNightPrepSystem -> Continuous siege kapaliysa legacy DayPrep sayacini azaltir
+WaveSpawnSystem -> Config varsa kale etrafindaki random 360 spawn cemberini ve continuous intensity ritmini kullanir
 ApplyMovementForceSystem -> Config varsa zombiyi CastleCenter'a yonlendirir, ZombieSlow varsa hiz carpanini uygular
 BoundarySystem -> Config varsa AttackRadius icinde Attacking state'e gecirir
 GameManager.BuyArcher(type) -> main scene `Grid/outside` tilemap hucrelerine okcu spawn eder

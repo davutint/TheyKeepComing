@@ -60,6 +60,16 @@ namespace DeadWalls
             if (gameState.IsGameOver || gameState.IsLevelUpPending)
                 return;
 
+            if (mobileMode && SystemAPI.HasSingleton<ContinuousSiegeCycleData>())
+            {
+                var cycle = SystemAPI.GetSingleton<ContinuousSiegeCycleData>();
+                if (cycle.Enabled)
+                {
+                    HandleContinuousSiegeSpawn(ref state, ref waveState.ValueRW, mobileConfig, cycle, dt);
+                    return;
+                }
+            }
+
             if (!waveState.ValueRO.WaveActive)
                 return;
 
@@ -200,6 +210,27 @@ namespace DeadWalls
 
             ecb.Playback(state.EntityManager);
             ecb.Dispose();
+        }
+
+        private void HandleContinuousSiegeSpawn(ref SystemState state, ref WaveStateData wave,
+            MobileCastleCombatConfig mobileConfig, ContinuousSiegeCycleData cycle, float dt)
+        {
+            wave.WaveActive = true;
+            wave.Phase = RunPhaseType.NightCombat;
+            wave.PrepTimer = 0f;
+            wave.PrepDuration = 0f;
+            wave.WaveStartTimer = 0f;
+
+            wave.SpawnTimer -= dt;
+            if (wave.SpawnTimer > 0f)
+                return;
+
+            float intensity = math.max(0.01f, cycle.SpawnIntensityMultiplier);
+            float baseInterval = wave.SpawnInterval > 0f ? wave.SpawnInterval : mobileConfig.BaseSpawnInterval;
+            wave.SpawnTimer = math.max(mobileConfig.MinSpawnInterval, baseInterval / intensity);
+
+            int batchSize = math.max(1, (int)math.round(math.max(1, mobileConfig.SpawnBatchSize) * intensity));
+            SpawnZombieBatch(ref state, ref wave, batchSize, true, mobileConfig);
         }
 
         private static WaveClearRewardData CalculateWaveClearBonus(

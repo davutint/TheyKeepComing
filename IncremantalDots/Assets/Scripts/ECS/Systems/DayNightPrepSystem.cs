@@ -22,6 +22,12 @@ namespace DeadWalls
         {
             var gameState = SystemAPI.GetSingleton<GameStateData>();
             var waveState = SystemAPI.GetSingletonRW<WaveStateData>();
+            if (SystemAPI.HasSingleton<ContinuousSiegeCycleData>()
+                && SystemAPI.GetSingleton<ContinuousSiegeCycleData>().Enabled)
+            {
+                return;
+            }
+
             if (gameState.IsGameOver || gameState.IsLevelUpPending || waveState.ValueRO.StressTestMode)
                 return;
 

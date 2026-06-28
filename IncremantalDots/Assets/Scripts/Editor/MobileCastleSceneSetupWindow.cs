@@ -211,18 +211,18 @@ namespace DeadWalls
             gameStateAuthoring.SpawnInterval = 0.8f;
             gameStateAuthoring.WaveStartDelay = 3f;
             gameStateAuthoring.BaseZombieSpeed = 0.85f;
-            gameStateAuthoring.InitialWood = 150;
-            gameStateAuthoring.InitialStone = 80;
-            gameStateAuthoring.InitialIron = 45;
-            gameStateAuthoring.InitialFood = 150;
+            gameStateAuthoring.InitialWood = 120;
+            gameStateAuthoring.InitialStone = 60;
+            gameStateAuthoring.InitialIron = 35;
+            gameStateAuthoring.InitialFood = 90;
             gameStateAuthoring.TestWoodProdRate = 90f;
             gameStateAuthoring.TestStoneProdRate = 30f;
             gameStateAuthoring.TestIronProdRate = 16f;
             gameStateAuthoring.TestFoodProdRate = 60f;
-            gameStateAuthoring.InitialPopulation = 60;
+            gameStateAuthoring.InitialPopulation = 24;
             gameStateAuthoring.InitialCapacity = 999999;
-            gameStateAuthoring.TestWorkers = 53;
-            gameStateAuthoring.TestArchers = 1;
+            gameStateAuthoring.TestWorkers = 16;
+            gameStateAuthoring.TestArchers = 4;
             gameStateAuthoring.FoodPerAssignedPerMin = 0.25f;
             gameStateAuthoring.InitialArrows = 200;
 
@@ -283,6 +283,15 @@ namespace DeadWalls
             mobileAuthoring.DayOverlayAlpha = 0f;
             mobileAuthoring.NightOverlayAlpha = 0.50f;
             mobileAuthoring.UnlimitedArrows = true;
+            mobileAuthoring.ContinuousSiegeEnabled = true;
+            mobileAuthoring.SiegeCycleDuration = 60f;
+            mobileAuthoring.SiegeDayDuration = 25f;
+            mobileAuthoring.SiegeDuskDuration = 10f;
+            mobileAuthoring.SiegeNightDuration = 25f;
+            mobileAuthoring.SiegeDayIntensityMultiplier = 0.55f;
+            mobileAuthoring.SiegeDuskStartIntensityMultiplier = 1f;
+            mobileAuthoring.SiegeDuskEndIntensityMultiplier = 1.35f;
+            mobileAuthoring.SiegeNightIntensityMultiplier = 1.65f;
             mobileAuthoring.BaseSpawnInterval = 0.8f;
             mobileAuthoring.SpawnIntervalWaveMultiplier = 0.96f;
             mobileAuthoring.MinSpawnInterval = 0.35f;
@@ -293,10 +302,10 @@ namespace DeadWalls
             mobileAuthoring.OpeningBatchDelta = -1;
             mobileAuthoring.FinalBatchDelta = 1;
             mobileAuthoring.PopulationGrowthPerDayPrep = 15;
-            mobileAuthoring.InitialWoodWorkers = 20;
-            mobileAuthoring.InitialStoneWorkers = 10;
-            mobileAuthoring.InitialIronWorkers = 8;
-            mobileAuthoring.InitialFoodWorkers = 15;
+            mobileAuthoring.InitialWoodWorkers = 6;
+            mobileAuthoring.InitialStoneWorkers = 3;
+            mobileAuthoring.InitialIronWorkers = 2;
+            mobileAuthoring.InitialFoodWorkers = 5;
             mobileAuthoring.WoodWorkerProductionPerMin = 4.5f;
             mobileAuthoring.StoneWorkerProductionPerMin = 3f;
             mobileAuthoring.IronWorkerProductionPerMin = 2f;
@@ -1190,6 +1199,7 @@ namespace DeadWalls
             Stretch(hudRoot.GetComponent<RectTransform>());
 
             var hud = EnsureComponent<HUDController>(hudRoot);
+            bool hasCycleHud = FindChildByName(hudRoot, "CyclePanel") != null;
             hud.WoodText = FindOrCreateText(hudRoot.transform, "WoodText", "Wood: 150", 22,
                 TextAlignmentOptions.Left, new Vector2(0f, 1f), new Vector2(0f, 1f),
                 new Vector2(24f, -42f), new Vector2(210f, -10f));
@@ -1208,12 +1218,16 @@ namespace DeadWalls
             hud.ArrowText = FindOrCreateText(hudRoot.transform, "ArrowText", "Arrows: 200", 22,
                 TextAlignmentOptions.Left, new Vector2(0f, 1f), new Vector2(0f, 1f),
                 new Vector2(1024f, -42f), new Vector2(1210f, -10f));
-            hud.WaveText = FindOrCreateText(hudRoot.transform, "WaveText", "WAVE 01", 34,
-                TextAlignmentOptions.Center, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
-                new Vector2(-170f, -56f), new Vector2(170f, -8f));
-            hud.KillsText = FindOrCreateText(hudRoot.transform, "KillsText", "KILLS 0 / 30", 24,
-                TextAlignmentOptions.Center, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
-                new Vector2(-180f, -92f), new Vector2(180f, -58f));
+            hud.WaveText = hasCycleHud
+                ? FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "WaveText")
+                : FindOrCreateText(hudRoot.transform, "WaveText", "WAVE 01", 34,
+                    TextAlignmentOptions.Center, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
+                    new Vector2(-170f, -56f), new Vector2(170f, -8f));
+            hud.KillsText = hasCycleHud
+                ? FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "KillsText")
+                : FindOrCreateText(hudRoot.transform, "KillsText", "KILLS 0 / 30", 24,
+                    TextAlignmentOptions.Center, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
+                    new Vector2(-180f, -92f), new Vector2(180f, -58f));
             hud.DefenseText = FindOrCreateText(hudRoot.transform, "DefenseText", "DEF 100%", 20,
                 TextAlignmentOptions.Center, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
                 new Vector2(190f, -92f), new Vector2(360f, -58f));
@@ -1222,11 +1236,18 @@ namespace DeadWalls
                 new Vector2(-250f, -132f), new Vector2(250f, -98f));
             hud.WaveRewardText.gameObject.SetActive(false);
             BindDefenseHudFields(hudRoot, hud);
+            BindContinuousSiegeHudFields(hudRoot, hud);
+            if (hasCycleHud)
+            {
+                SetOptionalChildActive(hudRoot, "WaveText", false);
+                SetOptionalChildActive(hudRoot, "KillsText", false);
+            }
             hud.DamageFlashImage = EnsureDamageFlashOverlay(hudRoot.transform);
             DestroyChildIfExists(hudRoot.transform, "ArcherTypeText");
             hud.ArcherTypeText = null;
             HideEconomyFocus(hudRoot);
             ConfigureCastleEconomy(hudRoot);
+            ConfigureWorkerEconomyDrawer(hudRoot);
 
             var market = EnsureComponent<MarketUI>(hudRoot);
             market.ArcherDrawerPanel = FindRectTransformByName(hudRoot, "ArcherDrawerPanel")
@@ -1264,6 +1285,38 @@ namespace DeadWalls
                 hud.DefenseText.gameObject.SetActive(false);
         }
 
+        private static void BindContinuousSiegeHudFields(GameObject hudRoot, HUDController hud)
+        {
+            hud.CyclePanel = FindChildByName(hudRoot, "CyclePanel");
+            hud.CyclePhaseText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "CyclePhaseText");
+            hud.CycleDayLabelText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "CycleDayLabelText");
+            hud.CycleDuskLabelText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "CycleDuskLabelText");
+            hud.CycleNightLabelText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "CycleNightLabelText");
+            hud.CycleProgressFill = FindComponentInChildrenByName<Image>(hudRoot, "CycleProgressFill");
+            hud.CycleProgressMarker = FindRectTransformByName(hudRoot, "CycleProgressMarker");
+
+            hud.HordePressurePanel = FindChildByName(hudRoot, "HordePressurePanel");
+            hud.HordePressureTitleText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "HordePressureTitleText");
+            hud.HordePressureFill = FindComponentInChildrenByName<Image>(hudRoot, "HordePressureFill");
+            hud.HordePressureText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "HordePressureText");
+            hud.HordePressureLevelText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "HordePressureLevelText");
+
+            ConfigureCycleProgressLayout(hud.CycleProgressFill, hud.CycleProgressMarker);
+            if (hud.HordePressurePanel != null)
+                hud.HordePressurePanel.SetActive(false);
+
+            if (hud.CyclePhaseText != null)
+                hud.CyclePhaseText.text = "DAY";
+            if (hud.CycleDayLabelText != null)
+                hud.CycleDayLabelText.text = "DAY";
+            if (hud.CycleDuskLabelText != null)
+                hud.CycleDuskLabelText.text = "DUSK";
+            if (hud.CycleNightLabelText != null)
+                hud.CycleNightLabelText.text = "NIGHT";
+            if (hud.HordePressureTitleText != null)
+                hud.HordePressureTitleText.text = "HORDE PRESSURE";
+        }
+
         private static void ConfigureDefenseFillImage(Image image)
         {
             if (image == null)
@@ -1273,6 +1326,28 @@ namespace DeadWalls
             image.fillMethod = Image.FillMethod.Horizontal;
             image.fillOrigin = (int)Image.OriginHorizontal.Left;
             image.fillAmount = 1f;
+        }
+
+        private static void ConfigureCycleProgressLayout(Image fill, RectTransform marker)
+        {
+            if (fill != null)
+            {
+                fill.type = Image.Type.Simple;
+                RectTransform fillRect = fill.rectTransform;
+                fillRect.anchorMin = new Vector2(0f, 0.5f);
+                fillRect.anchorMax = new Vector2(0f, 0.5f);
+                fillRect.pivot = new Vector2(0f, 0.5f);
+                fillRect.anchoredPosition = new Vector2(0f, fillRect.anchoredPosition.y);
+                fillRect.sizeDelta = new Vector2(0f, fillRect.sizeDelta.y);
+            }
+
+            if (marker == null)
+                return;
+
+            marker.anchorMin = new Vector2(0f, 0.5f);
+            marker.anchorMax = new Vector2(0f, 0.5f);
+            marker.pivot = new Vector2(0.5f, 0.5f);
+            marker.anchoredPosition = new Vector2(0f, marker.anchoredPosition.y);
         }
 
         private static void EnsureDayNightOverlay(Transform canvasTransform)
@@ -1322,6 +1397,7 @@ namespace DeadWalls
         private static void ConfigureCastleEconomy(GameObject hudRoot)
         {
             var castleEconomy = EnsureComponent<CastleEconomyUI>(hudRoot);
+            castleEconomy.PlayerFacingPanelEnabled = false;
             castleEconomy.CastleEconomyPanel = FindChildByName(hudRoot, "CastleEconomyPanel");
             castleEconomy.CloseCastleEconomyButton = FindComponentInChildrenByName<Button>(hudRoot, "CloseCastleEconomyButton");
             castleEconomy.ConfirmCastleEconomyButton = FindComponentInChildrenByName<Button>(hudRoot, "ConfirmCastleEconomyButton");
@@ -1387,6 +1463,44 @@ namespace DeadWalls
                 castleEconomy.EconomyEventBadge.SetActive(false);
             if (castleEconomy.EconomyEventGlow != null)
                 castleEconomy.EconomyEventGlow.SetActive(false);
+        }
+
+        private static void ConfigureWorkerEconomyDrawer(GameObject hudRoot)
+        {
+            var workerDrawer = EnsureComponent<WorkerEconomyDrawerUI>(hudRoot);
+            workerDrawer.WorkerDrawerToggleButton = FindComponentInChildrenByName<Button>(hudRoot, "WorkerDrawerToggleButton");
+            workerDrawer.WorkerEconomyDrawerPanel = FindChildByName(hudRoot, "WorkerEconomyDrawerPanel");
+            workerDrawer.WorkerDrawerTitleText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "WorkerDrawerTitleText");
+            workerDrawer.WorkerIdlePopulationText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "WorkerIdlePopulationText");
+            workerDrawer.WorkerTotalText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "WorkerTotalText");
+            workerDrawer.WorkerArcherPopulationText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "WorkerArcherPopulationText");
+
+            workerDrawer.WoodWorkerCountText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "WoodWorkerCountText");
+            workerDrawer.WoodWorkerRateText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "WoodWorkerRateText");
+            workerDrawer.WoodWorkerAddButton = FindComponentInChildrenByName<Button>(hudRoot, "WoodWorkerAddButton");
+            workerDrawer.WoodWorkerStatusText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "WoodWorkerStatusText");
+
+            workerDrawer.StoneWorkerCountText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "StoneWorkerCountText");
+            workerDrawer.StoneWorkerRateText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "StoneWorkerRateText");
+            workerDrawer.StoneWorkerAddButton = FindComponentInChildrenByName<Button>(hudRoot, "StoneWorkerAddButton");
+            workerDrawer.StoneWorkerStatusText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "StoneWorkerStatusText");
+
+            workerDrawer.IronWorkerCountText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "IronWorkerCountText");
+            workerDrawer.IronWorkerRateText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "IronWorkerRateText");
+            workerDrawer.IronWorkerAddButton = FindComponentInChildrenByName<Button>(hudRoot, "IronWorkerAddButton");
+            workerDrawer.IronWorkerStatusText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "IronWorkerStatusText");
+
+            workerDrawer.FoodWorkerCountText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "FoodWorkerCountText");
+            workerDrawer.FoodWorkerRateText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "FoodWorkerRateText");
+            workerDrawer.FoodWorkerAddButton = FindComponentInChildrenByName<Button>(hudRoot, "FoodWorkerAddButton");
+            workerDrawer.FoodWorkerStatusText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "FoodWorkerStatusText");
+
+            if (workerDrawer.WorkerDrawerToggleButton != null)
+                workerDrawer.WorkerDrawerToggleButton.gameObject.SetActive(true);
+            if (workerDrawer.WorkerEconomyDrawerPanel != null)
+                workerDrawer.WorkerEconomyDrawerPanel.SetActive(false);
+
+            EditorUtility.SetDirty(workerDrawer);
         }
 
         private static void SetOptionalChildActive(GameObject root, string name, bool active)

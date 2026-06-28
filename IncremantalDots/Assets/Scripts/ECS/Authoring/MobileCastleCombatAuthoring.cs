@@ -49,6 +49,17 @@ namespace DeadWalls
         [Range(0f, 1f)] public float NightOverlayAlpha = 0.50f;
         public bool UnlimitedArrows = true;
 
+        [Header("Continuous Siege Cycle")]
+        public bool ContinuousSiegeEnabled = true;
+        public float SiegeCycleDuration = 60f;
+        public float SiegeDayDuration = 25f;
+        public float SiegeDuskDuration = 10f;
+        public float SiegeNightDuration = 25f;
+        public float SiegeDayIntensityMultiplier = 0.55f;
+        public float SiegeDuskStartIntensityMultiplier = 1.00f;
+        public float SiegeDuskEndIntensityMultiplier = 1.35f;
+        public float SiegeNightIntensityMultiplier = 1.65f;
+
         [Header("Wave Director")]
         public float BaseSpawnInterval = 0.8f;
         public float SpawnIntervalWaveMultiplier = 0.96f;
@@ -62,10 +73,10 @@ namespace DeadWalls
 
         [Header("Population Economy")]
         public int PopulationGrowthPerDayPrep = 15;
-        public int InitialWoodWorkers = 20;
-        public int InitialStoneWorkers = 10;
-        public int InitialIronWorkers = 8;
-        public int InitialFoodWorkers = 15;
+        public int InitialWoodWorkers = 6;
+        public int InitialStoneWorkers = 3;
+        public int InitialIronWorkers = 2;
+        public int InitialFoodWorkers = 5;
         public float WoodWorkerProductionPerMin = 4.5f;
         public float StoneWorkerProductionPerMin = 3.0f;
         public float IronWorkerProductionPerMin = 2.0f;
@@ -128,6 +139,15 @@ namespace DeadWalls
                     DayOverlayAlpha = math.clamp(authoring.DayOverlayAlpha, 0f, 1f),
                     NightOverlayAlpha = math.clamp(authoring.NightOverlayAlpha, 0f, 1f),
                     UnlimitedArrows = authoring.UnlimitedArrows,
+                    ContinuousSiegeEnabled = authoring.ContinuousSiegeEnabled,
+                    SiegeCycleDuration = math.max(1f, authoring.SiegeCycleDuration),
+                    SiegeDayDuration = math.max(0.1f, authoring.SiegeDayDuration),
+                    SiegeDuskDuration = math.max(0.1f, authoring.SiegeDuskDuration),
+                    SiegeNightDuration = math.max(0.1f, authoring.SiegeNightDuration),
+                    SiegeDayIntensityMultiplier = math.max(0.01f, authoring.SiegeDayIntensityMultiplier),
+                    SiegeDuskStartIntensityMultiplier = math.max(0.01f, authoring.SiegeDuskStartIntensityMultiplier),
+                    SiegeDuskEndIntensityMultiplier = math.max(0.01f, authoring.SiegeDuskEndIntensityMultiplier),
+                    SiegeNightIntensityMultiplier = math.max(0.01f, authoring.SiegeNightIntensityMultiplier),
                     BaseSpawnInterval = math.max(0.01f, authoring.BaseSpawnInterval),
                     SpawnIntervalWaveMultiplier = math.clamp(authoring.SpawnIntervalWaveMultiplier, 0.01f, 1f),
                     MinSpawnInterval = math.max(0.01f, authoring.MinSpawnInterval),
@@ -195,6 +215,22 @@ namespace DeadWalls
                     ProductionBonusMultiplier = 1f,
                     ProductionBonusExpiresAfterWave = 0,
                     RandomSeed = authoring.EconomyEventSeed == 0u ? 91273u : authoring.EconomyEventSeed
+                });
+
+                AddComponent(entity, new ContinuousSiegeCycleData
+                {
+                    Enabled = authoring.ContinuousSiegeEnabled,
+                    CycleTimer = 0f,
+                    CycleDuration = math.max(1f, authoring.SiegeCycleDuration),
+                    DayDuration = math.max(0.1f, authoring.SiegeDayDuration),
+                    DuskDuration = math.max(0.1f, authoring.SiegeDuskDuration),
+                    NightDuration = math.max(0.1f, authoring.SiegeNightDuration),
+                    CycleProgress01 = 0f,
+                    PhaseProgress01 = 0f,
+                    SpawnIntensityMultiplier = math.max(0.01f, authoring.SiegeDayIntensityMultiplier),
+                    HordePressure01 = 0f,
+                    CycleIndex = 0,
+                    Phase = SiegeCyclePhase.Day
                 });
 
                 var slots = AddBuffer<ArcherSlotPosition>(entity);

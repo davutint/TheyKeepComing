@@ -157,7 +157,7 @@ Ust HUD sunlari gosterir:
 - Population / idle population
 - Arrows V1 icin `INF`
 - Day/Dusk/Night state
-- Kill count / horde pressure
+- Kill count
 - Defense Wall/Gate/Core HP
 
 ---
@@ -227,7 +227,7 @@ Bu kart sistemi, mobile core loop icin legacy kabul edilir. Okcu alma ve upgrade
 
 Castle Interior Economy Area, ekonomiyi oyuncunun elinde ve gozunun onunde hissettiren alandir.
 
-Eski slider tabanli fullscreen Castle Economy paneli ekonomik karari temsil ediyordu; fakat yeterince "yasayan kale" hissi vermiyordu. Yeni hedefte resource assignment daha fiziksel ve gorseldir.
+Eski slider tabanli fullscreen Castle Economy paneli ekonomik karari temsil ediyordu; fakat yeterince "yasayan kale" hissi vermiyordu. Yeni hedefte resource assignment sol ust resource bar altindaki `WorkerEconomyDrawerPanel` uzerinden her an erisilebilir, sahnede ise fiziksel villager lojistigiyle okunur.
 
 Oyuncu kaynak butonuna bastiginda:
 
@@ -300,12 +300,35 @@ CastleInteriorEconomyArea
 
 V1 kurallari:
 
-- Her resource butonu bir worker assignment dener.
+- Sol ust Worker Drawer icindeki her resource `+ WORKER` butonu bir worker assignment dener.
+- Worker assignment DayPrep'e bagli degildir; continuous siege akisi icinde her zaman denenebilir.
 - Idle population yoksa assignment basarisiz olur.
 - Basarili assignment ilgili resource worker count'u +1 yapar.
 - Worker visual ilgili site pickup noktasi ile hub delivery noktasi arasinda loop yapar.
 - Worker production rate aninda guncellenir.
 - Worker geri cekme V1 icin zorunlu degildir; sonraki milestone'da dusunulebilir.
+
+### 4.4.1 Baslangic Defaultlari
+
+V1 baslangic ekonomisi:
+
+```text
+Population Total: 24
+Initial Workers: 16
+Initial Archers: 4
+Idle Population: 4
+
+Wood Workers: 6
+Food Workers: 5
+Stone Workers: 3
+Iron Workers: 2
+
+Wood: 120
+Food: 90
+Stone: 60
+Iron: 35
+Arrows: INF
+```
 
 ### 4.5 Worker Limitleri
 
@@ -679,17 +702,17 @@ Defense panel:
 Wave text yerine yeni dil:
 
 ```text
-DAY 07
-DUSK 07
-NIGHT 07
-DAWN 07
+DAY
+DUSK
+NIGHT
 ```
 
-Kills text:
+Cycle UI:
 
 ```text
-KILLS 128 / 300
-HORDE PRESSURE
+Top: current phase
+Bottom: DAY / DUSK / NIGHT labels
+Progress slider: 60s cycle position
 ```
 
 Eger kod icinde wave budget devam ediyorsa UI bunu "wave" olarak gostermek zorunda degildir.
@@ -854,8 +877,8 @@ Hedef:
 
 Kabul:
 
-- Wood butonuna basinca idle pop varsa Wood worker artar.
-- Wood site'ta yeni worker visual gorunur.
+- Worker Drawer'da Wood `+ WORKER` butonuna basinca idle pop varsa Wood worker artar.
+- Yeni DOTS villager Wood pickup noktasi ile CastleWorkerHub delivery noktasi arasinda hareket eder.
 - Wood/min artar.
 - Idle pop yoksa buton disabled veya `NEED POP`.
 - Ayni mantik Stone/Iron/Food icin calisir.

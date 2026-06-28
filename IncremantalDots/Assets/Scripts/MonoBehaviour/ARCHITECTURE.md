@@ -9,12 +9,12 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 ### GameManager.cs
 
 - Singleton pattern
-- Her frame ECS singleton'larini okur: `GameStateData`, `WaveStateData`, `CastleHP`, resource ve population verileri
+- Her frame ECS singleton'larini okur: `GameStateData`, `WaveStateData`, `ContinuousSiegeCycleData`, `CastleHP`, resource ve population verileri
 - Event'ler: `OnGameOver`, legacy `OnLevelUp`, `OnWaveChanged`, `OnGameStateChanged`
-- `OnWaveCompleted` ile wave cleared / market bekleme fazini UI katmanina bildirir
-- Mobile ilk play'de baked aktif wave state'ini `DayPrep` baslangicina normalize eder
-- `StartNextWave()` debug/public API olarak kalir; mobile player-facing akis otomatik day/night sayaciyla ilerler
-- `RepairDefenseFull()` day prep aksiyonudur; `BuyFortify()`, `BuyRally()` ve `RefillArrows()` legacy/debug API olarak kalir
+- `OnWaveCompleted` legacy wave cleared / market bekleme fazini UI katmanina bildirebilir; continuous siege varsayilaninda tetiklenmez
+- Mobile ilk play'de baked aktif wave state'ini legacy DayPrep baslangicina normalize edebilir; continuous siege system bir sonraki frame aktif cycle'a ceker
+- `StartNextWave()` debug/public API olarak kalir; mobile player-facing akis continuous day/dusk/night cycle ile ilerler
+- `RepairDefenseFull()`, `BuyFortify()`, `BuyRally()` ve `RefillArrows()` legacy/debug API olarak kalir
 - `GetDefensePercent()` wall/gate/castle toplam HP yuzdesini HUD'a verir
 - Mobile archer economy API'leri: unlock, buy, upgrade, cost ve type count/DPS okuma
 - Worker economy API'leri: `OpenCastleEconomy()`, `CloseCastleEconomy()`, `SetResourceWorkers()`, `ChooseEconomyEvent()`
@@ -29,16 +29,17 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 
 ### HUDController.cs
 
-- HP, XP, wave, level, zombie alive/max, resource, population ve arrow text'lerini gunceller
+- HP, XP, continuous cycle, zombie alive/max, resource, population ve arrow text'lerini gunceller
 - Mobile HUD'da resource text'leri label tekrar etmez; sadece kompakt value/rate yazar
 - Resource rate gosteriminde base production yerine effective production'i kullanir; mobile worker economy aktifken bu deger worker allocation'dan gelir
-- Wave state'ini `WAVE 01`, `WAVE 01 STARTING`, `WAVE 01 CLEARED` formatinda yazar
-- Mobile mode'da wave state'ini `DAY 01 - 12s` ve `NIGHT 01` formatinda yazar
-- Day prep sirasinda kills text'i `PREPARE DEFENSE`, night combat sirasinda `KILLS x / y` olur
+- `CyclePanel` varsa `CyclePhaseText` degerini sadece `DAY / DUSK / NIGHT` olarak yazar
+- `CycleProgressFill` ve `CycleProgressMarker` ile 60s cycle progress'ini gosterir
+- `HordePressurePanel` imported prefabda bulunsa bile player-facing olarak kapali tutulur
+- `CyclePanel` yoksa legacy wave fallback text'lerini kullanir
 - Mobile unlimited arrow modunda `ArrowText` degeri `INF` olur
 - Mobile HUD'da `CastleDefensePanel` varsa `DefenseWallFill`, `DefenseGateFill`, `DefenseCoreFill` ve yuzde text'leriyle gercek defense modulu guncellenir; eski `DefenseText` sadece fallback'tir
 - `WaveRewardText`, wave clear bonusunu kisa sure `Wave Cleared +...` olarak gosterir
-- Wave final baski fazinda wave/kills text'i sicak threat rengine gecer; savunma hasarinda `DamageFlashImage` kisa red flash verir
+- Night/high pressure baskisinda threat rengi kullanabilir; savunma hasarinda `DamageFlashImage` kisa red flash verir
 - Archer count bilgisi sag drawer row'larinda okunur; mobile setup eski `ArcherTypeText` placeholder'ini kullanmaz
 - Text alanlarini sadece deger degisince guncelleyerek gereksiz string allocation'i azaltir
 
@@ -70,14 +71,15 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - `GameManager.Free Economy Test Mode` acikken cost satirlari `FREE` gosterir; kaynak ve population yetersizligi player-facing aksiyonlari bloklamaz
 - Worker economy aktifken `Repair`, `Fortify` ve `Rally` player-facing drawer'da gizlenir; drawer archer progression paneli olarak kalir
 - Mobile unlimited arrow modunda `Arrow Refill` gizlenir
-- Mobile day/night loop'ta `Start Next Wave` player-facing UI'da gizlenir; otomatik sayac yeni wave'i baslatir
+- Mobile continuous siege loop'ta `Start Next Wave` player-facing UI'da gizlenir; oyun durmadan `DAY / DUSK / NIGHT` cycle'i akar
 - Runtime davranisi UI Importer JSON'una gomulmez; controller ve scene setup tool tarafinda baglanir
 
 ### DayNightOverlayController.cs
 
 - `Canvas/DayNightOverlay` full-screen black `Image` alpha degerini yonetir.
-- `DayPrep` sirasinda alpha'yi config'teki day/night degerleri arasinda sayac progress'ine gore artirir.
-- `NightCombat` sirasinda night alpha sabit kalir.
+- Continuous siege aktifken Day alpha acik kalir, Dusk boyunca day/night alpha arasinda kararir, Night alpha sabit kalir.
+- Legacy `DayPrep` sirasinda alpha'yi config'teki day/night degerleri arasinda sayac progress'ine gore artirir.
+- Legacy `NightCombat` sirasinda night alpha sabit kalir.
 - Stress veya non-mobile mode'da alpha `0` olur.
 
 ### EconomyFocusUI.cs
@@ -88,19 +90,23 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 
 ### CastleEconomyUI.cs
 
-- `CastleEconomyPanel` full-screen ekonomi panelini yonetir.
-- `CastleTapHint` DayPrep sirasinda gorunur; panel acikken, combat sirasinda ve stress mode'da gizlenir.
-- Panel acikken `GameManager.OpenCastleEconomy()` ile prep timer ve resource tick pause olur.
-- Worker slider'larini `GameManager.SetResourceWorkers()` API'sine baglar.
-- Population total, idle, archers, growth ve worker budget text'lerini gunceller.
-- Kalan DayPrep suresine gore `net/min * remaining prep / 60` projected resource gain text'lerini gunceller.
-- `CastleRepairButton` ile repair aksiyonunu panel icinde yonetir.
-- Pending economy event varsa 2 secenekli event alanini ve badge/glow feedback'ini gosterir.
+- Legacy full-screen ekonomi panelidir.
+- Mobile continuous worker drawer akisi aktifken `PlayerFacingPanelEnabled = false` kalir.
+- `CastleEconomyPanel` ve `CastleTapHint` player-facing ana ekonomi akisi degildir.
+- Slider/debug bindingleri korunabilir, fakat ana worker assignment UI'i `WorkerEconomyDrawerUI` tarafindadir.
+
+### WorkerEconomyDrawerUI.cs
+
+- Sol ust resource bar altindaki worker drawer'i yonetir.
+- `WorkerDrawerToggleButton` ile drawer panelini acip kapatir.
+- Idle pop, total worker, archer count ve resource worker rate alanlarini gunceller.
+- Wood/Stone/Iron/Food `+ WORKER` butonlarini `GameManager.AssignResourceWorker()` API'sine baglar.
+- DayPrep sartina bagli degildir; worker assignment her zaman denenebilir.
 
 ### CastleInteriorClickTarget.cs
 
 - Main scene'deki `CastleClickTarget` objesi uzerindedir.
-- Sadece mobile normal `DayPrep` sirasinda kale/world merkezi tiklamasini kabul eder.
+- Legacy Castle Interior panel akisi icindir; yeni player-facing worker yonetimi sol drawer'dadir.
 - Default click radius `2.0`; setup tool bunu gorsel kale footprint'ine gore normalize eder.
 - UI ustune tiklamalari ignore eder ve `CastleEconomyUI.OpenFromCastle()` cagirir.
 
@@ -122,8 +128,8 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 ECS Systems -> Entity Data -> GameManager.ReadECSData() -> Events -> UI Controllers
 UI Input -> GameManager.CanApplyUpgrade()/ApplyUpgrade() -> EntityManager.SetComponentData -> ECS
 Drawer Input -> GameManager.BuyArcher()/UpgradeArcherType()/UnlockArcherType() -> EntityManager.SetComponentData -> ECS
-Castle Click -> CastleEconomyUI.OpenFromCastle() -> MobilePrepPauseState
-Worker Assign Button -> GameManager.AssignResourceWorker() -> MobilePopulationAllocation -> DOTS VillagerWorker route visual sync -> MobilePopulationEconomySystem
+Worker Drawer Input -> GameManager.AssignResourceWorker() -> MobilePopulationAllocation -> DOTS VillagerWorker route visual sync -> MobilePopulationEconomySystem
+Legacy Castle Click -> CastleEconomyUI.OpenFromCastle() -> MobilePrepPauseState
 Legacy Worker Slider Input -> GameManager.SetResourceWorkers() -> MobilePopulationAllocation -> DOTS VillagerWorker visual sync
 Economy Event Input -> GameManager.ChooseEconomyEvent() -> Resources/Population/MobileEconomyEventState
 Castle Interior Repair -> GameManager.RepairDefenseFull() -> EntityManager.SetComponentData -> ECS
