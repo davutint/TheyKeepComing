@@ -114,7 +114,7 @@ namespace DeadWalls
 
             SetText(WorkerDrawerTitleText, "WORKERS");
             SetText(WorkerIdlePopulationText, $"IDLE {idle}");
-            SetText(WorkerTotalText, $"WORKERS {totalWorkers}");
+            SetText(WorkerTotalText, $"WORKERS {totalWorkers}/{gm.GetAvailablePopulation()}");
             SetText(WorkerArcherPopulationText, $"ARCHERS {population.Archers}");
 
             RefreshRow(gm, EconomyFocusType.Wood, "WOOD", WoodWorkerCountText, WoodWorkerRateText,
@@ -131,18 +131,21 @@ namespace DeadWalls
             TMP_Text countText, TMP_Text rateText, Button addButton, TMP_Text statusText)
         {
             int count = gm.GetResourceWorkers(resource);
+            int cap = gm.GetMaxWorkersForResource(resource);
             float rate = gm.GetWorkerProductionRate(resource);
             bool canAssign = gm.CanAssignResourceWorker(resource);
+            bool atCap = cap > 0 && count >= cap;
             bool hasIdle = gm.GetIdlePopulation() > 0 || gm.IsFreeEconomyTestMode;
+            string status = atCap ? "CAP FULL" : hasIdle ? "READY" : "NEED POP";
 
-            SetText(countText, $"{label} x{count}");
+            SetText(countText, cap > 0 ? $"{label} {count}/{cap}" : $"{label} x{count}");
             SetText(rateText, $"+{rate:0}/min");
-            SetText(statusText, hasIdle ? "READY" : "NEED POP");
+            SetText(statusText, status);
 
             if (addButton != null)
             {
                 addButton.interactable = canAssign;
-                SetButtonText(addButton, hasIdle ? "+ WORKER" : "NEED POP");
+                SetButtonText(addButton, atCap ? "CAP FULL" : hasIdle ? "+ WORKER" : "NEED POP");
             }
         }
 

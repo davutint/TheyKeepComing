@@ -61,8 +61,9 @@ Script eklendikten sonra disaridan manuel compile komutu calistirma. Unity refre
   - Initial Zombies To Spawn: `30`
   - Spawn Interval: `0.8`
   - Base Zombie Speed: `0.85`
-  - Initial Wood/Stone/Iron/Food: `150 / 80 / 45 / 150`
-  - Passive income Wood/Stone/Iron/Food per min: `90 / 50 / 30 / 75`
+  - Initial Wood/Stone/Iron/Food: `280 / 120 / 70 / 220`
+  - Initial Population: `60`
+  - Initial Workers/Archers: `53 / 4`
   - Initial Arrows: `200`
 - `WaveConfigAuthoring`
   - Zombie, Arrow ve Archer prefab referanslari dolu olmali.
@@ -76,7 +77,8 @@ Script eklendikten sonra disaridan manuel compile komutu calistirma. Unity refre
 - `MobileCastleHudRoot`
   - `HUDController`: economy text'leri, `WaveText`, `KillsText`, `WaveRewardText`, `DamageFlashImage` ve varsa defense module alanlari bagli olmali.
   - Defense module: `DefensePercentText`, `DefenseWallFill`, `DefenseGateFill`, `DefenseCoreFill`, `DefenseWallText`, `DefenseGateText`, `DefenseCoreText`.
-  - `MarketUI`: `ArcherDrawerPanel`, `DrawerToggleButton`, Basic/Rapid/Frost row alanlari, tech unlock ve prep butonlari bagli olmali.
+  - `MarketUI`: `ArcherDrawerPanel`, `DrawerToggleButton`, Basic/Rapid/Frost row buy alanlari bagli olmali.
+  - `MarketUI`: `Basic/Rapid/FrostUpgradeButton`, `ArrowTechPanel`, `RapidTechUnlockButton`, `FrostTechUnlockButton` prefabda varsa player-facing olarak gizlenmelidir.
   - Castle Yard: `RepairButton`; polish prefabda varsa `FortifyButton`, `RallyButton` ve cost/status text'leri.
 - `Canvas/DayNightOverlay`
   - Full-screen black `Image`, raycast target kapali.
@@ -96,13 +98,11 @@ Script eklendikten sonra disaridan manuel compile komutu calistirma. Unity refre
 - Basic/Rapid/Frost oklari okcu tipinin tint'ini miras alir.
 - Frost isabet eden zombi slow suresince mavi/soguk gorunur, sonra normale doner.
 - Okcular yalnizca `Grid/outside` tilemapindeki dolu hucrelere yerlestirilir; hucreler sinirsiz tekrar kullanilir.
-- Drawer toggle ile sag `Archer Progression` paneli acilip kapanir ve oyun pause olmaz.
+- Drawer toggle ile sag `Archer Recruitment` paneli acilip kapanir ve oyun pause olmaz.
 - Basic buy kaynak dusurup yeni Basic okcu spawn eder.
-- Rapid/Frost locked baslar; tech unlock sonrasi buy/upgrade aktif olur.
+- Rapid/Frost locked baslar; sag panelde unlock/upgrade butonu gosterilmez, unlock ileride Tech Tree tarafindan yapilacaktir.
 - Kaynak yetmiyorsa ilgili row `CostText` alaninda `NEED ...` gorunur.
-- Type upgrade mevcut ve gelecekte spawn olacak ayni tip okculari guclendirir.
-- `ArrowDamageUp` mevcut ve future okculari guclendirir.
-- `FireRateUp` mevcut ve future okcularin atis hizini artirir.
+- Sag panelde upgrade butonu gorunmez; panel sadece okcu satin alma icindir.
 - Frost oklar hedef zombiyi yavaslatir.
 - `Repair` day prep sirasinda savunma HP'lerini onarir.
 - Oyun kisa `DAY 01` hazirligi ile baslar, sayac bitince `NIGHT 01` otomatik baslar.

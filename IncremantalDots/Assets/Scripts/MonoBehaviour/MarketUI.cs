@@ -9,6 +9,7 @@ namespace DeadWalls
         [Header("Drawer")]
         public RectTransform ArcherDrawerPanel;
         public Button DrawerToggleButton;
+        public TMP_Text DrawerTitleText;
         public bool OpenOnHudShown = true;
         public bool OpenOnWaveCompleted = true;
         public float SlideDuration = 0.18f;
@@ -51,6 +52,7 @@ namespace DeadWalls
         public Button FrostUpgradeButton;
 
         [Header("Arrow Tech")]
+        public GameObject ArrowTechPanel;
         public Button RapidTechUnlockButton;
         public Button FrostTechUnlockButton;
 
@@ -108,6 +110,9 @@ namespace DeadWalls
                 return;
             }
 
+            SetText(DrawerTitleText, "ARCHER RECRUITMENT");
+            HideTechControls();
+
             RefreshArcherRow(
                 ArcherType.Basic,
                 BasicCountText,
@@ -134,9 +139,6 @@ namespace DeadWalls
                 FrostCostText,
                 FrostBuyButton,
                 FrostUpgradeButton);
-
-            RefreshTechButton(ArcherType.Rapid, RapidTechUnlockButton);
-            RefreshTechButton(ArcherType.Frost, FrostTechUnlockButton);
 
             bool mobileMode = gm.IsMobileMode;
             bool prepMovedToCastleInterior = gm.IsMobilePopulationEconomyEnabled();
@@ -197,8 +199,6 @@ namespace DeadWalls
             {
                 var resources = gm.Resources;
                 var buyCost = gm.GetArcherBuyCost(type);
-                var upgradeCost = gm.GetArcherUpgradeCost(type);
-                var unlockCost = gm.GetArcherUnlockCost(type);
                 bool freeMode = gm.IsFreeEconomyTestMode;
                 string buyCostLabel = FormatCostWithNeed(buyCost, resources, freeMode);
                 if (!freeMode
@@ -211,27 +211,26 @@ namespace DeadWalls
                 }
 
                 costText.text = unlocked
-                    ? $"BUY {buyCostLabel}\nUP {FormatCostWithNeed(upgradeCost, resources, freeMode)}"
-                    : $"UNLOCK {FormatCostWithNeed(unlockCost, resources, freeMode)}";
+                    ? $"BUY {buyCostLabel}"
+                    : "LOCKED BY TECH";
             }
 
             if (buyButton != null)
+            {
                 buyButton.interactable = gm.CanBuyArcher(type);
-            if (upgradeButton != null)
-                upgradeButton.interactable = gm.CanUpgradeArcherType(type);
+                SetButtonText(buyButton, unlocked ? "Buy" : "Locked");
+            }
+
+            HideButton(upgradeButton);
         }
 
-        private void RefreshTechButton(ArcherType type, Button button)
+        private void HideTechControls()
         {
-            if (button == null || GameManager.Instance == null)
-                return;
+            if (ArrowTechPanel != null)
+                ArrowTechPanel.SetActive(false);
 
-            var gm = GameManager.Instance;
-            bool unlocked = gm.IsArcherTypeUnlocked(type);
-            button.interactable = gm.CanUnlockArcherType(type);
-            SetButtonText(button, unlocked
-                ? $"{GetArcherLabel(type)} Ready"
-                : $"Unlock {GetArcherLabel(type)}\n{FormatCostWithNeed(gm.GetArcherUnlockCost(type), gm.Resources, gm.IsFreeEconomyTestMode)}");
+            HideButton(RapidTechUnlockButton);
+            HideButton(FrostTechUnlockButton);
         }
 
         private void RefreshPrepAction(Button button, TMP_Text costText, TMP_Text statusText, string label,
@@ -282,13 +281,8 @@ namespace DeadWalls
             FortifyButton?.onClick.AddListener(HandleFortifyClicked);
             RallyButton?.onClick.AddListener(HandleRallyClicked);
             BasicBuyButton?.onClick.AddListener(HandleBasicBuyClicked);
-            BasicUpgradeButton?.onClick.AddListener(HandleBasicUpgradeClicked);
             RapidBuyButton?.onClick.AddListener(HandleRapidBuyClicked);
-            RapidUpgradeButton?.onClick.AddListener(HandleRapidUpgradeClicked);
             FrostBuyButton?.onClick.AddListener(HandleFrostBuyClicked);
-            FrostUpgradeButton?.onClick.AddListener(HandleFrostUpgradeClicked);
-            RapidTechUnlockButton?.onClick.AddListener(HandleRapidUnlockClicked);
-            FrostTechUnlockButton?.onClick.AddListener(HandleFrostUnlockClicked);
         }
 
         private void UnbindButtons()
@@ -300,13 +294,8 @@ namespace DeadWalls
             FortifyButton?.onClick.RemoveListener(HandleFortifyClicked);
             RallyButton?.onClick.RemoveListener(HandleRallyClicked);
             BasicBuyButton?.onClick.RemoveListener(HandleBasicBuyClicked);
-            BasicUpgradeButton?.onClick.RemoveListener(HandleBasicUpgradeClicked);
             RapidBuyButton?.onClick.RemoveListener(HandleRapidBuyClicked);
-            RapidUpgradeButton?.onClick.RemoveListener(HandleRapidUpgradeClicked);
             FrostBuyButton?.onClick.RemoveListener(HandleFrostBuyClicked);
-            FrostUpgradeButton?.onClick.RemoveListener(HandleFrostUpgradeClicked);
-            RapidTechUnlockButton?.onClick.RemoveListener(HandleRapidUnlockClicked);
-            FrostTechUnlockButton?.onClick.RemoveListener(HandleFrostUnlockClicked);
         }
 
         private void HandleRepairClicked()
@@ -342,27 +331,10 @@ namespace DeadWalls
         private void HandleBasicBuyClicked() => BuyArcher(ArcherType.Basic);
         private void HandleRapidBuyClicked() => BuyArcher(ArcherType.Rapid);
         private void HandleFrostBuyClicked() => BuyArcher(ArcherType.Frost);
-        private void HandleBasicUpgradeClicked() => UpgradeArcher(ArcherType.Basic);
-        private void HandleRapidUpgradeClicked() => UpgradeArcher(ArcherType.Rapid);
-        private void HandleFrostUpgradeClicked() => UpgradeArcher(ArcherType.Frost);
-        private void HandleRapidUnlockClicked() => UnlockArcher(ArcherType.Rapid);
-        private void HandleFrostUnlockClicked() => UnlockArcher(ArcherType.Frost);
 
         private void BuyArcher(ArcherType type)
         {
             GameManager.Instance?.BuyArcher(type);
-            Refresh();
-        }
-
-        private void UpgradeArcher(ArcherType type)
-        {
-            GameManager.Instance?.UpgradeArcherType(type);
-            Refresh();
-        }
-
-        private void UnlockArcher(ArcherType type)
-        {
-            GameManager.Instance?.UnlockArcherType(type);
             Refresh();
         }
 
@@ -402,18 +374,32 @@ namespace DeadWalls
             if (FortifyButton != null) FortifyButton.interactable = interactable;
             if (RallyButton != null) RallyButton.interactable = interactable;
             if (BasicBuyButton != null) BasicBuyButton.interactable = interactable;
-            if (BasicUpgradeButton != null) BasicUpgradeButton.interactable = interactable;
             if (RapidBuyButton != null) RapidBuyButton.interactable = interactable;
-            if (RapidUpgradeButton != null) RapidUpgradeButton.interactable = interactable;
             if (FrostBuyButton != null) FrostBuyButton.interactable = interactable;
-            if (FrostUpgradeButton != null) FrostUpgradeButton.interactable = interactable;
-            if (RapidTechUnlockButton != null) RapidTechUnlockButton.interactable = interactable;
-            if (FrostTechUnlockButton != null) FrostTechUnlockButton.interactable = interactable;
+            HideButton(BasicUpgradeButton);
+            HideButton(RapidUpgradeButton);
+            HideButton(FrostUpgradeButton);
+            HideTechControls();
         }
 
         private static void SetButtonText(Button button, string value)
         {
             var text = button.GetComponentInChildren<TMP_Text>(true);
+            if (text != null)
+                text.text = value;
+        }
+
+        private static void HideButton(Button button)
+        {
+            if (button == null)
+                return;
+
+            button.interactable = false;
+            button.gameObject.SetActive(false);
+        }
+
+        private static void SetText(TMP_Text text, string value)
+        {
             if (text != null)
                 text.text = value;
         }
@@ -427,19 +413,6 @@ namespace DeadWalls
             return string.IsNullOrEmpty(need)
                 ? cost.ToDisplayString()
                 : $"{cost.ToDisplayString()} {need}";
-        }
-
-        private static string GetArcherLabel(ArcherType type)
-        {
-            switch (type)
-            {
-                case ArcherType.Rapid:
-                    return "Rapid";
-                case ArcherType.Frost:
-                    return "Frost";
-                default:
-                    return "Basic";
-            }
         }
 
         private static string GetRepairStatus(GameManager gm)

@@ -43,11 +43,12 @@ Tum component'lar unmanaged ECS struct olarak tutulur. Davranis sistemlerde, ver
 
 ## MobileCastleCombatComponents.cs
 
-- `MobileCastleCombatConfig`: `NewGameScene` mobile castle mode singleton'i. Kale merkezi, spawn radius, attack radius, mobile wave/siege sayilari, spawn batch, zombie scale/speed, continuous siege tuning, reward/focus tuning, legacy day/night prep tuning, unlimited arrow flag'i ve stress test limitlerini tutar.
+- `MobileCastleCombatConfig`: `NewGameScene` mobile castle mode singleton'i. Kale merkezi, spawn radius, attack radius, mobile wave/siege sayilari, spawn batch, zombie scale/speed, continuous siege tuning, worker production/cap tuning, reward/focus tuning, legacy day/night prep tuning, unlimited arrow flag'i ve stress test limitlerini tutar.
 - `ContinuousSiegeCycleData`: player-facing `DAY / DUSK / NIGHT` fazini, 60s cycle progress'ini, horde pressure ve spawn intensity degerlerini tutar.
 - `EconomyFocusState`: aktif mobile ekonomi focus'unu tutar. `Balanced` default'tur; Wood/Stone/Iron/Food secimleri passive income, kill reward ve wave clear bonus'u yonlendirir.
 - `WaveClearRewardData`: son wave clear bonusunu HUD feedback'i icin saklar.
 - `CastleYardPrepState`: `Fortify` ve `Rally` tek-gecelik prep buff state'ini tutar.
+- `MobilePopulationAllocation`: Wood/Stone/Iron/Food worker sayilarini, legacy wave growth checkpoint'ini ve continuous cycle growth checkpoint'ini tutar.
 - `ArcherSlotPosition`: legacy/manual pozisyon buffer'i. NewGameScene mobile tilemap spawn akisi bunu kullanmaz.
 
 ## CastleInteriorWorkerComponents.cs

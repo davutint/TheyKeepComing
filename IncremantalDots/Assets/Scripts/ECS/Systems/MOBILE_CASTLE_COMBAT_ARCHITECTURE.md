@@ -42,9 +42,10 @@ Varsayilan mobile degerleri:
 - Stress max alive zombies: `1500`
 - Kill reward: Wood `1.0`, Food `0.6`, Stone `0.25`, Iron `0.15`, wave scale `+5%`
 - Wave clear bonus: Wood `20 + 6 per wave`, Food `15 + 5 per wave`, Stone `10 + 4 per wave`, Iron `6 + 3 per wave`
-- Worker economy: population growth legacy DayPrep akisi icin `15`, initial workers Wood/Stone/Iron/Food `6 / 3 / 2 / 5`
-- Worker production: Wood `4.5/min`, Stone `3/min`, Iron `2/min`, Food `4/min` per worker
-- Worker economy reward multiplier: `0.45`
+- Worker economy: population growth continuous siege cycle basina `15`, initial workers Wood/Stone/Iron/Food `20 / 10 / 8 / 15`
+- Worker caps: Wood/Stone/Iron/Food `40 / 30 / 24 / 40`
+- Worker production: Wood/Stone/Iron/Food `8 / 5.5 / 3.8 / 7` per minute
+- Worker economy reward multiplier: `0.25`
 - Economy event chance `15%`, cooldown `2` waves
 - Continuous siege cycle: total `60s`, Day `25s`, Dusk `10s`, Night `25s`
 - Continuous siege intensity: Day `0.55`, Dusk `1.00 -> 1.35`, Night `1.65`
@@ -84,11 +85,11 @@ Wave clear bonus normal mobile modda bir kez verilir. Worker economy aktifken bo
 
 ### ResourceTickSystem
 
-Worker economy aktifken `MobilePopulationEconomySystem` `ResourceProductionRate` degerlerini worker allocation'a gore yazar. `ResourceTickSystem`, `MobilePrepPauseState.IsPaused` true iken resource accumulator ilerletmez. `MobilePopulationAllocation` yoksa eski economy focus multiplier akisi korunur.
+Worker economy aktifken `MobilePopulationEconomySystem` `ResourceProductionRate` degerlerini worker allocation'a gore yazar. Continuous siege aktifken her tamamlanan 60 saniyelik cycle, population'a `PopulationGrowthPerDayPrep` kadar yeni nufus ekler. `MobilePrepPauseState.IsPaused` true iken `ResourceTickSystem` resource accumulator ilerletmez. `MobilePopulationAllocation` yoksa eski economy focus multiplier akisi korunur.
 
 ### MobilePopulationEconomySystem
 
-Mobile mode'da worker allocation'i clamp eder, `PopulationState.Workers/Idle` degerlerini gunceller ve resource production rate'lerini yazar. Her completed wave sonrasi DayPrep basinda population growth uygular. Event cooldown/sans roll'u da burada yapilir; pending event secilmezse gece baslarken expire eder.
+Mobile mode'da worker allocation'i resource cap ve population'a gore clamp eder, `PopulationState.Workers/Idle` degerlerini gunceller ve resource production rate'lerini yazar. Continuous siege varsayilaninda her tamamlanan cycle basina population growth uygular. Legacy DayPrep akisi acilirse completed wave sonrasi DayPrep basinda ayni growth degerini kullanir. Event cooldown/sans roll'u legacy DayPrep akisinda burada yapilir; pending event secilmezse gece baslarken expire eder.
 
 ### ApplyMovementForceSystem
 
@@ -147,17 +148,18 @@ HUD varsa `CastleDefensePanel` uzerindeki `DefenseWallFill`, `DefenseGateFill`, 
 
 Sol ust economy HUD mevcut kaynaklari gosterir: Wood, Stone, Iron, Food, Population, Arrows. Runtime text'ler label tekrar etmez; kutu basligi UI'da, value/rate text'i kod tarafindadir. HUD rate degeri mobile population allocation tarafindan yazilan worker production'dir. NewGameScene mobile default'lari:
 
-- Wood `120`, Stone `60`, Iron `35`, Food `90`, Population `24`, Arrows `INF`
-- Initial workers: Wood `6`, Stone `3`, Iron `2`, Food `5`
-- Worker income: Wood `4.5/min`, Stone `3/min`, Iron `2/min`, Food `4/min` per assigned worker
+- Wood `280`, Stone `120`, Iron `70`, Food `220`, Population `60`, Arrows `INF`
+- Initial workers: Wood `20`, Stone `10`, Iron `8`, Food `15`
+- Worker caps: Wood `40`, Stone `30`, Iron `24`, Food `40`
+- Worker income: Wood `8/min`, Stone `5.5/min`, Iron `3.8/min`, Food `7/min` per assigned worker
 
-## Continuous Upgrade Loop
+## Continuous Recruitment Loop
 
-Mobile castle mode'da XP level-up pause veya kart paneli tetiklemez. Oyun dongusu surekli devam eder: zombi oldur, kaynak biriktir, drawer'dan okcu satin al veya upgrade et.
+Mobile castle mode'da XP level-up pause veya kart paneli tetiklemez. Oyun dongusu surekli devam eder: zombi oldur, kaynak biriktir, sol worker drawer'dan ekonomi buyut, sag recruitment drawer'dan okcu satin al.
 
 Legacy level-up kart API'si eski akis icin kodda durabilir, ama `MobileCastleCombatConfig` varken `DamageCleanupSystem` XP threshold'u `IsLevelUpPending` yapmaz.
 
-Mobile normal mode'da `DamageCleanupSystem`, death timer biten zombiler icin kill reward'i `ResourceAccumulator` uzerine yazar. Worker economy aktifken kill reward `WorkerEconomyRewardMultiplier` ile azaltilir; ana gelir kaynagi worker allocation'dir. Continuous siege varsayilaninda wave clear bonus/player-facing clear akisi tetiklenmez. Stress mode'da reward verilmez.
+Mobile normal mode'da `DamageCleanupSystem`, death timer biten zombiler icin kill reward'i `ResourceAccumulator` uzerine yazar. Worker economy aktifken kill reward `WorkerEconomyRewardMultiplier` ile azaltilir; ana gelir kaynagi worker allocation'dir. Continuous siege varsayilaninda wave clear bonus/player-facing clear akisi tetiklenmez, fakat cycle tamamlandikca population growth uygulanir. Stress mode'da reward verilmez.
 
 ## Castle Interior Economy
 
@@ -172,25 +174,24 @@ Mobile normal mode'da `DamageCleanupSystem`, death timer biten zombiler icin kil
 - Villager worker pickup pozisyonlari main scene `CastleInteriorEconomyArea/*Site/WorkerSpawnPoints` marker'larindan gelir.
 - Delivery pozisyonlari `CastleInteriorEconomyArea/CastleWorkerHub/DeliveryPoints` marker'larindan gelir.
 - `WorkerLogisticsMovementSystem`, villagerlari pickup ile hub arasinda yuruturek kaynak tasima feedback'i verir.
-- `PopulationGrowthPerDayPrep` legacy DayPrep akisi icindir; continuous siege varsayilaninda otomatik wave arasi population growth calismaz.
+- `PopulationGrowthPerDayPrep` legacy DayPrep akisi icin isimlendirilmis eski alan olarak kalir; continuous siege varsayilaninda her cycle tamamlandiginda population growth miktari olarak kullanilir.
 - Okcu satin almak `1` idle population kullanir; idle yoksa buy disabled olur ve drawer `NEED POP` yazar.
 - Editor testleri icin `GameManager.Free Economy Test Mode` acilirsa okcu satin alma population harcamaz ve resource/population eksigi aksiyonlari bloklamaz.
 - Nadir eventler `MobileEconomyEventState` ile tutulur; secilmezse gece baslarken expire eder.
 
 ## Archer Economy Drawer
 
-`MarketUI`, `MobileCastleHudRoot` altindaki `ArcherDrawerPanel` controller'idir. Drawer combat sirasinda acilip kapanir ve `Time.timeScale` degistirmez.
+`MarketUI`, `MobileCastleHudRoot` altindaki `ArcherDrawerPanel` controller'idir. Drawer combat sirasinda acilip kapanir ve `Time.timeScale` degistirmez. Sag drawer'in player-facing rolu yalnizca archer recruitment'tir; upgrade ve tech unlock aksiyonlari burada gosterilmez.
 
 - Basic baslangicta unlocked.
-- Rapid unlock: `90W + 50I`.
-- Frost unlock: `80S + 45I + 30F`.
-- Basic Buy: `45W + 20F`; Upgrade base `70W + 30F`, level basi `x1.35`.
-- Rapid Buy: `55W + 35I + 20F`; Upgrade base `85W + 55I`, level basi `x1.40`.
-- Frost Buy: `45W + 55S + 25I`; Upgrade base `70S + 45I`, level basi `x1.40`.
-- Yetersiz kaynak varsa row `CostText` mevcut cost yanina `NEED ...` ekler; idle population yoksa buy cost yanina `NEED POP` ekler. Yeni UI elemani gerekmez.
-- `Free Economy Test Mode` sadece lokal test kolayligi icindir; acikken UI costlari `FREE` gosterir ve satin alma/upgrade/unlock kaynak dusurmez.
+- Rapid/Frost kilitli baslar; unlock ileride full-screen Tech Tree tarafindan yapilacaktir.
+- Basic Buy: `45W + 20F`.
+- Rapid Buy: `55W + 35I + 20F`.
+- Frost Buy: `45W + 55S + 25I`.
+- Yetersiz kaynak varsa row `CostText` mevcut cost yanina `NEED ...` ekler; idle population yoksa buy cost yanina `NEED POP` ekler. Locked tiplerde row `LOCKED BY TECH` gosterir. Yeni UI elemani gerekmez.
+- `Free Economy Test Mode` sadece lokal test kolayligi icindir; acikken UI costlari `FREE` gosterir ve satin alma kaynak/population eksiginden bloklanmaz.
 
-Type level `1` baslar. Her type upgrade ayni tip mevcut ve future okculara uygulanir:
+Type level ve upgrade API'leri kodda korunur, fakat player-facing sahibi sag drawer degildir. Ileride Tech Tree node'lari ayni tip mevcut ve future okculara su scaling'i uygulayabilir:
 
 - Damage `+12%`
 - FireRate `+8%`

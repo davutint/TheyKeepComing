@@ -4,10 +4,11 @@
 
 ## Sorumluluklar
 
-- `MobilePopulationAllocation` icindeki Wood/Stone/Iron/Food worker sayilarini clamp eder.
+- `MobilePopulationAllocation` icindeki Wood/Stone/Iron/Food worker sayilarini population ve resource cap'lerine gore clamp eder.
 - `PopulationState.Workers` ve `PopulationState.Idle` degerlerini allocation + archer sayisina gore gunceller.
 - `ResourceProductionRate` degerlerini worker sayisi x worker production tuning olarak yazar.
-- Her completed wave sonrasi `DayPrep` basinda population growth uygular.
+- Continuous siege aciksa her tamamlanan 60 saniyelik cycle basina bir kez population growth uygular.
+- Legacy DayPrep akisinda her completed wave sonrasi `DayPrep` basinda population growth uygular.
 - `MobileEconomyEventState` icin nadir event roll eder ve aktif production bonusunu rate'lere uygular.
 
 ## Akis
@@ -18,7 +19,7 @@ Stress mode'da calismaz. Legacy/non-mobile sahnelerde `MobileCastleCombatConfig`
 
 ## Event Modeli
 
-Eventler sadece normal mobile `DayPrep` basinda roll edilir:
+Eventler legacy normal mobile `DayPrep` basinda roll edilir:
 
 - Roll sansi: `MobileCastleCombatConfig.EconomyEventChance`
 - Cooldown: `EconomyEventCooldownWaves`
@@ -30,5 +31,6 @@ V1 eventleri geneldir: resource stash, quarry crew, refugee cart. UI metinleri `
 ## Bilerek Yapilmayanlar
 
 - Population cap sistemi yok; mobile setup internal high capacity kullanir.
+- Worker cap resource basina vardir; population buyumesi yeni worker basma alanini acar.
 - Worker assignment otomatik optimize edilmez.
 - Event popup/polish bu sistemde degil, `CastleEconomyUI` tarafindadir.

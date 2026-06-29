@@ -51,6 +51,10 @@ namespace DeadWalls
         public int OpeningBatchDelta;
         public int FinalBatchDelta;
         public int PopulationGrowthPerDayPrep;
+        public int WoodWorkerCap;
+        public int StoneWorkerCap;
+        public int IronWorkerCap;
+        public int FoodWorkerCap;
         public float WoodWorkerProductionPerMin;
         public float StoneWorkerProductionPerMin;
         public float IronWorkerProductionPerMin;
@@ -132,6 +136,7 @@ namespace DeadWalls
         public int IronWorkers;
         public int FoodWorkers;
         public int LastPopulationGrowthWave;
+        public int LastPopulationGrowthCycle;
         public int LastEventPrepWave;
     }
 

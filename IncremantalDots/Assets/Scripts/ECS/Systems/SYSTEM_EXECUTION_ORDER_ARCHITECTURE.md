@@ -81,7 +81,8 @@ Presentation tarafinda `SpriteAnimationSystem` UV rect hesaplarini yapar.
 
 - Mobile normal mode'da worker allocation'i clamp eder.
 - `ResourceProductionRate` ve `PopulationState.Workers/Idle` degerlerini yazar.
-- Completed wave sonrasi DayPrep basinda population growth uygular.
+- Continuous siege aktifken her tamamlanan cycle basina population growth uygular.
+- Legacy mobile akista completed wave sonrasi DayPrep basinda population growth uygular.
 - Nadir economy event roll eder ve secili production bonusunu rate'lere uygular.
 - Stress mode'da calismaz.
 

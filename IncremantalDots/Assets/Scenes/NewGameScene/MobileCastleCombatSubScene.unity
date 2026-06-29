@@ -269,15 +269,19 @@ MonoBehaviour:
   OpeningBatchDelta: -1
   FinalBatchDelta: 1
   PopulationGrowthPerDayPrep: 15
-  InitialWoodWorkers: 6
-  InitialStoneWorkers: 3
-  InitialIronWorkers: 2
-  InitialFoodWorkers: 5
-  WoodWorkerProductionPerMin: 4.5
-  StoneWorkerProductionPerMin: 3
-  IronWorkerProductionPerMin: 2
-  FoodWorkerProductionPerMin: 4
-  WorkerEconomyRewardMultiplier: 0.45
+  InitialWoodWorkers: 20
+  InitialStoneWorkers: 10
+  InitialIronWorkers: 8
+  InitialFoodWorkers: 15
+  WoodWorkerCap: 40
+  StoneWorkerCap: 30
+  IronWorkerCap: 24
+  FoodWorkerCap: 40
+  WoodWorkerProductionPerMin: 8
+  StoneWorkerProductionPerMin: 5.5
+  IronWorkerProductionPerMin: 3.8
+  FoodWorkerProductionPerMin: 7
+  WorkerEconomyRewardMultiplier: 0.25
   EconomyEventChance: 0.15
   EconomyEventCooldownWaves: 2
   EconomyEventSeed: 91273
@@ -374,21 +378,21 @@ MonoBehaviour:
   SpawnInterval: 0.8
   WaveStartDelay: 3
   BaseZombieSpeed: 0.85
-  InitialWood: 120
-  InitialStone: 60
-  InitialIron: 35
-  InitialFood: 90
-  TestWoodProdRate: 90
-  TestStoneProdRate: 30
-  TestIronProdRate: 16
-  TestFoodProdRate: 60
+  InitialWood: 280
+  InitialStone: 120
+  InitialIron: 70
+  InitialFood: 220
+  TestWoodProdRate: 160
+  TestStoneProdRate: 55
+  TestIronProdRate: 30
+  TestFoodProdRate: 105
   TestWoodConsRate: 0
   TestStoneConsRate: 0
   TestIronConsRate: 0
   TestFoodConsRate: 0
-  InitialPopulation: 24
+  InitialPopulation: 60
   InitialCapacity: 999999
-  TestWorkers: 16
+  TestWorkers: 53
   TestArchers: 4
   FoodPerAssignedPerMin: 0.25
   InitialArrows: 200

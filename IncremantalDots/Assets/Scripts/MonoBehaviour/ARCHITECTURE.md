@@ -16,7 +16,7 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - `StartNextWave()` debug/public API olarak kalir; mobile player-facing akis continuous day/dusk/night cycle ile ilerler
 - `RepairDefenseFull()`, `BuyFortify()`, `BuyRally()` ve `RefillArrows()` legacy/debug API olarak kalir
 - `GetDefensePercent()` wall/gate/castle toplam HP yuzdesini HUD'a verir
-- Mobile archer economy API'leri: unlock, buy, upgrade, cost ve type count/DPS okuma
+- Mobile archer economy API'leri: buy, cost ve type count/DPS okuma; unlock/upgrade API'leri ileride Tech Tree icin kodda kalir ama sag drawer player-facing kullanmaz
 - Worker economy API'leri: `OpenCastleEconomy()`, `CloseCastleEconomy()`, `SetResourceWorkers()`, `ChooseEconomyEvent()`
 - Economy focus API'leri legacy olarak kalir; worker economy aktifken setup tool focus UI'yi gizler
 - Legacy level-up API'leri durur, fakat mobile castle loop'ta XP level-up pause tetiklemez
@@ -24,7 +24,7 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - Mevcut `ArcherUnit` entity'lerinden Basic/Rapid/Frost sayilarini okur
 - Spawn edilen okcuya type-specific `SpriteTint` yazar
 - Spawn edilen okculari varsayilan East facing idle state'iyle baslatir
-- Type upgrade'leri mevcut ve gelecekte spawn olacak ayni tip okculara damage/fire-rate scaling uygular
+- Type upgrade'leri mevcut ve gelecekte spawn olacak ayni tip okculara damage/fire-rate scaling uygular; bu akisin player-facing sahibi sag drawer degil, ileride full-screen Tech Tree olacaktir
 - `RestartGame()` ile oyunu sifirlar
 
 ### HUDController.cs
@@ -59,17 +59,18 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 ### LevelUpUI.cs
 
 - Legacy kart panelidir.
-- Mobile castle loop'ta kullanilmaz; okcu alma/upgrade sag drawer economy uzerinden ilerler.
+- Mobile castle loop'ta kullanilmaz; okcu alma sag drawer recruitment uzerinden ilerler, upgrade/unlock ileride Tech Tree'ye tasinacaktir.
 
 ### MarketUI.cs
 
 - `MobileCastleHudRoot` uzerindeki sag `ArcherDrawerPanel` controller'idir
 - Drawer combat sirasinda acilip kapanir; oyun pause olmaz
-- Basic/Rapid/Frost row'larinda `Buy` ve `Upgrade` aksiyonlarini `GameManager` API'lerine baglar
-- Rapid/Frost tech unlock butonlarini yonetir; Basic baslangicta aciktir
+- Basic/Rapid/Frost row'larinda yalnizca `Buy` aksiyonunu `GameManager.BuyArcher()` API'sine baglar
+- Upgrade butonlari, Rapid/Frost tech unlock butonlari ve `ArrowTechPanel` player-facing olarak gizlenir
+- Basic baslangicta aciktir; Rapid/Frost ileride Tech Tree tarafindan unlock edilecek kilitli satirlar olarak kalir
 - Row `CostText` alanlarinda mevcut cost ile beraber eksik kaynak varsa `NEED ...`, idle population yoksa `NEED POP` yazar
 - `GameManager.Free Economy Test Mode` acikken cost satirlari `FREE` gosterir; kaynak ve population yetersizligi player-facing aksiyonlari bloklamaz
-- Worker economy aktifken `Repair`, `Fortify` ve `Rally` player-facing drawer'da gizlenir; drawer archer progression paneli olarak kalir
+- Worker economy aktifken `Repair`, `Fortify` ve `Rally` player-facing drawer'da gizlenir; drawer archer recruitment paneli olarak kalir
 - Mobile unlimited arrow modunda `Arrow Refill` gizlenir
 - Mobile continuous siege loop'ta `Start Next Wave` player-facing UI'da gizlenir; oyun durmadan `DAY / DUSK / NIGHT` cycle'i akar
 - Runtime davranisi UI Importer JSON'una gomulmez; controller ve scene setup tool tarafinda baglanir
@@ -126,8 +127,8 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 
 ```
 ECS Systems -> Entity Data -> GameManager.ReadECSData() -> Events -> UI Controllers
-UI Input -> GameManager.CanApplyUpgrade()/ApplyUpgrade() -> EntityManager.SetComponentData -> ECS
-Drawer Input -> GameManager.BuyArcher()/UpgradeArcherType()/UnlockArcherType() -> EntityManager.SetComponentData -> ECS
+Legacy UI Input -> GameManager.CanApplyUpgrade()/ApplyUpgrade() -> EntityManager.SetComponentData -> ECS
+Archer Drawer Input -> GameManager.BuyArcher() -> EntityManager.SetComponentData -> ECS
 Worker Drawer Input -> GameManager.AssignResourceWorker() -> MobilePopulationAllocation -> DOTS VillagerWorker route visual sync -> MobilePopulationEconomySystem
 Legacy Castle Click -> CastleEconomyUI.OpenFromCastle() -> MobilePrepPauseState
 Legacy Worker Slider Input -> GameManager.SetResourceWorkers() -> MobilePopulationAllocation -> DOTS VillagerWorker visual sync

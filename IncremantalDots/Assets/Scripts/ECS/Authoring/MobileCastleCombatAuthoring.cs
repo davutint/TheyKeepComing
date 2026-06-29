@@ -73,15 +73,19 @@ namespace DeadWalls
 
         [Header("Population Economy")]
         public int PopulationGrowthPerDayPrep = 15;
-        public int InitialWoodWorkers = 6;
-        public int InitialStoneWorkers = 3;
-        public int InitialIronWorkers = 2;
-        public int InitialFoodWorkers = 5;
-        public float WoodWorkerProductionPerMin = 4.5f;
-        public float StoneWorkerProductionPerMin = 3.0f;
-        public float IronWorkerProductionPerMin = 2.0f;
-        public float FoodWorkerProductionPerMin = 4.0f;
-        [Range(0f, 1f)] public float WorkerEconomyRewardMultiplier = 0.45f;
+        public int InitialWoodWorkers = 20;
+        public int InitialStoneWorkers = 10;
+        public int InitialIronWorkers = 8;
+        public int InitialFoodWorkers = 15;
+        public int WoodWorkerCap = 40;
+        public int StoneWorkerCap = 30;
+        public int IronWorkerCap = 24;
+        public int FoodWorkerCap = 40;
+        public float WoodWorkerProductionPerMin = 8.0f;
+        public float StoneWorkerProductionPerMin = 5.5f;
+        public float IronWorkerProductionPerMin = 3.8f;
+        public float FoodWorkerProductionPerMin = 7.0f;
+        [Range(0f, 1f)] public float WorkerEconomyRewardMultiplier = 0.25f;
 
         [Header("Economy Events")]
         [Range(0f, 1f)] public float EconomyEventChance = 0.15f;
@@ -158,6 +162,10 @@ namespace DeadWalls
                     OpeningBatchDelta = authoring.OpeningBatchDelta,
                     FinalBatchDelta = authoring.FinalBatchDelta,
                     PopulationGrowthPerDayPrep = math.max(0, authoring.PopulationGrowthPerDayPrep),
+                    WoodWorkerCap = math.max(0, authoring.WoodWorkerCap),
+                    StoneWorkerCap = math.max(0, authoring.StoneWorkerCap),
+                    IronWorkerCap = math.max(0, authoring.IronWorkerCap),
+                    FoodWorkerCap = math.max(0, authoring.FoodWorkerCap),
                     WoodWorkerProductionPerMin = math.max(0f, authoring.WoodWorkerProductionPerMin),
                     StoneWorkerProductionPerMin = math.max(0f, authoring.StoneWorkerProductionPerMin),
                     IronWorkerProductionPerMin = math.max(0f, authoring.IronWorkerProductionPerMin),
@@ -198,6 +206,7 @@ namespace DeadWalls
                     IronWorkers = math.max(0, authoring.InitialIronWorkers),
                     FoodWorkers = math.max(0, authoring.InitialFoodWorkers),
                     LastPopulationGrowthWave = 0,
+                    LastPopulationGrowthCycle = 0,
                     LastEventPrepWave = 0
                 });
 

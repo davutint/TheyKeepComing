@@ -48,4 +48,5 @@ FoodWorkerStatusText
 2. `Mobile Castle Scene Setup` calistir.
 3. Play modunda sol ust `Workers` toggle'ina bas.
 4. `+ WORKER` butonlari idle population varsa worker sayisini artirmali.
-5. Sahnede ilgili resource site ile `CastleWorkerHub` arasinda yeni DOTS villager hareketi gorunmelidir.
+5. Resource cap dolunca row `CAP FULL` gostermeli ve buton disabled olmalidir.
+6. Sahnede ilgili resource site ile `CastleWorkerHub` arasinda yeni DOTS villager hareketi gorunmelidir.

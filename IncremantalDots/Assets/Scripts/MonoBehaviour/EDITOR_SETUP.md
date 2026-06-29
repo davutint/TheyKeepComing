@@ -32,8 +32,9 @@ Beklenen referanslar:
 - Combat feedback: main scene'de `CombatFeedbackRoot` + `CombatFeedbackBridge` bulunur; setup tool arrow hit/frost VFX prefablarini, opsiyonel muzzle referansini ve arrow/castle SFX clip'lerini otomatik baglar. Shoot muzzle VFX V1'de oynatilmaz.
 - Drawer: `ArcherDrawerPanel`, `DrawerToggleButton`
 - Rows: `BasicArcherRow`, `RapidArcherRow`, `FrostArcherRow`
-- Row fields: `BasicCountText`, `BasicDpsText`, `BasicLevelText`, `BasicCostText`, `BasicBuyButton`, `BasicUpgradeButton`; ayni pattern `Rapid` ve `Frost` icin
-- Tech: `RapidTechUnlockButton`, `FrostTechUnlockButton`
+- Row fields: `BasicCountText`, `BasicDpsText`, `BasicLevelText`, `BasicCostText`, `BasicBuyButton`; ayni pattern `Rapid` ve `Frost` icin
+- Legacy/hidden row fields: `BasicUpgradeButton`, `RapidUpgradeButton`, `FrostUpgradeButton`
+- Legacy/hidden tech: `ArrowTechPanel`, `RapidTechUnlockButton`, `FrostTechUnlockButton`
 - Prep: `RepairButton`, optional `RepairCostText`, `RepairStatusText`
 - Castle Yard: `FortifyButton`, `FortifyCostText`, `FortifyStatusText`, `RallyButton`, `RallyCostText`, `RallyStatusText`
 - `RefillArrowsButton` varsa mobile unlimited arrow modda gizlenir
@@ -42,9 +43,9 @@ Beklenen referanslar:
 
 Generated UI kullanilacaksa owner tarafindan onaylanan UI Importer export'u `Assets/Prefabs/UI/Generated/MobileCastleHudRoot.prefab` olarak import edilir. Sonra Mobile Castle Scene Setup tekrar calistirilir; prefab varsa fallback HUD yerine onu kullanir. Implementer kendi basina UI JSON/export uretmez.
 
-Drawer gameplay'i pause etmez. Mobile castle loop'ta level-up paneli kullanilmaz; oyuncu surekli oldurur, kaynak toplar, drawer'dan okcu alir veya upgrade eder. Wave arasi `DayPrep` sayaci otomatik akar, ekran kararir ve sure bitince gece wave'i baslar. Kaynak yetmiyorsa mevcut row `CostText` alaninda `NEED ...` gosterilir; bunun icin yeni UI binding gerekmez.
+Drawer gameplay'i pause etmez. Mobile castle loop'ta level-up paneli kullanilmaz; oyuncu surekli oldurur, kaynak toplar ve sag drawer'dan okcu satin alir. Upgrade/unlock aksiyonlari sag drawer'da player-facing degildir; ileride full-screen Tech Tree tarafina tasinacaktir. Wave arasi `DayPrep` sayaci otomatik akar, ekran kararir ve sure bitince gece wave'i baslar. Kaynak yetmiyorsa mevcut row `CostText` alaninda `NEED ...`, idle population yoksa `NEED POP` gosterilir; bunun icin yeni UI binding gerekmez.
 
-`Repair`, `Fortify` ve `Rally` sadece `DayPrep` sirasinda aktif olur. Archer buy/upgrade, tech unlock ve economy focus combat sirasinda kullanilmaya devam eder; sag panel komple kilitlenmez. Castle Yard aksiyonlari polish prefabda yoksa tool yeni Fortify/Rally gorseli uretmez, sadece mevcut isimleri baglar.
+`Repair`, `Fortify` ve `Rally` sag drawer'da player-facing olarak gizlenir. Archer buy combat sirasinda kullanilmaya devam eder; sag panel komple kilitlenmez. Castle Yard aksiyonlari polish prefabda yoksa tool yeni Fortify/Rally gorseli uretmez, sadece mevcut isimleri baglar.
 
 Economy focus butonlari combat sirasinda kullanilabilir. Balanced seciliyken tum passive/reward akisi hafif boost alir; Wood/Stone/Iron/Food seciliyken secili kaynak pasif uretim, kill reward ve wave clear bonus tarafinda daha guclu akar.
 

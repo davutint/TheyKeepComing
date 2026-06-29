@@ -37,12 +37,16 @@ namespace DeadWalls
         private const float GlobalDamageCardBonus = 5f;
         private static readonly ResourceCost FortifyCost = new ResourceCost(0, 50, 25, 0);
         private static readonly ResourceCost RallyCost = new ResourceCost(35, 0, 0, 45);
-        private const int MobileInitialPopulation = 24;
+        private const int MobileInitialPopulation = 60;
         private const int MobileInternalPopulationCapacity = 999999;
-        private const int MobileInitialWoodWorkers = 6;
-        private const int MobileInitialStoneWorkers = 3;
-        private const int MobileInitialIronWorkers = 2;
-        private const int MobileInitialFoodWorkers = 5;
+        private const int MobileInitialWoodWorkers = 20;
+        private const int MobileInitialStoneWorkers = 10;
+        private const int MobileInitialIronWorkers = 8;
+        private const int MobileInitialFoodWorkers = 15;
+        private const int MobileFallbackWoodWorkerCap = 40;
+        private const int MobileFallbackStoneWorkerCap = 30;
+        private const int MobileFallbackIronWorkerCap = 24;
+        private const int MobileFallbackFoodWorkerCap = 40;
         private const int MobileInitialBasicArchers = 4;
         private const float EconomyEventProductionMultiplier = 1.5f;
         private float _globalArrowDamageBonus;
@@ -675,7 +679,52 @@ namespace DeadWalls
 
         public int GetMaxWorkersForResource(EconomyFocusType resource)
         {
-            return GetResourceWorkers(resource) + GetIdlePopulation();
+            resource = EconomyFocusUtility.Normalize(resource);
+            if (resource == EconomyFocusType.Balanced)
+                return GetAvailablePopulation();
+
+            int cap = 0;
+            if (TryGetMobileCombatConfig(out var config))
+                cap = GetWorkerCap(resource, config);
+
+            if (cap <= 0)
+                cap = GetFallbackWorkerCap(resource);
+
+            return Mathf.Max(0, cap);
+        }
+
+        private static int GetWorkerCap(EconomyFocusType resource, MobileCastleCombatConfig config)
+        {
+            switch (resource)
+            {
+                case EconomyFocusType.Wood:
+                    return config.WoodWorkerCap;
+                case EconomyFocusType.Stone:
+                    return config.StoneWorkerCap;
+                case EconomyFocusType.Iron:
+                    return config.IronWorkerCap;
+                case EconomyFocusType.Food:
+                    return config.FoodWorkerCap;
+                default:
+                    return 0;
+            }
+        }
+
+        private static int GetFallbackWorkerCap(EconomyFocusType resource)
+        {
+            switch (resource)
+            {
+                case EconomyFocusType.Wood:
+                    return MobileFallbackWoodWorkerCap;
+                case EconomyFocusType.Stone:
+                    return MobileFallbackStoneWorkerCap;
+                case EconomyFocusType.Iron:
+                    return MobileFallbackIronWorkerCap;
+                case EconomyFocusType.Food:
+                    return MobileFallbackFoodWorkerCap;
+                default:
+                    return 0;
+            }
         }
 
         public float GetWorkerProductionRate(EconomyFocusType resource)
@@ -735,7 +784,10 @@ namespace DeadWalls
 
             var allocation = _entityManager.GetComponentData<MobilePopulationAllocation>(mobileConfigEntity);
             int current = GetResourceWorkers(resource);
-            int clamped = Mathf.Clamp(value, 0, current + GetIdlePopulation());
+            int populationLimit = current + GetIdlePopulation();
+            int workerCap = GetMaxWorkersForResource(resource);
+            int max = Mathf.Min(populationLimit, workerCap);
+            int clamped = Mathf.Clamp(value, 0, max);
             switch (resource)
             {
                 case EconomyFocusType.Wood:
@@ -765,6 +817,7 @@ namespace DeadWalls
             return _initialized
                 && resource != EconomyFocusType.Balanced
                 && IsMobilePopulationEconomyEnabled()
+                && GetResourceWorkers(resource) < GetMaxWorkersForResource(resource)
                 && (freeEconomyTestMode || GetIdlePopulation() > 0);
         }
 
@@ -1957,6 +2010,7 @@ namespace DeadWalls
                     IronWorkers = MobileInitialIronWorkers,
                     FoodWorkers = MobileInitialFoodWorkers,
                     LastPopulationGrowthWave = 0,
+                    LastPopulationGrowthCycle = 0,
                     LastEventPrepWave = 0
                 };
                 _entityManager.SetComponentData(mobileConfigEntity, allocation);
@@ -2032,10 +2086,10 @@ namespace DeadWalls
             // Kaynak resetle
             _entityManager.SetComponentData(_gameStateEntity, new ResourceData
             {
-                Wood = mobileMode ? 120 : 100,
-                Stone = mobileMode ? 60 : 50,
-                Iron = mobileMode ? 35 : 20,
-                Food = mobileMode ? 90 : 100
+                Wood = mobileMode ? 280 : 100,
+                Stone = mobileMode ? 120 : 50,
+                Iron = mobileMode ? 70 : 20,
+                Food = mobileMode ? 220 : 100
             });
 
             _entityManager.SetComponentData(_gameStateEntity, new ResourceProductionRate

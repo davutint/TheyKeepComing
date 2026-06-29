@@ -211,17 +211,17 @@ namespace DeadWalls
             gameStateAuthoring.SpawnInterval = 0.8f;
             gameStateAuthoring.WaveStartDelay = 3f;
             gameStateAuthoring.BaseZombieSpeed = 0.85f;
-            gameStateAuthoring.InitialWood = 120;
-            gameStateAuthoring.InitialStone = 60;
-            gameStateAuthoring.InitialIron = 35;
-            gameStateAuthoring.InitialFood = 90;
-            gameStateAuthoring.TestWoodProdRate = 90f;
-            gameStateAuthoring.TestStoneProdRate = 30f;
-            gameStateAuthoring.TestIronProdRate = 16f;
-            gameStateAuthoring.TestFoodProdRate = 60f;
-            gameStateAuthoring.InitialPopulation = 24;
+            gameStateAuthoring.InitialWood = 280;
+            gameStateAuthoring.InitialStone = 120;
+            gameStateAuthoring.InitialIron = 70;
+            gameStateAuthoring.InitialFood = 220;
+            gameStateAuthoring.TestWoodProdRate = 160f;
+            gameStateAuthoring.TestStoneProdRate = 55f;
+            gameStateAuthoring.TestIronProdRate = 30f;
+            gameStateAuthoring.TestFoodProdRate = 105f;
+            gameStateAuthoring.InitialPopulation = 60;
             gameStateAuthoring.InitialCapacity = 999999;
-            gameStateAuthoring.TestWorkers = 16;
+            gameStateAuthoring.TestWorkers = 53;
             gameStateAuthoring.TestArchers = 4;
             gameStateAuthoring.FoodPerAssignedPerMin = 0.25f;
             gameStateAuthoring.InitialArrows = 200;
@@ -302,15 +302,19 @@ namespace DeadWalls
             mobileAuthoring.OpeningBatchDelta = -1;
             mobileAuthoring.FinalBatchDelta = 1;
             mobileAuthoring.PopulationGrowthPerDayPrep = 15;
-            mobileAuthoring.InitialWoodWorkers = 6;
-            mobileAuthoring.InitialStoneWorkers = 3;
-            mobileAuthoring.InitialIronWorkers = 2;
-            mobileAuthoring.InitialFoodWorkers = 5;
-            mobileAuthoring.WoodWorkerProductionPerMin = 4.5f;
-            mobileAuthoring.StoneWorkerProductionPerMin = 3f;
-            mobileAuthoring.IronWorkerProductionPerMin = 2f;
-            mobileAuthoring.FoodWorkerProductionPerMin = 4f;
-            mobileAuthoring.WorkerEconomyRewardMultiplier = 0.45f;
+            mobileAuthoring.InitialWoodWorkers = 20;
+            mobileAuthoring.InitialStoneWorkers = 10;
+            mobileAuthoring.InitialIronWorkers = 8;
+            mobileAuthoring.InitialFoodWorkers = 15;
+            mobileAuthoring.WoodWorkerCap = 40;
+            mobileAuthoring.StoneWorkerCap = 30;
+            mobileAuthoring.IronWorkerCap = 24;
+            mobileAuthoring.FoodWorkerCap = 40;
+            mobileAuthoring.WoodWorkerProductionPerMin = 8f;
+            mobileAuthoring.StoneWorkerProductionPerMin = 5.5f;
+            mobileAuthoring.IronWorkerProductionPerMin = 3.8f;
+            mobileAuthoring.FoodWorkerProductionPerMin = 7f;
+            mobileAuthoring.WorkerEconomyRewardMultiplier = 0.25f;
             mobileAuthoring.EconomyEventChance = 0.15f;
             mobileAuthoring.EconomyEventCooldownWaves = 2;
             mobileAuthoring.EconomyEventSeed = 91273u;
@@ -1264,6 +1268,7 @@ namespace DeadWalls
             EnsureFallbackTechAndPrep(market.ArcherDrawerPanel);
             BindMarketFields(hudRoot, market);
             HidePlayerFacingPrepButtons(market);
+            HidePlayerFacingArcherProgressionControls(market);
         }
 
         private static void BindDefenseHudFields(GameObject hudRoot, HUDController hud)
@@ -1608,29 +1613,12 @@ namespace DeadWalls
                 new Vector2(16f, 14f), new Vector2(-16f, 44f));
 
             var buy = EnsureButton(row.transform, prefix + "BuyButton",
-                new Vector2(1f, 0f), new Vector2(-188f, 56f), new Vector2(-100f, 104f), out _);
+                new Vector2(1f, 0f), new Vector2(-128f, 56f), new Vector2(-8f, 104f), out _);
             SetButtonLabel(buy, "Buy");
-            var upgrade = EnsureButton(row.transform, prefix + "UpgradeButton",
-                new Vector2(1f, 0f), new Vector2(-92f, 56f), new Vector2(-8f, 104f), out _);
-            SetButtonLabel(upgrade, "Upgrade");
         }
 
         private static void EnsureFallbackTechAndPrep(RectTransform drawer)
         {
-            if (FindChildByName(drawer.gameObject, "RapidTechUnlockButton") == null)
-            {
-                var rapid = EnsureButton(drawer, "RapidTechUnlockButton",
-                    new Vector2(0f, 0f), new Vector2(18f, 222f), new Vector2(214f, 278f), out _);
-                SetButtonLabel(rapid, "Unlock Rapid");
-            }
-
-            if (FindChildByName(drawer.gameObject, "FrostTechUnlockButton") == null)
-            {
-                var frost = EnsureButton(drawer, "FrostTechUnlockButton",
-                    new Vector2(0f, 0f), new Vector2(232f, 222f), new Vector2(432f, 278f), out _);
-                SetButtonLabel(frost, "Unlock Frost");
-            }
-
             EnsurePrepButton(drawer, "RepairButton", "Repair", 150f);
             DestroyLegacyFallbackPrepButtonIfExists(drawer, "FortifyButton");
             DestroyLegacyFallbackPrepButtonIfExists(drawer, "RallyButton");
@@ -1671,6 +1659,10 @@ namespace DeadWalls
 
         private static void BindMarketFields(GameObject root, MarketUI market)
         {
+            market.DrawerTitleText = FindComponentInChildrenByName<TextMeshProUGUI>(root, "DrawerTitleText");
+            if (market.DrawerTitleText != null)
+                market.DrawerTitleText.text = "ARCHER RECRUITMENT";
+
             market.BasicCountText = FindComponentInChildrenByName<TextMeshProUGUI>(root, "BasicCountText");
             market.BasicDpsText = FindComponentInChildrenByName<TextMeshProUGUI>(root, "BasicDpsText");
             market.BasicLevelText = FindComponentInChildrenByName<TextMeshProUGUI>(root, "BasicLevelText");
@@ -1692,6 +1684,7 @@ namespace DeadWalls
             market.FrostBuyButton = FindComponentInChildrenByName<Button>(root, "FrostBuyButton");
             market.FrostUpgradeButton = FindComponentInChildrenByName<Button>(root, "FrostUpgradeButton");
 
+            market.ArrowTechPanel = FindChildByName(root, "ArrowTechPanel");
             market.RapidTechUnlockButton = FindComponentInChildrenByName<Button>(root, "RapidTechUnlockButton");
             market.FrostTechUnlockButton = FindComponentInChildrenByName<Button>(root, "FrostTechUnlockButton");
             market.RepairButton = FindComponentInChildrenByName<Button>(root, "RepairButton");
@@ -1743,6 +1736,32 @@ namespace DeadWalls
                 market.RallyButton.interactable = false;
                 market.RallyButton.gameObject.SetActive(false);
             }
+        }
+
+        private static void HidePlayerFacingArcherProgressionControls(MarketUI market)
+        {
+            HideButton(market.BasicUpgradeButton);
+            HideButton(market.RapidUpgradeButton);
+            HideButton(market.FrostUpgradeButton);
+            HideButton(market.RapidTechUnlockButton);
+            HideButton(market.FrostTechUnlockButton);
+
+            if (market.ArrowTechPanel != null)
+                market.ArrowTechPanel.SetActive(false);
+
+            SetOptionalChildActive(market.gameObject, "RapidTechCard", false);
+            SetOptionalChildActive(market.gameObject, "FrostTechCard", false);
+            SetOptionalChildActive(market.gameObject, "ArrowTechTitleText", false);
+            SetOptionalChildActive(market.gameObject, "ArrowTechHintText", false);
+        }
+
+        private static void HideButton(Button button)
+        {
+            if (button == null)
+                return;
+
+            button.interactable = false;
+            button.gameObject.SetActive(false);
         }
 
         private static void EnsureSubSceneRoot(Scene scene, SceneAsset subSceneAsset)

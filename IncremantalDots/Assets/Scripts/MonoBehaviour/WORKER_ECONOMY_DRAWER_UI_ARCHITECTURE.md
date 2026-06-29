@@ -26,9 +26,9 @@ Wood/Stone/Iron/Food + Worker button
 - Idle population
 - Total worker count
 - Archer population count
-- Wood/Stone/Iron/Food worker count
+- Wood/Stone/Iron/Food worker count ve resource cap (`WOOD 20/40`)
 - Wood/Stone/Iron/Food production rate
-- `NEED POP` / `READY` status
+- `READY` / `NEED POP` / `CAP FULL` status
 
 ## Scope
 

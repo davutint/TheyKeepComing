@@ -16,7 +16,7 @@
 
 ## Sorumluluk Sinirlari
 
-Bu tool sahne altyapisini ve mobile HUD/drawer icin gerekli UI/SubScene baglantilarini kurar. `MarketUI` artik popup market degil, `MobileCastleHudRoot` uzerindeki sag `ArcherDrawerPanel` controller'idir. Satin alma, upgrade ve tech unlock davranisi runtime `GameManager` API'lerindedir; polish gorsel export owner onayindan sonra gelir.
+Bu tool sahne altyapisini ve mobile HUD/drawer icin gerekli UI/SubScene baglantilarini kurar. `MarketUI` artik popup market degil, `MobileCastleHudRoot` uzerindeki sag `ArcherDrawerPanel` controller'idir. Sag drawer'in player-facing rolu yalnizca okcu satin alma/recruitment'tir. Upgrade ve tech unlock API'leri runtime'da ileride Tech Tree icin kalabilir, fakat bu panelde gosterilmez.
 
 Mevcut `GameScene` ve `GameScene/TestSubScene` referans olarak kullanilir, ama yeni mobil sahneye town-building/grid/resource UI kopyalanmaz.
 
@@ -26,7 +26,7 @@ Tool ayni isimli root ve child objeleri yeniden kullanir. Tekrar calistirildigin
 
 World visual tilemap'leri owner tarafindan yonetilir. Tool `Grid/outside` tilemapini bulursa sadece `MobileCastleArcherTilePlacement` controller'ina baglar; tile icerigine dokunmaz. Kale occlusion icin renderer sorting ve z-depth band'larini normalize eder: `inside` Wall/1/z0, `outside0` ve `outside` Wall/2/z0, `outside2` Wall/4/z-2.
 
-`Assets/Prefabs/UI/Generated/MobileCastleHudRoot.prefab` varsa `MobileCastleHudRoot` bu prefabdan instancelanir. Prefab yoksa fallback HUD ayni runtime isimleriyle kurulur: economy text'leri, fallback `WaveText`, fallback `KillsText`, fallback `DefenseText`, `WaveRewardText`, `DamageFlashOverlay`, `ArcherDrawerPanel`, Basic/Rapid/Frost row alanlari, tech unlock butonlari ve `RepairButton`. Onayli prefabda `CyclePanel` varsa fallback `WaveText/KillsText` uretilmez ve varsa kapatilir. Castle Interior economy paneli icin fallback polish UI uretilmez; owner onayli UI Importer export'u beklenir.
+`Assets/Prefabs/UI/Generated/MobileCastleHudRoot.prefab` varsa `MobileCastleHudRoot` bu prefabdan instancelanir. Prefab yoksa fallback HUD ayni runtime isimleriyle kurulur: economy text'leri, fallback `WaveText`, fallback `KillsText`, fallback `DefenseText`, `WaveRewardText`, `DamageFlashOverlay`, `ArcherDrawerPanel`, Basic/Rapid/Frost row buy alanlari ve `RepairButton`. Onayli prefabda `CyclePanel` varsa fallback `WaveText/KillsText` uretilmez ve varsa kapatilir. Castle Interior economy paneli icin fallback polish UI uretilmez; owner onayli UI Importer export'u beklenir.
 
 Onayli polish prefab gelirse tool `CastleDefensePanel` altindaki `DefensePercentText`, `DefenseWallFill`, `DefenseGateFill`, `DefenseCoreFill`, `DefenseWallText`, `DefenseGateText`, `DefenseCoreText` ve opsiyonel `DefenseDamageGlow` alanlarini baglar. Fill image'lari setup sirasinda horizontal left fill moduna alinir.
 
@@ -46,7 +46,7 @@ Readability polish icin `MobileCastleArcherTilePlacement` Scene view'da `outside
 
 Wave/run loop icin drawer oyun akisi controller'i degil, yalnizca gorsel ve referans root'udur. Davranis `MarketUI`, `UIManager`, `GameManager` ve ECS `DayNightPrepSystem` tarafindan uygulanir. UI Importer JSON'u runtime event barindirmaz. Yeni UI ihtiyaci dogarsa implementer final JSON uretmez; owner'a ayri Codex tabinda mockup/preview icin prompt verilir.
 
-Castle Yard prep aksiyonlari sag drawer'da player-facing degildir. Tool `RepairButton`, `FortifyButton`, `RallyButton`, `RefillArrowsButton` ve `StartNextWaveButton` bulursa gizler; sag drawer archer buy/upgrade ve tech unlock icin kullanilir. `CastleRepairButton` legacy Castle Interior akisi icin bagli kalabilir, fakat continuous siege varsayilaninda Castle Interior player-facing kapali tutulur.
+Castle Yard prep aksiyonlari sag drawer'da player-facing degildir. Tool `RepairButton`, `FortifyButton`, `RallyButton`, `RefillArrowsButton` ve `StartNextWaveButton` bulursa gizler. Tool ayrica `Basic/Rapid/FrostUpgradeButton`, `ArrowTechPanel`, `RapidTechUnlockButton` ve `FrostTechUnlockButton` bulursa gizler; sag drawer yalnizca archer recruitment icin kullanilir. `CastleRepairButton` legacy Castle Interior akisi icin bagli kalabilir, fakat continuous siege varsayilaninda Castle Interior player-facing kapali tutulur.
 
 `DayNightOverlay` Canvas'in ilk child'i olarak kurulur. Full-screen siyah Image sadece world'u karartir; `MobileCastleHudRoot` sonradan geldigi icin HUD/drawer overlay'in ustunde kalir. Overlay alpha runtime'da `DayNightOverlayController` tarafindan mobile config'teki day/night alpha ve `WaveStateData.PrepTimer` degerlerine gore guncellenir.
 
@@ -54,8 +54,11 @@ Castle Yard prep aksiyonlari sag drawer'da player-facing degildir. Tool `RepairB
 
 Mobile HUD economy varsayilanlari NewGameScene setup tarafindan GameStateAuthoring'e yazilir:
 
-- Wood `120`, Stone `60`, Iron `35`, Food `90`, Population `24`, Arrows `200`
+- Wood `280`, Stone `120`, Iron `70`, Food `220`, Population `60`, Arrows `200`
 - Initial workers: Wood `20`, Stone `10`, Iron `8`, Food `15`
-- Worker production: Wood `4.5/min`, Stone `3/min`, Iron `2/min`, Food `4/min`
+- Initial archers: `4`
+- Worker caps: Wood `40`, Stone `30`, Iron `24`, Food `40`
+- Worker production: Wood `8/min`, Stone `5.5/min`, Iron `3.8/min`, Food `7/min`
+- Continuous siege cycle tamamlandikca population growth `+15` uygulanir.
 
 Economy focus UI mobile worker economy ile kullanilmaz. Tool eski `EconomyFocusText` ve `EconomyBalanced/Wood/Stone/Iron/FoodButton` objelerini gizler. Yeni player-facing worker kontrolu `WorkerEconomyDrawerUI` uzerinden sol ust resource bar altindaki drawer ile yapilir. `CastleEconomyUI` legacy full-screen panel olarak bagli kalabilir ama `PlayerFacingPanelEnabled = false` ile kapali tutulur. Runtime davranis UI JSON icine gomulmez.

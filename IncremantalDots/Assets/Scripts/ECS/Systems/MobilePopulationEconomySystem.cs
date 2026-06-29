@@ -36,11 +36,30 @@ namespace DeadWalls
             var populationRW = SystemAPI.GetSingletonRW<PopulationState>();
             var productionRW = SystemAPI.GetSingletonRW<ResourceProductionRate>();
 
-            if (!wave.WaveActive && wave.Phase == RunPhaseType.DayPrep && wave.CurrentWave > 0)
+            if (config.ContinuousSiegeEnabled && SystemAPI.HasSingleton<ContinuousSiegeCycleData>())
+            {
+                var cycle = SystemAPI.GetSingleton<ContinuousSiegeCycleData>();
+                ApplyContinuousCycleGrowth(ref allocationRW.ValueRW, ref populationRW.ValueRW, config, cycle);
+            }
+            else if (!wave.WaveActive && wave.Phase == RunPhaseType.DayPrep && wave.CurrentWave > 0)
+            {
                 ApplyDayPrepStart(ref allocationRW.ValueRW, ref eventRW.ValueRW, ref populationRW.ValueRW, config, wave.CurrentWave);
+            }
 
-            NormalizeAllocation(ref allocationRW.ValueRW, ref populationRW.ValueRW);
+            NormalizeAllocation(ref allocationRW.ValueRW, ref populationRW.ValueRW, config);
             WriteProductionRates(ref productionRW.ValueRW, allocationRW.ValueRO, eventRW.ValueRO, config);
+        }
+
+        private static void ApplyContinuousCycleGrowth(ref MobilePopulationAllocation allocation,
+            ref PopulationState population, MobileCastleCombatConfig config, ContinuousSiegeCycleData cycle)
+        {
+            if (!cycle.Enabled || cycle.CycleIndex <= 0 || allocation.LastPopulationGrowthCycle == cycle.CycleIndex)
+                return;
+
+            population.Total += math.max(0, config.PopulationGrowthPerDayPrep);
+            population.Capacity = math.max(population.Capacity, population.Total);
+            population.BaseCapacity = math.max(population.BaseCapacity, population.Capacity);
+            allocation.LastPopulationGrowthCycle = cycle.CycleIndex;
         }
 
         private static void ApplyDayPrepStart(ref MobilePopulationAllocation allocation,
@@ -108,12 +127,13 @@ namespace DeadWalls
             }
         }
 
-        private static void NormalizeAllocation(ref MobilePopulationAllocation allocation, ref PopulationState population)
+        private static void NormalizeAllocation(ref MobilePopulationAllocation allocation, ref PopulationState population,
+            MobileCastleCombatConfig config)
         {
-            allocation.WoodWorkers = math.max(0, allocation.WoodWorkers);
-            allocation.StoneWorkers = math.max(0, allocation.StoneWorkers);
-            allocation.IronWorkers = math.max(0, allocation.IronWorkers);
-            allocation.FoodWorkers = math.max(0, allocation.FoodWorkers);
+            allocation.WoodWorkers = ClampWorkerCount(allocation.WoodWorkers, config.WoodWorkerCap);
+            allocation.StoneWorkers = ClampWorkerCount(allocation.StoneWorkers, config.StoneWorkerCap);
+            allocation.IronWorkers = ClampWorkerCount(allocation.IronWorkers, config.IronWorkerCap);
+            allocation.FoodWorkers = ClampWorkerCount(allocation.FoodWorkers, config.FoodWorkerCap);
 
             int availableForWorkers = math.max(0, population.Total - population.Archers);
             int totalWorkers = allocation.WoodWorkers + allocation.StoneWorkers + allocation.IronWorkers + allocation.FoodWorkers;
@@ -131,6 +151,12 @@ namespace DeadWalls
             population.Idle = math.max(0, population.Total - population.Workers - population.Archers);
             population.Capacity = math.max(population.Capacity, population.Total);
             population.BaseCapacity = math.max(population.BaseCapacity, population.Capacity);
+        }
+
+        private static int ClampWorkerCount(int value, int cap)
+        {
+            value = math.max(0, value);
+            return cap > 0 ? math.min(value, cap) : value;
         }
 
         private static void Reduce(ref int value, ref int overflow)
