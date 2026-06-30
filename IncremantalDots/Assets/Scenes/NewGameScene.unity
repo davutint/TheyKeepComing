@@ -61437,7 +61437,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3298377366900382478, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
   m_PrefabInstance: {fileID: 1065689827}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1266384030}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
@@ -66559,6 +66559,14 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 1103141597134995686, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4290764778
+      objectReference: {fileID: 0}
+    - target: {fileID: 1103141597134995686, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
     - target: {fileID: 1106985544423488794, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
       propertyPath: m_Layer
       value: 5
@@ -66670,6 +66678,14 @@ PrefabInstance:
     - target: {fileID: 1220051767087184936, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
       propertyPath: m_Layer
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1221014628284957157, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4290764778
+      objectReference: {fileID: 0}
+    - target: {fileID: 1221014628284957157, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
       objectReference: {fileID: 0}
     - target: {fileID: 1225118772321343912, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
       propertyPath: m_Layer
@@ -69567,6 +69583,14 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5627801258349568964, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4290573055
+      objectReference: {fileID: 0}
+    - target: {fileID: 5627801258349568964, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
     - target: {fileID: 5632416436167727010, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
       propertyPath: m_Layer
       value: 5
@@ -70376,6 +70400,10 @@ PrefabInstance:
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 6889692733459713975, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+    - target: {fileID: 6889692733459713975, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
       propertyPath: m_fontColor32.rgba
       value: 4287153369
       objectReference: {fileID: 0}
@@ -70881,7 +70909,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7420597294958708344, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
       propertyPath: m_fontColor32.rgba
-      value: 4290638079
+      value: 4290764778
       objectReference: {fileID: 0}
     - target: {fileID: 7420597294958708344, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
       propertyPath: m_TextStyleHashCode
@@ -71903,6 +71931,14 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 8981635845157838370, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4290764778
+      objectReference: {fileID: 0}
+    - target: {fileID: 8981635845157838370, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
     - target: {fileID: 8982967439736390643, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
       propertyPath: m_Layer
       value: 5
@@ -72059,7 +72095,8 @@ PrefabInstance:
     - {fileID: 3655209949892590321, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
     - {fileID: 4548538280086737171, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
     - {fileID: 4977326653440044398, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 646128468541810482, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 1637502214968463535, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
       insertIndex: 0
@@ -72265,7 +72302,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3468296184552571353, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
   m_PrefabInstance: {fileID: 1065689827}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1266384031}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
@@ -72551,281 +72588,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6b07c0870ab432da9e6902833163c53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: DeadWalls::DeadWalls.CastleTechTreeUI
-  CastleTechTreeToggleButton: {fileID: 0}
-  CastleTechTreePanel: {fileID: 0}
-  CastleTechTreeCloseButton: {fileID: 0}
-  CastleTechTreeContent: {fileID: 0}
-  TechNodeTooltipPanel: {fileID: 0}
-  TechNodeTooltipTitleText: {fileID: 0}
-  TechNodeTooltipDescriptionText: {fileID: 0}
-  TechNodeTooltipCostText: {fileID: 0}
-  TechNodeTooltipBuyButton: {fileID: 0}
-  TechNodeTooltipStatusText: {fileID: 0}
-  ArcherDrawerPanel: {fileID: 1266384032}
-  DrawerToggleButtonObject: {fileID: 1266384031}
-  WorkerEconomyDrawerPanel: {fileID: 421566634}
-  WorkerDrawerToggleButtonObject: {fileID: 1266384030}
-  MarketUI: {fileID: 1065689863}
-  WorkerEconomyDrawerUI: {fileID: 1065689866}
-  TechNodes:
-  - TechId: 0
-    Button: {fileID: 0}
-    TitleText: {fileID: 0}
-    LevelText: {fileID: 0}
-    StateText: {fileID: 0}
-    CostText: {fileID: 0}
-    NeedText: {fileID: 0}
-    AvailableGlow: {fileID: 0}
-    LockIcon: {fileID: 0}
-    BoughtCheck: {fileID: 0}
-    MaxedBadge: {fileID: 0}
-  - TechId: 1
-    Button: {fileID: 0}
-    TitleText: {fileID: 0}
-    LevelText: {fileID: 0}
-    StateText: {fileID: 0}
-    CostText: {fileID: 0}
-    NeedText: {fileID: 0}
-    AvailableGlow: {fileID: 0}
-    LockIcon: {fileID: 0}
-    BoughtCheck: {fileID: 0}
-    MaxedBadge: {fileID: 0}
-  - TechId: 2
-    Button: {fileID: 0}
-    TitleText: {fileID: 0}
-    LevelText: {fileID: 0}
-    StateText: {fileID: 0}
-    CostText: {fileID: 0}
-    NeedText: {fileID: 0}
-    AvailableGlow: {fileID: 0}
-    LockIcon: {fileID: 0}
-    BoughtCheck: {fileID: 0}
-    MaxedBadge: {fileID: 0}
-  - TechId: 3
-    Button: {fileID: 0}
-    TitleText: {fileID: 0}
-    LevelText: {fileID: 0}
-    StateText: {fileID: 0}
-    CostText: {fileID: 0}
-    NeedText: {fileID: 0}
-    AvailableGlow: {fileID: 0}
-    LockIcon: {fileID: 0}
-    BoughtCheck: {fileID: 0}
-    MaxedBadge: {fileID: 0}
-  - TechId: 4
-    Button: {fileID: 0}
-    TitleText: {fileID: 0}
-    LevelText: {fileID: 0}
-    StateText: {fileID: 0}
-    CostText: {fileID: 0}
-    NeedText: {fileID: 0}
-    AvailableGlow: {fileID: 0}
-    LockIcon: {fileID: 0}
-    BoughtCheck: {fileID: 0}
-    MaxedBadge: {fileID: 0}
-  - TechId: 5
-    Button: {fileID: 0}
-    TitleText: {fileID: 0}
-    LevelText: {fileID: 0}
-    StateText: {fileID: 0}
-    CostText: {fileID: 0}
-    NeedText: {fileID: 0}
-    AvailableGlow: {fileID: 0}
-    LockIcon: {fileID: 0}
-    BoughtCheck: {fileID: 0}
-    MaxedBadge: {fileID: 0}
-  - TechId: 6
-    Button: {fileID: 0}
-    TitleText: {fileID: 0}
-    LevelText: {fileID: 0}
-    StateText: {fileID: 0}
-    CostText: {fileID: 0}
-    NeedText: {fileID: 0}
-    AvailableGlow: {fileID: 0}
-    LockIcon: {fileID: 0}
-    BoughtCheck: {fileID: 0}
-    MaxedBadge: {fileID: 0}
-  - TechId: 7
-    Button: {fileID: 0}
-    TitleText: {fileID: 0}
-    LevelText: {fileID: 0}
-    StateText: {fileID: 0}
-    CostText: {fileID: 0}
-    NeedText: {fileID: 0}
-    AvailableGlow: {fileID: 0}
-    LockIcon: {fileID: 0}
-    BoughtCheck: {fileID: 0}
-    MaxedBadge: {fileID: 0}
-  - TechId: 8
-    Button: {fileID: 0}
-    TitleText: {fileID: 0}
-    LevelText: {fileID: 0}
-    StateText: {fileID: 0}
-    CostText: {fileID: 0}
-    NeedText: {fileID: 0}
-    AvailableGlow: {fileID: 0}
-    LockIcon: {fileID: 0}
-    BoughtCheck: {fileID: 0}
-    MaxedBadge: {fileID: 0}
-  - TechId: 9
-    Button: {fileID: 0}
-    TitleText: {fileID: 0}
-    LevelText: {fileID: 0}
-    StateText: {fileID: 0}
-    CostText: {fileID: 0}
-    NeedText: {fileID: 0}
-    AvailableGlow: {fileID: 0}
-    LockIcon: {fileID: 0}
-    BoughtCheck: {fileID: 0}
-    MaxedBadge: {fileID: 0}
-  - TechId: 10
-    Button: {fileID: 0}
-    TitleText: {fileID: 0}
-    LevelText: {fileID: 0}
-    StateText: {fileID: 0}
-    CostText: {fileID: 0}
-    NeedText: {fileID: 0}
-    AvailableGlow: {fileID: 0}
-    LockIcon: {fileID: 0}
-    BoughtCheck: {fileID: 0}
-    MaxedBadge: {fileID: 0}
-  - TechId: 11
-    Button: {fileID: 0}
-    TitleText: {fileID: 0}
-    LevelText: {fileID: 0}
-    StateText: {fileID: 0}
-    CostText: {fileID: 0}
-    NeedText: {fileID: 0}
-    AvailableGlow: {fileID: 0}
-    LockIcon: {fileID: 0}
-    BoughtCheck: {fileID: 0}
-    MaxedBadge: {fileID: 0}
-  - TechId: 12
-    Button: {fileID: 0}
-    TitleText: {fileID: 0}
-    LevelText: {fileID: 0}
-    StateText: {fileID: 0}
-    CostText: {fileID: 0}
-    NeedText: {fileID: 0}
-    AvailableGlow: {fileID: 0}
-    LockIcon: {fileID: 0}
-    BoughtCheck: {fileID: 0}
-    MaxedBadge: {fileID: 0}
-  - TechId: 13
-    Button: {fileID: 0}
-    TitleText: {fileID: 0}
-    LevelText: {fileID: 0}
-    StateText: {fileID: 0}
-    CostText: {fileID: 0}
-    NeedText: {fileID: 0}
-    AvailableGlow: {fileID: 0}
-    LockIcon: {fileID: 0}
-    BoughtCheck: {fileID: 0}
-    MaxedBadge: {fileID: 0}
-  - TechId: 14
-    Button: {fileID: 0}
-    TitleText: {fileID: 0}
-    LevelText: {fileID: 0}
-    StateText: {fileID: 0}
-    CostText: {fileID: 0}
-    NeedText: {fileID: 0}
-    AvailableGlow: {fileID: 0}
-    LockIcon: {fileID: 0}
-    BoughtCheck: {fileID: 0}
-    MaxedBadge: {fileID: 0}
-  - TechId: 15
-    Button: {fileID: 0}
-    TitleText: {fileID: 0}
-    LevelText: {fileID: 0}
-    StateText: {fileID: 0}
-    CostText: {fileID: 0}
-    NeedText: {fileID: 0}
-    AvailableGlow: {fileID: 0}
-    LockIcon: {fileID: 0}
-    BoughtCheck: {fileID: 0}
-    MaxedBadge: {fileID: 0}
-  - TechId: 16
-    Button: {fileID: 0}
-    TitleText: {fileID: 0}
-    LevelText: {fileID: 0}
-    StateText: {fileID: 0}
-    CostText: {fileID: 0}
-    NeedText: {fileID: 0}
-    AvailableGlow: {fileID: 0}
-    LockIcon: {fileID: 0}
-    BoughtCheck: {fileID: 0}
-    MaxedBadge: {fileID: 0}
-  - TechId: 17
-    Button: {fileID: 0}
-    TitleText: {fileID: 0}
-    LevelText: {fileID: 0}
-    StateText: {fileID: 0}
-    CostText: {fileID: 0}
-    NeedText: {fileID: 0}
-    AvailableGlow: {fileID: 0}
-    LockIcon: {fileID: 0}
-    BoughtCheck: {fileID: 0}
-    MaxedBadge: {fileID: 0}
-  TechPaths:
-  - TargetTechId: 1
-    PathRoot: {fileID: 0}
-  - TargetTechId: 8
-    PathRoot: {fileID: 0}
-  - TargetTechId: 14
-    PathRoot: {fileID: 0}
-  - TargetTechId: 2
-    PathRoot: {fileID: 0}
-  - TargetTechId: 3
-    PathRoot: {fileID: 0}
-  - TargetTechId: 4
-    PathRoot: {fileID: 0}
-  - TargetTechId: 5
-    PathRoot: {fileID: 0}
-  - TargetTechId: 6
-    PathRoot: {fileID: 0}
-  - TargetTechId: 7
-    PathRoot: {fileID: 0}
-  - TargetTechId: 9
-    PathRoot: {fileID: 0}
-  - TargetTechId: 10
-    PathRoot: {fileID: 0}
-  - TargetTechId: 11
-    PathRoot: {fileID: 0}
-  - TargetTechId: 12
-    PathRoot: {fileID: 0}
-  - TargetTechId: 13
-    PathRoot: {fileID: 0}
-  - TargetTechId: 15
-    PathRoot: {fileID: 0}
-  - TargetTechId: 16
-    PathRoot: {fileID: 0}
-  - TargetTechId: 17
-    PathRoot: {fileID: 0}
-  BoughtPathColor:
-    r: 0.42
-    g: 0.7
-    b: 0.28
-    a: 1
-  AvailablePathColor:
-    r: 0.74
-    g: 0.52
-    b: 0.18
-    a: 1
-  LockedPathColor:
-    r: 0.42
-    g: 0.38
-    b: 0.32
-    a: 0.65
-  _selectedTech: 0
-  _isOpen: 0
-  _suppressedUi: 0
-  _marketWasEnabled: 0
-  _workerWasEnabled: 0
-  _archerDrawerWasActive: 0
-  _drawerToggleWasActive: 0
-  _workerPanelWasActive: 0
-  _workerToggleWasActive: 0
-  _nextRefreshTime: 0
 --- !u!114 &1074900026 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 176901796550179758, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
@@ -73094,21 +72856,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
---- !u!1 &1266384030 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7263182947267159011, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
-  m_PrefabInstance: {fileID: 1065689827}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &1266384031 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6981620538660003400, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
-  m_PrefabInstance: {fileID: 1065689827}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &1266384032 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7592589841566647446, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
-  m_PrefabInstance: {fileID: 1065689827}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1274978490 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5886367851562520847, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}

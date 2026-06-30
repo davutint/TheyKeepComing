@@ -163,7 +163,7 @@ Mobile normal mode'da `DamageCleanupSystem`, death timer biten zombiler icin kil
 
 ## Castle Interior Economy
 
-`EconomyFocusUI` mobile loop'ta artik kullanilmaz; setup tool eski focus objelerini gizler. Ekonomi yonu sol worker drawer ve kale ici worker site gorselleriyle belirlenir.
+`EconomyFocusUI` mobile loop'ta artik kullanilmaz; setup tool eski `EconomyFocusPanel` ve focus child objelerini root'tan soker. Ekonomi yonu sol worker drawer ve kale ici worker site gorselleriyle belirlenir.
 
 - `CastleInteriorClickTarget` ve `CastleEconomyUI` legacy/debug akisi olarak kalir; player-facing ana worker kontrolu sol drawer'dadir.
 - `WorkerEconomyDrawerUI` her zaman acilip kapanabilir; DayPrep sartina bagli degildir.

@@ -22,7 +22,8 @@ Proje ilk GDD'lerdeki grid town-building / RTS vizyonundan CIKTI. Su an aktif ge
   `CastleClickTarget`, ve bir SubScene referansi.
 - **`Assets/Scenes/NewGameScene/MobileCastleCombatSubScene.unity`** = DOTS authoring tarafi (ECS'e bake).
   Icerik: `GameState` (GameState+WaveConfig authoring), `CastleCore` (CastleAuthoring),
-  `MobileCastleConfig` (MobileCastleCombatAuthoring), `ArcherSlotRoot/ArcherSlot_01..03`.
+  `MobileCastleConfig` (MobileCastleCombatAuthoring), legacy/seed `BasicArcher_01`.
+- Okcu spawn noktasi artik subscene slot'lari degil, ana scene `Grid/outside` tilemapindeki dolu hucrelerdir.
 - Iki katman BILINCLI ayrik: Mono/UI ana sahnede, simulasyon datasi subscene'de.
 
 ### Gorsel temel: `WorldVisualRoot` + SmallScaleInt
@@ -103,7 +104,7 @@ Assets/Docs/                                     - GDD + ROADMAP (LEGACY/baglam)
 ```
 
 ## UI Uretim Is Akisi (ZORUNLU KURAL)
-**UI import edilir, ELLE YAZILMAZ/KURULMAZ.** Spec: `Editor/UIBuilder/CODEX_EXPORT_FORMAT.md`.
+Ana yol: UI import edilir. Spec: `Editor/UIBuilder/CODEX_EXPORT_FORMAT.md`.
 1. **Owner** UI'yi ayri bir Codex tasarim aracinda (kendi tool'u / yan tab) tasarlar; onizleme `CodexPreviews/<name>/`.
 2. **Owner** paketi `Assets/UIExports/<name>/` altina export eder: `ui.json` (layout) + `manifest.json`
    (sprite haritasi) + opsiyonel `sprites/`. Bu, UI layout'unun TEK dogruluk kaynagidir.
@@ -112,9 +113,11 @@ Assets/Docs/                                     - GDD + ROADMAP (LEGACY/baglam)
 4. **Implementer** sprite atar/auto-find yapar ve davranisi DeadWalls MonoBehaviour controller'larinda
    (`HUDController`, `MarketUI`, `CastleEconomyUI`, ...) integration report'a gore baglar.
 
-> **IMPLEMENTER ASLA:** elle `ui.json`/`manifest.json` layout YAZMAZ, elle uGUI hiyerarsisi KURMAZ.
-> Layout eksik/yanlissa -> owner'dan YENI export iste. Implementer'in UI isi: importer'i calistir, sprite ata, controller bagla.
-> (Owner UI yapmaktan hoslanmaz; UI kurulum adimlari ilgili `*_EDITOR_SETUP.md`'ye yazilir.)
+> **Onemli istisna:** Claude Code Unity prefab stage'de mevcut prefab uzerinde polish yapabilir. Bu durumda
+> `Assets/Prefabs/UI/Generated/MobileCastleHudRoot.prefab` anlik dogruluk kaynagidir; sonra
+> `Assets/UIExports/mobile_castle_hud/ui.json` + `manifest.json` ayni karara senkronlanir ki re-import eski UI'yi geri getirmesin.
+> Prefab polish yaparken binding isimleri korunur, mevcut HUD komple yeniden uretilmez, C# runtime davranisi degistirilmez.
+> `EconomyFocusPanel` retired durumdadir: prefabda ve exportta yoktur; setup tool bunu geri uretmez.
 
 ## Mimari Ozet
 > Otorite: gercek frame sirasi `[UpdateBefore]`/`[UpdateAfter]`/`OrderFirst` ozniteliklerinden gelir.

@@ -1389,8 +1389,8 @@
                     "y": 0
                   },
                   "sizeDelta": {
-                    "x": 24,
-                    "y": 24
+                    "x": 32,
+                    "y": 32
                   }
                 },
                 "image": {
@@ -1624,8 +1624,8 @@
                     "y": 0
                   },
                   "sizeDelta": {
-                    "x": 24,
-                    "y": 24
+                    "x": 32,
+                    "y": 32
                   }
                 },
                 "image": {
@@ -1859,8 +1859,8 @@
                     "y": 0
                   },
                   "sizeDelta": {
-                    "x": 24,
-                    "y": 24
+                    "x": 32,
+                    "y": 32
                   }
                 },
                 "image": {
@@ -2094,8 +2094,8 @@
                     "y": 0
                   },
                   "sizeDelta": {
-                    "x": 24,
-                    "y": 24
+                    "x": 32,
+                    "y": 32
                   }
                 },
                 "image": {
@@ -2336,532 +2336,6 @@
       },
       {
         "type": "Image",
-        "name": "EconomyFocusPanel",
-        "raycastTarget": false,
-        "rectTransform": {
-          "anchorMin": {
-            "x": 0.5,
-            "y": 0.5
-          },
-          "anchorMax": {
-            "x": 0.5,
-            "y": 0.5
-          },
-          "pivot": {
-            "x": 0.5,
-            "y": 0.5
-          },
-          "anchoredPosition": {
-            "x": -590,
-            "y": 407
-          },
-          "sizeDelta": {
-            "x": 700,
-            "y": 58
-          }
-        },
-        "image": {
-          "spriteName": null,
-          "color": "#FFFFFFFF",
-          "imageType": "Simple",
-          "preserveAspect": false
-        },
-        "spriteSlot": {
-          "category": "background",
-          "hint": "economy_focus_bar_v1.png",
-          "suggestedSize": "700x58"
-        },
-        "children": [
-          {
-            "type": "Text",
-            "name": "EconomyFocusText",
-            "raycastTarget": false,
-            "rectTransform": {
-              "anchorMin": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "anchorMax": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "pivot": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "anchoredPosition": {
-                "x": -272,
-                "y": 0
-              },
-              "sizeDelta": {
-                "x": 144,
-                "y": 38
-              }
-            },
-            "text": {
-              "content": "ECONOMY FOCUS",
-              "fontSize": 13.5,
-              "fontStyle": "Bold",
-              "color": "#E7CF79FF",
-              "alignment": "MiddleLeft",
-              "overflow": "Overflow"
-            }
-          },
-          {
-            "type": "Button",
-            "name": "EconomyBalancedButton",
-            "rectTransform": {
-              "anchorMin": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "anchorMax": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "pivot": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "anchoredPosition": {
-                "x": -144,
-                "y": 0
-              },
-              "sizeDelta": {
-                "x": 96,
-                "y": 38
-              }
-            },
-            "button": {
-              "interactable": true,
-              "transition": "ColorTint",
-              "colors": {
-                "normal": "#FFFFFFFF",
-                "highlighted": "#FFFFFFE8",
-                "pressed": "#00000022",
-                "disabled": "#707070AA"
-              }
-            },
-            "spriteSlot": {
-              "category": "button",
-              "hint": "economy_focus_chip_selected_v1.png",
-              "suggestedSize": "96x38"
-            },
-            "text": {
-              "content": "BAL",
-              "fontSize": 13,
-              "fontStyle": "Bold",
-              "color": "#FFF2BCFF",
-              "alignment": "MiddleCenter",
-              "overflow": "Overflow"
-            },
-            "style": {
-              "backgroundColor": "#FFFFFFFF"
-            }
-          },
-          {
-            "type": "Button",
-            "name": "EconomyWoodButton",
-            "rectTransform": {
-              "anchorMin": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "anchorMax": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "pivot": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "anchoredPosition": {
-                "x": -40,
-                "y": 0
-              },
-              "sizeDelta": {
-                "x": 96,
-                "y": 38
-              }
-            },
-            "button": {
-              "interactable": true,
-              "transition": "ColorTint",
-              "colors": {
-                "normal": "#FFFFFFFF",
-                "highlighted": "#FFFFFFE8",
-                "pressed": "#00000022",
-                "disabled": "#707070AA"
-              }
-            },
-            "spriteSlot": {
-              "category": "button",
-              "hint": "economy_focus_chip_v1.png",
-              "suggestedSize": "96x38"
-            },
-            "text": {
-              "content": "WOOD",
-              "fontSize": 13,
-              "fontStyle": "Bold",
-              "color": "#EADFBFFF",
-              "alignment": "MiddleCenter",
-              "overflow": "Overflow"
-            },
-            "style": {
-              "backgroundColor": "#FFFFFFFF"
-            }
-          },
-          {
-            "type": "Button",
-            "name": "EconomyStoneButton",
-            "rectTransform": {
-              "anchorMin": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "anchorMax": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "pivot": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "anchoredPosition": {
-                "x": 64,
-                "y": 0
-              },
-              "sizeDelta": {
-                "x": 96,
-                "y": 38
-              }
-            },
-            "button": {
-              "interactable": true,
-              "transition": "ColorTint",
-              "colors": {
-                "normal": "#FFFFFFFF",
-                "highlighted": "#FFFFFFE8",
-                "pressed": "#00000022",
-                "disabled": "#707070AA"
-              }
-            },
-            "spriteSlot": {
-              "category": "button",
-              "hint": "economy_focus_chip_v1.png",
-              "suggestedSize": "96x38"
-            },
-            "text": {
-              "content": "STONE",
-              "fontSize": 13,
-              "fontStyle": "Bold",
-              "color": "#EADFBFFF",
-              "alignment": "MiddleCenter",
-              "overflow": "Overflow"
-            },
-            "style": {
-              "backgroundColor": "#FFFFFFFF"
-            }
-          },
-          {
-            "type": "Button",
-            "name": "EconomyIronButton",
-            "rectTransform": {
-              "anchorMin": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "anchorMax": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "pivot": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "anchoredPosition": {
-                "x": 168,
-                "y": 0
-              },
-              "sizeDelta": {
-                "x": 96,
-                "y": 38
-              }
-            },
-            "button": {
-              "interactable": true,
-              "transition": "ColorTint",
-              "colors": {
-                "normal": "#FFFFFFFF",
-                "highlighted": "#FFFFFFE8",
-                "pressed": "#00000022",
-                "disabled": "#707070AA"
-              }
-            },
-            "spriteSlot": {
-              "category": "button",
-              "hint": "economy_focus_chip_v1.png",
-              "suggestedSize": "96x38"
-            },
-            "text": {
-              "content": "IRON",
-              "fontSize": 13,
-              "fontStyle": "Bold",
-              "color": "#EADFBFFF",
-              "alignment": "MiddleCenter",
-              "overflow": "Overflow"
-            },
-            "style": {
-              "backgroundColor": "#FFFFFFFF"
-            }
-          },
-          {
-            "type": "Button",
-            "name": "EconomyFoodButton",
-            "rectTransform": {
-              "anchorMin": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "anchorMax": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "pivot": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "anchoredPosition": {
-                "x": 272,
-                "y": 0
-              },
-              "sizeDelta": {
-                "x": 96,
-                "y": 38
-              }
-            },
-            "button": {
-              "interactable": true,
-              "transition": "ColorTint",
-              "colors": {
-                "normal": "#FFFFFFFF",
-                "highlighted": "#FFFFFFE8",
-                "pressed": "#00000022",
-                "disabled": "#707070AA"
-              }
-            },
-            "spriteSlot": {
-              "category": "button",
-              "hint": "economy_focus_chip_v1.png",
-              "suggestedSize": "96x38"
-            },
-            "text": {
-              "content": "FOOD",
-              "fontSize": 13,
-              "fontStyle": "Bold",
-              "color": "#EADFBFFF",
-              "alignment": "MiddleCenter",
-              "overflow": "Overflow"
-            },
-            "style": {
-              "backgroundColor": "#FFFFFFFF"
-            }
-          },
-          {
-            "type": "Image",
-            "name": "EconomyBalancedSelected",
-            "raycastTarget": false,
-            "rectTransform": {
-              "anchorMin": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "anchorMax": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "pivot": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "anchoredPosition": {
-                "x": -144,
-                "y": 0
-              },
-              "sizeDelta": {
-                "x": 96,
-                "y": 38
-              }
-            },
-            "image": {
-              "spriteName": null,
-              "color": "#FFFFFFFF",
-              "imageType": "Simple",
-              "preserveAspect": false
-            },
-            "spriteSlot": {
-              "category": "selection",
-              "hint": "economy_focus_selected_v1.png",
-              "suggestedSize": "96x38"
-            }
-          },
-          {
-            "type": "Image",
-            "name": "EconomyWoodSelected",
-            "raycastTarget": false,
-            "rectTransform": {
-              "anchorMin": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "anchorMax": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "pivot": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "anchoredPosition": {
-                "x": -40,
-                "y": 0
-              },
-              "sizeDelta": {
-                "x": 96,
-                "y": 38
-              }
-            },
-            "image": {
-              "spriteName": null,
-              "color": "#FFFFFF00",
-              "imageType": "Simple",
-              "preserveAspect": false
-            },
-            "spriteSlot": {
-              "category": "selection",
-              "hint": "economy_focus_selected_v1.png",
-              "suggestedSize": "96x38"
-            }
-          },
-          {
-            "type": "Image",
-            "name": "EconomyStoneSelected",
-            "raycastTarget": false,
-            "rectTransform": {
-              "anchorMin": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "anchorMax": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "pivot": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "anchoredPosition": {
-                "x": 64,
-                "y": 0
-              },
-              "sizeDelta": {
-                "x": 96,
-                "y": 38
-              }
-            },
-            "image": {
-              "spriteName": null,
-              "color": "#FFFFFF00",
-              "imageType": "Simple",
-              "preserveAspect": false
-            },
-            "spriteSlot": {
-              "category": "selection",
-              "hint": "economy_focus_selected_v1.png",
-              "suggestedSize": "96x38"
-            }
-          },
-          {
-            "type": "Image",
-            "name": "EconomyIronSelected",
-            "raycastTarget": false,
-            "rectTransform": {
-              "anchorMin": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "anchorMax": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "pivot": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "anchoredPosition": {
-                "x": 168,
-                "y": 0
-              },
-              "sizeDelta": {
-                "x": 96,
-                "y": 38
-              }
-            },
-            "image": {
-              "spriteName": null,
-              "color": "#FFFFFF00",
-              "imageType": "Simple",
-              "preserveAspect": false
-            },
-            "spriteSlot": {
-              "category": "selection",
-              "hint": "economy_focus_selected_v1.png",
-              "suggestedSize": "96x38"
-            }
-          },
-          {
-            "type": "Image",
-            "name": "EconomyFoodSelected",
-            "raycastTarget": false,
-            "rectTransform": {
-              "anchorMin": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "anchorMax": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "pivot": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "anchoredPosition": {
-                "x": 272,
-                "y": 0
-              },
-              "sizeDelta": {
-                "x": 96,
-                "y": 38
-              }
-            },
-            "image": {
-              "spriteName": null,
-              "color": "#FFFFFF00",
-              "imageType": "Simple",
-              "preserveAspect": false
-            },
-            "spriteSlot": {
-              "category": "selection",
-              "hint": "economy_focus_selected_v1.png",
-              "suggestedSize": "96x38"
-            }
-          }
-        ],
-        "active": false
-      },
-      {
-        "type": "Image",
         "name": "CyclePanel",
         "raycastTarget": false,
         "rectTransform": {
@@ -3099,7 +2573,7 @@
               },
               "sizeDelta": {
                 "x": 300,
-                "y": 14
+                "y": 20
               }
             },
             "image": {
@@ -3137,12 +2611,12 @@
                   },
                   "sizeDelta": {
                     "x": 184,
-                    "y": 8
+                    "y": 14
                   }
                 },
                 "image": {
                   "spriteName": null,
-                  "color": "#F0B65AFF",
+                  "color": "#FFC752FF",
                   "imageType": "Simple",
                   "preserveAspect": false
                 },
@@ -3551,7 +3025,7 @@
           },
           "sizeDelta": {
             "x": 340,
-            "y": 92
+            "y": 110
           }
         },
         "image": {
@@ -3589,7 +3063,7 @@
               },
               "sizeDelta": {
                 "x": 328,
-                "y": 82
+                "y": 100
               }
             },
             "image": {

@@ -18,13 +18,13 @@
 
 ## NewGameScene Mobile HUD
 
-`Window -> DeadWalls -> Mobile Castle Scene Setup` tool'u `Canvas/MobileCastleHudRoot` objesini, `HUDController`, `MarketUI` ve `EconomyFocusUI` controller'larini idempotent olarak baglar.
+`Window -> DeadWalls -> Mobile Castle Scene Setup` tool'u `Canvas/MobileCastleHudRoot` objesini, `HUDController`, `MarketUI` ve `WorkerEconomyDrawerUI` controller'larini idempotent olarak baglar. Legacy `EconomyFocusUI` mobile continuous loop'ta player-facing degildir ve setup tarafindan root'tan sokulur.
 
 Beklenen referanslar:
 
 - Economy: `WoodText`, `StoneText`, `IronText`, `FoodText`, `PopulationText`, `ArrowText`
-- Economy Focus: `EconomyFocusText`, `EconomyBalancedButton`, `EconomyWoodButton`, `EconomyStoneButton`, `EconomyIronButton`, `EconomyFoodButton`
-- Optional Focus Highlight: `EconomyBalancedSelected`, `EconomyWoodSelected`, `EconomyStoneSelected`, `EconomyIronSelected`, `EconomyFoodSelected`
+- Worker drawer: `WorkerEconomyDrawerPanel`, `WorkerDrawerToggleButton`, `WorkerIdlePopulationText`, `WorkerTotalText`, `WorkerArcherPopulationText`
+- Worker rows: `WoodWorkerCountText`, `WoodWorkerRateText`, `WoodWorkerAddButton`, `WoodWorkerStatusText`; ayni pattern `Stone`, `Iron` ve `Food` icin
 - Top center: `WaveText`, `KillsText`, `WaveRewardText`
 - Defense module: `CastleDefensePanel`, `DefensePercentText`, `DefenseWallFill`, `DefenseGateFill`, `DefenseCoreFill`, `DefenseWallText`, `DefenseGateText`, `DefenseCoreText`
 - Optional defense feedback: `DefenseDamageGlow`, `DefenseWarningIcon`, fallback `DefenseText`
@@ -47,7 +47,7 @@ Drawer gameplay'i pause etmez. Mobile castle loop'ta level-up paneli kullanilmaz
 
 `Repair`, `Fortify` ve `Rally` sag drawer'da player-facing olarak gizlenir. Archer buy combat sirasinda kullanilmaya devam eder; sag panel komple kilitlenmez. Castle Yard aksiyonlari polish prefabda yoksa tool yeni Fortify/Rally gorseli uretmez, sadece mevcut isimleri baglar.
 
-Economy focus butonlari combat sirasinda kullanilabilir. Balanced seciliyken tum passive/reward akisi hafif boost alir; Wood/Stone/Iron/Food seciliyken secili kaynak pasif uretim, kill reward ve wave clear bonus tarafinda daha guclu akar.
+Economy focus butonlari mobile continuous HUD'dan tamamen kaldirildi. Kaynak yonlendirme player-facing olarak sol worker drawer uzerinden yapilir; `EconomyFocusState` ve `EconomyFocusUI` sadece legacy/debug akislar icin kodda kalabilir.
 
 Mobile unlimited arrow modunda HUD `ArrowText` degeri `INF` gosterir. Refill butonu player-facing UI'da kullanilmaz; `GameManager.RefillArrows()` legacy/debug API olarak kalabilir.
 

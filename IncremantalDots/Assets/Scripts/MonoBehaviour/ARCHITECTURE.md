@@ -86,7 +86,7 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 ### EconomyFocusUI.cs
 
 - Legacy controller'dir.
-- Mobile worker economy aktifken setup tool economy focus objelerini gizler ve bu controller'i kullanmaz.
+- Mobile worker economy aktifken setup tool economy focus panel/objelerini root'tan soker ve bu controller'i kullanmaz.
 - Eski focus akisi, `MobilePopulationAllocation` bulunmayan mobile/legacy denemeler icin korunur.
 
 ### CastleEconomyUI.cs

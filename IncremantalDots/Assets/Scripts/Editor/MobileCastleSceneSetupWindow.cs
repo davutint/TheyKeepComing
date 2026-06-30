@@ -1386,17 +1386,18 @@ namespace DeadWalls
         private static void HideEconomyFocus(GameObject hudRoot)
         {
             DestroyComponentIfExists<EconomyFocusUI>(hudRoot);
-            SetOptionalChildActive(hudRoot, "EconomyFocusText", false);
-            SetOptionalChildActive(hudRoot, "EconomyBalancedButton", false);
-            SetOptionalChildActive(hudRoot, "EconomyWoodButton", false);
-            SetOptionalChildActive(hudRoot, "EconomyStoneButton", false);
-            SetOptionalChildActive(hudRoot, "EconomyIronButton", false);
-            SetOptionalChildActive(hudRoot, "EconomyFoodButton", false);
-            SetOptionalChildActive(hudRoot, "EconomyBalancedSelected", false);
-            SetOptionalChildActive(hudRoot, "EconomyWoodSelected", false);
-            SetOptionalChildActive(hudRoot, "EconomyStoneSelected", false);
-            SetOptionalChildActive(hudRoot, "EconomyIronSelected", false);
-            SetOptionalChildActive(hudRoot, "EconomyFoodSelected", false);
+            DestroyChildIfExists(hudRoot.transform, "EconomyFocusPanel");
+            DestroyChildIfExists(hudRoot.transform, "EconomyFocusText");
+            DestroyChildIfExists(hudRoot.transform, "EconomyBalancedButton");
+            DestroyChildIfExists(hudRoot.transform, "EconomyWoodButton");
+            DestroyChildIfExists(hudRoot.transform, "EconomyStoneButton");
+            DestroyChildIfExists(hudRoot.transform, "EconomyIronButton");
+            DestroyChildIfExists(hudRoot.transform, "EconomyFoodButton");
+            DestroyChildIfExists(hudRoot.transform, "EconomyBalancedSelected");
+            DestroyChildIfExists(hudRoot.transform, "EconomyWoodSelected");
+            DestroyChildIfExists(hudRoot.transform, "EconomyStoneSelected");
+            DestroyChildIfExists(hudRoot.transform, "EconomyIronSelected");
+            DestroyChildIfExists(hudRoot.transform, "EconomyFoodSelected");
         }
 
         private static void ConfigureCastleEconomy(GameObject hudRoot)
@@ -1522,47 +1523,6 @@ namespace DeadWalls
 
             foreach (var graphic in root.GetComponentsInChildren<Graphic>(true))
                 graphic.raycastTarget = false;
-        }
-
-        private static void ConfigureEconomyFocus(GameObject hudRoot)
-        {
-            EnsureFallbackEconomyFocus(hudRoot.transform);
-
-            var economyFocus = EnsureComponent<EconomyFocusUI>(hudRoot);
-            economyFocus.EconomyFocusText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "EconomyFocusText");
-            economyFocus.EconomyBalancedButton = FindComponentInChildrenByName<Button>(hudRoot, "EconomyBalancedButton");
-            economyFocus.EconomyWoodButton = FindComponentInChildrenByName<Button>(hudRoot, "EconomyWoodButton");
-            economyFocus.EconomyStoneButton = FindComponentInChildrenByName<Button>(hudRoot, "EconomyStoneButton");
-            economyFocus.EconomyIronButton = FindComponentInChildrenByName<Button>(hudRoot, "EconomyIronButton");
-            economyFocus.EconomyFoodButton = FindComponentInChildrenByName<Button>(hudRoot, "EconomyFoodButton");
-            economyFocus.EconomyBalancedSelected = FindChildByName(hudRoot, "EconomyBalancedSelected");
-            economyFocus.EconomyWoodSelected = FindChildByName(hudRoot, "EconomyWoodSelected");
-            economyFocus.EconomyStoneSelected = FindChildByName(hudRoot, "EconomyStoneSelected");
-            economyFocus.EconomyIronSelected = FindChildByName(hudRoot, "EconomyIronSelected");
-            economyFocus.EconomyFoodSelected = FindChildByName(hudRoot, "EconomyFoodSelected");
-        }
-
-        private static void EnsureFallbackEconomyFocus(Transform root)
-        {
-            FindOrCreateText(root, "EconomyFocusText", "FOCUS: BALANCED", 16,
-                TextAlignmentOptions.Left, new Vector2(0f, 1f), new Vector2(0f, 1f),
-                new Vector2(24f, -90f), new Vector2(260f, -62f));
-
-            EnsureFocusButton(root, "EconomyBalancedButton", "BAL", 24f, 80f);
-            EnsureFocusButton(root, "EconomyWoodButton", "WOOD", 112f, 198f);
-            EnsureFocusButton(root, "EconomyStoneButton", "STONE", 206f, 304f);
-            EnsureFocusButton(root, "EconomyIronButton", "IRON", 312f, 398f);
-            EnsureFocusButton(root, "EconomyFoodButton", "FOOD", 406f, 492f);
-        }
-
-        private static void EnsureFocusButton(Transform root, string name, string label, float left, float right)
-        {
-            if (FindComponentInChildrenByName<Button>(root.gameObject, name) != null)
-                return;
-
-            var button = EnsureButton(root, name,
-                new Vector2(0f, 1f), new Vector2(left, -132f), new Vector2(right, -94f), out _);
-            SetButtonLabel(button, label);
         }
 
         private static TextMeshProUGUI FindOrCreateText(Transform root, string name, string value, int fontSize,
