@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd1a2ac33dcbea94ebf0eadaff16ae71, type: 3}
+  m_Name: WorkerCamp
+  m_EditorClassIdentifier: DeadWalls::DeadWalls.TechNodeDefinitionSO
+  Id: worker_camp
+  Title: Worker Camp
+  Description: +6 worker cap on every resource.
+  Icon: {fileID: 0}
+  Cost:
+    Wood: 80
+    Stone: 40
+    Iron: 0
+    Food: 0
+  MaxLevel: 1
+  PrerequisiteNodeIds:
+  - wood_camp
+  RevealChildNodeIds: []
+  Effects:
+  - Type: 4
+    Value: 6
+    ArcherType: 0
+    Resource: 0

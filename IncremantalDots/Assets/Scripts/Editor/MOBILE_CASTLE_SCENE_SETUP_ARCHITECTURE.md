@@ -64,3 +64,20 @@ Mobile HUD economy varsayilanlari NewGameScene setup tarafindan GameStateAuthori
 - Continuous siege cycle tamamlandikca population growth `+15` uygulanir.
 
 Economy focus UI mobile worker economy ile kullanilmaz. Tool eski `EconomyFocusPanel`, `EconomyFocusText` ve `EconomyBalanced/Wood/Stone/Iron/FoodButton` objelerini root'tan soker; bunlar re-run ile geri uretilmez. Yeni player-facing worker kontrolu `WorkerEconomyDrawerUI` uzerinden sol ust resource bar altindaki drawer ile yapilir. `CastleEconomyUI` legacy full-screen panel olarak bagli kalabilir ama `PlayerFacingPanelEnabled = false` ile kapali tutulur. Runtime davranis UI JSON icine gomulmez.
+
+## Tech Tree Kurulumu
+
+Tool `Assets/ScriptableObject/MobileCastle/TechTree/` altinda 13 default `TechNodeDefinitionSO`
+asset'ini ve `TechTreeCatalog.asset`'i idempotent seed eder (`EnsureDefaultTechTreeCatalog`):
+mevcut asset degerlerine DOKUNMAZ, katalogdaki kullanici-eklenmis ekstra node'lar KORUNUR
+(merge-only), `RootNodeId` bossa `castle_heart` yazilir, `ValidateCatalog()` sorunlari
+Console'a warning basilir. Catalog `GameManager.techTreeCatalog` alanina baglanir.
+
+`ConfigureTechTree` HUD root'a `TechTreeUI` component'ini ekler ve prefabdaki
+`TechTreePanel/TechTreeOpenButton/TechTreeCloseButton/TechTreeViewport/TechTreeContent/
+TechNodeTemplate/TechConnectionTemplate` objelerini isimle baglar; template'ler inactive,
+panel kapali garanti edilir. Prefabda panel yoksa `EnsureFallbackTechTreePanel` minimal
+iskeleti kurar (normal akista devreye girmez — objeler `MobileCastleHudRoot.prefab` icindedir).
+`ConfigureHudRoot` ayrica HUD root'taki missing-script kalintilarini temizler
+(`GameObjectUtility.RemoveMonoBehavioursWithMissingScript`; eski `CastleTechTreeUI` kalintisi).
+Detay: `MonoBehaviour/TECH_TREE_UI_ARCHITECTURE.md` + `ScriptableObject/TECH_TREE_SO_ARCHITECTURE.md`.

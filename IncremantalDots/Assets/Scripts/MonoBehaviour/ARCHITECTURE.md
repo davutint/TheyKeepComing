@@ -16,7 +16,9 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - `StartNextWave()` debug/public API olarak kalir; mobile player-facing akis continuous day/dusk/night cycle ile ilerler
 - `RepairDefenseFull()`, `BuyFortify()`, `BuyRally()` ve `RefillArrows()` legacy/debug API olarak kalir
 - `GetDefensePercent()` wall/gate/castle toplam HP yuzdesini HUD'a verir
-- Mobile archer economy API'leri: `ArcherDefinitionSO` catalog'undan buy cost/base stat okuma, buy, type count/DPS okuma; unlock/upgrade API'leri ileride Tech Tree icin kodda kalir ama sag drawer player-facing kullanmaz
+- Mobile archer economy API'leri: `ArcherDefinitionSO` catalog'undan buy cost/base stat okuma, buy, type count/DPS okuma; legacy unlock/upgrade API'leri kodda kalir ama sag drawer player-facing kullanmaz
+- Tech Tree runtime state'i (run-scoped, persistence yok): `_techNodeLevels` + `_revealedTechNodes`; katalog `techTreeCatalog` (`TechTreeCatalogSO`, setup tool baglar). API: `IsTechNodeRevealed`, `GetTechNodeLevel`, `CanBuyTechNode(node, out reason)`, `TryBuyTechNode`, `GetRevealedTechNodes`. Root (`castle_heart`) otomatik sahipli baslar; satin alma `RevealChildNodeIds`'i gorunur yapar
+- Tech effect'leri: `UnlockArcherType` (maliyetsiz icsel unlock — `UnlockArcherType()` cagrilmaz, cift harcamayi onler), damage/firerate carpanlari (`GetScaledArcherStats` + `ApplyScaledStatsToArchers`), worker cap / production / population growth (`MobileCastleCombatConfig`'e base'ten yeniden hesaplanarak yazilir), defense MaxHP (Wall/Gate/Core, CurrentHP orani korunur). Base degerler ilk dokunusta cache'lenir; `RestartGame()` -> `ResetTechTreeState()` hepsini base'e dondurur
 - Worker economy API'leri: `OpenCastleEconomy()`, `CloseCastleEconomy()`, `SetResourceWorkers()`, `ChooseEconomyEvent()`
 - Economy focus API'leri legacy olarak kalir; worker economy aktifken setup tool focus UI'yi gizler
 - Legacy level-up API'leri durur, fakat mobile castle loop'ta XP level-up pause tetiklemez
@@ -76,6 +78,18 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - Mobile continuous siege loop'ta `Start Next Wave` player-facing UI'da gizlenir; oyun durmadan `DAY / DUSK / NIGHT` cycle'i akar
 - Runtime davranisi UI Importer JSON'una gomulmez; controller ve scene setup tool tarafinda baglanir
 
+### TechTreeUI.cs
+
+- Fullscreen dinamik Tech Tree paneli controller'idir (`MobileCastleHudRoot` uzerinde, MarketUI gibi ayri component)
+- Sabit kategori/tier/elle-yerlestirilmis agac YOKTUR; gorunur node'lar `GameManager.GetRevealedTechNodes()`'tan gelir, `TechNodeTemplate` runtime'da klonlanir
+- Baglanti cizgileri `RevealChildNodeIds` iliskisinden `TechConnectionTemplate` klonuyla cizilir; layout deterministik agac algoritmasi (derinlik -> x, gorunur yaprak sayisi -> y dagilimi)
+- Panel default kapali; `TechTreeOpenButton` acar, `TechTreeCloseButton` kapatir; PANEL ACIKKEN OYUN DURMAZ (drawer emsali; `MobilePrepPauseState` continuous siege'de olu, `Time.timeScale=0` "oyun durmaz" ilkesiyle catisir)
+- Satin alma `GameManager.TryBuyTechNode()` uzerinden; basarida graf yeniden kurulur (yeni reveal'lar gorunur)
+- Durum etiketleri: `AVAILABLE` / `BOUGHT` / `LOCKED` / `MAX` / `NEED ...` — duz renklerle ayrisir
+- `Icon` null ise `TechNodeIconImage` kapanir, `TechNodeIconFallbackText` baslik bas-harflerini gosterir (art uretilmez)
+- 0.2s unscaled poll ile refresh; gorunur node sayisi degisince rebuild
+- Otoriter dok: `TECH_TREE_UI_ARCHITECTURE.md`
+
 ### DayNightOverlayController.cs
 
 - `Canvas/DayNightOverlay` full-screen black `Image` alpha degerini yonetir.
@@ -130,6 +144,7 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 ECS Systems -> Entity Data -> GameManager.ReadECSData() -> Events -> UI Controllers
 Legacy UI Input -> GameManager.CanApplyUpgrade()/ApplyUpgrade() -> EntityManager.SetComponentData -> ECS
 Archer Drawer Input -> GameManager.BuyArcher() -> EntityManager.SetComponentData -> ECS
+Tech Tree Input -> GameManager.TryBuyTechNode() -> reveal/unlock state + MobileCastleCombatConfig/CastleHP/ArcherUnit yazimi -> ECS
 Worker Drawer Input -> GameManager.AssignResourceWorker() -> MobilePopulationAllocation -> DOTS VillagerWorker route visual sync -> MobilePopulationEconomySystem
 Legacy Castle Click -> CastleEconomyUI.OpenFromCastle() -> MobilePrepPauseState
 Legacy Worker Slider Input -> GameManager.SetResourceWorkers() -> MobilePopulationAllocation -> DOTS VillagerWorker visual sync

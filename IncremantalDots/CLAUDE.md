@@ -60,6 +60,7 @@ Otorite `ContinuousSiegeCycleData` (eski `WaveStateData.Phase` DEGIL):
 | Defense panel | `HUDController.cs` | AYRI controller YOK -- HUD alt modulu (`CastleDefensePanel`) Wall/Gate/Core |
 | Worker economy drawer (sol) | `WorkerEconomyDrawerUI.cs` | resource bar alti; Wood/Stone/Iron/Food `+ WORKER` assignment -- AKTIF ana ekonomi |
 | Archer recruitment drawer (sag) | `MarketUI.cs` | SO-driven `ArcherDefinitionSO` catalog'dan row basar; SADECE okcu satin alma (Buy); upgrade/ArrowTech/Repair/Fortify/Rally/StartNextWave player-facing GIZLI |
+| Tech Tree (fullscreen) | `TechTreeUI.cs` | SO-driven dinamik reveal grafi: `TechNodeDefinitionSO`+`TechTreeCatalogSO`, root `castle_heart` sahipli baslar, satin alma cocuklari acar; Rapid/Frost unlock BURADAN gelir; panel acikken oyun DURMAZ; kategori/tier YOK |
 | Gun/Gece overlay | `DayNightOverlayController.cs` | faz alpha (Day 0 -> Night 0.50) |
 | Castle Interior ekonomi paneli | `CastleEconomyUI.cs` | LEGACY/debug (`PlayerFacingPanelEnabled=false`); ana ekonomi sol drawer'a tasindi |
 | Kaleye tikla-ac tetikleyici | `CastleInteriorClickTarget.cs` | LEGACY; player-facing worker yonetimi sol drawer'da |
@@ -70,6 +71,7 @@ Otorite `ContinuousSiegeCycleData` (eski `WaveStateData.Phase` DEGIL):
   `Systems/MOBILE_CASTLE_COMBAT_ARCHITECTURE.md`, `Systems/CONTINUOUS_SIEGE_CYCLE_SYSTEM_ARCHITECTURE.md`,
   `Systems/MOBILE_POPULATION_ECONOMY_SYSTEM_ARCHITECTURE.md`, `Systems/SYSTEM_EXECUTION_ORDER_ARCHITECTURE.md`,
   `MonoBehaviour/ARCHITECTURE.md`, `MonoBehaviour/WORKER_ECONOMY_DRAWER_UI_ARCHITECTURE.md`,
+  `MonoBehaviour/TECH_TREE_UI_ARCHITECTURE.md`, `ScriptableObject/TECH_TREE_SO_ARCHITECTURE.md`,
   `MonoBehaviour/CASTLE_ECONOMY_UI_ARCHITECTURE.md`, `Editor/MOBILE_CASTLE_SCENE_SETUP_ARCHITECTURE.md`.
 - **Aktif yon:** mobile continuous siege + sol castle interior worker economy + combat/UI polish. **M-ISO (izometrik/perimeter) ARTIK AKTIF DEGIL.**
 - `Assets/Docs/ROADMAP.md` (son guncelleme 2026-03-18) = LEGACY milestone gecmisi, guncel yon DEGIL.
@@ -94,7 +96,7 @@ Assets/Scripts/
   ECS/{Components, Authoring, Systems, Physics}  - ECS data/baker/sistem/custom physics
   MonoBehaviour/                                 - manager + UI controller (ECS world'e kopru)
   Editor/                                        - tool/analyzer + UIBuilder/ (UI import pipeline)
-  ScriptableObject/                              - BuildingConfigSO (LEGACY bina sistemi)
+  ScriptableObject/                              - BuildingConfigSO (LEGACY) + MobileCastle SO'lari (ArcherDefinition/TechTree)
 Assets/Scenes/NewGameScene*                      - AKTIF sahne + DOTS subscene
 Assets/SmallScaleInt/                            - gorsel temel art (tileset + character creator)
 Assets/UIExports/<name>/                         - owner UI export'lari (ui.json + manifest + sprites)

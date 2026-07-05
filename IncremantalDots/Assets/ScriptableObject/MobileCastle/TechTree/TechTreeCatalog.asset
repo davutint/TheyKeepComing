@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f88e1b646a603b43932489619758c5e, type: 3}
+  m_Name: TechTreeCatalog
+  m_EditorClassIdentifier: DeadWalls::DeadWalls.TechTreeCatalogSO
+  RootNodeId: castle_heart
+  Nodes:
+  - {fileID: 11400000, guid: f458727655d705249bee48962ee756e8, type: 2}
+  - {fileID: 11400000, guid: eae63be275194e5498ca9e6c0611977c, type: 2}
+  - {fileID: 11400000, guid: f982f534d59934c4dab4ef860166141e, type: 2}
+  - {fileID: 11400000, guid: e43f0b1e914aa564e94c99c89f75e026, type: 2}
+  - {fileID: 11400000, guid: a741a533e0dd634469f3e8d89392cdfc, type: 2}
+  - {fileID: 11400000, guid: 2212b034341cc464f80b2672b020edf5, type: 2}
+  - {fileID: 11400000, guid: 393e195e6da05ae4d83367b3744e80bd, type: 2}
+  - {fileID: 11400000, guid: e6ee14b121ab7a748813bdf8fd2874ed, type: 2}
+  - {fileID: 11400000, guid: 702a68e37ba16ec4bacf296dfa0717c9, type: 2}
+  - {fileID: 11400000, guid: 247eb98e309e14b47854ac9c8c6a04d0, type: 2}
+  - {fileID: 11400000, guid: 55e5d274e1a4db640b4239b9aed385b7, type: 2}
+  - {fileID: 11400000, guid: cb4adf867ee26db4bb1db5e59f85be19, type: 2}
+  - {fileID: 11400000, guid: 9be79e70598f721468df8e734111b205, type: 2}

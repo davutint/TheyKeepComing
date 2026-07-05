@@ -15,6 +15,9 @@ namespace DeadWalls
         [Header("Mobile Recruitment")]
         [SerializeField] private ArcherRecruitmentCatalogSO archerCatalog;
 
+        [Header("Mobile Tech Tree")]
+        [SerializeField] private TechTreeCatalogSO techTreeCatalog;
+
         private EntityManager _entityManager;
         private Entity _gameStateEntity;
         private Entity _waveStateEntity;
@@ -58,6 +61,29 @@ namespace DeadWalls
         private bool _missingWorkerPlacementWarningLogged;
         private ArcherDefinitionSO[] _runtimeDefaultArcherDefinitions;
 
+        // Tech tree run-scoped state (persistence yok; RestartGame sifirlar — _unlockedArcherTypes kalibi)
+        private readonly Dictionary<string, int> _techNodeLevels = new Dictionary<string, int>();
+        private readonly HashSet<string> _revealedTechNodes = new HashSet<string>();
+        private bool _techTreeInitialized;
+        private float _techDamageMultiplier = 1f;
+        private float _techFireRateMultiplier = 1f;
+        // Config/defense base degerleri: tech ilk dokunmadan once yakalanir, her satin almada
+        // toplam etki base'ten YENIDEN hesaplanir (compound hatasi yok), restart'ta base geri yazilir.
+        private bool _techConfigBaselineCaptured;
+        private int _baseWoodWorkerCap;
+        private int _baseStoneWorkerCap;
+        private int _baseIronWorkerCap;
+        private int _baseFoodWorkerCap;
+        private float _baseWoodProductionPerMin;
+        private float _baseStoneProductionPerMin;
+        private float _baseIronProductionPerMin;
+        private float _baseFoodProductionPerMin;
+        private int _basePopulationGrowthPerCycle;
+        private bool _techDefenseBaselineCaptured;
+        private float _baseWallMaxHp;
+        private float _baseGateMaxHp;
+        private float _baseCastleMaxHp;
+
         public GameStateData GameState { get; private set; }
         public WaveStateData WaveState { get; private set; }
         public WallSegment Wall { get; private set; }
@@ -82,6 +108,7 @@ namespace DeadWalls
         public bool IsMobileMode => _initialized && TryGetMobileConfigEntity(out _);
         public bool IsFreeEconomyTestMode => freeEconomyTestMode;
         public ArcherRecruitmentCatalogSO ArcherCatalog => archerCatalog;
+        public TechTreeCatalogSO TechCatalog => techTreeCatalog;
 
         public event System.Action OnGameOver;
         public event System.Action OnLevelUp;
@@ -1168,6 +1195,389 @@ namespace DeadWalls
             return true;
         }
 
+        // ---------------------------------------------------------------------------------
+        // Tech Tree (SO-driven dinamik reveal grafi — otoriter dok: TECH_TREE_SO_ARCHITECTURE.md)
+        // Kurallar: node satin alinabilir <=> revealed + prerequisite'ler sahipli + !maxed + kaynak yeter.
+        // Root otomatik sahipli baslar; satin alma RevealChildNodeIds'i gorunur yapar.
+        // UnlockArcherType effect'i MALIYETSIZ icsel yoldan gider (UnlockArcherType() cift harcardi).
+        // ---------------------------------------------------------------------------------
+
+        public bool HasTechTreeCatalog => techTreeCatalog != null
+            && techTreeCatalog.Nodes != null
+            && techTreeCatalog.Nodes.Length > 0;
+
+        private void EnsureTechTreeInitialized()
+        {
+            if (_techTreeInitialized || techTreeCatalog == null)
+                return;
+
+            var root = techTreeCatalog.GetRootNode();
+            if (root == null)
+                return;
+
+            _techTreeInitialized = true;
+            // Root sahipli baslar: oyuncu agaci ilk actiginda satin alinabilir gercek tech'leri gorur.
+            _revealedTechNodes.Add(root.Id);
+            _techNodeLevels[root.Id] = 1;
+            RevealTechChildren(root);
+        }
+
+        private void RevealTechChildren(TechNodeDefinitionSO node)
+        {
+            if (node == null || node.RevealChildNodeIds == null || techTreeCatalog == null)
+                return;
+
+            foreach (var childId in node.RevealChildNodeIds)
+            {
+                if (!string.IsNullOrEmpty(childId) && techTreeCatalog.GetNode(childId) != null)
+                    _revealedTechNodes.Add(childId);
+            }
+        }
+
+        public bool IsTechNodeRevealed(string nodeId)
+        {
+            EnsureTechTreeInitialized();
+            return !string.IsNullOrEmpty(nodeId) && _revealedTechNodes.Contains(nodeId);
+        }
+
+        public int GetTechNodeLevel(string nodeId)
+        {
+            EnsureTechTreeInitialized();
+            return !string.IsNullOrEmpty(nodeId) && _techNodeLevels.TryGetValue(nodeId, out int level) ? level : 0;
+        }
+
+        public bool IsTechNodeMaxed(TechNodeDefinitionSO node)
+        {
+            return node != null && GetTechNodeLevel(node.Id) >= node.MaxLevel;
+        }
+
+        /// <summary>Su an gorunur (revealed) node tanimlarini katalog sirasiyla dondurur. UI graf kurulumu bunu kullanir.</summary>
+        public List<TechNodeDefinitionSO> GetRevealedTechNodes()
+        {
+            EnsureTechTreeInitialized();
+            var result = new List<TechNodeDefinitionSO>();
+            if (techTreeCatalog == null || techTreeCatalog.Nodes == null)
+                return result;
+
+            foreach (var node in techTreeCatalog.Nodes)
+            {
+                if (node != null && _revealedTechNodes.Contains(node.Id))
+                    result.Add(node);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Satin alma kural zinciri; reason UI status etiketi icin kisa koddur:
+        /// WAIT / HIDDEN / MAX / LOCKED / NEED ... (bos = alinabilir).
+        /// </summary>
+        public bool CanBuyTechNode(TechNodeDefinitionSO node, out string reason)
+        {
+            reason = string.Empty;
+            if (node == null || !_initialized)
+            {
+                reason = "WAIT";
+                return false;
+            }
+
+            EnsureTechTreeInitialized();
+
+            if (!_revealedTechNodes.Contains(node.Id))
+            {
+                reason = "HIDDEN";
+                return false;
+            }
+
+            if (GetTechNodeLevel(node.Id) >= node.MaxLevel)
+            {
+                reason = "MAX";
+                return false;
+            }
+
+            if (node.PrerequisiteNodeIds != null)
+            {
+                foreach (var prereqId in node.PrerequisiteNodeIds)
+                {
+                    if (!string.IsNullOrEmpty(prereqId) && GetTechNodeLevel(prereqId) <= 0)
+                    {
+                        reason = "LOCKED";
+                        return false;
+                    }
+                }
+            }
+
+            if (!CanAfford(node.Cost))
+            {
+                reason = node.Cost.ToNeedDisplayString(Resources);
+                return false;
+            }
+
+            return true;
+        }
+
+        public bool TryBuyTechNode(string nodeId)
+        {
+            return TryBuyTechNode(techTreeCatalog != null ? techTreeCatalog.GetNode(nodeId) : null);
+        }
+
+        public bool TryBuyTechNode(TechNodeDefinitionSO node)
+        {
+            if (!CanBuyTechNode(node, out _))
+                return false;
+
+            if (!SpendResources(node.Cost))
+                return false;
+
+            int newLevel = GetTechNodeLevel(node.Id) + 1;
+            _techNodeLevels[node.Id] = newLevel;
+
+            if (newLevel == 1)
+                RevealTechChildren(node);
+
+            ApplyTechNodeEffects(node);
+            OnGameStateChanged?.Invoke();
+            return true;
+        }
+
+        private void ApplyTechNodeEffects(TechNodeDefinitionSO node)
+        {
+            if (node.Effects == null || node.Effects.Length == 0)
+                return;
+
+            bool statsDirty = false;
+            bool economyDirty = false;
+            bool defenseDirty = false;
+
+            foreach (var effect in node.Effects)
+            {
+                switch (effect.Type)
+                {
+                    case TechNodeEffectType.UnlockArcherType:
+                        UnlockArcherTypeFromTech(effect.ArcherType);
+                        break;
+                    case TechNodeEffectType.ModifyArcherDamagePercent:
+                        _techDamageMultiplier *= 1f + effect.Value;
+                        statsDirty = true;
+                        break;
+                    case TechNodeEffectType.ModifyArcherFireRatePercent:
+                        _techFireRateMultiplier *= 1f + effect.Value;
+                        statsDirty = true;
+                        break;
+                    case TechNodeEffectType.IncreaseWorkerCap:
+                    case TechNodeEffectType.IncreaseResourceProductionPercent:
+                    case TechNodeEffectType.IncreasePopulationGrowth:
+                        economyDirty = true;
+                        break;
+                    case TechNodeEffectType.IncreaseDefenseMaxHpPercent:
+                        defenseDirty = true;
+                        break;
+                }
+            }
+
+            if (statsDirty)
+                ApplyScaledStatsToArchers(ArcherType.Basic, false);
+            if (economyDirty)
+                ApplyTechEconomyAggregates();
+            if (defenseDirty)
+                ApplyTechDefenseAggregates();
+        }
+
+        /// <summary>Tech ile acilan okcu tipi: maliyetsiz icsel unlock (node maliyeti zaten odendi).</summary>
+        private void UnlockArcherTypeFromTech(ArcherType type)
+        {
+            if (type == ArcherType.Basic)
+                return;
+
+            _unlockedArcherTypes.Add(type);
+        }
+
+        /// <summary>
+        /// Sahip olunan TUM tech node'larin ekonomi etkilerini base config degerlerinden yeniden hesaplar
+        /// ve MobileCastleCombatConfig'e yazar. ECS tuketicileri (MobilePopulationEconomySystem,
+        /// GetWorkerCap/GetWorkerProductionRate) config'i her frame taze okudugu icin baska sey gerekmez.
+        /// </summary>
+        private void ApplyTechEconomyAggregates()
+        {
+            if (!TryGetMobileConfigEntity(out var configEntity))
+                return;
+
+            var config = _entityManager.GetComponentData<MobileCastleCombatConfig>(configEntity);
+
+            if (!_techConfigBaselineCaptured)
+            {
+                _baseWoodWorkerCap = config.WoodWorkerCap;
+                _baseStoneWorkerCap = config.StoneWorkerCap;
+                _baseIronWorkerCap = config.IronWorkerCap;
+                _baseFoodWorkerCap = config.FoodWorkerCap;
+                _baseWoodProductionPerMin = config.WoodWorkerProductionPerMin;
+                _baseStoneProductionPerMin = config.StoneWorkerProductionPerMin;
+                _baseIronProductionPerMin = config.IronWorkerProductionPerMin;
+                _baseFoodProductionPerMin = config.FoodWorkerProductionPerMin;
+                _basePopulationGrowthPerCycle = config.PopulationGrowthPerDayPrep;
+                _techConfigBaselineCaptured = true;
+            }
+
+            int woodCap = 0, stoneCap = 0, ironCap = 0, foodCap = 0;
+            float woodProd = 0f, stoneProd = 0f, ironProd = 0f, foodProd = 0f;
+            int growth = 0;
+
+            if (techTreeCatalog != null && techTreeCatalog.Nodes != null)
+            {
+                foreach (var node in techTreeCatalog.Nodes)
+                {
+                    if (node == null || node.Effects == null)
+                        continue;
+
+                    int level = GetTechNodeLevel(node.Id);
+                    if (level <= 0)
+                        continue;
+
+                    foreach (var effect in node.Effects)
+                    {
+                        switch (effect.Type)
+                        {
+                            case TechNodeEffectType.IncreaseWorkerCap:
+                            {
+                                int amount = Mathf.RoundToInt(effect.Value) * level;
+                                bool all = effect.Resource == EconomyFocusType.Balanced;
+                                if (all || effect.Resource == EconomyFocusType.Wood) woodCap += amount;
+                                if (all || effect.Resource == EconomyFocusType.Stone) stoneCap += amount;
+                                if (all || effect.Resource == EconomyFocusType.Iron) ironCap += amount;
+                                if (all || effect.Resource == EconomyFocusType.Food) foodCap += amount;
+                                break;
+                            }
+                            case TechNodeEffectType.IncreaseResourceProductionPercent:
+                            {
+                                float amount = effect.Value * level;
+                                bool all = effect.Resource == EconomyFocusType.Balanced;
+                                if (all || effect.Resource == EconomyFocusType.Wood) woodProd += amount;
+                                if (all || effect.Resource == EconomyFocusType.Stone) stoneProd += amount;
+                                if (all || effect.Resource == EconomyFocusType.Iron) ironProd += amount;
+                                if (all || effect.Resource == EconomyFocusType.Food) foodProd += amount;
+                                break;
+                            }
+                            case TechNodeEffectType.IncreasePopulationGrowth:
+                                growth += Mathf.RoundToInt(effect.Value) * level;
+                                break;
+                        }
+                    }
+                }
+            }
+
+            config.WoodWorkerCap = _baseWoodWorkerCap + woodCap;
+            config.StoneWorkerCap = _baseStoneWorkerCap + stoneCap;
+            config.IronWorkerCap = _baseIronWorkerCap + ironCap;
+            config.FoodWorkerCap = _baseFoodWorkerCap + foodCap;
+            config.WoodWorkerProductionPerMin = _baseWoodProductionPerMin * (1f + woodProd);
+            config.StoneWorkerProductionPerMin = _baseStoneProductionPerMin * (1f + stoneProd);
+            config.IronWorkerProductionPerMin = _baseIronProductionPerMin * (1f + ironProd);
+            config.FoodWorkerProductionPerMin = _baseFoodProductionPerMin * (1f + foodProd);
+            config.PopulationGrowthPerDayPrep = _basePopulationGrowthPerCycle + growth;
+            _entityManager.SetComponentData(configEntity, config);
+        }
+
+        /// <summary>
+        /// Sahip olunan tech'lerin toplam MaxHP yuzdesini base degerlerden hesaplar; Wall/Gate/Core
+        /// MaxHP'sini yazar, CurrentHP oranini korur (RepairGate SetComponentData kalibi).
+        /// </summary>
+        private void ApplyTechDefenseAggregates()
+        {
+            if (!CanAccessEntityManager() || !_entityManager.Exists(_castleEntity))
+                return;
+
+            if (!_techDefenseBaselineCaptured)
+            {
+                _baseWallMaxHp = _entityManager.GetComponentData<WallSegment>(_castleEntity).MaxHP;
+                _baseGateMaxHp = _entityManager.GetComponentData<GateComponent>(_castleEntity).MaxHP;
+                _baseCastleMaxHp = _entityManager.GetComponentData<CastleHP>(_castleEntity).MaxHP;
+                _techDefenseBaselineCaptured = true;
+            }
+
+            float totalPercent = 0f;
+            if (techTreeCatalog != null && techTreeCatalog.Nodes != null)
+            {
+                foreach (var node in techTreeCatalog.Nodes)
+                {
+                    if (node == null || node.Effects == null)
+                        continue;
+
+                    int level = GetTechNodeLevel(node.Id);
+                    if (level <= 0)
+                        continue;
+
+                    foreach (var effect in node.Effects)
+                    {
+                        if (effect.Type == TechNodeEffectType.IncreaseDefenseMaxHpPercent)
+                            totalPercent += effect.Value * level;
+                    }
+                }
+            }
+
+            float multiplier = 1f + totalPercent;
+
+            var wall = _entityManager.GetComponentData<WallSegment>(_castleEntity);
+            float wallRatio = wall.MaxHP > 0f ? wall.CurrentHP / wall.MaxHP : 1f;
+            wall.MaxHP = _baseWallMaxHp * multiplier;
+            wall.CurrentHP = wall.MaxHP * wallRatio;
+            _entityManager.SetComponentData(_castleEntity, wall);
+            Wall = wall;
+
+            var gate = _entityManager.GetComponentData<GateComponent>(_castleEntity);
+            float gateRatio = gate.MaxHP > 0f ? gate.CurrentHP / gate.MaxHP : 1f;
+            gate.MaxHP = _baseGateMaxHp * multiplier;
+            gate.CurrentHP = gate.MaxHP * gateRatio;
+            _entityManager.SetComponentData(_castleEntity, gate);
+            Gate = gate;
+
+            var castle = _entityManager.GetComponentData<CastleHP>(_castleEntity);
+            float castleRatio = castle.MaxHP > 0f ? castle.CurrentHP / castle.MaxHP : 1f;
+            castle.MaxHP = _baseCastleMaxHp * multiplier;
+            castle.CurrentHP = castle.MaxHP * castleRatio;
+            _entityManager.SetComponentData(_castleEntity, castle);
+            Castle = castle;
+        }
+
+        /// <summary>Restart'ta tech state'i sifirlar ve config/defense degerlerini base'e dondurur.</summary>
+        private void ResetTechTreeState()
+        {
+            _techNodeLevels.Clear();
+            _revealedTechNodes.Clear();
+            _techTreeInitialized = false;
+            _techDamageMultiplier = 1f;
+            _techFireRateMultiplier = 1f;
+
+            if (_techConfigBaselineCaptured && TryGetMobileConfigEntity(out var configEntity))
+            {
+                var config = _entityManager.GetComponentData<MobileCastleCombatConfig>(configEntity);
+                config.WoodWorkerCap = _baseWoodWorkerCap;
+                config.StoneWorkerCap = _baseStoneWorkerCap;
+                config.IronWorkerCap = _baseIronWorkerCap;
+                config.FoodWorkerCap = _baseFoodWorkerCap;
+                config.WoodWorkerProductionPerMin = _baseWoodProductionPerMin;
+                config.StoneWorkerProductionPerMin = _baseStoneProductionPerMin;
+                config.IronWorkerProductionPerMin = _baseIronProductionPerMin;
+                config.FoodWorkerProductionPerMin = _baseFoodProductionPerMin;
+                config.PopulationGrowthPerDayPrep = _basePopulationGrowthPerCycle;
+                _entityManager.SetComponentData(configEntity, config);
+            }
+
+            if (_techDefenseBaselineCaptured && CanAccessEntityManager() && _entityManager.Exists(_castleEntity))
+            {
+                var wall = _entityManager.GetComponentData<WallSegment>(_castleEntity);
+                wall.MaxHP = _baseWallMaxHp;
+                _entityManager.SetComponentData(_castleEntity, wall);
+
+                var gate = _entityManager.GetComponentData<GateComponent>(_castleEntity);
+                gate.MaxHP = _baseGateMaxHp;
+                _entityManager.SetComponentData(_castleEntity, gate);
+
+                var castle = _entityManager.GetComponentData<CastleHP>(_castleEntity);
+                castle.MaxHP = _baseCastleMaxHp;
+                _entityManager.SetComponentData(_castleEntity, castle);
+            }
+        }
+
         private void ConfigureWaveForCurrentNumber(ref WaveStateData wave)
         {
             int w = wave.CurrentWave;
@@ -1258,8 +1668,9 @@ namespace DeadWalls
             float damageScale = math.pow(TypeDamageMultiplierPerLevel, extraLevels);
             float fireRateScale = math.pow(TypeFireRateMultiplierPerLevel, extraLevels) * _globalFireRateMultiplier;
 
-            stats.Damage = stats.Damage * damageScale + _globalArrowDamageBonus;
-            stats.FireRate *= fireRateScale;
+            // Tech tree carpanlari son degere uygulanir (flat bonus dahil) — bkz. TECH_TREE_SO_ARCHITECTURE.md
+            stats.Damage = (stats.Damage * damageScale + _globalArrowDamageBonus) * _techDamageMultiplier;
+            stats.FireRate *= fireRateScale * _techFireRateMultiplier;
 
             if (type == ArcherType.Frost)
             {
@@ -2082,6 +2493,7 @@ namespace DeadWalls
                 BuildingDetailUI.Instance.CloseDetail();
 
             ResetArcherEconomyState();
+            ResetTechTreeState();
             if (mobileMode && _entityManager.HasComponent<EconomyFocusState>(mobileConfigEntity))
             {
                 _entityManager.SetComponentData(mobileConfigEntity, new EconomyFocusState

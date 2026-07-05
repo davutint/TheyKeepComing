@@ -35,6 +35,8 @@ namespace DeadWalls
         private const string BasicArcherDefinitionPath = ArcherDefinitionFolder + "/BasicArcher.asset";
         private const string RapidArcherDefinitionPath = ArcherDefinitionFolder + "/RapidArcher.asset";
         private const string FrostArcherDefinitionPath = ArcherDefinitionFolder + "/FrostArcher.asset";
+        private const string TechTreeFolder = "Assets/ScriptableObject/MobileCastle/TechTree";
+        private const string TechTreeCatalogPath = TechTreeFolder + "/TechTreeCatalog.asset";
         private const string SmallScaleTilesRoot = "Assets/SmallScaleInt/Fantasy kingdom Tileset/Environment/Tiles";
         private const string ArrowMuzzleVfxPath = "Assets/VFX_Klaus/Prefabs/Stylized Shoot & Hit Vol.2/FX_Shoot_Arrow_muzzle.prefab";
         private const string ArrowHitVfxPath = "Assets/VFX_Klaus/Prefabs/Stylized Shoot & Hit Vol.2/FX_Shoot_Arrow_hit.prefab";
@@ -708,6 +710,7 @@ namespace DeadWalls
         private static void EnsureManagers(Scene scene, Canvas canvas)
         {
             ArcherRecruitmentCatalogSO archerCatalog = EnsureDefaultArcherRecruitmentCatalog();
+            TechTreeCatalogSO techCatalog = EnsureDefaultTechTreeCatalog();
             GameObject gameManagerObject = FindRoot(scene, "GameManager");
             if (gameManagerObject == null)
             {
@@ -717,6 +720,7 @@ namespace DeadWalls
             }
             var gameManager = EnsureComponent<GameManager>(gameManagerObject);
             AssignObjectReference(gameManager, "archerCatalog", archerCatalog);
+            AssignObjectReference(gameManager, "techTreeCatalog", techCatalog);
 
             var uiManager = EnsureComponent<UIManager>(canvas.gameObject);
             BuildCanvasPanels(canvas.transform, uiManager, archerCatalog);
@@ -793,6 +797,226 @@ namespace DeadWalls
             EnsureAssetFolder(parent);
             if (!AssetDatabase.IsValidFolder(normalized))
                 AssetDatabase.CreateFolder(parent, folderName);
+        }
+
+        // ---------------------------------------------------------------------------------
+        // Tech Tree SO seed (ArcherRecruitmentCatalog kalibi): default node'lar SADECE eksikse
+        // olusturulur (mevcut asset degerlerine dokunulmaz), katalog merge-only calisir —
+        // kullanicinin sonradan ekledigi ekstra tech node'lari ASLA silinmez.
+        // ---------------------------------------------------------------------------------
+
+        private struct TechNodeSeed
+        {
+            public string Id;
+            public string Title;
+            public string Description;
+            public ResourceCost Cost;
+            public int MaxLevel;
+            public string[] Prerequisites;
+            public string[] RevealChildren;
+            public TechNodeEffect[] Effects;
+        }
+
+        private static TechNodeSeed[] GetDefaultTechNodeSeeds()
+        {
+            return new[]
+            {
+                new TechNodeSeed
+                {
+                    Id = "castle_heart", Title = "Castle Heart",
+                    Description = "The living core of the castle. Every path grows from here.",
+                    Cost = ResourceCost.Zero, MaxLevel = 1,
+                    Prerequisites = new string[0],
+                    RevealChildren = new[] { "basic_archer", "wood_camp", "wall_reinforcement", "frost_arrows" },
+                    Effects = new TechNodeEffect[0]
+                },
+                new TechNodeSeed
+                {
+                    Id = "basic_archer", Title = "Basic Archer",
+                    Description = "Garrison drills that open the archery discipline.",
+                    Cost = new ResourceCost(40, 0, 0, 0), MaxLevel = 1,
+                    Prerequisites = new[] { "castle_heart" },
+                    RevealChildren = new[] { "bow_training", "rapid_volley" },
+                    Effects = new TechNodeEffect[0]
+                },
+                new TechNodeSeed
+                {
+                    Id = "bow_training", Title = "Bow Training",
+                    Description = "+15% archer damage per level.",
+                    Cost = new ResourceCost(60, 0, 20, 0), MaxLevel = 3,
+                    Prerequisites = new[] { "basic_archer" },
+                    RevealChildren = new string[0],
+                    Effects = new[] { new TechNodeEffect { Type = TechNodeEffectType.ModifyArcherDamagePercent, Value = 0.15f } }
+                },
+                new TechNodeSeed
+                {
+                    Id = "rapid_volley", Title = "Rapid Volley",
+                    Description = "+12% archer fire rate.",
+                    Cost = new ResourceCost(90, 0, 50, 0), MaxLevel = 1,
+                    Prerequisites = new[] { "basic_archer" },
+                    RevealChildren = new[] { "rapid_archer" },
+                    Effects = new[] { new TechNodeEffect { Type = TechNodeEffectType.ModifyArcherFireRatePercent, Value = 0.12f } }
+                },
+                new TechNodeSeed
+                {
+                    Id = "rapid_archer", Title = "Rapid Archer",
+                    Description = "Unlocks Rapid Archer recruitment.",
+                    Cost = new ResourceCost(120, 0, 60, 0), MaxLevel = 1,
+                    Prerequisites = new[] { "rapid_volley" },
+                    RevealChildren = new string[0],
+                    Effects = new[] { new TechNodeEffect { Type = TechNodeEffectType.UnlockArcherType, ArcherType = ArcherType.Rapid } }
+                },
+                new TechNodeSeed
+                {
+                    Id = "wood_camp", Title = "Wood Camp",
+                    Description = "+20% wood production.",
+                    Cost = new ResourceCost(50, 0, 0, 0), MaxLevel = 1,
+                    Prerequisites = new[] { "castle_heart" },
+                    RevealChildren = new[] { "worker_camp", "food_stores" },
+                    Effects = new[] { new TechNodeEffect { Type = TechNodeEffectType.IncreaseResourceProductionPercent, Value = 0.20f, Resource = EconomyFocusType.Wood } }
+                },
+                new TechNodeSeed
+                {
+                    Id = "worker_camp", Title = "Worker Camp",
+                    Description = "+6 worker cap on every resource.",
+                    Cost = new ResourceCost(80, 40, 0, 0), MaxLevel = 1,
+                    Prerequisites = new[] { "wood_camp" },
+                    RevealChildren = new string[0],
+                    Effects = new[] { new TechNodeEffect { Type = TechNodeEffectType.IncreaseWorkerCap, Value = 6f, Resource = EconomyFocusType.Balanced } }
+                },
+                new TechNodeSeed
+                {
+                    Id = "food_stores", Title = "Food Stores",
+                    Description = "+20% food production.",
+                    Cost = new ResourceCost(60, 0, 0, 30), MaxLevel = 1,
+                    Prerequisites = new[] { "wood_camp" },
+                    RevealChildren = new[] { "population_growth" },
+                    Effects = new[] { new TechNodeEffect { Type = TechNodeEffectType.IncreaseResourceProductionPercent, Value = 0.20f, Resource = EconomyFocusType.Food } }
+                },
+                new TechNodeSeed
+                {
+                    Id = "population_growth", Title = "Population Growth",
+                    Description = "+5 population each siege cycle.",
+                    Cost = new ResourceCost(40, 0, 0, 90), MaxLevel = 1,
+                    Prerequisites = new[] { "food_stores" },
+                    RevealChildren = new string[0],
+                    Effects = new[] { new TechNodeEffect { Type = TechNodeEffectType.IncreasePopulationGrowth, Value = 5f } }
+                },
+                new TechNodeSeed
+                {
+                    Id = "wall_reinforcement", Title = "Wall Reinforcement",
+                    Description = "+15% defense max HP.",
+                    Cost = new ResourceCost(0, 70, 0, 0), MaxLevel = 1,
+                    Prerequisites = new[] { "castle_heart" },
+                    RevealChildren = new[] { "repair_crew" },
+                    Effects = new[] { new TechNodeEffect { Type = TechNodeEffectType.IncreaseDefenseMaxHpPercent, Value = 0.15f } }
+                },
+                new TechNodeSeed
+                {
+                    Id = "repair_crew", Title = "Repair Crew",
+                    Description = "Dedicated crews thicken every rampart. +20% defense max HP.",
+                    Cost = new ResourceCost(0, 90, 40, 0), MaxLevel = 1,
+                    Prerequisites = new[] { "wall_reinforcement" },
+                    RevealChildren = new string[0],
+                    Effects = new[] { new TechNodeEffect { Type = TechNodeEffectType.IncreaseDefenseMaxHpPercent, Value = 0.20f } }
+                },
+                new TechNodeSeed
+                {
+                    Id = "frost_arrows", Title = "Frost Arrows",
+                    Description = "Chilling arrowheads open the frost path.",
+                    Cost = new ResourceCost(0, 60, 30, 0), MaxLevel = 1,
+                    Prerequisites = new[] { "castle_heart" },
+                    RevealChildren = new[] { "frost_archer" },
+                    Effects = new TechNodeEffect[0]
+                },
+                new TechNodeSeed
+                {
+                    Id = "frost_archer", Title = "Frost Archer",
+                    Description = "Unlocks Frost Archer recruitment.",
+                    Cost = new ResourceCost(0, 110, 60, 0), MaxLevel = 1,
+                    Prerequisites = new[] { "frost_arrows" },
+                    RevealChildren = new string[0],
+                    Effects = new[] { new TechNodeEffect { Type = TechNodeEffectType.UnlockArcherType, ArcherType = ArcherType.Frost } }
+                },
+            };
+        }
+
+        private static TechTreeCatalogSO EnsureDefaultTechTreeCatalog()
+        {
+            EnsureAssetFolder(TechTreeFolder);
+
+            var seeds = GetDefaultTechNodeSeeds();
+            var seedAssets = new List<TechNodeDefinitionSO>(seeds.Length);
+            foreach (var seed in seeds)
+                seedAssets.Add(EnsureTechNodeAsset(seed));
+
+            var catalog = AssetDatabase.LoadAssetAtPath<TechTreeCatalogSO>(TechTreeCatalogPath);
+            if (catalog == null)
+            {
+                catalog = ScriptableObject.CreateInstance<TechTreeCatalogSO>();
+                catalog.RootNodeId = "castle_heart";
+                AssetDatabase.CreateAsset(catalog, TechTreeCatalogPath);
+            }
+
+            var nodes = catalog.Nodes ?? Array.Empty<TechNodeDefinitionSO>();
+            bool changed = false;
+            var merged = new List<TechNodeDefinitionSO>(nodes.Length + seedAssets.Count);
+            for (int i = 0; i < nodes.Length; i++)
+            {
+                if (nodes[i] != null && !merged.Contains(nodes[i]))
+                    merged.Add(nodes[i]);
+            }
+
+            foreach (var seedAsset in seedAssets)
+            {
+                if (seedAsset != null && !merged.Contains(seedAsset))
+                {
+                    merged.Add(seedAsset);
+                    changed = true;
+                }
+            }
+
+            if (changed || merged.Count != nodes.Length)
+            {
+                Undo.RecordObject(catalog, "Configure Tech Tree Catalog");
+                catalog.Nodes = merged.ToArray();
+                EditorUtility.SetDirty(catalog);
+            }
+
+            if (string.IsNullOrEmpty(catalog.RootNodeId))
+            {
+                Undo.RecordObject(catalog, "Configure Tech Tree Catalog Root");
+                catalog.RootNodeId = "castle_heart";
+                EditorUtility.SetDirty(catalog);
+            }
+
+            var problems = catalog.ValidateCatalog();
+            foreach (var problem in problems)
+                Debug.LogWarning($"[MobileCastleSceneSetup] TechTreeCatalog: {problem}", catalog);
+
+            return catalog;
+        }
+
+        private static TechNodeDefinitionSO EnsureTechNodeAsset(TechNodeSeed seed)
+        {
+            string path = TechTreeFolder + "/" + seed.Title.Replace(" ", string.Empty) + ".asset";
+            var node = AssetDatabase.LoadAssetAtPath<TechNodeDefinitionSO>(path);
+            if (node != null)
+                return node; // mevcut asset degerlerine dokunma (owner editleri korunur)
+
+            node = ScriptableObject.CreateInstance<TechNodeDefinitionSO>();
+            node.Id = seed.Id;
+            node.Title = seed.Title;
+            node.Description = seed.Description;
+            node.Icon = null; // simdilik bilerek bos; UI bas-harf placeholder gosterir
+            node.Cost = seed.Cost;
+            node.MaxLevel = Mathf.Max(1, seed.MaxLevel);
+            node.PrerequisiteNodeIds = seed.Prerequisites ?? new string[0];
+            node.RevealChildNodeIds = seed.RevealChildren ?? new string[0];
+            node.Effects = seed.Effects ?? new TechNodeEffect[0];
+            AssetDatabase.CreateAsset(node, path);
+            EditorUtility.SetDirty(node);
+            return node;
         }
 
         private static void EnsureCastleInteriorWorkerArea(Scene scene)
@@ -1276,6 +1500,8 @@ namespace DeadWalls
         private static void ConfigureHudRoot(GameObject hudRoot, ArcherRecruitmentCatalogSO archerCatalog)
         {
             RemoveGeneratedCanvasComponents(hudRoot);
+            // Silinmis script kalintilarini temizle (orn. eski CastleTechTreeUI missing-script'i)
+            GameObjectUtility.RemoveMonoBehavioursWithMissingScript(hudRoot);
             SetLayerRecursive(hudRoot, LayerMask.NameToLayer("UI"));
             Stretch(hudRoot.GetComponent<RectTransform>());
 
@@ -1347,6 +1573,132 @@ namespace DeadWalls
             BindMarketFields(hudRoot, market);
             HidePlayerFacingPrepButtons(market);
             HidePlayerFacingArcherProgressionControls(market);
+
+            ConfigureTechTree(hudRoot);
+        }
+
+        /// <summary>
+        /// TechTreeUI component'ini HUD root'a ekler ve prefabdaki Tech Tree objelerini isimle bulup
+        /// baglar. Prefabda eksikse minimal fallback kurar (prefab yeniden kurulum senaryosu).
+        /// Katalog referansi GameManager'dadir (TechCatalog); UI runtime'da oradan okur.
+        /// </summary>
+        private static void ConfigureTechTree(GameObject hudRoot)
+        {
+            var techTree = EnsureComponent<TechTreeUI>(hudRoot);
+
+            var panel = FindChildByName(hudRoot, "TechTreePanel");
+            if (panel == null)
+                panel = EnsureFallbackTechTreePanel(hudRoot.transform);
+            techTree.TechTreePanel = panel;
+
+            techTree.TechTreeOpenButton = FindComponentInChildrenByName<Button>(hudRoot, "TechTreeOpenButton");
+            if (techTree.TechTreeOpenButton == null)
+            {
+                techTree.TechTreeOpenButton = EnsureButton(hudRoot.transform, "TechTreeOpenButton",
+                    new Vector2(0f, 1f), new Vector2(232f, -168f), new Vector2(358f, -130f), out _);
+                SetButtonLabel(techTree.TechTreeOpenButton, "TECH");
+            }
+
+            techTree.TechTreeCloseButton = FindComponentInChildrenByName<Button>(hudRoot, "TechTreeCloseButton");
+            techTree.TechTreeViewport = FindRectTransformByName(hudRoot, "TechTreeViewport");
+            techTree.TechTreeContent = FindRectTransformByName(hudRoot, "TechTreeContent");
+            techTree.TechNodeTemplate = FindRectTransformByName(hudRoot, "TechNodeTemplate");
+            techTree.TechConnectionTemplate = FindRectTransformByName(hudRoot, "TechConnectionTemplate");
+
+            if (techTree.TechNodeTemplate != null)
+                techTree.TechNodeTemplate.gameObject.SetActive(false);
+            if (techTree.TechConnectionTemplate != null)
+                techTree.TechConnectionTemplate.gameObject.SetActive(false);
+
+            // Panel default kapali; state sahibi TechTreeUI.
+            if (techTree.TechTreePanel != null)
+                techTree.TechTreePanel.SetActive(false);
+        }
+
+        /// <summary>
+        /// Prefabda Tech Tree UI'si hic yoksa calisan minimal iskelet kurar:
+        /// fullscreen panel + baslik + close + ScrollRect viewport/content + inactive node/connection template.
+        /// Normal akista prefab bu objeleri zaten icerir, bu yol devreye girmez.
+        /// </summary>
+        private static GameObject EnsureFallbackTechTreePanel(Transform hudRoot)
+        {
+            var panelGo = EnsurePanel(hudRoot, "TechTreePanel", false, new Color(0.043f, 0.055f, 0.067f, 0.96f));
+            var panelRect = panelGo.GetComponent<RectTransform>();
+            Stretch(panelRect);
+
+            EnsureText(panelGo.transform, "TechTreeTitleText", "TECH TREE", 26, TextAlignmentOptions.Left,
+                new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(28f, -58f), new Vector2(420f, -14f));
+
+            var closeButton = EnsureButton(panelGo.transform, "TechTreeCloseButton",
+                new Vector2(1f, 1f), new Vector2(-148f, -58f), new Vector2(-20f, -16f), out _);
+            SetButtonLabel(closeButton, "CLOSE");
+
+            var viewportGo = EnsureChild(panelGo.transform, "TechTreeViewport", true);
+            var viewportRect = viewportGo.GetComponent<RectTransform>();
+            SetRect(viewportRect, new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(16f, 16f), new Vector2(-16f, -72f));
+            EnsureComponent<RectMask2D>(viewportGo);
+
+            var contentGo = EnsureChild(viewportGo.transform, "TechTreeContent", true);
+            var contentRect = contentGo.GetComponent<RectTransform>();
+            contentRect.anchorMin = new Vector2(0f, 1f);
+            contentRect.anchorMax = new Vector2(0f, 1f);
+            contentRect.pivot = new Vector2(0f, 1f);
+            contentRect.anchoredPosition = Vector2.zero;
+            contentRect.sizeDelta = new Vector2(2400f, 1400f);
+
+            var scroll = EnsureComponent<ScrollRect>(viewportGo);
+            scroll.content = contentRect;
+            scroll.viewport = viewportRect;
+            scroll.horizontal = true;
+            scroll.vertical = true;
+            scroll.movementType = ScrollRect.MovementType.Clamped;
+            scroll.scrollSensitivity = 24f;
+
+            // Connection template: node'lardan once (altta cizilsin)
+            var connectionGo = EnsureChild(contentGo.transform, "TechConnectionTemplate", true);
+            var connectionRect = connectionGo.GetComponent<RectTransform>();
+            connectionRect.sizeDelta = new Vector2(120f, 3f);
+            var connectionImage = EnsureComponent<Image>(connectionGo);
+            connectionImage.color = new Color(0.42f, 0.47f, 0.52f, 0.85f);
+            connectionImage.raycastTarget = false;
+            connectionGo.SetActive(false);
+
+            var nodeGo = EnsureChild(contentGo.transform, "TechNodeTemplate", true);
+            var nodeRect = nodeGo.GetComponent<RectTransform>();
+            nodeRect.sizeDelta = new Vector2(230f, 112f);
+            var nodeImage = EnsureComponent<Image>(nodeGo);
+            nodeImage.color = new Color(0.137f, 0.165f, 0.196f, 0.95f);
+
+            var iconGo = EnsureChild(nodeGo.transform, "TechNodeIconImage", true);
+            var iconRect = iconGo.GetComponent<RectTransform>();
+            SetRect(iconRect, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(10f, -42f), new Vector2(42f, -10f));
+            var iconImage = EnsureComponent<Image>(iconGo);
+            iconImage.raycastTarget = false;
+            EnsureText(iconGo.transform, "TechNodeIconFallbackText", "?", 13, TextAlignmentOptions.Center,
+                new Vector2(0f, 0f), new Vector2(1f, 1f), Vector2.zero, Vector2.zero);
+
+            EnsureText(nodeGo.transform, "TechNodeTitleText", "Tech Node", 14, TextAlignmentOptions.Left,
+                new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(50f, -34f), new Vector2(-64f, -8f));
+            EnsureText(nodeGo.transform, "TechNodeLevelText", "LV 1", 10, TextAlignmentOptions.Right,
+                new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-62f, -30f), new Vector2(-8f, -10f));
+            EnsureText(nodeGo.transform, "TechNodeDescriptionText", "Description", 9, TextAlignmentOptions.TopLeft,
+                new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(12f, 34f), new Vector2(-84f, -42f));
+            EnsureText(nodeGo.transform, "TechNodeCostText", "COST", 10, TextAlignmentOptions.Left,
+                new Vector2(0f, 0f), new Vector2(0.55f, 0f), new Vector2(12f, 8f), new Vector2(0f, 30f));
+            EnsureText(nodeGo.transform, "TechNodeStatusText", "LOCKED", 10, TextAlignmentOptions.Center,
+                new Vector2(0.38f, 0f), new Vector2(0.64f, 0f), new Vector2(0f, 8f), new Vector2(0f, 30f));
+
+            var buyButton = EnsureButton(nodeGo.transform, "TechNodeBuyButton",
+                new Vector2(1f, 0f), new Vector2(-78f, 8f), new Vector2(-8f, 46f), out var buyLabel);
+            if (buyLabel != null)
+            {
+                buyLabel.gameObject.name = "TechNodeBuyButtonText";
+                buyLabel.text = "BUY";
+                buyLabel.fontSize = 12;
+            }
+
+            nodeGo.SetActive(false);
+            return panelGo;
         }
 
         private static void BindDefenseHudFields(GameObject hudRoot, HUDController hud)
