@@ -81,6 +81,8 @@ Otorite `ContinuousSiegeCycleData` (eski `WaveStateData.Phase` DEGIL):
 ## Proje Hakkinda
 - **Motor:** Unity `6000.3.10f1` (Unity 6 LTS) + DOTS/ECS (`com.unity.entities` 1.3.9, Entities Graphics, URP 2D).
 - **Namespace:** `DeadWalls` (tek asmdef: `Assets/Scripts/DeadWalls.asmdef`, `allowUnsafeCode: true`).
+- **Tween:** DOTween Pro (`Assets/Plugins/Demigiant`); UI juice icin. `DeadWalls.asmdef` -> `DOTween.Modules`
+  referansi SART (DOTween Utility Panel > Create ASMDEF ile uretilir); Modules asmdef'i silinirse DOFade/DOColor derlenmez.
 - **Tur:** Zombie castle-defense (360-derece, kaynak/nufus ekonomisi).
 
 ## Komutlar (build / test) -- detay: `AGENTS.md`

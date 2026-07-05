@@ -87,8 +87,15 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - Satin alma `GameManager.TryBuyTechNode()` uzerinden; basarida graf yeniden kurulur (yeni reveal'lar gorunur)
 - Durum etiketleri: `AVAILABLE` / `BOUGHT` / `LOCKED` / `MAX` / `NEED ...` — duz renklerle ayrisir
 - `Icon` null ise `TechNodeIconImage` kapanir, `TechNodeIconFallbackText` baslik bas-harflerini gosterir (art uretilmez)
-- 0.2s unscaled poll ile refresh; gorunur node sayisi degisince rebuild
+- 0.2s unscaled poll ile refresh; gorunur node sayisi degisince INCREMENTAL sync (mevcut view'lar korunur, yeniler cizgi-cizilme + scale-pop animasyonuyla eklenir, yeri degisenler kayar — DOTween, unscaled)
+- Juice: satin alma punch + chip flash + toast, reddetmede shake + kilit SFX'i, TECH butonunda alinabilir-tech badge'i (pulse), satin alinmis yollarin cizgileri yesil, LV pip'leri (MaxLevel 2-4), panel fade acilisi + son alinan node'a odak; SFX'ler Fantasy UI SFX Lite'tan setup tool ile baglanir
 - Otoriter dok: `TECH_TREE_UI_ARCHITECTURE.md`
+
+### TechTreeViewController.cs
+
+- Tech tree viewport'unun pan/zoom controller'i; ScrollRect'in ustune eklenir (sol drag ScrollRect'te kalir)
+- `TechTreeInputMode` enum (`Auto/Desktop/Mobile`): Desktop = tekerlek imlec-merkezli zoom + orta tus pan; Mobile = pinch zoom (orta-nokta merkezli) + tek parmak pan; Auto platforma gore secer
+- Zoom `content.localScale` ile (layout sabit); alt sinir icerik viewport'a sigiyorsa 1'e clamp; pinch sirasinda ScrollRect gecici kapatilir
 
 ### DayNightOverlayController.cs
 

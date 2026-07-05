@@ -28,6 +28,18 @@ Katalog `GameManager.techTreeCatalog`'a baglanir; `TechTreeUI` catalog'u GameMan
 - `TechTreeContent` altinda inactive template'ler: `TechConnectionTemplate` (120x3 duz Image)
   ve `TechNodeTemplate` (230x112; tum zorunlu cocuk isimleriyle — bkz. ARCHITECTURE isim sozlesmesi).
 
+## Juice + Gezinme Kurulumu (setup tool otomatik yapar)
+
+- `TechTreeViewController` viewport'a eklenir (`InputMode=Auto`); ScrollRect Elastic + inertia +
+  `scrollSensitivity=0` yapilir (tekerlek zoom'a devredildi).
+- `TechTreePanel`'e CanvasGroup (fade acilisi icin).
+- `TechTreeBadge` (TECH butonu cocugu, sari Knob nokta, default OFF) ve `TechTreeToastText`
+  (HUD katmani, alpha 0) bulunur/olusturulur ve baglanir.
+- SFX clip'leri baglanir: Buy=`Coins 2-1`, Reveal=`Magical Texture Chimes 1-1`,
+  Denied=`Key & Lock 1-1`, PanelOpen=`Book Page 1-2` (Fantasy UI SFX - Lite Edition).
+- DOTween gereksinimi: `Assets/Plugins/Demigiant` kurulu + `DOTween.Modules.asmdef` olusturulmus
+  + `DeadWalls.asmdef` referanslarinda `DOTween.Modules` olmali (DOTween Utility Panel > Create ASMDEF).
+
 ## Test Adimlari
 
 1. Play'e gir; `TECH` butonuna bas — panel acilir, `Castle Heart` (BOUGHT) + 4 cocuk

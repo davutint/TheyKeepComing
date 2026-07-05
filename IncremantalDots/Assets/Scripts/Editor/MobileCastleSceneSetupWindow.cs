@@ -37,6 +37,10 @@ namespace DeadWalls
         private const string FrostArcherDefinitionPath = ArcherDefinitionFolder + "/FrostArcher.asset";
         private const string TechTreeFolder = "Assets/ScriptableObject/MobileCastle/TechTree";
         private const string TechTreeCatalogPath = TechTreeFolder + "/TechTreeCatalog.asset";
+        private const string TechBuySfxPath = FantasyUiSfxRoot + "/Coins 2-1.wav";
+        private const string TechRevealSfxPath = FantasyUiSfxRoot + "/Magical Texture Chimes 1-1.wav";
+        private const string TechDeniedSfxPath = FantasyUiSfxRoot + "/Key & Lock 1-1.wav";
+        private const string TechPanelOpenSfxPath = FantasyUiSfxRoot + "/Book Page 1-2.wav";
         private const string SmallScaleTilesRoot = "Assets/SmallScaleInt/Fantasy kingdom Tileset/Environment/Tiles";
         private const string ArrowMuzzleVfxPath = "Assets/VFX_Klaus/Prefabs/Stylized Shoot & Hit Vol.2/FX_Shoot_Arrow_muzzle.prefab";
         private const string ArrowHitVfxPath = "Assets/VFX_Klaus/Prefabs/Stylized Shoot & Hit Vol.2/FX_Shoot_Arrow_hit.prefab";
@@ -1609,6 +1613,60 @@ namespace DeadWalls
                 techTree.TechNodeTemplate.gameObject.SetActive(false);
             if (techTree.TechConnectionTemplate != null)
                 techTree.TechConnectionTemplate.gameObject.SetActive(false);
+
+            // Gezinme: viewport'a pan/zoom controller'i (enum Auto -> platforma gore Desktop/Mobile);
+            // ScrollRect tekerlegi zoom'a devredildigi icin kapatilir, elastic + inertia acilir.
+            if (techTree.TechTreeViewport != null)
+            {
+                var scroll = techTree.TechTreeViewport.GetComponent<ScrollRect>();
+                if (scroll != null)
+                {
+                    scroll.movementType = ScrollRect.MovementType.Elastic;
+                    scroll.elasticity = 0.08f;
+                    scroll.inertia = true;
+                    scroll.decelerationRate = 0.15f;
+                    scroll.scrollSensitivity = 0f;
+                }
+                EnsureComponent<TechTreeViewController>(techTree.TechTreeViewport.gameObject);
+            }
+
+            // Fade acilisi icin CanvasGroup
+            if (techTree.TechTreePanel != null)
+                EnsureComponent<CanvasGroup>(techTree.TechTreePanel);
+
+            // Juice binding'leri: badge (TECH butonu nabzi) + toast + SFX clip'leri
+            techTree.TechTreeOpenBadge = FindChildByName(hudRoot, "TechTreeBadge");
+            if (techTree.TechTreeOpenBadge == null && techTree.TechTreeOpenButton != null)
+            {
+                var badgeGo = EnsureChild(techTree.TechTreeOpenButton.transform, "TechTreeBadge", true);
+                var badgeRect = badgeGo.GetComponent<RectTransform>();
+                badgeRect.anchorMin = new Vector2(1f, 1f);
+                badgeRect.anchorMax = new Vector2(1f, 1f);
+                badgeRect.anchoredPosition = new Vector2(-4f, -2f);
+                badgeRect.sizeDelta = new Vector2(14f, 14f);
+                var badgeImage = EnsureComponent<Image>(badgeGo);
+                badgeImage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Knob.psd");
+                badgeImage.color = new Color(0.949f, 0.788f, 0.298f, 1f);
+                badgeImage.raycastTarget = false;
+                techTree.TechTreeOpenBadge = badgeGo;
+            }
+            if (techTree.TechTreeOpenBadge != null)
+                techTree.TechTreeOpenBadge.SetActive(false);
+
+            var toast = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "TechTreeToastText");
+            if (toast == null)
+            {
+                toast = EnsureText(hudRoot.transform, "TechTreeToastText", "TECH UNLOCKED", 18,
+                    TextAlignmentOptions.Center, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
+                    new Vector2(-220f, 258f), new Vector2(232f, 292f));
+                toast.raycastTarget = false;
+            }
+            techTree.ToastText = toast;
+
+            techTree.BuyClip = AssetDatabase.LoadAssetAtPath<AudioClip>(TechBuySfxPath);
+            techTree.RevealClip = AssetDatabase.LoadAssetAtPath<AudioClip>(TechRevealSfxPath);
+            techTree.DeniedClip = AssetDatabase.LoadAssetAtPath<AudioClip>(TechDeniedSfxPath);
+            techTree.PanelOpenClip = AssetDatabase.LoadAssetAtPath<AudioClip>(TechPanelOpenSfxPath);
 
             // Panel default kapali; state sahibi TechTreeUI.
             if (techTree.TechTreePanel != null)

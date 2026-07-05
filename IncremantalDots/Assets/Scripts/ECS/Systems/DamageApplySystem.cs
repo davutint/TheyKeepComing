@@ -71,6 +71,12 @@ namespace DeadWalls
                 }
             }
 
+            // DIKKAT: EmitCastleHitFeedback CreateEntity yapar (structural change) ve yukaridaki
+            // wall/gate/castle RefRW'lerini GECERSIZ kilar. Kale HP'si structural change'den ONCE
+            // lokale alinir; aksi halde castle.ValueRO ObjectDisposedException firlatir ve
+            // GameOver hic tetiklenmezdi.
+            float remainingCastleHp = castle.ValueRO.CurrentHP;
+
             if (totalAppliedDamage > 0f)
             {
                 float2 feedbackCenter = SystemAPI.HasSingleton<MobileCastleCombatConfig>()
@@ -79,8 +85,8 @@ namespace DeadWalls
                 EmitCastleHitFeedback(ref state, feedbackCenter);
             }
 
-            // Game Over kontrolu
-            if (castle.ValueRO.CurrentHP <= 0f)
+            // Game Over kontrolu (structural change sonrasi taze RefRW alinir)
+            if (remainingCastleHp <= 0f)
             {
                 var gameState = SystemAPI.GetSingletonRW<GameStateData>();
                 gameState.ValueRW.IsGameOver = true;
