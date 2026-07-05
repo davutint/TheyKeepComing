@@ -16,7 +16,7 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - `StartNextWave()` debug/public API olarak kalir; mobile player-facing akis continuous day/dusk/night cycle ile ilerler
 - `RepairDefenseFull()`, `BuyFortify()`, `BuyRally()` ve `RefillArrows()` legacy/debug API olarak kalir
 - `GetDefensePercent()` wall/gate/castle toplam HP yuzdesini HUD'a verir
-- Mobile archer economy API'leri: buy, cost ve type count/DPS okuma; unlock/upgrade API'leri ileride Tech Tree icin kodda kalir ama sag drawer player-facing kullanmaz
+- Mobile archer economy API'leri: `ArcherDefinitionSO` catalog'undan buy cost/base stat okuma, buy, type count/DPS okuma; unlock/upgrade API'leri ileride Tech Tree icin kodda kalir ama sag drawer player-facing kullanmaz
 - Worker economy API'leri: `OpenCastleEconomy()`, `CloseCastleEconomy()`, `SetResourceWorkers()`, `ChooseEconomyEvent()`
 - Economy focus API'leri legacy olarak kalir; worker economy aktifken setup tool focus UI'yi gizler
 - Legacy level-up API'leri durur, fakat mobile castle loop'ta XP level-up pause tetiklemez
@@ -65,7 +65,8 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 
 - `MobileCastleHudRoot` uzerindeki sag `ArcherDrawerPanel` controller'idir
 - Drawer combat sirasinda acilip kapanir; oyun pause olmaz
-- Basic/Rapid/Frost row'larinda yalnizca `Buy` aksiyonunu `GameManager.BuyArcher()` API'sine baglar
+- `ArcherRecruitmentListRoot` + inactive `ArcherRecruitmentRowTemplate` varsa satirlari `ArcherRecruitmentCatalogSO` definition listesinden runtime'da uretir
+- Template yoksa legacy Basic/Rapid/Frost row'larinda yalnizca `Buy` aksiyonunu `GameManager.BuyArcher()` API'sine baglar
 - Upgrade butonlari, Rapid/Frost tech unlock butonlari ve `ArrowTechPanel` player-facing olarak gizlenir
 - Basic baslangicta aciktir; Rapid/Frost ileride Tech Tree tarafindan unlock edilecek kilitli satirlar olarak kalir
 - Row `CostText` alanlarinda mevcut cost ile beraber eksik kaynak varsa `NEED ...`, idle population yoksa `NEED POP` yazar

@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace DeadWalls
@@ -56,14 +58,23 @@ namespace DeadWalls
         public Button RapidTechUnlockButton;
         public Button FrostTechUnlockButton;
 
+        [Header("Dynamic Archer Recruitment")]
+        public ArcherRecruitmentCatalogSO ArcherCatalog;
+        public RectTransform ArcherRecruitmentListRoot;
+        public RectTransform ArcherRecruitmentRowTemplate;
+        public float DynamicRowSpacing = 92f;
+
         private bool _drawerOpen;
         private bool _drawerPositionsReady;
         private Vector2 _drawerOpenPosition;
         private Vector2 _drawerClosedPosition;
         private float _nextRefreshTime;
+        private ArcherRecruitmentCatalogSO _builtCatalog;
+        private readonly List<DynamicArcherRow> _dynamicRows = new List<DynamicArcherRow>();
 
         private void OnEnable()
         {
+            EnsureDynamicRows(GameManager.Instance);
             BindButtons();
             EnsureDrawerPositions();
             SetDrawerOpen(OpenOnHudShown, true);
@@ -113,32 +124,35 @@ namespace DeadWalls
             SetText(DrawerTitleText, "ARCHER RECRUITMENT");
             HideTechControls();
 
-            RefreshArcherRow(
-                ArcherType.Basic,
-                BasicCountText,
-                BasicDpsText,
-                BasicLevelText,
-                BasicCostText,
-                BasicBuyButton,
-                BasicUpgradeButton);
+            if (!RefreshDynamicArcherRows(gm))
+            {
+                RefreshArcherRow(
+                    ArcherType.Basic,
+                    BasicCountText,
+                    BasicDpsText,
+                    BasicLevelText,
+                    BasicCostText,
+                    BasicBuyButton,
+                    BasicUpgradeButton);
 
-            RefreshArcherRow(
-                ArcherType.Rapid,
-                RapidCountText,
-                RapidDpsText,
-                RapidLevelText,
-                RapidCostText,
-                RapidBuyButton,
-                RapidUpgradeButton);
+                RefreshArcherRow(
+                    ArcherType.Rapid,
+                    RapidCountText,
+                    RapidDpsText,
+                    RapidLevelText,
+                    RapidCostText,
+                    RapidBuyButton,
+                    RapidUpgradeButton);
 
-            RefreshArcherRow(
-                ArcherType.Frost,
-                FrostCountText,
-                FrostDpsText,
-                FrostLevelText,
-                FrostCostText,
-                FrostBuyButton,
-                FrostUpgradeButton);
+                RefreshArcherRow(
+                    ArcherType.Frost,
+                    FrostCountText,
+                    FrostDpsText,
+                    FrostLevelText,
+                    FrostCostText,
+                    FrostBuyButton,
+                    FrostUpgradeButton);
+            }
 
             bool mobileMode = gm.IsMobileMode;
             bool prepMovedToCastleInterior = gm.IsMobilePopulationEconomyEnabled();
@@ -280,9 +294,17 @@ namespace DeadWalls
             StartNextWaveButton?.onClick.AddListener(HandleStartNextWaveClicked);
             FortifyButton?.onClick.AddListener(HandleFortifyClicked);
             RallyButton?.onClick.AddListener(HandleRallyClicked);
-            BasicBuyButton?.onClick.AddListener(HandleBasicBuyClicked);
-            RapidBuyButton?.onClick.AddListener(HandleRapidBuyClicked);
-            FrostBuyButton?.onClick.AddListener(HandleFrostBuyClicked);
+
+            if (_dynamicRows.Count > 0)
+            {
+                BindDynamicRowButtons();
+            }
+            else
+            {
+                BasicBuyButton?.onClick.AddListener(HandleBasicBuyClicked);
+                RapidBuyButton?.onClick.AddListener(HandleRapidBuyClicked);
+                FrostBuyButton?.onClick.AddListener(HandleFrostBuyClicked);
+            }
         }
 
         private void UnbindButtons()
@@ -296,6 +318,14 @@ namespace DeadWalls
             BasicBuyButton?.onClick.RemoveListener(HandleBasicBuyClicked);
             RapidBuyButton?.onClick.RemoveListener(HandleRapidBuyClicked);
             FrostBuyButton?.onClick.RemoveListener(HandleFrostBuyClicked);
+
+            for (int i = 0; i < _dynamicRows.Count; i++)
+            {
+                var row = _dynamicRows[i];
+                if (row.BuyButton != null && row.BuyAction != null)
+                    row.BuyButton.onClick.RemoveListener(row.BuyAction);
+                row.BuyAction = null;
+            }
         }
 
         private void HandleRepairClicked()
@@ -338,6 +368,12 @@ namespace DeadWalls
             Refresh();
         }
 
+        private void BuyArcher(ArcherDefinitionSO definition)
+        {
+            GameManager.Instance?.BuyArcher(definition);
+            Refresh();
+        }
+
         private void EnsureDrawerPositions()
         {
             if (_drawerPositionsReady)
@@ -376,10 +412,230 @@ namespace DeadWalls
             if (BasicBuyButton != null) BasicBuyButton.interactable = interactable;
             if (RapidBuyButton != null) RapidBuyButton.interactable = interactable;
             if (FrostBuyButton != null) FrostBuyButton.interactable = interactable;
+            for (int i = 0; i < _dynamicRows.Count; i++)
+            {
+                if (_dynamicRows[i].BuyButton != null)
+                    _dynamicRows[i].BuyButton.interactable = interactable;
+            }
             HideButton(BasicUpgradeButton);
             HideButton(RapidUpgradeButton);
             HideButton(FrostUpgradeButton);
             HideTechControls();
+        }
+
+        private bool RefreshDynamicArcherRows(GameManager gm)
+        {
+            if (!EnsureDynamicRows(gm))
+                return false;
+
+            SetLegacyRowsActive(false);
+            for (int i = 0; i < _dynamicRows.Count; i++)
+                RefreshDynamicArcherRow(_dynamicRows[i], gm);
+
+            return true;
+        }
+
+        private bool EnsureDynamicRows(GameManager gm)
+        {
+            ArcherRecruitmentListRoot ??= FindChildComponent<RectTransform>(gameObject, "ArcherRecruitmentListRoot");
+            ArcherRecruitmentRowTemplate ??= FindChildComponent<RectTransform>(gameObject, "ArcherRecruitmentRowTemplate");
+
+            if (ArcherRecruitmentListRoot == null || ArcherRecruitmentRowTemplate == null)
+                return false;
+
+            var definitions = GetDefinitions(gm);
+            if (definitions == null || definitions.Length == 0)
+                return false;
+
+            if (_dynamicRows.Count > 0 && _builtCatalog == ArcherCatalog)
+                return true;
+
+            ClearDynamicRows();
+            ArcherRecruitmentRowTemplate.gameObject.SetActive(false);
+
+            for (int i = 0; i < definitions.Length; i++)
+            {
+                var definition = definitions[i];
+                if (definition == null)
+                    continue;
+
+                var rowObject = Instantiate(ArcherRecruitmentRowTemplate.gameObject, ArcherRecruitmentListRoot);
+                rowObject.name = $"ArcherRecruitmentRow_{definition.Id}";
+                rowObject.SetActive(true);
+
+                var rect = rowObject.GetComponent<RectTransform>();
+                if (rect != null)
+                    rect.anchoredPosition = new Vector2(0f, -_dynamicRows.Count * DynamicRowSpacing);
+
+                _dynamicRows.Add(new DynamicArcherRow
+                {
+                    Definition = definition,
+                    Root = rowObject,
+                    NameText = FindChildComponent<TMP_Text>(rowObject, "ArcherNameText"),
+                    CountText = FindChildComponent<TMP_Text>(rowObject, "ArcherCountText"),
+                    DpsText = FindChildComponent<TMP_Text>(rowObject, "ArcherDpsText"),
+                    LevelText = FindChildComponent<TMP_Text>(rowObject, "ArcherLevelText"),
+                    CostText = FindChildComponent<TMP_Text>(rowObject, "ArcherCostText"),
+                    StatusText = FindChildComponent<TMP_Text>(rowObject, "ArcherStatusText"),
+                    BuyButton = FindChildComponent<Button>(rowObject, "ArcherBuyButton"),
+                    BuyButtonText = FindChildComponent<TMP_Text>(rowObject, "ArcherBuyButtonText")
+                });
+            }
+
+            _builtCatalog = ArcherCatalog;
+            SetLegacyRowsActive(false);
+            BindDynamicRowButtons();
+            return _dynamicRows.Count > 0;
+        }
+
+        private ArcherDefinitionSO[] GetDefinitions(GameManager gm)
+        {
+            var catalogDefinitions = ArcherCatalog != null ? ArcherCatalog.GetOrderedDefinitions() : null;
+            if (catalogDefinitions != null && catalogDefinitions.Length > 0)
+                return catalogDefinitions;
+
+            return gm != null ? gm.GetArcherDefinitions() : null;
+        }
+
+        private void ClearDynamicRows()
+        {
+            for (int i = 0; i < _dynamicRows.Count; i++)
+            {
+                var row = _dynamicRows[i];
+                if (row.BuyButton != null && row.BuyAction != null)
+                    row.BuyButton.onClick.RemoveListener(row.BuyAction);
+
+                if (row.Root == null)
+                    continue;
+
+                if (Application.isPlaying)
+                    Destroy(row.Root);
+                else
+                    DestroyImmediate(row.Root);
+            }
+
+            _dynamicRows.Clear();
+        }
+
+        private void RefreshDynamicArcherRow(DynamicArcherRow row, GameManager gm)
+        {
+            if (row == null || row.Definition == null || gm == null)
+                return;
+
+            ArcherType type = row.Definition.Type;
+            bool unlocked = gm.IsArcherTypeUnlocked(type);
+            bool canBuy = gm.CanBuyArcher(row.Definition);
+
+            SetText(row.NameText, row.Definition.DisplayName);
+            SetText(row.CountText, $"x{gm.GetArcherTypeCount(type)}");
+            SetText(row.DpsText, unlocked ? $"DPS {gm.GetArcherTypeDps(type):0.#}" : "LOCKED");
+            SetText(row.LevelText, unlocked ? $"LV {gm.GetArcherTypeLevel(type)}" : "TECH");
+            SetText(row.CostText, unlocked ? BuildBuyCostLabel(gm, row.Definition) : "LOCKED BY TECH");
+            SetText(row.StatusText, BuildStatusLabel(gm, row.Definition, unlocked, canBuy));
+
+            if (row.BuyButton != null)
+            {
+                row.BuyButton.interactable = canBuy;
+                SetText(row.BuyButtonText, unlocked ? "BUY" : "LOCKED");
+            }
+        }
+
+        private static string BuildBuyCostLabel(GameManager gm, ArcherDefinitionSO definition)
+        {
+            string label = FormatCostWithNeed(definition.BuyCost, gm.Resources, gm.IsFreeEconomyTestMode);
+            if (!gm.IsFreeEconomyTestMode
+                && gm.IsMobilePopulationEconomyEnabled()
+                && definition.BuyCost.CanAfford(gm.Resources)
+                && gm.GetIdlePopulation() < definition.PopulationCost)
+            {
+                label = $"{label} NEED POP";
+            }
+
+            return label;
+        }
+
+        private static string BuildStatusLabel(GameManager gm, ArcherDefinitionSO definition, bool unlocked, bool canBuy)
+        {
+            if (!unlocked)
+                return string.IsNullOrEmpty(definition.RequiredTechId) ? "LOCKED" : "TECH LOCKED";
+
+            if (canBuy)
+                return "READY";
+
+            if (gm.IsFreeEconomyTestMode)
+                return "READY";
+
+            string need = definition.BuyCost.ToNeedDisplayString(gm.Resources);
+            if (!string.IsNullOrEmpty(need))
+                return need;
+
+            if (gm.IsMobilePopulationEconomyEnabled() && gm.GetIdlePopulation() < definition.PopulationCost)
+                return "NEED POP";
+
+            return "WAIT";
+        }
+
+        private void BindDynamicRowButtons()
+        {
+            for (int i = 0; i < _dynamicRows.Count; i++)
+            {
+                var row = _dynamicRows[i];
+                if (row.BuyButton == null || row.BuyAction != null)
+                    continue;
+
+                row.BuyAction = () => BuyArcher(row.Definition);
+                row.BuyButton.onClick.AddListener(row.BuyAction);
+            }
+        }
+
+        private void SetLegacyRowsActive(bool active)
+        {
+            SetOptionalChildActive("BasicArcherRow", active);
+            SetOptionalChildActive("RapidArcherRow", active);
+            SetOptionalChildActive("FrostArcherRow", active);
+        }
+
+        private void SetOptionalChildActive(string name, bool active)
+        {
+            var child = FindChildByName(gameObject, name);
+            if (child != null)
+                child.SetActive(active);
+        }
+
+        private static T FindChildComponent<T>(GameObject root, string name) where T : Component
+        {
+            var child = FindChildByName(root, name);
+            return child != null ? child.GetComponent<T>() : null;
+        }
+
+        private static GameObject FindChildByName(GameObject root, string name)
+        {
+            if (root == null)
+                return null;
+
+            var transforms = root.GetComponentsInChildren<Transform>(true);
+            for (int i = 0; i < transforms.Length; i++)
+            {
+                if (transforms[i].name == name)
+                    return transforms[i].gameObject;
+            }
+
+            return null;
+        }
+
+        private sealed class DynamicArcherRow
+        {
+            public ArcherDefinitionSO Definition;
+            public GameObject Root;
+            public TMP_Text NameText;
+            public TMP_Text CountText;
+            public TMP_Text DpsText;
+            public TMP_Text LevelText;
+            public TMP_Text CostText;
+            public TMP_Text StatusText;
+            public Button BuyButton;
+            public TMP_Text BuyButtonText;
+            public UnityAction BuyAction;
         }
 
         private static void SetButtonText(Button button, string value)

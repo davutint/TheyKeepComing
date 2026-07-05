@@ -59,7 +59,7 @@ Otorite `ContinuousSiegeCycleData` (eski `WaveStateData.Phase` DEGIL):
 | Mobile HUD (kaynak/cycle/HP) | `HUDController.cs` | `MobileCastleHudRoot` prefab; Cycle paneli `DAY/DUSK/NIGHT` + 60s progress |
 | Defense panel | `HUDController.cs` | AYRI controller YOK -- HUD alt modulu (`CastleDefensePanel`) Wall/Gate/Core |
 | Worker economy drawer (sol) | `WorkerEconomyDrawerUI.cs` | resource bar alti; Wood/Stone/Iron/Food `+ WORKER` assignment -- AKTIF ana ekonomi |
-| Archer recruitment drawer (sag) | `MarketUI.cs` | SADECE okcu satin alma (Buy); upgrade/ArrowTech/Repair/Fortify/Rally/StartNextWave player-facing GIZLI |
+| Archer recruitment drawer (sag) | `MarketUI.cs` | SO-driven `ArcherDefinitionSO` catalog'dan row basar; SADECE okcu satin alma (Buy); upgrade/ArrowTech/Repair/Fortify/Rally/StartNextWave player-facing GIZLI |
 | Gun/Gece overlay | `DayNightOverlayController.cs` | faz alpha (Day 0 -> Night 0.50) |
 | Castle Interior ekonomi paneli | `CastleEconomyUI.cs` | LEGACY/debug (`PlayerFacingPanelEnabled=false`); ana ekonomi sol drawer'a tasindi |
 | Kaleye tikla-ac tetikleyici | `CastleInteriorClickTarget.cs` | LEGACY; player-facing worker yonetimi sol drawer'da |
@@ -117,6 +117,8 @@ Ana yol: UI import edilir. Spec: `Editor/UIBuilder/CODEX_EXPORT_FORMAT.md`.
 > `Assets/Prefabs/UI/Generated/MobileCastleHudRoot.prefab` anlik dogruluk kaynagidir; sonra
 > `Assets/UIExports/mobile_castle_hud/ui.json` + `manifest.json` ayni karara senkronlanir ki re-import eski UI'yi geri getirmesin.
 > Prefab polish yaparken binding isimleri korunur, mevcut HUD komple yeniden uretilmez, C# runtime davranisi degistirilmez.
+> Mobile HUD gorsel standardi su an **plain Unity UI / text-first**: custom fantasy icon uretmeye calisma; panel/row/button'larda duz yari-opak renkler,
+> builtin/simple Image yaklasimi, net text label'lar ve sabit satir olculeri kullan. UI'da ic ice gecme, buyuk tasan text veya dekoratif icon zorlamasi kabul edilmez.
 > `EconomyFocusPanel` retired durumdadir: prefabda ve exportta yoktur; setup tool bunu geri uretmez.
 
 ## Mimari Ozet

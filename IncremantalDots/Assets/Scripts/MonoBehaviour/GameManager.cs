@@ -12,6 +12,9 @@ namespace DeadWalls
         [Header("Mobile Test")]
         [SerializeField] private bool freeEconomyTestMode;
 
+        [Header("Mobile Recruitment")]
+        [SerializeField] private ArcherRecruitmentCatalogSO archerCatalog;
+
         private EntityManager _entityManager;
         private Entity _gameStateEntity;
         private Entity _waveStateEntity;
@@ -53,6 +56,7 @@ namespace DeadWalls
         private float _globalFireRateMultiplier = 1f;
         private bool _missingArcherPlacementWarningLogged;
         private bool _missingWorkerPlacementWarningLogged;
+        private ArcherDefinitionSO[] _runtimeDefaultArcherDefinitions;
 
         public GameStateData GameState { get; private set; }
         public WaveStateData WaveState { get; private set; }
@@ -77,6 +81,7 @@ namespace DeadWalls
         public int KillsThisWave => math.max(0, WaveState.ZombiesSpawned - WaveState.ZombiesAlive);
         public bool IsMobileMode => _initialized && TryGetMobileConfigEntity(out _);
         public bool IsFreeEconomyTestMode => freeEconomyTestMode;
+        public ArcherRecruitmentCatalogSO ArcherCatalog => archerCatalog;
 
         public event System.Action OnGameOver;
         public event System.Action OnLevelUp;
@@ -966,8 +971,44 @@ namespace DeadWalls
             return stats.Damage * stats.FireRate * GetArcherTypeCount(type);
         }
 
+        public ArcherDefinitionSO[] GetArcherDefinitions()
+        {
+            var catalogDefinitions = archerCatalog != null ? archerCatalog.GetOrderedDefinitions() : null;
+            if (catalogDefinitions != null && catalogDefinitions.Length > 0)
+                return catalogDefinitions;
+
+            _runtimeDefaultArcherDefinitions ??= new[]
+            {
+                ArcherDefinitionSO.CreateRuntimeDefault(ArcherType.Basic),
+                ArcherDefinitionSO.CreateRuntimeDefault(ArcherType.Rapid),
+                ArcherDefinitionSO.CreateRuntimeDefault(ArcherType.Frost)
+            };
+
+            return _runtimeDefaultArcherDefinitions;
+        }
+
+        public ArcherDefinitionSO GetArcherDefinition(ArcherType type)
+        {
+            var definition = archerCatalog != null ? archerCatalog.GetDefinition(type) : null;
+            if (definition != null)
+                return definition;
+
+            var definitions = GetArcherDefinitions();
+            for (int i = 0; i < definitions.Length; i++)
+            {
+                if (definitions[i] != null && definitions[i].Type == type)
+                    return definitions[i];
+            }
+
+            return null;
+        }
+
         public ResourceCost GetArcherBuyCost(ArcherType type)
         {
+            var definition = GetArcherDefinition(type);
+            if (definition != null)
+                return definition.BuyCost;
+
             switch (type)
             {
                 case ArcherType.Rapid:
@@ -977,6 +1018,11 @@ namespace DeadWalls
                 default:
                     return new ResourceCost(45, 0, 0, 20);
             }
+        }
+
+        public ResourceCost GetArcherBuyCost(ArcherDefinitionSO definition)
+        {
+            return definition != null ? definition.BuyCost : ResourceCost.Zero;
         }
 
         public ResourceCost GetArcherUpgradeCost(ArcherType type)
@@ -1008,6 +1054,10 @@ namespace DeadWalls
 
         public bool CanBuyArcher(ArcherType type)
         {
+            var definition = GetArcherDefinition(type);
+            if (definition != null)
+                return CanBuyArcher(definition);
+
             return _initialized
                 && _archerPrefabEntity != Entity.Null
                 && _entityManager.Exists(_archerPrefabEntity)
@@ -1016,7 +1066,48 @@ namespace DeadWalls
                 && CanAfford(GetArcherBuyCost(type));
         }
 
+        public bool CanBuyArcher(ArcherDefinitionSO definition)
+        {
+            if (definition == null)
+                return false;
+
+            return _initialized
+                && _archerPrefabEntity != Entity.Null
+                && _entityManager.Exists(_archerPrefabEntity)
+                && IsArcherTypeUnlocked(definition.Type)
+                && HasPopulationForNewArcher(definition.PopulationCost)
+                && CanAfford(definition.BuyCost);
+        }
+
         public bool BuyArcher(ArcherType type)
+        {
+            var definition = GetArcherDefinition(type);
+            return definition != null ? BuyArcher(definition) : BuyArcherFallback(type);
+        }
+
+        public bool BuyArcher(ArcherDefinitionSO definition)
+        {
+            if (!CanBuyArcher(definition))
+                return false;
+
+            var cost = definition.BuyCost;
+            if (!SpendResources(cost))
+                return false;
+
+            if (!SpawnArcher(definition.Type))
+            {
+                if (!freeEconomyTestMode)
+                    AddResources(cost);
+                return false;
+            }
+
+            ConsumePopulationForNewArcher(definition.PopulationCost);
+            ReadArcherTypeCounts();
+            OnGameStateChanged?.Invoke();
+            return true;
+        }
+
+        private bool BuyArcherFallback(ArcherType type)
         {
             if (!CanBuyArcher(type))
                 return false;
@@ -1128,28 +1219,33 @@ namespace DeadWalls
                 spawnPosition,
                 quaternion.identity,
                 1f));
-            SetSpriteTint(entity, ArcherVisualStyle.GetTint(type));
+            SetSpriteTint(entity, GetArcherTint(type));
             return true;
         }
 
-        private bool HasPopulationForNewArcher()
+        private bool HasPopulationForNewArcher(int populationCost = 1)
         {
             if (freeEconomyTestMode)
                 return true;
 
-            return !IsMobilePopulationEconomyEnabled() || GetIdlePopulation() > 0;
+            return populationCost <= 0
+                || !IsMobilePopulationEconomyEnabled()
+                || GetIdlePopulation() >= populationCost;
         }
 
-        private void ConsumePopulationForNewArcher()
+        private void ConsumePopulationForNewArcher(int populationCost = 1)
         {
             if (freeEconomyTestMode)
+                return;
+
+            if (populationCost <= 0)
                 return;
 
             if (!IsMobilePopulationEconomyEnabled() || !CanAccessEntityManager() || !_entityManager.Exists(_gameStateEntity))
                 return;
 
             var population = _entityManager.GetComponentData<PopulationState>(_gameStateEntity);
-            population.Archers = Mathf.Min(population.Total, population.Archers + 1);
+            population.Archers = Mathf.Min(population.Total, population.Archers + populationCost);
             population.Idle = Mathf.Max(0, population.Total - population.Workers - population.Archers);
             _entityManager.SetComponentData(_gameStateEntity, population);
             Population = population;
@@ -1175,8 +1271,12 @@ namespace DeadWalls
             return stats;
         }
 
-        private static ArcherStats GetBaseArcherStats(ArcherType type)
+        private ArcherStats GetBaseArcherStats(ArcherType type)
         {
+            var definition = GetArcherDefinition(type);
+            if (definition != null)
+                return definition.ToArcherStats();
+
             switch (type)
             {
                 case ArcherType.Rapid:
@@ -1209,6 +1309,16 @@ namespace DeadWalls
                         SlowMultiplier = 1f
                     };
             }
+        }
+
+        private float4 GetArcherTint(ArcherType type)
+        {
+            var definition = GetArcherDefinition(type);
+            if (definition == null)
+                return ArcherVisualStyle.GetTint(type);
+
+            var color = definition.Tint;
+            return new float4(color.r, color.g, color.b, color.a);
         }
 
         private bool UpgradeGlobalArcherFireRate(float multiplier)
@@ -2256,6 +2366,7 @@ namespace DeadWalls
         public float SlowMultiplier;
     }
 
+    [System.Serializable]
     public struct ResourceCost
     {
         public static ResourceCost Zero => new ResourceCost(0, 0, 0, 0);

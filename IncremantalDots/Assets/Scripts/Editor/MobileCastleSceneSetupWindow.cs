@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
+using System.IO;
 using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -29,6 +30,11 @@ namespace DeadWalls
         private const string WorkerMaterialPath = "Assets/Materials/Villager.mat";
         private const string WorkerIdleSpritesheetPath = "Assets/SmallScaleInt/Character creator - Fantasy/Created Spritesheets/Character_villager/Idle.png";
         private const string GeneratedHudPrefabPath = "Assets/Prefabs/UI/Generated/MobileCastleHudRoot.prefab";
+        private const string ArcherDefinitionFolder = "Assets/ScriptableObject/MobileCastle/Archers";
+        private const string ArcherCatalogPath = ArcherDefinitionFolder + "/ArcherRecruitmentCatalog.asset";
+        private const string BasicArcherDefinitionPath = ArcherDefinitionFolder + "/BasicArcher.asset";
+        private const string RapidArcherDefinitionPath = ArcherDefinitionFolder + "/RapidArcher.asset";
+        private const string FrostArcherDefinitionPath = ArcherDefinitionFolder + "/FrostArcher.asset";
         private const string SmallScaleTilesRoot = "Assets/SmallScaleInt/Fantasy kingdom Tileset/Environment/Tiles";
         private const string ArrowMuzzleVfxPath = "Assets/VFX_Klaus/Prefabs/Stylized Shoot & Hit Vol.2/FX_Shoot_Arrow_muzzle.prefab";
         private const string ArrowHitVfxPath = "Assets/VFX_Klaus/Prefabs/Stylized Shoot & Hit Vol.2/FX_Shoot_Arrow_hit.prefab";
@@ -701,6 +707,7 @@ namespace DeadWalls
 
         private static void EnsureManagers(Scene scene, Canvas canvas)
         {
+            ArcherRecruitmentCatalogSO archerCatalog = EnsureDefaultArcherRecruitmentCatalog();
             GameObject gameManagerObject = FindRoot(scene, "GameManager");
             if (gameManagerObject == null)
             {
@@ -708,14 +715,84 @@ namespace DeadWalls
                 Undo.RegisterCreatedObjectUndo(gameManagerObject, "Create GameManager");
                 SceneManager.MoveGameObjectToScene(gameManagerObject, scene);
             }
-            EnsureComponent<GameManager>(gameManagerObject);
+            var gameManager = EnsureComponent<GameManager>(gameManagerObject);
+            AssignObjectReference(gameManager, "archerCatalog", archerCatalog);
 
             var uiManager = EnsureComponent<UIManager>(canvas.gameObject);
-            BuildCanvasPanels(canvas.transform, uiManager);
+            BuildCanvasPanels(canvas.transform, uiManager, archerCatalog);
             EnsureCastleClickTarget(scene);
             EnsureArcherTilePlacement(scene);
             EnsureCombatFeedbackRoot(scene);
             NormalizeCastleTilemapSorting(scene);
+        }
+
+        private static ArcherRecruitmentCatalogSO EnsureDefaultArcherRecruitmentCatalog()
+        {
+            EnsureAssetFolder(ArcherDefinitionFolder);
+
+            ArcherDefinitionSO basic = EnsureArcherDefinitionAsset(BasicArcherDefinitionPath, ArcherType.Basic);
+            ArcherDefinitionSO rapid = EnsureArcherDefinitionAsset(RapidArcherDefinitionPath, ArcherType.Rapid);
+            ArcherDefinitionSO frost = EnsureArcherDefinitionAsset(FrostArcherDefinitionPath, ArcherType.Frost);
+
+            var catalog = AssetDatabase.LoadAssetAtPath<ArcherRecruitmentCatalogSO>(ArcherCatalogPath);
+            if (catalog == null)
+            {
+                catalog = ScriptableObject.CreateInstance<ArcherRecruitmentCatalogSO>();
+                AssetDatabase.CreateAsset(catalog, ArcherCatalogPath);
+            }
+
+            var definitions = catalog.Definitions ?? Array.Empty<ArcherDefinitionSO>();
+            bool hasBasic = Array.IndexOf(definitions, basic) >= 0;
+            bool hasRapid = Array.IndexOf(definitions, rapid) >= 0;
+            bool hasFrost = Array.IndexOf(definitions, frost) >= 0;
+            if (!hasBasic || !hasRapid || !hasFrost)
+            {
+                Undo.RecordObject(catalog, "Configure Archer Recruitment Catalog");
+                var merged = new List<ArcherDefinitionSO>(definitions.Length + 3);
+                for (int i = 0; i < definitions.Length; i++)
+                {
+                    if (definitions[i] != null && !merged.Contains(definitions[i]))
+                        merged.Add(definitions[i]);
+                }
+
+                if (!hasBasic) merged.Add(basic);
+                if (!hasRapid) merged.Add(rapid);
+                if (!hasFrost) merged.Add(frost);
+
+                catalog.Definitions = merged.ToArray();
+                EditorUtility.SetDirty(catalog);
+            }
+
+            return catalog;
+        }
+
+        private static ArcherDefinitionSO EnsureArcherDefinitionAsset(string path, ArcherType type)
+        {
+            var definition = AssetDatabase.LoadAssetAtPath<ArcherDefinitionSO>(path);
+            if (definition != null)
+                return definition;
+
+            definition = ScriptableObject.CreateInstance<ArcherDefinitionSO>();
+            definition.ApplyDefaultValues(type);
+            AssetDatabase.CreateAsset(definition, path);
+            EditorUtility.SetDirty(definition);
+            return definition;
+        }
+
+        private static void EnsureAssetFolder(string path)
+        {
+            if (AssetDatabase.IsValidFolder(path))
+                return;
+
+            string normalized = path.Replace('\\', '/').TrimEnd('/');
+            string parent = Path.GetDirectoryName(normalized)?.Replace('\\', '/');
+            string folderName = Path.GetFileName(normalized);
+            if (string.IsNullOrEmpty(parent) || string.IsNullOrEmpty(folderName))
+                return;
+
+            EnsureAssetFolder(parent);
+            if (!AssetDatabase.IsValidFolder(normalized))
+                AssetDatabase.CreateFolder(parent, folderName);
         }
 
         private static void EnsureCastleInteriorWorkerArea(Scene scene)
@@ -1107,12 +1184,12 @@ namespace DeadWalls
             }
         }
 
-        private static void BuildCanvasPanels(Transform canvasTransform, UIManager uiManager)
+        private static void BuildCanvasPanels(Transform canvasTransform, UIManager uiManager, ArcherRecruitmentCatalogSO archerCatalog)
         {
             EnsureDayNightOverlay(canvasTransform);
 
             GameObject hudRoot = EnsureHudRoot(canvasTransform);
-            ConfigureHudRoot(hudRoot);
+            ConfigureHudRoot(hudRoot, archerCatalog);
 
             GameObject levelUpPanel = EnsurePanel(canvasTransform, "LevelUpPanel", false, new Color(0.04f, 0.05f, 0.07f, 0.92f));
             Center(levelUpPanel.GetComponent<RectTransform>(), new Vector2(820f, 430f));
@@ -1196,7 +1273,7 @@ namespace DeadWalls
                 : EnsurePanel(canvasTransform, "MobileCastleHudRoot", true, new Color(0f, 0f, 0f, 0f));
         }
 
-        private static void ConfigureHudRoot(GameObject hudRoot)
+        private static void ConfigureHudRoot(GameObject hudRoot, ArcherRecruitmentCatalogSO archerCatalog)
         {
             RemoveGeneratedCanvasComponents(hudRoot);
             SetLayerRecursive(hudRoot, LayerMask.NameToLayer("UI"));
@@ -1254,6 +1331,7 @@ namespace DeadWalls
             ConfigureWorkerEconomyDrawer(hudRoot);
 
             var market = EnsureComponent<MarketUI>(hudRoot);
+            market.ArcherCatalog = archerCatalog;
             market.ArcherDrawerPanel = FindRectTransformByName(hudRoot, "ArcherDrawerPanel")
                 ?? EnsureFallbackDrawer(hudRoot.transform);
             market.DrawerToggleButton = FindComponentInChildrenByName<Button>(hudRoot, "DrawerToggleButton");
@@ -1623,6 +1701,11 @@ namespace DeadWalls
             if (market.DrawerTitleText != null)
                 market.DrawerTitleText.text = "ARCHER RECRUITMENT";
 
+            market.ArcherRecruitmentListRoot = FindRectTransformByName(root, "ArcherRecruitmentListRoot");
+            market.ArcherRecruitmentRowTemplate = FindRectTransformByName(root, "ArcherRecruitmentRowTemplate");
+            if (market.ArcherRecruitmentRowTemplate != null)
+                market.ArcherRecruitmentRowTemplate.gameObject.SetActive(false);
+
             market.BasicCountText = FindComponentInChildrenByName<TextMeshProUGUI>(root, "BasicCountText");
             market.BasicDpsText = FindComponentInChildrenByName<TextMeshProUGUI>(root, "BasicDpsText");
             market.BasicLevelText = FindComponentInChildrenByName<TextMeshProUGUI>(root, "BasicLevelText");
@@ -1962,6 +2045,25 @@ namespace DeadWalls
                 return component;
 
             return Undo.AddComponent(gameObject, componentType);
+        }
+
+        private static void AssignObjectReference(UnityEngine.Object target, string propertyName, UnityEngine.Object value)
+        {
+            if (target == null)
+                return;
+
+            var serializedObject = new SerializedObject(target);
+            SerializedProperty property = serializedObject.FindProperty(propertyName);
+            if (property == null || property.propertyType != SerializedPropertyType.ObjectReference)
+                return;
+
+            if (property.objectReferenceValue == value)
+                return;
+
+            Undo.RecordObject(target, "Assign Object Reference");
+            property.objectReferenceValue = value;
+            serializedObject.ApplyModifiedProperties();
+            EditorUtility.SetDirty(target);
         }
 
         private static Type FindComponentType(string fullName)

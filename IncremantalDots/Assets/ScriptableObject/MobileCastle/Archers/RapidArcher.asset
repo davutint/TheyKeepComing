@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d1c59f91b5a42e4a930bfdd0c44db4a, type: 3}
+  m_Name: RapidArcher
+  m_EditorClassIdentifier: DeadWalls::DeadWalls.ArcherDefinitionSO
+  Id: rapid_archer
+  DisplayName: Rapid Archer
+  Type: 1
+  Description: Fast shots, lower damage.
+  SortOrder: 20
+  BuyCost:
+    Wood: 55
+    Stone: 0
+    Iron: 35
+    Food: 20
+  PopulationCost: 1
+  RequiredTechId: rapid_volley
+  Damage: 6
+  FireRate: 3
+  Range: 14
+  SlowDuration: 0
+  SlowMultiplier: 1
+  Tint: {r: 1, g: 0.82, b: 0.32, a: 1}

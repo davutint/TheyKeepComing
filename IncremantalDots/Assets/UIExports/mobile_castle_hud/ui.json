@@ -66,14 +66,9 @@
         },
         "image": {
           "spriteName": null,
-          "color": "#FFFFFFFF",
+          "color": "#00000000",
           "imageType": "Simple",
           "preserveAspect": false
-        },
-        "spriteSlot": {
-          "category": "background",
-          "hint": "resource_bar_clean_v4.png",
-          "suggestedSize": "700x84"
         },
         "children": [
           {
@@ -104,54 +99,11 @@
             },
             "image": {
               "spriteName": null,
-              "color": "#FFFFFFFF",
+              "color": "#171C22F2",
               "imageType": "Simple",
               "preserveAspect": false
             },
-            "spriteSlot": {
-              "category": "background",
-              "hint": "resource_chip_clean_v4.png",
-              "suggestedSize": "104x62"
-            },
             "children": [
-              {
-                "type": "Image",
-                "name": "WoodIcon",
-                "raycastTarget": false,
-                "rectTransform": {
-                  "anchorMin": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "anchorMax": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "pivot": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "anchoredPosition": {
-                    "x": -36,
-                    "y": -2
-                  },
-                  "sizeDelta": {
-                    "x": 26,
-                    "y": 26
-                  }
-                },
-                "image": {
-                  "spriteName": null,
-                  "color": "#FFFFFFFF",
-                  "imageType": "Simple",
-                  "preserveAspect": true
-                },
-                "spriteSlot": {
-                  "category": "icon",
-                  "hint": "wood_loot_v4.png",
-                  "suggestedSize": "26x26"
-                }
-              },
               {
                 "type": "Text",
                 "name": "WoodLabel",
@@ -170,11 +122,11 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": 18,
+                    "x": 0,
                     "y": 18
                   },
                   "sizeDelta": {
-                    "x": 58,
+                    "x": 82,
                     "y": 15
                   }
                 },
@@ -182,10 +134,11 @@
                   "content": "WOOD",
                   "fontSize": 9.5,
                   "fontStyle": "Bold",
-                  "color": "#BBAE83FF",
+                  "color": "#B9B0A0FF",
                   "alignment": "MiddleCenter",
                   "overflow": "Overflow"
-                }
+                },
+                "children": []
               },
               {
                 "type": "Text",
@@ -205,22 +158,26 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": 18,
+                    "x": 0,
                     "y": -10
                   },
                   "sizeDelta": {
-                    "x": 66,
-                    "y": 30
+                    "x": 88,
+                    "y": 32
                   }
                 },
                 "text": {
                   "content": "4,280",
-                  "fontSize": 16,
+                  "fontSize": 15,
                   "fontStyle": "Bold",
-                  "color": "#F7E9C9FF",
+                  "color": "#F2E7CEFF",
                   "alignment": "MiddleCenter",
-                  "overflow": "Overflow"
-                }
+                  "overflow": "Overflow",
+                  "autoSize": true,
+                  "fontSizeMin": 8,
+                  "fontSizeMax": 15
+                },
+                "children": []
               }
             ]
           },
@@ -252,54 +209,11 @@
             },
             "image": {
               "spriteName": null,
-              "color": "#FFFFFFFF",
+              "color": "#171C22F2",
               "imageType": "Simple",
               "preserveAspect": false
             },
-            "spriteSlot": {
-              "category": "background",
-              "hint": "resource_chip_clean_v4.png",
-              "suggestedSize": "104x62"
-            },
             "children": [
-              {
-                "type": "Image",
-                "name": "StoneIcon",
-                "raycastTarget": false,
-                "rectTransform": {
-                  "anchorMin": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "anchorMax": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "pivot": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "anchoredPosition": {
-                    "x": -36,
-                    "y": -2
-                  },
-                  "sizeDelta": {
-                    "x": 26,
-                    "y": 26
-                  }
-                },
-                "image": {
-                  "spriteName": null,
-                  "color": "#FFFFFFFF",
-                  "imageType": "Simple",
-                  "preserveAspect": true
-                },
-                "spriteSlot": {
-                  "category": "icon",
-                  "hint": "stone_loot_v4.png",
-                  "suggestedSize": "26x26"
-                }
-              },
               {
                 "type": "Text",
                 "name": "StoneLabel",
@@ -318,11 +232,11 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": 18,
+                    "x": 0,
                     "y": 18
                   },
                   "sizeDelta": {
-                    "x": 58,
+                    "x": 82,
                     "y": 15
                   }
                 },
@@ -330,10 +244,11 @@
                   "content": "STONE",
                   "fontSize": 9.5,
                   "fontStyle": "Bold",
-                  "color": "#BBAE83FF",
+                  "color": "#B9B0A0FF",
                   "alignment": "MiddleCenter",
                   "overflow": "Overflow"
-                }
+                },
+                "children": []
               },
               {
                 "type": "Text",
@@ -353,22 +268,26 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": 18,
+                    "x": 0,
                     "y": -10
                   },
                   "sizeDelta": {
-                    "x": 66,
-                    "y": 30
+                    "x": 88,
+                    "y": 32
                   }
                 },
                 "text": {
                   "content": "1,960",
-                  "fontSize": 16,
+                  "fontSize": 15,
                   "fontStyle": "Bold",
-                  "color": "#F7E9C9FF",
+                  "color": "#F2E7CEFF",
                   "alignment": "MiddleCenter",
-                  "overflow": "Overflow"
-                }
+                  "overflow": "Overflow",
+                  "autoSize": true,
+                  "fontSizeMin": 8,
+                  "fontSizeMax": 15
+                },
+                "children": []
               }
             ]
           },
@@ -400,54 +319,11 @@
             },
             "image": {
               "spriteName": null,
-              "color": "#FFFFFFFF",
+              "color": "#171C22F2",
               "imageType": "Simple",
               "preserveAspect": false
             },
-            "spriteSlot": {
-              "category": "background",
-              "hint": "resource_chip_clean_v4.png",
-              "suggestedSize": "104x62"
-            },
             "children": [
-              {
-                "type": "Image",
-                "name": "IronIcon",
-                "raycastTarget": false,
-                "rectTransform": {
-                  "anchorMin": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "anchorMax": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "pivot": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "anchoredPosition": {
-                    "x": -36,
-                    "y": -2
-                  },
-                  "sizeDelta": {
-                    "x": 26,
-                    "y": 26
-                  }
-                },
-                "image": {
-                  "spriteName": null,
-                  "color": "#FFFFFFFF",
-                  "imageType": "Simple",
-                  "preserveAspect": true
-                },
-                "spriteSlot": {
-                  "category": "icon",
-                  "hint": "iron_loot_v4.png",
-                  "suggestedSize": "26x26"
-                }
-              },
               {
                 "type": "Text",
                 "name": "IronLabel",
@@ -466,11 +342,11 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": 18,
+                    "x": 0,
                     "y": 18
                   },
                   "sizeDelta": {
-                    "x": 58,
+                    "x": 82,
                     "y": 15
                   }
                 },
@@ -478,10 +354,11 @@
                   "content": "IRON",
                   "fontSize": 9.5,
                   "fontStyle": "Bold",
-                  "color": "#BBAE83FF",
+                  "color": "#B9B0A0FF",
                   "alignment": "MiddleCenter",
                   "overflow": "Overflow"
-                }
+                },
+                "children": []
               },
               {
                 "type": "Text",
@@ -501,22 +378,26 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": 18,
+                    "x": 0,
                     "y": -10
                   },
                   "sizeDelta": {
-                    "x": 66,
-                    "y": 30
+                    "x": 88,
+                    "y": 32
                   }
                 },
                 "text": {
                   "content": "860",
-                  "fontSize": 16,
+                  "fontSize": 15,
                   "fontStyle": "Bold",
-                  "color": "#F7E9C9FF",
+                  "color": "#F2E7CEFF",
                   "alignment": "MiddleCenter",
-                  "overflow": "Overflow"
-                }
+                  "overflow": "Overflow",
+                  "autoSize": true,
+                  "fontSizeMin": 8,
+                  "fontSizeMax": 15
+                },
+                "children": []
               }
             ]
           },
@@ -548,54 +429,11 @@
             },
             "image": {
               "spriteName": null,
-              "color": "#FFFFFFFF",
+              "color": "#171C22F2",
               "imageType": "Simple",
               "preserveAspect": false
             },
-            "spriteSlot": {
-              "category": "background",
-              "hint": "resource_chip_clean_v4.png",
-              "suggestedSize": "104x62"
-            },
             "children": [
-              {
-                "type": "Image",
-                "name": "FoodIcon",
-                "raycastTarget": false,
-                "rectTransform": {
-                  "anchorMin": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "anchorMax": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "pivot": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "anchoredPosition": {
-                    "x": -36,
-                    "y": -2
-                  },
-                  "sizeDelta": {
-                    "x": 26,
-                    "y": 26
-                  }
-                },
-                "image": {
-                  "spriteName": null,
-                  "color": "#FFFFFFFF",
-                  "imageType": "Simple",
-                  "preserveAspect": true
-                },
-                "spriteSlot": {
-                  "category": "icon",
-                  "hint": "food_wheat_v4.png",
-                  "suggestedSize": "26x26"
-                }
-              },
               {
                 "type": "Text",
                 "name": "FoodLabel",
@@ -614,11 +452,11 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": 18,
+                    "x": 0,
                     "y": 18
                   },
                   "sizeDelta": {
-                    "x": 58,
+                    "x": 82,
                     "y": 15
                   }
                 },
@@ -626,10 +464,11 @@
                   "content": "FOOD",
                   "fontSize": 9.5,
                   "fontStyle": "Bold",
-                  "color": "#BBAE83FF",
+                  "color": "#B9B0A0FF",
                   "alignment": "MiddleCenter",
                   "overflow": "Overflow"
-                }
+                },
+                "children": []
               },
               {
                 "type": "Text",
@@ -649,22 +488,26 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": 18,
+                    "x": 0,
                     "y": -10
                   },
                   "sizeDelta": {
-                    "x": 66,
-                    "y": 30
+                    "x": 88,
+                    "y": 32
                   }
                 },
                 "text": {
                   "content": "74",
-                  "fontSize": 16,
+                  "fontSize": 15,
                   "fontStyle": "Bold",
-                  "color": "#F7E9C9FF",
+                  "color": "#F2E7CEFF",
                   "alignment": "MiddleCenter",
-                  "overflow": "Overflow"
-                }
+                  "overflow": "Overflow",
+                  "autoSize": true,
+                  "fontSizeMin": 8,
+                  "fontSizeMax": 15
+                },
+                "children": []
               }
             ]
           },
@@ -696,54 +539,11 @@
             },
             "image": {
               "spriteName": null,
-              "color": "#FFFFFFFF",
+              "color": "#171C22F2",
               "imageType": "Simple",
               "preserveAspect": false
             },
-            "spriteSlot": {
-              "category": "background",
-              "hint": "resource_chip_clean_v4.png",
-              "suggestedSize": "104x62"
-            },
             "children": [
-              {
-                "type": "Image",
-                "name": "PopulationIcon",
-                "raycastTarget": false,
-                "rectTransform": {
-                  "anchorMin": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "anchorMax": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "pivot": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "anchoredPosition": {
-                    "x": -36,
-                    "y": -2
-                  },
-                  "sizeDelta": {
-                    "x": 26,
-                    "y": 26
-                  }
-                },
-                "image": {
-                  "spriteName": null,
-                  "color": "#FFFFFFFF",
-                  "imageType": "Simple",
-                  "preserveAspect": true
-                },
-                "spriteSlot": {
-                  "category": "icon",
-                  "hint": "population_people_v4.png",
-                  "suggestedSize": "26x26"
-                }
-              },
               {
                 "type": "Text",
                 "name": "PopulationLabel",
@@ -762,11 +562,11 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": 18,
+                    "x": 0,
                     "y": 18
                   },
                   "sizeDelta": {
-                    "x": 58,
+                    "x": 82,
                     "y": 15
                   }
                 },
@@ -774,10 +574,11 @@
                   "content": "POP",
                   "fontSize": 9.5,
                   "fontStyle": "Bold",
-                  "color": "#BBAE83FF",
+                  "color": "#B9B0A0FF",
                   "alignment": "MiddleCenter",
                   "overflow": "Overflow"
-                }
+                },
+                "children": []
               },
               {
                 "type": "Text",
@@ -797,22 +598,26 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": 18,
+                    "x": 0,
                     "y": -10
                   },
                   "sizeDelta": {
-                    "x": 66,
-                    "y": 30
+                    "x": 88,
+                    "y": 32
                   }
                 },
                 "text": {
                   "content": "58/60",
-                  "fontSize": 16,
+                  "fontSize": 15,
                   "fontStyle": "Bold",
-                  "color": "#F7E9C9FF",
+                  "color": "#F2E7CEFF",
                   "alignment": "MiddleCenter",
-                  "overflow": "Overflow"
-                }
+                  "overflow": "Overflow",
+                  "autoSize": true,
+                  "fontSizeMin": 8,
+                  "fontSizeMax": 15
+                },
+                "children": []
               }
             ]
           },
@@ -844,54 +649,11 @@
             },
             "image": {
               "spriteName": null,
-              "color": "#FFFFFFFF",
+              "color": "#171C22F2",
               "imageType": "Simple",
               "preserveAspect": false
             },
-            "spriteSlot": {
-              "category": "background",
-              "hint": "resource_chip_clean_v4.png",
-              "suggestedSize": "104x62"
-            },
             "children": [
-              {
-                "type": "Image",
-                "name": "ArrowIcon",
-                "raycastTarget": false,
-                "rectTransform": {
-                  "anchorMin": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "anchorMax": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "pivot": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "anchoredPosition": {
-                    "x": -36,
-                    "y": -2
-                  },
-                  "sizeDelta": {
-                    "x": 26,
-                    "y": 26
-                  }
-                },
-                "image": {
-                  "spriteName": null,
-                  "color": "#FFFFFFFF",
-                  "imageType": "Simple",
-                  "preserveAspect": true
-                },
-                "spriteSlot": {
-                  "category": "icon",
-                  "hint": "arrow_stock_v4.png",
-                  "suggestedSize": "26x26"
-                }
-              },
               {
                 "type": "Text",
                 "name": "ArrowLabel",
@@ -910,11 +672,11 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": 18,
+                    "x": 0,
                     "y": 18
                   },
                   "sizeDelta": {
-                    "x": 58,
+                    "x": 82,
                     "y": 15
                   }
                 },
@@ -922,10 +684,11 @@
                   "content": "ARROWS",
                   "fontSize": 9.5,
                   "fontStyle": "Bold",
-                  "color": "#BBAE83FF",
+                  "color": "#B9B0A0FF",
                   "alignment": "MiddleCenter",
                   "overflow": "Overflow"
-                }
+                },
+                "children": []
               },
               {
                 "type": "Text",
@@ -945,22 +708,26 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": 18,
+                    "x": 0,
                     "y": -10
                   },
                   "sizeDelta": {
-                    "x": 66,
-                    "y": 30
+                    "x": 88,
+                    "y": 32
                   }
                 },
                 "text": {
                   "content": "430",
-                  "fontSize": 16,
+                  "fontSize": 15,
                   "fontStyle": "Bold",
-                  "color": "#F7E9C9FF",
+                  "color": "#F2E7CEFF",
                   "alignment": "MiddleCenter",
-                  "overflow": "Overflow"
-                }
+                  "overflow": "Overflow",
+                  "autoSize": true,
+                  "fontSizeMin": 8,
+                  "fontSizeMax": 15
+                },
+                "children": []
               }
             ]
           }
@@ -985,16 +752,16 @@
           },
           "anchoredPosition": {
             "x": -656,
-            "y": 348
+            "y": 278
           },
           "sizeDelta": {
-            "x": 560,
-            "y": 176
+            "x": 420,
+            "y": 320
           }
         },
         "image": {
           "spriteName": null,
-          "color": "#FFFFFFFF",
+          "color": "#13171CEB",
           "imageType": "Simple",
           "preserveAspect": false
         },
@@ -1027,7 +794,7 @@
             },
             "image": {
               "spriteName": null,
-              "color": "#FFFFFFFF",
+              "color": "#00000000",
               "imageType": "Simple",
               "preserveAspect": false
             },
@@ -1050,64 +817,25 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": -68,
+                    "x": -130,
                     "y": 0
                   },
                   "sizeDelta": {
-                    "x": 110,
-                    "y": 22
+                    "x": 180,
+                    "y": 28
                   }
                 },
                 "text": {
                   "content": "WORKERS",
-                  "fontSize": 15,
+                  "fontSize": 16,
                   "fontStyle": "Bold",
-                  "color": "#F0D27AFF",
+                  "color": "#F2E7CEFF",
                   "alignment": "MiddleLeft",
                   "overflow": "Overflow"
-                }
-              },
-              {
-                "type": "Text",
-                "name": "WorkerDrawerSubtitleText",
-                "raycastTarget": false,
-                "rectTransform": {
-                  "anchorMin": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "anchorMax": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "pivot": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "anchoredPosition": {
-                    "x": 58,
-                    "y": 0
-                  },
-                  "sizeDelta": {
-                    "x": 116,
-                    "y": 18
-                  }
                 },
-                "text": {
-                  "content": "CITY WORKFORCE",
-                  "fontSize": 10,
-                  "fontStyle": "Bold",
-                  "color": "#BBAE83FF",
-                  "alignment": "MiddleRight",
-                  "overflow": "Overflow"
-                }
+                "children": []
               }
-            ],
-            "spriteSlot": {
-              "category": "background",
-              "hint": "drawer_header_clean_v4.png",
-              "suggestedSize": "260x34"
-            }
+            ]
           },
           {
             "type": "Image",
@@ -1137,7 +865,7 @@
             },
             "image": {
               "spriteName": null,
-              "color": "#FFFFFFFF",
+              "color": "#00000000",
               "imageType": "Simple",
               "preserveAspect": false
             },
@@ -1175,14 +903,10 @@
                   "color": "#F5EACDFF",
                   "alignment": "MiddleCenter",
                   "overflow": "Overflow"
-                }
+                },
+                "children": []
               }
-            ],
-            "spriteSlot": {
-              "category": "background",
-              "hint": "resource_chip_clean_v4.png",
-              "suggestedSize": "76x32"
-            }
+            ]
           },
           {
             "type": "Image",
@@ -1212,7 +936,7 @@
             },
             "image": {
               "spriteName": null,
-              "color": "#FFFFFFFF",
+              "color": "#00000000",
               "imageType": "Simple",
               "preserveAspect": false
             },
@@ -1250,14 +974,10 @@
                   "color": "#F5EACDFF",
                   "alignment": "MiddleCenter",
                   "overflow": "Overflow"
-                }
+                },
+                "children": []
               }
-            ],
-            "spriteSlot": {
-              "category": "background",
-              "hint": "resource_chip_clean_v4.png",
-              "suggestedSize": "82x32"
-            }
+            ]
           },
           {
             "type": "Image",
@@ -1287,7 +1007,7 @@
             },
             "image": {
               "spriteName": null,
-              "color": "#FFFFFFFF",
+              "color": "#00000000",
               "imageType": "Simple",
               "preserveAspect": false
             },
@@ -1325,14 +1045,10 @@
                   "color": "#F5EACDFF",
                   "alignment": "MiddleCenter",
                   "overflow": "Overflow"
-                }
+                },
+                "children": []
               }
-            ],
-            "spriteSlot": {
-              "category": "background",
-              "hint": "resource_chip_clean_v4.png",
-              "suggestedSize": "96x32"
-            }
+            ]
           },
           {
             "type": "Image",
@@ -1352,59 +1068,21 @@
                 "y": 0.5
               },
               "anchoredPosition": {
-                "x": -135,
-                "y": 10
+                "x": 0,
+                "y": 82
               },
               "sizeDelta": {
-                "x": 258,
-                "y": 50
+                "x": 380,
+                "y": 52
               }
             },
             "image": {
               "spriteName": null,
-              "color": "#11100DE8",
+              "color": "#232A32F2",
               "imageType": "Simple",
               "preserveAspect": false
             },
             "children": [
-              {
-                "type": "Image",
-                "name": "WoodWorkerIcon",
-                "raycastTarget": false,
-                "rectTransform": {
-                  "anchorMin": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "anchorMax": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "pivot": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "anchoredPosition": {
-                    "x": -114,
-                    "y": 0
-                  },
-                  "sizeDelta": {
-                    "x": 32,
-                    "y": 32
-                  }
-                },
-                "image": {
-                  "spriteName": null,
-                  "color": "#FFFFFFFF",
-                  "imageType": "Simple",
-                  "preserveAspect": true
-                },
-                "spriteSlot": {
-                  "category": "icon",
-                  "hint": "wood_loot_v4.png",
-                  "suggestedSize": "24x24"
-                }
-              },
               {
                 "type": "Text",
                 "name": "WoodWorkerCountText",
@@ -1423,22 +1101,23 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": -70,
-                    "y": 9
+                    "x": -118,
+                    "y": 8
                   },
                   "sizeDelta": {
-                    "x": 82,
-                    "y": 16
+                    "x": 118,
+                    "y": 22
                   }
                 },
                 "text": {
                   "content": "WOOD x6",
-                  "fontSize": 12.5,
+                  "fontSize": 13,
                   "fontStyle": "Bold",
-                  "color": "#EFE4C4FF",
+                  "color": "#F2E7CEFF",
                   "alignment": "MiddleLeft",
                   "overflow": "Overflow"
-                }
+                },
+                "children": []
               },
               {
                 "type": "Text",
@@ -1458,22 +1137,23 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": -70,
-                    "y": -10
+                    "x": -118,
+                    "y": -12
                   },
                   "sizeDelta": {
-                    "x": 82,
-                    "y": 14
+                    "x": 118,
+                    "y": 20
                   }
                 },
                 "text": {
                   "content": "+54/min",
-                  "fontSize": 10.5,
+                  "fontSize": 11,
                   "fontStyle": "Bold",
-                  "color": "#D6B45BFF",
+                  "color": "#74D680FF",
                   "alignment": "MiddleLeft",
                   "overflow": "Overflow"
-                }
+                },
+                "children": []
               },
               {
                 "type": "Button",
@@ -1492,28 +1172,23 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": 44,
+                    "x": 128,
                     "y": 0
                   },
                   "sizeDelta": {
-                    "x": 82,
-                    "y": 38
+                    "x": 104,
+                    "y": 36
                   }
                 },
                 "button": {
                   "interactable": true,
                   "transition": "ColorTint",
                   "colors": {
-                    "normal": "#FFFFFFFF",
-                    "highlighted": "#FFF3C7F0",
-                    "pressed": "#00000030",
+                    "normal": "#2F9E44FF",
+                    "highlighted": "#37B24DFF",
+                    "pressed": "#2B8A3EFF",
                     "disabled": "#707070AA"
                   }
-                },
-                "spriteSlot": {
-                  "category": "button",
-                  "hint": "button_buy_clean_v4.png",
-                  "suggestedSize": "82x38"
                 },
                 "text": {
                   "content": "+ WORKER",
@@ -1524,8 +1199,9 @@
                   "overflow": "Overflow"
                 },
                 "style": {
-                  "backgroundColor": "#FFFFFFFF"
-                }
+                  "backgroundColor": "#2F9E44FF"
+                },
+                "children": []
               },
               {
                 "type": "Text",
@@ -1545,29 +1221,25 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": 105,
+                    "x": 42,
                     "y": 0
                   },
                   "sizeDelta": {
-                    "x": 46,
-                    "y": 18
+                    "x": 76,
+                    "y": 22
                   }
                 },
                 "text": {
                   "content": "READY",
-                  "fontSize": 9.5,
+                  "fontSize": 10,
                   "fontStyle": "Bold",
-                  "color": "#91D879FF",
+                  "color": "#74D680FF",
                   "alignment": "MiddleCenter",
                   "overflow": "Overflow"
-                }
+                },
+                "children": []
               }
-            ],
-            "spriteSlot": {
-              "category": "background",
-              "hint": "resource_chip_clean_v4.png",
-              "suggestedSize": "258x50"
-            }
+            ]
           },
           {
             "type": "Image",
@@ -1587,59 +1259,21 @@
                 "y": 0.5
               },
               "anchoredPosition": {
-                "x": 135,
-                "y": 10
+                "x": 0,
+                "y": 22
               },
               "sizeDelta": {
-                "x": 258,
-                "y": 50
+                "x": 380,
+                "y": 52
               }
             },
             "image": {
               "spriteName": null,
-              "color": "#11100DE8",
+              "color": "#232A32F2",
               "imageType": "Simple",
               "preserveAspect": false
             },
             "children": [
-              {
-                "type": "Image",
-                "name": "StoneWorkerIcon",
-                "raycastTarget": false,
-                "rectTransform": {
-                  "anchorMin": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "anchorMax": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "pivot": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "anchoredPosition": {
-                    "x": -114,
-                    "y": 0
-                  },
-                  "sizeDelta": {
-                    "x": 32,
-                    "y": 32
-                  }
-                },
-                "image": {
-                  "spriteName": null,
-                  "color": "#FFFFFFFF",
-                  "imageType": "Simple",
-                  "preserveAspect": true
-                },
-                "spriteSlot": {
-                  "category": "icon",
-                  "hint": "stone_loot_v4.png",
-                  "suggestedSize": "24x24"
-                }
-              },
               {
                 "type": "Text",
                 "name": "StoneWorkerCountText",
@@ -1658,22 +1292,23 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": -70,
-                    "y": 9
+                    "x": -118,
+                    "y": 8
                   },
                   "sizeDelta": {
-                    "x": 82,
-                    "y": 16
+                    "x": 118,
+                    "y": 22
                   }
                 },
                 "text": {
                   "content": "STONE x4",
-                  "fontSize": 12.5,
+                  "fontSize": 13,
                   "fontStyle": "Bold",
-                  "color": "#EFE4C4FF",
+                  "color": "#F2E7CEFF",
                   "alignment": "MiddleLeft",
                   "overflow": "Overflow"
-                }
+                },
+                "children": []
               },
               {
                 "type": "Text",
@@ -1693,22 +1328,23 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": -70,
-                    "y": -10
+                    "x": -118,
+                    "y": -12
                   },
                   "sizeDelta": {
-                    "x": 82,
-                    "y": 14
+                    "x": 118,
+                    "y": 20
                   }
                 },
                 "text": {
                   "content": "+32/min",
-                  "fontSize": 10.5,
+                  "fontSize": 11,
                   "fontStyle": "Bold",
-                  "color": "#C9C7B9FF",
+                  "color": "#74D680FF",
                   "alignment": "MiddleLeft",
                   "overflow": "Overflow"
-                }
+                },
+                "children": []
               },
               {
                 "type": "Button",
@@ -1727,28 +1363,23 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": 44,
+                    "x": 128,
                     "y": 0
                   },
                   "sizeDelta": {
-                    "x": 82,
-                    "y": 38
+                    "x": 104,
+                    "y": 36
                   }
                 },
                 "button": {
                   "interactable": true,
                   "transition": "ColorTint",
                   "colors": {
-                    "normal": "#FFFFFFFF",
-                    "highlighted": "#FFF3C7F0",
-                    "pressed": "#00000030",
+                    "normal": "#2F9E44FF",
+                    "highlighted": "#37B24DFF",
+                    "pressed": "#2B8A3EFF",
                     "disabled": "#707070AA"
                   }
-                },
-                "spriteSlot": {
-                  "category": "button",
-                  "hint": "button_buy_clean_v4.png",
-                  "suggestedSize": "82x38"
                 },
                 "text": {
                   "content": "+ WORKER",
@@ -1759,8 +1390,9 @@
                   "overflow": "Overflow"
                 },
                 "style": {
-                  "backgroundColor": "#FFFFFFFF"
-                }
+                  "backgroundColor": "#2F9E44FF"
+                },
+                "children": []
               },
               {
                 "type": "Text",
@@ -1780,29 +1412,25 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": 105,
+                    "x": 42,
                     "y": 0
                   },
                   "sizeDelta": {
-                    "x": 46,
-                    "y": 18
+                    "x": 76,
+                    "y": 22
                   }
                 },
                 "text": {
                   "content": "READY",
-                  "fontSize": 9.5,
+                  "fontSize": 10,
                   "fontStyle": "Bold",
-                  "color": "#91D879FF",
+                  "color": "#74D680FF",
                   "alignment": "MiddleCenter",
                   "overflow": "Overflow"
-                }
+                },
+                "children": []
               }
-            ],
-            "spriteSlot": {
-              "category": "background",
-              "hint": "resource_chip_clean_v4.png",
-              "suggestedSize": "258x50"
-            }
+            ]
           },
           {
             "type": "Image",
@@ -1822,59 +1450,21 @@
                 "y": 0.5
               },
               "anchoredPosition": {
-                "x": -135,
-                "y": -48
+                "x": 0,
+                "y": -38
               },
               "sizeDelta": {
-                "x": 258,
-                "y": 50
+                "x": 380,
+                "y": 52
               }
             },
             "image": {
               "spriteName": null,
-              "color": "#11100DE8",
+              "color": "#232A32F2",
               "imageType": "Simple",
               "preserveAspect": false
             },
             "children": [
-              {
-                "type": "Image",
-                "name": "IronWorkerIcon",
-                "raycastTarget": false,
-                "rectTransform": {
-                  "anchorMin": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "anchorMax": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "pivot": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "anchoredPosition": {
-                    "x": -114,
-                    "y": 0
-                  },
-                  "sizeDelta": {
-                    "x": 32,
-                    "y": 32
-                  }
-                },
-                "image": {
-                  "spriteName": null,
-                  "color": "#FFFFFFFF",
-                  "imageType": "Simple",
-                  "preserveAspect": true
-                },
-                "spriteSlot": {
-                  "category": "icon",
-                  "hint": "iron_loot_v4.png",
-                  "suggestedSize": "24x24"
-                }
-              },
               {
                 "type": "Text",
                 "name": "IronWorkerCountText",
@@ -1893,22 +1483,23 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": -70,
-                    "y": 9
+                    "x": -118,
+                    "y": 8
                   },
                   "sizeDelta": {
-                    "x": 82,
-                    "y": 16
+                    "x": 118,
+                    "y": 22
                   }
                 },
                 "text": {
                   "content": "IRON x2",
-                  "fontSize": 12.5,
+                  "fontSize": 13,
                   "fontStyle": "Bold",
-                  "color": "#EFE4C4FF",
+                  "color": "#F2E7CEFF",
                   "alignment": "MiddleLeft",
                   "overflow": "Overflow"
-                }
+                },
+                "children": []
               },
               {
                 "type": "Text",
@@ -1928,22 +1519,23 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": -70,
-                    "y": -10
+                    "x": -118,
+                    "y": -12
                   },
                   "sizeDelta": {
-                    "x": 82,
-                    "y": 14
+                    "x": 118,
+                    "y": 20
                   }
                 },
                 "text": {
                   "content": "+18/min",
-                  "fontSize": 10.5,
+                  "fontSize": 11,
                   "fontStyle": "Bold",
-                  "color": "#B9B7AAFF",
+                  "color": "#74D680FF",
                   "alignment": "MiddleLeft",
                   "overflow": "Overflow"
-                }
+                },
+                "children": []
               },
               {
                 "type": "Button",
@@ -1962,28 +1554,23 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": 44,
+                    "x": 128,
                     "y": 0
                   },
                   "sizeDelta": {
-                    "x": 82,
-                    "y": 38
+                    "x": 104,
+                    "y": 36
                   }
                 },
                 "button": {
                   "interactable": true,
                   "transition": "ColorTint",
                   "colors": {
-                    "normal": "#FFFFFFFF",
-                    "highlighted": "#FFF3C7F0",
-                    "pressed": "#00000030",
+                    "normal": "#2F9E44FF",
+                    "highlighted": "#37B24DFF",
+                    "pressed": "#2B8A3EFF",
                     "disabled": "#707070AA"
                   }
-                },
-                "spriteSlot": {
-                  "category": "button",
-                  "hint": "button_buy_clean_v4.png",
-                  "suggestedSize": "82x38"
                 },
                 "text": {
                   "content": "+ WORKER",
@@ -1994,8 +1581,9 @@
                   "overflow": "Overflow"
                 },
                 "style": {
-                  "backgroundColor": "#FFFFFFFF"
-                }
+                  "backgroundColor": "#2F9E44FF"
+                },
+                "children": []
               },
               {
                 "type": "Text",
@@ -2015,29 +1603,25 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": 105,
+                    "x": 42,
                     "y": 0
                   },
                   "sizeDelta": {
-                    "x": 46,
-                    "y": 18
+                    "x": 76,
+                    "y": 22
                   }
                 },
                 "text": {
                   "content": "NEED POP",
-                  "fontSize": 9.5,
+                  "fontSize": 10,
                   "fontStyle": "Bold",
-                  "color": "#D9A35BFF",
+                  "color": "#74D680FF",
                   "alignment": "MiddleCenter",
                   "overflow": "Overflow"
-                }
+                },
+                "children": []
               }
-            ],
-            "spriteSlot": {
-              "category": "background",
-              "hint": "resource_chip_clean_v4.png",
-              "suggestedSize": "258x50"
-            }
+            ]
           },
           {
             "type": "Image",
@@ -2057,59 +1641,21 @@
                 "y": 0.5
               },
               "anchoredPosition": {
-                "x": 135,
-                "y": -48
+                "x": 0,
+                "y": -98
               },
               "sizeDelta": {
-                "x": 258,
-                "y": 50
+                "x": 380,
+                "y": 52
               }
             },
             "image": {
               "spriteName": null,
-              "color": "#11100DE8",
+              "color": "#232A32F2",
               "imageType": "Simple",
               "preserveAspect": false
             },
             "children": [
-              {
-                "type": "Image",
-                "name": "FoodWorkerIcon",
-                "raycastTarget": false,
-                "rectTransform": {
-                  "anchorMin": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "anchorMax": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "pivot": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "anchoredPosition": {
-                    "x": -114,
-                    "y": 0
-                  },
-                  "sizeDelta": {
-                    "x": 32,
-                    "y": 32
-                  }
-                },
-                "image": {
-                  "spriteName": null,
-                  "color": "#FFFFFFFF",
-                  "imageType": "Simple",
-                  "preserveAspect": true
-                },
-                "spriteSlot": {
-                  "category": "icon",
-                  "hint": "food_wheat_v4.png",
-                  "suggestedSize": "24x24"
-                }
-              },
               {
                 "type": "Text",
                 "name": "FoodWorkerCountText",
@@ -2128,22 +1674,23 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": -70,
-                    "y": 9
+                    "x": -118,
+                    "y": 8
                   },
                   "sizeDelta": {
-                    "x": 82,
-                    "y": 16
+                    "x": 118,
+                    "y": 22
                   }
                 },
                 "text": {
                   "content": "FOOD x8",
-                  "fontSize": 12.5,
+                  "fontSize": 13,
                   "fontStyle": "Bold",
-                  "color": "#EFE4C4FF",
+                  "color": "#F2E7CEFF",
                   "alignment": "MiddleLeft",
                   "overflow": "Overflow"
-                }
+                },
+                "children": []
               },
               {
                 "type": "Text",
@@ -2163,22 +1710,23 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": -70,
-                    "y": -10
+                    "x": -118,
+                    "y": -12
                   },
                   "sizeDelta": {
-                    "x": 82,
-                    "y": 14
+                    "x": 118,
+                    "y": 20
                   }
                 },
                 "text": {
                   "content": "+48/min",
-                  "fontSize": 10.5,
+                  "fontSize": 11,
                   "fontStyle": "Bold",
-                  "color": "#D6B45BFF",
+                  "color": "#74D680FF",
                   "alignment": "MiddleLeft",
                   "overflow": "Overflow"
-                }
+                },
+                "children": []
               },
               {
                 "type": "Button",
@@ -2197,28 +1745,23 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": 44,
+                    "x": 128,
                     "y": 0
                   },
                   "sizeDelta": {
-                    "x": 82,
-                    "y": 38
+                    "x": 104,
+                    "y": 36
                   }
                 },
                 "button": {
                   "interactable": true,
                   "transition": "ColorTint",
                   "colors": {
-                    "normal": "#FFFFFFFF",
-                    "highlighted": "#FFF3C7F0",
-                    "pressed": "#00000030",
+                    "normal": "#2F9E44FF",
+                    "highlighted": "#37B24DFF",
+                    "pressed": "#2B8A3EFF",
                     "disabled": "#707070AA"
                   }
-                },
-                "spriteSlot": {
-                  "category": "button",
-                  "hint": "button_buy_clean_v4.png",
-                  "suggestedSize": "82x38"
                 },
                 "text": {
                   "content": "+ WORKER",
@@ -2229,8 +1772,9 @@
                   "overflow": "Overflow"
                 },
                 "style": {
-                  "backgroundColor": "#FFFFFFFF"
-                }
+                  "backgroundColor": "#2F9E44FF"
+                },
+                "children": []
               },
               {
                 "type": "Text",
@@ -2250,36 +1794,27 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": 105,
+                    "x": 42,
                     "y": 0
                   },
                   "sizeDelta": {
-                    "x": 46,
-                    "y": 18
+                    "x": 76,
+                    "y": 22
                   }
                 },
                 "text": {
                   "content": "READY",
-                  "fontSize": 9.5,
+                  "fontSize": 10,
                   "fontStyle": "Bold",
-                  "color": "#91D879FF",
+                  "color": "#74D680FF",
                   "alignment": "MiddleCenter",
                   "overflow": "Overflow"
-                }
+                },
+                "children": []
               }
-            ],
-            "spriteSlot": {
-              "category": "background",
-              "hint": "resource_chip_clean_v4.png",
-              "suggestedSize": "258x50"
-            }
+            ]
           }
         ],
-        "spriteSlot": {
-          "category": "background",
-          "hint": "drawer_panel_clean_v4.png",
-          "suggestedSize": "560x176"
-        },
         "active": true
       },
       {
@@ -2311,16 +1846,11 @@
           "interactable": true,
           "transition": "ColorTint",
           "colors": {
-            "normal": "#FFFFFFFF",
-            "highlighted": "#FFFFFFE8",
-            "pressed": "#2B1D0F66",
+            "normal": "#414B56FF",
+            "highlighted": "#5A6572FF",
+            "pressed": "#3E4650FF",
             "disabled": "#707070AA"
           }
-        },
-        "spriteSlot": {
-          "category": "button",
-          "hint": "button_secondary_clean_v4.png",
-          "suggestedSize": "126x38"
         },
         "text": {
           "content": "WORKERS",
@@ -2331,8 +1861,9 @@
           "overflow": "Overflow"
         },
         "style": {
-          "backgroundColor": "#FFFFFFFF"
-        }
+          "backgroundColor": "#414B56FF"
+        },
+        "children": []
       },
       {
         "type": "Image",
@@ -2362,54 +1893,11 @@
         },
         "image": {
           "spriteName": null,
-          "color": "#FFFFFFFF",
+          "color": "#13171CEB",
           "imageType": "Simple",
           "preserveAspect": false
         },
-        "spriteSlot": {
-          "category": "background",
-          "hint": "drawer_panel_clean_v4.png",
-          "suggestedSize": "384x106"
-        },
         "children": [
-          {
-            "type": "Image",
-            "name": "CycleFrame",
-            "raycastTarget": false,
-            "rectTransform": {
-              "anchorMin": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "anchorMax": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "pivot": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "anchoredPosition": {
-                "x": 0,
-                "y": 0
-              },
-              "sizeDelta": {
-                "x": 366,
-                "y": 88
-              }
-            },
-            "image": {
-              "spriteName": null,
-              "color": "#FFFFFFFF",
-              "imageType": "Simple",
-              "preserveAspect": false
-            },
-            "spriteSlot": {
-              "category": "decoration",
-              "hint": "defense_frame_clean_v1.png",
-              "suggestedSize": "366x88"
-            }
-          },
           {
             "type": "Text",
             "name": "CyclePhaseText",
@@ -2429,21 +1917,22 @@
               },
               "anchoredPosition": {
                 "x": 0,
-                "y": 28
+                "y": 24
               },
               "sizeDelta": {
-                "x": 318,
+                "x": 260,
                 "y": 34
               }
             },
             "text": {
               "content": "DUSK",
-              "fontSize": 27,
+              "fontSize": 30,
               "fontStyle": "Bold",
-              "color": "#F0D27AFF",
+              "color": "#FFE083FF",
               "alignment": "MiddleCenter",
               "overflow": "Overflow"
-            }
+            },
+            "children": []
           },
           {
             "type": "Text",
@@ -2463,22 +1952,23 @@
                 "y": 0.5
               },
               "anchoredPosition": {
-                "x": -112,
-                "y": -4
+                "x": -118,
+                "y": -34
               },
               "sizeDelta": {
-                "x": 82,
+                "x": 86,
                 "y": 18
               }
             },
             "text": {
               "content": "DAY",
-              "fontSize": 11.5,
+              "fontSize": 13,
               "fontStyle": "Bold",
-              "color": "#EDE1BAFF",
+              "color": "#F2E7CEFF",
               "alignment": "MiddleCenter",
               "overflow": "Overflow"
-            }
+            },
+            "children": []
           },
           {
             "type": "Text",
@@ -2499,21 +1989,22 @@
               },
               "anchoredPosition": {
                 "x": 0,
-                "y": -4
+                "y": -34
               },
               "sizeDelta": {
-                "x": 82,
+                "x": 86,
                 "y": 18
               }
             },
             "text": {
               "content": "DUSK",
-              "fontSize": 11.5,
+              "fontSize": 13,
               "fontStyle": "Bold",
-              "color": "#F0D27AFF",
+              "color": "#F2E7CEFF",
               "alignment": "MiddleCenter",
               "overflow": "Overflow"
-            }
+            },
+            "children": []
           },
           {
             "type": "Text",
@@ -2533,22 +2024,23 @@
                 "y": 0.5
               },
               "anchoredPosition": {
-                "x": 112,
-                "y": -4
+                "x": 118,
+                "y": -34
               },
               "sizeDelta": {
-                "x": 82,
+                "x": 86,
                 "y": 18
               }
             },
             "text": {
               "content": "NIGHT",
-              "fontSize": 11.5,
+              "fontSize": 13,
               "fontStyle": "Bold",
-              "color": "#EDE1BAFF",
+              "color": "#F2E7CEFF",
               "alignment": "MiddleCenter",
               "overflow": "Overflow"
-            }
+            },
+            "children": []
           },
           {
             "type": "Image",
@@ -2569,23 +2061,18 @@
               },
               "anchoredPosition": {
                 "x": 0,
-                "y": -34
+                "y": -8
               },
               "sizeDelta": {
                 "x": 300,
-                "y": 20
+                "y": 18
               }
             },
             "image": {
               "spriteName": null,
-              "color": "#FFFFFFFF",
+              "color": "#0C0F13E8",
               "imageType": "Simple",
               "preserveAspect": false
-            },
-            "spriteSlot": {
-              "category": "background",
-              "hint": "progress_track_clean_v4.png",
-              "suggestedSize": "300x14"
             },
             "children": [
               {
@@ -2620,11 +2107,7 @@
                   "imageType": "Simple",
                   "preserveAspect": false
                 },
-                "spriteSlot": {
-                  "category": "decoration",
-                  "hint": "progress_fill_v4.png",
-                  "suggestedSize": "184x8"
-                }
+                "children": []
               },
               {
                 "type": "Image",
@@ -2654,15 +2137,11 @@
                 },
                 "image": {
                   "spriteName": null,
-                  "color": "#FFF1B9FF",
+                  "color": "#F2E7CEFF",
                   "imageType": "Simple",
                   "preserveAspect": false
                 },
-                "spriteSlot": {
-                  "category": "decoration",
-                  "hint": "resource_chip_clean_v4.png",
-                  "suggestedSize": "10x26"
-                }
+                "children": []
               }
             ]
           }
@@ -2696,14 +2175,9 @@
         },
         "image": {
           "spriteName": null,
-          "color": "#FFFFFFFF",
+          "color": "#13171CEB",
           "imageType": "Simple",
           "preserveAspect": false
-        },
-        "spriteSlot": {
-          "category": "background",
-          "hint": "drawer_panel_clean_v4.png",
-          "suggestedSize": "330x78"
         },
         "children": [
           {
@@ -2739,7 +2213,8 @@
               "color": "#F0D27AFF",
               "alignment": "MiddleLeft",
               "overflow": "Overflow"
-            }
+            },
+            "children": []
           },
           {
             "type": "Text",
@@ -2774,7 +2249,8 @@
               "color": "#E57C39FF",
               "alignment": "MiddleCenter",
               "overflow": "Overflow"
-            }
+            },
+            "children": []
           },
           {
             "type": "Image",
@@ -2850,7 +2326,8 @@
                   "category": "decoration",
                   "hint": "defense_fill_gate_v1.png",
                   "suggestedSize": "182x10"
-                }
+                },
+                "children": []
               }
             ]
           },
@@ -2887,9 +2364,11 @@
               "color": "#EDE1BAFF",
               "alignment": "MiddleCenter",
               "overflow": "Overflow"
-            }
+            },
+            "children": []
           }
-        ]
+        ],
+        "active": false
       },
       {
         "type": "Image",
@@ -2962,7 +2441,8 @@
               "color": "#FFFFFF00",
               "alignment": "MiddleCenter",
               "overflow": "Overflow"
-            }
+            },
+            "children": []
           },
           {
             "type": "Text",
@@ -2997,7 +2477,8 @@
               "color": "#FFFFFF00",
               "alignment": "MiddleCenter",
               "overflow": "Overflow"
-            }
+            },
+            "children": []
           }
         ],
         "active": false
@@ -3030,54 +2511,11 @@
         },
         "image": {
           "spriteName": null,
-          "color": "#FFFFFFFF",
+          "color": "#13171CEB",
           "imageType": "Simple",
           "preserveAspect": false
         },
-        "spriteSlot": {
-          "category": "background",
-          "hint": "defense_panel_clean_v1.png",
-          "suggestedSize": "340x92"
-        },
         "children": [
-          {
-            "type": "Image",
-            "name": "DefenseFrame",
-            "raycastTarget": false,
-            "rectTransform": {
-              "anchorMin": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "anchorMax": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "pivot": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "anchoredPosition": {
-                "x": 0,
-                "y": 0
-              },
-              "sizeDelta": {
-                "x": 328,
-                "y": 100
-              }
-            },
-            "image": {
-              "spriteName": null,
-              "color": "#FFFFFFFF",
-              "imageType": "Simple",
-              "preserveAspect": false
-            },
-            "spriteSlot": {
-              "category": "decoration",
-              "hint": "defense_frame_clean_v1.png",
-              "suggestedSize": "328x82"
-            }
-          },
           {
             "type": "Image",
             "name": "DefenseDamageGlow",
@@ -3114,45 +2552,9 @@
               "category": "decoration",
               "hint": "defense_damage_glow_v1.png",
               "suggestedSize": "72x52"
-            }
-          },
-          {
-            "type": "Image",
-            "name": "DefenseWarningIcon",
-            "raycastTarget": false,
-            "rectTransform": {
-              "anchorMin": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "anchorMax": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "pivot": {
-                "x": 0.5,
-                "y": 0.5
-              },
-              "anchoredPosition": {
-                "x": -147,
-                "y": 28
-              },
-              "sizeDelta": {
-                "x": 22,
-                "y": 22
-              }
             },
-            "image": {
-              "spriteName": null,
-              "color": "#FFFFFFFF",
-              "imageType": "Simple",
-              "preserveAspect": true
-            },
-            "spriteSlot": {
-              "category": "icon",
-              "hint": "defense_shield_icon_v1.png",
-              "suggestedSize": "22x22"
-            }
+            "active": false,
+            "children": []
           },
           {
             "type": "Text",
@@ -3182,12 +2584,13 @@
             },
             "text": {
               "content": "DEFENSE",
-              "fontSize": 15,
+              "fontSize": 16,
               "fontStyle": "Bold",
-              "color": "#F0D27AFF",
+              "color": "#FFE083FF",
               "alignment": "MiddleLeft",
               "overflow": "Overflow"
-            }
+            },
+            "children": []
           },
           {
             "type": "Image",
@@ -3217,14 +2620,9 @@
             },
             "image": {
               "spriteName": null,
-              "color": "#FFFFFFFF",
+              "color": "#00000000",
               "imageType": "Simple",
               "preserveAspect": false
-            },
-            "spriteSlot": {
-              "category": "background",
-              "hint": "defense_percent_badge_v1.png",
-              "suggestedSize": "58x26"
             },
             "children": [
               {
@@ -3255,12 +2653,13 @@
                 },
                 "text": {
                   "content": "84%",
-                  "fontSize": 15,
+                  "fontSize": 16,
                   "fontStyle": "Bold",
-                  "color": "#F4E0A0FF",
+                  "color": "#F2E7CEFF",
                   "alignment": "MiddleCenter",
                   "overflow": "Overflow"
-                }
+                },
+                "children": []
               }
             ]
           },
@@ -3292,12 +2691,13 @@
             },
             "text": {
               "content": "WALL 92%",
-              "fontSize": 10.5,
+              "fontSize": 11,
               "fontStyle": "Bold",
-              "color": "#EEE4C8FF",
+              "color": "#F2E7CEFF",
               "alignment": "MiddleLeft",
               "overflow": "Overflow"
-            }
+            },
+            "children": []
           },
           {
             "type": "Image",
@@ -3327,14 +2727,9 @@
             },
             "image": {
               "spriteName": null,
-              "color": "#FFFFFFFF",
+              "color": "#0C0F13E8",
               "imageType": "Simple",
               "preserveAspect": false
-            },
-            "spriteSlot": {
-              "category": "background",
-              "hint": "defense_track_clean_v1.png",
-              "suggestedSize": "210x12"
             },
             "children": [
               {
@@ -3365,7 +2760,7 @@
                 },
                 "image": {
                   "spriteName": null,
-                  "color": "#FFFFFFFF",
+                  "color": "#76C66AFF",
                   "imageType": "Simple",
                   "preserveAspect": false
                 },
@@ -3373,7 +2768,8 @@
                   "category": "decoration",
                   "hint": "defense_fill_wall_v1.png",
                   "suggestedSize": "193x7"
-                }
+                },
+                "children": []
               }
             ]
           },
@@ -3405,12 +2801,13 @@
             },
             "text": {
               "content": "GATE 76%",
-              "fontSize": 10.5,
+              "fontSize": 11,
               "fontStyle": "Bold",
-              "color": "#EEE4C8FF",
+              "color": "#F2E7CEFF",
               "alignment": "MiddleLeft",
               "overflow": "Overflow"
-            }
+            },
+            "children": []
           },
           {
             "type": "Image",
@@ -3440,14 +2837,9 @@
             },
             "image": {
               "spriteName": null,
-              "color": "#FFFFFFFF",
+              "color": "#0C0F13E8",
               "imageType": "Simple",
               "preserveAspect": false
-            },
-            "spriteSlot": {
-              "category": "background",
-              "hint": "defense_track_clean_v1.png",
-              "suggestedSize": "210x12"
             },
             "children": [
               {
@@ -3478,7 +2870,7 @@
                 },
                 "image": {
                   "spriteName": null,
-                  "color": "#FFFFFFFF",
+                  "color": "#DCA447FF",
                   "imageType": "Simple",
                   "preserveAspect": false
                 },
@@ -3486,7 +2878,8 @@
                   "category": "decoration",
                   "hint": "defense_fill_gate_v1.png",
                   "suggestedSize": "160x7"
-                }
+                },
+                "children": []
               }
             ]
           },
@@ -3518,12 +2911,13 @@
             },
             "text": {
               "content": "CORE 100%",
-              "fontSize": 10.5,
+              "fontSize": 11,
               "fontStyle": "Bold",
-              "color": "#EEE4C8FF",
+              "color": "#F2E7CEFF",
               "alignment": "MiddleLeft",
               "overflow": "Overflow"
-            }
+            },
+            "children": []
           },
           {
             "type": "Image",
@@ -3553,14 +2947,9 @@
             },
             "image": {
               "spriteName": null,
-              "color": "#FFFFFFFF",
+              "color": "#0C0F13E8",
               "imageType": "Simple",
               "preserveAspect": false
-            },
-            "spriteSlot": {
-              "category": "background",
-              "hint": "defense_track_clean_v1.png",
-              "suggestedSize": "210x12"
             },
             "children": [
               {
@@ -3591,7 +2980,7 @@
                 },
                 "image": {
                   "spriteName": null,
-                  "color": "#FFFFFFFF",
+                  "color": "#9CD46AFF",
                   "imageType": "Simple",
                   "preserveAspect": false
                 },
@@ -3599,7 +2988,8 @@
                   "category": "decoration",
                   "hint": "defense_fill_core_v1.png",
                   "suggestedSize": "204x7"
-                }
+                },
+                "children": []
               }
             ]
           }
@@ -3717,7 +3107,8 @@
                   "category": "icon",
                   "hint": "Subtle future arrow skill placeholder.",
                   "suggestedSize": "58x58"
-                }
+                },
+                "children": []
               },
               {
                 "type": "Text",
@@ -3752,7 +3143,8 @@
                   "color": "#F0D27AFF",
                   "alignment": "MiddleCenter",
                   "overflow": "Overflow"
-                }
+                },
+                "children": []
               }
             ]
           },
@@ -3830,7 +3222,8 @@
                   "category": "icon",
                   "hint": "Subtle future arrow skill placeholder.",
                   "suggestedSize": "58x58"
-                }
+                },
+                "children": []
               },
               {
                 "type": "Text",
@@ -3865,7 +3258,8 @@
                   "color": "#F0D27AFF",
                   "alignment": "MiddleCenter",
                   "overflow": "Overflow"
-                }
+                },
+                "children": []
               }
             ]
           },
@@ -3943,7 +3337,8 @@
                   "category": "icon",
                   "hint": "Subtle future arrow skill placeholder.",
                   "suggestedSize": "58x58"
-                }
+                },
+                "children": []
               },
               {
                 "type": "Text",
@@ -3978,7 +3373,8 @@
                   "color": "#F0D27AFF",
                   "alignment": "MiddleCenter",
                   "overflow": "Overflow"
-                }
+                },
+                "children": []
               }
             ]
           },
@@ -4056,7 +3452,8 @@
                   "category": "icon",
                   "hint": "Subtle future arrow skill placeholder.",
                   "suggestedSize": "58x58"
-                }
+                },
+                "children": []
               },
               {
                 "type": "Text",
@@ -4091,7 +3488,8 @@
                   "color": "#F0D27AFF",
                   "alignment": "MiddleCenter",
                   "overflow": "Overflow"
-                }
+                },
+                "children": []
               }
             ]
           },
@@ -4169,7 +3567,8 @@
                   "category": "icon",
                   "hint": "Subtle future arrow skill placeholder.",
                   "suggestedSize": "58x58"
-                }
+                },
+                "children": []
               },
               {
                 "type": "Text",
@@ -4204,7 +3603,8 @@
                   "color": "#F0D27AFF",
                   "alignment": "MiddleCenter",
                   "overflow": "Overflow"
-                }
+                },
+                "children": []
               }
             ]
           }
@@ -4229,24 +3629,19 @@
             "y": 0.5
           },
           "anchoredPosition": {
-            "x": 660,
-            "y": 186
+            "x": 666,
+            "y": 290
           },
           "sizeDelta": {
-            "x": 552,
-            "y": 564
+            "x": 540,
+            "y": 350
           }
         },
         "image": {
           "spriteName": null,
-          "color": "#FFFFFFFF",
+          "color": "#13171CEB",
           "imageType": "Simple",
           "preserveAspect": false
-        },
-        "spriteSlot": {
-          "category": "background",
-          "hint": "drawer_panel_clean_v4.png",
-          "suggestedSize": "552x564"
         },
         "children": [
           {
@@ -4278,19 +3673,14 @@
               "interactable": true,
               "transition": "ColorTint",
               "colors": {
-                "normal": "#FFFFFFFF",
-                "highlighted": "#FFFFFFE8",
-                "pressed": "#00000022",
+                "normal": "#414B56FF",
+                "highlighted": "#5A6572FF",
+                "pressed": "#3E4650FF",
                 "disabled": "#707070AA"
               }
             },
             "style": {
-              "backgroundColor": "#FFFFFFFF"
-            },
-            "spriteSlot": {
-              "category": "button",
-              "hint": "drawer_toggle_clean_v4.png",
-              "suggestedSize": "58x176"
+              "backgroundColor": "#414B56FF"
             }
           },
           {
@@ -4321,14 +3711,9 @@
             },
             "image": {
               "spriteName": null,
-              "color": "#FFFFFFFF",
+              "color": "#00000000",
               "imageType": "Simple",
               "preserveAspect": false
-            },
-            "spriteSlot": {
-              "category": "background",
-              "hint": "drawer_header_clean_v4.png",
-              "suggestedSize": "510x56"
             },
             "children": [
               {
@@ -4353,15 +3738,15 @@
                     "y": 0
                   },
                   "sizeDelta": {
-                    "x": 470,
-                    "y": 38
+                    "x": 420,
+                    "y": 36
                   }
                 },
                 "text": {
                   "content": "ARCHER RECRUITMENT",
-                  "fontSize": 24,
+                  "fontSize": 21,
                   "fontStyle": "Bold",
-                  "color": "#F0D27AFF",
+                  "color": "#FFE083FF",
                   "alignment": "MiddleCenter",
                   "overflow": "Overflow"
                 }
@@ -4387,63 +3772,20 @@
               },
               "anchoredPosition": {
                 "x": 0,
-                "y": 116
+                "y": 82
               },
               "sizeDelta": {
-                "x": 510,
-                "y": 132
+                "x": 500,
+                "y": 88
               }
             },
             "image": {
               "spriteName": null,
-              "color": "#FFFFFFFF",
+              "color": "#232A32F2",
               "imageType": "Simple",
               "preserveAspect": false
             },
-            "spriteSlot": {
-              "category": "background",
-              "hint": "archer_row_active_clean_v4.png",
-              "suggestedSize": "510x132"
-            },
             "children": [
-              {
-                "type": "Image",
-                "name": "BasicPortraitIcon",
-                "raycastTarget": false,
-                "rectTransform": {
-                  "anchorMin": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "anchorMax": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "pivot": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "anchoredPosition": {
-                    "x": -206,
-                    "y": 4
-                  },
-                  "sizeDelta": {
-                    "x": 72,
-                    "y": 76
-                  }
-                },
-                "image": {
-                  "spriteName": null,
-                  "color": "#FFFFFFFF",
-                  "imageType": "Simple",
-                  "preserveAspect": true
-                },
-                "spriteSlot": {
-                  "category": "icon",
-                  "hint": "archer_basic_portrait_v4.png",
-                  "suggestedSize": "72x76"
-                }
-              },
               {
                 "type": "Text",
                 "name": "BasicNameText",
@@ -4462,19 +3804,19 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": -66,
-                    "y": 40
+                    "x": -158,
+                    "y": 22
                   },
                   "sizeDelta": {
-                    "x": 162,
-                    "y": 26
+                    "x": 190,
+                    "y": 24
                   }
                 },
                 "text": {
                   "content": "Basic Archer",
-                  "fontSize": 18,
+                  "fontSize": 16,
                   "fontStyle": "Bold",
-                  "color": "#F5E8C7FF",
+                  "color": "#F2E7CEFF",
                   "alignment": "MiddleLeft",
                   "overflow": "Overflow"
                 }
@@ -4497,19 +3839,19 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": 82,
-                    "y": 40
+                    "x": 22,
+                    "y": 22
                   },
                   "sizeDelta": {
-                    "x": 52,
+                    "x": 54,
                     "y": 24
                   }
                 },
                 "text": {
                   "content": "x12",
-                  "fontSize": 15,
+                  "fontSize": 13,
                   "fontStyle": "Bold",
-                  "color": "#F0D27AFF",
+                  "color": "#F2E7CEFF",
                   "alignment": "MiddleRight",
                   "overflow": "Overflow"
                 }
@@ -4532,19 +3874,19 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": -80,
-                    "y": 13
+                    "x": -158,
+                    "y": 0
                   },
                   "sizeDelta": {
                     "x": 104,
-                    "y": 24
+                    "y": 20
                   }
                 },
                 "text": {
                   "content": "DPS 180",
-                  "fontSize": 15,
+                  "fontSize": 12,
                   "fontStyle": "Bold",
-                  "color": "#EEDC9CFF",
+                  "color": "#F2E7CEFF",
                   "alignment": "MiddleLeft",
                   "overflow": "Overflow"
                 }
@@ -4567,19 +3909,19 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": 12,
-                    "y": 13
+                    "x": -52,
+                    "y": 0
                   },
                   "sizeDelta": {
-                    "x": 76,
-                    "y": 24
+                    "x": 104,
+                    "y": 20
                   }
                 },
                 "text": {
                   "content": "Level 3",
-                  "fontSize": 15,
+                  "fontSize": 12,
                   "fontStyle": "Bold",
-                  "color": "#EEDC9CFF",
+                  "color": "#F2E7CEFF",
                   "alignment": "MiddleLeft",
                   "overflow": "Overflow"
                 }
@@ -4602,19 +3944,19 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": -27,
-                    "y": -22
+                    "x": -108,
+                    "y": -28
                   },
                   "sizeDelta": {
-                    "x": 184,
-                    "y": 34
+                    "x": 244,
+                    "y": 24
                   }
                 },
                 "text": {
                   "content": "120 wood",
-                  "fontSize": 10.5,
+                  "fontSize": 11,
                   "fontStyle": "Bold",
-                  "color": "#D9C488FF",
+                  "color": "#B9B0A0FF",
                   "alignment": "MiddleLeft",
                   "overflow": "Wrap"
                 }
@@ -4640,24 +3982,19 @@
                     "y": 0
                   },
                   "sizeDelta": {
-                    "x": 128,
-                    "y": 64
+                    "x": 108,
+                    "y": 54
                   }
                 },
                 "button": {
                   "interactable": true,
                   "transition": "ColorTint",
                   "colors": {
-                    "normal": "#FFFFFFFF",
-                    "highlighted": "#FFFFFFE8",
-                    "pressed": "#00000022",
+                    "normal": "#2F9E44FF",
+                    "highlighted": "#37B24DFF",
+                    "pressed": "#2B8A3EFF",
                     "disabled": "#707070AA"
                   }
-                },
-                "spriteSlot": {
-                  "category": "button",
-                  "hint": "button_buy_clean_v4.png",
-                  "suggestedSize": "128x64"
                 },
                 "text": {
                   "content": "Buy",
@@ -4668,7 +4005,7 @@
                   "overflow": "Overflow"
                 },
                 "style": {
-                  "backgroundColor": "#FFFFFFFF"
+                  "backgroundColor": "#2F9E44FF"
                 }
               }
             ]
@@ -4692,63 +4029,20 @@
               },
               "anchoredPosition": {
                 "x": 0,
-                "y": -30
+                "y": -22
               },
               "sizeDelta": {
-                "x": 510,
-                "y": 132
+                "x": 500,
+                "y": 88
               }
             },
             "image": {
               "spriteName": null,
-              "color": "#FFFFFFFF",
+              "color": "#1B2027E8",
               "imageType": "Simple",
               "preserveAspect": false
             },
-            "spriteSlot": {
-              "category": "background",
-              "hint": "archer_row_locked_clean_v4.png",
-              "suggestedSize": "510x132"
-            },
             "children": [
-              {
-                "type": "Image",
-                "name": "RapidPortraitIcon",
-                "raycastTarget": false,
-                "rectTransform": {
-                  "anchorMin": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "anchorMax": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "pivot": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "anchoredPosition": {
-                    "x": -206,
-                    "y": 4
-                  },
-                  "sizeDelta": {
-                    "x": 72,
-                    "y": 76
-                  }
-                },
-                "image": {
-                  "spriteName": null,
-                  "color": "#999EADD9",
-                  "imageType": "Simple",
-                  "preserveAspect": true
-                },
-                "spriteSlot": {
-                  "category": "icon",
-                  "hint": "archer_rapid_portrait_v4.png",
-                  "suggestedSize": "72x76"
-                }
-              },
               {
                 "type": "Text",
                 "name": "RapidNameText",
@@ -4767,19 +4061,19 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": -66,
-                    "y": 40
+                    "x": -158,
+                    "y": 22
                   },
                   "sizeDelta": {
-                    "x": 162,
-                    "y": 26
+                    "x": 190,
+                    "y": 24
                   }
                 },
                 "text": {
                   "content": "Rapid Archer",
-                  "fontSize": 18,
+                  "fontSize": 16,
                   "fontStyle": "Bold",
-                  "color": "#E2D8B8FF",
+                  "color": "#F2E7CEFF",
                   "alignment": "MiddleLeft",
                   "overflow": "Overflow"
                 }
@@ -4802,19 +4096,19 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": 82,
-                    "y": 40
+                    "x": 22,
+                    "y": 22
                   },
                   "sizeDelta": {
-                    "x": 52,
+                    "x": 54,
                     "y": 24
                   }
                 },
                 "text": {
                   "content": "x0",
-                  "fontSize": 15,
+                  "fontSize": 13,
                   "fontStyle": "Bold",
-                  "color": "#F0D27AFF",
+                  "color": "#F2E7CEFF",
                   "alignment": "MiddleRight",
                   "overflow": "Overflow"
                 }
@@ -4837,19 +4131,19 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": -80,
-                    "y": 13
+                    "x": -158,
+                    "y": 0
                   },
                   "sizeDelta": {
                     "x": 104,
-                    "y": 24
+                    "y": 20
                   }
                 },
                 "text": {
                   "content": "DPS 0",
-                  "fontSize": 15,
+                  "fontSize": 12,
                   "fontStyle": "Bold",
-                  "color": "#EEDC9CFF",
+                  "color": "#F2E7CEFF",
                   "alignment": "MiddleLeft",
                   "overflow": "Overflow"
                 }
@@ -4872,19 +4166,19 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": 12,
-                    "y": 13
+                    "x": -52,
+                    "y": 0
                   },
                   "sizeDelta": {
-                    "x": 76,
-                    "y": 24
+                    "x": 104,
+                    "y": 20
                   }
                 },
                 "text": {
                   "content": "Level 0",
-                  "fontSize": 15,
+                  "fontSize": 12,
                   "fontStyle": "Bold",
-                  "color": "#EEDC9CFF",
+                  "color": "#F2E7CEFF",
                   "alignment": "MiddleLeft",
                   "overflow": "Overflow"
                 }
@@ -4907,19 +4201,19 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": -27,
-                    "y": -22
+                    "x": -108,
+                    "y": -28
                   },
                   "sizeDelta": {
-                    "x": 184,
-                    "y": 34
+                    "x": 244,
+                    "y": 24
                   }
                 },
                 "text": {
                   "content": "260 wood",
-                  "fontSize": 10.5,
+                  "fontSize": 11,
                   "fontStyle": "Bold",
-                  "color": "#D9C488FF",
+                  "color": "#B9B0A0FF",
                   "alignment": "MiddleLeft",
                   "overflow": "Wrap"
                 }
@@ -4945,24 +4239,19 @@
                     "y": 0
                   },
                   "sizeDelta": {
-                    "x": 128,
-                    "y": 64
+                    "x": 108,
+                    "y": 54
                   }
                 },
                 "button": {
                   "interactable": true,
                   "transition": "ColorTint",
                   "colors": {
-                    "normal": "#FFFFFFFF",
-                    "highlighted": "#FFFFFFD8",
-                    "pressed": "#00000022",
+                    "normal": "#2F9E44FF",
+                    "highlighted": "#37B24DFF",
+                    "pressed": "#2B8A3EFF",
                     "disabled": "#707070AA"
                   }
-                },
-                "spriteSlot": {
-                  "category": "button",
-                  "hint": "button_buy_clean_v4.png",
-                  "suggestedSize": "128x64"
                 },
                 "text": {
                   "content": "Buy",
@@ -4973,7 +4262,7 @@
                   "overflow": "Overflow"
                 },
                 "style": {
-                  "backgroundColor": "#FFFFFFFF"
+                  "backgroundColor": "#2F9E44FF"
                 }
               }
             ]
@@ -4997,63 +4286,20 @@
               },
               "anchoredPosition": {
                 "x": 0,
-                "y": -176
+                "y": -126
               },
               "sizeDelta": {
-                "x": 510,
-                "y": 132
+                "x": 500,
+                "y": 88
               }
             },
             "image": {
               "spriteName": null,
-              "color": "#FFFFFFFF",
+              "color": "#1B2027E8",
               "imageType": "Simple",
               "preserveAspect": false
             },
-            "spriteSlot": {
-              "category": "background",
-              "hint": "archer_row_locked_clean_v4.png",
-              "suggestedSize": "510x132"
-            },
             "children": [
-              {
-                "type": "Image",
-                "name": "FrostPortraitIcon",
-                "raycastTarget": false,
-                "rectTransform": {
-                  "anchorMin": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "anchorMax": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "pivot": {
-                    "x": 0.5,
-                    "y": 0.5
-                  },
-                  "anchoredPosition": {
-                    "x": -206,
-                    "y": 4
-                  },
-                  "sizeDelta": {
-                    "x": 72,
-                    "y": 76
-                  }
-                },
-                "image": {
-                  "spriteName": null,
-                  "color": "#999EADD9",
-                  "imageType": "Simple",
-                  "preserveAspect": true
-                },
-                "spriteSlot": {
-                  "category": "icon",
-                  "hint": "archer_frost_portrait_v4.png",
-                  "suggestedSize": "72x76"
-                }
-              },
               {
                 "type": "Text",
                 "name": "FrostNameText",
@@ -5072,19 +4318,19 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": -66,
-                    "y": 40
+                    "x": -158,
+                    "y": 22
                   },
                   "sizeDelta": {
-                    "x": 162,
-                    "y": 26
+                    "x": 190,
+                    "y": 24
                   }
                 },
                 "text": {
                   "content": "Frost Archer",
-                  "fontSize": 18,
+                  "fontSize": 16,
                   "fontStyle": "Bold",
-                  "color": "#E2D8B8FF",
+                  "color": "#F2E7CEFF",
                   "alignment": "MiddleLeft",
                   "overflow": "Overflow"
                 }
@@ -5107,19 +4353,19 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": 82,
-                    "y": 40
+                    "x": 22,
+                    "y": 22
                   },
                   "sizeDelta": {
-                    "x": 52,
+                    "x": 54,
                     "y": 24
                   }
                 },
                 "text": {
                   "content": "x0",
-                  "fontSize": 15,
+                  "fontSize": 13,
                   "fontStyle": "Bold",
-                  "color": "#F0D27AFF",
+                  "color": "#F2E7CEFF",
                   "alignment": "MiddleRight",
                   "overflow": "Overflow"
                 }
@@ -5142,19 +4388,19 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": -80,
-                    "y": 13
+                    "x": -158,
+                    "y": 0
                   },
                   "sizeDelta": {
                     "x": 104,
-                    "y": 24
+                    "y": 20
                   }
                 },
                 "text": {
                   "content": "DPS 0",
-                  "fontSize": 15,
+                  "fontSize": 12,
                   "fontStyle": "Bold",
-                  "color": "#EEDC9CFF",
+                  "color": "#F2E7CEFF",
                   "alignment": "MiddleLeft",
                   "overflow": "Overflow"
                 }
@@ -5177,19 +4423,19 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": 12,
-                    "y": 13
+                    "x": -52,
+                    "y": 0
                   },
                   "sizeDelta": {
-                    "x": 76,
-                    "y": 24
+                    "x": 104,
+                    "y": 20
                   }
                 },
                 "text": {
                   "content": "Level 0",
-                  "fontSize": 15,
+                  "fontSize": 12,
                   "fontStyle": "Bold",
-                  "color": "#EEDC9CFF",
+                  "color": "#F2E7CEFF",
                   "alignment": "MiddleLeft",
                   "overflow": "Overflow"
                 }
@@ -5212,19 +4458,19 @@
                     "y": 0.5
                   },
                   "anchoredPosition": {
-                    "x": -27,
-                    "y": -22
+                    "x": -108,
+                    "y": -28
                   },
                   "sizeDelta": {
-                    "x": 184,
-                    "y": 34
+                    "x": 244,
+                    "y": 24
                   }
                 },
                 "text": {
                   "content": "320 iron",
-                  "fontSize": 10.5,
+                  "fontSize": 11,
                   "fontStyle": "Bold",
-                  "color": "#D9C488FF",
+                  "color": "#B9B0A0FF",
                   "alignment": "MiddleLeft",
                   "overflow": "Wrap"
                 }
@@ -5250,24 +4496,19 @@
                     "y": 0
                   },
                   "sizeDelta": {
-                    "x": 128,
-                    "y": 64
+                    "x": 108,
+                    "y": 54
                   }
                 },
                 "button": {
                   "interactable": true,
                   "transition": "ColorTint",
                   "colors": {
-                    "normal": "#FFFFFFFF",
-                    "highlighted": "#FFFFFFD8",
-                    "pressed": "#00000022",
+                    "normal": "#2F9E44FF",
+                    "highlighted": "#37B24DFF",
+                    "pressed": "#2B8A3EFF",
                     "disabled": "#707070AA"
                   }
-                },
-                "spriteSlot": {
-                  "category": "button",
-                  "hint": "button_buy_clean_v4.png",
-                  "suggestedSize": "128x64"
                 },
                 "text": {
                   "content": "Buy",
@@ -5278,8 +4519,359 @@
                   "overflow": "Overflow"
                 },
                 "style": {
-                  "backgroundColor": "#FFFFFFFF"
+                  "backgroundColor": "#2F9E44FF"
                 }
+              }
+            ]
+          },
+          {
+            "type": "Panel",
+            "name": "ArcherRecruitmentListRoot",
+            "raycastTarget": false,
+            "rectTransform": {
+              "anchorMin": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchorMax": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "pivot": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "anchoredPosition": {
+                "x": 0,
+                "y": -22.5
+              },
+              "sizeDelta": {
+                "x": 510,
+                "y": 285
+              }
+            },
+            "children": [
+              {
+                "type": "Image",
+                "name": "ArcherRecruitmentRowTemplate",
+                "raycastTarget": false,
+                "rectTransform": {
+                  "anchorMin": {
+                    "x": 0.5,
+                    "y": 1
+                  },
+                  "anchorMax": {
+                    "x": 0.5,
+                    "y": 1
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 1
+                  },
+                  "anchoredPosition": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "sizeDelta": {
+                    "x": 510,
+                    "y": 84
+                  }
+                },
+                "image": {
+                  "spriteName": null,
+                  "color": "#232A32EB",
+                  "imageType": "Simple",
+                  "preserveAspect": false
+                },
+                "children": [
+                  {
+                    "type": "Text",
+                    "name": "ArcherNameText",
+                    "raycastTarget": false,
+                    "rectTransform": {
+                      "anchorMin": {
+                        "x": 0.5,
+                        "y": 0.5
+                      },
+                      "anchorMax": {
+                        "x": 0.5,
+                        "y": 0.5
+                      },
+                      "pivot": {
+                        "x": 0.5,
+                        "y": 0.5
+                      },
+                      "anchoredPosition": {
+                        "x": -162,
+                        "y": 24
+                      },
+                      "sizeDelta": {
+                        "x": 196,
+                        "y": 22
+                      }
+                    },
+                    "text": {
+                      "content": "ARCHER NAME",
+                      "fontSize": 14,
+                      "fontStyle": "Bold",
+                      "color": "#F2E7CEFF",
+                      "alignment": "MiddleLeft",
+                      "overflow": "Overflow"
+                    }
+                  },
+                  {
+                    "type": "Text",
+                    "name": "ArcherCountText",
+                    "raycastTarget": false,
+                    "rectTransform": {
+                      "anchorMin": {
+                        "x": 0.5,
+                        "y": 0.5
+                      },
+                      "anchorMax": {
+                        "x": 0.5,
+                        "y": 0.5
+                      },
+                      "pivot": {
+                        "x": 0.5,
+                        "y": 0.5
+                      },
+                      "anchoredPosition": {
+                        "x": 20,
+                        "y": 24
+                      },
+                      "sizeDelta": {
+                        "x": 54,
+                        "y": 20
+                      }
+                    },
+                    "text": {
+                      "content": "x0",
+                      "fontSize": 12,
+                      "fontStyle": "Bold",
+                      "color": "#FFE083FF",
+                      "alignment": "MiddleRight",
+                      "overflow": "Overflow"
+                    }
+                  },
+                  {
+                    "type": "Text",
+                    "name": "ArcherDpsText",
+                    "raycastTarget": false,
+                    "rectTransform": {
+                      "anchorMin": {
+                        "x": 0.5,
+                        "y": 0.5
+                      },
+                      "anchorMax": {
+                        "x": 0.5,
+                        "y": 0.5
+                      },
+                      "pivot": {
+                        "x": 0.5,
+                        "y": 0.5
+                      },
+                      "anchoredPosition": {
+                        "x": -162,
+                        "y": 2
+                      },
+                      "sizeDelta": {
+                        "x": 104,
+                        "y": 20
+                      }
+                    },
+                    "text": {
+                      "content": "DPS 0",
+                      "fontSize": 11.5,
+                      "fontStyle": "Bold",
+                      "color": "#F2E7CEFF",
+                      "alignment": "MiddleLeft",
+                      "overflow": "Overflow"
+                    }
+                  },
+                  {
+                    "type": "Text",
+                    "name": "ArcherLevelText",
+                    "raycastTarget": false,
+                    "rectTransform": {
+                      "anchorMin": {
+                        "x": 0.5,
+                        "y": 0.5
+                      },
+                      "anchorMax": {
+                        "x": 0.5,
+                        "y": 0.5
+                      },
+                      "pivot": {
+                        "x": 0.5,
+                        "y": 0.5
+                      },
+                      "anchoredPosition": {
+                        "x": -54,
+                        "y": 2
+                      },
+                      "sizeDelta": {
+                        "x": 82,
+                        "y": 20
+                      }
+                    },
+                    "text": {
+                      "content": "LV 1",
+                      "fontSize": 11.5,
+                      "fontStyle": "Bold",
+                      "color": "#F2E7CEFF",
+                      "alignment": "MiddleLeft",
+                      "overflow": "Overflow"
+                    }
+                  },
+                  {
+                    "type": "Text",
+                    "name": "ArcherStatusText",
+                    "raycastTarget": false,
+                    "rectTransform": {
+                      "anchorMin": {
+                        "x": 0.5,
+                        "y": 0.5
+                      },
+                      "anchorMax": {
+                        "x": 0.5,
+                        "y": 0.5
+                      },
+                      "pivot": {
+                        "x": 0.5,
+                        "y": 0.5
+                      },
+                      "anchoredPosition": {
+                        "x": 72,
+                        "y": 2
+                      },
+                      "sizeDelta": {
+                        "x": 92,
+                        "y": 20
+                      }
+                    },
+                    "text": {
+                      "content": "READY",
+                      "fontSize": 10.5,
+                      "fontStyle": "Bold",
+                      "color": "#74D680FF",
+                      "alignment": "MiddleCenter",
+                      "overflow": "Overflow"
+                    }
+                  },
+                  {
+                    "type": "Text",
+                    "name": "ArcherCostText",
+                    "raycastTarget": false,
+                    "rectTransform": {
+                      "anchorMin": {
+                        "x": 0.5,
+                        "y": 0.5
+                      },
+                      "anchorMax": {
+                        "x": 0.5,
+                        "y": 0.5
+                      },
+                      "pivot": {
+                        "x": 0.5,
+                        "y": 0.5
+                      },
+                      "anchoredPosition": {
+                        "x": -126,
+                        "y": -26
+                      },
+                      "sizeDelta": {
+                        "x": 252,
+                        "y": 20
+                      }
+                    },
+                    "text": {
+                      "content": "COST",
+                      "fontSize": 11,
+                      "fontStyle": "Bold",
+                      "color": "#B9B0A0FF",
+                      "alignment": "MiddleLeft",
+                      "overflow": "Overflow"
+                    }
+                  },
+                  {
+                    "type": "Button",
+                    "name": "ArcherBuyButton",
+                    "rectTransform": {
+                      "anchorMin": {
+                        "x": 0.5,
+                        "y": 0.5
+                      },
+                      "anchorMax": {
+                        "x": 0.5,
+                        "y": 0.5
+                      },
+                      "pivot": {
+                        "x": 0.5,
+                        "y": 0.5
+                      },
+                      "anchoredPosition": {
+                        "x": 190,
+                        "y": 0
+                      },
+                      "sizeDelta": {
+                        "x": 100,
+                        "y": 60
+                      }
+                    },
+                    "button": {
+                      "interactable": true,
+                      "transition": "ColorTint",
+                      "colors": {
+                        "normal": "#2F9E44FF",
+                        "highlighted": "#37B24DFF",
+                        "pressed": "#2B8A3EFF",
+                        "disabled": "#707070AA"
+                      }
+                    },
+                    "style": {
+                      "backgroundColor": "#2F9E44FF"
+                    },
+                    "children": [
+                      {
+                        "type": "Text",
+                        "name": "ArcherBuyButtonText",
+                        "raycastTarget": false,
+                        "rectTransform": {
+                          "anchorMin": {
+                            "x": 0.5,
+                            "y": 0.5
+                          },
+                          "anchorMax": {
+                            "x": 0.5,
+                            "y": 0.5
+                          },
+                          "pivot": {
+                            "x": 0.5,
+                            "y": 0.5
+                          },
+                          "anchoredPosition": {
+                            "x": 0,
+                            "y": 0
+                          },
+                          "sizeDelta": {
+                            "x": 100,
+                            "y": 60
+                          }
+                        },
+                        "text": {
+                          "content": "BUY",
+                          "fontSize": 13,
+                          "fontStyle": "Bold",
+                          "color": "#FFFFFFFF",
+                          "alignment": "MiddleCenter",
+                          "overflow": "Overflow"
+                        }
+                      }
+                    ]
+                  }
+                ],
+                "active": false
               }
             ]
           }
