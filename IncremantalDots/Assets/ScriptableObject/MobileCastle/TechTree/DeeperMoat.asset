@@ -10,26 +10,25 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cd1a2ac33dcbea94ebf0eadaff16ae71, type: 3}
-  m_Name: WallReinforcement
+  m_Name: DeeperMoat
   m_EditorClassIdentifier: DeadWalls::DeadWalls.TechNodeDefinitionSO
-  Id: wall_reinforcement
-  Title: Wall Reinforcement
-  Description: +15% defense max HP.
+  Id: moat_dig
+  Title: Deeper Moat
+  Description: 'Dig the moat deeper: +10% slow per level.'
   Icon: {fileID: 0}
   Cost:
-    Wood: 0
-    Stone: 70
+    Wood: 40
+    Stone: 90
     Iron: 0
     Food: 0
-  MaxLevel: 1
-  CostGrowthPerLevel: 0
+  MaxLevel: 3
+  CostGrowthPerLevel: 0.35
   PrerequisiteNodeIds:
-  - castle_heart
+  - wall_reinforcement
   RevealChildNodeIds:
-  - repair_crew
-  - moat_dig
+  - moat_flame
   Effects:
-  - Type: 7
-    Value: 0.15
+  - Type: 9
+    Value: 0.1
     ArcherType: 0
     Resource: 0

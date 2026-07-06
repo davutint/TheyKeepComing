@@ -48,7 +48,11 @@ namespace DeadWalls
 
             if (mobileMode)
             {
-                targetPoint = SystemAPI.GetSingleton<MobileCastleCombatConfig>().CastleCenter;
+                var mobileConfig = SystemAPI.GetSingleton<MobileCastleCombatConfig>();
+                // Tek cephe: hedef duvar hatti (sola bakis); 360 modda kale merkezi
+                targetPoint = mobileConfig.SingleFrontEnabled
+                    ? new float2(mobileConfig.FrontlineX, 0f)
+                    : mobileConfig.CastleCenter;
             }
             else if (hasWallTarget)
             {

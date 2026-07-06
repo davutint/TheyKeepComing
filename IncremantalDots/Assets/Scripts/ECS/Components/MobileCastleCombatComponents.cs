@@ -84,6 +84,19 @@ namespace DeadWalls
         // Repair maliyeti: tam kayipta odenen taban (kayip oranıyla olceklenir)
         public int RepairBaseWoodCost;
         public int RepairBaseStoneCost;
+        // --- Tek Cephe (K4, M-0): dusmanlar yalniz SAGDAN gelir ---
+        // true iken 360-ring spawn/hedefleme devre disi; false = eski davranis (geri alinabilir)
+        public bool SingleFrontEnabled;
+        // Savunma hattinin (duvarin) x konumu; zombiler bu hatta yaslanip vurur
+        public float FrontlineX;
+        // Spawn seridi: sag kenar x tabani (+ ileri jitter) ve dikey yarim-bant
+        public float SpawnLineX;
+        public float SpawnBandYHalf;
+        // Hendek bandi (duvarin onunde): icindeyken yavaslatma, upgrade ile gecis hasari
+        public float MoatXMin;
+        public float MoatXMax;
+        public float MoatSlowMultiplier;    // 1 = etkisiz; 0.55 = %45 yavaslatma
+        public float MoatDamagePerSecond;   // 0 = kapali (tech ile acilir)
     }
 
     public enum SiegeCyclePhase : byte

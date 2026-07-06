@@ -32,15 +32,17 @@ namespace DeadWalls
                 return;
 
             float wallX = mobileMode ? 0f : SystemAPI.GetSingleton<WallXPosition>().Value;
-            float2 castleCenter = mobileMode
-                ? SystemAPI.GetSingleton<MobileCastleCombatConfig>().CastleCenter
-                : float2.zero;
+            var mobileConfig = mobileMode
+                ? SystemAPI.GetSingleton<MobileCastleCombatConfig>()
+                : default;
 
             new ApplyForceJob
             {
                 MobileMode = mobileMode,
+                SingleFront = mobileMode && mobileConfig.SingleFrontEnabled,
+                FrontlineX = mobileConfig.FrontlineX,
                 WallX = wallX,
-                CastleCenter = castleCenter,
+                CastleCenter = mobileConfig.CastleCenter,
                 SlowLookup = SystemAPI.GetComponentLookup<ZombieSlow>(true)
             }.ScheduleParallel();
         }
@@ -49,6 +51,8 @@ namespace DeadWalls
         partial struct ApplyForceJob : IJobEntity
         {
             public bool MobileMode;
+            public bool SingleFront;
+            public float FrontlineX;
             public float WallX;
             public float2 CastleCenter;
             [Unity.Collections.ReadOnly] public ComponentLookup<ZombieSlow> SlowLookup;
@@ -67,8 +71,11 @@ namespace DeadWalls
                     return;
                 }
 
+                // Tek cephe (K4): hedef duvarin x hatti (duz sola akis); 360 modda kale merkezi
                 float2 desiredDir = MobileMode
-                    ? math.normalizesafe(CastleCenter - transform.Position.xy)
+                    ? (SingleFront
+                        ? math.normalizesafe(new float2(FrontlineX - transform.Position.x, 0f))
+                        : math.normalizesafe(CastleCenter - transform.Position.xy))
                     : math.normalizesafe(new float2(WallX - transform.Position.x, 0f));
 
                 // Fallback: yon sifirsa sola git

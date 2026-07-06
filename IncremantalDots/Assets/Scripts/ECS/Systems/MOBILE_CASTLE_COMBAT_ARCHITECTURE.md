@@ -8,7 +8,36 @@
 
 - `MobileCastleCombatConfig` varsa oyun mobile castle mode'dadir.
 - `MobileCastleCombatConfig` yoksa sistemler eski `WallXPosition` akisina doner.
-- `NewGameScene` 360 derece kale savunmasi kullanir; eski sahneler config yoksa kendi akisinda kalir.
+- `NewGameScene` TEK CEPHE duzeni kullanir (asagidaki bolum); eski sahneler config yoksa kendi akisinda kalir.
+
+## Tek Cephe (K4 pivotu, M-0 — 2026-07-06)
+
+`SingleFrontEnabled=true` (default) iken 360-ring TERK EDILIR; dusmanlar YALNIZ SAGDAN gelir:
+
+- **Spawn:** sag kenar seridi — x = `SpawnLineX`(13) + 0..2 jitter, y = +-`SpawnBandYHalf`(6.5)
+  (WaveSpawnSystem; batch/intensity/eskalasyon mantigi DEGISMEDI, yalniz dogum yeri degisti).
+- **Hareket:** hedef `(FrontlineX, kendi y)` — duz sola akis (ApplyMovementForceSystem).
+- **Saldiri gecisi:** `pos.x <= FrontlineX + AttackRadius` esiginde Attacking; duvar bariyeri
+  yalniz x'i sabitler, y'de yigilma serbest (BoundarySystem). Domino kuyruk fizigi aynen calisir.
+- **Arena siniri:** x = [FrontlineX, SpawnLineX+4], y = +-(SpawnBandYHalf+2).
+- **Hendek (MoatSystem, YENI):** `MoatXMin..MoatXMax`(-4..-1.5) bandindaki Moving/Queued
+  zombilere yavaslatma — frost ile AYNI `ZombieSlow` kanali (en dusuk carpan kazanir, sure
+  0.15s'lik tazeleme; mavi tint bedava gelir). `MoatDamagePerSecond > 0` ise gecis hasari
+  (moat_flame tech'i acar); olum ZombieDeathSystem'de. Sira: ZombieSlowTimer -> Moat -> ApplyMovementForce.
+- **Hendek evrimi (tech):** `moat_dig` (DeepenMoatSlowPercent: carpan -0.10/seviye, L3) ->
+  `moat_flame` (AddMoatDamagePerSecond: +4/sn/seviye, L3). GameManager economy-aggregate
+  kalibiyla config'e yazilir; restart'ta base'e doner.
+- **Okcu yerlesimi:** oncelik tilemap hucresi AMA yalniz `x <= FrontlineX+1` bolgesindekiler
+  gecerli (eski 360 hucreleri elenir); yoksa duvar kolonu fallback'i (x = FrontlineX-0.8,
+  ortadan disa dikey dizilim). Owner duvar/kule tile'larini boyayinca tilemap oncelik kazanir.
+- **Kamera:** sabit tek ekran — pozisyon (4.5, 0, -10), ortho 8 (setup tool normalize eder).
+- **Animasyon/feedback:** yon hedefi ve kale-vurus VFX konumu duvar hattina baglanir.
+- **Geri alma:** `SingleFrontEnabled=false` -> eski 360-ring davranisi aynen doner (karsilastirma/test icin).
+
+Dogrulama (play, 2026-07-06): spawn x=[8..15] sagdan, sola akis, Attacking tam x=-4.65 duvar
+hattinda, kuyruk olusumu, hendekte 14/14 yavaslatma + dps HP erimesi (32->20.8 canli kanit),
+olum hendegi (dps=100) gecit vermedi, okcular 4/4 fallback kolonunda ve vuruyor, duvar hasar
+aliyor, GameOver zinciri calisti (3 gunluk basibos kusatmada kale dustu).
 
 ## ECS Verisi
 
@@ -93,7 +122,7 @@ Mobile mode'da worker allocation'i resource cap ve population'a gore clamp eder,
 
 ### ApplyMovementForceSystem
 
-Mobile mode'da moving zombiler `CastleCenter` noktasina dogru kuvvet alir. `ZombieSlow` enabled ise hareket kuvveti slow multiplier ile carpilir.
+Mobile mode'da moving zombiler tek-cephe modunda `(FrontlineX, kendi y)` hedefine (duz sola), 360 modunda `CastleCenter` noktasina dogru kuvvet alir. `ZombieSlow` enabled ise hareket kuvveti slow multiplier ile carpilir (frost VE hendek ayni kanali kullanir).
 
 ### BoundarySystem
 

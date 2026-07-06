@@ -136,11 +136,13 @@ Ara hedef olarak "oynanabilir demo" = C1-C10 (store maddeleri haric).
 > shipping iskeleti (M-E/F), store (M-H).
 
 - **M-0. Tek Cephe Pivotu (K4)** — spawn 360-ring -> sag kenar seridi; savunma hatti
-  (Wall->Gate->Core zinciri korunarak) sola tasinir; HENDEK katmani v1 (yavaslatma +
-  opsiyonel DoT; tasarim milestone basinda kilitlenir); KULE/okcu slotlari owner tilemap
-  hucrelerinden okunur (mevcut Grid/outside modeli uyarlanir); kamera/arena duzeni yatay
-  serite gecer. IS BOLUMU: owner koy+duvar+kule tilemap gorsellerini boyar (paralel);
-  Claude mekanigi placeholder gorsellerle kurar, owner tilemap'i gelince baglar. (~1-2 oturum)
+  (Wall->Gate->Core zinciri korunarak) sola tasinir; HENDEK v1 [KILITLENDI 2026-07-06:
+  UPGRADE ILE EVRILEN — baslangicta basit cukur (yavaslatma), tech tree upgrade'leriyle
+  derinlesir/lav-diken olur (gecis hasari); tech sink'i buyutur]; KULE/okcu slotlari owner
+  tilemap hucrelerinden okunur (mevcut Grid/outside modeli uyarlanir); KAMERA [KILITLENDI:
+  SABIT TEK EKRAN — tum alan tek bakista, pan/zoom yok, mobil okunurluk oncelikli].
+  IS BOLUMU: owner koy+duvar+kule tilemap gorsellerini boyar (paralel); Claude mekanigi
+  placeholder gorsellerle kurar, owner tilemap'i gelince baglar. (~1-2 oturum)
 - **M-A. Olcum ve Balance Temeli** — hizlandirilmis uzun-kosu simulasyonu (DAY 1-20 metrik
   dokumu, TEK CEPHE duzeninde), egri kirilmalarinin tespiti + duzeltmesi. Cikti: "ortalama
   kosu N gun/M dakika" verisi (M-B meta tasariminin girdisi). (~1 oturum)
@@ -173,7 +175,9 @@ Ara hedef olarak "oynanabilir demo" = C1-C10 (store maddeleri haric).
 - Multiplayer / co-op
 - Kale disina birim gonderme (saldiri/keşif harici loop)
 - Anlati kampanyasi / gorev sistemi (council'in uretken anlatisi YETERLI)
-- [KARAR BEKLIYOR: bu listeye eklemek/cikarmak istedigin var mi?]
+
+> Liste owner tarafindan 2026-07-06'da ONAYLANDI ve kilitlendi. Geri acmak = bilincli
+> yeni karar (bu dokumanda gunlukle birlikte).
 
 ## 6. KARAR GUNLUGU (verilmis buyuk kararlar — "neden boyleydi?")
 
@@ -190,12 +194,20 @@ Ara hedef olarak "oynanabilir demo" = C1-C10 (store maddeleri haric).
 - 2026-07-06: K4 = TEK CEPHE (sagdan saldiri; 360-ring terk edildi). Hat: duvar+hendek+kule;
   ordu modeli okcu-duvar (melee YOK); duvar temasi vurus+kuyruk; koy/duvar gorselleri owner
   tilemap isi, gameplay baglari Claude (referans: yatay hero-castle-defense duzeni)
+- 2026-07-06: M-0 tasarim kararlari — HENDEK: upgrade ile evrilen (cukur/yavaslatma ->
+  tech ile lav-diken/hasar); KAMERA: sabit tek ekran (pan/zoom yok); KAPSAM DISI listesi
+  (9 madde) owner tarafindan onaylanip kilitlendi
 
 ## 7. GUNCEL DURUM OZETI (son guncelleme: 2026-07-06)
 
 - Cekirdek dongu calisiyor ve "iyi hissettiriyor" (owner, DAY 1-3 araligi).
 - K1/K2/K3/K4 KILITLENDI: Play Store urunu / Roguelite meta / Mobil-first / Tek cephe (sagdan).
+- **M-0 MEKANIGI TAMAM (2026-07-06):** sag-serit spawn, duvar hatti, hendek (yavaslatma +
+  moat_flame yakma evrimi, tech zinciri wall_reinforcement -> moat_dig -> moat_flame), okcu
+  kolon-fallback'i, sabit kamera — hepsi play-mode dogrulandi (kuyruk olusumu, duvar hasari,
+  hendek 14/14 slow + HP erimesi, GameOver). GERIYE KALAN (owner): eski kale siluetinin
+  kaldirilip koy/duvar/kule/hendek tilemap'lerinin boyanmasi; Claude hazir olunca baglar
+  (okcu yerlesimi otomatik tilemap-oncelikli olur).
 - Bilinen acik teknik borc: TechTreeUI'de IsMobileMode guard'i (dalgalanma riski, dusuk oncelik);
   gercek cihaz hic test edilmedi; save yok.
-- SIRADAKI IS: M-0 (Tek Cephe Pivotu) — Claude mekanik iskeleti placeholder ile kurar,
-  owner koy/duvar/kule tilemap'lerini paralel boyar. M-A olcumu pivottan SONRA.
+- SIRADAKI IS: owner gorsel boyama (M-0 kapanisi) + ardindan M-A (Olcum, tek-cephe duzeninde).

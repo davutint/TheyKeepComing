@@ -36,6 +36,12 @@ namespace DeadWalls
                 : default;
 
             float mobileLimit = mobileConfig.SpawnRadius + 2f;
+            bool singleFront = mobileMode && mobileConfig.SingleFrontEnabled;
+
+            // Tek cephe arena dikdortgeni: duvar hattindan spawn seridinin biraz otesine
+            float sfMinX = mobileConfig.FrontlineX;
+            float sfMaxX = mobileConfig.SpawnLineX + 4f;
+            float sfHalfY = mobileConfig.SpawnBandYHalf + 2f;
 
             var spatialMap = BuildSpatialHashSystem.ReadMap;
             bool hasSpatialMap = spatialMap.IsCreated && !spatialMap.IsEmpty;
@@ -43,13 +49,15 @@ namespace DeadWalls
             new BoundaryJob
             {
                 MobileMode = mobileMode,
+                SingleFront = singleFront,
+                FrontlineX = mobileConfig.FrontlineX,
                 WallX = wallX,
                 CastleCenter = mobileConfig.CastleCenter,
                 AttackRadius = mobileConfig.AttackRadius,
-                MinX = mobileMode ? mobileConfig.CastleCenter.x - mobileLimit : -100000f,
-                MaxX = mobileMode ? mobileConfig.CastleCenter.x + mobileLimit : 40f,
-                MinY = mobileMode ? mobileConfig.CastleCenter.y - mobileLimit : -15f,
-                MaxY = mobileMode ? mobileConfig.CastleCenter.y + mobileLimit : 15f,
+                MinX = mobileMode ? (singleFront ? sfMinX : mobileConfig.CastleCenter.x - mobileLimit) : -100000f,
+                MaxX = mobileMode ? (singleFront ? sfMaxX : mobileConfig.CastleCenter.x + mobileLimit) : 40f,
+                MinY = mobileMode ? (singleFront ? -sfHalfY : mobileConfig.CastleCenter.y - mobileLimit) : -15f,
+                MaxY = mobileMode ? (singleFront ? sfHalfY : mobileConfig.CastleCenter.y + mobileLimit) : 15f,
                 CellSize = SpatialHash.DefaultCellSize,
                 HasSpatialMap = hasSpatialMap,
                 SpatialMap = spatialMap,
@@ -63,6 +71,8 @@ namespace DeadWalls
         partial struct BoundaryJob : IJobEntity
         {
             public bool MobileMode;
+            public bool SingleFront;
+            public float FrontlineX;
             public float WallX;
             public float2 CastleCenter;
             public float AttackRadius;
@@ -134,8 +144,11 @@ namespace DeadWalls
                         // 1. Duvara ulasti → Attacking
                         if (MobileMode)
                         {
-                            float attackRadiusSq = AttackRadius * AttackRadius;
-                            if (math.distancesq(pos.xy, CastleCenter) <= attackRadiusSq)
+                            // Tek cephe: duvara x-esigi ile ulasma; 360 modda merkeze mesafe
+                            bool reachedWall = SingleFront
+                                ? pos.x <= FrontlineX + AttackRadius
+                                : math.distancesq(pos.xy, CastleCenter) <= AttackRadius * AttackRadius;
+                            if (reachedWall)
                             {
                                 zombieState.Value = ZombieStateType.Attacking;
                                 body.Velocity = float2.zero;
@@ -161,8 +174,11 @@ namespace DeadWalls
                         // 1. Duvara ulasti → Attacking
                         if (MobileMode)
                         {
-                            float attackRadiusSq = AttackRadius * AttackRadius;
-                            if (math.distancesq(pos.xy, CastleCenter) <= attackRadiusSq)
+                            // Tek cephe: duvara x-esigi ile ulasma; 360 modda merkeze mesafe
+                            bool reachedWall = SingleFront
+                                ? pos.x <= FrontlineX + AttackRadius
+                                : math.distancesq(pos.xy, CastleCenter) <= AttackRadius * AttackRadius;
+                            if (reachedWall)
                             {
                                 zombieState.Value = ZombieStateType.Attacking;
                                 body.Velocity = float2.zero;
@@ -187,11 +203,20 @@ namespace DeadWalls
                         if (MobileMode)
                         {
                             body.Velocity = float2.zero;
-                            float2 fromCenter = pos.xy - CastleCenter;
-                            float2 dir = math.normalizesafe(fromCenter, new float2(1f, 0f));
-                            float2 clamped = CastleCenter + dir * AttackRadius;
-                            pos.x = clamped.x;
-                            pos.y = clamped.y;
+                            if (SingleFront)
+                            {
+                                // Duvar bariyeri: hattin gerisine gecilmez (yalniz x sabitlenir; y'de yigilma serbest)
+                                if (pos.x < FrontlineX + AttackRadius)
+                                    pos.x = FrontlineX + AttackRadius;
+                            }
+                            else
+                            {
+                                float2 fromCenter = pos.xy - CastleCenter;
+                                float2 dir = math.normalizesafe(fromCenter, new float2(1f, 0f));
+                                float2 clamped = CastleCenter + dir * AttackRadius;
+                                pos.x = clamped.x;
+                                pos.y = clamped.y;
+                            }
                         }
                         // Duvar bariyeri
                         else if (pos.x < WallX)

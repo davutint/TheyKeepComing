@@ -33,6 +33,12 @@ namespace DeadWalls
 
         /// <summary>Tamir maliyetini yuzdesel dusurur (Value 0.20 = -%20). Coklu seviye carpimsal birikir.</summary>
         ReduceRepairCostPercent = 8,
+
+        /// <summary>Hendek yavaslatmasini derinlestirir: MoatSlowMultiplier'dan seviye*Value dusulur (0.10 = +%10 ek yavaslatma).</summary>
+        DeepenMoatSlowPercent = 9,
+
+        /// <summary>Hendege gecis hasari ekler: MoatDamagePerSecond += seviye*Value (moat_flame evrimi).</summary>
+        AddMoatDamagePerSecond = 10,
     }
 
     /// <summary>

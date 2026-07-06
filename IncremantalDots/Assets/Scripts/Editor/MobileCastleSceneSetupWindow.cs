@@ -489,7 +489,9 @@ namespace DeadWalls
             cameraObject.tag = "MainCamera";
             camera.orthographic = true;
             camera.orthographicSize = 8f;
-            camera.transform.position = new Vector3(0f, 0f, -10f);
+            // Tek cephe (K4): sabit tek ekran — duvar hatti (x~-6) solda, spawn seridi (x~13-15)
+            // sagda gorunecek sekilde cerceve merkezi sagda tutulur
+            camera.transform.position = new Vector3(4.5f, 0f, -10f);
             camera.transform.rotation = Quaternion.identity;
             camera.clearFlags = CameraClearFlags.SolidColor;
             camera.backgroundColor = new Color(0.07f, 0.09f, 0.075f, 1f);
@@ -990,6 +992,25 @@ namespace DeadWalls
                     RevealChildren = new string[0],
                     Effects = new[] { new TechNodeEffect { Type = TechNodeEffectType.ReduceRepairCostPercent, Value = 0.20f } }
                 },
+                // Hendek evrimi (K4 Tek Cephe): cukur derinlesir, sonra alev/dikene evrilir
+                new TechNodeSeed
+                {
+                    Id = "moat_dig", Title = "Deeper Moat",
+                    Description = "Dig the moat deeper: +10% slow per level.",
+                    Cost = new ResourceCost(40, 90, 0, 0), MaxLevel = 3, CostGrowthPerLevel = 0.35f,
+                    Prerequisites = new[] { "wall_reinforcement" },
+                    RevealChildren = new[] { "moat_flame" },
+                    Effects = new[] { new TechNodeEffect { Type = TechNodeEffectType.DeepenMoatSlowPercent, Value = 0.10f } }
+                },
+                new TechNodeSeed
+                {
+                    Id = "moat_flame", Title = "Burning Moat",
+                    Description = "Oil and stakes: crossing the moat deals 4 dmg/s per level.",
+                    Cost = new ResourceCost(60, 60, 70, 0), MaxLevel = 3, CostGrowthPerLevel = 0.45f,
+                    Prerequisites = new[] { "moat_dig" },
+                    RevealChildren = new string[0],
+                    Effects = new[] { new TechNodeEffect { Type = TechNodeEffectType.AddMoatDamagePerSecond, Value = 4f } }
+                },
             };
         }
 
@@ -1004,6 +1025,8 @@ namespace DeadWalls
             ("bow_training", "bow_mastery"),
             ("rapid_volley", "volley_mastery"),
             ("repair_crew", "repair_efficiency"),
+            ("wall_reinforcement", "moat_dig"),
+            ("moat_dig", "moat_flame"),
         };
 
         private static void EnsureTechRevealLinks(TechTreeCatalogSO catalog)

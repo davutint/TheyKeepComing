@@ -88,9 +88,14 @@ Otorite `ContinuousSiegeCycleData` (eski `WaveStateData.Phase` DEGIL):
   `MonoBehaviour/TECH_TREE_UI_ARCHITECTURE.md`, `ScriptableObject/TECH_TREE_SO_ARCHITECTURE.md`,
   `MonoBehaviour/CASTLE_ECONOMY_UI_ARCHITECTURE.md`, `Editor/MOBILE_CASTLE_SCENE_SETUP_ARCHITECTURE.md`.
 - **Aktif yon:** mobile continuous siege + sol castle interior worker economy + combat/UI polish. **M-ISO (izometrik/perimeter) ARTIK AKTIF DEGIL.**
-- **PIVOT KARARI (2026-07-06, K4 — henuz implemente EDILMEDI):** 360-ring spawn terk edildi;
-  dusmanlar yalniz SAGDAN gelecek (solda us/ekonomi, ortada duvar+hendek+kule hatti, okcu-duvar
-  modeli). Kod su an HALA 360-ring calisiyor; implementasyon = MASTER_PLAN M-0 milestone'u.
+- **K4 TEK CEPHE (2026-07-06, M-0 mekanigi TAMAM):** dusmanlar yalniz SAGDAN gelir
+  (`SingleFrontEnabled=true` default; false = eski 360-ring geri doner). Spawn sag serit
+  (SpawnLineX 13, band +-6.5), hedef/saldiri duvar hatti (FrontlineX -6, AttackRadius esigi),
+  HENDEK bandi [-4,-1.5] `MoatSystem` ile yavaslatir (frost'la ayni ZombieSlow kanali) +
+  moat_flame tech'iyle yakar; hendek evrimi tech'leri `moat_dig`/`moat_flame`; okcu yerlesimi
+  tilemap-hucre (x<=FrontlineX+1 filtreli) + duvar kolonu fallback; kamera sabit (4.5,0) ortho 8.
+  GORSEL katman owner isi: eski kale silueti/koy/duvar/kule tilemap'leri yeniden boyanacak.
+  Otoriter dok: `Systems/MOBILE_CASTLE_COMBAT_ARCHITECTURE.md` "Tek Cephe" bolumu.
 - `Assets/Docs/ROADMAP.md` (son guncelleme 2026-03-18) = LEGACY milestone gecmisi, guncel yon DEGIL.
 
 ---

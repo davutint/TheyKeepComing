@@ -79,9 +79,15 @@ namespace DeadWalls
 
             if (totalAppliedDamage > 0f)
             {
-                float2 feedbackCenter = SystemAPI.HasSingleton<MobileCastleCombatConfig>()
-                    ? SystemAPI.GetSingleton<MobileCastleCombatConfig>().CastleCenter
-                    : float2.zero;
+                float2 feedbackCenter = float2.zero;
+                if (SystemAPI.HasSingleton<MobileCastleCombatConfig>())
+                {
+                    var mobileConfig = SystemAPI.GetSingleton<MobileCastleCombatConfig>();
+                    // Tek cephe: vurus geri bildirimi duvar hattinda; 360 modda kale merkezinde
+                    feedbackCenter = mobileConfig.SingleFrontEnabled
+                        ? new float2(mobileConfig.FrontlineX, 0f)
+                        : mobileConfig.CastleCenter;
+                }
                 EmitCastleHitFeedback(ref state, feedbackCenter);
             }
 

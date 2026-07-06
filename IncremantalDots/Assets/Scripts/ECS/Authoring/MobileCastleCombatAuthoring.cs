@@ -13,6 +13,25 @@ namespace DeadWalls
         public int ExtraEnemiesPerWave = 10;
         public int SpawnBatchSize = 2;
 
+        [Header("Single Front (K4 pivotu — dusmanlar yalniz sagdan)")]
+        [Tooltip("true = tek cephe: sag-serit spawn + sola akis + duvara vurma. false = eski 360-ring (geri alma anahtari).")]
+        public bool SingleFrontEnabled = true;
+        [Tooltip("Savunma hattinin (duvarin) x konumu; zombiler bu hatta yaslanip vurur.")]
+        public float FrontlineX = -6f;
+        [Tooltip("Spawn seridinin x tabani (uzerine 0-2 birim ileri jitter eklenir).")]
+        public float SpawnLineX = 13f;
+        [Tooltip("Spawn seridinin dikey yarim-genisligi (y = -bu..+bu).")]
+        public float SpawnBandYHalf = 6.5f;
+
+        [Header("Moat (hendek — upgrade ile evrilir)")]
+        [Tooltip("Hendek bandinin x araligi (duvarin onunde).")]
+        public float MoatXMin = -4f;
+        public float MoatXMax = -1.5f;
+        [Tooltip("Hendek icindeyken hiz carpani (1 = etkisiz, 0.55 = %45 yavaslatma). Tech dusurur.")]
+        public float MoatSlowMultiplier = 0.55f;
+        [Tooltip("Hendek gecis hasari/sn. 0 = kapali; moat_flame tech'i acar.")]
+        public float MoatDamagePerSecond = 0f;
+
         [Header("Mass Escalation")]
         public float ZombieBaseHP = 20f;
         [Tooltip("Cycle basina lineer HP buyumesi (0.30 = her cycle +%30 taban HP). Eski ustel w^1.2 egrisinin yerini alir.")]
@@ -186,6 +205,14 @@ namespace DeadWalls
                     SiegeDawnIntensityMultiplier = math.max(0.01f, authoring.SiegeDawnIntensityMultiplier),
                     RepairBaseWoodCost = math.max(0, authoring.RepairBaseWoodCost),
                     RepairBaseStoneCost = math.max(0, authoring.RepairBaseStoneCost),
+                    SingleFrontEnabled = authoring.SingleFrontEnabled,
+                    FrontlineX = authoring.FrontlineX,
+                    SpawnLineX = authoring.SpawnLineX,
+                    SpawnBandYHalf = math.max(1f, authoring.SpawnBandYHalf),
+                    MoatXMin = math.min(authoring.MoatXMin, authoring.MoatXMax),
+                    MoatXMax = math.max(authoring.MoatXMin, authoring.MoatXMax),
+                    MoatSlowMultiplier = math.clamp(authoring.MoatSlowMultiplier, 0.05f, 1f),
+                    MoatDamagePerSecond = math.max(0f, authoring.MoatDamagePerSecond),
                     BaseSpawnInterval = math.max(0.01f, authoring.BaseSpawnInterval),
                     SpawnIntervalWaveMultiplier = math.clamp(authoring.SpawnIntervalWaveMultiplier, 0.01f, 1f),
                     MinSpawnInterval = math.max(0.01f, authoring.MinSpawnInterval),

@@ -167,11 +167,20 @@ namespace DeadWalls
 
                 if (mobileMode)
                 {
-                    float angle = _random.NextFloat(0f, math.PI * 2f);
-                    float2 dir = new float2(math.cos(angle), math.sin(angle));
-                    float2 spawnPos = mobileConfig.CastleCenter + dir * mobileConfig.SpawnRadius;
-                    spawnX = spawnPos.x;
-                    spawnY = spawnPos.y;
+                    if (mobileConfig.SingleFrontEnabled)
+                    {
+                        // Tek cephe (K4): sag kenar seridinden, dikey bantta rastgele
+                        spawnX = mobileConfig.SpawnLineX + _random.NextFloat(0f, 2f);
+                        spawnY = _random.NextFloat(-mobileConfig.SpawnBandYHalf, mobileConfig.SpawnBandYHalf);
+                    }
+                    else
+                    {
+                        float angle = _random.NextFloat(0f, math.PI * 2f);
+                        float2 dir = new float2(math.cos(angle), math.sin(angle));
+                        float2 spawnPos = mobileConfig.CastleCenter + dir * mobileConfig.SpawnRadius;
+                        spawnX = spawnPos.x;
+                        spawnY = spawnPos.y;
+                    }
                 }
                 else
                 {

@@ -83,6 +83,8 @@ namespace DeadWalls
         private float _baseIronProductionPerMin;
         private float _baseFoodProductionPerMin;
         private int _basePopulationGrowthPerCycle;
+        private float _baseMoatSlowMultiplier = 1f;
+        private float _baseMoatDamagePerSecond;
         private bool _techDefenseBaselineCaptured;
         private float _baseWallMaxHp;
         private float _baseGateMaxHp;
@@ -1442,7 +1444,9 @@ namespace DeadWalls
                     case TechNodeEffectType.IncreaseWorkerCap:
                     case TechNodeEffectType.IncreaseResourceProductionPercent:
                     case TechNodeEffectType.IncreasePopulationGrowth:
-                        economyDirty = true;
+                    case TechNodeEffectType.DeepenMoatSlowPercent:
+                    case TechNodeEffectType.AddMoatDamagePerSecond:
+                        economyDirty = true; // moat da config aggregate'inde yasar
                         break;
                     case TechNodeEffectType.IncreaseDefenseMaxHpPercent:
                         defenseDirty = true;
@@ -1493,12 +1497,15 @@ namespace DeadWalls
                 _baseIronProductionPerMin = config.IronWorkerProductionPerMin;
                 _baseFoodProductionPerMin = config.FoodWorkerProductionPerMin;
                 _basePopulationGrowthPerCycle = config.PopulationGrowthPerDayPrep;
+                _baseMoatSlowMultiplier = config.MoatSlowMultiplier;
+                _baseMoatDamagePerSecond = config.MoatDamagePerSecond;
                 _techConfigBaselineCaptured = true;
             }
 
             int woodCap = 0, stoneCap = 0, ironCap = 0, foodCap = 0;
             float woodProd = 0f, stoneProd = 0f, ironProd = 0f, foodProd = 0f;
             int growth = 0;
+            float moatSlowReduction = 0f, moatDamageBonus = 0f;
 
             if (techTreeCatalog != null && techTreeCatalog.Nodes != null)
             {
@@ -1538,6 +1545,12 @@ namespace DeadWalls
                             case TechNodeEffectType.IncreasePopulationGrowth:
                                 growth += Mathf.RoundToInt(effect.Value) * level;
                                 break;
+                            case TechNodeEffectType.DeepenMoatSlowPercent:
+                                moatSlowReduction += effect.Value * level;
+                                break;
+                            case TechNodeEffectType.AddMoatDamagePerSecond:
+                                moatDamageBonus += effect.Value * level;
+                                break;
                         }
                     }
                 }
@@ -1554,6 +1567,9 @@ namespace DeadWalls
             config.IronWorkerProductionPerMin = _baseIronProductionPerMin * (1f + ironProd);
             config.FoodWorkerProductionPerMin = _baseFoodProductionPerMin * (1f + foodProd);
             config.PopulationGrowthPerDayPrep = _basePopulationGrowthPerCycle + growth;
+            // Hendek evrimi (K4): tech yavaslatmayi derinlestirir, gecis hasarini acar/buyutur
+            config.MoatSlowMultiplier = Mathf.Clamp(_baseMoatSlowMultiplier - moatSlowReduction, 0.05f, 1f);
+            config.MoatDamagePerSecond = Mathf.Max(0f, _baseMoatDamagePerSecond + moatDamageBonus);
             _entityManager.SetComponentData(configEntity, config);
         }
 
@@ -1640,6 +1656,8 @@ namespace DeadWalls
                 config.IronWorkerProductionPerMin = _baseIronProductionPerMin;
                 config.FoodWorkerProductionPerMin = _baseFoodProductionPerMin;
                 config.PopulationGrowthPerDayPrep = _basePopulationGrowthPerCycle;
+                config.MoatSlowMultiplier = _baseMoatSlowMultiplier;
+                config.MoatDamagePerSecond = _baseMoatDamagePerSecond;
                 _entityManager.SetComponentData(configEntity, config);
             }
 
@@ -2502,12 +2520,32 @@ namespace DeadWalls
         {
             position = default;
 
-            if (!TryGetMobileConfigEntity(out _))
+            if (!TryGetMobileConfigEntity(out var configEntity))
                 return false;
+
+            var config = _entityManager.GetComponentData<MobileCastleCombatConfig>(configEntity);
 
             MobileCastleArcherTilePlacement placement = MobileCastleArcherTilePlacement.GetOrCreateRuntime();
             if (placement != null && placement.TryGetSpawnPosition(archerCount, out position))
             {
+                // Tek cephe (K4): yalniz duvar hatti bolgesindeki tilemap hucreleri gecerli —
+                // eski 360-duzen hucreleri (kale cevresi) elenir; owner kule tile'larini
+                // duvara boyadiginda otomatik gecerli olur
+                if (!config.SingleFrontEnabled || position.x <= config.FrontlineX + 1f)
+                {
+                    _missingArcherPlacementWarningLogged = false;
+                    return true;
+                }
+            }
+
+            // Tek cephe placeholder fallback: duvar hattinda dikey kolon (ortadan disa dogru)
+            if (config.SingleFrontEnabled)
+            {
+                float spacing = 1.3f;
+                int step = (archerCount + 1) / 2;
+                float y = (archerCount % 2 == 0 ? 1f : -1f) * step * spacing;
+                y = Mathf.Clamp(y, -config.SpawnBandYHalf, config.SpawnBandYHalf);
+                position = new float3(config.FrontlineX - 0.8f, y, MobileCastleRenderDepth.UnitZ);
                 _missingArcherPlacementWarningLogged = false;
                 return true;
             }
@@ -2518,13 +2556,6 @@ namespace DeadWalls
 
         private void RepositionExistingMobileArchersToOutside()
         {
-            MobileCastleArcherTilePlacement placement = MobileCastleArcherTilePlacement.GetOrCreateRuntime();
-            if (placement == null)
-            {
-                LogMissingArcherPlacementWarning();
-                return;
-            }
-
             var query = _entityManager.CreateEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] { typeof(ArcherUnit), typeof(Unity.Transforms.LocalTransform) },
@@ -2533,7 +2564,9 @@ namespace DeadWalls
             using var entities = query.ToEntityArray(Unity.Collections.Allocator.Temp);
             for (int i = 0; i < entities.Length; i++)
             {
-                if (!placement.TryGetSpawnPosition(i, out float3 position))
+                // Merkezi yerlesim yolu: tilemap hucresi + tek-cephe filtresi + kolon fallback
+                // (seed okcunun eski 360-hucresine tasinmasini da ayni filtre engeller)
+                if (!TryGetMobileArcherSpawnPosition(i, out float3 position))
                     return;
 
                 var transform = _entityManager.GetComponentData<Unity.Transforms.LocalTransform>(entities[i]);
