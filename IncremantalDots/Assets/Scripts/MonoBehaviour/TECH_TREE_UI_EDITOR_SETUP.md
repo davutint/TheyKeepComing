@@ -57,5 +57,5 @@ Katalog `GameManager.techTreeCatalog`'a baglanir; `TechTreeUI` catalog'u GameMan
 - Binding isimlerini degistirme; setup tool exact-match arar.
 - `TechTreePanel` prefabin ICINDE kalmali — sahne-override olarak eklenirse HUD prefab
   yeniden kurulumunda kaybolur.
-- UI Importer bu panel icin CALISTIRILMAZ (prefab dogrudan duzenlendi); `mobile_castle_hud`
-  export'u henuz tech tree icermiyor, re-import paneli SILER (once export sync gerekir).
+- Prefab TEK dogruluk kaynagidir; UI dogrudan prefab stage'de duzenlenir
+  (eski UIImporter/export pipeline'i 2026-07-06'da kaldirildi — sync borcu kavrami kapandi).

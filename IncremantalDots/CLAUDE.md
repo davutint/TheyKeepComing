@@ -108,33 +108,33 @@ Otorite `ContinuousSiegeCycleData` (eski `WaveStateData.Phase` DEGIL):
 Assets/Scripts/
   ECS/{Components, Authoring, Systems, Physics}  - ECS data/baker/sistem/custom physics
   MonoBehaviour/                                 - manager + UI controller (ECS world'e kopru)
-  Editor/                                        - tool/analyzer + UIBuilder/ (UI import pipeline)
-  ScriptableObject/                              - BuildingConfigSO (LEGACY) + MobileCastle SO'lari (ArcherDefinition/TechTree)
+  Editor/                                        - tool/analyzer
+  ScriptableObject/                              - BuildingConfigSO (LEGACY) + MobileCastle SO'lari (ArcherDefinition/TechTree/Council)
 Assets/Scenes/NewGameScene*                      - AKTIF sahne + DOTS subscene
 Assets/SmallScaleInt/                            - gorsel temel art (tileset + character creator)
-Assets/UIExports/<name>/                         - owner UI export'lari (ui.json + manifest + sprites)
-Assets/Prefabs/UI/Generated/                     - UIImporter ciktisi (uGUI prefab'lar)
-CodexPreviews/                                   - owner UI tasarim onizlemeleri (HTML)
+Assets/Prefabs/UI/Generated/                     - aktif UI prefab'lari (MobileCastleHudRoot = TEK dogruluk kaynagi)
+Assets/Tests/EditMode/                           - EditMode testleri (DeadWalls.EditMode.Tests)
+CodexPreviews/                                   - eski UI tasarim onizlemeleri (HTML; tarihsel referans)
 Assets/Docs/                                     - GDD + ROADMAP (LEGACY/baglam)
 ```
 
 ## UI Uretim Is Akisi (ZORUNLU KURAL)
-Ana yol: UI import edilir. Spec: `Editor/UIBuilder/CODEX_EXPORT_FORMAT.md`.
-1. **Owner** UI'yi ayri bir Codex tasarim aracinda (kendi tool'u / yan tab) tasarlar; onizleme `CodexPreviews/<name>/`.
-2. **Owner** paketi `Assets/UIExports/<name>/` altina export eder: `ui.json` (layout) + `manifest.json`
-   (sprite haritasi) + opsiyonel `sprites/`. Bu, UI layout'unun TEK dogruluk kaynagidir.
-3. **Implementer (sen)** UIImporter'i calistirir: `Window > DeadWalls > UI Importer` (veya export klasorune
-   sag-tik). Cikti: `Assets/Prefabs/UI/Generated/<Root>.prefab` + `Assets/Sprites/UI/Generated/<name>/`.
-4. **Implementer** sprite atar/auto-find yapar ve davranisi DeadWalls MonoBehaviour controller'larinda
-   (`HUDController`, `MarketUI`, `CastleEconomyUI`, ...) integration report'a gore baglar.
+UI dogrudan Unity prefab'i uzerinde uretilir/duzenlenir. TEK dogruluk kaynagi:
+`Assets/Prefabs/UI/Generated/MobileCastleHudRoot.prefab`.
 
-> **Onemli istisna:** Claude Code Unity prefab stage'de mevcut prefab uzerinde polish yapabilir. Bu durumda
-> `Assets/Prefabs/UI/Generated/MobileCastleHudRoot.prefab` anlik dogruluk kaynagidir; sonra
-> `Assets/UIExports/mobile_castle_hud/ui.json` + `manifest.json` ayni karara senkronlanir ki re-import eski UI'yi geri getirmesin.
-> Prefab polish yaparken binding isimleri korunur, mevcut HUD komple yeniden uretilmez, C# runtime davranisi degistirilmez.
-> Mobile HUD gorsel standardi su an **plain Unity UI / text-first**: custom fantasy icon uretmeye calisma; panel/row/button'larda duz yari-opak renkler,
-> builtin/simple Image yaklasimi, net text label'lar ve sabit satir olculeri kullan. UI'da ic ice gecme, buyuk tasan text veya dekoratif icon zorlamasi kabul edilmez.
-> `EconomyFocusPanel` retired durumdadir: prefabda ve exportta yoktur; setup tool bunu geri uretmez.
+> Eski "Codex export -> UIImporter" pipeline'i 2026-07-06'da KALDIRILDI (`Assets/UIExports/` +
+> `Editor/UIBuilder/` silindi): iki-yazici senkron borcu/riski kokten bitirildi. Gerekirse git
+> gecmisinden geri getirilebilir. `CodexPreviews/` tarihsel referans olarak durur.
+
+Kurallar:
+1. Yeni UI yuzeyi = prefab stage'de kur + controller'i `MonoBehaviour/`'da yaz + setup tool'a
+   binding ekle (`MobileCastleSceneSetupWindow` isimle bulur/baglar).
+2. **Binding isimleri SOZLESMEDIR** — yeniden adlandirma setup tool re-run'ini kirar.
+3. Prefab polish'te mevcut HUD komple yeniden uretilmez; C# runtime davranisi ayri karardir.
+4. Gorsel standart **plain Unity UI / text-first**: custom fantasy icon uretmeye calisma;
+   panel/row/button'larda duz yari-opak renkler, builtin/simple Image yaklasimi, net text
+   label'lar ve sabit satir olculeri. Ic ice gecme, tasan text, dekoratif icon zorlamasi kabul edilmez.
+5. `EconomyFocusPanel` retired durumdadir: prefabda yoktur; setup tool bunu geri uretmez.
 
 ## Mimari Ozet
 > Otorite: gercek frame sirasi `[UpdateBefore]`/`[UpdateAfter]`/`OrderFirst` ozniteliklerinden gelir.
@@ -218,7 +218,6 @@ Queued --> Moving      (blocker gitti) ; Queued --> Attacking (kaleye ulasti)
 ## Editor Tool'lari (`Assets/Scripts/Editor`)
 - **MobileCastleSceneSetupWindow** -- NewGameScene + subscene + WorldVisualRoot iskeletini tek tikla (idempotent) kurar. (AKTIF is akisinin merkezi)
 - **ArenaMapGeneratorWindow** -- seed-tabanli tek-tik izometrik arena uretici (gorsel). WorldVisualRoot tilemap'lerine biome zemin + noise-blend gecis + dekor + dekoratif yapi boyar; canli-sahne onizleme, tek-undo. Tile = Fantasy kingdom Tileset (duz Tile asset). Bkz. `ARENA_MAP_GENERATOR_ARCHITECTURE.md`.
-- **UIBuilder/** -- owner UI export'unu (`Assets/UIExports/<name>/`) uGUI prefab'ina ceviren import pipeline.
 - **MapImporterWindow / GroundTileMapperWindow / BuildingTileComposerWindow** -- harita/zemin/bina tile araclari (cogu LEGACY town tarafi).
 - **SpriteAtlasGenerator** -- 4 karakter animasyon PNG'sini tek atlasa birlestir.
 - **ProfilerDataAnalyzer** -- `.raw` profiler dosyasini A/B karsilastirmali rapora donustur.

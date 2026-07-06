@@ -48,4 +48,4 @@ Bu panel mobile continuous worker drawer akisi icin legacy/debug kabul edilir. P
 - Eski `Economy Focus` butonlari gizlenir.
 - Sag drawer'daki eski `RepairButton` player-facing olarak gizlenir.
 
-Setup tool polish fallback full-screen panel uretmez. Yeni worker assignment gorseli owner onayli UI Importer export'u ile gelen sol `WorkerEconomyDrawerPanel` uzerindedir.
+Setup tool polish fallback full-screen panel uretmez. Yeni worker assignment gorseli prefabdaki sol `WorkerEconomyDrawerPanel` uzerindedir.

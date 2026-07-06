@@ -39,7 +39,7 @@
 
 ## Dikkat
 
-- Kart objeleri PREFABDADIR (`CouncilEventPanel`) — sahne-override degil; UI export sync
-  borcu listesine dahildir (UIImporter calistirilmamali).
+- Kart objeleri PREFABDADIR (`CouncilEventPanel`) — sahne-override degil. Prefab TEK dogruluk
+  kaynagidir (eski UIImporter/export pipeline'i 2026-07-06'da kaldirildi).
 - Test/debug icin `CouncilEventUI.enabled` veya `freeEconomyTestMode` degistirilirse
   EDIT MODDA yapilan degisiklik sahneye KALICI yazilir — geri almayi unutma (bir kez yasandi).

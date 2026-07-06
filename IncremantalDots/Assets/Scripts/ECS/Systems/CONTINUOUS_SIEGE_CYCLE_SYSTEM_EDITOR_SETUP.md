@@ -22,4 +22,4 @@ HUD prefabinda su isimler varsa `HUDController` alanlarina baglanir:
 - `CycleProgressFill`
 - `CycleProgressMarker`
 
-`CyclePanel` varsa setup tool eski fallback `WaveText` ve `KillsText` objelerini uretmez; sahnede kalmislarsa kapatir. `HordePressurePanel` prefabda varsa player-facing olarak kapali tutulur. UI Importer export'u bu dosyada uretilmez, sadece owner'in import ettigi prefab isimleri baglanir.
+`CyclePanel` varsa setup tool eski fallback `WaveText` ve `KillsText` objelerini uretmez; sahnede kalmislarsa kapatir. `HordePressurePanel` prefabda varsa player-facing olarak kapali tutulur. Bu dosya UI uretmez; prefabdaki isimler baglanir.

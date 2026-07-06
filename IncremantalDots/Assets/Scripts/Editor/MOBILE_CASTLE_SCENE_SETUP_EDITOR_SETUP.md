@@ -89,9 +89,11 @@ SubScene:
 - `BasicArcher_01`: `ArcherAuthoring.Tint` ve `SpriteSheetAuthoring.Tint` beyaz
 - `MobileCastleCombatSubScene`: Scene Asset alani `MobileCastleCombatSubScene.unity`
 
-## UI Importer Akisi
+## HUD Prefab Isim Sozlesmesi
 
-Polish HUD gorseli owner tarafindan ayri Codex tabinda mockup/preview ile onaylanir. Implementer bu repoda kendi basina UI JSON/export uretmez. Onayli export geldikten sonra UI Importer ile hedef prefab uretilir:
+UI dogrudan `Assets/Prefabs/UI/Generated/MobileCastleHudRoot.prefab` uzerinde (prefab stage'de)
+uretilir/duzenlenir; bu prefab TEK dogruluk kaynagidir. (Eski Codex export -> UI Importer
+pipeline'i 2026-07-06'da kaldirildi.) Setup tool asagidaki isimleri exact-match ile bulur/baglar:
 
 - Hedef prefab: `Assets/Prefabs/UI/Generated/MobileCastleHudRoot.prefab`
 - Beklenen root: `MobileCastleHudRoot`
@@ -112,11 +114,11 @@ Polish HUD gorseli owner tarafindan ayri Codex tabinda mockup/preview ile onayla
 - Opsiyonel Castle Interior feedback: `CastleTapHintPulse`, `ProjectedIncomeFrame`, `CastleRepairFrame`, `EconomyEventGlow`
 - Sag drawer archer recruitment icindir. `Basic/Rapid/FrostUpgradeButton`, `ArrowTechPanel`, `RapidTechUnlockButton`, `FrostTechUnlockButton`, `RepairButton`, `FortifyButton`, `RallyButton`, `RefillArrowsButton` ve `StartNextWaveButton` prefabda varsa setup tool bunlari player-facing olarak gizler.
 
-Import etmek icin `Window -> DeadWalls -> UI Importer` acilir, export folder yuklenir ve prefab yukaridaki hedefe uretilir. Runtime davranisi JSON icinde degildir; `MarketUI` ve scene setup tool baglar.
+Runtime davranisi prefab icinde degildir; `MarketUI` ve scene setup tool baglar.
 
 Mobile continuous siege loop'ta player-facing `StartNextWaveButton` yoktur ve unlimited arrows acikken `RefillArrowsButton` player-facing UI'da gizlenir/disable edilir. Prefab bu objeleri iceriyorsa tool referansi baglar ama aktif kullanima acmaz.
 
-`CastleRepairButton` legacy Castle Interior akisi icindir. Continuous siege varsayilaninda Castle Interior panel player-facing kapali kalir; sag drawer'in sadece archer buy/recruitment aksiyonlari combat sirasinda kullanilmaya devam eder. Upgrade ve tech unlock full-screen Tech Tree milestone'una birakilir. Castle Interior paneli yoksa setup tool polish fallback uretmez; owner onayli UI Importer export'u beklenir.
+`CastleRepairButton` legacy Castle Interior akisi icindir. Continuous siege varsayilaninda Castle Interior panel player-facing kapali kalir; sag drawer'in sadece archer buy/recruitment aksiyonlari combat sirasinda kullanilmaya devam eder. Upgrade ve tech unlock full-screen Tech Tree milestone'una birakilir. Castle Interior paneli yoksa setup tool polish fallback uretmez; panel gerekirse dogrudan prefabda kurulur.
 
 ## World Visuals
 

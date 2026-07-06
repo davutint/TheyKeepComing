@@ -44,7 +44,7 @@ FoodWorkerStatusText
 
 ## Test
 
-1. UI Importer ile guncel `MobileCastleHudRoot` prefabini import et.
+1. `Assets/Prefabs/UI/Generated/MobileCastleHudRoot.prefab` guncel olmali (UI dogrudan prefabda duzenlenir).
 2. `Mobile Castle Scene Setup` calistir.
 3. Play modunda sol ust `Workers` toggle'ina bas.
 4. `+ WORKER` butonlari idle population varsa worker sayisini artirmali.

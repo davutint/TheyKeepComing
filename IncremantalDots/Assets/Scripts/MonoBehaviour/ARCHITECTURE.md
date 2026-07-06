@@ -76,7 +76,8 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - Worker economy aktifken `Repair`, `Fortify` ve `Rally` player-facing drawer'da gizlenir; drawer archer recruitment paneli olarak kalir
 - Mobile unlimited arrow modunda `Arrow Refill` gizlenir
 - Mobile continuous siege loop'ta `Start Next Wave` player-facing UI'da gizlenir; oyun durmadan `DAY / DUSK / NIGHT` cycle'i akar
-- Runtime davranisi UI Importer JSON'una gomulmez; controller ve scene setup tool tarafinda baglanir
+- Runtime davranisi prefaba gomulmez; controller ve scene setup tool tarafinda baglanir
+  (UI dogrudan prefab uzerinde uretilir; eski UIImporter/export pipeline'i 2026-07-06'da kaldirildi)
 
 ### TechTreeUI.cs
 

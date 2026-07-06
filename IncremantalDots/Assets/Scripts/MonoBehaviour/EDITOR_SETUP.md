@@ -41,7 +41,7 @@ Beklenen referanslar:
 - `StartNextWaveButton` varsa mobile otomatik day/night loop'ta gizlenir
 - `Canvas/DayNightOverlay`: full-screen black `Image` + `DayNightOverlayController`
 
-Generated UI kullanilacaksa owner tarafindan onaylanan UI Importer export'u `Assets/Prefabs/UI/Generated/MobileCastleHudRoot.prefab` olarak import edilir. Sonra Mobile Castle Scene Setup tekrar calistirilir; prefab varsa fallback HUD yerine onu kullanir. Implementer kendi basina UI JSON/export uretmez.
+`Assets/Prefabs/UI/Generated/MobileCastleHudRoot.prefab` UI'nin TEK dogruluk kaynagidir; UI dogrudan bu prefab uzerinde (prefab stage'de) uretilir/duzenlenir. Mobile Castle Scene Setup prefab varsa fallback HUD yerine onu kullanir. (Eski UIImporter/export pipeline'i 2026-07-06'da kaldirildi.)
 
 Drawer gameplay'i pause etmez. Mobile castle loop'ta level-up paneli kullanilmaz; oyuncu surekli oldurur, kaynak toplar ve sag drawer'dan okcu satin alir. Archer recruitment row'lari `ArcherDefinitionSO` asset'lerini iceren `ArcherRecruitmentCatalogSO` catalog'undan uretilir; template yoksa eski Basic/Rapid/Frost row'lari fallback olarak calisir. Upgrade/unlock aksiyonlari sag drawer'da player-facing degildir; ileride full-screen Tech Tree tarafina tasinacaktir. Wave arasi `DayPrep` sayaci otomatik akar, ekran kararir ve sure bitince gece wave'i baslar. Kaynak yetmiyorsa mevcut row `CostText` alaninda `NEED ...`, idle population yoksa `NEED POP` gosterilir; bunun icin yeni UI binding gerekmez.
 

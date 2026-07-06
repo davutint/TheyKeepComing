@@ -26,7 +26,7 @@ Repair Button -> GameManager.RepairDefenseFull() -> Wall/Gate/Castle HP
 Event Button -> GameManager.ChooseEconomyEvent() -> MobileEconomyEventState / Resources / Population
 ```
 
-UI Importer export'u sadece gorsel prefab uretir. Runtime binding isim tabanlidir ve `MobileCastleSceneSetupWindow` tarafindan yapilir.
+Prefab sadece gorsel katmandir. Runtime binding isim tabanlidir ve `MobileCastleSceneSetupWindow` tarafindan yapilir.
 
 Projected gain formulu resource bazinda `net/min * WaveStateData.PrepTimer / 60` kullanir. `net/min`, worker production degerinden mevcut `ResourceConsumptionRate` degerinin cikarilmasidir. Bu alan legacy panel icindir; yeni worker assignment UI'i `WorkerEconomyDrawerUI` tarafindadir.
 
