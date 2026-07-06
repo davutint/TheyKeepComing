@@ -16,17 +16,17 @@ namespace DeadWalls
         [Header("Single Front (K4 pivotu — dusmanlar yalniz sagdan)")]
         [Tooltip("true = tek cephe: sag-serit spawn + sola akis + duvara vurma. false = eski 360-ring (geri alma anahtari).")]
         public bool SingleFrontEnabled = true;
-        [Tooltip("Savunma hattinin (duvarin) x konumu; zombiler bu hatta yaslanip vurur.")]
-        public float FrontlineX = -6f;
+        [Tooltip("Savunma hattinin (duvarin) x konumu; zombiler bu hatta yaslanip vurur. Owner'in duvar tilemap'i dunya x~0 kolonunda — durma noktasi duvarin sag yuzune gelecek sekilde ayarli.")]
+        public float FrontlineX = -0.5f;
         [Tooltip("Spawn seridinin x tabani (uzerine 0-2 birim ileri jitter eklenir).")]
         public float SpawnLineX = 13f;
         [Tooltip("Spawn seridinin dikey yarim-genisligi (y = -bu..+bu).")]
         public float SpawnBandYHalf = 6.5f;
 
         [Header("Moat (hendek — upgrade ile evrilir)")]
-        [Tooltip("Hendek bandinin x araligi (duvarin onunde).")]
-        public float MoatXMin = -4f;
-        public float MoatXMax = -1.5f;
+        [Tooltip("Hendek bandinin x araligi (duvarin onunde, zombi durma noktasinin sagi).")]
+        public float MoatXMin = 1.5f;
+        public float MoatXMax = 4f;
         [Tooltip("Hendek icindeyken hiz carpani (1 = etkisiz, 0.55 = %45 yavaslatma). Tech dusurur.")]
         public float MoatSlowMultiplier = 0.55f;
         [Tooltip("Hendek gecis hasari/sn. 0 = kapali; moat_flame tech'i acar.")]

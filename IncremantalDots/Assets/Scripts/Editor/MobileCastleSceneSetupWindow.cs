@@ -489,9 +489,9 @@ namespace DeadWalls
             cameraObject.tag = "MainCamera";
             camera.orthographic = true;
             camera.orthographicSize = 8f;
-            // Tek cephe (K4): sabit tek ekran — duvar hatti (x~-6) solda, spawn seridi (x~13-15)
-            // sagda gorunecek sekilde cerceve merkezi sagda tutulur
-            camera.transform.position = new Vector3(4.5f, 0f, -10f);
+            // Tek cephe (K4): sabit tek ekran — duvar hatti (x~0, owner tilemap'i) solda,
+            // spawn seridi (x~13-15) sagda; solda koy icin ~8 birim alan kalir
+            camera.transform.position = new Vector3(6f, 0f, -10f);
             camera.transform.rotation = Quaternion.identity;
             camera.clearFlags = CameraClearFlags.SolidColor;
             camera.backgroundColor = new Color(0.07f, 0.09f, 0.075f, 1f);

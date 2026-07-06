@@ -228,6 +228,8 @@ Queued --> Moving      (blocker gitti) ; Queued --> Attacking (kaleye ulasti)
 
 ## Editor Tool'lari (`Assets/Scripts/Editor`)
 - **MobileCastleSceneSetupWindow** -- NewGameScene + subscene + WorldVisualRoot iskeletini tek tikla (idempotent) kurar. (AKTIF is akisinin merkezi)
+- **LongRunSimulatorWindow** -- M-A olcum botu: play modda makul-oyuncu politikasi kosar,
+  her safakta gun-sonu metriklerini `Logs/LongRun/*.csv`'ye doker. Bkz. `LONG_RUN_SIMULATOR_ARCHITECTURE.md`.
 - **ArenaMapGeneratorWindow** -- seed-tabanli tek-tik izometrik arena uretici (gorsel). WorldVisualRoot tilemap'lerine biome zemin + noise-blend gecis + dekor + dekoratif yapi boyar; canli-sahne onizleme, tek-undo. Tile = Fantasy kingdom Tileset (duz Tile asset). Bkz. `ARENA_MAP_GENERATOR_ARCHITECTURE.md`.
 - **MapImporterWindow / GroundTileMapperWindow / BuildingTileComposerWindow** -- harita/zemin/bina tile araclari (cogu LEGACY town tarafi).
 - **SpriteAtlasGenerator** -- 4 karakter animasyon PNG'sini tek atlasa birlestir.

@@ -221,11 +221,11 @@ MonoBehaviour:
   ExtraEnemiesPerWave: 10
   SpawnBatchSize: 2
   SingleFrontEnabled: 1
-  FrontlineX: -6
+  FrontlineX: -0.5
   SpawnLineX: 13
   SpawnBandYHalf: 6.5
-  MoatXMin: -4
-  MoatXMax: -1.5
+  MoatXMin: 1.5
+  MoatXMax: 4
   MoatSlowMultiplier: 0.55
   MoatDamagePerSecond: 0
   ZombieBaseHP: 20

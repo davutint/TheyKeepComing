@@ -210,4 +210,7 @@ Ara hedef olarak "oynanabilir demo" = C1-C10 (store maddeleri haric).
   (okcu yerlesimi otomatik tilemap-oncelikli olur).
 - Bilinen acik teknik borc: TechTreeUI'de IsMobileMode guard'i (dalgalanma riski, dusuk oncelik);
   gercek cihaz hic test edilmedi; save yok.
-- SIRADAKI IS: owner gorsel boyama (M-0 kapanisi) + ardindan M-A (Olcum, tek-cephe duzeninde).
+- M-A HAZIRLIGI TAMAM (2026-07-06): `LongRunSimulatorWindow` olcum botu yazildi
+  (Window > DeadWalls > Long Run Simulator) — play testi owner'in tilemap boyamasi
+  bitince yapilacak.
+- SIRADAKI IS: owner gorsel boyama (M-0 kapanisi) -> M-A olcum kosulari (bot hazir).

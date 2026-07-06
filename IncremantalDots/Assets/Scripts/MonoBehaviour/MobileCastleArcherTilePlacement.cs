@@ -111,25 +111,31 @@ namespace DeadWalls
                     _spawnCells.Add(cell);
             }
 
-            Vector3 center = bounds.center;
+            // DUNYA pozisyonuna gore "ortadan disa" siralama: ilk okcular hattin ortasina,
+            // sonrakiler uclara dogru yayilir (izometrik grid'de hucre koordinati dunya
+            // eksenleriyle ortusmedigi icin dunya-Y uzerinden hesaplanir; eski merkez-aci
+            // siralamasi tek-cephe dikey duvarda tum okculari alt uca yigiyordu).
+            var worldPos = new Dictionary<Vector3Int, Vector3>(_spawnCells.Count);
+            float avgY = 0f;
+            foreach (Vector3Int cell in _spawnCells)
+            {
+                Vector3 w = spawnTilemap.GetCellCenterWorld(cell);
+                worldPos[cell] = w;
+                avgY += w.y;
+            }
+            if (_spawnCells.Count > 0)
+                avgY /= _spawnCells.Count;
+
             _spawnCells.Sort((a, b) =>
             {
-                float angleA = Mathf.Atan2(a.y + 0.5f - center.y, a.x + 0.5f - center.x);
-                float angleB = Mathf.Atan2(b.y + 0.5f - center.y, b.x + 0.5f - center.x);
-                int angleCompare = angleA.CompareTo(angleB);
-                if (angleCompare != 0)
-                    return angleCompare;
+                float distA = Mathf.Abs(worldPos[a].y - avgY);
+                float distB = Mathf.Abs(worldPos[b].y - avgY);
+                int distCompare = distA.CompareTo(distB);
+                if (distCompare != 0)
+                    return distCompare;
 
-                float distA = (a.x + 0.5f - center.x) * (a.x + 0.5f - center.x)
-                    + (a.y + 0.5f - center.y) * (a.y + 0.5f - center.y);
-                float distB = (b.x + 0.5f - center.x) * (b.x + 0.5f - center.x)
-                    + (b.y + 0.5f - center.y) * (b.y + 0.5f - center.y);
-                int distanceCompare = distB.CompareTo(distA);
-                if (distanceCompare != 0)
-                    return distanceCompare;
-
-                int yCompare = a.y.CompareTo(b.y);
-                return yCompare != 0 ? yCompare : a.x.CompareTo(b.x);
+                int yCompare = worldPos[a].y.CompareTo(worldPos[b].y);
+                return yCompare != 0 ? yCompare : worldPos[a].x.CompareTo(worldPos[b].x);
             });
 
             if (_spawnCells.Count > 0)
@@ -145,12 +151,21 @@ namespace DeadWalls
         {
             RegisterInstance();
             _cacheDirty = true;
+            // Boyama sirasinda gizmo/slot listesi CANLI guncellensin (cache bayatlamasin)
+            Tilemap.tilemapTileChanged += OnTilemapTileChanged;
         }
 
         private void OnDisable()
         {
+            Tilemap.tilemapTileChanged -= OnTilemapTileChanged;
             if (Instance == this)
                 Instance = null;
+        }
+
+        private void OnTilemapTileChanged(Tilemap tilemap, Tilemap.SyncTile[] tiles)
+        {
+            if (tilemap == spawnTilemap || (spawnTilemap == null && tilemap != null && tilemap.name == spawnTilemapName))
+                _cacheDirty = true;
         }
 
         private void OnValidate()
