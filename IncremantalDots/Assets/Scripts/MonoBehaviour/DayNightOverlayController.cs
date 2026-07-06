@@ -50,6 +50,10 @@ namespace DeadWalls
                 if (cycle.Phase == SiegeCyclePhase.Dusk)
                     return Mathf.Lerp(config.DayOverlayAlpha, config.NightOverlayAlpha, cycle.PhaseProgress01);
 
+                // Dawn: gece karartmasi safakla hizla acilir (odul/nefes fazi)
+                if (cycle.Phase == SiegeCyclePhase.Dawn)
+                    return Mathf.Lerp(config.NightOverlayAlpha, config.DayOverlayAlpha, cycle.PhaseProgress01);
+
                 return config.NightOverlayAlpha;
             }
 

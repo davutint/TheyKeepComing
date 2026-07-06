@@ -22,9 +22,11 @@ MonoBehaviour:
     Iron: 20
     Food: 0
   MaxLevel: 3
+  CostGrowthPerLevel: 0
   PrerequisiteNodeIds:
   - basic_archer
-  RevealChildNodeIds: []
+  RevealChildNodeIds:
+  - bow_mastery
   Effects:
   - Type: 2
     Value: 0.15

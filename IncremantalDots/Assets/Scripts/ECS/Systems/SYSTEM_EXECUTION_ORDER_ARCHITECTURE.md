@@ -54,15 +54,21 @@ Presentation tarafinda `SpriteAnimationSystem` UV rect hesaplarini yapar.
 
 ### ContinuousSiegeCycleSystem
 
-- Mobile continuous siege mode'da 60s `DAY / DUSK / NIGHT` cycle datasini yazar.
+- Mobile continuous siege mode'da 60s `DAY / DUSK / NIGHT / DAWN` (22/8/22/8) cycle datasini yazar;
+  `SiegeDawnDuration=0` bake'lerde legacy 3-faz davranisa duser.
+- Her tamamlanan cycle'da `CycleIndex` artar; `wave.CurrentWave = CycleIndex + 1` yazilir ve
+  `MobileWaveUtility.ConfigureMobileWave` ile zombi stat/pacing yeniden hesaplanir (kutle eskalasyonu:
+  HP lineer `ZombieBaseHP*(1+(w-1)*ZombieHpGrowthPerCycle)`, ustel DEGIL).
 - `WaveStateData.WaveActive` degerini uyumluluk icin true tutar ve eski DayPrep dur-kalk akisinin tetiklenmesini engeller.
-- `SpawnIntensityMultiplier` ve `HordePressure01` degerlerini `WaveSpawnSystem` ve HUD icin uretir.
+- `SpawnIntensityMultiplier` (Dawn 0.15 dahil) ve `HordePressure01` degerlerini `WaveSpawnSystem` ve HUD icin uretir.
 - Stress mode'da calismaz.
 
 ### WaveSpawnSystem
 
 - Mobile castle mode'da `MobileCastleCombatConfig` varsa spawn kale merkezi etrafindaki cemberden random aciyla yapilir.
 - Continuous siege aktifken spawn yonu random 360 kalir ve interval/batch `ContinuousSiegeCycleData.SpawnIntensityMultiplier` ile akar; wave clear kontrolu calismaz.
+- Continuous batch cycle ile de buyur: `SpawnBatchSize * intensity * (1 + (w-1)*SpawnBatchGrowthPerCycle)`, tavan `MaxSpawnBatch` (0 = sinirsiz).
+- Continuous modda `MaxAliveZombies` guvenlik tavani (0 = sinirsiz): cap doluyken spawn atlanir; guard timer resetinden ONCE calisir, yer acilinca hemen doldurulur.
 - Legacy mobile mode'da wave ici opening/mid/final fazlari interval ve batch'i degistirir.
 - Legacy mobile modda wave temizlenince wave clear bonus'u ekler, `WaveClearRewardData` yazar ve `Phase = DayPrep`, `WaveActive = false`, `PrepTimer = DayPrepDuration` yazar.
 - Worker economy aktifse wave clear bonus `WorkerEconomyRewardMultiplier` ile azaltilir.
@@ -81,7 +87,9 @@ Presentation tarafinda `SpriteAnimationSystem` UV rect hesaplarini yapar.
 
 - Mobile normal mode'da worker allocation'i clamp eder.
 - `ResourceProductionRate` ve `PopulationState.Workers/Idle` degerlerini yazar.
-- Continuous siege aktifken her tamamlanan cycle basina population growth uygular.
+- Continuous siege aktifken population growth DAWN fazinda uygulanir (cycle basina bir kez;
+  monotonik isaret degeri buyuk-dt'de Dawn frame'i kacsa bile odulu sonraki fazda telafi eder).
+  `DawnDuration=0` legacy bake'lerde eski wrap-tabanli davranis korunur.
 - Legacy mobile akista completed wave sonrasi DayPrep basinda population growth uygular.
 - Nadir economy event roll eder ve secili production bonusunu rate'lere uygular.
 - Stress mode'da calismaz.

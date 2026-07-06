@@ -67,6 +67,7 @@ namespace DeadWalls
         private bool _techTreeInitialized;
         private float _techDamageMultiplier = 1f;
         private float _techFireRateMultiplier = 1f;
+        private float _techRepairCostMultiplier = 1f;
         // Config/defense base degerleri: tech ilk dokunmadan once yakalanir, her satin almada
         // toplam etki base'ten YENIDEN hesaplanir (compound hatasi yok), restart'ta base geri yazilir.
         private bool _techConfigBaselineCaptured;
@@ -427,6 +428,9 @@ namespace DeadWalls
             if (!CanRepairDefenseFull())
                 return false;
 
+            if (!SpendResources(GetRepairCost()))
+                return false;
+
             bool repaired = RepairGate();
             if (repaired)
                 OnGameStateChanged?.Invoke();
@@ -434,17 +438,44 @@ namespace DeadWalls
             return repaired;
         }
 
+        /// <summary>
+        /// Continuous siege'de tamir HER ZAMAN denenebilir (DayPrep sarti kaldirildi — o faz
+        /// continuous akista hic olusmaz, repair fiilen olu bir yoldu). Kosul: kayip var + kaynak yeter.
+        /// </summary>
         public bool CanRepairDefenseFull()
         {
-            return CanAccessEntityManager()
+            return _initialized
+                && CanAccessEntityManager()
                 && _entityManager.Exists(_castleEntity)
+                && !GameState.IsGameOver
                 && GetDefensePercent() < 0.995f
-                && (!TryGetMobileConfigEntity(out _) || CanUseMobilePrepAction());
+                && CanAfford(GetRepairCost());
         }
 
+        /// <summary>
+        /// Tamir maliyeti kayip oraniyla olceklenir: tam kayipta config taban maliyeti
+        /// (RepairBaseWood/StoneCost), az hasarda orantili ucuz. Tech ReduceRepairCostPercent
+        /// carpani uygulanir. Ana ekonomi sink'lerinden biridir.
+        /// </summary>
         public ResourceCost GetRepairCost()
         {
-            return ResourceCost.Zero;
+            float missing = Mathf.Clamp01(1f - GetDefensePercent());
+            if (missing <= 0.005f)
+                return ResourceCost.Zero;
+
+            int baseWood = 120;
+            int baseStone = 80;
+            if (TryGetMobileCombatConfig(out var config))
+            {
+                if (config.RepairBaseWoodCost > 0) baseWood = config.RepairBaseWoodCost;
+                if (config.RepairBaseStoneCost > 0) baseStone = config.RepairBaseStoneCost;
+            }
+
+            float multiplier = missing * Mathf.Max(0.05f, _techRepairCostMultiplier);
+            return new ResourceCost(
+                Mathf.CeilToInt(baseWood * multiplier),
+                Mathf.CeilToInt(baseStone * multiplier),
+                0, 0);
         }
 
         public ResourceCost GetFortifyCost()
@@ -1307,13 +1338,35 @@ namespace DeadWalls
                 }
             }
 
-            if (!CanAfford(node.Cost))
+            var effectiveCost = GetTechNodeCost(node);
+            if (!CanAfford(effectiveCost))
             {
-                reason = node.Cost.ToNeedDisplayString(Resources);
+                reason = effectiveCost.ToNeedDisplayString(Resources);
                 return false;
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Node'un mevcut seviyeye gore efektif maliyeti: Cost * (1 + level * CostGrowthPerLevel).
+        /// Tekrarlanabilir sink node'lari (mastery) her seviyede pahalanir.
+        /// </summary>
+        public ResourceCost GetTechNodeCost(TechNodeDefinitionSO node)
+        {
+            if (node == null)
+                return ResourceCost.Zero;
+
+            float growth = Mathf.Max(0f, node.CostGrowthPerLevel);
+            if (growth <= 0f)
+                return node.Cost;
+
+            float scale = 1f + GetTechNodeLevel(node.Id) * growth;
+            return new ResourceCost(
+                Mathf.CeilToInt(node.Cost.Wood * scale),
+                Mathf.CeilToInt(node.Cost.Stone * scale),
+                Mathf.CeilToInt(node.Cost.Iron * scale),
+                Mathf.CeilToInt(node.Cost.Food * scale));
         }
 
         public bool TryBuyTechNode(string nodeId)
@@ -1326,7 +1379,7 @@ namespace DeadWalls
             if (!CanBuyTechNode(node, out _))
                 return false;
 
-            if (!SpendResources(node.Cost))
+            if (!SpendResources(GetTechNodeCost(node)))
                 return false;
 
             int newLevel = GetTechNodeLevel(node.Id) + 1;
@@ -1371,6 +1424,9 @@ namespace DeadWalls
                         break;
                     case TechNodeEffectType.IncreaseDefenseMaxHpPercent:
                         defenseDirty = true;
+                        break;
+                    case TechNodeEffectType.ReduceRepairCostPercent:
+                        _techRepairCostMultiplier *= Mathf.Clamp01(1f - effect.Value);
                         break;
                 }
             }
@@ -1546,6 +1602,7 @@ namespace DeadWalls
             _techTreeInitialized = false;
             _techDamageMultiplier = 1f;
             _techFireRateMultiplier = 1f;
+            _techRepairCostMultiplier = 1f;
 
             if (_techConfigBaselineCaptured && TryGetMobileConfigEntity(out var configEntity))
             {
@@ -2605,13 +2662,13 @@ namespace DeadWalls
                 StressTestMode = false
             });
 
-            // Kaynak resetle
+            // Kaynak resetle (setup tool GameStateAuthoring defaultlariyla senkron: 160/80/50/120)
             _entityManager.SetComponentData(_gameStateEntity, new ResourceData
             {
-                Wood = mobileMode ? 280 : 100,
-                Stone = mobileMode ? 120 : 50,
-                Iron = mobileMode ? 70 : 20,
-                Food = mobileMode ? 220 : 100
+                Wood = mobileMode ? 160 : 100,
+                Stone = mobileMode ? 80 : 50,
+                Iron = mobileMode ? 50 : 20,
+                Food = mobileMode ? 120 : 100
             });
 
             _entityManager.SetComponentData(_gameStateEntity, new ResourceProductionRate

@@ -32,13 +32,17 @@ namespace DeadWalls
             float dayDuration = math.max(0.1f, config.SiegeDayDuration);
             float duskDuration = math.max(0.1f, config.SiegeDuskDuration);
             float nightDuration = math.max(0.1f, config.SiegeNightDuration);
-            float authoredDuration = math.max(0.1f, dayDuration + duskDuration + nightDuration);
+            // Dawn: gece sonrasi odul/nefes fazi (GDD v5 4-faz dongusu). Eski bake'lerde alan 0
+            // gelirse dawn'siz 3-faz davranisina duser (geriye uyumlu).
+            float dawnDuration = math.max(0f, config.SiegeDawnDuration);
+            float authoredDuration = math.max(0.1f, dayDuration + duskDuration + nightDuration + dawnDuration);
             float cycleDuration = math.max(1f, config.SiegeCycleDuration);
             float durationScale = cycleDuration / authoredDuration;
 
             dayDuration *= durationScale;
             duskDuration *= durationScale;
             nightDuration *= durationScale;
+            dawnDuration *= durationScale;
 
             float timer = cycle.ValueRO.CycleTimer + SystemAPI.Time.DeltaTime;
             int wrappedCycles = 0;
@@ -69,11 +73,17 @@ namespace DeadWalls
                     math.max(0.01f, config.SiegeDuskEndIntensityMultiplier),
                     phaseProgress);
             }
-            else
+            else if (timer < dayDuration + duskDuration + nightDuration || dawnDuration <= 0f)
             {
                 phase = SiegeCyclePhase.Night;
                 phaseProgress = math.saturate((timer - dayDuration - duskDuration) / math.max(0.01f, nightDuration));
                 intensity = math.max(0.01f, config.SiegeNightIntensityMultiplier);
+            }
+            else
+            {
+                phase = SiegeCyclePhase.Dawn;
+                phaseProgress = math.saturate((timer - dayDuration - duskDuration - nightDuration) / math.max(0.01f, dawnDuration));
+                intensity = math.max(0.01f, config.SiegeDawnIntensityMultiplier > 0f ? config.SiegeDawnIntensityMultiplier : 0.15f);
             }
 
             int cycleIndex = math.max(0, cycle.ValueRO.CycleIndex + wrappedCycles);
@@ -83,6 +93,7 @@ namespace DeadWalls
             cycle.ValueRW.DayDuration = dayDuration;
             cycle.ValueRW.DuskDuration = duskDuration;
             cycle.ValueRW.NightDuration = nightDuration;
+            cycle.ValueRW.DawnDuration = dawnDuration;
             cycle.ValueRW.CycleProgress01 = math.saturate(timer / cycleDuration);
             cycle.ValueRW.PhaseProgress01 = phaseProgress;
             cycle.ValueRW.SpawnIntensityMultiplier = intensity;

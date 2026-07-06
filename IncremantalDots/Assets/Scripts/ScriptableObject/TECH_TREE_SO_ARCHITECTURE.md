@@ -24,6 +24,7 @@ Tek bir tech node'un sabit datasi. Runtime durum (seviye/reveal) burada tutulmaz
 | `PrerequisiteNodeIds` | Satin alma sarti: hepsi >=1 seviye sahipli olmali |
 | `RevealChildNodeIds` | ILK satin almada gorunur olan cocuklar; UI baglanti cizgileri de bu iliskiden cizilir |
 | `Effects` | `TechNodeEffect[]` — asagiya bak |
+| `CostGrowthPerLevel` | Efektif maliyet = `Cost * (1 + seviye * bu)`. Tekrarlanabilir sink node'lari (bow_mastery/volley_mastery, MaxLevel 20, 0.40) icin — agac tukenmez |
 
 ### TechNodeEffect (struct)
 
@@ -40,6 +41,7 @@ hedefi (`Balanced` = tum kaynaklar).
 | `IncreaseResourceProductionPercent` | `MobileCastleCombatConfig.XxxWorkerProductionPerMin` |
 | `IncreasePopulationGrowth` | `MobileCastleCombatConfig.PopulationGrowthPerDayPrep` (cycle basi buyume) |
 | `IncreaseDefenseMaxHpPercent` | Wall/Gate/CastleHP MaxHP; CurrentHP orani korunur |
+| `ReduceRepairCostPercent` | `GameManager._techRepairCostMultiplier` -> `GetRepairCost()` (repair sink'ini ucuzlatir) |
 
 BILINCLI OLMAYANLAR: `IncreasePopulationCapacity` (mobile modda Capacity hicbir seyi
 sinirlamiyor, her frame ratchet'leniyor — no-op olurdu), `RepairEfficiency` (repair su an
@@ -73,6 +75,9 @@ ucretsiz + aninda tam dolum; olceklenecek sey yok). Sahte/gosteris effect'i ekle
 
 Setup tool (`MobileCastleSceneSetupWindow`) default node'lari yalnizca EKSIKSE seed eder;
 katalogdaki ekstra node'lara ve mevcut asset degerlerine dokunmaz (merge-only).
+TEK ISTISNA: `EnsureTechRevealLinks` — sonradan eklenen seed node'larinin reveal edilebilmesi
+icin MEVCUT parent asset'lerin `RevealChildNodeIds` listesine eksik cocugu ADDITIVE ekler
+(silme yok, yalniz ekleme; ornek: bow_training -> bow_mastery).
 
 ## Iliskili
 

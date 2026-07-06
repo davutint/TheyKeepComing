@@ -219,7 +219,14 @@ MonoBehaviour:
   AttackRadius: 1.35
   BaseWaveEnemyCount: 30
   ExtraEnemiesPerWave: 10
-  SpawnBatchSize: 3
+  SpawnBatchSize: 2
+  ZombieBaseHP: 20
+  ZombieHpGrowthPerCycle: 0.3
+  ZombieBaseDamage: 5
+  ZombieDamagePerCycle: 0.5
+  SpawnBatchGrowthPerCycle: 0.1
+  MaxSpawnBatch: 12
+  MaxAliveZombies: 900
   ZombieScale: 1.4
   BaseZombieSpeed: 0.85
   ZombieSpeedPerWave: 0.04
@@ -230,7 +237,7 @@ MonoBehaviour:
   KillRewardFood: 0.6
   KillRewardStone: 0.25
   KillRewardIron: 0.15
-  KillRewardWaveScale: 0.05
+  KillRewardWaveScale: 0
   WaveClearWoodBase: 20
   WaveClearFoodBase: 15
   WaveClearStoneBase: 10
@@ -252,14 +259,18 @@ MonoBehaviour:
   UnlimitedArrows: 1
   ContinuousSiegeEnabled: 1
   SiegeCycleDuration: 60
-  SiegeDayDuration: 25
-  SiegeDuskDuration: 10
-  SiegeNightDuration: 25
+  SiegeDayDuration: 22
+  SiegeDuskDuration: 8
+  SiegeNightDuration: 22
+  SiegeDawnDuration: 8
   SiegeDayIntensityMultiplier: 0.55
   SiegeDuskStartIntensityMultiplier: 1
   SiegeDuskEndIntensityMultiplier: 1.35
   SiegeNightIntensityMultiplier: 1.65
-  BaseSpawnInterval: 0.8
+  SiegeDawnIntensityMultiplier: 0.15
+  RepairBaseWoodCost: 120
+  RepairBaseStoneCost: 80
+  BaseSpawnInterval: 0.95
   SpawnIntervalWaveMultiplier: 0.96
   MinSpawnInterval: 0.35
   OpeningEnemyRatio: 0.2
@@ -378,10 +389,10 @@ MonoBehaviour:
   SpawnInterval: 0.8
   WaveStartDelay: 3
   BaseZombieSpeed: 0.85
-  InitialWood: 280
-  InitialStone: 120
-  InitialIron: 70
-  InitialFood: 220
+  InitialWood: 160
+  InitialStone: 80
+  InitialIron: 50
+  InitialFood: 120
   TestWoodProdRate: 160
   TestStoneProdRate: 55
   TestIronProdRate: 30

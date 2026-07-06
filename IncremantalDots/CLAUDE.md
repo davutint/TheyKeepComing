@@ -39,17 +39,22 @@ Proje ilk GDD'lerdeki grid town-building / RTS vizyonundan CIKTI. Su an aktif ge
 ### Aktif oyun dongusu (Mobile Continuous Siege -- otoriter dok: `Systems/MOBILE_CASTLE_COMBAT_ARCHITECTURE.md` + `Systems/CONTINUOUS_SIEGE_CYCLE_SYSTEM_ARCHITECTURE.md`)
 360-derece merkezi kale savunmasi, SUREKLI akan kusatma. Player-facing "Start Next Wave" / "Wave Cleared" YOK; oyun durmaz.
 Otorite `ContinuousSiegeCycleData` (eski `WaveStateData.Phase` DEGIL):
-1. **Cycle (`ContinuousSiegeCycleSystem`)** -- 60s dongu: DAY 25s -> DUSK 10s -> NIGHT 25s. `ContinuousSiegeCycleData`
-   `Phase` + 60s progress + `SpawnIntensityMultiplier` + `HordePressure01` yazar. UI sadece `DAY/DUSK/NIGHT` gosterir.
-2. **Spawn** -- zombiler rastgele 360-ring'den spawn; `WaveSpawnSystem` wave-clear kontrolune GIRMEZ, interval/batch
-   intensity'ye gore akar (Day 0.55, Dusk 1.00 -> 1.35, Night 1.65). Gunduz overlay alpha 0 -> gece 0.50.
-3. **Reward** -- her tamamlanan 60s cycle basina population growth (+15). Kill reward kucuk
-   (`WorkerEconomyRewardMultiplier` ile azaltilir); ana gelir sol worker ekonomisi.
+1. **Cycle (`ContinuousSiegeCycleSystem`)** -- 60s dongu 4 FAZ: DAY 22s -> DUSK 8s -> NIGHT 22s -> DAWN 8s.
+   `ContinuousSiegeCycleData` `Phase` + progress + `SpawnIntensityMultiplier` + `HordePressure01` + `CycleIndex` yazar.
+   UI `DAY/DUSK/NIGHT/DAWN` + `CycleDayCounterText` ("DAY n") gosterir.
+2. **Spawn (kutle eskalasyonu)** -- zombiler rastgele 360-ring'den; interval/batch intensity'ye gore akar
+   (Day 0.55, Dusk 1.00 -> 1.35, Night 1.65, Dawn 0.15). Cycle ile: batch buyur (`SpawnBatchGrowthPerCycle`,
+   `MaxSpawnBatch` cap), HP LINEER buyur (`ZombieBaseHP*(1+(w-1)*ZombieHpGrowthPerCycle)` -- ustel DEGIL,
+   sunger degil kalabalik), `MaxAliveZombies` performans tavani. Gunduz overlay alpha 0 -> gece 0.50 -> Dawn'da acilir.
+3. **Reward (DAWN)** -- population growth (+15) DAWN fazinda verilir + `DawnRewardToastUI` toast'u.
+   Kill reward SABIT kalir (`KillRewardWaveScale=0`, gelir/zorluk ayrisik); ana gelir sol worker ekonomisi.
+   Repair artik MALIYETLI (kayip-orantili, `DefenseRepairUI` butonu) -- ana sink'lerden biri.
 4. **Economy events** (`MobileEconomyEventState`) -- legacy DayPrep akisinda rollanir; continuous'ta player-facing degil.
 - **LEGACY (kodda durur, `ContinuousSiegeCycleData.Enabled` true iken DEVRE DISI):** `WaveStateData.Phase` DayPrep/NightCombat,
   Wave-clear reward (`WaveClearRewardData`), `Start Next Wave`, `Repair/Fortify/Rally`, intra-wave director pacing.
 - Anahtarlar `MobileCastleCombatConfig`'te: CastleCenter (0,0), SpawnRadius 11, AttackRadius 1.35,
-  `UnlimitedArrows=true`, continuous cycle 60s (25/10/25) + intensity, worker uretim/cap/odul carpani (detay icin doc).
+  `UnlimitedArrows=true`, continuous cycle 60s (22/8/22/8) + intensity + kutle eskalasyonu + repair maliyeti,
+  worker uretim/cap/odul carpani (detay icin doc).
 - BIRAKILAN GDD ozellikleri: grid town-building, lane/telegraph wave, manuel RTS okcu yerlestirme, manuel Start Next Wave /
   wave-clear ekrani, XP level-up kartlari, ok stogu yonetimi -- hepsi mobile loop'ta YOK.
 
@@ -61,7 +66,9 @@ Otorite `ContinuousSiegeCycleData` (eski `WaveStateData.Phase` DEGIL):
 | Worker economy drawer (sol) | `WorkerEconomyDrawerUI.cs` | resource bar alti; Wood/Stone/Iron/Food `+ WORKER` assignment -- AKTIF ana ekonomi |
 | Archer recruitment drawer (sag) | `MarketUI.cs` | SO-driven `ArcherDefinitionSO` catalog'dan row basar; SADECE okcu satin alma (Buy); upgrade/ArrowTech/Repair/Fortify/Rally/StartNextWave player-facing GIZLI |
 | Tech Tree (fullscreen) | `TechTreeUI.cs` | SO-driven dinamik reveal grafi: `TechNodeDefinitionSO`+`TechTreeCatalogSO`, root `castle_heart` sahipli baslar, satin alma cocuklari acar; Rapid/Frost unlock BURADAN gelir; panel acikken oyun DURMAZ; kategori/tier YOK |
-| Gun/Gece overlay | `DayNightOverlayController.cs` | faz alpha (Day 0 -> Night 0.50) |
+| Gun/Gece overlay | `DayNightOverlayController.cs` | faz alpha (Day 0 -> Night 0.50 -> Dawn'da geri acilir) |
+| Defense repair butonu | `DefenseRepairUI.cs` | CastleDefensePanel'de REPAIR + kayip-orantili maliyet etiketi; her zaman denenebilir (DayPrep sarti YOK) |
+| Dawn odul toast'u | `DawnRewardToastUI.cs` | faz Dawn'a gecince "DAWN - DAY n SURVIVED +15 POP" (SiegeToastText) |
 | Castle Interior ekonomi paneli | `CastleEconomyUI.cs` | LEGACY/debug (`PlayerFacingPanelEnabled=false`); ana ekonomi sol drawer'a tasindi |
 | Kaleye tikla-ac tetikleyici | `CastleInteriorClickTarget.cs` | LEGACY; player-facing worker yonetimi sol drawer'da |
 

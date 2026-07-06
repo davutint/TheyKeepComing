@@ -22,10 +22,12 @@ MonoBehaviour:
     Iron: 50
     Food: 0
   MaxLevel: 1
+  CostGrowthPerLevel: 0
   PrerequisiteNodeIds:
   - basic_archer
   RevealChildNodeIds:
   - rapid_archer
+  - volley_mastery
   Effects:
   - Type: 3
     Value: 0.12

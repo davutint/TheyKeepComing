@@ -10,25 +10,24 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cd1a2ac33dcbea94ebf0eadaff16ae71, type: 3}
-  m_Name: RepairCrew
+  m_Name: RepairEfficiency
   m_EditorClassIdentifier: DeadWalls::DeadWalls.TechNodeDefinitionSO
-  Id: repair_crew
-  Title: Repair Crew
-  Description: Dedicated crews thicken every rampart. +20% defense max HP.
+  Id: repair_efficiency
+  Title: Repair Efficiency
+  Description: -20% repair cost per level.
   Icon: {fileID: 0}
   Cost:
     Wood: 0
-    Stone: 90
-    Iron: 40
+    Stone: 80
+    Iron: 50
     Food: 0
-  MaxLevel: 1
+  MaxLevel: 2
   CostGrowthPerLevel: 0
   PrerequisiteNodeIds:
-  - wall_reinforcement
-  RevealChildNodeIds:
-  - repair_efficiency
+  - repair_crew
+  RevealChildNodeIds: []
   Effects:
-  - Type: 7
+  - Type: 8
     Value: 0.2
     ArcherType: 0
     Resource: 0

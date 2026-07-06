@@ -11,6 +11,14 @@ namespace DeadWalls
         public int BaseWaveEnemyCount;
         public int ExtraEnemiesPerWave;
         public int SpawnBatchSize;
+        // Kutle-odakli eskalasyon: HP lineer buyur (sunger degil), batch cycle ile buyur (kalabalik artar)
+        public float ZombieBaseHP;
+        public float ZombieHpGrowthPerCycle;
+        public float ZombieBaseDamage;
+        public float ZombieDamagePerCycle;
+        public float SpawnBatchGrowthPerCycle;
+        public int MaxSpawnBatch;
+        public int MaxAliveZombies;
         public float ZombieScale;
         public float BaseZombieSpeed;
         public float ZombieSpeedPerWave;
@@ -67,17 +75,23 @@ namespace DeadWalls
         public float SiegeDayDuration;
         public float SiegeDuskDuration;
         public float SiegeNightDuration;
+        public float SiegeDawnDuration;
         public float SiegeDayIntensityMultiplier;
         public float SiegeDuskStartIntensityMultiplier;
         public float SiegeDuskEndIntensityMultiplier;
         public float SiegeNightIntensityMultiplier;
+        public float SiegeDawnIntensityMultiplier;
+        // Repair maliyeti: tam kayipta odenen taban (kayip oranıyla olceklenir)
+        public int RepairBaseWoodCost;
+        public int RepairBaseStoneCost;
     }
 
     public enum SiegeCyclePhase : byte
     {
         Day,
         Dusk,
-        Night
+        Night,
+        Dawn
     }
 
     public struct ContinuousSiegeCycleData : IComponentData
@@ -88,6 +102,7 @@ namespace DeadWalls
         public float DayDuration;
         public float DuskDuration;
         public float NightDuration;
+        public float DawnDuration;
         public float CycleProgress01;
         public float PhaseProgress01;
         public float SpawnIntensityMultiplier;

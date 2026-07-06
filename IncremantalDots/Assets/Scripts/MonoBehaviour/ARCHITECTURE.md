@@ -97,6 +97,19 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - `TechTreeInputMode` enum (`Auto/Desktop/Mobile`): Desktop = tekerlek imlec-merkezli zoom + orta tus pan; Mobile = pinch zoom (orta-nokta merkezli) + tek parmak pan; Auto platforma gore secer
 - Zoom `content.localScale` ile (layout sabit); alt sinir icerik viewport'a sigiyorsa 1'e clamp; pinch sirasinda ScrollRect gecici kapatilir
 
+### DefenseRepairUI.cs
+
+- CastleDefensePanel'deki player-facing REPAIR butonunun controller'i (HUD root'ta ayri component)
+- Tamir continuous siege sirasinda HER ZAMAN denenebilir (eski DayPrep sarti kaldirildi — continuous'ta olu yoldu)
+- Maliyet kayip-orantili: `GameManager.GetRepairCost()` = `ceil(RepairBase * kayipOrani * techCarpani)`; taban config'te (120W/80S tam kayipta)
+- `repair_efficiency` tech node'u (`ReduceRepairCostPercent`) maliyeti dusurur
+- Basarida punch, reddetmede shake (DOTween); 0.25s poll ile cost etiketi/interactable
+
+### DawnRewardToastUI.cs
+
+- Faz DAWN'a gectiginde bir kez "DAWN — DAY n SURVIVED  +N POP" toast'u (SiegeToastText, DOTween fade)
+- Nufus odulunu MobilePopulationEconomySystem verir; bu controller yalnizca ani GORUNUR kilar (GDD 4-faz odul vurusu)
+
 ### DayNightOverlayController.cs
 
 - `Canvas/DayNightOverlay` full-screen black `Image` alpha degerini yonetir.

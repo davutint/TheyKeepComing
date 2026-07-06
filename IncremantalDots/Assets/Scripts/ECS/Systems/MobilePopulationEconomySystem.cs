@@ -53,13 +53,35 @@ namespace DeadWalls
         private static void ApplyContinuousCycleGrowth(ref MobilePopulationAllocation allocation,
             ref PopulationState population, MobileCastleCombatConfig config, ContinuousSiegeCycleData cycle)
         {
-            if (!cycle.Enabled || cycle.CycleIndex <= 0 || allocation.LastPopulationGrowthCycle == cycle.CycleIndex)
+            if (!cycle.Enabled)
                 return;
+
+            // Odul ani DAWN'a tasindi (GDD 4-faz): geceyi atlatinca gorunur nufus odulu.
+            // Dawn fazi yoksa (legacy 3-faz bake) eski davranis: cycle wrap'inde ver.
+            bool dawnConfigured = cycle.DawnDuration > 0f;
+            if (dawnConfigured)
+            {
+                // Isaret degeri: Dawn sirasinda BU cycle'in odulu (CycleIndex+1, cunku CycleIndex
+                // Dawn'da henuz artmadi); diger fazlarda EN SON TAMAMLANAN cycle'in odulu (CycleIndex).
+                // Monotonik >= kontrolu hem cift-odulu engeller hem de cok buyuk dt / cok kisa Dawn
+                // yuzunden Dawn frame'i hic gorulmezse odulu bir sonraki fazda TELAFI eder.
+                int rewardCycle = cycle.Phase == SiegeCyclePhase.Dawn ? cycle.CycleIndex + 1 : cycle.CycleIndex;
+                if (rewardCycle <= 0 || allocation.LastPopulationGrowthCycle >= rewardCycle)
+                    return;
+
+                allocation.LastPopulationGrowthCycle = rewardCycle;
+            }
+            else
+            {
+                if (cycle.CycleIndex <= 0 || allocation.LastPopulationGrowthCycle == cycle.CycleIndex)
+                    return;
+
+                allocation.LastPopulationGrowthCycle = cycle.CycleIndex;
+            }
 
             population.Total += math.max(0, config.PopulationGrowthPerDayPrep);
             population.Capacity = math.max(population.Capacity, population.Total);
             population.BaseCapacity = math.max(population.BaseCapacity, population.Capacity);
-            allocation.LastPopulationGrowthCycle = cycle.CycleIndex;
         }
 
         private static void ApplyDayPrepStart(ref MobilePopulationAllocation allocation,

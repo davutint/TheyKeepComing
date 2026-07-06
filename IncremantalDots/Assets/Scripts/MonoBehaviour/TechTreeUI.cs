@@ -675,7 +675,7 @@ namespace DeadWalls
                 return;
             }
 
-            var cost = def.Cost;
+            var cost = gm.GetTechNodeCost(def);
             bool unlockedSomething = false;
             ArcherType unlockedType = ArcherType.Basic;
             if (def.Effects != null)
@@ -751,7 +751,7 @@ namespace DeadWalls
                 SetText(view.LevelText, def.MaxLevel > 1 ? $"LV {level}/{def.MaxLevel}" : (owned ? "LV 1" : string.Empty));
             }
 
-            string costLabel = maxed ? string.Empty : def.Cost.ToDisplayString();
+            string costLabel = maxed ? string.Empty : gm.GetTechNodeCost(def).ToDisplayString();
             if (!maxed && string.IsNullOrEmpty(costLabel))
                 costLabel = "FREE";
             SetText(view.CostText, costLabel);

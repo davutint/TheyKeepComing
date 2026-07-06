@@ -45,6 +45,7 @@ namespace DeadWalls
         [Header("Continuous Siege")]
         public GameObject CyclePanel;
         public TMP_Text CyclePhaseText;
+        public TMP_Text CycleDayCounterText;
         public TMP_Text CycleDayLabelText;
         public TMP_Text CycleDuskLabelText;
         public TMP_Text CycleNightLabelText;
@@ -337,6 +338,13 @@ namespace DeadWalls
             string phase = FormatSiegePhase(cycle.Phase);
             if (CyclePhaseText != null)
                 CyclePhaseText.text = phase;
+            if (CycleDayCounterText != null)
+            {
+                // Gun sayaci: sonsuz kusatmada "ne kadar dayandim" hedef hissi (skor)
+                string dayLabel = "DAY " + Mathf.Max(1, cycle.CycleIndex + 1);
+                if (CycleDayCounterText.text != dayLabel)
+                    CycleDayCounterText.text = dayLabel;
+            }
             if (CycleDayLabelText != null)
                 CycleDayLabelText.text = "DAY";
             if (CycleDuskLabelText != null)
@@ -535,6 +543,8 @@ namespace DeadWalls
                     return "DUSK";
                 case SiegeCyclePhase.Night:
                     return "NIGHT";
+                case SiegeCyclePhase.Dawn:
+                    return "DAWN";
                 default:
                     return "DAY";
             }

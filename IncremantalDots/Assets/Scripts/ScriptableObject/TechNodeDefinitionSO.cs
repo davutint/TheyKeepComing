@@ -30,6 +30,9 @@ namespace DeadWalls
 
         /// <summary>Wall/Gate/Core MaxHP degerlerini yuzdesel arttirir; CurrentHP orani korunur.</summary>
         IncreaseDefenseMaxHpPercent = 7,
+
+        /// <summary>Tamir maliyetini yuzdesel dusurur (Value 0.20 = -%20). Coklu seviye carpimsal birikir.</summary>
+        ReduceRepairCostPercent = 8,
     }
 
     /// <summary>
@@ -71,6 +74,9 @@ namespace DeadWalls
         [Header("Purchase")]
         public ResourceCost Cost = new ResourceCost(40, 0, 0, 0);
         [Min(1)] public int MaxLevel = 1;
+
+        [Tooltip("Seviye basina maliyet buyumesi: efektif maliyet = Cost * (1 + level * bu). 0 = sabit maliyet. Tekrarlanabilir sink node'lari icin kullanilir.")]
+        [Min(0f)] public float CostGrowthPerLevel;
 
         [Header("Graph")]
         [Tooltip("Satin alinabilmek icin sahip olunmasi (>=1 seviye) gereken node Id'leri.")]

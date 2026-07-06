@@ -223,10 +223,11 @@ namespace DeadWalls
             gameStateAuthoring.SpawnInterval = 0.8f;
             gameStateAuthoring.WaveStartDelay = 3f;
             gameStateAuthoring.BaseZombieSpeed = 0.85f;
-            gameStateAuthoring.InitialWood = 280;
-            gameStateAuthoring.InitialStone = 120;
-            gameStateAuthoring.InitialIron = 70;
-            gameStateAuthoring.InitialFood = 220;
+            // Balance: baslangic kaynaklari ilk dakikalarda secim baskisi yaratacak duzeye cekildi
+            gameStateAuthoring.InitialWood = 160;
+            gameStateAuthoring.InitialStone = 80;
+            gameStateAuthoring.InitialIron = 50;
+            gameStateAuthoring.InitialFood = 120;
             gameStateAuthoring.TestWoodProdRate = 160f;
             gameStateAuthoring.TestStoneProdRate = 55f;
             gameStateAuthoring.TestIronProdRate = 30f;
@@ -264,7 +265,14 @@ namespace DeadWalls
             mobileAuthoring.AttackRadius = 1.35f;
             mobileAuthoring.BaseWaveEnemyCount = 30;
             mobileAuthoring.ExtraEnemiesPerWave = 10;
-            mobileAuthoring.SpawnBatchSize = 3;
+            mobileAuthoring.SpawnBatchSize = 2;
+            mobileAuthoring.ZombieBaseHP = 20f;
+            mobileAuthoring.ZombieHpGrowthPerCycle = 0.30f;
+            mobileAuthoring.ZombieBaseDamage = 5f;
+            mobileAuthoring.ZombieDamagePerCycle = 0.5f;
+            mobileAuthoring.SpawnBatchGrowthPerCycle = 0.10f;
+            mobileAuthoring.MaxSpawnBatch = 12;
+            mobileAuthoring.MaxAliveZombies = 900;
             mobileAuthoring.ZombieScale = 1.4f;
             mobileAuthoring.BaseZombieSpeed = 0.85f;
             mobileAuthoring.ZombieSpeedPerWave = 0.04f;
@@ -275,7 +283,7 @@ namespace DeadWalls
             mobileAuthoring.KillRewardFood = 0.6f;
             mobileAuthoring.KillRewardStone = 0.25f;
             mobileAuthoring.KillRewardIron = 0.15f;
-            mobileAuthoring.KillRewardWaveScale = 0.05f;
+            mobileAuthoring.KillRewardWaveScale = 0f; // gelir/zorluk ayrismasi: kill odulu cycle ile buyumez
             mobileAuthoring.WaveClearWoodBase = 20;
             mobileAuthoring.WaveClearFoodBase = 15;
             mobileAuthoring.WaveClearStoneBase = 10;
@@ -297,14 +305,18 @@ namespace DeadWalls
             mobileAuthoring.UnlimitedArrows = true;
             mobileAuthoring.ContinuousSiegeEnabled = true;
             mobileAuthoring.SiegeCycleDuration = 60f;
-            mobileAuthoring.SiegeDayDuration = 25f;
-            mobileAuthoring.SiegeDuskDuration = 10f;
-            mobileAuthoring.SiegeNightDuration = 25f;
+            mobileAuthoring.SiegeDayDuration = 22f;
+            mobileAuthoring.SiegeDuskDuration = 8f;
+            mobileAuthoring.SiegeNightDuration = 22f;
+            mobileAuthoring.SiegeDawnDuration = 8f;
             mobileAuthoring.SiegeDayIntensityMultiplier = 0.55f;
             mobileAuthoring.SiegeDuskStartIntensityMultiplier = 1f;
             mobileAuthoring.SiegeDuskEndIntensityMultiplier = 1.35f;
             mobileAuthoring.SiegeNightIntensityMultiplier = 1.65f;
-            mobileAuthoring.BaseSpawnInterval = 0.8f;
+            mobileAuthoring.SiegeDawnIntensityMultiplier = 0.15f;
+            mobileAuthoring.RepairBaseWoodCost = 120;
+            mobileAuthoring.RepairBaseStoneCost = 80;
+            mobileAuthoring.BaseSpawnInterval = 0.95f;
             mobileAuthoring.SpawnIntervalWaveMultiplier = 0.96f;
             mobileAuthoring.MinSpawnInterval = 0.35f;
             mobileAuthoring.OpeningEnemyRatio = 0.20f;
@@ -816,6 +828,7 @@ namespace DeadWalls
             public string Description;
             public ResourceCost Cost;
             public int MaxLevel;
+            public float CostGrowthPerLevel;
             public string[] Prerequisites;
             public string[] RevealChildren;
             public TechNodeEffect[] Effects;
@@ -942,7 +955,68 @@ namespace DeadWalls
                     RevealChildren = new string[0],
                     Effects = new[] { new TechNodeEffect { Type = TechNodeEffectType.UnlockArcherType, ArcherType = ArcherType.Frost } }
                 },
+                // Tekrarlanabilir sink node'lari: yuksek MaxLevel + seviye basina buyuyen maliyet.
+                // Gec oyunda kaynaklarin her zaman gidecegi bir yer olur; tech tree tukenmez.
+                new TechNodeSeed
+                {
+                    Id = "bow_mastery", Title = "Bow Mastery",
+                    Description = "+6% archer damage per level. Endless drills.",
+                    Cost = new ResourceCost(70, 0, 30, 0), MaxLevel = 20, CostGrowthPerLevel = 0.40f,
+                    Prerequisites = new[] { "bow_training" },
+                    RevealChildren = new string[0],
+                    Effects = new[] { new TechNodeEffect { Type = TechNodeEffectType.ModifyArcherDamagePercent, Value = 0.06f } }
+                },
+                new TechNodeSeed
+                {
+                    Id = "volley_mastery", Title = "Volley Mastery",
+                    Description = "+5% archer fire rate per level.",
+                    Cost = new ResourceCost(80, 0, 40, 0), MaxLevel = 20, CostGrowthPerLevel = 0.40f,
+                    Prerequisites = new[] { "rapid_volley" },
+                    RevealChildren = new string[0],
+                    Effects = new[] { new TechNodeEffect { Type = TechNodeEffectType.ModifyArcherFireRatePercent, Value = 0.05f } }
+                },
+                new TechNodeSeed
+                {
+                    Id = "repair_efficiency", Title = "Repair Efficiency",
+                    Description = "-20% repair cost per level.",
+                    Cost = new ResourceCost(0, 80, 50, 0), MaxLevel = 2,
+                    Prerequisites = new[] { "repair_crew" },
+                    RevealChildren = new string[0],
+                    Effects = new[] { new TechNodeEffect { Type = TechNodeEffectType.ReduceRepairCostPercent, Value = 0.20f } }
+                },
             };
+        }
+
+        /// <summary>
+        /// Reveal iliskisi merge'u: seed tablosundaki parent -> child baglantilarini MEVCUT parent
+        /// asset'lerine ADDITIVE ekler (silme yok, sadece eksik ekleme — owner editleri korunur).
+        /// Bu olmadan sonradan eklenen seed node'lari asla reveal edilmezdi (parent asset'ler
+        /// diskte eski listeleriyle durur, EnsureTechNodeAsset mevcut asset'e dokunmaz).
+        /// </summary>
+        private static readonly (string parentId, string childId)[] TechRevealLinks =
+        {
+            ("bow_training", "bow_mastery"),
+            ("rapid_volley", "volley_mastery"),
+            ("repair_crew", "repair_efficiency"),
+        };
+
+        private static void EnsureTechRevealLinks(TechTreeCatalogSO catalog)
+        {
+            foreach (var (parentId, childId) in TechRevealLinks)
+            {
+                var parent = catalog.GetNode(parentId);
+                if (parent == null || catalog.GetNode(childId) == null)
+                    continue;
+
+                var children = parent.RevealChildNodeIds ?? Array.Empty<string>();
+                if (Array.IndexOf(children, childId) >= 0)
+                    continue;
+
+                Undo.RecordObject(parent, "Add Tech Reveal Link");
+                var merged = new List<string>(children) { childId };
+                parent.RevealChildNodeIds = merged.ToArray();
+                EditorUtility.SetDirty(parent);
+            }
         }
 
         private static TechTreeCatalogSO EnsureDefaultTechTreeCatalog()
@@ -994,6 +1068,8 @@ namespace DeadWalls
                 EditorUtility.SetDirty(catalog);
             }
 
+            EnsureTechRevealLinks(catalog);
+
             var problems = catalog.ValidateCatalog();
             foreach (var problem in problems)
                 Debug.LogWarning($"[MobileCastleSceneSetup] TechTreeCatalog: {problem}", catalog);
@@ -1015,6 +1091,7 @@ namespace DeadWalls
             node.Icon = null; // simdilik bilerek bos; UI bas-harf placeholder gosterir
             node.Cost = seed.Cost;
             node.MaxLevel = Mathf.Max(1, seed.MaxLevel);
+            node.CostGrowthPerLevel = Mathf.Max(0f, seed.CostGrowthPerLevel);
             node.PrerequisiteNodeIds = seed.Prerequisites ?? new string[0];
             node.RevealChildNodeIds = seed.RevealChildren ?? new string[0];
             node.Effects = seed.Effects ?? new TechNodeEffect[0];
@@ -1548,6 +1625,7 @@ namespace DeadWalls
             hud.WaveRewardText.gameObject.SetActive(false);
             BindDefenseHudFields(hudRoot, hud);
             BindContinuousSiegeHudFields(hudRoot, hud);
+            hud.CycleDayCounterText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "CycleDayCounterText");
             if (hasCycleHud)
             {
                 SetOptionalChildActive(hudRoot, "WaveText", false);
@@ -1579,6 +1657,31 @@ namespace DeadWalls
             HidePlayerFacingArcherProgressionControls(market);
 
             ConfigureTechTree(hudRoot);
+            ConfigureDefenseRepair(hudRoot);
+            ConfigureDawnToast(hudRoot);
+        }
+
+        /// <summary>Player-facing REPAIR butonu (CastleDefensePanel) + kayip-orantili maliyet etiketi.</summary>
+        private static void ConfigureDefenseRepair(GameObject hudRoot)
+        {
+            var repairUi = EnsureComponent<DefenseRepairUI>(hudRoot);
+            repairUi.RepairButton = FindComponentInChildrenByName<Button>(hudRoot, "DefenseRepairButton");
+            repairUi.RepairCostText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "DefenseRepairCostText");
+        }
+
+        /// <summary>DAWN odul toast'u: faz Dawn'a gecince gorunur nufus odulu bildirimi.</summary>
+        private static void ConfigureDawnToast(GameObject hudRoot)
+        {
+            var dawnToast = EnsureComponent<DawnRewardToastUI>(hudRoot);
+            var toast = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "SiegeToastText");
+            if (toast == null)
+            {
+                toast = EnsureText(hudRoot.transform, "SiegeToastText", "DAWN", 18,
+                    TextAlignmentOptions.Center, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
+                    new Vector2(-220f, 224f), new Vector2(232f, 258f));
+                toast.raycastTarget = false;
+            }
+            dawnToast.ToastText = toast;
         }
 
         /// <summary>

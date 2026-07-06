@@ -8,8 +8,17 @@ namespace DeadWalls
         {
             int waveNumber = math.max(1, wave.CurrentWave);
             wave.ZombiesToSpawn = config.BaseWaveEnemyCount + (waveNumber - 1) * config.ExtraEnemiesPerWave;
-            wave.ZombieHP = 20f * math.pow(waveNumber, 1.2f);
-            wave.ZombieDamage = 5f + (waveNumber - 1) * 0.5f;
+
+            // Kutle-odakli eskalasyon: HP LINEER buyur (eski 20*w^1.2 ustel egri zombileri
+            // "sungerlestiriyordu"; zorluk artisi kalabaliktan gelmeli — GDD pillar #1).
+            // Eski bake'lerle uyumluluk icin config 0 ise legacy tabanlara duser.
+            float baseHp = config.ZombieBaseHP > 0f ? config.ZombieBaseHP : 20f;
+            float hpGrowth = math.max(0f, config.ZombieHpGrowthPerCycle);
+            wave.ZombieHP = baseHp * (1f + (waveNumber - 1) * hpGrowth);
+
+            float baseDamage = config.ZombieBaseDamage > 0f ? config.ZombieBaseDamage : 5f;
+            wave.ZombieDamage = baseDamage + (waveNumber - 1) * math.max(0f, config.ZombieDamagePerCycle);
+
             wave.ZombieSpeed = config.BaseZombieSpeed + (waveNumber - 1) * config.ZombieSpeedPerWave;
             wave.SpawnInterval = math.max(
                 config.MinSpawnInterval,

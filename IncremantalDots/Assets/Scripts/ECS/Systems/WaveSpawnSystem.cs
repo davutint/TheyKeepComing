@@ -225,11 +225,27 @@ namespace DeadWalls
             if (wave.SpawnTimer > 0f)
                 return;
 
+            // Performans guvenlik tavani: canli zombi sayisi siniri (0 = sinirsiz, legacy bake).
+            // Guard TIMER RESETINDEN ONCE: cap doluyken interval bosa yanmaz, yer acilinca
+            // hemen spawn edilir (stress dali ile ayni semantik).
+            int maxAlive = mobileConfig.MaxAliveZombies > 0 ? mobileConfig.MaxAliveZombies : int.MaxValue;
+            if (wave.ZombiesAlive >= maxAlive)
+                return;
+
             float intensity = math.max(0.01f, cycle.SpawnIntensityMultiplier);
             float baseInterval = wave.SpawnInterval > 0f ? wave.SpawnInterval : mobileConfig.BaseSpawnInterval;
             wave.SpawnTimer = math.max(mobileConfig.MinSpawnInterval, baseInterval / intensity);
 
-            int batchSize = math.max(1, (int)math.round(math.max(1, mobileConfig.SpawnBatchSize) * intensity));
+            // Kutle eskalasyonu: batch faz intensity'sine EK olarak cycle sayisiyla da buyur
+            // (tempo MinSpawnInterval tabaninda doyduktan sonra kalabalik artmaya devam etsin)
+            float cycleGrowth = 1f + (math.max(1, wave.CurrentWave) - 1) * math.max(0f, mobileConfig.SpawnBatchGrowthPerCycle);
+            int batchSize = math.max(1, (int)math.round(math.max(1, mobileConfig.SpawnBatchSize) * intensity * cycleGrowth));
+            if (mobileConfig.MaxSpawnBatch > 0)
+                batchSize = math.min(batchSize, mobileConfig.MaxSpawnBatch);
+            batchSize = math.min(batchSize, maxAlive - wave.ZombiesAlive);
+            if (batchSize <= 0)
+                return;
+
             SpawnZombieBatch(ref state, ref wave, batchSize, true, mobileConfig);
         }
 
