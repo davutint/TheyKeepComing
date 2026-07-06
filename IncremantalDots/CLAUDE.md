@@ -77,6 +77,9 @@ Otorite `ContinuousSiegeCycleData` (eski `WaveStateData.Phase` DEGIL):
 | Kaleye tikla-ac tetikleyici | `CastleInteriorClickTarget.cs` | LEGACY; player-facing worker yonetimi sol drawer'da |
 
 ### Su anki pusula (takip kaynaklari) -- ROADMAP DEGIL
+- **YON VE KAPSAM OTORITESI:** `Assets/Docs/DEAD_WALLS_MASTER_PLAN.md` — "oyun ne olacak,
+  ne kaldi, ne yapilmayacak" sorularinin TEK cevabi. KURAL: durum degistiren her calisma
+  oturumunun sonunda guncellenir (sorumlu: Claude). Kilitlenecek K1/K2/K3 kararlari orada.
 - **Guncel tasarim GDD'si:** `Assets/Docs/DEAD_WALLS_GDD_v5.0.md` (Mobile Continuous Siege + Castle Interior Economy). GDD v2-v4 = legacy.
 - **Canli takip:** ozellik-bazli mobile docs:
   `Systems/MOBILE_CASTLE_COMBAT_ARCHITECTURE.md`, `Systems/CONTINUOUS_SIEGE_CYCLE_SYSTEM_ARCHITECTURE.md`,
@@ -85,6 +88,9 @@ Otorite `ContinuousSiegeCycleData` (eski `WaveStateData.Phase` DEGIL):
   `MonoBehaviour/TECH_TREE_UI_ARCHITECTURE.md`, `ScriptableObject/TECH_TREE_SO_ARCHITECTURE.md`,
   `MonoBehaviour/CASTLE_ECONOMY_UI_ARCHITECTURE.md`, `Editor/MOBILE_CASTLE_SCENE_SETUP_ARCHITECTURE.md`.
 - **Aktif yon:** mobile continuous siege + sol castle interior worker economy + combat/UI polish. **M-ISO (izometrik/perimeter) ARTIK AKTIF DEGIL.**
+- **PIVOT KARARI (2026-07-06, K4 — henuz implemente EDILMEDI):** 360-ring spawn terk edildi;
+  dusmanlar yalniz SAGDAN gelecek (solda us/ekonomi, ortada duvar+hendek+kule hatti, okcu-duvar
+  modeli). Kod su an HALA 360-ring calisiyor; implementasyon = MASTER_PLAN M-0 milestone'u.
 - `Assets/Docs/ROADMAP.md` (son guncelleme 2026-03-18) = LEGACY milestone gecmisi, guncel yon DEGIL.
 
 ---
