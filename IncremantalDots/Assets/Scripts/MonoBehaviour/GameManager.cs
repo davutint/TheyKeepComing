@@ -93,9 +93,13 @@ namespace DeadWalls
         private readonly List<string> _recentCouncilTemplates = new List<string>();
         private readonly HashSet<string> _usedOneShotCouncils = new HashSet<string>();
         private ComposedCouncilEvent _activeCouncilEvent;
-        private int _councilDaysSinceEvent;
+        // 99 = ilk safakta pity garantisi (meclis ilk sabah toplanir — onboarding)
+        private int _councilDaysSinceEvent = 99;
         private int _councilCooldownRemaining;
         private int _lastCouncilRollDay = -1;
+        // Kosu basina rastgele tuz: sabit seed'in "ilk 3 gun HER kosuda bos" evrensel
+        // kaderini kirar; kosu ICINDE determinizm korunur (gun basina tek roll).
+        private uint _councilRunSalt;
         private int _councilWoodCapBonus;
         private int _councilStoneCapBonus;
         private int _councilIronCapBonus;
@@ -1911,7 +1915,10 @@ namespace DeadWalls
                     baseSeed = stored;
             }
 
-            return math.hash(new uint2(baseSeed, (uint)day));
+            if (_councilRunSalt == 0u)
+                _councilRunSalt = (uint)UnityEngine.Random.Range(1, int.MaxValue);
+
+            return math.hash(new uint3(baseSeed, _councilRunSalt, (uint)day));
         }
 
         private CouncilContext BuildCouncilContext(int day)
@@ -1940,9 +1947,10 @@ namespace DeadWalls
             _recentCouncilTemplates.Clear();
             _usedOneShotCouncils.Clear();
             _activeCouncilEvent = null;
-            _councilDaysSinceEvent = 0;
+            _councilDaysSinceEvent = 99; // yeni kosunun ilk safaginda da garanti kart
             _councilCooldownRemaining = 0;
             _lastCouncilRollDay = -1;
+            _councilRunSalt = (uint)UnityEngine.Random.Range(1, int.MaxValue); // her kosuya taze zar
             _councilWoodCapBonus = 0;
             _councilStoneCapBonus = 0;
             _councilIronCapBonus = 0;

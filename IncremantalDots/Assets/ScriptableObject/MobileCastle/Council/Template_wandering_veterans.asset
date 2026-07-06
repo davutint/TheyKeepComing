@@ -15,13 +15,23 @@ MonoBehaviour:
   Id: wandering_veterans
   Title: WANDERING VETERANS
   Body: Grizzled archers offer their bows for a warm meal.
+  BodyVariants:
+  - '{ARCHER_N} bowmen in patched leathers, longbows wrapped in oilcloth. ''Feed
+    us and we''ll hold your wall. Or we patch your stonework for directions south,
+    and walk.'''
+  - "Old soldiers, road-worn but steady-eyed. They'll fight for a full stomach \u2014
+    or fix our defenses and move on."
+  OutcomeA: "They eat like wolves \u2014 {PAY_N} {PAY_RES} gone \u2014 then take
+    the wall without being asked. {ARCHER_N} bows join the watch."
+  OutcomeB: They spend the day on the stonework and leave at dusk. Defenses patched
+    up by {HEAL_PCT}%.
   Contrast: 3
   OptionAAtomIds:
   - free_archers
   OptionBAtomIds:
   - heal_defense
   OptionAVerb: Feed them
-  OptionBVerb: Trade repairs
+  OptionBVerb: Repairs for directions
   BaseWeight: 0.9
   MinDay: 1
   RequiredFlags: []

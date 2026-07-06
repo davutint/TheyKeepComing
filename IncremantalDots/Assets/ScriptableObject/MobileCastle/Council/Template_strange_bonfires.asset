@@ -16,13 +16,23 @@ MonoBehaviour:
   Title: STRANGE BONFIRES
   Body: The horde's staging grounds lie exposed. Burning them is safe... looting
     them is not.
+  BodyVariants:
+  - "Fires on the horizon \u2014 the horde's staging ground, close enough to reach.
+    We could burn their nests and buy a quiet night... or loot the camps first and
+    risk waking them early."
+  - "Scouts mapped the bonfire camps. Torching them thins tonight's assault. Picking
+    them clean first is worth a fortune \u2014 if we're fast enough."
+  OutcomeA: "The camps go up in oily smoke. Whatever was gathering out there scatters
+    \u2014 tonight should be {NIGHT_PCT}% quieter."
+  OutcomeB: "The crews grab {GAIN_N} {GAIN_RES} and everything else worth carrying
+    \u2014 but the noise travels. Tonight comes {NIGHT_PCT}% harder."
   Contrast: 4
   OptionAAtomIds:
   - calm_night
   OptionBAtomIds:
   - wild_night
   OptionAVerb: Burn it all
-  OptionBVerb: Loot first
+  OptionBVerb: Loot first, then burn
   BaseWeight: 0.9
   MinDay: 2
   RequiredFlags: []

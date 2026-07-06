@@ -15,13 +15,22 @@ MonoBehaviour:
   Id: cold_snap
   Title: COLD SNAP
   Body: Frost creeps into the stores. The council argues over the firewood.
+  BodyVariants:
+  - Frost crept into the storehouses overnight. The workers are blue-fingered and
+    slow. Either we burn extra {PAY_RES} to keep them warm, or we grit through it.
+  - A hard freeze. Tools crack, hands stiffen. Warmth costs {PAY_RES} we'd rather
+    spend on the walls.
+  OutcomeA: The crews work short shifts around what fires we have. {PEN_RES} output
+    down {PEN_PCT}% for {PEN_D} day(s).
+  OutcomeB: "Braziers roar through the night \u2014 {PAY_N} {PAY_RES} up in smoke,
+    but the crews keep their pace."
   Contrast: 5
   OptionAAtomIds:
   - penalty_production
   OptionBAtomIds:
   - pay_resource
-  OptionAVerb: Endure it
-  OptionBVerb: Burn extra timber
+  OptionAVerb: Grit through it
+  OptionBVerb: Burn extra fuel
   BaseWeight: 0.8
   MinDay: 3
   RequiredFlags: []

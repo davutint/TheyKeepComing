@@ -1150,67 +1150,109 @@ namespace DeadWalls
                 EnsureCouncilTemplate("merchant_caravan", t =>
                 {
                     t.Title = "MERCHANT CARAVAN";
-                    t.Body = "A caravan master offers goods from the far settlements — for a price.";
+                    t.BodyVariants = new[]
+                    {
+                        "A dust-caked caravan halts at the gate. The master looks over our stockpiles with a practiced eye. 'You're sitting on {PAY_RES} and starving for {GAIN_RES}. I can fix that — for a price.'",
+                        "Traders out of the burned valley. Their wagons carry good {GAIN_RES} — and they know exactly how badly we need it.",
+                    };
+                    t.OutcomeA = "Hands are shaken. Their crew unloads {GAIN_N} {GAIN_RES} while ours counts out {PAY_N} {PAY_RES}. The caravan is over the ridge before dusk.";
+                    t.OutcomeB = "The master shrugs — 'Your loss.' They leave {GAIN_N} {GAIN_RES} at the gate anyway. Goodwill, or an advertisement.";
                     t.Contrast = CouncilContrastType.ResourceTrade;
                     t.OptionAAtomIds = new[] { "pay_resource" };
                     t.OptionBAtomIds = new[] { "gain_resource" };
-                    t.OptionAVerb = "Trade"; t.OptionBVerb = "Decline";
+                    t.OptionAVerb = "Make the trade"; t.OptionBVerb = "Send them away";
                     t.SetsFlagOnA = "traded_with_merchant";
                 }),
                 EnsureCouncilTemplate("abandoned_cache", t =>
                 {
                     t.Title = "ABANDONED CACHE";
-                    t.Body = "Scouts report an untouched supply cache beyond the treeline.";
+                    t.BodyVariants = new[]
+                    {
+                        "Scouts found a supply depot beyond the treeline — abandoned in a hurry, still intact. We can strip it in one run, or put a crew on it and work it properly.",
+                        "An old army cache, untouched since the fall. One big haul now, or a steady trickle if we man it.",
+                    };
+                    t.OutcomeA = "The crews work fast and ugly. {GAIN_N} {GAIN_RES} reaches the stores by midday; the rest is left for the crows.";
+                    t.OutcomeB = "A crew digs in at the depot. {BOOST_RES} output is up {BOOST_PCT}% for the next {BOOST_D} days.";
                     t.Contrast = CouncilContrastType.NowVsLater;
                     t.OptionAAtomIds = new[] { "gain_cache" };
                     t.OptionBAtomIds = new[] { "boost_production" };
-                    t.OptionAVerb = "Haul it now"; t.OptionBVerb = "Set up a crew";
+                    t.OptionAVerb = "Strip it now"; t.OptionBVerb = "Work it properly";
                     t.BaseWeight = 1.2f;
                 }),
                 EnsureCouncilTemplate("refugees_at_gate", t =>
                 {
                     t.Title = "REFUGEES AT THE GATE";
-                    t.Body = "Survivors beg for shelter behind your walls.";
+                    t.BodyVariants = new[]
+                    {
+                        "{POP_N} survivors at the gate — gaunt, scared, begging for walls between them and the dark. More mouths to feed. More hands to work.",
+                        "A column of refugees followed the smoke to our walls. Shelter costs food — but people are the one thing the dead can't give us.",
+                    };
+                    t.OutcomeA = "The gate opens. {POP_N} souls file in — by evening they're hauling timber like they were born here.";
+                    t.OutcomeB = "We keep the gate shut and pass rations over the wall. Their leader leaves {GAIN_N} {GAIN_RES} in thanks — salvage they couldn't carry.";
                     t.Contrast = CouncilContrastType.PopulationVsResource;
                     t.OptionAAtomIds = new[] { "gain_population" };
                     t.OptionBAtomIds = new[] { "gain_resource" };
-                    t.OptionAVerb = "Take them in"; t.OptionBVerb = "Hand out rations";
+                    t.OptionAVerb = "Open the gate"; t.OptionBVerb = "Rations only";
                     t.SetsFlagOnA = "refugees_taken";
                 }),
                 EnsureCouncilTemplate("wandering_veterans", t =>
                 {
                     t.Title = "WANDERING VETERANS";
-                    t.Body = "Grizzled archers offer their bows for a warm meal.";
+                    t.BodyVariants = new[]
+                    {
+                        "{ARCHER_N} bowmen in patched leathers, longbows wrapped in oilcloth. 'Feed us and we'll hold your wall. Or we patch your stonework for directions south, and walk.'",
+                        "Old soldiers, road-worn but steady-eyed. They'll fight for a full stomach — or fix our defenses and move on.",
+                    };
+                    t.OutcomeA = "They eat like wolves — {PAY_N} {PAY_RES} gone — then take the wall without being asked. {ARCHER_N} bows join the watch.";
+                    t.OutcomeB = "They spend the day on the stonework and leave at dusk. Defenses patched up by {HEAL_PCT}%.";
                     t.Contrast = CouncilContrastType.EconomyVsDefense;
                     t.OptionAAtomIds = new[] { "free_archers" };
                     t.OptionBAtomIds = new[] { "heal_defense" };
-                    t.OptionAVerb = "Feed them"; t.OptionBVerb = "Trade repairs";
+                    t.OptionAVerb = "Feed them"; t.OptionBVerb = "Repairs for directions";
                     t.BaseWeight = 0.9f;
                 }),
                 EnsureCouncilTemplate("strange_bonfires", t =>
                 {
                     t.Title = "STRANGE BONFIRES";
-                    t.Body = "The horde's staging grounds lie exposed. Burning them is safe... looting them is not.";
+                    t.BodyVariants = new[]
+                    {
+                        "Fires on the horizon — the horde's staging ground, close enough to reach. We could burn their nests and buy a quiet night... or loot the camps first and risk waking them early.",
+                        "Scouts mapped the bonfire camps. Torching them thins tonight's assault. Picking them clean first is worth a fortune — if we're fast enough.",
+                    };
+                    t.OutcomeA = "The camps go up in oily smoke. Whatever was gathering out there scatters — tonight should be {NIGHT_PCT}% quieter.";
+                    t.OutcomeB = "The crews grab {GAIN_N} {GAIN_RES} and everything else worth carrying — but the noise travels. Tonight comes {NIGHT_PCT}% harder.";
                     t.Contrast = CouncilContrastType.SafeVsRisky;
                     t.OptionAAtomIds = new[] { "calm_night" };
                     t.OptionBAtomIds = new[] { "wild_night" };
-                    t.OptionAVerb = "Burn it all"; t.OptionBVerb = "Loot first";
+                    t.OptionAVerb = "Burn it all"; t.OptionBVerb = "Loot first, then burn";
                     t.MinDay = 2; t.BaseWeight = 0.9f;
                 }),
                 EnsureCouncilTemplate("cold_snap", t =>
                 {
                     t.Title = "COLD SNAP";
-                    t.Body = "Frost creeps into the stores. The council argues over the firewood.";
+                    t.BodyVariants = new[]
+                    {
+                        "Frost crept into the storehouses overnight. The workers are blue-fingered and slow. Either we burn extra {PAY_RES} to keep them warm, or we grit through it.",
+                        "A hard freeze. Tools crack, hands stiffen. Warmth costs {PAY_RES} we'd rather spend on the walls.",
+                    };
+                    t.OutcomeA = "The crews work short shifts around what fires we have. {PEN_RES} output down {PEN_PCT}% for {PEN_D} day(s).";
+                    t.OutcomeB = "Braziers roar through the night — {PAY_N} {PAY_RES} up in smoke, but the crews keep their pace.";
                     t.Contrast = CouncilContrastType.PayOrSuffer;
                     t.OptionAAtomIds = new[] { "penalty_production" };
                     t.OptionBAtomIds = new[] { "pay_resource" };
-                    t.OptionAVerb = "Endure it"; t.OptionBVerb = "Burn extra timber";
+                    t.OptionAVerb = "Grit through it"; t.OptionBVerb = "Burn extra fuel";
                     t.MinDay = 3; t.BaseWeight = 0.8f;
                 }),
                 EnsureCouncilTemplate("quarry_crew", t =>
                 {
-                    t.Title = "IDLE QUARRY CREW";
-                    t.Body = "A masters' crew seeks contract work while the roads stay closed.";
+                    t.Title = "IDLE WORK CREW";
+                    t.BodyVariants = new[]
+                    {
+                        "A master's work crew, idle since the roads closed, offers their backs. One brutal contract — or keep them on and expand the yards.",
+                        "Skilled hands looking for work. They'll do one big job for cheap, or settle in for good if we make room.",
+                    };
+                    t.OutcomeA = "They work through the night and hand over {GAIN_N} {GAIN_RES}, then drift on down the road.";
+                    t.OutcomeB = "They raise their own bunkhouse by the yards. {CAP_RES} crew capacity up by {CAP_N}.";
                     t.Contrast = CouncilContrastType.NowVsLater;
                     t.OptionAAtomIds = new[] { "gain_cache" };
                     t.OptionBAtomIds = new[] { "cap_bonus" };
@@ -1220,18 +1262,28 @@ namespace DeadWalls
                 EnsureCouncilTemplate("among_the_refugees", t =>
                 {
                     t.Title = "AMONG THE REFUGEES";
-                    t.Body = "One of the newcomers turns out to be a master craftsman.";
+                    t.BodyVariants = new[]
+                    {
+                        "One of the newcomers turns out to be a guild craftsman — the kind cities used to fight over. He owes us for the open gate, and he knows it.",
+                    };
+                    t.OutcomeA = "He works a week's worth in a single day: {GAIN_N} {GAIN_RES}, guild-stamped. 'Debt paid,' he says — and means it.";
+                    t.OutcomeB = "He hangs his tools by the {BOOST_RES} yards. Output up {BOOST_PCT}% for {BOOST_D} days.";
                     t.Contrast = CouncilContrastType.NowVsLater;
                     t.OptionAAtomIds = new[] { "gain_cache" };
                     t.OptionBAtomIds = new[] { "boost_production" };
-                    t.OptionAVerb = "A parting gift"; t.OptionBVerb = "Open a workshop";
+                    t.OptionAVerb = "A parting gift"; t.OptionBVerb = "Set up his workshop";
                     t.RequiredFlags = new[] { "refugees_taken" };
                     t.ChainDelayDays = 2; t.OneShot = true; t.BaseWeight = 2f;
                 }),
                 EnsureCouncilTemplate("an_old_friend", t =>
                 {
                     t.Title = "AN OLD FRIEND";
-                    t.Body = "The caravan master returns, grinning. 'For my favorite customer...'";
+                    t.BodyVariants = new[]
+                    {
+                        "The caravan master is back, grinning through the road dust. 'For my favorite customer — one last haul, or a standing arrangement. Dealer's choice.'",
+                    };
+                    t.OutcomeA = "The wagons empty at our gate: {GAIN_N} {GAIN_RES}. He tips his hat. 'Pleasure as always.'";
+                    t.OutcomeB = "Papers signed over a shared drink. His runners will keep the {BOOST_RES} flowing — up {BOOST_PCT}% for {BOOST_D} days.";
                     t.Contrast = CouncilContrastType.NowVsLater;
                     t.OptionAAtomIds = new[] { "gain_cache" };
                     t.OptionBAtomIds = new[] { "boost_production" };
@@ -1320,7 +1372,31 @@ namespace DeadWalls
             string path = CouncilFolder + "/Template_" + id + ".asset";
             var template = AssetDatabase.LoadAssetAtPath<CouncilTemplateSO>(path);
             if (template != null)
+            {
+                // METIN MIGRATION: anlati alanlari hic doldurulmamissa (BodyVariants bos)
+                // seed'in guncel metinlerini uygula. Kullanici metin girdiyse dokunulmaz;
+                // mekanik alanlara (contrast/atom/flag/weight) HICBIR kosulda dokunulmaz.
+                if (template.BodyVariants == null || template.BodyVariants.Length == 0)
+                {
+                    var fresh = ScriptableObject.CreateInstance<CouncilTemplateSO>();
+                    fresh.Id = id;
+                    configure?.Invoke(fresh);
+                    if (fresh.BodyVariants != null && fresh.BodyVariants.Length > 0)
+                    {
+                        Undo.RecordObject(template, "Update Council Template Texts");
+                        template.Title = fresh.Title;
+                        template.BodyVariants = fresh.BodyVariants;
+                        template.OutcomeA = fresh.OutcomeA;
+                        template.OutcomeB = fresh.OutcomeB;
+                        template.OptionAVerb = fresh.OptionAVerb;
+                        template.OptionBVerb = fresh.OptionBVerb;
+                        EditorUtility.SetDirty(template);
+                    }
+                    UnityEngine.Object.DestroyImmediate(fresh);
+                }
+
                 return template;
+            }
 
             template = ScriptableObject.CreateInstance<CouncilTemplateSO>();
             template.Id = id;
@@ -1930,6 +2006,8 @@ namespace DeadWalls
             council.CouncilOptionAText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "CouncilOptionAText");
             council.CouncilOptionBButton = FindComponentInChildrenByName<Button>(hudRoot, "CouncilOptionBButton");
             council.CouncilOptionBText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "CouncilOptionBText");
+            council.CouncilEffectBadgeText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "CouncilEffectBadgeText");
+            council.NightToastText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "SiegeToastText");
             council.AppearClip = AssetDatabase.LoadAssetAtPath<AudioClip>(CouncilAppearSfxPath);
             council.ChooseClip = AssetDatabase.LoadAssetAtPath<AudioClip>(CouncilChooseSfxPath);
 

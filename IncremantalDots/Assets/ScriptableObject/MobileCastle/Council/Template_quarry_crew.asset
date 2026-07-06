@@ -13,8 +13,17 @@ MonoBehaviour:
   m_Name: Template_quarry_crew
   m_EditorClassIdentifier: DeadWalls::DeadWalls.CouncilTemplateSO
   Id: quarry_crew
-  Title: IDLE QUARRY CREW
+  Title: IDLE WORK CREW
   Body: A masters' crew seeks contract work while the roads stay closed.
+  BodyVariants:
+  - "A master's work crew, idle since the roads closed, offers their backs. One brutal
+    contract \u2014 or keep them on and expand the yards."
+  - Skilled hands looking for work. They'll do one big job for cheap, or settle in
+    for good if we make room.
+  OutcomeA: They work through the night and hand over {GAIN_N} {GAIN_RES}, then drift
+    on down the road.
+  OutcomeB: They raise their own bunkhouse by the yards. {CAP_RES} crew capacity
+    up by {CAP_N}.
   Contrast: 0
   OptionAAtomIds:
   - gain_cache

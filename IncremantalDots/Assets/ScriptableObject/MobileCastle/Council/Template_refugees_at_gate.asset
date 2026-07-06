@@ -15,13 +15,22 @@ MonoBehaviour:
   Id: refugees_at_gate
   Title: REFUGEES AT THE GATE
   Body: Survivors beg for shelter behind your walls.
+  BodyVariants:
+  - "{POP_N} survivors at the gate \u2014 gaunt, scared, begging for walls between
+    them and the dark. More mouths to feed. More hands to work."
+  - "A column of refugees followed the smoke to our walls. Shelter costs food \u2014
+    but people are the one thing the dead can't give us."
+  OutcomeA: "The gate opens. {POP_N} souls file in \u2014 by evening they're hauling
+    timber like they were born here."
+  OutcomeB: "We keep the gate shut and pass rations over the wall. Their leader leaves
+    {GAIN_N} {GAIN_RES} in thanks \u2014 salvage they couldn't carry."
   Contrast: 2
   OptionAAtomIds:
   - gain_population
   OptionBAtomIds:
   - gain_resource
-  OptionAVerb: Take them in
-  OptionBVerb: Hand out rations
+  OptionAVerb: Open the gate
+  OptionBVerb: Rations only
   BaseWeight: 1
   MinDay: 1
   RequiredFlags: []

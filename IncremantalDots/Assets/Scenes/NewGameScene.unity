@@ -61955,6 +61955,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1094158081}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &538463515 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 302241222611445367, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
+  m_PrefabInstance: {fileID: 1065689827}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!1 &542764392
 GameObject:
   m_ObjectHideFlags: 0
@@ -69977,6 +69988,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5921356501611650583, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 5938414536115381275, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
       propertyPath: m_Layer
       value: 5
@@ -72913,6 +72928,8 @@ MonoBehaviour:
   CouncilOptionAText: {fileID: 1523538275}
   CouncilOptionBButton: {fileID: 1523538274}
   CouncilOptionBText: {fileID: 1523538273}
+  CouncilEffectBadgeText: {fileID: 538463515}
+  NightToastText: {fileID: 1269954045}
   AppearClip: {fileID: 8300000, guid: 8e481e330959d4f0584fd5ed50106a1d, type: 3}
   ChooseClip: {fileID: 8300000, guid: 6eadee2cd04b74be989969265badd518, type: 3}
   AppearDelay: 1.2
@@ -73550,7 +73567,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1331322098
 MonoBehaviour:
   m_ObjectHideFlags: 0

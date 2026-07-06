@@ -15,13 +15,23 @@ MonoBehaviour:
   Id: merchant_caravan
   Title: MERCHANT CARAVAN
   Body: "A caravan master offers goods from the far settlements \u2014 for a price."
+  BodyVariants:
+  - "A dust-caked caravan halts at the gate. The master looks over our stockpiles
+    with a practiced eye. 'You're sitting on {PAY_RES} and starving for {GAIN_RES}.
+    I can fix that \u2014 for a price.'"
+  - "Traders out of the burned valley. Their wagons carry good {GAIN_RES} \u2014
+    and they know exactly how badly we need it."
+  OutcomeA: Hands are shaken. Their crew unloads {GAIN_N} {GAIN_RES} while ours counts
+    out {PAY_N} {PAY_RES}. The caravan is over the ridge before dusk.
+  OutcomeB: "The master shrugs \u2014 'Your loss.' They leave {GAIN_N} {GAIN_RES}
+    at the gate anyway. Goodwill, or an advertisement."
   Contrast: 1
   OptionAAtomIds:
   - pay_resource
   OptionBAtomIds:
   - gain_resource
-  OptionAVerb: Trade
-  OptionBVerb: Decline
+  OptionAVerb: Make the trade
+  OptionBVerb: Send them away
   BaseWeight: 1
   MinDay: 1
   RequiredFlags: []

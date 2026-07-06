@@ -15,13 +15,20 @@ MonoBehaviour:
   Id: among_the_refugees
   Title: AMONG THE REFUGEES
   Body: One of the newcomers turns out to be a master craftsman.
+  BodyVariants:
+  - "One of the newcomers turns out to be a guild craftsman \u2014 the kind cities
+    used to fight over. He owes us for the open gate, and he knows it."
+  OutcomeA: "He works a week's worth in a single day: {GAIN_N} {GAIN_RES}, guild-stamped.
+    'Debt paid,' he says \u2014 and means it."
+  OutcomeB: He hangs his tools by the {BOOST_RES} yards. Output up {BOOST_PCT}% for
+    {BOOST_D} days.
   Contrast: 0
   OptionAAtomIds:
   - gain_cache
   OptionBAtomIds:
   - boost_production
   OptionAVerb: A parting gift
-  OptionBVerb: Open a workshop
+  OptionBVerb: Set up his workshop
   BaseWeight: 2
   MinDay: 1
   RequiredFlags:

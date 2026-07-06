@@ -15,13 +15,22 @@ MonoBehaviour:
   Id: abandoned_cache
   Title: ABANDONED CACHE
   Body: Scouts report an untouched supply cache beyond the treeline.
+  BodyVariants:
+  - "Scouts found a supply depot beyond the treeline \u2014 abandoned in a hurry,
+    still intact. We can strip it in one run, or put a crew on it and work it properly."
+  - An old army cache, untouched since the fall. One big haul now, or a steady trickle
+    if we man it.
+  OutcomeA: The crews work fast and ugly. {GAIN_N} {GAIN_RES} reaches the stores
+    by midday; the rest is left for the crows.
+  OutcomeB: A crew digs in at the depot. {BOOST_RES} output is up {BOOST_PCT}% for
+    the next {BOOST_D} days.
   Contrast: 0
   OptionAAtomIds:
   - gain_cache
   OptionBAtomIds:
   - boost_production
-  OptionAVerb: Haul it now
-  OptionBVerb: Set up a crew
+  OptionAVerb: Strip it now
+  OptionBVerb: Work it properly
   BaseWeight: 1.2
   MinDay: 1
   RequiredFlags: []

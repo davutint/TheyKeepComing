@@ -36,32 +36,50 @@ namespace DeadWalls.Tests
                 {
                     t.OptionAAtomIds = new[] { "pay_resource" };
                     t.OptionBAtomIds = new[] { "gain_resource" };
+                    t.BodyVariants = new[] { "Pay {PAY_N} {PAY_RES} for {GAIN_N} {GAIN_RES} on day {DAY}." };
+                    t.OutcomeA = "Paid {PAY_N} {PAY_RES}, got {GAIN_N} {GAIN_RES}.";
+                    t.OutcomeB = "Got {GAIN_N} {GAIN_RES} instead.";
                 }),
                 MakeTemplate("cache", CouncilContrastType.NowVsLater, t =>
                 {
                     t.OptionAAtomIds = new[] { "gain_cache" };
                     t.OptionBAtomIds = new[] { "boost_production" };
+                    t.BodyVariants = new[] { "{GAIN_N} {GAIN_RES} now or {BOOST_PCT}% later." };
+                    t.OutcomeA = "+{GAIN_N} {GAIN_RES}.";
+                    t.OutcomeB = "{BOOST_RES} +{BOOST_PCT}% for {BOOST_D} days.";
                 }),
                 MakeTemplate("refugees", CouncilContrastType.PopulationVsResource, t =>
                 {
                     t.OptionAAtomIds = new[] { "gain_population" };
                     t.OptionBAtomIds = new[] { "gain_resource" };
                     t.SetsFlagOnA = "refugees_taken";
+                    t.BodyVariants = new[] { "{POP_N} people at the gate." };
+                    t.OutcomeA = "+{POP_N} people.";
+                    t.OutcomeB = "+{GAIN_N} {GAIN_RES}.";
                 }),
                 MakeTemplate("veterans", CouncilContrastType.EconomyVsDefense, t =>
                 {
                     t.OptionAAtomIds = new[] { "free_archers" };
                     t.OptionBAtomIds = new[] { "heal_defense" };
+                    t.BodyVariants = new[] { "{ARCHER_N} archers for {PAY_N} {PAY_RES}." };
+                    t.OutcomeA = "+{ARCHER_N} archers, -{PAY_N} {PAY_RES}.";
+                    t.OutcomeB = "Defenses +{HEAL_PCT}%.";
                 }),
                 MakeTemplate("bonfires", CouncilContrastType.SafeVsRisky, t =>
                 {
                     t.OptionAAtomIds = new[] { "calm_night" };
                     t.OptionBAtomIds = new[] { "wild_night" };
+                    t.BodyVariants = new[] { "Risk the camps?" };
+                    t.OutcomeA = "Night {NIGHT_PCT}% quieter.";
+                    t.OutcomeB = "+{GAIN_N} {GAIN_RES}, night {NIGHT_PCT}% harder.";
                 }),
                 MakeTemplate("coldsnap", CouncilContrastType.PayOrSuffer, t =>
                 {
                     t.OptionAAtomIds = new[] { "penalty_production" };
                     t.OptionBAtomIds = new[] { "pay_resource" };
+                    t.BodyVariants = new[] { "Pay {PAY_RES} or suffer {PEN_PCT}%." };
+                    t.OutcomeA = "{PEN_RES} -{PEN_PCT}% for {PEN_D} days.";
+                    t.OutcomeB = "-{PAY_N} {PAY_RES}.";
                 }),
                 MakeTemplate("chain_child", CouncilContrastType.NowVsLater, t =>
                 {
@@ -70,6 +88,9 @@ namespace DeadWalls.Tests
                     t.RequiredFlags = new[] { "refugees_taken" };
                     t.ChainDelayDays = 2;
                     t.OneShot = true;
+                    t.BodyVariants = new[] { "A craftsman among them." };
+                    t.OutcomeA = "+{GAIN_N} {GAIN_RES}.";
+                    t.OutcomeB = "{BOOST_RES} +{BOOST_PCT}% for {BOOST_D} days.";
                 }),
             };
         }
@@ -115,6 +136,28 @@ namespace DeadWalls.Tests
                 Assert.LessOrEqual(ratio, 2.6f,
                     $"seed {seed} [{composed.TemplateId}] butce dengesiz: A={a:0.00} B={b:0.00}\nA: {composed.OptionA.Label}\nB: {composed.OptionB.Label}");
             }
+        }
+
+        [Test]
+        public void MetinTokenlari_TumUretimlerde_Cozulur()
+        {
+            var context = MakeContext(day: 6);
+            for (uint i = 1; i <= 300; i++)
+            {
+                uint seed = Unity.Mathematics.math.hash(new Unity.Mathematics.uint2(555u, i));
+                var composed = CouncilComposer.Compose(_catalog, seed, context);
+                Assert.IsNotNull(composed);
+                AssertNoTokens(composed.TemplateId, "Body", composed.Body);
+                AssertNoTokens(composed.TemplateId, "OutcomeA", composed.OutcomeA);
+                AssertNoTokens(composed.TemplateId, "OutcomeB", composed.OutcomeB);
+            }
+        }
+
+        private static void AssertNoTokens(string templateId, string field, string text)
+        {
+            Assert.IsNotEmpty(text, $"[{templateId}] {field} bos");
+            Assert.IsFalse(text.Contains("{"),
+                $"[{templateId}] {field} cozulmemis token iceriyor: \"{text}\"");
         }
 
         [Test]

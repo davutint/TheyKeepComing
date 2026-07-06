@@ -17,7 +17,7 @@ namespace DeadWalls
         [Header("Pacing")]
         [Range(0f, 1f)] public float DailyEventChance = 0.30f;
         [Tooltip("Bu kadar gun event cikmadiysa garanti cikar (pity).")]
-        public int PityDays = 4;
+        public int PityDays = 3;
         [Tooltip("Bir event'ten sonra en az bu kadar gun bosluk.")]
         public int CooldownDays = 1;
         [Tooltip("Son N sablon anti-tekrar sogumasina girer.")]

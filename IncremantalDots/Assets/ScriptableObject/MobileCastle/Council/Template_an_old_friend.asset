@@ -15,6 +15,13 @@ MonoBehaviour:
   Id: an_old_friend
   Title: AN OLD FRIEND
   Body: The caravan master returns, grinning. 'For my favorite customer...'
+  BodyVariants:
+  - "The caravan master is back, grinning through the road dust. 'For my favorite
+    customer \u2014 one last haul, or a standing arrangement. Dealer's choice.'"
+  OutcomeA: 'The wagons empty at our gate: {GAIN_N} {GAIN_RES}. He tips his hat.
+    ''Pleasure as always.'''
+  OutcomeB: "Papers signed over a shared drink. His runners will keep the {BOOST_RES}
+    flowing \u2014 up {BOOST_PCT}% for {BOOST_D} days."
   Contrast: 0
   OptionAAtomIds:
   - gain_cache

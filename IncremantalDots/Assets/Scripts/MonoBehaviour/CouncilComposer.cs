@@ -38,6 +38,9 @@ namespace DeadWalls
         public string TemplateId;
         public string Title;
         public string Body;
+        /// <summary>Secim sonrasi kartta gosterilen sonuc metinleri (token'lari doldurulmus).</summary>
+        public string OutcomeA;
+        public string OutcomeB;
         public ComposedCouncilOption OptionA;
         public ComposedCouncilOption OptionB;
         public string SetsFlagOnA;
@@ -78,19 +81,28 @@ namespace DeadWalls
             {
                 TemplateId = template.Id,
                 Title = template.Title,
-                Body = template.Body,
                 SetsFlagOnA = template.SetsFlagOnA,
                 SetsFlagOnB = template.SetsFlagOnB,
             };
 
             float band = PickBand(ref rng);
+            // Govde varyanti secimi (rng tuketimi BuildOptions'tan ONCE — deterministik sira)
+            string bodyRaw = template.Body;
+            if (template.BodyVariants != null && template.BodyVariants.Length > 0)
+                bodyRaw = template.BodyVariants[rng.NextInt(0, template.BodyVariants.Length)];
+
             BuildOptions(catalog, template, ref rng, context, band, composed);
             if (composed.OptionA == null || composed.OptionB == null)
                 return null;
 
             BalanceBudgets(composed, context);
-            composed.OptionA.Label = template.OptionAVerb + ": " + DescribeEffects(composed.OptionA.Effects);
-            composed.OptionB.Label = template.OptionBVerb + ": " + DescribeEffects(composed.OptionB.Effects);
+            composed.OptionA.Label = template.OptionAVerb + "  —  " + DescribeEffects(composed.OptionA.Effects);
+            composed.OptionB.Label = template.OptionBVerb + "  —  " + DescribeEffects(composed.OptionB.Effects);
+            // Token doldurma: govde her iki secenegin sayilarini kullanabilir (once A, sonra B
+            // taranir); sonuc metinleri YALNIZ kendi seceneginin efektlerinden cozulur.
+            composed.Body = FillTokens(bodyRaw, composed.OptionA, composed.OptionB, context.Day);
+            composed.OutcomeA = FillTokens(template.OutcomeA, composed.OptionA, null, context.Day);
+            composed.OutcomeB = FillTokens(template.OutcomeB, composed.OptionB, null, context.Day);
             return composed;
         }
 
@@ -504,6 +516,11 @@ namespace DeadWalls
             }
         }
 
+        // TMP rich-text renkleri: kazanc yesil, bedel kirmizi, risk turuncu
+        private const string GainColor = "#8FD98A";
+        private const string CostColor = "#E08A7A";
+        private const string RiskColor = "#E5B963";
+
         private static string DescribeEffects(List<ComposedCouncilEffect> effects)
         {
             var parts = new List<string>(effects.Count);
@@ -512,38 +529,111 @@ namespace DeadWalls
                 switch (effect.Kind)
                 {
                     case CouncilEffectKind.GainResource:
-                        parts.Add($"+{effect.Amount} {ResourceName(effect.Resource)}");
+                        parts.Add($"<color={GainColor}>+{effect.Amount} {ResourceName(effect.Resource)}</color>");
                         break;
                     case CouncilEffectKind.PayResource:
-                        parts.Add($"-{effect.Amount} {ResourceName(effect.Resource)}");
+                        parts.Add($"<color={CostColor}>-{effect.Amount} {ResourceName(effect.Resource)}</color>");
                         break;
                     case CouncilEffectKind.TempProductionBoost:
-                        parts.Add($"{ResourceName(effect.Resource)} +{Mathf.RoundToInt(effect.Rate * 100f)}% for {effect.DurationDays}d");
+                        parts.Add($"<color={GainColor}>{ResourceName(effect.Resource)} +{Mathf.RoundToInt(effect.Rate * 100f)}% for {FormatDays(effect.DurationDays)}</color>");
                         break;
                     case CouncilEffectKind.TempProductionPenalty:
-                        parts.Add($"{ResourceName(effect.Resource)} -{Mathf.RoundToInt(effect.Rate * 100f)}% for {effect.DurationDays}d");
+                        parts.Add($"<color={CostColor}>{ResourceName(effect.Resource)} -{Mathf.RoundToInt(effect.Rate * 100f)}% for {FormatDays(effect.DurationDays)}</color>");
                         break;
                     case CouncilEffectKind.WorkerCapBonus:
-                        parts.Add($"{ResourceName(effect.Resource)} cap +{effect.Amount}");
+                        parts.Add($"<color={GainColor}>{ResourceName(effect.Resource)} crew cap +{effect.Amount}</color>");
                         break;
                     case CouncilEffectKind.GainPopulation:
-                        parts.Add($"+{effect.Amount} POP");
+                        parts.Add($"<color={GainColor}>+{effect.Amount} people</color>");
                         break;
                     case CouncilEffectKind.GainFreeArchers:
-                        parts.Add($"+{effect.Amount} ARCHER");
+                        parts.Add(effect.Amount == 1
+                            ? $"<color={GainColor}>+1 archer</color>"
+                            : $"<color={GainColor}>+{effect.Amount} archers</color>");
                         break;
                     case CouncilEffectKind.HealDefensePercent:
-                        parts.Add($"repair {Mathf.RoundToInt(effect.Rate * 100f)}% defense");
+                        parts.Add($"<color={GainColor}>defenses restored +{Mathf.RoundToInt(effect.Rate * 100f)}%</color>");
                         break;
                     case CouncilEffectKind.NextNightSpawnDelta:
                         parts.Add(effect.Rate < 0f
-                            ? $"next night {Mathf.RoundToInt(effect.Rate * 100f)}% horde"
-                            : $"next night +{Mathf.RoundToInt(effect.Rate * 100f)}% horde");
+                            ? $"<color={GainColor}>a quieter night ({Mathf.RoundToInt(effect.Rate * 100f)}%)</color>"
+                            : $"<color={RiskColor}>a harder night (+{Mathf.RoundToInt(effect.Rate * 100f)}%)</color>");
                         break;
                 }
             }
 
             return string.Join(", ", parts);
+        }
+
+        private static string FormatDays(int days)
+        {
+            return days == 1 ? "1 day" : days + " days";
+        }
+
+        // ---------------------------------------------------------------
+        // Metin token'lari: {GAIN_N} {GAIN_RES} {PAY_N} {PAY_RES} {POP_N} {ARCHER_N}
+        // {BOOST_RES} {BOOST_PCT} {BOOST_D} {PEN_RES} {PEN_PCT} {PEN_D} {HEAL_PCT}
+        // {NIGHT_PCT} {CAP_RES} {CAP_N} {DAY} — once primary sonra secondary taranir.
+        // ---------------------------------------------------------------
+        private static string FillTokens(string text, ComposedCouncilOption primary,
+            ComposedCouncilOption secondary, int day)
+        {
+            if (string.IsNullOrEmpty(text) || text.IndexOf('{') < 0)
+                return text;
+
+            text = text.Replace("{DAY}", day.ToString());
+
+            ComposedCouncilEffect effect;
+            if (TryFindEffect(primary, secondary, CouncilEffectKind.GainResource, out effect))
+                text = text.Replace("{GAIN_N}", effect.Amount.ToString())
+                           .Replace("{GAIN_RES}", ResourceName(effect.Resource));
+            if (TryFindEffect(primary, secondary, CouncilEffectKind.PayResource, out effect))
+                text = text.Replace("{PAY_N}", effect.Amount.ToString())
+                           .Replace("{PAY_RES}", ResourceName(effect.Resource));
+            if (TryFindEffect(primary, secondary, CouncilEffectKind.GainPopulation, out effect))
+                text = text.Replace("{POP_N}", effect.Amount.ToString());
+            if (TryFindEffect(primary, secondary, CouncilEffectKind.GainFreeArchers, out effect))
+                text = text.Replace("{ARCHER_N}", effect.Amount.ToString());
+            if (TryFindEffect(primary, secondary, CouncilEffectKind.TempProductionBoost, out effect))
+                text = text.Replace("{BOOST_RES}", ResourceName(effect.Resource))
+                           .Replace("{BOOST_PCT}", Mathf.RoundToInt(effect.Rate * 100f).ToString())
+                           .Replace("{BOOST_D}", effect.DurationDays.ToString());
+            if (TryFindEffect(primary, secondary, CouncilEffectKind.TempProductionPenalty, out effect))
+                text = text.Replace("{PEN_RES}", ResourceName(effect.Resource))
+                           .Replace("{PEN_PCT}", Mathf.RoundToInt(effect.Rate * 100f).ToString())
+                           .Replace("{PEN_D}", effect.DurationDays.ToString());
+            if (TryFindEffect(primary, secondary, CouncilEffectKind.HealDefensePercent, out effect))
+                text = text.Replace("{HEAL_PCT}", Mathf.RoundToInt(effect.Rate * 100f).ToString());
+            if (TryFindEffect(primary, secondary, CouncilEffectKind.NextNightSpawnDelta, out effect))
+                text = text.Replace("{NIGHT_PCT}", Mathf.RoundToInt(Mathf.Abs(effect.Rate) * 100f).ToString());
+            if (TryFindEffect(primary, secondary, CouncilEffectKind.WorkerCapBonus, out effect))
+                text = text.Replace("{CAP_RES}", ResourceName(effect.Resource))
+                           .Replace("{CAP_N}", effect.Amount.ToString());
+
+            return text;
+        }
+
+        private static bool TryFindEffect(ComposedCouncilOption primary, ComposedCouncilOption secondary,
+            CouncilEffectKind kind, out ComposedCouncilEffect found)
+        {
+            if (primary != null)
+            {
+                foreach (var effect in primary.Effects)
+                {
+                    if (effect.Kind == kind) { found = effect; return true; }
+                }
+            }
+
+            if (secondary != null)
+            {
+                foreach (var effect in secondary.Effects)
+                {
+                    if (effect.Kind == kind) { found = effect; return true; }
+                }
+            }
+
+            found = default;
+            return false;
         }
 
         private static string ResourceName(EconomyFocusType resource)

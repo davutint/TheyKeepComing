@@ -9,8 +9,12 @@
    mevcut asset degerlerine ve kullanicinin ekledigi atom/sablonlara dokunulmaz.
 2. Katalog `GameManager.councilCatalog` alanina baglanir.
 3. `CouncilEventUI` HUD root'a eklenir; kart objeleri isimle bulunur, SFX baglanir
-   (Appear = `Book Handle 1-2.wav`, Choose = `Card Place 1-1.wav`).
+   (Appear = `Book Handle 1-2.wav`, Choose = `Card Place 1-1.wav`); `CouncilEffectBadgeText`
+   (aktif etki rozeti) + `NightToastText` (= `SiegeToastText`) baglanir.
 4. `ValidateCatalog()` sorunlari Console'a warning basilir.
+5. **Metin migration:** mevcut Template asset'inde `BodyVariants` BOS ise seed'in guncel
+   anlatilari (Title/BodyVariants/OutcomeA-B/Verb'ler) uygulanir. Kullanici metin girdiyse
+   (BodyVariants dolu) dokunulmaz; mekanik alanlara hicbir kosulda dokunulmaz.
 
 ## Yeni Icerik Ekleme (kod GEREKMEZ)
 

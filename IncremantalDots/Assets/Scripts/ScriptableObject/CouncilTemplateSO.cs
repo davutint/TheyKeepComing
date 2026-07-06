@@ -38,6 +38,14 @@ namespace DeadWalls
         public string Title = "COUNCIL MATTER";
         [TextArea(2, 4)] public string Body = "The council awaits your decision.";
 
+        [Header("Narrative (placeholder destekli)")]
+        [Tooltip("Doluysa composer rastgele birini secer (Body yerine). Placeholder'lar: {GAIN_N} {GAIN_RES} {PAY_N} {PAY_RES} {POP_N} {ARCHER_N} {BOOST_RES} {BOOST_PCT} {BOOST_D} {PEN_RES} {PEN_PCT} {PEN_D} {HEAL_PCT} {NIGHT_PCT} {CAP_RES} {CAP_N} {DAY} — once A sonra B seceneginin efektlerinden cozulur.")]
+        [TextArea(2, 4)] public string[] BodyVariants = new string[0];
+        [Tooltip("A secildikten sonra kartta gosterilen sonuc metni (yalniz A'nin efektlerinden cozulur).")]
+        [TextArea(2, 3)] public string OutcomeA = string.Empty;
+        [Tooltip("B secildikten sonra gosterilen sonuc metni (yalniz B'nin efektlerinden cozulur).")]
+        [TextArea(2, 3)] public string OutcomeB = string.Empty;
+
         [Header("Composition")]
         public CouncilContrastType Contrast = CouncilContrastType.NowVsLater;
 

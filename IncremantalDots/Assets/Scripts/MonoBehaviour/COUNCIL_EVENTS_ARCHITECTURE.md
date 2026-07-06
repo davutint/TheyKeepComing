@@ -39,6 +39,27 @@ varyant dogurur ve yeni atom/sablon eklemek cesitliligi CARPARAK buyutur.
 | SafeVsRisky | sonraki gece -%X horde | cift yagma + sonraki gece +%Y horde |
 | PayOrSuffer | uretim cezasina katlan | kaynak ode, gecistir |
 
+## Anlati Katmani (promise -> choice -> consequence)
+
+- **Placeholder'li metinler:** sablon `BodyVariants[]` (2-3 varyant; composer rastgele secer) +
+  `OutcomeA/OutcomeB`. Token'lar composer'da gercek sayilarla doldurulur: `{GAIN_N} {GAIN_RES}
+  {PAY_N} {PAY_RES} {POP_N} {ARCHER_N} {BOOST_RES} {BOOST_PCT} {BOOST_D} {PEN_RES} {PEN_PCT}
+  {PEN_D} {HEAL_PCT} {NIGHT_PCT} {CAP_RES} {CAP_N} {DAY}`. Govde her iki secenegin sayilarina
+  bakabilir (once A, sonra B); outcome yalniz kendi seceneginden cozulur. Boylece hikaye teklifin
+  KENDISINI anlatir ("Their wagons carry good IRON — and they know exactly how badly we need it").
+- **Sonuc ani:** secimden sonra kart kapanmaz — butonlar/sure seridi gizlenir, govde 3.4s
+  boyunca outcome metnine donusur ("A crew digs in at the depot. WOOD output is up 35%...").
+  Expire'da genel "The moment passes..." metni 2.4s gosterilir.
+- **Aktif etki rozeti (`CouncilEffectBadgeText`):** surel etki yasarken sol-ustte
+  "PACT — WOOD +35% . 2d left" (yesil) / "HARDSHIP — ..." (kirmizi) / "OMEN — the horde comes
+  harder tonight (+%X)" (turuncu). Her poll'da `GameManager.EconomyEvent` cache'inden hesaplanir.
+- **Gece hatirlatmasi:** NIGHT'a geciste gece carpani aktifse `SiegeToastText` uzerinden toast
+  ("The noise carried. They come harder tonight (+14%).") — riskli secim ile zor gece arasindaki
+  nedensellik bagini kapatir.
+- **Renkli buton ozetleri:** DescribeEffects TMP rich-text uretir (kazanc #8FD98A, bedel
+  #E08A7A, risk #E5B963).
+- Testler cozulmemis token kalmadigini garanti eder (300 uretimde `{` taramasi).
+
 ## "Akillilik" Kaynaklari
 
 - **Director:** atom bazli baglam carpanlari — kit kaynagi kayirma (ScarcityWeightMult),
