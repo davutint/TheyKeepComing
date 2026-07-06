@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28bd919e7eea8be478f6ff9a9ae93566, type: 3}
+  m_Name: Template_refugees_at_gate
+  m_EditorClassIdentifier: DeadWalls::DeadWalls.CouncilTemplateSO
+  Id: refugees_at_gate
+  Title: REFUGEES AT THE GATE
+  Body: Survivors beg for shelter behind your walls.
+  Contrast: 2
+  OptionAAtomIds:
+  - gain_population
+  OptionBAtomIds:
+  - gain_resource
+  OptionAVerb: Take them in
+  OptionBVerb: Hand out rations
+  BaseWeight: 1
+  MinDay: 1
+  RequiredFlags: []
+  ForbiddenFlags: []
+  SetsFlagOnA: refugees_taken
+  SetsFlagOnB: 
+  ChainDelayDays: 0
+  OneShot: 0

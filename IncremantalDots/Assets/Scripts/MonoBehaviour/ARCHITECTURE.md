@@ -97,6 +97,14 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - `TechTreeInputMode` enum (`Auto/Desktop/Mobile`): Desktop = tekerlek imlec-merkezli zoom + orta tus pan; Mobile = pinch zoom (orta-nokta merkezli) + tek parmak pan; Auto platforma gore secer
 - Zoom `content.localScale` ile (layout sabit); alt sinir icerik viewport'a sigiyorsa 1'e clamp; pinch sirasinda ScrollRect gecici kapatilir
 
+### CouncilComposer.cs + CouncilEventUI.cs
+
+- Safak meclisi event'leri: kart DAWN'da belirir, DAY boyunca yasar, DUSK'ta expire; oyun durmaz
+- Event'ler asset degil — `CouncilComposer` (pure static, EditMode testli) sablon x atom x baglam x olcek carpimindan uretir; deterministik (seed = hash(ECS RandomSeed, gun))
+- Director: kit kaynak/dusuk savunma/bolluk baglamina gore atom-sablon agirliklari; hafiza: flag'ler + zincir sablonlari (RequiredFlags/ChainDelayDays/OneShot); butce: A/B secenekleri "dakika-degeri" cinsinden dengelenir
+- GameManager API: `TryRollCouncilEvent` (sans 0.30 + pity 4 gun + cooldown), `ChooseCouncilOption`, `ExpireCouncilEvent`, `CanAffordCouncilOption`; efektler mevcut yollara akar (AddResources/AddPopulation/SpawnArcher/config cap aggregate/temp production slotu/NextNightSpawnMultiplier)
+- Otoriter dok: `COUNCIL_EVENTS_ARCHITECTURE.md`
+
 ### DefenseRepairUI.cs
 
 - CastleDefensePanel'deki player-facing REPAIR butonunun controller'i (HUD root'ta ayri component)

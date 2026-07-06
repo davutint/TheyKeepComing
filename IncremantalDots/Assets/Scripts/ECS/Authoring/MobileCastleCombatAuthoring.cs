@@ -257,7 +257,9 @@ namespace DeadWalls
                     ProductionBonusResource = EconomyFocusType.Balanced,
                     ProductionBonusMultiplier = 1f,
                     ProductionBonusExpiresAfterWave = 0,
-                    RandomSeed = authoring.EconomyEventSeed == 0u ? 91273u : authoring.EconomyEventSeed
+                    RandomSeed = authoring.EconomyEventSeed == 0u ? 91273u : authoring.EconomyEventSeed,
+                    NextNightSpawnMultiplier = 1f,
+                    NightSpawnExpiresAfterWave = 0
                 });
 
                 AddComponent(entity, new ContinuousSiegeCycleData

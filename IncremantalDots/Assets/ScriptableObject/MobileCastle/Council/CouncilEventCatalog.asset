@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fdfd985ff082b04bac6af934e95383f, type: 3}
+  m_Name: CouncilEventCatalog
+  m_EditorClassIdentifier: DeadWalls::DeadWalls.CouncilEventCatalogSO
+  Templates:
+  - {fileID: 11400000, guid: a95a6429638fe6441a30450731cac597, type: 2}
+  - {fileID: 11400000, guid: 75732cdbb7d971d468be2fcf50654894, type: 2}
+  - {fileID: 11400000, guid: efaa99a19f944984ba626f7f31620a25, type: 2}
+  - {fileID: 11400000, guid: ead52bd211367e64eaeb2a4b95ad2b9c, type: 2}
+  - {fileID: 11400000, guid: 39d1391b67142984aaab3d9704acce20, type: 2}
+  - {fileID: 11400000, guid: f11730390e899af42a2a8667fcfa2772, type: 2}
+  - {fileID: 11400000, guid: c3295c20442387d4c9d389fff4fbf026, type: 2}
+  - {fileID: 11400000, guid: 304a59f79630ea64fb5edcbe0d143392, type: 2}
+  - {fileID: 11400000, guid: 544bcc4174cfe6b41939b1d9436e27be, type: 2}
+  Atoms:
+  - {fileID: 11400000, guid: d6cd7984cf3bb2f4ba267ac6bce435a5, type: 2}
+  - {fileID: 11400000, guid: c7dfeaf01a15ead4693b2f17504d55a6, type: 2}
+  - {fileID: 11400000, guid: 4a5663045b852f4479321b25c7e3dcf7, type: 2}
+  - {fileID: 11400000, guid: d16aa0192ee2c2d48a22e026b3b11a1f, type: 2}
+  - {fileID: 11400000, guid: e5b56399793b66f489bbf110a9951ad2, type: 2}
+  - {fileID: 11400000, guid: 8ae0f3edafd82b3439f69d8842cc82f3, type: 2}
+  - {fileID: 11400000, guid: fc833c428e0f7a14789f804de3d96dd9, type: 2}
+  - {fileID: 11400000, guid: 7a3f64937bb078241bf5a0bc30434ff9, type: 2}
+  - {fileID: 11400000, guid: 4cf9ab88112f6f040a904804fe66e1a9, type: 2}
+  - {fileID: 11400000, guid: f8a0291574b65e247afdb0b51cb8dff9, type: 2}
+  - {fileID: 11400000, guid: 9c66821a4842b3e4c8e35459c2aecf40, type: 2}
+  DailyEventChance: 0.3
+  PityDays: 4
+  CooldownDays: 1
+  RecentTemplateMemory: 3

@@ -37,6 +37,10 @@ namespace DeadWalls
         private const string FrostArcherDefinitionPath = ArcherDefinitionFolder + "/FrostArcher.asset";
         private const string TechTreeFolder = "Assets/ScriptableObject/MobileCastle/TechTree";
         private const string TechTreeCatalogPath = TechTreeFolder + "/TechTreeCatalog.asset";
+        private const string CouncilFolder = "Assets/ScriptableObject/MobileCastle/Council";
+        private const string CouncilCatalogPath = CouncilFolder + "/CouncilEventCatalog.asset";
+        private const string CouncilAppearSfxPath = FantasyUiSfxRoot + "/Book Handle 1-2.wav";
+        private const string CouncilChooseSfxPath = FantasyUiSfxRoot + "/Card Place 1-1.wav";
         private const string TechBuySfxPath = FantasyUiSfxRoot + "/Coins 2-1.wav";
         private const string TechRevealSfxPath = FantasyUiSfxRoot + "/Magical Texture Chimes 1-1.wav";
         private const string TechDeniedSfxPath = FantasyUiSfxRoot + "/Key & Lock 1-1.wav";
@@ -727,6 +731,7 @@ namespace DeadWalls
         {
             ArcherRecruitmentCatalogSO archerCatalog = EnsureDefaultArcherRecruitmentCatalog();
             TechTreeCatalogSO techCatalog = EnsureDefaultTechTreeCatalog();
+            CouncilEventCatalogSO councilEventCatalog = EnsureDefaultCouncilCatalog();
             GameObject gameManagerObject = FindRoot(scene, "GameManager");
             if (gameManagerObject == null)
             {
@@ -737,6 +742,7 @@ namespace DeadWalls
             var gameManager = EnsureComponent<GameManager>(gameManagerObject);
             AssignObjectReference(gameManager, "archerCatalog", archerCatalog);
             AssignObjectReference(gameManager, "techTreeCatalog", techCatalog);
+            AssignObjectReference(gameManager, "councilCatalog", councilEventCatalog);
 
             var uiManager = EnsureComponent<UIManager>(canvas.gameObject);
             BuildCanvasPanels(canvas.transform, uiManager, archerCatalog);
@@ -1075,6 +1081,253 @@ namespace DeadWalls
                 Debug.LogWarning($"[MobileCastleSceneSetup] TechTreeCatalog: {problem}", catalog);
 
             return catalog;
+        }
+
+        // ---------------------------------------------------------------------------------
+        // Council event seed (safak meclisi): atomlar + sablonlar merge-only kurulur.
+        // Somut event asset'i YOKTUR — CouncilComposer runtime'da uretir.
+        // ---------------------------------------------------------------------------------
+
+        private static CouncilEventCatalogSO EnsureDefaultCouncilCatalog()
+        {
+            EnsureAssetFolder(CouncilFolder);
+
+            var atoms = new List<CouncilEffectAtomSO>
+            {
+                EnsureCouncilAtom("gain_resource", CouncilEffectKind.GainResource, a =>
+                {
+                    a.MinutesOfProduction = 1.5f; a.BudgetMinutes = 1.5f;
+                    a.ScarcityWeightMult = 3f; a.LabelFormat = "+{N} {RES}";
+                }),
+                EnsureCouncilAtom("gain_cache", CouncilEffectKind.GainResource, a =>
+                {
+                    a.MinutesOfProduction = 2.2f; a.BudgetMinutes = 2.2f;
+                    a.ScarcityWeightMult = 2f;
+                }),
+                EnsureCouncilAtom("pay_resource", CouncilEffectKind.PayResource, a =>
+                {
+                    a.MinutesOfProduction = 1.2f; a.BudgetMinutes = 1.2f;
+                    a.AbundanceWeightMult = 1.5f;
+                }),
+                EnsureCouncilAtom("boost_production", CouncilEffectKind.TempProductionBoost, a =>
+                {
+                    a.Rate = 0.25f; a.DurationDays = 2; a.BudgetMinutes = 2f;
+                }),
+                EnsureCouncilAtom("penalty_production", CouncilEffectKind.TempProductionPenalty, a =>
+                {
+                    a.Rate = 0.20f; a.DurationDays = 1; a.BudgetMinutes = 1.2f;
+                }),
+                EnsureCouncilAtom("gain_population", CouncilEffectKind.GainPopulation, a =>
+                {
+                    a.Rate = 6f; a.PerDay = 0.5f; a.BudgetMinutes = 2.2f;
+                }),
+                EnsureCouncilAtom("free_archers", CouncilEffectKind.GainFreeArchers, a =>
+                {
+                    a.Rate = 1.4f; a.PerDay = 0.1f; a.BudgetMinutes = 2.5f;
+                    a.LowDefenseWeightMult = 2f;
+                }),
+                EnsureCouncilAtom("heal_defense", CouncilEffectKind.HealDefensePercent, a =>
+                {
+                    a.Rate = 0.20f; a.BudgetMinutes = 1.8f;
+                    a.LowDefenseWeightMult = 3f;
+                }),
+                EnsureCouncilAtom("calm_night", CouncilEffectKind.NextNightSpawnDelta, a =>
+                {
+                    a.Rate = 0.25f; a.BudgetMinutes = 1.5f;
+                }),
+                EnsureCouncilAtom("wild_night", CouncilEffectKind.NextNightSpawnDelta, a =>
+                {
+                    a.Rate = 0.20f; a.BudgetMinutes = 1.5f; a.AbundanceWeightMult = 1.5f;
+                }),
+                EnsureCouncilAtom("cap_bonus", CouncilEffectKind.WorkerCapBonus, a =>
+                {
+                    a.Rate = 3f; a.PerDay = 0.15f; a.BudgetMinutes = 1.6f;
+                }),
+            };
+
+            var templates = new List<CouncilTemplateSO>
+            {
+                EnsureCouncilTemplate("merchant_caravan", t =>
+                {
+                    t.Title = "MERCHANT CARAVAN";
+                    t.Body = "A caravan master offers goods from the far settlements — for a price.";
+                    t.Contrast = CouncilContrastType.ResourceTrade;
+                    t.OptionAAtomIds = new[] { "pay_resource" };
+                    t.OptionBAtomIds = new[] { "gain_resource" };
+                    t.OptionAVerb = "Trade"; t.OptionBVerb = "Decline";
+                    t.SetsFlagOnA = "traded_with_merchant";
+                }),
+                EnsureCouncilTemplate("abandoned_cache", t =>
+                {
+                    t.Title = "ABANDONED CACHE";
+                    t.Body = "Scouts report an untouched supply cache beyond the treeline.";
+                    t.Contrast = CouncilContrastType.NowVsLater;
+                    t.OptionAAtomIds = new[] { "gain_cache" };
+                    t.OptionBAtomIds = new[] { "boost_production" };
+                    t.OptionAVerb = "Haul it now"; t.OptionBVerb = "Set up a crew";
+                    t.BaseWeight = 1.2f;
+                }),
+                EnsureCouncilTemplate("refugees_at_gate", t =>
+                {
+                    t.Title = "REFUGEES AT THE GATE";
+                    t.Body = "Survivors beg for shelter behind your walls.";
+                    t.Contrast = CouncilContrastType.PopulationVsResource;
+                    t.OptionAAtomIds = new[] { "gain_population" };
+                    t.OptionBAtomIds = new[] { "gain_resource" };
+                    t.OptionAVerb = "Take them in"; t.OptionBVerb = "Hand out rations";
+                    t.SetsFlagOnA = "refugees_taken";
+                }),
+                EnsureCouncilTemplate("wandering_veterans", t =>
+                {
+                    t.Title = "WANDERING VETERANS";
+                    t.Body = "Grizzled archers offer their bows for a warm meal.";
+                    t.Contrast = CouncilContrastType.EconomyVsDefense;
+                    t.OptionAAtomIds = new[] { "free_archers" };
+                    t.OptionBAtomIds = new[] { "heal_defense" };
+                    t.OptionAVerb = "Feed them"; t.OptionBVerb = "Trade repairs";
+                    t.BaseWeight = 0.9f;
+                }),
+                EnsureCouncilTemplate("strange_bonfires", t =>
+                {
+                    t.Title = "STRANGE BONFIRES";
+                    t.Body = "The horde's staging grounds lie exposed. Burning them is safe... looting them is not.";
+                    t.Contrast = CouncilContrastType.SafeVsRisky;
+                    t.OptionAAtomIds = new[] { "calm_night" };
+                    t.OptionBAtomIds = new[] { "wild_night" };
+                    t.OptionAVerb = "Burn it all"; t.OptionBVerb = "Loot first";
+                    t.MinDay = 2; t.BaseWeight = 0.9f;
+                }),
+                EnsureCouncilTemplate("cold_snap", t =>
+                {
+                    t.Title = "COLD SNAP";
+                    t.Body = "Frost creeps into the stores. The council argues over the firewood.";
+                    t.Contrast = CouncilContrastType.PayOrSuffer;
+                    t.OptionAAtomIds = new[] { "penalty_production" };
+                    t.OptionBAtomIds = new[] { "pay_resource" };
+                    t.OptionAVerb = "Endure it"; t.OptionBVerb = "Burn extra timber";
+                    t.MinDay = 3; t.BaseWeight = 0.8f;
+                }),
+                EnsureCouncilTemplate("quarry_crew", t =>
+                {
+                    t.Title = "IDLE QUARRY CREW";
+                    t.Body = "A masters' crew seeks contract work while the roads stay closed.";
+                    t.Contrast = CouncilContrastType.NowVsLater;
+                    t.OptionAAtomIds = new[] { "gain_cache" };
+                    t.OptionBAtomIds = new[] { "cap_bonus" };
+                    t.OptionAVerb = "One big job"; t.OptionBVerb = "Keep them on";
+                    t.MinDay = 2;
+                }),
+                EnsureCouncilTemplate("among_the_refugees", t =>
+                {
+                    t.Title = "AMONG THE REFUGEES";
+                    t.Body = "One of the newcomers turns out to be a master craftsman.";
+                    t.Contrast = CouncilContrastType.NowVsLater;
+                    t.OptionAAtomIds = new[] { "gain_cache" };
+                    t.OptionBAtomIds = new[] { "boost_production" };
+                    t.OptionAVerb = "A parting gift"; t.OptionBVerb = "Open a workshop";
+                    t.RequiredFlags = new[] { "refugees_taken" };
+                    t.ChainDelayDays = 2; t.OneShot = true; t.BaseWeight = 2f;
+                }),
+                EnsureCouncilTemplate("an_old_friend", t =>
+                {
+                    t.Title = "AN OLD FRIEND";
+                    t.Body = "The caravan master returns, grinning. 'For my favorite customer...'";
+                    t.Contrast = CouncilContrastType.NowVsLater;
+                    t.OptionAAtomIds = new[] { "gain_cache" };
+                    t.OptionBAtomIds = new[] { "boost_production" };
+                    t.OptionAVerb = "One last haul"; t.OptionBVerb = "A standing contract";
+                    t.RequiredFlags = new[] { "traded_with_merchant" };
+                    t.ChainDelayDays = 2; t.OneShot = true; t.BaseWeight = 1.5f;
+                }),
+            };
+
+            var catalog = AssetDatabase.LoadAssetAtPath<CouncilEventCatalogSO>(CouncilCatalogPath);
+            if (catalog == null)
+            {
+                catalog = ScriptableObject.CreateInstance<CouncilEventCatalogSO>();
+                AssetDatabase.CreateAsset(catalog, CouncilCatalogPath);
+            }
+
+            MergeCouncilList(catalog, atoms, templates);
+
+            var problems = catalog.ValidateCatalog();
+            foreach (var problem in problems)
+                Debug.LogWarning($"[MobileCastleSceneSetup] CouncilCatalog: {problem}", catalog);
+
+            return catalog;
+        }
+
+        private static void MergeCouncilList(CouncilEventCatalogSO catalog,
+            List<CouncilEffectAtomSO> atoms, List<CouncilTemplateSO> templates)
+        {
+            var mergedAtoms = new List<CouncilEffectAtomSO>();
+            if (catalog.Atoms != null)
+            {
+                foreach (var atom in catalog.Atoms)
+                {
+                    if (atom != null && !mergedAtoms.Contains(atom))
+                        mergedAtoms.Add(atom);
+                }
+            }
+            bool changed = false;
+            foreach (var atom in atoms)
+            {
+                if (atom != null && !mergedAtoms.Contains(atom)) { mergedAtoms.Add(atom); changed = true; }
+            }
+
+            var mergedTemplates = new List<CouncilTemplateSO>();
+            if (catalog.Templates != null)
+            {
+                foreach (var template in catalog.Templates)
+                {
+                    if (template != null && !mergedTemplates.Contains(template))
+                        mergedTemplates.Add(template);
+                }
+            }
+            foreach (var template in templates)
+            {
+                if (template != null && !mergedTemplates.Contains(template)) { mergedTemplates.Add(template); changed = true; }
+            }
+
+            if (changed)
+            {
+                Undo.RecordObject(catalog, "Configure Council Catalog");
+                catalog.Atoms = mergedAtoms.ToArray();
+                catalog.Templates = mergedTemplates.ToArray();
+                EditorUtility.SetDirty(catalog);
+            }
+        }
+
+        private static CouncilEffectAtomSO EnsureCouncilAtom(string id, CouncilEffectKind kind,
+            Action<CouncilEffectAtomSO> configure)
+        {
+            string path = CouncilFolder + "/Atom_" + id + ".asset";
+            var atom = AssetDatabase.LoadAssetAtPath<CouncilEffectAtomSO>(path);
+            if (atom != null)
+                return atom; // mevcut asset degerlerine dokunma
+
+            atom = ScriptableObject.CreateInstance<CouncilEffectAtomSO>();
+            atom.Id = id;
+            atom.Kind = kind;
+            configure?.Invoke(atom);
+            AssetDatabase.CreateAsset(atom, path);
+            EditorUtility.SetDirty(atom);
+            return atom;
+        }
+
+        private static CouncilTemplateSO EnsureCouncilTemplate(string id, Action<CouncilTemplateSO> configure)
+        {
+            string path = CouncilFolder + "/Template_" + id + ".asset";
+            var template = AssetDatabase.LoadAssetAtPath<CouncilTemplateSO>(path);
+            if (template != null)
+                return template;
+
+            template = ScriptableObject.CreateInstance<CouncilTemplateSO>();
+            template.Id = id;
+            configure?.Invoke(template);
+            AssetDatabase.CreateAsset(template, path);
+            EditorUtility.SetDirty(template);
+            return template;
         }
 
         private static TechNodeDefinitionSO EnsureTechNodeAsset(TechNodeSeed seed)
@@ -1659,6 +1912,29 @@ namespace DeadWalls
             ConfigureTechTree(hudRoot);
             ConfigureDefenseRepair(hudRoot);
             ConfigureDawnToast(hudRoot);
+            ConfigureCouncilUI(hudRoot);
+        }
+
+        /// <summary>
+        /// Safak meclisi kartinin binding'leri. Kart objeleri prefabdadir (HUD yeniden kurulumunda
+        /// kaybolmaz); tool yalnizca bulur, baglar ve SFX clip'lerini atar. Katalog GameManager'da.
+        /// </summary>
+        private static void ConfigureCouncilUI(GameObject hudRoot)
+        {
+            var council = EnsureComponent<CouncilEventUI>(hudRoot);
+            council.CouncilPanel = FindChildByName(hudRoot, "CouncilEventPanel");
+            council.CouncilTitleText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "CouncilTitleText");
+            council.CouncilBodyText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "CouncilBodyText");
+            council.CouncilTimerFill = FindComponentInChildrenByName<Image>(hudRoot, "CouncilTimerFill");
+            council.CouncilOptionAButton = FindComponentInChildrenByName<Button>(hudRoot, "CouncilOptionAButton");
+            council.CouncilOptionAText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "CouncilOptionAText");
+            council.CouncilOptionBButton = FindComponentInChildrenByName<Button>(hudRoot, "CouncilOptionBButton");
+            council.CouncilOptionBText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "CouncilOptionBText");
+            council.AppearClip = AssetDatabase.LoadAssetAtPath<AudioClip>(CouncilAppearSfxPath);
+            council.ChooseClip = AssetDatabase.LoadAssetAtPath<AudioClip>(CouncilChooseSfxPath);
+
+            if (council.CouncilPanel != null)
+                council.CouncilPanel.SetActive(false);
         }
 
         /// <summary>Player-facing REPAIR butonu (CastleDefensePanel) + kayip-orantili maliyet etiketi.</summary>

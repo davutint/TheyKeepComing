@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28bd919e7eea8be478f6ff9a9ae93566, type: 3}
+  m_Name: Template_strange_bonfires
+  m_EditorClassIdentifier: DeadWalls::DeadWalls.CouncilTemplateSO
+  Id: strange_bonfires
+  Title: STRANGE BONFIRES
+  Body: The horde's staging grounds lie exposed. Burning them is safe... looting
+    them is not.
+  Contrast: 4
+  OptionAAtomIds:
+  - calm_night
+  OptionBAtomIds:
+  - wild_night
+  OptionAVerb: Burn it all
+  OptionBVerb: Loot first
+  BaseWeight: 0.9
+  MinDay: 2
+  RequiredFlags: []
+  ForbiddenFlags: []
+  SetsFlagOnA: 
+  SetsFlagOnB: 
+  ChainDelayDays: 0
+  OneShot: 0

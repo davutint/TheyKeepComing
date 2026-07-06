@@ -18,6 +18,9 @@ namespace DeadWalls
         [Header("Mobile Tech Tree")]
         [SerializeField] private TechTreeCatalogSO techTreeCatalog;
 
+        [Header("Mobile Council Events")]
+        [SerializeField] private CouncilEventCatalogSO councilCatalog;
+
         private EntityManager _entityManager;
         private Entity _gameStateEntity;
         private Entity _waveStateEntity;
@@ -85,6 +88,19 @@ namespace DeadWalls
         private float _baseGateMaxHp;
         private float _baseCastleMaxHp;
 
+        // Council event run-state (persistence yok; RestartGame sifirlar)
+        private readonly Dictionary<string, int> _councilFlags = new Dictionary<string, int>();
+        private readonly List<string> _recentCouncilTemplates = new List<string>();
+        private readonly HashSet<string> _usedOneShotCouncils = new HashSet<string>();
+        private ComposedCouncilEvent _activeCouncilEvent;
+        private int _councilDaysSinceEvent;
+        private int _councilCooldownRemaining;
+        private int _lastCouncilRollDay = -1;
+        private int _councilWoodCapBonus;
+        private int _councilStoneCapBonus;
+        private int _councilIronCapBonus;
+        private int _councilFoodCapBonus;
+
         public GameStateData GameState { get; private set; }
         public WaveStateData WaveState { get; private set; }
         public WallSegment Wall { get; private set; }
@@ -110,6 +126,8 @@ namespace DeadWalls
         public bool IsFreeEconomyTestMode => freeEconomyTestMode;
         public ArcherRecruitmentCatalogSO ArcherCatalog => archerCatalog;
         public TechTreeCatalogSO TechCatalog => techTreeCatalog;
+        public CouncilEventCatalogSO CouncilCatalog => councilCatalog;
+        public ComposedCouncilEvent ActiveCouncilEvent => _activeCouncilEvent;
 
         public event System.Action OnGameOver;
         public event System.Action OnLevelUp;
@@ -1521,10 +1539,12 @@ namespace DeadWalls
                 }
             }
 
-            config.WoodWorkerCap = _baseWoodWorkerCap + woodCap;
-            config.StoneWorkerCap = _baseStoneWorkerCap + stoneCap;
-            config.IronWorkerCap = _baseIronWorkerCap + ironCap;
-            config.FoodWorkerCap = _baseFoodWorkerCap + foodCap;
+            // Cap toplamlari = base + tech + council (council bonuslari da ayni aggregate'te yasar,
+            // aksi halde tech satin alimi council kazanimlarini ezerdi)
+            config.WoodWorkerCap = _baseWoodWorkerCap + woodCap + _councilWoodCapBonus;
+            config.StoneWorkerCap = _baseStoneWorkerCap + stoneCap + _councilStoneCapBonus;
+            config.IronWorkerCap = _baseIronWorkerCap + ironCap + _councilIronCapBonus;
+            config.FoodWorkerCap = _baseFoodWorkerCap + foodCap + _councilFoodCapBonus;
             config.WoodWorkerProductionPerMin = _baseWoodProductionPerMin * (1f + woodProd);
             config.StoneWorkerProductionPerMin = _baseStoneProductionPerMin * (1f + stoneProd);
             config.IronWorkerProductionPerMin = _baseIronProductionPerMin * (1f + ironProd);
@@ -1633,6 +1653,300 @@ namespace DeadWalls
                 castle.MaxHP = _baseCastleMaxHp;
                 _entityManager.SetComponentData(_castleEntity, castle);
             }
+        }
+
+        // ---------------------------------------------------------------------------------
+        // Council Events (safak meclisi — otoriter dok: COUNCIL_EVENTS_ARCHITECTURE.md)
+        // Kart DAWN'da belirir, DAY boyunca yasar, DUSK girisinde expire olur (UI surer).
+        // Event'ler asset degil: CouncilComposer sablon x atom x baglam x olcekten uretir.
+        // ---------------------------------------------------------------------------------
+
+        public bool HasCouncilCatalog => councilCatalog != null
+            && councilCatalog.Templates != null && councilCatalog.Templates.Length > 0
+            && councilCatalog.Atoms != null && councilCatalog.Atoms.Length > 0;
+
+        /// <summary>
+        /// Gunde bir kez cagrilir (UI Dawn'a geciste). Sans + pity + cooldown zinciri;
+        /// basarida ActiveCouncilEvent dolar. Deterministiktir (seed = gun + ECS RandomSeed).
+        /// </summary>
+        public bool TryRollCouncilEvent()
+        {
+            // NOT: _initialized burada KULLANILMAZ — frame-arasi okumalarda dalgalanabiliyor
+            // (TryGetMobileConfigEntity'nin dispose-catch'i dusurup Update yeniden kuruyor).
+            // Cycle cache'inin akiyor olmasi yeterli sinyaldir; etki uygulayicilar zaten
+            // kendi CanAccessEntityManager guard'larina sahiptir.
+            if (!HasCouncilCatalog || !ContinuousSiegeCycle.Enabled || _activeCouncilEvent != null)
+                return false;
+
+            int day = Mathf.Max(1, ContinuousSiegeCycle.CycleIndex + 1);
+            if (day == _lastCouncilRollDay)
+                return false;
+
+            _lastCouncilRollDay = day;
+
+            if (_councilCooldownRemaining > 0)
+            {
+                _councilCooldownRemaining--;
+                _councilDaysSinceEvent++;
+                return false;
+            }
+
+            _councilDaysSinceEvent++;
+            bool pity = _councilDaysSinceEvent >= Mathf.Max(1, councilCatalog.PityDays);
+            uint seed = GetCouncilSeed(day);
+            if (!pity)
+            {
+                float roll = (math.hash(new uint2(seed, 0x9E3779B9u)) & 0x00FFFFFFu) / 16777215f;
+                if (roll >= Mathf.Clamp01(councilCatalog.DailyEventChance))
+                    return false;
+            }
+
+            var context = BuildCouncilContext(day);
+            var composed = CouncilComposer.Compose(councilCatalog, seed, context);
+            if (composed == null)
+                return false;
+
+            _activeCouncilEvent = composed;
+            _councilDaysSinceEvent = 0;
+            _councilCooldownRemaining = Mathf.Max(0, councilCatalog.CooldownDays);
+
+            _recentCouncilTemplates.Add(composed.TemplateId);
+            int memory = Mathf.Max(1, councilCatalog.RecentTemplateMemory);
+            while (_recentCouncilTemplates.Count > memory)
+                _recentCouncilTemplates.RemoveAt(0);
+
+            foreach (var template in councilCatalog.Templates)
+            {
+                if (template != null && template.Id == composed.TemplateId && template.OneShot)
+                    _usedOneShotCouncils.Add(template.Id);
+            }
+
+            OnGameStateChanged?.Invoke();
+            return true;
+        }
+
+        /// <summary>Secenegin odeme etkileri karsilanabiliyor mu (UI buton interactable'i icin).</summary>
+        public bool CanAffordCouncilOption(ComposedCouncilOption option)
+        {
+            if (option == null)
+                return false;
+
+            foreach (var effect in option.Effects)
+            {
+                if (effect.Kind == CouncilEffectKind.PayResource
+                    && !CanAfford(BuildSingleResourceCost(effect.Resource, effect.Amount)))
+                    return false;
+            }
+
+            return true;
+        }
+
+        public bool ChooseCouncilOption(bool optionA)
+        {
+            var active = _activeCouncilEvent;
+            if (active == null)
+                return false;
+
+            var option = optionA ? active.OptionA : active.OptionB;
+            if (!CanAffordCouncilOption(option))
+                return false;
+
+            ApplyCouncilEffects(option.Effects);
+
+            int day = Mathf.Max(1, ContinuousSiegeCycle.CycleIndex + 1);
+            SetCouncilFlag("council_" + active.TemplateId + (optionA ? "_a" : "_b"), day);
+            string extraFlag = optionA ? active.SetsFlagOnA : active.SetsFlagOnB;
+            if (!string.IsNullOrEmpty(extraFlag))
+                SetCouncilFlag(extraFlag, day);
+
+            _activeCouncilEvent = null;
+            OnGameStateChanged?.Invoke();
+            return true;
+        }
+
+        /// <summary>Karar penceresi kapandi (DUSK) — kart secilmeden dagilir; flag yazilmaz.</summary>
+        public void ExpireCouncilEvent()
+        {
+            if (_activeCouncilEvent == null)
+                return;
+
+            _activeCouncilEvent = null;
+            OnGameStateChanged?.Invoke();
+        }
+
+        private void ApplyCouncilEffects(List<ComposedCouncilEffect> effects)
+        {
+            bool capsDirty = false;
+            foreach (var effect in effects)
+            {
+                switch (effect.Kind)
+                {
+                    case CouncilEffectKind.GainResource:
+                        AddResources(BuildSingleResourceCost(effect.Resource, effect.Amount));
+                        break;
+                    case CouncilEffectKind.PayResource:
+                        SpendResources(BuildSingleResourceCost(effect.Resource, effect.Amount));
+                        break;
+                    case CouncilEffectKind.GainPopulation:
+                        AddPopulation(effect.Amount);
+                        break;
+                    case CouncilEffectKind.GainFreeArchers:
+                        for (int i = 0; i < effect.Amount; i++)
+                            SpawnArcher(ArcherType.Basic); // bedava: population tuketilmez
+                        break;
+                    case CouncilEffectKind.HealDefensePercent:
+                        HealDefenseByPercent(Mathf.Abs(effect.Rate));
+                        break;
+                    case CouncilEffectKind.WorkerCapBonus:
+                        ApplyCouncilCapBonus(effect.Resource, effect.Amount);
+                        capsDirty = true;
+                        break;
+                    case CouncilEffectKind.TempProductionBoost:
+                        ApplyCouncilProductionModifier(effect.Resource, 1f + Mathf.Abs(effect.Rate), effect.DurationDays);
+                        break;
+                    case CouncilEffectKind.TempProductionPenalty:
+                        ApplyCouncilProductionModifier(effect.Resource, Mathf.Clamp(1f - Mathf.Abs(effect.Rate), 0.1f, 1f), effect.DurationDays);
+                        break;
+                    case CouncilEffectKind.NextNightSpawnDelta:
+                        ApplyCouncilNightModifier(1f + effect.Rate);
+                        break;
+                }
+            }
+
+            if (capsDirty)
+                ApplyTechEconomyAggregates(); // cap toplamlari base+tech+council olarak yeniden yazilir
+        }
+
+        private static ResourceCost BuildSingleResourceCost(EconomyFocusType resource, int amount)
+        {
+            switch (resource)
+            {
+                case EconomyFocusType.Stone: return new ResourceCost(0, amount, 0, 0);
+                case EconomyFocusType.Iron: return new ResourceCost(0, 0, amount, 0);
+                case EconomyFocusType.Food: return new ResourceCost(0, 0, 0, amount);
+                default: return new ResourceCost(amount, 0, 0, 0);
+            }
+        }
+
+        private void HealDefenseByPercent(float percent)
+        {
+            if (!CanAccessEntityManager() || !_entityManager.Exists(_castleEntity) || percent <= 0f)
+                return;
+
+            var wall = _entityManager.GetComponentData<WallSegment>(_castleEntity);
+            wall.CurrentHP = Mathf.Min(wall.MaxHP, wall.CurrentHP + wall.MaxHP * percent);
+            _entityManager.SetComponentData(_castleEntity, wall);
+            Wall = wall;
+
+            var gate = _entityManager.GetComponentData<GateComponent>(_castleEntity);
+            gate.CurrentHP = Mathf.Min(gate.MaxHP, gate.CurrentHP + gate.MaxHP * percent);
+            _entityManager.SetComponentData(_castleEntity, gate);
+            Gate = gate;
+
+            var castle = _entityManager.GetComponentData<CastleHP>(_castleEntity);
+            castle.CurrentHP = Mathf.Min(castle.MaxHP, castle.CurrentHP + castle.MaxHP * percent);
+            _entityManager.SetComponentData(_castleEntity, castle);
+            Castle = castle;
+        }
+
+        private void ApplyCouncilCapBonus(EconomyFocusType resource, int amount)
+        {
+            bool all = resource == EconomyFocusType.Balanced;
+            if (all || resource == EconomyFocusType.Wood) _councilWoodCapBonus += amount;
+            if (all || resource == EconomyFocusType.Stone) _councilStoneCapBonus += amount;
+            if (all || resource == EconomyFocusType.Iron) _councilIronCapBonus += amount;
+            if (all || resource == EconomyFocusType.Food) _councilFoodCapBonus += amount;
+        }
+
+        private void ApplyCouncilProductionModifier(EconomyFocusType resource, float multiplier, int durationDays)
+        {
+            if (!TryGetMobileConfigEntity(out var configEntity)
+                || !_entityManager.HasComponent<MobileEconomyEventState>(configEntity))
+                return;
+
+            int day = Mathf.Max(1, ContinuousSiegeCycle.CycleIndex + 1);
+            var eventState = _entityManager.GetComponentData<MobileEconomyEventState>(configEntity);
+            // Tek aktif bonus slotu: yeni gelen eskisini ezer (V1 kisiti, dokumante)
+            eventState.ProductionBonusResource = resource;
+            eventState.ProductionBonusMultiplier = multiplier;
+            eventState.ProductionBonusExpiresAfterWave = day + Mathf.Max(1, durationDays);
+            _entityManager.SetComponentData(configEntity, eventState);
+            EconomyEvent = eventState;
+        }
+
+        private void ApplyCouncilNightModifier(float multiplier)
+        {
+            if (!TryGetMobileConfigEntity(out var configEntity)
+                || !_entityManager.HasComponent<MobileEconomyEventState>(configEntity))
+                return;
+
+            int day = Mathf.Max(1, ContinuousSiegeCycle.CycleIndex + 1);
+            // "Sonraki gece": Dawn'da secildiyse bir sonraki cycle'in gecesi (expire +2),
+            // Day/Dusk'ta secildiyse bu cycle'in gecesi (expire +1).
+            bool inDawn = ContinuousSiegeCycle.Phase == SiegeCyclePhase.Dawn;
+            var eventState = _entityManager.GetComponentData<MobileEconomyEventState>(configEntity);
+            eventState.NextNightSpawnMultiplier = Mathf.Clamp(multiplier, 0.25f, 2f);
+            eventState.NightSpawnExpiresAfterWave = day + (inDawn ? 2 : 1);
+            _entityManager.SetComponentData(configEntity, eventState);
+            EconomyEvent = eventState;
+        }
+
+        private void SetCouncilFlag(string flag, int day)
+        {
+            if (string.IsNullOrEmpty(flag))
+                return;
+
+            if (!_councilFlags.ContainsKey(flag))
+                _councilFlags[flag] = day;
+        }
+
+        private uint GetCouncilSeed(int day)
+        {
+            uint baseSeed = 91273u;
+            if (TryGetMobileConfigEntity(out var configEntity)
+                && _entityManager.HasComponent<MobileEconomyEventState>(configEntity))
+            {
+                uint stored = _entityManager.GetComponentData<MobileEconomyEventState>(configEntity).RandomSeed;
+                if (stored != 0u)
+                    baseSeed = stored;
+            }
+
+            return math.hash(new uint2(baseSeed, (uint)day));
+        }
+
+        private CouncilContext BuildCouncilContext(int day)
+        {
+            return new CouncilContext
+            {
+                Day = day,
+                Wood = Resources.Wood,
+                Stone = Resources.Stone,
+                Iron = Resources.Iron,
+                Food = Resources.Food,
+                WoodPerMin = GetWorkerProductionRate(EconomyFocusType.Wood),
+                StonePerMin = GetWorkerProductionRate(EconomyFocusType.Stone),
+                IronPerMin = GetWorkerProductionRate(EconomyFocusType.Iron),
+                FoodPerMin = GetWorkerProductionRate(EconomyFocusType.Food),
+                Defense01 = GetDefensePercent(),
+                Flags = _councilFlags,
+                RecentTemplateIds = _recentCouncilTemplates,
+                UsedOneShotTemplateIds = _usedOneShotCouncils,
+            };
+        }
+
+        private void ResetCouncilState()
+        {
+            _councilFlags.Clear();
+            _recentCouncilTemplates.Clear();
+            _usedOneShotCouncils.Clear();
+            _activeCouncilEvent = null;
+            _councilDaysSinceEvent = 0;
+            _councilCooldownRemaining = 0;
+            _lastCouncilRollDay = -1;
+            _councilWoodCapBonus = 0;
+            _councilStoneCapBonus = 0;
+            _councilIronCapBonus = 0;
+            _councilFoodCapBonus = 0;
         }
 
         private void ConfigureWaveForCurrentNumber(ref WaveStateData wave)
@@ -2551,6 +2865,7 @@ namespace DeadWalls
 
             ResetArcherEconomyState();
             ResetTechTreeState();
+            ResetCouncilState();
             if (mobileMode && _entityManager.HasComponent<EconomyFocusState>(mobileConfigEntity))
             {
                 _entityManager.SetComponentData(mobileConfigEntity, new EconomyFocusState

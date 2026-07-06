@@ -233,6 +233,16 @@ namespace DeadWalls
                 return;
 
             float intensity = math.max(0.01f, cycle.SpawnIntensityMultiplier);
+
+            // Council risk atomu: "sonraki gece" carpani yalniz NIGHT fazinda uygulanir
+            if (cycle.Phase == SiegeCyclePhase.Night
+                && SystemAPI.HasSingleton<MobileEconomyEventState>())
+            {
+                float nightMult = SystemAPI.GetSingleton<MobileEconomyEventState>().NextNightSpawnMultiplier;
+                if (nightMult > 0f)
+                    intensity *= nightMult;
+            }
+
             float baseInterval = wave.SpawnInterval > 0f ? wave.SpawnInterval : mobileConfig.BaseSpawnInterval;
             wave.SpawnTimer = math.max(mobileConfig.MinSpawnInterval, baseInterval / intensity);
 

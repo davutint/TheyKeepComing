@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2f7c4ee73e14814293430f157bb3fb9, type: 3}
+  m_Name: Atom_gain_cache
+  m_EditorClassIdentifier: DeadWalls::DeadWalls.CouncilEffectAtomSO
+  Id: gain_cache
+  Kind: 1
+  Resource: 0
+  MinutesOfProduction: 2.2
+  FlatFallback: 60
+  Rate: 0.25
+  PerDay: 0.3
+  DurationDays: 2
+  BudgetMinutes: 2.2
+  ScarcityThresholdMinutes: 2
+  ScarcityWeightMult: 2
+  AbundanceWeightMult: 1
+  LowDefenseWeightMult: 1
+  LabelFormat: +{N} {RES}

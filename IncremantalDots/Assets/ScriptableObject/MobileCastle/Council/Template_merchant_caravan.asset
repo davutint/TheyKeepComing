@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28bd919e7eea8be478f6ff9a9ae93566, type: 3}
+  m_Name: Template_merchant_caravan
+  m_EditorClassIdentifier: DeadWalls::DeadWalls.CouncilTemplateSO
+  Id: merchant_caravan
+  Title: MERCHANT CARAVAN
+  Body: "A caravan master offers goods from the far settlements \u2014 for a price."
+  Contrast: 1
+  OptionAAtomIds:
+  - pay_resource
+  OptionBAtomIds:
+  - gain_resource
+  OptionAVerb: Trade
+  OptionBVerb: Decline
+  BaseWeight: 1
+  MinDay: 1
+  RequiredFlags: []
+  ForbiddenFlags: []
+  SetsFlagOnA: traded_with_merchant
+  SetsFlagOnB: 
+  ChainDelayDays: 0
+  OneShot: 0

@@ -40,6 +40,7 @@ namespace DeadWalls
             {
                 var cycle = SystemAPI.GetSingleton<ContinuousSiegeCycleData>();
                 ApplyContinuousCycleGrowth(ref allocationRW.ValueRW, ref populationRW.ValueRW, config, cycle);
+                ExpireContinuousEventEffects(ref eventRW.ValueRW, cycle);
             }
             else if (!wave.WaveActive && wave.Phase == RunPhaseType.DayPrep && wave.CurrentWave > 0)
             {
@@ -82,6 +83,31 @@ namespace DeadWalls
             population.Total += math.max(0, config.PopulationGrowthPerDayPrep);
             population.Capacity = math.max(population.Capacity, population.Total);
             population.BaseCapacity = math.max(population.BaseCapacity, population.Capacity);
+        }
+
+        /// <summary>
+        /// Continuous modda sureli event etkilerinin son kullanma kontrolu (legacy ApplyDayPrepStart
+        /// continuous'ta hic kosulamadigi icin buradan islenir). Wave sayisi = CycleIndex + 1.
+        /// </summary>
+        private static void ExpireContinuousEventEffects(ref MobileEconomyEventState economyEvent,
+            ContinuousSiegeCycleData cycle)
+        {
+            int currentWave = math.max(1, cycle.CycleIndex + 1);
+
+            if (economyEvent.ProductionBonusExpiresAfterWave > 0
+                && currentWave >= economyEvent.ProductionBonusExpiresAfterWave)
+            {
+                economyEvent.ProductionBonusResource = EconomyFocusType.Balanced;
+                economyEvent.ProductionBonusMultiplier = 1f;
+                economyEvent.ProductionBonusExpiresAfterWave = 0;
+            }
+
+            if (economyEvent.NightSpawnExpiresAfterWave > 0
+                && currentWave >= economyEvent.NightSpawnExpiresAfterWave)
+            {
+                economyEvent.NextNightSpawnMultiplier = 1f;
+                economyEvent.NightSpawnExpiresAfterWave = 0;
+            }
         }
 
         private static void ApplyDayPrepStart(ref MobilePopulationAllocation allocation,

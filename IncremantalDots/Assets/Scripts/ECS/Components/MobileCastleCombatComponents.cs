@@ -177,6 +177,10 @@ namespace DeadWalls
         public float ProductionBonusMultiplier;
         public int ProductionBonusExpiresAfterWave;
         public uint RandomSeed;
+        // Council risk atomu: SONRAKI gece spawn yogunlugu carpani (1 = notr; 0 = ayarsiz/legacy).
+        // WaveSpawnSystem yalniz Night fazinda uygular; expire continuous dalda islenir.
+        public float NextNightSpawnMultiplier;
+        public int NightSpawnExpiresAfterWave;
     }
 
     public struct ArcherSlotPosition : IBufferElementData

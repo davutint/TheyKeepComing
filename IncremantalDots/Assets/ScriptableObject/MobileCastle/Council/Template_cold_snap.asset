@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28bd919e7eea8be478f6ff9a9ae93566, type: 3}
+  m_Name: Template_cold_snap
+  m_EditorClassIdentifier: DeadWalls::DeadWalls.CouncilTemplateSO
+  Id: cold_snap
+  Title: COLD SNAP
+  Body: Frost creeps into the stores. The council argues over the firewood.
+  Contrast: 5
+  OptionAAtomIds:
+  - penalty_production
+  OptionBAtomIds:
+  - pay_resource
+  OptionAVerb: Endure it
+  OptionBVerb: Burn extra timber
+  BaseWeight: 0.8
+  MinDay: 3
+  RequiredFlags: []
+  ForbiddenFlags: []
+  SetsFlagOnA: 
+  SetsFlagOnB: 
+  ChainDelayDays: 0
+  OneShot: 0

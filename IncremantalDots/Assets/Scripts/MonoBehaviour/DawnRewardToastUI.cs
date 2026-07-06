@@ -38,9 +38,10 @@ namespace DeadWalls
             _nextCheckTime = Time.unscaledTime + CheckInterval;
 
             var gm = GameManager.Instance;
-            if (gm == null || !gm.IsMobileMode)
+            if (gm == null)
                 return;
 
+            // IsMobileMode kullanilmaz (frame-arasi dalgalanma); cycle cache'i yeterli sinyal.
             var cycle = gm.ContinuousSiegeCycle;
             if (!cycle.Enabled)
                 return;

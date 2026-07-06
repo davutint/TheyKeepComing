@@ -49,7 +49,10 @@ Otorite `ContinuousSiegeCycleData` (eski `WaveStateData.Phase` DEGIL):
 3. **Reward (DAWN)** -- population growth (+15) DAWN fazinda verilir + `DawnRewardToastUI` toast'u.
    Kill reward SABIT kalir (`KillRewardWaveScale=0`, gelir/zorluk ayrisik); ana gelir sol worker ekonomisi.
    Repair artik MALIYETLI (kayip-orantili, `DefenseRepairUI` butonu) -- ana sink'lerden biri.
-4. **Economy events** (`MobileEconomyEventState`) -- legacy DayPrep akisinda rollanir; continuous'ta player-facing degil.
+4. **Council events (safak meclisi)** -- DAWN'da rollanir (sans 0.30 + 4 gun pity), kart DAY boyunca yasar,
+   DUSK'ta expire. `CouncilComposer` uretir (SO atom/sablon havuzu `ScriptableObject/MobileCastle/Council/`);
+   risk atomu `NextNightSpawnMultiplier` ile sonraki geceyi buker. Legacy `MobileEconomyEventState` roll'u
+   (DayPrep) continuous'ta kosmaz; temp-bonus/expire alanlari yeni sistemce KULLANILIR.
 - **LEGACY (kodda durur, `ContinuousSiegeCycleData.Enabled` true iken DEVRE DISI):** `WaveStateData.Phase` DayPrep/NightCombat,
   Wave-clear reward (`WaveClearRewardData`), `Start Next Wave`, `Repair/Fortify/Rally`, intra-wave director pacing.
 - Anahtarlar `MobileCastleCombatConfig`'te: CastleCenter (0,0), SpawnRadius 11, AttackRadius 1.35,
@@ -69,6 +72,7 @@ Otorite `ContinuousSiegeCycleData` (eski `WaveStateData.Phase` DEGIL):
 | Gun/Gece overlay | `DayNightOverlayController.cs` | faz alpha (Day 0 -> Night 0.50 -> Dawn'da geri acilir) |
 | Defense repair butonu | `DefenseRepairUI.cs` | CastleDefensePanel'de REPAIR + kayip-orantili maliyet etiketi; her zaman denenebilir (DayPrep sarti YOK) |
 | Dawn odul toast'u | `DawnRewardToastUI.cs` | faz Dawn'a gecince "DAWN - DAY n SURVIVED +15 POP" (SiegeToastText) |
+| Council event karti | `CouncilEventUI.cs` + `CouncilComposer.cs` | safak meclisi: kart DAWN'da belirir, DAY boyunca yasar, DUSK'ta expire; event'ler asset DEGIL, sablon x atom x baglam x olcekten uretilir (director + zincir/flag hafizasi + butce dengeleme); pause YOK |
 | Castle Interior ekonomi paneli | `CastleEconomyUI.cs` | LEGACY/debug (`PlayerFacingPanelEnabled=false`); ana ekonomi sol drawer'a tasindi |
 | Kaleye tikla-ac tetikleyici | `CastleInteriorClickTarget.cs` | LEGACY; player-facing worker yonetimi sol drawer'da |
 
