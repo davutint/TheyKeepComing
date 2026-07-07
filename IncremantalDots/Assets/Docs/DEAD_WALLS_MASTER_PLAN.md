@@ -17,7 +17,7 @@
 | K1 | Bar nerede? | **PLAY STORE URUNU** — yayinlanacak gercek urun; store varliklari, analytics ve monetizasyon karari plana dahildir (C11-C13 aktif) |
 | K2 | Kosu yapisi? | **ROGUELITE META** — olum -> kalici meta-ilerleme -> yeni kosu; olum anlamli, kosular tempolu (C9 aktif) |
 | K3 | Platform? | **MOBIL-FIRST, PC KAPISI ACIK** — ana hedef telefon; PC/Steam ileride ayri karar (kod iki girisi destekliyor) |
-| K4 | Savas duzeni? | **TEK CEPHE (SAGDAN SALDIRI)** — 360-ring TERK EDILDI. Dusmanlar yalniz sagdan gelir; solda us/ekonomi, ortada savunma hatti. Hat yapisi: DUVAR + HENDEK + KULELER. Ordu modeli: OKCU-DUVAR korunur (melee ordu YOK). Duvar temasi: vurur + domino kuyruk (mevcut fizik). GORSEL IS BOLUMU: koy/us ve duvar tilemap'lerini OWNER olusturur; gameplay baglari (spawn seridi, hat konumu, kule slotu = dolu tilemap hucresi okuma) Claude yapar. |
+| K4 | Savas duzeni? | **TEK CEPHE (SAGDAN SALDIRI)** — 360-ring TERK EDILDI. Dusmanlar yalniz sagdan gelir; solda us/ekonomi, ortada savunma hatti. Hat yapisi: DUVAR + HENDEK + KULELER. Ordu modeli: OKCU-DUVAR korunur (melee ordu YOK). Duvar temasi: vurur + domino kuyruk (mevcut fizik). GORSEL IS BOLUMU: koy/us ve duvar tilemap'lerini OWNER olusturur; gameplay baglari (spawn seridi, hat konumu, kule slotu = dolu tilemap hucresi okuma) Claude yapar. **GORSEL KATMAN TAMAM (2026-07-07):** komple harita MCP tile pipeline ile boyandi — koy (kale W6x5 + tarla + tas ocagi + demir madeni + kereste kampi + meydan/patikalar), duvar (owner'in el tasarimi git'ten geri insa + tek panelli kapi), hendek, kuru savas alani + toprak yol, spawn seridi, ust kenar orman bandi. Kontratlar: `outside` = 40 okcu slotu (x=0), `VillageMarkers` 5 tam isimli marker. Setup tool boyamayi korur (fallback arena kapili). Play testi GECTI (okcular duvarda, zombi spawn calisiyor). Detay: `STRUCTURE_SPRITE_BAKER_CAPABILITIES.md`. |
 
 > Bu kararlar geri acilmaz (yeni buyuk bilgi cikmadikca). Tum milestone ve kriterler
 > bu kararlara gore okunur. K4 implementasyonu M-0 milestone'udur (kod su an hala 360-ring).
@@ -210,7 +210,29 @@ Ara hedef olarak "oynanabilir demo" = C1-C10 (store maddeleri haric).
   (okcu yerlesimi otomatik tilemap-oncelikli olur).
 - Bilinen acik teknik borc: TechTreeUI'de IsMobileMode guard'i (dalgalanma riski, dusuk oncelik);
   gercek cihaz hic test edilmedi; save yok.
-- M-A HAZIRLIGI TAMAM (2026-07-06): `LongRunSimulatorWindow` olcum botu yazildi
-  (Window > DeadWalls > Long Run Simulator) — play testi owner'in tilemap boyamasi
-  bitince yapilacak.
-- SIRADAKI IS: owner gorsel boyama (M-0 kapanisi) -> M-A olcum kosulari (bot hazir).
+- **M-0 KAPANDI (2026-07-07):** gorsel katman + VillageMarkers -> villager rotalari
+  setup-tool koprusuyle baglandi; play'de 56 villager koy yapilarina yuruyor,
+  okcular duvarda, tam akis dogrulandi (screenshot'li).
+- **M-A OLCUM TAMAM (2026-07-07):** 10 kosu (Logs/LongRun/*.csv). ANA BULGU — "cift
+  kambur": kosularin ~%90'i DAY 2-3'te oluyor (duvar 200 HP tek gecede gidiyor; repair
+  stone'a bagli ve erken oyunda stone yetmiyor), DAY 4'u atlatan tek kosu ise DAY 20'ye
+  kadar HIC olmuyor (okcu+tech gucu eskalasyonu geciyor; gate %66'da 14 gun sabit).
+  C1 hedefi (15-40 dk kosu) su tuning'de imkansiz: kosu ya 2-3 dk ya sonsuz.
+  Ek bulgular: IRON kalici darbogaz (uretim 114/dk, tech talebi cok ustunde);
+  STONE+FOOD gec oyunda olu para (S2894/F5225 birikti — food'un hic sink'i yok);
+  okcu enflasyonu (council free-archer akisi + alimlar -> DAY 20'de 95 okcu);
+  FPS saglikli (gun-sonu 180-280; anlik gece diplerinde ~58-130).
+  Balance duzeltme paketi owner onayi bekliyor; yapisal plato cozumu = M-C
+  (zombi tipleri + ozel geceler), food kimligi = M-B/3.2 karari.
+- **DIFFICULTY TUNER TAMAM + BALANCE DUZELDI (2026-07-07):** zorluk veriye tasindi —
+  `DifficultyProfileSO` (gun-egrileri + eskalasyon; SpawnTable/SpecialNights M-C iskeleti)
+  + `Difficulty Tuner` penceresi (Apply canli + Run Bot + dagilim ozeti). Default profil
+  (ramp d1 0.5 -> d7 1.0, HpGrowth 0.40, BatchGrowth 0.15, MaxBatch 16, RepairStone 50,
+  Wall 350, Iron +%30, council free-archer kisildi) ile dogrulama: olumler DAY 2-3'ten
+  6+'ya tasindi; DAY 20'ye ulasan kosu SUREKLI MUCADELE yasadi (DAY 18'de duvar+kapi
+  dustu, 47 repair, 892 canli zombi @ FPS 200+). "Ya 2 dk ya sonsuz" cift-kamburu KIRILDI.
+  Ust-uc inceltme M-C'de (zombi tipleri + ozel geceler); ayar artik owner'in elinde
+  (Tuner, kod istemez).
+- SIRADAKI IS: M-B ROGUELITE META tasarim sohbeti — girdiler hazir: kosu bandi ~6-20 gun
+  (6-20 dk @1x), olurken elde kalan tipik birikim CSV'lerde; food/stone fazlasi meta
+  para birimi adayi.

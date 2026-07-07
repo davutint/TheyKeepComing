@@ -214,6 +214,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec07ec66a83d4b3ea0839d9a6f998d09, type: 3}
   m_Name: 
   m_EditorClassIdentifier: DeadWalls::DeadWalls.MobileCastleCombatAuthoring
+  Profile: {fileID: 11400000, guid: 9f798199948144043ae3b437a0945fe5, type: 2}
   CastleCenter: {x: 0, y: 0}
   SpawnRadius: 11
   AttackRadius: 1.35
@@ -298,7 +299,7 @@ MonoBehaviour:
   FoodWorkerCap: 40
   WoodWorkerProductionPerMin: 8
   StoneWorkerProductionPerMin: 5.5
-  IronWorkerProductionPerMin: 3.8
+  IronWorkerProductionPerMin: 4.9
   FoodWorkerProductionPerMin: 7
   WorkerEconomyRewardMultiplier: 0.25
   EconomyEventChance: 0.15
@@ -490,7 +491,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92a9dfb7af13ac247b1838328901b51e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: DeadWalls::DeadWalls.CastleAuthoring
-  WallHP: 200
+  WallHP: 350
   GateHP: 100
   CastleMaxHP: 500
   WallXPos: 0

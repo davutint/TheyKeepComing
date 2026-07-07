@@ -37,6 +37,8 @@ namespace DeadWalls
         private const string FrostArcherDefinitionPath = ArcherDefinitionFolder + "/FrostArcher.asset";
         private const string TechTreeFolder = "Assets/ScriptableObject/MobileCastle/TechTree";
         private const string TechTreeCatalogPath = TechTreeFolder + "/TechTreeCatalog.asset";
+        private const string DifficultyFolder = "Assets/ScriptableObject/MobileCastle/Difficulty";
+        public const string DifficultyProfilePath = DifficultyFolder + "/DefaultDifficulty.asset";
         private const string CouncilFolder = "Assets/ScriptableObject/MobileCastle/Council";
         private const string CouncilCatalogPath = CouncilFolder + "/CouncilEventCatalog.asset";
         private const string CouncilAppearSfxPath = FantasyUiSfxRoot + "/Book Handle 1-2.wav";
@@ -252,7 +254,7 @@ namespace DeadWalls
             var castle = EnsureSceneRoot(subScene, "CastleCore");
             castle.transform.position = Vector3.zero;
             var castleAuthoring = EnsureComponent<CastleAuthoring>(castle);
-            castleAuthoring.WallHP = 200f;
+            castleAuthoring.WallHP = 350f; // M-A balance: erken geceler tek atista yikmasin (200 -> 350)
             castleAuthoring.GateHP = 100f;
             castleAuthoring.CastleMaxHP = 500f;
             castleAuthoring.WallXPos = 0f;
@@ -340,7 +342,7 @@ namespace DeadWalls
             mobileAuthoring.FoodWorkerCap = 40;
             mobileAuthoring.WoodWorkerProductionPerMin = 8f;
             mobileAuthoring.StoneWorkerProductionPerMin = 5.5f;
-            mobileAuthoring.IronWorkerProductionPerMin = 3.8f;
+            mobileAuthoring.IronWorkerProductionPerMin = 4.9f; // M-A balance: iron darbogazi (+%30)
             mobileAuthoring.FoodWorkerProductionPerMin = 7f;
             mobileAuthoring.WorkerEconomyRewardMultiplier = 0.25f;
             mobileAuthoring.EconomyEventChance = 0.15f;
@@ -740,6 +742,7 @@ namespace DeadWalls
             ArcherRecruitmentCatalogSO archerCatalog = EnsureDefaultArcherRecruitmentCatalog();
             TechTreeCatalogSO techCatalog = EnsureDefaultTechTreeCatalog();
             CouncilEventCatalogSO councilEventCatalog = EnsureDefaultCouncilCatalog();
+            AssignDifficultyProfileToAuthoring(EnsureDefaultDifficultyProfile());
             GameObject gameManagerObject = FindRoot(scene, "GameManager");
             if (gameManagerObject == null)
             {
@@ -1116,6 +1119,56 @@ namespace DeadWalls
         // Council event seed (safak meclisi): atomlar + sablonlar merge-only kurulur.
         // Somut event asset'i YOKTUR — CouncilComposer runtime'da uretir.
         // ---------------------------------------------------------------------------------
+
+        // ---------------------------------------------------------------------------------
+        // Difficulty profile seed: zorlugun tek dogruluk kaynagi (M-A olcum bulgularina gore
+        // duzeltme paketi degerleriyle dogar). Mevcut asset'e ASLA dokunulmaz (merge-only).
+        // Duzenleme yeri: Window > DeadWalls > Difficulty Tuner.
+        // ---------------------------------------------------------------------------------
+
+        public static DifficultyProfileSO EnsureDefaultDifficultyProfile()
+        {
+            EnsureAssetFolder(DifficultyFolder);
+
+            var profile = AssetDatabase.LoadAssetAtPath<DifficultyProfileSO>(DifficultyProfilePath);
+            if (profile != null)
+                return profile;
+
+            profile = ScriptableObject.CreateInstance<DifficultyProfileSO>();
+            // Erken olum kamburu duzeltmesi (M-A): ilk geceler kademeli siddet rampi
+            profile.NightIntensityByDay = new AnimationCurve(
+                new Keyframe(1f, 0.60f), new Keyframe(2f, 0.80f),
+                new Keyframe(3f, 1.00f), new Keyframe(60f, 1.00f));
+            profile.ZombieHpMultByDay = AnimationCurve.Constant(1f, 60f, 1f);
+            profile.SpawnBatchMultByDay = AnimationCurve.Constant(1f, 60f, 1f);
+            profile.SampleDays = 60;
+            // Plato yumusatma (M-A): eskalasyon sikilastirildi
+            profile.ZombieHpGrowthPerCycle = 0.40f;
+            profile.SpawnBatchGrowthPerCycle = 0.15f;
+            profile.MaxSpawnBatch = 16;
+            // Erken kurtulus yolu: repair'in stone bagimliligi dusuruldu
+            profile.RepairBaseStoneCost = 50;
+            AssetDatabase.CreateAsset(profile, DifficultyProfilePath);
+            EditorUtility.SetDirty(profile);
+            return profile;
+        }
+
+        /// <summary>Subscene'deki combat authoring'ine profili baglar (yalniz BOSSA; owner atamasina dokunmaz).</summary>
+        private static void AssignDifficultyProfileToAuthoring(DifficultyProfileSO profile)
+        {
+            if (profile == null)
+                return;
+
+            var authoring = UnityEngine.Object.FindFirstObjectByType<MobileCastleCombatAuthoring>(FindObjectsInactive.Include);
+            if (authoring == null || authoring.Profile != null)
+                return;
+
+            Undo.RecordObject(authoring, "Assign Difficulty Profile");
+            authoring.Profile = profile;
+            EditorUtility.SetDirty(authoring);
+            EditorSceneManager.MarkSceneDirty(authoring.gameObject.scene);
+            EditorSceneManager.SaveScene(authoring.gameObject.scene);
+        }
 
         private static CouncilEventCatalogSO EnsureDefaultCouncilCatalog()
         {

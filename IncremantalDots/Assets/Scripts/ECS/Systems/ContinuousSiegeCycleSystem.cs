@@ -55,6 +55,19 @@ namespace DeadWalls
             if (timer < 0f)
                 timer = 0f;
 
+            // Difficulty profile gun carpani: erken oyun rampi vb. — gece (ve dusk-sonu)
+            // siddetini gunun orneklemiyle carpar. Buffer yok/bos = 1 (geriye uyumlu).
+            int currentCycleIndex = math.max(0, cycle.ValueRO.CycleIndex);
+            float dayNightMult = 1f;
+            float dayHpMult = 1f;
+            if (SystemAPI.TryGetSingletonBuffer<DifficultyDaySample>(out var difficultySamples, true)
+                && difficultySamples.Length > 0)
+            {
+                var sample = difficultySamples[math.min(currentCycleIndex, difficultySamples.Length - 1)];
+                dayNightMult = math.max(0.01f, sample.NightIntensityMult);
+                dayHpMult = math.max(0.01f, sample.ZombieHpMult);
+            }
+
             SiegeCyclePhase phase;
             float phaseProgress;
             float intensity;
@@ -70,14 +83,14 @@ namespace DeadWalls
                 phaseProgress = math.saturate((timer - dayDuration) / math.max(0.01f, duskDuration));
                 intensity = math.lerp(
                     math.max(0.01f, config.SiegeDuskStartIntensityMultiplier),
-                    math.max(0.01f, config.SiegeDuskEndIntensityMultiplier),
+                    math.max(0.01f, config.SiegeDuskEndIntensityMultiplier) * dayNightMult,
                     phaseProgress);
             }
             else if (timer < dayDuration + duskDuration + nightDuration || dawnDuration <= 0f)
             {
                 phase = SiegeCyclePhase.Night;
                 phaseProgress = math.saturate((timer - dayDuration - duskDuration) / math.max(0.01f, nightDuration));
-                intensity = math.max(0.01f, config.SiegeNightIntensityMultiplier);
+                intensity = math.max(0.01f, config.SiegeNightIntensityMultiplier * dayNightMult);
             }
             else
             {
@@ -102,7 +115,7 @@ namespace DeadWalls
             cycle.ValueRW.Phase = phase;
 
             wave.ValueRW.CurrentWave = math.max(1, cycleIndex + 1);
-            MobileWaveUtility.ConfigureMobileWave(ref wave.ValueRW, config);
+            MobileWaveUtility.ConfigureMobileWave(ref wave.ValueRW, config, dayHpMult);
             wave.ValueRW.WaveActive = true;
             wave.ValueRW.Phase = RunPhaseType.NightCombat;
             wave.ValueRW.PrepTimer = 0f;

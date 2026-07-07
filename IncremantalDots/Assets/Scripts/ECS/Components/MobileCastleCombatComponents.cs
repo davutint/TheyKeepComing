@@ -200,4 +200,17 @@ namespace DeadWalls
     {
         public float3 Value;
     }
+
+    /// <summary>
+    /// DifficultyProfileSO gun-egrilerinin ECS'e ornekelnmis hali (AnimationCurve Burst'e
+    /// giremez). Config entity'sinde buffer olarak yasar: index = gun-1 (gun 1-tabanli);
+    /// gun buffer uzunlugunu asarsa SON eleman kullanilir. Buffer yok/bos = tum carpanlar 1
+    /// (geriye uyumlu). Kaynak: baker (edit) veya Difficulty Tuner (play, canli).
+    /// </summary>
+    public struct DifficultyDaySample : IBufferElementData
+    {
+        public float NightIntensityMult;
+        public float ZombieHpMult;
+        public float SpawnBatchMult;
+    }
 }

@@ -258,7 +258,17 @@ namespace DeadWalls
             // Kutle eskalasyonu: batch faz intensity'sine EK olarak cycle sayisiyla da buyur
             // (tempo MinSpawnInterval tabaninda doyduktan sonra kalabalik artmaya devam etsin)
             float cycleGrowth = 1f + (math.max(1, wave.CurrentWave) - 1) * math.max(0f, mobileConfig.SpawnBatchGrowthPerCycle);
-            int batchSize = math.max(1, (int)math.round(math.max(1, mobileConfig.SpawnBatchSize) * intensity * cycleGrowth));
+
+            // Difficulty profile gun carpani (buffer yok/bos = 1, geriye uyumlu)
+            float dayBatchMult = 1f;
+            if (SystemAPI.TryGetSingletonBuffer<DifficultyDaySample>(out var difficultySamples, true)
+                && difficultySamples.Length > 0)
+            {
+                int dayIndex = math.min(math.max(0, wave.CurrentWave - 1), difficultySamples.Length - 1);
+                dayBatchMult = math.max(0.01f, difficultySamples[dayIndex].SpawnBatchMult);
+            }
+
+            int batchSize = math.max(1, (int)math.round(math.max(1, mobileConfig.SpawnBatchSize) * intensity * cycleGrowth * dayBatchMult));
             if (mobileConfig.MaxSpawnBatch > 0)
                 batchSize = math.min(batchSize, mobileConfig.MaxSpawnBatch);
             batchSize = math.min(batchSize, maxAlive - wave.ZombiesAlive);

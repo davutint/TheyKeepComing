@@ -49,6 +49,21 @@ namespace DeadWalls
             GetWindow<LongRunSimulatorWindow>("Long Run Sim");
         }
 
+        public bool IsRunning => _running;
+        public string CsvPath => _csvPath;
+        public string Status => _status;
+
+        /// <summary>Difficulty Tuner koprusu: pencereyi acar, parametreleri kurar ve kosuyu baslatir (play modda olunmali).</summary>
+        public static LongRunSimulatorWindow OpenAndStart(float timeScale, int targetDay, bool autoRestartOnGameOver)
+        {
+            var win = GetWindow<LongRunSimulatorWindow>("Long Run Sim");
+            win._timeScale = Mathf.Clamp(timeScale, 1f, 5f);
+            win._targetDay = Mathf.Max(0, targetDay);
+            win._autoRestartOnGameOver = autoRestartOnGameOver;
+            win.StartRun();
+            return win;
+        }
+
         private void OnEnable() => EditorApplication.update += OnEditorUpdate;
         private void OnDisable()
         {
