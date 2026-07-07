@@ -519,8 +519,14 @@ namespace DeadWalls
             Tilemap castleWall = EnsureVisualTilemap(gridObject.transform, "CastleWallTilemap", -30);
             Tilemap castleProps = EnsureVisualTilemap(gridObject.transform, "CastlePropsTilemap", -20);
 
-            PaintArenaGround(ground, castleGround);
-            PaintCastle(castleGround, castleWall, castleProps);
+            // K4 boyanmis dunya korumasi (2026-07-07): kok 'Grid' haritasi varsa fallback 360 arena
+            // BOYANMAZ — koy/kale/duvar/hendek boyamasi ezilmesin (bkz. STRUCTURE_SPRITE_BAKER_CAPABILITIES.md).
+            bool hasPaintedWorld = GameObject.Find("Grid") != null;
+            if (!hasPaintedWorld)
+            {
+                PaintArenaGround(ground, castleGround);
+                PaintCastle(castleGround, castleWall, castleProps);
+            }
 
             EditorUtility.SetDirty(root);
             EditorUtility.SetDirty(gridObject);
@@ -1846,13 +1852,15 @@ namespace DeadWalls
 
         private static void NormalizeCastleTilemapSorting(Scene scene)
         {
-            NormalizeTilemapRenderer(scene, "inside", 1, MobileCastleRenderDepth.BackTilemapZ);
-            NormalizeTilemapRenderer(scene, "outside0", 2, MobileCastleRenderDepth.BackTilemapZ);
-            NormalizeTilemapRenderer(scene, "outside", 2, MobileCastleRenderDepth.BackTilemapZ);
-            NormalizeTilemapRenderer(scene, "outside2", 4, MobileCastleRenderDepth.FrontOccluderZ);
+            // Owner duvar tasarimi (05de29e98'den geri getirildi, 2026-07-07): kaldirim govde
+            // (outside0/outside, Wall/2) + G-dilim zirh (outside2, Wall/4 = on-orducu; birimleri
+            // duvarin arkasinda gizler). outside ayni zamanda okcu slot kaynagi (H4 yuruyus yolu).
+            NormalizeTilemapRenderer(scene, "outside0", "Wall", 2, MobileCastleRenderDepth.BackTilemapZ);
+            NormalizeTilemapRenderer(scene, "outside", "Wall", 2, MobileCastleRenderDepth.BackTilemapZ);
+            NormalizeTilemapRenderer(scene, "outside2", "Wall", 4, MobileCastleRenderDepth.FrontOccluderZ);
         }
 
-        private static void NormalizeTilemapRenderer(Scene scene, string tilemapName, int sortingOrder, float worldZ)
+        private static void NormalizeTilemapRenderer(Scene scene, string tilemapName, string sortingLayer, int sortingOrder, float worldZ)
         {
             Tilemap tilemap = FindSceneTilemap(scene, tilemapName);
             if (tilemap == null)
@@ -1863,9 +1871,9 @@ namespace DeadWalls
                 return;
 
             bool changed = false;
-            if (renderer.sortingLayerName != "Wall")
+            if (renderer.sortingLayerName != sortingLayer)
             {
-                renderer.sortingLayerName = "Wall";
+                renderer.sortingLayerName = sortingLayer;
                 changed = true;
             }
 
