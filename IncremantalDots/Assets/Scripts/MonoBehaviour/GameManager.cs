@@ -21,6 +21,9 @@ namespace DeadWalls
         [Header("Mobile Council Events")]
         [SerializeField] private CouncilEventCatalogSO councilCatalog;
 
+        [Header("Meta Progression (roguelite — kosular ARASI kalici)")]
+        [SerializeField] private MetaUpgradeCatalogSO metaUpgradeCatalog;
+
         private EntityManager _entityManager;
         private Entity _gameStateEntity;
         private Entity _waveStateEntity;
@@ -107,6 +110,13 @@ namespace DeadWalls
         private int _councilIronCapBonus;
         private int _councilFoodCapBonus;
 
+        // Meta-progression kosu-ici state'i: her kosu basinda kalici seviyelerden yeniden kurulur
+        private bool _metaAppliedThisRun;
+        private bool _metaRunCollected;
+        private float _metaWallHpPercent;
+        private float _metaDamageMultiplier = 1f;
+        private float _metaProductionPercent;
+
         public GameStateData GameState { get; private set; }
         public WaveStateData WaveState { get; private set; }
         public WallSegment Wall { get; private set; }
@@ -134,6 +144,9 @@ namespace DeadWalls
         public TechTreeCatalogSO TechCatalog => techTreeCatalog;
         public CouncilEventCatalogSO CouncilCatalog => councilCatalog;
         public ComposedCouncilEvent ActiveCouncilEvent => _activeCouncilEvent;
+        public MetaUpgradeCatalogSO MetaCatalog => metaUpgradeCatalog;
+        /// <summary>Son biten kosunun meta ozeti (olum ekrani gosterir).</summary>
+        public MetaRunResult LastRunResult { get; private set; }
 
         public event System.Action OnGameOver;
         public event System.Action OnLevelUp;
@@ -223,7 +236,10 @@ namespace DeadWalls
             OnGameStateChanged?.Invoke();
 
             if (GameState.IsGameOver && !prevGameState.IsGameOver)
+            {
+                CollectMetaRunResult(); // olum ekrani acilmadan ONCE kill'ler Ruh'a cevrilir
                 OnGameOver?.Invoke();
+            }
 
             if (GameState.IsLevelUpPending && !prevGameState.IsLevelUpPending)
             {
@@ -1562,10 +1578,10 @@ namespace DeadWalls
             config.StoneWorkerCap = _baseStoneWorkerCap + stoneCap + _councilStoneCapBonus;
             config.IronWorkerCap = _baseIronWorkerCap + ironCap + _councilIronCapBonus;
             config.FoodWorkerCap = _baseFoodWorkerCap + foodCap + _councilFoodCapBonus;
-            config.WoodWorkerProductionPerMin = _baseWoodProductionPerMin * (1f + woodProd);
-            config.StoneWorkerProductionPerMin = _baseStoneProductionPerMin * (1f + stoneProd);
-            config.IronWorkerProductionPerMin = _baseIronProductionPerMin * (1f + ironProd);
-            config.FoodWorkerProductionPerMin = _baseFoodProductionPerMin * (1f + foodProd);
+            config.WoodWorkerProductionPerMin = _baseWoodProductionPerMin * (1f + woodProd + _metaProductionPercent);
+            config.StoneWorkerProductionPerMin = _baseStoneProductionPerMin * (1f + stoneProd + _metaProductionPercent);
+            config.IronWorkerProductionPerMin = _baseIronProductionPerMin * (1f + ironProd + _metaProductionPercent);
+            config.FoodWorkerProductionPerMin = _baseFoodProductionPerMin * (1f + foodProd + _metaProductionPercent);
             config.PopulationGrowthPerDayPrep = _basePopulationGrowthPerCycle + growth;
             // Hendek evrimi (K4): tech yavaslatmayi derinlestirir, gecis hasarini acar/buyutur
             config.MoatSlowMultiplier = Mathf.Clamp(_baseMoatSlowMultiplier - moatSlowReduction, 0.05f, 1f);
@@ -1610,7 +1626,7 @@ namespace DeadWalls
                 }
             }
 
-            float multiplier = 1f + totalPercent;
+            float multiplier = 1f + totalPercent + _metaWallHpPercent; // tech + meta ayni kanal
 
             var wall = _entityManager.GetComponentData<WallSegment>(_castleEntity);
             float wallRatio = wall.MaxHP > 0f ? wall.CurrentHP / wall.MaxHP : 1f;
@@ -1975,6 +1991,112 @@ namespace DeadWalls
             _councilFoodCapBonus = 0;
         }
 
+        // ---------------------------------------------------------------------------------
+        // Meta Progression (roguelite, K2 karari — otoriter dok: META_PROGRESSION_ARCHITECTURE.md)
+        // Kalici katman MetaProgression static sinifinda (JSON); burada kosu-basi uygulama +
+        // kosu-sonu kazanim yasar. Para birimi: RUH (1 kill = 1 Ruh + yeni rekorda gun x 50).
+        // ---------------------------------------------------------------------------------
+
+        /// <summary>Kosu basinda kalici meta seviyelerini oyuna uygular (idempotent — kosu basina bir kez).</summary>
+        private void ApplyMetaProgressionAtRunStart()
+        {
+            if (_metaAppliedThisRun || metaUpgradeCatalog == null || metaUpgradeCatalog.Upgrades == null)
+                return;
+
+            _metaAppliedThisRun = true;
+            _metaWallHpPercent = 0f;
+            _metaDamageMultiplier = 1f;
+            _metaProductionPercent = 0f;
+
+            foreach (var upgrade in metaUpgradeCatalog.Upgrades)
+            {
+                if (upgrade == null)
+                    continue;
+
+                int level = MetaProgression.GetUpgradeLevel(upgrade.Id);
+                if (level <= 0)
+                    continue;
+
+                float total = upgrade.ValuePerLevel * level;
+                switch (upgrade.EffectType)
+                {
+                    case MetaUpgradeEffectType.StartingResource:
+                        AddResources(BuildMetaStartingResourceCost(upgrade.Resource, Mathf.RoundToInt(total)));
+                        break;
+                    case MetaUpgradeEffectType.StartingArchers:
+                        for (int i = 0; i < Mathf.RoundToInt(total); i++)
+                            SpawnArcher(ArcherType.Basic); // baslangic garnizonu: population tuketmez
+                        break;
+                    case MetaUpgradeEffectType.StartingTechLevel:
+                        GrantTechNodeLevelsFromMeta(upgrade.TechNodeId, level);
+                        break;
+                    case MetaUpgradeEffectType.WallHpPercent:
+                        _metaWallHpPercent += total;
+                        break;
+                    case MetaUpgradeEffectType.ArcherDamagePercent:
+                        _metaDamageMultiplier *= 1f + total;
+                        break;
+                    case MetaUpgradeEffectType.ProductionPercent:
+                        _metaProductionPercent += total;
+                        break;
+                }
+            }
+
+            // Yuzdesel katkilar aggregate katmanlarindan akar (tech/council ile ayni kanal)
+            if (_metaWallHpPercent > 0f)
+                ApplyTechDefenseAggregates();
+            if (_metaProductionPercent > 0f)
+                ApplyTechEconomyAggregates();
+            if (!Mathf.Approximately(_metaDamageMultiplier, 1f))
+                ApplyScaledStatsToArchers(ArcherType.Basic, false);
+        }
+
+        private static ResourceCost BuildMetaStartingResourceCost(EconomyFocusType resource, int amount)
+        {
+            if (resource == EconomyFocusType.Balanced)
+            {
+                int each = Mathf.Max(1, amount / 4);
+                return new ResourceCost(each, each, each, each);
+            }
+
+            return BuildSingleResourceCost(resource, amount);
+        }
+
+        /// <summary>Meta ile acilan tech: maliyetsiz, hedef seviyeye tamamlar (reveal + effect'ler dahil).</summary>
+        private void GrantTechNodeLevelsFromMeta(string nodeId, int targetLevel)
+        {
+            if (techTreeCatalog == null || string.IsNullOrEmpty(nodeId))
+                return;
+
+            var node = techTreeCatalog.GetNode(nodeId);
+            if (node == null)
+                return;
+
+            EnsureTechTreeInitialized();
+            _revealedTechNodes.Add(node.Id);
+
+            int current = GetTechNodeLevel(node.Id);
+            int goal = Mathf.Min(targetLevel, node.MaxLevel);
+            for (int level = current; level < goal; level++)
+            {
+                _techNodeLevels[node.Id] = level + 1;
+                if (level + 1 == 1)
+                    RevealTechChildren(node);
+                ApplyTechNodeEffects(node);
+            }
+        }
+
+        /// <summary>Kosu kapanisi: kill'leri Ruh'a cevirir (bir kez); sonuc LastRunResult'ta.</summary>
+        private void CollectMetaRunResult()
+        {
+            if (_metaRunCollected)
+                return;
+
+            _metaRunCollected = true;
+            int day = Mathf.Max(1, ContinuousSiegeCycle.CycleIndex + 1);
+            LastRunResult = MetaProgression.AddRunResult(day, GameState.TotalKills);
+        }
+
         private void ConfigureWaveForCurrentNumber(ref WaveStateData wave)
         {
             int w = wave.CurrentWave;
@@ -2066,7 +2188,8 @@ namespace DeadWalls
             float fireRateScale = math.pow(TypeFireRateMultiplierPerLevel, extraLevels) * _globalFireRateMultiplier;
 
             // Tech tree carpanlari son degere uygulanir (flat bonus dahil) — bkz. TECH_TREE_SO_ARCHITECTURE.md
-            stats.Damage = (stats.Damage * damageScale + _globalArrowDamageBonus) * _techDamageMultiplier;
+            // Meta-progression kalici hasar carpani ayni kanaldan biner
+            stats.Damage = (stats.Damage * damageScale + _globalArrowDamageBonus) * _techDamageMultiplier * _metaDamageMultiplier;
             stats.FireRate *= fireRateScale * _techFireRateMultiplier;
 
             if (type == ArcherType.Frost)
@@ -2440,6 +2563,7 @@ namespace DeadWalls
 
             RepositionExistingMobileArchersToOutside();
             EnsureInitialMobileArcherCount();
+            ApplyMetaProgressionAtRunStart();
 
             var mobileConfig = _entityManager.GetComponentData<MobileCastleCombatConfig>(mobileConfigEntity);
             if (mobileConfig.ContinuousSiegeEnabled)
@@ -3109,6 +3233,12 @@ namespace DeadWalls
 
             _upgradeTiers.Clear();
             _currentUpgradeCards = null;
+
+            // Yeni kosu: meta yeniden uygulanir (kalici seviyeler her kosuya tasinir),
+            // kosu-sonu kazanim bayragi da temizlenir (siradaki olum yeniden Ruh toplar)
+            _metaAppliedThisRun = false;
+            _metaRunCollected = false;
+            ApplyMetaProgressionAtRunStart();
         }
 
         private void ResetArcherEconomyState()

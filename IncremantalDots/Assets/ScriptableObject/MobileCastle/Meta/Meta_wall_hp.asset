@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4162ec2ce66fd1a439e5110d43e55e18, type: 3}
+  m_Name: Meta_wall_hp
+  m_EditorClassIdentifier: DeadWalls::DeadWalls.MetaUpgradeSO
+  Id: wall_hp
+  Title: Reinforced Foundations
+  Description: +5% defense max HP per level (permanent).
+  BaseCost: 300
+  CostGrowthPerLevel: 0.8
+  MaxLevel: 5
+  EffectType: 4
+  ValuePerLevel: 0.05
+  Resource: 0
+  TechNodeId: 

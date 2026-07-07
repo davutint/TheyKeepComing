@@ -64,6 +64,7 @@ namespace DeadWalls
 
                 // Timer bitti → odul ver + sil
                 gameState.ValueRW.XP += stats.ValueRO.XPReward;
+                gameState.ValueRW.TotalKills++;
                 waveState.ValueRW.ZombiesAlive--;
                 if (canApplyMobileReward)
                     AddKillReward(ref resourceAccumulator.ValueRW, mobileConfig, economyFocus,

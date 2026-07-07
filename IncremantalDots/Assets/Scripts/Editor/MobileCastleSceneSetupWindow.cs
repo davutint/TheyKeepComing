@@ -37,6 +37,8 @@ namespace DeadWalls
         private const string FrostArcherDefinitionPath = ArcherDefinitionFolder + "/FrostArcher.asset";
         private const string TechTreeFolder = "Assets/ScriptableObject/MobileCastle/TechTree";
         private const string TechTreeCatalogPath = TechTreeFolder + "/TechTreeCatalog.asset";
+        private const string MetaFolder = "Assets/ScriptableObject/MobileCastle/Meta";
+        private const string MetaCatalogPath = MetaFolder + "/MetaUpgradeCatalog.asset";
         private const string DifficultyFolder = "Assets/ScriptableObject/MobileCastle/Difficulty";
         public const string DifficultyProfilePath = DifficultyFolder + "/DefaultDifficulty.asset";
         private const string CouncilFolder = "Assets/ScriptableObject/MobileCastle/Council";
@@ -723,6 +725,10 @@ namespace DeadWalls
                 SceneManager.MoveGameObjectToScene(canvasObject, scene);
             }
 
+            // Sigorta: Canvas kazara kapali kaydedilmisse oyun UI'siz kalir (bir kez yasandi)
+            if (!canvasObject.activeSelf)
+                canvasObject.SetActive(true);
+
             SetLayerRecursive(canvasObject, LayerMask.NameToLayer("UI"));
 
             var canvas = EnsureComponent<Canvas>(canvasObject);
@@ -754,6 +760,7 @@ namespace DeadWalls
             AssignObjectReference(gameManager, "archerCatalog", archerCatalog);
             AssignObjectReference(gameManager, "techTreeCatalog", techCatalog);
             AssignObjectReference(gameManager, "councilCatalog", councilEventCatalog);
+            AssignObjectReference(gameManager, "metaUpgradeCatalog", EnsureDefaultMetaUpgradeCatalog());
 
             var uiManager = EnsureComponent<UIManager>(canvas.gameObject);
             BuildCanvasPanels(canvas.transform, uiManager, archerCatalog);
@@ -1119,6 +1126,118 @@ namespace DeadWalls
         // Council event seed (safak meclisi): atomlar + sablonlar merge-only kurulur.
         // Somut event asset'i YOKTUR — CouncilComposer runtime'da uretir.
         // ---------------------------------------------------------------------------------
+
+        // ---------------------------------------------------------------------------------
+        // Meta upgrade seed (roguelite magazasi): ivme + hafif guc paketi (M-B karari).
+        // Merge-only: mevcut asset degerlerine ve kullanicinin ekledigi upgrade'lere dokunulmaz.
+        // ---------------------------------------------------------------------------------
+
+        private static MetaUpgradeCatalogSO EnsureDefaultMetaUpgradeCatalog()
+        {
+            EnsureAssetFolder(MetaFolder);
+
+            var upgrades = new List<MetaUpgradeSO>
+            {
+                EnsureMetaUpgrade("start_wood", u =>
+                {
+                    u.Title = "Timber Cache";
+                    u.Description = "Start each run with extra wood.";
+                    u.EffectType = MetaUpgradeEffectType.StartingResource;
+                    u.Resource = EconomyFocusType.Wood;
+                    u.ValuePerLevel = 75f; u.MaxLevel = 5; u.BaseCost = 150; u.CostGrowthPerLevel = 0.6f;
+                }),
+                EnsureMetaUpgrade("start_food", u =>
+                {
+                    u.Title = "Grain Stores";
+                    u.Description = "Start each run with extra food.";
+                    u.EffectType = MetaUpgradeEffectType.StartingResource;
+                    u.Resource = EconomyFocusType.Food;
+                    u.ValuePerLevel = 60f; u.MaxLevel = 5; u.BaseCost = 150; u.CostGrowthPerLevel = 0.6f;
+                }),
+                EnsureMetaUpgrade("start_archers", u =>
+                {
+                    u.Title = "Veteran Guard";
+                    u.Description = "Start each run with extra archers on the wall.";
+                    u.EffectType = MetaUpgradeEffectType.StartingArchers;
+                    u.ValuePerLevel = 1f; u.MaxLevel = 3; u.BaseCost = 400; u.CostGrowthPerLevel = 1.0f;
+                }),
+                EnsureMetaUpgrade("start_moat", u =>
+                {
+                    u.Title = "Old Trenches";
+                    u.Description = "Start each run with the moat already dug (Deeper Moat unlocked).";
+                    u.EffectType = MetaUpgradeEffectType.StartingTechLevel;
+                    u.TechNodeId = "moat_dig";
+                    u.ValuePerLevel = 1f; u.MaxLevel = 2; u.BaseCost = 600; u.CostGrowthPerLevel = 1.2f;
+                }),
+                EnsureMetaUpgrade("wall_hp", u =>
+                {
+                    u.Title = "Reinforced Foundations";
+                    u.Description = "+5% defense max HP per level (permanent).";
+                    u.EffectType = MetaUpgradeEffectType.WallHpPercent;
+                    u.ValuePerLevel = 0.05f; u.MaxLevel = 5; u.BaseCost = 300; u.CostGrowthPerLevel = 0.8f;
+                }),
+                EnsureMetaUpgrade("archer_damage", u =>
+                {
+                    u.Title = "Sharpened Arrows";
+                    u.Description = "+3% archer damage per level (permanent).";
+                    u.EffectType = MetaUpgradeEffectType.ArcherDamagePercent;
+                    u.ValuePerLevel = 0.03f; u.MaxLevel = 5; u.BaseCost = 350; u.CostGrowthPerLevel = 0.8f;
+                }),
+                EnsureMetaUpgrade("production", u =>
+                {
+                    u.Title = "Efficient Tools";
+                    u.Description = "+3% worker production per level (permanent).";
+                    u.EffectType = MetaUpgradeEffectType.ProductionPercent;
+                    u.ValuePerLevel = 0.03f; u.MaxLevel = 5; u.BaseCost = 350; u.CostGrowthPerLevel = 0.8f;
+                }),
+            };
+
+            var catalog = AssetDatabase.LoadAssetAtPath<MetaUpgradeCatalogSO>(MetaCatalogPath);
+            if (catalog == null)
+            {
+                catalog = ScriptableObject.CreateInstance<MetaUpgradeCatalogSO>();
+                AssetDatabase.CreateAsset(catalog, MetaCatalogPath);
+            }
+
+            var merged = new List<MetaUpgradeSO>();
+            if (catalog.Upgrades != null)
+            {
+                foreach (var u in catalog.Upgrades)
+                    if (u != null && !merged.Contains(u))
+                        merged.Add(u);
+            }
+            bool changed = false;
+            foreach (var u in upgrades)
+            {
+                if (u != null && !merged.Contains(u)) { merged.Add(u); changed = true; }
+            }
+            if (changed)
+            {
+                Undo.RecordObject(catalog, "Configure Meta Upgrade Catalog");
+                catalog.Upgrades = merged.ToArray();
+                EditorUtility.SetDirty(catalog);
+            }
+
+            foreach (var problem in catalog.ValidateCatalog())
+                Debug.LogWarning($"[MobileCastleSceneSetup] MetaCatalog: {problem}", catalog);
+
+            return catalog;
+        }
+
+        private static MetaUpgradeSO EnsureMetaUpgrade(string id, Action<MetaUpgradeSO> configure)
+        {
+            string path = MetaFolder + "/Meta_" + id + ".asset";
+            var upgrade = AssetDatabase.LoadAssetAtPath<MetaUpgradeSO>(path);
+            if (upgrade != null)
+                return upgrade; // mevcut asset degerlerine dokunma
+
+            upgrade = ScriptableObject.CreateInstance<MetaUpgradeSO>();
+            upgrade.Id = id;
+            configure?.Invoke(upgrade);
+            AssetDatabase.CreateAsset(upgrade, path);
+            EditorUtility.SetDirty(upgrade);
+            return upgrade;
+        }
 
         // ---------------------------------------------------------------------------------
         // Difficulty profile seed: zorlugun tek dogruluk kaynagi (M-A olcum bulgularina gore
@@ -1981,17 +2100,19 @@ namespace DeadWalls
             };
 
             GameObject gameOverPanel = EnsurePanel(canvasTransform, "GameOverPanel", false, new Color(0.03f, 0.03f, 0.04f, 0.94f));
-            Center(gameOverPanel.GetComponent<RectTransform>(), new Vector2(680f, 360f));
+            Center(gameOverPanel.GetComponent<RectTransform>(), new Vector2(680f, 640f));
             var gameOver = EnsureComponent<GameOverUI>(gameOverPanel);
             gameOver.GameOverText = EnsureText(gameOverPanel.transform, "GameOverText", "GAME OVER", 48,
                 TextAlignmentOptions.Center, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
                 new Vector2(-260f, -86f), new Vector2(260f, -20f));
-            gameOver.StatsText = EnsureText(gameOverPanel.transform, "StatsText", "Wave: 1\nLevel: 1", 26,
+            gameOver.StatsText = EnsureText(gameOverPanel.transform, "StatsText", "Wave: 1\nLevel: 1", 22,
                 TextAlignmentOptions.Center, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                new Vector2(-240f, -58f), new Vector2(240f, 62f));
+                new Vector2(-240f, 190f), new Vector2(240f, 252f));
             gameOver.RestartButton = EnsureButton(gameOverPanel.transform, "RestartButton",
-                new Vector2(0.5f, 0f), new Vector2(-120f, 34f), new Vector2(120f, 96f), out var restartText);
+                new Vector2(0.5f, 0f), new Vector2(-120f, 24f), new Vector2(120f, 84f), out var restartText);
             restartText.text = "Restart";
+
+            ConfigureMetaProgressionUI(gameOverPanel);
 
             uiManager.HUDPanel = hudRoot;
             uiManager.LevelUpPanel = levelUpPanel;
@@ -2001,6 +2122,86 @@ namespace DeadWalls
             hudRoot.SetActive(true);
             levelUpPanel.SetActive(false);
             gameOverPanel.SetActive(false);
+        }
+
+        /// <summary>
+        /// Olum ekrani meta katmani (roguelite): kosu ozeti + RUH bakiyesi + kalici yukseltme
+        /// magazasi. GameOverPanel kod-uretimli oldugundan objeler burada kurulur (prefab degil);
+        /// isim sozlesmesi: MetaSummaryText / MetaSoulsText / MetaShopListRoot / MetaShopRowTemplate
+        /// (Row cocuklari: RowTitleText / RowLevelText / RowCostText / RowBuyButton).
+        /// </summary>
+        private static void ConfigureMetaProgressionUI(GameObject gameOverPanel)
+        {
+            var meta = EnsureComponent<MetaProgressionUI>(gameOverPanel);
+
+            meta.MetaSummaryText = EnsureText(gameOverPanel.transform, "MetaSummaryText",
+                "DAY 1 — 0 kill\n+0 RUH", 22, TextAlignmentOptions.Center,
+                new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
+                new Vector2(-300f, 116f), new Vector2(300f, 184f));
+
+            meta.MetaSoulsText = EnsureText(gameOverPanel.transform, "MetaSoulsText",
+                "0 RUH", 18, TextAlignmentOptions.Center,
+                new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
+                new Vector2(-300f, 84f), new Vector2(300f, 112f));
+            meta.MetaSoulsText.color = new Color(0.69f, 0.52f, 0.96f, 1f);
+
+            // Magaza listesi: dikey layout'lu konteyner
+            GameObject listRoot = FindDirectChild(gameOverPanel.transform, "MetaShopListRoot");
+            if (listRoot == null)
+            {
+                listRoot = new GameObject("MetaShopListRoot", typeof(RectTransform));
+                Undo.RegisterCreatedObjectUndo(listRoot, "Create Meta Shop List");
+                listRoot.layer = gameOverPanel.layer;
+                listRoot.transform.SetParent(gameOverPanel.transform, false);
+            }
+            var listRect = (RectTransform)listRoot.transform;
+            listRect.anchorMin = new Vector2(0.5f, 0.5f);
+            listRect.anchorMax = new Vector2(0.5f, 0.5f);
+            listRect.offsetMin = new Vector2(-320f, -250f);
+            listRect.offsetMax = new Vector2(320f, 78f);
+            var layout = EnsureComponent<UnityEngine.UI.VerticalLayoutGroup>(listRoot);
+            layout.spacing = 6f;
+            layout.childForceExpandWidth = true;
+            layout.childForceExpandHeight = false;
+            layout.childControlWidth = true;
+            layout.childControlHeight = false;
+            layout.childAlignment = TextAnchor.UpperCenter;
+            meta.MetaShopListRoot = listRect;
+
+            // Satir sablonu (inactive; MetaProgressionUI klonlar)
+            GameObject template = FindDirectChild(listRoot.transform, "MetaShopRowTemplate");
+            if (template == null)
+            {
+                template = EnsurePanel(listRoot.transform, "MetaShopRowTemplate", false,
+                    new Color(0.10f, 0.12f, 0.15f, 0.95f));
+                var rowRect = (RectTransform)template.transform;
+                rowRect.sizeDelta = new Vector2(640f, 40f);
+
+                EnsureText(template.transform, "RowTitleText", "Upgrade", 15,
+                    TextAlignmentOptions.MidlineLeft, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f),
+                    new Vector2(12f, -16f), new Vector2(280f, 16f));
+                EnsureText(template.transform, "RowLevelText", "LV 0/5", 13,
+                    TextAlignmentOptions.Center, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
+                    new Vector2(-40f, -14f), new Vector2(50f, 14f));
+                EnsureText(template.transform, "RowCostText", "150 RUH", 13,
+                    TextAlignmentOptions.MidlineRight, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f),
+                    new Vector2(-260f, -14f), new Vector2(-110f, 14f));
+                var buy = EnsureButton(template.transform, "RowBuyButton",
+                    new Vector2(1f, 0.5f), new Vector2(-100f, -15f), new Vector2(-10f, 15f), out var buyText);
+                buyText.text = "BUY";
+                buyText.fontSize = 13;
+                var colors = buy.colors;
+                colors.normalColor = new Color(0.18f, 0.55f, 0.25f, 1f);
+                colors.disabledColor = new Color(0.3f, 0.32f, 0.35f, 0.6f);
+                buy.colors = colors;
+            }
+            var layoutElement = EnsureComponent<UnityEngine.UI.LayoutElement>(template);
+            layoutElement.preferredHeight = 40f;
+            layoutElement.minHeight = 40f;
+            template.SetActive(false);
+            meta.MetaShopRowTemplate = template;
+
+            EditorUtility.SetDirty(meta);
         }
 
         private static GameObject EnsureHudRoot(Transform canvasTransform)

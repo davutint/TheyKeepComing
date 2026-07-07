@@ -92,12 +92,15 @@ Ara hedef olarak "oynanabilir demo" = C1-C10 (store maddeleri haric).
   (a) aktif yetenek butonlari (yagli ok yagmuru, tamir dalgasi — cooldown'lu)
   (b) hedef onceligi secimi (c) hicbiri — "izle ve planla" kimligi korunur.
 
-### 3.4 Meta-progression / Kosu Yapisi (K2 = ROGUELITE, kilitli)
-- VAR: Henuz hicbir sey — restart her seyi sifirlar. Karar verildi, tasarim/implementasyon M-B'de.
-- EKSIK: Meta tasarimi + implementasyonu + olum ekrani ("DAY X'e ulastin" ozeti + kazanilan meta).
-- ACIK KARAR: [KARAR BEKLIYOR, M-B basinda] Meta para birimi ne (hayatta kalinan gun?
-  oldurulen zombi? kurtarilan nufus?) ve neye harcanir (kalici tech indirimi, baslangic
-  bonusu, yeni okcu tipleri, kozmetik)? Oneri M-B basinda 2-3 paket halinde sunulacak.
+### 3.4 Meta-progression / Kosu Yapisi (K2 = ROGUELITE — M-B IMPLEMENTE EDILDI 2026-07-07)
+- KARARLAR (owner): para birimi = OLDURULEN ZOMBI (1 kill = 1 RUH; + yeni gun rekorunda
+  gun x 50 bonus); magaza odagi = IVME + HAFIF GUC; isim "RUH" placeholder (kesinlesmedi).
+- VAR: kill sayaci (GameStateData.TotalKills), kalici JSON depo (persistentDataPath —
+  M-E save'inin ilk tuglasi), MetaUpgradeSO katalogu (7 yukseltme: baslangic odun/yiyecek/
+  okcu/moat-tech + duvar HP/hasar/uretim yuzdeleri), kosu-basi otomatik uygulama
+  (aggregate kanallarindan), olum ekrani ozet + magaza UI. Dok: META_PROGRESSION_ARCHITECTURE.md.
+- EKSIK: play dogrulamasi (Unity+MCP bekliyor); isim kesinlesmesi; magaza rafi buyumesi
+  (M-C icerigiyle: yeni okcu tipleri meta-unlock adayi).
 
 ### 3.5 His / Juice / Ses
 - VAR: UI juice guclu (tech tree cizgi animasyonlari, council kart akisi, toast'lar, badge'ler,
