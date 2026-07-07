@@ -1476,6 +1476,52 @@ namespace DeadWalls
             placement.SpawnZ = MobileCastleRenderDepth.UnitZ;
             placement.RepeatOffsetRadius = 0.12f;
             EditorUtility.SetDirty(placement);
+
+            ApplyVillageMarkers(scene, root);
+        }
+
+        /// <summary>
+        /// Boyama oturumunun biraktigi `VillageMarkers` sozlesmesini (gorsel = otorite) worker
+        /// ekonomi rotalarina uygular: CastleKeepMarker -> CastleWorkerHub, {Wood,Stone,Iron,Food}
+        /// SiteMarker -> ilgili site koku. Marker yoksa mevcut duzen aynen korunur (opsiyonel).
+        /// Cocuk pickup/delivery noktalari parent'la birlikte tasinir; z korunur.
+        /// </summary>
+        private static void ApplyVillageMarkers(Scene scene, GameObject economyRoot)
+        {
+            GameObject markersRoot = FindRoot(scene, "VillageMarkers");
+            if (markersRoot == null)
+                return;
+
+            ApplyMarkerPosition(markersRoot.transform, "CastleKeepMarker",
+                FindDirectChild(economyRoot.transform, CastleInteriorWorkerPlacement.HubName));
+            ApplyMarkerPosition(markersRoot.transform, "WoodSiteMarker",
+                FindDirectChild(economyRoot.transform, "WoodSite"));
+            ApplyMarkerPosition(markersRoot.transform, "StoneSiteMarker",
+                FindDirectChild(economyRoot.transform, "StoneSite"));
+            ApplyMarkerPosition(markersRoot.transform, "IronSiteMarker",
+                FindDirectChild(economyRoot.transform, "IronSite"));
+            ApplyMarkerPosition(markersRoot.transform, "FoodSiteMarker",
+                FindDirectChild(economyRoot.transform, "FoodSite"));
+        }
+
+        private static void ApplyMarkerPosition(Transform markersRoot, string markerName, GameObject target)
+        {
+            if (target == null)
+                return;
+
+            Transform marker = markersRoot.Find(markerName);
+            if (marker == null)
+                return;
+
+            var t = target.transform;
+            Vector3 current = t.position;
+            Vector3 desired = new Vector3(marker.position.x, marker.position.y, current.z);
+            if ((current - desired).sqrMagnitude < 0.0001f)
+                return;
+
+            Undo.RecordObject(t, "Apply Village Marker");
+            t.position = desired;
+            EditorUtility.SetDirty(t);
         }
 
         private static Transform EnsureWorkerHub(Transform parent)
