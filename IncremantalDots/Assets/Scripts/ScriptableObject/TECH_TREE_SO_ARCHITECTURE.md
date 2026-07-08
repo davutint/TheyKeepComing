@@ -42,6 +42,12 @@ hedefi (`Balanced` = tum kaynaklar).
 | `IncreasePopulationGrowth` | `MobileCastleCombatConfig.PopulationGrowthPerDayPrep` (cycle basi buyume) |
 | `IncreaseDefenseMaxHpPercent` | Wall/Gate/CastleHP MaxHP; CurrentHP orani korunur |
 | `ReduceRepairCostPercent` | `GameManager._techRepairCostMultiplier` -> `GetRepairCost()` (repair sink'ini ucuzlatir) |
+| `DeepenMoatSlowPercent` | `MobileCastleCombatConfig.MoatSlowMultiplier` (base'ten yeniden hesap; moat_dig) |
+| `AddMoatDamagePerSecond` | `MobileCastleCombatConfig.MoatDamagePerSecond` (moat_flame) |
+| `UnlockSpellcasting` | `GameManager._fireballUnlocked` -> SpellCastUI paneli gorunur (arcane_tower) |
+| `ModifySpellDamagePercent` | `_spellDamageMultiplier` -> `FireballDamage` (fire_power; carpimsal) |
+| `AddSpellRadius` | `_spellRadiusBonus` -> `FireballRadius` (fire_radius; duz ekleme) |
+| `ReduceSpellCooldownPercent` | `_spellCooldownMultiplier` -> `FireballCooldownDuration` (fire_cooldown; carpimsal dusus) |
 
 BILINCLI OLMAYANLAR: `IncreasePopulationCapacity` (mobile modda Capacity hicbir seyi
 sinirlamiyor, her frame ratchet'leniyor — no-op olurdu), `RepairEfficiency` (repair su an
@@ -78,6 +84,15 @@ katalogdaki ekstra node'lara ve mevcut asset degerlerine dokunmaz (merge-only).
 TEK ISTISNA: `EnsureTechRevealLinks` — sonradan eklenen seed node'larinin reveal edilebilmesi
 icin MEVCUT parent asset'lerin `RevealChildNodeIds` listesine eksik cocugu ADDITIVE ekler
 (silme yok, yalniz ekleme; ornek: bow_training -> bow_mastery).
+
+## Buyuculuk Dali (M-C, 2026-07-08)
+
+`castle_heart -> arcane_tower` (unlock, MaxLevel 1) -> cocuklari `fire_power` (+%20 hasar/lv,
+L5), `fire_radius` (+0.4 yaricap/lv, L3), `fire_cooldown` (-%10 cd/lv, L5). Owner tasarim
+karari: buyunun HER ekseni ayri teknolojiyle gelisir; cooldown dugumleri tekrarlanabilir
+gec-oyun sink'i olarak da calisir. Baz degerler GameManager sabitlerinde: hasar 60,
+yaricap 2.2, cooldown 45s. Spell state run-scoped (RestartGame sifirlar); cast akisi
+`SpellCastUI` -> `TryCastFireball` -> ECS `FireballStrike` -> `FireballStrikeSystem`.
 
 ## Iliskili
 

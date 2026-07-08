@@ -25,13 +25,31 @@ namespace DeadWalls
             }
         }
 
+        // Kanli ay gecesi karartma tonu: koyu kirmizi (normal gece = siyah)
+        private static readonly Color BloodMoonTint = new Color(0.30f, 0.02f, 0.02f);
+
         private void Update()
         {
             if (OverlayImage == null)
                 return;
 
             float targetAlpha = ResolveTargetAlpha();
+
+            // Kanli ay: gece boyunca overlay kirmiziya kayar; diger fazlarda siyaha doner
+            Color targetTint = Color.black;
+            var gmTint = GameManager.Instance;
+            if (gmTint != null && gmTint.TryGetContinuousSiegeCycle(out var tintCycle)
+                && tintCycle.IsBloodMoonNight
+                && (tintCycle.Phase == SiegeCyclePhase.Night || tintCycle.Phase == SiegeCyclePhase.Dusk))
+            {
+                targetTint = BloodMoonTint;
+            }
+
             Color color = OverlayImage.color;
+            float tintSpeed = AlphaMoveSpeed * 0.25f * Time.unscaledDeltaTime;
+            color.r = Mathf.MoveTowards(color.r, targetTint.r, tintSpeed);
+            color.g = Mathf.MoveTowards(color.g, targetTint.g, tintSpeed);
+            color.b = Mathf.MoveTowards(color.b, targetTint.b, tintSpeed);
             color.a = Mathf.MoveTowards(color.a, targetAlpha, AlphaMoveSpeed * Time.unscaledDeltaTime);
             OverlayImage.color = color;
         }

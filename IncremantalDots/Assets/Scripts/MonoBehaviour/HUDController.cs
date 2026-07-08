@@ -45,6 +45,9 @@ namespace DeadWalls
         [Header("Continuous Siege")]
         public GameObject CyclePanel;
         public TMP_Text CyclePhaseText;
+        // Kanli ay etiketi icin orijinal faz-etiket rengi (ilk kullanimda cache'lenir)
+        private Color _cyclePhaseDefaultColor = Color.white;
+        private bool _cyclePhaseDefaultColorCached;
         public TMP_Text CycleDayCounterText;
         public TMP_Text CycleDayLabelText;
         public TMP_Text CycleDuskLabelText;
@@ -336,8 +339,22 @@ namespace DeadWalls
                 KillsText.gameObject.SetActive(false);
 
             string phase = FormatSiegePhase(cycle.Phase);
+            // Kanli ay gecesi: etiket "BLOOD MOON" + text rengi kirmizi.
+            // NOT: prefab'taki CyclePhaseText rich text render etmiyor — renk TAG DEGIL
+            // TMP_Text.color ile verilir (normal fazlarda orijinal renge doner).
+            bool bloodMoonLabel = cycle.IsBloodMoonNight && cycle.Phase == SiegeCyclePhase.Night;
+            if (bloodMoonLabel)
+                phase = "BLOOD MOON";
             if (CyclePhaseText != null)
+            {
+                if (!_cyclePhaseDefaultColorCached)
+                {
+                    _cyclePhaseDefaultColor = CyclePhaseText.color;
+                    _cyclePhaseDefaultColorCached = true;
+                }
                 CyclePhaseText.text = phase;
+                CyclePhaseText.color = bloodMoonLabel ? new Color(0.88f, 0.33f, 0.27f, 1f) : _cyclePhaseDefaultColor;
+            }
             if (CycleDayCounterText != null)
             {
                 // Gun sayaci: sonsuz kusatmada "ne kadar dayandim" hedef hissi (skor)

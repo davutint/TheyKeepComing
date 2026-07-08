@@ -22,10 +22,12 @@ MonoBehaviour:
     Iron: 0
     Food: 0
   MaxLevel: 1
+  CostGrowthPerLevel: 0
   PrerequisiteNodeIds: []
   RevealChildNodeIds:
   - basic_archer
   - wood_camp
   - wall_reinforcement
   - frost_arrows
+  - arcane_tower
   Effects: []

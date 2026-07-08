@@ -27,6 +27,7 @@
 11. ZombieAttackTimerSystem
 12. ArrowMoveSystem
 13. ArrowHitSystem
+13b. FireballStrikeSystem  (UpdateAfter ArrowHit, UpdateBefore ZombieDeath)
 14. ZombieDeathSystem
 15. ZombieAnimationStateSystem
 16. ArcherAnimationStateSystem
@@ -150,6 +151,13 @@ Presentation tarafinda `SpriteAnimationSystem` UV rect hesaplarini yapar.
 
 - Mesafe `< 0.5` ise hasar uygular ve oku siler.
 - Frost ok isabetinde hedefteki `ZombieSlow` duration'ini refresh eder.
+
+### FireballStrikeSystem (M-C buyuculuk)
+
+- `FireballStrike` entity'lerini (GameManager.TryCastFireball yaratir) main-thread toplar,
+  ECB ile siler; tek `IJobEntity` yaricap ici TUM zombilerin `CurrentHP`'sini dusurur.
+- `RequireForUpdate<FireballStrike>` — cast yokken hic kosmaz (cooldown'lu oyuncu aksiyonu).
+- Olum akisina karismaz (HP<=0 -> ZombieDeathSystem); pause guard ArrowHit ile ayni.
 
 ### DamageApplySystem
 

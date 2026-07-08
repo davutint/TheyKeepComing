@@ -17,7 +17,12 @@ namespace DeadWalls
         public AnimationCurve WeightByDay;
     }
 
-    /// <summary>M-C hazirlik iskeleti: ozel gece takvimi satiri (kanli ay, boss gecesi...). V1'de sistem okumaz.</summary>
+    /// <summary>
+    /// Ozel gece takvimi satiri (M-C: AKTIF — kanli ay). Baker her gun icin carpani hesaplar:
+    /// gun % EveryNDays == 0 ise o gecenin intensity'si (1 + IntensityBonus) ile carpilir
+    /// (birden cok satir carpimsal birikir). Kind v1'de filtrelenmez (blood_moon varsayilir);
+    /// boss geceleri gibi turler M-C2'de ayrisir.
+    /// </summary>
     [System.Serializable]
     public struct SpecialNightEntry
     {
@@ -25,7 +30,7 @@ namespace DeadWalls
         public int EveryNDays;
         [Tooltip("Tur kimligi (orn. blood_moon, boss).")]
         public string Kind;
-        [Tooltip("O gecenin intensity'sine eklenen bonus carpan.")]
+        [Tooltip("O gecenin intensity'sine eklenen bonus carpan (0.5 = +%50).")]
         public float IntensityBonus;
     }
 

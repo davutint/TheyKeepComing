@@ -60,13 +60,20 @@ namespace DeadWalls
             int currentCycleIndex = math.max(0, cycle.ValueRO.CycleIndex);
             float dayNightMult = 1f;
             float dayHpMult = 1f;
+            float bloodMoonMult = 1f;
             if (SystemAPI.TryGetSingletonBuffer<DifficultyDaySample>(out var difficultySamples, true)
                 && difficultySamples.Length > 0)
             {
                 var sample = difficultySamples[math.min(currentCycleIndex, difficultySamples.Length - 1)];
                 dayNightMult = math.max(0.01f, sample.NightIntensityMult);
                 dayHpMult = math.max(0.01f, sample.ZombieHpMult);
+                // Kanli ay: egriler clamp'lenir ama periyodik ozel gece WRAP okunur — aksi halde
+                // buffer sonundaki gunun kanli-ay durumu sonraki TUM gunlere yapisirdi.
+                var bloodSample = difficultySamples[currentCycleIndex % difficultySamples.Length];
+                // 0 = eski bake (alan yokken) -> 1 sayilir (geriye uyumlu)
+                bloodMoonMult = bloodSample.BloodMoonIntensityMult > 0.01f ? bloodSample.BloodMoonIntensityMult : 1f;
             }
+            bool isBloodMoonNight = bloodMoonMult > 1.001f;
 
             SiegeCyclePhase phase;
             float phaseProgress;
@@ -83,14 +90,14 @@ namespace DeadWalls
                 phaseProgress = math.saturate((timer - dayDuration) / math.max(0.01f, duskDuration));
                 intensity = math.lerp(
                     math.max(0.01f, config.SiegeDuskStartIntensityMultiplier),
-                    math.max(0.01f, config.SiegeDuskEndIntensityMultiplier) * dayNightMult,
+                    math.max(0.01f, config.SiegeDuskEndIntensityMultiplier) * dayNightMult * bloodMoonMult,
                     phaseProgress);
             }
             else if (timer < dayDuration + duskDuration + nightDuration || dawnDuration <= 0f)
             {
                 phase = SiegeCyclePhase.Night;
                 phaseProgress = math.saturate((timer - dayDuration - duskDuration) / math.max(0.01f, nightDuration));
-                intensity = math.max(0.01f, config.SiegeNightIntensityMultiplier * dayNightMult);
+                intensity = math.max(0.01f, config.SiegeNightIntensityMultiplier * dayNightMult * bloodMoonMult);
             }
             else
             {
@@ -113,6 +120,7 @@ namespace DeadWalls
             cycle.ValueRW.HordePressure01 = ResolvePressure01(intensity, config);
             cycle.ValueRW.CycleIndex = cycleIndex;
             cycle.ValueRW.Phase = phase;
+            cycle.ValueRW.IsBloodMoonNight = isBloodMoonNight;
 
             wave.ValueRW.CurrentWave = math.max(1, cycleIndex + 1);
             MobileWaveUtility.ConfigureMobileWave(ref wave.ValueRW, config, dayHpMult);

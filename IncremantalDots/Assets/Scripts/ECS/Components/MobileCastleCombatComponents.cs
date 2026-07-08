@@ -122,6 +122,8 @@ namespace DeadWalls
         public float HordePressure01;
         public int CycleIndex;
         public SiegeCyclePhase Phase;
+        // BU GUNUN gecesi kanli ay mi (tum fazlar boyunca true — gunduz uyarisi + gece etiketi ayni bayragi okur)
+        public bool IsBloodMoonNight;
     }
 
     public struct WaveClearRewardData : IComponentData
@@ -212,5 +214,19 @@ namespace DeadWalls
         public float NightIntensityMult;
         public float ZombieHpMult;
         public float SpawnBatchMult;
+        // Kanli ay carpani: 1 = normal gece; >1 = o gece ozel (baker SpecialNights'tan hesaplar).
+        // 0 (eski bake) calisma aninda 1 sayilir (geriye uyumlu).
+        public float BloodMoonIntensityMult;
+    }
+
+    /// <summary>
+    /// Oyuncunun attigi Ates Topu istegi (Mono -> ECS). GameManager.TryCastFireball yaratir;
+    /// FireballStrikeSystem ayni/ertesi frame yaricap ici zombilere hasari uygular ve siler.
+    /// </summary>
+    public struct FireballStrike : IComponentData
+    {
+        public float2 Position;
+        public float Radius;
+        public float Damage;
     }
 }

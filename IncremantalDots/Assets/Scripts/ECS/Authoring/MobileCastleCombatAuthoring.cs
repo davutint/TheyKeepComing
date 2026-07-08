@@ -308,11 +308,23 @@ namespace DeadWalls
                     int days = math.clamp(profile.SampleDays, 1, 200);
                     for (int day = 1; day <= days; day++)
                     {
+                        // Kanli ay (SpecialNights): her N. gun intensity bonusu carpan olarak birikir
+                        float bloodMoonMult = 1f;
+                        if (profile.SpecialNights != null)
+                        {
+                            foreach (var special in profile.SpecialNights)
+                            {
+                                if (special.EveryNDays > 0 && day % special.EveryNDays == 0)
+                                    bloodMoonMult *= 1f + math.max(0f, special.IntensityBonus);
+                            }
+                        }
+
                         difficultySamples.Add(new DifficultyDaySample
                         {
                             NightIntensityMult = profile.EvaluateCurve(profile.NightIntensityByDay, day),
                             ZombieHpMult = profile.EvaluateCurve(profile.ZombieHpMultByDay, day),
                             SpawnBatchMult = profile.EvaluateCurve(profile.SpawnBatchMultByDay, day),
+                            BloodMoonIntensityMult = bloodMoonMult,
                         });
                     }
                 }
@@ -323,6 +335,7 @@ namespace DeadWalls
                         NightIntensityMult = 1f,
                         ZombieHpMult = 1f,
                         SpawnBatchMult = 1f,
+                        BloodMoonIntensityMult = 1f,
                     });
                 }
 

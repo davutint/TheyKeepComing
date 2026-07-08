@@ -39,6 +39,18 @@ namespace DeadWalls
 
         /// <summary>Hendege gecis hasari ekler: MoatDamagePerSecond += seviye*Value (moat_flame evrimi).</summary>
         AddMoatDamagePerSecond = 10,
+
+        /// <summary>Buyuculugu acar: Ates Topu butonu gorunur olur (arcane_tower dugumu).</summary>
+        UnlockSpellcasting = 11,
+
+        /// <summary>Buyu hasarina yuzdesel carpan (Value 0.20 = +%20/seviye, carpimsal birikir).</summary>
+        ModifySpellDamagePercent = 12,
+
+        /// <summary>Buyu etki yaricapina duz ekleme (Value 0.4 = +0.4 dunya birimi/seviye).</summary>
+        AddSpellRadius = 13,
+
+        /// <summary>Buyu cooldown'unu yuzdesel dusurur (Value 0.10 = -%10/seviye, carpimsal birikir).</summary>
+        ReduceSpellCooldownPercent = 14,
     }
 
     /// <summary>

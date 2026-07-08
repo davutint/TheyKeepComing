@@ -74,6 +74,17 @@ namespace DeadWalls
         private float _techDamageMultiplier = 1f;
         private float _techFireRateMultiplier = 1f;
         private float _techRepairCostMultiplier = 1f;
+
+        // Buyuculuk (M-C): arcane_tower unlock'u + fire_power/fire_radius/fire_cooldown gelisimi.
+        // Run-scoped (RestartGame sifirlar); baz degerler sabit, tech carpimsal/duz biner.
+        private const float FireballBaseDamage = 60f;
+        private const float FireballBaseRadius = 2.2f;
+        private const float FireballBaseCooldown = 45f;
+        private bool _fireballUnlocked;
+        private float _spellDamageMultiplier = 1f;
+        private float _spellRadiusBonus;
+        private float _spellCooldownMultiplier = 1f;
+        private float _fireballCooldownRemaining;
         // Config/defense base degerleri: tech ilk dokunmadan once yakalanir, her satin almada
         // toplam etki base'ten YENIDEN hesaplanir (compound hatasi yok), restart'ta base geri yazilir.
         private bool _techConfigBaselineCaptured;
@@ -170,6 +181,15 @@ namespace DeadWalls
                 return;
 
             ReadECSData();
+            TickSpellCooldown();
+        }
+
+        private void TickSpellCooldown()
+        {
+            if (_fireballCooldownRemaining <= 0f || GameState.IsGameOver)
+                return;
+
+            _fireballCooldownRemaining = Mathf.Max(0f, _fireballCooldownRemaining - Time.deltaTime);
         }
 
         private bool TryInitialize()
@@ -1470,6 +1490,18 @@ namespace DeadWalls
                     case TechNodeEffectType.ReduceRepairCostPercent:
                         _techRepairCostMultiplier *= Mathf.Clamp01(1f - effect.Value);
                         break;
+                    case TechNodeEffectType.UnlockSpellcasting:
+                        _fireballUnlocked = true;
+                        break;
+                    case TechNodeEffectType.ModifySpellDamagePercent:
+                        _spellDamageMultiplier *= 1f + effect.Value;
+                        break;
+                    case TechNodeEffectType.AddSpellRadius:
+                        _spellRadiusBonus += effect.Value;
+                        break;
+                    case TechNodeEffectType.ReduceSpellCooldownPercent:
+                        _spellCooldownMultiplier *= Mathf.Clamp01(1f - effect.Value);
+                        break;
                 }
             }
 
@@ -1659,6 +1691,11 @@ namespace DeadWalls
             _techDamageMultiplier = 1f;
             _techFireRateMultiplier = 1f;
             _techRepairCostMultiplier = 1f;
+            _fireballUnlocked = false;
+            _spellDamageMultiplier = 1f;
+            _spellRadiusBonus = 0f;
+            _spellCooldownMultiplier = 1f;
+            _fireballCooldownRemaining = 0f;
 
             if (_techConfigBaselineCaptured && TryGetMobileConfigEntity(out var configEntity))
             {
@@ -1989,6 +2026,42 @@ namespace DeadWalls
             _councilStoneCapBonus = 0;
             _councilIronCapBonus = 0;
             _councilFoodCapBonus = 0;
+        }
+
+        // ---------------------------------------------------------------------------------
+        // Buyuculuk / Ates Topu (M-C): oyuncunun aktif savas gucu. Unlock + gelisim tech
+        // agacindan (arcane_tower dali); cast Mono'dan ECS'e FireballStrike entity'siyle gecer,
+        // hasari FireballStrikeSystem uygular. UI: SpellCastUI (polling).
+        // ---------------------------------------------------------------------------------
+
+        public bool FireballUnlocked => _fireballUnlocked;
+        public float FireballDamage => FireballBaseDamage * _spellDamageMultiplier;
+        public float FireballRadius => FireballBaseRadius + _spellRadiusBonus;
+        public float FireballCooldownDuration => FireballBaseCooldown * _spellCooldownMultiplier;
+        public float FireballCooldownRemaining => _fireballCooldownRemaining;
+        public bool FireballReady => _fireballUnlocked && _fireballCooldownRemaining <= 0f;
+
+        /// <summary>
+        /// Ates Topu'nu dunya konumuna atar. Basarida cooldown baslar ve ECS'e strike istegi
+        /// birakilir (hasar FireballStrikeSystem'de). Gorsel patlamayi cagiran taraf oynatir.
+        /// </summary>
+        public bool TryCastFireball(Vector2 worldPosition)
+        {
+            if (!_initialized || !FireballReady || GameState.IsGameOver)
+                return false;
+
+            _fireballCooldownRemaining = FireballCooldownDuration;
+
+            var strikeEntity = _entityManager.CreateEntity(typeof(FireballStrike));
+            _entityManager.SetComponentData(strikeEntity, new FireballStrike
+            {
+                Position = new float2(worldPosition.x, worldPosition.y),
+                Radius = FireballRadius,
+                Damage = FireballDamage
+            });
+
+            OnGameStateChanged?.Invoke();
+            return true;
         }
 
         // ---------------------------------------------------------------------------------

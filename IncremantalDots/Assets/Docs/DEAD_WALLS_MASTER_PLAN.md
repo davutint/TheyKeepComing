@@ -151,9 +151,14 @@ Ara hedef olarak "oynanabilir demo" = C1-C10 (store maddeleri haric).
   kosu N gun/M dakika" verisi (M-B meta tasariminin girdisi). (~1 oturum)
 - **M-B. Kosu Yapisi + Meta v1** — K2 karari, olum ekrani ("gun X'e ulastin" ozeti),
   (K2=b/c ise) meta para birimi + 3-5 kalici unlock, rekor takibi. (~1-2 oturum)
-- **M-C. Dusman Cesitliligi v1** — 2-3 yeni zombi tipi (oneri: Kosucu [hizli/kirilgan, Frost'u
-  degerli kilar], Tank [yavas/etli, odak atesi ister], Zirhli [ok direnci, tech cevabi ister])
-  + gorsel ayrisma + spawn karisim kurallari cycle'a gore. (~1-2 oturum)
+- **M-C. Dusman Cesitliligi v1 — KAPSAM DEGISTI (owner, 2026-07-08) + IMPLEMENTE EDILDI** —
+  Zombi tipleri ERTELENDI (owner: "simdilik tek zombi"; Kosucu/Tank/Zirhli M-C2'ye).
+  Yerine: (1) KANLI AY — her 5. gece intensity x1.5 (SpecialNights AKTIF, Difficulty
+  Tuner'dan ayarlanir), gunduz uyari toast'u + kirmizi gece etiketi/overlay;
+  (2) ATES TOPU — oyuncunun aktif savas gucu: tech'ten acilir (arcane_tower), butona
+  bas -> alana tikla -> alan hasari; hasar/yaricap/cooldown AYRI tech dugumleriyle
+  gelisir (owner vizyonu; buyucu gorseli soyut, "sifir asker + tiklama savasi" modeli
+  sonraya). Dok: TECH_TREE_SO + CONTINUOUS_SIEGE v5.2. Play dogrulamasi bekliyor. (~1 oturum)
 - **M-D. His Katmani** — combat SFX seti, gece ambiyans/muzik katmani, kale hasar hissi
   (sarsinti/flash), zombi olum efekti. (~1 oturum)
 - **M-E. Shipping Iskeleti** — safak-checkpoint save/load, ana menu + pause + ayarlar,
@@ -236,6 +241,10 @@ Ara hedef olarak "oynanabilir demo" = C1-C10 (store maddeleri haric).
   dustu, 47 repair, 892 canli zombi @ FPS 200+). "Ya 2 dk ya sonsuz" cift-kamburu KIRILDI.
   Ust-uc inceltme M-C'de (zombi tipleri + ozel geceler); ayar artik owner'in elinde
   (Tuner, kod istemez).
-- SIRADAKI IS: M-B ROGUELITE META tasarim sohbeti — girdiler hazir: kosu bandi ~6-20 gun
-  (6-20 dk @1x), olurken elde kalan tipik birikim CSV'lerde; food/stone fazlasi meta
-  para birimi adayi.
+- M-B TAMAM (2026-07-07): kill -> RUH meta dongusu implemente + play'de iki tam olum
+  dongusuyle dogrulandi (kazanim/rekor/magaza/restart-etkisi/kalicilik). Detay: 3.4.
+- M-C V1 IMPLEMENTE EDILDI (2026-07-08): Kanli Ay + Ates Topu (buyuculuk tech dali).
+  Kapsam degisikligi ve detay: milestone listesindeki M-C maddesi. PLAY DOGRULAMASI
+  BEKLIYOR (Unity setup kosusunda kesildi).
+- SIRADAKI IS: M-C play dogrulamasi (tech satin al -> fireball cast -> kill; DAY 5
+  kanli ay gecesi olcumu) -> sonra M-D his katmani ya da M-C2 (zombi tipleri) karari.

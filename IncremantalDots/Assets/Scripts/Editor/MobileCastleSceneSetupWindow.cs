@@ -1027,6 +1027,43 @@ namespace DeadWalls
                     RevealChildren = new string[0],
                     Effects = new[] { new TechNodeEffect { Type = TechNodeEffectType.AddMoatDamagePerSecond, Value = 4f } }
                 },
+                // ---- Buyuculuk dali (M-C): oyuncunun aktif savas gucu ----
+                new TechNodeSeed
+                {
+                    Id = "arcane_tower", Title = "Arcane Tower",
+                    Description = "Unlock the Fireball spell: blast an area of your choosing.",
+                    Cost = new ResourceCost(100, 0, 80, 0), MaxLevel = 1, CostGrowthPerLevel = 0f,
+                    Prerequisites = new[] { "castle_heart" },
+                    RevealChildren = new[] { "fire_power", "fire_radius", "fire_cooldown" },
+                    Effects = new[] { new TechNodeEffect { Type = TechNodeEffectType.UnlockSpellcasting } }
+                },
+                new TechNodeSeed
+                {
+                    Id = "fire_power", Title = "Searing Flames",
+                    Description = "+20% fireball damage per level.",
+                    Cost = new ResourceCost(60, 0, 50, 0), MaxLevel = 5, CostGrowthPerLevel = 0.5f,
+                    Prerequisites = new[] { "arcane_tower" },
+                    RevealChildren = new string[0],
+                    Effects = new[] { new TechNodeEffect { Type = TechNodeEffectType.ModifySpellDamagePercent, Value = 0.20f } }
+                },
+                new TechNodeSeed
+                {
+                    Id = "fire_radius", Title = "Greater Blast",
+                    Description = "+0.4 fireball blast radius per level.",
+                    Cost = new ResourceCost(70, 0, 60, 0), MaxLevel = 3, CostGrowthPerLevel = 0.6f,
+                    Prerequisites = new[] { "arcane_tower" },
+                    RevealChildren = new string[0],
+                    Effects = new[] { new TechNodeEffect { Type = TechNodeEffectType.AddSpellRadius, Value = 0.4f } }
+                },
+                new TechNodeSeed
+                {
+                    Id = "fire_cooldown", Title = "Arcane Focus",
+                    Description = "-10% fireball cooldown per level.",
+                    Cost = new ResourceCost(50, 0, 60, 0), MaxLevel = 5, CostGrowthPerLevel = 0.5f,
+                    Prerequisites = new[] { "arcane_tower" },
+                    RevealChildren = new string[0],
+                    Effects = new[] { new TechNodeEffect { Type = TechNodeEffectType.ReduceSpellCooldownPercent, Value = 0.10f } }
+                },
             };
         }
 
@@ -1043,6 +1080,8 @@ namespace DeadWalls
             ("repair_crew", "repair_efficiency"),
             ("wall_reinforcement", "moat_dig"),
             ("moat_dig", "moat_flame"),
+            // castle_heart asset'i diskte mevcut — buyuculuk dalinin reveal'i ancak link merge ile acilir
+            ("castle_heart", "arcane_tower"),
         };
 
         private static void EnsureTechRevealLinks(TechTreeCatalogSO catalog)
@@ -1251,7 +1290,10 @@ namespace DeadWalls
 
             var profile = AssetDatabase.LoadAssetAtPath<DifficultyProfileSO>(DifficultyProfilePath);
             if (profile != null)
+            {
+                EnsureBloodMoonSeed(profile);
                 return profile;
+            }
 
             profile = ScriptableObject.CreateInstance<DifficultyProfileSO>();
             // Erken olum kamburu duzeltmesi (M-A): ilk geceler kademeli siddet rampi
@@ -1268,8 +1310,23 @@ namespace DeadWalls
             // Erken kurtulus yolu: repair'in stone bagimliligi dusuruldu
             profile.RepairBaseStoneCost = 50;
             AssetDatabase.CreateAsset(profile, DifficultyProfilePath);
+            EnsureBloodMoonSeed(profile);
             EditorUtility.SetDirty(profile);
             return profile;
+        }
+
+        /// <summary>Kanli ay v1 seed'i (M-C): YALNIZ SpecialNights bos ise eklenir (owner ayarina dokunulmaz).</summary>
+        private static void EnsureBloodMoonSeed(DifficultyProfileSO profile)
+        {
+            if (profile.SpecialNights != null && profile.SpecialNights.Length > 0)
+                return;
+
+            Undo.RecordObject(profile, "Seed Blood Moon Special Night");
+            profile.SpecialNights = new[]
+            {
+                new SpecialNightEntry { EveryNDays = 5, Kind = "blood_moon", IntensityBonus = 0.5f }
+            };
+            EditorUtility.SetDirty(profile);
         }
 
         /// <summary>Subscene'deki combat authoring'ine profili baglar (yalniz BOSSA; owner atamasina dokunmaz).</summary>
@@ -2113,6 +2170,8 @@ namespace DeadWalls
             restartText.text = "Restart";
 
             ConfigureMetaProgressionUI(gameOverPanel);
+            ConfigureSpellUI(canvasTransform);
+            ConfigureBloodMoonWarning(canvasTransform);
 
             uiManager.HUDPanel = hudRoot;
             uiManager.LevelUpPanel = levelUpPanel;
@@ -2202,6 +2261,107 @@ namespace DeadWalls
             meta.MetaShopRowTemplate = template;
 
             EditorUtility.SetDirty(meta);
+        }
+
+        /// <summary>
+        /// Ates Topu UI'i (M-C buyuculuk): SpellUiRoot (hep aktif; controller burada yasar ki
+        /// panel kapaliyken de Update kossun) altinda SpellPanel (sag-alt buton + cooldown fill).
+        /// Isim sozlesmesi: SpellPanel / FireballButton / FireballCooldownFill (buton child'i).
+        /// </summary>
+        private static void ConfigureSpellUI(Transform canvasTransform)
+        {
+            GameObject root = FindDirectChild(canvasTransform, "SpellUiRoot");
+            if (root == null)
+            {
+                root = new GameObject("SpellUiRoot", typeof(RectTransform));
+                Undo.RegisterCreatedObjectUndo(root, "Create Spell UI Root");
+                root.layer = canvasTransform.gameObject.layer;
+                root.transform.SetParent(canvasTransform, false);
+            }
+            var rootRect = (RectTransform)root.transform;
+            rootRect.anchorMin = Vector2.zero;
+            rootRect.anchorMax = Vector2.one;
+            rootRect.offsetMin = Vector2.zero;
+            rootRect.offsetMax = Vector2.zero;
+
+            var spell = EnsureComponent<SpellCastUI>(root);
+
+            GameObject panel = FindDirectChild(root.transform, "SpellPanel");
+            if (panel == null)
+                panel = EnsurePanel(root.transform, "SpellPanel", false, new Color(0.06f, 0.05f, 0.10f, 0.85f));
+            var panelRect = (RectTransform)panel.transform;
+            panelRect.anchorMin = new Vector2(1f, 0f);
+            panelRect.anchorMax = new Vector2(1f, 0f);
+            panelRect.offsetMin = new Vector2(-190f, 96f);
+            panelRect.offsetMax = new Vector2(-16f, 168f);
+            spell.SpellPanel = panel;
+
+            var button = EnsureButton(panel.transform, "FireballButton",
+                new Vector2(0.5f, 0.5f), new Vector2(-80f, -30f), new Vector2(80f, 30f), out var label);
+            label.text = "FIREBALL";
+            label.fontSize = 18;
+            var colors = button.colors;
+            colors.normalColor = new Color(0.72f, 0.32f, 0.10f, 1f);
+            colors.highlightedColor = new Color(0.85f, 0.42f, 0.15f, 1f);
+            colors.pressedColor = new Color(0.55f, 0.24f, 0.08f, 1f);
+            colors.disabledColor = new Color(0.30f, 0.22f, 0.18f, 0.85f);
+            button.colors = colors;
+            spell.FireballButton = button;
+            spell.FireballLabelText = label;
+
+            // Cooldown overlay: butonun ustunde asagidan dolan karartma (kalan sure orani)
+            GameObject fillGo = FindDirectChild(button.transform, "FireballCooldownFill");
+            if (fillGo == null)
+            {
+                fillGo = new GameObject("FireballCooldownFill", typeof(RectTransform));
+                Undo.RegisterCreatedObjectUndo(fillGo, "Create Fireball Cooldown Fill");
+                fillGo.layer = panel.layer;
+                fillGo.transform.SetParent(button.transform, false);
+            }
+            var fillRect = (RectTransform)fillGo.transform;
+            fillRect.anchorMin = Vector2.zero;
+            fillRect.anchorMax = Vector2.one;
+            fillRect.offsetMin = Vector2.zero;
+            fillRect.offsetMax = Vector2.zero;
+            var fillImage = EnsureComponent<UnityEngine.UI.Image>(fillGo);
+            fillImage.color = new Color(0f, 0f, 0f, 0.55f);
+            fillImage.type = UnityEngine.UI.Image.Type.Filled;
+            fillImage.fillMethod = UnityEngine.UI.Image.FillMethod.Vertical;
+            fillImage.fillOrigin = (int)UnityEngine.UI.Image.OriginVertical.Bottom;
+            fillImage.fillAmount = 0f;
+            fillImage.raycastTarget = false;
+            // Label fill'in ustunde okunur kalsin
+            label.transform.SetAsLastSibling();
+            spell.FireballCooldownFill = fillImage;
+
+            panel.SetActive(false); // unlock'a kadar gizli; SpellCastUI acar
+            EditorUtility.SetDirty(spell);
+        }
+
+        /// <summary>Kanli ay gunduz uyarisi (M-C): ust-orta toast text'i + BloodMoonWarningUI controller'i.</summary>
+        private static void ConfigureBloodMoonWarning(Transform canvasTransform)
+        {
+            GameObject root = FindDirectChild(canvasTransform, "BloodMoonWarningRoot");
+            if (root == null)
+            {
+                root = new GameObject("BloodMoonWarningRoot", typeof(RectTransform));
+                Undo.RegisterCreatedObjectUndo(root, "Create Blood Moon Warning Root");
+                root.layer = canvasTransform.gameObject.layer;
+                root.transform.SetParent(canvasTransform, false);
+            }
+            var rootRect = (RectTransform)root.transform;
+            rootRect.anchorMin = Vector2.zero;
+            rootRect.anchorMax = Vector2.one;
+            rootRect.offsetMin = Vector2.zero;
+            rootRect.offsetMax = Vector2.zero;
+
+            var warning = EnsureComponent<BloodMoonWarningUI>(root);
+            warning.WarningText = EnsureText(root.transform, "BloodMoonWarningText",
+                "BLOOD MOON RISES TONIGHT", 30, TextAlignmentOptions.Center,
+                new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
+                new Vector2(-380f, -240f), new Vector2(380f, -150f));
+            warning.WarningText.gameObject.SetActive(false);
+            EditorUtility.SetDirty(warning);
         }
 
         private static GameObject EnsureHudRoot(Transform canvasTransform)

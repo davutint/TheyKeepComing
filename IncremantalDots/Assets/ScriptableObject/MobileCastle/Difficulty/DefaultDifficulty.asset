@@ -130,4 +130,7 @@ MonoBehaviour:
   RepairBaseWoodCost: 120
   RepairBaseStoneCost: 50
   SpawnTable: []
-  SpecialNights: []
+  SpecialNights:
+  - EveryNDays: 5
+    Kind: blood_moon
+    IntensityBonus: 0.5

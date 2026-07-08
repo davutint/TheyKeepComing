@@ -48,3 +48,20 @@ odul/nefes fazi. `SiegeDawnDuration=0` bake'lerde legacy 3-faz davranis korunur.
 - `KillRewardWaveScale=0` default: kill odulu cycle ile buyumez (gelir/zorluk ayrisik).
 - DayNightOverlayController Dawn'da night->day alpha lerp'i yapar;
   HUDController `DAWN` yazar ve `CycleDayCounterText` ("DAY n" = CycleIndex+1) gunceller.
+
+## v5.2: Kanli Ay / SpecialNights (M-C, 2026-07-08)
+
+`DifficultyProfileSO.SpecialNights` artik AKTIF: baker (ve Difficulty Tuner canli-apply)
+her gun icin `gun % EveryNDays == 0` kontroluyle `BloodMoonIntensityMult`u
+`DifficultyDaySample` buffer'ina yazar (birden cok satir carpimsal birikir;
+`1 + IntensityBonus`). Seed: her 5. gece, bonus 0.5 (yalniz-bosken eklenir).
+
+- Sistem NIGHT (ve Dusk-sonu lerp hedefi) intensity'sini `bloodMoonMult` ile carpar ve
+  `ContinuousSiegeCycleData.IsBloodMoonNight` bayragini yazar (gunun TUM fazlarinda true).
+- Buffer okuma farki: egriler CLAMP (son gune yapisir), kanli ay WRAP
+  (`cycleIndex % len`) — aksi halde SampleDays sonrasi her gece kanli kalirdi.
+  Eski bake'lerde alan 0 gelir -> 1 sayilir (geriye uyumlu).
+- UI: `BloodMoonWarningUI` (Day fazina giriste "BLOOD MOON RISES TONIGHT" toast'u),
+  HUDController gece etiketi kirmizi "BLOOD MOON", DayNightOverlayController gece
+  karartmasini koyu kirmiziya kaydirir. Hepsi GameManager cycle cache'inden polling.
+- `Kind` alani v1'de filtrelenmez (blood_moon varsayilir); boss geceleri M-C2'de ayrisir.

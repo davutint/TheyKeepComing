@@ -436,11 +436,23 @@ namespace DeadWalls
             int days = Mathf.Clamp(p.SampleDays, 1, 200);
             for (int day = 1; day <= days; day++)
             {
+                // Kanli ay (SpecialNights) — baker ile AYNI formul (iki yazici senkron kalmali)
+                float bloodMoonMult = 1f;
+                if (p.SpecialNights != null)
+                {
+                    foreach (var special in p.SpecialNights)
+                    {
+                        if (special.EveryNDays > 0 && day % special.EveryNDays == 0)
+                            bloodMoonMult *= 1f + Mathf.Max(0f, special.IntensityBonus);
+                    }
+                }
+
                 buffer.Add(new DifficultyDaySample
                 {
                     NightIntensityMult = p.EvaluateCurve(p.NightIntensityByDay, day),
                     ZombieHpMult = p.EvaluateCurve(p.ZombieHpMultByDay, day),
                     SpawnBatchMult = p.EvaluateCurve(p.SpawnBatchMultByDay, day),
+                    BloodMoonIntensityMult = bloodMoonMult,
                 });
             }
         }
