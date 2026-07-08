@@ -88,6 +88,7 @@ namespace DeadWalls
 
             if (gm.RepairDefenseFull())
             {
+                UiSoundFeedback.Instance?.PlaySuccess();
                 // Basarili tamir: butonda kucuk punch (juice tutarliligi)
                 var rect = RepairButton != null ? (RectTransform)RepairButton.transform : null;
                 if (rect != null)

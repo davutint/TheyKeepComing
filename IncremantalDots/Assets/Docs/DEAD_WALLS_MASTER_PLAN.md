@@ -295,6 +295,12 @@ Ara hedef olarak "oynanabilir demo" = C1-C10 (store maddeleri haric).
   DamageFlashUI renkli vurus API'si; safak girisinde ALTIN, kanli ay gecesinde KIZIL
   parlama (MomentVignetteUI); olum aninda 0.9sn timeScale 0.25 AGIR CEKIM sonra ekran
   (UIManager.GameOverSequence). Hepsi play'de dogrulandi (screenshot + timeScale penceresi).
+- POLISH TURU 3 (2026-07-08): SES CILASI — UiSoundFeedback (Canvas'ta, iki sahnede):
+  her interactable butona MERKEZI tik sesi (raycast yakalama — runtime klonlar dahil,
+  listener gerekmez), satin alma basari/basarisizlik sesleri (TechTree fail, Meta magaza,
+  Repair), olum ekrani sting'i (LowBoom, agir cekim sonunda ekranla birlikte), ana menuye
+  ruzgar drone ambiyansi (SoundSettings.AmbienceVolume'a canli tabi). Clip'ler ELEMENTAL
+  paketinden, setup yalniz-bossa atar. Play'de dogrulandi (uc kanal + volume-0 guvenligi).
 - SIRADAKI IS: polish devami (owner yonlendirmesiyle) ya da M-F (Android build —
   owner karari: cihaz testi COK SONRA). Kucuk acik uclar: buyucu gorseli yok;
   onboarding yok; zombi cesitliligi (gorsel boru hattiyla birlikte yeniden ele alinacak).

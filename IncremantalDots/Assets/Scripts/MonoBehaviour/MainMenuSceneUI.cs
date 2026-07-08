@@ -28,6 +28,9 @@ namespace DeadWalls
         public Button NewRunButton;
         public Button SettingsButton;
         public SettingsUI Settings;
+        [Tooltip("Menu arka plan ambiyansi (loop; setup atar). Volume SoundSettings.AmbienceVolume'a tabidir.")]
+        public AudioSource AmbienceSource;
+        [Range(0f, 1f)] public float AmbienceVolume = 0.22f;
 
         private static readonly Color NightTop = new Color(0.030f, 0.034f, 0.075f);
         private static readonly Color NightMid = new Color(0.045f, 0.030f, 0.055f);
@@ -40,6 +43,21 @@ namespace DeadWalls
             ApplyGeneratedVisuals();
             ConfigureButtons();
             PlayIntroAnimation();
+
+            if (AmbienceSource != null && AmbienceSource.clip != null)
+            {
+                AmbienceSource.loop = true;
+                AmbienceSource.spatialBlend = 0f;
+                AmbienceSource.volume = AmbienceVolume * SoundSettings.AmbienceVolume;
+                AmbienceSource.Play();
+            }
+        }
+
+        private void Update()
+        {
+            // ayar slider'i canli etki etsin
+            if (AmbienceSource != null && AmbienceSource.isPlaying)
+                AmbienceSource.volume = AmbienceVolume * SoundSettings.AmbienceVolume;
         }
 
         // ---------------------------------------------------------------------------

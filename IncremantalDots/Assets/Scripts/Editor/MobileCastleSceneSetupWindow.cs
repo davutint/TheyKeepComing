@@ -2236,6 +2236,20 @@ namespace DeadWalls
             BuildSettingsPanel(ct, settings);
             menuUi.Settings = settings;
 
+            // menu sesleri (Polish 3): tik/olay sesleri + arka plan ambiyansi
+            ConfigureUiSounds(canvasGo);
+            GameObject ambienceGo = FindRoot(menuScene, "MenuAmbience");
+            if (ambienceGo == null)
+            {
+                ambienceGo = new GameObject("MenuAmbience");
+                SceneManager.MoveGameObjectToScene(ambienceGo, menuScene);
+            }
+            var ambienceSource = EnsureComponent<AudioSource>(ambienceGo);
+            ambienceSource.playOnAwake = false;
+            if (ambienceSource.clip == null)
+                ambienceSource.clip = LoadSfx("Wind Magic/RPG3_WindMagic_Drone01_LowSubtleLoop.wav");
+            menuUi.AmbienceSource = ambienceSource;
+
             EditorUtility.SetDirty(menuUi);
             EditorUtility.SetDirty(settings);
             EditorSceneManager.MarkSceneDirty(menuScene);
@@ -2264,6 +2278,21 @@ namespace DeadWalls
             }
             if (changed)
                 EditorBuildSettings.scenes = scenes.ToArray();
+        }
+
+        /// <summary>UI ses geribildirimi (Polish 3): merkezi tik + olay sesleri; clip'ler yalniz-bossa atanir.</summary>
+        private static void ConfigureUiSounds(GameObject canvasObject)
+        {
+            var sounds = EnsureComponent<UiSoundFeedback>(canvasObject);
+            if (sounds.ClickClip == null)
+                sounds.ClickClip = LoadSfx("Generic Magic and Impacts/RPG3_Generic_SubtleWhoosh01.wav");
+            if (sounds.SuccessClip == null)
+                sounds.SuccessClip = LoadSfx("UI, Pads, Enchantments and Misc/RPG3_Enchantment2_Success01v2_Short.wav");
+            if (sounds.FailClip == null)
+                sounds.FailClip = LoadSfx("UI, Pads, Enchantments and Misc/RPG3_UI_NegativeAlert01.wav");
+            if (sounds.DeathStingClip == null)
+                sounds.DeathStingClip = LoadSfx("Generic Magic and Impacts/RPG3_GenericMisc_LowBoom01.wav");
+            EditorUtility.SetDirty(sounds);
         }
 
         /// <summary>Kale hasar hissi (M-D): ana kameraya CameraShaker kurar.</summary>
@@ -2737,6 +2766,7 @@ namespace DeadWalls
             ConfigureMetaProgressionUI(gameOverPanel);
             ConfigureSpellUI(canvasTransform);
             ConfigureBloodMoonWarning(canvasTransform);
+            ConfigureUiSounds(canvasTransform.gameObject); // Polish 3: tik/basari/fail/sting
 
             uiManager.HUDPanel = hudRoot;
             uiManager.LevelUpPanel = levelUpPanel;

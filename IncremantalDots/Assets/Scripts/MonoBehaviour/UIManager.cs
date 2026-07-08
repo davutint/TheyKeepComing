@@ -91,6 +91,7 @@ namespace DeadWalls
         {
             Time.timeScale = 0.25f;
             yield return new WaitForSecondsRealtime(0.9f);
+            UiSoundFeedback.Instance?.PlayDeathSting(); // kasvetli bom — ekranla ayni anda
             GameOverPanel?.SetActive(true);
             Time.timeScale = 0f;
             _gameOverRoutine = null;

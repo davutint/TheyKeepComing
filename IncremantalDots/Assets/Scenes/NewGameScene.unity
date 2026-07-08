@@ -27644,6 +27644,7 @@ GameObject:
   - component: {fileID: 383404866}
   - component: {fileID: 383404865}
   - component: {fileID: 383404864}
+  - component: {fileID: 383404869}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -27757,6 +27758,26 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &383404869
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 383404863}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56c1f12dcab0b8443b2638714d12add0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DeadWalls::DeadWalls.UiSoundFeedback
+  ClickClip: {fileID: 8300000, guid: ec87c5a9fc6564ca4bdfd0776b7382bf, type: 3}
+  SuccessClip: {fileID: 8300000, guid: 731b4cd107938445799026a296b46bbc, type: 3}
+  FailClip: {fileID: 8300000, guid: 0a89822109ba44092ba91468c6964740, type: 3}
+  DeathStingClip: {fileID: 8300000, guid: 70f9d3223a2f54990959c06e1d6d513c, type: 3}
+  ClickVolume: 0.35
+  SuccessVolume: 0.5
+  FailVolume: 0.45
+  StingVolume: 0.7
 --- !u!1 &395458699
 GameObject:
   m_ObjectHideFlags: 0

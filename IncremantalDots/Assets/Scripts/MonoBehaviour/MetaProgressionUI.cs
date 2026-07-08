@@ -132,10 +132,15 @@ namespace DeadWalls
             {
                 if (MetaProgression.TryBuyUpgrade(upgrade))
                 {
+                    UiSoundFeedback.Instance?.PlaySuccess();
                     var rect = (RectTransform)buyButton.transform;
                     rect.DOKill(true);
                     rect.DOPunchScale(Vector3.one * 0.08f, 0.18f, 8, 0.7f).SetUpdate(true);
                     RebuildShop(GameManager.Instance);
+                }
+                else
+                {
+                    UiSoundFeedback.Instance?.PlayFail();
                 }
             });
         }

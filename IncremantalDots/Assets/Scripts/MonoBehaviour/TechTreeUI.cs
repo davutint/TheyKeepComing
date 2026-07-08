@@ -691,7 +691,10 @@ namespace DeadWalls
             }
 
             if (!gm.TryBuyTechNode(def))
+            {
+                UiSoundFeedback.Instance?.PlayFail();
                 return;
+            }
 
             _lastBoughtNodeId = def.Id;
             PlaySfx(BuyClip, 0.85f);
