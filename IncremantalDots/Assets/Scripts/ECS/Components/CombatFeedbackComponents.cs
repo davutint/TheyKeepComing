@@ -16,7 +16,10 @@ namespace DeadWalls
         ArrowShoot,
         ArrowHit,
         FrostHit,
-        CastleHit
+        CastleHit,
+        // M-D his katmani eklemeleri
+        ZombieDeath,
+        FireballBlast
     }
 
     public struct CombatVfxEvent : IComponentData

@@ -41,6 +41,16 @@ namespace DeadWalls
             {
                 strikes.Add(strike.ValueRO);
                 ecb.DestroyEntity(entity);
+
+                // Patlama SFX'i (M-D): gorsel SpellCastUI'da, ses feedback kanalindan
+                var sfxEvent = ecb.CreateEntity();
+                ecb.AddComponent(sfxEvent, new CombatSfxEvent
+                {
+                    Position = new float3(strike.ValueRO.Position.x, strike.ValueRO.Position.y, 0f),
+                    Type = CombatSfxType.FireballBlast,
+                    Volume = 0.9f,
+                    Pitch = 1f
+                });
             }
 
             state.Dependency = new FireballDamageJob

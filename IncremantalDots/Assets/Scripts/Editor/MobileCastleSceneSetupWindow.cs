@@ -767,6 +767,9 @@ namespace DeadWalls
             EnsureCastleClickTarget(scene);
             EnsureArcherTilePlacement(scene);
             EnsureCombatFeedbackRoot(scene);
+            EnsureCameraShaker(scene);
+            EnsureDamageFlash(canvas.transform);
+            EnsureAmbientAudio(scene);
             NormalizeCastleTilemapSorting(scene);
         }
 
@@ -1943,8 +1946,100 @@ namespace DeadWalls
             bridge.VfxSortingLayer = "Wall";
             bridge.VfxSortingOrder = 12;
 
+            // M-D his katmani: yeni SFX clip'leri (RPG Magic ELEMENTAL paketi; yalniz-bossa ata)
+            if (bridge.ZombieDeathClips == null || bridge.ZombieDeathClips.Length == 0)
+            {
+                bridge.ZombieDeathClips = new[]
+                {
+                    LoadSfx("UI, Pads, Enchantments and Misc/RPG3_MONSTER_Hurt01.wav"),
+                    LoadSfx("UI, Pads, Enchantments and Misc/RPG3_MONSTER_Hurt02.wav"),
+                };
+            }
+            if (bridge.FireballBlastClip == null)
+                bridge.FireballBlastClip = LoadSfx("Fire Magic/RPG3_FireMagic_Explosion02.wav");
+            if (bridge.ArrowHitClip == null)
+                bridge.ArrowHitClip = LoadSfx("Generic Magic and Impacts/RPG3_GenericArrow_Impact01.wav");
+            if (bridge.FrostHitClip == null)
+                bridge.FrostHitClip = LoadSfx("Ice Magic/RPG3_IceMagic2_IceBreak01.wav");
+            if (bridge.CastleHitClip == null)
+                bridge.CastleHitClip = LoadSfx("Generic Magic and Impacts/RPG3_GenericCannon_LowImpact01.wav");
+
             EditorUtility.SetDirty(bridge);
             EditorUtility.SetDirty(root);
+        }
+
+        private const string SfxPackRoot = "Assets/RPG Magic Sound Effects Pack 3 [ELEMENTAL]/";
+
+        private static AudioClip LoadSfx(string relativePath)
+        {
+            var clip = AssetDatabase.LoadAssetAtPath<AudioClip>(SfxPackRoot + relativePath);
+            if (clip == null)
+                Debug.LogWarning($"[MobileCastleSceneSetup] SFX bulunamadi: {SfxPackRoot + relativePath}");
+            return clip;
+        }
+
+        /// <summary>Kale hasar hissi (M-D): ana kameraya CameraShaker kurar.</summary>
+        private static void EnsureCameraShaker(Scene scene)
+        {
+            var camera = Camera.main;
+            if (camera == null)
+            {
+                GameObject cameraGo = FindRoot(scene, "Main Camera");
+                camera = cameraGo != null ? cameraGo.GetComponent<Camera>() : null;
+            }
+            if (camera == null)
+                return;
+
+            EnsureComponent<CameraShaker>(camera.gameObject);
+            EditorUtility.SetDirty(camera.gameObject);
+        }
+
+        /// <summary>Kale hasar flash'i (M-D): Canvas'in EN USTUNE tam-ekran FlashOverlay kurar.</summary>
+        private static void EnsureDamageFlash(Transform canvasTransform)
+        {
+            GameObject overlay = FindDirectChild(canvasTransform, "DamageFlashOverlay");
+            if (overlay == null)
+            {
+                overlay = new GameObject("DamageFlashOverlay", typeof(RectTransform));
+                Undo.RegisterCreatedObjectUndo(overlay, "Create Damage Flash Overlay");
+                overlay.layer = canvasTransform.gameObject.layer;
+                overlay.transform.SetParent(canvasTransform, false);
+            }
+            var rect = (RectTransform)overlay.transform;
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+            overlay.transform.SetAsLastSibling(); // her seyin ustunde parlar
+
+            var image = EnsureComponent<UnityEngine.UI.Image>(overlay);
+            image.color = new Color(0.75f, 0.08f, 0.05f, 0f);
+            image.raycastTarget = false;
+
+            var flash = EnsureComponent<DamageFlashUI>(overlay);
+            flash.FlashImage = image;
+            EditorUtility.SetDirty(flash);
+        }
+
+        /// <summary>Gece/kanli ay ambiyansi (M-D): sahne kokune AmbientAudioController kurar, clip'leri yalniz-bossa atar.</summary>
+        private static void EnsureAmbientAudio(Scene scene)
+        {
+            GameObject root = FindRoot(scene, "AmbientAudioRoot");
+            if (root == null)
+            {
+                root = new GameObject("AmbientAudioRoot");
+                Undo.RegisterCreatedObjectUndo(root, "Create Ambient Audio Root");
+                SceneManager.MoveGameObjectToScene(root, scene);
+            }
+
+            var ambient = EnsureComponent<AmbientAudioController>(root);
+            if (ambient.NightLoop == null)
+                ambient.NightLoop = LoadSfx("Wind Magic/RPG3_WindMagic_Drone01_LowSubtleLoop.wav");
+            if (ambient.BloodMoonLoop == null)
+                ambient.BloodMoonLoop = LoadSfx("Dark Magic/RPG3_DarkMagic_DroneUnderworld_Loop.wav");
+            if (ambient.BloodMoonSting == null)
+                ambient.BloodMoonSting = LoadSfx("UI, Pads, Enchantments and Misc/RPG3_MONSTER_Roar01.wav");
+            EditorUtility.SetDirty(ambient);
         }
 
         private static Sprite[] FindHitFlipbookSprites()

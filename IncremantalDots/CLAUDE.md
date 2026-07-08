@@ -75,6 +75,7 @@ Otorite `ContinuousSiegeCycleData` (eski `WaveStateData.Phase` DEGIL):
 | Olum ekrani + meta magaza | `MetaProgressionUI.cs` + `MetaProgression.cs` | roguelite: 1 kill = 1 RUH (+rekor bonusu), kalici yukseltmeler (JSON persistentDataPath); GameOverPanel kod-uretimli, objeleri setup kurar |
 | Ates Topu butonu + hedefleme | `SpellCastUI.cs` | M-C buyuculuk: arcane_tower tech'i acinca gorunur; buton -> alana tikla -> `TryCastFireball` -> ECS `FireballStrike`; cooldown fill + runtime radial sprite VFX |
 | Kanli ay uyarisi | `BloodMoonWarningUI.cs` | her 5. gece (DifficultyProfileSO.SpecialNights): Day girisinde toast, gece HUD etiketi kirmizi "BLOOD MOON", overlay koyu kirmizi |
+| His katmani (M-D) | `CombatFeedbackBridge.cs` + `CameraShaker.cs` + `DamageFlashUI.cs` + `AmbientAudioController.cs` | SFX (ok/olum/patlama/kale — ELEMENTAL ses paketi, setup yalniz-bossa atar), kale vurusunda sarsinti+flash, gece/kanli-ay drone ambiyansi + sting |
 | Council event karti | `CouncilEventUI.cs` + `CouncilComposer.cs` | safak meclisi: kart DAWN'da belirir, DAY boyunca yasar, DUSK'ta expire; event'ler asset DEGIL, sablon x atom x baglam x olcekten uretilir (director + zincir/flag hafizasi + butce dengeleme); pause YOK |
 | Castle Interior ekonomi paneli | `CastleEconomyUI.cs` | LEGACY/debug (`PlayerFacingPanelEnabled=false`); ana ekonomi sol drawer'a tasindi |
 | Kaleye tikla-ac tetikleyici | `CastleInteriorClickTarget.cs` | LEGACY; player-facing worker yonetimi sol drawer'da |

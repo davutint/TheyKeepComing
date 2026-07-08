@@ -16,6 +16,22 @@
 - `ArcherShootSystem`: `ArrowShoot` SFX. Shoot muzzle VFX V1'de kapali.
 - `ArrowHitSystem`: Basic/Rapid icin `ArrowHit`, Frost icin `FrostHit`; hit VFX hedef pozisyonunda kisa sprite flipbook impact olarak oynar.
 - `DamageApplySystem`: savunma hasari alindiginda `CastleHit`.
+- `ZombieDeathSystem` (M-D): olum aninda `ZombieDeath` SFX (rate-limit 0.09s — kalabalik yigilmaz).
+- `FireballStrikeSystem` (M-D): patlama aninda `FireballBlast` SFX (gorsel SpellCastUI'da).
+
+## M-D His Katmani (2026-07-08)
+
+- **SFX clip'leri** "RPG Magic Sound Effects Pack 3 [ELEMENTAL]" paketinden setup tool ile
+  YALNIZ-BOSSA atanir (owner atamasi korunur): ZombieDeathClips (MONSTER_Hurt 1-2, random),
+  FireballBlastClip (FireMagic_Explosion02), ArrowHitClip, FrostHitClip.
+- **Kale hasar hissi:** `PlaySfx` icinde rate-limit'ten GECEN her CastleHit,
+  `CameraShaker.Instance.AddTrauma` (trauma^2 Perlin offset, base pozisyon cache) +
+  `DamageFlashUI.Instance.Flash` (tam-ekran kirmizi vuru; Canvas'in son sibling'i) tetikler.
+  Ayar: `CastleHitShakeTrauma` / `CastleHitFlashEnabled`.
+- **Ambiyans:** `AmbientAudioController` (AmbientAudioRoot; setup kurar) — Dusk+Night'ta gece
+  drone'u (WindMagic_Drone01_LowSubtleLoop), kanli ay gecesinde DarkMagic_DroneUnderworld_Loop
+  + Night'a giris aninda MONSTER_Roar01 sting'i; 2 kaynakli crossfade, GameOver'da susar.
+- `_lastSfxTimes` dizisi enum'dan BUYUK tutulur (8 slot) — yeni SFX tipi eklerken tasma olmaz.
 
 ## Asset Kullanimi
 

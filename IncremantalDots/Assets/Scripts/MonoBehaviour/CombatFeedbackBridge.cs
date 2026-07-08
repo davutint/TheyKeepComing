@@ -21,6 +21,8 @@ namespace DeadWalls
         public AudioClip ArrowHitClip;
         public AudioClip FrostHitClip;
         public AudioClip CastleHitClip;
+        public AudioClip[] ZombieDeathClips;
+        public AudioClip FireballBlastClip;
 
         [Header("Hit Flipbook")]
         public Sprite[] HitFlipbookSprites;
@@ -53,6 +55,14 @@ namespace DeadWalls
         public float ShootSfxMinInterval = 0.045f;
         public float HitSfxMinInterval = 0.08f;
         public float CastleHitSfxMinInterval = 0.18f;
+        public float ZombieDeathSfxMinInterval = 0.09f;
+        public float FireballBlastSfxMinInterval = 0.2f;
+
+        [Header("Castle Hit Feel (M-D)")]
+        [Tooltip("CastleHit SFX calindiginda kamera sarsintisi siddeti (0 = kapali).")]
+        public float CastleHitShakeTrauma = 0.35f;
+        [Tooltip("CastleHit SFX calindiginda ekran flash'i tetiklenir.")]
+        public bool CastleHitFlashEnabled = true;
         public float PitchRandomMin = 0.94f;
         public float PitchRandomMax = 1.06f;
         [Range(0f, 1f)] public float SpatialBlend = 0.45f;
@@ -66,7 +76,8 @@ namespace DeadWalls
         private readonly Queue<FlipbookVfx> _hitFlipbookPool = new Queue<FlipbookVfx>();
         private readonly List<FlipbookVfx> _activeHitFlipbooks = new List<FlipbookVfx>();
         private readonly List<AudioSource> _audioSources = new List<AudioSource>();
-        private readonly float[] _lastSfxTimes = { -999f, -999f, -999f, -999f };
+        // Boyut enum uzunlugundan buyuk tutulur (yeni SFX tipi eklerken tasma olmasin)
+        private readonly float[] _lastSfxTimes = { -999f, -999f, -999f, -999f, -999f, -999f, -999f, -999f };
 
         private World _world;
         private EntityManager _entityManager;
@@ -523,6 +534,16 @@ namespace DeadWalls
                 return;
 
             _lastSfxTimes[index] = now;
+
+            // Kale hasar hissi (M-D): SFX rate-limit'inden gecen her CastleHit sarsintiyi/flash'i tetikler
+            if (sfxEvent.Type == CombatSfxType.CastleHit)
+            {
+                if (CastleHitShakeTrauma > 0f)
+                    CameraShaker.Instance?.AddTrauma(CastleHitShakeTrauma);
+                if (CastleHitFlashEnabled)
+                    DamageFlashUI.Instance?.Flash();
+            }
+
             EnsureAudioPool();
 
             AudioSource source = GetNextAudioSource();
@@ -564,13 +585,33 @@ namespace DeadWalls
             if (type == CombatSfxType.ArrowShoot)
                 return GetRandomArrowShootClip();
 
+            if (type == CombatSfxType.ZombieDeath)
+                return GetRandomClip(ZombieDeathClips);
+
             return type switch
             {
                 CombatSfxType.ArrowHit => ArrowHitClip,
                 CombatSfxType.FrostHit => FrostHitClip,
                 CombatSfxType.CastleHit => CastleHitClip,
+                CombatSfxType.FireballBlast => FireballBlastClip,
                 _ => null
             };
+        }
+
+        private static AudioClip GetRandomClip(AudioClip[] clips)
+        {
+            if (clips == null || clips.Length == 0)
+                return null;
+
+            int startIndex = UnityEngine.Random.Range(0, clips.Length);
+            for (int i = 0; i < clips.Length; i++)
+            {
+                AudioClip clip = clips[(startIndex + i) % clips.Length];
+                if (clip != null)
+                    return clip;
+            }
+
+            return null;
         }
 
         private AudioClip GetRandomArrowShootClip()
@@ -617,6 +658,8 @@ namespace DeadWalls
                 CombatSfxType.ArrowHit => HitSfxMinInterval,
                 CombatSfxType.FrostHit => HitSfxMinInterval,
                 CombatSfxType.CastleHit => CastleHitSfxMinInterval,
+                CombatSfxType.ZombieDeath => ZombieDeathSfxMinInterval,
+                CombatSfxType.FireballBlast => FireballBlastSfxMinInterval,
                 _ => 0.05f
             };
         }

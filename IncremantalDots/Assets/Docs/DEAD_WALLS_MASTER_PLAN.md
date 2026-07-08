@@ -159,8 +159,12 @@ Ara hedef olarak "oynanabilir demo" = C1-C10 (store maddeleri haric).
   bas -> alana tikla -> alan hasari; hasar/yaricap/cooldown AYRI tech dugumleriyle
   gelisir (owner vizyonu; buyucu gorseli soyut, "sifir asker + tiklama savasi" modeli
   sonraya). Dok: TECH_TREE_SO + CONTINUOUS_SIEGE v5.2. Play dogrulamasi bekliyor. (~1 oturum)
-- **M-D. His Katmani** — combat SFX seti, gece ambiyans/muzik katmani, kale hasar hissi
-  (sarsinti/flash), zombi olum efekti. (~1 oturum)
+- **M-D. His Katmani — TAMAM (2026-07-08)** — combat SFX seti dolduruldu (ok atis/isabet,
+  zombi olum, kale vurus, fireball patlama — "RPG Magic ELEMENTAL" paketi, setup yalniz-bossa
+  atar), kale hasar hissi (CameraShaker trauma sarsintisi + DamageFlashUI kirmizi vuru),
+  gece/kanli-ay drone ambiyansi + kanli ay giris sting'i (AmbientAudioController crossfade).
+  Play'de dogrulandi (SFX timestampleri + sarsinti/flash olcumu + ambiyans gecisi).
+  Kalan (M-D2 adaylari): muzik, UI tik sesleri, olum ekrani sting'i, volume ayar menusu (M-E).
 - **M-E. Shipping Iskeleti** — safak-checkpoint save/load, ana menu + pause + ayarlar,
   minimal onboarding (3 ipucu balonu). (~2 oturum)
 - **M-F. Cihaz Dogrulamasi** — Android build, gercek cihazda perf/input/battery testi,
@@ -246,5 +250,11 @@ Ara hedef olarak "oynanabilir demo" = C1-C10 (store maddeleri haric).
 - M-C V1 IMPLEMENTE EDILDI (2026-07-08): Kanli Ay + Ates Topu (buyuculuk tech dali).
   Kapsam degisikligi ve detay: milestone listesindeki M-C maddesi. PLAY DOGRULAMASI
   BEKLIYOR (Unity setup kosusunda kesildi).
-- SIRADAKI IS: M-C play dogrulamasi (tech satin al -> fireball cast -> kill; DAY 5
-  kanli ay gecesi olcumu) -> sonra M-D his katmani ya da M-C2 (zombi tipleri) karari.
+- M-C V1 DOGRULANDI (2026-07-08): buyuculuk dali formulleri birebir (72/40.5s/2.6);
+  fireball izole vurusu tam hasar; kanli ay DAY 5 intensity 2.10 birebir + tum UI katmani.
+  Yakalanan buglar: CyclePhaseText rich-text render etmiyor (renk artik TMP color ile),
+  Tuner canli-apply blood moon alani (baker ile ayni formul yazildi).
+- M-D TAMAM (2026-07-08, owner secimi): his katmani — detay milestone listesinde.
+- SIRADAKI IS: yol karari — M-C2 (zombi tipleri: Kosucu/Tank, SpawnTable bagla) ya da
+  M-E (shipping iskeleti: safak-checkpoint save + ana menu + pause). Kucuk acik uclar:
+  RUH ismi kesinlesmedi; olum ekrani GAME OVER basligi kozmetik cakisma; buyucu gorseli yok.
