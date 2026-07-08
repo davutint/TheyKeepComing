@@ -229,4 +229,18 @@ namespace DeadWalls
         public float Radius;
         public float Damage;
     }
+
+    /// <summary>
+    /// Ucan Ates Topu mermisi (polish: fireball artik anlik degil, gorunur bir mermi).
+    /// GameManager.TryCastFireball yaratir; FireballProjectileSystem hedefe tasir, varista
+    /// FireballStrike uretir (hasar + SFX ayni kanaldan) ve mermiyi siler. Gorseli Mono'da
+    /// SpellCastUI cizer (entity pozisyonunu takip eden flipbook — tek otorite ECS).
+    /// </summary>
+    public struct FireballProjectile : IComponentData
+    {
+        public float2 Target;
+        public float Speed;
+        public float Radius;
+        public float Damage;
+    }
 }

@@ -41,7 +41,10 @@
 - `FX_Shoot_Arrow_hit.prefab` normal hit icin oynatilmaz; castle fallback olarak atanabilir.
 - `FX_Shoot_Ice_hit.prefab` normal Frost hit icin oynatilmaz; Frost V1'de ayni hit flipbook + slow tint ile okunur.
 
-Castle hit V1'de ayrica prefab verilmezse `ArrowHitPrefab` ile fallback yapabilir. Owner daha sonra Inspector'dan ayri castle impact prefab'i atayabilir.
+Castle hit VFX prefab'i VARSAYILAN BOS (polish fix: eski ArrowHitPrefab fallback'i "duvara
+ok saplanmasi" bug'i uretiyordu — kaldirildi; setup atanmis arrowHit'i de temizler).
+Kale vurus hissi sarsinti+flash+ses ile verilir. Owner isterse Inspector'dan ayri bir
+castle impact prefab'i atayabilir (yalniz-bossa kurali onu korur).
 
 ## Performans Notlari
 

@@ -277,6 +277,16 @@ Ara hedef olarak "oynanabilir demo" = C1-C10 (store maddeleri haric).
   SpriteAtlasGenerator) birlikte, bastan tasarlanmali. Kod tamamen sokuldu; oyun tek-zombi
   davranisinda. SpawnTable/SpecialNights iskeletlerinden SpecialNights (kanli ay) AKTIF
   kalir; SpawnTable yine "sistem okumaz" durumuna dondu.
-- SIRADAKI IS: M-F (Android build + gercek cihaz testi — tum onkosullar hazir).
-  Kucuk acik uclar: buyucu gorseli yok; onboarding yok; zombi cesitliligi (gorsel boru
-  hattiyla birlikte yeniden ele alinacak).
+- POLISH TURU 1 (2026-07-08, owner yonlendirmesi "oyun canli hissettirsin"):
+  (1) FIREBALL METEOR — GOKTEN hedefe dusen flipbook mermi (owner v2 duzeltmesi:
+  "duvardan degil yukaridan"; baslangic hedef+13y ekran disi, hafif capraz; PPU 28 =
+  ~2.6 birim buyuk gorunur govde; Wall sorting layer) + varista patlama flipbook'u
+  (Fantasy FX Pack 2 fire_spell, 23 kare); sim ECS'te (FireballProjectileSystem ->
+  varista FireballStrike), gorsel Mono takipli (SpellCastUI). Eski duz-daire kalkti.
+  (2) DUVARA OK SAPLANMASI BUG'I FIX — CastleHit'in ArrowHitPrefab fallback'i kaldirildi
+  (gorsel kanit: %56 hasarli duvar, sifir ok). (3) GECE/GUNDUZ ATMOSFERI — duz siyah
+  karartma yerine faz-renkli: Dusk amber gun batimi -> gece koyu mavi-mor -> Dawn
+  altin-pembe; kanli ay kizil; renkler Inspector'dan ayarlanabilir.
+- SIRADAKI IS: polish devami (owner yonlendirmesiyle) ya da M-F (Android build —
+  owner karari: cihaz testi COK SONRA). Kucuk acik uclar: buyucu gorseli yok;
+  onboarding yok; zombi cesitliligi (gorsel boru hattiyla birlikte yeniden ele alinacak).

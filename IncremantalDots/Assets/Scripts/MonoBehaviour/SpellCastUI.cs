@@ -1,5 +1,6 @@
-using DG.Tweening;
 using TMPro;
+using Unity.Entities;
+using Unity.Transforms;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -7,12 +8,12 @@ using UnityEngine.UI;
 namespace DeadWalls
 {
     /// <summary>
-    /// Ates Topu UI'i (M-C buyuculuk): cooldown gostergeli buton + hedefleme modu + patlama
-    /// gorseli. arcane_tower tech'i alinana kadar panel gizlidir. Akis: butona bas ->
-    /// hedefleme (dunya-uzayi yaricap dairesi imleci izler) -> sol tik = cast
-    /// (GameManager.TryCastFireball), sag tik/ESC = iptal. Gorseller runtime uretilen radial
-    /// sprite'tir (asset bagimliligi yok); kalici VFX kanali M-D isi.
-    /// Controller SpellUiRoot uzerinde yasar (hep aktif); paneli kendisi ac/kapar.
+    /// Ates Topu UI'i (M-C buyuculuk + polish): cooldown gostergeli buton + hedefleme modu +
+    /// UCAN MERMI gorseli + varista patlama flipbook'u. Sim otoritesi ECS'tedir:
+    /// GameManager.TryCastFireball mermi entity'sini yaratir, bu sinif yalniz
+    /// ActiveFireballProjectile pozisyon/rotasyonunu kopyalayip sprite cizer; entity yok
+    /// olunca (varis) patlama flipbook'u hedef noktada bir kez oynar.
+    /// Sprite kareleri setup tool tarafindan atanir (Super Pixel Projectiles/FX Pack 2).
     /// </summary>
     public class SpellCastUI : MonoBehaviour
     {
@@ -22,13 +23,32 @@ namespace DeadWalls
         public Image FireballCooldownFill;
         public TMP_Text FireballLabelText;
 
+        [Header("Flipbook kareleri (setup tool sheet'lerden atar)")]
+        public Sprite[] ProjectileFrames;
+        public Sprite[] BlastFrames;
+        public float ProjectileFps = 20f;
+        public float BlastFps = 30f;
+
         private static readonly Color IndicatorColor = new Color(1f, 0.55f, 0.15f, 0.30f);
-        private static readonly Color BlastColor = new Color(1f, 0.45f, 0.10f, 0.85f);
 
         private bool _targeting;
         private SpriteRenderer _targetingIndicator;
         private Sprite _circleSprite;
         private Camera _camera;
+
+        // mermi takibi
+        private Entity _trackedProjectile = Entity.Null;
+        private Vector3 _lastProjectilePosition;
+        private Vector2 _pendingBlastPosition;
+        private float _pendingBlastRadius;
+        private SpriteRenderer _projectileVisual;
+        private float _projectileFrameTimer;
+        private int _projectileFrame;
+
+        // patlama
+        private SpriteRenderer _blastVisual;
+        private float _blastFrameTimer;
+        private int _blastFrame = -1; // -1 = oynamiyor
 
         private void Start()
         {
@@ -48,6 +68,9 @@ namespace DeadWalls
             if (SpellPanel != null && SpellPanel.activeSelf != visible)
                 SpellPanel.SetActive(visible);
 
+            UpdateProjectileVisual(gm);
+            UpdateBlastVisual();
+
             if (!visible)
             {
                 CancelTargeting();
@@ -59,6 +82,123 @@ namespace DeadWalls
             if (_targeting)
                 UpdateTargeting(gm);
         }
+
+        // ---------------------------------------------------------------------------
+        // Mermi gorseli: ECS entity pozisyonunu kopyalar; entity olunce patlama tetiklenir
+        // ---------------------------------------------------------------------------
+
+        private void UpdateProjectileVisual(GameManager gm)
+        {
+            var world = World.DefaultGameObjectInjectionWorld;
+            if (world == null || !world.IsCreated)
+                return;
+            var em = world.EntityManager;
+
+            // yeni mermi firlatildi mi
+            if (gm != null && gm.ActiveFireballProjectile != Entity.Null
+                && gm.ActiveFireballProjectile != _trackedProjectile
+                && em.Exists(gm.ActiveFireballProjectile))
+            {
+                _trackedProjectile = gm.ActiveFireballProjectile;
+                var proj = em.GetComponentData<FireballProjectile>(_trackedProjectile);
+                _pendingBlastPosition = new Vector2(proj.Target.x, proj.Target.y);
+                _pendingBlastRadius = proj.Radius;
+                EnsureProjectileVisual();
+                _projectileVisual.gameObject.SetActive(true);
+                _projectileFrame = 0;
+                _projectileFrameTimer = 0f;
+            }
+
+            if (_trackedProjectile == Entity.Null)
+                return;
+
+            if (em.Exists(_trackedProjectile))
+            {
+                var transform = em.GetComponentData<LocalTransform>(_trackedProjectile);
+                _lastProjectilePosition = new Vector3(transform.Position.x, transform.Position.y, 0f);
+                _projectileVisual.transform.SetPositionAndRotation(_lastProjectilePosition, transform.Rotation);
+
+                if (ProjectileFrames != null && ProjectileFrames.Length > 0)
+                {
+                    _projectileFrameTimer += Time.deltaTime;
+                    if (_projectileFrameTimer >= 1f / Mathf.Max(1f, ProjectileFps))
+                    {
+                        _projectileFrameTimer = 0f;
+                        _projectileFrame = (_projectileFrame + 1) % ProjectileFrames.Length;
+                        _projectileVisual.sprite = ProjectileFrames[_projectileFrame];
+                    }
+                }
+            }
+            else
+            {
+                // varis: mermi silindi — patlamayi hedefte oynat
+                _trackedProjectile = Entity.Null;
+                if (_projectileVisual != null)
+                    _projectileVisual.gameObject.SetActive(false);
+                StartBlast(_pendingBlastPosition, _pendingBlastRadius);
+            }
+        }
+
+        private void EnsureProjectileVisual()
+        {
+            if (_projectileVisual != null)
+                return;
+
+            var go = new GameObject("FireballProjectileVisual");
+            _projectileVisual = go.AddComponent<SpriteRenderer>();
+            if (ProjectileFrames != null && ProjectileFrames.Length > 0)
+                _projectileVisual.sprite = ProjectileFrames[0];
+            _projectileVisual.sortingLayerName = "Wall"; // savas alani gorselleriyle ayni katman — kesin ustte
+            _projectileVisual.sortingOrder = 210;
+            go.SetActive(false);
+        }
+
+        private void StartBlast(Vector2 position, float radius)
+        {
+            if (BlastFrames == null || BlastFrames.Length == 0)
+                return;
+
+            if (_blastVisual == null)
+            {
+                var go = new GameObject("FireballBlastVisual");
+                _blastVisual = go.AddComponent<SpriteRenderer>();
+                _blastVisual.sortingLayerName = "Wall";
+                _blastVisual.sortingOrder = 211;
+            }
+
+            // patlama gorseli etki alanini kaplasin: sprite dunya boyutuna gore olcekle
+            float spriteWorldSize = BlastFrames[0].bounds.size.x;
+            float scale = spriteWorldSize > 0.01f ? radius * 2.4f / spriteWorldSize : 1f;
+            _blastVisual.transform.position = new Vector3(position.x, position.y, 0f);
+            _blastVisual.transform.localScale = Vector3.one * scale;
+            _blastVisual.transform.rotation = Quaternion.identity;
+            _blastVisual.sprite = BlastFrames[0];
+            _blastVisual.gameObject.SetActive(true);
+            _blastFrame = 0;
+            _blastFrameTimer = 0f;
+        }
+
+        private void UpdateBlastVisual()
+        {
+            if (_blastFrame < 0 || _blastVisual == null)
+                return;
+
+            _blastFrameTimer += Time.deltaTime;
+            if (_blastFrameTimer < 1f / Mathf.Max(1f, BlastFps))
+                return;
+
+            _blastFrameTimer = 0f;
+            _blastFrame++;
+            if (BlastFrames == null || _blastFrame >= BlastFrames.Length)
+            {
+                _blastFrame = -1;
+                _blastVisual.gameObject.SetActive(false);
+                return;
+            }
+            _blastVisual.sprite = BlastFrames[_blastFrame];
+        }
+
+        // ---------------------------------------------------------------------------
 
         private void UpdateCooldownVisual(GameManager gm)
         {
@@ -113,10 +253,7 @@ namespace DeadWalls
                     return;
 
                 if (gm.TryCastFireball(new Vector2(world.x, world.y)))
-                {
-                    SpawnBlastVisual(world, gm.FireballRadius);
                     CancelTargeting();
-                }
             }
         }
 
@@ -148,28 +285,12 @@ namespace DeadWalls
             _targetingIndicator = go.AddComponent<SpriteRenderer>();
             _targetingIndicator.sprite = GetCircleSprite();
             _targetingIndicator.color = IndicatorColor;
+            _targetingIndicator.sortingLayerName = "Wall";
             _targetingIndicator.sortingOrder = 200;
             go.SetActive(false);
         }
 
-        private void SpawnBlastVisual(Vector3 position, float radius)
-        {
-            var go = new GameObject("FireballBlastVfx");
-            go.transform.position = new Vector3(position.x, position.y, 0f);
-            var sr = go.AddComponent<SpriteRenderer>();
-            sr.sprite = GetCircleSprite();
-            sr.color = BlastColor;
-            sr.sortingOrder = 210;
-
-            float diameter = radius * 2f;
-            go.transform.localScale = Vector3.one * (diameter * 0.25f);
-            DOTween.Sequence()
-                .Append(go.transform.DOScale(diameter, 0.22f).SetEase(Ease.OutCubic))
-                .Join(sr.DOFade(0f, 0.45f).SetEase(Ease.InQuad))
-                .OnComplete(() => Destroy(go));
-        }
-
-        /// <summary>1 dunya-birimi capinda, kenari yumusak radial daire (runtime uretim, cache'li).</summary>
+        /// <summary>1 dunya-birimi capinda, kenari yumusak radial daire (hedefleme halkasi).</summary>
         private Sprite GetCircleSprite()
         {
             if (_circleSprite != null)
@@ -184,10 +305,8 @@ namespace DeadWalls
                 for (int x = 0; x < size; x++)
                 {
                     float dist = Vector2.Distance(new Vector2(x + 0.5f, y + 0.5f), new Vector2(half, half)) / half;
-                    // merkez dolu, kenara dogru yumusak dusus (0.85..1.0 bandinda erir)
                     float alpha = Mathf.Clamp01((1f - dist) / 0.15f);
-                    byte a = (byte)(Mathf.Clamp01(alpha) * 255f);
-                    pixels[y * size + x] = new Color32(255, 255, 255, a);
+                    pixels[y * size + x] = new Color32(255, 255, 255, (byte)(Mathf.Clamp01(alpha) * 255f));
                 }
             }
             tex.SetPixels32(pixels);

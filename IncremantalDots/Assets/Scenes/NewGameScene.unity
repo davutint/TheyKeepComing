@@ -30740,7 +30740,7 @@ MonoBehaviour:
   ArrowMuzzlePrefab: {fileID: 719657563245746768, guid: 1f39d67347c32db42b5bfa32af20e8b8, type: 3}
   ArrowHitPrefab: {fileID: 7044691720042714530, guid: 618a66bd7838cf14ea3796f525b1edd2, type: 3}
   FrostHitPrefab: {fileID: 944750204202798419, guid: d5841a72fc3bb1448847966f04bb905a, type: 3}
-  CastleHitPrefab: {fileID: 7044691720042714530, guid: 618a66bd7838cf14ea3796f525b1edd2, type: 3}
+  CastleHitPrefab: {fileID: 0}
   ArrowShootClip: {fileID: 8300000, guid: ae61285d635e340c5abc9413cb06301b, type: 3}
   ArrowShootClips:
   - {fileID: 8300000, guid: da1db8529006f4a0f9ffa6428e54c604, type: 3}
@@ -32139,6 +32139,43 @@ MonoBehaviour:
   FireballButton: {fileID: 1788197983}
   FireballCooldownFill: {fileID: 826934514}
   FireballLabelText: {fileID: 1038509285}
+  ProjectileFrames:
+  - {fileID: 8673283512139689658, guid: d99fedf6094e7e741b9033567cf6a7d4, type: 3}
+  - {fileID: 2112119992331828786, guid: d99fedf6094e7e741b9033567cf6a7d4, type: 3}
+  - {fileID: 364630787094113051, guid: d99fedf6094e7e741b9033567cf6a7d4, type: 3}
+  - {fileID: -5490945197755662192, guid: d99fedf6094e7e741b9033567cf6a7d4, type: 3}
+  - {fileID: 8662497501436820962, guid: d99fedf6094e7e741b9033567cf6a7d4, type: 3}
+  - {fileID: 2371050419378103419, guid: d99fedf6094e7e741b9033567cf6a7d4, type: 3}
+  - {fileID: 5961685419649759798, guid: d99fedf6094e7e741b9033567cf6a7d4, type: 3}
+  - {fileID: 601581715184597111, guid: d99fedf6094e7e741b9033567cf6a7d4, type: 3}
+  - {fileID: -7155570462808879971, guid: d99fedf6094e7e741b9033567cf6a7d4, type: 3}
+  - {fileID: 1696591351133385988, guid: d99fedf6094e7e741b9033567cf6a7d4, type: 3}
+  BlastFrames:
+  - {fileID: 8673283512139689658, guid: 8c20046015c0e2c46a34b7b3d372974d, type: 3}
+  - {fileID: 2112119992331828786, guid: 8c20046015c0e2c46a34b7b3d372974d, type: 3}
+  - {fileID: 364630787094113051, guid: 8c20046015c0e2c46a34b7b3d372974d, type: 3}
+  - {fileID: -5490945197755662192, guid: 8c20046015c0e2c46a34b7b3d372974d, type: 3}
+  - {fileID: 8662497501436820962, guid: 8c20046015c0e2c46a34b7b3d372974d, type: 3}
+  - {fileID: 2371050419378103419, guid: 8c20046015c0e2c46a34b7b3d372974d, type: 3}
+  - {fileID: 5961685419649759798, guid: 8c20046015c0e2c46a34b7b3d372974d, type: 3}
+  - {fileID: 601581715184597111, guid: 8c20046015c0e2c46a34b7b3d372974d, type: 3}
+  - {fileID: -7155570462808879971, guid: 8c20046015c0e2c46a34b7b3d372974d, type: 3}
+  - {fileID: 1696591351133385988, guid: 8c20046015c0e2c46a34b7b3d372974d, type: 3}
+  - {fileID: 4813649479255411303, guid: 8c20046015c0e2c46a34b7b3d372974d, type: 3}
+  - {fileID: -2163629211269793909, guid: 8c20046015c0e2c46a34b7b3d372974d, type: 3}
+  - {fileID: -3859094460156601481, guid: 8c20046015c0e2c46a34b7b3d372974d, type: 3}
+  - {fileID: 3925152270859159499, guid: 8c20046015c0e2c46a34b7b3d372974d, type: 3}
+  - {fileID: -8613526081923268975, guid: 8c20046015c0e2c46a34b7b3d372974d, type: 3}
+  - {fileID: 6915553294033043229, guid: 8c20046015c0e2c46a34b7b3d372974d, type: 3}
+  - {fileID: 4422891160138998478, guid: 8c20046015c0e2c46a34b7b3d372974d, type: 3}
+  - {fileID: -77789508786456262, guid: 8c20046015c0e2c46a34b7b3d372974d, type: 3}
+  - {fileID: 3973188589083092960, guid: 8c20046015c0e2c46a34b7b3d372974d, type: 3}
+  - {fileID: -6848211472367207970, guid: 8c20046015c0e2c46a34b7b3d372974d, type: 3}
+  - {fileID: -7965393433483348297, guid: 8c20046015c0e2c46a34b7b3d372974d, type: 3}
+  - {fileID: -6131558145244503127, guid: 8c20046015c0e2c46a34b7b3d372974d, type: 3}
+  - {fileID: -7342315053162181326, guid: 8c20046015c0e2c46a34b7b3d372974d, type: 3}
+  ProjectileFps: 20
+  BlastFps: 30
 --- !u!1 &640175788
 GameObject:
   m_ObjectHideFlags: 0
@@ -32441,6 +32478,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: DeadWalls::DeadWalls.DayNightOverlayController
   OverlayImage: {fileID: 687747855}
   AlphaMoveSpeed: 8
+  DuskColor: {r: 0.55, g: 0.24, b: 0.06, a: 1}
+  NightColor: {r: 0.04, g: 0.06, b: 0.17, a: 1}
+  DawnColor: {r: 0.55, g: 0.3, b: 0.14, a: 1}
+  BloodMoonColor: {r: 0.32, g: 0.02, b: 0.02, a: 1}
 --- !u!114 &687747855
 MonoBehaviour:
   m_ObjectHideFlags: 0

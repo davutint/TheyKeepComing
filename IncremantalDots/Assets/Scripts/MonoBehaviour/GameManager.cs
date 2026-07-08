@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Transforms;
 using UnityEngine;
 
 namespace DeadWalls
@@ -2273,9 +2274,18 @@ namespace DeadWalls
         public float FireballCooldownRemaining => _fireballCooldownRemaining;
         public bool FireballReady => _fireballUnlocked && _fireballCooldownRemaining <= 0f;
 
+        private const float FireballProjectileSpeed = 18f;
+        // Meteor dususu (owner istegi): mermi hedefin USTUNDEN, hafif capraz iner
+        private const float FireballDropHeight = 13f;
+        private const float FireballDropSideOffset = 4f;
+
+        /// <summary>Ucustaki mermi (SpellCastUI gorseli bunu takip eder; Null/olu = mermi yok).</summary>
+        public Entity ActiveFireballProjectile { get; private set; } = Entity.Null;
+
         /// <summary>
-        /// Ates Topu'nu dunya konumuna atar. Basarida cooldown baslar ve ECS'e strike istegi
-        /// birakilir (hasar FireballStrikeSystem'de). Gorsel patlamayi cagiran taraf oynatir.
+        /// Ates Topu'nu dunya konumuna atar. Basarida cooldown baslar ve GOKTEN hedefe
+        /// dusen bir meteor-mermi dogar (owner istegi: yukaridan dusus); hasar varista
+        /// FireballStrikeSystem'de. Gorseli SpellCastUI cizer (ActiveFireballProjectile takip).
         /// </summary>
         public bool TryCastFireball(Vector2 worldPosition)
         {
@@ -2284,13 +2294,22 @@ namespace DeadWalls
 
             _fireballCooldownRemaining = FireballCooldownDuration;
 
-            var strikeEntity = _entityManager.CreateEntity(typeof(FireballStrike));
-            _entityManager.SetComponentData(strikeEntity, new FireballStrike
+            // Baslangic: hedefin ustunde, ekran disindan hafif capraz (meteor hissi)
+            float3 start = new float3(
+                worldPosition.x + FireballDropSideOffset,
+                worldPosition.y + FireballDropHeight,
+                MobileCastleRenderDepth.ProjectileZ);
+
+            var projectile = _entityManager.CreateEntity(typeof(FireballProjectile), typeof(LocalTransform));
+            _entityManager.SetComponentData(projectile, new FireballProjectile
             {
-                Position = new float2(worldPosition.x, worldPosition.y),
+                Target = new float2(worldPosition.x, worldPosition.y),
+                Speed = FireballProjectileSpeed,
                 Radius = FireballRadius,
                 Damage = FireballDamage
             });
+            _entityManager.SetComponentData(projectile, LocalTransform.FromPosition(start));
+            ActiveFireballProjectile = projectile;
 
             OnGameStateChanged?.Invoke();
             return true;

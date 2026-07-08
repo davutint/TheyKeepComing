@@ -26,6 +26,7 @@
 10. BoundarySystem
 11. ZombieAttackTimerSystem
 12. ArrowMoveSystem
+12b. FireballProjectileSystem (UpdateAfter ArrowMove, UpdateBefore ArrowHit — mermiyi tasir, varista strike uretir)
 13. ArrowHitSystem
 13b. FireballStrikeSystem  (UpdateAfter ArrowHit, UpdateBefore ZombieDeath)
 14. ZombieDeathSystem

@@ -1910,12 +1910,12 @@ namespace DeadWalls
             var castleHit = AssetDatabase.LoadAssetAtPath<AudioClip>(CastleHitSfxPath);
 
             if (arrowMuzzle != null) bridge.ArrowMuzzlePrefab = arrowMuzzle;
-            if (arrowHit != null)
-            {
-                bridge.ArrowHitPrefab = arrowHit;
-                if (bridge.CastleHitPrefab == null)
-                    bridge.CastleHitPrefab = arrowHit;
-            }
+            if (arrowHit != null) bridge.ArrowHitPrefab = arrowHit;
+            // Polish fix: kale vurusu OK gorseliyle OYNAMAZ (duvara ok saplanmasi bug'i) —
+            // eski fallback'le atanmis arrowHit temizlenir; owner ileride kendi impact
+            // prefab'ini atarsa dokunulmaz.
+            if (bridge.CastleHitPrefab == arrowHit)
+                bridge.CastleHitPrefab = null;
             if (frostHit != null) bridge.FrostHitPrefab = frostHit;
             if (arrowShoot != null) bridge.ArrowShootClip = arrowShoot;
             bridge.ArrowShootClips = FindArrowShootClips();
@@ -2354,6 +2354,83 @@ namespace DeadWalls
             return int.MaxValue;
         }
 
+        // ---------------------------------------------------------------------------------
+        // Fireball flipbook'lari (polish): Super Pixel paketlerinden ucus + patlama kareleri.
+        // Sheet'ler grid-slice edilir (spritesheet.txt duzeni) ve SpellCastUI'ya atanir.
+        // ---------------------------------------------------------------------------------
+
+        private const string FireballProjectileSheetPath =
+            "Assets/Art/Projectiles/Super Pixel Projectiles Pack 2/spritesheet/pj2_fireball_large_orange/spritesheet.png";
+        private const string FireballBlastSheetPath =
+            "Assets/Art/Super Pixel Fantasy FX Pack 2/spritesheet/fanfx2_fire_spell_large_orange/spritesheet.png";
+
+        private static void ConfigureFireballVisuals(SpellCastUI spell)
+        {
+            // ucus: 10 kare, 72x32; PPU 28 -> dunyada ~2.6 birim uzunluk (net gorunur meteor)
+            EnsureGridSlicedSheet(FireballProjectileSheetPath, 72, 32, 10, 28f);
+            // patlama: 23 kare, 160x160; PPU 100 -> SpellCastUI radius'a gore olcekler
+            EnsureGridSlicedSheet(FireballBlastSheetPath, 160, 160, 23, 100f);
+
+            spell.ProjectileFrames = LoadSlicedSprites(FireballProjectileSheetPath, 10);
+            spell.BlastFrames = LoadSlicedSprites(FireballBlastSheetPath, 23);
+            EditorUtility.SetDirty(spell);
+        }
+
+        /// <summary>Sheet'i Sprite/Multiple + grid slice olarak import eder (idempotent).</summary>
+        private static void EnsureGridSlicedSheet(string path, int frameWidth, int frameHeight, int frameCount, float pixelsPerUnit)
+        {
+            var importer = AssetImporter.GetAtPath(path) as TextureImporter;
+            if (importer == null)
+            {
+                Debug.LogWarning($"[MobileCastleSceneSetup] Sheet bulunamadi: {path}");
+                return;
+            }
+
+            bool dirty = false;
+            if (importer.textureType != TextureImporterType.Sprite) { importer.textureType = TextureImporterType.Sprite; dirty = true; }
+            if (importer.spriteImportMode != SpriteImportMode.Multiple) { importer.spriteImportMode = SpriteImportMode.Multiple; dirty = true; }
+            if (!importer.alphaIsTransparency) { importer.alphaIsTransparency = true; dirty = true; }
+            if (importer.mipmapEnabled) { importer.mipmapEnabled = false; dirty = true; }
+            if (importer.filterMode != FilterMode.Point) { importer.filterMode = FilterMode.Point; dirty = true; } // pixel-art
+            if (!Mathf.Approximately(importer.spritePixelsPerUnit, pixelsPerUnit)) { importer.spritePixelsPerUnit = pixelsPerUnit; dirty = true; }
+            if (importer.maxTextureSize < 4096) { importer.maxTextureSize = 4096; dirty = true; }
+
+            var existing = importer.spritesheet;
+            if (existing == null || existing.Length != frameCount)
+            {
+                var metas = new SpriteMetaData[frameCount];
+                for (int i = 0; i < frameCount; i++)
+                {
+                    metas[i] = new SpriteMetaData
+                    {
+                        name = "frame_" + i.ToString("000"),
+                        rect = new Rect(i * frameWidth, 0, frameWidth, frameHeight),
+                        alignment = (int)SpriteAlignment.Center,
+                        pivot = new Vector2(0.5f, 0.5f)
+                    };
+                }
+                importer.spritesheet = metas;
+                dirty = true;
+            }
+
+            if (dirty)
+                importer.SaveAndReimport();
+        }
+
+        private static Sprite[] LoadSlicedSprites(string path, int expectedCount)
+        {
+            var sprites = new List<Sprite>();
+            foreach (var asset in AssetDatabase.LoadAllAssetsAtPath(path))
+            {
+                if (asset is Sprite sprite)
+                    sprites.Add(sprite);
+            }
+            sprites.Sort((a, b) => string.CompareOrdinal(a.name, b.name)); // frame_000.. sirali
+            if (sprites.Count != expectedCount)
+                Debug.LogWarning($"[MobileCastleSceneSetup] {path}: {expectedCount} kare beklenirken {sprites.Count} bulundu.");
+            return sprites.ToArray();
+        }
+
         private static void EnsureHitFlipbookImportSettings()
         {
             var importer = AssetImporter.GetAtPath(HitFlipbookSpritesheetPath) as TextureImporter;
@@ -2725,6 +2802,7 @@ namespace DeadWalls
             spell.FireballCooldownFill = fillImage;
 
             panel.SetActive(false); // unlock'a kadar gizli; SpellCastUI acar
+            ConfigureFireballVisuals(spell); // ucus + patlama flipbook kareleri (polish)
             EditorUtility.SetDirty(spell);
         }
 
