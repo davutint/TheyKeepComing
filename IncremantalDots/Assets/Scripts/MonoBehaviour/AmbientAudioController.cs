@@ -88,7 +88,7 @@ namespace DeadWalls
             if (cycle.Phase == SiegeCyclePhase.Night && _lastPhase != SiegeCyclePhase.Night
                 && bloodMoon && BloodMoonSting != null && _stingSource != null)
             {
-                _stingSource.PlayOneShot(BloodMoonSting, StingVolume);
+                _stingSource.PlayOneShot(BloodMoonSting, StingVolume * SoundSettings.AmbienceVolume);
             }
             _lastPhase = cycle.Phase;
 
@@ -115,7 +115,7 @@ namespace DeadWalls
 
             if (!_activeSource.isPlaying)
                 _activeSource.Play();
-            _targetVolume = targetVolume;
+            _targetVolume = targetVolume * SoundSettings.AmbienceVolume;
         }
     }
 }

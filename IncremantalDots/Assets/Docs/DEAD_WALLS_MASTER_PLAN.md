@@ -165,8 +165,13 @@ Ara hedef olarak "oynanabilir demo" = C1-C10 (store maddeleri haric).
   gece/kanli-ay drone ambiyansi + kanli ay giris sting'i (AmbientAudioController crossfade).
   Play'de dogrulandi (SFX timestampleri + sarsinti/flash olcumu + ambiyans gecisi).
   Kalan (M-D2 adaylari): muzik, UI tik sesleri, olum ekrani sting'i, volume ayar menusu (M-E).
-- **M-E. Shipping Iskeleti** — safak-checkpoint save/load, ana menu + pause + ayarlar,
-  minimal onboarding (3 ipucu balonu). (~2 oturum)
+- **M-E. Shipping Iskeleti — CEKIRDEK TAMAM (2026-07-08)** — safak-checkpoint save/load
+  (her DAWN otomatik; olum/NEW RUN siler; CONTINUE son safaktan — restore = temiz taban +
+  tech recompute; dok: RUN_SAVE_ARCHITECTURE.md), ana menu (CONTINUE — DAY X / NEW RUN /
+  SETTINGS; acilista timeScale=0), pause (sag ust) + ses ayarlari (SFX/ambiyans,
+  PlayerPrefs). Play'de uctan uca dogrulandi (kayit -> stop/play -> CONTINUE birebir;
+  olumde silme). KALAN: onboarding (owner karari: M-G'ye ertelendi — oyun son halini
+  alinca yazilir).
 - **M-F. Cihaz Dogrulamasi** — Android build, gercek cihazda perf/input/battery testi,
   cozunurluk/safe-area duzeltmeleri. (~1 oturum + owner cihaz testi)
 - **M-G. Icerik Dolgusu** — council V1.5 (negatif event'ler, yeni zincirler, simulator
@@ -255,6 +260,16 @@ Ara hedef olarak "oynanabilir demo" = C1-C10 (store maddeleri haric).
   Yakalanan buglar: CyclePhaseText rich-text render etmiyor (renk artik TMP color ile),
   Tuner canli-apply blood moon alani (baker ile ayni formul yazildi).
 - M-D TAMAM (2026-07-08, owner secimi): his katmani — detay milestone listesinde.
-- SIRADAKI IS: yol karari — M-C2 (zombi tipleri: Kosucu/Tank, SpawnTable bagla) ya da
-  M-E (shipping iskeleti: safak-checkpoint save + ana menu + pause). Kucuk acik uclar:
-  RUH ismi kesinlesmedi; olum ekrani GAME OVER basligi kozmetik cakisma; buyucu gorseli yok.
+- ROTUS TURU TAMAM (2026-07-08): oyun dili INGILIZCE kurali (SOULS; player-facing
+  Turkce kacaklari temizlendi), olum ekrani dim + "You survived N days", cizim sirasi.
+- M-E CEKIRDEK TAMAM (2026-07-08): safak-checkpoint save + ana menu/CONTINUE + pause +
+  ses ayarlari; uctan uca dogrulandi. Onboarding M-G'ye ertelendi (owner).
+- M-E v2 (2026-07-08, owner geri bildirimi "ayri sahne + guzel olsun"): ana menu AYRI
+  SAHNEYE tasindi (MainMenuScene.unity, build 0) — runtime-uretilen gorsel kimlik
+  (gece gradyani + glow'lu kanli ay + rounded butonlar + giris animasyonlari);
+  panel-menu ve timeScale=0 acilis hack'i kaldirildi; GameBootstrap/RunBootstrap
+  sahneler-arasi akis; pause'a MAIN MENU butonu. Tam dongu dogrulandi:
+  menu -> NEW RUN -> oyun -> safak kayit -> MAIN MENU -> CONTINUE — DAY 3 -> restore.
+- SIRADAKI IS: M-C2 (zombi tipleri: Kosucu/Tank — SpawnTable bagla, tint+olcek gorsel)
+  ya da M-F (Android build + gercek cihaz testi — M-E onkosulu artik hazir).
+  Kucuk acik uclar: buyucu gorseli yok; onboarding yok.

@@ -121,6 +121,9 @@ namespace DeadWalls
         private int _councilIronCapBonus;
         private int _councilFoodCapBonus;
 
+        // Safak-checkpoint (M-E): Dawn'a giris kenarinda kosu kaydedilir (RunPersistence)
+        private SiegeCyclePhase _lastPhaseForCheckpoint = SiegeCyclePhase.Day;
+
         // Meta-progression kosu-ici state'i: her kosu basinda kalici seviyelerden yeniden kurulur
         private bool _metaAppliedThisRun;
         private bool _metaRunCollected;
@@ -182,6 +185,22 @@ namespace DeadWalls
 
             ReadECSData();
             TickSpellCooldown();
+            TrackDawnCheckpoint();
+        }
+
+        /// <summary>Safak checkpoint'i (M-E): Dawn'a giris kenarinda kosuyu kaydeder.</summary>
+        private void TrackDawnCheckpoint()
+        {
+            if (!ContinuousSiegeCycle.Enabled)
+                return;
+
+            var phase = ContinuousSiegeCycle.Phase;
+            if (phase == SiegeCyclePhase.Dawn && _lastPhaseForCheckpoint != SiegeCyclePhase.Dawn
+                && !GameState.IsGameOver)
+            {
+                SaveRunCheckpoint();
+            }
+            _lastPhaseForCheckpoint = phase;
         }
 
         private void TickSpellCooldown()
@@ -257,7 +276,8 @@ namespace DeadWalls
 
             if (GameState.IsGameOver && !prevGameState.IsGameOver)
             {
-                CollectMetaRunResult(); // olum ekrani acilmadan ONCE kill'ler Ruh'a cevrilir
+                CollectMetaRunResult(); // olum ekrani acilmadan ONCE kill'ler Soul'a cevrilir
+                RunPersistence.Delete(); // roguelite: olum = kosu bitti, checkpoint gecersiz
                 OnGameOver?.Invoke();
             }
 
@@ -2026,6 +2046,218 @@ namespace DeadWalls
             _councilStoneCapBonus = 0;
             _councilIronCapBonus = 0;
             _councilFoodCapBonus = 0;
+        }
+
+        // ---------------------------------------------------------------------------------
+        // Safak-Checkpoint Save/Load (M-E — otoriter dok: RUN_SAVE_ARCHITECTURE.md)
+        // Kayit: Dawn'a giris kenari. Restore: temiz RestartGame tabani + snapshot yazimi;
+        // turetilebilir her sey (tech carpanlari, reveal, spell, meta) yeniden hesaplanir.
+        // ---------------------------------------------------------------------------------
+
+        /// <summary>Kosunun safak fotografini diske yazar (yalniz recompute-EDILEMEYEN durum).</summary>
+        private void SaveRunCheckpoint()
+        {
+            var save = new RunSaveState
+            {
+                CycleIndex = ContinuousSiegeCycle.CycleIndex,
+                XP = GameState.XP,
+                Level = GameState.Level,
+                XPToNextLevel = GameState.XPToNextLevel,
+                TotalKills = GameState.TotalKills,
+                Wood = Resources.Wood,
+                Stone = Resources.Stone,
+                Iron = Resources.Iron,
+                Food = Resources.Food,
+                PopulationTotal = Population.Total,
+                PopulationCapacity = Population.Capacity,
+                PopulationBaseCapacity = Population.BaseCapacity,
+                WoodWorkers = PopulationAllocation.WoodWorkers,
+                StoneWorkers = PopulationAllocation.StoneWorkers,
+                IronWorkers = PopulationAllocation.IronWorkers,
+                FoodWorkers = PopulationAllocation.FoodWorkers,
+                WallCurrentHP = Wall.CurrentHP,
+                GateCurrentHP = Gate.CurrentHP,
+                CastleCurrentHP = Castle.CurrentHP,
+                BasicArchers = BasicArcherCount,
+                RapidArchers = RapidArcherCount,
+                FrostArchers = FrostArcherCount,
+                GlobalArrowDamageBonus = _globalArrowDamageBonus,
+                GlobalFireRateMultiplier = _globalFireRateMultiplier,
+                CouncilDaysSinceEvent = _councilDaysSinceEvent,
+                CouncilCooldownRemaining = _councilCooldownRemaining,
+                CouncilRunSalt = _councilRunSalt,
+                CouncilWoodCapBonus = _councilWoodCapBonus,
+                CouncilStoneCapBonus = _councilStoneCapBonus,
+                CouncilIronCapBonus = _councilIronCapBonus,
+                CouncilFoodCapBonus = _councilFoodCapBonus,
+                EconomyFocus = (int)EconomyFocus
+            };
+
+            if (CanAccessEntityManager() && _entityManager.Exists(_castleEntity)
+                && _entityManager.HasComponent<CastleUpgradeData>(_castleEntity))
+            {
+                save.CastleUpgradeLevel = _entityManager.GetComponentData<CastleUpgradeData>(_castleEntity).Level;
+            }
+
+            foreach (var pair in _techNodeLevels)
+                save.TechNodeLevels.Add(new TechLevelEntry { Id = pair.Key, Level = pair.Value });
+            foreach (var pair in _archerTypeLevels)
+                save.ArcherTypeLevels.Add(new ArcherLevelEntry { Type = (int)pair.Key, Level = pair.Value });
+            foreach (var pair in _upgradeTiers)
+                save.UpgradeTiers.Add(new UpgradeTierEntry { Type = (int)pair.Key, Tier = pair.Value });
+            foreach (var pair in _councilFlags)
+                save.CouncilFlags.Add(new CouncilFlagEntry { Flag = pair.Key, Day = pair.Value });
+            save.RecentCouncilTemplates.AddRange(_recentCouncilTemplates);
+            save.UsedOneShotCouncils.AddRange(_usedOneShotCouncils);
+
+            RunPersistence.Save(save);
+        }
+
+        /// <summary>
+        /// Ana menu CONTINUE: kaydedilen kosuyu geri yukler. Akis: RestartGame temiz tabani
+        /// (meta uygulanmis, taze okcu seed'i) -> tech'ler maliyetsiz yeniden uygulanir
+        /// (carpanlar/reveal/spell/config aggregate'leri recompute) -> council hafizasi ->
+        /// okcu tamamlama -> ECS snapshot yazimlari. Oyun YENI GUNUN sabahindan bas
+        /// (kaydedilen gunun safak odulleri zaten verilmisti).
+        /// </summary>
+        public bool TryRestoreRunFromCheckpoint()
+        {
+            var save = RunPersistence.TryLoad();
+            if (save == null || !_initialized || !TryGetMobileConfigEntity(out var mobileConfigEntity))
+                return false;
+
+            RestartGame();
+
+            // 1) Tech: seviyeleri maliyetsiz yeniden uygula (reveal + carpan + spell + aggregate)
+            foreach (var entry in save.TechNodeLevels)
+                GrantTechNodeLevelsFromMeta(entry.Id, entry.Level);
+
+            // 2) Council hafizasi (salt DAHIL — kosu-ici RNG determinizmi korunur)
+            _councilFlags.Clear();
+            foreach (var flag in save.CouncilFlags)
+                _councilFlags[flag.Flag] = flag.Day;
+            _recentCouncilTemplates.Clear();
+            _recentCouncilTemplates.AddRange(save.RecentCouncilTemplates);
+            _usedOneShotCouncils.Clear();
+            foreach (var id in save.UsedOneShotCouncils)
+                _usedOneShotCouncils.Add(id);
+            _councilDaysSinceEvent = save.CouncilDaysSinceEvent;
+            _councilCooldownRemaining = save.CouncilCooldownRemaining;
+            _councilRunSalt = save.CouncilRunSalt;
+            _councilWoodCapBonus = save.CouncilWoodCapBonus;
+            _councilStoneCapBonus = save.CouncilStoneCapBonus;
+            _councilIronCapBonus = save.CouncilIronCapBonus;
+            _councilFoodCapBonus = save.CouncilFoodCapBonus;
+            _lastCouncilRollDay = -1;
+            ApplyTechEconomyAggregates(); // council cap bonuslari fold'lanir
+
+            // 3) Level-up kartlari + okcu yukseltme seviyeleri (canli okculara stats yansir)
+            _upgradeTiers.Clear();
+            foreach (var tier in save.UpgradeTiers)
+                _upgradeTiers[(UpgradeType)tier.Type] = tier.Tier;
+            _globalArrowDamageBonus = save.GlobalArrowDamageBonus;
+            _globalFireRateMultiplier = save.GlobalFireRateMultiplier;
+            _archerTypeLevels.Clear();
+            foreach (var entry in save.ArcherTypeLevels)
+                _archerTypeLevels[(ArcherType)entry.Type] = entry.Level;
+
+            // 4) Okcu sayilarini tamamla (RestartGame seed'i + meta okculari zaten sahnede;
+            //    pozisyonlar tilemap slot sirasindan otomatik)
+            ReadArcherTypeCounts();
+            for (int i = BasicArcherCount; i < save.BasicArchers; i++) SpawnArcher(ArcherType.Basic);
+            for (int i = RapidArcherCount; i < save.RapidArchers; i++) SpawnArcher(ArcherType.Rapid);
+            for (int i = FrostArcherCount; i < save.FrostArchers; i++) SpawnArcher(ArcherType.Frost);
+            ApplyScaledStatsToArchers(ArcherType.Basic, false);
+            ApplyScaledStatsToArchers(ArcherType.Rapid, false);
+            ApplyScaledStatsToArchers(ArcherType.Frost, false);
+
+            // 5) ECS snapshot yazimlari
+            _entityManager.SetComponentData(_gameStateEntity, new ResourceData
+            {
+                Wood = save.Wood,
+                Stone = save.Stone,
+                Iron = save.Iron,
+                Food = save.Food
+            });
+
+            if (_entityManager.HasComponent<EconomyFocusState>(mobileConfigEntity))
+            {
+                _entityManager.SetComponentData(mobileConfigEntity,
+                    new EconomyFocusState { Type = (EconomyFocusType)save.EconomyFocus });
+                EconomyFocus = (EconomyFocusType)save.EconomyFocus;
+            }
+
+            int restoredCycleIndex = save.CycleIndex + 1; // yeni gunun sabahi
+            if (_entityManager.HasComponent<MobilePopulationAllocation>(mobileConfigEntity))
+            {
+                var allocation = _entityManager.GetComponentData<MobilePopulationAllocation>(mobileConfigEntity);
+                allocation.WoodWorkers = save.WoodWorkers;
+                allocation.StoneWorkers = save.StoneWorkers;
+                allocation.IronWorkers = save.IronWorkers;
+                allocation.FoodWorkers = save.FoodWorkers;
+                // kayit anindaki gunun safak odulu VERILMISTI — cift odul gate'i
+                allocation.LastPopulationGrowthCycle = save.CycleIndex + 1;
+                allocation.LastEventPrepWave = save.CycleIndex + 1;
+                _entityManager.SetComponentData(mobileConfigEntity, allocation);
+                PopulationAllocation = allocation;
+            }
+
+            int totalArchers = save.BasicArchers + save.RapidArchers + save.FrostArchers;
+            int totalWorkers = save.WoodWorkers + save.StoneWorkers + save.IronWorkers + save.FoodWorkers;
+            _entityManager.SetComponentData(_gameStateEntity, new PopulationState
+            {
+                Total = save.PopulationTotal,
+                Workers = totalWorkers,
+                Archers = totalArchers,
+                Idle = Mathf.Max(0, save.PopulationTotal - totalWorkers - totalArchers),
+                Capacity = save.PopulationCapacity,
+                BaseCapacity = save.PopulationBaseCapacity,
+                FoodPerAssignedPerMin = Population.FoodPerAssignedPerMin
+            });
+
+            if (_entityManager.HasComponent<ContinuousSiegeCycleData>(mobileConfigEntity))
+            {
+                var cycle = _entityManager.GetComponentData<ContinuousSiegeCycleData>(mobileConfigEntity);
+                cycle.CycleIndex = restoredCycleIndex;
+                cycle.CycleTimer = 0f;
+                cycle.CycleProgress01 = 0f;
+                cycle.PhaseProgress01 = 0f;
+                cycle.Phase = SiegeCyclePhase.Day;
+                _entityManager.SetComponentData(mobileConfigEntity, cycle);
+                ContinuousSiegeCycle = cycle;
+            }
+            _lastPhaseForCheckpoint = SiegeCyclePhase.Day;
+
+            var gameState = _entityManager.GetComponentData<GameStateData>(_gameStateEntity);
+            gameState.XP = save.XP;
+            gameState.Level = save.Level;
+            gameState.XPToNextLevel = save.XPToNextLevel;
+            gameState.TotalKills = save.TotalKills;
+            _entityManager.SetComponentData(_gameStateEntity, gameState);
+
+            if (_entityManager.HasComponent<CastleUpgradeData>(_castleEntity))
+            {
+                var upgrade = _entityManager.GetComponentData<CastleUpgradeData>(_castleEntity);
+                upgrade.Level = save.CastleUpgradeLevel;
+                _entityManager.SetComponentData(_castleEntity, upgrade);
+            }
+
+            // 6) Savunma CurrentHP EN SON (MaxHP tech/meta aggregate'lerinden kuruldu)
+            var wall = _entityManager.GetComponentData<WallSegment>(_castleEntity);
+            wall.CurrentHP = Mathf.Min(save.WallCurrentHP, wall.MaxHP);
+            _entityManager.SetComponentData(_castleEntity, wall);
+            var gate = _entityManager.GetComponentData<GateComponent>(_castleEntity);
+            gate.CurrentHP = Mathf.Min(save.GateCurrentHP, gate.MaxHP);
+            _entityManager.SetComponentData(_castleEntity, gate);
+            var castle = _entityManager.GetComponentData<CastleHP>(_castleEntity);
+            castle.CurrentHP = Mathf.Min(save.CastleCurrentHP, castle.MaxHP);
+            _entityManager.SetComponentData(_castleEntity, castle);
+
+            // 7) Restore gunu Dawn'i atladi — gunun council karti elle roll edilir
+            TryRollCouncilEvent();
+
+            OnGameStateChanged?.Invoke();
+            return true;
         }
 
         // ---------------------------------------------------------------------------------

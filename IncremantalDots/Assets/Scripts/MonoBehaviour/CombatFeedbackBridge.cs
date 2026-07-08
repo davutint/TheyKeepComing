@@ -549,7 +549,7 @@ namespace DeadWalls
             AudioSource source = GetNextAudioSource();
             source.transform.position = new Vector3(sfxEvent.Position.x, sfxEvent.Position.y, MobileCastleRenderDepth.ProjectileZ);
             source.clip = clip;
-            source.volume = Mathf.Clamp01(sfxEvent.Volume);
+            source.volume = Mathf.Clamp01(sfxEvent.Volume) * SoundSettings.SfxVolume;
             source.pitch = Mathf.Max(0.05f, sfxEvent.Pitch * UnityEngine.Random.Range(PitchRandomMin, PitchRandomMax));
             source.spatialBlend = SpatialBlend;
             source.Play();

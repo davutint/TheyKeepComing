@@ -99,6 +99,7 @@ namespace DeadWalls
             MarketPanel?.GetComponent<MarketUI>()?.SetDrawerOpen(true, true);
             LevelUpPanel?.SetActive(false);
             Time.timeScale = 1f;
+            RunPersistence.Delete(); // yeni kosu = eski checkpoint gecersiz
             GameManager.Instance?.RestartGame();
         }
     }

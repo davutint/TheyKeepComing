@@ -757,6 +757,7 @@ namespace DeadWalls
                 SceneManager.MoveGameObjectToScene(gameManagerObject, scene);
             }
             var gameManager = EnsureComponent<GameManager>(gameManagerObject);
+            EnsureComponent<RunBootstrap>(gameManagerObject); // menuden gelen Continue/NewRun'i uygular
             AssignObjectReference(gameManager, "archerCatalog", archerCatalog);
             AssignObjectReference(gameManager, "techTreeCatalog", techCatalog);
             AssignObjectReference(gameManager, "councilCatalog", councilEventCatalog);
@@ -768,8 +769,10 @@ namespace DeadWalls
             EnsureArcherTilePlacement(scene);
             EnsureCombatFeedbackRoot(scene);
             EnsureCameraShaker(scene);
-            EnsureDamageFlash(canvas.transform);
+            ConfigureMenuSystem(canvas.transform);
+            EnsureDamageFlash(canvas.transform); // flash her seyin (menu dahil) ustunde kalir
             EnsureAmbientAudio(scene);
+            EnsureMainMenuScene(); // ayri menu sahnesi (additive kur/kaydet) + Build Settings
             NormalizeCastleTilemapSorting(scene);
         }
 
@@ -1976,6 +1979,275 @@ namespace DeadWalls
             if (clip == null)
                 Debug.LogWarning($"[MobileCastleSceneSetup] SFX bulunamadi: {SfxPackRoot + relativePath}");
             return clip;
+        }
+
+        /// <summary>
+        /// Menu sistemi (M-E): MenuUiRoot (hep aktif; MainMenuUI + PauseMenuUI + SettingsUI
+        /// controller'lari burada) + MainMenuPanel (tam ekran; acilis) + PauseButton (sag ust)
+        /// + PausePanel + SettingsPanel. Isim sozlesmeleri controller binding'leridir.
+        /// GameOverPanel'den SONRA kurulur (menu paneller olum ekraninin da ustunde acilabilir).
+        /// </summary>
+        private static void ConfigureMenuSystem(Transform canvasTransform)
+        {
+            GameObject root = FindDirectChild(canvasTransform, "MenuUiRoot");
+            if (root == null)
+            {
+                root = new GameObject("MenuUiRoot", typeof(RectTransform));
+                Undo.RegisterCreatedObjectUndo(root, "Create Menu UI Root");
+                root.layer = canvasTransform.gameObject.layer;
+                root.transform.SetParent(canvasTransform, false);
+            }
+            var rootRect = (RectTransform)root.transform;
+            rootRect.anchorMin = Vector2.zero;
+            rootRect.anchorMax = Vector2.one;
+            rootRect.offsetMin = Vector2.zero;
+            rootRect.offsetMax = Vector2.zero;
+            root.transform.SetAsLastSibling();
+
+            var settings = EnsureComponent<SettingsUI>(root);
+            var pauseMenu = EnsureComponent<PauseMenuUI>(root);
+
+            // M-E v2: panel-menu ayri sahneye tasindi — eski kalintilari temizle
+            DestroyChildIfExists(root.transform, "MainMenuPanel");
+            GameObjectUtility.RemoveMonoBehavioursWithMissingScript(root);
+
+            // --- Pause butonu (sag ust; oyun sirasinda gorunur) ---
+            var pauseButton = EnsureButton(root.transform, "PauseButton",
+                new Vector2(1f, 1f), new Vector2(-64f, -64f), new Vector2(-16f, -16f), out var pauseLabel);
+            pauseLabel.text = "II";
+            pauseLabel.fontSize = 20;
+            pauseMenu.PauseButton = pauseButton;
+
+            // --- Pause paneli ---
+            GameObject pausePanel = EnsurePanel(root.transform, "PausePanel", false, new Color(0.02f, 0.02f, 0.04f, 0.92f));
+            Stretch(pausePanel.GetComponent<RectTransform>());
+            EnsureText(pausePanel.transform, "PauseTitleText", "PAUSED", 44, TextAlignmentOptions.Center,
+                new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-220f, 120f), new Vector2(220f, 190f));
+            var resumeButton = EnsureButton(pausePanel.transform, "ResumeButton",
+                new Vector2(0.5f, 0.5f), new Vector2(-130f, 30f), new Vector2(130f, 88f), out var resumeLabel);
+            resumeLabel.text = "RESUME";
+            var pauseSettingsButton = EnsureButton(pausePanel.transform, "PauseSettingsButton",
+                new Vector2(0.5f, 0.5f), new Vector2(-130f, -40f), new Vector2(130f, 18f), out var pauseSettingsLabel);
+            pauseSettingsLabel.text = "SETTINGS";
+            var pauseRestartButton = EnsureButton(pausePanel.transform, "PauseRestartButton",
+                new Vector2(0.5f, 0.5f), new Vector2(-130f, -110f), new Vector2(130f, -52f), out var pauseRestartLabel);
+            pauseRestartLabel.text = "NEW RUN";
+            var pauseMainMenuButton = EnsureButton(pausePanel.transform, "PauseMainMenuButton",
+                new Vector2(0.5f, 0.5f), new Vector2(-130f, -180f), new Vector2(130f, -122f), out var pauseMainMenuLabel);
+            pauseMainMenuLabel.text = "MAIN MENU";
+            pauseMenu.PausePanel = pausePanel;
+            pauseMenu.ResumeButton = resumeButton;
+            pauseMenu.SettingsButton = pauseSettingsButton;
+            pauseMenu.RestartButton = pauseRestartButton;
+            pauseMenu.MainMenuButton = pauseMainMenuButton;
+            pauseMenu.Settings = settings;
+
+            // --- Settings paneli (pause acar; acan panelin ustune gecer) ---
+            BuildSettingsPanel(root.transform, settings);
+
+            pausePanel.SetActive(false);
+
+            EditorUtility.SetDirty(settings);
+            EditorUtility.SetDirty(pauseMenu);
+        }
+
+        /// <summary>Ses ayarlari paneli ureticisi — oyun sahnesi (pause) ve ana menu sahnesi paylasir.</summary>
+        private static void BuildSettingsPanel(Transform parent, SettingsUI settings)
+        {
+            GameObject settingsPanel = EnsurePanel(parent, "SettingsPanel", false, new Color(0.03f, 0.03f, 0.06f, 0.96f));
+            Center(settingsPanel.GetComponent<RectTransform>(), new Vector2(520f, 360f));
+            EnsureText(settingsPanel.transform, "SettingsTitleText", "SETTINGS", 34, TextAlignmentOptions.Center,
+                new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(-200f, -70f), new Vector2(200f, -16f));
+            EnsureText(settingsPanel.transform, "SfxLabelText", "SFX", 20, TextAlignmentOptions.MidlineLeft,
+                new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(36f, 26f), new Vector2(180f, 62f));
+            var sfxSlider = EnsureSlider(settingsPanel.transform, "SfxSlider",
+                new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-70f, 30f), new Vector2(220f, 56f),
+                new Color(0.12f, 0.13f, 0.16f, 1f), new Color(0.85f, 0.55f, 0.20f, 1f));
+            EnsureText(settingsPanel.transform, "AmbienceLabelText", "AMBIENCE", 20, TextAlignmentOptions.MidlineLeft,
+                new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(36f, -48f), new Vector2(180f, -12f));
+            var ambienceSlider = EnsureSlider(settingsPanel.transform, "AmbienceSlider",
+                new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-70f, -44f), new Vector2(220f, -18f),
+                new Color(0.12f, 0.13f, 0.16f, 1f), new Color(0.35f, 0.60f, 0.90f, 1f));
+            var closeButton = EnsureButton(settingsPanel.transform, "SettingsCloseButton",
+                new Vector2(0.5f, 0f), new Vector2(-110f, 18f), new Vector2(110f, 70f), out var closeLabel);
+            closeLabel.text = "CLOSE";
+            settings.SettingsPanel = settingsPanel;
+            settings.SfxSlider = sfxSlider;
+            settings.AmbienceSlider = ambienceSlider;
+            settings.CloseButton = closeButton;
+            settingsPanel.SetActive(false);
+        }
+
+        // ---------------------------------------------------------------------------------
+        // Ana menu SAHNESI (M-E v2, owner istegi): ayri hafif sahne — kamera + Canvas + menu.
+        // Additive acilir/kurulur/kaydedilir/kapatilir (aktif sahne degismez). Gorseller
+        // runtime uretilir (MainMenuSceneUI/MenuSpriteFactory); burada yalniz iskelet + binding.
+        // ---------------------------------------------------------------------------------
+
+        private const string MainMenuScenePath = "Assets/Scenes/MainMenuScene.unity";
+        private const string GameScenePathForBuild = "Assets/Scenes/NewGameScene.unity";
+
+        private static void EnsureMainMenuScene()
+        {
+            bool exists = System.IO.File.Exists(MainMenuScenePath);
+            Scene menuScene = exists
+                ? EditorSceneManager.OpenScene(MainMenuScenePath, OpenSceneMode.Additive)
+                : EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Additive);
+
+            // kamera (solid koyu; UI-disi bir sey render etmez)
+            GameObject cameraGo = FindRoot(menuScene, "Main Camera");
+            if (cameraGo == null)
+            {
+                cameraGo = new GameObject("Main Camera");
+                SceneManager.MoveGameObjectToScene(cameraGo, menuScene);
+            }
+            var camera = EnsureComponent<Camera>(cameraGo);
+            camera.clearFlags = CameraClearFlags.SolidColor;
+            camera.backgroundColor = new Color(0.02f, 0.02f, 0.05f, 1f);
+            camera.orthographic = true;
+            cameraGo.tag = "MainCamera";
+            EnsureComponent<AudioListener>(cameraGo);
+
+            // EventSystem
+            GameObject eventSystemGo = FindRoot(menuScene, "EventSystem");
+            if (eventSystemGo == null)
+            {
+                eventSystemGo = new GameObject("EventSystem");
+                SceneManager.MoveGameObjectToScene(eventSystemGo, menuScene);
+            }
+            EnsureComponent<UnityEngine.EventSystems.EventSystem>(eventSystemGo);
+            EnsureComponent<UnityEngine.EventSystems.StandaloneInputModule>(eventSystemGo);
+
+            // Canvas
+            GameObject canvasGo = FindRoot(menuScene, "Canvas");
+            if (canvasGo == null)
+            {
+                canvasGo = new GameObject("Canvas", typeof(RectTransform));
+                SceneManager.MoveGameObjectToScene(canvasGo, menuScene);
+            }
+            var canvas = EnsureComponent<Canvas>(canvasGo);
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            var scaler = EnsureComponent<UnityEngine.UI.CanvasScaler>(canvasGo);
+            scaler.uiScaleMode = UnityEngine.UI.CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1920f, 1080f);
+            scaler.matchWidthOrHeight = 0.5f;
+            EnsureComponent<UnityEngine.UI.GraphicRaycaster>(canvasGo);
+            SetLayerRecursive(canvasGo, LayerMask.NameToLayer("UI"));
+
+            var menuUi = EnsureComponent<MainMenuSceneUI>(canvasGo);
+            var settings = EnsureComponent<SettingsUI>(canvasGo);
+            Transform ct = canvasGo.transform;
+
+            // arka plan (sprite runtime'da uretilir; burada bos Image)
+            GameObject bg = EnsureChild(ct, "BackgroundImage", true);
+            Stretch(bg.GetComponent<RectTransform>());
+            var bgImage = EnsureComponent<UnityEngine.UI.Image>(bg);
+            bgImage.raycastTarget = false;
+            menuUi.BackgroundImage = bgImage;
+
+            // kanli ay (glow altta, ay ustte) — sag ust bolge
+            GameObject glow = EnsureChild(ct, "MoonGlowImage", true);
+            SetRect(glow.GetComponent<RectTransform>(), new Vector2(0.84f, 0.62f), new Vector2(0.84f, 0.62f),
+                new Vector2(-240f, -240f), new Vector2(240f, 240f));
+            var glowImage = EnsureComponent<UnityEngine.UI.Image>(glow);
+            glowImage.raycastTarget = false;
+            menuUi.MoonGlowImage = glowImage;
+
+            GameObject moon = EnsureChild(ct, "MoonImage", true);
+            SetRect(moon.GetComponent<RectTransform>(), new Vector2(0.84f, 0.62f), new Vector2(0.84f, 0.62f),
+                new Vector2(-150f, -150f), new Vector2(150f, 150f));
+            var moonImage = EnsureComponent<UnityEngine.UI.Image>(moon);
+            moonImage.raycastTarget = false;
+            menuUi.MoonImage = moonImage;
+
+            // baslik + tagline
+            var title = EnsureText(ct, "TitleText", "DEAD WALLS", 84, TextAlignmentOptions.Center,
+                new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(-460f, -300f), new Vector2(460f, -170f));
+            title.fontStyle = FontStyles.Bold;
+            title.color = new Color(0.93f, 0.88f, 0.84f, 1f);
+            title.characterSpacing = 8f;
+            menuUi.TitleText = title;
+
+            var tagline = EnsureText(ct, "TaglineText", "THE HORDE COMES AT NIGHT", 21, TextAlignmentOptions.Center,
+                new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(-380f, -348f), new Vector2(380f, -300f));
+            tagline.color = new Color(0.62f, 0.56f, 0.55f, 1f);
+            tagline.characterSpacing = 14f;
+            menuUi.TaglineText = tagline;
+
+            // butonlar (dikey grup; CanvasGroup giris animasyonu icin)
+            GameObject buttonsRoot = EnsureChild(ct, "ButtonsRoot", true);
+            SetRect(buttonsRoot.GetComponent<RectTransform>(), new Vector2(0.5f, 0.40f), new Vector2(0.5f, 0.40f),
+                new Vector2(-210f, -140f), new Vector2(210f, 140f));
+            var buttonsGroup = EnsureComponent<CanvasGroup>(buttonsRoot);
+            var layout = EnsureComponent<UnityEngine.UI.VerticalLayoutGroup>(buttonsRoot);
+            layout.spacing = 18f;
+            layout.childAlignment = TextAnchor.UpperCenter;
+            layout.childControlWidth = true;
+            layout.childControlHeight = false;
+            layout.childForceExpandWidth = true;
+            layout.childForceExpandHeight = false;
+            menuUi.ButtonsGroup = buttonsGroup;
+
+            var continueButton = EnsureButton(buttonsRoot.transform, "ContinueButton",
+                new Vector2(0.5f, 0.5f), new Vector2(-210f, -33f), new Vector2(210f, 33f), out var continueLabel);
+            continueLabel.text = "CONTINUE";
+            continueLabel.fontSize = 25;
+            EnsureComponent<UnityEngine.UI.LayoutElement>(continueButton.gameObject).preferredHeight = 66f;
+            menuUi.ContinueButton = continueButton;
+            menuUi.ContinueLabelText = continueLabel;
+
+            var newRunButton = EnsureButton(buttonsRoot.transform, "NewRunButton",
+                new Vector2(0.5f, 0.5f), new Vector2(-210f, -33f), new Vector2(210f, 33f), out var newRunLabel);
+            newRunLabel.text = "NEW RUN";
+            newRunLabel.fontSize = 25;
+            EnsureComponent<UnityEngine.UI.LayoutElement>(newRunButton.gameObject).preferredHeight = 66f;
+            menuUi.NewRunButton = newRunButton;
+
+            var menuSettingsButton = EnsureButton(buttonsRoot.transform, "MenuSettingsButton",
+                new Vector2(0.5f, 0.5f), new Vector2(-210f, -33f), new Vector2(210f, 33f), out var menuSettingsLabel);
+            menuSettingsLabel.text = "SETTINGS";
+            menuSettingsLabel.fontSize = 25;
+            EnsureComponent<UnityEngine.UI.LayoutElement>(menuSettingsButton.gameObject).preferredHeight = 66f;
+            menuUi.SettingsButton = menuSettingsButton;
+
+            // versiyon
+            var version = EnsureText(ct, "VersionText", "v0.1", 16, TextAlignmentOptions.BottomLeft,
+                new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(20f, 14f), new Vector2(160f, 44f));
+            version.color = new Color(1f, 1f, 1f, 0.35f);
+            menuUi.VersionText = version;
+
+            // settings paneli (ortak uretici)
+            BuildSettingsPanel(ct, settings);
+            menuUi.Settings = settings;
+
+            EditorUtility.SetDirty(menuUi);
+            EditorUtility.SetDirty(settings);
+            EditorSceneManager.MarkSceneDirty(menuScene);
+            EditorSceneManager.SaveScene(menuScene, MainMenuScenePath);
+            EditorSceneManager.CloseScene(menuScene, true);
+
+            EnsureBuildSettingsScenes();
+        }
+
+        /// <summary>Build Settings: menu sahnesi index 0, oyun sahnesi index 1 (yalniz eksikse eklenir).</summary>
+        private static void EnsureBuildSettingsScenes()
+        {
+            var scenes = new List<EditorBuildSettingsScene>(EditorBuildSettings.scenes);
+            bool hasMenu = scenes.Exists(s => s.path == MainMenuScenePath);
+            bool hasGame = scenes.Exists(s => s.path == GameScenePathForBuild);
+            bool changed = false;
+            if (!hasMenu)
+            {
+                scenes.Insert(0, new EditorBuildSettingsScene(MainMenuScenePath, true));
+                changed = true;
+            }
+            if (!hasGame)
+            {
+                scenes.Add(new EditorBuildSettingsScene(GameScenePathForBuild, true));
+                changed = true;
+            }
+            if (changed)
+                EditorBuildSettings.scenes = scenes.ToArray();
         }
 
         /// <summary>Kale hasar hissi (M-D): ana kameraya CameraShaker kurar.</summary>
