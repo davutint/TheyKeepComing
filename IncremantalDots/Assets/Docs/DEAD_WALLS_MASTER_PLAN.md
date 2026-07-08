@@ -287,6 +287,14 @@ Ara hedef olarak "oynanabilir demo" = C1-C10 (store maddeleri haric).
   (gorsel kanit: %56 hasarli duvar, sifir ok). (3) GECE/GUNDUZ ATMOSFERI — duz siyah
   karartma yerine faz-renkli: Dusk amber gun batimi -> gece koyu mavi-mor -> Dawn
   altin-pembe; kanli ay kizil; renkler Inspector'dan ayarlanabilir.
+- POLISH TURU 2 (2026-07-08): (1) UI GORSEL BIRLIGI — menu'nun rounded-rect dili oyun
+  icine tasindi: rounded sprite ASSET'lesti (Art/Generated/ui_rounded_rect.png, 9-slice);
+  kod-uretimli paneller + butonlar (ApplyGameUiSkin) ve HUD PREFAB'inin 23 duz paneli +
+  20 default butonu giydirildi (ozel sanatli sprite'lar korundu). (2) SOULS SAYACI —
+  HUD sag-ust mor kutu, kosu ici kill birikimi canli (SoulCounterUI). (3) AN VURGULARI —
+  DamageFlashUI renkli vurus API'si; safak girisinde ALTIN, kanli ay gecesinde KIZIL
+  parlama (MomentVignetteUI); olum aninda 0.9sn timeScale 0.25 AGIR CEKIM sonra ekran
+  (UIManager.GameOverSequence). Hepsi play'de dogrulandi (screenshot + timeScale penceresi).
 - SIRADAKI IS: polish devami (owner yonlendirmesiyle) ya da M-F (Android build —
   owner karari: cihaz testi COK SONRA). Kucuk acik uclar: buyucu gorseli yok;
   onboarding yok; zombi cesitliligi (gorsel boru hattiyla birlikte yeniden ele alinacak).

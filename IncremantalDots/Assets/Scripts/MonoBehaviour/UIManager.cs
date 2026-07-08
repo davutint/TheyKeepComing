@@ -1,9 +1,12 @@
+using System.Collections;
 using UnityEngine;
 
 namespace DeadWalls
 {
     public class UIManager : MonoBehaviour
     {
+        private Coroutine _gameOverRoutine;
+
         public static UIManager Instance { get; private set; }
 
         [Header("Panels")]
@@ -78,8 +81,19 @@ namespace DeadWalls
 
         public void ShowGameOver()
         {
+            // Olum ani agir cekimi (Polish 2): son an kisa sure izlenir, sonra ekran acilir
+            if (_gameOverRoutine != null)
+                StopCoroutine(_gameOverRoutine);
+            _gameOverRoutine = StartCoroutine(GameOverSequence());
+        }
+
+        private IEnumerator GameOverSequence()
+        {
+            Time.timeScale = 0.25f;
+            yield return new WaitForSecondsRealtime(0.9f);
             GameOverPanel?.SetActive(true);
             Time.timeScale = 0f;
+            _gameOverRoutine = null;
         }
 
         public void HideLevelUp()

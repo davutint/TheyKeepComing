@@ -18,7 +18,8 @@ namespace DeadWalls
         [Tooltip("Alpha'nin saniyede sonumlenme hizi.")]
         public float FadePerSecond = 0.9f;
 
-        private static readonly Color FlashColor = new Color(0.75f, 0.08f, 0.05f);
+        private static readonly Color DamageColor = new Color(0.75f, 0.08f, 0.05f);
+        private Color _currentColor = new Color(0.75f, 0.08f, 0.05f);
         private float _alpha;
 
         private void Awake()
@@ -27,7 +28,7 @@ namespace DeadWalls
             if (FlashImage != null)
             {
                 FlashImage.raycastTarget = false;
-                FlashImage.color = new Color(FlashColor.r, FlashColor.g, FlashColor.b, 0f);
+                FlashImage.color = new Color(DamageColor.r, DamageColor.g, DamageColor.b, 0f);
             }
         }
 
@@ -37,9 +38,17 @@ namespace DeadWalls
                 Instance = null;
         }
 
+        /// <summary>Hasar vurusu (kirmizi, varsayilan siddet).</summary>
         public void Flash()
         {
-            _alpha = Mathf.Clamp01(Mathf.Max(_alpha, PeakAlpha));
+            Flash(DamageColor, PeakAlpha);
+        }
+
+        /// <summary>Renkli an vurusu (Polish 2): safak altini, kanli ay kizili vb.</summary>
+        public void Flash(Color color, float peak)
+        {
+            _currentColor = color;
+            _alpha = Mathf.Clamp01(Mathf.Max(_alpha, peak));
         }
 
         private void Update()
@@ -48,7 +57,7 @@ namespace DeadWalls
                 return;
 
             _alpha = Mathf.Max(0f, _alpha - FadePerSecond * Time.unscaledDeltaTime);
-            FlashImage.color = new Color(FlashColor.r, FlashColor.g, FlashColor.b, _alpha);
+            FlashImage.color = new Color(_currentColor.r, _currentColor.g, _currentColor.b, _alpha);
         }
     }
 }

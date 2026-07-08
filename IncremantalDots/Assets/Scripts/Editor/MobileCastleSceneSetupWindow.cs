@@ -771,6 +771,7 @@ namespace DeadWalls
             EnsureCameraShaker(scene);
             ConfigureMenuSystem(canvas.transform);
             EnsureDamageFlash(canvas.transform); // flash her seyin (menu dahil) ustunde kalir
+            ApplyGameUiSkin(canvas.transform); // Polish 2: menu dili oyun ici panellere
             EnsureAmbientAudio(scene);
             EnsureMainMenuScene(); // ayri menu sahnesi (additive kur/kaydet) + Build Settings
             NormalizeCastleTilemapSorting(scene);
@@ -2018,6 +2019,21 @@ namespace DeadWalls
             pauseLabel.fontSize = 20;
             pauseMenu.PauseButton = pauseButton;
 
+            // --- SOUL sayaci (Polish 2): pause butonunun altinda kucuk kosu-birikimi kutusu ---
+            var soulCounter = EnsureComponent<SoulCounterUI>(root);
+            GameObject soulPanel = EnsurePanel(root.transform, "SoulCounterPanel", false, new Color(0.10f, 0.07f, 0.16f, 0.85f));
+            var soulRect = (RectTransform)soulPanel.transform;
+            soulRect.anchorMin = new Vector2(1f, 1f);
+            soulRect.anchorMax = new Vector2(1f, 1f);
+            soulRect.offsetMin = new Vector2(-150f, -112f);
+            soulRect.offsetMax = new Vector2(-16f, -72f);
+            var soulText = EnsureText(soulPanel.transform, "SoulCounterText", "SOULS  0", 17,
+                TextAlignmentOptions.Center, new Vector2(0f, 0f), new Vector2(1f, 1f),
+                new Vector2(4f, 2f), new Vector2(-4f, -2f));
+            soulCounter.CounterPanel = soulPanel;
+            soulCounter.CounterText = soulText;
+            EditorUtility.SetDirty(soulCounter);
+
             // --- Pause paneli ---
             GameObject pausePanel = EnsurePanel(root.transform, "PausePanel", false, new Color(0.02f, 0.02f, 0.04f, 0.92f));
             Stretch(pausePanel.GetComponent<RectTransform>());
@@ -2305,6 +2321,7 @@ namespace DeadWalls
             }
 
             var ambient = EnsureComponent<AmbientAudioController>(root);
+            EnsureComponent<MomentVignetteUI>(root); // an vurgulari (Polish 2): safak altini + kanli ay kizili
             if (ambient.NightLoop == null)
                 ambient.NightLoop = LoadSfx("Wind Magic/RPG3_WindMagic_Drone01_LowSubtleLoop.wav");
             if (ambient.BloodMoonLoop == null)
@@ -2352,6 +2369,110 @@ namespace DeadWalls
             }
 
             return int.MaxValue;
+        }
+
+        // ---------------------------------------------------------------------------------
+        // UI gorsel birligi (Polish 2): menu'nun rounded-rect dilini oyun ici panellere
+        // tasimak icin sprite ASSET olarak uretilir (MenuSpriteFactory ayni matematigi
+        // runtime'da menu icin kullanir; asset versiyonu edit-time atanabilir olsun diye).
+        // ---------------------------------------------------------------------------------
+
+        private const string GeneratedArtFolder = "Assets/Art/Generated";
+        private const string RoundedRectAssetPath = GeneratedArtFolder + "/ui_rounded_rect.png";
+
+        private static Sprite EnsureRoundedRectAsset()
+        {
+            if (!AssetDatabase.IsValidFolder(GeneratedArtFolder))
+                AssetDatabase.CreateFolder("Assets/Art", "Generated");
+
+            if (!System.IO.File.Exists(RoundedRectAssetPath))
+            {
+                // MenuSpriteFactory.CreateRoundedRect ile ayni matematik (64px, radius 18, AA)
+                const int size = 64;
+                const float radius = 18f;
+                var tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
+                var pixels = new Color32[size * size];
+                for (int y = 0; y < size; y++)
+                {
+                    for (int x = 0; x < size; x++)
+                    {
+                        float dx = Mathf.Max(radius - x - 0.5f, x + 0.5f - (size - radius), 0f);
+                        float dy = Mathf.Max(radius - y - 0.5f, y + 0.5f - (size - radius), 0f);
+                        float dist = Mathf.Sqrt(dx * dx + dy * dy);
+                        float alpha = Mathf.Clamp01(radius - dist + 0.5f);
+                        pixels[y * size + x] = new Color32(255, 255, 255, (byte)(alpha * 255f));
+                    }
+                }
+                tex.SetPixels32(pixels);
+                tex.Apply();
+                System.IO.File.WriteAllBytes(RoundedRectAssetPath, tex.EncodeToPNG());
+                UnityEngine.Object.DestroyImmediate(tex);
+                AssetDatabase.ImportAsset(RoundedRectAssetPath, ImportAssetOptions.ForceSynchronousImport);
+            }
+
+            var importer = AssetImporter.GetAtPath(RoundedRectAssetPath) as TextureImporter;
+            if (importer != null)
+            {
+                bool dirty = false;
+                if (importer.textureType != TextureImporterType.Sprite) { importer.textureType = TextureImporterType.Sprite; dirty = true; }
+                if (importer.spriteImportMode != SpriteImportMode.Single) { importer.spriteImportMode = SpriteImportMode.Single; dirty = true; }
+                if (importer.spriteBorder != new Vector4(20f, 20f, 20f, 20f)) { importer.spriteBorder = new Vector4(20f, 20f, 20f, 20f); dirty = true; }
+                if (!importer.alphaIsTransparency) { importer.alphaIsTransparency = true; dirty = true; }
+                if (importer.mipmapEnabled) { importer.mipmapEnabled = false; dirty = true; }
+                if (dirty) importer.SaveAndReimport();
+            }
+
+            return AssetDatabase.LoadAssetAtPath<Sprite>(RoundedRectAssetPath);
+        }
+
+        /// <summary>Bir Image'i rounded-rect diline gecirir (sprite + Sliced; renk korunur/verilir).</summary>
+        private static void ApplyRoundedSkin(UnityEngine.UI.Image image, Sprite rounded, Color? color = null, float ppuMultiplier = 1.6f)
+        {
+            if (image == null || rounded == null)
+                return;
+
+            image.sprite = rounded;
+            image.type = UnityEngine.UI.Image.Type.Sliced;
+            image.pixelsPerUnitMultiplier = ppuMultiplier;
+            if (color.HasValue)
+                image.color = color.Value;
+            EditorUtility.SetDirty(image);
+        }
+
+        /// <summary>
+        /// Oyun ici kod-uretimli panelleri menu diline gecirir (Polish 2): panel kokleri +
+        /// TUM butonlar rounded olur (renkler korunur). Dim/flash katmanlari ve slider'lar
+        /// bilerek duz kalir (tam-ekran ortuler koseye ihtiyac duymaz; slider'lar ince).
+        /// </summary>
+        private static void ApplyGameUiSkin(Transform canvasTransform)
+        {
+            Sprite rounded = EnsureRoundedRectAsset();
+            if (rounded == null)
+                return;
+
+            string[] panelPaths =
+            {
+                "GameOverPanel",
+                "MenuUiRoot/PausePanel",
+                "MenuUiRoot/SettingsPanel",
+                "SpellUiRoot/SpellPanel",
+                "LevelUpPanel",
+                "GameOverPanel/MetaShopListRoot/MetaShopRowTemplate"
+            };
+            foreach (var path in panelPaths)
+            {
+                var t = canvasTransform.Find(path);
+                if (t != null)
+                    ApplyRoundedSkin(t.GetComponent<UnityEngine.UI.Image>(), rounded);
+            }
+
+            // tum butonlar (dim'ler Button degil — etkilenmez)
+            foreach (var button in canvasTransform.GetComponentsInChildren<UnityEngine.UI.Button>(true))
+            {
+                var image = button.GetComponent<UnityEngine.UI.Image>();
+                float height = ((RectTransform)button.transform).rect.height;
+                ApplyRoundedSkin(image, rounded, null, height < 46f ? 2.2f : 1.6f);
+            }
         }
 
         // ---------------------------------------------------------------------------------
