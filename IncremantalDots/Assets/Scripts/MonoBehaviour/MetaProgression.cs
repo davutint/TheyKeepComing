@@ -43,7 +43,8 @@ namespace DeadWalls
     /// </summary>
     public static class MetaProgression
     {
-        public const string CurrencyName = "RUH"; // isim tek yerden degisir (owner henuz kesinlestirmedi)
+        // Owner karari (2026-07-08): kavram RUH, oyun dili INGILIZCE -> ekranda "SOULS"
+        public const string CurrencyName = "SOULS";
         public const int RecordBonusPerDay = 50;  // yeni rekor: bonus = yeniBestDay * bu
 
         private static MetaProgressState _state;

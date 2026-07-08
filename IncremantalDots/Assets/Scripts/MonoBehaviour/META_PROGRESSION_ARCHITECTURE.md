@@ -2,11 +2,12 @@
 
 ## Amac
 
-K2 karari: olum -> kalici ilerleme -> yeni kosu. Para birimi RUH: 1 oldurulen zombi = 1 Ruh
-(+ yeni gun rekorunda `gun x 50` bonus). Ruh, olum ekrani magazasinda KALICI yukseltmelere
-harcanir; yukseltmeler her kosunun BASINDA otomatik uygulanir. V1 odagi (owner karari):
-baslangic ivmesi + hafif guc. Isim "RUH" placeholder'dir — `MetaProgression.CurrencyName`
-tek sabitinden degisir.
+K2 karari: olum -> kalici ilerleme -> yeni kosu. Para birimi RUH (ekranda "SOULS" —
+owner karari 2026-07-08: kavram ruh, OYUN DILI INGILIZCE; `MetaProgression.CurrencyName`
+tek sabiti): 1 oldurulen zombi = 1 Soul (+ yeni gun rekorunda `gun x 50` bonus). Souls,
+olum ekrani magazasinda KALICI yukseltmelere harcanir; yukseltmeler her kosunun BASINDA
+otomatik uygulanir. V1 odagi (owner karari): baslangic ivmesi + hafif guc.
+KURAL: player-facing TUM metinler INGILIZCE (Turkce yalniz kod yorumu/editor tool'u).
 
 ## Katmanlar
 

@@ -2273,6 +2273,10 @@ namespace DeadWalls
             uiManager.MarketPanel = hudRoot;
             uiManager.GameOverPanel = gameOverPanel;
 
+            // Olum ekrani diger tum UI'in (council karti dahil) USTUNDE durmali;
+            // DamageFlashOverlay setup akisinin sonunda kendini yine en sona alir.
+            gameOverPanel.transform.SetAsLastSibling();
+
             hudRoot.SetActive(true);
             levelUpPanel.SetActive(false);
             gameOverPanel.SetActive(false);
@@ -2288,13 +2292,32 @@ namespace DeadWalls
         {
             var meta = EnsureComponent<MetaProgressionUI>(gameOverPanel);
 
+            // Tam-ekran dim: arka plandaki HUD'u karartir + yanlis tiklamayi bloklar
+            GameObject dim = FindDirectChild(gameOverPanel.transform, "GameOverDim");
+            if (dim == null)
+            {
+                dim = new GameObject("GameOverDim", typeof(RectTransform));
+                Undo.RegisterCreatedObjectUndo(dim, "Create Game Over Dim");
+                dim.layer = gameOverPanel.layer;
+                dim.transform.SetParent(gameOverPanel.transform, false);
+            }
+            var dimRect = (RectTransform)dim.transform;
+            dimRect.anchorMin = Vector2.zero;
+            dimRect.anchorMax = Vector2.one;
+            dimRect.offsetMin = new Vector2(-2400f, -1400f); // panel sinirlarini asip ekrani kaplar
+            dimRect.offsetMax = new Vector2(2400f, 1400f);
+            var dimImage = EnsureComponent<UnityEngine.UI.Image>(dim);
+            dimImage.color = new Color(0.01f, 0.01f, 0.02f, 0.86f);
+            dimImage.raycastTarget = true;
+            dim.transform.SetAsFirstSibling(); // icerik ustte kalir
+
             meta.MetaSummaryText = EnsureText(gameOverPanel.transform, "MetaSummaryText",
-                "DAY 1 — 0 kill\n+0 RUH", 22, TextAlignmentOptions.Center,
+                "DAY 1 — 0 kills\n+0 SOULS", 22, TextAlignmentOptions.Center,
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
                 new Vector2(-300f, 116f), new Vector2(300f, 184f));
 
             meta.MetaSoulsText = EnsureText(gameOverPanel.transform, "MetaSoulsText",
-                "0 RUH", 18, TextAlignmentOptions.Center,
+                "0 SOULS", 18, TextAlignmentOptions.Center,
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
                 new Vector2(-300f, 84f), new Vector2(300f, 112f));
             meta.MetaSoulsText.color = new Color(0.69f, 0.52f, 0.96f, 1f);
@@ -2337,7 +2360,7 @@ namespace DeadWalls
                 EnsureText(template.transform, "RowLevelText", "LV 0/5", 13,
                     TextAlignmentOptions.Center, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
                     new Vector2(-40f, -14f), new Vector2(50f, 14f));
-                EnsureText(template.transform, "RowCostText", "150 RUH", 13,
+                EnsureText(template.transform, "RowCostText", "150 SOULS", 13,
                     TextAlignmentOptions.MidlineRight, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f),
                     new Vector2(-260f, -14f), new Vector2(-110f, 14f));
                 var buy = EnsureButton(template.transform, "RowBuyButton",

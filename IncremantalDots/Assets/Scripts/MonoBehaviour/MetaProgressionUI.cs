@@ -68,10 +68,10 @@ namespace DeadWalls
             if (MetaSummaryText != null)
             {
                 string record = result.NewRecord
-                    ? $"  <color=#F2C94C>YENI REKOR!</color>"
-                    : $"  (rekor: DAY {state.BestDay})";
+                    ? $"  <color=#F2C94C>NEW RECORD!</color>"
+                    : $"  (best: DAY {state.BestDay})";
                 MetaSummaryText.text =
-                    $"DAY {result.Day} — {result.Kills} kill{record}\n" +
+                    $"DAY {result.Day} — {result.Kills} kills{record}\n" +
                     $"<color=#B085F5>+{result.SoulsEarned} {MetaProgression.CurrencyName}</color>";
             }
 

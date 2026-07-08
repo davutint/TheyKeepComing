@@ -16,12 +16,18 @@ namespace DeadWalls
 
             var gs = GameManager.Instance.GameState;
             var ws = GameManager.Instance.WaveState;
+            var cycle = GameManager.Instance.ContinuousSiegeCycle;
 
             if (GameOverText != null)
                 GameOverText.text = "GAME OVER";
 
             if (StatsText != null)
-                StatsText.text = $"Wave: {ws.CurrentWave}\nLevel: {gs.Level}";
+            {
+                // Continuous siege dili: DAY sayaci (legacy Wave/Level yalniz eski modda)
+                StatsText.text = cycle.Enabled
+                    ? $"You survived {Mathf.Max(1, cycle.CycleIndex + 1)} days"
+                    : $"Wave: {ws.CurrentWave}\nLevel: {gs.Level}";
+            }
 
             if (RestartButton != null)
             {
