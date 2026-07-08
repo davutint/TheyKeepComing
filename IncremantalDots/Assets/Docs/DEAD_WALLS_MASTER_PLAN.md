@@ -270,6 +270,13 @@ Ara hedef olarak "oynanabilir demo" = C1-C10 (store maddeleri haric).
   panel-menu ve timeScale=0 acilis hack'i kaldirildi; GameBootstrap/RunBootstrap
   sahneler-arasi akis; pause'a MAIN MENU butonu. Tam dongu dogrulandi:
   menu -> NEW RUN -> oyun -> safak kayit -> MAIN MENU -> CONTINUE — DAY 3 -> restore.
-- SIRADAKI IS: M-C2 (zombi tipleri: Kosucu/Tank — SpawnTable bagla, tint+olcek gorsel)
-  ya da M-F (Android build + gercek cihaz testi — M-E onkosulu artik hazir).
-  Kucuk acik uclar: buyucu gorseli yok; onboarding yok.
+- M-C2 GERI ALINDI (2026-07-08, owner karari): veri-odakli zombi tipi sistemi kuruldu,
+  asset-only kanitla dogrulandi, AMA owner "gorsel ayrisma (tint+boy) yeni zombi
+  SUNMAYA yetmez" diyerek kaldirtti — HAKLI ders: zombi cesitliligi GORSEL BORU HATTIYLA
+  (tip basina kendi sprite/animasyonu; aday: SmallScaleInt Character Creator ->
+  SpriteAtlasGenerator) birlikte, bastan tasarlanmali. Kod tamamen sokuldu; oyun tek-zombi
+  davranisinda. SpawnTable/SpecialNights iskeletlerinden SpecialNights (kanli ay) AKTIF
+  kalir; SpawnTable yine "sistem okumaz" durumuna dondu.
+- SIRADAKI IS: M-F (Android build + gercek cihaz testi — tum onkosullar hazir).
+  Kucuk acik uclar: buyucu gorseli yok; onboarding yok; zombi cesitliligi (gorsel boru
+  hattiyla birlikte yeniden ele alinacak).
