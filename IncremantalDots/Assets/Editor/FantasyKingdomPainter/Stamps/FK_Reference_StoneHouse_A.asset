@@ -1,0 +1,4032 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70ada4f2396a5304ab3719210b82a424, type: 3}
+  m_Name: FK_Reference_StoneHouse_A
+  m_EditorClassIdentifier: DeadWalls::DeadWalls.FantasyKingdomStructureStamp
+  sourceScenePath: Assets/SmallScaleInt/Fantasy kingdom Tileset/Example scene/Example
+    scene.unity
+  sourceGridPath: Grid
+  sourceRegionMin: {x: -20, y: -38}
+  sourceRegionSize: {x: 11, y: 14}
+  sourceCellLayout: 2
+  sourceCellSwizzle: 0
+  sourceCellSize: {x: 1, y: 0.5, z: 1}
+  sourceCellGap: {x: 0, y: 0, z: 0}
+  layers:
+  - sourceHierarchyPath: Grid/LowerShadows
+    sourceName: LowerShadows
+    sortingLayerName: Default
+    sortingOrder: -50
+    rendererMode: 1
+    sortOrder: 3
+    tileAnchor: {x: 0.5, y: 0.5, z: 0}
+    layerColor: {r: 0, g: 0, b: 0, a: 0.5137255}
+    orientation: 0
+    orientationMatrix:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    cells:
+    - localPosition: {x: 10, y: 7, z: 0}
+      tile: {fileID: 11400000, guid: 17302f025b95a484f88463d436347300, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+  - sourceHierarchyPath: Grid/Ground 2
+    sourceName: Ground 2
+    sortingLayerName: Default
+    sortingOrder: -11
+    rendererMode: 1
+    sortOrder: 3
+    tileAnchor: {x: 0.5, y: 0.5, z: 0}
+    layerColor: {r: 1, g: 1, b: 1, a: 1}
+    orientation: 0
+    orientationMatrix:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    cells:
+    - localPosition: {x: 0, y: 0, z: 0}
+      tile: {fileID: 11400000, guid: 808f65dc5027f6e48b932f6c8df57bfa, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 5, y: 0, z: 0}
+      tile: {fileID: 11400000, guid: 42fc864505a226b4485a10bb00614243, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 6, y: 0, z: 0}
+      tile: {fileID: 11400000, guid: 57ad16d5f564e0240b1a673317cfa01b, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 0, y: 1, z: 0}
+      tile: {fileID: 11400000, guid: 808f65dc5027f6e48b932f6c8df57bfa, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 5, y: 1, z: 0}
+      tile: {fileID: 11400000, guid: 762a49a152191b547abae48824235904, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 0, y: 2, z: 0}
+      tile: {fileID: 11400000, guid: 808f65dc5027f6e48b932f6c8df57bfa, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 5, y: 2, z: 0}
+      tile: {fileID: 11400000, guid: fd1b15fe2b2444c4eb7fb13f00d47c78, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 0, y: 3, z: 0}
+      tile: {fileID: 11400000, guid: 808f65dc5027f6e48b932f6c8df57bfa, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 5, y: 3, z: 0}
+      tile: {fileID: 11400000, guid: 42fc864505a226b4485a10bb00614243, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 0, y: 4, z: 0}
+      tile: {fileID: 11400000, guid: 808f65dc5027f6e48b932f6c8df57bfa, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 5, y: 4, z: 0}
+      tile: {fileID: 11400000, guid: 42fc864505a226b4485a10bb00614243, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 6, y: 4, z: 0}
+      tile: {fileID: 11400000, guid: 104ce1d67e1e695488603e6b85e14338, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 0, y: 5, z: 0}
+      tile: {fileID: 11400000, guid: 808f65dc5027f6e48b932f6c8df57bfa, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 5, y: 5, z: 0}
+      tile: {fileID: 11400000, guid: 189fe974062169a488eaf3e42b9088bc, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 6, y: 5, z: 0}
+      tile: {fileID: 11400000, guid: 801c4f4caf69f31468b0bf0944591bf9, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 0, y: 6, z: 0}
+      tile: {fileID: 11400000, guid: 42fc864505a226b4485a10bb00614243, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 1, y: 6, z: 0}
+      tile: {fileID: 11400000, guid: 42fc864505a226b4485a10bb00614243, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 2, y: 6, z: 0}
+      tile: {fileID: 11400000, guid: 42fc864505a226b4485a10bb00614243, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 3, y: 6, z: 0}
+      tile: {fileID: 11400000, guid: 801c4f4caf69f31468b0bf0944591bf9, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 0, y: 7, z: 0}
+      tile: {fileID: 11400000, guid: 42fc864505a226b4485a10bb00614243, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 1, y: 7, z: 0}
+      tile: {fileID: 11400000, guid: 42fc864505a226b4485a10bb00614243, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 2, y: 7, z: 0}
+      tile: {fileID: 11400000, guid: 42fc864505a226b4485a10bb00614243, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 3, y: 7, z: 0}
+      tile: {fileID: 11400000, guid: 42fc864505a226b4485a10bb00614243, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 4, y: 7, z: 0}
+      tile: {fileID: 11400000, guid: 57ad16d5f564e0240b1a673317cfa01b, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 0, y: 8, z: 0}
+      tile: {fileID: 11400000, guid: 42fc864505a226b4485a10bb00614243, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 1, y: 8, z: 0}
+      tile: {fileID: 11400000, guid: 42fc864505a226b4485a10bb00614243, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 2, y: 8, z: 0}
+      tile: {fileID: 11400000, guid: 42fc864505a226b4485a10bb00614243, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 3, y: 8, z: 0}
+      tile: {fileID: 11400000, guid: 42fc864505a226b4485a10bb00614243, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 4, y: 8, z: 0}
+      tile: {fileID: 11400000, guid: 104ce1d67e1e695488603e6b85e14338, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 5, y: 8, z: 0}
+      tile: {fileID: 11400000, guid: fd1b15fe2b2444c4eb7fb13f00d47c78, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 0, y: 9, z: 0}
+      tile: {fileID: 11400000, guid: 801c4f4caf69f31468b0bf0944591bf9, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 1, y: 9, z: 0}
+      tile: {fileID: 11400000, guid: 42fc864505a226b4485a10bb00614243, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 2, y: 9, z: 0}
+      tile: {fileID: 11400000, guid: 42fc864505a226b4485a10bb00614243, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 3, y: 9, z: 0}
+      tile: {fileID: 11400000, guid: 42fc864505a226b4485a10bb00614243, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 4, y: 9, z: 0}
+      tile: {fileID: 11400000, guid: 42fc864505a226b4485a10bb00614243, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 5, y: 9, z: 0}
+      tile: {fileID: 11400000, guid: 801c4f4caf69f31468b0bf0944591bf9, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 0, y: 10, z: 0}
+      tile: {fileID: 11400000, guid: 57ad16d5f564e0240b1a673317cfa01b, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 1, y: 10, z: 0}
+      tile: {fileID: 11400000, guid: 189fe974062169a488eaf3e42b9088bc, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 2, y: 10, z: 0}
+      tile: {fileID: 11400000, guid: 42fc864505a226b4485a10bb00614243, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 3, y: 10, z: 0}
+      tile: {fileID: 11400000, guid: 42fc864505a226b4485a10bb00614243, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 4, y: 10, z: 0}
+      tile: {fileID: 11400000, guid: 42fc864505a226b4485a10bb00614243, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 5, y: 10, z: 0}
+      tile: {fileID: 11400000, guid: 104ce1d67e1e695488603e6b85e14338, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 0, y: 11, z: 0}
+      tile: {fileID: 11400000, guid: 57ad16d5f564e0240b1a673317cfa01b, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 1, y: 11, z: 0}
+      tile: {fileID: 11400000, guid: d9747e81ddc8167428bcce6a58289bf3, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 2, y: 11, z: 0}
+      tile: {fileID: 11400000, guid: 42fc864505a226b4485a10bb00614243, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 3, y: 11, z: 0}
+      tile: {fileID: 11400000, guid: 42fc864505a226b4485a10bb00614243, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 4, y: 11, z: 0}
+      tile: {fileID: 11400000, guid: 42fc864505a226b4485a10bb00614243, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 5, y: 11, z: 0}
+      tile: {fileID: 11400000, guid: 801c4f4caf69f31468b0bf0944591bf9, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 0, y: 12, z: 0}
+      tile: {fileID: 11400000, guid: 104ce1d67e1e695488603e6b85e14338, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 1, y: 12, z: 0}
+      tile: {fileID: 11400000, guid: 189fe974062169a488eaf3e42b9088bc, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 2, y: 12, z: 0}
+      tile: {fileID: 11400000, guid: 42fc864505a226b4485a10bb00614243, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 3, y: 12, z: 0}
+      tile: {fileID: 11400000, guid: 42fc864505a226b4485a10bb00614243, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 4, y: 12, z: 0}
+      tile: {fileID: 11400000, guid: 801c4f4caf69f31468b0bf0944591bf9, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 0, y: 13, z: 0}
+      tile: {fileID: 11400000, guid: 801c4f4caf69f31468b0bf0944591bf9, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 2, y: 13, z: 0}
+      tile: {fileID: 11400000, guid: 189fe974062169a488eaf3e42b9088bc, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 3, y: 13, z: 0}
+      tile: {fileID: 11400000, guid: 801c4f4caf69f31468b0bf0944591bf9, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 5, y: 13, z: 0}
+      tile: {fileID: 11400000, guid: fd1b15fe2b2444c4eb7fb13f00d47c78, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 6, y: 13, z: 0}
+      tile: {fileID: 11400000, guid: fd1b15fe2b2444c4eb7fb13f00d47c78, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 10, y: 13, z: 0}
+      tile: {fileID: 11400000, guid: ee97d9d07dd77f348bec3c5f3fc93792, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+  - sourceHierarchyPath: Grid/Ground 3
+    sourceName: Ground 3
+    sortingLayerName: Default
+    sortingOrder: -10
+    rendererMode: 1
+    sortOrder: 3
+    tileAnchor: {x: 0.5, y: 0.5, z: 0}
+    layerColor: {r: 1, g: 1, b: 1, a: 1}
+    orientation: 0
+    orientationMatrix:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    cells:
+    - localPosition: {x: 0, y: 9, z: 0}
+      tile: {fileID: 11400000, guid: e0fa7553939014245808a15d70b37310, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 0, y: 10, z: 0}
+      tile: {fileID: 11400000, guid: d0e49b5b894e84145b32126958a82e6a, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 1, y: 10, z: 0}
+      tile: {fileID: 11400000, guid: 3376610424f7e7a4ebbcd5722aaa4b59, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 0, y: 11, z: 0}
+      tile: {fileID: 11400000, guid: e49209abc46ca434f9a62d43851139b4, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 2, y: 11, z: 0}
+      tile: {fileID: 11400000, guid: 0ae05f17707fd4642804e0d2f715d358, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 0, y: 12, z: 0}
+      tile: {fileID: 11400000, guid: e49209abc46ca434f9a62d43851139b4, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 1, y: 12, z: 0}
+      tile: {fileID: 11400000, guid: f5424e51326a15b41b47b80bd3af0c6f, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 2, y: 12, z: 0}
+      tile: {fileID: 11400000, guid: 0ae05f17707fd4642804e0d2f715d358, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 3, y: 12, z: 0}
+      tile: {fileID: 11400000, guid: 0ae05f17707fd4642804e0d2f715d358, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 5, y: 12, z: 0}
+      tile: {fileID: 11400000, guid: 3376610424f7e7a4ebbcd5722aaa4b59, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 2, y: 13, z: 0}
+      tile: {fileID: 11400000, guid: 0ae05f17707fd4642804e0d2f715d358, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 3, y: 13, z: 0}
+      tile: {fileID: 11400000, guid: 0ae05f17707fd4642804e0d2f715d358, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 4, y: 13, z: 0}
+      tile: {fileID: 11400000, guid: 0ae05f17707fd4642804e0d2f715d358, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 7, y: 13, z: 0}
+      tile: {fileID: 11400000, guid: 603705c7a47e6e845afd946525b0ed61, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+  - sourceHierarchyPath: Grid/Shadows1
+    sourceName: Shadows1
+    sortingLayerName: Default
+    sortingOrder: -9
+    rendererMode: 1
+    sortOrder: 3
+    tileAnchor: {x: 0.5, y: 0.5, z: 0}
+    layerColor: {r: 0, g: 0, b: 0, a: 0.37254903}
+    orientation: 0
+    orientationMatrix:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    cells:
+    - localPosition: {x: 1, y: 11, z: 0}
+      tile: {fileID: 11400000, guid: 7e30b7b8f2889384793bf79982310c14, type: 2}
+      transformMatrix:
+        e00: 0.08715588
+        e01: -0.9961946
+        e02: 0
+        e03: 0
+        e10: 0.39449307
+        e11: 0.034513727
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+  - sourceHierarchyPath: Grid/Shadows2
+    sourceName: Shadows2
+    sortingLayerName: Default
+    sortingOrder: -5
+    rendererMode: 0
+    sortOrder: 3
+    tileAnchor: {x: 0.5, y: 0.5, z: 0}
+    layerColor: {r: 0, g: 0, b: 0, a: 0.5647059}
+    orientation: 0
+    orientationMatrix:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    cells:
+    - localPosition: {x: 0, y: 0, z: 0}
+      tile: {fileID: 11400000, guid: cbb8ef1342fcd7d47bfa963f177340fa, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 0, y: 1, z: 0}
+      tile: {fileID: 11400000, guid: 17302f025b95a484f88463d436347300, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 0, y: 2, z: 0}
+      tile: {fileID: 11400000, guid: 17302f025b95a484f88463d436347300, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 0, y: 3, z: 0}
+      tile: {fileID: 11400000, guid: 17302f025b95a484f88463d436347300, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 0, y: 4, z: 0}
+      tile: {fileID: 11400000, guid: 17302f025b95a484f88463d436347300, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 0, y: 5, z: 0}
+      tile: {fileID: 11400000, guid: 17302f025b95a484f88463d436347300, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 0, y: 6, z: 0}
+      tile: {fileID: 11400000, guid: 17302f025b95a484f88463d436347300, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 1, y: 6, z: 0}
+      tile: {fileID: 11400000, guid: 17302f025b95a484f88463d436347300, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 2, y: 6, z: 0}
+      tile: {fileID: 11400000, guid: 17302f025b95a484f88463d436347300, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 3, y: 6, z: 0}
+      tile: {fileID: 11400000, guid: 17302f025b95a484f88463d436347300, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+  - sourceHierarchyPath: Grid/Objects
+    sourceName: Objects
+    sortingLayerName: Default
+    sortingOrder: 0
+    rendererMode: 1
+    sortOrder: 3
+    tileAnchor: {x: 0.5, y: 0.5, z: 0}
+    layerColor: {r: 1, g: 1, b: 1, a: 1}
+    orientation: 0
+    orientationMatrix:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    cells:
+    - localPosition: {x: 9, y: 0, z: 0}
+      tile: {fileID: 11400000, guid: c07019c8f0a4ead458888db73369001d, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 7, y: 1, z: 0}
+      tile: {fileID: 11400000, guid: dcd283a8a95687141905bbea749784f7, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 7, y: 2, z: 0}
+      tile: {fileID: 11400000, guid: 779064a1722d8634e88b5b5fc7eb0315, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 9, y: 3, z: 0}
+      tile: {fileID: 11400000, guid: e69b26942d3dc9544b4ae6d942f004fe, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 1, y: 6, z: 0}
+      tile: {fileID: 11400000, guid: 97c0d9b22d449ea4db093b5c9d5da65c, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 0, y: 7, z: 0}
+      tile: {fileID: 11400000, guid: 5a8c62a6f2ebfd2438abb43672c41d5e, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 1, y: 7, z: 0}
+      tile: {fileID: 11400000, guid: 5a8c62a6f2ebfd2438abb43672c41d5e, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 1, y: 8, z: 0}
+      tile: {fileID: 11400000, guid: 6f7e842f41426fa4889345af961884bd, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 2, y: 8, z: 0}
+      tile: {fileID: 11400000, guid: 5a8c62a6f2ebfd2438abb43672c41d5e, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 1, y: 9, z: 0}
+      tile: {fileID: 11400000, guid: c960f50d316ffea49a82f516b64f2f94, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 2, y: 9, z: 0}
+      tile: {fileID: 11400000, guid: 6cc98a0e11e184040848c222fdd8ca64, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 3, y: 9, z: 0}
+      tile: {fileID: 11400000, guid: 5a8c62a6f2ebfd2438abb43672c41d5e, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 3, y: 10, z: 0}
+      tile: {fileID: 11400000, guid: 6f7e842f41426fa4889345af961884bd, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 4, y: 10, z: 0}
+      tile: {fileID: 11400000, guid: e8c0344b0b986d849948fd4d665b421f, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 2, y: 11, z: 0}
+      tile: {fileID: 11400000, guid: 4860a2333cde6b845bd66b54577fb6d8, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 3, y: 11, z: 0}
+      tile: {fileID: 11400000, guid: 5a8c62a6f2ebfd2438abb43672c41d5e, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 4, y: 11, z: 0}
+      tile: {fileID: 11400000, guid: dca6b4830347fcc4db20740a92bea89e, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 3, y: 12, z: 0}
+      tile: {fileID: 11400000, guid: 3e3d62fe1870be94aa84a18f1fddb359, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 2, y: 13, z: 0}
+      tile: {fileID: 11400000, guid: 641fb0a89f135e541ada3123ad23a56d, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 3, y: 13, z: 0}
+      tile: {fileID: 11400000, guid: 7103b133ca8b906408ca1b4d73ce2280, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 4, y: 13, z: 0}
+      tile: {fileID: 11400000, guid: 4406283298c3c4d488fdb48f57951da0, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+  - sourceHierarchyPath: Grid/Walls
+    sourceName: Walls
+    sortingLayerName: Default
+    sortingOrder: 0
+    rendererMode: 1
+    sortOrder: 2
+    tileAnchor: {x: 0.5, y: 0.5, z: 0}
+    layerColor: {r: 1, g: 1, b: 1, a: 1}
+    orientation: 0
+    orientationMatrix:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    cells:
+    - localPosition: {x: 0, y: 0, z: 0}
+      tile: {fileID: 11400000, guid: b746caf95476f0e498a8a1cc7b045465, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 1, y: 0, z: 0}
+      tile: {fileID: 11400000, guid: 5192d2281bf5ba54990b72ce92f268bf, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 2, y: 0, z: 0}
+      tile: {fileID: 11400000, guid: c37d81b5bf5821840bbefce6d3702da4, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 3, y: 0, z: 0}
+      tile: {fileID: 11400000, guid: c37d81b5bf5821840bbefce6d3702da4, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 4, y: 0, z: 0}
+      tile: {fileID: 11400000, guid: 53be8842955da2e449cb6e2211268061, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 0, y: 1, z: 0}
+      tile: {fileID: 11400000, guid: 44871a70029b78549b7b5e09fe2a452d, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 1, y: 1, z: 0}
+      tile: {fileID: 11400000, guid: 2b6cba37a60717f4bb0376893c066b40, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 4, y: 1, z: 0}
+      tile: {fileID: 11400000, guid: fd739003a284ebb41b488f02e2f44afa, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 0, y: 2, z: 0}
+      tile: {fileID: 11400000, guid: d86778c90d766484c8e2ed54c0766562, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 1, y: 2, z: 0}
+      tile: {fileID: 11400000, guid: 57deb6e2c23dfdf4cb1e8db55a0aab4f, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 4, y: 2, z: 0}
+      tile: {fileID: 11400000, guid: fd739003a284ebb41b488f02e2f44afa, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 0, y: 3, z: 0}
+      tile: {fileID: 11400000, guid: 44871a70029b78549b7b5e09fe2a452d, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 1, y: 3, z: 0}
+      tile: {fileID: 11400000, guid: 2b6cba37a60717f4bb0376893c066b40, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 4, y: 3, z: 0}
+      tile: {fileID: 11400000, guid: 9038c9a54906d5b449ce80d816f350e6, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 0, y: 4, z: 0}
+      tile: {fileID: 11400000, guid: d86778c90d766484c8e2ed54c0766562, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 1, y: 4, z: 0}
+      tile: {fileID: 11400000, guid: 2b6cba37a60717f4bb0376893c066b40, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 4, y: 4, z: 0}
+      tile: {fileID: 11400000, guid: fd739003a284ebb41b488f02e2f44afa, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 0, y: 5, z: 0}
+      tile: {fileID: 11400000, guid: 28afacec5d305294190fb7877cc23978, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 1, y: 5, z: 0}
+      tile: {fileID: 11400000, guid: 9851e38434902fb4ebfc1809396fb7b2, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 2, y: 5, z: 0}
+      tile: {fileID: 11400000, guid: 9b8ee0ba62c99c747b94383d70390f09, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 3, y: 5, z: 0}
+      tile: {fileID: 11400000, guid: 9b8ee0ba62c99c747b94383d70390f09, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 4, y: 5, z: 0}
+      tile: {fileID: 11400000, guid: 459a738c940ccd0489cc15e15ba9b115, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 1, y: 11, z: 0}
+      tile: {fileID: 11400000, guid: 7e30b7b8f2889384793bf79982310c14, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 7, y: 13, z: 0}
+      tile: {fileID: 11400000, guid: fda01e66e93962f408725cbf5024518c, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+  - sourceHierarchyPath: Grid/Roof1
+    sourceName: Roof1
+    sortingLayerName: Default
+    sortingOrder: 2
+    rendererMode: 2
+    sortOrder: 3
+    tileAnchor: {x: 0.5, y: 0.5, z: 0}
+    layerColor: {r: 1, g: 1, b: 1, a: 1}
+    orientation: 0
+    orientationMatrix:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    cells:
+    - localPosition: {x: 2, y: 2, z: 0}
+      tile: {fileID: 11400000, guid: ec53b05e66bee9e4a8111a5a18c90778, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 3, y: 2, z: 0}
+      tile: {fileID: 11400000, guid: f9f22a1fca3fbeb4186cc0211f10ea86, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 4, y: 2, z: 0}
+      tile: {fileID: 11400000, guid: 36512f698b237084b96d7196e24c0c2a, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 5, y: 2, z: 0}
+      tile: {fileID: 11400000, guid: f9f22a1fca3fbeb4186cc0211f10ea86, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 6, y: 2, z: 0}
+      tile: {fileID: 11400000, guid: 61218f60b5a5ea44aad98005f69cf136, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 2, y: 3, z: 0}
+      tile: {fileID: 11400000, guid: c067732d46479dc4f9c1bf7764f4759b, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 6, y: 3, z: 0}
+      tile: {fileID: 11400000, guid: feda45cb6f2342f4f82c8f53f10d5bd8, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 2, y: 4, z: 0}
+      tile: {fileID: 11400000, guid: c067732d46479dc4f9c1bf7764f4759b, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 6, y: 4, z: 0}
+      tile: {fileID: 11400000, guid: c73ebf24debb7af4ca34b2f35fd279d2, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 2, y: 5, z: 0}
+      tile: {fileID: 11400000, guid: c067732d46479dc4f9c1bf7764f4759b, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 6, y: 5, z: 0}
+      tile: {fileID: 11400000, guid: feda45cb6f2342f4f82c8f53f10d5bd8, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 2, y: 6, z: 0}
+      tile: {fileID: 11400000, guid: c067732d46479dc4f9c1bf7764f4759b, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 6, y: 6, z: 0}
+      tile: {fileID: 11400000, guid: c73ebf24debb7af4ca34b2f35fd279d2, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 2, y: 7, z: 0}
+      tile: {fileID: 11400000, guid: b99d9028a9b1c2643b3991b0b4822646, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 3, y: 7, z: 0}
+      tile: {fileID: 11400000, guid: d4f39a7834981db459a84a0a8ebf3932, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 4, y: 7, z: 0}
+      tile: {fileID: 11400000, guid: 769df3e0c76771742b24f0aa335de7e1, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 5, y: 7, z: 0}
+      tile: {fileID: 11400000, guid: d4f39a7834981db459a84a0a8ebf3932, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 6, y: 7, z: 0}
+      tile: {fileID: 11400000, guid: f145b6dfb584bb34fa6540303746dad0, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+  - sourceHierarchyPath: Grid/Roof2
+    sourceName: Roof2
+    sortingLayerName: Default
+    sortingOrder: 11
+    rendererMode: 0
+    sortOrder: 3
+    tileAnchor: {x: 0.5, y: 0.5, z: 0}
+    layerColor: {r: 1, g: 1, b: 1, a: 1}
+    orientation: 0
+    orientationMatrix:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    cells:
+    - localPosition: {x: 5, y: 0, z: 0}
+      tile: {fileID: 11400000, guid: c1eb1c81e7bfeab47861d0311495f633, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 4, y: 4, z: 0}
+      tile: {fileID: 11400000, guid: 96eaf9f199591f74c844a5815497bbe1, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 5, y: 4, z: 0}
+      tile: {fileID: 11400000, guid: 16d5e95da5d0aa34a9cb0ab13d29efa3, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 6, y: 4, z: 0}
+      tile: {fileID: 11400000, guid: 16d5e95da5d0aa34a9cb0ab13d29efa3, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 7, y: 4, z: 0}
+      tile: {fileID: 11400000, guid: 16d5e95da5d0aa34a9cb0ab13d29efa3, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 8, y: 4, z: 0}
+      tile: {fileID: 11400000, guid: d2589b67acfc0ec45a4abb07f9d9ff13, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 6, y: 5, z: 0}
+      tile: {fileID: 11400000, guid: 96eaf9f199591f74c844a5815497bbe1, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 7, y: 5, z: 0}
+      tile: {fileID: 11400000, guid: 16d5e95da5d0aa34a9cb0ab13d29efa3, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 8, y: 5, z: 0}
+      tile: {fileID: 11400000, guid: d2589b67acfc0ec45a4abb07f9d9ff13, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 8, y: 6, z: 0}
+      tile: {fileID: 11400000, guid: d2589b67acfc0ec45a4abb07f9d9ff13, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+  - sourceHierarchyPath: Grid/Roof3
+    sourceName: Roof3
+    sortingLayerName: Default
+    sortingOrder: 15
+    rendererMode: 0
+    sortOrder: 3
+    tileAnchor: {x: 0.5, y: 0.5, z: 0}
+    layerColor: {r: 1, g: 1, b: 1, a: 1}
+    orientation: 0
+    orientationMatrix:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    cells:
+    - localPosition: {x: 4, y: 4, z: 0}
+      tile: {fileID: 11400000, guid: 0aae9b3578bfd7d4dafad9d72b1d4b70, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 8, y: 4, z: 0}
+      tile: {fileID: 11400000, guid: 848d45752378ceb4f9ff6c3740b44c94, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 4, y: 5, z: 0}
+      tile: {fileID: 11400000, guid: 0aae9b3578bfd7d4dafad9d72b1d4b70, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 6, y: 5, z: 0}
+      tile: {fileID: 11400000, guid: 0aae9b3578bfd7d4dafad9d72b1d4b70, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 4, y: 6, z: 0}
+      tile: {fileID: 11400000, guid: 0aae9b3578bfd7d4dafad9d72b1d4b70, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 6, y: 6, z: 0}
+      tile: {fileID: 11400000, guid: 0aae9b3578bfd7d4dafad9d72b1d4b70, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 8, y: 6, z: 0}
+      tile: {fileID: 11400000, guid: f71c49ac2f08d9c43a618e63f6ff574d, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 2, y: 7, z: 0}
+      tile: {fileID: 11400000, guid: ab62af7d16f28684789b2aec9f72c8c2, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 4, y: 7, z: 0}
+      tile: {fileID: 11400000, guid: 0aae9b3578bfd7d4dafad9d72b1d4b70, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 6, y: 7, z: 0}
+      tile: {fileID: 11400000, guid: 0aae9b3578bfd7d4dafad9d72b1d4b70, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 8, y: 7, z: 0}
+      tile: {fileID: 11400000, guid: f71c49ac2f08d9c43a618e63f6ff574d, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 4, y: 8, z: 0}
+      tile: {fileID: 11400000, guid: 0aae9b3578bfd7d4dafad9d72b1d4b70, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 6, y: 8, z: 0}
+      tile: {fileID: 11400000, guid: 0aae9b3578bfd7d4dafad9d72b1d4b70, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 8, y: 8, z: 0}
+      tile: {fileID: 11400000, guid: f71c49ac2f08d9c43a618e63f6ff574d, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 4, y: 9, z: 0}
+      tile: {fileID: 11400000, guid: 0aae9b3578bfd7d4dafad9d72b1d4b70, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 6, y: 9, z: 0}
+      tile: {fileID: 11400000, guid: 0aae9b3578bfd7d4dafad9d72b1d4b70, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 8, y: 9, z: 0}
+      tile: {fileID: 11400000, guid: f71c49ac2f08d9c43a618e63f6ff574d, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 6, y: 10, z: 0}
+      tile: {fileID: 11400000, guid: 0aae9b3578bfd7d4dafad9d72b1d4b70, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 8, y: 10, z: 0}
+      tile: {fileID: 11400000, guid: f71c49ac2f08d9c43a618e63f6ff574d, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1
+    - localPosition: {x: 8, y: 11, z: 0}
+      tile: {fileID: 11400000, guid: f71c49ac2f08d9c43a618e63f6ff574d, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 1

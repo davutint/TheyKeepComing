@@ -17,7 +17,8 @@ Proje ilk GDD'lerdeki grid town-building / RTS vizyonundan CIKTI. Su an aktif ge
 
 ### Aktif sahne yapisi (iki katman)
 - **`Assets/Scenes/NewGameScene.unity`** = AKTIF ana sahne -- MonoBehaviour/UI + gorsel kabuk.
-  Icerik: `Main Camera` (ortho, size 8), `Global Light 2D`, `WorldVisualRoot`, `Canvas`
+  Icerik: `Main Camera` (ortho, size 8), `Global Light 2D`, aktif kok `Grid`, bos/legacy
+  `WorldVisualRoot`, `Canvas`
   (`DayNightOverlay` + `MobileCastleHudRoot` prefab + level/restart), `GameManager`,
   `CastleClickTarget`, ve bir SubScene referansi.
 - **`Assets/Scenes/NewGameScene/MobileCastleCombatSubScene.unity`** = DOTS authoring tarafi (ECS'e bake).
@@ -26,23 +27,24 @@ Proje ilk GDD'lerdeki grid town-building / RTS vizyonundan CIKTI. Su an aktif ge
 - Okcu spawn noktasi artik subscene slot'lari degil, ana scene `Grid/outside` tilemapindeki dolu hucrelerdir.
 - Iki katman BILINCLI ayrik: Mono/UI ana sahnede, simulasyon datasi subscene'de.
 
-### Gorsel temel: `WorldVisualRoot` + SmallScaleInt
-- `WorldVisualRoot` = duz sahne GameObject (NewGameScene.unity:132, scale 0.35) -- prefab/ECS DEGIL,
-  gameplay'i ETKILEMEZ. `MobileCastleSceneSetupWindow.EnsureWorldVisuals` (MobileCastleSceneSetupWindow.cs:375)
-  idempotent kurar/normalize eder.
-- Altinda `MobileArenaGrid` (Unity `Grid`, Isometric, cellSize 4/2/4) -> 4 `Tilemap` katmani
-  (sortingOrder ile derinlik): `GroundTilemap` -50, `CastleGroundTilemap` -40, `CastleWallTilemap` -30,
-  `CastlePropsTilemap` -20. Yani: izometrik arena zemini + kale silueti + savas alani dekoru, salt okunabilirlik.
+### Gorsel temel: `NewGameScene/Grid` + SmallScaleInt
+- Aktif gorsel truth, sahnenin kok `Grid` objesidir: Unity native Isometric,
+  `cellSize=(1,0.5,1)` ve dokuz child Tilemap. `outside*` ile gameplay slotlari da bu Grid'dedir.
+- `WorldVisualRoot` sahnede bos/legacy koktur; eski `MobileArenaGrid` 4-katman pipeline'i aktif
+  tam-harita hedefi degildir.
+- K4 full-map gorsel revizyonu `FantasyKingdomScenePainterWindow` ve ayri
+  `FantasyKingdomFullMapComposerWindow` uzerinden bu kok Grid'e yonelir.
 - Tile'lar `Assets/SmallScaleInt/Fantasy kingdom Tileset/Environment/Tiles`'ten isimle yuklenir
   (`SmallScaleInt/` = gorsel temel art: Fantasy kingdom Tileset + Character creator - Fantasy).
 
 ### Aktif oyun dongusu (Mobile Continuous Siege -- otoriter dok: `Systems/MOBILE_CASTLE_COMBAT_ARCHITECTURE.md` + `Systems/CONTINUOUS_SIEGE_CYCLE_SYSTEM_ARCHITECTURE.md`)
-360-derece merkezi kale savunmasi, SUREKLI akan kusatma. Player-facing "Start Next Wave" / "Wave Cleared" YOK; oyun durmaz.
+Sagdan tek-cephe castle-defense, SUREKLI akan kusatma. Player-facing "Start Next Wave" /
+"Wave Cleared" YOK; oyun durmaz.
 Otorite `ContinuousSiegeCycleData` (eski `WaveStateData.Phase` DEGIL):
 1. **Cycle (`ContinuousSiegeCycleSystem`)** -- 60s dongu 4 FAZ: DAY 22s -> DUSK 8s -> NIGHT 22s -> DAWN 8s.
    `ContinuousSiegeCycleData` `Phase` + progress + `SpawnIntensityMultiplier` + `HordePressure01` + `CycleIndex` yazar.
    UI `DAY/DUSK/NIGHT/DAWN` + `CycleDayCounterText` ("DAY n") gosterir.
-2. **Spawn (kutle eskalasyonu)** -- zombiler rastgele 360-ring'den; interval/batch intensity'ye gore akar
+2. **Spawn (kutle eskalasyonu)** -- zombiler sag spawn seridinden; interval/batch intensity'ye gore akar
    (Day 0.55, Dusk 1.00 -> 1.35, Night 1.65, Dawn 0.15). Cycle ile: batch buyur (`SpawnBatchGrowthPerCycle`,
    `MaxSpawnBatch` cap), HP LINEER buyur (`ZombieBaseHP*(1+(w-1)*ZombieHpGrowthPerCycle)` -- ustel DEGIL,
    sunger degil kalabalik), `MaxAliveZombies` performans tavani. Gunduz overlay alpha 0 -> gece 0.50 -> Dawn'da acilir.
@@ -56,7 +58,8 @@ Otorite `ContinuousSiegeCycleData` (eski `WaveStateData.Phase` DEGIL):
 - **LEGACY (kodda durur, `ContinuousSiegeCycleData.Enabled` true iken DEVRE DISI):** `WaveStateData.Phase` DayPrep/NightCombat,
   Wave-clear reward (`WaveClearRewardData`), `Start Next Wave`, `Repair/Fortify/Rally`, intra-wave director pacing.
 - Anahtarlar `MobileCastleCombatConfig`'te: CastleCenter (0,0), SpawnRadius 11, AttackRadius 1.35,
-  `UnlimitedArrows=true`, continuous cycle 60s (22/8/22/8) + intensity + kutle eskalasyonu + repair maliyeti,
+  `SingleFrontEnabled=true`, `UnlimitedArrows=true`, continuous cycle 60s (22/8/22/8) +
+  intensity + kutle eskalasyonu + repair maliyeti,
   worker uretim/cap/odul carpani (detay icin doc).
 - BIRAKILAN GDD ozellikleri: grid town-building, lane/telegraph wave, manuel RTS okcu yerlestirme, manuel Start Next Wave /
   wave-clear ekrani, XP level-up kartlari, ok stogu yonetimi -- hepsi mobile loop'ta YOK.
@@ -96,12 +99,14 @@ Otorite `ContinuousSiegeCycleData` (eski `WaveStateData.Phase` DEGIL):
   `MonoBehaviour/CASTLE_ECONOMY_UI_ARCHITECTURE.md`, `Editor/MOBILE_CASTLE_SCENE_SETUP_ARCHITECTURE.md`.
 - **Aktif yon:** mobile continuous siege + sol castle interior worker economy + combat/UI polish. **M-ISO (izometrik/perimeter) ARTIK AKTIF DEGIL.**
 - **K4 TEK CEPHE (2026-07-06, M-0 mekanigi TAMAM):** dusmanlar yalniz SAGDAN gelir
-  (`SingleFrontEnabled=true` default; false = eski 360-ring geri doner). Spawn sag serit
-  (SpawnLineX 13, band +-6.5), hedef/saldiri duvar hatti (FrontlineX -6, AttackRadius esigi),
-  HENDEK bandi [-4,-1.5] `MoatSystem` ile yavaslatir (frost'la ayni ZombieSlow kanali) +
+  (`SingleFrontEnabled=true` default; false = eski 360-ring fallback). Spawn gizli sag serit
+  (X 27..29, Y +-6.5; Android max aspect 2.4'te de ekran disi), hedef/saldiri duvar hatti
+  (frontline X -0.5),
+  HENDEK bandi X 1.5..4 `MoatSystem` ile yavaslatir (frost'la ayni ZombieSlow kanali) +
   moat_flame tech'iyle yakar; hendek evrimi tech'leri `moat_dig`/`moat_flame`; okcu yerlesimi
-  tilemap-hucre (x<=FrontlineX+1 filtreli) + duvar kolonu fallback; kamera sabit (4.5,0) ortho 8.
-  GORSEL katman owner isi: eski kale silueti/koy/duvar/kule tilemap'leri yeniden boyanacak.
+  tilemap-hucre + duvar kolonu fallback; `outside` x=0 uzerinde 40 okcu slotudur; kamera
+  sabit ortho 8. Gorsel bantlar: battlefield X 4..18, far-right frame X 18..27,
+  hidden spawn X 27..29. GORSEL acik is: kanitlanmis kontratlari koruyan final full-map revizyonu.
   Otoriter dok: `Systems/MOBILE_CASTLE_COMBAT_ARCHITECTURE.md` "Tek Cephe" bolumu.
 - `Assets/Docs/ROADMAP.md` (son guncelleme 2026-03-18) = LEGACY milestone gecmisi, guncel yon DEGIL.
 
@@ -112,7 +117,7 @@ Otorite `ContinuousSiegeCycleData` (eski `WaveStateData.Phase` DEGIL):
 - **Namespace:** `DeadWalls` (tek asmdef: `Assets/Scripts/DeadWalls.asmdef`, `allowUnsafeCode: true`).
 - **Tween:** DOTween Pro (`Assets/Plugins/Demigiant`); UI juice icin. `DeadWalls.asmdef` -> `DOTween.Modules`
   referansi SART (DOTween Utility Panel > Create ASMDEF ile uretilir); Modules asmdef'i silinirse DOFade/DOColor derlenmez.
-- **Tur:** Zombie castle-defense (360-derece, kaynak/nufus ekonomisi).
+- **Tur:** Sagdan tek-cephe zombie castle-defense (kaynak/nufus ekonomisi).
 
 ## Komutlar (build / test) -- detay: `AGENTS.md`
 - **Ac:** Unity Hub -> `IncremantalDots`. Aktif sahne: `Assets/Scenes/NewGameScene.unity`.
@@ -170,8 +175,9 @@ Kurallar:
   (+`MobilePopulationAllocation`/`MobilePrepPauseState`/`MobileEconomyEventState`/`CastleYardPrepState`/`EconomyFocusState`).
 
 ### Mod anahtari: Mobile/Kale vs Legacy WallX
-- `MobileCastleCombatConfig` singleton VARSA -> **mobil/kale modu** (AKTIF): CastleCenter'a yon, 360 spawn,
-  AttackRadius, continuous DAY/DUSK/NIGHT dongusu. `GameManager.TryGetMobileConfigEntity()` tum ekonomi/wave mantigini dallandirir.
+- `MobileCastleCombatConfig` singleton VARSA -> **mobil/kale modu** (AKTIF):
+  `SingleFrontEnabled` ile sag spawn seridi/frontline, AttackRadius ve continuous
+  DAY/DUSK/NIGHT dongusu. `GameManager.TryGetMobileConfigEntity()` tum ekonomi/wave mantigini dallandirir.
 - Config YOKSA -> **legacy WallX modu** (fallback): zombiler sagdan, yon `WallXPosition` ile.
 
 ### Iki entity-olusturma pattern'i
@@ -241,7 +247,29 @@ Queued --> Moving      (blocker gitti) ; Queued --> Attacking (kaleye ulasti)
   alanlari M-C hazirligi (sistem henuz okumaz). Bkz. `DIFFICULTY_TUNER_ARCHITECTURE.md`.
 - **LongRunSimulatorWindow** -- M-A olcum botu: play modda makul-oyuncu politikasi kosar,
   her safakta gun-sonu metriklerini `Logs/LongRun/*.csv`'ye doker. Bkz. `LONG_RUN_SIMULATOR_ARCHITECTURE.md`.
-- **ArenaMapGeneratorWindow** -- seed-tabanli tek-tik izometrik arena uretici (gorsel). WorldVisualRoot tilemap'lerine biome zemin + noise-blend gecis + dekor + dekoratif yapi boyar; canli-sahne onizleme, tek-undo. Tile = Fantasy kingdom Tileset (duz Tile asset). Bkz. `ARENA_MAP_GENERATOR_ARCHITECTURE.md`.
+- **FantasyKingdomScenePainterWindow** -- Fantasy Kingdom `Example scene.unity` referansini
+  salt-okunur analiz eder; Roof component'lerinden yapi adayi bulur ve secilen bolgeyi cok-
+  katmanli `FantasyKingdomStructureStamp` assetine cikarir. Faz 2 stamp'i hedef Grid uzerinde
+  `DontSave` tilemap'leriyle tasinabilir dry-run olarak gosterir ve cakisma raporu uretir.
+  Faz 3 yalniz tool-owned FK katmanlarina strict preflight + tek Undo grubuyla Safe Apply yapar;
+  mevcut map/gameplay tile'larini silmez ve scene'i kaydetmez. Stamp purpose sol yerlesim ile
+  sag battlefield art'ini ayirir. Bkz. `FantasyKingdomPainter/FANTASY_KINGDOM_SCENE_PAINTER_ARCHITECTURE.md`.
+- **FantasyKingdomFullMapComposerWindow** -- data-driven `FantasyKingdomMapLayout`
+  ve `NewGameScene-VisualRebuild-v2` profiliyle 3 sol yapi + 8 sag kenar mikro-stamp'ini
+  birlikte gosterir. Sol kit korunmus tam keep, eksiksiz log cabin ve tas girisli eksiksiz
+  workshop'tur; sag merkez combat okunurlugu icin bos, dekor yalniz kuzey/guney/far-right
+  kenarlarindadir. `__FKFullMapPreviewRoot` salt-gecici preview'dur; preview acikken
+  `Structures`/`OverlayProps`/`Roof*` legacy renderer'lari gecici gizlenir ve clear, reload
+  veya Play Mode gecisinden once eski durumlarina getirilir.
+  Guncel v2 dry-run: 11/11 placement, 120 tile, 83 unique / 72 solid cell, 0 hard conflict,
+  8 warning, 20 straight-guide corridor-risk cell, 49 legacy-overlap cell, 0 camera/ref-
+  viewport disi cell ve 3/5 gameplay anchor; kalici tile 3116 -> 3116. Food/Iron anchor'lari
+  ertelendi. Duz marker->keep cizgisi konservatif rehberdir; tam binayi kesme gerekcesi
+  degildir, kalici apply oncesi route-based koridor cozumu gerekir. Full-layout apply,
+  `SetTile` veya scene save sunulmaz. Onceki kompakt 3+3 v1, geometrik raporu gecmesine
+  ragmen owner gorsel incelemesinde reddedildi ve guncel truth degildir.
+- **ArenaMapGeneratorWindow** -- eski `WorldVisualRoot/MobileArenaGrid` icin seed-tabanli
+  gorsel arena uretici; aktif full-map truth degildir. Bkz. `ARENA_MAP_GENERATOR_ARCHITECTURE.md`.
 - **MapImporterWindow / GroundTileMapperWindow / BuildingTileComposerWindow** -- harita/zemin/bina tile araclari (cogu LEGACY town tarafi).
 - **SpriteAtlasGenerator** -- 4 karakter animasyon PNG'sini tek atlasa birlestir.
 - **ProfilerDataAnalyzer** -- `.raw` profiler dosyasini A/B karsilastirmali rapora donustur.

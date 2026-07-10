@@ -271,6 +271,7 @@ namespace DeadWalls
             mobileAuthoring.CastleCenter = Vector2.zero;
             mobileAuthoring.SpawnRadius = 11f;
             mobileAuthoring.AttackRadius = 1.35f;
+            mobileAuthoring.SpawnLineX = 27f; // K4: max 2.4 aspect'te zombi dogumu ekran disinda.
             mobileAuthoring.BaseWaveEnemyCount = 30;
             mobileAuthoring.ExtraEnemiesPerWave = 10;
             mobileAuthoring.SpawnBatchSize = 2;

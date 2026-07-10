@@ -14,13 +14,20 @@
 
 `SingleFrontEnabled=true` (default) iken 360-ring TERK EDILIR; dusmanlar YALNIZ SAGDAN gelir:
 
-- **Spawn:** sag kenar seridi — x = `SpawnLineX`(13) + 0..2 jitter, y = +-`SpawnBandYHalf`(6.5)
+- **Spawn:** gizli sag serit — x = `SpawnLineX`(27) + 0..2 jitter, y =
+  +-`SpawnBandYHalf`(6.5). Sonuc `X 27..29`; Android max aspect 2.4, kamera sarsintisi
+  ve zombi quad yaricapi dahil ekran disindadir.
   (WaveSpawnSystem; batch/intensity/eskalasyon mantigi DEGISMEDI, yalniz dogum yeri degisti).
 - **Hareket:** hedef `(FrontlineX, kendi y)` — duz sola akis (ApplyMovementForceSystem).
 - **Saldiri gecisi:** `pos.x <= FrontlineX + AttackRadius` esiginde Attacking; duvar bariyeri
   yalniz x'i sabitler, y'de yigilma serbest (BoundarySystem). Domino kuyruk fizigi aynen calisir.
 - **Arena siniri:** x = [FrontlineX, SpawnLineX+4], y = +-(SpawnBandYHalf+2).
-- **Hendek (MoatSystem, YENI):** `MoatXMin..MoatXMax`(-4..-1.5) bandindaki Moving/Queued
+- **Gorsel giris bantlari:** battlefield `X 4..18`, far-right frame `X 18..27`, hidden
+  spawn ground `X 27..29`. Frame, zombinin dogumunu degil cepheye girisini gosterir.
+- **Tempo notu:** `SpawnLineX` 13 -> 27 degisimi base hiz 0.85'te ilk duvar temasini
+  yaklasik 16.5 saniye geciktirir. Bu degisiklikte hiz/intensity telafisi yapilmadi;
+  offscreen birikim ve ilk baski ayri Play Mode denge kontrolu ister.
+- **Hendek (MoatSystem):** `MoatXMin..MoatXMax`(1.5..4) bandindaki Moving/Queued
   zombilere yavaslatma — frost ile AYNI `ZombieSlow` kanali (en dusuk carpan kazanir, sure
   0.15s'lik tazeleme; mavi tint bedava gelir). `MoatDamagePerSecond > 0` ise gecis hasari
   (moat_flame tech'i acar); olum ZombieDeathSystem'de. Sira: ZombieSlowTimer -> Moat -> ApplyMovementForce.

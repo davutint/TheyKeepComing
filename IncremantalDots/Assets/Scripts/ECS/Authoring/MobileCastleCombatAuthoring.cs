@@ -22,8 +22,8 @@ namespace DeadWalls
         public bool SingleFrontEnabled = true;
         [Tooltip("Savunma hattinin (duvarin) x konumu; zombiler bu hatta yaslanip vurur. Owner'in duvar tilemap'i dunya x~0 kolonunda — durma noktasi duvarin sag yuzune gelecek sekilde ayarli.")]
         public float FrontlineX = -0.5f;
-        [Tooltip("Spawn seridinin x tabani (uzerine 0-2 birim ileri jitter eklenir).")]
-        public float SpawnLineX = 13f;
+        [Tooltip("Spawn seridinin x tabani (uzerine 0-2 birim ileri jitter eklenir). 27, desteklenen 2.4 aspect + kamera sarsintisinda dogumu ekran disinda tutar.")]
+        public float SpawnLineX = 27f;
         [Tooltip("Spawn seridinin dikey yarim-genisligi (y = -bu..+bu).")]
         public float SpawnBandYHalf = 6.5f;
 

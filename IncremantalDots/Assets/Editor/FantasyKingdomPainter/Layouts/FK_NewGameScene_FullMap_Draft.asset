@@ -1,0 +1,97 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da3be81fc3f679d4a906e852fbd2cebd, type: 3}
+  m_Name: FK_NewGameScene_FullMap_Draft
+  m_EditorClassIdentifier: DeadWalls::DeadWalls.FantasyKingdomMapLayout
+  schemaVersion: 1
+  targetScene: {fileID: 102900000, guid: 8abb5f6d2bd47fe458a507d96cb461a0, type: 3}
+  targetGridPath: Grid
+  profileId: NewGameScene-VisualRebuild-v2
+  seed: 1072026
+  placements:
+  - id: left.keep
+    label: Preserved Village Keep
+    enabled: 1
+    stamp: {fileID: 11400000, guid: fe71ba8add8b0c142a75c5ba40a03efb, type: 2}
+    targetAnchorCell: {x: 4, y: 15, z: 0}
+    zone: 0
+    gameplayAnchor: 1
+  - id: left.house
+    label: Complete Log Cabin
+    enabled: 1
+    stamp: {fileID: 11400000, guid: 647b0c42f3e945b48a24a859828b3568, type: 2}
+    targetAnchorCell: {x: -5, y: 5, z: 0}
+    zone: 0
+    gameplayAnchor: 2
+  - id: left.workshop
+    label: Stone Entry Workshop
+    enabled: 1
+    stamp: {fileID: 11400000, guid: 67996e08634c61643891cb53db505e0a, type: 2}
+    targetAnchorCell: {x: -16, y: -4, z: 0}
+    zone: 0
+    gameplayAnchor: 3
+  - id: right.north.low_ruin
+    label: Northern Low Ruin
+    enabled: 1
+    stamp: {fileID: 11400000, guid: 5e77c7d9db71a5047bb936f7baa75aca, type: 2}
+    targetAnchorCell: {x: 27, y: -3, z: 0}
+    zone: 1
+    gameplayAnchor: 0
+  - id: right.north.rubble_dense
+    label: Northern Dense Rubble
+    enabled: 1
+    stamp: {fileID: 11400000, guid: a498a8874fbe03744848209063f5d185, type: 2}
+    targetAnchorCell: {x: 26, y: -8, z: 0}
+    zone: 1
+    gameplayAnchor: 0
+  - id: right.south.broken_cart
+    label: Southern Broken Cart
+    enabled: 1
+    stamp: {fileID: 11400000, guid: 6c21a74da5f1b544fa3a697751c59646, type: 2}
+    targetAnchorCell: {x: 2, y: -26, z: 0}
+    zone: 1
+    gameplayAnchor: 0
+  - id: right.south.dry_branch
+    label: Southern Dry Branch
+    enabled: 1
+    stamp: {fileID: 11400000, guid: 4f72199105e52b5478ac0cef45857798, type: 2}
+    targetAnchorCell: {x: 6, y: -28, z: 0}
+    zone: 1
+    gameplayAnchor: 0
+  - id: right.edge.crater_north
+    label: Northern Edge Crater
+    enabled: 1
+    stamp: {fileID: 11400000, guid: e8551b8712c9a314883d6198a608958b, type: 2}
+    targetAnchorCell: {x: 20, y: -10, z: 0}
+    zone: 1
+    gameplayAnchor: 0
+  - id: right.edge.crater_south
+    label: Southern Edge Crater
+    enabled: 1
+    stamp: {fileID: 11400000, guid: a096669a1ccd5964b9492b227018ecec, type: 2}
+    targetAnchorCell: {x: 13, y: -19, z: 0}
+    zone: 1
+    gameplayAnchor: 0
+  - id: right.far.worn_scuff
+    label: Far Right Worn Scuff
+    enabled: 1
+    stamp: {fileID: 11400000, guid: cf06a086b3ba9be4b8a997ee3ad3ab9c, type: 2}
+    targetAnchorCell: {x: 28, y: -12, z: 0}
+    zone: 4
+    gameplayAnchor: 0
+  - id: right.far.rubble_light
+    label: Far Right Light Rubble
+    enabled: 1
+    stamp: {fileID: 11400000, guid: 1321139fa7b034245a88de702b148d34, type: 2}
+    targetAnchorCell: {x: 14, y: -30, z: 0}
+    zone: 4
+    gameplayAnchor: 0

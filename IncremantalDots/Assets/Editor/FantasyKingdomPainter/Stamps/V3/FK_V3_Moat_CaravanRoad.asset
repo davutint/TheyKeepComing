@@ -1,0 +1,368 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70ada4f2396a5304ab3719210b82a424, type: 3}
+  m_Name: FK_V3_Moat_CaravanRoad
+  m_EditorClassIdentifier: DeadWalls::DeadWalls.FantasyKingdomStructureStamp
+  sourceScenePath: Assets/Scenes/NewGameScene.unity
+  sourceGridPath: Grid
+  sourceRegionMin: {x: 0, y: 0}
+  sourceRegionSize: {x: 3, y: 7}
+  sourceCellLayout: 2
+  sourceCellSwizzle: 0
+  sourceCellSize: {x: 1, y: 0.5, z: 1}
+  sourceCellGap: {x: 0, y: 0, z: 0}
+  anchorLocalCell: {x: 0, y: 0, z: 0}
+  hasExplicitAnchor: 1
+  purpose: 3
+  layers:
+  - sourceHierarchyPath: Generated/V3/Ground V3 Caravan Road
+    sourceName: Ground V3 Caravan Road
+    sortingLayerName: Ground
+    sortingOrder: 3
+    rendererMode: 0
+    sortOrder: 3
+    tileAnchor: {x: 0.5, y: 0.5, z: 0}
+    layerColor: {r: 1, g: 1, b: 1, a: 1}
+    orientation: 0
+    orientationMatrix:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    cells:
+    - localPosition: {x: 0, y: 0, z: 0}
+      tile: {fileID: 11400000, guid: 2d0d699dda7fcc74ebf62c166bdaecbb, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 0
+    - localPosition: {x: 0, y: 1, z: 0}
+      tile: {fileID: 11400000, guid: 628b51fee0a78dc4696323c71f41864a, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 0
+    - localPosition: {x: 1, y: 1, z: 0}
+      tile: {fileID: 11400000, guid: 475dcaf4c01bfb24692318b908358b67, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 0
+    - localPosition: {x: 0, y: 2, z: 0}
+      tile: {fileID: 11400000, guid: 58e4f77d88d3f5c42a2941fbbba9b6ba, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 0
+    - localPosition: {x: 1, y: 2, z: 0}
+      tile: {fileID: 11400000, guid: 475dcaf4c01bfb24692318b908358b67, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 0
+    - localPosition: {x: 2, y: 2, z: 0}
+      tile: {fileID: 11400000, guid: 58e4f77d88d3f5c42a2941fbbba9b6ba, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 0
+    - localPosition: {x: 0, y: 3, z: 0}
+      tile: {fileID: 11400000, guid: 628b51fee0a78dc4696323c71f41864a, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 0
+    - localPosition: {x: 1, y: 3, z: 0}
+      tile: {fileID: 11400000, guid: 628b51fee0a78dc4696323c71f41864a, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 0
+    - localPosition: {x: 2, y: 3, z: 0}
+      tile: {fileID: 11400000, guid: 58e4f77d88d3f5c42a2941fbbba9b6ba, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 0
+    - localPosition: {x: 0, y: 4, z: 0}
+      tile: {fileID: 11400000, guid: 58e4f77d88d3f5c42a2941fbbba9b6ba, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 0
+    - localPosition: {x: 1, y: 4, z: 0}
+      tile: {fileID: 11400000, guid: 2d0d699dda7fcc74ebf62c166bdaecbb, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 0
+    - localPosition: {x: 2, y: 4, z: 0}
+      tile: {fileID: 11400000, guid: 475dcaf4c01bfb24692318b908358b67, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 0
+    - localPosition: {x: 1, y: 5, z: 0}
+      tile: {fileID: 11400000, guid: 628b51fee0a78dc4696323c71f41864a, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 0
+    - localPosition: {x: 2, y: 5, z: 0}
+      tile: {fileID: 11400000, guid: 58e4f77d88d3f5c42a2941fbbba9b6ba, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 0
+    - localPosition: {x: 2, y: 6, z: 0}
+      tile: {fileID: 11400000, guid: 628b51fee0a78dc4696323c71f41864a, type: 2}
+      transformMatrix:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: 0
+        e21: 0
+        e22: 1
+        e23: 0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      color: {r: 1, g: 1, b: 1, a: 1}
+      flags: 0

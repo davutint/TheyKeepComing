@@ -1,6 +1,6 @@
 # DEAD WALLS - MASTER PLAN (yasayan pusula dokumani)
 
-> STATUS: v0.2 (2026-07-06) — K1/K2/K3 temel kararlari OWNER TARAFINDAN KILITLENDI.
+> STATUS: v0.3 (2026-07-10) — K1/K2/K3/K4 temel kararlari OWNER TARAFINDAN KILITLENDI.
 > Kalan [KARAR BEKLIYOR] maddeleri ilgili milestone baslarken karara baglanacak.
 > Bu dokuman oyunun YON ve KAPSAM otoritesidir: "oyun ne olacak, ne kaldi, ne yapilmayacak"
 > sorularinin TEK cevabi buradadir. Sistemlerin nasil calistigi icin GDD + *_ARCHITECTURE.md'lere bak.
@@ -19,8 +19,16 @@
 | K3 | Platform? | **MOBIL-FIRST, PC KAPISI ACIK** — ana hedef telefon; PC/Steam ileride ayri karar (kod iki girisi destekliyor) |
 | K4 | Savas duzeni? | **TEK CEPHE (SAGDAN SALDIRI)** — 360-ring TERK EDILDI. Dusmanlar yalniz sagdan gelir; solda us/ekonomi, ortada savunma hatti. Hat yapisi: DUVAR + HENDEK + KULELER. Ordu modeli: OKCU-DUVAR korunur (melee ordu YOK). Duvar temasi: vurur + domino kuyruk (mevcut fizik). GORSEL IS BOLUMU: koy/us ve duvar tilemap'lerini OWNER olusturur; gameplay baglari (spawn seridi, hat konumu, kule slotu = dolu tilemap hucresi okuma) Claude yapar. **GORSEL KATMAN TAMAM (2026-07-07):** komple harita MCP tile pipeline ile boyandi — koy (kale W6x5 + tarla + tas ocagi + demir madeni + kereste kampi + meydan/patikalar), duvar (owner'in el tasarimi git'ten geri insa + tek panelli kapi), hendek, kuru savas alani + toprak yol, spawn seridi, ust kenar orman bandi. Kontratlar: `outside` = 40 okcu slotu (x=0), `VillageMarkers` 5 tam isimli marker. Setup tool boyamayi korur (fallback arena kapili). Play testi GECTI (okcular duvarda, zombi spawn calisiyor). Detay: `STRUCTURE_SPRITE_BAKER_CAPABILITIES.md`. |
 
+> **K4 GORSEL REVIZYON KARARI (owner, 2026-07-10):** 2026-07-07 haritasi gameplay
+> kontratlarini kanitladi ama final art DEGIL. Fantasy Kingdom Painter guvenli apply pipeline'i
+> tamamlandiktan sonra TUM HARITA tek kompozisyon olarak bastan boyanacak. Sol taraf kompakt
+> keep + en fazla iki kucuk yapi + Wood/Stone/Iron/Food kimlikleri; sag taraf ise bos arena
+> degil, okunabilir ama zengin savas cephesi olacak. `outside*`, 5 `VillageMarkers`, frontline
+> -0.5 ve moat X 1.5..4 degismeyecek. Spawn 2026-07-10 owner karariyla gizli X 27..29
+> bandina tasindi; far-right frame X 18..27 zombinin hiclikten dogumunu perdeleyecek.
+
 > Bu kararlar geri acilmaz (yeni buyuk bilgi cikmadikca). Tum milestone ve kriterler
-> bu kararlara gore okunur. K4 implementasyonu M-0 milestone'udur (kod su an hala 360-ring).
+> bu kararlara gore okunur. K4 mekanigi M-0'da tamamlandi; acik is final gorsel revizyondur.
 
 ---
 
@@ -214,22 +222,48 @@ Ara hedef olarak "oynanabilir demo" = C1-C10 (store maddeleri haric).
 - 2026-07-06: M-0 tasarim kararlari — HENDEK: upgrade ile evrilen (cukur/yavaslatma ->
   tech ile lav-diken/hasar); KAMERA: sabit tek ekran (pan/zoom yok); KAPSAM DISI listesi
   (9 madde) owner tarafindan onaylanip kilitlendi
+- 2026-07-10: K4 tam-harita gorsel revizyonu onaylandi. Hedef: kompakt kaynak-okunur sol
+  yerlesim + detayli fakat combat okunurlugunu koruyan sag savas cephesi; gameplay kontratlari
+  sabit. Fantasy Kingdom Painter strict preview/Safe Apply bu revizyonun editor pipeline'idir.
+- 2026-07-10: Kompakt 3-sol + 3-sag `NewGameScene-VisualRebuild-v1` dry-run'i teknik
+  geometri kontrollerini gecti ancak owner gorsel incelemesinde reddedildi: sol house/workshop
+  crop'lari eksik ve cati-agirlikliydi, sagdaki buyuk stamp'ler combat ekraninin merkezini
+  anlamsiz bicimde dolduruyordu. V1 kalici boyanmadi, kaydedilmedi ve basari durumu degildir.
+- 2026-07-10: `NewGameScene-VisualRebuild-v2` dry-run'i korunmus tam keep + eksiksiz log
+  cabin + tas girisli eksiksiz workshop ile, sagda yalniz kenarlara dagitilan sekiz mikro-
+  stamp kullanir; merkez combat alani bostur. Rapor: 11/11 placement, 120 tile, 83 unique /
+  72 solid cell, 0 hard conflict, 8 warning, 20 straight-guide corridor-risk cell,
+  49 legacy-overlap cell, 0 camera/ref-viewport disi cell ve 3/5 gameplay anchor. Food/Iron
+  ertelendi; kalici tile sayisi 3116 -> 3116 kaldi. Preview legacy
+  `Structures`/`OverlayProps`/`Roof*` renderer'larini gecici gizler ve clear/reload/Play Mode
+  gecisinden once geri yukler; bu faz `NewGameScene`e kalici `SetTile` veya `SaveScene` yapmaz.
+- 2026-07-10: Zombi dogumu tum desteklenen ekran oranlarinda gorunmesin diye runtime
+  `SpawnLineX` 13 -> 27 tasindi. Yeni bantlar: battlefield X 4..18, far-right frame X 18..27,
+  hidden spawn X 27..29 / Y +-6.5. Android max aspect 2.4 hesaba katildi. Base hizda
+  yaklasik +16.5s yaklasma suresi nedeniyle baski temposu yeniden olculmeli.
 
-## 7. GUNCEL DURUM OZETI (son guncelleme: 2026-07-06)
+## 7. GUNCEL DURUM OZETI (son guncelleme: 2026-07-10)
 
 - Cekirdek dongu calisiyor ve "iyi hissettiriyor" (owner, DAY 1-3 araligi).
 - K1/K2/K3/K4 KILITLENDI: Play Store urunu / Roguelite meta / Mobil-first / Tek cephe (sagdan).
 - **M-0 MEKANIGI TAMAM (2026-07-06):** sag-serit spawn, duvar hatti, hendek (yavaslatma +
   moat_flame yakma evrimi, tech zinciri wall_reinforcement -> moat_dig -> moat_flame), okcu
   kolon-fallback'i, sabit kamera — hepsi play-mode dogrulandi (kuyruk olusumu, duvar hasari,
-  hendek 14/14 slow + HP erimesi, GameOver). GERIYE KALAN (owner): eski kale siluetinin
-  kaldirilip koy/duvar/kule/hendek tilemap'lerinin boyanmasi; Claude hazir olunca baglar
-  (okcu yerlesimi otomatik tilemap-oncelikli olur).
+  hendek 14/14 slow + HP erimesi, GameOver). GERIYE KALAN: kanitlanmis gameplay
+  kontratlarini koruyarak final tam-harita gorsel revizyonunu tamamlamak.
 - Bilinen acik teknik borc: TechTreeUI'de IsMobileMode guard'i (dalgalanma riski, dusuk oncelik);
   gercek cihaz hic test edilmedi; save yok.
 - **M-0 KAPANDI (2026-07-07):** gorsel katman + VillageMarkers -> villager rotalari
   setup-tool koprusuyle baglandi; play'de 56 villager koy yapilarina yuruyor,
   okcular duvarda, tam akis dogrulandi (screenshot'li).
+- **K4 GORSEL REVIZYON V2 DRY-RUN HAZIR (2026-07-10):** V1 gorsel incelemede reddedildi.
+  Guncel `NewGameScene-VisualRebuild-v2`, korunmus tam keep + iki eksiksiz sol yapi ve sag
+  kenarlarda sekiz mikro-stamp kullanir; ekran merkezi combat icin bos tutulur. Aggregate
+  rapor 11/11, 120 tile, 83 unique / 72 solid, hard 0, warning 8, straight-guide corridor
+  riski 20 cell, legacy overlap 49 cell, camera/ref disi 0 ve anchor 3/5'tir. Food/Iron
+  sonraya ertelendi. Duz marker->keep rehberi tam binalari kirpmak icin gerekce degildir;
+  kalici yeniden boyama oncesinde route-based koridor cozumu ve ayri apply yetkilendirmesi
+  gerekir. Persistent tile sayisi 3116 -> 3116; henuz kalici boyama veya scene save yoktur.
 - **M-A OLCUM TAMAM (2026-07-07):** 10 kosu (Logs/LongRun/*.csv). ANA BULGU — "cift
   kambur": kosularin ~%90'i DAY 2-3'te oluyor (duvar 200 HP tek gecede gidiyor; repair
   stone'a bagli ve erken oyunda stone yetmiyor), DAY 4'u atlatan tek kosu ise DAY 20'ye
