@@ -50,12 +50,16 @@ namespace DeadWalls
 
         private const string StagingRootName = "__FK_V3_Map_Staging";
         private const string TargetScenePath = "Assets/Scenes/NewGameScene.unity";
-        private const string ApprovedProfileId = "NewGameScene-ApprovedVisualRebuild-v3";
-        private const int ExpectedPlacementCount = 19;
-        private const int ExpectedTileCount = 2488;
-        private const int ExpectedUniqueCellCount = 1928;
-        private const int ExpectedSolidCellCount = 405;
-        private const int ExpectedPersistentTileCount = 5157;
+        private const string ApprovedProfileId = "NewGameScene-VisualRetouch-Candidate-v3.1";
+        private const int ExpectedPlacementCount = 16;
+        private const int ExpectedTileCount = 2721;
+        private const int ExpectedUniqueCellCount = 2148;
+        private const int ExpectedSolidCellCount = 448;
+        private const int ExpectedPersistentTileCount = 5390;
+        private const string PreviousApprovedProfileId = "NewGameScene-ApprovedVisualRebuild-v3";
+        private const int PreviousExpectedPlacementCount = 19;
+        private const int PreviousExpectedTileCount = 2488;
+        private const int PreviousExpectedPersistentTileCount = 5157;
         private const string ApprovedProtectedFingerprint =
             "1D82353DF4CACF23FD5D1657C6358DA7E0671B2C09B62556394999350E9E098E";
         private const string ApprovedMarkerFingerprint =
@@ -104,7 +108,7 @@ namespace DeadWalls
             {
                 FantasyKingdomV3ApplyReport report = ApplyApprovedV3();
                 Debug.Log("FK V3 APPLY OK — " + report.BuildSummary(),
-                    FantasyKingdomMapLayoutFactory.LoadDefault());
+                    FantasyKingdomMapLayoutFactory.LoadApproved());
             }
             catch (Exception exception)
             {
@@ -118,8 +122,14 @@ namespace DeadWalls
         {
             Scene scene = SceneManager.GetActiveScene();
             Grid grid = FantasyKingdomStampPreviewService.FindDefaultTargetGrid(scene);
-            FantasyKingdomMapLayout layout = FantasyKingdomMapLayoutFactory.LoadDefault();
-            PersistentValidation validation = ValidatePersistentState(grid, layout, null, false);
+            FantasyKingdomMapLayout layout = FantasyKingdomMapLayoutFactory.LoadApproved();
+            ValidateLayoutIdentity(layout, grid);
+            PersistentValidation validation = ValidatePersistentState(
+                grid,
+                layout,
+                null,
+                false,
+                ExpectedPersistentTileCount);
             Debug.Log(validation.BuildSummary(), layout);
         }
 
@@ -144,13 +154,14 @@ namespace DeadWalls
                 throw new InvalidOperationException("NewGameScene kok Grid bulunamadi.");
             EnsureNoTransientRoots(scene, grid);
 
-            FantasyKingdomMapLayout layout = FantasyKingdomMapLayoutFactory.LoadDefault();
+            FantasyKingdomMapLayout layout = FantasyKingdomMapLayoutFactory.LoadApproved();
             ValidateLayoutIdentity(layout, grid);
 
             Transform existingManagedRoot = grid.transform.Find(ManagedRootName);
             bool originallyHadManagedRoot = existingManagedRoot != null;
+            FantasyKingdomMapLayout existingManagedLayout = null;
             if (existingManagedRoot != null)
-                ValidateManagedRoot(existingManagedRoot, layout, false);
+                existingManagedLayout = ResolveKnownManagedLayout(existingManagedRoot, grid, layout);
             ValidateLegacyBaseline(grid, originallyHadManagedRoot);
 
             SceneContractSnapshot baseline = CaptureSceneContract(scene, grid);
@@ -180,7 +191,12 @@ namespace DeadWalls
                 EditorSceneManager.MarkSceneDirty(scene);
 
                 PersistentValidation validation =
-                    ValidatePersistentState(grid, layout, baseline, true);
+                    ValidatePersistentState(
+                        grid,
+                        layout,
+                        baseline,
+                        true,
+                        ExpectedPersistentTileCount);
                 if (!scene.isDirty)
                     throw new InvalidOperationException("V3 apply sonrasi sahne dirty olmadi.");
 
@@ -220,7 +236,7 @@ namespace DeadWalls
                     ValidateRollbackState(
                         scene,
                         grid,
-                        layout,
+                        existingManagedLayout,
                         baseline,
                         originallyHadManagedRoot);
                 }
@@ -237,21 +253,89 @@ namespace DeadWalls
 
         internal static void ValidatePersistentV3ForBuilder(Grid grid)
         {
-            FantasyKingdomMapLayout layout = FantasyKingdomMapLayoutFactory.LoadDefault();
-            ValidateLayoutIdentity(layout, grid);
-            ValidatePersistentState(grid, layout, null, false);
+            Transform managedRoot = grid != null ? grid.transform.Find(ManagedRootName) : null;
+            if (managedRoot == null)
+                throw new InvalidOperationException("Grid/FK_V3_Map bulunamadi.");
+
+            FantasyKingdomMapLayout approvedLayout = FantasyKingdomMapLayoutFactory.LoadApproved();
+            FantasyKingdomMapLayout layout = ResolveKnownManagedLayout(managedRoot, grid, approvedLayout);
+            int expectedPersistentTileCount = ReferenceEquals(layout, approvedLayout)
+                ? ExpectedPersistentTileCount
+                : PreviousExpectedPersistentTileCount;
+            ValidatePersistentState(
+                grid,
+                layout,
+                null,
+                false,
+                expectedPersistentTileCount);
+        }
+
+        private static FantasyKingdomMapLayout ResolveKnownManagedLayout(
+            Transform managedRoot,
+            Grid grid,
+            FantasyKingdomMapLayout approvedLayout)
+        {
+            Exception approvedException;
+            try
+            {
+                ValidateLayoutIdentity(approvedLayout, grid);
+                ValidateManagedRoot(managedRoot, approvedLayout, true);
+                return approvedLayout;
+            }
+            catch (Exception exception)
+            {
+                approvedException = exception;
+            }
+
+            FantasyKingdomMapLayout previousLayout =
+                FantasyKingdomMapLayoutFactory.LoadPreviousApproved();
+            try
+            {
+                ValidateLayoutContract(
+                    previousLayout,
+                    grid,
+                    PreviousApprovedProfileId,
+                    PreviousExpectedPlacementCount,
+                    PreviousExpectedTileCount);
+                ValidateManagedRoot(managedRoot, previousLayout, true);
+                return previousLayout;
+            }
+            catch (Exception previousException)
+            {
+                throw new AggregateException(
+                    "FK_V3_Map ne onayli v3.1 ne de onceki v3 kontratiyla eslesiyor.",
+                    approvedException,
+                    previousException);
+            }
         }
 
         private static void ValidateLayoutIdentity(FantasyKingdomMapLayout layout, Grid grid)
         {
+            ValidateLayoutContract(
+                layout,
+                grid,
+                ApprovedProfileId,
+                ExpectedPlacementCount,
+                ExpectedTileCount);
+        }
+
+        private static void ValidateLayoutContract(
+            FantasyKingdomMapLayout layout,
+            Grid grid,
+            string expectedProfileId,
+            int expectedPlacementCount,
+            int expectedTileCount)
+        {
             if (layout == null)
-                throw new InvalidOperationException("Default V3 layout asset'i bulunamadi.");
+                throw new InvalidOperationException("V3 layout asset'i bulunamadi.");
+            if (grid == null)
+                throw new InvalidOperationException("V3 layout target Grid bulunamadi.");
             if (layout.SchemaVersion != FantasyKingdomMapLayout.CurrentSchemaVersion ||
-                !string.Equals(layout.ProfileId, ApprovedProfileId, StringComparison.Ordinal))
+                !string.Equals(layout.ProfileId, expectedProfileId, StringComparison.Ordinal))
             {
                 throw new InvalidOperationException(
-                    "Yalniz onayli V3 schema/profile uygulanabilir. Schema=" + layout.SchemaVersion +
-                    " Profile=" + layout.ProfileId);
+                    "V3 schema/profile kontrati bozuk. Schema=" + layout.SchemaVersion +
+                    " Profile=" + layout.ProfileId + " Beklenen=" + expectedProfileId);
             }
             if (!string.Equals(
                     NormalizePath(layout.TargetScenePath),
@@ -261,14 +345,19 @@ namespace DeadWalls
             {
                 throw new InvalidOperationException("V3 layout target scene/Grid kontrati bozuk.");
             }
-            if (layout.Placements.Count != ExpectedPlacementCount ||
+            if (layout.Placements.Count != expectedPlacementCount ||
                 layout.Placements.Any(placement => placement == null || !placement.Enabled))
             {
                 throw new InvalidOperationException(
-                    "V3 placement kontrati bozuk. Beklenen enabled=" + ExpectedPlacementCount);
+                    "V3 placement kontrati bozuk. Beklenen enabled=" + expectedPlacementCount);
             }
-            if (layout.Placements.Sum(placement => placement.Stamp.TotalTileCount) != ExpectedTileCount)
-                throw new InvalidOperationException("V3 stamp tile toplami onayli 2488 degerinden sapmis.");
+            int actualTileCount = layout.Placements.Sum(placement => placement.Stamp.TotalTileCount);
+            if (actualTileCount != expectedTileCount)
+            {
+                throw new InvalidOperationException(
+                    "V3 stamp tile toplami sapmis. Beklenen=" + expectedTileCount +
+                    " Mevcut=" + actualTileCount);
+            }
             if (grid.transform.Find(StagingRootName) != null)
                 throw new InvalidOperationException("Onceki apply'dan staging root kalmis.");
         }
@@ -295,8 +384,8 @@ namespace DeadWalls
                            report.LivingForestTreeCount != 32 ||
                            report.EnemyForestBackTreeCount != 140 ||
                            report.EnemyForestFrontTreeCount != 60 ||
-                           report.EnemyFrontCoveredYBandCount != 14 ||
-                           report.CaravanRoadCellCount != 84 ||
+                           report.EnemyFrontCoveredYBandCount != 13 ||
+                           report.CaravanRoadCellCount != 43 ||
                            report.CaravanRoadComponentCount != 1 ||
                            report.OpenBattlefieldSolidCellCount != 0;
             if (invalid)
@@ -498,7 +587,8 @@ namespace DeadWalls
             Grid grid,
             FantasyKingdomMapLayout layout,
             SceneContractSnapshot baseline,
-            bool requireDirty)
+            bool requireDirty,
+            int expectedPersistentTileCount)
         {
             if (grid == null || layout == null)
                 throw new InvalidOperationException("Persistent V3 validation target'i eksik.");
@@ -516,10 +606,10 @@ namespace DeadWalls
                 throw new InvalidOperationException("Persistent V3 sonrasinda legacy visual tile kaldi: " + legacyTiles);
 
             validation.PersistentTileCount = grid.GetComponentsInChildren<Tilemap>(true).Sum(CountTiles);
-            if (validation.PersistentTileCount != ExpectedPersistentTileCount)
+            if (validation.PersistentTileCount != expectedPersistentTileCount)
             {
                 throw new InvalidOperationException(
-                    "Persistent scene tile toplami sapmis. Beklenen=" + ExpectedPersistentTileCount +
+                    "Persistent scene tile toplami sapmis. Beklenen=" + expectedPersistentTileCount +
                     " Mevcut=" + validation.PersistentTileCount);
             }
             ValidateMarkerContract(grid.gameObject.scene);
@@ -644,9 +734,12 @@ namespace DeadWalls
                 throw new InvalidOperationException("Managed V3 altinda TilemapCollider2D olmamali.");
 
             int tileCount = maps.Sum(CountTiles);
-            if (tileCount != ExpectedTileCount)
+            int expectedTileCount = layout.Placements.Sum(
+                placement => placement.Stamp.TotalTileCount);
+            if (tileCount != expectedTileCount)
                 throw new InvalidOperationException(
-                    "Managed V3 tile sayisi sapmis. Beklenen=" + ExpectedTileCount + " Mevcut=" + tileCount);
+                    "Managed V3 tile sayisi sapmis. Beklenen=" + expectedTileCount +
+                    " Mevcut=" + tileCount);
 
             for (int bandIndex = 0; bandIndex < bandNames.Length; bandIndex++)
             {

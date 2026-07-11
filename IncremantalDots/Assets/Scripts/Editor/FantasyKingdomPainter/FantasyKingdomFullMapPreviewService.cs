@@ -255,6 +255,30 @@ namespace DeadWalls
             }
         }
 
+        [MenuItem("Window/DeadWalls/Fantasy Kingdom/Create V3 Retouch Preview")]
+        private static void CreateV3RetouchPreviewFromMenu()
+        {
+            Scene scene = SceneManager.GetActiveScene();
+            Grid grid = FantasyKingdomStampPreviewService.FindDefaultTargetGrid(scene);
+            FantasyKingdomMapLayout layout = FantasyKingdomMapLayoutFactory.LoadRetouchCandidate();
+            if (layout == null)
+            {
+                throw new InvalidOperationException(
+                    "V3 retouch preview layout bulunamadi. Once Rebuild V3 Retouch Preview Assets calistirilmalidir.");
+            }
+
+            FantasyKingdomFullMapPreviewReport report = CreateOrUpdatePreview(layout, grid);
+            Debug.Log(report.BuildSummary().Replace('\n', ' '), layout);
+            for (int issueIndex = 0; issueIndex < report.Issues.Count; issueIndex++)
+            {
+                FantasyKingdomFullMapIssue issue = report.Issues[issueIndex];
+                if (issue.Severity == FantasyKingdomFullMapIssueSeverity.Error)
+                    Debug.LogError("FK V3 RETOUCH " + issue, layout);
+                else
+                    Debug.LogWarning("FK V3 RETOUCH " + issue, layout);
+            }
+        }
+
         [MenuItem("Window/DeadWalls/Fantasy Kingdom/Clear Full Map Preview")]
         private static void ClearDefaultPreviewFromMenu()
         {
@@ -941,6 +965,8 @@ namespace DeadWalls
             FantasyKingdomFullMapPreviewReport report)
         {
             PlacementRuntime livingForest = FindRuntime(runtimes, "left.wood.living_forest");
+            PlacementRuntime castle = FindRuntime(runtimes, "left.castle.citadel");
+            PlacementRuntime enemyShadow = FindRuntime(runtimes, "enemy_forest.shadow");
             PlacementRuntime enemyBack = FindRuntime(runtimes, "enemy_forest.back");
             PlacementRuntime enemyFront = FindRuntime(runtimes, "enemy_forest.front");
 
@@ -954,6 +980,44 @@ namespace DeadWalls
                 report.AddError("enemy_forest.back", "Dusman ormani back mass en az 120 agac tasimalidir.");
             if (report.EnemyForestFrontTreeCount < 40)
                 report.AddError("enemy_forest.front", "Front occluder en az 40 agac tasimalidir.");
+
+            bool isRetouchCandidate = castle != null &&
+                                      castle.Placement.Stamp != null &&
+                                      castle.Placement.Stamp.name.EndsWith(
+                                          "_RetouchPreview",
+                                          StringComparison.Ordinal);
+            if (isRetouchCandidate)
+            {
+                ValidateRetouchCastleRoofCaps(castle, report);
+
+                int castleForestOverlap = castle.SolidCells.Count(
+                    cell => livingForest != null && livingForest.SolidCells.Contains(cell));
+                if (castleForestOverlap > 0)
+                {
+                    report.AddError(
+                        "left.wood.living_forest",
+                        "Retouch candidate kale ile " + castleForestOverlap +
+                        " ayni solid hucreyi paylasiyor; beklenen 0.");
+                }
+
+                int leaflessFrontTrees = CountStampTilesByPrefix(enemyFront, "Tree E1") +
+                                         CountStampTilesByPrefix(enemyFront, "Tree E3");
+                if (leaflessFrontTrees > 0)
+                {
+                    report.AddError(
+                        "enemy_forest.front",
+                        "Retouch front occluder yapraksiz Tree E1/E3 tasiyor: " +
+                        leaflessFrontTrees);
+                }
+
+                int treeShadows = CountStampTilesByPrefix(enemyShadow, "Tree");
+                if (treeShadows > 0)
+                {
+                    report.AddError(
+                        "enemy_forest.shadow",
+                        "Retouch shadow katmaninda siyah tree kopyasi var: " + treeShadows);
+                }
+            }
 
             var coveredBands = new HashSet<int>();
             if (enemyFront != null)
@@ -977,6 +1041,7 @@ namespace DeadWalls
             }
 
             var roadCells = new HashSet<Vector3Int>();
+            int roadStraightRutCellCount = 0;
             for (int runtimeIndex = 0; runtimeIndex < runtimes.Count; runtimeIndex++)
             {
                 PlacementRuntime runtime = runtimes[runtimeIndex];
@@ -995,21 +1060,50 @@ namespace DeadWalls
                             continue;
                         }
                         Vector3Int targetCell = runtime.Origin + cell.LocalPosition;
-                        if (targetGrid.GetCellCenterWorld(targetCell).x >= 4f)
-                            roadCells.Add(targetCell);
+                        float minimumRoadWorldX = isRetouchCandidate ? -0.5f : 4f;
+                        if (targetGrid.GetCellCenterWorld(targetCell).x < minimumRoadWorldX ||
+                            !roadCells.Add(targetCell))
+                        {
+                            continue;
+                        }
+
+                        if (cell.Tile.name.StartsWith(
+                                     "Ground I1_",
+                                     StringComparison.OrdinalIgnoreCase))
+                        {
+                            roadStraightRutCellCount++;
+                        }
                     }
                 }
             }
             report.CaravanRoadCellCount = roadCells.Count;
             report.CaravanRoadComponentCount = CountConnectedComponents4(roadCells);
-            if (roadCells.Count < 70)
-                report.AddError("battlefield.calm_ground", "Kervan yolu en az 70 bagli hucresel iz tasimalidir.");
+            int minimumRoadCellCount = isRetouchCandidate ? 40 : 70;
+            if (roadCells.Count < minimumRoadCellCount)
+            {
+                report.AddError(
+                    "battlefield.calm_ground",
+                    "Kervan yolu en az " + minimumRoadCellCount +
+                    " bagli hucresel iz tasimalidir.");
+            }
             if (report.CaravanRoadComponentCount != 1)
             {
                 report.AddError(
                     "battlefield.calm_ground",
                     "Kervan yolu tek bagli component olmalidir. Mevcut=" +
                     report.CaravanRoadComponentCount);
+            }
+            if (isRetouchCandidate && roadCells.Count > 0)
+            {
+                int straightRutPercent = Mathf.RoundToInt(
+                    roadStraightRutCellCount * 100f / roadCells.Count);
+                if (straightRutPercent < 65 || straightRutPercent > 95)
+                {
+                    report.AddError(
+                        "battlefield.calm_ground",
+                        "Retouch tek-iz yolunda Ground I1 orani referans dilinden sapti: %" +
+                        straightRutPercent + " (beklenen %65..%95)." );
+                }
             }
 
             var centerSolidCells = new HashSet<Vector3Int>();
@@ -1065,6 +1159,95 @@ namespace DeadWalls
                 }
             }
             return count;
+        }
+
+        private static void ValidateRetouchCastleRoofCaps(
+            PlacementRuntime castle,
+            FantasyKingdomFullMapPreviewReport report)
+        {
+            var roofCells = new HashSet<Vector3Int>();
+            bool touchesExtractionEdge = false;
+            Vector2Int sourceSize = castle.Placement.Stamp.SourceRegionSize;
+            IReadOnlyList<FantasyKingdomStampLayer> layers = castle.Placement.Stamp.Layers;
+            for (int layerIndex = 0; layerIndex < layers.Count; layerIndex++)
+            {
+                FantasyKingdomStampLayer layer = layers[layerIndex];
+                if (!string.Equals(layer.SourceName, "Roof1", StringComparison.OrdinalIgnoreCase) &&
+                    !string.Equals(layer.SourceName, "Roof2", StringComparison.OrdinalIgnoreCase) &&
+                    !string.Equals(layer.SourceName, "Roof3", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                IReadOnlyList<FantasyKingdomStampCell> cells = layer.Cells;
+                for (int cellIndex = 0; cellIndex < cells.Count; cellIndex++)
+                {
+                    Vector3Int local = cells[cellIndex].LocalPosition;
+                    roofCells.Add(castle.Origin + local);
+                    if (local.x <= 0 || local.y <= 0 ||
+                        local.x >= sourceSize.x - 1 || local.y >= sourceSize.y - 1)
+                    {
+                        touchesExtractionEdge = true;
+                    }
+                }
+            }
+
+            if (touchesExtractionEdge)
+            {
+                report.AddError(
+                    "left.castle.citadel",
+                    "Retouch kale roof hucreleri extraction sinirina degiyor; crop riski devam ediyor.");
+            }
+
+            Vector3Int[] lowerRightTowerCap =
+            {
+                new Vector3Int(8, 13, 0), new Vector3Int(9, 13, 0),
+                new Vector3Int(8, 14, 0), new Vector3Int(9, 14, 0),
+                new Vector3Int(8, 15, 0), new Vector3Int(9, 15, 0),
+                new Vector3Int(10, 15, 0), new Vector3Int(11, 15, 0),
+                new Vector3Int(10, 16, 0), new Vector3Int(10, 17, 0)
+            };
+            Vector3Int[] upperRightTowerCap =
+            {
+                new Vector3Int(8, 23, 0), new Vector3Int(9, 23, 0),
+                new Vector3Int(8, 24, 0), new Vector3Int(9, 24, 0),
+                new Vector3Int(8, 25, 0), new Vector3Int(9, 25, 0),
+                new Vector3Int(10, 25, 0), new Vector3Int(11, 25, 0),
+                new Vector3Int(10, 26, 0), new Vector3Int(10, 27, 0)
+            };
+
+            ValidateTowerCapCells(
+                roofCells,
+                lowerRightTowerCap,
+                "alt sag kule",
+                report);
+            ValidateTowerCapCells(
+                roofCells,
+                upperRightTowerCap,
+                "ust sag kule",
+                report);
+        }
+
+        private static void ValidateTowerCapCells(
+            HashSet<Vector3Int> roofCells,
+            Vector3Int[] requiredCells,
+            string towerLabel,
+            FantasyKingdomFullMapPreviewReport report)
+        {
+            var missing = new List<Vector3Int>();
+            for (int index = 0; index < requiredCells.Length; index++)
+            {
+                if (!roofCells.Contains(requiredCells[index]))
+                    missing.Add(requiredCells[index]);
+            }
+            if (missing.Count == 0)
+                return;
+
+            report.AddError(
+                "left.castle.citadel",
+                "Retouch " + towerLabel + " roof-cap eksik: " + missing.Count +
+                "/" + requiredCells.Length + " hucre bulunamadi (" +
+                string.Join(", ", missing.Select(cell => cell.ToString()).ToArray()) + ").");
         }
 
         private static int CountConnectedComponents4(HashSet<Vector3Int> cells)
@@ -1256,6 +1439,7 @@ namespace DeadWalls
                            purpose == FantasyKingdomStampPurpose.GroundDetail;
                 case FantasyKingdomMapZone.MoatGround:
                 case FantasyKingdomMapZone.SpawnGround:
+                case FantasyKingdomMapZone.FullMapGround:
                     return purpose == FantasyKingdomStampPurpose.GroundDetail;
                 default:
                     return false;
@@ -1283,6 +1467,11 @@ namespace DeadWalls
                     return !solid && world.x >= SpawnMinX - 0.001f &&
                            world.x <= SpawnMaxX + 0.001f &&
                            Mathf.Abs(world.y) <= SpawnMaxAbsY + 0.001f;
+                case FantasyKingdomMapZone.FullMapGround:
+                    return !solid && world.x >= -0.501f &&
+                           world.x <= FarRightFrameMaxX + 0.001f &&
+                           world.y >= CameraMinY - 0.5f &&
+                           world.y <= CameraMaxY + 0.5f;
                 default:
                     return false;
             }
@@ -1299,6 +1488,8 @@ namespace DeadWalls
             }
 
             if (zone == FantasyKingdomMapZone.FarRightFrame)
+                return world.x <= FarRightFrameMaxX + 0.001f;
+            if (zone == FantasyKingdomMapZone.FullMapGround)
                 return world.x <= FarRightFrameMaxX + 0.001f;
             if (zone == FantasyKingdomMapZone.SpawnGround)
                 return world.x >= SpawnMinX - 0.001f &&

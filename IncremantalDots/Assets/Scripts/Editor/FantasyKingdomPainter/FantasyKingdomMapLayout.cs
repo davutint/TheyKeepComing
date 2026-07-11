@@ -12,7 +12,8 @@ namespace DeadWalls
         Battlefield = 1,
         MoatGround = 2,
         SpawnGround = 3,
-        FarRightFrame = 4
+        FarRightFrame = 4,
+        FullMapGround = 5
     }
 
     public enum FantasyKingdomGameplayAnchor
@@ -127,6 +128,8 @@ namespace DeadWalls
             "Assets/Editor/FantasyKingdomPainter/Layouts/FK_NewGameScene_FullMap_Draft.asset";
         public const string DefaultLayoutPath =
             "Assets/Editor/FantasyKingdomPainter/Layouts/FK_NewGameScene_FullMap_V3_Draft.asset";
+        public const string RetouchCandidateLayoutPath =
+            "Assets/Editor/FantasyKingdomPainter/Layouts/FK_NewGameScene_FullMap_V3_RetouchPreview.asset";
 
         private const string TargetScenePath = "Assets/Scenes/NewGameScene.unity";
         private const string StampFolder = "Assets/Editor/FantasyKingdomPainter/Stamps/";
@@ -134,6 +137,21 @@ namespace DeadWalls
         public static FantasyKingdomMapLayout LoadDefault()
         {
             return AssetDatabase.LoadAssetAtPath<FantasyKingdomMapLayout>(DefaultLayoutPath);
+        }
+
+        public static FantasyKingdomMapLayout LoadRetouchCandidate()
+        {
+            return AssetDatabase.LoadAssetAtPath<FantasyKingdomMapLayout>(RetouchCandidateLayoutPath);
+        }
+
+        public static FantasyKingdomMapLayout LoadApproved()
+        {
+            return LoadRetouchCandidate();
+        }
+
+        public static FantasyKingdomMapLayout LoadPreviousApproved()
+        {
+            return LoadDefault();
         }
 
         public static FantasyKingdomMapLayout CreateOrLoadDefault()

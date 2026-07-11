@@ -1,0 +1,148 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da3be81fc3f679d4a906e852fbd2cebd, type: 3}
+  m_Name: FK_NewGameScene_FullMap_V3_RetouchPreview
+  m_EditorClassIdentifier: DeadWalls::DeadWalls.FantasyKingdomMapLayout
+  schemaVersion: 2
+  targetScene: {fileID: 102900000, guid: 8abb5f6d2bd47fe458a507d96cb461a0, type: 3}
+  targetGridPath: Grid
+  profileId: NewGameScene-VisualRetouch-Candidate-v3.1
+  seed: 1072026
+  placements:
+  - id: left.settlement.ground_support
+    label: Castle and Forest Ground Support
+    enabled: 1
+    stamp: {fileID: 11400000, guid: 5f902f90912758e40bbeb21afa673649, type: 2}
+    targetAnchorCell: {x: -5, y: 15, z: 0}
+    zone: 0
+    gameplayAnchor: 0
+    renderBand: 1
+  - id: left.castle.shadow
+    label: Stone Citadel Shadow
+    enabled: 1
+    stamp: {fileID: 11400000, guid: 48603f2c6d131f04a881045d58848d3e, type: 2}
+    targetAnchorCell: {x: 2, y: 10, z: 0}
+    zone: 0
+    gameplayAnchor: 0
+    renderBand: 1
+  - id: left.castle.citadel
+    label: All-Stone Citadel
+    enabled: 1
+    stamp: {fileID: 11400000, guid: 51cbc22ecbe1a5c47b77574dc5aedf02, type: 2}
+    targetAnchorCell: {x: 2, y: 10, z: 0}
+    zone: 0
+    gameplayAnchor: 1
+    renderBand: 2
+  - id: left.wood.living_forest
+    label: Dense Living Wood Forest
+    enabled: 1
+    stamp: {fileID: 11400000, guid: d806126030a60fc4593d2c3f8b726fb6, type: 2}
+    targetAnchorCell: {x: 7, y: 11, z: 0}
+    zone: 0
+    gameplayAnchor: 2
+    renderBand: 2
+  - id: left.stone.ground
+    label: Stone Quarry Ground
+    enabled: 1
+    stamp: {fileID: 11400000, guid: 8fb4151deec74804e81a43d0030e8e74, type: 2}
+    targetAnchorCell: {x: -10, y: 4, z: 0}
+    zone: 0
+    gameplayAnchor: 0
+    renderBand: 1
+  - id: left.stone.quarry
+    label: Readable Stone Quarry
+    enabled: 1
+    stamp: {fileID: 11400000, guid: 8409ac855b578b542b53ac08b62c0ae1, type: 2}
+    targetAnchorCell: {x: -10, y: 4, z: 0}
+    zone: 0
+    gameplayAnchor: 3
+    renderBand: 2
+  - id: left.iron.ground
+    label: Iron Mine Ground
+    enabled: 1
+    stamp: {fileID: 11400000, guid: 1f4cabfaf86602d499c6cff847b2b13e, type: 2}
+    targetAnchorCell: {x: -22, y: -8, z: 0}
+    zone: 0
+    gameplayAnchor: 0
+    renderBand: 1
+  - id: left.iron.mine
+    label: Readable Iron Mine
+    enabled: 1
+    stamp: {fileID: 11400000, guid: f2e65cb39f42bc14ab3516d54b826e8b, type: 2}
+    targetAnchorCell: {x: -22, y: -8, z: 0}
+    zone: 0
+    gameplayAnchor: 5
+    renderBand: 2
+  - id: left.food.field
+    label: Dominant Food Field
+    enabled: 1
+    stamp: {fileID: 11400000, guid: 4110d8af36622e54199647ba819b3f3e, type: 2}
+    targetAnchorCell: {x: -15, y: -8, z: 0}
+    zone: 0
+    gameplayAnchor: 4
+    renderBand: 1
+  - id: left.food.hedge
+    label: Food Field Hedge
+    enabled: 1
+    stamp: {fileID: 11400000, guid: deb6804508d08d94ea170db2fcc72787, type: 2}
+    targetAnchorCell: {x: -15, y: -8, z: 0}
+    zone: 0
+    gameplayAnchor: 0
+    renderBand: 2
+  - id: left.food.granary_shadow
+    label: Granary Shadow
+    enabled: 1
+    stamp: {fileID: 11400000, guid: 671540e2560270a4b87a952047abc7b0, type: 2}
+    targetAnchorCell: {x: -8, y: 0, z: 0}
+    zone: 0
+    gameplayAnchor: 0
+    renderBand: 1
+  - id: left.food.granary
+    label: Field-Edge Granary
+    enabled: 1
+    stamp: {fileID: 11400000, guid: 7dfb1a54efa12654987424f8366ea00c, type: 2}
+    targetAnchorCell: {x: -8, y: 0, z: 0}
+    zone: 0
+    gameplayAnchor: 0
+    renderBand: 2
+  - id: battlefield.calm_ground
+    label: Seamless Full Ground and Smooth Caravan Road
+    enabled: 1
+    stamp: {fileID: 11400000, guid: 2a832590d5d656145809bb962892f03b, type: 2}
+    targetAnchorCell: {x: -15, y: -45, z: 0}
+    zone: 5
+    gameplayAnchor: 0
+    renderBand: 1
+  - id: enemy_forest.shadow
+    label: Enemy Forest Soft Ground Shadows
+    enabled: 1
+    stamp: {fileID: 11400000, guid: 2528c68c41be0184789e3d3a5b5c0cad, type: 2}
+    targetAnchorCell: {x: 2, y: -41, z: 0}
+    zone: 4
+    gameplayAnchor: 0
+    renderBand: 1
+  - id: enemy_forest.back
+    label: Enemy Forest Behind Zombies
+    enabled: 1
+    stamp: {fileID: 11400000, guid: e922d13065f69bc4fa77992f1b86d2ba, type: 2}
+    targetAnchorCell: {x: 2, y: -41, z: 0}
+    zone: 4
+    gameplayAnchor: 0
+    renderBand: 2
+  - id: enemy_forest.front
+    label: Enemy Forest Front Occluder
+    enabled: 1
+    stamp: {fileID: 11400000, guid: 10f64dda2b8ed1047926a2f392824ad6, type: 2}
+    targetAnchorCell: {x: 4, y: -37, z: 0}
+    zone: 4
+    gameplayAnchor: 0
+    renderBand: 3
