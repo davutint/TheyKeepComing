@@ -1628,7 +1628,7 @@ namespace DeadWalls
                 case FantasyKingdomRenderBand.InFrontOfUnits:
                     sortingLayer = SortingLayerExists("Wall") ? "Wall" :
                         SortingLayerExists(sourceSortingLayer) ? sourceSortingLayer : "Default";
-                    sortingOrder = 4;
+                    sortingOrder = ResolveFrontOccluderOrder(normalized);
                     return;
                 default:
                     sortingLayer = groundLike && SortingLayerExists("Ground") ? "Ground" :
@@ -1637,6 +1637,16 @@ namespace DeadWalls
                     sortingOrder = 100 + localOrder * 10 + placementIndex;
                     return;
             }
+        }
+
+        private static int ResolveFrontOccluderOrder(string normalizedSourceName)
+        {
+            if (normalizedSourceName.Contains("roof"))
+                return normalizedSourceName.EndsWith("3", StringComparison.Ordinal) ? 8 :
+                    normalizedSourceName.EndsWith("2", StringComparison.Ordinal) ? 7 : 6;
+            if (normalizedSourceName.Contains("objects"))
+                return 5;
+            return 4;
         }
 
         private static float ResolveRenderBandZ(FantasyKingdomRenderBand renderBand)

@@ -140,9 +140,14 @@ Layout placement origin'i transform kaydirarak degil, her zaman
 - Solid sinifi stamp purpose'tan degil source layer adindan gelir: ground/shadow disindaki
   `Objects`, `BrokenObjects`, `Walls`, `WallDetail*` ve `Roof*` hucreleri soliddir.
 - Schema 2 preview placement kokleri `Ground/BehindUnits z=0`, unit `z=-1`,
-  `InFrontOfUnits z=-2` kontratini kullanir. Front occluder `Wall` sorting ve Individual
-  renderer ile agacin zombinin onune gecmesini; back forest z=0 ile zombinin arkasinda
-  kalmasini saglar. Zombie prefab sorting'i yukseltilmez.
+  `InFrontOfUnits z=-2` kontratini kullanir. Owner onayli V3.1'de hem 140 agacli deep
+  enemy forest hem 60 agacli front lip `InFrontOfUnits`, `Wall/4` ve Individual renderer
+  kullanir; zombie orman kutlesinin ustunde gorunmez. Zombie prefab sorting'i yukseltilmez.
+- Worker rotalarinin uzerindeki citadel, living forest, quarry, iron mine, food hedge ve
+  granary de `InFrontOfUnits` kullanir. Worker `Wall/3` kalir; yuksek yapi ve bitki
+  pikselleri `Wall/4+` ile worker'i orter, zemin placement'lari ise `Ground` kalir.
+  Katmanli yapilarda Walls/Structures `4`, Objects `5`, Roof1/2/3 `6/7/8` kullanir;
+  boylece worker occlusion saglanirken citadel ve granary'nin kendi cizim sirasi korunur.
 - Full preview render edildikten sonra persistent `GroundDetail`, `Structures`,
   `OverlayProps` ve `Roof*`
   TilemapRenderer'lari `forceRenderingOff` ile gecici gizlenir. Onceki durumlari Grid bazinda
@@ -245,15 +250,16 @@ V3, owner'in su kilit kararlarini uygular:
 - Stone quarry, Iron mine ve Food field + granary ayri okunur,
 - battlefield merkezinde yuksek obje yoktur; zemin sakin ve dusuk varyasyonludur,
 - orman agzindan duvar/kale yonune tek bagli S-kervan yolu gider,
-- sag bant 140 back + 60 front agacli enemy forest'tir,
-- zombie z=-1 korunur; front forest z=-2 occluder olarak birimin bir kismini kapatir.
+- sag bant 140 deep + 60 front agacli enemy forest'tir,
+- zombie z=-1 korunur; iki enemy forest katmani da z=-2 `Wall/4` occluder olarak birimi
+  orman icindeyken kapatir.
 
 Guncel assetler:
 
-- Layout: `Assets/Editor/FantasyKingdomPainter/Layouts/FK_NewGameScene_FullMap_V3_Draft.asset`
+- Layout: `Assets/Editor/FantasyKingdomPainter/Layouts/FK_NewGameScene_FullMap_V3_RetouchPreview.asset`
 - Stable stamp set: `Assets/Editor/FantasyKingdomPainter/Stamps/V3`
-- Builder menu: `Window/DeadWalls/Fantasy Kingdom/Rebuild V3 Draft Assets`
-- Preview menu: `Window/DeadWalls/Fantasy Kingdom/Create Default V3 Preview`
+- Builder menu: `Window/DeadWalls/Fantasy Kingdom/Rebuild V3 Retouch Preview Assets`
+- Preview menu: `Window/DeadWalls/Fantasy Kingdom/Create V3 Retouch Preview`
 - Occlusion proof: `Window/DeadWalls/Fantasy Kingdom/Create Zombie Forest Occlusion Probe`
 
 ## Faz 6: owner-onayli kalici V3 snapshot apply
@@ -262,16 +268,17 @@ Owner screenshot onayindan sonra kalici sahip `FantasyKingdomV3MapApplyService` 
 Phase 3 `ApplySafely` placement basina dongude cagrilmaz. Tum layout tek atomik Undo
 grubunda `Grid/FK_V3_Map` altina yazilir:
 
-- `00_Ground`: z=0, 11 placement-specific Tilemap, 1992 tile,
-- `10_BehindUnits`: z=0, 15 placement-specific Tilemap, 436 tile,
-- `20_FrontOccluders`: z=-2, 1 Tilemap, 60 tile,
-- toplam: 19 placement, 27 Tilemap, 2488 tile.
+- `00_Ground`: z=0, 8 placement-specific Tilemap, 2171 tile,
+- `10_BehindUnits`: z=0, bos band root'u,
+- `20_FrontOccluders`: z=-2, 16 Tilemap, 524 tile,
+- toplam: 16 placement, 24 Tilemap, 2695 tile.
 
 Her placement ve source layer ayri persistent Tilemap tasir; ayni adli source layer'lar
 birlesmez. Ground/Behind renderer sorting order'i semantic local order + placement/layer
 indexinden olusan serialize edilmis tie-break kullanir. Boylece onayli preview, apply oncesi
-ve scene reload sonrasi render sirasi instance ID'ye bagli kalmaz. Front occluder `Wall/4`
-ve `Individual` kalir; zombie/unit z=-1 sahipligi degismez.
+ve scene reload sonrasi render sirasi instance ID'ye bagli kalmaz. Enemy forest `Wall/4`;
+worker rotasinin kestigi katmanli settlement yapi occluder'lari `Wall/4..8`, `Individual`
+ve z=-2 kalir; zombie/unit z=-1 sahipligi degismez.
 
 Apply once temiz `NewGameScene`, exact V3 schema/profile ve full preflight hard gate ister.
 Yeni snapshot staging root'ta tamamen kurulup dogrulandiktan sonra yalniz exact direct-child

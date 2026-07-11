@@ -52,10 +52,10 @@ namespace DeadWalls
         private const string TargetScenePath = "Assets/Scenes/NewGameScene.unity";
         private const string ApprovedProfileId = "NewGameScene-VisualRetouch-Candidate-v3.1";
         private const int ExpectedPlacementCount = 16;
-        private const int ExpectedTileCount = 2721;
+        private const int ExpectedTileCount = 2695;
         private const int ExpectedUniqueCellCount = 2148;
         private const int ExpectedSolidCellCount = 448;
-        private const int ExpectedPersistentTileCount = 5390;
+        private const int ExpectedPersistentTileCount = 5364;
         private const string PreviousApprovedProfileId = "NewGameScene-ApprovedVisualRebuild-v3";
         private const int PreviousExpectedPlacementCount = 19;
         private const int PreviousExpectedTileCount = 2488;
@@ -964,7 +964,7 @@ namespace DeadWalls
             string normalized = (sourceName ?? string.Empty).ToLowerInvariant();
             if (renderBand == FantasyKingdomRenderBand.InFrontOfUnits)
             {
-                sortingOrder = 4;
+                sortingOrder = ResolveFrontOccluderOrder(normalized);
                 return;
             }
             int localOrder;
@@ -983,6 +983,16 @@ namespace DeadWalls
             // instance-id ile tie-break etmesin. Onayli preview'un creation sirasini kalici,
             // serialize edilen bir sortingOrder tie-break'ine ceviriyoruz.
             sortingOrder = localOrder * 1000 + placementIndex * 10 + layerIndex;
+        }
+
+        private static int ResolveFrontOccluderOrder(string normalizedSourceName)
+        {
+            if (normalizedSourceName.Contains("roof"))
+                return normalizedSourceName.EndsWith("3", StringComparison.Ordinal) ? 8 :
+                    normalizedSourceName.EndsWith("2", StringComparison.Ordinal) ? 7 : 6;
+            if (normalizedSourceName.Contains("objects"))
+                return 5;
+            return 4;
         }
 
         private static SceneContractSnapshot CaptureSceneContract(Scene scene, Grid grid)

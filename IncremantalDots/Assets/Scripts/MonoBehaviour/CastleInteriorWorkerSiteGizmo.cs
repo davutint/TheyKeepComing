@@ -84,6 +84,32 @@ namespace DeadWalls
 
         private void DrawDeliveryRoute(Vector3 pickupPosition, int index, Color lineColor)
         {
+            CastleInteriorWorkerPlacement placement = GetComponentInParent<CastleInteriorWorkerPlacement>();
+            if (placement != null && placement.TryGetLogisticsRoutePositions(
+                    Resource,
+                    index,
+                    out Unity.Mathematics.float3 pickup,
+                    out Unity.Mathematics.float3 siteApproach,
+                    out Unity.Mathematics.float3 hubApproach,
+                    out Unity.Mathematics.float3 delivery))
+            {
+                Vector3 pickupPoint = new Vector3(pickup.x, pickup.y, pickup.z);
+                Vector3 siteApproachPoint = new Vector3(siteApproach.x, siteApproach.y, siteApproach.z);
+                Vector3 hubApproachPoint = new Vector3(hubApproach.x, hubApproach.y, hubApproach.z);
+                Vector3 deliveryPoint = new Vector3(delivery.x, delivery.y, delivery.z);
+
+                Gizmos.color = lineColor;
+                Gizmos.DrawLine(pickupPoint, siteApproachPoint);
+                Gizmos.DrawLine(siteApproachPoint, hubApproachPoint);
+                Gizmos.DrawLine(hubApproachPoint, deliveryPoint);
+
+                Color routedDeliveryColor = lineColor;
+                routedDeliveryColor.a = 0.65f;
+                Gizmos.color = routedDeliveryColor;
+                Gizmos.DrawWireSphere(deliveryPoint, MarkerRadius * 1.15f);
+                return;
+            }
+
             if (_deliveryMarkers.Count == 0)
                 return;
 

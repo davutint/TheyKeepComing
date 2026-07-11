@@ -438,34 +438,34 @@ namespace DeadWalls
                         FantasyKingdomGameplayAnchor.None, FantasyKingdomRenderBand.Ground),
                     Placement("left.castle.citadel", "All-Stone Citadel", castleSolid,
                         new Vector3Int(2, 10, 0), FantasyKingdomMapZone.Settlement,
-                        FantasyKingdomGameplayAnchor.CastleKeep, FantasyKingdomRenderBand.BehindUnits),
+                        FantasyKingdomGameplayAnchor.CastleKeep, FantasyKingdomRenderBand.InFrontOfUnits),
                     Placement("left.wood.living_forest", "Dense Living Wood Forest", woodForest,
                         woodForestTargetAnchor, FantasyKingdomMapZone.Settlement,
-                        FantasyKingdomGameplayAnchor.Wood, FantasyKingdomRenderBand.BehindUnits),
+                        FantasyKingdomGameplayAnchor.Wood, FantasyKingdomRenderBand.InFrontOfUnits),
                     Placement("left.stone.ground", "Stone Quarry Ground", stoneGround,
                         new Vector3Int(-10, 4, 0), FantasyKingdomMapZone.Settlement,
                         FantasyKingdomGameplayAnchor.None, FantasyKingdomRenderBand.Ground),
                     Placement("left.stone.quarry", "Readable Stone Quarry", stoneSolid,
                         new Vector3Int(-10, 4, 0), FantasyKingdomMapZone.Settlement,
-                        FantasyKingdomGameplayAnchor.Stone, FantasyKingdomRenderBand.BehindUnits),
+                        FantasyKingdomGameplayAnchor.Stone, FantasyKingdomRenderBand.InFrontOfUnits),
                     Placement("left.iron.ground", "Iron Mine Ground", ironGround,
                         new Vector3Int(-22, -8, 0), FantasyKingdomMapZone.Settlement,
                         FantasyKingdomGameplayAnchor.None, FantasyKingdomRenderBand.Ground),
                     Placement("left.iron.mine", "Readable Iron Mine", ironSolid,
                         new Vector3Int(-22, -8, 0), FantasyKingdomMapZone.Settlement,
-                        FantasyKingdomGameplayAnchor.Iron, FantasyKingdomRenderBand.BehindUnits),
+                        FantasyKingdomGameplayAnchor.Iron, FantasyKingdomRenderBand.InFrontOfUnits),
                     Placement("left.food.field", "Dominant Food Field", foodGround,
                         new Vector3Int(-15, -8, 0), FantasyKingdomMapZone.Settlement,
                         FantasyKingdomGameplayAnchor.Food, FantasyKingdomRenderBand.Ground),
                     Placement("left.food.hedge", "Food Field Hedge", foodHedge,
                         new Vector3Int(-15, -8, 0), FantasyKingdomMapZone.Settlement,
-                        FantasyKingdomGameplayAnchor.None, FantasyKingdomRenderBand.BehindUnits),
+                        FantasyKingdomGameplayAnchor.None, FantasyKingdomRenderBand.InFrontOfUnits),
                     Placement("left.food.granary_shadow", "Granary Shadow", granaryShadow,
                         new Vector3Int(-8, 0, 0), FantasyKingdomMapZone.Settlement,
                         FantasyKingdomGameplayAnchor.None, FantasyKingdomRenderBand.Ground),
                     Placement("left.food.granary", "Field-Edge Granary", granarySolid,
                         new Vector3Int(-8, 0, 0), FantasyKingdomMapZone.Settlement,
-                        FantasyKingdomGameplayAnchor.None, FantasyKingdomRenderBand.BehindUnits)
+                        FantasyKingdomGameplayAnchor.None, FantasyKingdomRenderBand.InFrontOfUnits)
                 };
 
                 if (writeRetouchCandidate)
@@ -500,10 +500,17 @@ namespace DeadWalls
                     enemyForest.Shadow.Stamp, enemyForest.Shadow.AnchorCell,
                     FantasyKingdomMapZone.FarRightFrame,
                     FantasyKingdomGameplayAnchor.None, FantasyKingdomRenderBand.Ground));
-                placements.Add(Placement("enemy_forest.back", "Enemy Forest Behind Zombies",
+                placements.Add(Placement(
+                    "enemy_forest.back",
+                    writeRetouchCandidate
+                        ? "Enemy Forest Deep Front Occluder"
+                        : "Enemy Forest Behind Zombies",
                     enemyForest.Back.Stamp, enemyForest.Back.AnchorCell,
                     FantasyKingdomMapZone.FarRightFrame,
-                    FantasyKingdomGameplayAnchor.None, FantasyKingdomRenderBand.BehindUnits));
+                    FantasyKingdomGameplayAnchor.None,
+                    writeRetouchCandidate
+                        ? FantasyKingdomRenderBand.InFrontOfUnits
+                        : FantasyKingdomRenderBand.BehindUnits));
                 placements.Add(Placement("enemy_forest.front", "Enemy Forest Front Occluder",
                     enemyForest.Front.Stamp, enemyForest.Front.AnchorCell,
                     FantasyKingdomMapZone.FarRightFrame,
@@ -662,24 +669,29 @@ namespace DeadWalls
             HashSet<Vector3Int> castleCells = CollectSolidTargetCells(
                 castleSolid,
                 castleTargetAnchor);
-            var result = originalTrees
-                .Where(tree => !IsInsideCastleTreeBuffer(tree.Position, castleCells) &&
-                               !protectedCells.Contains(tree.Position))
-                .ToList();
-            var used = new HashSet<Vector3Int>(result.Select(tree => tree.Position));
-
+            Vector2 visibleForestCenter = new Vector2(-5.5f, 6.5f);
             List<Vector3Int> replacementCandidates = EnumerateCandidateCells()
-                .Where(cell => cell.x >= -4 && cell.x <= 12 &&
-                               cell.y >= 11 && cell.y <= 34 &&
-                               targetGrid.GetCellCenterWorld(cell).x <= -1.5f &&
-                               !protectedCells.Contains(cell) &&
-                               !used.Contains(cell) &&
-                               !IsInsideCastleTreeBuffer(cell, castleCells))
-                .OrderBy(cell => PositiveHash(cell, Seed + 1701))
+                .Where(cell =>
+                {
+                    Vector3 world = targetGrid.GetCellCenterWorld(cell);
+                    return world.x >= -8.1f && world.x <= -1.5f &&
+                           world.y >= 0f && world.y <= 7.8f &&
+                           !protectedCells.Contains(cell) &&
+                           !IsInsideCastleTreeBuffer(cell, castleCells);
+                })
+                .OrderBy(cell =>
+                {
+                    Vector3 world = targetGrid.GetCellCenterWorld(cell);
+                    float distance = (new Vector2(world.x, world.y) - visibleForestCenter).sqrMagnitude;
+                    float jitter = (PositiveHash(cell, Seed + 1701) % 1000) * 0.0001f;
+                    return distance + jitter;
+                })
+                .Take(32)
                 .ToList();
 
+            var result = new List<AbsoluteTileCell>();
             for (int candidateIndex = 0;
-                 result.Count < 32 && candidateIndex < replacementCandidates.Count;
+                 candidateIndex < replacementCandidates.Count;
                  candidateIndex++)
             {
                 Vector3Int position = replacementCandidates[candidateIndex];
@@ -691,13 +703,12 @@ namespace DeadWalls
                     template.TransformMatrix,
                     template.Color,
                     template.Flags));
-                used.Add(position);
             }
 
             if (result.Count != 32)
             {
                 throw new InvalidOperationException(
-                    "Retouch living forest kale buffer'i disinda 32 agaca tamamlanamadi: " +
+                    "Retouch living forest gorunur kale buffer'i disinda 32 agaca tamamlanamadi: " +
                     result.Count);
             }
 
@@ -1026,8 +1037,8 @@ namespace DeadWalls
                     targetGrid,
                     objectTemplate,
                     "EnemyForestBack",
-                    "Objects",
-                    11,
+                    "Wall",
+                    4,
                     backTiles),
                 Front = BuildGeneratedStamp(
                     "FK_V3_EnemyForest_FrontOccluder",

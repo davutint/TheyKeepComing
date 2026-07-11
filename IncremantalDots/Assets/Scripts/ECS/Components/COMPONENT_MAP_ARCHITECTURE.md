@@ -55,7 +55,8 @@ Tum component'lar unmanaged ECS struct olarak tutulur. Davranis sistemlerde, ver
 
 - `WorkerPrefabData`: SubScene `WaveConfigAuthoring` tarafindan bake edilen DOTS villager worker prefab referansi.
 - `ResourceWorkerVisual`: sahnede gorunen DOTS villager entity'sinin Wood/Stone/Iron/Food kaynagini ve site icindeki index'ini tutar.
-- `WorkerLogisticsRoute`: DOTS villager'in kaynak pickup noktasi ile CastleWorkerHub delivery noktasi arasindaki rota state'ini tutar.
+- `WorkerLogisticsRoute`: DOTS villager'in pickup, site approach, ortak koridor approach ve
+  CastleWorkerHub delivery noktasi arasindaki segmentli rota state'ini tutar.
 - `ResourceWorkerVisualStyle`: kaynak tipine gore hafif worker tint degerlerini merkezi tutar.
 
 `MobileCastleCombatConfig` sahnede yoksa sistemler eski `WallXPosition` tabanli davranisi kullanir.

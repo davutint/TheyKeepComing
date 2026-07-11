@@ -22,6 +22,12 @@ namespace DeadWalls
         public float SpawnZ = MobileCastleRenderDepth.UnitZ;
         public float RepeatOffsetRadius = 0.12f;
 
+        [Header("Visible Route Corridor")]
+        public float RouteCorridorX = -0.9f;
+        public float HubApproachY = 0.6f;
+        public float RouteLaneSpacing = 0.1f;
+        public int RouteLaneCount = 5;
+
         private readonly List<Vector3> _woodPoints = new List<Vector3>();
         private readonly List<Vector3> _stonePoints = new List<Vector3>();
         private readonly List<Vector3> _ironPoints = new List<Vector3>();
@@ -84,6 +90,29 @@ namespace DeadWalls
             int stackIndex = Mathf.Abs(workerIndex) / _hubPoints.Count;
             Vector3 point = _hubPoints[deliveryIndex] + GetRepeatOffset(stackIndex) * 0.7f;
             delivery = new float3(point.x, point.y, SpawnZ);
+            return true;
+        }
+
+        public bool TryGetLogisticsRoutePositions(
+            EconomyFocusType resource,
+            int workerIndex,
+            out float3 pickup,
+            out float3 siteApproach,
+            out float3 hubApproach,
+            out float3 delivery)
+        {
+            siteApproach = default;
+            hubApproach = default;
+            if (!TryGetLogisticsPositions(resource, workerIndex, out pickup, out delivery))
+                return false;
+
+            int laneCount = Mathf.Max(1, RouteLaneCount);
+            int laneIndex = Mathf.Abs(workerIndex) % laneCount;
+            float centeredLane = laneIndex - (laneCount - 1) * 0.5f;
+            float corridorX = RouteCorridorX + centeredLane * Mathf.Max(0f, RouteLaneSpacing);
+
+            siteApproach = new float3(corridorX, pickup.y, SpawnZ);
+            hubApproach = new float3(corridorX, HubApproachY, SpawnZ);
             return true;
         }
 

@@ -201,7 +201,13 @@ V3 derinlik sozlesmesi:
 - `Ground`: z=0, Ground sorting.
 - `BehindUnits`: z=0, Individual renderer.
 - Zombie/unit: z=-1; prefab veya runtime sorting degeri degistirilmez.
-- `InFrontOfUnits`: z=-2, Wall sorting order 4, Individual renderer.
+- `InFrontOfUnits`: z=-2, Wall sorting, Individual renderer. Structures/Walls `4`,
+  Objects `5`, Roof1/2/3 `6/7/8` kullanir.
+- V3.1 `enemy_forest.back` ve `enemy_forest.front` placement'larinin ikisi de
+  `InFrontOfUnits` altindadir; zombiler orman agaclarinin ustunde gorunmemelidir.
+- Citadel, living forest, quarry, iron mine, food hedge ve granary de
+  `InFrontOfUnits` altindadir; `Wall/3` worker gorselleri bu `Wall/4..8` piksellerin
+  ustunde gorunmemelidir. Ilgili ground/shadow placement'lari `Ground` kalir.
 
 V3 far-right/enemy forest bandi X `18..29`, Y `-8..8`dir. Hidden spawn X `27..29`,
 Y `+-6.5` bu orman kutlesinin icindedir. Preview/probe `DontSave`dir.
@@ -209,20 +215,20 @@ Y `+-6.5` bu orman kutlesinin icindedir. Preview/probe `DontSave`dir.
 ## Owner onayi sonrasi kalici V3 uygulama
 
 1. Preview ve zombie probe'u temizle; aktif sahnenin `NewGameScene` ve temiz oldugunu dogrula.
-2. Son kez `Create Default V3 Preview` calistir; `Hard: 0`, anchor `5/5`, living/back/front
-   `32/140/60`, front Y band `14/14`, road `84/1`, open-center solid `0` olmali.
+2. Son kez `Create V3 Retouch Preview` calistir; `Hard: 0`, anchor `5/5`, living/back/front
+   `32/140/60`, front Y band `13/14`, road `43/1`, open-center solid `0` olmali.
 3. `Window > DeadWalls > Fantasy Kingdom > APPLY APPROVED V3 TO NEW GAME SCENE` calistir.
    Islem tek Undo grubudur ve otomatik save yapmaz.
-4. `Validate Persistent V3 Map` ile 19 placement, 27 Tilemap, 2488 managed tile,
-   legacy visual `0`, collider `0`, anchor `5/5` sonucunu dogrula.
+4. `Validate Persistent V3 Map` ile 16 placement, 24 Tilemap, 2721 managed tile,
+   5390 total persistent tile, legacy visual `0`, collider `0`, anchor `5/5` sonucunu dogrula.
 5. Main Camera screenshot'ini owner-onayli preview ile karsilastir. Render sirasi
    serialize edilen placement/layer tie-break'i sayesinde reload sonrasi da ayni kalmalidir.
 6. Yalniz gorsel ve yapisal kontrol gectiyse `NewGameScene` sahnesini acikca kaydet.
 7. Sahneyi reload et, `Validate Persistent V3 Map` ve Main Camera screenshot'ini tekrarla.
 8. Play Mode'da gercek ECS zombie icin spawn X `27..29`, `|Y|<=6.5`, unit z=-1 ve
-   forest back z=0 / front z=-2 occlusion kontratini smoke-test et.
+   deep/front enemy forest z=-2 `Wall/4` occlusion kontratini smoke-test et.
 
-Apply sonrasi `Rebuild V3 Draft Assets` guvenlidir: legacy source katmanlari sifirsa ve
+Apply sonrasi `Rebuild V3 Retouch Preview Assets` guvenlidir: legacy source katmanlari sifirsa ve
 `Grid/FK_V3_Map` varsa Wood/Stone/Iron/Food stabil stamp'leri exact tile sayilariyla korunur.
 Kismi veya beklenmeyen legacy kaynak snapshot'i builder'i durdurur; mevcut onayli assetleri
 bos veriyle overwrite etmez.

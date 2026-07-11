@@ -3161,7 +3161,13 @@ namespace DeadWalls
                 return false;
             }
 
-            if (!TryGetWorkerRoutePositions(resource, index, out float3 pickup, out float3 delivery))
+            if (!TryGetWorkerRoutePositions(
+                    resource,
+                    index,
+                    out float3 pickup,
+                    out float3 siteApproach,
+                    out float3 hubApproach,
+                    out float3 delivery))
                 return false;
 
             var entity = _entityManager.Instantiate(_workerPrefabEntity);
@@ -3174,14 +3180,27 @@ namespace DeadWalls
                 pickup,
                 quaternion.identity,
                 1f));
-            ConfigureWorkerLogisticsRoute(entity, index, pickup, delivery, true);
+            ConfigureWorkerLogisticsRoute(
+                entity,
+                index,
+                pickup,
+                siteApproach,
+                hubApproach,
+                delivery,
+                true);
             ConfigureWorkerSprite(entity, resource, index);
             return true;
         }
 
         private void UpdateWorkerVisualRoute(Entity entity, EconomyFocusType resource, int index, bool resetPosition)
         {
-            if (!TryGetWorkerRoutePositions(resource, index, out float3 pickup, out float3 delivery))
+            if (!TryGetWorkerRoutePositions(
+                    resource,
+                    index,
+                    out float3 pickup,
+                    out float3 siteApproach,
+                    out float3 hubApproach,
+                    out float3 delivery))
                 return;
 
             if (resetPosition)
@@ -3191,15 +3210,36 @@ namespace DeadWalls
                 _entityManager.SetComponentData(entity, transform);
             }
 
-            ConfigureWorkerLogisticsRoute(entity, index, pickup, delivery, resetPosition);
+            ConfigureWorkerLogisticsRoute(
+                entity,
+                index,
+                pickup,
+                siteApproach,
+                hubApproach,
+                delivery,
+                resetPosition);
         }
 
-        private bool TryGetWorkerRoutePositions(EconomyFocusType resource, int index, out float3 pickup, out float3 delivery)
+        private bool TryGetWorkerRoutePositions(
+            EconomyFocusType resource,
+            int index,
+            out float3 pickup,
+            out float3 siteApproach,
+            out float3 hubApproach,
+            out float3 delivery)
         {
             pickup = default;
+            siteApproach = default;
+            hubApproach = default;
             delivery = default;
             CastleInteriorWorkerPlacement placement = CastleInteriorWorkerPlacement.GetOrCreateRuntime();
-            if (placement != null && placement.TryGetLogisticsPositions(resource, index, out pickup, out delivery))
+            if (placement != null && placement.TryGetLogisticsRoutePositions(
+                    resource,
+                    index,
+                    out pickup,
+                    out siteApproach,
+                    out hubApproach,
+                    out delivery))
             {
                 _missingWorkerPlacementWarningLogged = false;
                 return true;
@@ -3209,14 +3249,23 @@ namespace DeadWalls
             return false;
         }
 
-        private void ConfigureWorkerLogisticsRoute(Entity entity, int index, float3 pickup, float3 delivery, bool resetRoute)
+        private void ConfigureWorkerLogisticsRoute(
+            Entity entity,
+            int index,
+            float3 pickup,
+            float3 siteApproach,
+            float3 hubApproach,
+            float3 delivery,
+            bool resetRoute)
         {
-            float2 direction = math.normalizesafe((delivery - pickup).xy, new float2(1f, 0f));
+            float2 direction = math.normalizesafe((siteApproach - pickup).xy, new float2(1f, 0f));
             WorkerLogisticsRoute route = _entityManager.HasComponent<WorkerLogisticsRoute>(entity)
                 ? _entityManager.GetComponentData<WorkerLogisticsRoute>(entity)
                 : default;
 
             route.PickupPosition = pickup;
+            route.SiteApproachPosition = siteApproach;
+            route.HubApproachPosition = hubApproach;
             route.DeliveryPosition = delivery;
             route.Speed = 0.85f;
             route.WorkDuration = 0.65f;
@@ -3226,6 +3275,7 @@ namespace DeadWalls
             if (resetRoute || !_entityManager.HasComponent<WorkerLogisticsRoute>(entity))
             {
                 route.MovingToHub = 1;
+                route.RouteLeg = 0;
                 route.WaitTimer = 0.12f + (index % 5) * 0.08f;
                 route.LastDirection = direction;
             }

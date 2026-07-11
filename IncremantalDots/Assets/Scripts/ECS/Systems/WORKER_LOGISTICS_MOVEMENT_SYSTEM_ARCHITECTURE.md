@@ -21,9 +21,16 @@ GameManager worker visual sync
 `WorkerLogisticsRoute` sunlari tutar:
 
 - `PickupPosition`: Wood/Stone/Iron/Food site marker pozisyonu.
+- `SiteApproachPosition`: worker'in kaynak yapisindan acik koridora ciktigi ara nokta.
+- `HubApproachPosition`: ortak koridordan kaleye girdigi ara nokta.
 - `DeliveryPosition`: `CastleWorkerHub/DeliveryPoints` marker pozisyonu.
 - `MovingToHub`: su an hub'a mi pickup'a mi gittigini belirler.
+- `RouteLeg`: iki ara nokta ve endpoint arasindaki aktif segmenti belirler.
 - `WorkDuration` ve `DeliveryDuration`: rota ucundaki kisa bekleme sureleri.
+
+Gidis rotasi `pickup -> site approach -> hub approach -> delivery`, donus rotasi bunun
+tersidir. Boylece workerlar kaynak binasi ile kale arasinda tek diagonal cizgiyle yapi
+sprite'larinin icinden gecmez; acik sag koridorda lane'lere dagilarak yurur.
 
 ## Animasyon
 

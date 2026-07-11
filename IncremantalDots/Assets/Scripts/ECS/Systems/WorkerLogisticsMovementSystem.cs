@@ -38,15 +38,22 @@ namespace DeadWalls
                     return;
                 }
 
-                float3 target = route.MovingToHub != 0 ? route.DeliveryPosition : route.PickupPosition;
+                float3 target = ResolveTarget(route);
                 float3 delta = target - transform.Position;
                 float2 delta2 = delta.xy;
                 float distanceSq = math.lengthsq(delta2);
 
                 if (distanceSq <= ArrivalDistance * ArrivalDistance)
                 {
+                    if (route.RouteLeg < 2)
+                    {
+                        route.RouteLeg++;
+                        return;
+                    }
+
                     bool arrivedAtHub = route.MovingToHub != 0;
                     route.MovingToHub = arrivedAtHub ? (byte)0 : (byte)1;
+                    route.RouteLeg = 0;
                     route.WaitTimer = arrivedAtHub ? route.DeliveryDuration : route.WorkDuration;
                     SetAnimation(ref anim, IdleOffset + ResolveDirection(route.LastDirection, anim.DirectionRow % 8));
                     return;
@@ -58,6 +65,24 @@ namespace DeadWalls
                 transform.Position += new float3(direction * step, target.z - transform.Position.z);
                 route.LastDirection = direction;
                 SetAnimation(ref anim, WalkOffset + ResolveDirection(direction, anim.DirectionRow % 8));
+            }
+
+            private static float3 ResolveTarget(WorkerLogisticsRoute route)
+            {
+                if (route.MovingToHub != 0)
+                {
+                    if (route.RouteLeg == 0)
+                        return route.SiteApproachPosition;
+                    if (route.RouteLeg == 1)
+                        return route.HubApproachPosition;
+                    return route.DeliveryPosition;
+                }
+
+                if (route.RouteLeg == 0)
+                    return route.HubApproachPosition;
+                if (route.RouteLeg == 1)
+                    return route.SiteApproachPosition;
+                return route.PickupPosition;
             }
 
             private static void SetAnimation(ref SpriteAnimation anim, int targetRow)

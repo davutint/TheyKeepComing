@@ -17,12 +17,15 @@ namespace DeadWalls
     public struct WorkerLogisticsRoute : IComponentData
     {
         public float3 PickupPosition;
+        public float3 SiteApproachPosition;
+        public float3 HubApproachPosition;
         public float3 DeliveryPosition;
         public float Speed;
         public float WorkDuration;
         public float DeliveryDuration;
         public float WaitTimer;
         public byte MovingToHub;
+        public byte RouteLeg;
         public float2 LastDirection;
     }
 

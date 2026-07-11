@@ -1718,6 +1718,10 @@ namespace DeadWalls
             placement.FoodWorkerSpawnRoot = EnsureWorkerSite(root.transform, "FoodSite", EconomyFocusType.Food, hubDeliveryRoot, new Vector3(1.25f, -1.25f, 0f));
             placement.SpawnZ = MobileCastleRenderDepth.UnitZ;
             placement.RepeatOffsetRadius = 0.12f;
+            placement.RouteCorridorX = -0.9f;
+            placement.HubApproachY = 0.6f;
+            placement.RouteLaneSpacing = 0.1f;
+            placement.RouteLaneCount = 5;
             EditorUtility.SetDirty(placement);
 
             ApplyVillageMarkers(scene, root);

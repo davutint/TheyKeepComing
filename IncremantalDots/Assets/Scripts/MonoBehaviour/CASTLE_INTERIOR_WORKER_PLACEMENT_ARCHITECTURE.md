@@ -5,8 +5,11 @@
 ## Sorumluluk
 
 - `CastleInteriorEconomyArea` root'unu, resource site pickup marker'larini ve `CastleWorkerHub` delivery marker'larini okur.
-- Wood/Stone/Iron/Food icin siradaki worker pickup/delivery world pozisyonlarini verir.
+- Wood/Stone/Iron/Food icin siradaki worker pickup, site approach, ortak koridor approach
+  ve delivery world pozisyonlarini verir.
 - Spawn point sayisi gameplay cap degildir; markerlar biterse ayni noktalara kucuk deterministic offset uygular.
+- `RouteCorridorX`, `HubApproachY`, `RouteLaneSpacing` ve `RouteLaneCount` worker'lari
+  yapilarin icinden gecen tek diagonal yerine sagdaki acik dikey koridora dagitir.
 - Worker visual spawn etmez; sadece route pozisyonlarini saglar. Spawn islemini `GameManager` ECS prefab instantiate ile yapar.
 
 ## Hedef Hierarchy
@@ -39,7 +42,10 @@ CastleInteriorEconomyArea
 
 `VisualRoot` owner tarafindan kurulan dekor/gorsel alanidir. Runtime kod bu objeleri boyamaz veya tasimaz.
 
-`WorkerSpawnPoints` artik villagerlarin durdugu yer degil, kaynak pickup marker'laridir. `CastleWorkerHub/DeliveryPoints` ise kaynak teslim merkezidir.
+`WorkerSpawnPoints` artik villagerlarin durdugu yer degil, kaynak pickup marker'laridir.
+`CastleWorkerHub/DeliveryPoints` ise kaynak teslim merkezidir. Runtime rota
+`pickup -> site approach -> hub approach -> delivery` sirasi ile ilerler ve donuste ayni
+koridoru ters kullanir.
 
 ## DOTS Worker Akisi
 
@@ -64,6 +70,9 @@ MobileCastleRenderDepth.UnitZ = -1
 ```
 
 `Villager.mat`, `DeadWalls/SpriteSheet` shader'i ve `Character_villager/Idle.png` spritesheet'i kullanir.
+Citadel, living forest, quarry, iron mine, food hedge ve granary `Wall/4..8` front
+occluder'dir; worker `Wall/3` kaldigi icin bu yuksek piksellerin ustune cizilmez.
+Katmanli citadel/granary kendi Walls -> Objects -> Roof1/2/3 sirasini korur.
 
 ## Gizmo Preview
 
@@ -71,5 +80,5 @@ MobileCastleRenderDepth.UnitZ = -1
 
 - Resource site radius'u gorunur.
 - `WorkerSpawnPoints/Spawn_XX` marker noktalari gorunur.
-- Hub delivery marker'larina rota cizgileri gorunur.
+- Pickup -> site approach -> hub approach -> delivery rota cizgileri gorunur.
 - Markerlar isim sirasina gore cizilir; runtime worker logistics ile ayni sirayi temsil eder.

@@ -41,7 +41,7 @@ MonoBehaviour:
     targetAnchorCell: {x: 2, y: 10, z: 0}
     zone: 0
     gameplayAnchor: 1
-    renderBand: 2
+    renderBand: 3
   - id: left.wood.living_forest
     label: Dense Living Wood Forest
     enabled: 1
@@ -49,7 +49,7 @@ MonoBehaviour:
     targetAnchorCell: {x: 7, y: 11, z: 0}
     zone: 0
     gameplayAnchor: 2
-    renderBand: 2
+    renderBand: 3
   - id: left.stone.ground
     label: Stone Quarry Ground
     enabled: 1
@@ -65,7 +65,7 @@ MonoBehaviour:
     targetAnchorCell: {x: -10, y: 4, z: 0}
     zone: 0
     gameplayAnchor: 3
-    renderBand: 2
+    renderBand: 3
   - id: left.iron.ground
     label: Iron Mine Ground
     enabled: 1
@@ -81,7 +81,7 @@ MonoBehaviour:
     targetAnchorCell: {x: -22, y: -8, z: 0}
     zone: 0
     gameplayAnchor: 5
-    renderBand: 2
+    renderBand: 3
   - id: left.food.field
     label: Dominant Food Field
     enabled: 1
@@ -97,7 +97,7 @@ MonoBehaviour:
     targetAnchorCell: {x: -15, y: -8, z: 0}
     zone: 0
     gameplayAnchor: 0
-    renderBand: 2
+    renderBand: 3
   - id: left.food.granary_shadow
     label: Granary Shadow
     enabled: 1
@@ -113,7 +113,7 @@ MonoBehaviour:
     targetAnchorCell: {x: -8, y: 0, z: 0}
     zone: 0
     gameplayAnchor: 0
-    renderBand: 2
+    renderBand: 3
   - id: battlefield.calm_ground
     label: Seamless Full Ground and Smooth Caravan Road
     enabled: 1
@@ -131,13 +131,13 @@ MonoBehaviour:
     gameplayAnchor: 0
     renderBand: 1
   - id: enemy_forest.back
-    label: Enemy Forest Behind Zombies
+    label: Enemy Forest Deep Front Occluder
     enabled: 1
     stamp: {fileID: 11400000, guid: e922d13065f69bc4fa77992f1b86d2ba, type: 2}
     targetAnchorCell: {x: 2, y: -41, z: 0}
     zone: 4
     gameplayAnchor: 0
-    renderBand: 2
+    renderBand: 3
   - id: enemy_forest.front
     label: Enemy Forest Front Occluder
     enabled: 1
