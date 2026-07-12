@@ -7,6 +7,7 @@ namespace DeadWalls
 {
     [BurstCompile]
     [UpdateInGroup(typeof(SimulationSystemGroup), OrderFirst = true)]
+    [UpdateAfter(typeof(ContinuousSiegeCycleSystem))]
     public partial struct WaveSpawnSystem : ISystem
     {
         [BurstCompile]
@@ -62,7 +63,12 @@ namespace DeadWalls
                 var cycle = SystemAPI.GetSingleton<ContinuousSiegeCycleData>();
                 if (cycle.Enabled)
                 {
-                    HandleContinuousSiegeSpawn(ref state, ref waveState.ValueRW, mobileConfig, cycle, dt);
+                    if (SystemAPI.HasSingleton<ContinuousSpawnBudgetData>())
+                    {
+                        var budget = SystemAPI.GetSingletonRW<ContinuousSpawnBudgetData>();
+                        HandleContinuousSiegeSpawn(ref state, ref waveState.ValueRW,
+                            ref budget.ValueRW, mobileConfig, cycle, dt);
+                    }
                     return;
                 }
             }
@@ -222,7 +228,8 @@ namespace DeadWalls
         }
 
         private void HandleContinuousSiegeSpawn(ref SystemState state, ref WaveStateData wave,
-            MobileCastleCombatConfig mobileConfig, ContinuousSiegeCycleData cycle, float dt)
+            ref ContinuousSpawnBudgetData budget, MobileCastleCombatConfig mobileConfig,
+            ContinuousSiegeCycleData cycle, float dt)
         {
             wave.WaveActive = true;
             wave.Phase = RunPhaseType.NightCombat;
@@ -230,18 +237,7 @@ namespace DeadWalls
             wave.PrepDuration = 0f;
             wave.WaveStartTimer = 0f;
 
-            wave.SpawnTimer -= dt;
-            if (wave.SpawnTimer > 0f)
-                return;
-
-            // Performans guvenlik tavani: canli zombi sayisi siniri (0 = sinirsiz, legacy bake).
-            // Guard TIMER RESETINDEN ONCE: cap doluyken interval bosa yanmaz, yer acilinca
-            // hemen spawn edilir (stress dali ile ayni semantik).
-            int maxAlive = mobileConfig.MaxAliveZombies > 0 ? mobileConfig.MaxAliveZombies : int.MaxValue;
-            if (wave.ZombiesAlive >= maxAlive)
-                return;
-
-            float intensity = math.max(0.01f, cycle.SpawnIntensityMultiplier);
+            float phaseIntensity = math.max(0.01f, cycle.SpawnIntensityMultiplier);
 
             // Council risk atomu: "sonraki gece" carpani yalniz NIGHT fazinda uygulanir
             if (cycle.Phase == SiegeCyclePhase.Night
@@ -249,33 +245,72 @@ namespace DeadWalls
             {
                 float nightMult = SystemAPI.GetSingleton<MobileEconomyEventState>().NextNightSpawnMultiplier;
                 if (nightMult > 0f)
-                    intensity *= nightMult;
+                    phaseIntensity *= nightMult;
             }
 
-            float baseInterval = wave.SpawnInterval > 0f ? wave.SpawnInterval : mobileConfig.BaseSpawnInterval;
-            wave.SpawnTimer = math.max(mobileConfig.MinSpawnInterval, baseInterval / intensity);
-
-            // Kutle eskalasyonu: batch faz intensity'sine EK olarak cycle sayisiyla da buyur
-            // (tempo MinSpawnInterval tabaninda doyduktan sonra kalabalik artmaya devam etsin)
-            float cycleGrowth = 1f + (math.max(1, wave.CurrentWave) - 1) * math.max(0f, mobileConfig.SpawnBatchGrowthPerCycle);
-
-            // Difficulty profile gun carpani (buffer yok/bos = 1, geriye uyumlu)
-            float dayBatchMult = 1f;
+            // Gun tabani ile faz temposu ayri tutulur. Dawn'in dusuk phase intensity'si
+            // sonraki gunun day curve/interval tabanini geriye yazamaz.
+            float dayQuantityMultiplier = 1f;
             if (SystemAPI.TryGetSingletonBuffer<DifficultyDaySample>(out var difficultySamples, true)
                 && difficultySamples.Length > 0)
             {
                 int dayIndex = math.min(math.max(0, wave.CurrentWave - 1), difficultySamples.Length - 1);
-                dayBatchMult = math.max(0.01f, difficultySamples[dayIndex].SpawnBatchMult);
+                dayQuantityMultiplier = math.max(0.01f, difficultySamples[dayIndex].SpawnBatchMult);
             }
 
-            int batchSize = math.max(1, (int)math.round(math.max(1, mobileConfig.SpawnBatchSize) * intensity * cycleGrowth * dayBatchMult));
-            if (mobileConfig.MaxSpawnBatch > 0)
-                batchSize = math.min(batchSize, mobileConfig.MaxSpawnBatch);
-            batchSize = math.min(batchSize, maxAlive - wave.ZombiesAlive);
-            if (batchSize <= 0)
+            float dayBaseInterval = wave.SpawnInterval > 0f
+                ? wave.SpawnInterval
+                : math.max(mobileConfig.MinSpawnInterval, mobileConfig.BaseSpawnInterval);
+            float effectiveInterval = ContinuousSpawnBudgetUtility.ResolveEffectiveInterval(
+                dayBaseInterval, phaseIntensity, mobileConfig.MinSpawnInterval);
+            int demandPerInterval = ContinuousSpawnBudgetUtility.ResolveDemandPerInterval(
+                mobileConfig.SpawnBatchSize,
+                mobileConfig.SpawnBatchGrowthPerCycle,
+                wave.CurrentWave,
+                dayQuantityMultiplier,
+                phaseIntensity,
+                mobileConfig.MaxSpawnBatch);
+
+            budget.DayQuantityMultiplier = dayQuantityMultiplier;
+            budget.DayBaseSpawnInterval = dayBaseInterval;
+            budget.PhaseIntensityMultiplier = phaseIntensity;
+            budget.EffectiveSpawnInterval = effectiveInterval;
+            budget.DemandPerInterval = demandPerInterval;
+            budget.LastDemandedEnemies = 0;
+            budget.LastSpawnedEnemies = 0;
+
+            wave.SpawnTimer -= dt;
+            int elapsedIntervals = ContinuousSpawnBudgetUtility.CountElapsedIntervals(
+                wave.SpawnTimer, effectiveInterval);
+            if (elapsedIntervals > 0)
+            {
+                long pendingBefore = budget.PendingEnemies;
+                budget.PendingEnemies = ContinuousSpawnBudgetUtility.AddDemand(
+                    budget.PendingEnemies, demandPerInterval, elapsedIntervals);
+                long demanded = budget.PendingEnemies - math.max(0L, pendingBefore);
+                budget.LastDemandedEnemies = (int)math.min(int.MaxValue, demanded);
+                budget.TotalDemandedEnemies = ContinuousSpawnBudgetUtility.AddTelemetry(
+                    budget.TotalDemandedEnemies, demanded);
+                wave.SpawnTimer = ContinuousSpawnBudgetUtility.AdvanceTimer(
+                    wave.SpawnTimer, effectiveInterval, elapsedIntervals);
+            }
+
+            int maxDrainPerFrame = mobileConfig.MaxSpawnBatch > 0
+                ? mobileConfig.MaxSpawnBatch
+                : demandPerInterval;
+            int spawnCount = ContinuousSpawnBudgetUtility.ResolveDrainCount(
+                budget.PendingEnemies,
+                wave.ZombiesAlive,
+                mobileConfig.MaxAliveZombies,
+                math.max(1, maxDrainPerFrame));
+            if (spawnCount <= 0)
                 return;
 
-            SpawnZombieBatch(ref state, ref wave, batchSize, true, mobileConfig);
+            SpawnZombieBatch(ref state, ref wave, spawnCount, true, mobileConfig);
+            budget.PendingEnemies -= spawnCount;
+            budget.LastSpawnedEnemies = spawnCount;
+            budget.TotalSpawnedEnemies = ContinuousSpawnBudgetUtility.AddTelemetry(
+                budget.TotalSpawnedEnemies, spawnCount);
         }
 
         private static WaveClearRewardData CalculateWaveClearBonus(

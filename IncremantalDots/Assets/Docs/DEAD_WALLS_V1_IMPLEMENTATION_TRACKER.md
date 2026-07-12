@@ -5,7 +5,7 @@
 > **Tracker sürümü:** 2.0  
 > **Son tam kapsam denetimi:** 2026-07-12  
 > **Aktif paket:** Package B - Continuous Horde
-> **Aktif iş:** `DW-B-FLOW` - Spawn Budget & Backlog
+> **Aktif iş:** `DW-B-MOAT` - Dormant Moat Isolation
 
 ---
 
@@ -123,8 +123,8 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Oyun hızı | Oyuncu kontrollü x2/x4 veya offline progress owner'ı bulunmadı | Blueprint ile uyumlu; regression gerekli |
 | Battlefield | Kale/duvar solda, spawn sağdaki `SpawnLineX` bandından geliyor | Temel kompozisyon uyumlu |
 | Build placement | Aktif scene'de `BuildingPlacementUI` ve `BuildingGridManager` bağlı değil | Hazır bina yönüyle uyumlu |
-| Cycle | Toplam 60 saniye fakat `22/8/22/8` | Hedef `30/5/20/5` |
-| Horde | Tek prefab akışı mevcut; stat growth, Blood Moon ve destroy-on-death aktif | Package B uyumsuz |
+| Cycle | `Day 30 / Dusk 5 / Night 20 / Dawn 5`; dört fazda pozitif spawn temposu | Uyumlu |
+| Horde | Tek prefab; sabit stats; explicit saved backlog; Blood Moon dormant; death hâlâ `DestroyEntity` | Package B kısmi |
 | Moat | `MoatSystem` ve `MoatSlowMultiplier=0.55` aktif combat etkisi uyguluyor | Yalnız dormant kalabilir; active bağlantı onaysız |
 | Defense | Damage/Game Over aktif olarak tek Wall'a çekildi | Kodlandı, runtime test bekliyor |
 | Normal repair | Wood+Stone maliyeti kullanıyor ve Night phase guard'ı yok | Day/Dusk + Stone-only hedefiyle çelişiyor |
@@ -145,8 +145,8 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Meta | Ayrı JSON ve Game Over shop var; `StartingTechLevel` aktif | Kısmi uyum |
 | HUD | CyclePanel, DAY/DUSK/NIGHT ve Horde Pressure mevcut; tek Wall runtime gizleme var | Package I polish gerekli |
 | Tutorial | Aktif tutorial/onboarding sistemi bulunmadı | Package I eksik |
-| Testler | CouncilComposer ve SingleWallDefenseRules EditMode testleri var | V1 matrisinin küçük bölümü |
-| Telemetry | Blueprint event'leri için runtime telemetry owner'ı bulunmadı | Eksik |
+| Testler | V1 contract testleri EditMode `28/28`, PlayMode `9/9` geçiyor | Kapsam büyüyor |
+| Telemetry | Spawn budget demanded/spawned/backlog telemetry mevcut; tam Blueprint event owner'ı eksik | Kısmi |
 
 ---
 
@@ -154,8 +154,8 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 | Sıra | Paket | Durum | Sonraki pakete geçiş kapısı |
 |---:|---|---|---|
-| 1 | A - System Contracts | **Aktif** | Reset/Continue deterministik; upkeep yok; tek Wall testli |
-| 2 | B - Continuous Horde | Bekliyor | Sabit stats ile gün baskısı artar; backlog/pool çalışır |
+| 1 | A - System Contracts | Tamamlandı | Reset/Continue deterministik; upkeep yok; tek Wall testli |
+| 2 | B - Continuous Horde | **Aktif** | Sabit stats ile gün baskısı artar; backlog/pool çalışır |
 | 3 | C - Economy + Population | Bekliyor | Pasif drain yok; arrival tek Food öder; cap aşılmaz |
 | 4 | D - Archers + Ammo | Bekliyor | 1.000 x 10.000; 40x25; Arrow truth çalışır |
 | 5 | E - Castle Heart | Bekliyor | Aynı seed/load aynı valid graph'ı üretir |
@@ -298,14 +298,21 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [x] SpecialNight content/schema gelecekte kullanım için korunuyor fakat V1 runtime'a bağlı değil.
 - [x] Stale special multiplier enjekte edilen ileri gün testinde intensity bonusu ve warning oluşmadı.
 
-### `DW-B-FLOW` - Şu anki tek aktif iş
+### `DW-B-FLOW` - Tamamlandı: Spawn Budget & Backlog
 
-- [ ] Count/batch/interval quantity pressure alanlarının tek runtime owner'ını çıkar.
-- [ ] Day curve ile phase multiplier'ı birbirinden ayıran açık spawn budget state'i kur.
-- [ ] Dawn'daki düşük anlık intensity'nin yeni gün tabanını geriye düşürmesini engelle.
-- [ ] Active cap dolduğunda spawn talebini silmek yerine explicit backlog'a aktar.
-- [ ] Backlog state'ini exact save ve runtime telemetry'ye ekle.
-- [ ] Cap boşaldığında backlog'un sahaya geri aktığını runtime test et.
+- [x] Count/batch/interval quantity pressure matematiği `ContinuousSpawnBudgetUtility` altında toplandı.
+- [x] Day curve/base interval ile phase multiplier'ı ayrı tutan `ContinuousSpawnBudgetData` kuruldu.
+- [x] Dawn'daki düşük anlık intensity yalnız effective interval'i etkiliyor; yeni gün tabanına geri yazmıyor.
+- [x] Active cap dolduğunda geçen her interval talebi explicit `PendingEnemies` backlog'una ekleniyor.
+- [x] Backlog ve demanded/spawned telemetry sayaçları exact save/Continue state'ine eklendi.
+- [x] Cap boşaldığında backlog'un `MaxSpawnBatch` ve alive capacity sınırlarıyla sahaya aktığı runtime test edildi.
+
+### `DW-B-MOAT` - Şu anki tek aktif iş
+
+- [ ] Aktif `MoatSystem` etkisinin V1 Blueprint core loop'una nasıl bağlandığını çıkar.
+- [ ] Slow/damage tuning, tech aggregate ve scene bağlantılarını dormant sınırına çek.
+- [ ] Moat content ve kodunu silmeden aktif combat sonucuna sızmasını engelle.
+- [ ] Runtime regression testiyle stale Moat değerlerinin zombie speed/HP'sini değiştiremediğini kanıtla.
 
 ### Mevcut oyun ile karşılaştırma
 
@@ -318,7 +325,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Quantity-only difficulty | Count/batch/interval büyüyor; stat growth utility seviyesinde yok sayılıyor | `[x]` |
 | Tek enemy prefab | Aktif çıkış tek zombie prefab üzerinden | `[~]` Catalog contract yok |
 | 10k expandable pool | Active cap 900; death `DestroyEntity` | `[!]` |
-| Backlog kaybolmaz | Cap gate var; explicit backlog state/soak kanıtı yok | `[~]` |
+| Backlog kaybolmaz | Explicit saved budget state cap altında talep biriktiriyor ve kapasitede kontrollü boşaltıyor | `[x]` |
 | Special night yok | SpecialNight schema dormant; runtime multiplier/flag/warning üretemiyor | `[x]` |
 
 ### Yapılacaklar
@@ -328,23 +335,23 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [x] Zombie HP growth'ü kaldır.
 - [x] Zombie damage growth'ü kaldır.
 - [x] Zombie speed growth'ü kaldır.
-- [ ] Spawn count/budget için day curve ve phase multiplier owner'ı oluştur.
-- [ ] Dawn yoğunluğunu düşürürken yeni gün tabanının önceki güne geri dönmemesini sağla.
+- [x] Spawn count/budget için day curve ve phase multiplier owner'ı oluştur.
+- [x] Dawn yoğunluğunu düşürürken yeni gün tabanının önceki güne geri dönmemesini sağla.
 - [x] Blood Moon/SpecialNights active bağlantısını kaldır; dormant kalabilir.
 - [ ] Aktif `MoatSystem` combat etkisini V1 core loop'tan ayır; kod/content dormant kalabilir.
 - [ ] `EnemyDefinition` ve tek kayıtlı enemy catalog oluştur.
 - [ ] Enemy type özel dalları spawn/UI koduna eklemeden content genişleme sınırı kur.
-- [ ] Explicit spawn backlog state/policy kur ve save/telemetry'ye aç.
+- [x] Explicit spawn backlog state/policy kur ve save/telemetry'ye aç.
 - [ ] Enemy pool'u küçük prewarm + ihtiyaçla genişleme şeklinde kur.
 - [ ] Ölümde entity destroy yerine pool return uygula.
-- [ ] Active cap'i data-driven yap; teknik cap dolduğunda talebi silme.
+- [x] Active cap data-driven kalır; teknik cap dolduğunda talebi explicit backlog'da koru.
 - [ ] Gerçek oyun UI/VFX/save açıkken 10.000 enemy ölçüm senaryosu kur.
 
 ### Kabul kapısı
 
-- [ ] Day 1 ve ileri günlerde enemy HP/damage/speed aynıdır.
-- [ ] Gün baskısı yalnız count/budget/flow ile artar.
-- [ ] Cap doluyken talep backlog'a gider ve boşlukta sahaya çıkar.
+- [x] Day 1 ve ileri günlerde enemy HP/damage/speed aynıdır.
+- [x] Gün baskısı yalnız count/budget/flow ile artar.
+- [x] Cap doluyken talep backlog'a gider ve boşlukta sahaya çıkar.
 - [ ] Tek prefab catalog üzerinden çalışır.
 - [ ] Death churn pool ile yönetilir.
 
@@ -1038,3 +1045,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-12 | `DW-B-CYCLE` Blueprint phase rhythm | Active cycle ve initializer değerleri Day 30 / Dusk 5 / Night 20 / Dawn 5 olarak eşlendi | Unity compile: 0 error; EditMode 24/24; PlayMode 6/6 |
 | 2026-07-12 | `DW-B-STATS` quantity-only difficulty | Enemy HP/damage/speed progression utility seviyesinde kaldırıldı; baskı count/batch/interval kanallarında kaldı | Unity compile: 0 error; EditMode 25/25; PlayMode 7/7 |
 | 2026-07-12 | `DW-B-SPECIAL` special nights removal | Blood Moon seed, multiplier, flag restore ve runtime warning zinciri V1'de dormant hale getirildi | Unity compile: 0 error; EditMode 25/25; PlayMode 8/8 |
+| 2026-07-12 | `DW-B-FLOW` spawn budget & backlog | Day tabanı/phase multiplier ayrıldı; cap altındaki her interval explicit saved backlog'a dönüştü ve kontrollü drain edildi | Unity compile: 0 error; EditMode 28/28; PlayMode 9/9 |

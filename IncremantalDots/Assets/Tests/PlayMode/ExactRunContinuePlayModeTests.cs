@@ -55,7 +55,8 @@ namespace DeadWalls.Tests
             Assert.That(runtimeReady, Is.True, "GameManager/SubScene 300 frame icinde snapshot icin hazir olmadi.");
 
             EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-            Entity cycleEntity = entityManager.CreateEntityQuery(typeof(ContinuousSiegeCycleData)).GetSingletonEntity();
+            Entity cycleEntity = entityManager.CreateEntityQuery(
+                typeof(ContinuousSiegeCycleData), typeof(ContinuousSpawnBudgetData)).GetSingletonEntity();
             Entity resourceEntity = entityManager.CreateEntityQuery(typeof(ResourceData), typeof(WaveStateData)).GetSingletonEntity();
 
             var cycle = entityManager.GetComponentData<ContinuousSiegeCycleData>(cycleEntity);
@@ -77,6 +78,17 @@ namespace DeadWalls.Tests
             wave.SpawnRandomState = 987654321u;
             entityManager.SetComponentData(resourceEntity, wave);
 
+            var spawnBudget = entityManager.GetComponentData<ContinuousSpawnBudgetData>(cycleEntity);
+            spawnBudget.PendingEnemies = 73;
+            spawnBudget.TotalDemandedEnemies = 500;
+            spawnBudget.TotalSpawnedEnemies = 427;
+            spawnBudget.DemandPerInterval = 11;
+            spawnBudget.DayQuantityMultiplier = 1.4f;
+            spawnBudget.DayBaseSpawnInterval = 0.42f;
+            spawnBudget.PhaseIntensityMultiplier = 1.65f;
+            spawnBudget.EffectiveSpawnInterval = 0.2545f;
+            entityManager.SetComponentData(cycleEntity, spawnBudget);
+
             Assert.That(gameManager.SaveRunSnapshot(), Is.True);
             string savedRunId = gameManager.CurrentRunId;
 
@@ -88,12 +100,18 @@ namespace DeadWalls.Tests
             entityManager.SetComponentData(resourceEntity, resources);
             wave.SpawnRandomState = 1u;
             entityManager.SetComponentData(resourceEntity, wave);
+            spawnBudget.PendingEnemies = 0;
+            spawnBudget.TotalDemandedEnemies = 0;
+            spawnBudget.TotalSpawnedEnemies = 0;
+            entityManager.SetComponentData(cycleEntity, spawnBudget);
 
             Assert.That(gameManager.TryRestoreRunFromCheckpoint(), Is.True);
 
-            cycleEntity = entityManager.CreateEntityQuery(typeof(ContinuousSiegeCycleData)).GetSingletonEntity();
+            cycleEntity = entityManager.CreateEntityQuery(
+                typeof(ContinuousSiegeCycleData), typeof(ContinuousSpawnBudgetData)).GetSingletonEntity();
             resourceEntity = entityManager.CreateEntityQuery(typeof(ResourceData), typeof(WaveStateData)).GetSingletonEntity();
             var restoredCycle = entityManager.GetComponentData<ContinuousSiegeCycleData>(cycleEntity);
+            var restoredBudget = entityManager.GetComponentData<ContinuousSpawnBudgetData>(cycleEntity);
             var restoredResources = entityManager.GetComponentData<ResourceData>(resourceEntity);
             var restoredWave = entityManager.GetComponentData<WaveStateData>(resourceEntity);
 
@@ -106,6 +124,10 @@ namespace DeadWalls.Tests
             Assert.That(restoredResources.Iron, Is.EqualTo(2109));
             Assert.That(restoredResources.Food, Is.EqualTo(1098));
             Assert.That(restoredWave.SpawnRandomState, Is.EqualTo(987654321u));
+            Assert.That(restoredBudget.PendingEnemies, Is.EqualTo(73));
+            Assert.That(restoredBudget.TotalDemandedEnemies, Is.EqualTo(500));
+            Assert.That(restoredBudget.TotalSpawnedEnemies, Is.EqualTo(427));
+            Assert.That(restoredBudget.DayBaseSpawnInterval, Is.EqualTo(0.42f).Within(0.001f));
             yield return null;
         }
 
@@ -477,6 +499,71 @@ namespace DeadWalls.Tests
                 if (warning.WarningText != null)
                     Assert.That(warning.WarningText.gameObject.activeSelf, Is.False);
             }
+        }
+
+        [UnityTest]
+        public IEnumerator ContinuousSpawnBudget_AccumulatesAtCap_AndDrainsWhenCapacityOpens()
+        {
+            var gameManager = GameManager.Instance;
+            bool runtimeReady = false;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                {
+                    runtimeReady = true;
+                    break;
+                }
+                yield return null;
+            }
+            Assert.That(runtimeReady, Is.True);
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            Entity configEntity = entityManager.CreateEntityQuery(
+                typeof(MobileCastleCombatConfig),
+                typeof(ContinuousSiegeCycleData),
+                typeof(ContinuousSpawnBudgetData)).GetSingletonEntity();
+            Entity waveEntity = entityManager.CreateEntityQuery(typeof(WaveStateData)).GetSingletonEntity();
+
+            var zombieQuery = entityManager.CreateEntityQuery(new EntityQueryDesc
+            {
+                All = new[] { ComponentType.ReadOnly<ZombieTag>() },
+                None = new[] { ComponentType.ReadOnly<Prefab>() }
+            });
+            entityManager.DestroyEntity(zombieQuery);
+
+            var config = entityManager.GetComponentData<MobileCastleCombatConfig>(configEntity);
+            config.MaxAliveZombies = 1;
+            config.MaxSpawnBatch = 4;
+            config.MinSpawnInterval = 0.05f;
+            entityManager.SetComponentData(configEntity, config);
+
+            var wave = entityManager.GetComponentData<WaveStateData>(waveEntity);
+            wave.ZombiesAlive = 1;
+            wave.SpawnTimer = 0f;
+            wave.SpawnInterval = 0.05f;
+            entityManager.SetComponentData(waveEntity, wave);
+
+            entityManager.SetComponentData(configEntity, new ContinuousSpawnBudgetData());
+            yield return null;
+
+            var blockedBudget = entityManager.GetComponentData<ContinuousSpawnBudgetData>(configEntity);
+            Assert.That(blockedBudget.PendingEnemies, Is.GreaterThan(0));
+            Assert.That(blockedBudget.TotalSpawnedEnemies, Is.Zero);
+
+            wave = entityManager.GetComponentData<WaveStateData>(waveEntity);
+            wave.ZombiesAlive = 0;
+            wave.SpawnTimer = 999f;
+            entityManager.SetComponentData(waveEntity, wave);
+            long pendingBeforeDrain = blockedBudget.PendingEnemies;
+
+            yield return null;
+
+            var drainedBudget = entityManager.GetComponentData<ContinuousSpawnBudgetData>(configEntity);
+            var drainedWave = entityManager.GetComponentData<WaveStateData>(waveEntity);
+            Assert.That(drainedBudget.LastSpawnedEnemies, Is.EqualTo(1));
+            Assert.That(drainedBudget.PendingEnemies, Is.EqualTo(pendingBeforeDrain - 1));
+            Assert.That(drainedBudget.TotalSpawnedEnemies, Is.EqualTo(1));
+            Assert.That(drainedWave.ZombiesAlive, Is.EqualTo(1));
         }
     }
 }

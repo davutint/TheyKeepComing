@@ -146,6 +146,7 @@ namespace DeadWalls
         public WaveClearRewardData WaveClearReward { get; private set; }
         public CastleYardPrepState CastleYardPrep { get; private set; }
         public ContinuousSiegeCycleData ContinuousSiegeCycle { get; private set; }
+        public ContinuousSpawnBudgetData ContinuousSpawnBudget { get; private set; }
         public MobilePopulationAllocation PopulationAllocation { get; private set; }
         public MobilePrepPauseState PrepPause { get; private set; }
         public MobileEconomyEventState EconomyEvent { get; private set; }
@@ -756,6 +757,22 @@ namespace DeadWalls
             cycle = _entityManager.GetComponentData<ContinuousSiegeCycleData>(mobileConfigEntity);
             ContinuousSiegeCycle = cycle;
             return cycle.Enabled;
+        }
+
+        public bool TryGetContinuousSpawnBudget(out ContinuousSpawnBudgetData budget)
+        {
+            budget = default;
+            if (!_initialized
+                || !CanAccessEntityManager()
+                || !TryGetMobileConfigEntity(out var mobileConfigEntity)
+                || !_entityManager.HasComponent<ContinuousSpawnBudgetData>(mobileConfigEntity))
+            {
+                return false;
+            }
+
+            budget = _entityManager.GetComponentData<ContinuousSpawnBudgetData>(mobileConfigEntity);
+            ContinuousSpawnBudget = budget;
+            return true;
         }
 
         public bool IsUnlimitedArrowsEnabled()
@@ -2279,6 +2296,9 @@ namespace DeadWalls
             var allocation = _entityManager.GetComponentData<MobilePopulationAllocation>(mobileConfigEntity);
             var prep = _entityManager.GetComponentData<CastleYardPrepState>(mobileConfigEntity);
             var economyEvent = _entityManager.GetComponentData<MobileEconomyEventState>(mobileConfigEntity);
+            var spawnBudget = _entityManager.HasComponent<ContinuousSpawnBudgetData>(mobileConfigEntity)
+                ? _entityManager.GetComponentData<ContinuousSpawnBudgetData>(mobileConfigEntity)
+                : default;
 
             var save = new RunSaveState
             {
@@ -2310,6 +2330,16 @@ namespace DeadWalls
                 WaveStartDelay = wave.WaveStartDelay,
                 WaveStartTimer = wave.WaveStartTimer,
                 SpawnRandomState = wave.SpawnRandomState,
+                SpawnBacklog = spawnBudget.PendingEnemies,
+                TotalDemandedEnemies = spawnBudget.TotalDemandedEnemies,
+                TotalBudgetSpawnedEnemies = spawnBudget.TotalSpawnedEnemies,
+                DemandPerInterval = spawnBudget.DemandPerInterval,
+                LastDemandedEnemies = spawnBudget.LastDemandedEnemies,
+                LastBudgetSpawnedEnemies = spawnBudget.LastSpawnedEnemies,
+                DayQuantityMultiplier = spawnBudget.DayQuantityMultiplier,
+                DayBaseSpawnInterval = spawnBudget.DayBaseSpawnInterval,
+                PhaseIntensityMultiplier = spawnBudget.PhaseIntensityMultiplier,
+                EffectiveSpawnInterval = spawnBudget.EffectiveSpawnInterval,
                 Wood = Resources.Wood,
                 Stone = Resources.Stone,
                 Iron = Resources.Iron,
@@ -2642,6 +2672,25 @@ namespace DeadWalls
             _entityManager.SetComponentData(mobileConfigEntity, cycle);
             ContinuousSiegeCycle = cycle;
             _lastPhaseForCheckpoint = cycle.Phase;
+
+            if (_entityManager.HasComponent<ContinuousSpawnBudgetData>(mobileConfigEntity))
+            {
+                var spawnBudget = new ContinuousSpawnBudgetData
+                {
+                    PendingEnemies = save.SpawnBacklog > 0L ? save.SpawnBacklog : 0L,
+                    TotalDemandedEnemies = save.TotalDemandedEnemies > 0L ? save.TotalDemandedEnemies : 0L,
+                    TotalSpawnedEnemies = save.TotalBudgetSpawnedEnemies > 0L ? save.TotalBudgetSpawnedEnemies : 0L,
+                    DemandPerInterval = Mathf.Max(0, save.DemandPerInterval),
+                    LastDemandedEnemies = Mathf.Max(0, save.LastDemandedEnemies),
+                    LastSpawnedEnemies = Mathf.Max(0, save.LastBudgetSpawnedEnemies),
+                    DayQuantityMultiplier = Mathf.Max(0.01f, save.DayQuantityMultiplier),
+                    DayBaseSpawnInterval = Mathf.Max(0.001f, save.DayBaseSpawnInterval),
+                    PhaseIntensityMultiplier = Mathf.Max(0.01f, save.PhaseIntensityMultiplier),
+                    EffectiveSpawnInterval = Mathf.Max(0.001f, save.EffectiveSpawnInterval)
+                };
+                _entityManager.SetComponentData(mobileConfigEntity, spawnBudget);
+                ContinuousSpawnBudget = spawnBudget;
+            }
 
             var wave = _entityManager.GetComponentData<WaveStateData>(_gameStateEntity);
             wave.CurrentWave = save.CurrentWave;
@@ -3479,6 +3528,7 @@ namespace DeadWalls
             WaveClearReward = default;
             CastleYardPrep = default;
             ContinuousSiegeCycle = default;
+            ContinuousSpawnBudget = default;
             PopulationAllocation = default;
             PrepPause = default;
             EconomyEvent = default;
@@ -3494,6 +3544,9 @@ namespace DeadWalls
 
             if (_entityManager.HasComponent<ContinuousSiegeCycleData>(mobileConfigEntity))
                 ContinuousSiegeCycle = _entityManager.GetComponentData<ContinuousSiegeCycleData>(mobileConfigEntity);
+
+            if (_entityManager.HasComponent<ContinuousSpawnBudgetData>(mobileConfigEntity))
+                ContinuousSpawnBudget = _entityManager.GetComponentData<ContinuousSpawnBudgetData>(mobileConfigEntity);
 
             if (_entityManager.HasComponent<MobilePopulationAllocation>(mobileConfigEntity))
                 PopulationAllocation = _entityManager.GetComponentData<MobilePopulationAllocation>(mobileConfigEntity);
@@ -4031,6 +4084,25 @@ namespace DeadWalls
                 cycle.Phase = SiegeCyclePhase.Day;
                 _entityManager.SetComponentData(mobileConfigEntity, cycle);
                 ContinuousSiegeCycle = cycle;
+            }
+            if (mobileMode && _entityManager.HasComponent<ContinuousSpawnBudgetData>(mobileConfigEntity))
+            {
+                var spawnBudget = new ContinuousSpawnBudgetData
+                {
+                    PendingEnemies = 0,
+                    TotalDemandedEnemies = 0,
+                    TotalSpawnedEnemies = 0,
+                    DemandPerInterval = 0,
+                    LastDemandedEnemies = 0,
+                    LastSpawnedEnemies = 0,
+                    DayQuantityMultiplier = 1f,
+                    DayBaseSpawnInterval = Mathf.Max(mobileConfig.MinSpawnInterval, mobileConfig.BaseSpawnInterval),
+                    PhaseIntensityMultiplier = Mathf.Max(0.01f, mobileConfig.SiegeDayIntensityMultiplier),
+                    EffectiveSpawnInterval = Mathf.Max(mobileConfig.MinSpawnInterval,
+                        mobileConfig.BaseSpawnInterval / Mathf.Max(0.01f, mobileConfig.SiegeDayIntensityMultiplier))
+                };
+                _entityManager.SetComponentData(mobileConfigEntity, spawnBudget);
+                ContinuousSpawnBudget = spawnBudget;
             }
 
             // Game state resetle

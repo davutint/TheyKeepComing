@@ -126,6 +126,24 @@ namespace DeadWalls
         public bool IsBloodMoonNight;
     }
 
+    /// <summary>
+    /// Continuous horde icin exact spawn talebi ve runtime telemetry state'i.
+    /// Day tabani phase carpanindan ayridir; cap doluyken PendingEnemies silinmez.
+    /// </summary>
+    public struct ContinuousSpawnBudgetData : IComponentData
+    {
+        public long PendingEnemies;
+        public long TotalDemandedEnemies;
+        public long TotalSpawnedEnemies;
+        public int DemandPerInterval;
+        public int LastDemandedEnemies;
+        public int LastSpawnedEnemies;
+        public float DayQuantityMultiplier;
+        public float DayBaseSpawnInterval;
+        public float PhaseIntensityMultiplier;
+        public float EffectiveSpawnInterval;
+    }
+
     public struct WaveClearRewardData : IComponentData
     {
         public int Sequence;

@@ -53,6 +53,18 @@ namespace DeadWalls
         public float WaveStartTimer;
         public uint SpawnRandomState;
 
+        // Continuous spawn budget + runtime telemetry
+        public long SpawnBacklog;
+        public long TotalDemandedEnemies;
+        public long TotalBudgetSpawnedEnemies;
+        public int DemandPerInterval;
+        public int LastDemandedEnemies;
+        public int LastBudgetSpawnedEnemies;
+        public float DayQuantityMultiplier;
+        public float DayBaseSpawnInterval;
+        public float PhaseIntensityMultiplier;
+        public float EffectiveSpawnInterval;
+
         // Kaynaklar + kesirli accumulator
         public int Wood;
         public int Stone;

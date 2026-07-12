@@ -341,6 +341,21 @@ namespace DeadWalls
                     Phase = SiegeCyclePhase.Day
                 });
 
+                AddComponent(entity, new ContinuousSpawnBudgetData
+                {
+                    PendingEnemies = 0,
+                    TotalDemandedEnemies = 0,
+                    TotalSpawnedEnemies = 0,
+                    DemandPerInterval = 0,
+                    LastDemandedEnemies = 0,
+                    LastSpawnedEnemies = 0,
+                    DayQuantityMultiplier = 1f,
+                    DayBaseSpawnInterval = math.max(config.MinSpawnInterval, config.BaseSpawnInterval),
+                    PhaseIntensityMultiplier = math.max(0.01f, config.SiegeDayIntensityMultiplier),
+                    EffectiveSpawnInterval = math.max(config.MinSpawnInterval,
+                        config.BaseSpawnInterval / math.max(0.01f, config.SiegeDayIntensityMultiplier))
+                });
+
                 var slots = AddBuffer<ArcherSlotPosition>(entity);
                 if (authoring.ArcherSlots != null)
                 {

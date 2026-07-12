@@ -56,6 +56,7 @@ Savunma sonucu için tek runtime owner `WallSegment`tir. Gate/Core component ve 
 
 - `MobileCastleCombatConfig`: kale merkezi, spawn radius, attack radius, wave/siege sayilari, spawn batch, zombie scale/speed, continuous siege tuning, reward tuning, worker economy tuning, event tuning, unlimited arrow flag'i ve stress test limitlerini tutar.
 - `ContinuousSiegeCycleData`: player-facing `DAY / DUSK / NIGHT` fazini, 60s cycle progress'ini, spawn intensity multiplier'i ve horde pressure degerini tutar.
+- `ContinuousSpawnBudgetData`: day tabanı ile phase multiplier'ını ayrı tutar; pending enemy backlog'u ve demanded/spawned runtime telemetry sayaçlarını taşır.
 - `WaveStateData.Phase`: mobile continuous modda uyumluluk icin `NightCombat` aktif tutulur. Eski DayPrep akisi component seviyesinde kalir ama `ContinuousSiegeCycleData.Enabled` true iken player-facing akisi yonetmez.
 - `EconomyFocusState`: eski focus akisi icin korunur. Worker economy aktifken player-facing UI bunu kullanmaz.
 - `WaveClearRewardData`: son wave clear bonusunu HUD toast'i icin saklar.
@@ -119,7 +120,7 @@ Mobile castle render sirasi shader degistirilerek degil, world z bandlariyla coz
 
 ### WaveSpawnSystem
 
-Mobile mode'da zombileri kale merkezi etrafindaki cemberden random aciyla spawn eder. Spawn yonu tam random 360 kalir; lane, cephe veya telegraph yoktur. Continuous siege aktifken `WaveSpawnSystem`, wave clear kontrolune girmez; `ContinuousSiegeCycleData.SpawnIntensityMultiplier` ile interval'i kisa/uzun, batch'i kucuk/buyuk yapar. Ic tarafta `CurrentWave` cycle index olarak tutulur ve `MobileWaveUtility.ConfigureMobileWave()` zombi HP/speed gibi scaling degerlerini hesaplamaya devam eder, fakat UI wave numarasi gostermez.
+Continuous siege aktifken `WaveSpawnSystem`, wave clear kontrolüne girmez. `ContinuousSpawnBudgetUtility` günlük count/batch/interval tabanını phase multiplier'dan ayrı hesaplar. Alive cap doluysa geçen interval talebi `ContinuousSpawnBudgetData.PendingEnemies` içinde korunur; kapasite açılınca frame başına `MaxSpawnBatch` sınırıyla sahaya aktarılır. İç tarafta `CurrentWave` cycle index olarak tutulur; `MobileWaveUtility.ConfigureMobileWave()` count ve base interval'i günceller, enemy HP/damage/speed'i sabit tutar. UI wave veya backlog sayısını player-facing olarak göstermez.
 
 Legacy mobile wave director akisi `ContinuousSiegeCycleData.Enabled` false yapilirsa hala calisabilir: opening/mid/final fazlari `ZombiesSpawned / ZombiesToSpawn` oranindan hesaplanir ve wave temizlenince DayPrep'e doner. Varsayilan NewGameScene akisi continuous siege'dir. Stress mode aciksa mobile config'teki stress batch/interval/cap kullanilir, reward verilmez ve continuous/legacy wave director fazlari calismaz.
 

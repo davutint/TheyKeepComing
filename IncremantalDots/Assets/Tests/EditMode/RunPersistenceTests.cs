@@ -25,6 +25,14 @@ namespace DeadWalls.Tests
                 CycleProgress01 = 0.6875f,
                 PhaseProgress01 = 0.3125f,
                 SpawnRandomState = 123456u,
+                SpawnBacklog = 77,
+                TotalDemandedEnemies = 1234,
+                TotalBudgetSpawnedEnemies = 1157,
+                DemandPerInterval = 9,
+                DayQuantityMultiplier = 1.4f,
+                DayBaseSpawnInterval = 0.42f,
+                PhaseIntensityMultiplier = 1.65f,
+                EffectiveSpawnInterval = 0.2545f,
                 Wood = 321,
                 Stone = 222,
                 Iron = 111,
@@ -88,6 +96,10 @@ namespace DeadWalls.Tests
             Assert.That(restored.CyclePhase, Is.EqualTo((int)SiegeCyclePhase.Night));
             Assert.That(restored.CycleTimer, Is.EqualTo(41.25f));
             Assert.That(restored.SpawnRandomState, Is.EqualTo(123456u));
+            Assert.That(restored.SpawnBacklog, Is.EqualTo(77));
+            Assert.That(restored.TotalDemandedEnemies, Is.EqualTo(1234));
+            Assert.That(restored.TotalBudgetSpawnedEnemies, Is.EqualTo(1157));
+            Assert.That(restored.DayBaseSpawnInterval, Is.EqualTo(0.42f));
             Assert.That(restored.ArrowCurrent, Is.EqualTo(456));
             Assert.That(restored.ActiveCouncilEvent.TemplateId, Is.EqualTo("council_test"));
             Assert.That(restored.ActiveCouncilEvent.OptionA.Effects.Count, Is.EqualTo(1));

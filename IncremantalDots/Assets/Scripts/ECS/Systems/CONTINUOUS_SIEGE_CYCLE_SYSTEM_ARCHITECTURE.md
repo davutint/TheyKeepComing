@@ -18,7 +18,7 @@
 
 ## Spawn Pressure
 
-Sistem `SpawnIntensityMultiplier` ve `HordePressure01` uretir. `WaveSpawnSystem` continuous siege aktifken eski wave clear kontrolunu calistirmaz; bu multiplier'a gore spawn interval ve batch size ayarlar.
+Sistem `SpawnIntensityMultiplier` ve `HordePressure01` uretir. `WaveSpawnSystem` continuous siege aktifken eski wave clear kontrolunu calistirmaz. Günlük count/batch/interval tabanı ile phase multiplier ayrı `ContinuousSpawnBudgetData` alanlarında tutulur; ayrıntılı sözleşme `CONTINUOUS_SPAWN_BUDGET_ARCHITECTURE.md` dosyasındadır.
 
 Varsayilan yogunluklar:
 
@@ -40,10 +40,10 @@ odul/nefes fazi. `SiegeDawnDuration=0` bake'lerde legacy 3-faz davranis korunur.
   (`MobilePopulationEconomySystem.ApplyContinuousCycleGrowth`; isaret degeri
   `LastPopulationGrowthCycle = CycleIndex + 1`, ilk gunun Dawn'i dahil).
   `DawnRewardToastUI` bu ani toast ile gorunur kilar.
-- Kutle eskalasyonu (MobileWaveUtility + WaveSpawnSystem.HandleContinuousSiegeSpawn):
-  HP/damage/speed cycle ile buyumez; batch = `SpawnBatchSize * intensity *
-  (1+(w-1)*SpawnBatchGrowthPerCycle)` cap `MaxSpawnBatch`; `MaxAliveZombies`
-  performans tavani (spawn atlanir). Tabanlar config'e tasindi (hardcoded 20/5 yok).
+- Kutle eskalasyonu (MobileWaveUtility + ContinuousSpawnBudgetUtility):
+  HP/damage/speed cycle ile buyumez; demand batch day curve, cycle growth ve phase
+  intensity ile hesaplanıp `MaxSpawnBatch` ile sınırlanır. `MaxAliveZombies` doluyken
+  talep atlanmaz; explicit backlog'a eklenir ve kapasite açılınca kontrollü boşalır.
 - `KillRewardWaveScale=0` default: kill odulu cycle ile buyumez (gelir/zorluk ayrisik).
 - DayNightOverlayController Dawn'da night->day alpha lerp'i yapar;
   HUDController `DAWN` yazar ve `CycleDayCounterText` ("DAY n" = CycleIndex+1) gunceller.
