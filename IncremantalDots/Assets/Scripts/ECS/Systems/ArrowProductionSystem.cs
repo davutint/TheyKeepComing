@@ -30,6 +30,10 @@ namespace DeadWalls
             if (gameState.IsGameOver)
                 return;
 
+            // V1 castle loop: Fletcher/queue yok; ok satin alimi anlik transaction'dir.
+            if (SystemAPI.HasSingleton<MobileCastleCombatConfig>())
+                return;
+
             float dt = SystemAPI.Time.DeltaTime;
 
             // Tum Fletcher'larin toplam ok uretim ve ahsap tuketim hizi

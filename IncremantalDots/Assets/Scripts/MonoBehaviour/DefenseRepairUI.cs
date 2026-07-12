@@ -68,6 +68,8 @@ namespace DeadWalls
                 string label;
                 if (!damaged)
                     label = "FULL";
+                else if (!gm.IsRepairPhaseAvailable())
+                    label = "DAY / DUSK ONLY";
                 else
                 {
                     label = cost.ToDisplayString();

@@ -9,12 +9,9 @@ namespace DeadWalls
     [UpdateInGroup(typeof(SimulationSystemGroup), OrderFirst = true)]
     public partial struct WaveSpawnSystem : ISystem
     {
-        private Random _random;
-
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            _random = Random.CreateFromIndex(42);
             state.RequireForUpdate<WaveStateData>();
             state.RequireForUpdate<ZombiePrefabData>();
             state.RequireForUpdate<GameStateData>();
@@ -152,6 +149,7 @@ namespace DeadWalls
         {
             var prefabData = SystemAPI.GetSingleton<ZombiePrefabData>();
             var ecb = new EntityCommandBuffer(Unity.Collections.Allocator.Temp);
+            var random = new Random(wave.SpawnRandomState != 0u ? wave.SpawnRandomState : 42u);
 
             // Prefab'dan scale degerini oku — Inspector'da ayarlanan deger kullanilir
             float prefabScale = state.EntityManager
@@ -170,12 +168,12 @@ namespace DeadWalls
                     if (mobileConfig.SingleFrontEnabled)
                     {
                         // Tek cephe (K4): sag kenar seridinden, dikey bantta rastgele
-                        spawnX = mobileConfig.SpawnLineX + _random.NextFloat(0f, 2f);
-                        spawnY = _random.NextFloat(-mobileConfig.SpawnBandYHalf, mobileConfig.SpawnBandYHalf);
+                        spawnX = mobileConfig.SpawnLineX + random.NextFloat(0f, 2f);
+                        spawnY = random.NextFloat(-mobileConfig.SpawnBandYHalf, mobileConfig.SpawnBandYHalf);
                     }
                     else
                     {
-                        float angle = _random.NextFloat(0f, math.PI * 2f);
+                        float angle = random.NextFloat(0f, math.PI * 2f);
                         float2 dir = new float2(math.cos(angle), math.sin(angle));
                         float2 spawnPos = mobileConfig.CastleCenter + dir * mobileConfig.SpawnRadius;
                         spawnX = spawnPos.x;
@@ -185,8 +183,8 @@ namespace DeadWalls
                 else
                 {
                     // Sag tarafta random Y pozisyonunda, X de biraz dagitilmis
-                    spawnX = 28f + _random.NextFloat(0f, 5f);
-                    spawnY = _random.NextFloat(-12f, 12f);
+                    spawnX = 28f + random.NextFloat(0f, 5f);
+                    spawnY = random.NextFloat(-12f, 12f);
                 }
 
                 var transform = LocalTransform.FromPositionRotationScale(
@@ -216,6 +214,8 @@ namespace DeadWalls
                 wave.ZombiesSpawned++;
                 wave.ZombiesAlive++;
             }
+
+            wave.SpawnRandomState = random.state;
 
             ecb.Playback(state.EntityManager);
             ecb.Dispose();

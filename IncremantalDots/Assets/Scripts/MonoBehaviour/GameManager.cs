@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -30,6 +31,8 @@ namespace DeadWalls
         private Entity _waveStateEntity;
         private Entity _castleEntity;
         private Entity _archerPrefabEntity;
+        private Entity _zombiePrefabEntity;
+        private Entity _arrowPrefabEntity;
         private Entity _workerPrefabEntity;
         private bool _initialized;
         private bool _mobileInitialPrepApplied;
@@ -126,6 +129,7 @@ namespace DeadWalls
         // Meta-progression kosu-ici state'i: her kosu basinda kalici seviyelerden yeniden kurulur
         private bool _metaAppliedThisRun;
         private bool _metaRunCollected;
+        private string _currentRunId;
         private float _metaWallHpPercent;
         private float _metaDamageMultiplier = 1f;
         private float _metaProductionPercent;
@@ -156,6 +160,7 @@ namespace DeadWalls
         public CouncilEventCatalogSO CouncilCatalog => councilCatalog;
         public ComposedCouncilEvent ActiveCouncilEvent => _activeCouncilEvent;
         public MetaUpgradeCatalogSO MetaCatalog => metaUpgradeCatalog;
+        public string CurrentRunId => _currentRunId;
         /// <summary>Son biten kosunun meta ozeti (olum ekrani gosterir).</summary>
         public MetaRunResult LastRunResult { get; private set; }
 
@@ -173,6 +178,7 @@ namespace DeadWalls
                 return;
             }
             Instance = this;
+            RunPersistence.RecoverPendingDeathReward();
         }
 
         private void Update()
@@ -182,7 +188,6 @@ namespace DeadWalls
 
             ReadECSData();
             TickSpellCooldown();
-            TrackDawnCheckpoint();
         }
 
         /// <summary>Safak checkpoint'i (M-E): Dawn'a giris kenarinda kosuyu kaydeder.</summary>
@@ -195,7 +200,7 @@ namespace DeadWalls
             if (phase == SiegeCyclePhase.Dawn && _lastPhaseForCheckpoint != SiegeCyclePhase.Dawn
                 && !GameState.IsGameOver)
             {
-                SaveRunCheckpoint();
+                SaveRunSnapshot();
             }
             _lastPhaseForCheckpoint = phase;
         }
@@ -228,6 +233,16 @@ namespace DeadWalls
 
             _archerPrefabEntity = _entityManager.GetComponentData<ArcherPrefabData>(
                 archerPrefabQuery.GetSingletonEntity()).ArcherPrefab;
+
+            var zombiePrefabQuery = _entityManager.CreateEntityQuery(typeof(ZombiePrefabData));
+            if (zombiePrefabQuery.IsEmpty) return false;
+            _zombiePrefabEntity = _entityManager.GetComponentData<ZombiePrefabData>(
+                zombiePrefabQuery.GetSingletonEntity()).ZombiePrefab;
+
+            var arrowPrefabQuery = _entityManager.CreateEntityQuery(typeof(ArrowPrefabData));
+            if (arrowPrefabQuery.IsEmpty) return false;
+            _arrowPrefabEntity = _entityManager.GetComponentData<ArrowPrefabData>(
+                arrowPrefabQuery.GetSingletonEntity()).ArrowPrefab;
             TryResolveWorkerPrefabEntity();
 
             var castleQuery = _entityManager.CreateEntityQuery(typeof(WallSegment));
@@ -236,6 +251,7 @@ namespace DeadWalls
             _castleEntity = castleQuery.GetSingletonEntity();
             _initialized = true;
             ApplyMobileInitialPrepIfNeeded();
+            EnsureCurrentRunId();
             return true;
         }
 
@@ -271,8 +287,9 @@ namespace DeadWalls
 
             if (GameState.IsGameOver && !prevGameState.IsGameOver)
             {
+                CommitRunDeath();
                 CollectMetaRunResult(); // olum ekrani acilmadan ONCE kill'ler Soul'a cevrilir
-                RunPersistence.Delete(); // roguelite: olum = kosu bitti, checkpoint gecersiz
+                RunPersistence.ClearPendingDeath(_currentRunId);
                 OnGameOver?.Invoke();
             }
 
@@ -537,14 +554,33 @@ namespace DeadWalls
             var gameState = _entityManager.GetComponentData<GameStateData>(_gameStateEntity);
             var wall = _entityManager.GetComponentData<WallSegment>(_castleEntity);
             return !gameState.IsGameOver
+                && IsRepairPhaseAvailable()
                 && !SingleWallDefenseRules.IsDestroyed(wall.CurrentHP)
                 && SingleWallDefenseRules.GetHealthRatio(wall.CurrentHP, wall.MaxHP) < 0.995f
                 && CanAfford(GetRepairCost());
         }
 
+        public bool IsRepairPhaseAvailable()
+        {
+            if (!_initialized || !CanAccessEntityManager())
+                return false;
+
+            if (!TryGetMobileConfigEntity(out var mobileConfigEntity))
+                return true;
+
+            if (_entityManager.HasComponent<ContinuousSiegeCycleData>(mobileConfigEntity))
+            {
+                var cycle = _entityManager.GetComponentData<ContinuousSiegeCycleData>(mobileConfigEntity);
+                if (cycle.Enabled)
+                    return SingleWallDefenseRules.IsRepairPhaseAllowed(cycle.Phase);
+            }
+
+            return CanUseMobilePrepAction();
+        }
+
         /// <summary>
-        /// Tamir maliyeti kayip oraniyla olceklenir: tam kayipta config taban maliyeti
-        /// (RepairBaseWood/StoneCost), az hasarda orantili ucuz. Tech ReduceRepairCostPercent
+        /// Tamir maliyeti kayip oraniyla olceklenir: tam kayipta config taban Stone maliyeti,
+        /// az hasarda orantili ucuz. Tech ReduceRepairCostPercent
         /// carpani uygulanir. Ana ekonomi sink'lerinden biridir.
         /// </summary>
         public ResourceCost GetRepairCost()
@@ -553,17 +589,15 @@ namespace DeadWalls
             if (missing <= 0.005f)
                 return ResourceCost.Zero;
 
-            int baseWood = 120;
             int baseStone = 80;
             if (TryGetMobileCombatConfig(out var config))
             {
-                if (config.RepairBaseWoodCost > 0) baseWood = config.RepairBaseWoodCost;
                 if (config.RepairBaseStoneCost > 0) baseStone = config.RepairBaseStoneCost;
             }
 
             float multiplier = missing * Mathf.Max(0.05f, _techRepairCostMultiplier);
             return new ResourceCost(
-                Mathf.CeilToInt(baseWood * multiplier),
+                0,
                 Mathf.CeilToInt(baseStone * multiplier),
                 0, 0);
         }
@@ -2032,7 +2066,7 @@ namespace DeadWalls
         // ---------------------------------------------------------------------------------
 
         /// <summary>Kosunun safak fotografini diske yazar (yalniz recompute-EDILEMEYEN durum).</summary>
-        private void SaveRunCheckpoint()
+        private void SaveRunCheckpointLegacy()
         {
             var save = new RunSaveState
             {
@@ -2095,7 +2129,7 @@ namespace DeadWalls
         /// okcu tamamlama -> ECS snapshot yazimlari. Oyun YENI GUNUN sabahindan bas
         /// (kaydedilen gunun safak odulleri zaten verilmisti).
         /// </summary>
-        public bool TryRestoreRunFromCheckpoint()
+        private bool TryRestoreRunFromCheckpointLegacy()
         {
             var save = RunPersistence.TryLoad();
             if (save == null || !_initialized || !TryGetMobileConfigEntity(out var mobileConfigEntity))
@@ -2228,6 +2262,525 @@ namespace DeadWalls
 
             OnGameStateChanged?.Invoke();
             return true;
+        }
+
+        /// <summary>V1 exact run snapshot: oyuncunun ayni ana donebilmesi icin runtime state'i kaydeder.</summary>
+        public bool SaveRunSnapshot()
+        {
+            if (!TryInitialize() || GameState.IsGameOver || !TryGetMobileConfigEntity(out var mobileConfigEntity))
+                return false;
+
+            ReadECSData();
+            EnsureCurrentRunId();
+
+            var cycle = _entityManager.GetComponentData<ContinuousSiegeCycleData>(mobileConfigEntity);
+            var wave = _entityManager.GetComponentData<WaveStateData>(_gameStateEntity);
+            var accumulator = _entityManager.GetComponentData<ResourceAccumulator>(_gameStateEntity);
+            var allocation = _entityManager.GetComponentData<MobilePopulationAllocation>(mobileConfigEntity);
+            var prep = _entityManager.GetComponentData<CastleYardPrepState>(mobileConfigEntity);
+            var economyEvent = _entityManager.GetComponentData<MobileEconomyEventState>(mobileConfigEntity);
+
+            var save = new RunSaveState
+            {
+                RunId = _currentRunId,
+                CycleIndex = cycle.CycleIndex,
+                CyclePhase = (int)cycle.Phase,
+                CycleTimer = cycle.CycleTimer,
+                CycleProgress01 = cycle.CycleProgress01,
+                PhaseProgress01 = cycle.PhaseProgress01,
+                SpawnIntensityMultiplier = cycle.SpawnIntensityMultiplier,
+                HordePressure01 = cycle.HordePressure01,
+                IsBloodMoonNight = cycle.IsBloodMoonNight,
+                XP = GameState.XP,
+                Level = GameState.Level,
+                XPToNextLevel = GameState.XPToNextLevel,
+                TotalKills = GameState.TotalKills,
+                CurrentWave = wave.CurrentWave,
+                ZombiesToSpawn = wave.ZombiesToSpawn,
+                ZombiesSpawned = wave.ZombiesSpawned,
+                SpawnTimer = wave.SpawnTimer,
+                SpawnInterval = wave.SpawnInterval,
+                ZombieHP = wave.ZombieHP,
+                ZombieDamage = wave.ZombieDamage,
+                ZombieSpeed = wave.ZombieSpeed,
+                WaveActive = wave.WaveActive,
+                WavePhase = (int)wave.Phase,
+                PrepTimer = wave.PrepTimer,
+                PrepDuration = wave.PrepDuration,
+                WaveStartDelay = wave.WaveStartDelay,
+                WaveStartTimer = wave.WaveStartTimer,
+                SpawnRandomState = wave.SpawnRandomState,
+                Wood = Resources.Wood,
+                Stone = Resources.Stone,
+                Iron = Resources.Iron,
+                Food = Resources.Food,
+                WoodAccumulator = accumulator.Wood,
+                StoneAccumulator = accumulator.Stone,
+                IronAccumulator = accumulator.Iron,
+                FoodAccumulator = accumulator.Food,
+                ArrowCurrent = ArrowSupply.Current,
+                ArrowAccumulator = ArrowSupply.Accumulator,
+                PopulationTotal = Population.Total,
+                PopulationCapacity = Population.Capacity,
+                PopulationBaseCapacity = Population.BaseCapacity,
+                WoodWorkers = allocation.WoodWorkers,
+                StoneWorkers = allocation.StoneWorkers,
+                IronWorkers = allocation.IronWorkers,
+                FoodWorkers = allocation.FoodWorkers,
+                LastPopulationGrowthWave = allocation.LastPopulationGrowthWave,
+                LastPopulationGrowthCycle = allocation.LastPopulationGrowthCycle,
+                LastEventPrepWave = allocation.LastEventPrepWave,
+                WallCurrentHP = Wall.CurrentHP,
+                BasicArchers = BasicArcherCount,
+                RapidArchers = RapidArcherCount,
+                FrostArchers = FrostArcherCount,
+                GlobalArrowDamageBonus = _globalArrowDamageBonus,
+                GlobalFireRateMultiplier = _globalFireRateMultiplier,
+                CouncilDaysSinceEvent = _councilDaysSinceEvent,
+                CouncilCooldownRemaining = _councilCooldownRemaining,
+                LastCouncilRollDay = _lastCouncilRollDay,
+                CouncilRunSalt = _councilRunSalt,
+                CouncilWoodCapBonus = _councilWoodCapBonus,
+                CouncilStoneCapBonus = _councilStoneCapBonus,
+                CouncilIronCapBonus = _councilIronCapBonus,
+                CouncilFoodCapBonus = _councilFoodCapBonus,
+                ActiveCouncilEvent = _activeCouncilEvent,
+                FireballCooldownRemaining = _fireballCooldownRemaining,
+                FortifyActive = prep.FortifyActive,
+                FortifyDamageMultiplier = prep.FortifyDamageMultiplier,
+                RallyTimer = prep.RallyTimer,
+                RallyDuration = prep.RallyDuration,
+                RallyFireRateMultiplier = prep.RallyFireRateMultiplier,
+                PendingEconomyEvent = (int)economyEvent.PendingEvent,
+                EconomyEventWave = economyEvent.EventWave,
+                EconomyEventCooldownWaves = economyEvent.CooldownWavesRemaining,
+                ProductionBonusResource = (int)economyEvent.ProductionBonusResource,
+                ProductionBonusMultiplier = economyEvent.ProductionBonusMultiplier,
+                ProductionBonusExpiresAfterWave = economyEvent.ProductionBonusExpiresAfterWave,
+                EconomyRandomSeed = economyEvent.RandomSeed,
+                NextNightSpawnMultiplier = economyEvent.NextNightSpawnMultiplier,
+                NightSpawnExpiresAfterWave = economyEvent.NightSpawnExpiresAfterWave,
+                EconomyFocus = (int)EconomyFocus
+            };
+
+            if (_entityManager.HasComponent<CastleUpgradeData>(_castleEntity))
+                save.CastleUpgradeLevel = _entityManager.GetComponentData<CastleUpgradeData>(_castleEntity).Level;
+
+            foreach (var pair in _techNodeLevels)
+                save.TechNodeLevels.Add(new TechLevelEntry { Id = pair.Key, Level = pair.Value });
+            foreach (var pair in _archerTypeLevels)
+                save.ArcherTypeLevels.Add(new ArcherLevelEntry { Type = (int)pair.Key, Level = pair.Value });
+            foreach (var pair in _upgradeTiers)
+                save.UpgradeTiers.Add(new UpgradeTierEntry { Type = (int)pair.Key, Tier = pair.Value });
+            foreach (var pair in _councilFlags)
+                save.CouncilFlags.Add(new CouncilFlagEntry { Flag = pair.Key, Day = pair.Value });
+            save.RecentCouncilTemplates.AddRange(_recentCouncilTemplates);
+            save.UsedOneShotCouncils.AddRange(_usedOneShotCouncils);
+
+            CaptureCombatSnapshot(save);
+            return RunPersistence.Save(save);
+        }
+
+        private void OnApplicationQuit()
+        {
+            if (_initialized && !GameState.IsGameOver)
+                SaveRunSnapshot();
+        }
+
+        private void CaptureCombatSnapshot(RunSaveState save)
+        {
+            var zombieToIndex = new Dictionary<Entity, int>();
+            var zombieQuery = _entityManager.CreateEntityQuery(new EntityQueryDesc
+            {
+                All = new[]
+                {
+                    ComponentType.ReadOnly<ZombieTag>(),
+                    ComponentType.ReadOnly<ZombieStats>(),
+                    ComponentType.ReadOnly<ZombieState>(),
+                    ComponentType.ReadOnly<LocalTransform>()
+                },
+                None = new[] { ComponentType.ReadOnly<Prefab>() }
+            });
+
+            using (var zombies = zombieQuery.ToEntityArray(Allocator.Temp))
+            {
+                for (int i = 0; i < zombies.Length; i++)
+                {
+                    Entity entity = zombies[i];
+                    var transform = _entityManager.GetComponentData<LocalTransform>(entity);
+                    var stats = _entityManager.GetComponentData<ZombieStats>(entity);
+                    var state = _entityManager.GetComponentData<ZombieState>(entity);
+                    var item = new ZombieRunSaveState
+                    {
+                        X = transform.Position.x,
+                        Y = transform.Position.y,
+                        Z = transform.Position.z,
+                        Scale = transform.Scale,
+                        MoveSpeed = stats.MoveSpeed,
+                        MaxHP = stats.MaxHP,
+                        CurrentHP = stats.CurrentHP,
+                        AttackDamage = stats.AttackDamage,
+                        AttackCooldown = stats.AttackCooldown,
+                        AttackTimer = stats.AttackTimer,
+                        XPReward = stats.XPReward,
+                        State = (int)state.Value
+                    };
+
+                    if (_entityManager.HasComponent<ZombieSlow>(entity))
+                    {
+                        var slow = _entityManager.GetComponentData<ZombieSlow>(entity);
+                        item.SlowEnabled = _entityManager.IsComponentEnabled<ZombieSlow>(entity);
+                        item.SlowDuration = slow.Duration;
+                        item.SlowMultiplier = slow.SpeedMultiplier;
+                    }
+
+                    if (_entityManager.HasComponent<PhysicsBody>(entity))
+                    {
+                        var body = _entityManager.GetComponentData<PhysicsBody>(entity);
+                        item.VelocityX = body.Velocity.x;
+                        item.VelocityY = body.Velocity.y;
+                        item.ForceX = body.Force.x;
+                        item.ForceY = body.Force.y;
+                    }
+
+                    if (_entityManager.HasComponent<DeathTimer>(entity))
+                    {
+                        item.HasDeathTimer = true;
+                        item.DeathTimer = _entityManager.GetComponentData<DeathTimer>(entity).Value;
+                    }
+
+                    zombieToIndex[entity] = save.ActiveZombies.Count;
+                    save.ActiveZombies.Add(item);
+                }
+            }
+
+            var arrowQuery = _entityManager.CreateEntityQuery(new EntityQueryDesc
+            {
+                All = new[]
+                {
+                    ComponentType.ReadOnly<ArrowTag>(),
+                    ComponentType.ReadOnly<ArrowProjectile>(),
+                    ComponentType.ReadOnly<LocalTransform>()
+                },
+                None = new[] { ComponentType.ReadOnly<Prefab>() }
+            });
+
+            using (var arrows = arrowQuery.ToEntityArray(Allocator.Temp))
+            {
+                for (int i = 0; i < arrows.Length; i++)
+                {
+                    Entity entity = arrows[i];
+                    var transform = _entityManager.GetComponentData<LocalTransform>(entity);
+                    var projectile = _entityManager.GetComponentData<ArrowProjectile>(entity);
+                    save.ActiveArrows.Add(new ArrowRunSaveState
+                    {
+                        X = transform.Position.x,
+                        Y = transform.Position.y,
+                        Z = transform.Position.z,
+                        Scale = transform.Scale,
+                        Speed = projectile.Speed,
+                        Damage = projectile.Damage,
+                        TargetZombieIndex = zombieToIndex.TryGetValue(projectile.Target, out int index) ? index : -1,
+                        ArcherType = (int)projectile.ArcherType,
+                        SlowDuration = projectile.SlowDuration,
+                        SlowMultiplier = projectile.SlowMultiplier
+                    });
+                }
+            }
+
+            if (ActiveFireballProjectile != Entity.Null
+                && _entityManager.Exists(ActiveFireballProjectile)
+                && _entityManager.HasComponent<FireballProjectile>(ActiveFireballProjectile)
+                && _entityManager.HasComponent<LocalTransform>(ActiveFireballProjectile))
+            {
+                var transform = _entityManager.GetComponentData<LocalTransform>(ActiveFireballProjectile);
+                var projectile = _entityManager.GetComponentData<FireballProjectile>(ActiveFireballProjectile);
+                save.ActiveFireball = new FireballRunSaveState
+                {
+                    Active = true,
+                    X = transform.Position.x,
+                    Y = transform.Position.y,
+                    Z = transform.Position.z,
+                    Scale = transform.Scale,
+                    TargetX = projectile.Target.x,
+                    TargetY = projectile.Target.y,
+                    Speed = projectile.Speed,
+                    Radius = projectile.Radius,
+                    Damage = projectile.Damage
+                };
+            }
+        }
+
+        public bool TryRestoreRunFromCheckpoint()
+        {
+            var save = RunPersistence.TryLoad();
+            if (save == null || !_initialized || !TryGetMobileConfigEntity(out var mobileConfigEntity))
+                return false;
+
+            RestartGame();
+            _currentRunId = save.RunId;
+
+            foreach (var entry in save.TechNodeLevels)
+                GrantTechNodeLevelsFromMeta(entry.Id, entry.Level);
+
+            _councilFlags.Clear();
+            foreach (var flag in save.CouncilFlags)
+                _councilFlags[flag.Flag] = flag.Day;
+            _recentCouncilTemplates.Clear();
+            _recentCouncilTemplates.AddRange(save.RecentCouncilTemplates);
+            _usedOneShotCouncils.Clear();
+            foreach (var id in save.UsedOneShotCouncils)
+                _usedOneShotCouncils.Add(id);
+            _councilDaysSinceEvent = save.CouncilDaysSinceEvent;
+            _councilCooldownRemaining = save.CouncilCooldownRemaining;
+            _lastCouncilRollDay = save.LastCouncilRollDay;
+            _councilRunSalt = save.CouncilRunSalt;
+            _councilWoodCapBonus = save.CouncilWoodCapBonus;
+            _councilStoneCapBonus = save.CouncilStoneCapBonus;
+            _councilIronCapBonus = save.CouncilIronCapBonus;
+            _councilFoodCapBonus = save.CouncilFoodCapBonus;
+            _activeCouncilEvent = save.ActiveCouncilEvent;
+            ApplyTechEconomyAggregates();
+
+            _upgradeTiers.Clear();
+            foreach (var tier in save.UpgradeTiers)
+                _upgradeTiers[(UpgradeType)tier.Type] = tier.Tier;
+            _globalArrowDamageBonus = save.GlobalArrowDamageBonus;
+            _globalFireRateMultiplier = save.GlobalFireRateMultiplier;
+            _archerTypeLevels.Clear();
+            foreach (var entry in save.ArcherTypeLevels)
+                _archerTypeLevels[(ArcherType)entry.Type] = entry.Level;
+
+            ReadArcherTypeCounts();
+            for (int i = BasicArcherCount; i < save.BasicArchers; i++) SpawnArcher(ArcherType.Basic);
+            for (int i = RapidArcherCount; i < save.RapidArchers; i++) SpawnArcher(ArcherType.Rapid);
+            for (int i = FrostArcherCount; i < save.FrostArchers; i++) SpawnArcher(ArcherType.Frost);
+            ApplyScaledStatsToArchers(ArcherType.Basic, false);
+            ApplyScaledStatsToArchers(ArcherType.Rapid, false);
+            ApplyScaledStatsToArchers(ArcherType.Frost, false);
+
+            _entityManager.SetComponentData(_gameStateEntity, new ResourceData
+            {
+                Wood = save.Wood,
+                Stone = save.Stone,
+                Iron = save.Iron,
+                Food = save.Food
+            });
+            _entityManager.SetComponentData(_gameStateEntity, new ResourceAccumulator
+            {
+                Wood = save.WoodAccumulator,
+                Stone = save.StoneAccumulator,
+                Iron = save.IronAccumulator,
+                Food = save.FoodAccumulator
+            });
+            _entityManager.SetComponentData(_gameStateEntity, new ArrowSupply
+            {
+                Current = save.ArrowCurrent,
+                Accumulator = save.ArrowAccumulator
+            });
+
+            if (_entityManager.HasComponent<EconomyFocusState>(mobileConfigEntity))
+            {
+                _entityManager.SetComponentData(mobileConfigEntity,
+                    new EconomyFocusState { Type = (EconomyFocusType)save.EconomyFocus });
+                EconomyFocus = (EconomyFocusType)save.EconomyFocus;
+            }
+
+            var allocation = _entityManager.GetComponentData<MobilePopulationAllocation>(mobileConfigEntity);
+            allocation.WoodWorkers = save.WoodWorkers;
+            allocation.StoneWorkers = save.StoneWorkers;
+            allocation.IronWorkers = save.IronWorkers;
+            allocation.FoodWorkers = save.FoodWorkers;
+            allocation.LastPopulationGrowthWave = save.LastPopulationGrowthWave;
+            allocation.LastPopulationGrowthCycle = save.LastPopulationGrowthCycle;
+            allocation.LastEventPrepWave = save.LastEventPrepWave;
+            _entityManager.SetComponentData(mobileConfigEntity, allocation);
+            PopulationAllocation = allocation;
+
+            int totalArchers = save.BasicArchers + save.RapidArchers + save.FrostArchers;
+            int totalWorkers = save.WoodWorkers + save.StoneWorkers + save.IronWorkers + save.FoodWorkers;
+            _entityManager.SetComponentData(_gameStateEntity, new PopulationState
+            {
+                Total = save.PopulationTotal,
+                Workers = totalWorkers,
+                Archers = totalArchers,
+                Idle = Mathf.Max(0, save.PopulationTotal - totalWorkers - totalArchers),
+                Capacity = save.PopulationCapacity,
+                BaseCapacity = save.PopulationBaseCapacity,
+                FoodPerAssignedPerMin = Population.FoodPerAssignedPerMin
+            });
+
+            var prep = _entityManager.GetComponentData<CastleYardPrepState>(mobileConfigEntity);
+            prep.FortifyActive = save.FortifyActive;
+            prep.FortifyDamageMultiplier = save.FortifyDamageMultiplier;
+            prep.RallyTimer = save.RallyTimer;
+            prep.RallyDuration = save.RallyDuration;
+            prep.RallyFireRateMultiplier = save.RallyFireRateMultiplier;
+            _entityManager.SetComponentData(mobileConfigEntity, prep);
+
+            var economyEvent = _entityManager.GetComponentData<MobileEconomyEventState>(mobileConfigEntity);
+            economyEvent.PendingEvent = (MobileEconomyEventType)save.PendingEconomyEvent;
+            economyEvent.EventWave = save.EconomyEventWave;
+            economyEvent.CooldownWavesRemaining = save.EconomyEventCooldownWaves;
+            economyEvent.ProductionBonusResource = (EconomyFocusType)save.ProductionBonusResource;
+            economyEvent.ProductionBonusMultiplier = save.ProductionBonusMultiplier;
+            economyEvent.ProductionBonusExpiresAfterWave = save.ProductionBonusExpiresAfterWave;
+            economyEvent.RandomSeed = save.EconomyRandomSeed;
+            economyEvent.NextNightSpawnMultiplier = save.NextNightSpawnMultiplier;
+            economyEvent.NightSpawnExpiresAfterWave = save.NightSpawnExpiresAfterWave;
+            _entityManager.SetComponentData(mobileConfigEntity, economyEvent);
+
+            var cycle = _entityManager.GetComponentData<ContinuousSiegeCycleData>(mobileConfigEntity);
+            cycle.CycleIndex = save.CycleIndex;
+            cycle.CycleTimer = Mathf.Clamp(save.CycleTimer, 0f, Mathf.Max(0f, cycle.CycleDuration - 0.0001f));
+            cycle.CycleProgress01 = Mathf.Clamp01(save.CycleProgress01);
+            cycle.PhaseProgress01 = Mathf.Clamp01(save.PhaseProgress01);
+            cycle.SpawnIntensityMultiplier = Mathf.Max(0.01f, save.SpawnIntensityMultiplier);
+            cycle.HordePressure01 = Mathf.Clamp01(save.HordePressure01);
+            cycle.Phase = (SiegeCyclePhase)save.CyclePhase;
+            cycle.IsBloodMoonNight = save.IsBloodMoonNight;
+            _entityManager.SetComponentData(mobileConfigEntity, cycle);
+            ContinuousSiegeCycle = cycle;
+            _lastPhaseForCheckpoint = cycle.Phase;
+
+            var wave = _entityManager.GetComponentData<WaveStateData>(_gameStateEntity);
+            wave.CurrentWave = save.CurrentWave;
+            wave.ZombiesToSpawn = save.ZombiesToSpawn;
+            wave.ZombiesSpawned = save.ZombiesSpawned;
+            wave.ZombiesAlive = 0;
+            wave.SpawnTimer = save.SpawnTimer;
+            wave.SpawnInterval = save.SpawnInterval;
+            wave.ZombieHP = save.ZombieHP;
+            wave.ZombieDamage = save.ZombieDamage;
+            wave.ZombieSpeed = save.ZombieSpeed;
+            wave.WaveActive = save.WaveActive;
+            wave.Phase = (RunPhaseType)save.WavePhase;
+            wave.PrepTimer = save.PrepTimer;
+            wave.PrepDuration = save.PrepDuration;
+            wave.WaveStartDelay = save.WaveStartDelay;
+            wave.WaveStartTimer = save.WaveStartTimer;
+            wave.SpawnRandomState = save.SpawnRandomState != 0u ? save.SpawnRandomState : 42u;
+            _entityManager.SetComponentData(_gameStateEntity, wave);
+
+            var gameState = _entityManager.GetComponentData<GameStateData>(_gameStateEntity);
+            gameState.XP = save.XP;
+            gameState.Level = save.Level;
+            gameState.XPToNextLevel = save.XPToNextLevel;
+            gameState.TotalKills = save.TotalKills;
+            gameState.IsGameOver = false;
+            _entityManager.SetComponentData(_gameStateEntity, gameState);
+
+            if (_entityManager.HasComponent<CastleUpgradeData>(_castleEntity))
+            {
+                var upgrade = _entityManager.GetComponentData<CastleUpgradeData>(_castleEntity);
+                upgrade.Level = save.CastleUpgradeLevel;
+                _entityManager.SetComponentData(_castleEntity, upgrade);
+            }
+
+            var wall = _entityManager.GetComponentData<WallSegment>(_castleEntity);
+            wall.CurrentHP = Mathf.Clamp(save.WallCurrentHP, 0f, wall.MaxHP);
+            _entityManager.SetComponentData(_castleEntity, wall);
+            Wall = wall;
+            _fireballCooldownRemaining = Mathf.Max(0f, save.FireballCooldownRemaining);
+
+            RestoreCombatSnapshot(save);
+            ReadECSData();
+            OnGameStateChanged?.Invoke();
+            return true;
+        }
+
+        private void RestoreCombatSnapshot(RunSaveState save)
+        {
+            var savedZombies = save.ActiveZombies ?? new List<ZombieRunSaveState>();
+            var savedArrows = save.ActiveArrows ?? new List<ArrowRunSaveState>();
+            var zombieEntities = new List<Entity>(savedZombies.Count);
+            foreach (var item in savedZombies)
+            {
+                Entity entity = _entityManager.Instantiate(_zombiePrefabEntity);
+                _entityManager.SetComponentData(entity, LocalTransform.FromPositionRotationScale(
+                    new float3(item.X, item.Y, item.Z), quaternion.identity, Mathf.Max(0.01f, item.Scale)));
+                _entityManager.SetComponentData(entity, new ZombieStats
+                {
+                    MoveSpeed = item.MoveSpeed,
+                    MaxHP = item.MaxHP,
+                    CurrentHP = item.CurrentHP,
+                    AttackDamage = item.AttackDamage,
+                    AttackCooldown = item.AttackCooldown,
+                    AttackTimer = item.AttackTimer,
+                    XPReward = item.XPReward
+                });
+                _entityManager.SetComponentData(entity, new ZombieState { Value = (ZombieStateType)item.State });
+
+                if (_entityManager.HasComponent<ZombieSlow>(entity))
+                {
+                    _entityManager.SetComponentData(entity, new ZombieSlow
+                    {
+                        Duration = item.SlowDuration,
+                        SpeedMultiplier = item.SlowMultiplier
+                    });
+                    _entityManager.SetComponentEnabled<ZombieSlow>(entity, item.SlowEnabled);
+                }
+
+                if (_entityManager.HasComponent<PhysicsBody>(entity))
+                {
+                    var body = _entityManager.GetComponentData<PhysicsBody>(entity);
+                    body.Velocity = new float2(item.VelocityX, item.VelocityY);
+                    body.Force = new float2(item.ForceX, item.ForceY);
+                    _entityManager.SetComponentData(entity, body);
+                }
+
+                if (item.HasDeathTimer)
+                {
+                    var deathTimer = new DeathTimer { Value = item.DeathTimer };
+                    if (_entityManager.HasComponent<DeathTimer>(entity))
+                        _entityManager.SetComponentData(entity, deathTimer);
+                    else
+                        _entityManager.AddComponentData(entity, deathTimer);
+                }
+
+                zombieEntities.Add(entity);
+            }
+
+            foreach (var item in savedArrows)
+            {
+                if (item.TargetZombieIndex < 0 || item.TargetZombieIndex >= zombieEntities.Count)
+                    continue;
+
+                Entity entity = _entityManager.Instantiate(_arrowPrefabEntity);
+                _entityManager.SetComponentData(entity, LocalTransform.FromPositionRotationScale(
+                    new float3(item.X, item.Y, item.Z), quaternion.identity, Mathf.Max(0.01f, item.Scale)));
+                _entityManager.SetComponentData(entity, new ArrowProjectile
+                {
+                    Speed = item.Speed,
+                    Damage = item.Damage,
+                    Target = zombieEntities[item.TargetZombieIndex],
+                    ArcherType = (ArcherType)item.ArcherType,
+                    SlowDuration = item.SlowDuration,
+                    SlowMultiplier = item.SlowMultiplier
+                });
+                SetSpriteTint(entity, ArcherVisualStyle.GetTint((ArcherType)item.ArcherType));
+            }
+
+            ActiveFireballProjectile = Entity.Null;
+            if (save.ActiveFireball != null && save.ActiveFireball.Active)
+            {
+                var item = save.ActiveFireball;
+                Entity entity = _entityManager.CreateEntity(typeof(FireballProjectile), typeof(LocalTransform));
+                _entityManager.SetComponentData(entity, new FireballProjectile
+                {
+                    Target = new float2(item.TargetX, item.TargetY),
+                    Speed = item.Speed,
+                    Radius = item.Radius,
+                    Damage = item.Damage
+                });
+                _entityManager.SetComponentData(entity, LocalTransform.FromPositionRotationScale(
+                    new float3(item.X, item.Y, item.Z), quaternion.identity, Mathf.Max(0.01f, item.Scale)));
+                ActiveFireballProjectile = entity;
+            }
+
+            var wave = _entityManager.GetComponentData<WaveStateData>(_gameStateEntity);
+            wave.ZombiesAlive = zombieEntities.Count;
+            _entityManager.SetComponentData(_gameStateEntity, wave);
         }
 
         // ---------------------------------------------------------------------------------
@@ -2379,6 +2932,23 @@ namespace DeadWalls
             }
         }
 
+        private void EnsureCurrentRunId()
+        {
+            if (string.IsNullOrEmpty(_currentRunId))
+                _currentRunId = System.Guid.NewGuid().ToString("N");
+        }
+
+        private void CommitRunDeath()
+        {
+            EnsureCurrentRunId();
+            RunPersistence.CommitDeath(new RunDeathReceipt
+            {
+                RunId = _currentRunId,
+                Day = Mathf.Max(1, ContinuousSiegeCycle.CycleIndex + 1),
+                Kills = GameState.TotalKills
+            });
+        }
+
         /// <summary>Kosu kapanisi: kill'leri Ruh'a cevirir (bir kez); sonuc LastRunResult'ta.</summary>
         private void CollectMetaRunResult()
         {
@@ -2387,7 +2957,8 @@ namespace DeadWalls
 
             _metaRunCollected = true;
             int day = Mathf.Max(1, ContinuousSiegeCycle.CycleIndex + 1);
-            LastRunResult = MetaProgression.AddRunResult(day, GameState.TotalKills);
+            EnsureCurrentRunId();
+            LastRunResult = MetaProgression.AddRunResult(_currentRunId, day, GameState.TotalKills);
         }
 
         private void ConfigureWaveForCurrentNumber(ref WaveStateData wave)
@@ -3328,6 +3899,8 @@ namespace DeadWalls
                 return;
             }
 
+            _currentRunId = System.Guid.NewGuid().ToString("N");
+
             bool mobileMode = TryGetMobileConfigEntity(out var mobileConfigEntity);
             var mobileConfig = mobileMode
                 ? _entityManager.GetComponentData<MobileCastleCombatConfig>(mobileConfigEntity)
@@ -3341,6 +3914,10 @@ namespace DeadWalls
             // Tum oklari sil
             var arrowQuery = _entityManager.CreateEntityQuery(typeof(ArrowTag));
             _entityManager.DestroyEntity(arrowQuery);
+
+            var fireballQuery = _entityManager.CreateEntityQuery(typeof(FireballProjectile));
+            _entityManager.DestroyEntity(fireballQuery);
+            ActiveFireballProjectile = Entity.Null;
 
             if (mobileMode)
             {
@@ -3483,7 +4060,8 @@ namespace DeadWalls
                 PrepDuration = mobileMode && !continuousSiege ? math.max(0f, mobileConfig.InitialDayPrepDuration) : 0f,
                 WaveStartDelay = mobileMode ? 0f : 3f,
                 WaveStartTimer = mobileMode ? 0f : 3f,
-                StressTestMode = false
+                StressTestMode = false,
+                SpawnRandomState = 42u
             });
 
             // Kaynak resetle (setup tool GameStateAuthoring defaultlariyla senkron: 160/80/50/120)

@@ -81,7 +81,8 @@ namespace DeadWalls
                     PrepDuration = 0f,
                     WaveStartDelay = authoring.WaveStartDelay,
                     WaveStartTimer = authoring.WaveStartDelay,
-                    StressTestMode = authoring.StressTestMode
+                    StressTestMode = authoring.StressTestMode,
+                    SpawnRandomState = 42u
                 });
 
                 AddComponent(entity, new ResourceData

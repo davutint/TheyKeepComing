@@ -34,6 +34,9 @@ namespace DeadWalls
             var consumption = SystemAPI.GetSingleton<ResourceConsumptionRate>();
             if (SystemAPI.HasSingleton<MobileCastleCombatConfig>())
             {
+                // Dead Walls V1: ana kaynaklarda pasif upkeep yoktur.
+                consumption = default;
+
                 if (SystemAPI.HasSingleton<MobilePrepPauseState>()
                     && SystemAPI.GetSingleton<MobilePrepPauseState>().IsPaused)
                 {

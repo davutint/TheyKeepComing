@@ -20,6 +20,11 @@ namespace DeadWalls
             return currentHp <= 0f;
         }
 
+        public static bool IsRepairPhaseAllowed(SiegeCyclePhase phase)
+        {
+            return phase == SiegeCyclePhase.Day || phase == SiegeCyclePhase.Dusk;
+        }
+
         public static float GetHealthRatio(float currentHp, float maxHp)
         {
             if (maxHp <= 0f)

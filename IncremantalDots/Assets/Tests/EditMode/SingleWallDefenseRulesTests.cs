@@ -44,6 +44,15 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void RepairPhase_AllowsOnlyDayAndDusk()
+        {
+            Assert.That(SingleWallDefenseRules.IsRepairPhaseAllowed(SiegeCyclePhase.Day), Is.True);
+            Assert.That(SingleWallDefenseRules.IsRepairPhaseAllowed(SiegeCyclePhase.Dusk), Is.True);
+            Assert.That(SingleWallDefenseRules.IsRepairPhaseAllowed(SiegeCyclePhase.Night), Is.False);
+            Assert.That(SingleWallDefenseRules.IsRepairPhaseAllowed(SiegeCyclePhase.Dawn), Is.False);
+        }
+
+        [Test]
         public void HealthRatio_RepresentsSingleWallOnly()
         {
             Assert.That(SingleWallDefenseRules.GetHealthRatio(125f, 500f), Is.EqualTo(0.25f));

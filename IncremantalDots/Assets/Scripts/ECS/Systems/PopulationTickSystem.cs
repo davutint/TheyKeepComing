@@ -36,8 +36,6 @@ namespace DeadWalls
             popRW.ValueRW.Idle = math.max(0, popRW.ValueRO.Total - assigned);
 
             // Yemek tuketim hizini guncelle — sadece atanmis bireyler tuketir
-            var consumptionRW = SystemAPI.GetSingletonRW<ResourceConsumptionRate>();
-            consumptionRW.ValueRW.FoodPerMin += assigned * popRW.ValueRO.FoodPerAssignedPerMin;
         }
     }
 }

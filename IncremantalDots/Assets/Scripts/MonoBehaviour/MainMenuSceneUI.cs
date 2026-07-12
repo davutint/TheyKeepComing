@@ -40,6 +40,7 @@ namespace DeadWalls
 
         private void Start()
         {
+            RunPersistence.RecoverPendingDeathReward();
             ApplyGeneratedVisuals();
             ConfigureButtons();
             PlayIntroAnimation();
@@ -116,26 +117,31 @@ namespace DeadWalls
 
         private void ConfigureButtons()
         {
-            bool hasSave = RunPersistence.HasSave;
-            RunSaveState save = hasSave ? RunPersistence.TryLoad() : null;
-            hasSave = save != null;
+            RunSaveState save = RunPersistence.TryLoad();
+            bool hasSave = save != null;
 
             if (ContinueButton != null)
             {
                 ContinueButton.gameObject.SetActive(hasSave);
                 if (hasSave && ContinueLabelText != null)
-                    ContinueLabelText.text = $"CONTINUE — DAY {save.CycleIndex + 2}";
+                    ContinueLabelText.text = $"CONTINUE — DAY {save.CycleIndex + 1}";
                 ContinueButton.onClick.AddListener(() => StartGame(GameBootstrap.StartAction.Continue));
             }
 
             if (NewRunButton != null)
+            {
+                NewRunButton.gameObject.SetActive(!hasSave);
                 NewRunButton.onClick.AddListener(() => StartGame(GameBootstrap.StartAction.NewRun));
+            }
             if (SettingsButton != null)
                 SettingsButton.onClick.AddListener(() => Settings?.Open());
         }
 
         private void StartGame(GameBootstrap.StartAction action)
         {
+            if (action == GameBootstrap.StartAction.NewRun && RunPersistence.HasSave)
+                return; // V1: yasayan kosu owner onayi olmadan silinemez
+
             if (action == GameBootstrap.StartAction.NewRun)
                 RunPersistence.Delete();
 

@@ -61,7 +61,9 @@ namespace DeadWalls
             consumptionRW.ValueRW.WoodPerMin = 0f;
             consumptionRW.ValueRW.StonePerMin = 0f;
             consumptionRW.ValueRW.IronPerMin = 0f;
-            consumptionRW.ValueRW.FoodPerMin = totalBuildingFoodCost;
+            consumptionRW.ValueRW.FoodPerMin = SystemAPI.HasSingleton<MobileCastleCombatConfig>()
+                ? 0f
+                : totalBuildingFoodCost;
         }
     }
 }

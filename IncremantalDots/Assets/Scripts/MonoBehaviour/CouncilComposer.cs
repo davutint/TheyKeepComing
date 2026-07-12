@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -17,6 +18,7 @@ namespace DeadWalls
     }
 
     /// <summary>Uretilmis tek bir etki (somut sayilarla).</summary>
+    [Serializable]
     public struct ComposedCouncilEffect
     {
         public CouncilEffectKind Kind;
@@ -26,13 +28,15 @@ namespace DeadWalls
         public int DurationDays;
     }
 
+    [Serializable]
     public sealed class ComposedCouncilOption
     {
         public string Label;
-        public readonly List<ComposedCouncilEffect> Effects = new List<ComposedCouncilEffect>();
+        public List<ComposedCouncilEffect> Effects = new List<ComposedCouncilEffect>();
         public float BudgetMinutes;
     }
 
+    [Serializable]
     public sealed class ComposedCouncilEvent
     {
         public string TemplateId;

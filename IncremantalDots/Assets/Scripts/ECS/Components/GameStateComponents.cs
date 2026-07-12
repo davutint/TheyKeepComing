@@ -38,5 +38,7 @@ namespace DeadWalls
         public float WaveStartDelay;
         public float WaveStartTimer;
         public bool StressTestMode;
+        // Exact save/Continue icin spawn RNG stream state'i. 0 ise default seed kullanilir.
+        public uint SpawnRandomState;
     }
 }

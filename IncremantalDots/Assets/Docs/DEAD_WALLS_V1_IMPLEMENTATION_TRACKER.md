@@ -1,0 +1,981 @@
+# Dead Walls V1 - Implementation Tracker
+
+> **Amaç:** V1 Blueprint hedefi ile mevcut Unity projesi arasındaki farkı tek yerde tutmak; nerede kaldığımızı, sıradaki işi ve tamamlanma kanıtını kaybetmemek.
+>
+> **Tracker sürümü:** 2.0  
+> **Son tam kapsam denetimi:** 2026-07-12  
+> **Aktif paket:** Package A - System Contracts  
+> **Aktif iş:** `DW-A-TUNING` - Single Runtime Tuning Owner
+
+---
+
+## 1. Otorite ve Kullanım Kuralı
+
+### Kaynak sırası
+
+1. **Tasarım otoritesi:** [DEAD_WALLS_GAME_DESIGN_BLUEPRINT_v1.0.pdf](./DEAD_WALLS_GAME_DESIGN_BLUEPRINT_v1.0.pdf)
+2. **Düzenlenebilir tasarım kaynağı:** [DEAD_WALLS_GAME_DESIGN_BLUEPRINT_v1.0.docx](./DEAD_WALLS_GAME_DESIGN_BLUEPRINT_v1.0.docx)
+3. **Uygulama ve fark takibi:** Bu tracker.
+4. **Mevcut runtime gerçeği:** Aktif scene, prefab, ScriptableObject ve kod sahipleri.
+5. **Tarihsel bağlam:** Eski GDD, roadmap, master plan ve milestone belgeleri.
+
+**Owner referansı:** [Zero Stress King: Idle Defense](https://store.steampowered.com/app/4271160/Zero_Stress_King_Idle_Defense/) yalnız sürekli otomatik saldırı ve incremental büyüme için referanstır. Dead Walls gerçek ölüm, 60 saniyelik faz ritmi, worker ekonomisi, Council ve procedural Castle Heart ile ayrışır.
+
+Bu tracker Blueprint'i değiştiremez. Blueprint ile kod çelişiyorsa hedef Blueprint'tir; proje o hedefe çekilir. Blueprint'te açık olmayan ürün kararı kod içinde varsayımla kapatılmaz, owner'a sorulur.
+
+### Statüler
+
+- `[x]` Mevcut oyun Blueprint ile uyumlu ve kanıtlandı.
+- `[~]` İlgili sistem mevcut fakat sözleşme eksik veya runtime testi bekliyor.
+- `[!]` Aktif oyun Blueprint ile çelişiyor.
+- `[ ]` Sistem/iş henüz uygulanmadı.
+- `[?]` Owner kararı veya mockup gerekiyor.
+
+### Tamamlama kuralı
+
+Bir iş ancak şu dört kayıt birlikte varsa `[x]` olur:
+
+1. Kod/scene/prefab/SO değişikliği tamamlandı.
+2. İlgili kabul kriteri karşılandı.
+3. Uygun EditMode/PlayMode/runtime veya görsel doğrulama yapıldı.
+4. Bu tracker'ın mevcut durum, checklist, gap ve çalışma günlüğü güncellendi.
+
+---
+
+## 2. Blueprint Kapsam Haritası
+
+Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması için kullanılır.
+
+| Blueprint sayfaları | Konu | Tracker karşılığı |
+|---|---|---|
+| 1-3 | Belge otoritesi, ürün terimleri | Bölüm 1-3 |
+| 4-5 | Ürün sözleşmesi, oyuncu rolü | Bölüm 3 |
+| 6 | 60 saniyelik cycle | Package B |
+| 7 | Run, ölüm ve kayıt | Package A + H |
+| 8 | Sabit battlefield/kamera | Bölüm 3 + Package I |
+| 9 | Tek prefab horde | Package B |
+| 10 | Wall ve repair | Package A + G |
+| 11-13 | Kaynak, worker, population, beds | Package C + D |
+| 14 | Council | Package F |
+| 15-18 | Archer, ammo, placement, targeting | Package D |
+| 19-21 | Castle Heart ve procedural teknoloji graph'ı | Package E |
+| 22 | Aktif yetenekler | Package G |
+| 23-24 | Meta ve persistence | Package H |
+| 25 | Minimal HUD | Package I |
+| 26 | Onboarding | Package I |
+| 27 | Görsel/işitsel yön | Package I |
+| 28-29 | Teknik sahiplik ve data contract'ları | Bölüm 13 |
+| 30 | Performans sözleşmesi | Bölüm 14 |
+| 31 | Tuning ve telemetry | Bölüm 15 |
+| 32-34 | Paket sırası ve kabul kapıları | Bölüm 4-12 |
+| 35 | QA matrisi | Bölüm 16 |
+| 36 | Risk register | Bölüm 17 |
+| 37 | Release Definition of Done | Bölüm 18 |
+| 38 | Kapsam dışı guardrail'ler | Bölüm 19 |
+| 39 | Açık kararlar | Bölüm 20 |
+| 40 | Repo evidence/owner kaynakları | Bölüm 21 |
+
+---
+
+## 3. Ürün Sözleşmesi ve Mevcut Oyun Özeti
+
+### Ana terimler
+
+| Terim | Tracker'daki kesin anlamı |
+|---|---|
+| Run | Wall ayaktayken süren ve yalnız Game Over ile sıfırlanan aktif koşu |
+| Castle Heart | Run teknolojisinin procedural graph ekranı ve tek upgrade owner'ı |
+| Council | Her 3 günde bir regular ve nadir emergency karar açan run yönetim katmanı |
+| Meta | Yalnız ölümden sonra kalan sabit kalıcı upgrade listesi |
+| Grave Essence | Yalnız run içi Heart node'larında harcanan ve ölümde silinen kaynak |
+| Spawn budget | Enemy statını büyütmeden sahaya çıkacak adet/akış baskısını yöneten değer |
+
+### Kilitli ürün kimliği
+
+- Sabit kale, tek cephe ve otomatik savaş.
+- Tek enemy prefab; boss, elite veya varyant yok.
+- 10.000 aktif düşman ve 1.000 toplam okçu hedefi.
+- 60 saniyelik kesintisiz Day/Dusk/Night/Dawn döngüsü.
+- Zorluk enemy stat şişmesinden değil, sayı ve akıştan gelir.
+- Oyuncu işçi, kaynak, Wall, Arrow, Council, Heart ve cooldown yönetir.
+- Roguelike değişkenlik düşman/lane seçiminden değil generated Castle Heart graph'ından gelir.
+- Wall `0 HP` olduğunda run kesin olarak biter.
+- PC/Steam etkileşim dili; reklam, IAP veya mobile interaction hedefi yok.
+
+### Oyuncu eylemleri ve ritim
+
+| Ritim | Oyuncu eylemi | Sistem |
+|---|---|---|
+| Sürekli | Kaynak ve Arrow stokunu izler | Üst HUD + ammo satın alma |
+| Sık | Worker target ratio değiştirir | Farm/Lumberyard/Quarry/Mine |
+| Sık | Archer alır veya retrain eder | Basic/Rapid/Frost, ortak 1000 cap |
+| Dönemsel | Day/Dusk sırasında Wall onarır | Stone ile tek seferlik normal repair |
+| Dönemsel | Council kararı verir | 3/6/9... + rare emergency |
+| Dönemsel | Castle Heart node'u alır | Grave Essence + full pause |
+| Taktik | Fireball/Rally/Emergency Repair kullanır | Alt orta cooldown barı |
+
+### Canlı Unity/repo gerçeği - 2026-07-12
+
+| Alan | Mevcut gerçek | Sonuç |
+|---|---|---|
+| Aktif scene | `Assets/Scenes/NewGameScene.unity`, Unity MCP'de loaded ve clean | Kanıtlandı |
+| Kamera | Ortografik, size `8`, gameplay pan/zoom controller yok; `CameraShaker` var | Temel sabit kamera uyumlu |
+| Oyun hızı | Oyuncu kontrollü x2/x4 veya offline progress owner'ı bulunmadı | Blueprint ile uyumlu; regression gerekli |
+| Battlefield | Kale/duvar solda, spawn sağdaki `SpawnLineX` bandından geliyor | Temel kompozisyon uyumlu |
+| Build placement | Aktif scene'de `BuildingPlacementUI` ve `BuildingGridManager` bağlı değil | Hazır bina yönüyle uyumlu |
+| Cycle | Toplam 60 saniye fakat `22/8/22/8` | Hedef `30/5/20/5` |
+| Horde | Tek prefab akışı mevcut; stat growth, Blood Moon ve destroy-on-death aktif | Package B uyumsuz |
+| Moat | `MoatSystem` ve `MoatSlowMultiplier=0.55` aktif combat etkisi uyguluyor | Yalnız dormant kalabilir; active bağlantı onaysız |
+| Defense | Damage/Game Over aktif olarak tek Wall'a çekildi | Kodlandı, runtime test bekliyor |
+| Normal repair | Wood+Stone maliyeti kullanıyor ve Night phase guard'ı yok | Day/Dusk + Stone-only hedefiyle çelişiyor |
+| Save | Dawn checkpoint; Continue sonraki Day'e geçiyor | Package A kritik uyumsuz |
+| Economy | Üretim var; Food/Wood pasif consumption yolları hâlâ mevcut | Package A/C uyumsuz |
+| Population | Dawn'da bedelsiz +15; capacity otomatik büyüyor | Package C uyumsuz |
+| Workers | Dört resource allocation ve dünya worker entity'leri var; hedef oran yok, görseller 1:1 | Kısmi altyapı |
+| Council | Curated/deterministic composer ve kart UI var; schedule chance/pity/cooldown | Package F altyapısı var, schedule yanlış |
+| Archers | Basic/Rapid/Frost, instant buy ve population cost var | Kısmi uyum |
+| Archer cap | Ortak 1000 kontrolü yok | Package D uyumsuz |
+| Placement | `outside` tilemap merkezleri + küçük stack offset | 40x25 değil |
+| Targeting | Her okçu bütün zombileri brute-force tarıyor | 1k x 10k blocker |
+| Ammo | Config `UnlimitedArrows = true`; refill butonu bağlı değil | Package D uyumsuz |
+| Tech/Heart | Sabit SO catalog + reveal graph + ana kaynak maliyeti | Generated Heart değil |
+| Fireball | Dünya hedefli projectile/AoE ve cooldown çalışması mevcut | Korunacak temel |
+| Rally | Wood/Food maliyetli prep purchase | Cooldown-only ability olmalı |
+| Emergency Repair | Ayrı ability yok | Eksik |
+| Meta | Ayrı JSON ve Game Over shop var; `StartingTechLevel` aktif | Kısmi uyum |
+| HUD | CyclePanel, DAY/DUSK/NIGHT ve Horde Pressure mevcut; tek Wall runtime gizleme var | Package I polish gerekli |
+| Tutorial | Aktif tutorial/onboarding sistemi bulunmadı | Package I eksik |
+| Testler | CouncilComposer ve SingleWallDefenseRules EditMode testleri var | V1 matrisinin küçük bölümü |
+| Telemetry | Blueprint event'leri için runtime telemetry owner'ı bulunmadı | Eksik |
+
+---
+
+## 4. Paket Sırası ve Anlık İlerleme
+
+| Sıra | Paket | Durum | Sonraki pakete geçiş kapısı |
+|---:|---|---|---|
+| 1 | A - System Contracts | **Aktif** | Reset/Continue deterministik; upkeep yok; tek Wall testli |
+| 2 | B - Continuous Horde | Bekliyor | Sabit stats ile gün baskısı artar; backlog/pool çalışır |
+| 3 | C - Economy + Population | Bekliyor | Pasif drain yok; arrival tek Food öder; cap aşılmaz |
+| 4 | D - Archers + Ammo | Bekliyor | 1.000 x 10.000; 40x25; Arrow truth çalışır |
+| 5 | E - Castle Heart | Bekliyor | Aynı seed/load aynı valid graph'ı üretir |
+| 6 | F - Council | Bekliyor | 3/6/9 bozulmaz; etkiler ana cap'leri bypass etmez |
+| 7 | G - Active Abilities | Bekliyor | Kaynak tüketmez; Night repair sözleşmesi çalışır |
+| 8 | H - Meta + Persistence | Bekliyor | Ölüm ödülü idempotent; force-close ölümü geri alamaz |
+| 9 | I - Product Gate | Bekliyor | 10k scenario, tutorial ve temiz görsel inceleme |
+
+> “A1/A2” resmî Blueprint paketi değildir. Resmî paketler A-I'dır; iş kimlikleri yalnız tracker içinde `DW-A-SAVE` gibi kullanılır.
+
+---
+
+## 5. Package A - System Contracts
+
+### Mevcut oyun ile karşılaştırma
+
+| Sözleşme | Mevcut oyun | Durum |
+|---|---|---|
+| Tek Wall truth | Damage, Game Over, authoring, repair ve save defense alanı Wall'a çekildi | `[x]` 19/19 EditMode |
+| Run/meta ayrımı | Exact run `run_save.json`; kalıcı progression `meta_progress.json`; ölüm transaction'ı ayrı receipt | `[x]` |
+| Exact Continue | Schema v3 aynı cycle/phase/timer, kaynak ve spawn RNG state'ini restore ediyor | `[x]` EditMode + PlayMode |
+| Otomatik save | Ana menüye dönmeden önce ve application quit sırasında exact snapshot alınıyor | `[x]` |
+| Gönüllü reset yok | Aktif run sırasında Main Menu New Run ve Pause Restart kapalı; Game Over Restart yeni koşu başlatır | `[x]` |
+| Upkeep yok | V1 ResourceTick consumption'ı yok sayıyor; population Food ve Fletcher Wood yolları castle loop'ta kapalı | `[x]` |
+| Legacy Gate/Core disabled | Runtime tek Wall gösterimi var; HUD prefabında Gate/Core referansları serialize kalmış | `[~]` |
+| Tuning owner | Authoring defaults, active subscene ve DifficultyProfile aynı alanları paylaşabiliyor | `[!]` |
+| Normal repair resource/phase | GameManager Stone-only cost üretiyor; Day/Dusk dışını gameplay ve UI seviyesinde kapatıyor | `[x]` |
+
+### `DW-A-SAVE` - Tamamlandı: Exact Run Snapshot & Continue
+
+- [x] Run save schema `v3` oldu; eksik exact state içeren v2 Dawn checkpoint'i sessiz migrate edilmiyor.
+- [x] Gün/cycle index, aktif phase, exact cycle timer/progress ve spawn RNG state'i kaydediliyor.
+- [x] Wood, Stone, Iron, Food, Arrow current ve kesirli accumulator state'i kaydediliyor; data-driven capacity tech/config'ten yeniden hesaplanıyor.
+- [x] Population, bed/capacity, actual worker count ve growth/event tekrar gate'leri kaydediliyor. Target ratio owner'ı Package C'de eklendiğinde aynı capture/restore üçlüsüne bağlanacak.
+- [x] Basic/Rapid/Frost count, archer level ve ilgili run bonus state'i kaydediliyor.
+- [x] Wall current HP, Fireball cooldown/projectile, Rally ve Fortify state'i kaydediliyor.
+- [x] Tech node level state'i kaydediliyor; generated graph reveal/effect aggregate'leri level state'inden yeniden kuruluyor.
+- [x] Council flags, recent/one-shot memory, salt, cooldown, active event/options/effects ve süreli economy/horde effect state'i kaydediliyor.
+- [x] Ana menüye dönmeden hemen önce save alınıyor; başarısız save sahne geçişini durduruyor.
+- [x] Uygulama kapanırken canlı ve ölmemiş koşu güvenli biçimde kaydediliyor.
+- [x] Continue sırasında `CycleIndex + 1`, zorunlu `Day`, timer `0` ve Council reroll davranışları kaldırıldı.
+- [x] Aktif run varken gönüllü New Run/Restart yolları kapatıldı; Game Over sonrası Restart korunuyor.
+- [x] Wall `0 HP` frame'inde death receipt önce yazılıyor ve run save Continue için geçersiz kılınıyor.
+- [x] Run identity + death receipt + `RewardedRunIds` ile aynı ölümün meta ödülü idempotent hale getirildi.
+- [x] Eski Dawn checkpoint metotları runtime akışından çıkarıldı; exact snapshot tek aktif save owner'ı.
+
+### `DW-A-UPKEEP` - Tamamlandı: No Passive Main Resource Consumption
+
+- [x] `ResourceConsumptionRate` V1 castle loop'ta `ResourceTickSystem` tarafından sıfır kabul ediliyor.
+- [x] `PopulationTickSystem` pasif Food consumption yazmıyor.
+- [x] `BuildingPopulationSystem`, V1'de serialize kalmış `BuildingFoodCost` değerlerini sıfırlıyor.
+- [x] Legacy `ArrowProductionSystem`, `MobileCastleCombatConfig` bulunduğunda Fletcher arrow üretimi ve Wood consumption uygulamıyor.
+- [x] Ana kaynakların yüksek bir consumption rate enjekte edildiğinde dahi azalmadığını gerçek `NewGameScene` PlayMode testi kanıtlıyor.
+- [x] Wood ile anlık arrow satın alma bu işin parçası olarak sahte biçimde kapatılmadı; aktif config hâlâ `UnlimitedArrows=true`, çözüm Package D'de açık.
+
+### `DW-A-REPAIR` - Tamamlandı: Stone-only Day/Dusk Repair
+
+- [x] Bütün repair çağrı yolları `GameManager.CanRepairDefenseFull`, `GetRepairCost` ve `RepairDefenseFull` owner'ında birleşiyor.
+- [x] Normal repair maliyetinden Wood kaldırıldı; eksik HP oranına göre yalnız Stone harcanıyor.
+- [x] Normal repair yalnız Day ve Dusk phase'lerinde açık.
+- [x] Night ve Dawn sırasında hem gameplay transaction'ı hem UI interactable state'i kapalı.
+- [x] UI kilit metni `Day / Dusk only`; cost etiketi yalnız Stone gösteriyor.
+- [x] Same-frame lethal damage, phase ve Stone-only transaction regression testleri geçti.
+
+### `DW-A-TUNING` - Şu anki tek aktif iş
+
+- [ ] Aktif runtime tuning alanlarının bütün yazma/override owner'larını çıkar.
+- [ ] `MobileCastleCombatAuthoring`, active SubScene ve `DifficultyProfileSO` öncelik sırasını kanıtla.
+- [ ] Aynı alan için birden fazla aktif owner varsa tek otorite seçmeden kod değiştirme; owner kararı gereken noktayı Bölüm 20'ye yaz.
+- [ ] Runtime'da kullanılan değer ile Inspector/profile değerinin ayrışmasını yakalayan doğrulama ekle.
+- [ ] Tuning owner sözleşmesini ilgili architecture/editor setup belgelerine yaz.
+
+### Package A kalan işler
+
+- [x] `ResourceConsumptionRate` içindeki aktif ana kaynak tüketimini V1 loop'unda sıfırla/devre dışı bırak.
+- [x] `PopulationTickSystem` pasif Food tüketimini V1 loop'undan çıkar.
+- [x] Legacy `ArrowProductionSystem`/Fletcher consumption yolunun V1'e sızmasını engelle.
+- [ ] Aktif tuning alanlarında tek owner belirle: config default, scene override ve profile önceliğini belgeleyip test et.
+- [ ] Gate/Core bileşenlerinin aktif damage, repair, Council, save ve HUD yollarına dönmesini engelle.
+- [x] Normal repair maliyetinden Wood'u kaldır; Stone'u tek harcama kaynağı yap.
+- [x] Normal repair'i yalnız Day/Dusk phase'lerinde aç.
+- [x] Tek Wall EditMode testlerini Unity üzerinden çalıştır ve sonuç kaydet.
+- [x] Wall `0 HP` + aynı frame repair testini ekle.
+- [x] Save/Continue round-trip, migration ve ölüm invalidation testlerini ekle.
+
+### Package A kabul kapısı
+
+- [x] Restart/reset kuralları Blueprint ile uyumlu.
+- [x] Continue aynı phase/timer/state ile deterministik.
+- [x] Wood/Stone/Iron/Food pasif negatif akmıyor.
+- [x] Wall `0 HP` aynı frame repair ile geri döndürülemiyor; Game Over geçişi tek transition gate'inden üretiliyor.
+- [ ] Gate/Core aktif ürün davranışına geri dönemiyor.
+
+---
+
+## 6. Package B - Continuous Horde
+
+### Mevcut oyun ile karşılaştırma
+
+| Sözleşme | Mevcut oyun | Durum |
+|---|---|---|
+| 60 saniye kesintisiz cycle | Continuous system mevcut; faz toplamı 60 | `[~]` |
+| 30/5/20/5 | Active subscene `22/8/22/8` | `[!]` |
+| Spawn hiçbir fazda sıfır değil | Cycle her fazda pozitif intensity kullanıyor | `[~]` Runtime test gerekli |
+| Enemy stats sabit | HP, damage ve speed günle büyüyor | `[!]` |
+| Quantity-only difficulty | Count/interval büyümesi var fakat stat growth ile karışık | `[!]` |
+| Tek enemy prefab | Aktif çıkış tek zombie prefab üzerinden | `[~]` Catalog contract yok |
+| 10k expandable pool | Active cap 900; death `DestroyEntity` | `[!]` |
+| Backlog kaybolmaz | Cap gate var; explicit backlog state/soak kanıtı yok | `[~]` |
+| Special night yok | Difficulty profile her 5 günde Blood Moon üretiyor | `[!]` |
+
+### Yapılacaklar
+
+- [ ] Faz sürelerini `Day 30 / Dusk 5 / Night 20 / Dawn 5` yap.
+- [ ] Düşman akışının dört fazda da sıfıra düşmediğini test et.
+- [ ] Zombie HP growth'ü kaldır.
+- [ ] Zombie damage growth'ü kaldır.
+- [ ] Zombie speed growth'ü kaldır.
+- [ ] Spawn count/budget için day curve ve phase multiplier owner'ı oluştur.
+- [ ] Dawn yoğunluğunu düşürürken yeni gün tabanının önceki güne geri dönmemesini sağla.
+- [ ] Blood Moon/SpecialNights active bağlantısını kaldır; dormant kalabilir.
+- [ ] Aktif `MoatSystem` combat etkisini V1 core loop'tan ayır; kod/content dormant kalabilir.
+- [ ] `EnemyDefinition` ve tek kayıtlı enemy catalog oluştur.
+- [ ] Enemy type özel dalları spawn/UI koduna eklemeden content genişleme sınırı kur.
+- [ ] Explicit spawn backlog state/policy kur ve save/telemetry'ye aç.
+- [ ] Enemy pool'u küçük prewarm + ihtiyaçla genişleme şeklinde kur.
+- [ ] Ölümde entity destroy yerine pool return uygula.
+- [ ] Active cap'i data-driven yap; teknik cap dolduğunda talebi silme.
+- [ ] Gerçek oyun UI/VFX/save açıkken 10.000 enemy ölçüm senaryosu kur.
+
+### Kabul kapısı
+
+- [ ] Day 1 ve ileri günlerde enemy HP/damage/speed aynıdır.
+- [ ] Gün baskısı yalnız count/budget/flow ile artar.
+- [ ] Cap doluyken talep backlog'a gider ve boşlukta sahaya çıkar.
+- [ ] Tek prefab catalog üzerinden çalışır.
+- [ ] Death churn pool ile yönetilir.
+
+---
+
+## 7. Package C - Economy + Population
+
+### Mevcut oyun ile karşılaştırma
+
+| Sözleşme | Mevcut oyun | Durum |
+|---|---|---|
+| Dört hazır worker binası | Wood/Stone/Iron/Food allocation ve prebuilt world alanları var | `[~]` |
+| Target ratio | Integer actual count tutuluyor; kalıcı yüzde hedef yok | `[!]` |
+| Yeni pop otomatik dağılır | Dawn pop ekleniyor fakat target ratio olmadığı için hedef sözleşme yok | `[!]` |
+| +1/+10/+100/direct input | Aktif worker drawer yalnız add button ağırlıklı | `[!]` |
+| Worker world representation | Her assigned worker için 1:1 entity spawn ediliyor | `[!]` Büyük sayıda ölçeklenmez |
+| Beds incremental/no hard max | Mobile capacity `999999`; satın alınabilir bed sistemi yok | `[!]` |
+| Dawn survivor + one-time Food | Her dawn bedelsiz +15; yürüyen arrival/Food guard yok | `[!]` |
+| Mevcut pop pasif Food tüketmez | Atanmış pop Food/dk tüketebiliyor | `[!]` |
+| Fiyatlar adet/seviyeyle büyür | Bazı archer/tech cost growth var; bed/cap/efficiency contract yok | `[~]` |
+
+### Yapılacaklar
+
+- [ ] `WorkerAllocation` state'e dört target ratio, actual counts, caps ve idle population ekle.
+- [ ] Target ratio toplamını normalize eden deterministik kural tanımla.
+- [ ] Yeni population'ı target ratio'lara otomatik dağıt.
+- [ ] Bina cap'i dolduğunda fazlalığı Idle Population'da bırak.
+- [ ] Ücretsiz/anlık `+1 / +10 / +100 / direct input` kontrollerini ekle.
+- [ ] Worker world representation'ı sayısal truth'tan ayır; düşük/orta/yüksek temsilî density kur.
+- [ ] Worker animasyon, fener, taşıma ve üretim feedback'ini allocation ile senkron tut.
+- [ ] Houses için satın alınabilir bed capacity state'i kur.
+- [ ] Bed maliyetini sahip olunan capacity ile büyüt; hard max koyma.
+- [ ] Dawn survivor budget'ını bed boşluğu + Food bütçesiyle hesapla.
+- [ ] Her kabul edilen kişi için Food'u yalnız bir kez azalt.
+- [ ] Survivor'ları sağdan yürüyerek kaleye gelen görsel akışla temsil et.
+- [ ] Food yetersizliğinde mevcut popu azaltma; yalnız yeni arrival'ı sınırla.
+- [ ] Açlık, göç, population death ve üretim cezası ekleme.
+- [ ] Bina capacity ve efficiency satın alımlarını büyüyen maliyet eğrisine bağla.
+- [ ] Fiyat eğrilerini Inspector/SO tuning yüzeyi yap; int güvenlik sınırlarını koy.
+- [ ] Fletcher gameplay binası/worker'ı ve build placement'ı V1 akışına bağlama.
+
+### Kabul kapısı
+
+- [ ] Ana kaynaklarda pasif drain yok.
+- [ ] Food `0` iken mevcut population değişmiyor.
+- [ ] Dawn arrival yalnız Food+bed kadar kabul ediliyor.
+- [ ] Capacity hiçbir zaman aşılmıyor.
+- [ ] Target ratio ve worker state save/load ile aynı kalıyor.
+- [ ] Büyük allocation 1:1 worker entity üretmiyor.
+
+---
+
+## 8. Package D - Archers + Ammo
+
+### Mevcut oyun ile karşılaştırma
+
+| Sözleşme | Mevcut oyun | Durum |
+|---|---|---|
+| Basic/Rapid/Frost | Üç tip ve SO tanımları mevcut | `[x]` Yapısal olarak var |
+| Instant buy + population cost | Satın alım anlık; definition `PopulationCost=1` | `[~]` Cap testleri eksik |
+| Common 1000 cap | `CanBuyArcher` toplam cap kontrolü yapmıyor | `[!]` |
+| Basic retrain | Unlock ve buy var; Basic -> Rapid/Frost retrain owner'ı yok | `[!]` |
+| Archer death yok | Archer HP/death combat yolu yok | `[~]` Regression gerekli |
+| Upgrade yalnız Heart | Market'te type level ve upgrade butonları aktif | `[!]` |
+| 40x25 placement | Tile center + stack offset; preview 96 | `[!]` |
+| Nearest valid target | Brute-force ile nearest-to-archer uygulanıyor | `[~]` Davranış doğru, ölçek yanlış |
+| Incoming damage reservation | Yok | `[!]` |
+| Arrow -1/shot | Kod destekliyor fakat `UnlimitedArrows=true` bypass ediyor | `[!]` |
+| Wood ile instant refill | Mevcut refill ücretsiz ve sabit target'a çekiyor; UI gizli | `[!]` |
+| Fletcher yok | Legacy Fletcher kodu var; aktif mobile UI'da bağlı değil | `[~]` Leakage guard gerekli |
+
+### Archer ve retrain işleri
+
+- [ ] Toplam Basic+Rapid+Frost cap'ini `1000` olarak tek owner'da uygula.
+- [ ] 1.001. satın alımı reddet; kaynak/population harcama.
+- [ ] Council, meta başlangıç bonusu ve restore spawn'ında aynı cap guard'ını kullan.
+- [ ] Basic -> Rapid ve Basic -> Frost retrain işlemini tek seferlik maliyetle uygula.
+- [ ] Retrain toplam archer ve population sayısını değiştirmesin.
+- [ ] Type maliyetini aynı türün mevcut sayısına göre büyüt.
+- [ ] Market'teki ayrı Basic/Rapid/Frost level ve upgrade akışını kaldır/disable et.
+- [ ] Hasar, fire rate, range, Frost slow upgrade'lerini Heart effect pipeline'ına taşı.
+- [ ] Archer death/individual HP yolunun eklenmesini regression ile engelle.
+
+### 40x25 formation işleri
+
+- [ ] Kullanılacak tam 40 `outside` tile'ı data/version ile sabitle.
+- [ ] Her tile için `tile coordinate + local slot index` seed'iyle 25 nokta üret.
+- [ ] Noktaları izometrik diamond içinde güvenli inset ile örnekle.
+- [ ] Minimum local mesafe uygula.
+- [ ] Fill order'ı layer mantığıyla kur: önce 40 tile slot 0, sonra 40 tile slot 1...
+- [ ] Save yalnız type count tutarken stable algorithm ile aynı formasyonu kur.
+- [ ] Editor gizmo preview'u bütün 1000 noktayı göstersin.
+- [ ] Formation algorithm version'ını save migration'a ekle.
+
+### Targeting ve projectile işleri
+
+- [ ] Mevcut spatial hash'i archer target query için uygun read-only query owner'ına dönüştür.
+- [ ] Her okçu range içindeki yaşayan/death-state olmayan en yakın düşmanı seçsin.
+- [ ] Basic/Rapid/Frost aynı target policy'yi kullansın.
+- [ ] Projectile target pool'a döner/ölürse tek deterministik cleanup veya retarget policy uygula.
+- [ ] Incoming damage reservation/load ile overkill'i dağıt.
+- [ ] Target search'ü Burst/job ölçeğinde 1k x 10k için ölç.
+- [ ] Projectile instantiate/destroy churn'ünü pooling veya burst-safe lifetime yaklaşımıyla çöz.
+
+### Ammo işleri
+
+- [ ] `UnlimitedArrows` V1 active config'ini kaldır/false yap.
+- [ ] Atılan gerçek projectile başına tam 1 Arrow düşür.
+- [ ] Arrow `0` olduğunda okçuları durdur; refill sonrası aynı frame yeniden başlat.
+- [ ] Wood maliyetli sabit oranlı refill paketleri ekle.
+- [ ] Refill'i production queue olmadan anlık uygula.
+- [ ] Current/Capacity, paket fiyatları ve `Buy Max` kontrolünü UI'da göster.
+- [ ] Arrow capacity ve efficiency upgrade'lerini Heart/run purchase owner'ına bağla.
+- [ ] Refill başına birim fiyatın sonsuza büyümesini engelle; ordu/fire rate doğal talebi yaratsın.
+- [ ] Rapid'in yüksek fire rate'inin daha fazla Arrow tükettiğini test et.
+- [ ] Legacy Fletcher/ArrowProduction V1 akışına sızmasın.
+
+### Package D kabul kapısı
+
+- [ ] 1.001. archer alınamıyor.
+- [ ] Retrain toplam sayıyı değiştirmiyor.
+- [ ] 40 tile x 25 stable point save/load sonrası aynı.
+- [ ] 1.000 archer x 10.000 enemy gerçek oyun senaryosu çalışıyor.
+- [ ] Ammo truth ve refill davranışı korunuyor.
+
+---
+
+## 9. Package E - Castle Heart / Teknoloji Ağacı
+
+### Mevcut teknoloji sistemi - repo gerçeği
+
+| Alan | Mevcut uygulama | Blueprint farkı |
+|---|---|---|
+| Definition | `TechNodeDefinitionSO` + `TechTreeCatalogSO` | Katalog korunabilir, generator input'u olmalı |
+| Graph | Catalog içindeki sabit `RevealChildNodeIds` | Run başında generated node+edge graph gerekli |
+| Root/reveal | Root otomatik level 1; child listesi reveal | Temel reveal fikri korunabilir |
+| Maliyet | Wood/Stone/Iron/Food `ResourceCost` | Yalnız Grave Essence kullanılmalı |
+| Repeatable | `MaxLevel` ve linear cost growth var | +1/+10/Buy Max ve soft-cap contract eksik |
+| Effects | Archer unlock/stats, worker, Wall, moat, Fireball etkileri var | Effect pipeline genişletilip tek progression owner yapılmalı |
+| UI | Fullscreen graph, runtime layout, pan/zoom controller var | Kullanışlı temel; hidden graph/branch compass/Keystone sunumu eksik |
+| Pause | Panel açıkken oyun özellikle durmuyor | Heart bütün simulation/cycle/spawn/worker/cooldown'u durdurmalı |
+| Save | Sabit node level'ları save ediliyor | Generated graph, edge, hidden/reveal, locks ve version save edilmeli |
+| Guarantees | Sabit catalog içeriğine bağlı | Her graph Rapid/Frost/Fireball reachable validation gerekli |
+| Node türleri | Generic node/effect yapısı | Unlock/Repeatable/Evolution/Keystone semantiği eksik |
+| Duplicate upgrades | Market archer level/upgrade butonları aktif | Heart tek teknoloji owner'ı olmalı |
+
+### E1 - Data model ve catalog
+
+- [ ] `HeartNodeDefinition` contract oluştur: id, tags, effects, rarity, depth range, repeatable, base cost, cost growth, conflicts.
+- [ ] Node'ları `Unlock`, `Repeatable`, `Evolution`, `Keystone` türleriyle açıkça sınıflandır.
+- [ ] Mevcut `TechNodeDefinitionSO` içeriklerini yeni contract'a migrate etme planı çıkar.
+- [ ] `GeneratedRunGraph` contract oluştur: seed, graph version, node ids, edges, hidden/revealed, levels, locks.
+- [ ] Source asset'lerin runtime state taşımamasını garanti et.
+- [ ] Grave Essence run resource/state ve tek Heart spending owner'ını oluştur.
+- [ ] Grave Essence'ın ölümde silinmesini run save matrisiyle güvenceye al.
+
+### E2 - Graph üretimi
+
+- [ ] Castle Heart merkez/root node'unu sabitle.
+- [ ] Ordu, Savunma, Üretim ve Heart/Büyü yön pusulasını sabitle.
+- [ ] Run seed ve dört yön iskeletini oluştur.
+- [ ] Her ana yönün root'a bağlı olduğunu doğrula.
+- [ ] Rapid, Frost ve Fireball guarantee node'larını izinli derinliğe yerleştir.
+- [ ] Temel Wall/defense erişimini koru.
+- [ ] Her ana yönde en az bir repeatable sink garanti et.
+- [ ] Node havuzunu tag + rarity + depth kurallarıyla doldur.
+- [ ] Duplicate node ve invalid prerequisite üretimini engelle.
+- [ ] Edge ve kontrollü cross-link üret.
+- [ ] Keystone çiftlerini yalnız birbirini kapatacak biçimde yerleştir.
+- [ ] Normal node'un yanlışlıkla başka yolu lock etmesini engelle.
+- [ ] Disconnected graph, dead core path ve unreachable guarantee durumunda validation reroll/fallback uygula.
+- [ ] Graph tamamen run başlangıcında üretilsin; reveal anında RNG kullanma.
+- [ ] Graph valid değilse run'ı sessizce broken state ile başlatma; açık hata/fallback üret.
+
+### E3 - Reveal ve oyuncu bilgisi
+
+- [ ] Başlangıçta Heart ve bağlı ilk seçenekleri tamamen göster.
+- [ ] Uzak node'larda yalnız yön rengi/damarını göster; exact node'u gizle.
+- [ ] Gizli node içeriğini run başında kesinleştir ve save'e yaz.
+- [ ] İlk node alımında yalnız bağlı komşuları reveal et.
+- [ ] Save-scum ile hidden graph reroll olmasını engelle.
+- [ ] Oyuncunun gördüğü node'un effect ve gerçek sayısal sonucunu açıkça göster.
+- [ ] Keystone görünür olduğunda karşıt seçimi ve kapanacak node'u açıkça işaretle.
+
+### E4 - Node satın alma ve etkiler
+
+- [ ] Bütün Heart satın alımlarını yalnız Grave Essence ile yap.
+- [ ] Unlock node'u tek satın alma ile sistemi ve devam yolunu açsın.
+- [ ] Repeatable node için `+1 / +10 / Buy Max` ekle.
+- [ ] Evolution node'larını davranış değiştirici tek seferlik effect olarak uygula.
+- [ ] Keystone seçiminin yalnız eş Keystone'u kapatmasını sağla.
+- [ ] Damage/maliyet gibi büyük değerleri destekle.
+- [ ] Fire rate, cooldown, slow ve range için soft-cap/diminishing return uygula.
+- [ ] Soft-cap yüzünden node'u görünmez biçimde etkisizleştirme; kalan gerçek değeri UI'da göster.
+- [ ] Archer damage/fire rate/range/Frost slow upgrade'lerini Heart effect pipeline'ına taşı.
+- [ ] Wall Max HP, worker capacity/efficiency, Arrow capacity/efficiency ve ability upgrade'lerini aynı pipeline'a bağla.
+- [ ] Fireball damage/radius/cooldown repeatable node'larını destekle.
+- [ ] Burning ground/second blast gibi evolution'ları yalnız onaylı pool'dan üret.
+
+### E5 - Heart ekranı ve pause
+
+- [ ] HUD Castle Heart butonu full-screen graph açsın.
+- [ ] Heart açıkken cycle timer dursun.
+- [ ] Heart açıkken spawn ve movement/combat dursun.
+- [ ] Heart açıkken worker production/allocation simulation dursun.
+- [ ] Heart açıkken ability cooldown'ları dursun.
+- [ ] Mouse drag pan ve wheel zoom yalnız Heart ekranında çalışsın.
+- [ ] UI interaction, tooltip, buy/reveal ve focus davranışları unscaled UI zamanında çalışsın.
+- [ ] Graph kapanınca önceki simulation state'i deterministik devam etsin.
+- [ ] Market/Barracks archer upgrade ve direct unlock yüzeylerini kaldır/disable et.
+
+### E6 - Save, migration ve test
+
+- [ ] Seed, graph version, node ids, edge'ler, hidden/reveal, levels ve locks run save'e yazılsın.
+- [ ] Continue source asset'ten yeniden zar atmasın; kaydedilmiş graph'ı kursun.
+- [ ] Aynı seed + aynı catalog version aynı graph'ı üretsin.
+- [ ] Catalog değişiminde eski run graph'ı sessizce başka graph'a map edilmesin.
+- [ ] Rapid/Frost/Fireball unreachable graph testi ekle.
+- [ ] Normal node accidental lock testi ekle.
+- [ ] Keystone pair exclusion testi ekle.
+- [ ] Hidden graph save/load testi ekle.
+- [ ] Heart full-pause testi ekle.
+
+### Package E kabul kapısı
+
+- [ ] Aynı seed/load aynı graph.
+- [ ] Rapid, Frost ve Fireball her run'da reachable.
+- [ ] Hidden graph save-scum ile değişmiyor.
+- [ ] Heart yalnız Grave Essence kullanıyor.
+- [ ] Heart açıkken bütün simulation ve cooldown duruyor.
+- [ ] Ayrı archer upgrade owner'ı kalmıyor.
+
+---
+
+## 10. Package F - Council
+
+### Mevcut oyun ile karşılaştırma
+
+| Sözleşme | Mevcut oyun | Durum |
+|---|---|---|
+| Council aktif core sistem | Composer, catalog, atoms ve UI mevcut | `[x]` Altyapı var |
+| Curated/no runtime AI | Authored template/atom deterministik compose ediliyor | `[~]` Launch content review gerekli |
+| 3/6/9 regular schedule | Daily chance + pity + cooldown | `[!]` |
+| Rare emergency | Ayrı emergency type/trigger yok | `[!]` |
+| Exact effects visible | İki option ve effect badge mevcut | `[~]` Tüm effects audit gerekli |
+| Population guard | `AddPopulation` capacity/Food'u bypass ediyor | `[!]` |
+| Archer guard | Free archer population ve 1000 cap'i bypass ediyor | `[!]` |
+| Wall-only defense | Heal Wall'a yönlendirildi | `[~]` Test gerekli |
+| Count-only night effect | Next-night spawn multiplier mevcut | `[~]` Stat effect leakage testi gerekli |
+| Exact save | Flags/recent/cooldown kısmen save; active card/effects eksik | `[!]` |
+
+### Yapılacaklar
+
+- [ ] Regular Council'ı Day `3,6,9,12...` Dawn başlangıcında kesin tetikle.
+- [ ] Chance/pity/cooldown'u regular schedule owner'ı olmaktan çıkar.
+- [ ] Emergency Council için ayrı type ve owner-approved trigger listesi kullan.
+- [ ] Emergency olayın regular day index'ini taşımamasını/sıfırlamamasını sağla.
+- [ ] Her kartta tam sayısal iki seçenek ve karar süresi göster.
+- [ ] Resource scarcity, production, Wall ve previous flags bağlamını koru.
+- [ ] Aynı şablonun anlamsız tekrarını recent memory ile engelle.
+- [ ] Yalnız editoryal onaylı flag chain'leri aç.
+- [ ] Population gain'i available beds + one-time Food ile sınırla.
+- [ ] Free archer gain'i idle population + common 1000 cap ile sınırla.
+- [ ] Defense effect'lerini yalnız Wall current/max HP ile sınırla.
+- [ ] Horde effect'lerini yalnız count/flow multiplier ile sınırla.
+- [ ] Regular schedule, emergency state, chosen option, flags, recent templates ve active duration effects'i exact save et.
+- [ ] Council'ın Heart currency/upgrade rolünü veya Meta rolünü devralmasını engelle.
+- [ ] Launch template/atom listesi için owner review ve effect budget testi yap.
+
+### Kabul kapısı
+
+- [ ] Regular günler daima 3/6/9 düzeninde.
+- [ ] Aradaki emergency regular schedule'ı değiştirmiyor.
+- [ ] Hiçbir effect bed+Food, population, 1000 archer, Wall-only veya count-only guard'ını aşmıyor.
+- [ ] Save/Continue aynı Council state'ini koruyor.
+
+---
+
+## 11. Package G - Active Abilities
+
+### Mevcut oyun ile karşılaştırma
+
+| Ability | Mevcut oyun | Blueprint hedefi |
+|---|---|---|
+| Fireball | World target, AoE projectile ve cooldown mevcut | Koru; Heart guarantee/evolution/save ekle |
+| Rally | Wood+Food maliyetli prep purchase | Key `2`, global fire-rate buff, cooldown-only |
+| Emergency Repair | Yok | Key `3`, Night Wall % heal, uzun cooldown |
+| Fortify | Resource-cost prep etkisi mevcut | V1 üçlü ability barında yok; aktif rolü kaldır/ayır |
+| Arrow Storm | Aktif bulunmadı | Eklenmeyecek |
+
+### Yapılacaklar
+
+- [ ] Alt orta tek ability barı oluştur: Fireball, Rally, Emergency Repair.
+- [ ] Fireball input'unu `1 + world area selection` yap.
+- [ ] Rally input'unu `2` yap ve bütün okçulara kısa fire-rate boost uygula.
+- [ ] Emergency Repair input'unu `3` yap ve yalnız Night sırasında Wall Max HP yüzdesi heal et.
+- [ ] Üç ability'den Wood/Stone/Iron/Food/mana maliyetini kaldır.
+- [ ] Ability kullanımını yalnız unlock + cooldown + phase/input guard ile sınırla.
+- [ ] Fireball targeting sırasında UI click'lerini cast sayma.
+- [ ] Fireball damage/radius/cooldown'u Heart node'larına bağla.
+- [ ] Çıkış ability/spell içeriğini Fireball ile sınırla; yeni büyüleri yalnız ileride meta pool unlock yolu için data-driven bırak.
+- [ ] Rally ve Emergency Repair cooldown state'ini exact save et.
+- [ ] Night normal repair'i kapat; Stone harcanmamasını garanti et.
+- [ ] Night başlangıcında açık repair drawer/input davranışını deterministik kapat.
+- [ ] Normal repair paket formülünü tuning verisi yap: fixed HP, percent HP veya approved hybrid.
+- [ ] Eksik HP başına Stone maliyeti ve day price multiplier tuning alanlarını tanımla.
+- [ ] Emergency Repair yüzdesi ve cooldown tabanını tuning alanı yap.
+- [ ] Wall `0 HP` ile aynı frame Emergency Repair gelirse Game Over kazansın.
+- [ ] Fortify/Rally legacy prep purchase yollarının V1 ability sistemiyle çakışmasını kaldır.
+- [ ] Arrow Storm ekleme.
+
+### Kabul kapısı
+
+- [ ] Ability'ler ana kaynak tüketmiyor.
+- [ ] Night normal repair harcama yapmıyor.
+- [ ] Emergency Repair ölümü geri çevirmiyor.
+- [ ] Input ile UI aynı state'i gösteriyor.
+- [ ] Cooldown save/load exact.
+
+---
+
+## 12. Package H - Meta + Persistence
+
+### Mevcut oyun ile karşılaştırma
+
+| Sözleşme | Mevcut oyun | Durum |
+|---|---|---|
+| Meta ayrı save | `MetaProgression` ayrı JSON kullanıyor | `[x]` Yapısal ayrım var |
+| Death-only shop | `MetaProgressionUI` GameOver panelinde | `[~]` Voluntary reset yolları riskli |
+| Reward inputs | Day+kills+record bonus | Nights/peak pop/record weighting eksik/tuning |
+| Idempotent reward | GameOver transition bir kez çağırmayı varsayıyor; persistent receipt yok | `[!]` |
+| Fixed upgrade list | Catalog var; mevcut effect listesi Blueprint ile tam eşleşmiyor | `[~]` |
+| StartingTechLevel yok | Enum ve uygulama aktif | `[!]` |
+| Meta graph'ı değiştirmez | StartingTechLevel graph'ı atlıyor; pool unlock contract yok | `[!]` |
+| Tutorial flag | Aktif tutorial/meta flag bulunmadı | `[!]` |
+
+### Hedef meta upgrade listesi
+
+- [ ] Starting resources - Wood/Stone/Iron/Food; node açmaz.
+- [ ] Starting Basic Archers - Rapid/Frost açmaz.
+- [ ] Starting beds - run bed price curve'ünü silmez.
+- [ ] Base Wall HP - Heart Wall node'larını değersizleştirmez.
+- [ ] Worker production - küçük global multiplier; run capacity/efficiency devam eder.
+- [ ] Arrow efficiency - ammo kararını yok etmez.
+- [ ] Essence gain - graph sonucunu değiştirmez.
+- [ ] Node pool unlock - yeni olası content ekler; mevcut run'a zorla enjekte etmez.
+
+### Persistence işleri
+
+- [ ] Run save ve meta save alanlarının açık schema sahiplerini ayır.
+- [ ] Game Over'da run save içindeki tüm run state'i sil.
+- [ ] Meta currency, upgrade levels, pool unlocks ve tutorial flag'lerini koru.
+- [ ] Death reward'a unique run identity/receipt ekle.
+- [ ] Process restart sonrası aynı ölümün ikinci reward yazmasını engelle.
+- [ ] Force-close ile Game Over öncesi snapshot'a dönmeyi engelle.
+- [ ] Aktif run sırasında meta satın alımını engelle.
+- [ ] `StartingTechLevel` effect ve content'ini yeni modelden kaldır.
+- [ ] Meta'nın generated graph edges/Keystone/result seçmesini engelle.
+- [ ] Repeatable meta sink'lerde büyüyen maliyet; content unlock'ta tek sefer uygula.
+- [ ] Eski Mobile save'i yeni run contract'a sessiz yanlış map etme.
+- [ ] 10k enemy pozisyonlarını tek tek save etmek yerine perceptually faithful deterministik rebuild policy tanımla.
+
+### Kabul kapısı
+
+- [ ] Meta ödülü yalnız ölümde ve bir kez yazılıyor.
+- [ ] Gönüllü reset/prestige yok.
+- [ ] Force-close ölümü geri alamıyor.
+- [ ] Meta mevcut run graph'ını geriye dönük değiştirmiyor.
+- [ ] Migration guard eski save'i yanlış state'e çevirmiyor.
+
+---
+
+## 13. Package I - HUD, Onboarding ve Creative Polish
+
+### I1 - HUD mevcut oyun karşılaştırması
+
+| Blueprint hedefi | Mevcut canlı HUD | Durum |
+|---|---|---|
+| Tek minimal Wall bar | Runtime Wall-only yönü var; prefabda Gate/Core binding'leri hâlâ serialize | `[~]` |
+| Minimal phase area | Büyük CyclePanel + DAY/DUSK/NIGHT labels | `[!]` |
+| Forecast yok | HordePressurePanel aktif bağlı | `[!]` |
+| Abilities alt orta | Fireball ayrı Spell panelinde; Rally drawer'da; Emergency yok | `[!]` |
+| Workers/Housing alt sol | Worker drawer var; Housing owner yok | `[~]` |
+| Archers/Heart alt sağ | Archer drawer ve Heart button var; yerleşim/polish doğrulanmalı | `[~]` |
+| Tek drawer | Birden fazla controller bağımsız panel yönetiyor | `[~]` Exclusive owner testi yok |
+| Council geçici kart | Geçici iki-option kart UI mevcut | `[~]` Schedule/effect sunumu güncellenecek |
+| Fixed camera/ratio | Kamera sabit; ultrawide critical crop testi yok | `[~]` |
+
+### HUD işleri
+
+- [ ] Gate/Core serialized binding ve görsel kalıntılarını active prefabdan temizle veya açık dormant guard koy.
+- [ ] Üst kaynak HUD'ını kompakt tut.
+- [ ] Üst ortada minimal phase alanı ayır.
+- [ ] Büyük CyclePanel ve ham DAY/DUSK/NIGHT sunumunu owner-approved mockup ile değiştir.
+- [ ] Horde forecast/pressure panelini kaldır.
+- [ ] Fireball/Rally/Emergency Repair'ı alt orta tek cooldown barına taşı.
+- [ ] Workers/Housing alt sol yerleşimini kur.
+- [ ] Archers/Castle Heart alt sağ yerleşimini kur.
+- [ ] Aynı anda yalnız bir management drawer açık olacak owner kur.
+- [ ] Council kartında iki exact effect ve karar süresini göster.
+- [ ] 16:9 ve ultrawide'da battlefield ve kritik UI crop testleri yap.
+
+### I2 - İlk koşu onboarding
+
+- [ ] İlk Day: worker ratio düğmesini pulse + tek satır metinle öğret.
+- [ ] İlk kaynak yeterliliği: Basic Archer drawer highlight göster.
+- [ ] İlk düşük ammo: ammo satırını highlight et; zorunlu popup açma.
+- [ ] İlk kill/Essence: Heart butonunu pulse et; açılınca full pause öğret.
+- [ ] İlk regular Council/Day 3: bedel ve iki exact sonucu öğret.
+- [ ] İlk Wall hasarı sonrası Day: normal repair action'ı highlight et.
+- [ ] İlk Night: unlock olan ability üzerinde key hint göster.
+- [ ] Tutorial oyuncu adına kaynak harcamasın veya worker dağıtmasın.
+- [ ] Sürekli modal pause zinciri kurma.
+- [ ] İşlem prompt'tan önce yapılırsa adımı tamamlanmış say.
+- [ ] Tutorial complete flag'i meta save'e yaz.
+- [ ] Settings içinde tutorial reset ekle.
+- [ ] Player-facing bütün tutorial metnini English yap.
+- [ ] İkinci run'da tutorial'ın otomatik açılmadığını test et.
+
+### I3 - Day/night görsel ve işitsel yön
+
+- [ ] Day: sıcak ışık, okunur üretim, worker ambience.
+- [ ] Dusk: amber -> indigo geçiş, fenerlerin yanması, tension riser.
+- [ ] Night: soğuk ay, güçlü silhouette, pencere/ok salvosu, rate-limited yoğun mix.
+- [ ] Dawn: cyan/altın kırılma, kapı/survivor gelişi, nefes/yeni gün cue.
+- [ ] Faz geçişini büyük tam ekran yazı yerine grading, sky, particles ve audio ile okut.
+- [ ] 10k horde için ground contrast, silhouette edge ve motion cadence koru.
+- [ ] Hit VFX/SFX'i her düşmanda üretme; budget/rate limit uygula.
+- [ ] Fireball ve Frost feedback'ini horde içinde kaybolmayacak hierarchy ile sun.
+- [ ] Archer salvolarını tek tek projectile görsel kaosu yerine okunur toplu ritme çevir.
+- [ ] Blood Moon görsel/audio/warning active bağlantılarını kaldır.
+
+### Package I kabul kapısı
+
+- [ ] İlk-run tutorial tamamlanıyor; ikinci run'da otomatik açılmıyor.
+- [ ] Tek Wall bar ve minimal phase UI owner onayından geçiyor.
+- [ ] 16:9/ultrawide temiz render.
+- [ ] 10k horde okunabilir.
+- [ ] Day/night lighting, audio ve combat feedback görsel/işitsel review'dan geçiyor.
+
+---
+
+## 14. Teknik Sahiplik ve Yeni Data Contract'ları
+
+### Mevcut owner -> hedef sorumluluk
+
+| Alan | Mevcut owner | Hedef sorumluluk |
+|---|---|---|
+| Cycle/spawn | `ContinuousSiegeCycleSystem`, `WaveSpawnSystem` | 60 sn fixed phases, quantity-only, backlog |
+| Enemy data | Zombie prefab/authoring | `EnemyDefinition` + catalog + pool |
+| Workers | `MobilePopulationEconomySystem`, GameManager worker visuals | Target ratios + caps + representative density |
+| Archers | `GameManager`, `ArcherShootSystem` | Common 1000 cap + scalable target load |
+| Placement | `MobileCastleArcherTilePlacement` | 40x25 stable local points + version |
+| Heart | `TechNodeDefinitionSO`, `TechTreeCatalogSO`, `TechTreeUI` | Generator + Grave Essence + exact graph save |
+| Council | `CouncilComposer`, `CouncilEventUI`, catalog | 3/6/9 + emergency + guarded effects |
+| Meta | `MetaProgression` | Death-only fixed list + idempotent receipt |
+| HUD | `MobileCastleHudRoot`, `HUDController` | Single Wall + minimal cycle + bottom abilities |
+
+### Oluşturulacak/uyarlanacak contract'lar
+
+- [ ] `EnemyDefinition`: id, prefab, base stats, pool prewarm/expand, spawn weight.
+- [ ] `RunDifficultyProfile`: BaseSpawn curve, phase multipliers, active cap, backlog policy.
+- [ ] `HeartNodeDefinition`: tags, effects, rarity, depth, repeatable, cost growth, conflicts.
+- [ ] `GeneratedRunGraph`: seed/version, node ids, edges, hidden/revealed, levels, locks.
+- [ ] `WorkerAllocation`: four target ratios, actual counts, caps, idle population.
+- [ ] `ArcherFormation`: 40 cells, 25 local points, algorithm version.
+- [ ] `ActiveAbilityState`: unlocks, cooldown remaining, tuning multipliers.
+- [ ] `CouncilRunState`: regular day index, emergency trigger, flags, recent templates, active effects.
+- [ ] `MetaState`: currency, upgrade levels, pool unlocks, tutorial flags, death receipts.
+
+### Teknik sınırlar
+
+- [ ] Mevcut owner'lara paralel ikinci runtime sistem kurma; source owner'ı dönüştür.
+- [ ] `MobileCastle*` isimlerini yalnız estetik için toplu rename etme.
+- [ ] Definition asset ile runtime state'i birbirine karıştırma.
+- [ ] Dormant legacy code'un active V1 owner'ına bağlanmasını açık review olmadan yapma.
+
+---
+
+## 15. Performans, Tuning ve Telemetry
+
+### Performans sözleşmesi
+
+| Alan | Mevcut durum | Gerekli iş |
+|---|---|---|
+| Enemy spawn/death | Instantiate + DestroyEntity | Expandable pool + backlog |
+| Archer target search | 1 archer x all enemies brute-force | Spatial query + target load |
+| Projectiles | Instantiate/destroy | Pool/burst-safe lifetime |
+| VFX/SFX | CombatFeedbackBridge pool ve bazı min interval'lar var | 10k budget/aggregation audit |
+| Worker visuals | 1:1 assigned worker entity | Representative density |
+| Save | Compact resource/pop/archer count var; exact state eksik | Deterministic compact max-state save |
+
+### Ölçüm senaryoları
+
+- [ ] 1.000 archer + 10.000 enemy + projectile peak + Night presentation.
+- [ ] Fireball en yoğun horde içinde + aynı frame çoklu death pool return.
+- [ ] Arrow refill sonrası 1.000 archer yeniden ateş başlangıcı.
+- [ ] Maksimum run state ana menü save/Continue.
+- [ ] Düşük/orta/yüksek worker visual density geçişi.
+- [ ] Target search frame spike ve allocation ölçümü.
+- [ ] Long-run soak ve active cap/backlog saturation ölçümü.
+
+### Tuning yüzeyleri
+
+- [ ] Spawn: day curve, phase multiplier, backlog, active cap.
+- [ ] Wall: base HP, repair Stone cost, repair amount, Emergency %, day multiplier.
+- [ ] Economy: base rates, capacity cost, efficiency growth.
+- [ ] Population: Food per arrival, bed curve, dawn count.
+- [ ] Archers: base stats, cost growth, retrain cost, Arrow drain.
+- [ ] Heart: Essence gain, node cost/growth, rarity/depth.
+- [ ] Council: fixed cadence, emergency rarity, effect bands, repeat memory.
+- [ ] Meta: reward weights, upgrade costs/effects.
+
+### Telemetry event'leri
+
+- [ ] `run_started`: meta levels, starting resources, graph seed/version.
+- [ ] `phase_changed`: day, phase, alive enemies, spawn backlog.
+- [ ] `resource_spent`: resource, amount, purchase type, resulting level/count.
+- [ ] `archer_changed`: buy/retrain, type from/to, total cap usage.
+- [ ] `heart_node_bought`: node, level, depth, cost, revealed children.
+- [ ] `council_resolved`: day, regular/emergency, template, option/expired, effects, next-night delta.
+- [ ] `ability_cast`: ability, phase, cooldown, targets/repair.
+- [ ] `wall_repaired`: phase, Stone cost, HP before/after.
+- [ ] `run_ended`: day, kills, peak enemies/pop, Wall damage timeline, meta reward.
+
+---
+
+## 16. QA Kabul Matrisi
+
+| Alan | Test | Beklenen | Durum |
+|---|---|---|---|
+| Cycle | 60 sn full loop | 30/5/20/5; kesintisiz spawn | `[ ]` |
+| Horde | Active cap dolu | Talep backlog'a gider | `[ ]` |
+| Horde | Day 1 vs ileri gün stat | HP/damage/speed aynı | `[ ]` |
+| Wall | Night normal repair | Kapalı; Stone harcanmaz | `[ ]` |
+| Wall | HP 0 + same-frame repair | Game Over kazanır | `[ ]` |
+| Population | Food yetersiz dawn | Mevcut pop korunur; arrival sınırlı | `[ ]` |
+| Ammo | Arrow 0 / refill | Ateş durur / anında başlar | `[ ]` |
+| Archers | 1.001. purchase | Reddedilir; harcama yok | `[ ]` |
+| Placement | 40 tile'da 1.000 archer | Her tile 25 stable point | `[ ]` |
+| Targeting | Yoğun overkill | Incoming damage hedefleri dağıtır | `[ ]` |
+| Heart | Invalid generated graph | Reroll/fallback veya açık hata | `[ ]` |
+| Heart | Guarantee reachability | Rapid/Frost/Fireball reachable | `[ ]` |
+| Heart | Full pause | Cycle/spawn/worker/cooldown durur | `[ ]` |
+| Council | Day 3 + arada emergency | Regular schedule kaymaz | `[ ]` |
+| Council | Guarded effects | Bed/Food, 1000, Wall-only, count-only | `[ ]` |
+| Save | Menu çıkış / Continue | Aynı graph/phase/Wall/economy | `[ ]` |
+| Death | Process restart | Meta bir kez; run geri gelmez | `[ ]` |
+| HUD | 16:9 / ultrawide | Kritik UI ve dünya kırpılmaz | `[ ]` |
+| Tutorial | İkinci run | Otomatik tekrar etmez | `[ ]` |
+| Stress | 1k archer x 10k enemy | Hedef frame pacing | `[ ]` |
+
+### Mevcut test envanteri
+
+- `[~]` `Assets/Tests/EditMode/SingleWallDefenseRulesTests.cs` - keşfedildi, bu tracker turunda çalıştırılmadı.
+- `[~]` `Assets/Tests/EditMode/CouncilComposerTests.cs` - mevcut composer testleri; V1 schedule/guardrail kapsamı değil.
+- `[!]` PlayMode test klasörü/senaryoları bulunmadı.
+
+---
+
+## 17. Risk Register
+
+| Risk | Mevcut erken sinyal | Mitigation / kill rule |
+|---|---|---|
+| 1k x 10k targeting collapse | ArcherShoot brute-force | Spatial query + target load; HP scaling'e kaçma |
+| Projectile/VFX flood | Projectile destroy churn; hit yoğunluğu | Pool + budget + aggregation |
+| Graph unreachable | Generator henüz yok | Validation + deterministic fallback |
+| Meta runaway | Current reward kills/day ağırlıklı | Diminishing values + telemetry |
+| Ammo click angaryası | Refill tasarımı henüz aktif değil | Paket/capacity/efficiency tune; auto-spend ekleme |
+| HUD tekrar büyür | CyclePanel + HordePressure + çoklu drawers | Tek drawer + fixed layout + mockup gate |
+| Legacy leakage | Gate/Core binding, Fletcher, Barracks training, direct upgrades | Source-owner audit + guard tests |
+| Council generic/slop | Composer authored olsa da launch set review eksik | Human template review + effect budget |
+| Unapproved lore/content | Narrative açık karar | Owner review olmadan canon/content ekleme |
+| Save contract drift | Her yeni sistem ayrı field ekleyebilir | Merkezi schema/version/migration owner |
+
+---
+
+## 18. Release Definition of Done
+
+- [ ] Run yalnız Wall `0 HP` ile bitiyor; final wave/boss/ikinci fail phase yok.
+- [ ] Çıkış catalog'unda tek enemy prefab var.
+- [ ] Difficulty enemy stats değil adet/akış büyütüyor.
+- [ ] 60 saniye cycle 30/5/20/5 ve kesintisiz.
+- [ ] Speed-up/offline progress yok.
+- [ ] Wood/Stone/Iron/Food pasif negatif akmıyor; Arrow tek sürekli tüketim.
+- [ ] Population, beds ve worker ratios exact save/load.
+- [ ] Worker world feedback representative ve doğru.
+- [ ] Basic/Rapid/Frost toplam 1000 cap.
+- [ ] 40x25 stable formation.
+- [ ] Arrow Wood ile anında alınır; Fletcher/queue yok.
+- [ ] Castle Heart generated, validated, saved ve yalnız Grave Essence kullanıyor.
+- [ ] Council 3/6/9 ve rare emergency schedule'ı bozmuyor.
+- [ ] Council yalnız approved template/effect pool kullanıyor.
+- [ ] Council ana guardrail'leri bypass etmiyor.
+- [ ] Fireball/Rally/Emergency Repair bottom-center cooldown barında.
+- [ ] Meta yalnız ölümde bir kez reward veriyor; voluntary reset yok.
+- [ ] HUD tek Wall barı ve owner-approved minimal phase UI kullanıyor.
+- [ ] İlk-run tutorial tamamlanıyor; sonraki run'da tekrarlamıyor.
+- [ ] 1k archer + 10k enemy target hardware frame pacing kabul edildi.
+- [ ] EditMode/PlayMode, save migration ve long-run soak raporları temiz.
+- [ ] Day/night lighting, horde mix, Wall bar, phase UI ve combat feedback görsel incelemeden geçti.
+
+---
+
+## 19. Değiştirilemez Guardrail'ler
+
+- Boss/miniboss/elite/enemy variant yok.
+- Blood Moon veya sabit special-night schedule yok.
+- Enemy scout/forecast yok.
+- Enemy lane/front selection yok.
+- Build grid/building placement yok.
+- Fletcher production yok.
+- Archer death/individual HP yok.
+- Gate/Core HP yok.
+- Arrow Storm yok.
+- Voluntary reset/prestige button yok.
+- Offline income/offline death yok.
+- Separate archer upgrade panel yok.
+- Mobile ads/rewarded/IAP yok.
+- Council dormant değildir; active core run sistemidir.
+- Dormant Moat/Blood Moon/legacy wave kodu, owner onayı olmadan active V1 loop'a bağlanamaz.
+
+---
+
+## 20. Owner Kararı Bekleyen Açık Konular
+
+Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner kararı, sonra implementation.
+
+- [ ] Faz göstergesi: 2-3 minimal HUD mockup + motion örneği.
+- [ ] Meta currency adı, ikon ve death-screen copy.
+- [ ] Narrative premise/world pitch/opening copy.
+- [ ] Launch Heart node catalog ve effect specs.
+- [ ] Emergency Council trigger listesi + rarity tuning.
+- [ ] Council launch template/atom listesi + tekrar/bütçe testi.
+- [ ] En az 3 Keystone trade-off çifti.
+- [ ] Fireball için 2-3 evolution spec ve VFX yönü.
+- [ ] Exact spawn/economy/combat/meta tuning curves ve telemetry target'ları.
+- [ ] Day/night audio mix map ve rate-limit budget'ları.
+
+---
+
+## 21. Denetlenen Mevcut Kaynak Sahipleri
+
+| Kaynak | Denetlenen gerçek |
+|---|---|
+| `NewGameScene.unity` + `MobileCastleCombatSubScene.unity` | Kamera, HUD, active authoring, cycle ve combat values |
+| `MobileCastleHudRoot` live components | CyclePanel, HordePressure, Gate/Core bindings, drawers, upgrades |
+| `MobileCastleCombatAuthoring.cs` + `DefaultDifficulty.asset` | 22/8/22/8, stats growth, 900 cap, Blood Moon |
+| `GameManager.cs` | Save/restore, repair, archer buy/upgrade, Council, Fireball, meta bridge |
+| `RunPersistence.cs` | Dawn checkpoint schema v2 ve eksik exact state |
+| `ContinuousSiegeCycleSystem.cs` | Phase/intensity ve Blood Moon application |
+| `WaveSpawnSystem.cs` + `MobileWaveUtility.cs` | Spawn cap, stat growth ve entity instantiate |
+| `DamageCleanupSystem.cs` | Enemy death'te DestroyEntity |
+| `ResourceTickSystem.cs` + `PopulationTickSystem.cs` | Passive consumption |
+| `MobilePopulationEconomySystem.cs` | Bedelsiz population growth ve auto-capacity |
+| `MobileCastleArcherTilePlacement.cs` | Tile center + stack offset, preview 96 |
+| `ArcherShootSystem.cs` | Brute-force nearest target ve unlimited ammo bypass |
+| `TechNodeDefinitionSO.cs` + `TechTreeCatalogSO.cs` | Sabit catalog/reveal/cost/effect model |
+| `TechTreeUI.cs` + `TechTreeViewController.cs` | Fullscreen graph, pan/zoom, simulation'ın durmaması |
+| `CouncilComposer.cs` + `CouncilEventUI.cs` | Curated deterministic card infrastructure |
+| `MetaProgression.cs` + `MetaUpgradeSO.cs` | Separate meta save, current reward/effects |
+| `CombatFeedbackBridge.cs` | VFX/audio pools ve rate limiting altyapısı |
+| `Assets/Tests/EditMode` | Mevcut iki test alanı |
+
+---
+
+## 22. Tracker Güncelleme Protokolü
+
+1. Her işe başlamadan `Aktif paket` ve `Aktif iş` güncellenir.
+2. İlgili mevcut owner yeniden okunur; tracker'daki current truth bayatsa düzeltilir.
+3. İş kapsamı ilgili package checklist'inden seçilir; paket dışı ek özellik alınmaz.
+4. Uygulama ve doğrulama tamamlandığında checkbox/statü güncellenir.
+5. Yeni fark bulunursa ilgili package comparison tablosuna ve gerekiyorsa risk register'a eklenir.
+6. Owner kararı gereken konu Bölüm 20'ye eklenir; varsayımla kodlanmaz.
+7. İş kapanınca aşağıdaki çalışma günlüğüne kayıt düşülür.
+
+---
+
+## 23. Çalışma Günlüğü
+
+| Tarih | İş | Sonuç | Doğrulama |
+|---|---|---|---|
+| 2026-07-12 | Tracker 2.0 tam kapsam yeniden yazımı | 40 sayfalık Blueprint, canlı Unity scene/prefab ve repo owner'ları aynı takip belgesinde eşlendi | PDF text audit + Unity MCP + read-only code/SO/scene audit |
+| 2026-07-12 | V1 Blueprint/project gap audit | Package A'nın kısmen tamamlandığı; sıradaki işin exact save/Continue olduğu belirlendi | PDF, code, subscene ve Unity MCP |
+| 2026-07-12 | Tek Wall runtime dönüşümü | Damage, Game Over, authoring, repair, save defense alanı ve runtime HUD Wall'a çekildi | Statik kod denetimi; Unity testleri henüz çalıştırılmadı |
+| 2026-07-12 | `DW-A-SAVE` exact run snapshot | Schema v3, exact cycle/wave/RNG/combat/Council/ability snapshot, Main Menu ve app-quit save, aynı-an Continue, ölüm receipt'i ve idempotent meta ödülü tamamlandı | Unity compile: 0 error; EditMode 18/18; exact Continue PlayMode 1/1 |
+| 2026-07-12 | `DW-A-UPKEEP` pasif tüketim kaldırma | Population Food ve Fletcher Wood rate'leri V1 castle loop'ta kapatıldı; ResourceTick seviyesinde savunma sınırı eklendi | Unity compile: 0 error; EditMode 18/18; PlayMode 2/2 |
+| 2026-07-12 | `DW-A-REPAIR` Stone-only phase gate | Normal repair yalnız Day/Dusk ve yalnız Stone olacak şekilde tek GameManager owner'ında düzeltildi; UI kilit metinleri eşlendi | Unity compile: 0 error; EditMode 19/19; PlayMode 3/3 |

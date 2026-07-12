@@ -9,13 +9,15 @@ namespace DeadWalls
     [Serializable]
     public class MetaProgressState
     {
-        public int Version = 1;
+        public int Version = 2;
         public int Souls;                 // harcanabilir bakiye (1 kill = 1 Ruh)
         public int TotalSoulsEarned;
         public int BestDay;
         public int TotalRuns;
         public long TotalKillsAllTime;
         public List<MetaUpgradeLevel> Upgrades = new List<MetaUpgradeLevel>();
+        // Death journal recovery ayni kosuya ikinci kez odul yazamasin.
+        public List<string> RewardedRunIds = new List<string>();
     }
 
     [Serializable]
@@ -32,6 +34,7 @@ namespace DeadWalls
         public int Kills;
         public int SoulsEarned;
         public bool NewRecord;
+        public bool AlreadyRewarded;
     }
 
     /// <summary>
@@ -75,6 +78,10 @@ namespace DeadWalls
 
             if (_state == null)
                 _state = new MetaProgressState();
+
+            _state.Version = 2;
+            _state.Upgrades ??= new List<MetaUpgradeLevel>();
+            _state.RewardedRunIds ??= new List<string>();
         }
 
         public static void Save()
@@ -96,9 +103,41 @@ namespace DeadWalls
         /// Kosu kapanisi: kill'leri Ruh'a cevirir, rekoru gunceller, kaydeder.
         /// Ayni kosu icin bir kez cagrilmali (cagiran GameOver-gecisini izler).
         /// </summary>
-        public static MetaRunResult AddRunResult(int day, int kills)
+        public static bool HasRewardedRun(string runId)
+        {
+            if (string.IsNullOrEmpty(runId))
+                return false;
+
+            return State.RewardedRunIds.Contains(runId);
+        }
+
+        public static MetaRunResult AddRunResult(string runId, int day, int kills)
         {
             var s = State;
+            var result = ApplyRunResult(s, runId, day, kills);
+            if (!result.AlreadyRewarded)
+                Save();
+            return result;
+        }
+
+        internal static MetaRunResult ApplyRunResult(MetaProgressState s, string runId, int day, int kills)
+        {
+            if (s == null)
+                throw new ArgumentNullException(nameof(s));
+
+            s.RewardedRunIds ??= new List<string>();
+            if (string.IsNullOrEmpty(runId) || s.RewardedRunIds.Contains(runId))
+            {
+                return new MetaRunResult
+                {
+                    Day = day,
+                    Kills = kills,
+                    SoulsEarned = 0,
+                    NewRecord = false,
+                    AlreadyRewarded = true
+                };
+            }
+
             bool newRecord = day > s.BestDay;
             int earned = Mathf.Max(0, kills) + (newRecord ? day * RecordBonusPerDay : 0);
 
@@ -109,8 +148,19 @@ namespace DeadWalls
             if (newRecord)
                 s.BestDay = day;
 
-            Save();
-            return new MetaRunResult { Day = day, Kills = kills, SoulsEarned = earned, NewRecord = newRecord };
+            s.RewardedRunIds.Add(runId);
+            const int MaxRewardReceipts = 128;
+            if (s.RewardedRunIds.Count > MaxRewardReceipts)
+                s.RewardedRunIds.RemoveRange(0, s.RewardedRunIds.Count - MaxRewardReceipts);
+
+            return new MetaRunResult
+            {
+                Day = day,
+                Kills = kills,
+                SoulsEarned = earned,
+                NewRecord = newRecord,
+                AlreadyRewarded = false
+            };
         }
 
         public static int GetUpgradeLevel(string id)

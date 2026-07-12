@@ -1,58 +1,57 @@
 # Meta Progression (Roguelite) - Mimari
 
-## Amac
+## Amaç
 
-K2 karari: olum -> kalici ilerleme -> yeni kosu. Para birimi RUH (ekranda "SOULS" —
-owner karari 2026-07-08: kavram ruh, OYUN DILI INGILIZCE; `MetaProgression.CurrencyName`
-tek sabiti): 1 oldurulen zombi = 1 Soul (+ yeni gun rekorunda `gun x 50` bonus). Souls,
-olum ekrani magazasinda KALICI yukseltmelere harcanir; yukseltmeler her kosunun BASINDA
-otomatik uygulanir. V1 odagi (owner karari): baslangic ivmesi + hafif guc.
-KURAL: player-facing TUM metinler INGILIZCE (Turkce yalniz kod yorumu/editor tool'u).
+Wall `0 HP` olduğunda koşu tamamen biter; koşu içi state Continue edilemez. O koşunun kill ve day sonucu kalıcı Souls ilerlemesine bir kez aktarılır. Meta state yeni koşularda başlangıç ivmesi ve hafif kalıcı güç sağlar.
 
-## Katmanlar
+Player-facing bütün metinler İngilizcedir. Kod tarafındaki para birimi otoritesi `MetaProgression.CurrencyName` sabitidir.
 
-1. **Kill sayaci (ECS):** `GameStateData.TotalKills` — `DamageCleanupSystem` olu temizliginde
-   artirir; `RestartGame` GameStateData'yi yeniden yazarken sifirlanir.
-2. **Kalici depo (`MetaProgression` static, MonoBehaviour/MetaProgression.cs):**
-   `MetaProgressState` (Souls, TotalSoulsEarned, BestDay, TotalRuns, TotalKillsAllTime,
-   Upgrades[id,level]) -> JSON @ `persistentDataPath/meta_progress.json` (JsonUtility).
-   M-E save sisteminin ilk tuglasi. API: `AddRunResult(day, kills)` (kosu basina bir kez),
-   `GetUpgradeLevel`, `TryBuyUpgrade`, `ResetAll` (yalniz debug).
-3. **Katalog (SO):** `MetaUpgradeSO` (Id/Title/Cost merdiveni `Base*(1+seviye*Growth)`/
-   MaxLevel/EffectType/ValuePerLevel) + `MetaUpgradeCatalogSO`. Seed (setup, merge-only):
-   start_wood, start_food, start_archers, start_moat (moat_dig tech'i acik baslar),
-   wall_hp (+%5), archer_damage (+%3), production (+%3).
-4. **Kosu-basi uygulama (GameManager):** `ApplyMetaProgressionAtRunStart` — ilk init
-   (`ApplyMobileInitialPrepIfNeeded`) ve her `RestartGame` sonunda; idempotent
-   (`_metaAppliedThisRun`). Etki yollari MEVCUT kanallardan akar:
-   - StartingResource -> AddResources (Balanced = 4'e bolunur)
-   - StartingArchers -> SpawnArcher (population tuketmez)
-   - StartingTechLevel -> `GrantTechNodeLevelsFromMeta` (maliyetsiz; reveal + effect dahil;
-     ResetTechTreeState sonrasi yeniden verilir)
-   - WallHpPercent -> `ApplyTechDefenseAggregates` carpanina `_metaWallHpPercent`
-   - ArcherDamagePercent -> `GetScaledArcherStats`'a `_metaDamageMultiplier`
-   - ProductionPercent -> `ApplyTechEconomyAggregates` uretim carpanina
-5. **Kosu-sonu kazanim:** GameManager GameOver GECISINDE (`OnGameOver` firlamadan once)
-   `CollectMetaRunResult` -> `LastRunResult` (UI okur). Bir kez (`_metaRunCollected`);
-   restart bayragi temizler.
-6. **UI (`MetaProgressionUI`, GameOverPanel uzerinde):** olumde ozet ("DAY X — N kill,
-   +N RUH, YENI REKOR!") + bakiye + magaza satirlari (katalogdan klon, TechTree/Market
-   kalibi). Satin alim aninda islenir; etkisi SONRAKI kosuda (restart uygular).
-   GameOverPanel kod-uretimli oldugundan objeleri setup tool kurar (prefab degil) —
-   isim sozlesmesi: MetaSummaryText / MetaSoulsText / MetaShopListRoot /
-   MetaShopRowTemplate (RowTitleText / RowLevelText / RowCostText / RowBuyButton).
+## Kalıcı state
 
-## Fiyat/olcek notu
+`MetaProgression.cs` içindeki `MetaProgressState v2`, `persistentDataPath/meta_progress.json` dosyasına yazılır:
 
-M-A olcumu: DAY 6 olumu ~300-600 kill, DAY 15+ ~2-4k. Ilk yukseltme 150 Ruh (ilk kosudan
-alinabilir — "olum bile kazandirdi" hissi ilk dakikada); merdivenler buyume katsayilariyla
-uzun vadeye yayilir. Rekor bonusu (gun x 50) derinlik tesvikini korur.
+- Souls ve TotalSoulsEarned,
+- BestDay, TotalRuns ve TotalKillsAllTime,
+- `MetaUpgradeLevel` listesi,
+- Aynı koşunun iki kez ödüllendirilmesini önleyen sınırlı `RewardedRunIds` listesi.
 
-## Tuzaklar / kurallar
+JsonUtility dictionary serialize etmediği için upgrade state list olarak tutulur. `RewardedRunIds` son 128 run identity'siyle sınırlıdır.
 
-- Meta yuzdeleri tech/council ile AYNI aggregate kanallarindan akar — dogrudan config/entity
-  yazma YOK (her-frame-ezilme tuzagi).
-- `AddRunResult` cagiran taraf GameOver-GECISINI izlemeli (her frame degil) — cift kazanim
-  `_metaRunCollected` ile ayrica kilitli.
-- JsonUtility Dictionary serilestirmez — Upgrades List<MetaUpgradeLevel> olarak tutulur.
-- `MetaProgression.ResetAll` oyuncu-yuzeyine BAGLANMAZ (gercek ilerlemeyi siler; yalniz debug).
+## Koşu sonucu transaction'ı
+
+Otoriter API `AddRunResult(string runId, int day, int kills)` metodudur. Boş RunId kabul edilmez. Daha önce ödüllendirilen RunId yeniden gelirse sonuç `AlreadyRewarded` olarak döner ve Souls/istatistik değişmez.
+
+Game Over akışı:
+
+1. `GameManager`, run identity ile `RunDeathReceipt` yazar.
+2. Canlı run save silinir.
+3. `CollectMetaRunResult()` idempotent API'yi çağırır.
+4. Ödüllendirildiği doğrulanan receipt temizlenir.
+
+Uygulama bu adımların arasında kapanırsa `GameManager.Awake` ve ana menü başlangıcı `RunPersistence.RecoverPendingDeathReward()` çağırır. Receipt'teki aynı RunId meta state'te varsa ikinci ödül verilmeden journal temizlenir; yoksa ödül bir kez uygulanır.
+
+## Ödül hesabı
+
+- Her kill: `1 Soul`.
+- Yeni day rekoru: `day x 50` ek Soul.
+- Sonuç `MetaRunResult` üzerinden Game Over UI tarafından okunur.
+
+## Upgrade kataloğu ve koşu başı uygulama
+
+`MetaUpgradeCatalogSO` kalıcı upgrade tanımlarının sahibidir. Mevcut effect yolları:
+
+- StartingResource -> `AddResources`
+- StartingArchers -> `SpawnArcher`
+- StartingTechLevel -> `GrantTechNodeLevelsFromMeta`
+- WallHpPercent -> defense aggregate
+- ArcherDamagePercent -> archer stat scaling
+- ProductionPercent -> economy aggregate
+
+`GameManager.ApplyMetaProgressionAtRunStart()` her yeni koşuda state'i mevcut gameplay kanallarından uygular. `_metaAppliedThisRun` aynı runtime başlangıcında çift uygulamayı önler.
+
+## Kurallar
+
+- Meta yüzdeleri tech/Council ile aynı aggregate kanallarından geçer; runtime component'e ayrı bir sürekli override yazılmaz.
+- Run sonucu yalnız kesin Game Over geçişinde toplanır; frame polling ile ödül verilmez.
+- `MetaProgression.ResetAll` yalnız debug içindir ve oyuncu yüzeyine bağlanmaz.
+- Run save ile meta save ayrı otoritelerdir. Meta state hiçbir zaman canlı koşunun phase/timer/combat snapshot'ını taşımaz.

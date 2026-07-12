@@ -1,75 +1,73 @@
-# Safak-Checkpoint Save/Load (M-E) - Mimari
+# Exact Run Snapshot & Continue - Mimari
 
-## Amac
+## Otorite ve oyuncu sözleşmesi
 
-Owner karari (2026-07-08): SAFAK CHECKPOINT modeli — her DAWN'a giriste kosu otomatik
-kaydedilir; oyun acilista ana menuden CONTINUE ile SON SAFAKTAN devam eder. Gece ortasinda
-kapatilan oyunda o gunun savasi bastan baslar (bilincli kabul: safak dogal nefes anidir,
-ECS dunyasinin tam fotografi cekilmez). Roguelite kurali: OLUM ve NEW RUN checkpoint'i siler.
+V1 Blueprint kararı: koşu yalnız Wall `0 HP` olduğunda biter. Oyuncu ana menüye dönebilir veya uygulamayı kapatabilir; Continue aynı koşunun aynı anını geri yükler. Aktif koşu varken gönüllü New Run/Restart yolu sunulmaz.
 
-## Tasarim ilkesi: yalniz recompute-EDILEMEYENI kaydet
+`RunPersistence.cs` içindeki `RunSaveState` bu sözleşmenin disk şemasıdır. Güncel sürüm `v3`, desteklenen en eski sürüm de `v3` tür. Eski Dawn-checkpoint kayıtları exact state içermediği için sessizce migrate edilmez ve Continue olarak gösterilmez.
 
-Save dosyasi kucuk bir ekonomik ozettir; ne kadar az alan, o kadar az bozulma/versiyon riski.
-- KAYDEDILIR: gun (CycleIndex), kaynaklar, nufus + isci dagilimi, tek Wall CurrentHP,
-  okcu SAYILARI + tip yukseltme seviyeleri, tech SATIN-ALMA seviyeleri, level-up kart
-  tier'lari + global bonuslar, council hafizasi (flags/recent/oneshot/pity/cooldown/SALT/
-  cap bonuslari), economy focus, XP/kill sayaclari.
-- KAYDEDILMEZ (recompute): tech carpanlari, reveal listesi, spell unlock/degerleri,
-  meta bonuslari, Wall MaxHP, uretim oranlari, unlocked okcu tipleri, okcu
-  POZISYONLARI (tilemap slot sirasina yeniden dizilir), zombiler/oklar, aktif council karti
-  (deterministik seed'den ayni kart yeniden roll edilir), transient state'ler.
+## Kayıt anları
 
-## Katmanlar
+- `PauseMenuUI.MainMenu`: sahne değişmeden hemen önce `GameManager.SaveRunSnapshot()` çağrılır. Kayıt başarısızsa ana menüye geçilmez.
+- `GameManager.OnApplicationQuit`: koşu canlı ve Game Over değilse exact snapshot alınır.
+- Dawn otomatik checkpoint'i yoktur. Faz değişimi kayıt anı değildir.
+- Game Over: önce death receipt yazılır, sonra canlı run save geçersiz kılınır/silinir.
 
-1. **RunPersistence.cs**: `RunSaveState` (JsonUtility; dict'ler List&lt;pair&gt; olarak —
-   JsonUtility Dictionary serilestirmez) + `persistentDataPath/run_save.json` IO
-   (MetaProgression kalibi). `HasSave` / `TryLoad` / `Save` / `Delete`.
-2. **Kayit — GameManager.TrackDawnCheckpoint**: Update'te faz-kenari izler (GameOver-gecisi
-   kalibi); Dawn'a giriste `SaveRunCheckpoint()` cache'lerden + private koleksiyonlardan
-   snapshot cikarir. Kayit ani Dawn BASI: o gunun safak odulleri (pop growth) ECS'te zaten
-   islenmis olur.
-3. **Silme**: GameOver gecisinde (`CollectMetaRunResult` yani) + `UIManager.OnRestart`
-   (NEW RUN) + `MainMenuUI.OnNewRun`.
-4. **Restore — GameManager.TryRestoreRunFromCheckpoint** (MainMenu CONTINUE):
-   a. `RestartGame()` — temiz taban (meta uygulanir, seed okcular, taze salt)
-   b. tech: her (id, level) icin `GrantTechNodeLevelsFromMeta` — reveal + carpanlar +
-      spell + config/defense aggregate'leri MALIYETSIZ yeniden kurulur
-   c. council hafizasi (SALT dahil — kosu-ici RNG determinizmi) + `ApplyTechEconomyAggregates`
-   d. kart tier'lari + okcu seviyeleri; okcu sayilari hedefe TAMAMLANIR (SpawnArcher;
-      pozisyon tilemap slotundan otomatik) + `ApplyScaledStatsToArchers`
-   e. ECS yazimlari: kaynaklar, focus, allocation (`LastPopulationGrowthCycle =
-      savedCycleIndex+1` — cift safak odulu gate'i), PopulationState, cycle
-      (`CycleIndex = saved+1`, Phase=Day — YENI GUNUN sabahi; kaydedilen gunun odulleri
-      zaten verilmisti), GameStateData, CastleUpgrade
-   f. Wall CurrentHP EN SON (MaxHP aggregate'lerden kurulduktan sonra; clamp'li)
-   g. restore Dawn'i atladigi icin gunun council karti elle `TryRollCouncilEvent()`
-5. **UI — AYRI ANA MENU SAHNESI (M-E v2, owner istegi)**: `Assets/Scenes/MainMenuScene.unity`
-   (build index 0) — hafif sahne: kamera + Canvas + `MainMenuSceneUI`. Gorseller runtime
-   uretilir (`MenuSpriteFactory`: gece gradyani + kanli ay/glow + rounded-rect 9-slice
-   butonlar; Inspector'dan sprite atanarak override edilebilir) + DOTween giris animasyonlari.
-   Kayit varsa "CONTINUE — DAY X" (X = savedCycleIndex+2). Secim `GameBootstrap.PendingAction`
-   static'ine yazilir -> `SceneManager.LoadScene(NewGameScene)` -> oyun sahnesindeki
-   `RunBootstrap` init sonrasi uygular (Continue=restore; NewRun=RestartGame — sahne gecisi
-   ECS world'u YOK ETMEZ, onceki oturumun runtime entity'leri boylece temizlenir; None=
-   editorde dogrudan acilis, dokunulmaz — bot akislari bozulmaz). Eski panel-menu KALDIRILDI
-   (timeScale=0 acilis hack'i gitti). PauseMenuUI (sag ust II; RESUME/SETTINGS/NEW RUN/
-   MAIN MENU — sahneye doner; GameOver'da acilmaz) ve SettingsUI oyun sahnesinde panel
-   olarak kalir; settings paneli iki sahnede de `BuildSettingsPanel` ortak ureticisiyle kurulur.
+## Exact snapshot kapsamı
 
-## Dogrulama (2026-07-08, play)
+Kaydedilen state, oyuncunun aynı ana dönmesini etkileyen runtime verisidir:
 
-Kosu sekillendirildi (kaynak/tech/duvar 217 HP/DAY 3) -> Dawn'da checkpoint yazildi ->
-stop/play -> menu "CONTINUE — DAY 4" -> restore birebir: Wall 217/350, tech L1/L1,
-FireballDamage 72 (recompute kaniti), okcu 4, salt ayni, SpellPanel acik. Pause/Resume
-timeScale 0/1; settings slider'lari SoundSettings'e yazdi. Olumde kayit silindi.
+- Run identity, gün/cycle index, phase, exact cycle timer ve progress değerleri.
+- Wave state, spawn timer/budget ve `SpawnRandomState`.
+- Wood/Stone/Iron/Food, kesirli üretim accumulator'ları, Arrow current ve accumulator.
+- Population/capacity, worker dağılımı ve Dawn/event tekrarını önleyen last-marker alanları.
+- Wall current HP, archer sayıları/level state'i, tech node level'ları ve legacy upgrade tier'ları.
+- Council hafızası, salt, cooldown/pity/cap bonusları, aktif kart ve seçenek/effect içeriği.
+- Fireball cooldown'u ve aktif Fireball projectile; Fortify/Rally ve süreli economy/horde effect state'i.
+- Aktif zombie ve arrow entity'lerinin kompakt combat state'i. Arrow hedefleri zombie snapshot index'iyle tutulur.
 
-## Tuzaklar
+Definition asset'lerden güvenle yeniden üretilebilen tech aggregate'leri ve archer formation pozisyonları kaydedilmez. Tech seviyelerinden aggregate/reveal/spell state'i yeniden kurulur; archer formation mevcut deterministik yerleşim algoritmasından tekrar üretilir.
 
-- Yeni kosu-durumu alani eklerken: RunSaveState + SaveRunCheckpoint + TryRestoreRun
-  UCLUSUNE birden ekle (yoksa sessizce kaybolur). Recompute-edilebilirse HIC ekleme.
-- Restore sirasi degistirilemez: tech -> aggregate -> spawn -> ECS yazimi -> CurrentHP.
-- MainMenuUI save kontrolu CACHE'lidir (_saveChecked, acilista bir kez) — menu yalniz
-  acilista goruldugu icin yeterli; menu baska anda gosterilecekse cache tazelenmeli.
-- Editor botlari (LongRunSimulator/Tuner) timeScale'i kendileri yonetir; menu paneli
-  onlari engellemez ama bot koşusu Dawn'larda checkpoint YAZAR (Logs kirliligi degil,
-  run_save.json guncellenir) — bot sonrasi manuel oyunda CONTINUE bot kosusunu acabilir.
+## Determinizm
+
+`WaveStateData.SpawnRandomState` spawn RNG stream'inin sahibidir. `WaveSpawnSystem` her batch öncesi bu state'ten `Unity.Mathematics.Random` kurar ve batch sonunda güncel state'i tekrar component'e yazar. Böylece Continue sonrasındaki spawn konumları kapanmadan önceki stream'den devam eder.
+
+## Restore sırası
+
+`GameManager.TryRestoreRunFromCheckpoint()` şu sırayı korur:
+
+1. Geçerli `v3` snapshot yüklenir ve temiz runtime tabanı oluşturulur.
+2. Aynı `RunId` geri alınır; tech seviyeleri maliyetsiz uygulanıp türetilen aggregate'ler kurulur.
+3. Council hafızası ve aktif Council kartı aynen yüklenir; reroll yapılmaz.
+4. Archer level/count state'i ve kaynak/population/allocation state'i geri yazılır.
+5. Exact cycle phase/timer, wave state ve spawn RNG state'i geri yazılır. `CycleIndex + 1`, zorunlu Day veya timer `0` uygulanmaz.
+6. Wall current HP, ability cooldown ve süreli effect state'i geri yüklenir.
+7. Zombie'ler oluşturulur; ardından arrow hedefleri restore edilen zombie index'lerine bağlanır ve aktif Fireball kurulur.
+8. ECS cache/UI state'i yenilenir.
+
+## Ölüm transaction'ı ve idempotent meta ödülü
+
+`run_death_receipt.json`, run save ile meta save arasındaki küçük transaction journal'ıdır:
+
+1. Wall ölümü kesinleşince `{ RunId, Day, Kills }` receipt'i yazılır.
+2. `run_save.json` silinir; bu run artık Continue edilemez.
+3. `MetaProgression.AddRunResult(runId, day, kills)` çağrılır.
+4. Meta save, ödüllendirilmiş son RunId'leri saklar. Aynı RunId tekrar gelirse Souls/istatistik ikinci kez yazılmaz.
+5. Ödül doğrulandıktan sonra receipt silinir. İşlem ortasında uygulama kapanırsa bir sonraki açılış receipt'i idempotent biçimde tamamlar.
+
+## Değişiklik kuralı
+
+Yeni bir koşu state'i eklenirken üç sınır birlikte güncellenir:
+
+- `RunSaveState` alanı,
+- `GameManager.SaveRunSnapshot()` capture yolu,
+- `GameManager.TryRestoreRunFromCheckpoint()` restore yolu.
+
+Entity referansı doğrudan JSON'a yazılmaz. Referans gerekiyorsa compact stable identity/index kullanılır. Şema semantiği değişirse `CurrentVersion` artırılır ve migration açıkça yazılır; eksik exact state varsayımla doldurulmaz.
+
+## Doğrulama
+
+- `RunPersistenceTests.SchemaVersion_RejectsLegacyCheckpoint_AndAcceptsExactSnapshot`
+- `RunPersistenceTests.JsonRoundTrip_PreservesExactCycleCombatCouncilAndAbilityState`
+- `RunPersistenceTests.DeathReceipt_RoundTrip_PreservesRunIdentityAndRewardInputs`
+- Runtime kabulü ayrıca Main Menu save, uygulama kapanışı, aynı phase/timer restore, aktif projectile restore ve Wall ölümü sırasında force-close senaryolarını kapsar.

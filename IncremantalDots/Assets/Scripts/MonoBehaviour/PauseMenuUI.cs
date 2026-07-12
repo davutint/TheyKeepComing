@@ -28,14 +28,20 @@ namespace DeadWalls
             if (SettingsButton != null)
                 SettingsButton.onClick.AddListener(() => Settings?.Open());
             if (RestartButton != null)
-                RestartButton.onClick.AddListener(OnRestart);
+                RestartButton.gameObject.SetActive(false); // V1: aktif kosuda gonullu reset yok
             if (MainMenuButton != null)
                 MainMenuButton.onClick.AddListener(GoToMainMenu);
         }
 
         private void GoToMainMenu()
         {
-            // sahneye donus: timeScale geri verilir; ilerleme zaten son safakta kayitli
+            var gm = GameManager.Instance;
+            if (gm == null || !gm.SaveRunSnapshot())
+            {
+                Debug.LogError("[PauseMenuUI] Exact run snapshot yazilamadi; ilerleme kaybini onlemek icin ana menuye donus iptal edildi.");
+                return;
+            }
+
             Time.timeScale = 1f;
             UnityEngine.SceneManagement.SceneManager.LoadScene(GameBootstrap.MainMenuSceneName);
         }
@@ -58,11 +64,5 @@ namespace DeadWalls
             Time.timeScale = 1f;
         }
 
-        private void OnRestart()
-        {
-            if (PausePanel != null)
-                PausePanel.SetActive(false);
-            UIManager.Instance?.OnRestart();
-        }
     }
 }

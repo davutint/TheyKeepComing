@@ -673,8 +673,8 @@ namespace DeadWalls
 
         private static string GetRepairStatus(GameManager gm)
         {
-            if (!CanUsePrepAction(gm))
-                return "Day prep only";
+            if (!gm.IsRepairPhaseAvailable())
+                return "Day / Dusk only";
 
             return gm.GetDefensePercent() >= 0.995f ? "Defense full" : "Restore defense";
         }
