@@ -39,9 +39,9 @@ namespace DeadWalls
         [Header("Mass Escalation")]
         public float ZombieBaseHP = 20f;
         [Tooltip("Cycle basina lineer HP buyumesi (0.30 = her cycle +%30 taban HP). Eski ustel w^1.2 egrisinin yerini alir.")]
-        public float ZombieHpGrowthPerCycle = 0.30f;
+        public float ZombieHpGrowthPerCycle = 0f;
         public float ZombieBaseDamage = 5f;
-        public float ZombieDamagePerCycle = 0.5f;
+        public float ZombieDamagePerCycle = 0f;
         [Tooltip("Batch cycle ile buyur: batch = SpawnBatchSize * intensity * (1 + (cycle-1)*bu). Kalabalik eskalasyonu.")]
         public float SpawnBatchGrowthPerCycle = 0.10f;
         public int MaxSpawnBatch = 12;
@@ -50,7 +50,7 @@ namespace DeadWalls
 
         public float ZombieScale = 1.4f;
         public float BaseZombieSpeed = 0.85f;
-        public float ZombieSpeedPerWave = 0.04f;
+        public float ZombieSpeedPerWave = 0f;
         public int StressSpawnBatchSize = 25;
         public float StressSpawnInterval = 0.1f;
         public int StressMaxAliveZombies = 1500;
@@ -89,11 +89,11 @@ namespace DeadWalls
         [Header("Continuous Siege Cycle")]
         public bool ContinuousSiegeEnabled = true;
         public float SiegeCycleDuration = 60f;
-        public float SiegeDayDuration = 22f;
-        public float SiegeDuskDuration = 8f;
-        public float SiegeNightDuration = 22f;
+        public float SiegeDayDuration = 30f;
+        public float SiegeDuskDuration = 5f;
+        public float SiegeNightDuration = 20f;
         [Tooltip("Gece sonrasi odul/nefes fazi (GDD 4-faz dongusu). 0 = dawn'siz legacy 3-faz.")]
-        public float SiegeDawnDuration = 8f;
+        public float SiegeDawnDuration = 5f;
         public float SiegeDayIntensityMultiplier = 0.55f;
         public float SiegeDuskStartIntensityMultiplier = 1.00f;
         public float SiegeDuskEndIntensityMultiplier = 1.35f;
@@ -156,22 +156,22 @@ namespace DeadWalls
                 if (profile != null)
                     DependsOn(profile);
 
-                AddComponent(entity, new MobileCastleCombatConfig
+                var config = new MobileCastleCombatConfig
                 {
                     CastleCenter = authoring.CastleCenter,
                     SpawnRadius = math.max(1f, authoring.SpawnRadius),
                     AttackRadius = math.max(0.1f, authoring.AttackRadius),
                     BaseWaveEnemyCount = math.max(1, authoring.BaseWaveEnemyCount),
                     ExtraEnemiesPerWave = math.max(0, authoring.ExtraEnemiesPerWave),
-                    SpawnBatchSize = math.max(1, profile != null ? profile.SpawnBatchSize : authoring.SpawnBatchSize),
-                    ZombieBaseHP = math.max(1f, profile != null ? profile.ZombieBaseHP : authoring.ZombieBaseHP),
-                    ZombieHpGrowthPerCycle = math.max(0f, profile != null ? profile.ZombieHpGrowthPerCycle : authoring.ZombieHpGrowthPerCycle),
-                    ZombieBaseDamage = math.max(0.1f, profile != null ? profile.ZombieBaseDamage : authoring.ZombieBaseDamage),
-                    ZombieDamagePerCycle = math.max(0f, profile != null ? profile.ZombieDamagePerCycle : authoring.ZombieDamagePerCycle),
-                    SpawnBatchGrowthPerCycle = math.max(0f, profile != null ? profile.SpawnBatchGrowthPerCycle : authoring.SpawnBatchGrowthPerCycle),
+                    SpawnBatchSize = math.max(1, authoring.SpawnBatchSize),
+                    ZombieBaseHP = math.max(1f, authoring.ZombieBaseHP),
+                    ZombieHpGrowthPerCycle = math.max(0f, authoring.ZombieHpGrowthPerCycle),
+                    ZombieBaseDamage = math.max(0.1f, authoring.ZombieBaseDamage),
+                    ZombieDamagePerCycle = math.max(0f, authoring.ZombieDamagePerCycle),
+                    SpawnBatchGrowthPerCycle = math.max(0f, authoring.SpawnBatchGrowthPerCycle),
                     // 0 = sinirsiz sentineli KORUNUR (runtime "cap yok" olarak yorumlar)
-                    MaxSpawnBatch = math.max(0, profile != null ? profile.MaxSpawnBatch : authoring.MaxSpawnBatch),
-                    MaxAliveZombies = math.max(0, profile != null ? profile.MaxAliveZombies : authoring.MaxAliveZombies),
+                    MaxSpawnBatch = math.max(0, authoring.MaxSpawnBatch),
+                    MaxAliveZombies = math.max(0, authoring.MaxAliveZombies),
                     ZombieScale = math.max(0.1f, authoring.ZombieScale),
                     BaseZombieSpeed = math.max(0.05f, authoring.BaseZombieSpeed),
                     ZombieSpeedPerWave = math.max(0f, authoring.ZombieSpeedPerWave),
@@ -208,13 +208,13 @@ namespace DeadWalls
                     SiegeDuskDuration = math.max(0.1f, authoring.SiegeDuskDuration),
                     SiegeNightDuration = math.max(0.1f, authoring.SiegeNightDuration),
                     SiegeDawnDuration = math.max(0f, authoring.SiegeDawnDuration),
-                    SiegeDayIntensityMultiplier = math.max(0.01f, profile != null ? profile.DayIntensity : authoring.SiegeDayIntensityMultiplier),
-                    SiegeDuskStartIntensityMultiplier = math.max(0.01f, profile != null ? profile.DuskStartIntensity : authoring.SiegeDuskStartIntensityMultiplier),
-                    SiegeDuskEndIntensityMultiplier = math.max(0.01f, profile != null ? profile.DuskEndIntensity : authoring.SiegeDuskEndIntensityMultiplier),
-                    SiegeNightIntensityMultiplier = math.max(0.01f, profile != null ? profile.NightIntensity : authoring.SiegeNightIntensityMultiplier),
-                    SiegeDawnIntensityMultiplier = math.max(0.01f, profile != null ? profile.DawnIntensity : authoring.SiegeDawnIntensityMultiplier),
-                    RepairBaseWoodCost = math.max(0, profile != null ? profile.RepairBaseWoodCost : authoring.RepairBaseWoodCost),
-                    RepairBaseStoneCost = math.max(0, profile != null ? profile.RepairBaseStoneCost : authoring.RepairBaseStoneCost),
+                    SiegeDayIntensityMultiplier = math.max(0.01f, authoring.SiegeDayIntensityMultiplier),
+                    SiegeDuskStartIntensityMultiplier = math.max(0.01f, authoring.SiegeDuskStartIntensityMultiplier),
+                    SiegeDuskEndIntensityMultiplier = math.max(0.01f, authoring.SiegeDuskEndIntensityMultiplier),
+                    SiegeNightIntensityMultiplier = math.max(0.01f, authoring.SiegeNightIntensityMultiplier),
+                    SiegeDawnIntensityMultiplier = math.max(0.01f, authoring.SiegeDawnIntensityMultiplier),
+                    RepairBaseWoodCost = math.max(0, authoring.RepairBaseWoodCost),
+                    RepairBaseStoneCost = math.max(0, authoring.RepairBaseStoneCost),
                     SingleFrontEnabled = authoring.SingleFrontEnabled,
                     FrontlineX = authoring.FrontlineX,
                     SpawnLineX = authoring.SpawnLineX,
@@ -223,9 +223,9 @@ namespace DeadWalls
                     MoatXMax = math.max(authoring.MoatXMin, authoring.MoatXMax),
                     MoatSlowMultiplier = math.clamp(authoring.MoatSlowMultiplier, 0.05f, 1f),
                     MoatDamagePerSecond = math.max(0f, authoring.MoatDamagePerSecond),
-                    BaseSpawnInterval = math.max(0.01f, profile != null ? profile.BaseSpawnInterval : authoring.BaseSpawnInterval),
+                    BaseSpawnInterval = math.max(0.01f, authoring.BaseSpawnInterval),
                     SpawnIntervalWaveMultiplier = math.clamp(authoring.SpawnIntervalWaveMultiplier, 0.01f, 1f),
-                    MinSpawnInterval = math.max(0.01f, profile != null ? profile.MinSpawnInterval : authoring.MinSpawnInterval),
+                    MinSpawnInterval = math.max(0.01f, authoring.MinSpawnInterval),
                     OpeningEnemyRatio = math.clamp(authoring.OpeningEnemyRatio, 0f, 0.45f),
                     FinalEnemyRatio = math.clamp(authoring.FinalEnemyRatio, 0f, 0.45f),
                     OpeningIntervalMultiplier = math.max(0.01f, authoring.OpeningIntervalMultiplier),
@@ -244,7 +244,9 @@ namespace DeadWalls
                     WorkerEconomyRewardMultiplier = math.clamp(authoring.WorkerEconomyRewardMultiplier, 0f, 1f),
                     EconomyEventChance = math.clamp(authoring.EconomyEventChance, 0f, 1f),
                     EconomyEventCooldownWaves = math.max(0, authoring.EconomyEventCooldownWaves)
-                });
+                };
+                MobileCastleTuningResolver.ApplyDifficultyProfile(ref config, profile);
+                AddComponent(entity, config);
 
                 AddComponent(entity, new EconomyFocusState
                 {
@@ -308,24 +310,7 @@ namespace DeadWalls
                     int days = math.clamp(profile.SampleDays, 1, 200);
                     for (int day = 1; day <= days; day++)
                     {
-                        // Kanli ay (SpecialNights): her N. gun intensity bonusu carpan olarak birikir
-                        float bloodMoonMult = 1f;
-                        if (profile.SpecialNights != null)
-                        {
-                            foreach (var special in profile.SpecialNights)
-                            {
-                                if (special.EveryNDays > 0 && day % special.EveryNDays == 0)
-                                    bloodMoonMult *= 1f + math.max(0f, special.IntensityBonus);
-                            }
-                        }
-
-                        difficultySamples.Add(new DifficultyDaySample
-                        {
-                            NightIntensityMult = profile.EvaluateCurve(profile.NightIntensityByDay, day),
-                            ZombieHpMult = profile.EvaluateCurve(profile.ZombieHpMultByDay, day),
-                            SpawnBatchMult = profile.EvaluateCurve(profile.SpawnBatchMultByDay, day),
-                            BloodMoonIntensityMult = bloodMoonMult,
-                        });
+                        difficultySamples.Add(MobileCastleTuningResolver.ResolveDaySample(profile, day));
                     }
                 }
                 else
@@ -350,7 +335,7 @@ namespace DeadWalls
                     DawnDuration = math.max(0f, authoring.SiegeDawnDuration),
                     CycleProgress01 = 0f,
                     PhaseProgress01 = 0f,
-                    SpawnIntensityMultiplier = math.max(0.01f, authoring.SiegeDayIntensityMultiplier),
+                    SpawnIntensityMultiplier = config.SiegeDayIntensityMultiplier,
                     HordePressure01 = 0f,
                     CycleIndex = 0,
                     Phase = SiegeCyclePhase.Day

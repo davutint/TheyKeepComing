@@ -230,15 +230,15 @@ MonoBehaviour:
   MoatSlowMultiplier: 0.55
   MoatDamagePerSecond: 0
   ZombieBaseHP: 20
-  ZombieHpGrowthPerCycle: 0.3
+  ZombieHpGrowthPerCycle: 0
   ZombieBaseDamage: 5
-  ZombieDamagePerCycle: 0.5
+  ZombieDamagePerCycle: 0
   SpawnBatchGrowthPerCycle: 0.1
   MaxSpawnBatch: 12
   MaxAliveZombies: 900
   ZombieScale: 1.4
   BaseZombieSpeed: 0.85
-  ZombieSpeedPerWave: 0.04
+  ZombieSpeedPerWave: 0
   StressSpawnBatchSize: 25
   StressSpawnInterval: 0.1
   StressMaxAliveZombies: 1500
@@ -268,10 +268,10 @@ MonoBehaviour:
   UnlimitedArrows: 1
   ContinuousSiegeEnabled: 1
   SiegeCycleDuration: 60
-  SiegeDayDuration: 22
-  SiegeDuskDuration: 8
-  SiegeNightDuration: 22
-  SiegeDawnDuration: 8
+  SiegeDayDuration: 30
+  SiegeDuskDuration: 5
+  SiegeNightDuration: 20
+  SiegeDawnDuration: 5
   SiegeDayIntensityMultiplier: 0.55
   SiegeDuskStartIntensityMultiplier: 1
   SiegeDuskEndIntensityMultiplier: 1.35

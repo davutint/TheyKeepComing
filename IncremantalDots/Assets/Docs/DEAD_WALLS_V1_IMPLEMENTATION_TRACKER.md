@@ -4,8 +4,8 @@
 >
 > **Tracker sürümü:** 2.0  
 > **Son tam kapsam denetimi:** 2026-07-12  
-> **Aktif paket:** Package A - System Contracts  
-> **Aktif iş:** `DW-A-TUNING` - Single Runtime Tuning Owner
+> **Aktif paket:** Package B - Continuous Horde
+> **Aktif iş:** `DW-B-FLOW` - Spawn Budget & Backlog
 
 ---
 
@@ -180,8 +180,8 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Otomatik save | Ana menüye dönmeden önce ve application quit sırasında exact snapshot alınıyor | `[x]` |
 | Gönüllü reset yok | Aktif run sırasında Main Menu New Run ve Pause Restart kapalı; Game Over Restart yeni koşu başlatır | `[x]` |
 | Upkeep yok | V1 ResourceTick consumption'ı yok sayıyor; population Food ve Fletcher Wood yolları castle loop'ta kapalı | `[x]` |
-| Legacy Gate/Core disabled | Runtime tek Wall gösterimi var; HUD prefabında Gate/Core referansları serialize kalmış | `[~]` |
-| Tuning owner | Authoring defaults, active subscene ve DifficultyProfile aynı alanları paylaşabiliyor | `[!]` |
+| Legacy Gate/Core disabled | Gate/Core data/UI referansları dormant; runtime damage, Game Over, repair, Council, save ve HUD tek Wall | `[x]` |
+| Tuning owner | Difficulty alanları Profile, diğer baseline alanlar active SubScene Authoring, birleştirme tek resolver | `[x]` |
 | Normal repair resource/phase | GameManager Stone-only cost üretiyor; Day/Dusk dışını gameplay ve UI seviyesinde kapatıyor | `[x]` |
 
 ### `DW-A-SAVE` - Tamamlandı: Exact Run Snapshot & Continue
@@ -220,21 +220,36 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [x] UI kilit metni `Day / Dusk only`; cost etiketi yalnız Stone gösteriyor.
 - [x] Same-frame lethal damage, phase ve Stone-only transaction regression testleri geçti.
 
-### `DW-A-TUNING` - Şu anki tek aktif iş
+### `DW-A-TUNING` - Tamamlandı: Single Runtime Tuning Owner
 
-- [ ] Aktif runtime tuning alanlarının bütün yazma/override owner'larını çıkar.
-- [ ] `MobileCastleCombatAuthoring`, active SubScene ve `DifficultyProfileSO` öncelik sırasını kanıtla.
-- [ ] Aynı alan için birden fazla aktif owner varsa tek otorite seçmeden kod değiştirme; owner kararı gereken noktayı Bölüm 20'ye yaz.
-- [ ] Runtime'da kullanılan değer ile Inspector/profile değerinin ayrışmasını yakalayan doğrulama ekle.
-- [ ] Tuning owner sözleşmesini ilgili architecture/editor setup belgelerine yaz.
+- [x] Aktif runtime tuning alanlarının bake, live-apply ve aggregate yazma yolları çıkarıldı.
+- [x] Difficulty baseline alanlarının owner'ı `DifficultyProfileSO` olarak kesinleştirildi.
+- [x] Profile taşınmamış geometri, mode, cycle süreleri ve ekonomi baseline alanlarının owner'ı aktif SubScene `MobileCastleCombatAuthoring` olarak kesinleştirildi.
+- [x] `MobileCastleCombatConfig` içerik kaynağı değil, bake edilmiş runtime çıktı olarak tanımlandı.
+- [x] Tech/meta/Council değişiklikleri baseline üzerine effective aggregate katmanı olarak ayrıldı.
+- [x] Baker ve Difficulty Tuner live-apply içindeki çift profile eşlemesi `MobileCastleTuningResolver` altında birleştirildi.
+- [x] Difficulty curve ve SpecialNight sample üretimi Baker/Tuner için tek resolver metoduna çekildi.
+- [x] Active SubScene/Profile farkları EditMode, gerçek bake edilmiş runtime config PlayMode testiyle doğrulandı.
+- [x] Tuning owner sözleşmesi architecture ve editor setup belgelerine yazıldı.
+
+### `DW-A-LEGACY` - Tamamlandı: Gate/Core Runtime Exclusion
+
+- [x] Gate/Core component ve serialized UI referanslarının bütün aktif okuma/yazma yolları çıkarıldı.
+- [x] `CastleAuthoring.Baker` yalnız Wall, WallXPosition ve CastleUpgradeData üretiyor; Gate/Core bake edilmiyor.
+- [x] Damage ve Game Over kararının yalnız Wall üzerinden üretildiği runtime regression testiyle kilitlendi.
+- [x] Repair, Council, tech/meta defense ve save/Continue yolları yalnız Wall kullanıyor.
+- [x] Gate/Core HUD referansları serialize kalabilse de runtime'da kapalı.
+- [x] Gate/Core `0 HP` enjekte edildiğinde oyun sürüyor; Wall öldüğünde Gate/Core tam can olsa dahi Game Over oluşuyor.
+- [x] Legacy component/content migration uyumluluğu için dormant bırakıldı; aktif V1 davranışına sızması testle engellendi.
+- [x] Package A kabul kapısı test kanıtlarıyla kapatıldı.
 
 ### Package A kalan işler
 
 - [x] `ResourceConsumptionRate` içindeki aktif ana kaynak tüketimini V1 loop'unda sıfırla/devre dışı bırak.
 - [x] `PopulationTickSystem` pasif Food tüketimini V1 loop'undan çıkar.
 - [x] Legacy `ArrowProductionSystem`/Fletcher consumption yolunun V1'e sızmasını engelle.
-- [ ] Aktif tuning alanlarında tek owner belirle: config default, scene override ve profile önceliğini belgeleyip test et.
-- [ ] Gate/Core bileşenlerinin aktif damage, repair, Council, save ve HUD yollarına dönmesini engelle.
+- [x] Aktif tuning alanlarında tek owner belirle: config default, scene override ve profile önceliğini belgeleyip test et.
+- [x] Gate/Core bileşenlerinin aktif damage, repair, Council, save ve HUD yollarına dönmesini engelle.
 - [x] Normal repair maliyetinden Wood'u kaldır; Stone'u tek harcama kaynağı yap.
 - [x] Normal repair'i yalnız Day/Dusk phase'lerinde aç.
 - [x] Tek Wall EditMode testlerini Unity üzerinden çalıştır ve sonuç kaydet.
@@ -247,36 +262,75 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [x] Continue aynı phase/timer/state ile deterministik.
 - [x] Wood/Stone/Iron/Food pasif negatif akmıyor.
 - [x] Wall `0 HP` aynı frame repair ile geri döndürülemiyor; Game Over geçişi tek transition gate'inden üretiliyor.
-- [ ] Gate/Core aktif ürün davranışına geri dönemiyor.
+- [x] Gate/Core aktif ürün davranışına geri dönemiyor.
 
 ---
 
 ## 6. Package B - Continuous Horde
 
+### `DW-B-CYCLE` - Tamamlandı: Blueprint Phase Rhythm
+
+- [x] Aktif cycle süreleri `Day 30 / Dusk 5 / Night 20 / Dawn 5` oldu.
+- [x] Dört fazın toplamı `60 saniye` olarak kilitlendi.
+- [x] Profile/Authoring tuning owner sözleşmesi korunarak süreler active SubScene Authoring'de güncellendi.
+- [x] Authoring default ve setup tool initializer değerleri aynı ritme çekildi.
+- [x] Continue exact phase/timer davranışı yeni sürelerle çalışıyor.
+- [x] Day, Dusk, Night ve Dawn fazlarının intensity değeri runtime testte sıfırın üzerinde.
+
+### `DW-B-STATS` - Tamamlandı: Quantity-only Difficulty
+
+- [x] `MobileWaveUtility` zombie HP'yi yalnız base HP'den yazıyor; cycle/day growth okumuyor.
+- [x] Zombie damage yalnız base damage'dan yazılıyor; cycle growth okunmuyor.
+- [x] Zombie speed yalnız base speed'den yazılıyor; wave growth okunmuyor.
+- [x] Active Authoring/Profile growth değerleri `0` yapıldı.
+- [x] Legacy growth ve HP curve alanları serialize uyumluluğu için kalabilse de V1 stat hesabında dormant.
+- [x] Enemy count, batch ve spawn interval quantity pressure kanalları korunuyor.
+- [x] Day 1 ile ileri cycle runtime karşılaştırmasında HP/damage/speed aynı; count artıyor ve interval daralıyor.
+
+### `DW-B-SPECIAL` - Tamamlandı: Remove Special Nights
+
+- [x] DefaultDifficulty içindeki Blood Moon/SpecialNights seed'i kaldırıldı.
+- [x] Setup tool'un SpecialNights'i yeniden seed etme yolu kaldırıldı.
+- [x] Tuning resolver bütün V1 sample'larında special multiplier'ı `1` yazıyor.
+- [x] Runtime cycle system stale buffer multiplier'ını dahi okumuyor ve `IsBloodMoonNight=false` yazıyor.
+- [x] Save/Continue legacy special-night flag'ini runtime'a geri yüklemiyor.
+- [x] Warning, color, vignette ve audio dalları false runtime flag nedeniyle dormant.
+- [x] SpecialNight content/schema gelecekte kullanım için korunuyor fakat V1 runtime'a bağlı değil.
+- [x] Stale special multiplier enjekte edilen ileri gün testinde intensity bonusu ve warning oluşmadı.
+
+### `DW-B-FLOW` - Şu anki tek aktif iş
+
+- [ ] Count/batch/interval quantity pressure alanlarının tek runtime owner'ını çıkar.
+- [ ] Day curve ile phase multiplier'ı birbirinden ayıran açık spawn budget state'i kur.
+- [ ] Dawn'daki düşük anlık intensity'nin yeni gün tabanını geriye düşürmesini engelle.
+- [ ] Active cap dolduğunda spawn talebini silmek yerine explicit backlog'a aktar.
+- [ ] Backlog state'ini exact save ve runtime telemetry'ye ekle.
+- [ ] Cap boşaldığında backlog'un sahaya geri aktığını runtime test et.
+
 ### Mevcut oyun ile karşılaştırma
 
 | Sözleşme | Mevcut oyun | Durum |
 |---|---|---|
-| 60 saniye kesintisiz cycle | Continuous system mevcut; faz toplamı 60 | `[~]` |
-| 30/5/20/5 | Active subscene `22/8/22/8` | `[!]` |
-| Spawn hiçbir fazda sıfır değil | Cycle her fazda pozitif intensity kullanıyor | `[~]` Runtime test gerekli |
-| Enemy stats sabit | HP, damage ve speed günle büyüyor | `[!]` |
-| Quantity-only difficulty | Count/interval büyümesi var fakat stat growth ile karışık | `[!]` |
+| 60 saniye kesintisiz cycle | Continuous system ve dört faz toplamı 60 | `[x]` |
+| 30/5/20/5 | Active SubScene, authoring default ve setup tool aynı | `[x]` |
+| Spawn hiçbir fazda sıfır değil | Dört faz runtime testte pozitif intensity üretiyor | `[x]` |
+| Enemy stats sabit | HP, damage ve speed bütün cycle'larda base değerde | `[x]` |
+| Quantity-only difficulty | Count/batch/interval büyüyor; stat growth utility seviyesinde yok sayılıyor | `[x]` |
 | Tek enemy prefab | Aktif çıkış tek zombie prefab üzerinden | `[~]` Catalog contract yok |
 | 10k expandable pool | Active cap 900; death `DestroyEntity` | `[!]` |
 | Backlog kaybolmaz | Cap gate var; explicit backlog state/soak kanıtı yok | `[~]` |
-| Special night yok | Difficulty profile her 5 günde Blood Moon üretiyor | `[!]` |
+| Special night yok | SpecialNight schema dormant; runtime multiplier/flag/warning üretemiyor | `[x]` |
 
 ### Yapılacaklar
 
-- [ ] Faz sürelerini `Day 30 / Dusk 5 / Night 20 / Dawn 5` yap.
-- [ ] Düşman akışının dört fazda da sıfıra düşmediğini test et.
-- [ ] Zombie HP growth'ü kaldır.
-- [ ] Zombie damage growth'ü kaldır.
-- [ ] Zombie speed growth'ü kaldır.
+- [x] Faz sürelerini `Day 30 / Dusk 5 / Night 20 / Dawn 5` yap.
+- [x] Düşman akışının dört fazda da sıfıra düşmediğini test et.
+- [x] Zombie HP growth'ü kaldır.
+- [x] Zombie damage growth'ü kaldır.
+- [x] Zombie speed growth'ü kaldır.
 - [ ] Spawn count/budget için day curve ve phase multiplier owner'ı oluştur.
 - [ ] Dawn yoğunluğunu düşürürken yeni gün tabanının önceki güne geri dönmemesini sağla.
-- [ ] Blood Moon/SpecialNights active bağlantısını kaldır; dormant kalabilir.
+- [x] Blood Moon/SpecialNights active bağlantısını kaldır; dormant kalabilir.
 - [ ] Aktif `MoatSystem` combat etkisini V1 core loop'tan ayır; kod/content dormant kalabilir.
 - [ ] `EnemyDefinition` ve tek kayıtlı enemy catalog oluştur.
 - [ ] Enemy type özel dalları spawn/UI koduna eklemeden content genişleme sınırı kur.
@@ -979,3 +1033,8 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-12 | `DW-A-SAVE` exact run snapshot | Schema v3, exact cycle/wave/RNG/combat/Council/ability snapshot, Main Menu ve app-quit save, aynı-an Continue, ölüm receipt'i ve idempotent meta ödülü tamamlandı | Unity compile: 0 error; EditMode 18/18; exact Continue PlayMode 1/1 |
 | 2026-07-12 | `DW-A-UPKEEP` pasif tüketim kaldırma | Population Food ve Fletcher Wood rate'leri V1 castle loop'ta kapatıldı; ResourceTick seviyesinde savunma sınırı eklendi | Unity compile: 0 error; EditMode 18/18; PlayMode 2/2 |
 | 2026-07-12 | `DW-A-REPAIR` Stone-only phase gate | Normal repair yalnız Day/Dusk ve yalnız Stone olacak şekilde tek GameManager owner'ında düzeltildi; UI kilit metinleri eşlendi | Unity compile: 0 error; EditMode 19/19; PlayMode 3/3 |
+| 2026-07-12 | `DW-A-TUNING` runtime tuning owner | Profile/Authoring precedence tek resolver'a çekildi; Baker ve live tuner aynı mapping/sample kodunu kullanıyor | Unity compile: 0 error; EditMode 22/22; PlayMode 4/4 |
+| 2026-07-12 | `DW-A-LEGACY` Gate/Core exclusion | Legacy Gate/Core data ve UI referansları dormant tutuldu; bütün aktif sonuç yolları tek Wall'a kilitlendi | Unity compile: 0 error; targeted EditMode 2/2; targeted PlayMode 1/1 |
+| 2026-07-12 | `DW-B-CYCLE` Blueprint phase rhythm | Active cycle ve initializer değerleri Day 30 / Dusk 5 / Night 20 / Dawn 5 olarak eşlendi | Unity compile: 0 error; EditMode 24/24; PlayMode 6/6 |
+| 2026-07-12 | `DW-B-STATS` quantity-only difficulty | Enemy HP/damage/speed progression utility seviyesinde kaldırıldı; baskı count/batch/interval kanallarında kaldı | Unity compile: 0 error; EditMode 25/25; PlayMode 7/7 |
+| 2026-07-12 | `DW-B-SPECIAL` special nights removal | Blood Moon seed, multiplier, flag restore ve runtime warning zinciri V1'de dormant hale getirildi | Unity compile: 0 error; EditMode 25/25; PlayMode 8/8 |

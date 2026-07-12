@@ -18,10 +18,7 @@ namespace DeadWalls
     }
 
     /// <summary>
-    /// Ozel gece takvimi satiri (M-C: AKTIF — kanli ay). Baker her gun icin carpani hesaplar:
-    /// gun % EveryNDays == 0 ise o gecenin intensity'si (1 + IntensityBonus) ile carpilir
-    /// (birden cok satir carpimsal birikir). Kind v1'de filtrelenmez (blood_moon varsayilir);
-    /// boss geceleri gibi turler M-C2'de ayrisir.
+    /// Gelecekteki ozel gece takvimi satiri. V1 runtime bu veriyi okumaz.
     /// </summary>
     [System.Serializable]
     public struct SpecialNightEntry
@@ -40,7 +37,7 @@ namespace DeadWalls
     /// sirasinda canli yeniden uygulayabilir. Egriler x=GUN (1..SampleDays), y=CARPAN'dir ve
     /// temel formullere EK uygulanir (1 = etkisiz):
     ///   gece intensity = faz-intensity * NightIntensityByDay(gun)
-    ///   zombi HP       = (BaseHP * lineer buyume) * ZombieHpMultByDay(gun)
+    ///   zombi HP       = BaseHP (V1 quantity-only; HP curve/growth dormant)
     ///   spawn batch    = (taban * intensity * cycle buyumesi) * SpawnBatchMultByDay(gun)
     /// </summary>
     [CreateAssetMenu(fileName = "DifficultyProfile", menuName = "DeadWalls/Mobile Castle/Difficulty Profile")]
@@ -58,9 +55,9 @@ namespace DeadWalls
 
         [Header("Kutle Eskalasyonu (config'e yazilir)")]
         public float ZombieBaseHP = 20f;
-        public float ZombieHpGrowthPerCycle = 0.40f;
+        public float ZombieHpGrowthPerCycle = 0f;
         public float ZombieBaseDamage = 5f;
-        public float ZombieDamagePerCycle = 0.5f;
+        public float ZombieDamagePerCycle = 0f;
         public int SpawnBatchSize = 2;
         public float SpawnBatchGrowthPerCycle = 0.15f;
         public int MaxSpawnBatch = 16;
@@ -82,7 +79,7 @@ namespace DeadWalls
         [Header("Spawn Tablosu (M-C hazirlik — sistem HENUZ okumuyor)")]
         public SpawnTableEntry[] SpawnTable = new SpawnTableEntry[0];
 
-        [Header("Ozel Geceler (M-C hazirlik — sistem HENUZ okumuyor)")]
+        [Header("Ozel Geceler (V1 dormant — runtime okumaz)")]
         public SpecialNightEntry[] SpecialNights = new SpecialNightEntry[0];
 
         /// <summary>Gun egrisini guvenli degerlendirir (gun 1-tabanli; kirpma + negatif korumasi).</summary>

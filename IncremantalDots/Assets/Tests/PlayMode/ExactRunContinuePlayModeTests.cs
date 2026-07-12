@@ -218,5 +218,265 @@ namespace DeadWalls.Tests
             Assert.That(resourcesAfter.Wood, Is.Zero);
             Assert.That(resourcesAfter.Stone, Is.EqualTo(stoneBefore - cost.Stone));
         }
+
+        [UnityTest]
+        public IEnumerator RuntimeTuning_UsesProfileDifficulty_AndAuthoringCycleDurations()
+        {
+            var gameManager = GameManager.Instance;
+            bool runtimeReady = false;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                {
+                    runtimeReady = true;
+                    break;
+                }
+                yield return null;
+            }
+            Assert.That(runtimeReady, Is.True);
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            Entity configEntity = entityManager.CreateEntityQuery(typeof(MobileCastleCombatConfig)).GetSingletonEntity();
+            var config = entityManager.GetComponentData<MobileCastleCombatConfig>(configEntity);
+            var samples = entityManager.GetBuffer<DifficultyDaySample>(configEntity);
+
+            Assert.That(config.ZombieHpGrowthPerCycle, Is.Zero);
+            Assert.That(config.SpawnBatchGrowthPerCycle, Is.EqualTo(0.15f));
+            Assert.That(config.MaxSpawnBatch, Is.EqualTo(16));
+            Assert.That(config.RepairBaseStoneCost, Is.EqualTo(50));
+            Assert.That(config.SiegeDayDuration, Is.EqualTo(30f));
+            Assert.That(config.SiegeDuskDuration, Is.EqualTo(5f));
+            Assert.That(config.SiegeNightDuration, Is.EqualTo(20f));
+            Assert.That(config.SiegeDawnDuration, Is.EqualTo(5f));
+            Assert.That(config.SpawnLineX, Is.EqualTo(27f));
+            Assert.That(samples.Length, Is.EqualTo(60));
+            Assert.That(samples[0].NightIntensityMult, Is.EqualTo(0.5f));
+            Assert.That(samples[4].BloodMoonIntensityMult, Is.EqualTo(1f));
+        }
+
+        [UnityTest]
+        public IEnumerator RuntimeDefense_IgnoresInjectedGateCore_AndEndsOnlyWhenWallDies()
+        {
+            var gameManager = GameManager.Instance;
+            bool runtimeReady = false;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                {
+                    runtimeReady = true;
+                    break;
+                }
+                yield return null;
+            }
+            Assert.That(runtimeReady, Is.True);
+
+            var hudControllers = Object.FindObjectsByType<HUDController>(
+                FindObjectsInactive.Include, FindObjectsSortMode.None);
+            foreach (var hud in hudControllers)
+            {
+                if (!hud.gameObject.activeInHierarchy)
+                    continue;
+
+                if (hud.GateHPBar != null)
+                    Assert.That(hud.GateHPBar.gameObject.activeSelf, Is.False);
+                if (hud.CastleHPBar != null)
+                    Assert.That(hud.CastleHPBar.gameObject.activeSelf, Is.False);
+                if (hud.DefenseGateText != null)
+                    Assert.That(hud.DefenseGateText.gameObject.activeSelf, Is.False);
+                if (hud.DefenseCoreText != null)
+                    Assert.That(hud.DefenseCoreText.gameObject.activeSelf, Is.False);
+            }
+
+            // GameManager'in meta/death transaction'ini bu ECS owner testinden ayir.
+            gameManager.enabled = false;
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            Entity wallEntity = entityManager.CreateEntityQuery(typeof(WallSegment)).GetSingletonEntity();
+            Entity gameStateEntity = entityManager.CreateEntityQuery(typeof(GameStateData)).GetSingletonEntity();
+
+            if (!entityManager.HasComponent<GateComponent>(wallEntity))
+                entityManager.AddComponentData(wallEntity, new GateComponent());
+            if (!entityManager.HasComponent<CastleHP>(wallEntity))
+                entityManager.AddComponentData(wallEntity, new CastleHP());
+
+            var wall = entityManager.GetComponentData<WallSegment>(wallEntity);
+            wall.MaxHP = 100000f;
+            wall.CurrentHP = 100000f;
+            entityManager.SetComponentData(wallEntity, wall);
+            entityManager.SetComponentData(wallEntity, new GateComponent { MaxHP = 100f, CurrentHP = 0f });
+            entityManager.SetComponentData(wallEntity, new CastleHP { MaxHP = 500f, CurrentHP = 0f });
+
+            var gameState = entityManager.GetComponentData<GameStateData>(gameStateEntity);
+            gameState.IsGameOver = false;
+            entityManager.SetComponentData(gameStateEntity, gameState);
+
+            yield return null;
+            yield return null;
+            Assert.That(entityManager.GetComponentData<GameStateData>(gameStateEntity).IsGameOver, Is.False);
+
+            wall.CurrentHP = 1f;
+            entityManager.SetComponentData(wallEntity, wall);
+            entityManager.SetComponentData(wallEntity, new GateComponent { MaxHP = 100f, CurrentHP = 100f });
+            entityManager.SetComponentData(wallEntity, new CastleHP { MaxHP = 500f, CurrentHP = 500f });
+
+            Entity attacker = entityManager.CreateEntity(typeof(ZombieTag), typeof(ZombieStats), typeof(ZombieState));
+            entityManager.SetComponentData(attacker, new ZombieStats
+            {
+                CurrentHP = 10f,
+                MaxHP = 10f,
+                AttackDamage = 10f,
+                AttackCooldown = 999f,
+                AttackTimer = 0f
+            });
+            entityManager.SetComponentData(attacker, new ZombieState { Value = ZombieStateType.Attacking });
+
+            yield return null;
+
+            Assert.That(entityManager.GetComponentData<WallSegment>(wallEntity).CurrentHP, Is.Zero);
+            Assert.That(entityManager.GetComponentData<GameStateData>(gameStateEntity).IsGameOver, Is.True);
+            Assert.That(entityManager.GetComponentData<GateComponent>(wallEntity).CurrentHP, Is.EqualTo(100f));
+            Assert.That(entityManager.GetComponentData<CastleHP>(wallEntity).CurrentHP, Is.EqualTo(500f));
+            gameManager.enabled = true;
+        }
+
+        [UnityTest]
+        public IEnumerator ContinuousCycle_UsesThirtyFiveTwentyFive_AndNeverZeroIntensity()
+        {
+            var gameManager = GameManager.Instance;
+            bool runtimeReady = false;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                {
+                    runtimeReady = true;
+                    break;
+                }
+                yield return null;
+            }
+            Assert.That(runtimeReady, Is.True);
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            Entity configEntity = entityManager.CreateEntityQuery(
+                typeof(MobileCastleCombatConfig), typeof(ContinuousSiegeCycleData)).GetSingletonEntity();
+            var config = entityManager.GetComponentData<MobileCastleCombatConfig>(configEntity);
+
+            Assert.That(config.SiegeCycleDuration, Is.EqualTo(60f));
+            Assert.That(config.SiegeDayDuration, Is.EqualTo(30f));
+            Assert.That(config.SiegeDuskDuration, Is.EqualTo(5f));
+            Assert.That(config.SiegeNightDuration, Is.EqualTo(20f));
+            Assert.That(config.SiegeDawnDuration, Is.EqualTo(5f));
+            Assert.That(config.SiegeDayDuration + config.SiegeDuskDuration
+                + config.SiegeNightDuration + config.SiegeDawnDuration, Is.EqualTo(60f));
+
+            float[] timers = { 1f, 31f, 40f, 57f };
+            SiegeCyclePhase[] phases =
+            {
+                SiegeCyclePhase.Day,
+                SiegeCyclePhase.Dusk,
+                SiegeCyclePhase.Night,
+                SiegeCyclePhase.Dawn
+            };
+
+            for (int i = 0; i < timers.Length; i++)
+            {
+                var cycle = entityManager.GetComponentData<ContinuousSiegeCycleData>(configEntity);
+                cycle.CycleTimer = timers[i];
+                entityManager.SetComponentData(configEntity, cycle);
+                yield return null;
+
+                cycle = entityManager.GetComponentData<ContinuousSiegeCycleData>(configEntity);
+                Assert.That(cycle.Phase, Is.EqualTo(phases[i]));
+                Assert.That(cycle.SpawnIntensityMultiplier, Is.GreaterThan(0f));
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator AdvancedCycle_IncreasesQuantityButKeepsEnemyStatsFixed()
+        {
+            var gameManager = GameManager.Instance;
+            bool runtimeReady = false;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                {
+                    runtimeReady = true;
+                    break;
+                }
+                yield return null;
+            }
+            Assert.That(runtimeReady, Is.True);
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            Entity configEntity = entityManager.CreateEntityQuery(
+                typeof(MobileCastleCombatConfig), typeof(ContinuousSiegeCycleData)).GetSingletonEntity();
+            Entity waveEntity = entityManager.CreateEntityQuery(typeof(WaveStateData)).GetSingletonEntity();
+
+            var cycle = entityManager.GetComponentData<ContinuousSiegeCycleData>(configEntity);
+            cycle.CycleIndex = 0;
+            cycle.CycleTimer = 1f;
+            entityManager.SetComponentData(configEntity, cycle);
+            yield return null;
+            var dayOne = entityManager.GetComponentData<WaveStateData>(waveEntity);
+
+            cycle = entityManager.GetComponentData<ContinuousSiegeCycleData>(configEntity);
+            cycle.CycleIndex = 49;
+            cycle.CycleTimer = 1f;
+            entityManager.SetComponentData(configEntity, cycle);
+            yield return null;
+            var advanced = entityManager.GetComponentData<WaveStateData>(waveEntity);
+
+            Assert.That(advanced.ZombieHP, Is.EqualTo(dayOne.ZombieHP));
+            Assert.That(advanced.ZombieDamage, Is.EqualTo(dayOne.ZombieDamage));
+            Assert.That(advanced.ZombieSpeed, Is.EqualTo(dayOne.ZombieSpeed));
+            Assert.That(advanced.ZombiesToSpawn, Is.GreaterThan(dayOne.ZombiesToSpawn));
+            Assert.That(advanced.SpawnInterval, Is.LessThanOrEqualTo(dayOne.SpawnInterval));
+        }
+
+        [UnityTest]
+        public IEnumerator StaleSpecialNightSample_CannotCreateRuntimeSpecialNight()
+        {
+            var gameManager = GameManager.Instance;
+            bool runtimeReady = false;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                {
+                    runtimeReady = true;
+                    break;
+                }
+                yield return null;
+            }
+            Assert.That(runtimeReady, Is.True);
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            Entity configEntity = entityManager.CreateEntityQuery(
+                typeof(MobileCastleCombatConfig), typeof(ContinuousSiegeCycleData)).GetSingletonEntity();
+            var samples = entityManager.GetBuffer<DifficultyDaySample>(configEntity);
+            var stale = samples[4];
+            stale.BloodMoonIntensityMult = 9f;
+            samples[4] = stale;
+
+            var cycle = entityManager.GetComponentData<ContinuousSiegeCycleData>(configEntity);
+            cycle.CycleIndex = 4;
+            cycle.CycleTimer = 40f;
+            cycle.IsBloodMoonNight = true;
+            entityManager.SetComponentData(configEntity, cycle);
+            yield return null;
+
+            cycle = entityManager.GetComponentData<ContinuousSiegeCycleData>(configEntity);
+            var config = entityManager.GetComponentData<MobileCastleCombatConfig>(configEntity);
+            Assert.That(cycle.Phase, Is.EqualTo(SiegeCyclePhase.Night));
+            Assert.That(cycle.IsBloodMoonNight, Is.False);
+            Assert.That(cycle.SpawnIntensityMultiplier,
+                Is.LessThanOrEqualTo(config.SiegeNightIntensityMultiplier + 0.001f));
+
+            var warnings = Object.FindObjectsByType<BloodMoonWarningUI>(
+                FindObjectsInactive.Include, FindObjectsSortMode.None);
+            foreach (var warning in warnings)
+            {
+                if (warning.WarningText != null)
+                    Assert.That(warning.WarningText.gameObject.activeSelf, Is.False);
+            }
+        }
     }
 }

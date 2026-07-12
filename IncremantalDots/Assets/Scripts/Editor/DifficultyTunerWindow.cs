@@ -410,23 +410,7 @@ namespace DeadWalls
 
             var entity = query.GetSingletonEntity();
             var config = em.GetComponentData<MobileCastleCombatConfig>(entity);
-            config.SpawnBatchSize = Mathf.Max(1, p.SpawnBatchSize);
-            config.ZombieBaseHP = Mathf.Max(1f, p.ZombieBaseHP);
-            config.ZombieHpGrowthPerCycle = Mathf.Max(0f, p.ZombieHpGrowthPerCycle);
-            config.ZombieBaseDamage = Mathf.Max(0.1f, p.ZombieBaseDamage);
-            config.ZombieDamagePerCycle = Mathf.Max(0f, p.ZombieDamagePerCycle);
-            config.SpawnBatchGrowthPerCycle = Mathf.Max(0f, p.SpawnBatchGrowthPerCycle);
-            config.MaxSpawnBatch = Mathf.Max(0, p.MaxSpawnBatch);
-            config.MaxAliveZombies = Mathf.Max(0, p.MaxAliveZombies);
-            config.BaseSpawnInterval = Mathf.Max(0.01f, p.BaseSpawnInterval);
-            config.MinSpawnInterval = Mathf.Max(0.01f, p.MinSpawnInterval);
-            config.SiegeDayIntensityMultiplier = Mathf.Max(0.01f, p.DayIntensity);
-            config.SiegeDuskStartIntensityMultiplier = Mathf.Max(0.01f, p.DuskStartIntensity);
-            config.SiegeDuskEndIntensityMultiplier = Mathf.Max(0.01f, p.DuskEndIntensity);
-            config.SiegeNightIntensityMultiplier = Mathf.Max(0.01f, p.NightIntensity);
-            config.SiegeDawnIntensityMultiplier = Mathf.Max(0.01f, p.DawnIntensity);
-            config.RepairBaseWoodCost = Mathf.Max(0, p.RepairBaseWoodCost);
-            config.RepairBaseStoneCost = Mathf.Max(0, p.RepairBaseStoneCost);
+            MobileCastleTuningResolver.ApplyDifficultyProfile(ref config, p);
             em.SetComponentData(entity, config);
 
             var buffer = em.HasBuffer<DifficultyDaySample>(entity)
@@ -436,24 +420,7 @@ namespace DeadWalls
             int days = Mathf.Clamp(p.SampleDays, 1, 200);
             for (int day = 1; day <= days; day++)
             {
-                // Kanli ay (SpecialNights) — baker ile AYNI formul (iki yazici senkron kalmali)
-                float bloodMoonMult = 1f;
-                if (p.SpecialNights != null)
-                {
-                    foreach (var special in p.SpecialNights)
-                    {
-                        if (special.EveryNDays > 0 && day % special.EveryNDays == 0)
-                            bloodMoonMult *= 1f + Mathf.Max(0f, special.IntensityBonus);
-                    }
-                }
-
-                buffer.Add(new DifficultyDaySample
-                {
-                    NightIntensityMult = p.EvaluateCurve(p.NightIntensityByDay, day),
-                    ZombieHpMult = p.EvaluateCurve(p.ZombieHpMultByDay, day),
-                    SpawnBatchMult = p.EvaluateCurve(p.SpawnBatchMultByDay, day),
-                    BloodMoonIntensityMult = bloodMoonMult,
-                });
+                buffer.Add(MobileCastleTuningResolver.ResolveDaySample(p, day));
             }
         }
 

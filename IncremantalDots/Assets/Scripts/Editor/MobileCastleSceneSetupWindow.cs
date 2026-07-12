@@ -276,15 +276,15 @@ namespace DeadWalls
             mobileAuthoring.ExtraEnemiesPerWave = 10;
             mobileAuthoring.SpawnBatchSize = 2;
             mobileAuthoring.ZombieBaseHP = 20f;
-            mobileAuthoring.ZombieHpGrowthPerCycle = 0.30f;
+            mobileAuthoring.ZombieHpGrowthPerCycle = 0f;
             mobileAuthoring.ZombieBaseDamage = 5f;
-            mobileAuthoring.ZombieDamagePerCycle = 0.5f;
+            mobileAuthoring.ZombieDamagePerCycle = 0f;
             mobileAuthoring.SpawnBatchGrowthPerCycle = 0.10f;
             mobileAuthoring.MaxSpawnBatch = 12;
             mobileAuthoring.MaxAliveZombies = 900;
             mobileAuthoring.ZombieScale = 1.4f;
             mobileAuthoring.BaseZombieSpeed = 0.85f;
-            mobileAuthoring.ZombieSpeedPerWave = 0.04f;
+            mobileAuthoring.ZombieSpeedPerWave = 0f;
             mobileAuthoring.StressSpawnBatchSize = 25;
             mobileAuthoring.StressSpawnInterval = 0.1f;
             mobileAuthoring.StressMaxAliveZombies = 1500;
@@ -314,10 +314,10 @@ namespace DeadWalls
             mobileAuthoring.UnlimitedArrows = true;
             mobileAuthoring.ContinuousSiegeEnabled = true;
             mobileAuthoring.SiegeCycleDuration = 60f;
-            mobileAuthoring.SiegeDayDuration = 22f;
-            mobileAuthoring.SiegeDuskDuration = 8f;
-            mobileAuthoring.SiegeNightDuration = 22f;
-            mobileAuthoring.SiegeDawnDuration = 8f;
+            mobileAuthoring.SiegeDayDuration = 30f;
+            mobileAuthoring.SiegeDuskDuration = 5f;
+            mobileAuthoring.SiegeNightDuration = 20f;
+            mobileAuthoring.SiegeDawnDuration = 5f;
             mobileAuthoring.SiegeDayIntensityMultiplier = 0.55f;
             mobileAuthoring.SiegeDuskStartIntensityMultiplier = 1f;
             mobileAuthoring.SiegeDuskEndIntensityMultiplier = 1.35f;
@@ -1298,10 +1298,7 @@ namespace DeadWalls
 
             var profile = AssetDatabase.LoadAssetAtPath<DifficultyProfileSO>(DifficultyProfilePath);
             if (profile != null)
-            {
-                EnsureBloodMoonSeed(profile);
                 return profile;
-            }
 
             profile = ScriptableObject.CreateInstance<DifficultyProfileSO>();
             // Erken olum kamburu duzeltmesi (M-A): ilk geceler kademeli siddet rampi
@@ -1311,30 +1308,16 @@ namespace DeadWalls
             profile.ZombieHpMultByDay = AnimationCurve.Constant(1f, 60f, 1f);
             profile.SpawnBatchMultByDay = AnimationCurve.Constant(1f, 60f, 1f);
             profile.SampleDays = 60;
-            // Plato yumusatma (M-A): eskalasyon sikilastirildi
-            profile.ZombieHpGrowthPerCycle = 0.40f;
+            // V1 quantity-only difficulty: stat growth yok, baski kalabaliktan gelir.
+            profile.ZombieHpGrowthPerCycle = 0f;
+            profile.ZombieDamagePerCycle = 0f;
             profile.SpawnBatchGrowthPerCycle = 0.15f;
             profile.MaxSpawnBatch = 16;
             // Erken kurtulus yolu: repair'in stone bagimliligi dusuruldu
             profile.RepairBaseStoneCost = 50;
             AssetDatabase.CreateAsset(profile, DifficultyProfilePath);
-            EnsureBloodMoonSeed(profile);
             EditorUtility.SetDirty(profile);
             return profile;
-        }
-
-        /// <summary>Kanli ay v1 seed'i (M-C): YALNIZ SpecialNights bos ise eklenir (owner ayarina dokunulmaz).</summary>
-        private static void EnsureBloodMoonSeed(DifficultyProfileSO profile)
-        {
-            if (profile.SpecialNights != null && profile.SpecialNights.Length > 0)
-                return;
-
-            Undo.RecordObject(profile, "Seed Blood Moon Special Night");
-            profile.SpecialNights = new[]
-            {
-                new SpecialNightEntry { EveryNDays = 5, Kind = "blood_moon", IntensityBonus = 0.5f }
-            };
-            EditorUtility.SetDirty(profile);
         }
 
         /// <summary>Subscene'deki combat authoring'ine profili baglar (yalniz BOSSA; owner atamasina dokunmaz).</summary>

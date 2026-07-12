@@ -1,5 +1,9 @@
 # Mobile Castle Combat v2 - Mimari
 
+## Tuning sahipliği
+
+Baseline tuning tek bir precedence hattından geçer: difficulty alanları `DifficultyProfileSO`, diğer alanlar aktif SubScene `MobileCastleCombatAuthoring`, birleştirme kodu `MobileCastleTuningResolver`, runtime çıktı `MobileCastleCombatConfig`. Tech/meta/Council değişimleri baseline üzerine effective aggregate'dir. Ayrıntılı sözleşme `Assets/Scripts/ECS/Authoring/MOBILE_CASTLE_TUNING_ARCHITECTURE.md` dosyasındadır.
+
 ## Amac
 
 `NewGameScene` icin merkezi kale combat akisini, continuous day/dusk/night kusatma dongusunu ve mobile archer/worker economy drawer davranisini tasir. Mobil davranis sadece sahnede `MobileCastleCombatConfig` singleton'i bake edildiginde aktif olur.
@@ -48,6 +52,8 @@ aliyor, GameOver zinciri calisti (3 gunluk basibos kusatmada kale dustu).
 
 ## ECS Verisi
 
+Savunma sonucu için tek runtime owner `WallSegment`tir. Gate/Core component ve HUD referansları yalnız legacy serialization uyumluluğudur; ayrıntılı sınır `SINGLE_WALL_DEFENSE_ARCHITECTURE.md` dosyasındadır.
+
 - `MobileCastleCombatConfig`: kale merkezi, spawn radius, attack radius, wave/siege sayilari, spawn batch, zombie scale/speed, continuous siege tuning, reward tuning, worker economy tuning, event tuning, unlimited arrow flag'i ve stress test limitlerini tutar.
 - `ContinuousSiegeCycleData`: player-facing `DAY / DUSK / NIGHT` fazini, 60s cycle progress'ini, spawn intensity multiplier'i ve horde pressure degerini tutar.
 - `WaveStateData.Phase`: mobile continuous modda uyumluluk icin `NightCombat` aktif tutulur. Eski DayPrep akisi component seviyesinde kalir ama `ContinuousSiegeCycleData.Enabled` true iken player-facing akisi yonetmez.
@@ -69,27 +75,27 @@ Varsayilan mobile degerleri:
 - Attack radius: `1.35`
 - Base wave enemy count: `30`
 - Extra enemies per wave: `10`
-- Spawn batch size: `3`
+- Spawn batch size: `2` (Difficulty Profile)
 - Zombie scale: `1.4`
 - Base zombie speed: `0.85`
 - Zombie speed per wave: `0.04`
 - Stress spawn batch size: `25`
 - Stress spawn interval: `0.1`
 - Stress max alive zombies: `1500`
-- Kill reward: Wood `1.0`, Food `0.6`, Stone `0.25`, Iron `0.15`, wave scale `+5%`
+- Kill reward: Wood `1.0`, Food `0.6`, Stone `0.25`, Iron `0.15`, wave scale `0`
 - Wave clear bonus: Wood `20 + 6 per wave`, Food `15 + 5 per wave`, Stone `10 + 4 per wave`, Iron `6 + 3 per wave`
 - Worker economy: population growth continuous siege cycle basina `15`, initial workers Wood/Stone/Iron/Food `20 / 10 / 8 / 15`
 - Worker caps: Wood/Stone/Iron/Food `40 / 30 / 24 / 40`
-- Worker production: Wood/Stone/Iron/Food `8 / 5.5 / 3.8 / 7` per minute
+- Worker production baseline: Wood/Stone/Iron/Food `8 / 5.5 / 4.9 / 7` per minute
 - Worker economy reward multiplier: `0.25`
 - Economy event chance `15%`, cooldown `2` waves
-- Continuous siege cycle: total `60s`, Day `25s`, Dusk `10s`, Night `25s`
+- Continuous siege cycle: total `60s`, Day `30s`, Dusk `5s`, Night `20s`, Dawn `5s`
 - Continuous siege intensity: Day `0.55`, Dusk `1.00 -> 1.35`, Night `1.65`
 - Initial/day prep duration fields legacy/debug akis icin korunur
 - Day overlay alpha: `0`
 - Night overlay alpha: `0.50`
 - Unlimited arrows: `true`
-- Wave director: base interval `0.8`, wave multiplier `0.96`, min interval `0.35`
+- Wave director: base interval `0.95`, wave multiplier `0.96`, min interval `0.35`
 - Wave director phases: opening `20%` at interval `x1.35` and batch `-1`, final `20%` at interval `x0.65` and batch `+1`
 - Castle Yard: Fortify/Rally runtime state korunur, player-facing drawer'da gizlenir
 

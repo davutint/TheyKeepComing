@@ -2290,7 +2290,7 @@ namespace DeadWalls
                 PhaseProgress01 = cycle.PhaseProgress01,
                 SpawnIntensityMultiplier = cycle.SpawnIntensityMultiplier,
                 HordePressure01 = cycle.HordePressure01,
-                IsBloodMoonNight = cycle.IsBloodMoonNight,
+                IsBloodMoonNight = false,
                 XP = GameState.XP,
                 Level = GameState.Level,
                 XPToNextLevel = GameState.XPToNextLevel,
@@ -2638,7 +2638,7 @@ namespace DeadWalls
             cycle.SpawnIntensityMultiplier = Mathf.Max(0.01f, save.SpawnIntensityMultiplier);
             cycle.HordePressure01 = Mathf.Clamp01(save.HordePressure01);
             cycle.Phase = (SiegeCyclePhase)save.CyclePhase;
-            cycle.IsBloodMoonNight = save.IsBloodMoonNight;
+            cycle.IsBloodMoonNight = false;
             _entityManager.SetComponentData(mobileConfigEntity, cycle);
             ContinuousSiegeCycle = cycle;
             _lastPhaseForCheckpoint = cycle.Phase;

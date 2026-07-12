@@ -113,9 +113,9 @@ MonoBehaviour:
     m_RotationOrder: 4
   SampleDays: 60
   ZombieBaseHP: 20
-  ZombieHpGrowthPerCycle: 0.4
+  ZombieHpGrowthPerCycle: 0
   ZombieBaseDamage: 5
-  ZombieDamagePerCycle: 0.5
+  ZombieDamagePerCycle: 0
   SpawnBatchSize: 2
   SpawnBatchGrowthPerCycle: 0.15
   MaxSpawnBatch: 16
@@ -130,7 +130,4 @@ MonoBehaviour:
   RepairBaseWoodCost: 120
   RepairBaseStoneCost: 50
   SpawnTable: []
-  SpecialNights:
-  - EveryNDays: 5
-    Kind: blood_moon
-    IntensityBonus: 0.5
+  SpecialNights: []

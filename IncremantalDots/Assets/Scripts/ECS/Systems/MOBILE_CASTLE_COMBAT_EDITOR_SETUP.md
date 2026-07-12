@@ -1,5 +1,13 @@
 # Mobile Castle Combat v2 - Editor Setup
 
+## Tuning owner kuralı
+
+- Difficulty alanlarını doğrudan shadow Inspector değerlerinden değiştirme. Aktif profile atanmışsa `Window > DeadWalls > Difficulty Tuner` veya `DefaultDifficulty.asset` kullanılır.
+- Geometri, mode, cycle süreleri ve ekonomi baseline alanları aktif SubScene'deki `MobileCastleCombatAuthoring` üzerinden düzenlenir.
+- `MobileCastleCombatConfig` runtime çıktısıdır; Play Mode Inspector/debug değişikliği kalıcı tuning değildir.
+- Setup penceresi yalnız açıkça çalıştırılan initializer/repair aracıdır; günlük tuning owner'ı değildir.
+- Ayrıntılı alan listesi: `Assets/Scripts/ECS/Authoring/MOBILE_CASTLE_TUNING_ARCHITECTURE.md`.
+
 ## Kurulum
 
 1. Unity Editor'de projeyi ac.
@@ -29,7 +37,7 @@ Script eklendikten sonra disaridan manuel compile komutu calistirma. Unity refre
   - Attack Radius: `1.35`
   - Base Wave Enemy Count: `30`
   - Extra Enemies Per Wave: `10`
-  - Spawn Batch Size: `3`
+  - Spawn Batch Size: `2` (Difficulty Profile owner)
   - Zombie Scale: `1.4`
   - Base Zombie Speed: `0.85`
   - Zombie Speed Per Wave: `0.04`
@@ -37,14 +45,14 @@ Script eklendikten sonra disaridan manuel compile komutu calistirma. Unity refre
   - Stress Spawn Interval: `0.1`
   - Stress Max Alive Zombies: `1500`
   - Kill Reward Wood/Food/Stone/Iron: `1 / 0.6 / 0.25 / 0.15`
-  - Kill Reward Wave Scale: `0.05`
+  - Kill Reward Wave Scale: `0`
   - Wave Clear Bonus Wood/Food/Stone/Iron Base: `20 / 15 / 10 / 6`
   - Wave Clear Bonus Wood/Food/Stone/Iron Per Wave: `6 / 5 / 4 / 3`
   - Initial Day Prep Duration: `12`
   - Day Prep Duration: `15`
   - Day/Night Overlay Alpha: `0 / 0.50`
   - Unlimited Arrows: enabled
-  - Wave Director Base Spawn Interval: `0.8`
+  - Wave Director Base Spawn Interval: `0.95` (Difficulty Profile owner)
   - Spawn Interval Wave Multiplier: `0.96`
   - Min Spawn Interval: `0.35`
   - Opening/Final Enemy Ratio: `0.20 / 0.20`
