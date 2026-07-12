@@ -105,6 +105,24 @@ namespace DeadWalls
                     ActiveEntryIndex = activeEntryIndex
                 });
 
+                EnemyCatalogEntryData activeEntry = activeEntryIndex >= 0
+                    ? entries[activeEntryIndex]
+                    : default;
+                AddComponent(entity, new EnemyPoolRuntimeData
+                {
+                    Initialized = 0,
+                    ActiveEntryIndex = activeEntryIndex,
+                    PrewarmTarget = activeEntryIndex >= 0 ? activeEntry.PoolPrewarm : 0,
+                    ExpandBatch = activeEntryIndex >= 0 ? activeEntry.PoolExpandBatch : 1,
+                    TotalCreated = 0,
+                    AvailableCount = 0,
+                    ActiveCount = 0,
+                    ExpansionCount = 0,
+                    TotalRentCount = 0,
+                    TotalReturnCount = 0
+                });
+                AddBuffer<EnemyPoolAvailable>(entity);
+
                 Entity activeEnemyPrefab = activeEntryIndex >= 0
                     ? entries[activeEntryIndex].Prefab
                     : Entity.Null;

@@ -33,7 +33,7 @@ Catalog atanmamış eski sahnelerde `WaveConfigAuthoring.ZombiePrefab`, `legacy_
 
 ## Pool sınırı
 
-`PoolPrewarm` ve `PoolExpandBatch` alanları bu contract ile tanımlanmış ve bake edilmiştir. Entity prewarm/rent/return davranışı henüz uygulanmamıştır; `DW-B-POOL` işinin kapsamıdır. Şu an spawn instantiate, ölüm cleanup ise destroy kullanmaya devam eder.
+`PoolPrewarm` ve `PoolExpandBatch` alanları bake edilir ve `EnemyPoolInitializationSystem` tarafından gerçek runtime rezervine çevrilir. Spawn pool rent, ölüm pool return kullanır; ayrıntılı yaşam döngüsü `ENEMY_POOL_ARCHITECTURE.md` dosyasındadır.
 
 ## Yeni düşman ekleme sınırı
 

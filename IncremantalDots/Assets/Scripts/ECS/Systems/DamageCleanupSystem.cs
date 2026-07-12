@@ -5,20 +5,18 @@ using Unity.Mathematics;
 namespace DeadWalls
 {
     /// <summary>
-    /// Olen zombileri temizler.
+    /// Olen zombileri odullendirir ve pool rezervine dondurur.
     ///
     /// Eski akis: Dead → aninda sil
-    /// Yeni akis: Dead + DeathTimer → timer say → 0'a dusunce sil + odul ver
+    /// Yeni akis: Dead + DeathTimer → timer say → 0'a dusunce pool return + odul ver
     ///
     /// DeathTimer, ZombieAnimationStateSystem tarafindan eklenir.
     /// Bu system sadece DeathTimer olan entity'leri isle.
     /// </summary>
-    [BurstCompile]
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     [UpdateAfter(typeof(DamageApplySystem))]
     public partial struct DamageCleanupSystem : ISystem
     {
-        [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             if (!SystemAPI.HasSingleton<GameStateData>())
@@ -48,6 +46,10 @@ namespace DeadWalls
                 : default;
             var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
             var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+            Entity poolEntity = SystemAPI.HasSingleton<EnemyPoolRuntimeData>()
+                ? SystemAPI.GetSingletonEntity<EnemyPoolRuntimeData>()
+                : Entity.Null;
+            var returnedEntities = new Unity.Collections.NativeList<Entity>(Unity.Collections.Allocator.Temp);
             float dt = SystemAPI.Time.DeltaTime;
 
             foreach (var (stats, deathTimer, entity) in
@@ -62,7 +64,7 @@ namespace DeadWalls
                 if (deathTimer.ValueRO.Value > 0f)
                     continue;
 
-                // Timer bitti → odul ver + sil
+                // Timer bitti → odul ver + pool return
                 gameState.ValueRW.XP += stats.ValueRO.XPReward;
                 gameState.ValueRW.TotalKills++;
                 waveState.ValueRW.ZombiesAlive--;
@@ -70,8 +72,17 @@ namespace DeadWalls
                     AddKillReward(ref resourceAccumulator.ValueRW, mobileConfig, economyFocus,
                         waveState.ValueRO.CurrentWave, mobileRewardMultiplier);
 
-                ecb.DestroyEntity(entity);
+                returnedEntities.Add(entity);
             }
+
+            for (int i = 0; i < returnedEntities.Length; i++)
+            {
+                Entity entity = returnedEntities[i];
+                if (poolEntity == Entity.Null
+                    || !EnemyPoolRuntimeUtility.Return(state.EntityManager, poolEntity, entity))
+                    ecb.DestroyEntity(entity);
+            }
+            returnedEntities.Dispose();
 
             // Mobile castle loop artik level-up ile pause olmaz; XP sadece progress metric olarak kalir.
             if (!mobileMode && gameState.ValueRO.XP >= gameState.ValueRO.XPToNextLevel && !gameState.ValueRO.IsLevelUpPending)

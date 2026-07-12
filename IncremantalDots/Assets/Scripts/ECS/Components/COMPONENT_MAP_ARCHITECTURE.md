@@ -6,11 +6,11 @@ Tum component'lar unmanaged ECS struct olarak tutulur. Davranis sistemlerde, ver
 
 ## ZombieComponents.cs
 
-- `ZombieTag`: zombi entity'lerini isaretler.
+- `ZombieTag`: enableable aktif-zombi isaretidir; pool rezervinde disabled tutulur.
 - `ZombieStats`: HP, hareket hizi, saldiri hasari, cooldown ve XP odulu.
 - `ZombieSlow`: Frost ok etkisi icin enableable slow duration + speed multiplier.
 - `ZombieState`: zombi durumu: `Moving`, `Attacking`, `Dead`, `Queued`.
-- `DeathTimer`: olum animasyonu bitene kadar entity silmeyi geciktirir.
+- `DeathTimer`: enableable olum animasyonu sayacidir; bitince entity pool'a doner.
 
 ## SpriteComponents.cs
 
@@ -30,7 +30,7 @@ Tum component'lar unmanaged ECS struct olarak tutulur. Davranis sistemlerde, ver
 
 - `ArcherType`: `Basic`, `Rapid`, `Frost`.
 - `ArcherUnit`: okcu tipi, atis hizi, hasar, menzil, opsiyonel slow bilgileri, facing direction ve attack anim timer.
-- `ArrowProjectile`: okun hizi, hasari, hedef entity referansi ve projectile effect datasini tasir.
+- `ArrowProjectile`: okun hizi, hasari, hedef entity referansi, hedef pool generation'i ve projectile effect datasini tasir.
 - `ArrowTag`: ok entity'lerini isaretler.
 - `ArcherVisualStyle`: Basic/Rapid/Frost ve slow tint renklerini merkezi tutar.
 - `CombatVfxEvent` / `CombatSfxEvent`: DOTS combat sistemlerinden MonoBehaviour feedback bridge'e giden tek frame'lik VFX/SFX event'leridir. Normal arrow/frost hit event'leri bridge tarafinda sprite flipbook impact olarak oynatilir.
@@ -99,5 +99,5 @@ BoundarySystem -> ZombieState gecirir
 ZombieAttackSystem -> hasar queue yazar
 DamageApplySystem -> yalniz WallSegment HP yazar; Wall 0 ise GameStateData.IsGameOver
 ZombieDeathSystem -> ZombieState.Dead isaretler
-DamageCleanupSystem -> Dead entity'leri siler, GameStateData.XP ve mobile kill reward gunceller
+DamageCleanupSystem -> Dead entity'leri pool'a dondurur, GameStateData.XP ve mobile kill reward gunceller
 ```

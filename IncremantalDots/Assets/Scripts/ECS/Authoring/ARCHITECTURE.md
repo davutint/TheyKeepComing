@@ -36,6 +36,7 @@ Baker class'lari authoring degerlerini okuyarak entity'lere IComponentData ekler
 ### WaveConfigAuthoring.cs
 - `EnemyCatalogSO` ile aktif enemy prefab/stat/pool metadata kaynagini tutar; `ZombiePrefab` yalniz eski sahneler icin migration fallback'idir
 - `EnemyCatalogRuntimeData` ve `EnemyCatalogEntryData` buffer'ini bake eder
+- `EnemyPoolRuntimeData` ve inactive entity rezerv buffer'ini bake eder; prewarm runtime initialization system tarafindan yapilir
 - Aktif catalog kaydindan compatibility `ZombiePrefabData`; ayrica ArrowPrefabData ve ArcherPrefabData bake eder
 - Sub Scene icinde GameStateAuthoring ile ayni GameObject'e eklenebilir
 

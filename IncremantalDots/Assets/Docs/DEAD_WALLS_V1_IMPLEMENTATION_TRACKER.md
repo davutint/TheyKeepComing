@@ -5,7 +5,7 @@
 > **Tracker sürümü:** 2.0  
 > **Son tam kapsam denetimi:** 2026-07-12  
 > **Aktif paket:** Package B - Continuous Horde
-> **Aktif iş:** `DW-B-POOL` - Expandable Enemy Pool
+> **Aktif iş:** `DW-B-SCALE` - 10K Horde Runtime Gate
 
 ---
 
@@ -124,7 +124,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Battlefield | Kale/duvar solda, spawn sağdaki `SpawnLineX` bandından geliyor | Temel kompozisyon uyumlu |
 | Build placement | Aktif scene'de `BuildingPlacementUI` ve `BuildingGridManager` bağlı değil | Hazır bina yönüyle uyumlu |
 | Cycle | `Day 30 / Dusk 5 / Night 20 / Dawn 5`; dört fazda pozitif spawn temposu | Uyumlu |
-| Horde | Tek prefab; sabit stats; explicit saved backlog; Blood Moon dormant; death hâlâ `DestroyEntity` | Package B kısmi |
+| Horde | Tek catalog prefabı; sabit stats; saved backlog; expandable rent/return pool; Blood Moon dormant | 10K ürün ölçümü bekliyor |
 | Moat | Runtime flag kapalı; slow `1`, damage `0`; tech/meta catalog bağlantıları dormant | Uyumlu |
 | Defense | Damage/Game Over aktif olarak tek Wall'a çekildi | Kodlandı, runtime test bekliyor |
 | Normal repair | Wood+Stone maliyeti kullanıyor ve Night phase guard'ı yok | Day/Dusk + Stone-only hedefiyle çelişiyor |
@@ -145,7 +145,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Meta | Ayrı JSON ve Game Over shop var; `StartingTechLevel` aktif | Kısmi uyum |
 | HUD | CyclePanel, DAY/DUSK/NIGHT ve Horde Pressure mevcut; tek Wall runtime gizleme var | Package I polish gerekli |
 | Tutorial | Aktif tutorial/onboarding sistemi bulunmadı | Package I eksik |
-| Testler | V1 contract testleri EditMode `33/33`, PlayMode `11/11` geçiyor | Kapsam büyüyor |
+| Testler | V1 contract testleri EditMode `34/34`, PlayMode `12/12` geçiyor | Kapsam büyüyor |
 | Telemetry | Spawn budget demanded/spawned/backlog telemetry mevcut; tam Blueprint event owner'ı eksik | Kısmi |
 
 ---
@@ -322,14 +322,23 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [x] `WaveSpawnSystem` prefab/stat kaynağını catalog contract'ına bağla.
 - [x] Spawn/UI kodunda enemy-type özel dallanma oluşmasını engelleyen validation testleri ekle.
 
-### `DW-B-POOL` - Şu anki tek aktif iş
+### `DW-B-POOL` - Tamamlandı: Expandable Enemy Pool
 
-- [ ] Catalog `PoolPrewarm` metadata'sına göre inactive enemy entity rezervi oluştur.
-- [ ] Spawn talebini instantiate yerine pool rent'e bağla; rezerv biterse `PoolExpandBatch` kadar genişlet.
-- [ ] Ölüm cleanup'ını `DestroyEntity` yerine deterministik pool return akışına çevir.
-- [ ] Pool return sırasında target/projectile referansları ile zombie state/component verilerini güvenli sıfırla.
-- [ ] Exact Continue snapshot ve backlog davranışını pool kapasitesinden bağımsız tut.
-- [ ] Prewarm, expand, rent, return ve yoğun death churn için EditMode/PlayMode kanıtı ekle.
+- [x] Catalog `PoolPrewarm` metadata'sına göre inactive enemy entity rezervi oluştur.
+- [x] Spawn talebini instantiate yerine pool rent'e bağla; rezerv biterse `PoolExpandBatch` kadar genişlet.
+- [x] Ölüm cleanup'ını `DestroyEntity` yerine deterministik pool return akışına çevir.
+- [x] Pool return sırasında target/projectile referansları ile zombie state/component verilerini güvenli sıfırla.
+- [x] Exact Continue snapshot ve backlog davranışını pool kapasitesinden bağımsız tut.
+- [x] Prewarm, expand, rent, return ve yoğun death churn için EditMode/PlayMode kanıtı ekle.
+
+### `DW-B-SCALE` - Şu anki tek aktif iş
+
+- [ ] Gerçek `NewGameScene`, HUD, VFX/SFX ve save/Continue açıkken 10.000 aktif enemy senaryosu kur.
+- [ ] Test-only/runtime tuning ile active cap ve backlog'u 10K ölçümüne kontrollü çıkar; release değerini ölçüm sonucu olmadan değiştirme.
+- [ ] Pool total/available/active, expansion, rent/return ve spawn backlog telemetry'sini senaryo raporuna bağla.
+- [ ] Frame pacing, main-thread spike, allocation ve Entities rendering darboğazlarını ölç.
+- [ ] Fireball aynı-frame çoklu death return ve maksimum-state Continue senaryolarını doğrula.
+- [ ] Sonuçlara göre Package B kabul kapısını kapat veya ölçülmüş blocker kaydet.
 
 ### Mevcut oyun ile karşılaştırma
 
@@ -341,7 +350,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Enemy stats sabit | HP, damage ve speed bütün cycle'larda base değerde | `[x]` |
 | Quantity-only difficulty | Count/batch/interval büyüyor; stat growth utility seviyesinde yok sayılıyor | `[x]` |
 | Tek enemy prefab | `EnemyCatalog.asset` yalnız `zombie_basic` tanımını taşır; prefab ve base statlar aynı kayıttan spawn edilir | `[x]` |
-| 10k expandable pool | Active cap 900; death `DestroyEntity` | `[!]` |
+| 10k expandable pool | Prewarm `128`, ihtiyaçta `128` batch expand, spawn rent ve death return aktif; normal cap 900 | `[~]` 10K ürün ölçümü bekliyor |
 | Backlog kaybolmaz | Explicit saved budget state cap altında talep biriktiriyor ve kapasitede kontrollü boşaltıyor | `[x]` |
 | Special night yok | SpecialNight schema dormant; runtime multiplier/flag/warning üretemiyor | `[x]` |
 
@@ -359,8 +368,8 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [x] `EnemyDefinition` ve tek kayıtlı enemy catalog oluştur.
 - [x] Enemy type özel dalları spawn/UI koduna eklemeden content genişleme sınırı kur.
 - [x] Explicit spawn backlog state/policy kur ve save/telemetry'ye aç.
-- [ ] Enemy pool'u küçük prewarm + ihtiyaçla genişleme şeklinde kur.
-- [ ] Ölümde entity destroy yerine pool return uygula.
+- [x] Enemy pool'u küçük prewarm + ihtiyaçla genişleme şeklinde kur.
+- [x] Ölümde entity destroy yerine pool return uygula.
 - [x] Active cap data-driven kalır; teknik cap dolduğunda talebi explicit backlog'da koru.
 - [ ] Gerçek oyun UI/VFX/save açıkken 10.000 enemy ölçüm senaryosu kur.
 
@@ -370,7 +379,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [x] Gün baskısı yalnız count/budget/flow ile artar.
 - [x] Cap doluyken talep backlog'a gider ve boşlukta sahaya çıkar.
 - [x] Tek prefab catalog üzerinden çalışır.
-- [ ] Death churn pool ile yönetilir.
+- [x] Death churn pool ile yönetilir.
 
 ---
 
@@ -468,7 +477,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [ ] Mevcut spatial hash'i archer target query için uygun read-only query owner'ına dönüştür.
 - [ ] Her okçu range içindeki yaşayan/death-state olmayan en yakın düşmanı seçsin.
 - [ ] Basic/Rapid/Frost aynı target policy'yi kullansın.
-- [ ] Projectile target pool'a döner/ölürse tek deterministik cleanup veya retarget policy uygula.
+- [x] Projectile target pool'a döner/yeniden rent edilirse generation mismatch ile deterministik cleanup uygula; retarget yapma.
 - [ ] Incoming damage reservation/load ile overkill'i dağıt.
 - [ ] Target search'ü Burst/job ölçeğinde 1k x 10k için ölç.
 - [ ] Projectile instantiate/destroy churn'ünü pooling veya burst-safe lifetime yaklaşımıyla çöz.
@@ -854,12 +863,12 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 | Alan | Mevcut durum | Gerekli iş |
 |---|---|---|
-| Enemy spawn/death | Instantiate + DestroyEntity | Expandable pool + backlog |
+| Enemy spawn/death | Prewarm/expand + rent/return; backlog bağımsız | 10K frame pacing ve allocation ölçümü |
 | Archer target search | 1 archer x all enemies brute-force | Spatial query + target load |
 | Projectiles | Instantiate/destroy | Pool/burst-safe lifetime |
 | VFX/SFX | CombatFeedbackBridge pool ve bazı min interval'lar var | 10k budget/aggregation audit |
 | Worker visuals | 1:1 assigned worker entity | Representative density |
-| Save | Compact resource/pop/archer count var; exact state eksik | Deterministic compact max-state save |
+| Save | Exact aktif combat snapshot var; inactive pool catalog'dan yeniden kurulur | 10K maksimum-state Continue ölçümü |
 
 ### Ölçüm senaryoları
 
@@ -926,7 +935,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 - `[x]` EditMode: `33/33`; contract, save, tuning, cycle, quantity-only, backlog, Moat isolation ve enemy catalog kapsamı.
 - `[x]` PlayMode: `11/11`; gerçek `NewGameScene` bake/runtime, exact Continue, Wall, cycle, backlog, Moat ve catalog spawn kapsamı.
-- `[~]` Council schedule/guardrail, pool churn ve 1k x 10k ürün senaryoları ilgili paketleri bekliyor.
+- `[~]` Council schedule/guardrail ve 1k x 10k ürün senaryoları ilgili paketleri bekliyor; enemy pool churn contract testli.
 
 ---
 
@@ -1021,8 +1030,8 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | `GameManager.cs` | Save/restore, repair, archer buy/upgrade, Council, Fireball, meta bridge |
 | `RunPersistence.cs` | Dawn checkpoint schema v2 ve eksik exact state |
 | `ContinuousSiegeCycleSystem.cs` | Phase/intensity ve Blood Moon application |
-| `WaveSpawnSystem.cs` + `EnemyCatalogSO` + `EnemyDefinitionSO` | Tek catalog prefab/stat spawnı, cap/backlog ve entity instantiate; pool pending |
-| `DamageCleanupSystem.cs` | Enemy death'te DestroyEntity |
+| `WaveSpawnSystem.cs` + `EnemyPoolRuntimeUtility.cs` | Tek catalog prefab/stat, cap/backlog ve expandable pool rent |
+| `DamageCleanupSystem.cs` | Reward sonrası enemy pool return |
 | `ResourceTickSystem.cs` + `PopulationTickSystem.cs` | Passive consumption |
 | `MobilePopulationEconomySystem.cs` | Bedelsiz population growth ve auto-capacity |
 | `MobileCastleArcherTilePlacement.cs` | Tile center + stack offset, preview 96 |
@@ -1066,3 +1075,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-12 | `DW-B-FLOW` spawn budget & backlog | Day tabanı/phase multiplier ayrıldı; cap altındaki her interval explicit saved backlog'a dönüştü ve kontrollü drain edildi | Unity compile: 0 error; EditMode 28/28; PlayMode 9/9 |
 | 2026-07-12 | `DW-B-MOAT` dormant moat isolation | Moat slow/damage, tech ve meta yolları V1 core loop'tan ayrıldı; legacy content silinmeden catalog dışında ve runtime-neutral tutuldu | Unity compile: 0 error; EditMode 30/30; PlayMode 10/10 |
 | 2026-07-12 | `DW-B-ENEMY` single enemy catalog contract | `zombie_basic` için tek catalog/definition owner kuruldu; prefab, base stat, XP ve pool metadata bake edilip type branch olmadan gerçek spawn'a bağlandı | Unity compile: 0 error; EditMode 33/33; PlayMode 11/11 |
+| 2026-07-12 | `DW-B-POOL` expandable enemy pool | Catalog prewarm/expand metadata gerçek inactive rezerve bağlandı; spawn rent, ölüm return, Continue reuse ve projectile generation guard tamamlandı | Unity compile: 0 error; EditMode 34/34; PlayMode 12/12 |

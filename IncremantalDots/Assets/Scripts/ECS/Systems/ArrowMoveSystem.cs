@@ -26,6 +26,8 @@ namespace DeadWalls
             {
                 Dt = SystemAPI.Time.DeltaTime,
                 TransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true),
+                ZombieTagLookup = SystemAPI.GetComponentLookup<ZombieTag>(true),
+                PoolMemberLookup = SystemAPI.GetComponentLookup<EnemyPoolMember>(true),
                 ECB = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>()
                     .CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter()
             }.ScheduleParallel();
@@ -40,13 +42,16 @@ namespace DeadWalls
             [ReadOnly] [NativeDisableContainerSafetyRestriction]
             public ComponentLookup<LocalTransform> TransformLookup;
 
+            [ReadOnly] public ComponentLookup<ZombieTag> ZombieTagLookup;
+            [ReadOnly] public ComponentLookup<EnemyPoolMember> PoolMemberLookup;
+
             public EntityCommandBuffer.ParallelWriter ECB;
 
             void Execute(Entity entity, [ChunkIndexInQuery] int sortKey,
                 in ArrowProjectile arrow, ref LocalTransform transform)
             {
                 // Hedef hala var mi?
-                if (arrow.Target == Entity.Null || !TransformLookup.HasComponent(arrow.Target))
+                if (!IsValidTarget(arrow))
                 {
                     ECB.DestroyEntity(sortKey, entity);
                     return;
@@ -68,6 +73,18 @@ namespace DeadWalls
                     float angle = math.atan2(direction.y, direction.x);
                     transform.Rotation = quaternion.Euler(0f, 0f, angle);
                 }
+            }
+
+            private bool IsValidTarget(ArrowProjectile arrow)
+            {
+                if (arrow.Target == Entity.Null
+                    || !TransformLookup.HasComponent(arrow.Target)
+                    || !ZombieTagLookup.HasComponent(arrow.Target)
+                    || !ZombieTagLookup.IsComponentEnabled(arrow.Target))
+                    return false;
+
+                return !PoolMemberLookup.HasComponent(arrow.Target)
+                    || PoolMemberLookup[arrow.Target].Generation == arrow.TargetPoolGeneration;
             }
         }
     }

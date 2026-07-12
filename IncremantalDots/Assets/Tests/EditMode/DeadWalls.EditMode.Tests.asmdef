@@ -5,7 +5,10 @@
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
         "DeadWalls",
-        "Unity.Mathematics"
+        "Unity.Mathematics",
+        "Unity.Entities",
+        "Unity.Transforms",
+        "Unity.Collections"
     ],
     "includePlatforms": [
         "Editor"

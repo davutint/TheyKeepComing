@@ -33,6 +33,7 @@ namespace DeadWalls
             bool unlimitedArrows = SystemAPI.HasSingleton<MobileCastleCombatConfig>()
                 && SystemAPI.GetSingleton<MobileCastleCombatConfig>().UnlimitedArrows;
             float fireRateMultiplier = 1f;
+            var poolMemberLookup = SystemAPI.GetComponentLookup<EnemyPoolMember>(true);
             if (SystemAPI.HasSingleton<CastleYardPrepState>())
             {
                 var prep = SystemAPI.GetSingleton<CastleYardPrepState>();
@@ -101,6 +102,9 @@ namespace DeadWalls
                     Speed = 12f,
                     Damage = archer.ValueRO.ArrowDamage,
                     Target = closestZombie,
+                    TargetPoolGeneration = poolMemberLookup.HasComponent(closestZombie)
+                        ? poolMemberLookup[closestZombie].Generation
+                        : 0u,
                     ArcherType = archer.ValueRO.Type,
                     SlowDuration = archer.ValueRO.SlowDuration,
                     SlowMultiplier = archer.ValueRO.SlowMultiplier

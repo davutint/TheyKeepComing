@@ -32,6 +32,7 @@ namespace DeadWalls
         private Entity _castleEntity;
         private Entity _archerPrefabEntity;
         private Entity _zombiePrefabEntity;
+        private Entity _enemyPoolEntity;
         private Entity _arrowPrefabEntity;
         private Entity _workerPrefabEntity;
         private bool _initialized;
@@ -237,6 +238,14 @@ namespace DeadWalls
             if (zombiePrefabQuery.IsEmpty) return false;
             _zombiePrefabEntity = _entityManager.GetComponentData<ZombiePrefabData>(
                 zombiePrefabQuery.GetSingletonEntity()).ZombiePrefab;
+
+            var enemyPoolQuery = _entityManager.CreateEntityQuery(
+                typeof(EnemyPoolRuntimeData), typeof(EnemyPoolAvailable));
+            _enemyPoolEntity = enemyPoolQuery.IsEmpty
+                ? Entity.Null
+                : enemyPoolQuery.GetSingletonEntity();
+            if (_enemyPoolEntity != Entity.Null)
+                EnemyPoolRuntimeUtility.EnsureInitialized(_entityManager, _enemyPoolEntity);
 
             var arrowPrefabQuery = _entityManager.CreateEntityQuery(typeof(ArrowPrefabData));
             if (arrowPrefabQuery.IsEmpty) return false;
@@ -2461,7 +2470,8 @@ namespace DeadWalls
                         item.ForceY = body.Force.y;
                     }
 
-                    if (_entityManager.HasComponent<DeathTimer>(entity))
+                    if (_entityManager.HasComponent<DeathTimer>(entity)
+                        && _entityManager.IsComponentEnabled<DeathTimer>(entity))
                     {
                         item.HasDeathTimer = true;
                         item.DeathTimer = _entityManager.GetComponentData<DeathTimer>(entity).Value;
@@ -2731,9 +2741,17 @@ namespace DeadWalls
             var savedZombies = save.ActiveZombies ?? new List<ZombieRunSaveState>();
             var savedArrows = save.ActiveArrows ?? new List<ArrowRunSaveState>();
             var zombieEntities = new List<Entity>(savedZombies.Count);
+            if (_enemyPoolEntity != Entity.Null && _entityManager.Exists(_enemyPoolEntity))
+                EnemyPoolRuntimeUtility.ReturnAllActive(_entityManager, _enemyPoolEntity);
+
             foreach (var item in savedZombies)
             {
-                Entity entity = _entityManager.Instantiate(_zombiePrefabEntity);
+                Entity entity;
+                if (_enemyPoolEntity == Entity.Null
+                    || !_entityManager.Exists(_enemyPoolEntity)
+                    || !EnemyPoolRuntimeUtility.TryRent(_entityManager, _enemyPoolEntity, out entity))
+                    entity = _entityManager.Instantiate(_zombiePrefabEntity);
+
                 _entityManager.SetComponentData(entity, LocalTransform.FromPositionRotationScale(
                     new float3(item.X, item.Y, item.Z), quaternion.identity, Mathf.Max(0.01f, item.Scale)));
                 _entityManager.SetComponentData(entity, new ZombieStats
@@ -2773,6 +2791,12 @@ namespace DeadWalls
                         _entityManager.SetComponentData(entity, deathTimer);
                     else
                         _entityManager.AddComponentData(entity, deathTimer);
+                    _entityManager.SetComponentEnabled<DeathTimer>(entity, true);
+                }
+                else if (_entityManager.HasComponent<DeathTimer>(entity))
+                {
+                    _entityManager.SetComponentData(entity, new DeathTimer { Value = 0f });
+                    _entityManager.SetComponentEnabled<DeathTimer>(entity, false);
                 }
 
                 zombieEntities.Add(entity);
@@ -2791,6 +2815,8 @@ namespace DeadWalls
                     Speed = item.Speed,
                     Damage = item.Damage,
                     Target = zombieEntities[item.TargetZombieIndex],
+                    TargetPoolGeneration = EnemyPoolRuntimeUtility.GetGeneration(
+                        _entityManager, zombieEntities[item.TargetZombieIndex]),
                     ArcherType = (ArcherType)item.ArcherType,
                     SlowDuration = item.SlowDuration,
                     SlowMultiplier = item.SlowMultiplier
@@ -3950,7 +3976,9 @@ namespace DeadWalls
                 : default;
             bool continuousSiege = mobileMode && mobileConfig.ContinuousSiegeEnabled;
 
-            // Tum zombileri sil
+            // Pool-owned zombileri rezerve geri dondur; legacy/non-pool entity kalirsa sil.
+            if (_enemyPoolEntity != Entity.Null && _entityManager.Exists(_enemyPoolEntity))
+                EnemyPoolRuntimeUtility.ReturnAllActive(_entityManager, _enemyPoolEntity);
             var zombieQuery = _entityManager.CreateEntityQuery(typeof(ZombieTag));
             _entityManager.DestroyEntity(zombieQuery);
 

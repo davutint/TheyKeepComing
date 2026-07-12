@@ -2,6 +2,8 @@
 
 ## SimulationSystemGroup Sirasi
 
+`EnemyPoolInitializationSystem`, `InitializationSystemGroup` icinde Simulation baslamadan once catalog prewarm rezervini kurar.
+
 ```
 -5. ContinuousSiegeCycleSystem
 -4. DayNightPrepSystem
@@ -45,6 +47,7 @@ Presentation tarafinda `SpriteAnimationSystem` UV rect hesaplarini yapar.
 - Sistemlerin buyuk bolumu job schedule eder ve main thread'i bekletmez.
 - `DamageApplySystem` tek bilincli sync point'tir; attack damage queue drain etmek icin pending job'lari tamamlar.
 - `WaveSpawnSystem` frame basinda sequential calisir.
+- Rent/return normal akista enableable component state'i degistirir; structural instantiate yalniz pool batch genislemesinde olur.
 
 ## Sistem Notlari
 
@@ -57,11 +60,10 @@ Presentation tarafinda `SpriteAnimationSystem` UV rect hesaplarini yapar.
 
 ### ContinuousSiegeCycleSystem
 
-- Mobile continuous siege mode'da 60s `DAY / DUSK / NIGHT / DAWN` (22/8/22/8) cycle datasini yazar;
+- Mobile continuous siege mode'da 60s `DAY / DUSK / NIGHT / DAWN` (30/5/20/5) cycle datasini yazar;
   `SiegeDawnDuration=0` bake'lerde legacy 3-faz davranisa duser.
 - Her tamamlanan cycle'da `CycleIndex` artar; `wave.CurrentWave = CycleIndex + 1` yazilir ve
-  `MobileWaveUtility.ConfigureMobileWave` ile zombi stat/pacing yeniden hesaplanir (kutle eskalasyonu:
-  HP lineer `ZombieBaseHP*(1+(w-1)*ZombieHpGrowthPerCycle)`, ustel DEGIL).
+  `MobileWaveUtility.ConfigureMobileWave` quantity pacing'i yeniden hesaplar. Enemy HP/damage/speed catalog base degerinde sabit kalir.
 - `WaveStateData.WaveActive` degerini uyumluluk icin true tutar ve eski DayPrep dur-kalk akisinin tetiklenmesini engeller.
 - `SpawnIntensityMultiplier` (Dawn 0.15 dahil) ve `HordePressure01` degerlerini `WaveSpawnSystem` ve HUD icin uretir.
 - Stress mode'da calismaz.
@@ -78,7 +80,8 @@ Presentation tarafinda `SpriteAnimationSystem` UV rect hesaplarini yapar.
 - Yeni wave'i `DayNightPrepSystem` prep sayaci bitince otomatik baslatir.
 - Stress mode'da config'teki stress batch, interval ve max alive cap'i kullanilir.
 - Stress mode'da reward/bonus verilmez.
-- Spawn edilen zombilerde `ZombieSlow` disabled resetlenir.
+- Spawn `EnemyPoolRuntimeUtility.TryRent` kullanir; rezerv biterse definition `PoolExpandBatch` kadar genisler.
+- Rent edilen zombide slow, death timer, physics, tint ve animation transient state resetlenir.
 
 ### ResourceTickSystem
 
@@ -163,8 +166,9 @@ Presentation tarafinda `SpriteAnimationSystem` UV rect hesaplarini yapar.
 
 ### DamageCleanupSystem
 
-- Death timer biterse XP ekler ve zombi entity'sini siler.
+- Death timer biterse XP ekler ve zombi entity'sini pool rezervine dondurur.
 - Mobile normal mode'da kill reward'i `ResourceAccumulator` uzerine ekler.
+- Return entity'yi scale `0` ve disabled `ZombieTag` ile inactive yapar; ayni entity sonraki rent'te yeni generation alir.
 - Worker economy aktifse kill reward `WorkerEconomyRewardMultiplier` ile azaltilir.
 - Legacy mode'da XP threshold asilirsa `IsLevelUpPending` true olur.
 - Mobile castle mode'da XP threshold sadece progress olarak kalir; level-up pause yoktur.

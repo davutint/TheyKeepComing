@@ -22,4 +22,29 @@ namespace DeadWalls
         public int PoolPrewarm;
         public int PoolExpandBatch;
     }
+
+    public struct EnemyPoolRuntimeData : IComponentData
+    {
+        public byte Initialized;
+        public int ActiveEntryIndex;
+        public int PrewarmTarget;
+        public int ExpandBatch;
+        public int TotalCreated;
+        public int AvailableCount;
+        public int ActiveCount;
+        public int ExpansionCount;
+        public long TotalRentCount;
+        public long TotalReturnCount;
+    }
+
+    public struct EnemyPoolMember : IComponentData
+    {
+        public int CatalogEntryIndex;
+        public uint Generation;
+    }
+
+    public struct EnemyPoolAvailable : IBufferElementData
+    {
+        public Entity Entity;
+    }
 }

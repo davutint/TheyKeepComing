@@ -139,8 +139,9 @@ namespace DeadWalls
 
                         // Olum animasyonu suresi: 15 frame * FrameInterval
                         float deathDuration = DieFrameCount * anim.FrameInterval;
-                        ECB.AddComponent(sortKey, entity,
+                        ECB.SetComponent(sortKey, entity,
                             new DeathTimer { Value = deathDuration });
+                        ECB.SetComponentEnabled<DeathTimer>(sortKey, entity, true);
                         break;
                     }
                 }

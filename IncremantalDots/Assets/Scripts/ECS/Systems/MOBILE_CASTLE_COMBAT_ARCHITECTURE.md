@@ -52,6 +52,7 @@ Savunma sonucu için tek runtime owner `WallSegment`tir. Gate/Core component ve 
 
 - `MobileCastleCombatConfig`: kale merkezi, spawn radius, attack radius, wave/siege sayilari, spawn batch, zombie scale/speed, continuous siege tuning, reward tuning, worker economy tuning, event tuning, unlimited arrow flag'i ve stress test limitlerini tutar.
 - `EnemyCatalogRuntimeData` + `EnemyCatalogEntryData`: aktif enemy index'ini; prefab, base stats, scale, XP ve pool metadata'sini tutar. V1'de buffer tek kayittir.
+- `EnemyPoolRuntimeData` + `EnemyPoolAvailable`: prewarm/expand rezervini ve rent/return telemetry'sini tutar.
 - `ContinuousSiegeCycleData`: player-facing `DAY / DUSK / NIGHT` fazini, 60s cycle progress'ini, spawn intensity multiplier'i ve horde pressure degerini tutar.
 - `ContinuousSpawnBudgetData`: day tabanı ile phase multiplier'ını ayrı tutar; pending enemy backlog'u ve demanded/spawned runtime telemetry sayaçlarını taşır.
 - `WaveStateData.Phase`: mobile continuous modda uyumluluk icin `NightCombat` aktif tutulur. Eski DayPrep akisi component seviyesinde kalir ama `ContinuousSiegeCycleData.Enabled` true iken player-facing akisi yonetmez.
@@ -117,7 +118,7 @@ Mobile castle render sirasi shader degistirilerek degil, world z bandlariyla coz
 
 ### WaveSpawnSystem
 
-Continuous siege aktifken `WaveSpawnSystem`, wave clear kontrolüne girmez. `ContinuousSpawnBudgetUtility` günlük count/batch/interval tabanını phase multiplier'dan ayrı hesaplar. Alive cap doluysa geçen interval talebi `ContinuousSpawnBudgetData.PendingEnemies` içinde korunur; kapasite açılınca frame başına `MaxSpawnBatch` sınırıyla sahaya aktarılır. Spawn prefabı ve entity base statları aktif `EnemyCatalogEntryData` kaydından gelir; enemy tipine özel dal yoktur. İç tarafta `CurrentWave` cycle index olarak tutulur; `MobileWaveUtility.ConfigureMobileWave()` count ve base interval'i günceller, enemy HP/damage/speed'i sabit tutar. UI wave veya backlog sayısını player-facing olarak göstermez.
+Continuous siege aktifken `WaveSpawnSystem`, wave clear kontrolüne girmez. `ContinuousSpawnBudgetUtility` günlük count/batch/interval tabanını phase multiplier'dan ayrı hesaplar. Alive cap doluysa geçen interval talebi `ContinuousSpawnBudgetData.PendingEnemies` içinde korunur; kapasite açılınca frame başına `MaxSpawnBatch` sınırıyla sahaya aktarılır. Spawn prefabı ve entity base statları aktif `EnemyCatalogEntryData` kaydından gelir; entity `EnemyPoolRuntimeUtility.TryRent` ile alınır ve rezerv boşsa definition batch değeriyle genişler. Enemy tipine özel dal yoktur. İç tarafta `CurrentWave` cycle index olarak tutulur; `MobileWaveUtility.ConfigureMobileWave()` count ve base interval'i günceller, enemy HP/damage/speed'i sabit tutar. UI wave veya backlog sayısını player-facing olarak göstermez.
 
 Legacy mobile wave director akisi `ContinuousSiegeCycleData.Enabled` false yapilirsa hala calisabilir: opening/mid/final fazlari `ZombiesSpawned / ZombiesToSpawn` oranindan hesaplanir ve wave temizlenince DayPrep'e doner. Varsayilan NewGameScene akisi continuous siege'dir. Stress mode aciksa mobile config'teki stress batch/interval/cap kullanilir, reward verilmez ve continuous/legacy wave director fazlari calismaz.
 
@@ -199,7 +200,7 @@ Mobile castle mode'da XP level-up pause veya kart paneli tetiklemez. Oyun dongus
 
 Legacy level-up kart API'si eski akis icin kodda durabilir, ama `MobileCastleCombatConfig` varken `DamageCleanupSystem` XP threshold'u `IsLevelUpPending` yapmaz.
 
-Mobile normal mode'da `DamageCleanupSystem`, death timer biten zombiler icin kill reward'i `ResourceAccumulator` uzerine yazar. Worker economy aktifken kill reward `WorkerEconomyRewardMultiplier` ile azaltilir; ana gelir kaynagi worker allocation'dir. Continuous siege varsayilaninda wave clear bonus/player-facing clear akisi tetiklenmez, fakat cycle tamamlandikca population growth uygulanir. Stress mode'da reward verilmez.
+Mobile normal mode'da `DamageCleanupSystem`, death timer biten zombiler icin kill reward'i `ResourceAccumulator` uzerine yazar ve entity'yi pool rezervine dondurur. Worker economy aktifken kill reward `WorkerEconomyRewardMultiplier` ile azaltilir; ana gelir kaynagi worker allocation'dir. Continuous siege varsayilaninda wave clear bonus/player-facing clear akisi tetiklenmez, fakat cycle tamamlandikca population growth uygulanir. Stress mode'da reward verilmez.
 
 ## Castle Interior Economy
 
@@ -274,7 +275,7 @@ Tek Wall cani `CastleAuthoring` tarafindan bake edilen `WallSegment` verisinden 
 ## Bilerek Yapilmayanlar
 
 - Enemy variety yok; tek tip zombi kalir.
-- Enemy pool davranisi bu contract'ta yoktur; prewarm/expand metadata sonraki `DW-B-POOL` isi icin hazirdir.
+- Enemy pool prewarm/expand/rent/return aktiftir; 10k urun senaryosu ve profiling `DW-B-SCALE` isidir.
 - RTS-style manuel okcu kontrolu yok.
 - Nufus hard cap bu milestone'da okcu limitine baglanmaz.
 - Yeni coin yok; mevcut kaynak sistemi kullanilir.

@@ -35,6 +35,8 @@ namespace DeadWalls
                 {
                     Value = ZombieStateType.Moving
                 });
+                AddComponent(entity, new DeathTimer { Value = 0f });
+                SetComponentEnabled<DeathTimer>(entity, false);
                 AddComponent(entity, new ZombieSlow
                 {
                     Duration = 0f,

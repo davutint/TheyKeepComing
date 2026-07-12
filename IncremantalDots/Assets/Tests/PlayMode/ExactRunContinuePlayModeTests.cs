@@ -549,7 +549,8 @@ namespace DeadWalls.Tests
                 All = new[] { ComponentType.ReadOnly<ZombieTag>() },
                 None = new[] { ComponentType.ReadOnly<Prefab>() }
             });
-            entityManager.DestroyEntity(zombieQuery);
+            Entity poolEntity = entityManager.CreateEntityQuery(typeof(EnemyPoolRuntimeData)).GetSingletonEntity();
+            EnemyPoolRuntimeUtility.ReturnAllActive(entityManager, poolEntity);
 
             var config = entityManager.GetComponentData<MobileCastleCombatConfig>(configEntity);
             config.MaxAliveZombies = 1;
@@ -670,7 +671,7 @@ namespace DeadWalls.Tests
                 All = new[] { ComponentType.ReadOnly<ZombieTag>() },
                 None = new[] { ComponentType.ReadOnly<Prefab>() }
             });
-            entityManager.DestroyEntity(zombieQuery);
+            EnemyPoolRuntimeUtility.ReturnAllActive(entityManager, catalogEntity);
 
             var config = entityManager.GetComponentData<MobileCastleCombatConfig>(configEntity);
             config.MaxAliveZombies = 1;
@@ -707,6 +708,95 @@ namespace DeadWalls.Tests
             Assert.That(stats.MoveSpeed, Is.EqualTo(definition.BaseMoveSpeed));
             Assert.That(stats.XPReward, Is.EqualTo(definition.XPReward));
             Assert.That(transform.Scale, Is.EqualTo(definition.Scale));
+        }
+
+        [UnityTest]
+        public IEnumerator EnemyPool_DeathReturnsEntityAndRejectsStaleArrowGeneration()
+        {
+            var gameManager = GameManager.Instance;
+            bool runtimeReady = false;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                {
+                    runtimeReady = true;
+                    break;
+                }
+                yield return null;
+            }
+            Assert.That(runtimeReady, Is.True);
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            Entity poolEntity = entityManager.CreateEntityQuery(
+                typeof(EnemyPoolRuntimeData), typeof(EnemyPoolAvailable)).GetSingletonEntity();
+            Entity waveEntity = entityManager.CreateEntityQuery(typeof(WaveStateData)).GetSingletonEntity();
+            Entity configEntity = entityManager.CreateEntityQuery(
+                typeof(MobileCastleCombatConfig), typeof(ContinuousSpawnBudgetData)).GetSingletonEntity();
+
+            EnemyPoolRuntimeUtility.ReturnAllActive(entityManager, poolEntity);
+            var budget = entityManager.GetComponentData<ContinuousSpawnBudgetData>(configEntity);
+            budget.PendingEnemies = 0;
+            entityManager.SetComponentData(configEntity, budget);
+
+            var wave = entityManager.GetComponentData<WaveStateData>(waveEntity);
+            wave.ZombiesAlive = 1;
+            wave.SpawnTimer = 999f;
+            entityManager.SetComponentData(waveEntity, wave);
+
+            Assert.That(EnemyPoolRuntimeUtility.TryRent(entityManager, poolEntity, out Entity zombie), Is.True);
+            uint firstGeneration = entityManager.GetComponentData<EnemyPoolMember>(zombie).Generation;
+            entityManager.SetComponentData(zombie,
+                LocalTransform.FromPositionRotationScale(float3.zero, quaternion.identity, 1.4f));
+            entityManager.SetComponentData(zombie, new ZombieStats
+            {
+                MoveSpeed = 0.85f,
+                MaxHP = 20f,
+                CurrentHP = 0f,
+                AttackDamage = 5f,
+                AttackCooldown = 1f,
+                AttackTimer = 0f,
+                XPReward = 0
+            });
+            entityManager.SetComponentData(zombie, new ZombieState { Value = ZombieStateType.Dead });
+            entityManager.SetComponentData(zombie, new DeathTimer { Value = -1f });
+            entityManager.SetComponentEnabled<DeathTimer>(zombie, true);
+
+            Entity arrowPrefab = entityManager.GetComponentData<ArrowPrefabData>(
+                entityManager.CreateEntityQuery(typeof(ArrowPrefabData)).GetSingletonEntity()).ArrowPrefab;
+            Entity arrow = entityManager.Instantiate(arrowPrefab);
+            entityManager.SetComponentData(arrow, LocalTransform.FromPosition(new float3(-3f, 0f, 0f)));
+            entityManager.SetComponentData(arrow, new ArrowProjectile
+            {
+                Speed = 12f,
+                Damage = 1f,
+                Target = zombie,
+                TargetPoolGeneration = firstGeneration,
+                ArcherType = ArcherType.Basic,
+                SlowDuration = 0f,
+                SlowMultiplier = 1f
+            });
+
+            var poolBeforeReturn = entityManager.GetComponentData<EnemyPoolRuntimeData>(poolEntity);
+            yield return null;
+
+            Assert.That(entityManager.Exists(zombie), Is.True);
+            Assert.That(entityManager.IsComponentEnabled<ZombieTag>(zombie), Is.False);
+            Assert.That(entityManager.IsComponentEnabled<DeathTimer>(zombie), Is.False);
+            var poolAfterReturn = entityManager.GetComponentData<EnemyPoolRuntimeData>(poolEntity);
+            Assert.That(poolAfterReturn.TotalCreated, Is.EqualTo(poolBeforeReturn.TotalCreated));
+            Assert.That(poolAfterReturn.TotalReturnCount, Is.EqualTo(poolBeforeReturn.TotalReturnCount + 1));
+            Assert.That(entityManager.GetComponentData<WaveStateData>(waveEntity).ZombiesAlive, Is.Zero);
+
+            Assert.That(EnemyPoolRuntimeUtility.TryRent(entityManager, poolEntity, out Entity reused), Is.True);
+            Assert.That(reused, Is.EqualTo(zombie));
+            uint secondGeneration = entityManager.GetComponentData<EnemyPoolMember>(reused).Generation;
+            Assert.That(secondGeneration, Is.Not.EqualTo(firstGeneration));
+            entityManager.SetComponentData(reused,
+                LocalTransform.FromPositionRotationScale(new float3(3f, 0f, 0f), quaternion.identity, 1.4f));
+
+            yield return null;
+            Assert.That(entityManager.Exists(arrow), Is.False);
+            EnemyPoolRuntimeUtility.Return(entityManager, poolEntity, reused);
         }
     }
 }

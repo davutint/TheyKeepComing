@@ -28,6 +28,7 @@ namespace DeadWalls
         public float Speed;
         public float Damage;
         public Entity Target;
+        public uint TargetPoolGeneration;
         public ArcherType ArcherType;
         public float SlowDuration;
         public float SlowMultiplier;

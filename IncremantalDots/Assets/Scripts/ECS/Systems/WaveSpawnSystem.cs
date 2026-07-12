@@ -15,10 +15,10 @@ namespace DeadWalls
         {
             state.RequireForUpdate<WaveStateData>();
             state.RequireForUpdate<EnemyCatalogRuntimeData>();
+            state.RequireForUpdate<EnemyPoolRuntimeData>();
             state.RequireForUpdate<GameStateData>();
         }
 
-        [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             var gameState = SystemAPI.GetSingleton<GameStateData>();
@@ -150,18 +150,19 @@ namespace DeadWalls
             }
         }
 
-        private void SpawnZombieBatch(ref SystemState state, ref WaveStateData wave, int count,
+        private int SpawnZombieBatch(ref SystemState state, ref WaveStateData wave, int count,
             bool mobileMode, MobileCastleCombatConfig mobileConfig)
         {
             var catalog = SystemAPI.GetSingleton<EnemyCatalogRuntimeData>();
             var enemyEntries = SystemAPI.GetSingletonBuffer<EnemyCatalogEntryData>(true);
             int activeEnemyIndex = EnemyCatalogRuntimeUtility.ResolveActiveIndex(catalog, enemyEntries.Length);
             if (activeEnemyIndex < 0)
-                return;
+                return 0;
 
             EnemyCatalogEntryData enemy = enemyEntries[activeEnemyIndex];
-            var ecb = new EntityCommandBuffer(Unity.Collections.Allocator.Temp);
+            Entity poolEntity = SystemAPI.GetSingletonEntity<EnemyPoolRuntimeData>();
             var random = new Random(wave.SpawnRandomState != 0u ? wave.SpawnRandomState : 42u);
+            int spawned = 0;
 
             // Prefab'dan scale degerini oku — Inspector'da ayarlanan deger kullanilir
             float prefabScale = state.EntityManager
@@ -170,7 +171,8 @@ namespace DeadWalls
 
             for (int i = 0; i < count; i++)
             {
-                var zombie = ecb.Instantiate(enemy.Prefab);
+                if (!EnemyPoolRuntimeUtility.TryRent(state.EntityManager, poolEntity, out Entity zombie))
+                    break;
 
                 float spawnX;
                 float spawnY;
@@ -204,15 +206,15 @@ namespace DeadWalls
                     quaternion.identity,
                     spawnScale
                 );
-                ecb.SetComponent(zombie, transform);
-                ecb.SetComponent(zombie, new ZombieState { Value = ZombieStateType.Moving });
-                ecb.SetComponent(zombie, new ZombieSlow
+                state.EntityManager.SetComponentData(zombie, transform);
+                state.EntityManager.SetComponentData(zombie, new ZombieState { Value = ZombieStateType.Moving });
+                state.EntityManager.SetComponentData(zombie, new ZombieSlow
                 {
                     Duration = 0f,
                     SpeedMultiplier = 1f
                 });
-                ecb.SetComponentEnabled<ZombieSlow>(zombie, false);
-                ecb.SetComponent(zombie, new ZombieStats
+                state.EntityManager.SetComponentEnabled<ZombieSlow>(zombie, false);
+                state.EntityManager.SetComponentData(zombie, new ZombieStats
                 {
                     MoveSpeed = mobileMode ? enemy.BaseMoveSpeed : wave.ZombieSpeed,
                     MaxHP = mobileMode ? enemy.BaseHP : wave.ZombieHP,
@@ -225,12 +227,12 @@ namespace DeadWalls
 
                 wave.ZombiesSpawned++;
                 wave.ZombiesAlive++;
+                spawned++;
             }
 
             wave.SpawnRandomState = random.state;
 
-            ecb.Playback(state.EntityManager);
-            ecb.Dispose();
+            return spawned;
         }
 
         private void HandleContinuousSiegeSpawn(ref SystemState state, ref WaveStateData wave,
@@ -312,11 +314,11 @@ namespace DeadWalls
             if (spawnCount <= 0)
                 return;
 
-            SpawnZombieBatch(ref state, ref wave, spawnCount, true, mobileConfig);
-            budget.PendingEnemies -= spawnCount;
-            budget.LastSpawnedEnemies = spawnCount;
+            int spawned = SpawnZombieBatch(ref state, ref wave, spawnCount, true, mobileConfig);
+            budget.PendingEnemies -= spawned;
+            budget.LastSpawnedEnemies = spawned;
             budget.TotalSpawnedEnemies = ContinuousSpawnBudgetUtility.AddTelemetry(
-                budget.TotalSpawnedEnemies, spawnCount);
+                budget.TotalSpawnedEnemies, spawned);
         }
 
         private static WaveClearRewardData CalculateWaveClearBonus(

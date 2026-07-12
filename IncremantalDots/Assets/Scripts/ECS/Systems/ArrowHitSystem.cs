@@ -27,6 +27,8 @@ namespace DeadWalls
                 StatsLookup = SystemAPI.GetComponentLookup<ZombieStats>(false),
                 SlowLookup = SystemAPI.GetComponentLookup<ZombieSlow>(false),
                 TransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true),
+                ZombieTagLookup = SystemAPI.GetComponentLookup<ZombieTag>(true),
+                PoolMemberLookup = SystemAPI.GetComponentLookup<EnemyPoolMember>(true),
                 ECB = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>()
                     .CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter()
             }.ScheduleParallel();
@@ -43,6 +45,8 @@ namespace DeadWalls
             public ComponentLookup<ZombieSlow> SlowLookup;
 
             [ReadOnly] public ComponentLookup<LocalTransform> TransformLookup;
+            [ReadOnly] public ComponentLookup<ZombieTag> ZombieTagLookup;
+            [ReadOnly] public ComponentLookup<EnemyPoolMember> PoolMemberLookup;
 
             public EntityCommandBuffer.ParallelWriter ECB;
 
@@ -51,7 +55,7 @@ namespace DeadWalls
             {
                 var target = arrow.Target;
 
-                if (target == Entity.Null || !TransformLookup.HasComponent(target))
+                if (!IsValidTarget(arrow))
                 {
                     ECB.DestroyEntity(sortKey, entity);
                     return;
@@ -108,6 +112,18 @@ namespace DeadWalls
 
                     ECB.DestroyEntity(sortKey, entity);
                 }
+            }
+
+            private bool IsValidTarget(ArrowProjectile arrow)
+            {
+                if (arrow.Target == Entity.Null
+                    || !TransformLookup.HasComponent(arrow.Target)
+                    || !ZombieTagLookup.HasComponent(arrow.Target)
+                    || !ZombieTagLookup.IsComponentEnabled(arrow.Target))
+                    return false;
+
+                return !PoolMemberLookup.HasComponent(arrow.Target)
+                    || PoolMemberLookup[arrow.Target].Generation == arrow.TargetPoolGeneration;
             }
         }
     }

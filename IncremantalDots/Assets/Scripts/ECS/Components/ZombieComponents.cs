@@ -2,7 +2,7 @@ using Unity.Entities;
 
 namespace DeadWalls
 {
-    public struct ZombieTag : IComponentData { }
+    public struct ZombieTag : IComponentData, IEnableableComponent { }
 
     public struct ZombieStats : IComponentData
     {
@@ -39,9 +39,9 @@ namespace DeadWalls
     }
 
     /// <summary>
-    /// Olum animasyonu suresi. 0'a dusunce entity silinir.
+    /// Olum animasyonu suresi. Enableable'dir; 0'a dusunce entity pool'a doner.
     /// </summary>
-    public struct DeathTimer : IComponentData
+    public struct DeathTimer : IComponentData, IEnableableComponent
     {
         public float Value;
     }

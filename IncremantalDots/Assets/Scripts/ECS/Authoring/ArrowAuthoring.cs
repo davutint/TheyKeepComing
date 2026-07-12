@@ -25,6 +25,7 @@ namespace DeadWalls
                     Speed = authoring.Speed,
                     Damage = authoring.Damage,
                     Target = Entity.Null,
+                    TargetPoolGeneration = 0u,
                     ArcherType = authoring.ArcherType,
                     SlowDuration = authoring.SlowDuration,
                     SlowMultiplier = authoring.SlowMultiplier
