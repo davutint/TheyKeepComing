@@ -2,7 +2,7 @@
 
 ## Tuning sahipliği
 
-Baseline tuning tek bir precedence hattından geçer: difficulty alanları `DifficultyProfileSO`, diğer alanlar aktif SubScene `MobileCastleCombatAuthoring`, birleştirme kodu `MobileCastleTuningResolver`, runtime çıktı `MobileCastleCombatConfig`. Tech/meta/Council değişimleri baseline üzerine effective aggregate'dir. Ayrıntılı sözleşme `Assets/Scripts/ECS/Authoring/MOBILE_CASTLE_TUNING_ARCHITECTURE.md` dosyasındadır.
+Baseline tuning tek bir precedence hattından geçer: quantity/difficulty alanları `DifficultyProfileSO`, enemy prefab ve base statları aktif `EnemyDefinitionSO`, diğer alanlar aktif SubScene `MobileCastleCombatAuthoring`, birleştirme kodu `MobileCastleTuningResolver` + Baker, runtime çıktı `MobileCastleCombatConfig`. Tech/meta/Council değişimleri baseline üzerine effective aggregate'dir. Ayrıntılı sözleşme `Assets/Scripts/ECS/Authoring/MOBILE_CASTLE_TUNING_ARCHITECTURE.md` dosyasındadır.
 
 ## Amac
 
@@ -51,6 +51,7 @@ zombie HP/hız/slow state'ini değiştiremediğini kanıtlar.
 Savunma sonucu için tek runtime owner `WallSegment`tir. Gate/Core component ve HUD referansları yalnız legacy serialization uyumluluğudur; ayrıntılı sınır `SINGLE_WALL_DEFENSE_ARCHITECTURE.md` dosyasındadır.
 
 - `MobileCastleCombatConfig`: kale merkezi, spawn radius, attack radius, wave/siege sayilari, spawn batch, zombie scale/speed, continuous siege tuning, reward tuning, worker economy tuning, event tuning, unlimited arrow flag'i ve stress test limitlerini tutar.
+- `EnemyCatalogRuntimeData` + `EnemyCatalogEntryData`: aktif enemy index'ini; prefab, base stats, scale, XP ve pool metadata'sini tutar. V1'de buffer tek kayittir.
 - `ContinuousSiegeCycleData`: player-facing `DAY / DUSK / NIGHT` fazini, 60s cycle progress'ini, spawn intensity multiplier'i ve horde pressure degerini tutar.
 - `ContinuousSpawnBudgetData`: day tabanı ile phase multiplier'ını ayrı tutar; pending enemy backlog'u ve demanded/spawned runtime telemetry sayaçlarını taşır.
 - `WaveStateData.Phase`: mobile continuous modda uyumluluk icin `NightCombat` aktif tutulur. Eski DayPrep akisi component seviyesinde kalir ama `ContinuousSiegeCycleData.Enabled` true iken player-facing akisi yonetmez.
@@ -116,7 +117,7 @@ Mobile castle render sirasi shader degistirilerek degil, world z bandlariyla coz
 
 ### WaveSpawnSystem
 
-Continuous siege aktifken `WaveSpawnSystem`, wave clear kontrolüne girmez. `ContinuousSpawnBudgetUtility` günlük count/batch/interval tabanını phase multiplier'dan ayrı hesaplar. Alive cap doluysa geçen interval talebi `ContinuousSpawnBudgetData.PendingEnemies` içinde korunur; kapasite açılınca frame başına `MaxSpawnBatch` sınırıyla sahaya aktarılır. İç tarafta `CurrentWave` cycle index olarak tutulur; `MobileWaveUtility.ConfigureMobileWave()` count ve base interval'i günceller, enemy HP/damage/speed'i sabit tutar. UI wave veya backlog sayısını player-facing olarak göstermez.
+Continuous siege aktifken `WaveSpawnSystem`, wave clear kontrolüne girmez. `ContinuousSpawnBudgetUtility` günlük count/batch/interval tabanını phase multiplier'dan ayrı hesaplar. Alive cap doluysa geçen interval talebi `ContinuousSpawnBudgetData.PendingEnemies` içinde korunur; kapasite açılınca frame başına `MaxSpawnBatch` sınırıyla sahaya aktarılır. Spawn prefabı ve entity base statları aktif `EnemyCatalogEntryData` kaydından gelir; enemy tipine özel dal yoktur. İç tarafta `CurrentWave` cycle index olarak tutulur; `MobileWaveUtility.ConfigureMobileWave()` count ve base interval'i günceller, enemy HP/damage/speed'i sabit tutar. UI wave veya backlog sayısını player-facing olarak göstermez.
 
 Legacy mobile wave director akisi `ContinuousSiegeCycleData.Enabled` false yapilirsa hala calisabilir: opening/mid/final fazlari `ZombiesSpawned / ZombiesToSpawn` oranindan hesaplanir ve wave temizlenince DayPrep'e doner. Varsayilan NewGameScene akisi continuous siege'dir. Stress mode aciksa mobile config'teki stress batch/interval/cap kullanilir, reward verilmez ve continuous/legacy wave director fazlari calismaz.
 
@@ -273,6 +274,7 @@ Tek Wall cani `CastleAuthoring` tarafindan bake edilen `WallSegment` verisinden 
 ## Bilerek Yapilmayanlar
 
 - Enemy variety yok; tek tip zombi kalir.
+- Enemy pool davranisi bu contract'ta yoktur; prewarm/expand metadata sonraki `DW-B-POOL` isi icin hazirdir.
 - RTS-style manuel okcu kontrolu yok.
 - Nufus hard cap bu milestone'da okcu limitine baglanmaz.
 - Yeni coin yok; mevcut kaynak sistemi kullanilir.

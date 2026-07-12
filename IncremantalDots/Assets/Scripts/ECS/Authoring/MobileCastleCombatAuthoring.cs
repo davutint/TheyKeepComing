@@ -10,6 +10,9 @@ namespace DeadWalls
         [Tooltip("Zorlugun tek dogruluk kaynagi. Bos birakilirsa bu component'teki degerler kullanilir (geriye uyumlu). Duzenlemek icin: Window > DeadWalls > Difficulty Tuner.")]
         public DifficultyProfileSO Profile;
 
+        [Header("Enemy Catalog (base prefab/stat owner)")]
+        public EnemyCatalogSO EnemyCatalog;
+
         public Vector2 CastleCenter = Vector2.zero;
         public float SpawnRadius = 11f;
         public float AttackRadius = 1.35f;
@@ -155,6 +158,13 @@ namespace DeadWalls
                 var profile = authoring.Profile;
                 if (profile != null)
                     DependsOn(profile);
+                var activeEnemyDefinition = authoring.EnemyCatalog != null
+                    ? authoring.EnemyCatalog.GetActiveDefinition()
+                    : null;
+                if (authoring.EnemyCatalog != null)
+                    DependsOn(authoring.EnemyCatalog);
+                if (activeEnemyDefinition != null)
+                    DependsOn(activeEnemyDefinition);
 
                 var config = new MobileCastleCombatConfig
                 {
@@ -247,6 +257,7 @@ namespace DeadWalls
                     EconomyEventCooldownWaves = math.max(0, authoring.EconomyEventCooldownWaves)
                 };
                 MobileCastleTuningResolver.ApplyDifficultyProfile(ref config, profile);
+                EnemyCatalogRuntimeUtility.ApplyBaseStats(ref config, activeEnemyDefinition);
                 MoatDormancyRules.ApplyV1(ref config);
                 AddComponent(entity, config);
 

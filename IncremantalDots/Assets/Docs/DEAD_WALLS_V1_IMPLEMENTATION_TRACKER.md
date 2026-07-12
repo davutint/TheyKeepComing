@@ -5,7 +5,7 @@
 > **Tracker sürümü:** 2.0  
 > **Son tam kapsam denetimi:** 2026-07-12  
 > **Aktif paket:** Package B - Continuous Horde
-> **Aktif iş:** `DW-B-ENEMY` - Single Enemy Catalog Contract
+> **Aktif iş:** `DW-B-POOL` - Expandable Enemy Pool
 
 ---
 
@@ -145,7 +145,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Meta | Ayrı JSON ve Game Over shop var; `StartingTechLevel` aktif | Kısmi uyum |
 | HUD | CyclePanel, DAY/DUSK/NIGHT ve Horde Pressure mevcut; tek Wall runtime gizleme var | Package I polish gerekli |
 | Tutorial | Aktif tutorial/onboarding sistemi bulunmadı | Package I eksik |
-| Testler | V1 contract testleri EditMode `30/30`, PlayMode `10/10` geçiyor | Kapsam büyüyor |
+| Testler | V1 contract testleri EditMode `33/33`, PlayMode `11/11` geçiyor | Kapsam büyüyor |
 | Telemetry | Spawn budget demanded/spawned/backlog telemetry mevcut; tam Blueprint event owner'ı eksik | Kısmi |
 
 ---
@@ -315,12 +315,21 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [x] Setup tool'un dormant Moat içeriğini yeniden seed/merge etmesi engellendi.
 - [x] Stale `0.05 slow + 100000 DPS` değerlerinin zombie speed/HP/slow state'ini değiştiremediği runtime test edildi.
 
-### `DW-B-ENEMY` - Şu anki tek aktif iş
+### `DW-B-ENEMY` - Tamamlandı: Single Enemy Catalog Contract
 
-- [ ] `EnemyDefinition` veri sözleşmesini oluştur: id, prefab, base stats ve pool metadata.
-- [ ] V1 active enemy catalog'ını yalnız mevcut tek zombie prefab ile seed et.
-- [ ] `WaveSpawnSystem` prefab/stat kaynağını catalog contract'ına bağla.
-- [ ] Spawn/UI kodunda enemy-type özel dallanma oluşmasını engelleyen validation testleri ekle.
+- [x] `EnemyDefinition` veri sözleşmesini oluştur: id, prefab, base stats ve pool metadata.
+- [x] V1 active enemy catalog'ını yalnız mevcut tek zombie prefab ile seed et.
+- [x] `WaveSpawnSystem` prefab/stat kaynağını catalog contract'ına bağla.
+- [x] Spawn/UI kodunda enemy-type özel dallanma oluşmasını engelleyen validation testleri ekle.
+
+### `DW-B-POOL` - Şu anki tek aktif iş
+
+- [ ] Catalog `PoolPrewarm` metadata'sına göre inactive enemy entity rezervi oluştur.
+- [ ] Spawn talebini instantiate yerine pool rent'e bağla; rezerv biterse `PoolExpandBatch` kadar genişlet.
+- [ ] Ölüm cleanup'ını `DestroyEntity` yerine deterministik pool return akışına çevir.
+- [ ] Pool return sırasında target/projectile referansları ile zombie state/component verilerini güvenli sıfırla.
+- [ ] Exact Continue snapshot ve backlog davranışını pool kapasitesinden bağımsız tut.
+- [ ] Prewarm, expand, rent, return ve yoğun death churn için EditMode/PlayMode kanıtı ekle.
 
 ### Mevcut oyun ile karşılaştırma
 
@@ -331,7 +340,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Spawn hiçbir fazda sıfır değil | Dört faz runtime testte pozitif intensity üretiyor | `[x]` |
 | Enemy stats sabit | HP, damage ve speed bütün cycle'larda base değerde | `[x]` |
 | Quantity-only difficulty | Count/batch/interval büyüyor; stat growth utility seviyesinde yok sayılıyor | `[x]` |
-| Tek enemy prefab | Aktif çıkış tek zombie prefab üzerinden | `[~]` Catalog contract yok |
+| Tek enemy prefab | `EnemyCatalog.asset` yalnız `zombie_basic` tanımını taşır; prefab ve base statlar aynı kayıttan spawn edilir | `[x]` |
 | 10k expandable pool | Active cap 900; death `DestroyEntity` | `[!]` |
 | Backlog kaybolmaz | Explicit saved budget state cap altında talep biriktiriyor ve kapasitede kontrollü boşaltıyor | `[x]` |
 | Special night yok | SpecialNight schema dormant; runtime multiplier/flag/warning üretemiyor | `[x]` |
@@ -347,8 +356,8 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [x] Dawn yoğunluğunu düşürürken yeni gün tabanının önceki güne geri dönmemesini sağla.
 - [x] Blood Moon/SpecialNights active bağlantısını kaldır; dormant kalabilir.
 - [x] Aktif `MoatSystem` combat etkisini V1 core loop'tan ayır; kod/content dormant kalabilir.
-- [ ] `EnemyDefinition` ve tek kayıtlı enemy catalog oluştur.
-- [ ] Enemy type özel dalları spawn/UI koduna eklemeden content genişleme sınırı kur.
+- [x] `EnemyDefinition` ve tek kayıtlı enemy catalog oluştur.
+- [x] Enemy type özel dalları spawn/UI koduna eklemeden content genişleme sınırı kur.
 - [x] Explicit spawn backlog state/policy kur ve save/telemetry'ye aç.
 - [ ] Enemy pool'u küçük prewarm + ihtiyaçla genişleme şeklinde kur.
 - [ ] Ölümde entity destroy yerine pool return uygula.
@@ -360,7 +369,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [x] Day 1 ve ileri günlerde enemy HP/damage/speed aynıdır.
 - [x] Gün baskısı yalnız count/budget/flow ile artar.
 - [x] Cap doluyken talep backlog'a gider ve boşlukta sahaya çıkar.
-- [ ] Tek prefab catalog üzerinden çalışır.
+- [x] Tek prefab catalog üzerinden çalışır.
 - [ ] Death churn pool ile yönetilir.
 
 ---
@@ -809,7 +818,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Alan | Mevcut owner | Hedef sorumluluk |
 |---|---|---|
 | Cycle/spawn | `ContinuousSiegeCycleSystem`, `WaveSpawnSystem` | 60 sn fixed phases, quantity-only, backlog |
-| Enemy data | Zombie prefab/authoring | `EnemyDefinition` + catalog + pool |
+| Enemy data | `EnemyDefinitionSO` + tek kayıtlı `EnemyCatalogSO`; pool metadata bake ediliyor | Expandable runtime pool |
 | Workers | `MobilePopulationEconomySystem`, GameManager worker visuals | Target ratios + caps + representative density |
 | Archers | `GameManager`, `ArcherShootSystem` | Common 1000 cap + scalable target load |
 | Placement | `MobileCastleArcherTilePlacement` | 40x25 stable local points + version |
@@ -820,7 +829,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 ### Oluşturulacak/uyarlanacak contract'lar
 
-- [ ] `EnemyDefinition`: id, prefab, base stats, pool prewarm/expand, spawn weight.
+- [x] `EnemyDefinition`: id, prefab, base stats, pool prewarm/expand, spawn weight.
 - [ ] `RunDifficultyProfile`: BaseSpawn curve, phase multipliers, active cap, backlog policy.
 - [ ] `HeartNodeDefinition`: tags, effects, rarity, depth, repeatable, cost growth, conflicts.
 - [ ] `GeneratedRunGraph`: seed/version, node ids, edges, hidden/revealed, levels, locks.
@@ -891,11 +900,12 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 | Alan | Test | Beklenen | Durum |
 |---|---|---|---|
-| Cycle | 60 sn full loop | 30/5/20/5; kesintisiz spawn | `[ ]` |
-| Horde | Active cap dolu | Talep backlog'a gider | `[ ]` |
-| Horde | Day 1 vs ileri gün stat | HP/damage/speed aynı | `[ ]` |
-| Wall | Night normal repair | Kapalı; Stone harcanmaz | `[ ]` |
-| Wall | HP 0 + same-frame repair | Game Over kazanır | `[ ]` |
+| Cycle | 60 sn full loop | 30/5/20/5; kesintisiz spawn | `[x]` |
+| Horde | Active cap dolu | Talep backlog'a gider | `[x]` |
+| Horde | Day 1 vs ileri gün stat | HP/damage/speed aynı | `[x]` |
+| Wall | Night normal repair | Kapalı; Stone harcanmaz | `[x]` |
+| Wall | HP 0 + same-frame repair | Game Over kazanır | `[x]` |
+| Enemy catalog | V1 runtime bake + gerçek spawn | Tek `zombie_basic`; prefab/stat/scale tanımla eşleşir | `[x]` |
 | Population | Food yetersiz dawn | Mevcut pop korunur; arrival sınırlı | `[ ]` |
 | Ammo | Arrow 0 / refill | Ateş durur / anında başlar | `[ ]` |
 | Archers | 1.001. purchase | Reddedilir; harcama yok | `[ ]` |
@@ -914,9 +924,9 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 ### Mevcut test envanteri
 
-- `[~]` `Assets/Tests/EditMode/SingleWallDefenseRulesTests.cs` - keşfedildi, bu tracker turunda çalıştırılmadı.
-- `[~]` `Assets/Tests/EditMode/CouncilComposerTests.cs` - mevcut composer testleri; V1 schedule/guardrail kapsamı değil.
-- `[!]` PlayMode test klasörü/senaryoları bulunmadı.
+- `[x]` EditMode: `33/33`; contract, save, tuning, cycle, quantity-only, backlog, Moat isolation ve enemy catalog kapsamı.
+- `[x]` PlayMode: `11/11`; gerçek `NewGameScene` bake/runtime, exact Continue, Wall, cycle, backlog, Moat ve catalog spawn kapsamı.
+- `[~]` Council schedule/guardrail, pool churn ve 1k x 10k ürün senaryoları ilgili paketleri bekliyor.
 
 ---
 
@@ -1007,11 +1017,11 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 |---|---|
 | `NewGameScene.unity` + `MobileCastleCombatSubScene.unity` | Kamera, HUD, active authoring, cycle ve combat values |
 | `MobileCastleHudRoot` live components | CyclePanel, HordePressure, Gate/Core bindings, drawers, upgrades |
-| `MobileCastleCombatAuthoring.cs` + `DefaultDifficulty.asset` | 22/8/22/8, stats growth, 900 cap, Blood Moon |
+| `MobileCastleCombatAuthoring.cs` + `DefaultDifficulty.asset` + `BasicZombie.asset` | 30/5/20/5, quantity curves, 900 cap; enemy base statları catalog-owned |
 | `GameManager.cs` | Save/restore, repair, archer buy/upgrade, Council, Fireball, meta bridge |
 | `RunPersistence.cs` | Dawn checkpoint schema v2 ve eksik exact state |
 | `ContinuousSiegeCycleSystem.cs` | Phase/intensity ve Blood Moon application |
-| `WaveSpawnSystem.cs` + `MobileWaveUtility.cs` | Spawn cap, stat growth ve entity instantiate |
+| `WaveSpawnSystem.cs` + `EnemyCatalogSO` + `EnemyDefinitionSO` | Tek catalog prefab/stat spawnı, cap/backlog ve entity instantiate; pool pending |
 | `DamageCleanupSystem.cs` | Enemy death'te DestroyEntity |
 | `ResourceTickSystem.cs` + `PopulationTickSystem.cs` | Passive consumption |
 | `MobilePopulationEconomySystem.cs` | Bedelsiz population growth ve auto-capacity |
@@ -1022,7 +1032,7 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | `CouncilComposer.cs` + `CouncilEventUI.cs` | Curated deterministic card infrastructure |
 | `MetaProgression.cs` + `MetaUpgradeSO.cs` | Separate meta save, current reward/effects |
 | `CombatFeedbackBridge.cs` | VFX/audio pools ve rate limiting altyapısı |
-| `Assets/Tests/EditMode` | Mevcut iki test alanı |
+| `Assets/Tests/EditMode` + `Assets/Tests/PlayMode` | V1 contract ve gerçek scene/runtime regression testleri |
 
 ---
 
@@ -1055,3 +1065,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-12 | `DW-B-SPECIAL` special nights removal | Blood Moon seed, multiplier, flag restore ve runtime warning zinciri V1'de dormant hale getirildi | Unity compile: 0 error; EditMode 25/25; PlayMode 8/8 |
 | 2026-07-12 | `DW-B-FLOW` spawn budget & backlog | Day tabanı/phase multiplier ayrıldı; cap altındaki her interval explicit saved backlog'a dönüştü ve kontrollü drain edildi | Unity compile: 0 error; EditMode 28/28; PlayMode 9/9 |
 | 2026-07-12 | `DW-B-MOAT` dormant moat isolation | Moat slow/damage, tech ve meta yolları V1 core loop'tan ayrıldı; legacy content silinmeden catalog dışında ve runtime-neutral tutuldu | Unity compile: 0 error; EditMode 30/30; PlayMode 10/10 |
+| 2026-07-12 | `DW-B-ENEMY` single enemy catalog contract | `zombie_basic` için tek catalog/definition owner kuruldu; prefab, base stat, XP ve pool metadata bake edilip type branch olmadan gerçek spawn'a bağlandı | Unity compile: 0 error; EditMode 33/33; PlayMode 11/11 |

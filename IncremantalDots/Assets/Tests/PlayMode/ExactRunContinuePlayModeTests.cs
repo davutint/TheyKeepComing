@@ -279,6 +279,21 @@ namespace DeadWalls.Tests
             Assert.That(samples.Length, Is.EqualTo(60));
             Assert.That(samples[0].NightIntensityMult, Is.EqualTo(0.5f));
             Assert.That(samples[4].BloodMoonIntensityMult, Is.EqualTo(1f));
+
+            Entity enemyCatalogEntity = entityManager.CreateEntityQuery(
+                typeof(EnemyCatalogRuntimeData), typeof(EnemyCatalogEntryData)).GetSingletonEntity();
+            var enemyCatalog = entityManager.GetComponentData<EnemyCatalogRuntimeData>(enemyCatalogEntity);
+            var enemyEntries = entityManager.GetBuffer<EnemyCatalogEntryData>(enemyCatalogEntity);
+            Assert.That(enemyCatalog.EntryCount, Is.EqualTo(1));
+            Assert.That(enemyCatalog.ActiveEntryIndex, Is.Zero);
+            Assert.That(enemyEntries.Length, Is.EqualTo(1));
+            Assert.That(enemyEntries[0].Id.ToString(), Is.EqualTo("zombie_basic"));
+            Assert.That(config.ZombieBaseHP, Is.EqualTo(enemyEntries[0].BaseHP));
+            Assert.That(config.ZombieBaseDamage, Is.EqualTo(enemyEntries[0].BaseDamage));
+            Assert.That(config.BaseZombieSpeed, Is.EqualTo(enemyEntries[0].BaseMoveSpeed));
+            Assert.That(config.ZombieScale, Is.EqualTo(enemyEntries[0].Scale));
+            Assert.That(entityManager.GetComponentData<ZombiePrefabData>(enemyCatalogEntity).ZombiePrefab,
+                Is.EqualTo(enemyEntries[0].Prefab));
         }
 
         [UnityTest]
@@ -625,6 +640,73 @@ namespace DeadWalls.Tests
             Assert.That(stats.CurrentHP, Is.EqualTo(100f));
             Assert.That(stats.MoveSpeed, Is.EqualTo(3f));
             Assert.That(entityManager.IsComponentEnabled<ZombieSlow>(zombie), Is.False);
+        }
+
+        [UnityTest]
+        public IEnumerator EnemyCatalog_SpawnsRegisteredPrefabWithDefinitionStats()
+        {
+            var gameManager = GameManager.Instance;
+            bool runtimeReady = false;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                {
+                    runtimeReady = true;
+                    break;
+                }
+                yield return null;
+            }
+            Assert.That(runtimeReady, Is.True);
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            Entity catalogEntity = entityManager.CreateEntityQuery(
+                typeof(EnemyCatalogRuntimeData), typeof(EnemyCatalogEntryData)).GetSingletonEntity();
+            Entity configEntity = entityManager.CreateEntityQuery(
+                typeof(MobileCastleCombatConfig), typeof(ContinuousSpawnBudgetData)).GetSingletonEntity();
+            Entity waveEntity = entityManager.CreateEntityQuery(typeof(WaveStateData)).GetSingletonEntity();
+
+            var zombieQuery = entityManager.CreateEntityQuery(new EntityQueryDesc
+            {
+                All = new[] { ComponentType.ReadOnly<ZombieTag>() },
+                None = new[] { ComponentType.ReadOnly<Prefab>() }
+            });
+            entityManager.DestroyEntity(zombieQuery);
+
+            var config = entityManager.GetComponentData<MobileCastleCombatConfig>(configEntity);
+            config.MaxAliveZombies = 1;
+            entityManager.SetComponentData(configEntity, config);
+
+            var budget = entityManager.GetComponentData<ContinuousSpawnBudgetData>(configEntity);
+            budget.PendingEnemies = 1;
+            budget.TotalDemandedEnemies = 1;
+            budget.TotalSpawnedEnemies = 0;
+            entityManager.SetComponentData(configEntity, budget);
+
+            var wave = entityManager.GetComponentData<WaveStateData>(waveEntity);
+            wave.ZombiesAlive = 0;
+            wave.SpawnTimer = 999f;
+            entityManager.SetComponentData(waveEntity, wave);
+
+            yield return null;
+
+            using var zombies = zombieQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
+            Assert.That(zombies.Length, Is.EqualTo(1));
+
+            var runtimeCatalog = entityManager.GetComponentData<EnemyCatalogRuntimeData>(catalogEntity);
+            var entries = entityManager.GetBuffer<EnemyCatalogEntryData>(catalogEntity);
+            int activeIndex = EnemyCatalogRuntimeUtility.ResolveActiveIndex(runtimeCatalog, entries.Length);
+            var definition = entries[activeIndex];
+            Entity zombie = zombies[0];
+            var stats = entityManager.GetComponentData<ZombieStats>(zombie);
+            var transform = entityManager.GetComponentData<LocalTransform>(zombie);
+
+            Assert.That(definition.Id.ToString(), Is.EqualTo("zombie_basic"));
+            Assert.That(stats.MaxHP, Is.EqualTo(definition.BaseHP));
+            Assert.That(stats.CurrentHP, Is.EqualTo(definition.BaseHP));
+            Assert.That(stats.AttackDamage, Is.EqualTo(definition.BaseDamage));
+            Assert.That(stats.MoveSpeed, Is.EqualTo(definition.BaseMoveSpeed));
+            Assert.That(stats.XPReward, Is.EqualTo(definition.XPReward));
+            Assert.That(transform.Scale, Is.EqualTo(definition.Scale));
         }
     }
 }

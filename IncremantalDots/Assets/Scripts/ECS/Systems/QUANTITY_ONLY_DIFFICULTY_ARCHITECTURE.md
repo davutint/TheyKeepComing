@@ -6,13 +6,15 @@ Enemy tipi değişmediği sürece zombie HP, attack damage ve movement speed bü
 
 ## Sabit stat owner'ları
 
-`MobileWaveUtility.ConfigureMobileWave` şu baseline değerleri doğrudan yazar:
+Aktif `EnemyDefinitionSO`, prefab ile birlikte base HP, damage, movement speed ve scale değerlerinin içerik owner'ıdır. `MobileCastleCombatAuthoring` Baker'ı bu değerleri `MobileCastleCombatConfig` runtime çıktısına yazar. `MobileWaveUtility.ConfigureMobileWave` her cycle'da şu sabit runtime baseline değerlerini kullanır:
 
 - `ZombieHP = MobileCastleCombatConfig.ZombieBaseHP`
 - `ZombieDamage = MobileCastleCombatConfig.ZombieBaseDamage`
 - `ZombieSpeed = MobileCastleCombatConfig.BaseZombieSpeed`
 
 `ZombieHpGrowthPerCycle`, `ZombieDamagePerCycle`, `ZombieSpeedPerWave` ve `DifficultyDaySample.ZombieHpMult` eski serialized içerik uyumluluğu için kalabilir fakat V1 stat hesabında okunmaz. Aktif Authoring ve DefaultDifficulty değerleri ayrıca `0` tutulur.
+
+`DifficultyProfileSO` içindeki legacy base HP/damage alanları fallback mapping sırasında okunabilir; aktif catalog varken `EnemyDefinitionSO` bunların üzerine yazılır. Böylece miktar eğrileri Profile'da, düşman kimliği ve base statları catalog'da kalır.
 
 ## Artan baskı
 
@@ -33,5 +35,6 @@ Utility stat growth alanlarını tamamen görmezden gelir. Böylece eski bir sce
 
 - `MobileWaveUtilityTests.ConfigureMobileWave_IgnoresStatGrowthFields_ButIncreasesQuantityPressure`
 - `ExactRunContinuePlayModeTests.AdvancedCycle_IncreasesQuantityButKeepsEnemyStatsFixed`
+- `ExactRunContinuePlayModeTests.EnemyCatalog_SpawnsRegisteredPrefabWithDefinitionStats`
 
 Testler Day 1 ile ileri cycle'ı karşılaştırır: HP/damage/speed eşit kalırken enemy count artar ve spawn interval daralır.

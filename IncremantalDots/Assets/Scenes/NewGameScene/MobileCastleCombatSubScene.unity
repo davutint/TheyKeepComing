@@ -215,6 +215,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: DeadWalls::DeadWalls.MobileCastleCombatAuthoring
   Profile: {fileID: 11400000, guid: 9f798199948144043ae3b437a0945fe5, type: 2}
+  EnemyCatalog: {fileID: 11400000, guid: 72d3ad45923453e4e95632db6ddc7d50, type: 2}
   CastleCenter: {x: 0, y: 0}
   SpawnRadius: 11
   AttackRadius: 1.35
@@ -374,6 +375,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3992b19797271245ad8266c8d710a89, type: 3}
   m_Name: 
   m_EditorClassIdentifier: DeadWalls::DeadWalls.WaveConfigAuthoring
+  EnemyCatalog: {fileID: 11400000, guid: 72d3ad45923453e4e95632db6ddc7d50, type: 2}
   ZombiePrefab: {fileID: 2500375341052309922, guid: fd6eb8dd364f3cc4392a976574891ebd, type: 3}
   ArrowPrefab: {fileID: 2471557889972456781, guid: 7abd38f61690f6b4cb37dcb57c14df16, type: 3}
   ArcherPrefab: {fileID: 4088403277454710420, guid: aad3e620ee6a20d4ba4ea7ea7c38cbaf, type: 3}

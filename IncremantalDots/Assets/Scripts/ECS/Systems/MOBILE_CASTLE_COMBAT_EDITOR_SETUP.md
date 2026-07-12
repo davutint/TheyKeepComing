@@ -3,6 +3,7 @@
 ## Tuning owner kuralı
 
 - Difficulty alanlarını doğrudan shadow Inspector değerlerinden değiştirme. Aktif profile atanmışsa `Window > DeadWalls > Difficulty Tuner` veya `DefaultDifficulty.asset` kullanılır.
+- Enemy prefabı ile base HP/damage/speed/scale için `Assets/ScriptableObject/MobileCastle/Enemies/BasicZombie.asset` düzenlenir; Profile/Inspector shadow alanları owner değildir.
 - Geometri, mode, cycle süreleri ve ekonomi baseline alanları aktif SubScene'deki `MobileCastleCombatAuthoring` üzerinden düzenlenir.
 - `MobileCastleCombatConfig` runtime çıktısıdır; Play Mode Inspector/debug değişikliği kalıcı tuning değildir.
 - Setup penceresi yalnız açıkça çalıştırılan initializer/repair aracıdır; günlük tuning owner'ı değildir.
@@ -32,6 +33,7 @@ Script eklendikten sonra disaridan manuel compile komutu calistirma. Unity refre
 ## Inspector Kontrolleri
 
 - `MobileCastleCombatAuthoring`
+  - Enemy Catalog: `Assets/ScriptableObject/MobileCastle/Enemies/EnemyCatalog.asset`
   - Castle Center: `(0, 0)`
   - Spawn Radius: `11`
   - Attack Radius: `1.35`
@@ -74,7 +76,9 @@ Script eklendikten sonra disaridan manuel compile komutu calistirma. Unity refre
   - Initial Workers/Archers: `53 / 4`
   - Initial Arrows: `200`
 - `WaveConfigAuthoring`
-  - Zombie, Arrow ve Archer prefab referanslari dolu olmali.
+  - Enemy Catalog, Arrow ve Archer prefab referanslari dolu olmali.
+  - Enemy Catalog V1'de yalniz `zombie_basic` / `Zombie.prefab` kaydini icermeli.
+  - Zombie Prefab alani yalniz catalog'u olmayan legacy sahneler icin fallback'tir.
 - `BasicArcher_01`
   - Type: `Basic`
   - Fire Rate: `1.5`
@@ -103,6 +107,7 @@ Script eklendikten sonra disaridan manuel compile komutu calistirma. Unity refre
 - Zombi oldukce Wood/Food/Stone/Iron reward'i accumulator uzerinden artar.
 - `MaxAliveZombies` doluyken spawn talebi kaybolmaz; `ContinuousSpawnBudgetData.PendingEnemies` artar ve kapasite açılınca `MaxSpawnBatch` sınırıyla azalır.
 - V1 runtime config'te Moat gameplay kapalı, slow `1`, damage `0` olmalıdır. `moat_dig`, `moat_flame` ve `start_moat` aktif tech/meta catalog'larında görünmemelidir; görsel hendek ground detail olarak kalabilir.
+- Runtime `EnemyCatalogEntryData` buffer'i tek kayit olmali; spawn edilen zombi prefab/stat/scale degerleri `BasicZombie.asset` ile eslesmelidir.
 - XP threshold oyunu durdurmaz; level-up paneli acilmaz.
 - Basic/Rapid/Frost okcular farkli tint ile okunur.
 - Basic/Rapid/Frost oklari okcu tipinin tint'ini miras alir.

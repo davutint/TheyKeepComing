@@ -11,7 +11,8 @@ Sub Scene icinde su GameObject'leri olustur:
 ### GameState (Bos GameObject)
 - GameStateAuthoring ekle (Inspector'da degerleri ayarla)
 - WaveConfigAuthoring ekle
-  - ZombiePrefab → Zombie_Surungun prefab'ini surukleCastle (Bos GameObject veya Quad)
+  - EnemyCatalog → `Assets/ScriptableObject/MobileCastle/Enemies/EnemyCatalog.asset`
+  - ZombiePrefab → yalniz catalog'u olmayan legacy sahneler icin fallback
   - ArrowPrefab → Arrow prefab'ini surukle
 
 ### Castle (Bos GameObject veya Quad)
@@ -30,6 +31,8 @@ Sub Scene icinde su GameObject'leri olustur:
 - `CastleCore`: CastleAuthoring
 - `MobileCastleConfig`: MobileCastleCombatAuthoring
 - `BasicArcher_01`: ArcherAuthoring (`Type = Basic`, fire rate `1.5`, damage `10`, range `15`)
+
+Tool ayrica `BasicZombie.asset` ve tek kayitli `EnemyCatalog.asset` dosyalarini olusturur/onarir; ayni catalog'u `WaveConfigAuthoring` ve `MobileCastleCombatAuthoring` alanlarina baglar.
 
 MobileCastleCombatAuthoring varsa sistemler merkezi kale mode'da calisir; yoksa eski GameScene WallX akisi korunur. NewGameScene okcu yerlesimi main scene `Grid/outside` tilemapindeki dolu hucrelerden gelir.
 

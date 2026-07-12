@@ -14,7 +14,7 @@ namespace DeadWalls
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<WaveStateData>();
-            state.RequireForUpdate<ZombiePrefabData>();
+            state.RequireForUpdate<EnemyCatalogRuntimeData>();
             state.RequireForUpdate<GameStateData>();
         }
 
@@ -153,18 +153,24 @@ namespace DeadWalls
         private void SpawnZombieBatch(ref SystemState state, ref WaveStateData wave, int count,
             bool mobileMode, MobileCastleCombatConfig mobileConfig)
         {
-            var prefabData = SystemAPI.GetSingleton<ZombiePrefabData>();
+            var catalog = SystemAPI.GetSingleton<EnemyCatalogRuntimeData>();
+            var enemyEntries = SystemAPI.GetSingletonBuffer<EnemyCatalogEntryData>(true);
+            int activeEnemyIndex = EnemyCatalogRuntimeUtility.ResolveActiveIndex(catalog, enemyEntries.Length);
+            if (activeEnemyIndex < 0)
+                return;
+
+            EnemyCatalogEntryData enemy = enemyEntries[activeEnemyIndex];
             var ecb = new EntityCommandBuffer(Unity.Collections.Allocator.Temp);
             var random = new Random(wave.SpawnRandomState != 0u ? wave.SpawnRandomState : 42u);
 
             // Prefab'dan scale degerini oku — Inspector'da ayarlanan deger kullanilir
             float prefabScale = state.EntityManager
-                .GetComponentData<LocalTransform>(prefabData.ZombiePrefab).Scale;
-            float spawnScale = mobileMode ? mobileConfig.ZombieScale : prefabScale;
+                .GetComponentData<LocalTransform>(enemy.Prefab).Scale;
+            float spawnScale = mobileMode ? enemy.Scale : prefabScale;
 
             for (int i = 0; i < count; i++)
             {
-                var zombie = ecb.Instantiate(prefabData.ZombiePrefab);
+                var zombie = ecb.Instantiate(enemy.Prefab);
 
                 float spawnX;
                 float spawnY;
@@ -208,13 +214,13 @@ namespace DeadWalls
                 ecb.SetComponentEnabled<ZombieSlow>(zombie, false);
                 ecb.SetComponent(zombie, new ZombieStats
                 {
-                    MoveSpeed = wave.ZombieSpeed,
-                    MaxHP = wave.ZombieHP,
-                    CurrentHP = wave.ZombieHP,
-                    AttackDamage = wave.ZombieDamage,
+                    MoveSpeed = mobileMode ? enemy.BaseMoveSpeed : wave.ZombieSpeed,
+                    MaxHP = mobileMode ? enemy.BaseHP : wave.ZombieHP,
+                    CurrentHP = mobileMode ? enemy.BaseHP : wave.ZombieHP,
+                    AttackDamage = mobileMode ? enemy.BaseDamage : wave.ZombieDamage,
                     AttackCooldown = 1f,
                     AttackTimer = 0f,
-                    XPReward = 10
+                    XPReward = mobileMode ? enemy.XPReward : 10
                 });
 
                 wave.ZombiesSpawned++;

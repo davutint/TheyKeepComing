@@ -34,13 +34,15 @@ Baker class'lari authoring degerlerini okuyarak entity'lere IComponentData ekler
 - Mobile passive income degerleri ayni authoring uzerinden bake edilir: Wood `+90/min`, Stone `+50/min`, Iron `+30/min`, Food `+75/min`
 
 ### WaveConfigAuthoring.cs
-- Prefab referanslarini tutar (Zombie, Arrow, Archer)
-- ZombiePrefabData, ArrowPrefabData, ArcherPrefabData bake eder
+- `EnemyCatalogSO` ile aktif enemy prefab/stat/pool metadata kaynagini tutar; `ZombiePrefab` yalniz eski sahneler icin migration fallback'idir
+- `EnemyCatalogRuntimeData` ve `EnemyCatalogEntryData` buffer'ini bake eder
+- Aktif catalog kaydindan compatibility `ZombiePrefabData`; ayrica ArrowPrefabData ve ArcherPrefabData bake eder
 - Sub Scene icinde GameStateAuthoring ile ayni GameObject'e eklenebilir
 
 ### MobileCastleCombatAuthoring.cs
 - NewGameScene mobile castle mode switch'idir
 - MobileCastleCombatConfig singleton'ini bake eder
+- Aktif `EnemyDefinitionSO` base HP/damage/speed/scale degerlerini runtime config'e son owner olarak uygular
 - ArcherSlotPosition buffer'ina SubScene slot transform pozisyonlarini yazar
 - Kill reward, wave clear bonus ve economy focus tuning degerlerini Inspector'dan ECS config'e tasir
 - `EconomyFocusState` singleton'ini `Balanced` default'u ile bake eder
@@ -52,5 +54,6 @@ Baker class'lari authoring degerlerini okuyarak entity'lere IComponentData ekler
 ## Prefab Referans Akisi
 Mobile castle icin `WaveConfigAuthoring.ArcherPrefab` bake edilir ve `GameManager` tarafindan drawer economy uzerinden satin alinan Basic/Rapid/Frost okcu spawn'inda kullanilir.
 
-WaveConfigAuthoring.ZombiePrefab → Baker.GetEntity() → ZombiePrefabData.ZombiePrefab (Entity)
+WaveConfigAuthoring.EnemyCatalog → EnemyDefinitionSO → EnemyCatalogEntryData buffer → WaveSpawnSystem
+EnemyCatalogEntryData(active).Prefab → ZombiePrefabData.ZombiePrefab (legacy compatibility output)
 WaveConfigAuthoring.ArrowPrefab → Baker.GetEntity() → ArrowPrefabData.ArrowPrefab (Entity)

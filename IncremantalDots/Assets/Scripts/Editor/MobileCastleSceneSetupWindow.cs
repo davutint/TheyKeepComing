@@ -24,6 +24,9 @@ namespace DeadWalls
         private const string SubScenePath = SubSceneFolder + "/MobileCastleCombatSubScene.unity";
 
         private const string ZombiePrefabPath = "Assets/Prefabs/Zombie.prefab";
+        private const string EnemyDefinitionFolder = "Assets/ScriptableObject/MobileCastle/Enemies";
+        private const string BasicZombieDefinitionPath = EnemyDefinitionFolder + "/BasicZombie.asset";
+        private const string EnemyCatalogPath = EnemyDefinitionFolder + "/EnemyCatalog.asset";
         private const string ArrowPrefabPath = "Assets/Prefabs/Arrow.prefab";
         private const string ArcherPrefabPath = "Assets/Prefabs/Archer.prefab";
         private const string WorkerPrefabPath = "Assets/Prefabs/VillagerWorker.prefab";
@@ -217,6 +220,7 @@ namespace DeadWalls
         private static void EnsureCombatSubSceneContents(Scene subScene)
         {
             var zombiePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(ZombiePrefabPath);
+            var enemyCatalog = EnsureDefaultEnemyCatalog(zombiePrefab);
             var arrowPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(ArrowPrefabPath);
             var archerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(ArcherPrefabPath);
             var workerPrefab = EnsureVillagerWorkerPrefab();
@@ -248,6 +252,7 @@ namespace DeadWalls
             gameStateAuthoring.InitialArrows = 200;
 
             var waveConfig = EnsureComponent<WaveConfigAuthoring>(gameState);
+            waveConfig.EnemyCatalog = enemyCatalog;
             waveConfig.ZombiePrefab = zombiePrefab;
             waveConfig.ArrowPrefab = arrowPrefab;
             waveConfig.ArcherPrefab = archerPrefab;
@@ -268,6 +273,7 @@ namespace DeadWalls
             var mobileConfig = EnsureSceneRoot(subScene, "MobileCastleConfig");
             mobileConfig.transform.position = Vector3.zero;
             var mobileAuthoring = EnsureComponent<MobileCastleCombatAuthoring>(mobileConfig);
+            mobileAuthoring.EnemyCatalog = enemyCatalog;
             mobileAuthoring.CastleCenter = Vector2.zero;
             mobileAuthoring.SpawnRadius = 11f;
             mobileAuthoring.AttackRadius = 1.35f;
@@ -357,6 +363,49 @@ namespace DeadWalls
             mobileAuthoring.ArcherSlots = Array.Empty<Transform>();
 
             EnsureBasicArcher(subScene, archerPrefab, Vector3.zero);
+        }
+
+        private static EnemyCatalogSO EnsureDefaultEnemyCatalog(GameObject zombiePrefab)
+        {
+            EnsureAssetFolder(EnemyDefinitionFolder);
+
+            var definition = AssetDatabase.LoadAssetAtPath<EnemyDefinitionSO>(BasicZombieDefinitionPath);
+            if (definition == null)
+            {
+                definition = ScriptableObject.CreateInstance<EnemyDefinitionSO>();
+                definition.Id = "zombie_basic";
+                definition.Prefab = zombiePrefab;
+                definition.BaseHP = 20f;
+                definition.BaseDamage = 5f;
+                definition.BaseMoveSpeed = 0.85f;
+                definition.Scale = 1.4f;
+                definition.XPReward = 10;
+                definition.SpawnWeight = 1f;
+                definition.PoolPrewarm = 128;
+                definition.PoolExpandBatch = 128;
+                AssetDatabase.CreateAsset(definition, BasicZombieDefinitionPath);
+                EditorUtility.SetDirty(definition);
+            }
+
+            var catalog = AssetDatabase.LoadAssetAtPath<EnemyCatalogSO>(EnemyCatalogPath);
+            if (catalog == null)
+            {
+                catalog = ScriptableObject.CreateInstance<EnemyCatalogSO>();
+                AssetDatabase.CreateAsset(catalog, EnemyCatalogPath);
+            }
+
+            if (catalog.ActiveEnemyId != definition.Id
+                || catalog.Definitions == null
+                || catalog.Definitions.Length != 1
+                || catalog.Definitions[0] != definition)
+            {
+                Undo.RecordObject(catalog, "Configure V1 Enemy Catalog");
+                catalog.ActiveEnemyId = definition.Id;
+                catalog.Definitions = new[] { definition };
+                EditorUtility.SetDirty(catalog);
+            }
+
+            return catalog;
         }
 
         private static void EnsureBasicArcher(Scene subScene, GameObject archerPrefab, Vector3 position)

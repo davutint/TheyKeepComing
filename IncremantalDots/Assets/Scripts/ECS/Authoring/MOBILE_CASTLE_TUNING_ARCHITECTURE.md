@@ -7,16 +7,22 @@ Her tuning alanının tek bir baseline owner'ı olmalıdır. Inspector, Difficul
 ## Öncelik sözleşmesi
 
 1. V1 Blueprint ürün davranışının tasarım otoritesidir.
-2. `DifficultyProfileSO`, yalnız difficulty grubundaki baseline değerlerin içerik owner'ıdır.
-3. Aktif SubScene'deki `MobileCastleCombatAuthoring`, profile taşınmamış geometri, mode, cycle süresi, ekonomi ve feedback baseline değerlerinin owner'ıdır.
-4. `MobileCastleTuningResolver`, bu iki kaynağı `MobileCastleCombatConfig` içine birleştiren tek kod owner'ıdır.
-5. `MobileCastleCombatConfig`, runtime çıktısıdır; editlenecek içerik kaynağı değildir.
-6. Tech, meta progression ve Council etkileri baseline config üzerine runtime aggregate uygular. Bu effective değerler yeni baseline sayılmaz.
+2. Aktif `EnemyDefinitionSO`, enemy prefabı ile base HP/damage/speed/scale değerlerinin içerik owner'ıdır.
+3. `DifficultyProfileSO`, enemy base statları dışındaki quantity/difficulty baseline değerlerinin içerik owner'ıdır.
+4. Aktif SubScene'deki `MobileCastleCombatAuthoring`, profile taşınmamış geometri, mode, cycle süresi, ekonomi ve feedback baseline değerlerinin owner'ıdır.
+5. `MobileCastleTuningResolver` Profile/Authoring değerlerini birleştirir; Baker aktif EnemyDefinition base statlarını son adımda runtime config'e uygular.
+6. `MobileCastleCombatConfig`, runtime çıktısıdır; editlenecek içerik kaynağı değildir.
+7. Tech, meta progression ve Council etkileri baseline config üzerine runtime aggregate uygular. Bu effective değerler yeni baseline sayılmaz.
+
+## EnemyDefinition-owned alanlar
+
+- Enemy id ve prefab
+- Zombie base HP ve damage
+- Zombie base movement speed ve scale
+- XP reward, spawn weight ve pool metadata
 
 ## DifficultyProfile-owned alanlar
 
-- Zombie base HP ve HP/cycle growth
-- Zombie base damage ve damage/cycle growth
 - Spawn batch size ve batch/cycle growth
 - Max spawn batch ve max alive zombie
 - Base/min spawn interval
@@ -36,7 +42,7 @@ Not: Normal V1 repair artık yalnız Stone kullandığı için `RepairBaseWoodCo
 - Unlimited arrows gibi mode flag'leri
 - Overlay, wave director phase oranları, Fortify/Rally baseline
 
-Profile atanmışken aynı isimli shadow Inspector difficulty alanları fallback'tir; aktif runtime'a yazılmaz. Profile kaldırılırsa geriye uyumlu authoring fallback devreye girer.
+Profile atanmışken aynı isimli shadow Inspector difficulty alanları fallback'tir; aktif runtime'a yazılmaz. Profile kaldırılırsa geriye uyumlu authoring fallback devreye girer. Legacy Profile/Authoring enemy base stat alanları mapping uyumluluğu için kalabilir; catalog atanmış aktif sahnede EnemyDefinition bunların üzerine yazar.
 
 ## Editor araçları
 
@@ -50,6 +56,7 @@ Aktif SubScene `DefaultDifficulty.asset` profilini kullanır. Bilinçli olarak f
 
 | Alan | Authoring fallback | Profile | Runtime baseline |
 |---|---:|---:|---:|
+| Zombie base HP/damage/speed/scale | Legacy shadow fields | Legacy base HP/damage | `BasicZombie.asset`: 20/5/0.85/1.4 |
 | Zombie HP growth/cycle | 0 | 0 | 0; utility ayrıca growth'ü okumaz |
 | Spawn batch growth/cycle | 0.10 | 0.15 | 0.15 |
 | Max spawn batch | 12 | 16 | 16 |
@@ -64,3 +71,5 @@ Runtime production gibi bazı alanlar tech/meta aggregate sonrasında baseline'd
 - `MobileCastleTuningResolverTests.ActiveSubScene_AssignsDefaultProfile_AndResolvesItsDivergentValues`
 - `MobileCastleTuningResolverTests.DaySample_UsesSameCurveAndSpecialNightRulesForBakeAndLiveApply`
 - `ExactRunContinuePlayModeTests.RuntimeTuning_UsesProfileDifficulty_AndAuthoringCycleDurations`
+- `EnemyCatalogContractTests.Definition_OwnsBaseStatsAndFuturePoolMetadata`
+- `ExactRunContinuePlayModeTests.EnemyCatalog_SpawnsRegisteredPrefabWithDefinitionStats`
