@@ -11,8 +11,8 @@ Baker class'lari authoring degerlerini okuyarak entity'lere IComponentData ekler
 - ZombieTag, ZombieStats, ZombieState ve disabled ZombieSlow component'larini bake eder
 
 ### CastleAuthoring.cs
-- Kale/duvar/kapi GameObject'ine eklenir (Sub Scene icinde tek instance)
-- WallSegment, GateComponent, CastleHP, WallXPosition bake eder
+- Kale/duvar GameObject'ine eklenir (Sub Scene icinde tek instance)
+- Aktif savunma icin yalniz `WallSegment` ve `WallXPosition` bake eder; legacy Gate/Core alanlari serialize uyumlulugu icin gizli tutulur
 
 ### ArcherAuthoring.cs
 - Okcu prefab'ina eklenir

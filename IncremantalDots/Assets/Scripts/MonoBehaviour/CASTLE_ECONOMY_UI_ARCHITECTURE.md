@@ -22,7 +22,7 @@
 Legacy CastleInteriorClickTarget -> CastleEconomyUI.OpenFromCastle()
 CastleEconomyUI -> GameManager.OpenCastleEconomy() -> MobilePrepPauseState
 Slider Input -> GameManager.SetResourceWorkers() -> MobilePopulationAllocation
-Repair Button -> GameManager.RepairDefenseFull() -> Wall/Gate/Castle HP
+Repair Button -> GameManager.RepairDefenseFull() -> yalniz Wall HP
 Event Button -> GameManager.ChooseEconomyEvent() -> MobileEconomyEventState / Resources / Population
 ```
 

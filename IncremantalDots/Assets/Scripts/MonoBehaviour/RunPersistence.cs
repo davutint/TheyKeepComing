@@ -15,7 +15,7 @@ namespace DeadWalls
     [Serializable]
     public class RunSaveState
     {
-        public int Version = 1;
+        public int Version = 2;
 
         // Gun / ilerleme (CycleIndex = kayit ANINDAKI gun index'i; DAY = CycleIndex+1)
         public int CycleIndex;
@@ -40,9 +40,8 @@ namespace DeadWalls
         public int FoodWorkers;
 
         // Savunma (MaxHP kaydedilmez — tech/meta aggregate'lerinden yeniden kurulur)
+        // Sonuc otoritesi olan tek Wall'in anlik HP degeri.
         public float WallCurrentHP;
-        public float GateCurrentHP;
-        public float CastleCurrentHP;
         public int CastleUpgradeLevel;
 
         // Okcular (pozisyon kaydedilmez — tilemap slot sirasina yeniden dizilir)

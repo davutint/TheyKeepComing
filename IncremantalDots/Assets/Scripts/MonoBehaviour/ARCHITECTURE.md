@@ -9,7 +9,7 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 ### GameManager.cs
 
 - Singleton pattern
-- Her frame ECS singleton'larini okur: `GameStateData`, `WaveStateData`, `ContinuousSiegeCycleData`, `CastleHP`, resource ve population verileri
+- Her frame ECS singleton'larini okur: `GameStateData`, `WaveStateData`, `ContinuousSiegeCycleData`, `WallSegment`, resource ve population verileri
 - Event'ler: `OnGameOver`, legacy `OnLevelUp`, `OnWaveChanged`, `OnGameStateChanged`
 - `OnWaveCompleted` legacy wave cleared / market bekleme fazini UI katmanina bildirebilir; continuous siege varsayilaninda tetiklenmez
 - Mobile ilk play'de baked aktif wave state'ini legacy DayPrep baslangicina normalize edebilir; continuous siege system bir sonraki frame aktif cycle'a ceker
@@ -18,7 +18,7 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - `GetDefensePercent()` wall/gate/castle toplam HP yuzdesini HUD'a verir
 - Mobile archer economy API'leri: `ArcherDefinitionSO` catalog'undan buy cost/base stat okuma, buy, type count/DPS okuma; legacy unlock/upgrade API'leri kodda kalir ama sag drawer player-facing kullanmaz
 - Tech Tree runtime state'i (run-scoped, persistence yok): `_techNodeLevels` + `_revealedTechNodes`; katalog `techTreeCatalog` (`TechTreeCatalogSO`, setup tool baglar). API: `IsTechNodeRevealed`, `GetTechNodeLevel`, `CanBuyTechNode(node, out reason)`, `TryBuyTechNode`, `GetRevealedTechNodes`. Root (`castle_heart`) otomatik sahipli baslar; satin alma `RevealChildNodeIds`'i gorunur yapar
-- Tech effect'leri: `UnlockArcherType` (maliyetsiz icsel unlock — `UnlockArcherType()` cagrilmaz, cift harcamayi onler), damage/firerate carpanlari (`GetScaledArcherStats` + `ApplyScaledStatsToArchers`), worker cap / production / population growth (`MobileCastleCombatConfig`'e base'ten yeniden hesaplanarak yazilir), defense MaxHP (Wall/Gate/Core, CurrentHP orani korunur). Base degerler ilk dokunusta cache'lenir; `RestartGame()` -> `ResetTechTreeState()` hepsini base'e dondurur
+- Tech effect'leri: `UnlockArcherType` (maliyetsiz icsel unlock — `UnlockArcherType()` cagrilmaz, cift harcamayi onler), damage/firerate carpanlari (`GetScaledArcherStats` + `ApplyScaledStatsToArchers`), worker cap / production / population growth (`MobileCastleCombatConfig`'e base'ten yeniden hesaplanarak yazilir), tek Wall MaxHP (CurrentHP orani korunur). Base degerler ilk dokunusta cache'lenir; `RestartGame()` -> `ResetTechTreeState()` hepsini base'e dondurur
 - Worker economy API'leri: `OpenCastleEconomy()`, `CloseCastleEconomy()`, `SetResourceWorkers()`, `ChooseEconomyEvent()`
 - Economy focus API'leri legacy olarak kalir; worker economy aktifken setup tool focus UI'yi gizler
 - Legacy level-up API'leri durur, fakat mobile castle loop'ta XP level-up pause tetiklemez
@@ -39,7 +39,7 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - `HordePressurePanel` imported prefabda bulunsa bile player-facing olarak kapali tutulur
 - `CyclePanel` yoksa legacy wave fallback text'lerini kullanir
 - Mobile unlimited arrow modunda `ArrowText` degeri `INF` olur
-- Mobile HUD'da `CastleDefensePanel` varsa `DefenseWallFill`, `DefenseGateFill`, `DefenseCoreFill` ve yuzde text'leriyle gercek defense modulu guncellenir; eski `DefenseText` sadece fallback'tir
+- Mobile HUD'da yalniz `DefenseWallFill` ve Wall yuzdesi guncellenir; legacy Gate/Core alanlari runtime'da gizlenir
 - `WaveRewardText`, wave clear bonusunu kisa sure `Wave Cleared +...` olarak gosterir
 - Night/high pressure baskisinda threat rengi kullanabilir; savunma hasarinda `DamageFlashImage` kisa red flash verir
 - Archer count bilgisi sag drawer row'larinda okunur; mobile setup eski `ArcherTypeText` placeholder'ini kullanmaz
@@ -173,7 +173,7 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 ECS Systems -> Entity Data -> GameManager.ReadECSData() -> Events -> UI Controllers
 Legacy UI Input -> GameManager.CanApplyUpgrade()/ApplyUpgrade() -> EntityManager.SetComponentData -> ECS
 Archer Drawer Input -> GameManager.BuyArcher() -> EntityManager.SetComponentData -> ECS
-Tech Tree Input -> GameManager.TryBuyTechNode() -> reveal/unlock state + MobileCastleCombatConfig/CastleHP/ArcherUnit yazimi -> ECS
+Tech Tree Input -> GameManager.TryBuyTechNode() -> reveal/unlock state + MobileCastleCombatConfig/WallSegment/ArcherUnit yazimi -> ECS
 Worker Drawer Input -> GameManager.AssignResourceWorker() -> MobilePopulationAllocation -> DOTS VillagerWorker route visual sync -> MobilePopulationEconomySystem
 Legacy Castle Click -> CastleEconomyUI.OpenFromCastle() -> MobilePrepPauseState
 Legacy Worker Slider Input -> GameManager.SetResourceWorkers() -> MobilePopulationAllocation -> DOTS VillagerWorker visual sync

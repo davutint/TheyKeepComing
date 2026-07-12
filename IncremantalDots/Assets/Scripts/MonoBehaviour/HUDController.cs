@@ -8,7 +8,9 @@ namespace DeadWalls
     {
         [Header("HP Bars")]
         public Slider WallHPBar;
+        [HideInInspector]
         public Slider GateHPBar;
+        [HideInInspector]
         public Slider CastleHPBar;
 
         [Header("Text")]
@@ -21,11 +23,15 @@ namespace DeadWalls
         public TMP_Text DefenseText;
         public TMP_Text DefensePercentText;
         public TMP_Text DefenseWallText;
+        [HideInInspector]
         public TMP_Text DefenseGateText;
+        [HideInInspector]
         public TMP_Text DefenseCoreText;
         public TMP_Text WaveRewardText;
         public Image DefenseWallFill;
+        [HideInInspector]
         public Image DefenseGateFill;
+        [HideInInspector]
         public Image DefenseCoreFill;
         public Image DefenseDamageGlow;
         public Image DamageFlashImage;
@@ -74,7 +80,7 @@ namespace DeadWalls
         private string _lastArrowLabel;
         private int _lastBasicArchers = -1, _lastRapidArchers = -1, _lastFrostArchers = -1;
         private int _lastDefensePercent = -1;
-        private int _lastWallPercent = -1, _lastGatePercent = -1, _lastCorePercent = -1;
+        private int _lastWallPercent = -1;
         private float _lastDefenseRatio = -1f;
         private int _lastRewardSequence = -1;
         private float _rewardDisplayTimer;
@@ -88,6 +94,7 @@ namespace DeadWalls
 
         private void OnEnable()
         {
+            EnforceSingleWallPresentation();
             HideLegacyArcherTypeText();
             CacheDefaultColors();
         }
@@ -102,18 +109,6 @@ namespace DeadWalls
             {
                 WallHPBar.maxValue = gm.Wall.MaxHP;
                 WallHPBar.value = gm.Wall.CurrentHP;
-            }
-
-            if (GateHPBar != null)
-            {
-                GateHPBar.maxValue = gm.Gate.MaxHP;
-                GateHPBar.value = gm.Gate.CurrentHP;
-            }
-
-            if (CastleHPBar != null)
-            {
-                CastleHPBar.maxValue = gm.Castle.MaxHP;
-                CastleHPBar.value = gm.Castle.CurrentHP;
             }
 
             // Text (string alloc — sadece degisince)
@@ -246,6 +241,33 @@ namespace DeadWalls
             ArcherTypeText = null;
         }
 
+        private void EnforceSingleWallPresentation()
+        {
+            if (GateHPBar != null)
+                GateHPBar.gameObject.SetActive(false);
+            if (CastleHPBar != null)
+                CastleHPBar.gameObject.SetActive(false);
+            if (DefenseGateText != null)
+                DefenseGateText.gameObject.SetActive(false);
+            if (DefenseCoreText != null)
+                DefenseCoreText.gameObject.SetActive(false);
+
+            HideLegacyDefenseTrack(DefenseGateFill, "Gate");
+            HideLegacyDefenseTrack(DefenseCoreFill, "Core");
+        }
+
+        private static void HideLegacyDefenseTrack(Image fill, string expectedName)
+        {
+            if (fill == null)
+                return;
+
+            Transform parent = fill.transform.parent;
+            if (parent != null && parent.name.Contains(expectedName))
+                parent.gameObject.SetActive(false);
+            else
+                fill.gameObject.SetActive(false);
+        }
+
         private void CacheDefaultColors()
         {
             if (_colorsCached)
@@ -262,17 +284,11 @@ namespace DeadWalls
         private void UpdateDefenseState(GameManager gm)
         {
             if (DefenseText == null && DefensePercentText == null
-                && DefenseWallFill == null && DefenseGateFill == null && DefenseCoreFill == null)
+                && DefenseWallFill == null)
                 return;
 
             float ratio = gm.GetDefensePercent();
-            float wallRatio = GetRatio(gm.Wall.CurrentHP, gm.Wall.MaxHP);
-            float gateRatio = GetRatio(gm.Gate.CurrentHP, gm.Gate.MaxHP);
-            float coreRatio = GetRatio(gm.Castle.CurrentHP, gm.Castle.MaxHP);
             int percent = Mathf.RoundToInt(ratio * 100f);
-            int wallPercent = Mathf.RoundToInt(wallRatio * 100f);
-            int gatePercent = Mathf.RoundToInt(gateRatio * 100f);
-            int corePercent = Mathf.RoundToInt(coreRatio * 100f);
             if (_lastDefenseRatio >= 0f && ratio < _lastDefenseRatio - 0.002f)
                 _damageFlashTimer = DamageFlashDuration;
 
@@ -281,35 +297,19 @@ namespace DeadWalls
             {
                 _lastDefensePercent = percent;
                 if (DefenseText != null)
-                    DefenseText.text = $"DEF {percent}%";
+                    DefenseText.text = $"WALL {percent}%";
                 if (DefensePercentText != null)
                     DefensePercentText.text = $"{percent}%";
             }
 
-            if (_lastWallPercent != wallPercent)
+            if (_lastWallPercent != percent)
             {
-                _lastWallPercent = wallPercent;
+                _lastWallPercent = percent;
                 if (DefenseWallText != null)
-                    DefenseWallText.text = $"WALL {wallPercent}%";
+                    DefenseWallText.text = $"WALL {percent}%";
             }
 
-            if (_lastGatePercent != gatePercent)
-            {
-                _lastGatePercent = gatePercent;
-                if (DefenseGateText != null)
-                    DefenseGateText.text = $"GATE {gatePercent}%";
-            }
-
-            if (_lastCorePercent != corePercent)
-            {
-                _lastCorePercent = corePercent;
-                if (DefenseCoreText != null)
-                    DefenseCoreText.text = $"CORE {corePercent}%";
-            }
-
-            UpdateDefenseFill(DefenseWallFill, wallRatio);
-            UpdateDefenseFill(DefenseGateFill, gateRatio);
-            UpdateDefenseFill(DefenseCoreFill, coreRatio);
+            UpdateDefenseFill(DefenseWallFill, ratio);
         }
 
         private void UpdateContinuousSiegeHud(GameManager gm)
@@ -436,14 +436,6 @@ namespace DeadWalls
             overlay.a = 0.22f * progress;
             DamageFlashImage.raycastTarget = false;
             DamageFlashImage.color = overlay;
-        }
-
-        private static float GetRatio(float current, float max)
-        {
-            if (max <= 0.01f)
-                return 1f;
-
-            return Mathf.Clamp01(current / max);
         }
 
         private static void UpdateDefenseFill(Image fill, float ratio)

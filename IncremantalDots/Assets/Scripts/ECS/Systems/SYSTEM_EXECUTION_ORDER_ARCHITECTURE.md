@@ -163,9 +163,9 @@ Presentation tarafinda `SpriteAnimationSystem` UV rect hesaplarini yapar.
 ### DamageApplySystem
 
 - Stress mode acikken damage queue temizlenir ve kale HP dusmez.
-- Mobile normal mode'da `FortifyActive` ise wall/gate/castle hasari Fortify damage multiplier ile carpilir.
-- Hasar onceligi: Wall -> Gate -> Castle.
-- Castle HP sifira inerse game over yazar.
+- Mobile normal mode'da `FortifyActive` ise Wall hasari Fortify damage multiplier ile carpilir.
+- Tum dusman hasari yalniz `WallSegment` uzerine uygulanir.
+- Wall HP sifira inerse Game Over tek yonlu olarak yazilir; repair/Council Wall'i diriltemez.
 
 ### DamageCleanupSystem
 

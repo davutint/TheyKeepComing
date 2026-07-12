@@ -8,12 +8,15 @@ namespace DeadWalls
         public float CurrentHP;
     }
 
+    // Legacy veri tipi: eski Entity Scene verilerinin sorunsuz migrate olabilmesi icin tutulur.
+    // Aktif runtime savunma zincirinde bake edilmez veya okunmaz.
     public struct GateComponent : IComponentData
     {
         public float MaxHP;
         public float CurrentHP;
     }
 
+    // Legacy veri tipi: sonuc otoritesi degildir. Tek sonuc otoritesi WallSegment'tir.
     public struct CastleHP : IComponentData
     {
         public float MaxHP;

@@ -113,7 +113,7 @@ namespace DeadWalls
             _csv = new StringBuilder();
             _csv.AppendLine("day,gameMin,realMin,wood,stone,iron,food,prodW,prodS,prodI,prodF," +
                 "popTotal,popIdle,popWorkers,popArchers,archers,techLevels,aliveZombies," +
-                "wallPct,gatePct,corePct,fps,repairs,techBuys,archerBuys," +
+                "wallPct,fps,repairs,techBuys,archerBuys," +
                 "repairWood,repairStone,techWood,techStone,techIron,techFood,archWood,archFood");
 
             _running = true;
@@ -328,8 +328,6 @@ namespace DeadWalls
                     if (n != null) techLevels += gm.GetTechNodeLevel(n.Id);
 
             float wallPct = gm.Wall.MaxHP > 0 ? gm.Wall.CurrentHP / gm.Wall.MaxHP : 0f;
-            float gatePct = gm.Gate.MaxHP > 0 ? gm.Gate.CurrentHP / gm.Gate.MaxHP : 0f;
-            float corePct = gm.Castle.MaxHP > 0 ? gm.Castle.CurrentHP / gm.Castle.MaxHP : 0f;
 
             var ci = CultureInfo.InvariantCulture;
             _csv.AppendLine(string.Join(",",
@@ -342,7 +340,7 @@ namespace DeadWalls
                 gm.GetWorkerProductionRate(EconomyFocusType.Food).ToString("0.0", ci),
                 gm.Population.Total, gm.Population.Idle, gm.Population.Workers, gm.Population.Archers,
                 CountArchers(), techLevels, CountAliveZombies(),
-                wallPct.ToString("0.00", ci), gatePct.ToString("0.00", ci), corePct.ToString("0.00", ci),
+                wallPct.ToString("0.00", ci),
                 _fps.ToString("0", ci), _repairSpends, _techSpends, _archerSpends,
                 _totalRepairCost.Wood, _totalRepairCost.Stone,
                 _totalTechCost.Wood, _totalTechCost.Stone, _totalTechCost.Iron, _totalTechCost.Food,

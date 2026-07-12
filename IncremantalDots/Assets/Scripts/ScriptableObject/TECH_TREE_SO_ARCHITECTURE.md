@@ -40,7 +40,7 @@ hedefi (`Balanced` = tum kaynaklar).
 | `IncreaseWorkerCap` | `MobileCastleCombatConfig.XxxWorkerCap` (ECS clamp + UI limiti ayni anda) |
 | `IncreaseResourceProductionPercent` | `MobileCastleCombatConfig.XxxWorkerProductionPerMin` |
 | `IncreasePopulationGrowth` | `MobileCastleCombatConfig.PopulationGrowthPerDayPrep` (cycle basi buyume) |
-| `IncreaseDefenseMaxHpPercent` | Wall/Gate/CastleHP MaxHP; CurrentHP orani korunur |
+| `IncreaseDefenseMaxHpPercent` | Tek Wall MaxHP; CurrentHP orani korunur |
 | `ReduceRepairCostPercent` | `GameManager._techRepairCostMultiplier` -> `GetRepairCost()` (repair sink'ini ucuzlatir) |
 | `DeepenMoatSlowPercent` | `MobileCastleCombatConfig.MoatSlowMultiplier` (base'ten yeniden hesap; moat_dig) |
 | `AddMoatDamagePerSecond` | `MobileCastleCombatConfig.MoatDamagePerSecond` (moat_flame) |

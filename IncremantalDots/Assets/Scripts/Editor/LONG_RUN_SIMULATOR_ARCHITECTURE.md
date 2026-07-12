@@ -19,7 +19,7 @@ bot "makul ortalama oyuncu"yu temsil eder; egri kirilmalari politikadan bagimsiz
   5. Okcu tavani (40) altindaysa Frost > Rapid > Basic tercihiyle 1 okcu.
 - **Metrik satiri:** her SAFAK gecisinde (gun basina bir) CSV'ye yazilir; GameOver'da
   final satir. Kolonlar: gun, oyun-ici/gercek dakika, 4 kaynak stok + uretim/dk,
-  nufus dagilimi, okcu sayisi, toplam tech seviyesi, canli zombi, Wall/Gate/Core %,
+  nufus dagilimi, okcu sayisi, toplam tech seviyesi, canli zombi, Wall %,
   FPS (frame-fark yontemi), kumulatif repair/tech/okcu islem sayilari ve maliyetleri.
 - CSV: `Logs/LongRun/longrun_<timestamp>.csv` — her gun satirinda flush (kilitlenmeye dayanikli).
 - Hedef gun (default 20) dolunca veya GameOver'da durur; "GameOver'da yeni kosu" acikca

@@ -102,8 +102,6 @@ namespace DeadWalls
         private float _baseMoatDamagePerSecond;
         private bool _techDefenseBaselineCaptured;
         private float _baseWallMaxHp;
-        private float _baseGateMaxHp;
-        private float _baseCastleMaxHp;
 
         // Council event run-state (persistence yok; RestartGame sifirlar)
         private readonly Dictionary<string, int> _councilFlags = new Dictionary<string, int>();
@@ -135,8 +133,6 @@ namespace DeadWalls
         public GameStateData GameState { get; private set; }
         public WaveStateData WaveState { get; private set; }
         public WallSegment Wall { get; private set; }
-        public GateComponent Gate { get; private set; }
-        public CastleHP Castle { get; private set; }
         public ResourceData Resources { get; private set; }
         public ResourceProductionRate ResourceProduction { get; private set; }
         public ResourceConsumptionRate ResourceConsumption { get; private set; }
@@ -234,7 +230,7 @@ namespace DeadWalls
                 archerPrefabQuery.GetSingletonEntity()).ArcherPrefab;
             TryResolveWorkerPrefabEntity();
 
-            var castleQuery = _entityManager.CreateEntityQuery(typeof(CastleHP));
+            var castleQuery = _entityManager.CreateEntityQuery(typeof(WallSegment));
             if (castleQuery.IsEmpty) return false;
 
             _castleEntity = castleQuery.GetSingletonEntity();
@@ -267,8 +263,6 @@ namespace DeadWalls
             Population = _entityManager.GetComponentData<PopulationState>(_gameStateEntity);
             ArrowSupply = _entityManager.GetComponentData<ArrowSupply>(_gameStateEntity);
             Wall = _entityManager.GetComponentData<WallSegment>(_castleEntity);
-            Gate = _entityManager.GetComponentData<GateComponent>(_castleEntity);
-            Castle = _entityManager.GetComponentData<CastleHP>(_castleEntity);
             ReadArcherTypeCounts();
             ReadMobileRuntimeData();
             SyncWorkerVisualsIfNeeded();
@@ -367,7 +361,7 @@ namespace DeadWalls
                 case UpgradeType.FireRateUp:
                     return "Fire Rate";
                 case UpgradeType.RepairGate:
-                    return "Repair Defense";
+                    return "Repair Wall";
                 default:
                     return "Upgrade";
             }
@@ -388,7 +382,7 @@ namespace DeadWalls
                 case UpgradeType.FireRateUp:
                     return "All archers +15% speed";
                 case UpgradeType.RepairGate:
-                    return "Wall/Gate/Castle full HP";
+                    return "Wall full HP";
                 default:
                     return string.Empty;
             }
@@ -411,7 +405,16 @@ namespace DeadWalls
                     return GetArcherCount() > 0;
 
                 case UpgradeType.RepairGate:
-                    return _entityManager.Exists(_castleEntity);
+                {
+                    if (!_entityManager.Exists(_castleEntity))
+                        return false;
+
+                    var gameState = _entityManager.GetComponentData<GameStateData>(_gameStateEntity);
+                    var wall = _entityManager.GetComponentData<WallSegment>(_castleEntity);
+                    return !gameState.IsGameOver
+                        && !SingleWallDefenseRules.IsDestroyed(wall.CurrentHP)
+                        && wall.CurrentHP < wall.MaxHP - 0.001f;
+                }
 
                 default:
                     return false;
@@ -449,7 +452,7 @@ namespace DeadWalls
                     break;
 
                 case UpgradeType.RepairGate:
-                    applied = RepairGate();
+                    applied = RepairWallToFull();
                     break;
             }
 
@@ -512,7 +515,7 @@ namespace DeadWalls
             if (!SpendResources(GetRepairCost()))
                 return false;
 
-            bool repaired = RepairGate();
+            bool repaired = RepairWallToFull();
             if (repaired)
                 OnGameStateChanged?.Invoke();
 
@@ -520,16 +523,22 @@ namespace DeadWalls
         }
 
         /// <summary>
-        /// Continuous siege'de tamir HER ZAMAN denenebilir (DayPrep sarti kaldirildi — o faz
-        /// continuous akista hic olusmaz, repair fiilen olu bir yoldu). Kosul: kayip var + kaynak yeter.
+        /// Wall hasarliysa ve kaynak yeterliyse tamir denenebilir.
+        /// Sifir HP veya Game Over sonrasi tamir Wall'i diriltemez.
         /// </summary>
         public bool CanRepairDefenseFull()
         {
-            return _initialized
-                && CanAccessEntityManager()
-                && _entityManager.Exists(_castleEntity)
-                && !GameState.IsGameOver
-                && GetDefensePercent() < 0.995f
+            if (!_initialized
+                || !CanAccessEntityManager()
+                || !_entityManager.Exists(_castleEntity)
+                || !_entityManager.Exists(_gameStateEntity))
+                return false;
+
+            var gameState = _entityManager.GetComponentData<GameStateData>(_gameStateEntity);
+            var wall = _entityManager.GetComponentData<WallSegment>(_castleEntity);
+            return !gameState.IsGameOver
+                && !SingleWallDefenseRules.IsDestroyed(wall.CurrentHP)
+                && SingleWallDefenseRules.GetHealthRatio(wall.CurrentHP, wall.MaxHP) < 0.995f
                 && CanAfford(GetRepairCost());
         }
 
@@ -980,12 +989,7 @@ namespace DeadWalls
 
         public float GetDefensePercent()
         {
-            float max = Wall.MaxHP + Gate.MaxHP + Castle.MaxHP;
-            if (max <= 0.01f)
-                return 1f;
-
-            float current = Wall.CurrentHP + Gate.CurrentHP + Castle.CurrentHP;
-            return Mathf.Clamp01(current / max);
+            return SingleWallDefenseRules.GetHealthRatio(Wall.CurrentHP, Wall.MaxHP);
         }
 
         public bool IsMobileFinalWavePressure()
@@ -1643,8 +1647,8 @@ namespace DeadWalls
         }
 
         /// <summary>
-        /// Sahip olunan tech'lerin toplam MaxHP yuzdesini base degerlerden hesaplar; Wall/Gate/Core
-        /// MaxHP'sini yazar, CurrentHP oranini korur (RepairGate SetComponentData kalibi).
+        /// Sahip olunan tech'lerin toplam MaxHP yuzdesini base degerden hesaplar.
+        /// Yalniz Wall MaxHP'sini yazar ve CurrentHP oranini korur.
         /// </summary>
         private void ApplyTechDefenseAggregates()
         {
@@ -1654,8 +1658,6 @@ namespace DeadWalls
             if (!_techDefenseBaselineCaptured)
             {
                 _baseWallMaxHp = _entityManager.GetComponentData<WallSegment>(_castleEntity).MaxHP;
-                _baseGateMaxHp = _entityManager.GetComponentData<GateComponent>(_castleEntity).MaxHP;
-                _baseCastleMaxHp = _entityManager.GetComponentData<CastleHP>(_castleEntity).MaxHP;
                 _techDefenseBaselineCaptured = true;
             }
 
@@ -1679,28 +1681,13 @@ namespace DeadWalls
                 }
             }
 
-            float multiplier = 1f + totalPercent + _metaWallHpPercent; // tech + meta ayni kanal
-
+            float multiplier = Mathf.Max(0f, 1f + totalPercent + _metaWallHpPercent);
             var wall = _entityManager.GetComponentData<WallSegment>(_castleEntity);
-            float wallRatio = wall.MaxHP > 0f ? wall.CurrentHP / wall.MaxHP : 1f;
+            float healthRatio = SingleWallDefenseRules.GetHealthRatio(wall.CurrentHP, wall.MaxHP);
             wall.MaxHP = _baseWallMaxHp * multiplier;
-            wall.CurrentHP = wall.MaxHP * wallRatio;
+            wall.CurrentHP = wall.MaxHP * healthRatio;
             _entityManager.SetComponentData(_castleEntity, wall);
             Wall = wall;
-
-            var gate = _entityManager.GetComponentData<GateComponent>(_castleEntity);
-            float gateRatio = gate.MaxHP > 0f ? gate.CurrentHP / gate.MaxHP : 1f;
-            gate.MaxHP = _baseGateMaxHp * multiplier;
-            gate.CurrentHP = gate.MaxHP * gateRatio;
-            _entityManager.SetComponentData(_castleEntity, gate);
-            Gate = gate;
-
-            var castle = _entityManager.GetComponentData<CastleHP>(_castleEntity);
-            float castleRatio = castle.MaxHP > 0f ? castle.CurrentHP / castle.MaxHP : 1f;
-            castle.MaxHP = _baseCastleMaxHp * multiplier;
-            castle.CurrentHP = castle.MaxHP * castleRatio;
-            _entityManager.SetComponentData(_castleEntity, castle);
-            Castle = castle;
         }
 
         /// <summary>Restart'ta tech state'i sifirlar ve config/defense degerlerini base'e dondurur.</summary>
@@ -1738,16 +1725,11 @@ namespace DeadWalls
             if (_techDefenseBaselineCaptured && CanAccessEntityManager() && _entityManager.Exists(_castleEntity))
             {
                 var wall = _entityManager.GetComponentData<WallSegment>(_castleEntity);
+                float healthRatio = SingleWallDefenseRules.GetHealthRatio(wall.CurrentHP, wall.MaxHP);
                 wall.MaxHP = _baseWallMaxHp;
+                wall.CurrentHP = wall.MaxHP * healthRatio;
                 _entityManager.SetComponentData(_castleEntity, wall);
-
-                var gate = _entityManager.GetComponentData<GateComponent>(_castleEntity);
-                gate.MaxHP = _baseGateMaxHp;
-                _entityManager.SetComponentData(_castleEntity, gate);
-
-                var castle = _entityManager.GetComponentData<CastleHP>(_castleEntity);
-                castle.MaxHP = _baseCastleMaxHp;
-                _entityManager.SetComponentData(_castleEntity, castle);
+                Wall = wall;
             }
         }
 
@@ -1891,7 +1873,7 @@ namespace DeadWalls
                             SpawnArcher(ArcherType.Basic); // bedava: population tuketilmez
                         break;
                     case CouncilEffectKind.HealDefensePercent:
-                        HealDefenseByPercent(Mathf.Abs(effect.Rate));
+                        HealWallByPercent(Mathf.Abs(effect.Rate));
                         break;
                     case CouncilEffectKind.WorkerCapBonus:
                         ApplyCouncilCapBonus(effect.Resource, effect.Amount);
@@ -1924,25 +1906,19 @@ namespace DeadWalls
             }
         }
 
-        private void HealDefenseByPercent(float percent)
+        private void HealWallByPercent(float percent)
         {
             if (!CanAccessEntityManager() || !_entityManager.Exists(_castleEntity) || percent <= 0f)
                 return;
 
             var wall = _entityManager.GetComponentData<WallSegment>(_castleEntity);
-            wall.CurrentHP = Mathf.Min(wall.MaxHP, wall.CurrentHP + wall.MaxHP * percent);
+            float healedHp = SingleWallDefenseRules.HealByMaxPercent(wall.CurrentHP, wall.MaxHP, percent);
+            if (Mathf.Approximately(healedHp, wall.CurrentHP))
+                return;
+
+            wall.CurrentHP = healedHp;
             _entityManager.SetComponentData(_castleEntity, wall);
             Wall = wall;
-
-            var gate = _entityManager.GetComponentData<GateComponent>(_castleEntity);
-            gate.CurrentHP = Mathf.Min(gate.MaxHP, gate.CurrentHP + gate.MaxHP * percent);
-            _entityManager.SetComponentData(_castleEntity, gate);
-            Gate = gate;
-
-            var castle = _entityManager.GetComponentData<CastleHP>(_castleEntity);
-            castle.CurrentHP = Mathf.Min(castle.MaxHP, castle.CurrentHP + castle.MaxHP * percent);
-            _entityManager.SetComponentData(_castleEntity, castle);
-            Castle = castle;
         }
 
         private void ApplyCouncilCapBonus(EconomyFocusType resource, int amount)
@@ -2077,8 +2053,6 @@ namespace DeadWalls
                 IronWorkers = PopulationAllocation.IronWorkers,
                 FoodWorkers = PopulationAllocation.FoodWorkers,
                 WallCurrentHP = Wall.CurrentHP,
-                GateCurrentHP = Gate.CurrentHP,
-                CastleCurrentHP = Castle.CurrentHP,
                 BasicArchers = BasicArcherCount,
                 RapidArchers = RapidArcherCount,
                 FrostArchers = FrostArcherCount,
@@ -2243,16 +2217,11 @@ namespace DeadWalls
                 _entityManager.SetComponentData(_castleEntity, upgrade);
             }
 
-            // 6) Savunma CurrentHP EN SON (MaxHP tech/meta aggregate'lerinden kuruldu)
+            // 6) Wall CurrentHP EN SON (MaxHP tech/meta aggregate'lerinden kuruldu)
             var wall = _entityManager.GetComponentData<WallSegment>(_castleEntity);
-            wall.CurrentHP = Mathf.Min(save.WallCurrentHP, wall.MaxHP);
+            wall.CurrentHP = Mathf.Clamp(save.WallCurrentHP, 0f, wall.MaxHP);
             _entityManager.SetComponentData(_castleEntity, wall);
-            var gate = _entityManager.GetComponentData<GateComponent>(_castleEntity);
-            gate.CurrentHP = Mathf.Min(save.GateCurrentHP, gate.MaxHP);
-            _entityManager.SetComponentData(_castleEntity, gate);
-            var castle = _entityManager.GetComponentData<CastleHP>(_castleEntity);
-            castle.CurrentHP = Mathf.Min(save.CastleCurrentHP, castle.MaxHP);
-            _entityManager.SetComponentData(_castleEntity, castle);
+            Wall = wall;
 
             // 7) Restore gunu Dawn'i atladi — gunun council karti elle roll edilir
             TryRollCouncilEvent();
@@ -2623,24 +2592,25 @@ namespace DeadWalls
             entities.Dispose();
         }
 
-        private bool RepairGate()
+        private bool RepairWallToFull()
         {
-            if (!CanAccessEntityManager() || !_entityManager.Exists(_castleEntity)) return false;
+            if (!CanAccessEntityManager()
+                || !_entityManager.Exists(_castleEntity)
+                || !_entityManager.Exists(_gameStateEntity))
+                return false;
 
+            var gameState = _entityManager.GetComponentData<GameStateData>(_gameStateEntity);
             var wall = _entityManager.GetComponentData<WallSegment>(_castleEntity);
-            wall.CurrentHP = wall.MaxHP;
+            if (gameState.IsGameOver || SingleWallDefenseRules.IsDestroyed(wall.CurrentHP))
+                return false;
+
+            float repairedHp = SingleWallDefenseRules.RepairToFull(wall.CurrentHP, wall.MaxHP);
+            if (repairedHp <= wall.CurrentHP + 0.001f)
+                return false;
+
+            wall.CurrentHP = repairedHp;
             _entityManager.SetComponentData(_castleEntity, wall);
             Wall = wall;
-
-            var gate = _entityManager.GetComponentData<GateComponent>(_castleEntity);
-            gate.CurrentHP = gate.MaxHP;
-            _entityManager.SetComponentData(_castleEntity, gate);
-            Gate = gate;
-
-            var castle = _entityManager.GetComponentData<CastleHP>(_castleEntity);
-            castle.CurrentHP = castle.MaxHP;
-            _entityManager.SetComponentData(_castleEntity, castle);
-            Castle = castle;
             return true;
         }
 
@@ -3572,18 +3542,11 @@ namespace DeadWalls
                 FoodPerAssignedPerMin = mobileMode ? 0.25f : 2f
             });
 
-            // Kale resetle
-            var castle = _entityManager.GetComponentData<WallSegment>(_castleEntity);
-            castle.CurrentHP = castle.MaxHP;
-            _entityManager.SetComponentData(_castleEntity, castle);
-
-            var gate = _entityManager.GetComponentData<GateComponent>(_castleEntity);
-            gate.CurrentHP = gate.MaxHP;
-            _entityManager.SetComponentData(_castleEntity, gate);
-
-            var castleHP = _entityManager.GetComponentData<CastleHP>(_castleEntity);
-            castleHP.CurrentHP = castleHP.MaxHP;
-            _entityManager.SetComponentData(_castleEntity, castleHP);
+            // Wall resetle
+            var wall = _entityManager.GetComponentData<WallSegment>(_castleEntity);
+            wall.CurrentHP = wall.MaxHP;
+            _entityManager.SetComponentData(_castleEntity, wall);
+            Wall = wall;
 
             // Kale yukseltme resetle
             if (_entityManager.HasComponent<CastleUpgradeData>(_castleEntity))

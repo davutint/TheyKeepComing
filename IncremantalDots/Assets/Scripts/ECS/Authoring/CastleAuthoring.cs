@@ -6,8 +6,8 @@ namespace DeadWalls
     public class CastleAuthoring : MonoBehaviour
     {
         public float WallHP = 200f;
-        public float GateHP = 100f;
-        public float CastleMaxHP = 500f;
+        [HideInInspector] public float GateHP = 100f;
+        [HideInInspector] public float CastleMaxHP = 500f;
         public float WallXPos = 4.76f;
 
         [Header("Kale Yukseltme")]
@@ -26,16 +26,6 @@ namespace DeadWalls
                 {
                     MaxHP = authoring.WallHP,
                     CurrentHP = authoring.WallHP
-                });
-                AddComponent(entity, new GateComponent
-                {
-                    MaxHP = authoring.GateHP,
-                    CurrentHP = authoring.GateHP
-                });
-                AddComponent(entity, new CastleHP
-                {
-                    MaxHP = authoring.CastleMaxHP,
-                    CurrentHP = authoring.CastleMaxHP
                 });
                 AddComponent(entity, new WallXPosition
                 {

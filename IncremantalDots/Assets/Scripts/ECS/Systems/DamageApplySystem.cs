@@ -7,7 +7,7 @@ namespace DeadWalls
     /// <summary>
     /// TEK SYNC POINT: Tum physics + attack job'lari burada tamamlanir.
     /// ZombieAttackTimerSystem'in DamageQueue'sunu drain eder,
-    /// hasari Wall -> Gate -> Castle sirasina gore uygular.
+    /// hasari yalniz Wall'a uygular; Wall sifirlandiginda Game Over tetikler.
     /// </summary>
     // [BurstCompile] struct'tan kaldirildi — static field erisimi (ZombieAttackTimerSystem.DamageQueue)
     [UpdateInGroup(typeof(SimulationSystemGroup))]
@@ -30,6 +30,12 @@ namespace DeadWalls
             if (!damageQueue.IsCreated || damageQueue.Count == 0)
                 return;
 
+            if (SystemAPI.GetSingleton<GameStateData>().IsGameOver)
+            {
+                damageQueue.Clear();
+                return;
+            }
+
             if (SystemAPI.HasSingleton<WaveStateData>() &&
                 SystemAPI.GetSingleton<WaveStateData>().StressTestMode)
             {
@@ -48,34 +54,18 @@ namespace DeadWalls
 
             var wallEntity = SystemAPI.GetSingletonEntity<WallSegment>();
             var wall = SystemAPI.GetComponentRW<WallSegment>(wallEntity);
-            var gate = SystemAPI.GetComponentRW<GateComponent>(wallEntity);
-            var castle = SystemAPI.GetComponentRW<CastleHP>(wallEntity);
 
             float totalAppliedDamage = 0f;
             while (damageQueue.TryDequeue(out float damage))
             {
-                float finalDamage = damage * damageMultiplier;
-                totalAppliedDamage += finalDamage;
-                // Oncelik: Duvar -> Kapi -> Kale
-                if (wall.ValueRO.CurrentHP > 0f)
-                {
-                    wall.ValueRW.CurrentHP = math.max(0f, wall.ValueRO.CurrentHP - finalDamage);
-                }
-                else if (gate.ValueRO.CurrentHP > 0f)
-                {
-                    gate.ValueRW.CurrentHP = math.max(0f, gate.ValueRO.CurrentHP - finalDamage);
-                }
-                else
-                {
-                    castle.ValueRW.CurrentHP = math.max(0f, castle.ValueRO.CurrentHP - finalDamage);
-                }
+                float previousHp = wall.ValueRO.CurrentHP;
+                float nextHp = SingleWallDefenseRules.ApplyDamage(previousHp, damage, damageMultiplier);
+                totalAppliedDamage += math.max(0f, previousHp - nextHp);
+                wall.ValueRW.CurrentHP = nextHp;
             }
 
-            // DIKKAT: EmitCastleHitFeedback CreateEntity yapar (structural change) ve yukaridaki
-            // wall/gate/castle RefRW'lerini GECERSIZ kilar. Kale HP'si structural change'den ONCE
-            // lokale alinir; aksi halde castle.ValueRO ObjectDisposedException firlatir ve
-            // GameOver hic tetiklenmezdi.
-            float remainingCastleHp = castle.ValueRO.CurrentHP;
+            // Structural change oncesinde Wall HP lokale alinir.
+            float remainingWallHp = wall.ValueRO.CurrentHP;
 
             if (totalAppliedDamage > 0f)
             {
@@ -83,19 +73,20 @@ namespace DeadWalls
                 if (SystemAPI.HasSingleton<MobileCastleCombatConfig>())
                 {
                     var mobileConfig = SystemAPI.GetSingleton<MobileCastleCombatConfig>();
-                    // Tek cephe: vurus geri bildirimi duvar hattinda; 360 modda kale merkezinde
                     feedbackCenter = mobileConfig.SingleFrontEnabled
                         ? new float2(mobileConfig.FrontlineX, 0f)
                         : mobileConfig.CastleCenter;
                 }
+
                 EmitCastleHitFeedback(ref state, feedbackCenter);
             }
 
-            // Game Over kontrolu (structural change sonrasi taze RefRW alinir)
-            if (remainingCastleHp <= 0f)
+            // Tek sonuc otoritesi Wall'dir. Sifir HP, tek yonlu ve kesin Game Over'dir.
+            if (SingleWallDefenseRules.IsDestroyed(remainingWallHp))
             {
                 var gameState = SystemAPI.GetSingletonRW<GameStateData>();
-                gameState.ValueRW.IsGameOver = true;
+                if (!gameState.ValueRO.IsGameOver)
+                    gameState.ValueRW.IsGameOver = true;
             }
         }
 

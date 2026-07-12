@@ -76,7 +76,7 @@ Script eklendikten sonra disaridan manuel compile komutu calistirma. Unity refre
   - Local Scale: `1`
 - `MobileCastleHudRoot`
   - `HUDController`: economy text'leri, `WaveText`, `KillsText`, `WaveRewardText`, `DamageFlashImage` ve varsa defense module alanlari bagli olmali.
-  - Defense module: `DefensePercentText`, `DefenseWallFill`, `DefenseGateFill`, `DefenseCoreFill`, `DefenseWallText`, `DefenseGateText`, `DefenseCoreText`.
+  - Defense module: `DefensePercentText`, `DefenseWallFill`, `DefenseWallText`. Legacy Gate/Core referanslari serialize uyumlulugu icin kalabilir ama runtime'da gizlenir.
   - `MarketUI`: `ArcherDrawerPanel`, `DrawerToggleButton`, Basic/Rapid/Frost row buy alanlari bagli olmali.
   - `MarketUI`: `Basic/Rapid/FrostUpgradeButton`, `ArrowTechPanel`, `RapidTechUnlockButton`, `FrostTechUnlockButton` prefabda varsa player-facing olarak gizlenmelidir.
   - Castle Yard: `RepairButton`; polish prefabda varsa `FortifyButton`, `RallyButton` ve cost/status text'leri.
@@ -104,7 +104,7 @@ Script eklendikten sonra disaridan manuel compile komutu calistirma. Unity refre
 - Kaynak yetmiyorsa ilgili row `CostText` alaninda `NEED ...` gorunur.
 - Sag panelde upgrade butonu gorunmez; panel sadece okcu satin alma icindir.
 - Frost oklar hedef zombiyi yavaslatir.
-- `Repair` day prep sirasinda savunma HP'lerini onarir.
+- `Repair` tek Wall HP'sini onarir; Wall 0/Game Over sonrasi diriltme yapmaz.
 - Oyun kisa `DAY 01` hazirligi ile baslar, sayac bitince `NIGHT 01` otomatik baslar.
 - Wave basi daha sakin, wave sonu daha baskili akar.
 - Spawn yonleri tam random 360 kalir.
@@ -112,7 +112,7 @@ Script eklendikten sonra disaridan manuel compile komutu calistirma. Unity refre
 - Day prep boyunca overlay alpha `0 -> 0.50` artar, night combat'ta `0.50` sabit kalir.
 - Ok sayisi HUD'da `INF` gorunur ve mobile modda atis ok stogu dusurmez.
 - `Repair`, `Fortify` ve `Rally` sadece day prep sirasinda aktif olur.
-- HUD'da defense module barlari wall/gate/core HP'yi gosterir; wave clear bonusu kisa `Wave Cleared +...` feedback'i verir.
+- HUD'da tek Wall bari gorunur; wave clear bonusu kisa `Wave Cleared +...` feedback'i verir.
 - Wave son `20%` bolumunde wave/kills text'i threat rengine gecer; savunma hasarinda kisa red flash gorunur.
 - Wave bitince clear bonus tek sefer eklenir.
 

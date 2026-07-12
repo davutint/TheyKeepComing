@@ -1,0 +1,171 @@
+{
+  "input": "C:\\GithubProjeler\\TheyKeepComing\\IncremantalDots\\Assets\\Docs\\DEAD_WALLS_GAME_DESIGN_BLUEPRINT_v1.0.docx",
+  "fonts_by_char_count": {
+    "Calibri": 37127,
+    "Arial": 240
+  },
+  "direct_run_formatting_runs": 1023,
+  "direct_paragraph_formatting_paragraphs": 1061,
+  "heading_like_paragraphs_not_heading_style": [
+    {
+      "para_index": 1,
+      "text": "OWNER-APPROVED GAME DESIGN BLUEPRINT",
+      "style": "Normal"
+    },
+    {
+      "para_index": 2,
+      "text": "DEAD WALLS",
+      "style": "Normal"
+    },
+    {
+      "para_index": 3,
+      "text": "Infinite Siege | Incremental Economy | Procedural Castle Heart",
+      "style": "Normal"
+    },
+    {
+      "para_index": 6,
+      "text": "PC / STEAM PRODUCT FRAME  |  UNITY 6 DOTS/ECS  |  VERSION 1.0  |  12 JULY 2026",
+      "style": "Normal"
+    },
+    {
+      "para_index": 9,
+      "text": "FRONT MATTER 01",
+      "style": "Normal"
+    },
+    {
+      "para_index": 24,
+      "text": "FRONT MATTER 02",
+      "style": "Normal"
+    },
+    {
+      "para_index": 32,
+      "text": "SECTION 01 | PRODUCT",
+      "style": "Normal"
+    },
+    {
+      "para_index": 46,
+      "text": "SECTION 01 | PRODUCT",
+      "style": "Normal"
+    },
+    {
+      "para_index": 59,
+      "text": "SECTION 02 | CORE LOOP",
+      "style": "Normal"
+    },
+    {
+      "para_index": 67,
+      "text": "SECTION 02 | RUN",
+      "style": "Normal"
+    },
+    {
+      "para_index": 80,
+      "text": "SECTION 03 | BATTLEFIELD",
+      "style": "Normal"
+    },
+    {
+      "para_index": 92,
+      "text": "SECTION 03 | HORDE",
+      "style": "Normal"
+    },
+    {
+      "para_index": 106,
+      "text": "SECTION 03 | DEFENSE",
+      "style": "Normal"
+    },
+    {
+      "para_index": 118,
+      "text": "SECTION 04 | ECONOMY",
+      "style": "Normal"
+    },
+    {
+      "para_index": 125,
+      "text": "SECTION 04 | WORKERS",
+      "style": "Normal"
+    },
+    {
+      "para_index": 139,
+      "text": "SECTION 04 | POPULATION",
+      "style": "Normal"
+    },
+    {
+      "para_index": 153,
+      "text": "SECTION 05 | ARCHERS",
+      "style": "Normal"
+    },
+    {
+      "para_index": 166,
+      "text": "SECTION 05 | AMMO",
+      "style": "Normal"
+    },
+    {
+      "para_index": 178,
+      "text": "SECTION 05 | PLACEMENT",
+      "style": "Normal"
+    },
+    {
+      "para_index": 191,
+      "text": "SECTION 05 | COMBAT",
+      "style": "Normal"
+    }
+  ],
+  "examples": {
+    "direct_paragraph_formatting": [
+      {
+        "para_index": 1,
+        "text": "OWNER-APPROVED GAME DESIGN BLUEPRINT",
+        "style": "Normal"
+      },
+      {
+        "para_index": 2,
+        "text": "DEAD WALLS",
+        "style": "Normal"
+      },
+      {
+        "para_index": 3,
+        "text": "Infinite Siege | Incremental Economy | Procedural Castle Heart",
+        "style": "Normal"
+      },
+      {
+        "para_index": 4,
+        "text": "",
+        "style": "Normal"
+      },
+      {
+        "para_index": 5,
+        "text": "A fixed wall. One enemy. Ten thousand bodies. One run.",
+        "style": "Normal"
+      }
+    ],
+    "direct_run_formatting": [
+      {
+        "para_index": 1,
+        "run_text": "OWNER-APPROVED GAME DESIGN BLUEPRINT",
+        "style": "Normal"
+      },
+      {
+        "para_index": 2,
+        "run_text": "DEAD WALLS",
+        "style": "Normal"
+      },
+      {
+        "para_index": 3,
+        "run_text": "Infinite Siege | Incremental Economy | Procedural Castle Heart",
+        "style": "Normal"
+      },
+      {
+        "para_index": 5,
+        "run_text": "A fixed wall. One enemy. Ten thousand bodies. One run.",
+        "style": "Normal"
+      },
+      {
+        "para_index": 6,
+        "run_text": "PC / STEAM PRODUCT FRAME  |  UNITY 6 DOTS/ECS  |  VERSION 1.0  |  12 JULY 2026",
+        "style": "Normal"
+      }
+    ]
+  },
+  "notes": [
+    "Direct formatting is not always wrong, but it often causes inconsistent output when templates change.",
+    "Heading-like paragraphs not using Heading styles can break TOC and accessibility."
+  ]
+}

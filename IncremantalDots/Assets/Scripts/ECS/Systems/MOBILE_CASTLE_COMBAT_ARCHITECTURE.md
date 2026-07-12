@@ -180,7 +180,7 @@ Yeni imported HUD varsa cycle paneli player-facing zaman bilgisini gosterir:
 - `HordePressurePanel`: prefabda bulunsa bile player-facing olarak kapali tutulur
 - Fallback eski HUD varsa wave text sadece `DAY/DUSK/NIGHT`, kills text ise hedef sayi olmadan `KILLS x` yazar.
 
-HUD varsa `CastleDefensePanel` uzerindeki `DefenseWallFill`, `DefenseGateFill`, `DefenseCoreFill` ve yuzde text'lerini gunceller. Toplam defense yuzdesi wall, gate ve castle current/max HP toplamindan hesaplanir; eski `DefenseText` sadece fallback olarak kalir. Night/high pressure durumunda threat rengi kullanilabilir; savunma hasar aldiginda kisa red flash feedback'i verilir.
+HUD varsa `CastleDefensePanel` uzerindeki tek `DefenseWallFill` ve Wall yuzdesini gunceller. Legacy Gate/Core track ve text'leri runtime'da gizlenir. Night/high pressure durumunda threat rengi kullanilabilir; Wall hasar aldiginda kisa red flash feedback'i verilir.
 
 Sol ust economy HUD mevcut kaynaklari gosterir: Wood, Stone, Iron, Food, Population, Arrows. Runtime text'ler label tekrar etmez; kutu basligi UI'da, value/rate text'i kod tarafindadir. HUD rate degeri mobile population allocation tarafindan yazilan worker production'dir. NewGameScene mobile default'lari:
 
@@ -259,7 +259,7 @@ Bu milestone'da okcu hard cap yoktur. Gelecekte limit nufus/kaynak ekonomisinden
 
 World visual tilemap'leri main scene tarafinda owner kontrolundedir. Setup tool artik world visuals uretmez veya boyamaz.
 
-Wall/gate/core cani hala `CastleAuthoring` bake edilen ECS verisinden gelir; zombi spawn'i tam random 360 kalir. Gorsel katmandan okunan tek runtime veri `outside` tilemap okcu spawn hucreleridir.
+Tek Wall cani `CastleAuthoring` tarafindan bake edilen `WallSegment` verisinden gelir; Gate/Core sonuc zincirinde yoktur. Zombi spawn'i tam random 360 kalir. Gorsel katmandan okunan tek runtime veri `outside` tilemap okcu spawn hucreleridir.
 
 ## Stress Test
 

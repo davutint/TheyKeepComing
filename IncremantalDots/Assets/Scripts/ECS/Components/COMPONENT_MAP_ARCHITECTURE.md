@@ -20,9 +20,9 @@ Tum component'lar unmanaged ECS struct olarak tutulur. Davranis sistemlerde, ver
 
 ## CastleComponents.cs
 
-- `WallSegment`: duvar HP bilgisi.
-- `GateComponent`: kapi HP bilgisi.
-- `CastleHP`: kale ana HP bilgisi.
+- `WallSegment`: tek runtime savunma HP bilgisi ve Game Over otoritesi.
+- `GateComponent`: yalniz eski Entity Scene verisiyle uyumluluk icin tutulan legacy tip; aktif bake/runtime zincirinde kullanilmaz.
+- `CastleHP`: yalniz legacy uyumluluk tipi; sonuc otoritesi degildir.
 - `WallXPosition`: eski mode'da duvarin X koordinati.
 - `CastleUpgradeData`: kale upgrade seviyesi ve maliyetleri.
 
@@ -97,7 +97,7 @@ PhysicsCollisionSystem -> PhysicsBody.Velocity + LocalTransform yazar
 IntegrateSystem -> PhysicsBody.Force -> Velocity -> LocalTransform.Position
 BoundarySystem -> ZombieState gecirir
 ZombieAttackSystem -> hasar queue yazar
-DamageApplySystem -> Wall/Gate/Castle HP yazar
+DamageApplySystem -> yalniz WallSegment HP yazar; Wall 0 ise GameStateData.IsGameOver
 ZombieDeathSystem -> ZombieState.Dead isaretler
 DamageCleanupSystem -> Dead entity'leri siler, GameStateData.XP ve mobile kill reward gunceller
 ```

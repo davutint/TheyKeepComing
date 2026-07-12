@@ -10,12 +10,12 @@ ECS dunyasinin tam fotografi cekilmez). Roguelite kurali: OLUM ve NEW RUN checkp
 ## Tasarim ilkesi: yalniz recompute-EDILEMEYENI kaydet
 
 Save dosyasi kucuk bir ekonomik ozettir; ne kadar az alan, o kadar az bozulma/versiyon riski.
-- KAYDEDILIR: gun (CycleIndex), kaynaklar, nufus + isci dagilimi, savunma CurrentHP'leri,
+- KAYDEDILIR: gun (CycleIndex), kaynaklar, nufus + isci dagilimi, tek Wall CurrentHP,
   okcu SAYILARI + tip yukseltme seviyeleri, tech SATIN-ALMA seviyeleri, level-up kart
   tier'lari + global bonuslar, council hafizasi (flags/recent/oneshot/pity/cooldown/SALT/
   cap bonuslari), economy focus, XP/kill sayaclari.
 - KAYDEDILMEZ (recompute): tech carpanlari, reveal listesi, spell unlock/degerleri,
-  meta bonuslari, savunma MaxHP'leri, uretim oranlari, unlocked okcu tipleri, okcu
+  meta bonuslari, Wall MaxHP, uretim oranlari, unlocked okcu tipleri, okcu
   POZISYONLARI (tilemap slot sirasina yeniden dizilir), zombiler/oklar, aktif council karti
   (deterministik seed'den ayni kart yeniden roll edilir), transient state'ler.
 
@@ -41,7 +41,7 @@ Save dosyasi kucuk bir ekonomik ozettir; ne kadar az alan, o kadar az bozulma/ve
       savedCycleIndex+1` — cift safak odulu gate'i), PopulationState, cycle
       (`CycleIndex = saved+1`, Phase=Day — YENI GUNUN sabahi; kaydedilen gunun odulleri
       zaten verilmisti), GameStateData, CastleUpgrade
-   f. savunma CurrentHP'leri EN SON (MaxHP aggregate'lerden kurulduktan sonra; clamp'li)
+   f. Wall CurrentHP EN SON (MaxHP aggregate'lerden kurulduktan sonra; clamp'li)
    g. restore Dawn'i atladigi icin gunun council karti elle `TryRollCouncilEvent()`
 5. **UI — AYRI ANA MENU SAHNESI (M-E v2, owner istegi)**: `Assets/Scenes/MainMenuScene.unity`
    (build index 0) — hafif sahne: kamera + Canvas + `MainMenuSceneUI`. Gorseller runtime
