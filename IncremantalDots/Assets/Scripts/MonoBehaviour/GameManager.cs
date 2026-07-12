@@ -101,8 +101,6 @@ namespace DeadWalls
         private float _baseIronProductionPerMin;
         private float _baseFoodProductionPerMin;
         private int _basePopulationGrowthPerCycle;
-        private float _baseMoatSlowMultiplier = 1f;
-        private float _baseMoatDamagePerSecond;
         private bool _techDefenseBaselineCaptured;
         private float _baseWallMaxHp;
 
@@ -1556,9 +1554,11 @@ namespace DeadWalls
                     case TechNodeEffectType.IncreaseWorkerCap:
                     case TechNodeEffectType.IncreaseResourceProductionPercent:
                     case TechNodeEffectType.IncreasePopulationGrowth:
+                        economyDirty = true;
+                        break;
                     case TechNodeEffectType.DeepenMoatSlowPercent:
                     case TechNodeEffectType.AddMoatDamagePerSecond:
-                        economyDirty = true; // moat da config aggregate'inde yasar
+                        // V1: legacy Moat effect'i stale catalog/save icinden sizsa dahi etkisiz.
                         break;
                     case TechNodeEffectType.IncreaseDefenseMaxHpPercent:
                         defenseDirty = true;
@@ -1621,15 +1621,12 @@ namespace DeadWalls
                 _baseIronProductionPerMin = config.IronWorkerProductionPerMin;
                 _baseFoodProductionPerMin = config.FoodWorkerProductionPerMin;
                 _basePopulationGrowthPerCycle = config.PopulationGrowthPerDayPrep;
-                _baseMoatSlowMultiplier = config.MoatSlowMultiplier;
-                _baseMoatDamagePerSecond = config.MoatDamagePerSecond;
                 _techConfigBaselineCaptured = true;
             }
 
             int woodCap = 0, stoneCap = 0, ironCap = 0, foodCap = 0;
             float woodProd = 0f, stoneProd = 0f, ironProd = 0f, foodProd = 0f;
             int growth = 0;
-            float moatSlowReduction = 0f, moatDamageBonus = 0f;
 
             if (techTreeCatalog != null && techTreeCatalog.Nodes != null)
             {
@@ -1669,12 +1666,6 @@ namespace DeadWalls
                             case TechNodeEffectType.IncreasePopulationGrowth:
                                 growth += Mathf.RoundToInt(effect.Value) * level;
                                 break;
-                            case TechNodeEffectType.DeepenMoatSlowPercent:
-                                moatSlowReduction += effect.Value * level;
-                                break;
-                            case TechNodeEffectType.AddMoatDamagePerSecond:
-                                moatDamageBonus += effect.Value * level;
-                                break;
                         }
                     }
                 }
@@ -1691,9 +1682,7 @@ namespace DeadWalls
             config.IronWorkerProductionPerMin = _baseIronProductionPerMin * (1f + ironProd + _metaProductionPercent);
             config.FoodWorkerProductionPerMin = _baseFoodProductionPerMin * (1f + foodProd + _metaProductionPercent);
             config.PopulationGrowthPerDayPrep = _basePopulationGrowthPerCycle + growth;
-            // Hendek evrimi (K4): tech yavaslatmayi derinlestirir, gecis hasarini acar/buyutur
-            config.MoatSlowMultiplier = Mathf.Clamp(_baseMoatSlowMultiplier - moatSlowReduction, 0.05f, 1f);
-            config.MoatDamagePerSecond = Mathf.Max(0f, _baseMoatDamagePerSecond + moatDamageBonus);
+            MoatDormancyRules.ApplyV1(ref config);
             _entityManager.SetComponentData(configEntity, config);
         }
 
@@ -1768,8 +1757,7 @@ namespace DeadWalls
                 config.IronWorkerProductionPerMin = _baseIronProductionPerMin;
                 config.FoodWorkerProductionPerMin = _baseFoodProductionPerMin;
                 config.PopulationGrowthPerDayPrep = _basePopulationGrowthPerCycle;
-                config.MoatSlowMultiplier = _baseMoatSlowMultiplier;
-                config.MoatDamagePerSecond = _baseMoatDamagePerSecond;
+                MoatDormancyRules.ApplyV1(ref config);
                 _entityManager.SetComponentData(configEntity, config);
             }
 
@@ -2960,7 +2948,9 @@ namespace DeadWalls
         /// <summary>Meta ile acilan tech: maliyetsiz, hedef seviyeye tamamlar (reveal + effect'ler dahil).</summary>
         private void GrantTechNodeLevelsFromMeta(string nodeId, int targetLevel)
         {
-            if (techTreeCatalog == null || string.IsNullOrEmpty(nodeId))
+            if (techTreeCatalog == null
+                || string.IsNullOrEmpty(nodeId)
+                || MoatDormancyRules.IsDormantTechNodeId(nodeId))
                 return;
 
             var node = techTreeCatalog.GetNode(nodeId);

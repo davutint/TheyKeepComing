@@ -2,9 +2,11 @@ using System.Collections;
 using System.IO;
 using NUnit.Framework;
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
+using Unity.Transforms;
 
 namespace DeadWalls.Tests
 {
@@ -271,6 +273,9 @@ namespace DeadWalls.Tests
             Assert.That(config.SiegeNightDuration, Is.EqualTo(20f));
             Assert.That(config.SiegeDawnDuration, Is.EqualTo(5f));
             Assert.That(config.SpawnLineX, Is.EqualTo(27f));
+            Assert.That(config.MoatGameplayEnabled, Is.False);
+            Assert.That(config.MoatSlowMultiplier, Is.EqualTo(1f));
+            Assert.That(config.MoatDamagePerSecond, Is.Zero);
             Assert.That(samples.Length, Is.EqualTo(60));
             Assert.That(samples[0].NightIntensityMult, Is.EqualTo(0.5f));
             Assert.That(samples[4].BloodMoonIntensityMult, Is.EqualTo(1f));
@@ -564,6 +569,62 @@ namespace DeadWalls.Tests
             Assert.That(drainedBudget.PendingEnemies, Is.EqualTo(pendingBeforeDrain - 1));
             Assert.That(drainedBudget.TotalSpawnedEnemies, Is.EqualTo(1));
             Assert.That(drainedWave.ZombiesAlive, Is.EqualTo(1));
+        }
+
+        [UnityTest]
+        public IEnumerator StaleMoatTuning_CannotSlowOrDamageZombieInV1Runtime()
+        {
+            var gameManager = GameManager.Instance;
+            bool runtimeReady = false;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                {
+                    runtimeReady = true;
+                    break;
+                }
+                yield return null;
+            }
+            Assert.That(runtimeReady, Is.True);
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            Entity configEntity = entityManager.CreateEntityQuery(typeof(MobileCastleCombatConfig)).GetSingletonEntity();
+            var config = entityManager.GetComponentData<MobileCastleCombatConfig>(configEntity);
+            config.MoatGameplayEnabled = false;
+            config.MoatXMin = -1f;
+            config.MoatXMax = 1f;
+            config.MoatSlowMultiplier = 0.05f;
+            config.MoatDamagePerSecond = 100000f;
+            entityManager.SetComponentData(configEntity, config);
+
+            Entity zombie = entityManager.CreateEntity(
+                typeof(ZombieTag),
+                typeof(ZombieStats),
+                typeof(ZombieState),
+                typeof(ZombieSlow),
+                typeof(LocalTransform));
+            entityManager.SetComponentData(zombie, new ZombieStats
+            {
+                MoveSpeed = 3f,
+                MaxHP = 100f,
+                CurrentHP = 100f,
+                AttackDamage = 0f,
+                AttackCooldown = 999f,
+                AttackTimer = 999f
+            });
+            entityManager.SetComponentData(zombie, new ZombieState { Value = ZombieStateType.Queued });
+            entityManager.SetComponentData(zombie, new ZombieSlow { Duration = 0f, SpeedMultiplier = 1f });
+            entityManager.SetComponentEnabled<ZombieSlow>(zombie, false);
+            entityManager.SetComponentData(zombie,
+                LocalTransform.FromPositionRotationScale(new float3(0f, 100f, 0f), quaternion.identity, 1f));
+
+            yield return null;
+            yield return null;
+
+            var stats = entityManager.GetComponentData<ZombieStats>(zombie);
+            Assert.That(stats.CurrentHP, Is.EqualTo(100f));
+            Assert.That(stats.MoveSpeed, Is.EqualTo(3f));
+            Assert.That(entityManager.IsComponentEnabled<ZombieSlow>(zombie), Is.False);
         }
     }
 }

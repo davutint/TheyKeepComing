@@ -1016,25 +1016,6 @@ namespace DeadWalls
                     RevealChildren = new string[0],
                     Effects = new[] { new TechNodeEffect { Type = TechNodeEffectType.ReduceRepairCostPercent, Value = 0.20f } }
                 },
-                // Hendek evrimi (K4 Tek Cephe): cukur derinlesir, sonra alev/dikene evrilir
-                new TechNodeSeed
-                {
-                    Id = "moat_dig", Title = "Deeper Moat",
-                    Description = "Dig the moat deeper: +10% slow per level.",
-                    Cost = new ResourceCost(40, 90, 0, 0), MaxLevel = 3, CostGrowthPerLevel = 0.35f,
-                    Prerequisites = new[] { "wall_reinforcement" },
-                    RevealChildren = new[] { "moat_flame" },
-                    Effects = new[] { new TechNodeEffect { Type = TechNodeEffectType.DeepenMoatSlowPercent, Value = 0.10f } }
-                },
-                new TechNodeSeed
-                {
-                    Id = "moat_flame", Title = "Burning Moat",
-                    Description = "Oil and stakes: crossing the moat deals 4 dmg/s per level.",
-                    Cost = new ResourceCost(60, 60, 70, 0), MaxLevel = 3, CostGrowthPerLevel = 0.45f,
-                    Prerequisites = new[] { "moat_dig" },
-                    RevealChildren = new string[0],
-                    Effects = new[] { new TechNodeEffect { Type = TechNodeEffectType.AddMoatDamagePerSecond, Value = 4f } }
-                },
                 // ---- Buyuculuk dali (M-C): oyuncunun aktif savas gucu ----
                 new TechNodeSeed
                 {
@@ -1086,8 +1067,6 @@ namespace DeadWalls
             ("bow_training", "bow_mastery"),
             ("rapid_volley", "volley_mastery"),
             ("repair_crew", "repair_efficiency"),
-            ("wall_reinforcement", "moat_dig"),
-            ("moat_dig", "moat_flame"),
             // castle_heart asset'i diskte mevcut — buyuculuk dalinin reveal'i ancak link merge ile acilir
             ("castle_heart", "arcane_tower"),
         };
@@ -1133,7 +1112,9 @@ namespace DeadWalls
             var merged = new List<TechNodeDefinitionSO>(nodes.Length + seedAssets.Count);
             for (int i = 0; i < nodes.Length; i++)
             {
-                if (nodes[i] != null && !merged.Contains(nodes[i]))
+                if (nodes[i] != null
+                    && !MoatDormancyRules.IsDormantTechNodeId(nodes[i].Id)
+                    && !merged.Contains(nodes[i]))
                     merged.Add(nodes[i]);
             }
 
@@ -1176,7 +1157,7 @@ namespace DeadWalls
 
         // ---------------------------------------------------------------------------------
         // Meta upgrade seed (roguelite magazasi): ivme + hafif guc paketi (M-B karari).
-        // Merge-only: mevcut asset degerlerine ve kullanicinin ekledigi upgrade'lere dokunulmaz.
+        // Aktif V1 seed'leri merge edilir; rezerve dormant Moat id'si catalog disinda tutulur.
         // ---------------------------------------------------------------------------------
 
         private static MetaUpgradeCatalogSO EnsureDefaultMetaUpgradeCatalog()
@@ -1207,14 +1188,6 @@ namespace DeadWalls
                     u.Description = "Start each run with extra archers on the wall.";
                     u.EffectType = MetaUpgradeEffectType.StartingArchers;
                     u.ValuePerLevel = 1f; u.MaxLevel = 3; u.BaseCost = 400; u.CostGrowthPerLevel = 1.0f;
-                }),
-                EnsureMetaUpgrade("start_moat", u =>
-                {
-                    u.Title = "Old Trenches";
-                    u.Description = "Start each run with the moat already dug (Deeper Moat unlocked).";
-                    u.EffectType = MetaUpgradeEffectType.StartingTechLevel;
-                    u.TechNodeId = "moat_dig";
-                    u.ValuePerLevel = 1f; u.MaxLevel = 2; u.BaseCost = 600; u.CostGrowthPerLevel = 1.2f;
                 }),
                 EnsureMetaUpgrade("wall_hp", u =>
                 {
@@ -1250,7 +1223,9 @@ namespace DeadWalls
             if (catalog.Upgrades != null)
             {
                 foreach (var u in catalog.Upgrades)
-                    if (u != null && !merged.Contains(u))
+                    if (u != null
+                        && !MoatDormancyRules.IsDormantMetaUpgradeId(u.Id)
+                        && !merged.Contains(u))
                         merged.Add(u);
             }
             bool changed = false;
@@ -1258,7 +1233,7 @@ namespace DeadWalls
             {
                 if (u != null && !merged.Contains(u)) { merged.Add(u); changed = true; }
             }
-            if (changed)
+            if (changed || merged.Count != (catalog.Upgrades?.Length ?? 0))
             {
                 Undo.RecordObject(catalog, "Configure Meta Upgrade Catalog");
                 catalog.Upgrades = merged.ToArray();

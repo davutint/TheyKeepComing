@@ -38,6 +38,10 @@ namespace DeadWalls
             }
 
             var config = SystemAPI.GetSingleton<MobileCastleCombatConfig>();
+            // V1 Blueprint: legacy Moat content'i saklanir fakat core combat'a baglanmaz.
+            if (!MoatDormancyRules.IsGameplayEnabled(config))
+                return;
+
             bool slowActive = config.MoatSlowMultiplier < 0.999f;
             bool damageActive = config.MoatDamagePerSecond > 0f;
             if (!config.SingleFrontEnabled || (!slowActive && !damageActive))

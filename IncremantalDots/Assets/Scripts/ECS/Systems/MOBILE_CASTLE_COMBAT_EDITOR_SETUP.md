@@ -102,6 +102,7 @@ Script eklendikten sonra disaridan manuel compile komutu calistirma. Unity refre
 - Zombi oldukce mobile resource reward artar; mobile loop'ta XP level-up pause tetiklemez.
 - Zombi oldukce Wood/Food/Stone/Iron reward'i accumulator uzerinden artar.
 - `MaxAliveZombies` doluyken spawn talebi kaybolmaz; `ContinuousSpawnBudgetData.PendingEnemies` artar ve kapasite açılınca `MaxSpawnBatch` sınırıyla azalır.
+- V1 runtime config'te Moat gameplay kapalı, slow `1`, damage `0` olmalıdır. `moat_dig`, `moat_flame` ve `start_moat` aktif tech/meta catalog'larında görünmemelidir; görsel hendek ground detail olarak kalabilir.
 - XP threshold oyunu durdurmaz; level-up paneli acilmaz.
 - Basic/Rapid/Frost okcular farkli tint ile okunur.
 - Basic/Rapid/Frost oklari okcu tipinin tint'ini miras alir.

@@ -15,9 +15,7 @@
  4. CastleYardPrepSystem / ZombieSlowTimerSystem
     (ikisi de WaveSpawnSystem sonrasi; CastleYardPrepSystem ArcherShootSystem oncesi,
      ZombieSlowTimerSystem ApplyMovementForceSystem oncesi garantilenir)
- 4b. MoatSystem (ZombieSlowTimerSystem SONRASI, ApplyMovementForceSystem ONCESI —
-     hendek bandindaki zombilere ZombieSlow tazeler; timer'in ayni frame disable'i
-     moat tarafindan yeniden enable edilebilir; MoatDamagePerSecond > 0 ise HP asindirir)
+ 4b. MoatSystem (legacy sıra korunur; V1 `MoatGameplayEnabled=false` guard'ında çıkar)
  5. ArcherShootSystem
  6. ApplyMovementForceSystem
  7. BuildSpatialHashSystem
@@ -110,16 +108,12 @@ Presentation tarafinda `SpriteAnimationSystem` UV rect hesaplarini yapar.
 - Frost slow duration'ini azaltir.
 - Slow aktifken zombi `SpriteTint` rengini soguk/mavi yapar.
 
-### MoatSystem (Tek Cephe / K4)
+### MoatSystem (V1 Dormant)
 
-- `SingleFrontEnabled` + hendek etkisi aktifken kosar; `MoatXMin..MoatXMax` bandindaki
-  Moving/Queued zombilere `ZombieSlow` uygular (frost ile ayni kanal: en dusuk carpan kazanir,
-  sure 0.15s tazelenir — banttan cikinca timer dogal sonumler).
-- `MoatDamagePerSecond > 0` (moat_flame tech'i) ise banttaki zombilerin CurrentHP'sini asindirir;
-  olum ZombieDeathSystem'de islenir. Her entity yalniz kendi verisini yazar (ScheduleParallel).
-- Duration bitince multiplier'i `1` yapar ve `ZombieSlow` component'ini pasifler.
-- Duration bitince veya zombi Dead state'e gecince tint'i normale dondurur.
-- `ApplyMovementForceSystem` oncesinde calisir.
+- V1 config `MoatGameplayEnabled=false` olduğu için zombie query/job schedule edilmeden çıkar.
+- Stale `MoatSlowMultiplier` veya `MoatDamagePerSecond` değerleri HP, hız veya slow state'ini değiştiremez.
+- Legacy job ve execution-order attribute'ları gelecekteki içerik/migration için korunur.
+- Ayrıntılı sınır `MOAT_DORMANCY_ARCHITECTURE.md` dosyasındadır.
 
 ### ArcherShootSystem
 

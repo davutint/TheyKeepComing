@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace DeadWalls
 {
-    /// <summary>Meta magaza katalogu. Setup tool merge-only seed eder (mevcut asset'lere dokunulmaz).</summary>
+    /// <summary>Meta magaza katalogu. Setup tool aktif V1 seed'lerini merge eder; rezerve dormant id'leri disarida tutar.</summary>
     [CreateAssetMenu(fileName = "MetaUpgradeCatalog", menuName = "DeadWalls/Mobile Castle/Meta Upgrade Catalog")]
     public class MetaUpgradeCatalogSO : ScriptableObject
     {

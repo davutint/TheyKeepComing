@@ -32,7 +32,7 @@ namespace DeadWalls
         public float MoatXMin = 1.5f;
         public float MoatXMax = 4f;
         [Tooltip("Hendek icindeyken hiz carpani (1 = etkisiz, 0.55 = %45 yavaslatma). Tech dusurur.")]
-        public float MoatSlowMultiplier = 0.55f;
+        public float MoatSlowMultiplier = 1f;
         [Tooltip("Hendek gecis hasari/sn. 0 = kapali; moat_flame tech'i acar.")]
         public float MoatDamagePerSecond = 0f;
 
@@ -219,10 +219,11 @@ namespace DeadWalls
                     FrontlineX = authoring.FrontlineX,
                     SpawnLineX = authoring.SpawnLineX,
                     SpawnBandYHalf = math.max(1f, authoring.SpawnBandYHalf),
+                    MoatGameplayEnabled = false,
                     MoatXMin = math.min(authoring.MoatXMin, authoring.MoatXMax),
                     MoatXMax = math.max(authoring.MoatXMin, authoring.MoatXMax),
-                    MoatSlowMultiplier = math.clamp(authoring.MoatSlowMultiplier, 0.05f, 1f),
-                    MoatDamagePerSecond = math.max(0f, authoring.MoatDamagePerSecond),
+                    MoatSlowMultiplier = 1f,
+                    MoatDamagePerSecond = 0f,
                     BaseSpawnInterval = math.max(0.01f, authoring.BaseSpawnInterval),
                     SpawnIntervalWaveMultiplier = math.clamp(authoring.SpawnIntervalWaveMultiplier, 0.01f, 1f),
                     MinSpawnInterval = math.max(0.01f, authoring.MinSpawnInterval),
@@ -246,6 +247,7 @@ namespace DeadWalls
                     EconomyEventCooldownWaves = math.max(0, authoring.EconomyEventCooldownWaves)
                 };
                 MobileCastleTuningResolver.ApplyDifficultyProfile(ref config, profile);
+                MoatDormancyRules.ApplyV1(ref config);
                 AddComponent(entity, config);
 
                 AddComponent(entity, new EconomyFocusState

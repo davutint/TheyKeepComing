@@ -5,7 +5,7 @@
 > **Tracker sürümü:** 2.0  
 > **Son tam kapsam denetimi:** 2026-07-12  
 > **Aktif paket:** Package B - Continuous Horde
-> **Aktif iş:** `DW-B-MOAT` - Dormant Moat Isolation
+> **Aktif iş:** `DW-B-ENEMY` - Single Enemy Catalog Contract
 
 ---
 
@@ -125,7 +125,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Build placement | Aktif scene'de `BuildingPlacementUI` ve `BuildingGridManager` bağlı değil | Hazır bina yönüyle uyumlu |
 | Cycle | `Day 30 / Dusk 5 / Night 20 / Dawn 5`; dört fazda pozitif spawn temposu | Uyumlu |
 | Horde | Tek prefab; sabit stats; explicit saved backlog; Blood Moon dormant; death hâlâ `DestroyEntity` | Package B kısmi |
-| Moat | `MoatSystem` ve `MoatSlowMultiplier=0.55` aktif combat etkisi uyguluyor | Yalnız dormant kalabilir; active bağlantı onaysız |
+| Moat | Runtime flag kapalı; slow `1`, damage `0`; tech/meta catalog bağlantıları dormant | Uyumlu |
 | Defense | Damage/Game Over aktif olarak tek Wall'a çekildi | Kodlandı, runtime test bekliyor |
 | Normal repair | Wood+Stone maliyeti kullanıyor ve Night phase guard'ı yok | Day/Dusk + Stone-only hedefiyle çelişiyor |
 | Save | Dawn checkpoint; Continue sonraki Day'e geçiyor | Package A kritik uyumsuz |
@@ -145,7 +145,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Meta | Ayrı JSON ve Game Over shop var; `StartingTechLevel` aktif | Kısmi uyum |
 | HUD | CyclePanel, DAY/DUSK/NIGHT ve Horde Pressure mevcut; tek Wall runtime gizleme var | Package I polish gerekli |
 | Tutorial | Aktif tutorial/onboarding sistemi bulunmadı | Package I eksik |
-| Testler | V1 contract testleri EditMode `28/28`, PlayMode `9/9` geçiyor | Kapsam büyüyor |
+| Testler | V1 contract testleri EditMode `30/30`, PlayMode `10/10` geçiyor | Kapsam büyüyor |
 | Telemetry | Spawn budget demanded/spawned/backlog telemetry mevcut; tam Blueprint event owner'ı eksik | Kısmi |
 
 ---
@@ -307,12 +307,20 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [x] Backlog ve demanded/spawned telemetry sayaçları exact save/Continue state'ine eklendi.
 - [x] Cap boşaldığında backlog'un `MaxSpawnBatch` ve alive capacity sınırlarıyla sahaya aktığı runtime test edildi.
 
-### `DW-B-MOAT` - Şu anki tek aktif iş
+### `DW-B-MOAT` - Tamamlandı: Dormant Moat Isolation
 
-- [ ] Aktif `MoatSystem` etkisinin V1 Blueprint core loop'una nasıl bağlandığını çıkar.
-- [ ] Slow/damage tuning, tech aggregate ve scene bağlantılarını dormant sınırına çek.
-- [ ] Moat content ve kodunu silmeden aktif combat sonucuna sızmasını engelle.
-- [ ] Runtime regression testiyle stale Moat değerlerinin zombie speed/HP'sini değiştiremediğini kanıtla.
+- [x] `MoatSystem -> ZombieSlow/ZombieStats`, authoring, tech aggregate ve meta grant zinciri çıkarıldı.
+- [x] Baker, runtime aggregate ve reset yolları `disabled / slow 1 / damage 0` neutral sözleşmesine çekildi.
+- [x] `moat_dig`, `moat_flame` ve `start_moat` assetleri silinmeden aktif tech/meta catalog'larından çıkarıldı.
+- [x] Setup tool'un dormant Moat içeriğini yeniden seed/merge etmesi engellendi.
+- [x] Stale `0.05 slow + 100000 DPS` değerlerinin zombie speed/HP/slow state'ini değiştiremediği runtime test edildi.
+
+### `DW-B-ENEMY` - Şu anki tek aktif iş
+
+- [ ] `EnemyDefinition` veri sözleşmesini oluştur: id, prefab, base stats ve pool metadata.
+- [ ] V1 active enemy catalog'ını yalnız mevcut tek zombie prefab ile seed et.
+- [ ] `WaveSpawnSystem` prefab/stat kaynağını catalog contract'ına bağla.
+- [ ] Spawn/UI kodunda enemy-type özel dallanma oluşmasını engelleyen validation testleri ekle.
 
 ### Mevcut oyun ile karşılaştırma
 
@@ -338,7 +346,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [x] Spawn count/budget için day curve ve phase multiplier owner'ı oluştur.
 - [x] Dawn yoğunluğunu düşürürken yeni gün tabanının önceki güne geri dönmemesini sağla.
 - [x] Blood Moon/SpecialNights active bağlantısını kaldır; dormant kalabilir.
-- [ ] Aktif `MoatSystem` combat etkisini V1 core loop'tan ayır; kod/content dormant kalabilir.
+- [x] Aktif `MoatSystem` combat etkisini V1 core loop'tan ayır; kod/content dormant kalabilir.
 - [ ] `EnemyDefinition` ve tek kayıtlı enemy catalog oluştur.
 - [ ] Enemy type özel dalları spawn/UI koduna eklemeden content genişleme sınırı kur.
 - [x] Explicit spawn backlog state/policy kur ve save/telemetry'ye aç.
@@ -1046,3 +1054,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-12 | `DW-B-STATS` quantity-only difficulty | Enemy HP/damage/speed progression utility seviyesinde kaldırıldı; baskı count/batch/interval kanallarında kaldı | Unity compile: 0 error; EditMode 25/25; PlayMode 7/7 |
 | 2026-07-12 | `DW-B-SPECIAL` special nights removal | Blood Moon seed, multiplier, flag restore ve runtime warning zinciri V1'de dormant hale getirildi | Unity compile: 0 error; EditMode 25/25; PlayMode 8/8 |
 | 2026-07-12 | `DW-B-FLOW` spawn budget & backlog | Day tabanı/phase multiplier ayrıldı; cap altındaki her interval explicit saved backlog'a dönüştü ve kontrollü drain edildi | Unity compile: 0 error; EditMode 28/28; PlayMode 9/9 |
+| 2026-07-12 | `DW-B-MOAT` dormant moat isolation | Moat slow/damage, tech ve meta yolları V1 core loop'tan ayrıldı; legacy content silinmeden catalog dışında ve runtime-neutral tutuldu | Unity compile: 0 error; EditMode 30/30; PlayMode 10/10 |

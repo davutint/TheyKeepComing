@@ -6,8 +6,8 @@ namespace DeadWalls
     /// <summary>
     /// Tech tree'nin tum node tanimlarini toplayan katalog. Kategori/tier YOKTUR;
     /// agacin tek dogruluk kaynagi node'lar arasi RevealChildNodeIds baglantilaridir.
-    /// Setup tool eksik default node'lari seed eder ama kullanicinin ekledigi ekstra
-    /// node'lari asla silmez (merge-only).
+    /// Setup tool eksik default node'lari seed eder ve kullanicinin ekledigi ekstra
+    /// node'lari korur. V1'de rezerve dormant id'ler (Moat) aktif catalog'a alinmaz.
     /// </summary>
     [CreateAssetMenu(fileName = "TechTreeCatalog", menuName = "DeadWalls/Mobile Castle/Tech Tree Catalog")]
     public class TechTreeCatalogSO : ScriptableObject

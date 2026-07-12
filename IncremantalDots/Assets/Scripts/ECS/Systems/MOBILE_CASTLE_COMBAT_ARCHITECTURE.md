@@ -31,13 +31,10 @@ Baseline tuning tek bir precedence hattından geçer: difficulty alanları `Diff
 - **Tempo notu:** `SpawnLineX` 13 -> 27 degisimi base hiz 0.85'te ilk duvar temasini
   yaklasik 16.5 saniye geciktirir. Bu degisiklikte hiz/intensity telafisi yapilmadi;
   offscreen birikim ve ilk baski ayri Play Mode denge kontrolu ister.
-- **Hendek (MoatSystem):** `MoatXMin..MoatXMax`(1.5..4) bandindaki Moving/Queued
-  zombilere yavaslatma — frost ile AYNI `ZombieSlow` kanali (en dusuk carpan kazanir, sure
-  0.15s'lik tazeleme; mavi tint bedava gelir). `MoatDamagePerSecond > 0` ise gecis hasari
-  (moat_flame tech'i acar); olum ZombieDeathSystem'de. Sira: ZombieSlowTimer -> Moat -> ApplyMovementForce.
-- **Hendek evrimi (tech):** `moat_dig` (DeepenMoatSlowPercent: carpan -0.10/seviye, L3) ->
-  `moat_flame` (AddMoatDamagePerSecond: +4/sn/seviye, L3). GameManager economy-aggregate
-  kalibiyla config'e yazilir; restart'ta base'e doner.
+- **Hendek:** world-art bandı ve legacy `MoatSystem` kodu korunur fakat V1 gameplay'de dormant'tır.
+  Baker/runtime aggregate `MoatGameplayEnabled=false`, slow `1`, damage `0` yazar.
+  `moat_dig`, `moat_flame` ve `start_moat` assetleri aktif tech/meta catalog'larında bulunmaz.
+  Ayrıntılı sınır `MOAT_DORMANCY_ARCHITECTURE.md` dosyasındadır.
 - **Okcu yerlesimi:** oncelik tilemap hucresi AMA yalniz `x <= FrontlineX+1` bolgesindekiler
   gecerli (eski 360 hucreleri elenir); yoksa duvar kolonu fallback'i (x = FrontlineX-0.8,
   ortadan disa dikey dizilim). Owner duvar/kule tile'larini boyayinca tilemap oncelik kazanir.
@@ -45,10 +42,9 @@ Baseline tuning tek bir precedence hattından geçer: difficulty alanları `Diff
 - **Animasyon/feedback:** yon hedefi ve kale-vurus VFX konumu duvar hattina baglanir.
 - **Geri alma:** `SingleFrontEnabled=false` -> eski 360-ring davranisi aynen doner (karsilastirma/test icin).
 
-Dogrulama (play, 2026-07-06): spawn x=[8..15] sagdan, sola akis, Attacking tam x=-4.65 duvar
-hattinda, kuyruk olusumu, hendekte 14/14 yavaslatma + dps HP erimesi (32->20.8 canli kanit),
-olum hendegi (dps=100) gecit vermedi, okcular 4/4 fallback kolonunda ve vuruyor, duvar hasar
-aliyor, GameOver zinciri calisti (3 gunluk basibos kusatmada kale dustu).
+2026-07-06 tarihli hendek slow/damage doğrulaması yalnız legacy implementasyonun tarihsel
+kanıtıdır; V1 ürün davranışı değildir. 2026-07-12 runtime regresyonu stale Moat tuning'inin
+zombie HP/hız/slow state'ini değiştiremediğini kanıtlar.
 
 ## ECS Verisi
 
@@ -136,7 +132,7 @@ Mobile mode'da worker allocation'i resource cap ve population'a gore clamp eder,
 
 ### ApplyMovementForceSystem
 
-Mobile mode'da moving zombiler tek-cephe modunda `(FrontlineX, kendi y)` hedefine (duz sola), 360 modunda `CastleCenter` noktasina dogru kuvvet alir. `ZombieSlow` enabled ise hareket kuvveti slow multiplier ile carpilir (frost VE hendek ayni kanali kullanir).
+Mobile mode'da moving zombiler tek-cephe modunda `(FrontlineX, kendi y)` hedefine (duz sola), 360 modunda `CastleCenter` noktasina dogru kuvvet alir. V1'de aktif `ZombieSlow` kaynağı Frost oklarıdır; dormant Moat sistemi bu state'i değiştiremez.
 
 ### BoundarySystem
 

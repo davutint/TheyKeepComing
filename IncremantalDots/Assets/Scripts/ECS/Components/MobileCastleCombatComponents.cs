@@ -92,11 +92,12 @@ namespace DeadWalls
         // Spawn seridi: sag kenar x tabani (+ ileri jitter) ve dikey yarim-bant
         public float SpawnLineX;
         public float SpawnBandYHalf;
-        // Hendek bandi (duvarin onunde): icindeyken yavaslatma, upgrade ile gecis hasari
+        // V1'de hendek gameplay'i dormant. Geometri/tuning alanlari content migration icin korunur.
+        public bool MoatGameplayEnabled;
         public float MoatXMin;
         public float MoatXMax;
-        public float MoatSlowMultiplier;    // 1 = etkisiz; 0.55 = %45 yavaslatma
-        public float MoatDamagePerSecond;   // 0 = kapali (tech ile acilir)
+        public float MoatSlowMultiplier;
+        public float MoatDamagePerSecond;
     }
 
     public enum SiegeCyclePhase : byte

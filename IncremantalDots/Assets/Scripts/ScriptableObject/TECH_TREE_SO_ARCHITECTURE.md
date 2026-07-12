@@ -42,8 +42,8 @@ hedefi (`Balanced` = tum kaynaklar).
 | `IncreasePopulationGrowth` | `MobileCastleCombatConfig.PopulationGrowthPerDayPrep` (cycle basi buyume) |
 | `IncreaseDefenseMaxHpPercent` | Tek Wall MaxHP; CurrentHP orani korunur |
 | `ReduceRepairCostPercent` | `GameManager._techRepairCostMultiplier` -> `GetRepairCost()` (repair sink'ini ucuzlatir) |
-| `DeepenMoatSlowPercent` | `MobileCastleCombatConfig.MoatSlowMultiplier` (base'ten yeniden hesap; moat_dig) |
-| `AddMoatDamagePerSecond` | `MobileCastleCombatConfig.MoatDamagePerSecond` (moat_flame) |
+| `DeepenMoatSlowPercent` | V1 dormant; aktif catalog'da node yok ve `GameManager` effect'i yok sayar |
+| `AddMoatDamagePerSecond` | V1 dormant; aktif catalog'da node yok ve runtime damage üretemez |
 | `UnlockSpellcasting` | `GameManager._fireballUnlocked` -> SpellCastUI paneli gorunur (arcane_tower) |
 | `ModifySpellDamagePercent` | `_spellDamageMultiplier` -> `FireballDamage` (fire_power; carpimsal) |
 | `AddSpellRadius` | `_spellRadiusBonus` -> `FireballRadius` (fire_radius; duz ekleme) |
