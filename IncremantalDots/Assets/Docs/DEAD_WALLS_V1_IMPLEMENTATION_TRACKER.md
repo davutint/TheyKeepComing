@@ -5,7 +5,7 @@
 > **Tracker sürümü:** 2.0  
 > **Son tam kapsam denetimi:** 2026-07-12  
 > **Aktif paket:** Package B - Continuous Horde
-> **Aktif iş:** `DW-B-SCALE` - 10K Horde Runtime Gate
+> **Aktif iş:** `DW-B-SCALE-OPT` - 10K Death Spike & Allocation Optimization
 
 ---
 
@@ -145,7 +145,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Meta | Ayrı JSON ve Game Over shop var; `StartingTechLevel` aktif | Kısmi uyum |
 | HUD | CyclePanel, DAY/DUSK/NIGHT ve Horde Pressure mevcut; tek Wall runtime gizleme var | Package I polish gerekli |
 | Tutorial | Aktif tutorial/onboarding sistemi bulunmadı | Package I eksik |
-| Testler | V1 contract testleri EditMode `34/34`, PlayMode `12/12` geçiyor | Kapsam büyüyor |
+| Testler | V1 contract testleri EditMode `34/34`, PlayMode `13/13` geçiyor | 10K gate ölçümlü |
 | Telemetry | Spawn budget demanded/spawned/backlog telemetry mevcut; tam Blueprint event owner'ı eksik | Kısmi |
 
 ---
@@ -331,14 +331,23 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [x] Exact Continue snapshot ve backlog davranışını pool kapasitesinden bağımsız tut.
 - [x] Prewarm, expand, rent, return ve yoğun death churn için EditMode/PlayMode kanıtı ekle.
 
-### `DW-B-SCALE` - Şu anki tek aktif iş
+### `DW-B-SCALE` - Tamamlandı: 10K Horde Runtime Gate
 
-- [ ] Gerçek `NewGameScene`, HUD, VFX/SFX ve save/Continue açıkken 10.000 aktif enemy senaryosu kur.
-- [ ] Test-only/runtime tuning ile active cap ve backlog'u 10K ölçümüne kontrollü çıkar; release değerini ölçüm sonucu olmadan değiştirme.
-- [ ] Pool total/available/active, expansion, rent/return ve spawn backlog telemetry'sini senaryo raporuna bağla.
-- [ ] Frame pacing, main-thread spike, allocation ve Entities rendering darboğazlarını ölç.
-- [ ] Fireball aynı-frame çoklu death return ve maksimum-state Continue senaryolarını doğrula.
-- [ ] Sonuçlara göre Package B kabul kapısını kapat veya ölçülmüş blocker kaydet.
+- [x] Gerçek `NewGameScene`, HUD, VFX/SFX ve save/Continue açıkken 10.000 aktif enemy senaryosu kur.
+- [x] Test-only/runtime tuning ile active cap ve backlog'u 10K ölçümüne kontrollü çıkar; release değerini ölçüm sonucu olmadan değiştirme.
+- [x] Pool total/available/active, expansion, rent/return ve spawn backlog telemetry'sini senaryo raporuna bağla.
+- [x] Frame pacing, main-thread spike, allocation ve Entities rendering darboğazlarını ölç.
+- [x] Fireball aynı-frame çoklu death return ve maksimum-state Continue senaryolarını doğrula.
+- [x] Sonuçlara göre Package B kabul kapısını kapat veya ölçülmüş blocker kaydet.
+
+### `DW-B-SCALE-OPT` - Şu anki tek aktif iş
+
+- [ ] `DamageCleanupSystem` return yolunu 10.000 tekil buffer/state erişimi yerine bulk pool return'e çevir.
+- [ ] `126,42-131,95 ms` death/return peak değerini bulk return sonrası aynı benchmark ile yeniden ölç ve önceki sonuçla karşılaştır.
+- [ ] Steady-state yaklaşık `20,7 KB/frame` GC allocation owner'larını profiler marker/source audit ile çıkar ve kaçınılabilir allocation'ları kaldır.
+- [ ] `532` draw call için Entities instancing/batch durumunu GPU veya Frame Debugger kanıtıyla incele.
+- [ ] `7,37 MB` save ile `75,37 / 146,58 ms` save/restore maliyetini hedef build bütçesine göre değerlendir.
+- [ ] Ölçülen blockerlar çözülmeden release `MaxAliveZombies = 900` değerini yükseltme.
 
 ### Mevcut oyun ile karşılaştırma
 
@@ -350,7 +359,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Enemy stats sabit | HP, damage ve speed bütün cycle'larda base değerde | `[x]` |
 | Quantity-only difficulty | Count/batch/interval büyüyor; stat growth utility seviyesinde yok sayılıyor | `[x]` |
 | Tek enemy prefab | `EnemyCatalog.asset` yalnız `zombie_basic` tanımını taşır; prefab ve base statlar aynı kayıttan spawn edilir | `[x]` |
-| 10k expandable pool | Prewarm `128`, ihtiyaçta `128` batch expand, spawn rent ve death return aktif; normal cap 900 | `[~]` 10K ürün ölçümü bekliyor |
+| 10k expandable pool | 10K rent/return/Continue iki koşuda geçti; P95 `10,22-11,30 ms`, death peak `126,42-131,95 ms`, GC `~20,7 KB/frame`; normal cap 900 | `[~]` Ölçülmüş optimizasyon blockerları var |
 | Backlog kaybolmaz | Explicit saved budget state cap altında talep biriktiriyor ve kapasitede kontrollü boşaltıyor | `[x]` |
 | Special night yok | SpecialNight schema dormant; runtime multiplier/flag/warning üretemiyor | `[x]` |
 
@@ -371,7 +380,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [x] Enemy pool'u küçük prewarm + ihtiyaçla genişleme şeklinde kur.
 - [x] Ölümde entity destroy yerine pool return uygula.
 - [x] Active cap data-driven kalır; teknik cap dolduğunda talebi explicit backlog'da koru.
-- [ ] Gerçek oyun UI/VFX/save açıkken 10.000 enemy ölçüm senaryosu kur.
+- [x] Gerçek oyun UI/VFX/save açıkken 10.000 enemy ölçüm senaryosu kur.
 
 ### Kabul kapısı
 
@@ -380,6 +389,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [x] Cap doluyken talep backlog'a gider ve boşlukta sahaya çıkar.
 - [x] Tek prefab catalog üzerinden çalışır.
 - [x] Death churn pool ile yönetilir.
+- [ ] 10K death spike ve steady-state allocation blockerları çözülür.
 
 ---
 
@@ -873,9 +883,9 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 ### Ölçüm senaryoları
 
 - [ ] 1.000 archer + 10.000 enemy + projectile peak + Night presentation.
-- [ ] Fireball en yoğun horde içinde + aynı frame çoklu death pool return.
+- [x] Fireball 10K horde içinde aynı-frame lethal damage ve toplu pool return correctness geçti; `126,42-131,95 ms` peak optimizasyon işi ayrıca açık.
 - [ ] Arrow refill sonrası 1.000 archer yeniden ateş başlangıcı.
-- [ ] Maksimum run state ana menü save/Continue.
+- [ ] Tam maksimum run state ana menü save/Continue; 10K enemy snapshot/Continue geçti (`7,37 MB`, `75,37 / 146,58 ms`), 1K archer Package D'yi bekliyor.
 - [ ] Düşük/orta/yüksek worker visual density geçişi.
 - [ ] Target search frame spike ve allocation ölçümü.
 - [ ] Long-run soak ve active cap/backlog saturation ölçümü.
@@ -929,7 +939,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Death | Process restart | Meta bir kez; run geri gelmez | `[ ]` |
 | HUD | 16:9 / ultrawide | Kritik UI ve dünya kırpılmaz | `[ ]` |
 | Tutorial | İkinci run | Otomatik tekrar etmez | `[ ]` |
-| Stress | 1k archer x 10k enemy | Hedef frame pacing | `[ ]` |
+| Stress | 1k archer x 10k enemy | 10K enemy-only P95 `10,22 ms`; 1K archer ve death spike optimizasyonu bekliyor | `[~]` |
 
 ### Mevcut test envanteri
 
@@ -1076,3 +1086,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-12 | `DW-B-MOAT` dormant moat isolation | Moat slow/damage, tech ve meta yolları V1 core loop'tan ayrıldı; legacy content silinmeden catalog dışında ve runtime-neutral tutuldu | Unity compile: 0 error; EditMode 30/30; PlayMode 10/10 |
 | 2026-07-12 | `DW-B-ENEMY` single enemy catalog contract | `zombie_basic` için tek catalog/definition owner kuruldu; prefab, base stat, XP ve pool metadata bake edilip type branch olmadan gerçek spawn'a bağlandı | Unity compile: 0 error; EditMode 33/33; PlayMode 11/11 |
 | 2026-07-12 | `DW-B-POOL` expandable enemy pool | Catalog prewarm/expand metadata gerçek inactive rezerve bağlandı; spawn rent, ölüm return, Continue reuse ve projectile generation guard tamamlandı | Unity compile: 0 error; EditMode 34/34; PlayMode 12/12 |
+| 2026-07-12 | `DW-B-SCALE` 10K runtime gate | Gerçek NewGameScene'de 10K pool, HUD/feedback, profiler telemetry, Fireball toplu return ve Continue doğrulandı; `126,42-131,95 ms` death peak ve `~20,7 KB/frame` GC blocker kaydedildi | Targeted PlayMode 1/1; full EditMode 34/34; full PlayMode 13/13 |

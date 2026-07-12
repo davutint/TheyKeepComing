@@ -142,3 +142,11 @@ Stress mode'da zombi hasari uygulanmaz; castle HP dusmeden max gorunen zombi say
 Stress mode'da kill reward ve wave clear bonus verilmez.
 
 Stress test bitince `StressTestMode` tekrar `false` yapilmali.
+
+## Otomatik 10K Runtime Gate
+
+Release scene/asset cap degerlerini degistirmeden 10K senaryosunu calistirmak icin Unity Test Runner'da:
+
+`DeadWalls.Tests.HordeScalePlayModeTests.HordeScale_10K_WithHudFeedbackPoolFireballAndContinue_ProducesTelemetry`
+
+Test runtime-only cap override kullanir. Son olcum ve blocker raporu `Assets/Docs/DEAD_WALLS_10K_RUNTIME_REPORT.md` dosyasindadir.

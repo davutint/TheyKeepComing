@@ -45,10 +45,11 @@ Bu sözleşme, eski okun yeniden kullanılan aynı entity kimliğindeki yeni zom
 
 - `EnemyPoolRuntimeUtilityTests.Pool_PrewarmExpandsRentsReturnsAndResetsTransientState`
 - `ExactRunContinuePlayModeTests.EnemyPool_DeathReturnsEntityAndRejectsStaleArrowGeneration`
-- Tam regresyon: EditMode `34/34`, PlayMode `12/12`.
+- Tam regresyon: EditMode `34/34`, PlayMode `13/13`.
+- 10K runtime ölçümü: `Assets/Docs/DEAD_WALLS_10K_RUNTIME_REPORT.md`.
 
 ## Kapsam dışı
 
 - Arrow entity pooling bu işte yoktur.
 - VFX/SFX pool'ları `CombatFeedbackBridge` sorumluluğunda kalır.
-- 10.000 aktif enemy frame pacing ve ürün senaryosu `DW-B-SCALE` işidir.
+- 10.000 aktif enemy correctness ölçüldü; death spike ve GC optimizasyonu `DW-B-SCALE-OPT` işidir.
