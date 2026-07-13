@@ -135,10 +135,55 @@ Benchmark'taki yaklaşık `17,9 KB/frame` toplamı Unity Editor, GameView, MCP t
 
 ### Güncel karar
 
-`DW-B-SCALE-OPT` içindeki death spike ve kaçınılabilir steady-state allocation blockerları çözüldü. Açık kalan işler:
+`DW-B-SCALE-OPT` içindeki death spike ve kaçınılabilir steady-state allocation blockerları çözüldü. Standalone Player ölçümü save/restore ve render sayacını ürün ortamında doğruladı. Açık kalan ürün stresi:
 
-1. `532` draw call için GPU/Frame Debugger ile Entities instancing ve batch kanıtı.
-2. Save/restore maliyetinin standalone hedef PC build bütçesine göre değerlendirilmesi.
-3. Package D kapsamında 1.000 archer + 10.000 enemy + projectile peak senaryosu.
+1. Package D kapsamında 1.000 archer + 10.000 enemy + projectile peak senaryosu.
+2. Bu birleşik stres geçmeden release `MaxAliveZombies = 900` değerini yükseltmeme.
 
-Doğrulama: targeted profiler capture `1/1`, iki targeted 10K benchmark `2/2`, full EditMode `34/34`, full PlayMode `13 passed + 1 explicit skipped`.
+Doğrulama: targeted profiler capture `1/1`, targeted 10K benchmarklar geçti, full EditMode `35/35`, full PlayMode `13 passed + 1 explicit skipped` ve StandaloneWindows64 Player-targeted test `1/1`.
+
+### Compact save ve Standalone Player ölçümü - 2026-07-13
+
+Exact snapshot şeması değiştirilmeden `JsonUtility` çıktısı pretty JSON yerine compact JSON olarak yazıldı. İki temiz Editor koşusunda:
+
+| Metrik | Koşu 1 | Koşu 2 |
+|---|---:|---:|
+| Save | 54,00 ms | 52,84 ms |
+| Snapshot | 4.243.628 B | 4.243.491 B |
+| Restore | 115,25 ms | 106,65 ms |
+
+Önceki optimize koşularındaki `7.364.785-7.364.908 B` dosyaya göre snapshot yaklaşık `%42,4` küçüldü; `69,52-71,62 ms` save aralığına göre yazım yaklaşık `%24-26` hızlandı. Restore maliyeti şema aynı kaldığı için esasen aynı bantta kaldı.
+
+StandaloneWindows64 Player-targeted 10K sonucu:
+
+| Metrik | Player ölçümü |
+|---|---:|
+| Frame average / P95 | 7,12 / 6,97 ms |
+| Main thread average / max | 6,98 / 11,17 ms |
+| Draw call average | 535 |
+| Save / snapshot | 52,58 ms / 4.240.003 B |
+| Restore | 86,19 ms |
+| Death peak | 55,57 ms |
+| Used memory counter | 880.067.876 B |
+
+Save yalnız ana menü/uygulama çıkışında, restore ise Continue yükleme yolunda çalıştığı için Player'daki iki işlem de aktif combat frame bütçesinin dışındadır. Bu makinede ikisinin de `100 ms` altında kalması V1 enemy-only kabulü için yeterlidir; düşük donanım matrisi release QA'da ayrıca doğrulanmalıdır.
+
+### Frame Debugger takip ölçümü - 2026-07-13
+
+Editor `Draw Calls Count` sayacı SceneView ve Editor UI render'larını da içerir. Ancak Standalone Player'da da ortalama `535` ölçüldüğü için bu sayı yalnız Editor gürültüsü değildir ve ürünün gerçek düşük seviye draw komutları yüksektir.
+
+10.000 aktif enemy sahadayken durdurulan Main Camera Frame Debugger sonucu:
+
+| Event grubu | Adet |
+|---|---:|
+| Entities Graphics `HybridBatch` | 1 |
+| Normal `SRPBatch` | 3 |
+| Tilemap `DynamicGeometry` | 7 |
+| Final blit | 1 |
+| Canvas/UI overlay | 8 |
+| Sparse uploader/root compute | 1 |
+| **Toplam** | **21** |
+
+Bu `21` değer üst seviye Frame Debugger event sayısıdır; `HybridBatch` kendi içindeki draw komutlarını toplar ve tek draw call anlamına gelmez. ECS topology ölçümünde 10.000 aktif zombie `202` render/simulation chunk'ına dağıldı; örnek chunk `50/50` dolu ve archetype kapasitesi `50` entity'dir. En büyük per-entity alanlar `LocalToWorld 64 B`, `LocalTransform 32 B`, `SpriteAnimation 28 B`, `ZombieStats 28 B`, `PhysicsBody 24 B`, `RenderBounds 24 B` ve `WorldRenderBounds 24 B` olarak ölçüldü.
+
+Sonuç: `535` draw call ileri render-archetype slimming/batching için gerçek optimizasyon borcudur. Buna rağmen aynı standalone koşuda P95 `6,97 ms` ile 60 FPS bütçesinin (`16,67 ms`) belirgin biçimde altında kaldığı için enemy-only V1 blocker'ı değildir. Shader/material körlemesine değiştirilmedi; release cap birleşik 1K archer + 10K enemy testi görülmeden artırılmayacaktır.

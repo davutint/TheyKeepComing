@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.IO;
+using System.Text;
 using NUnit.Framework;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Profiling;
@@ -119,9 +121,12 @@ namespace DeadWalls.Tests
             EnemyCatalogEntryData definition = entries[activeEntryIndex];
 
             double activationStarted = Time.realtimeSinceStartupAsDouble;
+            Entity sampleZombie = Entity.Null;
             for (int i = 0; i < EnemyTarget; i++)
             {
                 Assert.That(EnemyPoolRuntimeUtility.TryRent(entityManager, poolEntity, out Entity zombie), Is.True);
+                if (sampleZombie == Entity.Null)
+                    sampleZombie = zombie;
                 int column = i % 100;
                 int row = i / 100;
                 float3 position = new float3(
@@ -157,6 +162,12 @@ namespace DeadWalls.Tests
 
             for (int frame = 0; frame < WarmupFrames; frame++)
                 yield return null;
+
+            int activeChunkCount = activeQuery.CalculateChunkCount();
+            double averageActiveEntitiesPerChunk = activeChunkCount > 0
+                ? (double)EnemyTarget / activeChunkCount
+                : 0.0;
+            Debug.Log(BuildArchetypeTelemetry(entityManager, sampleZombie, activeChunkCount));
 
             var frameTimes = new double[SampleFrames];
             double frameTotalMs = 0.0;
@@ -276,6 +287,7 @@ namespace DeadWalls.Tests
                 "[DW-B-SCALE] " +
                 $"enemy={EnemyTarget}; pool_total={poolAtTenK.TotalCreated}; " +
                 $"pool_available={poolAtTenK.AvailableCount}; expansions={poolAtTenK.ExpansionCount}; " +
+                $"active_chunks={activeChunkCount}; entities_per_chunk={averageActiveEntitiesPerChunk:F2}; " +
                 $"activation_ms={activationMs:F2}; frame_avg_ms={averageFrameMs:F2}; " +
                 $"frame_p95_ms={p95FrameMs:F2}; frame_max_ms={frameMaxMs:F2}; " +
                 $"main_avg_ms={averageMainThreadMs:F2}; main_max_ms={mainThreadMaxMs:F2}; " +
@@ -292,6 +304,33 @@ namespace DeadWalls.Tests
             wave.ZombiesAlive = 0;
             entityManager.SetComponentData(waveEntity, wave);
             activeQuery.Dispose();
+        }
+
+        private static string BuildArchetypeTelemetry(
+            EntityManager entityManager, Entity sampleEntity, int activeChunkCount)
+        {
+            ArchetypeChunk chunk = entityManager.GetChunk(sampleEntity);
+            using var componentTypes = entityManager.GetComponentTypes(sampleEntity, Allocator.Temp);
+            var builder = new StringBuilder(1024);
+            builder.Append("[DW-B-SCALE-ARCHETYPE] active_chunks=")
+                .Append(activeChunkCount)
+                .Append("; sample_chunk_count=").Append(chunk.Count)
+                .Append("; chunk_capacity=").Append(chunk.Capacity)
+                .Append("; components=");
+
+            for (int i = 0; i < componentTypes.Length; i++)
+            {
+                if (i > 0)
+                    builder.Append(',');
+
+                ComponentType componentType = componentTypes[i];
+                TypeManager.TypeInfo typeInfo = TypeManager.GetTypeInfo(componentType.TypeIndex);
+                builder.Append(typeInfo.DebugTypeName)
+                    .Append(':')
+                    .Append(typeInfo.SizeInChunk);
+            }
+
+            return builder.ToString();
         }
     }
 }

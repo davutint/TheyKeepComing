@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -127,6 +129,34 @@ namespace DeadWalls.Tests
             Assert.That(restored.RunId, Is.EqualTo("run_dead_01"));
             Assert.That(restored.Day, Is.EqualTo(12));
             Assert.That(restored.Kills, Is.EqualTo(9876));
+        }
+
+        [Test]
+        public void Save_WritesCompactJson_AndRemainsLoadable()
+        {
+            string path = Path.Combine(Application.persistentDataPath, "run_save.json");
+            byte[] original = File.Exists(path) ? File.ReadAllBytes(path) : null;
+            string runId = "run_compact_" + Guid.NewGuid().ToString("N");
+
+            try
+            {
+                Assert.That(RunPersistence.Save(new RunSaveState { RunId = runId }), Is.True);
+
+                string json = File.ReadAllText(path);
+                Assert.That(json, Does.Not.Contain("\r"));
+                Assert.That(json, Does.Not.Contain("\n"));
+
+                RunSaveState restored = RunPersistence.TryLoad();
+                Assert.That(restored, Is.Not.Null);
+                Assert.That(restored.RunId, Is.EqualTo(runId));
+            }
+            finally
+            {
+                if (original != null)
+                    File.WriteAllBytes(path, original);
+                else if (File.Exists(path))
+                    File.Delete(path);
+            }
         }
 
         [Test]

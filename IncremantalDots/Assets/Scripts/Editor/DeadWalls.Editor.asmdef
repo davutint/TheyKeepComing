@@ -1,0 +1,30 @@
+{
+    "name": "DeadWalls.Editor",
+    "rootNamespace": "DeadWalls.Editor",
+    "references": [
+        "DeadWalls",
+        "Unity.Entities",
+        "Unity.Entities.Hybrid",
+        "Unity.Transforms",
+        "Unity.Mathematics",
+        "Unity.Burst",
+        "Unity.Collections",
+        "Unity.Rendering.Hybrid",
+        "Unity.Entities.Graphics",
+        "Unity.TextMeshPro",
+        "ProjectDawn.Navigation",
+        "ProjectDawn.Navigation.Hybrid",
+        "DOTween.Modules"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

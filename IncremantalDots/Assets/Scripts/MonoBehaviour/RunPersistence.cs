@@ -314,7 +314,10 @@ namespace DeadWalls
         {
             try
             {
-                File.WriteAllText(path, JsonUtility.ToJson(state, true));
+                // Exact snapshot oyuncuya gosterilen bir dosya degildir. Pretty-print,
+                // 10K combat state'inde milyonlarca gereksiz whitespace byte'i ve ek
+                // serialization/I/O maliyeti uretir; compact JSON ayni schema'yi korur.
+                File.WriteAllText(path, JsonUtility.ToJson(state, false));
                 return true;
             }
             catch (Exception e)

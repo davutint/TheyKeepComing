@@ -6,6 +6,8 @@ V1 Blueprint kararı: koşu yalnız Wall `0 HP` olduğunda biter. Oyuncu ana men
 
 `RunPersistence.cs` içindeki `RunSaveState` bu sözleşmenin disk şemasıdır. Güncel sürüm `v3`, desteklenen en eski sürüm de `v3` tür. Eski Dawn-checkpoint kayıtları exact state içermediği için sessizce migrate edilmez ve Continue olarak gösterilmez.
 
+Disk çıktısı compact JSON'dur. Pretty-print kullanılmaz; özellikle 10K combat snapshot'ında whitespace dosya boyutu ve senkron I/O maliyeti üretmemelidir. Bu yalnız fiziksel yazım biçimidir; `v3` alan şeması ve `JsonUtility` Continue uyumluluğu değişmez.
+
 ## Kayıt anları
 
 - `PauseMenuUI.MainMenu`: sahne değişmeden hemen önce `GameManager.SaveRunSnapshot()` çağrılır. Kayıt başarısızsa ana menüye geçilmez.
@@ -70,4 +72,5 @@ Entity referansı doğrudan JSON'a yazılmaz. Referans gerekiyorsa compact stabl
 - `RunPersistenceTests.SchemaVersion_RejectsLegacyCheckpoint_AndAcceptsExactSnapshot`
 - `RunPersistenceTests.JsonRoundTrip_PreservesExactCycleCombatCouncilAndAbilityState`
 - `RunPersistenceTests.DeathReceipt_RoundTrip_PreservesRunIdentityAndRewardInputs`
+- `RunPersistenceTests.Save_WritesCompactJson_AndRemainsLoadable`
 - Runtime kabulü ayrıca Main Menu save, uygulama kapanışı, aynı phase/timer restore, aktif projectile restore ve Wall ölümü sırasında force-close senaryolarını kapsar.
