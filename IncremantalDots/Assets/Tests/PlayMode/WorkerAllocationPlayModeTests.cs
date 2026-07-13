@@ -122,5 +122,76 @@ namespace DeadWalls.Tests
             Assert.That(cappedPopulation.Workers, Is.EqualTo(population.Workers));
             Assert.That(cappedPopulation.Idle, Is.EqualTo(population.Idle + 3));
         }
+
+        [UnityTest]
+        public IEnumerator WorkerDrawer_TargetButtonsAndDirectInputChangeRatiosWithoutMovingWorkers()
+        {
+            WorkerEconomyDrawerUI drawer = Object.FindFirstObjectByType<WorkerEconomyDrawerUI>();
+            Assert.That(drawer, Is.Not.Null);
+            Assert.That(drawer.WoodWorkerAddButton, Is.Not.Null);
+            Assert.That(drawer.WoodWorkerTargetPlus10Button, Is.Not.Null);
+            Assert.That(drawer.WoodWorkerTargetPlus100Button, Is.Not.Null);
+            Assert.That(drawer.WoodWorkerTargetInput, Is.Not.Null);
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            using EntityQuery allocationQuery = entityManager.CreateEntityQuery(
+                typeof(MobileCastleCombatConfig), typeof(MobilePopulationAllocation));
+            Entity allocationEntity = allocationQuery.GetSingletonEntity();
+            var before = entityManager.GetComponentData<MobilePopulationAllocation>(allocationEntity);
+            int expectedWoodTarget = Mathf.Min(WorkerAllocationUtility.RatioScale,
+                before.WoodTargetRatioBps + 1000);
+
+            drawer.WoodWorkerTargetPlus10Button.onClick.Invoke();
+            yield return null;
+
+            var afterQuickAdd = entityManager.GetComponentData<MobilePopulationAllocation>(allocationEntity);
+            Assert.That(afterQuickAdd.WoodTargetRatioBps, Is.EqualTo(expectedWoodTarget));
+            Assert.That(TargetRatioTotal(afterQuickAdd), Is.EqualTo(WorkerAllocationUtility.RatioScale));
+            AssertWorkerCountsEqual(before, afterQuickAdd);
+
+            drawer.WoodWorkerTargetInput.onEndEdit.Invoke("25");
+            yield return null;
+
+            var afterDirectInput = entityManager.GetComponentData<MobilePopulationAllocation>(allocationEntity);
+            Assert.That(afterDirectInput.WoodTargetRatioBps, Is.EqualTo(2500));
+            Assert.That(TargetRatioTotal(afterDirectInput), Is.EqualTo(WorkerAllocationUtility.RatioScale));
+            AssertWorkerCountsEqual(before, afterDirectInput);
+
+            drawer.WoodWorkerAddButton.onClick.Invoke();
+            yield return null;
+
+            var afterPlusOne = entityManager.GetComponentData<MobilePopulationAllocation>(allocationEntity);
+            Assert.That(afterPlusOne.WoodTargetRatioBps, Is.EqualTo(2600));
+            Assert.That(TargetRatioTotal(afterPlusOne), Is.EqualTo(WorkerAllocationUtility.RatioScale));
+            AssertWorkerCountsEqual(before, afterPlusOne);
+
+            drawer.WoodWorkerTargetPlus100Button.onClick.Invoke();
+            yield return null;
+
+            var afterPlusHundred = entityManager.GetComponentData<MobilePopulationAllocation>(allocationEntity);
+            Assert.That(afterPlusHundred.WoodTargetRatioBps,
+                Is.EqualTo(WorkerAllocationUtility.RatioScale));
+            Assert.That(afterPlusHundred.StoneTargetRatioBps, Is.Zero);
+            Assert.That(afterPlusHundred.IronTargetRatioBps, Is.Zero);
+            Assert.That(afterPlusHundred.FoodTargetRatioBps, Is.Zero);
+            AssertWorkerCountsEqual(before, afterPlusHundred);
+        }
+
+        private static int TargetRatioTotal(MobilePopulationAllocation allocation)
+        {
+            return allocation.WoodTargetRatioBps
+                + allocation.StoneTargetRatioBps
+                + allocation.IronTargetRatioBps
+                + allocation.FoodTargetRatioBps;
+        }
+
+        private static void AssertWorkerCountsEqual(MobilePopulationAllocation expected,
+            MobilePopulationAllocation actual)
+        {
+            Assert.That(actual.WoodWorkers, Is.EqualTo(expected.WoodWorkers));
+            Assert.That(actual.StoneWorkers, Is.EqualTo(expected.StoneWorkers));
+            Assert.That(actual.IronWorkers, Is.EqualTo(expected.IronWorkers));
+            Assert.That(actual.FoodWorkers, Is.EqualTo(expected.FoodWorkers));
+        }
     }
 }

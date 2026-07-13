@@ -208,7 +208,9 @@ Mobile normal mode'da `DamageCleanupSystem`, death timer biten zombiler icin kil
 
 - `CastleInteriorClickTarget` ve `CastleEconomyUI` legacy/debug akisi olarak kalir; player-facing ana worker kontrolu sol drawer'dadir.
 - `WorkerEconomyDrawerUI` her zaman acilip kapanabilir; DayPrep sartina bagli degildir.
-- Wood/Stone/Iron/Food `+ WORKER` butonlari her basarili tiklamada ilgili worker sayisini +1 yapar; tap progress yoktur.
+- Wood/Stone/Iron/Food `+1% / +10% / +100% / direct input` kontrolleri target ratio'yu aninda ve ucretsiz degistirir; tap progress yoktur.
+- Secilen hedef exact kalir, diger uc hedef deterministik yeniden olceklenir ve toplam `%100` olur.
+- Target degisikligi mevcut worker'lari yeniden atamaz; yalniz sonra gelen population hedef acigina gore dagilir.
 - Eski worker slider'lari debug/legacy olarak kalabilir ve ayni `MobilePopulationAllocation` verisini degistirir.
 - Worker assignment toplam worker sayisini `Population.Total - Population.Archers` ustune cikaramaz.
 - `GameManager`, worker allocation degisince `WorkerPrefabData.WorkerPrefab` uzerinden DOTS villager entity'leri spawn/destroy eder.

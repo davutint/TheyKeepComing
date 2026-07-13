@@ -75,6 +75,55 @@ namespace DeadWalls.Tests
             Assert.That(WorkerAllocationUtility.TotalWorkers(allocation), Is.EqualTo(1));
         }
 
+        [Test]
+        public void SetTargetRatioBps_PreservesExactSelectionAndDeterministicTotal()
+        {
+            var first = CreateInitialAllocation();
+            var second = CreateInitialAllocation();
+            WorkerAllocationUtility.InitializeTargetsFromCurrent(ref first);
+            WorkerAllocationUtility.InitializeTargetsFromCurrent(ref second);
+
+            WorkerAllocationUtility.SetTargetRatioBps(ref first, 0, 5000);
+            WorkerAllocationUtility.SetTargetRatioBps(ref second, 0, 5000);
+
+            Assert.That(first.WoodTargetRatioBps, Is.EqualTo(5000));
+            Assert.That(TargetRatioTotal(first), Is.EqualTo(WorkerAllocationUtility.RatioScale));
+            Assert.That(first.StoneTargetRatioBps, Is.EqualTo(second.StoneTargetRatioBps));
+            Assert.That(first.IronTargetRatioBps, Is.EqualTo(second.IronTargetRatioBps));
+            Assert.That(first.FoodTargetRatioBps, Is.EqualTo(second.FoodTargetRatioBps));
+        }
+
+        [Test]
+        public void SetTargetRatioBps_WhenOtherTargetsAreZero_DistributesRemainderEvenly()
+        {
+            var allocation = new MobilePopulationAllocation
+            {
+                WoodTargetRatioBps = WorkerAllocationUtility.RatioScale
+            };
+
+            WorkerAllocationUtility.SetTargetRatioBps(ref allocation, 0, 2500);
+
+            Assert.That(allocation.WoodTargetRatioBps, Is.EqualTo(2500));
+            Assert.That(allocation.StoneTargetRatioBps, Is.EqualTo(2500));
+            Assert.That(allocation.IronTargetRatioBps, Is.EqualTo(2500));
+            Assert.That(allocation.FoodTargetRatioBps, Is.EqualTo(2500));
+        }
+
+        [Test]
+        public void SetTargetRatioBps_AtMaximumClearsOtherTargets()
+        {
+            var allocation = CreateInitialAllocation();
+            WorkerAllocationUtility.InitializeTargetsFromCurrent(ref allocation);
+
+            WorkerAllocationUtility.SetTargetRatioBps(ref allocation, 2,
+                WorkerAllocationUtility.RatioScale);
+
+            Assert.That(allocation.WoodTargetRatioBps, Is.Zero);
+            Assert.That(allocation.StoneTargetRatioBps, Is.Zero);
+            Assert.That(allocation.IronTargetRatioBps, Is.EqualTo(WorkerAllocationUtility.RatioScale));
+            Assert.That(allocation.FoodTargetRatioBps, Is.Zero);
+        }
+
         private static MobilePopulationAllocation CreateInitialAllocation()
         {
             return new MobilePopulationAllocation

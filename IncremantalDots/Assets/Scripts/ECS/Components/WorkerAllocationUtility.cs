@@ -94,6 +94,62 @@ namespace DeadWalls
             }
         }
 
+        public static void SetTargetRatioBps(ref MobilePopulationAllocation allocation,
+            int resourceIndex, int targetRatioBps)
+        {
+            resourceIndex = math.clamp(resourceIndex, 0, 3);
+            targetRatioBps = math.clamp(targetRatioBps, 0, RatioScale);
+            int remainingRatioBps = RatioScale - targetRatioBps;
+
+            long woodWeight = resourceIndex == 0 ? 0L : math.max(0, allocation.WoodTargetRatioBps);
+            long stoneWeight = resourceIndex == 1 ? 0L : math.max(0, allocation.StoneTargetRatioBps);
+            long ironWeight = resourceIndex == 2 ? 0L : math.max(0, allocation.IronTargetRatioBps);
+            long foodWeight = resourceIndex == 3 ? 0L : math.max(0, allocation.FoodTargetRatioBps);
+            long totalWeight = woodWeight + stoneWeight + ironWeight + foodWeight;
+
+            if (totalWeight <= 0 && remainingRatioBps > 0)
+            {
+                woodWeight = resourceIndex == 0 ? 0L : 1L;
+                stoneWeight = resourceIndex == 1 ? 0L : 1L;
+                ironWeight = resourceIndex == 2 ? 0L : 1L;
+                foodWeight = resourceIndex == 3 ? 0L : 1L;
+                totalWeight = woodWeight + stoneWeight + ironWeight + foodWeight;
+            }
+
+            int woodRatio = totalWeight > 0 ? (int)(woodWeight * remainingRatioBps / totalWeight) : 0;
+            int stoneRatio = totalWeight > 0 ? (int)(stoneWeight * remainingRatioBps / totalWeight) : 0;
+            int ironRatio = totalWeight > 0 ? (int)(ironWeight * remainingRatioBps / totalWeight) : 0;
+            int foodRatio = totalWeight > 0 ? (int)(foodWeight * remainingRatioBps / totalWeight) : 0;
+            long woodRemainder = totalWeight > 0 ? woodWeight * remainingRatioBps % totalWeight : -1L;
+            long stoneRemainder = totalWeight > 0 ? stoneWeight * remainingRatioBps % totalWeight : -1L;
+            long ironRemainder = totalWeight > 0 ? ironWeight * remainingRatioBps % totalWeight : -1L;
+            long foodRemainder = totalWeight > 0 ? foodWeight * remainingRatioBps % totalWeight : -1L;
+            int undistributed = remainingRatioBps - woodRatio - stoneRatio - ironRatio - foodRatio;
+
+            for (int i = 0; i < undistributed; i++)
+            {
+                int best = -1;
+                long bestRemainder = long.MinValue;
+                SelectRemainderCandidate(0, resourceIndex, woodRemainder, ref best, ref bestRemainder);
+                SelectRemainderCandidate(1, resourceIndex, stoneRemainder, ref best, ref bestRemainder);
+                SelectRemainderCandidate(2, resourceIndex, ironRemainder, ref best, ref bestRemainder);
+                SelectRemainderCandidate(3, resourceIndex, foodRemainder, ref best, ref bestRemainder);
+
+                switch (best)
+                {
+                    case 0: woodRatio++; woodRemainder = -1L; break;
+                    case 1: stoneRatio++; stoneRemainder = -1L; break;
+                    case 2: ironRatio++; ironRemainder = -1L; break;
+                    case 3: foodRatio++; foodRemainder = -1L; break;
+                }
+            }
+
+            allocation.WoodTargetRatioBps = resourceIndex == 0 ? targetRatioBps : woodRatio;
+            allocation.StoneTargetRatioBps = resourceIndex == 1 ? targetRatioBps : stoneRatio;
+            allocation.IronTargetRatioBps = resourceIndex == 2 ? targetRatioBps : ironRatio;
+            allocation.FoodTargetRatioBps = resourceIndex == 3 ? targetRatioBps : foodRatio;
+        }
+
         public static int BeginPopulationUpdate(ref MobilePopulationAllocation allocation, int populationTotal)
         {
             populationTotal = math.max(0, populationTotal);
@@ -168,6 +224,16 @@ namespace DeadWalls
 
             best = index;
             bestScore = score;
+        }
+
+        private static void SelectRemainderCandidate(int index, int excludedIndex, long remainder,
+            ref int best, ref long bestRemainder)
+        {
+            if (index == excludedIndex || remainder <= bestRemainder)
+                return;
+
+            best = index;
+            bestRemainder = remainder;
         }
     }
 }

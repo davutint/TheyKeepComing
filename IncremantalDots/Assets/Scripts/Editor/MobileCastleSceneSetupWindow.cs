@@ -70,6 +70,14 @@ namespace DeadWalls
             window.minSize = new Vector2(390f, 220f);
         }
 
+        [MenuItem("Window/DeadWalls/Repair Worker Drawer Target Controls")]
+        public static void RepairWorkerDrawerTargetControls()
+        {
+            EnsureWorkerDrawerTargetControlsInPrefab();
+            AssetDatabase.ImportAsset(GeneratedHudPrefabPath, ImportAssetOptions.ForceUpdate);
+            Debug.Log("[MobileCastleSceneSetup] Worker drawer target controls repaired.");
+        }
+
         private void OnGUI()
         {
             EditorGUILayout.Space(6f);
@@ -3000,6 +3008,8 @@ namespace DeadWalls
             DestroyChildIfExists(canvasTransform, "HUDPanel");
             DestroyChildIfExists(canvasTransform, "MarketPanel");
 
+            EnsureWorkerDrawerTargetControlsInPrefab();
+
             GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(GeneratedHudPrefabPath);
             Transform existing = canvasTransform.Find("MobileCastleHudRoot");
 
@@ -3027,6 +3037,158 @@ namespace DeadWalls
             return existing != null
                 ? existing.gameObject
                 : EnsurePanel(canvasTransform, "MobileCastleHudRoot", true, new Color(0f, 0f, 0f, 0f));
+        }
+
+        private static void EnsureWorkerDrawerTargetControlsInPrefab()
+        {
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(GeneratedHudPrefabPath);
+            if (prefab == null)
+                throw new InvalidOperationException("Worker drawer HUD prefab bulunamadi: " + GeneratedHudPrefabPath);
+
+            GameObject root = PrefabUtility.LoadPrefabContents(GeneratedHudPrefabPath);
+            try
+            {
+                GameObject panelObject = FindChildByName(root, "WorkerEconomyDrawerPanel");
+                if (panelObject == null)
+                    throw new InvalidOperationException("WorkerEconomyDrawerPanel prefab icinde bulunamadi.");
+
+                var panelRect = panelObject.GetComponent<RectTransform>();
+                panelRect.sizeDelta = new Vector2(620f, panelRect.sizeDelta.y);
+                panelRect.anchoredPosition = new Vector2(-600f, panelRect.anchoredPosition.y);
+
+                string[] prefixes = { "Wood", "Stone", "Iron", "Food" };
+                foreach (string prefix in prefixes)
+                    EnsureWorkerDrawerTargetRow(panelObject, prefix);
+
+                PrefabUtility.SaveAsPrefabAsset(root, GeneratedHudPrefabPath);
+            }
+            finally
+            {
+                PrefabUtility.UnloadPrefabContents(root);
+            }
+        }
+
+        private static void EnsureWorkerDrawerTargetRow(GameObject panelObject, string prefix)
+        {
+            GameObject rowObject = FindChildByName(panelObject, prefix + "WorkerRow");
+            var countText = FindComponentInChildrenByName<TextMeshProUGUI>(panelObject, prefix + "WorkerCountText");
+            var rateText = FindComponentInChildrenByName<TextMeshProUGUI>(panelObject, prefix + "WorkerRateText");
+            var statusText = FindComponentInChildrenByName<TextMeshProUGUI>(panelObject, prefix + "WorkerStatusText");
+            var plus1Button = FindComponentInChildrenByName<Button>(panelObject, prefix + "WorkerAddButton");
+            if (rowObject == null || countText == null || rateText == null || statusText == null || plus1Button == null)
+                throw new InvalidOperationException(prefix + " worker row gerekli legacy kontrolleri icermiyor.");
+
+            var rowRect = rowObject.GetComponent<RectTransform>();
+            rowRect.sizeDelta = new Vector2(596f, rowRect.sizeDelta.y);
+
+            Button plus10Button = FindComponentInChildrenByName<Button>(panelObject,
+                prefix + "WorkerTargetPlus10Button");
+            if (plus10Button == null)
+            {
+                GameObject clone = Instantiate(plus1Button.gameObject, rowObject.transform);
+                clone.name = prefix + "WorkerTargetPlus10Button";
+                plus10Button = clone.GetComponent<Button>();
+            }
+
+            Button plus100Button = FindComponentInChildrenByName<Button>(panelObject,
+                prefix + "WorkerTargetPlus100Button");
+            if (plus100Button == null)
+            {
+                GameObject clone = Instantiate(plus1Button.gameObject, rowObject.transform);
+                clone.name = prefix + "WorkerTargetPlus100Button";
+                plus100Button = clone.GetComponent<Button>();
+            }
+
+            TMP_InputField targetInput = FindComponentInChildrenByName<TMP_InputField>(panelObject,
+                prefix + "WorkerTargetInput");
+            if (targetInput == null)
+                targetInput = CreateWorkerTargetInput(rowObject.transform, prefix, statusText);
+
+            SetButtonLabel(plus1Button, "+1%");
+            SetButtonLabel(plus10Button, "+10%");
+            SetButtonLabel(plus100Button, "+100%");
+
+            SetWorkerDrawerControlRect(countText.rectTransform, -240f, 100f);
+            SetWorkerDrawerControlRect(rateText.rectTransform, -145f, 80f);
+            SetWorkerDrawerControlRect(statusText.rectTransform, -47f, 105f);
+            SetWorkerDrawerControlRect(targetInput.GetComponent<RectTransform>(), 46f, 70f);
+            SetWorkerDrawerControlRect(plus1Button.GetComponent<RectTransform>(), 112f, 52f);
+            SetWorkerDrawerControlRect(plus10Button.GetComponent<RectTransform>(), 174f, 62f);
+            SetWorkerDrawerControlRect(plus100Button.GetComponent<RectTransform>(), 254f, 82f);
+        }
+
+        private static TMP_InputField CreateWorkerTargetInput(Transform row, string prefix,
+            TextMeshProUGUI styleSource)
+        {
+            var inputObject = new GameObject(prefix + "WorkerTargetInput", typeof(RectTransform),
+                typeof(CanvasRenderer), typeof(Image));
+            inputObject.transform.SetParent(row, false);
+            inputObject.layer = row.gameObject.layer;
+            var image = inputObject.GetComponent<Image>();
+            image.color = new Color(0.035f, 0.055f, 0.075f, 0.96f);
+
+            var textObject = new GameObject("Text", typeof(RectTransform), typeof(CanvasRenderer),
+                typeof(TextMeshProUGUI));
+            textObject.transform.SetParent(inputObject.transform, false);
+            textObject.layer = row.gameObject.layer;
+            var textRect = textObject.GetComponent<RectTransform>();
+            textRect.anchorMin = Vector2.zero;
+            textRect.anchorMax = Vector2.one;
+            textRect.offsetMin = new Vector2(4f, 2f);
+            textRect.offsetMax = new Vector2(-4f, -2f);
+            var text = textObject.GetComponent<TextMeshProUGUI>();
+            CopyWorkerTargetInputTextStyle(text, styleSource, 16f, Color.white);
+
+            var placeholderObject = new GameObject("Placeholder", typeof(RectTransform),
+                typeof(CanvasRenderer), typeof(TextMeshProUGUI));
+            placeholderObject.transform.SetParent(inputObject.transform, false);
+            placeholderObject.layer = row.gameObject.layer;
+            var placeholderRect = placeholderObject.GetComponent<RectTransform>();
+            placeholderRect.anchorMin = Vector2.zero;
+            placeholderRect.anchorMax = Vector2.one;
+            placeholderRect.offsetMin = new Vector2(4f, 2f);
+            placeholderRect.offsetMax = new Vector2(-4f, -2f);
+            var placeholder = placeholderObject.GetComponent<TextMeshProUGUI>();
+            CopyWorkerTargetInputTextStyle(placeholder, styleSource, 13f,
+                new Color(1f, 1f, 1f, 0.35f));
+            placeholder.text = "0-100";
+
+            var input = inputObject.AddComponent<TMP_InputField>();
+            input.textViewport = inputObject.GetComponent<RectTransform>();
+            input.textComponent = text;
+            input.placeholder = placeholder;
+            input.contentType = TMP_InputField.ContentType.DecimalNumber;
+            input.lineType = TMP_InputField.LineType.SingleLine;
+            input.characterLimit = 6;
+            input.targetGraphic = image;
+            input.selectionColor = new Color(0.18f, 0.62f, 0.86f, 0.65f);
+            return input;
+        }
+
+        private static void CopyWorkerTargetInputTextStyle(TextMeshProUGUI target,
+            TextMeshProUGUI source, float fontSize, Color color)
+        {
+            if (source != null)
+            {
+                target.font = source.font;
+                target.fontSharedMaterial = source.fontSharedMaterial;
+            }
+
+            target.fontSize = fontSize;
+            target.color = color;
+            target.alignment = TextAlignmentOptions.Center;
+            target.textWrappingMode = TextWrappingModes.NoWrap;
+            target.raycastTarget = false;
+        }
+
+        private static void SetWorkerDrawerControlRect(RectTransform rect, float x, float width)
+        {
+            rect.anchorMin = new Vector2(0.5f, 0.5f);
+            rect.anchorMax = new Vector2(0.5f, 0.5f);
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.anchoredPosition = new Vector2(x, 0f);
+            rect.sizeDelta = new Vector2(width, 36f);
+            rect.localScale = Vector3.one;
         }
 
         private static void ConfigureHudRoot(GameObject hudRoot, ArcherRecruitmentCatalogSO archerCatalog)
@@ -3551,21 +3713,33 @@ namespace DeadWalls
             workerDrawer.WoodWorkerCountText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "WoodWorkerCountText");
             workerDrawer.WoodWorkerRateText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "WoodWorkerRateText");
             workerDrawer.WoodWorkerAddButton = FindComponentInChildrenByName<Button>(hudRoot, "WoodWorkerAddButton");
+            workerDrawer.WoodWorkerTargetPlus10Button = FindComponentInChildrenByName<Button>(hudRoot, "WoodWorkerTargetPlus10Button");
+            workerDrawer.WoodWorkerTargetPlus100Button = FindComponentInChildrenByName<Button>(hudRoot, "WoodWorkerTargetPlus100Button");
+            workerDrawer.WoodWorkerTargetInput = FindComponentInChildrenByName<TMP_InputField>(hudRoot, "WoodWorkerTargetInput");
             workerDrawer.WoodWorkerStatusText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "WoodWorkerStatusText");
 
             workerDrawer.StoneWorkerCountText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "StoneWorkerCountText");
             workerDrawer.StoneWorkerRateText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "StoneWorkerRateText");
             workerDrawer.StoneWorkerAddButton = FindComponentInChildrenByName<Button>(hudRoot, "StoneWorkerAddButton");
+            workerDrawer.StoneWorkerTargetPlus10Button = FindComponentInChildrenByName<Button>(hudRoot, "StoneWorkerTargetPlus10Button");
+            workerDrawer.StoneWorkerTargetPlus100Button = FindComponentInChildrenByName<Button>(hudRoot, "StoneWorkerTargetPlus100Button");
+            workerDrawer.StoneWorkerTargetInput = FindComponentInChildrenByName<TMP_InputField>(hudRoot, "StoneWorkerTargetInput");
             workerDrawer.StoneWorkerStatusText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "StoneWorkerStatusText");
 
             workerDrawer.IronWorkerCountText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "IronWorkerCountText");
             workerDrawer.IronWorkerRateText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "IronWorkerRateText");
             workerDrawer.IronWorkerAddButton = FindComponentInChildrenByName<Button>(hudRoot, "IronWorkerAddButton");
+            workerDrawer.IronWorkerTargetPlus10Button = FindComponentInChildrenByName<Button>(hudRoot, "IronWorkerTargetPlus10Button");
+            workerDrawer.IronWorkerTargetPlus100Button = FindComponentInChildrenByName<Button>(hudRoot, "IronWorkerTargetPlus100Button");
+            workerDrawer.IronWorkerTargetInput = FindComponentInChildrenByName<TMP_InputField>(hudRoot, "IronWorkerTargetInput");
             workerDrawer.IronWorkerStatusText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "IronWorkerStatusText");
 
             workerDrawer.FoodWorkerCountText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "FoodWorkerCountText");
             workerDrawer.FoodWorkerRateText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "FoodWorkerRateText");
             workerDrawer.FoodWorkerAddButton = FindComponentInChildrenByName<Button>(hudRoot, "FoodWorkerAddButton");
+            workerDrawer.FoodWorkerTargetPlus10Button = FindComponentInChildrenByName<Button>(hudRoot, "FoodWorkerTargetPlus10Button");
+            workerDrawer.FoodWorkerTargetPlus100Button = FindComponentInChildrenByName<Button>(hudRoot, "FoodWorkerTargetPlus100Button");
+            workerDrawer.FoodWorkerTargetInput = FindComponentInChildrenByName<TMP_InputField>(hudRoot, "FoodWorkerTargetInput");
             workerDrawer.FoodWorkerStatusText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "FoodWorkerStatusText");
 
             if (workerDrawer.WorkerDrawerToggleButton != null)

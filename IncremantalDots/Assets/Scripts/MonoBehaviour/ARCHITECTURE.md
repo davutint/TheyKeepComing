@@ -145,8 +145,10 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - Sol ust resource bar altindaki worker drawer'i yonetir.
 - `WorkerDrawerToggleButton` ile drawer panelini acip kapatir.
 - Idle pop, total worker, archer count ve resource worker rate alanlarini gunceller.
-- Wood/Stone/Iron/Food `+ WORKER` butonlarini `GameManager.AssignResourceWorker()` API'sine baglar.
-- DayPrep sartina bagli degildir; worker assignment her zaman denenebilir.
+- Wood/Stone/Iron/Food `+1% / +10% / +100% / direct input` kontrollerini target ratio API'lerine baglar.
+- Secilen exact hedef korunurken diger uc hedef deterministik yeniden dagilir; toplam `%100` kalir.
+- Mevcut actual worker'lari aninda tasimaz; hedef yalniz sonraki yeni population dagitimini yonlendirir.
+- DayPrep sartina bagli degildir; worker hedefi her zaman degistirilebilir.
 
 ### CastleInteriorClickTarget.cs
 
@@ -174,7 +176,7 @@ ECS Systems -> Entity Data -> GameManager.ReadECSData() -> Events -> UI Controll
 Legacy UI Input -> GameManager.CanApplyUpgrade()/ApplyUpgrade() -> EntityManager.SetComponentData -> ECS
 Archer Drawer Input -> GameManager.BuyArcher() -> EntityManager.SetComponentData -> ECS
 Tech Tree Input -> GameManager.TryBuyTechNode() -> reveal/unlock state + MobileCastleCombatConfig/WallSegment/ArcherUnit yazimi -> ECS
-Worker Drawer Input -> GameManager.AssignResourceWorker() -> MobilePopulationAllocation -> DOTS VillagerWorker route visual sync -> MobilePopulationEconomySystem
+Worker Drawer Input -> GameManager.Set/AdjustWorkerTargetRatioPercent() -> WorkerAllocationUtility -> MobilePopulationAllocation target -> sonraki population auto-allocation -> DOTS VillagerWorker visual sync
 Legacy Castle Click -> CastleEconomyUI.OpenFromCastle() -> MobilePrepPauseState
 Legacy Worker Slider Input -> GameManager.SetResourceWorkers() -> MobilePopulationAllocation -> DOTS VillagerWorker visual sync
 Economy Event Input -> GameManager.ChooseEconomyEvent() -> Resources/Population/MobileEconomyEventState

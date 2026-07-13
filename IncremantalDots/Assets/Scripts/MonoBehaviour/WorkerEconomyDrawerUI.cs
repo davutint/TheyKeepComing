@@ -1,3 +1,4 @@
+using System.Globalization;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,24 +19,36 @@ namespace DeadWalls
         public TMP_Text WoodWorkerCountText;
         public TMP_Text WoodWorkerRateText;
         public Button WoodWorkerAddButton;
+        public Button WoodWorkerTargetPlus10Button;
+        public Button WoodWorkerTargetPlus100Button;
+        public TMP_InputField WoodWorkerTargetInput;
         public TMP_Text WoodWorkerStatusText;
 
         [Header("Stone")]
         public TMP_Text StoneWorkerCountText;
         public TMP_Text StoneWorkerRateText;
         public Button StoneWorkerAddButton;
+        public Button StoneWorkerTargetPlus10Button;
+        public Button StoneWorkerTargetPlus100Button;
+        public TMP_InputField StoneWorkerTargetInput;
         public TMP_Text StoneWorkerStatusText;
 
         [Header("Iron")]
         public TMP_Text IronWorkerCountText;
         public TMP_Text IronWorkerRateText;
         public Button IronWorkerAddButton;
+        public Button IronWorkerTargetPlus10Button;
+        public Button IronWorkerTargetPlus100Button;
+        public TMP_InputField IronWorkerTargetInput;
         public TMP_Text IronWorkerStatusText;
 
         [Header("Food")]
         public TMP_Text FoodWorkerCountText;
         public TMP_Text FoodWorkerRateText;
         public Button FoodWorkerAddButton;
+        public Button FoodWorkerTargetPlus10Button;
+        public Button FoodWorkerTargetPlus100Button;
+        public TMP_InputField FoodWorkerTargetInput;
         public TMP_Text FoodWorkerStatusText;
 
         private bool _isOpen;
@@ -68,19 +81,43 @@ namespace DeadWalls
         {
             UnbindControls();
             WorkerDrawerToggleButton?.onClick.AddListener(Toggle);
-            WoodWorkerAddButton?.onClick.AddListener(HandleWoodClicked);
-            StoneWorkerAddButton?.onClick.AddListener(HandleStoneClicked);
-            IronWorkerAddButton?.onClick.AddListener(HandleIronClicked);
-            FoodWorkerAddButton?.onClick.AddListener(HandleFoodClicked);
+            WoodWorkerAddButton?.onClick.AddListener(HandleWoodPlus1Clicked);
+            WoodWorkerTargetPlus10Button?.onClick.AddListener(HandleWoodPlus10Clicked);
+            WoodWorkerTargetPlus100Button?.onClick.AddListener(HandleWoodPlus100Clicked);
+            WoodWorkerTargetInput?.onEndEdit.AddListener(HandleWoodTargetInput);
+            StoneWorkerAddButton?.onClick.AddListener(HandleStonePlus1Clicked);
+            StoneWorkerTargetPlus10Button?.onClick.AddListener(HandleStonePlus10Clicked);
+            StoneWorkerTargetPlus100Button?.onClick.AddListener(HandleStonePlus100Clicked);
+            StoneWorkerTargetInput?.onEndEdit.AddListener(HandleStoneTargetInput);
+            IronWorkerAddButton?.onClick.AddListener(HandleIronPlus1Clicked);
+            IronWorkerTargetPlus10Button?.onClick.AddListener(HandleIronPlus10Clicked);
+            IronWorkerTargetPlus100Button?.onClick.AddListener(HandleIronPlus100Clicked);
+            IronWorkerTargetInput?.onEndEdit.AddListener(HandleIronTargetInput);
+            FoodWorkerAddButton?.onClick.AddListener(HandleFoodPlus1Clicked);
+            FoodWorkerTargetPlus10Button?.onClick.AddListener(HandleFoodPlus10Clicked);
+            FoodWorkerTargetPlus100Button?.onClick.AddListener(HandleFoodPlus100Clicked);
+            FoodWorkerTargetInput?.onEndEdit.AddListener(HandleFoodTargetInput);
         }
 
         private void UnbindControls()
         {
             WorkerDrawerToggleButton?.onClick.RemoveListener(Toggle);
-            WoodWorkerAddButton?.onClick.RemoveListener(HandleWoodClicked);
-            StoneWorkerAddButton?.onClick.RemoveListener(HandleStoneClicked);
-            IronWorkerAddButton?.onClick.RemoveListener(HandleIronClicked);
-            FoodWorkerAddButton?.onClick.RemoveListener(HandleFoodClicked);
+            WoodWorkerAddButton?.onClick.RemoveListener(HandleWoodPlus1Clicked);
+            WoodWorkerTargetPlus10Button?.onClick.RemoveListener(HandleWoodPlus10Clicked);
+            WoodWorkerTargetPlus100Button?.onClick.RemoveListener(HandleWoodPlus100Clicked);
+            WoodWorkerTargetInput?.onEndEdit.RemoveListener(HandleWoodTargetInput);
+            StoneWorkerAddButton?.onClick.RemoveListener(HandleStonePlus1Clicked);
+            StoneWorkerTargetPlus10Button?.onClick.RemoveListener(HandleStonePlus10Clicked);
+            StoneWorkerTargetPlus100Button?.onClick.RemoveListener(HandleStonePlus100Clicked);
+            StoneWorkerTargetInput?.onEndEdit.RemoveListener(HandleStoneTargetInput);
+            IronWorkerAddButton?.onClick.RemoveListener(HandleIronPlus1Clicked);
+            IronWorkerTargetPlus10Button?.onClick.RemoveListener(HandleIronPlus10Clicked);
+            IronWorkerTargetPlus100Button?.onClick.RemoveListener(HandleIronPlus100Clicked);
+            IronWorkerTargetInput?.onEndEdit.RemoveListener(HandleIronTargetInput);
+            FoodWorkerAddButton?.onClick.RemoveListener(HandleFoodPlus1Clicked);
+            FoodWorkerTargetPlus10Button?.onClick.RemoveListener(HandleFoodPlus10Clicked);
+            FoodWorkerTargetPlus100Button?.onClick.RemoveListener(HandleFoodPlus100Clicked);
+            FoodWorkerTargetInput?.onEndEdit.RemoveListener(HandleFoodTargetInput);
         }
 
         private void Toggle()
@@ -124,13 +161,17 @@ namespace DeadWalls
             SetText(WorkerArcherPopulationText, $"ARCHERS {population.Archers}");
 
             RefreshRow(gm, EconomyFocusType.Wood, "WOOD", WoodWorkerCountText, WoodWorkerRateText,
-                WoodWorkerAddButton, WoodWorkerStatusText);
+                WoodWorkerAddButton, WoodWorkerTargetPlus10Button, WoodWorkerTargetPlus100Button,
+                WoodWorkerTargetInput, WoodWorkerStatusText);
             RefreshRow(gm, EconomyFocusType.Stone, "STONE", StoneWorkerCountText, StoneWorkerRateText,
-                StoneWorkerAddButton, StoneWorkerStatusText);
+                StoneWorkerAddButton, StoneWorkerTargetPlus10Button, StoneWorkerTargetPlus100Button,
+                StoneWorkerTargetInput, StoneWorkerStatusText);
             RefreshRow(gm, EconomyFocusType.Iron, "IRON", IronWorkerCountText, IronWorkerRateText,
-                IronWorkerAddButton, IronWorkerStatusText);
+                IronWorkerAddButton, IronWorkerTargetPlus10Button, IronWorkerTargetPlus100Button,
+                IronWorkerTargetInput, IronWorkerStatusText);
             RefreshRow(gm, EconomyFocusType.Food, "FOOD", FoodWorkerCountText, FoodWorkerRateText,
-                FoodWorkerAddButton, FoodWorkerStatusText);
+                FoodWorkerAddButton, FoodWorkerTargetPlus10Button, FoodWorkerTargetPlus100Button,
+                FoodWorkerTargetInput, FoodWorkerStatusText);
 
             _lastRefreshFingerprint = ComputeRefreshFingerprint(gm);
             _hasRefreshFingerprint = true;
@@ -172,6 +213,7 @@ namespace DeadWalls
         private static void AddResourceFingerprint(ref int hash, GameManager gm, EconomyFocusType resource)
         {
             AddFingerprintValue(ref hash, gm.GetResourceWorkers(resource));
+            AddFingerprintValue(ref hash, gm.GetWorkerTargetRatioBps(resource));
             AddFingerprintValue(ref hash, gm.GetMaxWorkersForResource(resource));
             AddFingerprintValue(ref hash, gm.GetWorkerProductionRate(resource).GetHashCode());
             AddFingerprintValue(ref hash, gm.CanAssignResourceWorker(resource));
@@ -191,36 +233,69 @@ namespace DeadWalls
         }
 
         private static void RefreshRow(GameManager gm, EconomyFocusType resource, string label,
-            TMP_Text countText, TMP_Text rateText, Button addButton, TMP_Text statusText)
+            TMP_Text countText, TMP_Text rateText, Button plus1Button, Button plus10Button,
+            Button plus100Button, TMP_InputField targetInput, TMP_Text statusText)
         {
             int count = gm.GetResourceWorkers(resource);
             int cap = gm.GetMaxWorkersForResource(resource);
             float rate = gm.GetWorkerProductionRate(resource);
-            bool canAssign = gm.CanAssignResourceWorker(resource);
             bool atCap = cap > 0 && count >= cap;
-            bool hasIdle = gm.GetIdlePopulation() > 0 || gm.IsFreeEconomyTestMode;
-            string status = atCap ? "CAP FULL" : hasIdle ? "READY" : "NEED POP";
+            float targetPercent = gm.GetWorkerTargetRatioBps(resource) / 100f;
 
             SetText(countText, cap > 0 ? $"{label} {count}/{cap}" : $"{label} x{count}");
             SetText(rateText, $"+{rate:0}/min");
-            SetText(statusText, status);
+            SetText(statusText, atCap ? $"TGT {targetPercent:0.##}% CAP" : $"TGT {targetPercent:0.##}%");
 
-            if (addButton != null)
-            {
-                addButton.interactable = canAssign;
-                SetButtonText(addButton, atCap ? "CAP FULL" : hasIdle ? "+ WORKER" : "NEED POP");
-            }
+            ConfigureTargetButton(plus1Button, "+1%");
+            ConfigureTargetButton(plus10Button, "+10%");
+            ConfigureTargetButton(plus100Button, "+100%");
+            if (targetInput != null && !targetInput.isFocused)
+                targetInput.SetTextWithoutNotify(targetPercent.ToString("0.##", CultureInfo.InvariantCulture));
         }
 
-        private void HandleWoodClicked() => Assign(EconomyFocusType.Wood);
-        private void HandleStoneClicked() => Assign(EconomyFocusType.Stone);
-        private void HandleIronClicked() => Assign(EconomyFocusType.Iron);
-        private void HandleFoodClicked() => Assign(EconomyFocusType.Food);
+        private void HandleWoodPlus1Clicked() => AdjustTarget(EconomyFocusType.Wood, 1);
+        private void HandleWoodPlus10Clicked() => AdjustTarget(EconomyFocusType.Wood, 10);
+        private void HandleWoodPlus100Clicked() => AdjustTarget(EconomyFocusType.Wood, 100);
+        private void HandleWoodTargetInput(string value) => SetTarget(EconomyFocusType.Wood, value);
+        private void HandleStonePlus1Clicked() => AdjustTarget(EconomyFocusType.Stone, 1);
+        private void HandleStonePlus10Clicked() => AdjustTarget(EconomyFocusType.Stone, 10);
+        private void HandleStonePlus100Clicked() => AdjustTarget(EconomyFocusType.Stone, 100);
+        private void HandleStoneTargetInput(string value) => SetTarget(EconomyFocusType.Stone, value);
+        private void HandleIronPlus1Clicked() => AdjustTarget(EconomyFocusType.Iron, 1);
+        private void HandleIronPlus10Clicked() => AdjustTarget(EconomyFocusType.Iron, 10);
+        private void HandleIronPlus100Clicked() => AdjustTarget(EconomyFocusType.Iron, 100);
+        private void HandleIronTargetInput(string value) => SetTarget(EconomyFocusType.Iron, value);
+        private void HandleFoodPlus1Clicked() => AdjustTarget(EconomyFocusType.Food, 1);
+        private void HandleFoodPlus10Clicked() => AdjustTarget(EconomyFocusType.Food, 10);
+        private void HandleFoodPlus100Clicked() => AdjustTarget(EconomyFocusType.Food, 100);
+        private void HandleFoodTargetInput(string value) => SetTarget(EconomyFocusType.Food, value);
 
-        private void Assign(EconomyFocusType resource)
+        private void AdjustTarget(EconomyFocusType resource, int deltaPercent)
         {
-            GameManager.Instance?.AssignResourceWorker(resource);
+            GameManager.Instance?.AdjustWorkerTargetRatioPercent(resource, deltaPercent);
             Refresh();
+        }
+
+        private void SetTarget(EconomyFocusType resource, string value)
+        {
+            string normalized = string.IsNullOrWhiteSpace(value)
+                ? string.Empty
+                : value.Trim().TrimEnd('%').Replace(',', '.');
+            if (float.TryParse(normalized, NumberStyles.Float, CultureInfo.InvariantCulture,
+                    out float targetPercent))
+            {
+                GameManager.Instance?.SetWorkerTargetRatioPercent(resource, targetPercent);
+            }
+            Refresh();
+        }
+
+        private static void ConfigureTargetButton(Button button, string label)
+        {
+            if (button == null)
+                return;
+
+            button.interactable = true;
+            SetButtonText(button, label);
         }
 
         private static void SetText(TMP_Text text, string value)

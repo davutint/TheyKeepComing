@@ -5,7 +5,7 @@
 ## Amac
 
 - Full-screen `CastleEconomyPanel` player-facing ana ekonomi UI'i olmaktan cikar.
-- Worker assignment her an HUD uzerinden erisilebilir olur.
+- Worker target ratio yonetimi her an HUD uzerinden erisilebilir olur.
 - Resource site objelerine tiklama gerekmez; buton input UI'dan gelir, gorsel feedback sahnedeki DOTS villager lojistigiyle verilir.
 
 ## Runtime Akisi
@@ -14,12 +14,17 @@
 WorkerDrawerToggleButton
 -> WorkerEconomyDrawerPanel ac/kapat
 
-Wood/Stone/Iron/Food + Worker button
--> GameManager.AssignResourceWorker(resource)
--> MobilePopulationAllocation artar
--> DOTS VillagerWorker route visual sync
--> WorkerLogisticsMovementSystem villager'i pickup/hub arasinda yurutur
+Wood/Stone/Iron/Food +1% / +10% / +100% / direct input
+-> GameManager.AdjustWorkerTargetRatioPercent() veya SetWorkerTargetRatioPercent()
+-> WorkerAllocationUtility.SetTargetRatioBps()
+-> Secilen hedef exact kalir; diger uc hedef oransal ve deterministik yeniden dagilir
+-> Toplam hedef 10.000 basis-point kalir
+-> Yalniz sonraki yeni population hedef acigina gore actual worker'a donusur
 ```
+
+`+1%` ve `+10%` secilen resource hedefini yuzde puan olarak artirir. `+100%`
+secili hedefi clamp yoluyla `%100`'e tasir. Direct input `0-100` araliginda exact
+hedef kabul eder. Hedef degisikligi mevcut worker sayilarini aninda hareket ettirmez.
 
 ## Guncellenen Alanlar
 
@@ -28,8 +33,11 @@ Wood/Stone/Iron/Food + Worker button
 - Archer population count
 - Wood/Stone/Iron/Food worker count ve resource cap (`WOOD 20/40`)
 - Wood/Stone/Iron/Food production rate
-- `READY` / `NEED POP` / `CAP FULL` status
+- Her resource icin `TGT xx%`; actual count cap'teyse `CAP` eki
+- Her resource icin exact yuzde input'u ve `+1% / +10% / +100%` kontrolleri
 
 ## Scope
 
-Bu controller ekonomi hesaplamasi yapmaz. Source-of-truth `GameManager`, `PopulationState` ve `MobilePopulationAllocation` tarafindadir.
+Bu controller ekonomi veya dagitim hesaplamasi yapmaz. Source-of-truth
+`GameManager`, `WorkerAllocationUtility`, `PopulationState` ve
+`MobilePopulationAllocation` tarafindadir.

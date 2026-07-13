@@ -924,6 +924,38 @@ namespace DeadWalls
             return true;
         }
 
+        public bool SetWorkerTargetRatioBps(EconomyFocusType resource, int targetRatioBps)
+        {
+            resource = EconomyFocusUtility.Normalize(resource);
+            if (resource == EconomyFocusType.Balanced
+                || !IsMobilePopulationEconomyEnabled()
+                || !TryGetMobileConfigEntity(out var mobileConfigEntity))
+            {
+                return false;
+            }
+
+            var allocation = _entityManager.GetComponentData<MobilePopulationAllocation>(mobileConfigEntity);
+            WorkerAllocationUtility.SetTargetRatioBps(ref allocation,
+                GetWorkerResourceIndex(resource), targetRatioBps);
+            _entityManager.SetComponentData(mobileConfigEntity, allocation);
+            PopulationAllocation = allocation;
+            OnGameStateChanged?.Invoke();
+            return true;
+        }
+
+        public bool SetWorkerTargetRatioPercent(EconomyFocusType resource, float targetPercent)
+        {
+            int targetRatioBps = Mathf.RoundToInt(Mathf.Clamp(targetPercent, 0f, 100f) * 100f);
+            return SetWorkerTargetRatioBps(resource, targetRatioBps);
+        }
+
+        public bool AdjustWorkerTargetRatioPercent(EconomyFocusType resource, int deltaPercent)
+        {
+            int currentRatioBps = GetWorkerTargetRatioBps(resource);
+            int targetRatioBps = currentRatioBps + deltaPercent * 100;
+            return SetWorkerTargetRatioBps(resource, targetRatioBps);
+        }
+
         public int GetMaxWorkersForResource(EconomyFocusType resource)
         {
             resource = EconomyFocusUtility.Normalize(resource);
@@ -3989,6 +4021,17 @@ namespace DeadWalls
                 && a.StoneWorkers == b.StoneWorkers
                 && a.IronWorkers == b.IronWorkers
                 && a.FoodWorkers == b.FoodWorkers;
+        }
+
+        private static int GetWorkerResourceIndex(EconomyFocusType resource)
+        {
+            switch (EconomyFocusUtility.Normalize(resource))
+            {
+                case EconomyFocusType.Stone: return 1;
+                case EconomyFocusType.Iron: return 2;
+                case EconomyFocusType.Food: return 3;
+                default: return 0;
+            }
         }
 
         private static void ApplySavedWorkerAllocation(ref MobilePopulationAllocation allocation, RunSaveState save)

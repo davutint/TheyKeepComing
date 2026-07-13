@@ -16,6 +16,16 @@
 
 `WorkerAllocationUtility.NormalizeTargetRatios` negatif girdileri sıfıra çeker ve oranları toplam `10.000` olacak şekilde integer largest-remainder yöntemiyle normalize eder. Eşit kalanlarda sabit öncelik Wood, Stone, Iron, Food sırasıdır. Bütün girdiler sıfırsa dengeli `2500 / 2500 / 2500 / 2500` hedefi kullanılır.
 
+`WorkerAllocationUtility.SetTargetRatioBps`, secilen resource hedefini exact
+`0-10.000` araliginda tutar ve kalan basis-point'leri diger uc hedefe mevcut
+oranlariyla, largest-remainder ve sabit resource onceligiyle dagitir. Diger uc
+hedefin tamami sifirsa kalan pay esit ve deterministik dagilir. Secilen hedef
+`10.000` ise diger hedefler sifir olur.
+
+Player-facing drawer bu kurali `+1%`, `+10%`, `+100%` ve `0-100` direct input
+ile cagirir. Bu mutasyon actual worker sayilarini degistirmez; worker gorsel
+senkronu ancak sonraki population gelisi actual count'u degistirdiginde calisir.
+
 İlk authoring değerleri gerçek worker dağılımından türetilir. NewGameScene'in `20 / 10 / 8 / 15` dağılımı bu nedenle `3774 / 1887 / 1509 / 2830` olarak başlar.
 
 ## Yeni Nüfus Dağıtımı
@@ -34,7 +44,7 @@ Worker görselleri hedef oran değiştiğinde yeniden üretilmez. Görsel senkro
 
 ## Doğrulama
 
-- `WorkerAllocationUtilityTests`: normalize, ilk baseline, deterministik dağıtım ve cap overflow.
+- `WorkerAllocationUtilityTests`: normalize, exact hedef mutation, ilk baseline, deterministik dağıtım ve cap overflow.
 - `RunPersistenceTests.TryLoad_Version3Snapshot_MigratesWorkerAllocationToVersion4`: v3 -> v4 geçişi.
-- `WorkerAllocationPlayModeTests`: gerçek NewGameScene'de yeni nüfus dağıtımı ve idle overflow.
+- `WorkerAllocationPlayModeTests`: gerçek NewGameScene'de yeni nüfus dağıtımı, idle overflow ve drawer hedef kontrollerinin actual worker'lari tasimama contract'i.
 - `ExactRunContinuePlayModeTests`: actual worker ve target ratio exact Continue round-trip.
