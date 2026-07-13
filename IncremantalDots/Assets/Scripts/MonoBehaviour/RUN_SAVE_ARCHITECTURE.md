@@ -4,9 +4,9 @@
 
 V1 Blueprint kararı: koşu yalnız Wall `0 HP` olduğunda biter. Oyuncu ana menüye dönebilir veya uygulamayı kapatabilir; Continue aynı koşunun aynı anını geri yükler. Aktif koşu varken gönüllü New Run/Restart yolu sunulmaz.
 
-`RunPersistence.cs` içindeki `RunSaveState` bu sözleşmenin disk şemasıdır. Güncel sürüm `v3`, desteklenen en eski sürüm de `v3` tür. Eski Dawn-checkpoint kayıtları exact state içermediği için sessizce migrate edilmez ve Continue olarak gösterilmez.
+`RunPersistence.cs` içindeki `RunSaveState` bu sözleşmenin disk şemasıdır. Güncel sürüm `v4`, desteklenen en eski sürüm `v3` tür. Eski v2 Dawn-checkpoint kayıtları exact state içermediği için Continue olarak gösterilmez. v3 exact snapshot'lar worker target-ratio state'i eklenerek açık ve deterministik biçimde v4'e yükseltilir.
 
-Disk çıktısı compact JSON'dur. Pretty-print kullanılmaz; özellikle 10K combat snapshot'ında whitespace dosya boyutu ve senkron I/O maliyeti üretmemelidir. Bu yalnız fiziksel yazım biçimidir; `v3` alan şeması ve `JsonUtility` Continue uyumluluğu değişmez.
+Disk çıktısı compact JSON'dur. Pretty-print kullanılmaz; özellikle 10K combat snapshot'ında whitespace dosya boyutu ve senkron I/O maliyeti üretmemelidir. Bu yalnız fiziksel yazım biçimidir; `v4` alan şeması ve `JsonUtility` Continue uyumluluğu değişmez.
 
 ## Kayıt anları
 
@@ -22,7 +22,7 @@ Kaydedilen state, oyuncunun aynı ana dönmesini etkileyen runtime verisidir:
 - Run identity, gün/cycle index, phase, exact cycle timer ve progress değerleri.
 - Wave state, spawn timer/budget ve `SpawnRandomState`.
 - Wood/Stone/Iron/Food, kesirli üretim accumulator'ları, Arrow current ve accumulator.
-- Population/capacity, worker dağılımı ve Dawn/event tekrarını önleyen last-marker alanları.
+- Population/capacity; actual worker dağılımı; target ratio, etkin worker cap ve idle aynaları; arrival checkpoint'i ve Dawn/event tekrarını önleyen last-marker alanları.
 - Wall current HP, archer sayıları/level state'i, tech node level'ları ve legacy upgrade tier'ları.
 - Council hafızası, salt, cooldown/pity/cap bonusları, aktif kart ve seçenek/effect içeriği.
 - Fireball cooldown'u ve aktif Fireball projectile; Fortify/Rally ve süreli economy/horde effect state'i.
@@ -38,7 +38,7 @@ Definition asset'lerden güvenle yeniden üretilebilen tech aggregate'leri ve ar
 
 `GameManager.TryRestoreRunFromCheckpoint()` şu sırayı korur:
 
-1. Geçerli `v3` snapshot yüklenir ve temiz runtime tabanı oluşturulur.
+1. Geçerli `v3` veya `v4` snapshot yüklenir; v3 ise worker oranları actual count'lardan türetilip in-memory v4'e yükseltilir ve temiz runtime tabanı oluşturulur.
 2. Aynı `RunId` geri alınır; tech seviyeleri maliyetsiz uygulanıp türetilen aggregate'ler kurulur.
 3. Council hafızası ve aktif Council kartı aynen yüklenir; reroll yapılmaz.
 4. Archer level/count state'i ve kaynak/population/allocation state'i geri yazılır.
@@ -73,4 +73,6 @@ Entity referansı doğrudan JSON'a yazılmaz. Referans gerekiyorsa compact stabl
 - `RunPersistenceTests.JsonRoundTrip_PreservesExactCycleCombatCouncilAndAbilityState`
 - `RunPersistenceTests.DeathReceipt_RoundTrip_PreservesRunIdentityAndRewardInputs`
 - `RunPersistenceTests.Save_WritesCompactJson_AndRemainsLoadable`
+- `RunPersistenceTests.TryLoad_Version3Snapshot_MigratesWorkerAllocationToVersion4`
+- `ExactRunContinuePlayModeTests.Continue_RestoresSameCyclePhaseTimerResourcesAndSpawnRng` actual worker ve target ratio state'ini de doğrular.
 - Runtime kabulü ayrıca Main Menu save, uygulama kapanışı, aynı phase/timer restore, aktif projectile restore ve Wall ölümü sırasında force-close senaryolarını kapsar.

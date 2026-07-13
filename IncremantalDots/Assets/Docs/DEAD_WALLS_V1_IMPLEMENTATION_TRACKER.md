@@ -126,12 +126,12 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Cycle | `Day 30 / Dusk 5 / Night 20 / Dawn 5`; dört fazda pozitif spawn temposu | Uyumlu |
 | Horde | Tek catalog prefabı; sabit stats; saved backlog; expandable bulk rent/return pool; Blood Moon dormant | 10K gate ve optimizasyon ölçüldü |
 | Moat | Runtime flag kapalı; slow `1`, damage `0`; tech/meta catalog bağlantıları dormant | Uyumlu |
-| Defense | Damage/Game Over aktif olarak tek Wall'a çekildi | Kodlandı, runtime test bekliyor |
-| Normal repair | Wood+Stone maliyeti kullanıyor ve Night phase guard'ı yok | Day/Dusk + Stone-only hedefiyle çelişiyor |
-| Save | Dawn checkpoint; Continue sonraki Day'e geçiyor | Package A kritik uyumsuz |
-| Economy | Üretim var; Food/Wood pasif consumption yolları hâlâ mevcut | Package A/C uyumsuz |
+| Defense | Damage/Game Over aktif ve testli olarak tek Wall'a çekildi | `[x]` |
+| Normal repair | Stone-only ve yalnız Day/Dusk | `[x]` |
+| Save | Exact same-moment Continue; schema v4, minimum v3 | `[x]` |
+| Economy | Worker üretimi var; V1 ana kaynaklarında pasif consumption yok | `[~]` Satın alım/eğri işleri Package C'de açık |
 | Population | Dawn'da bedelsiz +15; capacity otomatik büyüyor | Package C uyumsuz |
-| Workers | Dört resource allocation ve dünya worker entity'leri var; hedef oran yok, görseller 1:1 | Kısmi altyapı |
+| Workers | Kalıcı target ratio + actual/cap/idle state, yeni nüfus auto-allocation ve exact save var; görseller 1:1 | `[~]` UI ve temsili density açık |
 | Council | Curated/deterministic composer ve kart UI var; schedule chance/pity/cooldown | Package F altyapısı var, schedule yanlış |
 | Archers | Basic/Rapid/Frost, instant buy ve population cost var | Kısmi uyum |
 | Archer cap | Ortak 1000 kontrolü yok | Package D uyumsuz |
@@ -145,7 +145,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Meta | Ayrı JSON ve Game Over shop var; `StartingTechLevel` aktif | Kısmi uyum |
 | HUD | CyclePanel, DAY/DUSK/NIGHT ve Horde Pressure mevcut; tek Wall runtime gizleme var | Package I polish gerekli |
 | Tutorial | Aktif tutorial/onboarding sistemi bulunmadı | Package I eksik |
-| Testler | V1 contract testleri EditMode `35/35`; PlayMode `13 passed + 1 explicit profiler skip`; Standalone Player-targeted 10K `1/1` | 10K gate ürün ölçümlü |
+| Testler | EditMode `40/40`; PlayMode `15/15`; Standalone Player-targeted 10K `1/1` | Güncel değişiklikler full paketle testli |
 | Telemetry | Spawn budget demanded/spawned/backlog telemetry mevcut; tam Blueprint event owner'ı eksik | Kısmi |
 
 ---
@@ -155,8 +155,8 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Sıra | Paket | Durum | Sonraki pakete geçiş kapısı |
 |---:|---|---|---|
 | 1 | A - System Contracts | Tamamlandı | Reset/Continue deterministik; upkeep yok; tek Wall testli |
-| 2 | B - Continuous Horde | **Aktif** | Sabit stats ile gün baskısı artar; backlog/pool çalışır |
-| 3 | C - Economy + Population | Bekliyor | Pasif drain yok; arrival tek Food öder; cap aşılmaz |
+| 2 | B - Continuous Horde | Tamamlandı | Sabit stats, backlog/pool ve 10K ürün ölçümü tamamlandı |
+| 3 | C - Economy + Population | **Aktif** | Pasif drain yok; arrival tek Food öder; cap aşılmaz |
 | 4 | D - Archers + Ammo | Bekliyor | 1.000 x 10.000; 40x25; Arrow truth çalışır |
 | 5 | E - Castle Heart | Bekliyor | Aynı seed/load aynı valid graph'ı üretir |
 | 6 | F - Council | Bekliyor | 3/6/9 bozulmaz; etkiler ana cap'leri bypass etmez |
@@ -176,7 +176,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 |---|---|---|
 | Tek Wall truth | Damage, Game Over, authoring, repair ve save defense alanı Wall'a çekildi | `[x]` 19/19 EditMode |
 | Run/meta ayrımı | Exact run `run_save.json`; kalıcı progression `meta_progress.json`; ölüm transaction'ı ayrı receipt | `[x]` |
-| Exact Continue | Schema v3 aynı cycle/phase/timer, kaynak ve spawn RNG state'ini restore ediyor | `[x]` EditMode + PlayMode |
+| Exact Continue | Schema v4 aynı cycle/phase/timer, kaynak, spawn RNG ve worker target/checkpoint state'ini restore ediyor; v3 migrate ediliyor | `[x]` EditMode + PlayMode |
 | Otomatik save | Ana menüye dönmeden önce ve application quit sırasında exact snapshot alınıyor | `[x]` |
 | Gönüllü reset yok | Aktif run sırasında Main Menu New Run ve Pause Restart kapalı; Game Over Restart yeni koşu başlatır | `[x]` |
 | Upkeep yok | V1 ResourceTick consumption'ı yok sayıyor; population Food ve Fletcher Wood yolları castle loop'ta kapalı | `[x]` |
@@ -186,10 +186,10 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 ### `DW-A-SAVE` - Tamamlandı: Exact Run Snapshot & Continue
 
-- [x] Run save schema `v3` oldu; eksik exact state içeren v2 Dawn checkpoint'i sessiz migrate edilmiyor.
+- [x] Run save schema güncel `v4`, minimum `v3`; v2 Dawn checkpoint reddediliyor, v3 worker target state'iyle deterministik migrate ediliyor.
 - [x] Gün/cycle index, aktif phase, exact cycle timer/progress ve spawn RNG state'i kaydediliyor.
 - [x] Wood, Stone, Iron, Food, Arrow current ve kesirli accumulator state'i kaydediliyor; data-driven capacity tech/config'ten yeniden hesaplanıyor.
-- [x] Population, bed/capacity, actual worker count ve growth/event tekrar gate'leri kaydediliyor. Target ratio owner'ı Package C'de eklendiğinde aynı capture/restore üçlüsüne bağlanacak.
+- [x] Population, bed/capacity, actual worker count, target ratio/cap/idle/checkpoint ve growth/event tekrar gate'leri capture/restore zincirinde kaydediliyor.
 - [x] Basic/Rapid/Frost count, archer level ve ilgili run bonus state'i kaydediliyor.
 - [x] Wall current HP, Fireball cooldown/projectile, Rally ve Fortify state'i kaydediliyor.
 - [x] Tech node level state'i kaydediliyor; generated graph reveal/effect aggregate'leri level state'inden yeniden kuruluyor.
@@ -393,28 +393,28 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 ---
 
-## 7. Package C - Economy + Population - Sıradaki aktif paket
+## 7. Package C - Economy + Population - Aktif paket
 
 ### Mevcut oyun ile karşılaştırma
 
 | Sözleşme | Mevcut oyun | Durum |
 |---|---|---|
 | Dört hazır worker binası | Wood/Stone/Iron/Food allocation ve prebuilt world alanları var | `[~]` |
-| Target ratio | Integer actual count tutuluyor; kalıcı yüzde hedef yok | `[!]` |
-| Yeni pop otomatik dağılır | Dawn pop ekleniyor fakat target ratio olmadığı için hedef sözleşme yok | `[!]` |
+| Target ratio | Actual count yanında dört kalıcı basis-point hedef, cap/idle mirror ve runtime API var | `[x]` |
+| Yeni pop otomatik dağılır | Yalnız pozitif population farkı target deficit + cap kuralıyla deterministik dağılıyor | `[~]` Food/bed arrival budget açık |
 | +1/+10/+100/direct input | Aktif worker drawer yalnız add button ağırlıklı | `[!]` |
 | Worker world representation | Her assigned worker için 1:1 entity spawn ediliyor | `[!]` Büyük sayıda ölçeklenmez |
 | Beds incremental/no hard max | Mobile capacity `999999`; satın alınabilir bed sistemi yok | `[!]` |
 | Dawn survivor + one-time Food | Her dawn bedelsiz +15; yürüyen arrival/Food guard yok | `[!]` |
-| Mevcut pop pasif Food tüketmez | Atanmış pop Food/dk tüketebiliyor | `[!]` |
+| Mevcut pop pasif Food tüketmez | V1 castle loop'ta population Food/dk yazmıyor | `[x]` |
 | Fiyatlar adet/seviyeyle büyür | Bazı archer/tech cost growth var; bed/cap/efficiency contract yok | `[~]` |
 
 ### Yapılacaklar
 
-- [ ] `WorkerAllocation` state'e dört target ratio, actual counts, caps ve idle population ekle.
-- [ ] Target ratio toplamını normalize eden deterministik kural tanımla.
-- [ ] Yeni population'ı target ratio'lara otomatik dağıt.
-- [ ] Bina cap'i dolduğunda fazlalığı Idle Population'da bırak.
+- [x] `WorkerAllocation` state'e dört target ratio, actual counts, caps ve idle population ekle.
+- [x] Target ratio toplamını normalize eden deterministik kural tanımla.
+- [x] Yeni population'ı target ratio'lara otomatik dağıt.
+- [x] Bina cap'i dolduğunda fazlalığı Idle Population'da bırak.
 - [ ] Ücretsiz/anlık `+1 / +10 / +100 / direct input` kontrollerini ekle.
 - [ ] Worker world representation'ı sayısal truth'tan ayır; düşük/orta/yüksek temsilî density kur.
 - [ ] Worker animasyon, fener, taşıma ve üretim feedback'ini allocation ile senkron tut.
@@ -431,11 +431,11 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 ### Kabul kapısı
 
-- [ ] Ana kaynaklarda pasif drain yok.
+- [x] Ana kaynaklarda pasif drain yok.
 - [ ] Food `0` iken mevcut population değişmiyor.
 - [ ] Dawn arrival yalnız Food+bed kadar kabul ediliyor.
 - [ ] Capacity hiçbir zaman aşılmıyor.
-- [ ] Target ratio ve worker state save/load ile aynı kalıyor.
+- [x] Target ratio ve worker state save/load ile aynı kalıyor.
 - [ ] Büyük allocation 1:1 worker entity üretmiyor.
 
 ---
@@ -943,8 +943,8 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 ### Mevcut test envanteri
 
-- `[x]` EditMode: `35/35`; contract, compact save, tuning, cycle, quantity-only, backlog, Moat isolation, enemy catalog ve pool kapsamı.
-- `[x]` PlayMode: `13 passed + 1 explicit profiler skip`; gerçek `NewGameScene`, exact Continue, Wall, cycle, backlog, pool ve 10K runtime kapsamı.
+- `[x]` EditMode: `40/40`; contract, compact save/migration, worker allocation, tuning, cycle, quantity-only, backlog, Moat isolation, enemy catalog ve pool kapsamı.
+- `[x]` PlayMode: `15/15`; gerçek `NewGameScene`, exact Continue, worker arrival/cap overflow, Wall, cycle, backlog, pool ve 10K runtime/profiler kapsamı.
 - `[~]` Council schedule/guardrail ve 1k x 10k ürün senaryoları ilgili paketleri bekliyor; enemy pool churn contract testli.
 
 ---
@@ -1038,12 +1038,12 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | `MobileCastleHudRoot` live components | CyclePanel, HordePressure, Gate/Core bindings, drawers, upgrades |
 | `MobileCastleCombatAuthoring.cs` + `DefaultDifficulty.asset` + `BasicZombie.asset` | 30/5/20/5, quantity curves, 900 cap; enemy base statları catalog-owned |
 | `GameManager.cs` | Save/restore, repair, archer buy/upgrade, Council, Fireball, meta bridge |
-| `RunPersistence.cs` | Dawn checkpoint schema v2 ve eksik exact state |
+| `RunPersistence.cs` | Exact schema v4; minimum v3, worker target/checkpoint migration ve compact snapshot |
 | `ContinuousSiegeCycleSystem.cs` | Phase/intensity ve Blood Moon application |
 | `WaveSpawnSystem.cs` + `EnemyPoolRuntimeUtility.cs` | Tek catalog prefab/stat, cap/backlog ve expandable pool rent |
 | `DamageCleanupSystem.cs` | Reward sonrası enemy pool return |
-| `ResourceTickSystem.cs` + `PopulationTickSystem.cs` | Passive consumption |
-| `MobilePopulationEconomySystem.cs` | Bedelsiz population growth ve auto-capacity |
+| `ResourceTickSystem.cs` + `PopulationTickSystem.cs` | V1 castle loop'ta ana kaynak ve population için pasif consumption yok |
+| `MobilePopulationEconomySystem.cs` + `WorkerAllocationUtility.cs` | Target ratio auto-allocation/cap overflow; bedelsiz growth ve auto-capacity hâlâ açık Package C işi |
 | `MobileCastleArcherTilePlacement.cs` | Tile center + stack offset, preview 96 |
 | `ArcherShootSystem.cs` | Brute-force nearest target ve unlimited ammo bypass |
 | `TechNodeDefinitionSO.cs` + `TechTreeCatalogSO.cs` | Sabit catalog/reveal/cost/effect model |
@@ -1089,3 +1089,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-12 | `DW-B-SCALE` 10K runtime gate | Gerçek NewGameScene'de 10K pool, HUD/feedback, profiler telemetry, Fireball toplu return ve Continue doğrulandı; `126,42-131,95 ms` death peak ve `~20,7 KB/frame` GC blocker kaydedildi | Targeted PlayMode 1/1; full EditMode 34/34; full PlayMode 13/13 |
 | 2026-07-13 | `DW-B-SCALE-OPT` death/allocation pass | Pool return Burst-parallel reset + bulk commit oldu; death SFX ve death-animation ECB fan-out kaldırıldı; HUD/market/worker UI steady allocation owner'ları cache'lendi | 10K P95 `10,55-11,16 ms`; death peak `79,13-83,72 ms`; project allocation `11,6 B/frame`; EditMode 34/34; PlayMode 13 pass + 1 explicit skip |
 | 2026-07-13 | `DW-B-SCALE-OPT` Player/save/render gate | Exact snapshot compact JSON oldu; Editor-only sanılan draw sayısı Player'da doğrulandı ve archetype topology çıkarıldı; Editor araçları Player assembly'sinden ayrıldı | Player P95 `6,97 ms`; `535` draw call; `202` chunk x `50`; save/restore `52,58 / 86,19 ms`; snapshot `4.240.003 B`; EditMode 35/35; PlayMode 13+1; Player-targeted 1/1 |
+| 2026-07-13 | `DW-C-ALLOC` persistent worker targets | Actual count + dört target ratio + cap/idle/checkpoint state'i kuruldu; yalnız yeni nüfus deterministik dağılıyor, cap overflow idle kalıyor; schema v4 ve v3 migration eklendi | Unity compile: 0 error; EditMode 40/40; full PlayMode 15/15 |

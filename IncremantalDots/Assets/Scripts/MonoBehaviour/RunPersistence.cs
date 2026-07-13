@@ -13,7 +13,7 @@ namespace DeadWalls
     [Serializable]
     public class RunSaveState
     {
-        public const int CurrentVersion = 3;
+        public const int CurrentVersion = 4;
         public const int MinimumSupportedVersion = 3;
 
         public int Version = CurrentVersion;
@@ -85,6 +85,16 @@ namespace DeadWalls
         public int StoneWorkers;
         public int IronWorkers;
         public int FoodWorkers;
+        public int WoodWorkerTargetRatioBps;
+        public int StoneWorkerTargetRatioBps;
+        public int IronWorkerTargetRatioBps;
+        public int FoodWorkerTargetRatioBps;
+        public int WoodWorkerCapacity;
+        public int StoneWorkerCapacity;
+        public int IronWorkerCapacity;
+        public int FoodWorkerCapacity;
+        public int WorkerIdlePopulation;
+        public int LastObservedPopulation;
         public int LastPopulationGrowthWave;
         public int LastPopulationGrowthCycle;
         public int LastEventPrepWave;
@@ -240,6 +250,7 @@ namespace DeadWalls
                     return null;
                 }
 
+                UpgradeToCurrent(state);
                 return state;
             }
             catch (Exception e)
@@ -256,6 +267,38 @@ namespace DeadWalls
 
             state.Version = RunSaveState.CurrentVersion;
             return WriteJson(FilePath, state, "Run save");
+        }
+
+        private static void UpgradeToCurrent(RunSaveState state)
+        {
+            if (state == null || state.Version >= RunSaveState.CurrentVersion)
+                return;
+
+            if (state.Version == 3)
+            {
+                var allocation = new MobilePopulationAllocation
+                {
+                    WoodWorkers = state.WoodWorkers,
+                    StoneWorkers = state.StoneWorkers,
+                    IronWorkers = state.IronWorkers,
+                    FoodWorkers = state.FoodWorkers,
+                    WoodTargetRatioBps = state.WoodWorkerTargetRatioBps,
+                    StoneTargetRatioBps = state.StoneWorkerTargetRatioBps,
+                    IronTargetRatioBps = state.IronWorkerTargetRatioBps,
+                    FoodTargetRatioBps = state.FoodWorkerTargetRatioBps
+                };
+                WorkerAllocationUtility.InitializeTargetsFromCurrent(ref allocation);
+                state.WoodWorkerTargetRatioBps = allocation.WoodTargetRatioBps;
+                state.StoneWorkerTargetRatioBps = allocation.StoneTargetRatioBps;
+                state.IronWorkerTargetRatioBps = allocation.IronTargetRatioBps;
+                state.FoodWorkerTargetRatioBps = allocation.FoodTargetRatioBps;
+                state.WorkerIdlePopulation = Math.Max(0,
+                    state.PopulationTotal - state.WoodWorkers - state.StoneWorkers
+                    - state.IronWorkers - state.FoodWorkers
+                    - state.BasicArchers - state.RapidArchers - state.FrostArchers);
+                state.LastObservedPopulation = Math.Max(0, state.PopulationTotal);
+                state.Version = 4;
+            }
         }
 
         public static void CommitDeath(RunDeathReceipt receipt)

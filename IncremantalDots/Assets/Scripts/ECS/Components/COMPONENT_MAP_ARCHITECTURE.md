@@ -48,7 +48,7 @@ Tum component'lar unmanaged ECS struct olarak tutulur. Davranis sistemlerde, ver
 - `EconomyFocusState`: aktif mobile ekonomi focus'unu tutar. `Balanced` default'tur; Wood/Stone/Iron/Food secimleri passive income, kill reward ve wave clear bonus'u yonlendirir.
 - `WaveClearRewardData`: son wave clear bonusunu HUD feedback'i icin saklar.
 - `CastleYardPrepState`: `Fortify` ve `Rally` tek-gecelik prep buff state'ini tutar.
-- `MobilePopulationAllocation`: Wood/Stone/Iron/Food worker sayilarini, legacy wave growth checkpoint'ini ve continuous cycle growth checkpoint'ini tutar.
+- `MobilePopulationAllocation`: Wood/Stone/Iron/Food actual worker sayilarini, `10.000` basis-point target ratio'larini, etkin cap ve idle aynalarini, population auto-allocation checkpoint'ini ve growth checkpoint'lerini tutar.
 - `ArcherSlotPosition`: legacy/manual pozisyon buffer'i. NewGameScene mobile tilemap spawn akisi bunu kullanmaz.
 
 ## CastleInteriorWorkerComponents.cs
@@ -89,7 +89,8 @@ ArcherAnimationStateSystem -> Okculari hedef yonunde idle/attack row'larina ceke
 ## Veri Akisi
 
 ```
-PopulationTickSystem -> PopulationState.Idle hesaplar + ResourceConsumptionRate.FoodPerMin gunceller
+MobilePopulationEconomySystem -> yeni population'i target ratio + cap ile worker/idle state'e dagitir
+PopulationTickSystem -> PopulationState.Idle aggregate'ini hesaplar; V1'de pasif Food consumption yazmaz
 ResourceTickSystem -> EconomyFocusState varsa effective production hesaplar, ResourceAccumulator + ResourceData gunceller
 WaveSpawnSystem -> ZombieStats/ZombieState/PhysicsBody/CollisionRadius olusturur
 ApplyMovementForceSystem -> PhysicsBody.Force yazar

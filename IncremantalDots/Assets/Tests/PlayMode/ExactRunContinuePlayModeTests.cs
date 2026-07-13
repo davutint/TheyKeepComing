@@ -60,6 +60,8 @@ namespace DeadWalls.Tests
             Entity cycleEntity = entityManager.CreateEntityQuery(
                 typeof(ContinuousSiegeCycleData), typeof(ContinuousSpawnBudgetData)).GetSingletonEntity();
             Entity resourceEntity = entityManager.CreateEntityQuery(typeof(ResourceData), typeof(WaveStateData)).GetSingletonEntity();
+            Entity allocationEntity = entityManager.CreateEntityQuery(
+                typeof(MobileCastleCombatConfig), typeof(MobilePopulationAllocation)).GetSingletonEntity();
 
             var cycle = entityManager.GetComponentData<ContinuousSiegeCycleData>(cycleEntity);
             cycle.CycleIndex = 9;
@@ -91,6 +93,18 @@ namespace DeadWalls.Tests
             spawnBudget.EffectiveSpawnInterval = 0.2545f;
             entityManager.SetComponentData(cycleEntity, spawnBudget);
 
+            var workerAllocation = entityManager.GetComponentData<MobilePopulationAllocation>(allocationEntity);
+            int savedWoodWorkers = workerAllocation.WoodWorkers;
+            int savedStoneWorkers = workerAllocation.StoneWorkers;
+            int savedIronWorkers = workerAllocation.IronWorkers;
+            int savedFoodWorkers = workerAllocation.FoodWorkers;
+            workerAllocation.WoodTargetRatioBps = 1000;
+            workerAllocation.StoneTargetRatioBps = 2000;
+            workerAllocation.IronTargetRatioBps = 3000;
+            workerAllocation.FoodTargetRatioBps = 4000;
+            workerAllocation.LastObservedPopulation = 58;
+            entityManager.SetComponentData(allocationEntity, workerAllocation);
+
             Assert.That(gameManager.SaveRunSnapshot(), Is.True);
             string savedRunId = gameManager.CurrentRunId;
 
@@ -106,16 +120,28 @@ namespace DeadWalls.Tests
             spawnBudget.TotalDemandedEnemies = 0;
             spawnBudget.TotalSpawnedEnemies = 0;
             entityManager.SetComponentData(cycleEntity, spawnBudget);
+            workerAllocation.WoodWorkers = 0;
+            workerAllocation.StoneWorkers = 0;
+            workerAllocation.IronWorkers = 0;
+            workerAllocation.FoodWorkers = 0;
+            workerAllocation.WoodTargetRatioBps = 0;
+            workerAllocation.StoneTargetRatioBps = 0;
+            workerAllocation.IronTargetRatioBps = 0;
+            workerAllocation.FoodTargetRatioBps = WorkerAllocationUtility.RatioScale;
+            entityManager.SetComponentData(allocationEntity, workerAllocation);
 
             Assert.That(gameManager.TryRestoreRunFromCheckpoint(), Is.True);
 
             cycleEntity = entityManager.CreateEntityQuery(
                 typeof(ContinuousSiegeCycleData), typeof(ContinuousSpawnBudgetData)).GetSingletonEntity();
             resourceEntity = entityManager.CreateEntityQuery(typeof(ResourceData), typeof(WaveStateData)).GetSingletonEntity();
+            allocationEntity = entityManager.CreateEntityQuery(
+                typeof(MobileCastleCombatConfig), typeof(MobilePopulationAllocation)).GetSingletonEntity();
             var restoredCycle = entityManager.GetComponentData<ContinuousSiegeCycleData>(cycleEntity);
             var restoredBudget = entityManager.GetComponentData<ContinuousSpawnBudgetData>(cycleEntity);
             var restoredResources = entityManager.GetComponentData<ResourceData>(resourceEntity);
             var restoredWave = entityManager.GetComponentData<WaveStateData>(resourceEntity);
+            var restoredAllocation = entityManager.GetComponentData<MobilePopulationAllocation>(allocationEntity);
 
             Assert.That(gameManager.CurrentRunId, Is.EqualTo(savedRunId));
             Assert.That(restoredCycle.CycleIndex, Is.EqualTo(9));
@@ -130,6 +156,15 @@ namespace DeadWalls.Tests
             Assert.That(restoredBudget.TotalDemandedEnemies, Is.EqualTo(500));
             Assert.That(restoredBudget.TotalSpawnedEnemies, Is.EqualTo(427));
             Assert.That(restoredBudget.DayBaseSpawnInterval, Is.EqualTo(0.42f).Within(0.001f));
+            Assert.That(restoredAllocation.WoodWorkers, Is.EqualTo(savedWoodWorkers));
+            Assert.That(restoredAllocation.StoneWorkers, Is.EqualTo(savedStoneWorkers));
+            Assert.That(restoredAllocation.IronWorkers, Is.EqualTo(savedIronWorkers));
+            Assert.That(restoredAllocation.FoodWorkers, Is.EqualTo(savedFoodWorkers));
+            Assert.That(restoredAllocation.WoodTargetRatioBps, Is.EqualTo(1000));
+            Assert.That(restoredAllocation.StoneTargetRatioBps, Is.EqualTo(2000));
+            Assert.That(restoredAllocation.IronTargetRatioBps, Is.EqualTo(3000));
+            Assert.That(restoredAllocation.FoodTargetRatioBps, Is.EqualTo(4000));
+            Assert.That(restoredAllocation.LastObservedPopulation, Is.EqualTo(58));
             yield return null;
         }
 

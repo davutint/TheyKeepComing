@@ -47,7 +47,16 @@ namespace DeadWalls
                 ApplyDayPrepStart(ref allocationRW.ValueRW, ref eventRW.ValueRW, ref populationRW.ValueRW, config, wave.CurrentWave);
             }
 
-            NormalizeAllocation(ref allocationRW.ValueRW, ref populationRW.ValueRW, config);
+            SyncWorkerCapacities(ref allocationRW.ValueRW, config);
+            NormalizeAllocation(ref allocationRW.ValueRW, ref populationRW.ValueRW);
+            int addedPopulation = WorkerAllocationUtility.BeginPopulationUpdate(
+                ref allocationRW.ValueRW, populationRW.ValueRO.Total);
+            if (addedPopulation > 0)
+            {
+                int assignable = math.min(addedPopulation, populationRW.ValueRO.Idle);
+                WorkerAllocationUtility.AutoAssignNewPopulation(ref allocationRW.ValueRW, assignable);
+                NormalizeAllocation(ref allocationRW.ValueRW, ref populationRW.ValueRW);
+            }
             WriteProductionRates(ref productionRW.ValueRW, allocationRW.ValueRO, eventRW.ValueRO, config);
         }
 
@@ -175,13 +184,21 @@ namespace DeadWalls
             }
         }
 
-        private static void NormalizeAllocation(ref MobilePopulationAllocation allocation, ref PopulationState population,
+        private static void SyncWorkerCapacities(ref MobilePopulationAllocation allocation,
             MobileCastleCombatConfig config)
         {
-            allocation.WoodWorkers = ClampWorkerCount(allocation.WoodWorkers, config.WoodWorkerCap);
-            allocation.StoneWorkers = ClampWorkerCount(allocation.StoneWorkers, config.StoneWorkerCap);
-            allocation.IronWorkers = ClampWorkerCount(allocation.IronWorkers, config.IronWorkerCap);
-            allocation.FoodWorkers = ClampWorkerCount(allocation.FoodWorkers, config.FoodWorkerCap);
+            allocation.WoodWorkerCapacity = math.max(0, config.WoodWorkerCap);
+            allocation.StoneWorkerCapacity = math.max(0, config.StoneWorkerCap);
+            allocation.IronWorkerCapacity = math.max(0, config.IronWorkerCap);
+            allocation.FoodWorkerCapacity = math.max(0, config.FoodWorkerCap);
+        }
+
+        private static void NormalizeAllocation(ref MobilePopulationAllocation allocation, ref PopulationState population)
+        {
+            allocation.WoodWorkers = ClampWorkerCount(allocation.WoodWorkers, allocation.WoodWorkerCapacity);
+            allocation.StoneWorkers = ClampWorkerCount(allocation.StoneWorkers, allocation.StoneWorkerCapacity);
+            allocation.IronWorkers = ClampWorkerCount(allocation.IronWorkers, allocation.IronWorkerCapacity);
+            allocation.FoodWorkers = ClampWorkerCount(allocation.FoodWorkers, allocation.FoodWorkerCapacity);
 
             int availableForWorkers = math.max(0, population.Total - population.Archers);
             int totalWorkers = allocation.WoodWorkers + allocation.StoneWorkers + allocation.IronWorkers + allocation.FoodWorkers;
@@ -197,6 +214,7 @@ namespace DeadWalls
             totalWorkers = allocation.WoodWorkers + allocation.StoneWorkers + allocation.IronWorkers + allocation.FoodWorkers;
             population.Workers = totalWorkers;
             population.Idle = math.max(0, population.Total - population.Workers - population.Archers);
+            allocation.IdlePopulation = population.Idle;
             population.Capacity = math.max(population.Capacity, population.Total);
             population.BaseCapacity = math.max(population.BaseCapacity, population.Capacity);
         }

@@ -895,6 +895,35 @@ namespace DeadWalls
             }
         }
 
+        public int GetWorkerTargetRatioBps(EconomyFocusType resource)
+        {
+            switch (EconomyFocusUtility.Normalize(resource))
+            {
+                case EconomyFocusType.Wood: return PopulationAllocation.WoodTargetRatioBps;
+                case EconomyFocusType.Stone: return PopulationAllocation.StoneTargetRatioBps;
+                case EconomyFocusType.Iron: return PopulationAllocation.IronTargetRatioBps;
+                case EconomyFocusType.Food: return PopulationAllocation.FoodTargetRatioBps;
+                default: return WorkerAllocationUtility.RatioScale;
+            }
+        }
+
+        public bool SetWorkerTargetRatios(int wood, int stone, int iron, int food)
+        {
+            if (!IsMobilePopulationEconomyEnabled() || !TryGetMobileConfigEntity(out var mobileConfigEntity))
+                return false;
+
+            var allocation = _entityManager.GetComponentData<MobilePopulationAllocation>(mobileConfigEntity);
+            allocation.WoodTargetRatioBps = Mathf.Max(0, wood);
+            allocation.StoneTargetRatioBps = Mathf.Max(0, stone);
+            allocation.IronTargetRatioBps = Mathf.Max(0, iron);
+            allocation.FoodTargetRatioBps = Mathf.Max(0, food);
+            WorkerAllocationUtility.NormalizeTargetRatios(ref allocation);
+            _entityManager.SetComponentData(mobileConfigEntity, allocation);
+            PopulationAllocation = allocation;
+            OnGameStateChanged?.Invoke();
+            return true;
+        }
+
         public int GetMaxWorkersForResource(EconomyFocusType resource)
         {
             resource = EconomyFocusUtility.Normalize(resource);
@@ -2221,10 +2250,7 @@ namespace DeadWalls
             if (_entityManager.HasComponent<MobilePopulationAllocation>(mobileConfigEntity))
             {
                 var allocation = _entityManager.GetComponentData<MobilePopulationAllocation>(mobileConfigEntity);
-                allocation.WoodWorkers = save.WoodWorkers;
-                allocation.StoneWorkers = save.StoneWorkers;
-                allocation.IronWorkers = save.IronWorkers;
-                allocation.FoodWorkers = save.FoodWorkers;
+                ApplySavedWorkerAllocation(ref allocation, save);
                 // kayit anindaki gunun safak odulu VERILMISTI — cift odul gate'i
                 allocation.LastPopulationGrowthCycle = save.CycleIndex + 1;
                 allocation.LastEventPrepWave = save.CycleIndex + 1;
@@ -2361,6 +2387,16 @@ namespace DeadWalls
                 StoneWorkers = allocation.StoneWorkers,
                 IronWorkers = allocation.IronWorkers,
                 FoodWorkers = allocation.FoodWorkers,
+                WoodWorkerTargetRatioBps = allocation.WoodTargetRatioBps,
+                StoneWorkerTargetRatioBps = allocation.StoneTargetRatioBps,
+                IronWorkerTargetRatioBps = allocation.IronTargetRatioBps,
+                FoodWorkerTargetRatioBps = allocation.FoodTargetRatioBps,
+                WoodWorkerCapacity = allocation.WoodWorkerCapacity,
+                StoneWorkerCapacity = allocation.StoneWorkerCapacity,
+                IronWorkerCapacity = allocation.IronWorkerCapacity,
+                FoodWorkerCapacity = allocation.FoodWorkerCapacity,
+                WorkerIdlePopulation = allocation.IdlePopulation,
+                LastObservedPopulation = allocation.LastObservedPopulation,
                 LastPopulationGrowthWave = allocation.LastPopulationGrowthWave,
                 LastPopulationGrowthCycle = allocation.LastPopulationGrowthCycle,
                 LastEventPrepWave = allocation.LastEventPrepWave,
@@ -2622,10 +2658,7 @@ namespace DeadWalls
             }
 
             var allocation = _entityManager.GetComponentData<MobilePopulationAllocation>(mobileConfigEntity);
-            allocation.WoodWorkers = save.WoodWorkers;
-            allocation.StoneWorkers = save.StoneWorkers;
-            allocation.IronWorkers = save.IronWorkers;
-            allocation.FoodWorkers = save.FoodWorkers;
+            ApplySavedWorkerAllocation(ref allocation, save);
             allocation.LastPopulationGrowthWave = save.LastPopulationGrowthWave;
             allocation.LastPopulationGrowthCycle = save.LastPopulationGrowthCycle;
             allocation.LastEventPrepWave = save.LastEventPrepWave;
@@ -3958,6 +3991,26 @@ namespace DeadWalls
                 && a.FoodWorkers == b.FoodWorkers;
         }
 
+        private static void ApplySavedWorkerAllocation(ref MobilePopulationAllocation allocation, RunSaveState save)
+        {
+            allocation.WoodWorkers = Mathf.Max(0, save.WoodWorkers);
+            allocation.StoneWorkers = Mathf.Max(0, save.StoneWorkers);
+            allocation.IronWorkers = Mathf.Max(0, save.IronWorkers);
+            allocation.FoodWorkers = Mathf.Max(0, save.FoodWorkers);
+            allocation.WoodTargetRatioBps = save.WoodWorkerTargetRatioBps;
+            allocation.StoneTargetRatioBps = save.StoneWorkerTargetRatioBps;
+            allocation.IronTargetRatioBps = save.IronWorkerTargetRatioBps;
+            allocation.FoodTargetRatioBps = save.FoodWorkerTargetRatioBps;
+            WorkerAllocationUtility.NormalizeTargetRatios(ref allocation);
+            if (save.WoodWorkerCapacity > 0) allocation.WoodWorkerCapacity = save.WoodWorkerCapacity;
+            if (save.StoneWorkerCapacity > 0) allocation.StoneWorkerCapacity = save.StoneWorkerCapacity;
+            if (save.IronWorkerCapacity > 0) allocation.IronWorkerCapacity = save.IronWorkerCapacity;
+            if (save.FoodWorkerCapacity > 0) allocation.FoodWorkerCapacity = save.FoodWorkerCapacity;
+            allocation.IdlePopulation = Mathf.Max(0, save.WorkerIdlePopulation);
+            allocation.LastObservedPopulation = Mathf.Max(0, save.LastObservedPopulation);
+            allocation.AutoAllocationInitialized = 1;
+        }
+
         private void LogMissingArcherPlacementWarning()
         {
             if (_missingArcherPlacementWarningLogged)
@@ -4076,10 +4129,21 @@ namespace DeadWalls
                     StoneWorkers = MobileInitialStoneWorkers,
                     IronWorkers = MobileInitialIronWorkers,
                     FoodWorkers = MobileInitialFoodWorkers,
+                    WoodWorkerCapacity = MobileFallbackWoodWorkerCap,
+                    StoneWorkerCapacity = MobileFallbackStoneWorkerCap,
+                    IronWorkerCapacity = MobileFallbackIronWorkerCap,
+                    FoodWorkerCapacity = MobileFallbackFoodWorkerCap,
+                    IdlePopulation = MobileInitialPopulation
+                        - MobileInitialWoodWorkers - MobileInitialStoneWorkers
+                        - MobileInitialIronWorkers - MobileInitialFoodWorkers
+                        - MobileInitialBasicArchers,
+                    LastObservedPopulation = MobileInitialPopulation,
+                    AutoAllocationInitialized = 1,
                     LastPopulationGrowthWave = 0,
                     LastPopulationGrowthCycle = 0,
                     LastEventPrepWave = 0
                 };
+                WorkerAllocationUtility.InitializeTargetsFromCurrent(ref allocation);
                 _entityManager.SetComponentData(mobileConfigEntity, allocation);
                 PopulationAllocation = allocation;
             }

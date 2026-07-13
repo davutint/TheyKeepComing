@@ -160,6 +160,47 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void TryLoad_Version3Snapshot_MigratesWorkerAllocationToVersion4()
+        {
+            string path = Path.Combine(Application.persistentDataPath, "run_save.json");
+            byte[] original = File.Exists(path) ? File.ReadAllBytes(path) : null;
+            var legacy = new RunSaveState
+            {
+                Version = 3,
+                RunId = "run_v3_worker_migration_" + Guid.NewGuid().ToString("N"),
+                PopulationTotal = 60,
+                WoodWorkers = 20,
+                StoneWorkers = 10,
+                IronWorkers = 8,
+                FoodWorkers = 15,
+                BasicArchers = 4
+            };
+
+            try
+            {
+                File.WriteAllText(path, JsonUtility.ToJson(legacy));
+
+                RunSaveState restored = RunPersistence.TryLoad();
+
+                Assert.That(restored, Is.Not.Null);
+                Assert.That(restored.Version, Is.EqualTo(4));
+                Assert.That(restored.WoodWorkerTargetRatioBps, Is.EqualTo(3774));
+                Assert.That(restored.StoneWorkerTargetRatioBps, Is.EqualTo(1887));
+                Assert.That(restored.IronWorkerTargetRatioBps, Is.EqualTo(1509));
+                Assert.That(restored.FoodWorkerTargetRatioBps, Is.EqualTo(2830));
+                Assert.That(restored.WorkerIdlePopulation, Is.EqualTo(3));
+                Assert.That(restored.LastObservedPopulation, Is.EqualTo(60));
+            }
+            finally
+            {
+                if (original != null)
+                    File.WriteAllBytes(path, original);
+                else if (File.Exists(path))
+                    File.Delete(path);
+            }
+        }
+
+        [Test]
         public void PendingDeathReceipt_InvalidatesMatchingRunSnapshot()
         {
             var state = new RunSaveState { RunId = "run_dead_02" };

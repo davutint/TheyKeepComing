@@ -285,16 +285,22 @@ namespace DeadWalls
                     RallyFireRateMultiplier = math.max(1f, authoring.RallyFireRateMultiplier)
                 });
 
-                AddComponent(entity, new MobilePopulationAllocation
+                var populationAllocation = new MobilePopulationAllocation
                 {
                     WoodWorkers = math.max(0, authoring.InitialWoodWorkers),
                     StoneWorkers = math.max(0, authoring.InitialStoneWorkers),
                     IronWorkers = math.max(0, authoring.InitialIronWorkers),
                     FoodWorkers = math.max(0, authoring.InitialFoodWorkers),
+                    WoodWorkerCapacity = math.max(0, authoring.WoodWorkerCap),
+                    StoneWorkerCapacity = math.max(0, authoring.StoneWorkerCap),
+                    IronWorkerCapacity = math.max(0, authoring.IronWorkerCap),
+                    FoodWorkerCapacity = math.max(0, authoring.FoodWorkerCap),
                     LastPopulationGrowthWave = 0,
                     LastPopulationGrowthCycle = 0,
                     LastEventPrepWave = 0
-                });
+                };
+                WorkerAllocationUtility.InitializeTargetsFromCurrent(ref populationAllocation);
+                AddComponent(entity, populationAllocation);
 
                 AddComponent(entity, new MobilePrepPauseState
                 {

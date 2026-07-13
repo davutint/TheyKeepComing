@@ -184,6 +184,17 @@ namespace DeadWalls
         public int StoneWorkers;
         public int IronWorkers;
         public int FoodWorkers;
+        public int WoodTargetRatioBps;
+        public int StoneTargetRatioBps;
+        public int IronTargetRatioBps;
+        public int FoodTargetRatioBps;
+        public int WoodWorkerCapacity;
+        public int StoneWorkerCapacity;
+        public int IronWorkerCapacity;
+        public int FoodWorkerCapacity;
+        public int IdlePopulation;
+        public int LastObservedPopulation;
+        public byte AutoAllocationInitialized;
         public int LastPopulationGrowthWave;
         public int LastPopulationGrowthCycle;
         public int LastEventPrepWave;
