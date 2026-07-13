@@ -1,6 +1,7 @@
 using System.Collections;
 using System.IO;
 using NUnit.Framework;
+using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -177,6 +178,47 @@ namespace DeadWalls.Tests
             AssertWorkerCountsEqual(before, afterPlusHundred);
         }
 
+        [UnityTest]
+        public IEnumerator WorkerVisuals_UseRepresentativeDensityWithoutChangingActualAllocation()
+        {
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            using EntityQuery allocationQuery = entityManager.CreateEntityQuery(
+                typeof(MobileCastleCombatConfig), typeof(MobilePopulationAllocation));
+            using EntityQuery populationQuery = entityManager.CreateEntityQuery(typeof(PopulationState));
+            using EntityQuery waveQuery = entityManager.CreateEntityQuery(typeof(WaveStateData));
+            Entity allocationEntity = allocationQuery.GetSingletonEntity();
+            Entity populationEntity = populationQuery.GetSingletonEntity();
+            Entity waveEntity = waveQuery.GetSingletonEntity();
+
+            var wave = entityManager.GetComponentData<WaveStateData>(waveEntity);
+            wave.StressTestMode = true;
+            entityManager.SetComponentData(waveEntity, wave);
+
+            SetWoodWorkerCount(entityManager, allocationEntity, populationEntity, 12);
+            yield return WaitForWorkerVisualCount(entityManager, EconomyFocusType.Wood, 12);
+            Assert.That(ReadWoodWorkerCount(entityManager, allocationEntity), Is.EqualTo(12));
+            Assert.That(CountWorkerVisuals(entityManager, EconomyFocusType.Stone), Is.Zero);
+            Assert.That(CountWorkerVisuals(entityManager, EconomyFocusType.Iron), Is.Zero);
+            Assert.That(CountWorkerVisuals(entityManager, EconomyFocusType.Food), Is.Zero);
+
+            SetWoodWorkerCount(entityManager, allocationEntity, populationEntity, 60);
+            yield return WaitForWorkerVisualCount(entityManager, EconomyFocusType.Wood, 24);
+            Assert.That(ReadWoodWorkerCount(entityManager, allocationEntity), Is.EqualTo(60));
+
+            SetWoodWorkerCount(entityManager, allocationEntity, populationEntity, 1000);
+            yield return WaitForWorkerVisualCount(entityManager, EconomyFocusType.Wood, 32);
+            Assert.That(ReadWoodWorkerCount(entityManager, allocationEntity), Is.EqualTo(1000));
+
+            SetWoodWorkerCount(entityManager, allocationEntity, populationEntity, 5000);
+            yield return null;
+            Assert.That(ReadWoodWorkerCount(entityManager, allocationEntity), Is.EqualTo(5000));
+            Assert.That(CountWorkerVisuals(entityManager, EconomyFocusType.Wood), Is.EqualTo(32));
+
+            SetWoodWorkerCount(entityManager, allocationEntity, populationEntity, 0);
+            yield return WaitForWorkerVisualCount(entityManager, EconomyFocusType.Wood, 0);
+            Assert.That(ReadWoodWorkerCount(entityManager, allocationEntity), Is.Zero);
+        }
+
         private static int TargetRatioTotal(MobilePopulationAllocation allocation)
         {
             return allocation.WoodTargetRatioBps
@@ -192,6 +234,68 @@ namespace DeadWalls.Tests
             Assert.That(actual.StoneWorkers, Is.EqualTo(expected.StoneWorkers));
             Assert.That(actual.IronWorkers, Is.EqualTo(expected.IronWorkers));
             Assert.That(actual.FoodWorkers, Is.EqualTo(expected.FoodWorkers));
+        }
+
+        private static void SetWoodWorkerCount(EntityManager entityManager, Entity allocationEntity,
+            Entity populationEntity, int woodWorkers)
+        {
+            var population = entityManager.GetComponentData<PopulationState>(populationEntity);
+            population.Total = woodWorkers + population.Archers;
+            population.Workers = woodWorkers;
+            population.Idle = 0;
+            population.Capacity = Mathf.Max(population.Capacity, population.Total);
+            population.BaseCapacity = Mathf.Max(population.BaseCapacity, population.Capacity);
+            entityManager.SetComponentData(populationEntity, population);
+
+            var allocation = entityManager.GetComponentData<MobilePopulationAllocation>(allocationEntity);
+            allocation.WoodWorkers = woodWorkers;
+            allocation.StoneWorkers = 0;
+            allocation.IronWorkers = 0;
+            allocation.FoodWorkers = 0;
+            allocation.WoodTargetRatioBps = WorkerAllocationUtility.RatioScale;
+            allocation.StoneTargetRatioBps = 0;
+            allocation.IronTargetRatioBps = 0;
+            allocation.FoodTargetRatioBps = 0;
+            allocation.IdlePopulation = 0;
+            allocation.LastObservedPopulation = population.Total;
+            allocation.AutoAllocationInitialized = 1;
+            entityManager.SetComponentData(allocationEntity, allocation);
+        }
+
+        private static int ReadWoodWorkerCount(EntityManager entityManager, Entity allocationEntity)
+        {
+            return entityManager.GetComponentData<MobilePopulationAllocation>(allocationEntity).WoodWorkers;
+        }
+
+        private static IEnumerator WaitForWorkerVisualCount(EntityManager entityManager,
+            EconomyFocusType resource, int expectedCount)
+        {
+            for (int frame = 0; frame < 180; frame++)
+            {
+                if (CountWorkerVisuals(entityManager, resource) == expectedCount)
+                    yield break;
+                yield return null;
+            }
+
+            Assert.That(CountWorkerVisuals(entityManager, resource), Is.EqualTo(expectedCount));
+        }
+
+        private static int CountWorkerVisuals(EntityManager entityManager, EconomyFocusType resource)
+        {
+            using EntityQuery query = entityManager.CreateEntityQuery(new EntityQueryDesc
+            {
+                All = new[] { ComponentType.ReadOnly<ResourceWorkerVisual>() },
+                None = new[] { ComponentType.ReadOnly<Prefab>() }
+            });
+            using NativeArray<ResourceWorkerVisual> visuals =
+                query.ToComponentDataArray<ResourceWorkerVisual>(Allocator.Temp);
+            int count = 0;
+            for (int i = 0; i < visuals.Length; i++)
+            {
+                if (EconomyFocusUtility.Normalize(visuals[i].Resource) == resource)
+                    count++;
+            }
+            return count;
         }
     }
 }

@@ -131,7 +131,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Save | Exact same-moment Continue; schema v4, minimum v3 | `[x]` |
 | Economy | Worker üretimi var; V1 ana kaynaklarında pasif consumption yok | `[~]` Satın alım/eğri işleri Package C'de açık |
 | Population | Dawn'da bedelsiz +15; capacity otomatik büyüyor | Package C uyumsuz |
-| Workers | Kalıcı target ratio + actual/cap/idle state, +1/+10/+100/direct input, yeni nüfus auto-allocation ve exact save var; görseller 1:1 | `[~]` Yalnız temsili density açık |
+| Workers | Kalıcı target ratio + actual/cap/idle state, +1/+10/+100/direct input, yeni nüfus auto-allocation, exact save ve Low/Medium/High temsili density var | `[~]` Animasyon/fener/üretim feedback'i açık |
 | Council | Curated/deterministic composer ve kart UI var; schedule chance/pity/cooldown | Package F altyapısı var, schedule yanlış |
 | Archers | Basic/Rapid/Frost, instant buy ve population cost var | Kısmi uyum |
 | Archer cap | Ortak 1000 kontrolü yok | Package D uyumsuz |
@@ -145,7 +145,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Meta | Ayrı JSON ve Game Over shop var; `StartingTechLevel` aktif | Kısmi uyum |
 | HUD | CyclePanel, DAY/DUSK/NIGHT ve Horde Pressure mevcut; tek Wall runtime gizleme var | Package I polish gerekli |
 | Tutorial | Aktif tutorial/onboarding sistemi bulunmadı | Package I eksik |
-| Testler | EditMode `43/43`; PlayMode `15 pass + 1 explicit skip`; Standalone Player-targeted 10K `1/1` | Güncel değişiklikler full paketle testli |
+| Testler | EditMode `58/58`; PlayMode `16 pass + 1 explicit skip`; Standalone Player-targeted 10K `1/1` | Güncel değişiklikler full paketle testli |
 | Telemetry | Spawn budget demanded/spawned/backlog telemetry mevcut; tam Blueprint event owner'ı eksik | Kısmi |
 
 ---
@@ -403,7 +403,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Target ratio | Actual count yanında dört kalıcı basis-point hedef, cap/idle mirror ve runtime API var | `[x]` |
 | Yeni pop otomatik dağılır | Yalnız pozitif population farkı target deficit + cap kuralıyla deterministik dağılıyor | `[~]` Food/bed arrival budget açık |
 | +1/+10/+100/direct input | Drawer target share için ücretsiz/anlık +1%, +10%, +100% ve exact 0-100 input sunuyor | `[x]` |
-| Worker world representation | Her assigned worker için 1:1 entity spawn ediliyor | `[!]` Büyük sayıda ölçeklenmez |
+| Worker world representation | Actual count Low/Medium/High eğriyle resource başına en fazla 32 visual'a çevriliyor | `[x]` |
 | Beds incremental/no hard max | Mobile capacity `999999`; satın alınabilir bed sistemi yok | `[!]` |
 | Dawn survivor + one-time Food | Her dawn bedelsiz +15; yürüyen arrival/Food guard yok | `[!]` |
 | Mevcut pop pasif Food tüketmez | V1 castle loop'ta population Food/dk yazmıyor | `[x]` |
@@ -416,7 +416,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [x] Yeni population'ı target ratio'lara otomatik dağıt.
 - [x] Bina cap'i dolduğunda fazlalığı Idle Population'da bırak.
 - [x] Ücretsiz/anlık `+1 / +10 / +100 / direct input` kontrollerini ekle.
-- [ ] Worker world representation'ı sayısal truth'tan ayır; düşük/orta/yüksek temsilî density kur.
+- [x] Worker world representation'ı sayısal truth'tan ayır; düşük/orta/yüksek temsilî density kur.
 - [ ] Worker animasyon, fener, taşıma ve üretim feedback'ini allocation ile senkron tut.
 - [ ] Houses için satın alınabilir bed capacity state'i kur.
 - [ ] Bed maliyetini sahip olunan capacity ile büyüt; hard max koyma.
@@ -436,7 +436,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [ ] Dawn arrival yalnız Food+bed kadar kabul ediliyor.
 - [ ] Capacity hiçbir zaman aşılmıyor.
 - [x] Target ratio ve worker state save/load ile aynı kalıyor.
-- [ ] Büyük allocation 1:1 worker entity üretmiyor.
+- [x] Büyük allocation 1:1 worker entity üretmiyor.
 
 ---
 
@@ -877,7 +877,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Archer target search | 1 archer x all enemies brute-force | Spatial query + target load |
 | Projectiles | Instantiate/destroy | Pool/burst-safe lifetime |
 | VFX/SFX | CombatFeedbackBridge pool ve bazı min interval'lar var | 10k budget/aggregation audit |
-| Worker visuals | 1:1 assigned worker entity | Representative density |
+| Worker visuals | Low/Medium/High representative density; resource başına 32 visual cap | `[x]` |
 | Save | Exact aktif combat snapshot var; inactive pool catalog'dan yeniden kurulur | 10K maksimum-state Continue ölçümü |
 
 ### Ölçüm senaryoları
@@ -886,7 +886,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [x] Fireball 10K horde içinde aynı-frame lethal damage ve toplu pool return correctness geçti; optimize peak iki temiz koşuda `79,13-83,72 ms`.
 - [ ] Arrow refill sonrası 1.000 archer yeniden ateş başlangıcı.
 - [ ] Tam maksimum run state ana menü save/Continue; 10K enemy Player snapshot/Continue geçti (`4,24 MB`, `52,58 / 86,19 ms`), 1K archer Package D'yi bekliyor.
-- [ ] Düşük/orta/yüksek worker visual density geçişi.
+- [x] Düşük/orta/yüksek worker visual density geçişi; actual `12/60/1000/5000/0`, visual `12/24/32/32/0`.
 - [ ] Target search frame spike ve allocation ölçümü.
 - [ ] Long-run soak ve active cap/backlog saturation ölçümü.
 
@@ -943,8 +943,8 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 ### Mevcut test envanteri
 
-- `[x]` EditMode: `43/43`; contract, compact save/migration, worker target mutation/allocation, tuning, cycle, quantity-only, backlog, Moat isolation, enemy catalog ve pool kapsamı.
-- `[x]` PlayMode: `15 pass + 1 explicit skip`; gerçek `NewGameScene`, worker drawer target input, exact Continue, worker arrival/cap overflow, Wall, cycle, backlog ve pool kapsamı. 10K profiler capture explicit targeted testtir.
+- `[x]` EditMode: `58/58`; contract, compact save/migration, worker target mutation/allocation ve representative density, tuning, cycle, quantity-only, backlog, Moat isolation, enemy catalog ve pool kapsamı.
+- `[x]` PlayMode: `16 pass + 1 explicit skip`; gerçek `NewGameScene`, worker drawer target input, Low/Medium/High visual density, exact Continue, worker arrival/cap overflow, Wall, cycle, backlog ve pool kapsamı. 10K profiler capture explicit targeted testtir.
 - `[~]` Council schedule/guardrail ve 1k x 10k ürün senaryoları ilgili paketleri bekliyor; enemy pool churn contract testli.
 
 ---
@@ -1043,7 +1043,7 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | `WaveSpawnSystem.cs` + `EnemyPoolRuntimeUtility.cs` | Tek catalog prefab/stat, cap/backlog ve expandable pool rent |
 | `DamageCleanupSystem.cs` | Reward sonrası enemy pool return |
 | `ResourceTickSystem.cs` + `PopulationTickSystem.cs` | V1 castle loop'ta ana kaynak ve population için pasif consumption yok |
-| `MobilePopulationEconomySystem.cs` + `WorkerAllocationUtility.cs` | Target ratio auto-allocation/cap overflow; bedelsiz growth ve auto-capacity hâlâ açık Package C işi |
+| `MobilePopulationEconomySystem.cs` + `WorkerAllocationUtility.cs` + `WorkerVisualRepresentationUtility.cs` | Target ratio auto-allocation/cap overflow ve temsili visual density; bedelsiz growth ve auto-capacity hâlâ açık Package C işi |
 | `MobileCastleArcherTilePlacement.cs` | Tile center + stack offset, preview 96 |
 | `ArcherShootSystem.cs` | Brute-force nearest target ve unlimited ammo bypass |
 | `TechNodeDefinitionSO.cs` + `TechTreeCatalogSO.cs` | Sabit catalog/reveal/cost/effect model |
@@ -1091,3 +1091,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-13 | `DW-B-SCALE-OPT` Player/save/render gate | Exact snapshot compact JSON oldu; Editor-only sanılan draw sayısı Player'da doğrulandı ve archetype topology çıkarıldı; Editor araçları Player assembly'sinden ayrıldı | Player P95 `6,97 ms`; `535` draw call; `202` chunk x `50`; save/restore `52,58 / 86,19 ms`; snapshot `4.240.003 B`; EditMode 35/35; PlayMode 13+1; Player-targeted 1/1 |
 | 2026-07-13 | `DW-C-ALLOC` persistent worker targets | Actual count + dört target ratio + cap/idle/checkpoint state'i kuruldu; yalnız yeni nüfus deterministik dağılıyor, cap overflow idle kalıyor; schema v4 ve v3 migration eklendi | Unity compile: 0 error; EditMode 40/40; full PlayMode 15/15 |
 | 2026-07-13 | `DW-C-TARGET-UI` worker target controls | Worker drawer +1%/+10%/+100% ve exact 0-100 input ile target share owner'ına bağlandı; diğer hedefler deterministik ölçekleniyor, mevcut actual worker değişmiyor; generated HUD prefabı ve scene bindingleri yenilendi | Unity compile: 0 error; EditMode 43/43; PlayMode 15 pass + 1 explicit skip; game-view visual QA |
+| 2026-07-13 | `DW-C-VIS-DENSITY` representative worker visuals | Actual worker truth save/production state'inde korundu; Low `1-12` 1:1, Medium `13-60` seyreltilmiş, High `61+` daha güçlü seyreltilmiş ve resource başına `32` visual cap uygulandı; GameManager yalnız temsil sayısı değişince sync ediyor | Unity compile: 0 error; EditMode 58/58; PlayMode 16 pass + 1 explicit skip; başlangıç 53 actual -> 45 visual game-view QA |

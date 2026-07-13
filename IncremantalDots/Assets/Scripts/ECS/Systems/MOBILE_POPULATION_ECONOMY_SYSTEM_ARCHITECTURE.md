@@ -44,7 +44,7 @@ V1 eventleri geneldir: resource stash, quarry crew, refugee cart. UI metinleri `
 
 - Satın alınabilir bed/capacity ve tek seferlik arrival Food maliyeti henüz bu sistemde değildir.
 - Mevcut worker'ları target ratio değişince zorla retrain/redistribute etmez.
-- Worker world representation halen gerçek count ile 1:1 ölçeklenir; temsili density ayrı Package C işidir.
+- Worker world representation actual count'tan ayridir; `WorkerVisualRepresentationUtility` Low/Medium/High egriyle resource basina en fazla `32` temsili visual uretir.
 - Event popup/polish bu sistemde degil, `CastleEconomyUI` tarafindadir.
 
 ## Doğrulama

@@ -213,7 +213,7 @@ Mobile normal mode'da `DamageCleanupSystem`, death timer biten zombiler icin kil
 - Target degisikligi mevcut worker'lari yeniden atamaz; yalniz sonra gelen population hedef acigina gore dagilir.
 - Eski worker slider'lari debug/legacy olarak kalabilir ve ayni `MobilePopulationAllocation` verisini degistirir.
 - Worker assignment toplam worker sayisini `Population.Total - Population.Archers` ustune cikaramaz.
-- `GameManager`, worker allocation degisince `WorkerPrefabData.WorkerPrefab` uzerinden DOTS villager entity'leri spawn/destroy eder.
+- `GameManager`, actual worker allocation'i `WorkerVisualRepresentationUtility` ile Low/Medium/High temsili sayiya cevirir; resource basina en fazla `32` `WorkerPrefabData.WorkerPrefab` entity'si spawn/destroy eder.
 - Villager worker pickup pozisyonlari main scene `CastleInteriorEconomyArea/*Site/WorkerSpawnPoints` marker'larindan gelir.
 - Delivery pozisyonlari `CastleInteriorEconomyArea/CastleWorkerHub/DeliveryPoints` marker'larindan gelir.
 - `WorkerLogisticsMovementSystem`, villagerlari pickup ile hub arasinda yuruturek kaynak tasima feedback'i verir.

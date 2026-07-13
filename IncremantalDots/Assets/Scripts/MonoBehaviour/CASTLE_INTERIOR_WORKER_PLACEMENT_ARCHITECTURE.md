@@ -50,14 +50,18 @@ koridoru ters kullanir.
 ## DOTS Worker Akisi
 
 ```text
-CastleEconomyUI Assign Button
--> GameManager.AssignResourceWorker(resource)
--> MobilePopulationAllocation worker count artar
+Worker Drawer target ratio + yeni population
+-> MobilePopulationAllocation actual worker count
+-> WorkerVisualRepresentationUtility representative count
 -> GameManager worker visual sync
 -> WorkerPrefabData.WorkerPrefab instantiate
 -> ResourceWorkerVisual + WorkerLogisticsRoute + LocalTransform set edilir
 -> WorkerLogisticsMovementSystem villager'i pickup/hub arasinda yurutur
 ```
+
+Placement yalniz temsili visual index'ini route marker'larina map eder. Actual
+worker sayisi Low/Medium/High egriyle sikistirilir ve resource basina en fazla
+`32` hareketli visual uretilir; gameplay production hesabi actual count'u kullanir.
 
 Worker entity'leri `VillagerWorker.prefab` uzerinden bake edilir. Prefab `SpriteSheetAuthoring` ve `VillagerWorkerAuthoring` tasir.
 

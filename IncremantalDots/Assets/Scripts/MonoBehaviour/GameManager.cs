@@ -42,7 +42,7 @@ namespace DeadWalls
         private readonly Dictionary<UpgradeType, int> _upgradeTiers = new Dictionary<UpgradeType, int>();
         private readonly Dictionary<ArcherType, int> _archerTypeLevels = new Dictionary<ArcherType, int>();
         private readonly HashSet<ArcherType> _unlockedArcherTypes = new HashSet<ArcherType> { ArcherType.Basic };
-        private MobilePopulationAllocation _lastSyncedWorkerVisualAllocation;
+        private int4 _lastSyncedWorkerVisualCounts;
         private UpgradeCard[] _currentUpgradeCards;
         private const int MobileArrowRefillTarget = 200;
         private const int LegacyArrowRefillTarget = 50;
@@ -3762,21 +3762,27 @@ namespace DeadWalls
             if (!IsMobilePopulationEconomyEnabled())
                 return;
 
-            if (_workerVisualSyncInitialized && SameWorkerAllocation(_lastSyncedWorkerVisualAllocation, PopulationAllocation))
+            int4 representativeCounts = WorkerVisualRepresentationUtility.GetRepresentativeCounts(
+                PopulationAllocation);
+            if (_workerVisualSyncInitialized
+                && math.all(_lastSyncedWorkerVisualCounts == representativeCounts))
                 return;
 
-            SyncWorkerVisualsToAllocation();
+            SyncWorkerVisualsToAllocation(representativeCounts);
         }
 
         private void SyncWorkerVisualsToAllocation()
         {
+            SyncWorkerVisualsToAllocation(
+                WorkerVisualRepresentationUtility.GetRepresentativeCounts(PopulationAllocation));
+        }
+
+        private void SyncWorkerVisualsToAllocation(int4 representativeCounts)
+        {
             if (!CanAccessEntityManager() || !IsMobilePopulationEconomyEnabled())
                 return;
 
-            int targetTotal = PopulationAllocation.WoodWorkers
-                + PopulationAllocation.StoneWorkers
-                + PopulationAllocation.IronWorkers
-                + PopulationAllocation.FoodWorkers;
+            int targetTotal = math.csum(representativeCounts);
             if (targetTotal > 0 && !TryResolveWorkerPrefabEntity())
             {
                 LogMissingWorkerVisualWarning("WorkerPrefabData bulunamadi. Mobile Castle Scene Setup ile VillagerWorker prefab referansini kur.");
@@ -3789,12 +3795,12 @@ namespace DeadWalls
                 return;
             }
 
-            SyncResourceWorkerVisuals(EconomyFocusType.Wood, PopulationAllocation.WoodWorkers);
-            SyncResourceWorkerVisuals(EconomyFocusType.Stone, PopulationAllocation.StoneWorkers);
-            SyncResourceWorkerVisuals(EconomyFocusType.Iron, PopulationAllocation.IronWorkers);
-            SyncResourceWorkerVisuals(EconomyFocusType.Food, PopulationAllocation.FoodWorkers);
+            SyncResourceWorkerVisuals(EconomyFocusType.Wood, representativeCounts.x);
+            SyncResourceWorkerVisuals(EconomyFocusType.Stone, representativeCounts.y);
+            SyncResourceWorkerVisuals(EconomyFocusType.Iron, representativeCounts.z);
+            SyncResourceWorkerVisuals(EconomyFocusType.Food, representativeCounts.w);
 
-            _lastSyncedWorkerVisualAllocation = PopulationAllocation;
+            _lastSyncedWorkerVisualCounts = representativeCounts;
             _workerVisualSyncInitialized = true;
         }
 
@@ -4013,14 +4019,6 @@ namespace DeadWalls
             population.Idle = Mathf.Max(0, population.Total - population.Workers - population.Archers);
             _entityManager.SetComponentData(_gameStateEntity, population);
             Population = population;
-        }
-
-        private static bool SameWorkerAllocation(MobilePopulationAllocation a, MobilePopulationAllocation b)
-        {
-            return a.WoodWorkers == b.WoodWorkers
-                && a.StoneWorkers == b.StoneWorkers
-                && a.IronWorkers == b.IronWorkers
-                && a.FoodWorkers == b.FoodWorkers;
         }
 
         private static int GetWorkerResourceIndex(EconomyFocusType resource)

@@ -40,7 +40,9 @@ Cap değeri `0`, mevcut sistem sözleşmesinde uncapped anlamına gelir. Aktif N
 
 Run save `v4`; gerçek worker sayıları, hedef oranlar, cap aynaları, idle aynası ve population checkpoint'ini birlikte capture/restore eder. Desteklenen `v3` exact snapshot yüklenirken hedef oranlar kayıtlı gerçek worker sayılarından deterministik olarak türetilir; idle ve checkpoint population snapshot'ından kurulur.
 
-Worker görselleri hedef oran değiştiğinde yeniden üretilmez. Görsel senkron yalnız gerçek worker sayıları değiştiğinde tetiklenir.
+Worker görselleri hedef oran değiştiğinde yeniden üretilmez. Actual worker sayisi
+`WorkerVisualRepresentationUtility` ile temsili sayiya cevrilir; goruntu senkronu
+yalniz temsili count degistiginde tetiklenir. Resource basina visual cap `32`'dir.
 
 ## Doğrulama
 

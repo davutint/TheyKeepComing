@@ -11,7 +11,9 @@
 ## Component Akisi
 
 ```text
-GameManager worker visual sync
+MobilePopulationAllocation actual count
+-> WorkerVisualRepresentationUtility representative count
+-> GameManager worker visual sync
 -> ResourceWorkerVisual
 -> WorkerLogisticsRoute
 -> WorkerLogisticsMovementSystem
@@ -45,4 +47,4 @@ Sistem hareket yonunden direction index hesaplar ve `SpriteAnimation.DirectionRo
 
 ## Scope
 
-Bu sistem kaynak tick'i, income math veya population allocation yapmaz. Sadece worker visual feedback layer'idir.
+Bu sistem kaynak tick'i, income math, population allocation veya density hesabi yapmaz. Sadece `WorkerVisualRepresentationUtility` tarafindan belirlenen temsili worker visual feedback layer'ini hareket ettirir.
