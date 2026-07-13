@@ -48,6 +48,7 @@ Presentation tarafinda `SpriteAnimationSystem` UV rect hesaplarini yapar.
 - `DamageApplySystem` tek bilincli sync point'tir; attack damage queue drain etmek icin pending job'lari tamamlar.
 - `WaveSpawnSystem` frame basinda sequential calisir.
 - Rent/return normal akista enableable component state'i degistirir; structural instantiate yalniz pool batch genislemesinde olur.
+- `DamageCleanupSystem`, toplu return'de yalniz Burst-parallel transient reset job'ini tamamlar; ardindan available buffer ve pool telemetry'sini tek commit ile yazar.
 
 ## Sistem Notlari
 
@@ -164,9 +165,14 @@ Presentation tarafinda `SpriteAnimationSystem` UV rect hesaplarini yapar.
 - Tum dusman hasari yalniz `WallSegment` uzerine uygulanir.
 - Wall HP sifira inerse Game Over tek yonlu olarak yazilir; repair/Council Wall'i diriltemez.
 
+### ZombieDeathSystem / ZombieAnimationStateSystem
+
+- Ayni frame olen zombiler arasindan atomik claim ile tek temsilci death SFX konumu secilir; 10K gecici event entity'si uretilmez.
+- Death animasyonuna geciste enableable `DeathTimer` job icinde dogrudan yazilip acilir; entity basina ECB komutu yoktur.
+
 ### DamageCleanupSystem
 
-- Death timer biterse XP ekler ve zombi entity'sini pool rezervine dondurur.
+- Death timer biterse XP ekler; pool uyelerini toplu olarak Burst job'da resetler ve tek buffer/state commit ile pool rezervine dondurur.
 - Mobile normal mode'da kill reward'i `ResourceAccumulator` uzerine ekler.
 - Return entity'yi scale `0` ve disabled `ZombieTag` ile inactive yapar; ayni entity sonraki rent'te yeni generation alir.
 - Worker economy aktifse kill reward `WorkerEconomyRewardMultiplier` ile azaltilir.

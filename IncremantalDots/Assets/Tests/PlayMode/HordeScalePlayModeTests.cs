@@ -228,6 +228,8 @@ namespace DeadWalls.Tests
             });
 
             double deathPeakFrameMs = 0.0;
+            int deathPeakFrameIndex = -1;
+            int deathPeakActiveCount = EnemyTarget;
             int deathFrames = 0;
             using (var mainThreadDeath = ProfilerRecorder.StartNew(
                        ProfilerCategory.Internal, "Main Thread", 1))
@@ -238,8 +240,15 @@ namespace DeadWalls.Tests
                     double frameMs = Time.unscaledDeltaTime * 1000.0;
                     if (mainThreadDeath.Valid)
                         frameMs = Math.Max(frameMs, mainThreadDeath.LastValue / 1_000_000.0);
-                    deathPeakFrameMs = Math.Max(deathPeakFrameMs, frameMs);
-                    if (entityManager.GetComponentData<EnemyPoolRuntimeData>(poolEntity).ActiveCount == 0)
+                    int activeCount = entityManager
+                        .GetComponentData<EnemyPoolRuntimeData>(poolEntity).ActiveCount;
+                    if (frameMs > deathPeakFrameMs)
+                    {
+                        deathPeakFrameMs = frameMs;
+                        deathPeakFrameIndex = deathFrames;
+                        deathPeakActiveCount = activeCount;
+                    }
+                    if (activeCount == 0)
                         break;
                 }
             }
@@ -274,6 +283,7 @@ namespace DeadWalls.Tests
                 $"draw_calls_avg={averageDrawCalls}; used_memory_bytes={usedMemoryBytes}; " +
                 $"save_ms={saveMs:F2}; save_bytes={saveBytes}; " +
                 $"fireball_return_frames={deathFrames + 1}; death_peak_ms={deathPeakFrameMs:F2}; " +
+                $"death_peak_frame={deathPeakFrameIndex}; death_peak_active={deathPeakActiveCount}; " +
                 $"restore_ms={restoreMs:F2}; backlog={restoredBudget.PendingEnemies}");
 
             EnemyPoolRuntimeUtility.ReturnAllActive(entityManager, poolEntity);

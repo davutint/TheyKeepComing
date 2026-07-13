@@ -124,7 +124,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Battlefield | Kale/duvar solda, spawn sağdaki `SpawnLineX` bandından geliyor | Temel kompozisyon uyumlu |
 | Build placement | Aktif scene'de `BuildingPlacementUI` ve `BuildingGridManager` bağlı değil | Hazır bina yönüyle uyumlu |
 | Cycle | `Day 30 / Dusk 5 / Night 20 / Dawn 5`; dört fazda pozitif spawn temposu | Uyumlu |
-| Horde | Tek catalog prefabı; sabit stats; saved backlog; expandable rent/return pool; Blood Moon dormant | 10K ürün ölçümü bekliyor |
+| Horde | Tek catalog prefabı; sabit stats; saved backlog; expandable bulk rent/return pool; Blood Moon dormant | 10K gate ve optimizasyon ölçüldü |
 | Moat | Runtime flag kapalı; slow `1`, damage `0`; tech/meta catalog bağlantıları dormant | Uyumlu |
 | Defense | Damage/Game Over aktif olarak tek Wall'a çekildi | Kodlandı, runtime test bekliyor |
 | Normal repair | Wood+Stone maliyeti kullanıyor ve Night phase guard'ı yok | Day/Dusk + Stone-only hedefiyle çelişiyor |
@@ -145,7 +145,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Meta | Ayrı JSON ve Game Over shop var; `StartingTechLevel` aktif | Kısmi uyum |
 | HUD | CyclePanel, DAY/DUSK/NIGHT ve Horde Pressure mevcut; tek Wall runtime gizleme var | Package I polish gerekli |
 | Tutorial | Aktif tutorial/onboarding sistemi bulunmadı | Package I eksik |
-| Testler | V1 contract testleri EditMode `34/34`, PlayMode `13/13` geçiyor | 10K gate ölçümlü |
+| Testler | V1 contract testleri EditMode `34/34`; PlayMode `13/13` geçiyor, hedefli profiler testi normal sette explicit skip | 10K gate ölçümlü |
 | Telemetry | Spawn budget demanded/spawned/backlog telemetry mevcut; tam Blueprint event owner'ı eksik | Kısmi |
 
 ---
@@ -342,9 +342,9 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 ### `DW-B-SCALE-OPT` - Şu anki tek aktif iş
 
-- [ ] `DamageCleanupSystem` return yolunu 10.000 tekil buffer/state erişimi yerine bulk pool return'e çevir.
-- [ ] `126,42-131,95 ms` death/return peak değerini bulk return sonrası aynı benchmark ile yeniden ölç ve önceki sonuçla karşılaştır.
-- [ ] Steady-state yaklaşık `20,7 KB/frame` GC allocation owner'larını profiler marker/source audit ile çıkar ve kaçınılabilir allocation'ları kaldır.
+- [x] `DamageCleanupSystem` return yolunu 10.000 tekil buffer/state erişimi yerine Burst-parallel reset + tek buffer/state commit kullanan bulk pool return'e çevir.
+- [x] `126,42-131,95 ms` death/return peak değerini aynı benchmark ile yeniden ölç: iki temiz koşuda `79,13-83,72 ms`.
+- [x] Steady-state allocation owner'larını yüklenebilir PlayMode RAW capture ile çıkar; proje kodunu yaklaşık `2.394 B/frame` değerinden `11,6 B/frame` değerine indir (`~%99,5`).
 - [ ] `532` draw call için Entities instancing/batch durumunu GPU veya Frame Debugger kanıtıyla incele.
 - [ ] `7,37 MB` save ile `75,37 / 146,58 ms` save/restore maliyetini hedef build bütçesine göre değerlendir.
 - [ ] Ölçülen blockerlar çözülmeden release `MaxAliveZombies = 900` değerini yükseltme.
@@ -359,7 +359,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Enemy stats sabit | HP, damage ve speed bütün cycle'larda base değerde | `[x]` |
 | Quantity-only difficulty | Count/batch/interval büyüyor; stat growth utility seviyesinde yok sayılıyor | `[x]` |
 | Tek enemy prefab | `EnemyCatalog.asset` yalnız `zombie_basic` tanımını taşır; prefab ve base statlar aynı kayıttan spawn edilir | `[x]` |
-| 10k expandable pool | 10K rent/return/Continue iki koşuda geçti; P95 `10,22-11,30 ms`, death peak `126,42-131,95 ms`, GC `~20,7 KB/frame`; normal cap 900 | `[~]` Ölçülmüş optimizasyon blockerları var |
+| 10k expandable pool | 10K rent/return/Continue iki koşuda geçti; P95 `10,55-11,16 ms`, death peak `79,13-83,72 ms`, proje allocation `11,6 B/frame`; normal cap 900 | `[~]` Death/allocation blockerları çözüldü; GPU draw-call ve build save bütçesi açık |
 | Backlog kaybolmaz | Explicit saved budget state cap altında talep biriktiriyor ve kapasitede kontrollü boşaltıyor | `[x]` |
 | Special night yok | SpecialNight schema dormant; runtime multiplier/flag/warning üretemiyor | `[x]` |
 
@@ -389,7 +389,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [x] Cap doluyken talep backlog'a gider ve boşlukta sahaya çıkar.
 - [x] Tek prefab catalog üzerinden çalışır.
 - [x] Death churn pool ile yönetilir.
-- [ ] 10K death spike ve steady-state allocation blockerları çözülür.
+- [x] 10K death spike ve steady-state allocation blockerları çözülür.
 
 ---
 
@@ -883,7 +883,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 ### Ölçüm senaryoları
 
 - [ ] 1.000 archer + 10.000 enemy + projectile peak + Night presentation.
-- [x] Fireball 10K horde içinde aynı-frame lethal damage ve toplu pool return correctness geçti; `126,42-131,95 ms` peak optimizasyon işi ayrıca açık.
+- [x] Fireball 10K horde içinde aynı-frame lethal damage ve toplu pool return correctness geçti; optimize peak iki temiz koşuda `79,13-83,72 ms`.
 - [ ] Arrow refill sonrası 1.000 archer yeniden ateş başlangıcı.
 - [ ] Tam maksimum run state ana menü save/Continue; 10K enemy snapshot/Continue geçti (`7,37 MB`, `75,37 / 146,58 ms`), 1K archer Package D'yi bekliyor.
 - [ ] Düşük/orta/yüksek worker visual density geçişi.
@@ -1087,3 +1087,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-12 | `DW-B-ENEMY` single enemy catalog contract | `zombie_basic` için tek catalog/definition owner kuruldu; prefab, base stat, XP ve pool metadata bake edilip type branch olmadan gerçek spawn'a bağlandı | Unity compile: 0 error; EditMode 33/33; PlayMode 11/11 |
 | 2026-07-12 | `DW-B-POOL` expandable enemy pool | Catalog prewarm/expand metadata gerçek inactive rezerve bağlandı; spawn rent, ölüm return, Continue reuse ve projectile generation guard tamamlandı | Unity compile: 0 error; EditMode 34/34; PlayMode 12/12 |
 | 2026-07-12 | `DW-B-SCALE` 10K runtime gate | Gerçek NewGameScene'de 10K pool, HUD/feedback, profiler telemetry, Fireball toplu return ve Continue doğrulandı; `126,42-131,95 ms` death peak ve `~20,7 KB/frame` GC blocker kaydedildi | Targeted PlayMode 1/1; full EditMode 34/34; full PlayMode 13/13 |
+| 2026-07-13 | `DW-B-SCALE-OPT` death/allocation pass | Pool return Burst-parallel reset + bulk commit oldu; death SFX ve death-animation ECB fan-out kaldırıldı; HUD/market/worker UI steady allocation owner'ları cache'lendi | 10K P95 `10,55-11,16 ms`; death peak `79,13-83,72 ms`; project allocation `11,6 B/frame`; EditMode 34/34; PlayMode 13 pass + 1 explicit skip |

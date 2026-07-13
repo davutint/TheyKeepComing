@@ -72,17 +72,25 @@ namespace DeadWalls
         private int _lastKills = -1, _lastWaveTotal = -1;
         private string _lastWaveLabel;
         private string _lastKillsLabel;
+        private int _lastWaveLabelKey = int.MinValue;
+        private int _lastKillsLabelKey = int.MinValue;
         private int _maxAliveSeen = 0;
         private int _lastWood = -1, _lastStone = -1, _lastIron = -1, _lastFood = -1;
         private float _lastWoodNet, _lastStoneNet, _lastIronNet, _lastFoodNet;
         private int _lastPopTotal = -1, _lastPopCapacity = -1, _lastWorkers = -1, _lastArchers = -1;
         private int _lastArrowCurrent = -1;
         private string _lastArrowLabel;
+        private bool _lastArrowUnlimited;
+        private bool _arrowLabelInitialized;
         private int _lastBasicArchers = -1, _lastRapidArchers = -1, _lastFrostArchers = -1;
         private int _lastDefensePercent = -1;
         private int _lastWallPercent = -1;
         private float _lastDefenseRatio = -1f;
         private int _lastRewardSequence = -1;
+        private int _lastCyclePhase = int.MinValue;
+        private int _lastCycleDay = int.MinValue;
+        private bool _lastCycleBloodMoon;
+        private bool _cycleStaticLabelsInitialized;
         private float _rewardDisplayTimer;
         private float _damageFlashTimer;
         private Color _waveDefaultColor;
@@ -119,19 +127,21 @@ namespace DeadWalls
                 XPText.text = $"XP: {_lastXP}/{_lastXPToNext}";
             }
 
-            string waveLabel = FormatWaveState(gm);
-            if (WaveText != null && (_lastWave != gm.WaveState.CurrentWave || _lastWaveLabel != waveLabel))
+            int waveLabelKey = GetWaveLabelKey(gm);
+            if (WaveText != null && _lastWaveLabelKey != waveLabelKey)
             {
+                string waveLabel = FormatWaveState(gm);
+                _lastWaveLabelKey = waveLabelKey;
                 _lastWave = gm.WaveState.CurrentWave;
                 _lastWaveLabel = waveLabel;
                 WaveText.text = waveLabel;
             }
 
-            string killsLabel = FormatKillsState(gm);
-            if (KillsText != null && (_lastKills != gm.KillsThisWave
-                || _lastWaveTotal != gm.WaveState.ZombiesToSpawn
-                || _lastKillsLabel != killsLabel))
+            int killsLabelKey = GetKillsLabelKey(gm);
+            if (KillsText != null && _lastKillsLabelKey != killsLabelKey)
             {
+                string killsLabel = FormatKillsState(gm);
+                _lastKillsLabelKey = killsLabelKey;
                 _lastKills = gm.KillsThisWave;
                 _lastWaveTotal = gm.WaveState.ZombiesToSpawn;
                 _lastKillsLabel = killsLabel;
@@ -211,10 +221,15 @@ namespace DeadWalls
 
             // Ok envanter
             var arrowSupply = gm.ArrowSupply;
-            string arrowLabel = FormatArrowSupply(gm);
-            if (ArrowText != null && (_lastArrowCurrent != arrowSupply.Current || _lastArrowLabel != arrowLabel))
+            bool unlimitedArrows = gm.IsUnlimitedArrowsEnabled();
+            if (ArrowText != null && (!_arrowLabelInitialized
+                || _lastArrowCurrent != arrowSupply.Current
+                || _lastArrowUnlimited != unlimitedArrows))
             {
+                string arrowLabel = unlimitedArrows ? "INF" : arrowSupply.Current.ToString();
+                _arrowLabelInitialized = true;
                 _lastArrowCurrent = arrowSupply.Current;
+                _lastArrowUnlimited = unlimitedArrows;
                 _lastArrowLabel = arrowLabel;
                 ArrowText.text = arrowLabel;
             }
@@ -314,29 +329,27 @@ namespace DeadWalls
 
         private void UpdateContinuousSiegeHud(GameManager gm)
         {
-            ContinuousSiegeCycleData cycle = default;
+            ContinuousSiegeCycleData cycle = gm.ContinuousSiegeCycle;
             bool active = CyclePanel != null
                 && !gm.WaveState.StressTestMode
-                && gm.TryGetContinuousSiegeCycle(out cycle);
+                && cycle.Enabled;
 
-            if (CyclePanel != null)
-                CyclePanel.SetActive(active);
-            if (HordePressurePanel != null)
-                HordePressurePanel.SetActive(false);
+            SetActiveIfChanged(CyclePanel, active);
+            SetActiveIfChanged(HordePressurePanel, false);
 
             if (!active)
             {
                 if (CyclePanel == null && WaveText != null)
-                    WaveText.gameObject.SetActive(true);
+                    SetActiveIfChanged(WaveText.gameObject, true);
                 if (CyclePanel == null && KillsText != null)
-                    KillsText.gameObject.SetActive(true);
+                    SetActiveIfChanged(KillsText.gameObject, true);
                 return;
             }
 
             if (WaveText != null)
-                WaveText.gameObject.SetActive(false);
+                SetActiveIfChanged(WaveText.gameObject, false);
             if (KillsText != null)
-                KillsText.gameObject.SetActive(false);
+                SetActiveIfChanged(KillsText.gameObject, false);
 
             string phase = FormatSiegePhase(cycle.Phase);
             // Kanli ay gecesi: etiket "BLOOD MOON" + text rengi kirmizi.
@@ -345,7 +358,9 @@ namespace DeadWalls
             bool bloodMoonLabel = cycle.IsBloodMoonNight && cycle.Phase == SiegeCyclePhase.Night;
             if (bloodMoonLabel)
                 phase = "BLOOD MOON";
-            if (CyclePhaseText != null)
+            int phaseValue = (int)cycle.Phase;
+            if (CyclePhaseText != null
+                && (_lastCyclePhase != phaseValue || _lastCycleBloodMoon != bloodMoonLabel))
             {
                 if (!_cyclePhaseDefaultColorCached)
                 {
@@ -354,20 +369,26 @@ namespace DeadWalls
                 }
                 CyclePhaseText.text = phase;
                 CyclePhaseText.color = bloodMoonLabel ? new Color(0.88f, 0.33f, 0.27f, 1f) : _cyclePhaseDefaultColor;
+                _lastCyclePhase = phaseValue;
+                _lastCycleBloodMoon = bloodMoonLabel;
             }
-            if (CycleDayCounterText != null)
+            int cycleDay = Mathf.Max(1, cycle.CycleIndex + 1);
+            if (CycleDayCounterText != null && _lastCycleDay != cycleDay)
             {
                 // Gun sayaci: sonsuz kusatmada "ne kadar dayandim" hedef hissi (skor)
-                string dayLabel = "DAY " + Mathf.Max(1, cycle.CycleIndex + 1);
-                if (CycleDayCounterText.text != dayLabel)
-                    CycleDayCounterText.text = dayLabel;
+                _lastCycleDay = cycleDay;
+                CycleDayCounterText.text = "DAY " + cycleDay;
             }
-            if (CycleDayLabelText != null)
-                CycleDayLabelText.text = "DAY";
-            if (CycleDuskLabelText != null)
-                CycleDuskLabelText.text = "DUSK";
-            if (CycleNightLabelText != null)
-                CycleNightLabelText.text = "NIGHT";
+            if (!_cycleStaticLabelsInitialized)
+            {
+                if (CycleDayLabelText != null)
+                    CycleDayLabelText.text = "DAY";
+                if (CycleDuskLabelText != null)
+                    CycleDuskLabelText.text = "DUSK";
+                if (CycleNightLabelText != null)
+                    CycleNightLabelText.text = "NIGHT";
+                _cycleStaticLabelsInitialized = true;
+            }
 
             UpdateProgressFill(CycleProgressFill, cycle.CycleProgress01);
             UpdateProgressMarker(CycleProgressMarker, cycle.CycleProgress01);
@@ -514,8 +535,8 @@ namespace DeadWalls
             if (wave.StressTestMode)
                 return $"WAVE {wave.CurrentWave:00} STRESS";
 
-            if (gm.TryGetContinuousSiegeCycle(out var cycle))
-                return FormatSiegePhase(cycle.Phase);
+            if (gm.ContinuousSiegeCycle.Enabled)
+                return FormatSiegePhase(gm.ContinuousSiegeCycle.Phase);
 
             if (gm.IsMobileMode && wave.Phase == RunPhaseType.DayPrep && !wave.WaveActive)
                 return $"DAY {wave.CurrentWave + 1:00} - {Mathf.CeilToInt(wave.PrepTimer)}s";
@@ -535,7 +556,7 @@ namespace DeadWalls
         private static string FormatKillsState(GameManager gm)
         {
             WaveStateData wave = gm.WaveState;
-            if (!wave.StressTestMode && gm.TryGetContinuousSiegeCycle(out _))
+            if (!wave.StressTestMode && gm.ContinuousSiegeCycle.Enabled)
                 return $"KILLS {gm.KillsThisWave}";
 
             if (gm.IsMobileMode && wave.Phase == RunPhaseType.DayPrep && !wave.WaveActive && !wave.StressTestMode)
@@ -559,9 +580,53 @@ namespace DeadWalls
             }
         }
 
-        private static string FormatArrowSupply(GameManager gm)
+        private static int GetWaveLabelKey(GameManager gm)
         {
-            return gm.IsUnlimitedArrowsEnabled() ? "INF" : gm.ArrowSupply.Current.ToString();
+            WaveStateData wave = gm.WaveState;
+            unchecked
+            {
+                if (wave.StressTestMode)
+                    return wave.CurrentWave * 31 + 1;
+
+                if (gm.ContinuousSiegeCycle.Enabled)
+                    return 10_000 + (int)gm.ContinuousSiegeCycle.Phase;
+
+                int key = wave.CurrentWave;
+                key = key * 31 + (int)wave.Phase;
+                key = key * 31 + (wave.WaveActive ? 1 : 0);
+                key = key * 31 + (wave.WaveStartTimer > 0f ? 1 : 0);
+                bool mobileMode = gm.IsMobileMode;
+                key = key * 31 + (mobileMode ? 1 : 0);
+                if (mobileMode && wave.Phase == RunPhaseType.DayPrep && !wave.WaveActive)
+                    key = key * 31 + Mathf.CeilToInt(wave.PrepTimer);
+                return key;
+            }
+        }
+
+        private static int GetKillsLabelKey(GameManager gm)
+        {
+            WaveStateData wave = gm.WaveState;
+            unchecked
+            {
+                if (!wave.StressTestMode && gm.ContinuousSiegeCycle.Enabled)
+                    return gm.KillsThisWave * 31 + 1;
+
+                if (gm.IsMobileMode && wave.Phase == RunPhaseType.DayPrep
+                    && !wave.WaveActive && !wave.StressTestMode)
+                {
+                    return 2;
+                }
+
+                int key = gm.KillsThisWave;
+                key = key * 31 + wave.ZombiesToSpawn;
+                return key;
+            }
+        }
+
+        private static void SetActiveIfChanged(GameObject target, bool active)
+        {
+            if (target != null && target.activeSelf != active)
+                target.SetActive(active);
         }
 
         private static string FormatResource(string name, int amount, float netRate)

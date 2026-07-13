@@ -1,6 +1,10 @@
 using Unity.Burst;
+using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
+using Unity.Jobs;
 using Unity.Mathematics;
+using Unity.Transforms;
 
 namespace DeadWalls
 {
@@ -49,7 +53,7 @@ namespace DeadWalls
             Entity poolEntity = SystemAPI.HasSingleton<EnemyPoolRuntimeData>()
                 ? SystemAPI.GetSingletonEntity<EnemyPoolRuntimeData>()
                 : Entity.Null;
-            var returnedEntities = new Unity.Collections.NativeList<Entity>(Unity.Collections.Allocator.Temp);
+            var returnedEntities = new NativeList<Entity>(Allocator.Temp);
             float dt = SystemAPI.Time.DeltaTime;
 
             foreach (var (stats, deathTimer, entity) in
@@ -75,14 +79,39 @@ namespace DeadWalls
                 returnedEntities.Add(entity);
             }
 
+            var pooledEntities = new NativeList<Entity>(returnedEntities.Length, Allocator.TempJob);
             for (int i = 0; i < returnedEntities.Length; i++)
             {
                 Entity entity = returnedEntities[i];
-                if (poolEntity == Entity.Null
-                    || !EnemyPoolRuntimeUtility.Return(state.EntityManager, poolEntity, entity))
+                if (poolEntity != Entity.Null
+                    && state.EntityManager.HasComponent<EnemyPoolMember>(entity))
+                    pooledEntities.Add(entity);
+                else
                     ecb.DestroyEntity(entity);
             }
             returnedEntities.Dispose();
+
+            if (pooledEntities.Length > 0)
+            {
+                var resetJob = new PoolReturnResetJob
+                {
+                    Entities = pooledEntities.AsArray(),
+                    StatsLookup = SystemAPI.GetComponentLookup<ZombieStats>(false),
+                    StateLookup = SystemAPI.GetComponentLookup<ZombieState>(false),
+                    SlowLookup = SystemAPI.GetComponentLookup<ZombieSlow>(false),
+                    DeathTimerLookup = SystemAPI.GetComponentLookup<DeathTimer>(false),
+                    PhysicsLookup = SystemAPI.GetComponentLookup<PhysicsBody>(false),
+                    TintLookup = SystemAPI.GetComponentLookup<SpriteTint>(false),
+                    AnimationLookup = SystemAPI.GetComponentLookup<SpriteAnimation>(false),
+                    TransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(false),
+                    ZombieTagLookup = SystemAPI.GetComponentLookup<ZombieTag>(false)
+                };
+                state.Dependency = resetJob.Schedule(pooledEntities.Length, 128, state.Dependency);
+                state.Dependency.Complete();
+                EnemyPoolRuntimeUtility.CommitBulkReturn(
+                    state.EntityManager, poolEntity, pooledEntities.AsArray());
+            }
+            pooledEntities.Dispose();
 
             // Mobile castle loop artik level-up ile pause olmaz; XP sadece progress metric olarak kalir.
             if (!mobileMode && gameState.ValueRO.XP >= gameState.ValueRO.XPToNextLevel && !gameState.ValueRO.IsLevelUpPending)
@@ -104,6 +133,77 @@ namespace DeadWalls
                 * EconomyFocusUtility.GetKillRewardMultiplier(config, focus, EconomyFocusType.Iron);
             accumulator.Food += config.KillRewardFood * scale
                 * EconomyFocusUtility.GetKillRewardMultiplier(config, focus, EconomyFocusType.Food);
+        }
+
+        [BurstCompile]
+        private struct PoolReturnResetJob : IJobParallelFor
+        {
+            [ReadOnly] public NativeArray<Entity> Entities;
+
+            [NativeDisableParallelForRestriction] public ComponentLookup<ZombieStats> StatsLookup;
+            [NativeDisableParallelForRestriction] public ComponentLookup<ZombieState> StateLookup;
+            [NativeDisableParallelForRestriction] public ComponentLookup<ZombieSlow> SlowLookup;
+            [NativeDisableParallelForRestriction] public ComponentLookup<DeathTimer> DeathTimerLookup;
+            [NativeDisableParallelForRestriction] public ComponentLookup<PhysicsBody> PhysicsLookup;
+            [NativeDisableParallelForRestriction] public ComponentLookup<SpriteTint> TintLookup;
+            [NativeDisableParallelForRestriction] public ComponentLookup<SpriteAnimation> AnimationLookup;
+            [NativeDisableParallelForRestriction] public ComponentLookup<LocalTransform> TransformLookup;
+            [NativeDisableParallelForRestriction] public ComponentLookup<ZombieTag> ZombieTagLookup;
+
+            public void Execute(int index)
+            {
+                Entity entity = Entities[index];
+
+                if (StateLookup.HasComponent(entity))
+                    StateLookup[entity] = new ZombieState { Value = ZombieStateType.Moving };
+
+                if (StatsLookup.HasComponent(entity))
+                {
+                    ZombieStats stats = StatsLookup[entity];
+                    stats.CurrentHP = stats.MaxHP;
+                    stats.AttackTimer = 0f;
+                    StatsLookup[entity] = stats;
+                }
+
+                if (SlowLookup.HasComponent(entity))
+                {
+                    SlowLookup[entity] = new ZombieSlow { Duration = 0f, SpeedMultiplier = 1f };
+                    SlowLookup.SetComponentEnabled(entity, false);
+                }
+
+                if (DeathTimerLookup.HasComponent(entity))
+                {
+                    DeathTimerLookup[entity] = new DeathTimer { Value = 0f };
+                    DeathTimerLookup.SetComponentEnabled(entity, false);
+                }
+
+                if (PhysicsLookup.HasComponent(entity))
+                {
+                    PhysicsBody body = PhysicsLookup[entity];
+                    body.Velocity = float2.zero;
+                    body.Force = float2.zero;
+                    PhysicsLookup[entity] = body;
+                }
+
+                if (TintLookup.HasComponent(entity))
+                    TintLookup[entity] = new SpriteTint { Value = ArcherVisualStyle.NormalTint };
+
+                if (AnimationLookup.HasComponent(entity))
+                {
+                    SpriteAnimation animation = AnimationLookup[entity];
+                    animation.DirectionRow = 0;
+                    animation.FrameCount = 15;
+                    animation.CurrentFrame = 0;
+                    animation.FrameTimer = 0f;
+                    AnimationLookup[entity] = animation;
+                }
+
+                if (TransformLookup.HasComponent(entity))
+                    TransformLookup[entity] = LocalTransform.FromPositionRotationScale(
+                        float3.zero, quaternion.identity, 0f);
+
+                ZombieTagLookup.SetComponentEnabled(entity, false);
+            }
         }
     }
 }

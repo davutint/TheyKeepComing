@@ -90,3 +90,55 @@ Package B performans kapısı henüz kapanmadı. Ölçülmüş blockerlar:
 - Release cap'i yalnız ölçüm ve owner onayı sonrası değiştir.
 
 1.000 archer + 10.000 enemy kombinasyonu bu raporun kapsamında değildir; Package D hedefidir.
+
+---
+
+## DW-B-SCALE-OPT takip ölçümü - 2026-07-13
+
+Bu bölüm yukarıdaki ilk baseline kararının death spike ve allocation maddelerini günceller. Release `MaxAliveZombies = 900` değeri değiştirilmedi.
+
+### Uygulanan optimizasyonlar
+
+- `DamageCleanupSystem`: entity başına main-thread return yerine Burst-parallel transient reset ve tek `CommitBulkReturn` buffer/state yazımı.
+- `ZombieDeathSystem`: aynı frame'deki toplu ölüm için 10.000 geçici SFX event entity'si yerine tek temsilci event.
+- `ZombieAnimationStateSystem`: death timer geçişinde entity başına ECB komutları yerine doğrudan enableable component yazımı.
+- `GameManager` ve `HUDController`: değişmeyen ECS/UI verileri için entity, sayım ve label cache'leri.
+- `MarketUI` ve `WorkerEconomyDrawerUI`: sabit aralıkla koşulsuz string/hiyerarşi üretimi yerine allocation-free state fingerprint ve yalnız değişiklikte refresh.
+- PlayMode içinde domain reload sonrasında başlayan, yüklenebilir binary RAW üreten explicit 10K profiler capture testi.
+
+### İki temiz 10K doğrulama koşusu
+
+| Metrik | Koşu 1 | Koşu 2 |
+|---|---:|---:|
+| Frame average | 8,88 ms | 9,01 ms |
+| Frame P95 | 10,55 ms | 11,16 ms |
+| Main thread average | 8,79 ms | 8,90 ms |
+| Editor GC average | 17.943 B/frame | 17.868 B/frame |
+| Death peak | 83,72 ms | 79,13 ms |
+| Death peak frame / active | 0 / 10.000 | 0 / 10.000 |
+| Save | 71,62 ms | 69,52 ms |
+| Restore | 120,09 ms | 108,70 ms |
+| Snapshot | 7.364.785 B | 7.364.908 B |
+
+Steady P95 baseline aralığında kaldı. Death peak `126,42-131,95 ms` baseline'ından `79,13-83,72 ms` aralığına indi; karşılaştırma uçlarına göre yaklaşık `%34-40` iyileşme sağlandı.
+
+### Allocation owner sonucu
+
+İlk yüklenebilir 120-frame RAW audit'inde proje kodu yaklaşık `2.394 B/frame` üretiyordu; bunun `2.320 B/frame` kadarı tek başına `MarketUI.Update()` çağrı yolundaydı. Son capture sonucu:
+
+- Proje kodu toplamı: `1.405 B / 121 frame = 11,6 B/frame`.
+- `MarketUI.Update()`: `0 B`.
+- `WorkerEconomyDrawerUI.Update()`: `0 B`.
+- Başlangıç capture'ına göre proje steady allocation azalması: yaklaşık `%99,5`.
+
+Benchmark'taki yaklaşık `17,9 KB/frame` toplamı Unity Editor, GameView, MCP transport ve üçüncü taraf Editor menü callback'lerini de içerir; proje runtime allocation bütçesi olarak yorumlanmaz.
+
+### Güncel karar
+
+`DW-B-SCALE-OPT` içindeki death spike ve kaçınılabilir steady-state allocation blockerları çözüldü. Açık kalan işler:
+
+1. `532` draw call için GPU/Frame Debugger ile Entities instancing ve batch kanıtı.
+2. Save/restore maliyetinin standalone hedef PC build bütçesine göre değerlendirilmesi.
+3. Package D kapsamında 1.000 archer + 10.000 enemy + projectile peak senaryosu.
+
+Doğrulama: targeted profiler capture `1/1`, iki targeted 10K benchmark `2/2`, full EditMode `34/34`, full PlayMode `13 passed + 1 explicit skipped`.

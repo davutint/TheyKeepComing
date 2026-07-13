@@ -40,6 +40,8 @@ namespace DeadWalls
 
         private bool _isOpen;
         private float _nextRefreshTime;
+        private bool _hasRefreshFingerprint;
+        private int _lastRefreshFingerprint;
 
         private void OnEnable()
         {
@@ -59,7 +61,7 @@ namespace DeadWalls
                 return;
 
             _nextRefreshTime = Time.unscaledTime + 0.15f;
-            Refresh();
+            RefreshIfChanged();
         }
 
         private void BindControls()
@@ -106,7 +108,11 @@ namespace DeadWalls
                 WorkerEconomyDrawerPanel.SetActive(false);
 
             if (!enabledForMode)
+            {
+                _lastRefreshFingerprint = ComputeRefreshFingerprint(gm);
+                _hasRefreshFingerprint = true;
                 return;
+            }
 
             var population = gm.Population;
             int totalWorkers = gm.GetResourceWorkers(EconomyFocusType.Balanced);
@@ -125,6 +131,63 @@ namespace DeadWalls
                 IronWorkerAddButton, IronWorkerStatusText);
             RefreshRow(gm, EconomyFocusType.Food, "FOOD", FoodWorkerCountText, FoodWorkerRateText,
                 FoodWorkerAddButton, FoodWorkerStatusText);
+
+            _lastRefreshFingerprint = ComputeRefreshFingerprint(gm);
+            _hasRefreshFingerprint = true;
+        }
+
+        private void RefreshIfChanged()
+        {
+            var gm = GameManager.Instance;
+            int fingerprint = ComputeRefreshFingerprint(gm);
+            if (_hasRefreshFingerprint && fingerprint == _lastRefreshFingerprint)
+                return;
+
+            Refresh();
+        }
+
+        private static int ComputeRefreshFingerprint(GameManager gm)
+        {
+            unchecked
+            {
+                int hash = 17;
+                bool enabledForMode = gm != null && gm.IsMobilePopulationEconomyEnabled();
+                AddFingerprintValue(ref hash, enabledForMode);
+                if (!enabledForMode)
+                    return hash;
+
+                AddFingerprintValue(ref hash, gm.IsFreeEconomyTestMode);
+                AddFingerprintValue(ref hash, gm.Population.Total);
+                AddFingerprintValue(ref hash, gm.Population.Archers);
+                AddFingerprintValue(ref hash, gm.GetIdlePopulation());
+                AddFingerprintValue(ref hash, gm.GetAvailablePopulation());
+                AddResourceFingerprint(ref hash, gm, EconomyFocusType.Wood);
+                AddResourceFingerprint(ref hash, gm, EconomyFocusType.Stone);
+                AddResourceFingerprint(ref hash, gm, EconomyFocusType.Iron);
+                AddResourceFingerprint(ref hash, gm, EconomyFocusType.Food);
+                return hash;
+            }
+        }
+
+        private static void AddResourceFingerprint(ref int hash, GameManager gm, EconomyFocusType resource)
+        {
+            AddFingerprintValue(ref hash, gm.GetResourceWorkers(resource));
+            AddFingerprintValue(ref hash, gm.GetMaxWorkersForResource(resource));
+            AddFingerprintValue(ref hash, gm.GetWorkerProductionRate(resource).GetHashCode());
+            AddFingerprintValue(ref hash, gm.CanAssignResourceWorker(resource));
+        }
+
+        private static void AddFingerprintValue(ref int hash, int value)
+        {
+            unchecked
+            {
+                hash = hash * 31 + value;
+            }
+        }
+
+        private static void AddFingerprintValue(ref int hash, bool value)
+        {
+            AddFingerprintValue(ref hash, value ? 1 : 0);
         }
 
         private static void RefreshRow(GameManager gm, EconomyFocusType resource, string label,

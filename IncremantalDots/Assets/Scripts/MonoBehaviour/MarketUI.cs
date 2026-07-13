@@ -71,6 +71,12 @@ namespace DeadWalls
         private float _nextRefreshTime;
         private ArcherRecruitmentCatalogSO _builtCatalog;
         private readonly List<DynamicArcherRow> _dynamicRows = new List<DynamicArcherRow>();
+        private bool _hasRefreshFingerprint;
+        private int _lastRefreshFingerprint;
+        private bool _legacyRowsCached;
+        private GameObject _basicLegacyRow;
+        private GameObject _rapidLegacyRow;
+        private GameObject _frostLegacyRow;
 
         private void OnEnable()
         {
@@ -92,7 +98,7 @@ namespace DeadWalls
             if (Time.unscaledTime >= _nextRefreshTime)
             {
                 _nextRefreshTime = Time.unscaledTime + 0.20f;
-                Refresh();
+                RefreshIfChanged();
             }
         }
 
@@ -117,6 +123,7 @@ namespace DeadWalls
             var gm = GameManager.Instance;
             if (gm == null)
             {
+                _hasRefreshFingerprint = false;
                 SetAllButtonsInteractable(false);
                 return;
             }
@@ -186,6 +193,95 @@ namespace DeadWalls
                     && !gm.WaveState.WaveActive
                     && !gm.WaveState.StressTestMode;
             }
+
+            _lastRefreshFingerprint = ComputeRefreshFingerprint(gm);
+            _hasRefreshFingerprint = true;
+        }
+
+        private void RefreshIfChanged()
+        {
+            var gm = GameManager.Instance;
+            if (gm == null)
+            {
+                if (_hasRefreshFingerprint)
+                    Refresh();
+                return;
+            }
+
+            int fingerprint = ComputeRefreshFingerprint(gm);
+            if (_hasRefreshFingerprint && fingerprint == _lastRefreshFingerprint)
+                return;
+
+            Refresh();
+        }
+
+        private int ComputeRefreshFingerprint(GameManager gm)
+        {
+            unchecked
+            {
+                int hash = 17;
+                var resources = gm.Resources;
+                AddFingerprintValue(ref hash, resources.Wood);
+                AddFingerprintValue(ref hash, resources.Stone);
+                AddFingerprintValue(ref hash, resources.Iron);
+                AddFingerprintValue(ref hash, resources.Food);
+
+                var population = gm.Population;
+                AddFingerprintValue(ref hash, population.Total);
+                AddFingerprintValue(ref hash, population.Archers);
+                AddFingerprintValue(ref hash, gm.GetIdlePopulation());
+
+                AddArcherFingerprint(ref hash, gm, ArcherType.Basic);
+                AddArcherFingerprint(ref hash, gm, ArcherType.Rapid);
+                AddArcherFingerprint(ref hash, gm, ArcherType.Frost);
+
+                AddFingerprintValue(ref hash, gm.IsMobileMode);
+                AddFingerprintValue(ref hash, gm.IsMobilePopulationEconomyEnabled());
+                AddFingerprintValue(ref hash, gm.IsUnlimitedArrowsEnabled());
+                AddFingerprintValue(ref hash, gm.IsFreeEconomyTestMode);
+                AddFingerprintValue(ref hash, gm.GameState.IsGameOver);
+                AddFingerprintValue(ref hash, gm.GameState.IsLevelUpPending);
+
+                var wave = gm.WaveState;
+                AddFingerprintValue(ref hash, wave.WaveActive);
+                AddFingerprintValue(ref hash, wave.StressTestMode);
+                AddFingerprintValue(ref hash, (int)wave.Phase);
+
+                var prep = gm.CastleYardPrep;
+                AddFingerprintValue(ref hash, prep.FortifyActive);
+                AddFingerprintValue(ref hash, Mathf.CeilToInt(prep.RallyTimer));
+                AddFingerprintValue(ref hash, gm.CanRepairDefenseFull());
+                AddFingerprintValue(ref hash, gm.CanBuyFortify());
+                AddFingerprintValue(ref hash, gm.CanBuyRally());
+
+                var repairCost = gm.GetRepairCost();
+                AddFingerprintValue(ref hash, repairCost.Wood);
+                AddFingerprintValue(ref hash, repairCost.Stone);
+                AddFingerprintValue(ref hash, repairCost.Iron);
+                AddFingerprintValue(ref hash, repairCost.Food);
+                return hash;
+            }
+        }
+
+        private static void AddArcherFingerprint(ref int hash, GameManager gm, ArcherType type)
+        {
+            AddFingerprintValue(ref hash, gm.GetArcherTypeCount(type));
+            AddFingerprintValue(ref hash, gm.GetArcherTypeLevel(type));
+            AddFingerprintValue(ref hash, gm.IsArcherTypeUnlocked(type));
+            AddFingerprintValue(ref hash, gm.CanBuyArcher(type));
+        }
+
+        private static void AddFingerprintValue(ref int hash, int value)
+        {
+            unchecked
+            {
+                hash = hash * 31 + value;
+            }
+        }
+
+        private static void AddFingerprintValue(ref int hash, bool value)
+        {
+            AddFingerprintValue(ref hash, value ? 1 : 0);
         }
 
         private void RefreshArcherRow(
@@ -443,12 +539,12 @@ namespace DeadWalls
             if (ArcherRecruitmentListRoot == null || ArcherRecruitmentRowTemplate == null)
                 return false;
 
+            if (_dynamicRows.Count > 0 && _builtCatalog == ArcherCatalog)
+                return true;
+
             var definitions = GetDefinitions(gm);
             if (definitions == null || definitions.Length == 0)
                 return false;
-
-            if (_dynamicRows.Count > 0 && _builtCatalog == ArcherCatalog)
-                return true;
 
             ClearDynamicRows();
             ArcherRecruitmentRowTemplate.gameObject.SetActive(false);
@@ -590,15 +686,26 @@ namespace DeadWalls
 
         private void SetLegacyRowsActive(bool active)
         {
-            SetOptionalChildActive("BasicArcherRow", active);
-            SetOptionalChildActive("RapidArcherRow", active);
-            SetOptionalChildActive("FrostArcherRow", active);
+            CacheLegacyRows();
+            SetOptionalChildActive(_basicLegacyRow, active);
+            SetOptionalChildActive(_rapidLegacyRow, active);
+            SetOptionalChildActive(_frostLegacyRow, active);
         }
 
-        private void SetOptionalChildActive(string name, bool active)
+        private void CacheLegacyRows()
         {
-            var child = FindChildByName(gameObject, name);
-            if (child != null)
+            if (_legacyRowsCached)
+                return;
+
+            _basicLegacyRow = FindChildByName(gameObject, "BasicArcherRow");
+            _rapidLegacyRow = FindChildByName(gameObject, "RapidArcherRow");
+            _frostLegacyRow = FindChildByName(gameObject, "FrostArcherRow");
+            _legacyRowsCached = true;
+        }
+
+        private static void SetOptionalChildActive(GameObject child, bool active)
+        {
+            if (child != null && child.activeSelf != active)
                 child.SetActive(active);
         }
 

@@ -62,26 +62,24 @@ namespace DeadWalls
             new AnimationStateJob
             {
                 HasTargetPoint = mobileMode || hasWallTarget,
-                TargetPoint = targetPoint,
-                ECB = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>()
-                    .CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter()
+                TargetPoint = targetPoint
             }.ScheduleParallel();
         }
 
         [BurstCompile]
         [WithAll(typeof(ZombieTag))]
-        [WithNone(typeof(DeathTimer))]
+        [WithDisabled(typeof(DeathTimer))]
         partial struct AnimationStateJob : IJobEntity
         {
             public bool HasTargetPoint;
             public float2 TargetPoint;
-            public EntityCommandBuffer.ParallelWriter ECB;
 
-            void Execute(Entity entity, [ChunkIndexInQuery] int sortKey,
-                in ZombieState zombieState,
+            void Execute(in ZombieState zombieState,
                 in LocalTransform transform,
                 in PhysicsBody physicsBody,
-                ref SpriteAnimation anim)
+                ref SpriteAnimation anim,
+                ref DeathTimer deathTimer,
+                EnabledRefRW<DeathTimer> deathTimerEnabled)
             {
                 int dir = ResolveDirection(transform.Position.xy, physicsBody.Velocity, anim.DirectionRow % 8);
 
@@ -138,10 +136,8 @@ namespace DeadWalls
                         anim.FrameTimer = 0f;
 
                         // Olum animasyonu suresi: 15 frame * FrameInterval
-                        float deathDuration = DieFrameCount * anim.FrameInterval;
-                        ECB.SetComponent(sortKey, entity,
-                            new DeathTimer { Value = deathDuration });
-                        ECB.SetComponentEnabled<DeathTimer>(sortKey, entity, true);
+                        deathTimer.Value = DieFrameCount * anim.FrameInterval;
+                        deathTimerEnabled.ValueRW = true;
                         break;
                     }
                 }

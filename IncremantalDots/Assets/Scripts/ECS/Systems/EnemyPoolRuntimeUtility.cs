@@ -88,6 +88,25 @@ namespace DeadWalls
             return true;
         }
 
+        public static bool CommitBulkReturn(EntityManager entityManager, Entity poolEntity,
+            NativeArray<Entity> entities)
+        {
+            if (!IsValidPoolOwner(entityManager, poolEntity) || entities.Length == 0)
+                return false;
+
+            var available = entityManager.GetBuffer<EnemyPoolAvailable>(poolEntity);
+            available.EnsureCapacity(available.Length + entities.Length);
+            for (int i = 0; i < entities.Length; i++)
+                available.Add(new EnemyPoolAvailable { Entity = entities[i] });
+
+            var state = entityManager.GetComponentData<EnemyPoolRuntimeData>(poolEntity);
+            state.AvailableCount = available.Length;
+            state.ActiveCount = math.max(0, state.ActiveCount - entities.Length);
+            state.TotalReturnCount += entities.Length;
+            entityManager.SetComponentData(poolEntity, state);
+            return true;
+        }
+
         public static int ReturnAllActive(EntityManager entityManager, Entity poolEntity)
         {
             if (!IsValidPoolOwner(entityManager, poolEntity))

@@ -35,6 +35,7 @@ namespace DeadWalls
         private Entity _enemyPoolEntity;
         private Entity _arrowPrefabEntity;
         private Entity _workerPrefabEntity;
+        private Entity _mobileConfigEntity;
         private bool _initialized;
         private bool _mobileInitialPrepApplied;
         private bool _workerVisualSyncInitialized;
@@ -228,6 +229,11 @@ namespace DeadWalls
             _gameStateEntity = query.GetSingletonEntity();
             _waveStateEntity = _gameStateEntity; // ayni entity uzerinde
 
+            var mobileConfigQuery = _entityManager.CreateEntityQuery(typeof(MobileCastleCombatConfig));
+            _mobileConfigEntity = mobileConfigQuery.IsEmpty
+                ? Entity.Null
+                : mobileConfigQuery.GetSingletonEntity();
+
             var archerPrefabQuery = _entityManager.CreateEntityQuery(typeof(ArcherPrefabData));
             if (archerPrefabQuery.IsEmpty) return false;
 
@@ -287,7 +293,8 @@ namespace DeadWalls
             Population = _entityManager.GetComponentData<PopulationState>(_gameStateEntity);
             ArrowSupply = _entityManager.GetComponentData<ArrowSupply>(_gameStateEntity);
             Wall = _entityManager.GetComponentData<WallSegment>(_castleEntity);
-            ReadArcherTypeCounts();
+            if (BasicArcherCount + RapidArcherCount + FrostArcherCount != Population.Archers)
+                ReadArcherTypeCounts();
             ReadMobileRuntimeData();
             SyncWorkerVisualsIfNeeded();
 
@@ -3377,10 +3384,11 @@ namespace DeadWalls
                 All = new ComponentType[] { typeof(ArcherUnit) },
                 None = new ComponentType[] { typeof(Prefab) }
             });
-            var entities = query.ToEntityArray(Unity.Collections.Allocator.Temp);
-            foreach (var entity in entities)
+            using NativeArray<ArcherUnit> archers = query
+                .ToComponentDataArray<ArcherUnit>(Allocator.Temp);
+            for (int i = 0; i < archers.Length; i++)
             {
-                var archer = _entityManager.GetComponentData<ArcherUnit>(entity);
+                ArcherUnit archer = archers[i];
                 switch (archer.Type)
                 {
                     case ArcherType.Rapid:
@@ -3394,7 +3402,6 @@ namespace DeadWalls
                         break;
                 }
             }
-            entities.Dispose();
         }
 
         private void SetSpriteTint(Entity entity, float4 tint)
@@ -3410,6 +3417,14 @@ namespace DeadWalls
             configEntity = Entity.Null;
             if (!CanAccessEntityManager())
                 return false;
+
+            if (_mobileConfigEntity != Entity.Null
+                && _entityManager.Exists(_mobileConfigEntity)
+                && _entityManager.HasComponent<MobileCastleCombatConfig>(_mobileConfigEntity))
+            {
+                configEntity = _mobileConfigEntity;
+                return true;
+            }
 
             EntityQuery query;
             try
@@ -3427,7 +3442,8 @@ namespace DeadWalls
                 return false;
             }
 
-            configEntity = query.GetSingletonEntity();
+            _mobileConfigEntity = query.GetSingletonEntity();
+            configEntity = _mobileConfigEntity;
             return true;
         }
 
