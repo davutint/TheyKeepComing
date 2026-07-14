@@ -349,6 +349,7 @@ namespace DeadWalls
             mobileAuthoring.OpeningBatchDelta = -1;
             mobileAuthoring.FinalBatchDelta = 1;
             mobileAuthoring.PopulationGrowthPerDayPrep = 15;
+            mobileAuthoring.InitialBedCapacity = MobileBedCapacityUtility.DefaultInitialCapacity;
             mobileAuthoring.InitialWoodWorkers = 20;
             mobileAuthoring.InitialStoneWorkers = 10;
             mobileAuthoring.InitialIronWorkers = 8;

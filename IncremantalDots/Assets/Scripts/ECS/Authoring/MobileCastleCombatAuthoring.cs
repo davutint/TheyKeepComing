@@ -121,6 +121,8 @@ namespace DeadWalls
 
         [Header("Population Economy")]
         public int PopulationGrowthPerDayPrep = 15;
+        [Tooltip("Run baslangicindaki House yatak kapasitesi. Satin alinmis yataklar ayri run state'inde birikir.")]
+        public int InitialBedCapacity = MobileBedCapacityUtility.DefaultInitialCapacity;
         public int InitialWoodWorkers = 20;
         public int InitialStoneWorkers = 10;
         public int InitialIronWorkers = 8;
@@ -244,6 +246,7 @@ namespace DeadWalls
                     OpeningBatchDelta = authoring.OpeningBatchDelta,
                     FinalBatchDelta = authoring.FinalBatchDelta,
                     PopulationGrowthPerDayPrep = math.max(0, authoring.PopulationGrowthPerDayPrep),
+                    InitialBedCapacity = math.max(0, authoring.InitialBedCapacity),
                     WoodWorkerCap = math.max(0, authoring.WoodWorkerCap),
                     StoneWorkerCap = math.max(0, authoring.StoneWorkerCap),
                     IronWorkerCap = math.max(0, authoring.IronWorkerCap),
@@ -260,6 +263,8 @@ namespace DeadWalls
                 EnemyCatalogRuntimeUtility.ApplyBaseStats(ref config, activeEnemyDefinition);
                 MoatDormancyRules.ApplyV1(ref config);
                 AddComponent(entity, config);
+
+                AddComponent(entity, MobileBedCapacityUtility.CreateInitial(authoring.InitialBedCapacity));
 
                 AddComponent(entity, new EconomyFocusState
                 {

@@ -16,4 +16,15 @@ namespace DeadWalls
         public int BaseCapacity;            // Bina/upgrade olmadan temel kapasite (bake: 20)
         public float FoodPerAssignedPerMin; // Atanmis kisi basina yemek/dk
     }
+
+    /// <summary>
+    /// V1 castle loop'ta House yatak kapasitesinin run-scoped otoritesi.
+    /// PopulationState.Capacity arrival entegrasyonu tamamlanana kadar legacy aynadir;
+    /// satin alinmis yatak gercegi bu component'te tutulur.
+    /// </summary>
+    public struct MobileBedCapacityState : IComponentData
+    {
+        public int BaseCapacity;
+        public int PurchasedCapacity;
+    }
 }

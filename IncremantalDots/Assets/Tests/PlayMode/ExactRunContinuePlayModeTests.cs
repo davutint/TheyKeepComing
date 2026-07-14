@@ -169,6 +169,57 @@ namespace DeadWalls.Tests
         }
 
         [UnityTest]
+        public IEnumerator BedCapacityPurchase_SpendsWoodAndPersistsAcrossExactContinue()
+        {
+            var gameManager = GameManager.Instance;
+            bool runtimeReady = false;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                {
+                    runtimeReady = true;
+                    break;
+                }
+                yield return null;
+            }
+            Assert.That(runtimeReady, Is.True, "Bed capacity snapshot runtime'i hazir olmadi.");
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            Entity resourceEntity = entityManager.CreateEntityQuery(typeof(ResourceData)).GetSingletonEntity();
+            Entity bedEntity = entityManager.CreateEntityQuery(
+                typeof(MobileCastleCombatConfig), typeof(MobileBedCapacityState)).GetSingletonEntity();
+
+            var resources = entityManager.GetComponentData<ResourceData>(resourceEntity);
+            resources.Wood = 2_000;
+            entityManager.SetComponentData(resourceEntity, resources);
+
+            MobileBedCapacityState before = entityManager.GetComponentData<MobileBedCapacityState>(bedEntity);
+            ResourceCost cost = gameManager.GetBedCapacityPurchaseCost(5);
+            Assert.That(cost.Wood, Is.EqualTo(500));
+            Assert.That(gameManager.TryBuyBedCapacity(5), Is.True);
+
+            MobileBedCapacityState purchased = entityManager.GetComponentData<MobileBedCapacityState>(bedEntity);
+            ResourceData resourcesAfterPurchase = entityManager.GetComponentData<ResourceData>(resourceEntity);
+            Assert.That(purchased.BaseCapacity, Is.EqualTo(before.BaseCapacity));
+            Assert.That(purchased.PurchasedCapacity, Is.EqualTo(before.PurchasedCapacity + 5));
+            Assert.That(resourcesAfterPurchase.Wood, Is.EqualTo(1_500));
+            Assert.That(gameManager.SaveRunSnapshot(), Is.True);
+
+            purchased.PurchasedCapacity = 0;
+            entityManager.SetComponentData(bedEntity, purchased);
+            Assert.That(gameManager.TryRestoreRunFromCheckpoint(), Is.True);
+
+            bedEntity = entityManager.CreateEntityQuery(
+                typeof(MobileCastleCombatConfig), typeof(MobileBedCapacityState)).GetSingletonEntity();
+            MobileBedCapacityState restored = entityManager.GetComponentData<MobileBedCapacityState>(bedEntity);
+            Assert.That(restored.BaseCapacity, Is.EqualTo(before.BaseCapacity));
+            Assert.That(restored.PurchasedCapacity, Is.EqualTo(before.PurchasedCapacity + 5));
+            Assert.That(MobileBedCapacityUtility.GetTotalCapacity(restored),
+                Is.EqualTo(MobileBedCapacityUtility.GetTotalCapacity(before) + 5));
+            yield return null;
+        }
+
+        [UnityTest]
         public IEnumerator V1CastleLoop_DoesNotApplyPassiveMainResourceConsumption()
         {
             var gameManager = GameManager.Instance;

@@ -58,6 +58,7 @@ namespace DeadWalls
         private static readonly ResourceCost RallyCost = new ResourceCost(35, 0, 0, 45);
         private const int MobileInitialPopulation = 60;
         private const int MobileInternalPopulationCapacity = 999999;
+        private const int MobileBedBaseWoodCost = 100;
         private const int MobileInitialWoodWorkers = 20;
         private const int MobileInitialStoneWorkers = 10;
         private const int MobileInitialIronWorkers = 8;
@@ -149,6 +150,7 @@ namespace DeadWalls
         public ContinuousSiegeCycleData ContinuousSiegeCycle { get; private set; }
         public ContinuousSpawnBudgetData ContinuousSpawnBudget { get; private set; }
         public MobilePopulationAllocation PopulationAllocation { get; private set; }
+        public MobileBedCapacityState BedCapacity { get; private set; }
         public MobilePrepPauseState PrepPause { get; private set; }
         public MobileEconomyEventState EconomyEvent { get; private set; }
         public int BasicArcherCount { get; private set; }
@@ -1112,6 +1114,67 @@ namespace DeadWalls
 
             int current = GetResourceWorkers(resource);
             return SetResourceWorkers(resource, current + 1);
+        }
+
+        public int GetTotalBedCapacity()
+        {
+            if (!TryGetMobileConfigEntity(out var mobileConfigEntity)
+                || !_entityManager.HasComponent<MobileBedCapacityState>(mobileConfigEntity))
+                return 0;
+
+            var state = _entityManager.GetComponentData<MobileBedCapacityState>(mobileConfigEntity);
+            return MobileBedCapacityUtility.GetTotalCapacity(state);
+        }
+
+        public int GetPurchasedBedCapacity()
+        {
+            if (!TryGetMobileConfigEntity(out var mobileConfigEntity)
+                || !_entityManager.HasComponent<MobileBedCapacityState>(mobileConfigEntity))
+                return 0;
+
+            return Mathf.Max(0,
+                _entityManager.GetComponentData<MobileBedCapacityState>(mobileConfigEntity).PurchasedCapacity);
+        }
+
+        public ResourceCost GetBedCapacityPurchaseCost(int requestedCapacity = 1)
+        {
+            if (requestedCapacity <= 0)
+                return ResourceCost.Zero;
+
+            long wood = (long)MobileBedBaseWoodCost * requestedCapacity;
+            return new ResourceCost(wood >= int.MaxValue ? int.MaxValue : (int)wood, 0, 0, 0);
+        }
+
+        public bool CanBuyBedCapacity(int requestedCapacity = 1)
+        {
+            if (requestedCapacity <= 0
+                || !TryGetMobileConfigEntity(out var mobileConfigEntity)
+                || !_entityManager.HasComponent<MobileBedCapacityState>(mobileConfigEntity))
+                return false;
+
+            var state = _entityManager.GetComponentData<MobileBedCapacityState>(mobileConfigEntity);
+            int addedCapacity = MobileBedCapacityUtility.GetPurchasableIncrement(state, requestedCapacity);
+            return addedCapacity > 0 && CanAfford(GetBedCapacityPurchaseCost(addedCapacity));
+        }
+
+        public bool TryBuyBedCapacity(int requestedCapacity = 1)
+        {
+            if (!CanBuyBedCapacity(requestedCapacity)
+                || !TryGetMobileConfigEntity(out var mobileConfigEntity))
+                return false;
+
+            var state = _entityManager.GetComponentData<MobileBedCapacityState>(mobileConfigEntity);
+            int addedCapacity = MobileBedCapacityUtility.GetPurchasableIncrement(state, requestedCapacity);
+            ResourceCost cost = GetBedCapacityPurchaseCost(addedCapacity);
+            if (addedCapacity <= 0
+                || !MobileBedCapacityUtility.TryAddPurchasedCapacity(ref state, addedCapacity, out _)
+                || !SpendResources(cost))
+                return false;
+
+            _entityManager.SetComponentData(mobileConfigEntity, state);
+            BedCapacity = state;
+            OnGameStateChanged?.Invoke();
+            return true;
         }
 
         public float GetDefensePercent()
@@ -2165,6 +2228,8 @@ namespace DeadWalls
                 PopulationTotal = Population.Total,
                 PopulationCapacity = Population.Capacity,
                 PopulationBaseCapacity = Population.BaseCapacity,
+                BedBaseCapacity = BedCapacity.BaseCapacity,
+                PurchasedBedCapacity = BedCapacity.PurchasedCapacity,
                 WoodWorkers = PopulationAllocation.WoodWorkers,
                 StoneWorkers = PopulationAllocation.StoneWorkers,
                 IronWorkers = PopulationAllocation.IronWorkers,
@@ -2293,6 +2358,7 @@ namespace DeadWalls
 
             int totalArchers = save.BasicArchers + save.RapidArchers + save.FrostArchers;
             int totalWorkers = save.WoodWorkers + save.StoneWorkers + save.IronWorkers + save.FoodWorkers;
+            RestoreBedCapacityState(mobileConfigEntity, save);
             _entityManager.SetComponentData(_gameStateEntity, new PopulationState
             {
                 Total = save.PopulationTotal,
@@ -2359,6 +2425,7 @@ namespace DeadWalls
             var allocation = _entityManager.GetComponentData<MobilePopulationAllocation>(mobileConfigEntity);
             var prep = _entityManager.GetComponentData<CastleYardPrepState>(mobileConfigEntity);
             var economyEvent = _entityManager.GetComponentData<MobileEconomyEventState>(mobileConfigEntity);
+            var bedCapacity = _entityManager.GetComponentData<MobileBedCapacityState>(mobileConfigEntity);
             var spawnBudget = _entityManager.HasComponent<ContinuousSpawnBudgetData>(mobileConfigEntity)
                 ? _entityManager.GetComponentData<ContinuousSpawnBudgetData>(mobileConfigEntity)
                 : default;
@@ -2416,6 +2483,8 @@ namespace DeadWalls
                 PopulationTotal = Population.Total,
                 PopulationCapacity = Population.Capacity,
                 PopulationBaseCapacity = Population.BaseCapacity,
+                BedBaseCapacity = bedCapacity.BaseCapacity,
+                PurchasedBedCapacity = bedCapacity.PurchasedCapacity,
                 WoodWorkers = allocation.WoodWorkers,
                 StoneWorkers = allocation.StoneWorkers,
                 IronWorkers = allocation.IronWorkers,
@@ -2700,6 +2769,7 @@ namespace DeadWalls
 
             int totalArchers = save.BasicArchers + save.RapidArchers + save.FrostArchers;
             int totalWorkers = save.WoodWorkers + save.StoneWorkers + save.IronWorkers + save.FoodWorkers;
+            RestoreBedCapacityState(mobileConfigEntity, save);
             _entityManager.SetComponentData(_gameStateEntity, new PopulationState
             {
                 Total = save.PopulationTotal,
@@ -3628,6 +3698,7 @@ namespace DeadWalls
             ContinuousSiegeCycle = default;
             ContinuousSpawnBudget = default;
             PopulationAllocation = default;
+            BedCapacity = default;
             PrepPause = default;
             EconomyEvent = default;
 
@@ -3648,6 +3719,9 @@ namespace DeadWalls
 
             if (_entityManager.HasComponent<MobilePopulationAllocation>(mobileConfigEntity))
                 PopulationAllocation = _entityManager.GetComponentData<MobilePopulationAllocation>(mobileConfigEntity);
+
+            if (_entityManager.HasComponent<MobileBedCapacityState>(mobileConfigEntity))
+                BedCapacity = _entityManager.GetComponentData<MobileBedCapacityState>(mobileConfigEntity);
 
             if (_entityManager.HasComponent<MobilePrepPauseState>(mobileConfigEntity))
                 PrepPause = _entityManager.GetComponentData<MobilePrepPauseState>(mobileConfigEntity);
@@ -4119,6 +4193,20 @@ namespace DeadWalls
             allocation.AutoAllocationInitialized = 1;
         }
 
+        private void RestoreBedCapacityState(Entity mobileConfigEntity, RunSaveState save)
+        {
+            if (!_entityManager.HasComponent<MobileBedCapacityState>(mobileConfigEntity))
+                return;
+
+            var state = new MobileBedCapacityState
+            {
+                BaseCapacity = Mathf.Max(0, save.BedBaseCapacity),
+                PurchasedCapacity = Mathf.Max(0, save.PurchasedBedCapacity)
+            };
+            _entityManager.SetComponentData(mobileConfigEntity, state);
+            BedCapacity = state;
+        }
+
         private void LogMissingArcherPlacementWarning()
         {
             if (_missingArcherPlacementWarningLogged)
@@ -4254,6 +4342,15 @@ namespace DeadWalls
                 WorkerAllocationUtility.InitializeTargetsFromCurrent(ref allocation);
                 _entityManager.SetComponentData(mobileConfigEntity, allocation);
                 PopulationAllocation = allocation;
+            }
+            if (mobileMode && _entityManager.HasComponent<MobileBedCapacityState>(mobileConfigEntity))
+            {
+                var bedCapacity = MobileBedCapacityUtility.CreateInitial(
+                    mobileConfig.InitialBedCapacity > 0
+                        ? mobileConfig.InitialBedCapacity
+                        : MobileBedCapacityUtility.DefaultInitialCapacity);
+                _entityManager.SetComponentData(mobileConfigEntity, bedCapacity);
+                BedCapacity = bedCapacity;
             }
             if (mobileMode && _entityManager.HasComponent<MobilePrepPauseState>(mobileConfigEntity))
             {

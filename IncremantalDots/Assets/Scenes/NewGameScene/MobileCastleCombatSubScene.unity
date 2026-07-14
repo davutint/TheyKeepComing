@@ -290,6 +290,7 @@ MonoBehaviour:
   OpeningBatchDelta: -1
   FinalBatchDelta: 1
   PopulationGrowthPerDayPrep: 15
+  InitialBedCapacity: 60
   InitialWoodWorkers: 20
   InitialStoneWorkers: 10
   InitialIronWorkers: 8

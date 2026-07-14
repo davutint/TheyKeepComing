@@ -160,7 +160,7 @@ namespace DeadWalls.Tests
         }
 
         [Test]
-        public void TryLoad_Version3Snapshot_MigratesWorkerAllocationToVersion4()
+        public void TryLoad_Version3Snapshot_MigratesWorkerAllocationAndBedStateToVersion5()
         {
             string path = Path.Combine(Application.persistentDataPath, "run_save.json");
             byte[] original = File.Exists(path) ? File.ReadAllBytes(path) : null;
@@ -183,13 +183,49 @@ namespace DeadWalls.Tests
                 RunSaveState restored = RunPersistence.TryLoad();
 
                 Assert.That(restored, Is.Not.Null);
-                Assert.That(restored.Version, Is.EqualTo(4));
+                Assert.That(restored.Version, Is.EqualTo(5));
                 Assert.That(restored.WoodWorkerTargetRatioBps, Is.EqualTo(3774));
                 Assert.That(restored.StoneWorkerTargetRatioBps, Is.EqualTo(1887));
                 Assert.That(restored.IronWorkerTargetRatioBps, Is.EqualTo(1509));
                 Assert.That(restored.FoodWorkerTargetRatioBps, Is.EqualTo(2830));
                 Assert.That(restored.WorkerIdlePopulation, Is.EqualTo(3));
                 Assert.That(restored.LastObservedPopulation, Is.EqualTo(60));
+                Assert.That(restored.BedBaseCapacity, Is.EqualTo(60));
+                Assert.That(restored.PurchasedBedCapacity, Is.Zero);
+            }
+            finally
+            {
+                if (original != null)
+                    File.WriteAllBytes(path, original);
+                else if (File.Exists(path))
+                    File.Delete(path);
+            }
+        }
+
+        [Test]
+        public void TryLoad_Version4UnlimitedCapacity_MigratesToPopulationSafeBedBase()
+        {
+            string path = Path.Combine(Application.persistentDataPath, "run_save.json");
+            byte[] original = File.Exists(path) ? File.ReadAllBytes(path) : null;
+            var legacy = new RunSaveState
+            {
+                Version = 4,
+                RunId = "run_v4_bed_migration_" + Guid.NewGuid().ToString("N"),
+                PopulationTotal = 135,
+                PopulationCapacity = 999999,
+                PopulationBaseCapacity = 999999
+            };
+
+            try
+            {
+                File.WriteAllText(path, JsonUtility.ToJson(legacy));
+
+                RunSaveState restored = RunPersistence.TryLoad();
+
+                Assert.That(restored, Is.Not.Null);
+                Assert.That(restored.Version, Is.EqualTo(5));
+                Assert.That(restored.BedBaseCapacity, Is.EqualTo(135));
+                Assert.That(restored.PurchasedBedCapacity, Is.Zero);
             }
             finally
             {

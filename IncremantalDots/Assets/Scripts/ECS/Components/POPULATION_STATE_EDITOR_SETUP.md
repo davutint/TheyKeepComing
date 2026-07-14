@@ -19,6 +19,16 @@
 |------|-----------|----------|
 | Food Per Assigned Per Min | 2.0 | Her atanmis bireyin dakika basina yemek tuketimi |
 
+## MobileCastleCombatAuthoring Inspector
+
+### Population Economy
+
+| Alan | Varsayilan | Aciklama |
+|---|---:|---|
+| Initial Bed Capacity | 60 | Run başlangıcındaki House yatak kapasitesi; satın alınmış yataklar runtime state'te ayrı tutulur |
+
+`NewGameScene/MobileCastleCombatSubScene` içindeki `MobileCastleConfig` objesi bu değeri `60` olarak serialize eder. `GameStateAuthoring.InitialCapacity = 999999` geçici legacy mobile aynadır; Dawn Food+bed kabul bütçesi bağlanana kadar değiştirilmez.
+
 ## Test Senaryolari
 
 ### 1. Temel Idle Hesaplama
@@ -51,3 +61,4 @@
 2. HUD Canvas'a 1 TMP_Text objesi ekle (PopulationText)
 3. HUDController Inspector'ina PopulationText referansini ata
 4. Play mode'da Entity Debugger'dan PopulationState degerlerini dogrula
+5. Mobile testte `MobileBedCapacityState` için `BaseCapacity=60`, `PurchasedCapacity=0` başlangıcını doğrula

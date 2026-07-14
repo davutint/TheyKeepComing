@@ -13,7 +13,7 @@ namespace DeadWalls
     [Serializable]
     public class RunSaveState
     {
-        public const int CurrentVersion = 4;
+        public const int CurrentVersion = 5;
         public const int MinimumSupportedVersion = 3;
 
         public int Version = CurrentVersion;
@@ -81,6 +81,8 @@ namespace DeadWalls
         public int PopulationTotal;
         public int PopulationCapacity;
         public int PopulationBaseCapacity;
+        public int BedBaseCapacity;
+        public int PurchasedBedCapacity;
         public int WoodWorkers;
         public int StoneWorkers;
         public int IronWorkers;
@@ -298,6 +300,18 @@ namespace DeadWalls
                     - state.BasicArchers - state.RapidArchers - state.FrostArchers);
                 state.LastObservedPopulation = Math.Max(0, state.PopulationTotal);
                 state.Version = 4;
+            }
+
+            if (state.Version == 4)
+            {
+                // v4 mobile loop gercek yatak state'i tasimiyordu; Capacity 999999
+                // internal sentinel'iydi. Mevcut nufusu gecersiz kilmadan run'a gercek
+                // bir baslangic yatak tabani verilir, satin alinmis yatak sifirdan baslar.
+                state.BedBaseCapacity = Math.Max(
+                    MobileBedCapacityUtility.DefaultInitialCapacity,
+                    Math.Max(0, state.PopulationTotal));
+                state.PurchasedBedCapacity = 0;
+                state.Version = 5;
             }
         }
 

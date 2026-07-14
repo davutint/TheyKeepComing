@@ -59,6 +59,7 @@ namespace DeadWalls
         public int OpeningBatchDelta;
         public int FinalBatchDelta;
         public int PopulationGrowthPerDayPrep;
+        public int InitialBedCapacity;
         public int WoodWorkerCap;
         public int StoneWorkerCap;
         public int IronWorkerCap;
