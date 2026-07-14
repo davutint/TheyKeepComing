@@ -39,7 +39,7 @@ namespace DeadWalls
             var eventRW = SystemAPI.GetSingletonRW<MobileEconomyEventState>();
             var populationRW = SystemAPI.GetSingletonRW<PopulationState>();
             var productionRW = SystemAPI.GetSingletonRW<ResourceProductionRate>();
-            var resources = SystemAPI.GetSingleton<ResourceData>();
+            var resourcesRW = SystemAPI.GetSingletonRW<ResourceData>();
 
             SyncBedCapacity(ref populationRW.ValueRW, bedCapacity);
 
@@ -47,13 +47,14 @@ namespace DeadWalls
             {
                 var cycle = SystemAPI.GetSingleton<ContinuousSiegeCycleData>();
                 ApplyContinuousCycleGrowth(ref allocationRW.ValueRW, ref populationRW.ValueRW,
-                    config, cycle, bedCapacity, resources.Food);
+                    ref resourcesRW.ValueRW, config, cycle, bedCapacity);
                 ExpireContinuousEventEffects(ref eventRW.ValueRW, cycle);
             }
             else if (!wave.WaveActive && wave.Phase == RunPhaseType.DayPrep && wave.CurrentWave > 0)
             {
                 ApplyDayPrepStart(ref allocationRW.ValueRW, ref eventRW.ValueRW,
-                    ref populationRW.ValueRW, config, wave.CurrentWave, bedCapacity, resources.Food);
+                    ref populationRW.ValueRW, ref resourcesRW.ValueRW,
+                    config, wave.CurrentWave, bedCapacity);
             }
 
             SyncWorkerCapacities(ref allocationRW.ValueRW, config);
@@ -71,8 +72,9 @@ namespace DeadWalls
         }
 
         private static void ApplyContinuousCycleGrowth(ref MobilePopulationAllocation allocation,
-            ref PopulationState population, MobileCastleCombatConfig config, ContinuousSiegeCycleData cycle,
-            MobileBedCapacityState bedCapacity, int availableFood)
+            ref PopulationState population, ref ResourceData resources,
+            MobileCastleCombatConfig config, ContinuousSiegeCycleData cycle,
+            MobileBedCapacityState bedCapacity)
         {
             if (!cycle.Enabled)
                 return;
@@ -100,7 +102,7 @@ namespace DeadWalls
                 allocation.LastPopulationGrowthCycle = cycle.CycleIndex;
             }
 
-            ApplyArrivalBudget(ref allocation, ref population, config, bedCapacity, availableFood);
+            ApplyArrivalTransaction(ref allocation, ref population, ref resources, config, bedCapacity);
         }
 
         /// <summary>
@@ -130,12 +132,12 @@ namespace DeadWalls
 
         private static void ApplyDayPrepStart(ref MobilePopulationAllocation allocation,
             ref MobileEconomyEventState economyEvent, ref PopulationState population,
-            MobileCastleCombatConfig config, int currentWave,
-            MobileBedCapacityState bedCapacity, int availableFood)
+            ref ResourceData resources, MobileCastleCombatConfig config,
+            int currentWave, MobileBedCapacityState bedCapacity)
         {
             if (allocation.LastPopulationGrowthWave != currentWave)
             {
-                ApplyArrivalBudget(ref allocation, ref population, config, bedCapacity, availableFood);
+                ApplyArrivalTransaction(ref allocation, ref population, ref resources, config, bedCapacity);
                 allocation.LastPopulationGrowthWave = currentWave;
             }
 
@@ -168,20 +170,21 @@ namespace DeadWalls
             economyEvent.CooldownWavesRemaining = math.max(0, config.EconomyEventCooldownWaves);
         }
 
-        private static void ApplyArrivalBudget(ref MobilePopulationAllocation allocation,
-            ref PopulationState population, MobileCastleCombatConfig config,
-            MobileBedCapacityState bedCapacity, int availableFood)
+        private static void ApplyArrivalTransaction(ref MobilePopulationAllocation allocation,
+            ref PopulationState population, ref ResourceData resources,
+            MobileCastleCombatConfig config, MobileBedCapacityState bedCapacity)
         {
             MobilePopulationArrivalBudget budget = MobilePopulationArrivalUtility.CalculateBudget(
                 config.PopulationGrowthPerDayPrep,
                 population.Total,
                 MobileBedCapacityUtility.GetTotalCapacity(bedCapacity),
-                availableFood,
+                resources.Food,
                 config.FoodCostPerArrival);
 
             allocation.LastArrivalRequestedCount = budget.RequestedArrivals;
             allocation.LastArrivalAcceptedCount = budget.AcceptedArrivals;
             allocation.LastArrivalFoodCost = budget.RequiredFood;
+            resources.Food = math.max(0, resources.Food - budget.RequiredFood);
             population.Total += budget.AcceptedArrivals;
         }
 

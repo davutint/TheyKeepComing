@@ -82,7 +82,7 @@ BoundarySystem -> Config varsa AttackRadius icinde Attacking state'e gecirir
 GameManager.BuyArcher(type) -> main scene `Grid/outside` tilemap hucrelerine okcu spawn eder
 MobilePopulationAllocation actual count -> WorkerVisualRepresentationUtility -> GameManager temsili DOTS villager count + exact weight sync -> WorkerLogisticsMovementSystem animation/cargo/fener/teslimat feedback
 GameManager.TryBuyBedCapacity -> MobileBedCapacityUtility owned-capacity sıralı fiyatı -> Wood transaction -> MobileBedCapacityState.PurchasedCapacity
-MobilePopulationEconomySystem -> MobileBedCapacityState kapasite aynası -> MobilePopulationArrivalUtility bed + Food kabul bütçesi -> gerçek accepted population growth
+MobilePopulationEconomySystem -> MobileBedCapacityState kapasite aynası -> MobilePopulationArrivalUtility bed + Food kabul bütçesi -> accepted population growth + tek seferlik ResourceData.Food transaction
 GameManager.BuyFortify()/BuyRally() -> CastleYardPrepState uzerine tek-gecelik buff yazar
 CastleYardPrepSystem -> Rally timer'i NightCombat sirasinda azaltir
 ArcherShootSystem -> Okcu tipine gore projectile effect datasini oka yazar, facing direction + attack timer set eder

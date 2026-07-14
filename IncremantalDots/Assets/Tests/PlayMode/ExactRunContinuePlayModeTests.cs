@@ -103,6 +103,7 @@ namespace DeadWalls.Tests
             workerAllocation.IronTargetRatioBps = 3000;
             workerAllocation.FoodTargetRatioBps = 4000;
             workerAllocation.LastObservedPopulation = 58;
+            workerAllocation.LastPopulationGrowthCycle = 10;
             entityManager.SetComponentData(allocationEntity, workerAllocation);
 
             Assert.That(gameManager.SaveRunSnapshot(), Is.True);
@@ -165,6 +166,7 @@ namespace DeadWalls.Tests
             Assert.That(restoredAllocation.IronTargetRatioBps, Is.EqualTo(3000));
             Assert.That(restoredAllocation.FoodTargetRatioBps, Is.EqualTo(4000));
             Assert.That(restoredAllocation.LastObservedPopulation, Is.EqualTo(58));
+            Assert.That(restoredAllocation.LastPopulationGrowthCycle, Is.EqualTo(10));
             yield return null;
         }
 

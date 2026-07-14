@@ -63,7 +63,7 @@ Mobile V1 castle loop'ta bu pasif nüfus tüketimi uygulanmaz.
 - Başlangıç: Total=`60`, toplam yatak=`65`, Food=`3`
 - Config: requested=`15`, FoodCostPerArrival=`1`
 - Beklenen: accepted=`3`, Total=`63`, Capacity=`65`
-- Food bu bütçe paketinde `3` kalır; gerçek tek seferlik harcama `DW-C-FOOD-SPEND` işinde bağlanacaktır
+- Beklenen Food: `0`; kabul edilen `3` survivor için toplam `3 Food` aynı Dawn'da yalnız bir kez düşer
 
 ## HUD Gosterimi
 - TMP_Text field: `PopulationText`

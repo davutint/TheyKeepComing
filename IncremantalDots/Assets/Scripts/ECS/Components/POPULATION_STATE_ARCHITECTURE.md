@@ -47,7 +47,8 @@ accepted = min(requestedDawnCount, totalBeds - currentPopulation, Food / FoodCos
 - Owner onaylı V1 değeri `FoodCostPerArrival = 1`.
 - Food yetersizse mevcut nüfus azalmaz; yalnız yeni arrival sayısı düşer.
 - `MobilePopulationAllocation`, son istenen/kabul edilen sayıyı ve kabul edilenler için gereken Food tutarını saklar.
-- Bu paket Food'u henüz harcamaz. Tek seferlik gerçek resource transaction'ı tracker'daki `DW-C-FOOD-SPEND` işidir.
+- Kabul edilen population artışıyla aynı transaction içinde `RequiredFood`, `ResourceData.Food` stokundan yalnız bir kez düşülür.
+- `LastPopulationGrowthCycle/LastPopulationGrowthWave` marker'ları aynı Dawn veya Continue sonrasında transaction'ın tekrar uygulanmasını engeller.
 
 ## Nufus Modeli
 ```
@@ -59,7 +60,7 @@ Tum insanlar = TEK HAVUZ
 
 ## V1 Food Sözleşmesi
 
-V1 castle loop'ta population pasif Food tüketmez; açlık, göç, population death ve üretim cezası yoktur. Food yalnız yeni Dawn survivor'ı kabul edilirken kişi başına bir kez kullanılacaktır. Legacy/non-mobile alan ve bina tüketim verileri uyumluluk için component'larda kalır, fakat mobile population sistemi bunları pasif nüfus giderine çevirmez.
+V1 castle loop'ta population pasif Food tüketmez; açlık, göç, population death ve üretim cezası yoktur. Food yalnız yeni Dawn survivor'ı kabul edilirken kişi başına bir kez düşülür. Legacy/non-mobile alan ve bina tüketim verileri uyumluluk için component'larda kalır, fakat mobile population sistemi bunları pasif nüfus giderine çevirmez.
 
 ## Kapasite Hesaplama
 

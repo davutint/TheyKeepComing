@@ -127,7 +127,7 @@ namespace DeadWalls.Tests
         }
 
         [UnityTest]
-        public IEnumerator DawnArrivalBudget_LimitsGrowthByBedsAndFoodWithoutSpendingFoodYet()
+        public IEnumerator DawnArrivalTransaction_SpendsFoodOnceForAcceptedSurvivors()
         {
             EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             using EntityQuery mobileQuery = entityManager.CreateEntityQuery(
@@ -192,8 +192,8 @@ namespace DeadWalls.Tests
             Assert.That(population.Total, Is.EqualTo(63));
             Assert.That(population.Capacity, Is.EqualTo(65));
             Assert.That(population.BaseCapacity, Is.EqualTo(65));
-            Assert.That(resources.Food, Is.EqualTo(3),
-                "Food harcamasi bir sonraki tracker isine kadar bu pakette uygulanmamali.");
+            Assert.That(resources.Food, Is.Zero,
+                "Kabul edilen 3 survivor icin 3 Food ayni Dawn'da yalniz bir kez harcanmali.");
             Assert.That(allocation.LastPopulationGrowthCycle, Is.EqualTo(1));
             Assert.That(allocation.LastArrivalRequestedCount, Is.EqualTo(15));
             Assert.That(allocation.LastArrivalAcceptedCount, Is.EqualTo(3));

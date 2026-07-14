@@ -32,6 +32,8 @@ Kaydedilen state, oyuncunun aynı ana dönmesini etkileyen runtime verisidir:
 
 Definition asset'lerden güvenle yeniden üretilebilen tech aggregate'leri ve archer formation pozisyonları kaydedilmez. Tech seviyelerinden aggregate/reveal/spell state'i yeniden kurulur; archer formation mevcut deterministik yerleşim algoritmasından tekrar üretilir.
 
+Dawn survivor transaction'ında düşülen Food, resource snapshot'ının parçasıdır. Aynı transaction'ın `LastPopulationGrowthCycle/LastPopulationGrowthWave` marker'ı da allocation snapshot'ında saklandığı için Continue aynı Dawn'ı yeniden oynatıp ikinci kez population veya Food değişikliği yapmaz.
+
 ## Determinizm
 
 `WaveStateData.SpawnRandomState` spawn RNG stream'inin sahibidir. `WaveSpawnSystem` her batch öncesi bu state'ten `Unity.Mathematics.Random` kurar ve batch sonunda güncel state'i tekrar component'e yazar. Böylece Continue sonrasındaki spawn konumları kapanmadan önceki stream'den devam eder.

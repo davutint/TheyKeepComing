@@ -14,6 +14,7 @@
 - Continuous siege aciksa her tamamlanan 60 saniyelik cycle basina bir kez Dawn arrival bütçesi uygular.
 - Legacy DayPrep akisinda her completed wave sonrasi `DayPrep` basinda aynı arrival bütçesini uygular.
 - İstenen arrival'ı boş yatak ve mevcut Food / kişi maliyetiyle sınırlar; requested/accepted/required Food sonucunu allocation state'e yazar.
+- Kabul edilen survivor'ların toplam Food maliyetini population artışıyla aynı transaction içinde stoktan bir kez düşer.
 - `MobileEconomyEventState` icin nadir event roll eder ve aktif production bonusunu rate'lere uygular.
 
 ## Akis
@@ -27,7 +28,8 @@ Stress mode'da calismaz. Legacy/non-mobile sahnelerde `MobileCastleCombatConfig`
 - Dawn kabul formülü `min(requested, totalBeds - currentPopulation, Food / FoodCostPerArrival)` şeklindedir.
 - Aktif V1 tuning'i requested `15`, kişi başı Food `1` değeridir.
 - Food yetersizliğinde mevcut population düşmez; yalnız yeni arrival sınırlanır.
-- Bu paket gereken Food'u hesaplar ancak harcamaz; gerçek tek seferlik transaction sonraki tracker işidir.
+- `RequiredFood = accepted × FoodCostPerArrival` aynı işlemde `ResourceData.Food` stokundan düşülür.
+- Persistent `LastPopulationGrowthCycle/LastPopulationGrowthWave` marker'ları aynı Dawn'da ve exact Continue sonrasında çift population/harcama yapılmasını engeller.
 - Target ratio toplami `10.000` basis point'tir.
 - İlk runtime gözlemi mevcut population'i baseline kabul eder; önceden var olan idle nüfusu dağıtmaz.
 - Sonraki pozitif population farkı `WorkerAllocationUtility` ile Wood/Stone/Iron/Food hedeflerine atanır.
@@ -48,7 +50,6 @@ V1 eventleri geneldir: resource stash, quarry crew, refugee cart. UI metinleri `
 
 ## Bu Alt Pakette Bilerek Yapilmayanlar
 
-- Kabul edilen survivor için `ResourceData.Food` tek seferlik transaction'ı `DW-C-FOOD-SPEND` işinde yapılacaktır.
 - Survivor'ların sağdan yürüyerek kaleye geliş görseli ayrı tracker işidir.
 - Mevcut worker'ları target ratio değişince zorla retrain/redistribute etmez.
 - Worker world representation actual count'tan ayridir; `WorkerVisualRepresentationUtility` Low/Medium/High egriyle resource basina en fazla `32` temsili visual uretir.
@@ -59,5 +60,5 @@ V1 eventleri geneldir: resource stash, quarry crew, refugee cart. UI metinleri `
 - Saf allocation matematiği ve migration: EditMode.
 - `MobilePopulationArrivalUtilityTests`: istek, yatak, Food ve int sınırları için saf EditMode bütçe sözleşmesi.
 - Yeni population, cap ve idle overflow: gerçek `NewGameScene` PlayMode.
-- `WorkerAllocationPlayModeTests.DawnArrivalBudget_LimitsGrowthByBedsAndFoodWithoutSpendingFoodYet`: Food-limitli kabul, gerçek capacity aynası ve henüz harcanmayan Food doğrulaması.
-- Actual worker + target ratio save/Continue: `ExactRunContinuePlayModeTests`.
+- `WorkerAllocationPlayModeTests.DawnArrivalTransaction_SpendsFoodOnceForAcceptedSurvivors`: Food-limitli kabul, gerçek capacity aynası ve iki frame boyunca tek transaction doğrulaması.
+- Actual worker, target ratio, Food ve persistent growth marker save/Continue: `ExactRunContinuePlayModeTests`.
