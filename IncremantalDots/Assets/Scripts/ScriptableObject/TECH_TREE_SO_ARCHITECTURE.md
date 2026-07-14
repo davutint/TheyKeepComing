@@ -1,5 +1,9 @@
 # Tech Tree SO - Architecture
 
+> Bu dosya mevcut legacy sabit tech runtime'ini anlatir. Hedef Castle Heart source/run
+> contract'i ve cutover siniri icin `HEART_DATA_MODEL_ARCHITECTURE.md` ile
+> `HEART_DATA_MODEL_MIGRATION_PLAN.md` otoritedir.
+
 ## Amac
 
 Mobile castle modu icin SO-driven, dinamik genisleyen tech tree veri katmani.

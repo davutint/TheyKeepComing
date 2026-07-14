@@ -43,6 +43,7 @@ namespace DeadWalls.Tests
                 ArrowAccumulator = 0.75f,
                 ArrowCapacityLevel = 3,
                 ArrowEfficiencyLevel = 4,
+                GraveEssence = 9_876_543_210L,
                 WoodBuildingCapacityLevel = 3,
                 WoodBuildingEfficiencyLevel = 4,
                 StoneBuildingCapacityLevel = 5,
@@ -117,6 +118,7 @@ namespace DeadWalls.Tests
             Assert.That(restored.ArrowCurrent, Is.EqualTo(456));
             Assert.That(restored.ArrowCapacityLevel, Is.EqualTo(3));
             Assert.That(restored.ArrowEfficiencyLevel, Is.EqualTo(4));
+            Assert.That(restored.GraveEssence, Is.EqualTo(9_876_543_210L));
             Assert.That(restored.WoodBuildingCapacityLevel, Is.EqualTo(3));
             Assert.That(restored.WoodBuildingEfficiencyLevel, Is.EqualTo(4));
             Assert.That(restored.StoneBuildingCapacityLevel, Is.EqualTo(5));
@@ -223,6 +225,7 @@ namespace DeadWalls.Tests
                     Is.EqualTo(ArcherFormationUtility.CurrentVersion));
                 Assert.That(restored.ArrowCapacityLevel, Is.Zero);
                 Assert.That(restored.ArrowEfficiencyLevel, Is.Zero);
+                Assert.That(restored.GraveEssence, Is.Zero);
             }
             finally
             {
@@ -342,6 +345,73 @@ namespace DeadWalls.Tests
                     File.WriteAllBytes(path, original);
                 else if (File.Exists(path))
                     File.Delete(path);
+            }
+        }
+
+        [Test]
+        public void TryLoad_Version8Snapshot_MigratesToZeroGraveEssence()
+        {
+            string path = Path.Combine(Application.persistentDataPath, "run_save.json");
+            byte[] original = File.Exists(path) ? File.ReadAllBytes(path) : null;
+            var legacy = new RunSaveState
+            {
+                Version = 8,
+                RunId = "run_v8_heart_migration_" + Guid.NewGuid().ToString("N"),
+                GraveEssence = 999
+            };
+
+            try
+            {
+                File.WriteAllText(path, JsonUtility.ToJson(legacy));
+
+                RunSaveState restored = RunPersistence.TryLoad();
+
+                Assert.That(restored, Is.Not.Null);
+                Assert.That(restored.Version, Is.EqualTo(RunSaveState.CurrentVersion));
+                Assert.That(restored.GraveEssence, Is.Zero);
+            }
+            finally
+            {
+                if (original != null)
+                    File.WriteAllBytes(path, original);
+                else if (File.Exists(path))
+                    File.Delete(path);
+            }
+        }
+
+        [Test]
+        public void CommitDeath_DeletesRunSnapshotContainingGraveEssence()
+        {
+            string runPath = Path.Combine(Application.persistentDataPath, "run_save.json");
+            string receiptPath = Path.Combine(Application.persistentDataPath, "run_death_receipt.json");
+            byte[] originalRun = File.Exists(runPath) ? File.ReadAllBytes(runPath) : null;
+            byte[] originalReceipt = File.Exists(receiptPath) ? File.ReadAllBytes(receiptPath) : null;
+            string runId = "run_dead_heart_" + Guid.NewGuid().ToString("N");
+
+            try
+            {
+                Assert.That(RunPersistence.Save(new RunSaveState
+                {
+                    RunId = runId,
+                    GraveEssence = 42_000
+                }), Is.True);
+
+                RunPersistence.CommitDeath(new RunDeathReceipt { RunId = runId });
+
+                Assert.That(File.Exists(runPath), Is.False);
+                Assert.That(RunPersistence.TryLoad(), Is.Null);
+            }
+            finally
+            {
+                if (originalRun != null)
+                    File.WriteAllBytes(runPath, originalRun);
+                else if (File.Exists(runPath))
+                    File.Delete(runPath);
+
+                if (originalReceipt != null)
+                    File.WriteAllBytes(receiptPath, originalReceipt);
+                else if (File.Exists(receiptPath))
+                    File.Delete(receiptPath);
             }
         }
 

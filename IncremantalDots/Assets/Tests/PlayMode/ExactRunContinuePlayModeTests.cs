@@ -176,6 +176,40 @@ namespace DeadWalls.Tests
         }
 
         [UnityTest]
+        public IEnumerator GraveEssence_UsesHeartTransactionPersistsOnContinueAndResetsWithRun()
+        {
+            var gameManager = GameManager.Instance;
+            bool runtimeReady = false;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                {
+                    runtimeReady = true;
+                    break;
+                }
+                yield return null;
+            }
+            Assert.That(runtimeReady, Is.True,
+                "GameManager/SubScene 300 frame icinde Grave Essence testi icin hazir olmadi.");
+
+            Assert.That(gameManager.GraveEssenceAmount, Is.Zero);
+            Assert.That(gameManager.GrantGraveEssence(5_000_000_000L), Is.True);
+            Assert.That(gameManager.TrySpendGraveEssenceAtHeart(0), Is.False);
+            Assert.That(gameManager.TrySpendGraveEssenceAtHeart(6_000_000_000L), Is.False);
+            Assert.That(gameManager.TrySpendGraveEssenceAtHeart(1_250_000_000L), Is.True);
+            Assert.That(gameManager.GraveEssenceAmount, Is.EqualTo(3_750_000_000L));
+            Assert.That(gameManager.SaveRunSnapshot(), Is.True);
+
+            Assert.That(gameManager.GrantGraveEssence(125), Is.True);
+            Assert.That(gameManager.TryRestoreRunFromCheckpoint(), Is.True);
+            Assert.That(gameManager.GraveEssenceAmount, Is.EqualTo(3_750_000_000L));
+
+            gameManager.RestartGame();
+            Assert.That(gameManager.GraveEssenceAmount, Is.Zero);
+            yield return null;
+        }
+
+        [UnityTest]
         public IEnumerator BedCapacityPurchase_SpendsWoodAndPersistsAcrossExactContinue()
         {
             var gameManager = GameManager.Instance;

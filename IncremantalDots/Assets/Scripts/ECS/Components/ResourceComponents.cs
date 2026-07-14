@@ -59,4 +59,13 @@ namespace DeadWalls
         // Eski save semasi icin korunur; V1 castle loop'ta her zaman 0'dir.
         public float Accumulator;
     }
+
+    /// <summary>
+    /// Yalniz mevcut run icinde yasayan Castle Heart para birimi.
+    /// Meta state'e yazilmaz; Game Over run save'ini sildiginde bu deger de silinir.
+    /// </summary>
+    public struct GraveEssence : IComponentData
+    {
+        public long Current;
+    }
 }

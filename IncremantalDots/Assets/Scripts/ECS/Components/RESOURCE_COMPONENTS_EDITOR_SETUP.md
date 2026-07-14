@@ -33,6 +33,11 @@ HUDController Inspector'inda "Resources" header'i altinda 4 TMP_Text referansi a
 - **IronText** — "Demir: 20 (+2.0/dk)"
 - **FoodText** — "Yemek: 100 (+4.0/dk)"
 
+## Grave Essence
+
+`GameStateAuthoring.InitialGraveEssence` normal V1 run icin `0` kalir. Bu paket HUD
+binding'i eklemez; bakiye Castle Heart paneline E5'te baglanacaktir.
+
 ## Hizli Test
 1. TestWoodProdRate=60 yap → Wood her saniye +1 artmali
 2. TestWoodConsRate=120 yap → Wood her saniye -2 azalmali, 0'da durmali

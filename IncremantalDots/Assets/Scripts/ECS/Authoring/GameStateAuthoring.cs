@@ -49,6 +49,9 @@ namespace DeadWalls
         [Header("Arrow Supply — Baslangic")]
         public int InitialArrows = 50;
 
+        [Header("Castle Heart — Baslangic")]
+        public long InitialGraveEssence = 0;
+
         public class Baker : Baker<GameStateAuthoring>
         {
             public override void Bake(GameStateAuthoring authoring)
@@ -134,6 +137,13 @@ namespace DeadWalls
                     CapacityLevel = 0,
                     EfficiencyLevel = 0,
                     Accumulator = 0f
+                });
+
+                AddComponent(entity, new GraveEssence
+                {
+                    Current = authoring.InitialGraveEssence < 0
+                        ? 0
+                        : authoring.InitialGraveEssence
                 });
             }
         }

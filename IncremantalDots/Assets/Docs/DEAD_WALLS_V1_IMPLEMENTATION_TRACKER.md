@@ -5,7 +5,7 @@
 > **Tracker sürümü:** 2.0  
 > **Son tam kapsam denetimi:** 2026-07-12  
 > **Aktif paket:** Package E - Castle Heart
-> **Aktif iş:** `DW-E-DATA` - Heart Data Model + Generated Run Graph State
+> **Aktif iş:** `DW-E-GRAPH` - Deterministic Castle Heart Graph Generator
 
 ---
 
@@ -118,7 +118,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 | Alan | Mevcut gerçek | Sonuç |
 |---|---|---|
-| Aktif scene | `Assets/Scenes/NewGameScene.unity`, Unity MCP'de loaded ve clean | Kanıtlandı |
+| Aktif scene | `Assets/Scenes/NewGameScene.unity` Unity MCP'de loaded; bu paket scene kaydetmedi, dış değişiklik modali in-memory hali korumak için Ignore edildi | Disk/in-memory scene uzlaşması sonraki scene yazımından önce kontrol edilmeli |
 | Kamera | Ortografik, size `8`, gameplay pan/zoom controller yok; `CameraShaker` var | Temel sabit kamera uyumlu |
 | Oyun hızı | Oyuncu kontrollü x2/x4 veya offline progress owner'ı bulunmadı | Blueprint ile uyumlu; regression gerekli |
 | Battlefield | Kale/duvar solda, spawn sağdaki `SpawnLineX` bandından geliyor | Temel kompozisyon uyumlu |
@@ -128,24 +128,24 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Moat | Runtime flag kapalı; slow `1`, damage `0`; tech/meta catalog bağlantıları dormant | Uyumlu |
 | Defense | Damage/Game Over aktif ve testli olarak tek Wall'a çekildi | `[x]` |
 | Normal repair | Stone-only ve yalnız Day/Dusk | `[x]` |
-| Save | Exact same-moment Continue; schema v8, minimum v3; purchased bed, worker bina yatırımı, Archer Formation V1 ve finite Arrow yatırım state'i exact | `[x]` |
+| Save | Exact same-moment Continue; schema v9, minimum v3; purchased bed, worker bina yatırımı, Archer Formation V1, finite Arrow yatırımı ve Grave Essence exact | `[x]` |
 | Economy | Worker üretimi, bed alımı ve dört hazır binanın capacity/efficiency yatırımları var; bed ve bina fiyat eğrileri `DefaultDifficulty.asset`/Difficulty Tuner üzerinden baked runtime tuning'e bağlı; V1 ana kaynaklarında pasif consumption yok | `[x]` |
 | Population | House bed state + Wood purchase API + exact save var; Dawn isteği boş yatak ve Food/kişi bütçesiyle sınırlı, gerçek accepted count uygulanıyor, Food bir kez düşülüyor ve en fazla 15 temsili survivor sağdan Wall arkasına yürüyor | `[x]` |
 | Workers | Kalıcı target ratio + actual/cap/idle state, +1/+10/+100/direct input, bağımsız bina capacity/efficiency seviyeleri, yeni nüfus auto-allocation, exact save, Low/Medium/High density ve allocation-senkronlu animation/cargo/lantern/delivery feedback var | `[x]` |
 | Council | Curated/deterministic composer ve kart UI var; schedule chance/pity/cooldown | Package F altyapısı var, schedule yanlış |
 | Archers | Basic/Rapid/Frost, instant buy, incremental type maliyeti, yerinde retrain, version'lı 40x25 formation, scalable target load ve pooled projectile lifetime var | `[x]` Combat temeli; upgrade owner'ı Package E |
 | Archer cap | `ArcherCapacityUtility` Basic/Rapid/Frost toplamını `1000` ile sınırlar; buy, merkezi spawn, Council, meta, restore ve legacy Barracks aynı guard'ı kullanır | `[x]` |
-| Placement | Formation V1 asset'iyle sabit 40 `outside` tile x 25 seeded diamond nokta; layer-fill sıra, 1000 gizmo ve v8 Continue testli | `[x]` |
+| Placement | Formation V1 asset'iyle sabit 40 `outside` tile x 25 seeded diamond nokta; layer-fill sıra, 1000 gizmo ve v9 Continue testli | `[x]` |
 | Targeting | Persistent coarse spatial query + incoming damage reservation Burst job'ları aktif | `[x]` |
-| Ammo | Finite stok; gerçek projectile başına `-1`; Wood ile anlık +1/+5/Buy Max refill; Wood+Iron CAP/EFF yatırımı; Current/Capacity HUD ve exact save v8 | `[x]` |
-| Tech/Heart | Sabit SO catalog + reveal graph + ana kaynak maliyeti | Generated Heart değil |
+| Ammo | Finite stok; gerçek projectile başına `-1`; Wood ile anlık +1/+5/Buy Max refill; Wood+Iron CAP/EFF yatırımı; Current/Capacity HUD ve exact save v9 | `[x]` |
+| Tech/Heart | Yeni `HeartNodeDefinitionSO` + `GeneratedRunGraph` contract'ı ve run-only Grave Essence/save v9 var; aktif UI/satın alma halen sabit legacy SO catalog + ana kaynak maliyeti | E1 `[x]`; generator/cutover eksik |
 | Fireball | Dünya hedefli projectile/AoE ve cooldown çalışması mevcut | Korunacak temel |
 | Rally | Wood/Food maliyetli prep purchase | Cooldown-only ability olmalı |
 | Emergency Repair | Ayrı ability yok | Eksik |
 | Meta | Ayrı JSON ve Game Over shop var; `StartingTechLevel` aktif | Kısmi uyum |
 | HUD | CyclePanel, DAY/DUSK/NIGHT ve Horde Pressure mevcut; tek Wall runtime gizleme var | Package I polish gerekli |
 | Tutorial | Aktif tutorial/onboarding sistemi bulunmadı | Package I eksik |
-| Testler | EditMode `109/109`; PlayMode `28 pass + 1 explicit profiler skip`; Standalone Player-targeted 10K `1/1` | Güncel değişiklikler full paketle testli |
+| Testler | EditMode `119/119`; PlayMode `30/30`; Standalone Player-targeted 10K `1/1` | Güncel değişiklikler full paketle testli |
 | Telemetry | Spawn budget demanded/spawned/backlog telemetry mevcut; tam Blueprint event owner'ı eksik | Kısmi |
 
 ---
@@ -543,13 +543,13 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 ### E1 - Data model ve catalog
 
-- [ ] `HeartNodeDefinition` contract oluştur: id, tags, effects, rarity, depth range, repeatable, base cost, cost growth, conflicts.
-- [ ] Node'ları `Unlock`, `Repeatable`, `Evolution`, `Keystone` türleriyle açıkça sınıflandır.
-- [ ] Mevcut `TechNodeDefinitionSO` içeriklerini yeni contract'a migrate etme planı çıkar.
-- [ ] `GeneratedRunGraph` contract oluştur: seed, graph version, node ids, edges, hidden/revealed, levels, locks.
-- [ ] Source asset'lerin runtime state taşımamasını garanti et.
-- [ ] Grave Essence run resource/state ve tek Heart spending owner'ını oluştur.
-- [ ] Grave Essence'ın ölümde silinmesini run save matrisiyle güvenceye al.
+- [x] `HeartNodeDefinition` contract oluştur: id, tags, effects, rarity, depth range, repeatable, base cost, cost growth, conflicts.
+- [x] Node'ları `Unlock`, `Repeatable`, `Evolution`, `Keystone` türleriyle açıkça sınıflandır.
+- [x] Mevcut `TechNodeDefinitionSO` içeriklerini yeni contract'a migrate etme planı çıkar.
+- [x] `GeneratedRunGraph` contract oluştur: seed, graph version, node ids, edges, hidden/revealed, levels, locks.
+- [x] Source asset'lerin runtime state taşımamasını garanti et.
+- [x] Grave Essence run resource/state ve tek Heart spending owner'ını oluştur.
+- [x] Grave Essence'ın ölümde silinmesini run save matrisiyle güvenceye al.
 
 ### E2 - Graph üretimi
 
@@ -857,8 +857,8 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 - [x] `EnemyDefinition`: id, prefab, base stats, pool prewarm/expand, spawn weight.
 - [ ] `RunDifficultyProfile`: BaseSpawn curve, phase multipliers, active cap, backlog policy.
-- [ ] `HeartNodeDefinition`: tags, effects, rarity, depth, repeatable, cost growth, conflicts.
-- [ ] `GeneratedRunGraph`: seed/version, node ids, edges, hidden/revealed, levels, locks.
+- [x] `HeartNodeDefinition`: tags, effects, rarity, depth, repeatable, cost growth, conflicts.
+- [x] `GeneratedRunGraph`: seed/version, node ids, edges, hidden/revealed, levels, locks.
 - [ ] `WorkerAllocation`: four target ratios, actual counts, caps, idle population.
 - [ ] `ArcherFormation`: 40 cells, 25 local points, algorithm version.
 - [ ] `ActiveAbilityState`: unlocks, cooldown remaining, tuning multipliers.
@@ -869,7 +869,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 - [ ] Mevcut owner'lara paralel ikinci runtime sistem kurma; source owner'ı dönüştür.
 - [ ] `MobileCastle*` isimlerini yalnız estetik için toplu rename etme.
-- [ ] Definition asset ile runtime state'i birbirine karıştırma.
+- [x] Definition asset ile runtime state'i birbirine karıştırma.
 - [ ] Dormant legacy code'un active V1 owner'ına bağlanmasını açık review olmadan yapma.
 
 ---
@@ -938,6 +938,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Placement | 40 tile'da 1.000 archer | Her tile 25 stable point | `[x]` |
 | Targeting | Yoğun overkill | Incoming damage hedefleri dağıtır | `[x]` |
 | Heart | Invalid generated graph | Reroll/fallback veya açık hata | `[ ]` |
+| Heart | Source/runtime state + Grave Essence lifecycle | Asset runtime state taşımaz; Continue exact, Restart/ölüm siler | `[x]` |
 | Heart | Guarantee reachability | Rapid/Frost/Fireball reachable | `[ ]` |
 | Heart | Full pause | Cycle/spawn/worker/cooldown durur | `[ ]` |
 | Council | Day 3 + arada emergency | Regular schedule kaymaz | `[ ]` |
@@ -950,8 +951,8 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 ### Mevcut test envanteri
 
-- `[x]` EditMode: `109/109`; finite Arrow paket/Buy Max/CAP/EFF matematiği, arrow pool prewarm/expand/rent/return/reuse, targeting cell/range, lethal reservation ve stable tie-break dahil contract, compact save/migration v3-v8, Formation V1, common archer cap, economy, worker, cycle, quantity-only, backlog, Moat isolation ve enemy pool kapsamı.
-- `[x]` PlayMode: normal set `28 pass + 1 explicit profiler skip`; Arrow 0/refill/Rapid tüketimi, gerçek `NewGameScene`, pooled arrow lifetime/reuse, Basic/Rapid/Frost ortak target policy + lethal load dağıtımı, finite stokla 1K archer x 10K enemy, Formation V1, exact Continue, archer cap/retrain, economy/worker, Wall, cycle, backlog ve pool/Fireball kapsamı. Explicit raw profiler önceki targeted turda `1/1` geçti.
+- `[x]` EditMode: `119/119`; Heart definition/runtime ayrımı, graph JSON contract'ı, Grave Essence run/meta sınırı ve v8->v9 migration dahil; finite Arrow, pool, targeting, Formation V1, common archer cap, economy, worker, cycle, quantity-only, backlog, Moat isolation ve enemy pool kapsamı.
+- `[x]` PlayMode: `30/30`; Grave Essence Heart transaction/Continue/Restart dahil; Arrow 0/refill/Rapid tüketimi, gerçek `NewGameScene`, pooled arrow lifetime/reuse, ortak target policy, finite stokla 1K archer x 10K enemy, Formation V1, exact Continue, archer cap/retrain, economy/worker, Wall, cycle, backlog ve pool/Fireball kapsamı.
 - `[~]` Council schedule/guardrail ve Player/hardware frame pacing kabulü ilgili paket/kapıları bekliyor; Package D combat + ammo kapsamı tamamlandı.
 
 ---
@@ -1118,3 +1119,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-14 | `DW-D-TARGETING` spatial nearest-target + incoming load | `ArcherShootSystem` persistent `2.0` cell target grid'ini Burst-parallel kuruyor; tek deterministic Burst shoot job yaşayan/death-state olmayan nearest unsaturated target'ı seçiyor. Uçuşta ve aynı frame yaratılan ok damage'i target HP'ye rezerve ediliyor; Basic/Rapid/Frost aynı policy'de, pool generation mismatch retarget yapmıyor. Gerçek Formation V1 1K archer + pooled 10K enemy birleşik ürün testi geçti | Targeted EditMode 4/4; targeted targeting PlayMode 1/1; 1K×10K PlayMode 1/1, Editor P95 `9,66 ms`; full EditMode 102/102; full PlayMode 26/26; Unity console 0 error |
 | 2026-07-14 | `DW-D-PROJECTILE` arrow pool + Burst-safe lifetime | Ok atışındaki per-projectile instantiate/destroy kaldırıldı; enableable `ArrowTag`, `1024` prewarm, `256` batch expand, deferred return ve `5s` Burst lifetime kuruldu. İsabet/timeout/invalid target/generation mismatch tek pool return yolunda, Continue kalan lifetime'ı exact restore ediyor ve restart aktif okları rezerve döndürüyor | Unity compile: 0 error; targeted EditMode 2/2; targeted projectile/targeting/stale-generation PlayMode 3/3; 1K×10K pool telemetry `1536 total / 3000 rent / 2895 return`, P95 `12,50 ms`; full EditMode 103/103; full PlayMode 26 pass + 1 explicit skip; explicit profiler 1/1; Unity console 0 error |
 | 2026-07-14 | `DW-D-AMMO` finite Arrow supply + instant refill | Unlimited bypass kaldırıldı; başarılı pooled projectile tam `1 Arrow` tüketiyor, stok `0` iken atış duruyor. Wood ile sabit oranlı +1/+5/Buy Max refill, kısmi dolumda israf etmeyen fiyat, Wood+Iron CAP/EFF yatırımları, profile tuning, compact tek satır HUD ve exact save v8 kuruldu. Legacy Fletcher/queue aktif akış dışında kaldı; 10K fixture finite stokla güncellendi | Unity compile: 0 error; targeted EditMode 16/16; targeted ammo/targeting PlayMode 3/3; 10K targeted 1/1; full EditMode 109/109; full PlayMode 28 pass + 1 explicit profiler skip; Game View QA; Unity console 0 error |
+| 2026-07-14 | `DW-E-DATA` Heart data model + run-only Grave Essence | `HeartNodeDefinitionSO` dört Blueprint node tipi, tags/effects/rarity/depth/cost/conflict verisini source-only taşır; `GeneratedRunGraph` seed/version/node/edge/reveal/level/lock state'ini asset referanssız tanımlar. Grave Essence ayrı ECS singleton, tek Heart harcama kapısı ve exact save v9'a bağlandı; v8 migration `0`, Restart ve ölüm silme matrisi testlendi. Legacy tech graph/purchase bu pakette değiştirilmedi | Unity compile: 0 error; targeted EditMode 20/20; targeted PlayMode 1/1; full EditMode 119/119; full PlayMode 30/30; Unity console 0 error |

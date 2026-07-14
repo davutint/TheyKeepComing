@@ -13,7 +13,7 @@ namespace DeadWalls
     [Serializable]
     public class RunSaveState
     {
-        public const int CurrentVersion = 8;
+        public const int CurrentVersion = 9;
         public const int MinimumSupportedVersion = 3;
 
         public int Version = CurrentVersion;
@@ -78,6 +78,7 @@ namespace DeadWalls
         public float ArrowAccumulator;
         public int ArrowCapacityLevel;
         public int ArrowEfficiencyLevel;
+        public long GraveEssence;
 
         // Nufus + isci dagilimi
         public int PopulationTotal;
@@ -360,6 +361,14 @@ namespace DeadWalls
                 state.ArrowCapacityLevel = 0;
                 state.ArrowEfficiencyLevel = 0;
                 state.Version = 8;
+            }
+
+            if (state.Version == 8)
+            {
+                // v8'de Grave Essence run state'i yoktu. Yeni currency meta'dan
+                // beslenmez; eski exact snapshot temiz 0 bakiye ile devam eder.
+                state.GraveEssence = 0;
+                state.Version = 9;
             }
         }
 

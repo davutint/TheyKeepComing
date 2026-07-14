@@ -45,6 +45,7 @@ NewGameScene icin setup tool `GameStateAuthoring` kaynaklarini mobile economy'ye
 - Initial Wood/Stone/Iron/Food: `150 / 80 / 45 / 150`
 - Passive income Wood/Stone/Iron/Food: `90 / 50 / 30 / 75` per minute
 - Initial Arrows: `200`
+- Initial Grave Essence: `0` (run-only; Heart panel/drop entegrasyonu sonraki paket)
 
 Arrow stoku finite'tir. Refill/capacity/efficiency kurulumu ve HUD binding'leri icin
 `Assets/Scripts/ECS/Systems/ARROW_AMMO_EDITOR_SETUP.md` izlenir; Fletcher veya

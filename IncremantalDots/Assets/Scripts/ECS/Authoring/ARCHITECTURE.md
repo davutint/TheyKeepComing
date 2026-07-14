@@ -28,8 +28,8 @@ Baker class'lari authoring degerlerini okuyarak entity'lere IComponentData ekler
 
 ### GameStateAuthoring.cs
 - Oyun durumu singleton entity'si olusturur
-- GameStateData, WaveStateData, resource, population ve ArrowSupply singleton verilerini bake eder
-- Initial wave sayisi, HP, damage, spawn interval ve initial arrow degerleri Inspector'dan ayarlanabilir
+- GameStateData, WaveStateData, resource, population, ArrowSupply ve run-only GraveEssence singleton verilerini bake eder
+- Initial wave sayisi, HP, damage, spawn interval, initial arrow ve test Grave Essence degerleri Inspector'dan ayarlanabilir; normal run Essence `0` baslar
 - NewGameScene setup tool mobile default kaynaklari yazar: Wood `150`, Stone `80`, Iron `45`, Food `150`, Arrows `200`
 - Mobile passive income degerleri ayni authoring uzerinden bake edilir: Wood `+90/min`, Stone `+50/min`, Iron `+30/min`, Food `+75/min`
 

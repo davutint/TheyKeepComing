@@ -39,6 +39,13 @@ aninda uygular. `ArcherShootSystem` yalniz pool rent'i basarili projectile icin
 `Current -= 1` yapar. `Current <= 0` ise ok atilamaz.
 GameStateAuthoring Baker'i tarafindan eklenir — `InitialArrows` degeri baslangic stoku olarak yazilir.
 
+### GraveEssence (IComponentData — Castle Heart E1)
+- `Current` (`long`) — Yalniz mevcut run icindeki Castle Heart bakiyesi
+- `ResourceData`'dan ayri tutulur; Wood/Stone/Iron/Food transaction'ina girmez
+- Yalniz `GameManager.TrySpendGraveEssenceAtHeart()` harcama kapisindan azalir
+- Exact save v9'da korunur; Restart ve Game Over sonrasi `0` olur
+- Meta progression state'ine yazilmaz
+
 ## Veri Akisi
 ```
 ResourceProductionRate ─┐
@@ -59,3 +66,4 @@ GameManager + ArrowEconomyUtility → Wood refill / Wood+Iron yatirimi → Arrow
 Tumu GameStateAuthoring Baker'i tarafindan ayni entity'ye eklenir.
 Ek entity veya query olusturmaya gerek yok — `SystemAPI.GetSingletonRW<ResourceData>()` ile erisim.
 ArrowSupply da ayni entity uzerinde — `SystemAPI.GetSingletonRW<ArrowSupply>()` ile erisim.
+GraveEssence da ayni entity uzerindedir; kazanc kaynagi sonraki Heart/runtime paketine aittir.

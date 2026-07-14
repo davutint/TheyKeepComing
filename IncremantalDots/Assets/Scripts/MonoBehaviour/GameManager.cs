@@ -144,6 +144,7 @@ namespace DeadWalls
         public EconomyFocusType EconomyFocus { get; private set; } = EconomyFocusType.Balanced;
         public PopulationState Population { get; private set; }
         public ArrowSupply ArrowSupply { get; private set; }
+        public GraveEssence HeartEssence { get; private set; }
         public WaveClearRewardData WaveClearReward { get; private set; }
         public CastleYardPrepState CastleYardPrep { get; private set; }
         public ContinuousSiegeCycleData ContinuousSiegeCycle { get; private set; }
@@ -305,6 +306,7 @@ namespace DeadWalls
             EconomyFocus = ReadEconomyFocusState();
             Population = _entityManager.GetComponentData<PopulationState>(_gameStateEntity);
             ArrowSupply = _entityManager.GetComponentData<ArrowSupply>(_gameStateEntity);
+            HeartEssence = _entityManager.GetComponentData<GraveEssence>(_gameStateEntity);
             Wall = _entityManager.GetComponentData<WallSegment>(_castleEntity);
             if (BasicArcherCount + RapidArcherCount + FrostArcherCount != Population.Archers)
                 ReadArcherTypeCounts();
@@ -701,6 +703,82 @@ namespace DeadWalls
         {
             ArrowSupply supply = TryGetArrowSupply(out _, out var current) ? current : ArrowSupply;
             return ArrowEconomyUtility.GetCapacity(supply, GetEconomyPriceTuning());
+        }
+
+        public long GraveEssenceAmount
+        {
+            get
+            {
+                return TryGetGraveEssence(out _, out var current)
+                    ? current.Current
+                    : HeartEssence.Current;
+            }
+        }
+
+        public bool CanSpendGraveEssenceAtHeart(long cost)
+        {
+            return cost > 0
+                && _initialized
+                && !GameState.IsGameOver
+                && TryGetGraveEssence(out _, out var essence)
+                && essence.Current >= cost;
+        }
+
+        /// <summary>
+        /// Castle Heart node satin alimlarinin tek Grave Essence harcama kapisi.
+        /// E4 purchase pipeline bu metodu kullanacak; genel resource harcama yoluna baglanmaz.
+        /// </summary>
+        public bool TrySpendGraveEssenceAtHeart(long cost)
+        {
+            if (!CanSpendGraveEssenceAtHeart(cost)
+                || !TryGetGraveEssence(out Entity entity, out var essence))
+            {
+                return false;
+            }
+
+            essence.Current -= cost;
+            _entityManager.SetComponentData(entity, essence);
+            HeartEssence = essence;
+            OnGameStateChanged?.Invoke();
+            return true;
+        }
+
+        /// <summary>
+        /// Gelecekteki enemy drop owner'inin kullanacagi run-ici kazanc kapisi.
+        /// Bu paket herhangi bir drop kaynagi veya oran uydurmaz.
+        /// </summary>
+        public bool GrantGraveEssence(long amount)
+        {
+            if (amount <= 0
+                || !_initialized
+                || GameState.IsGameOver
+                || !TryGetGraveEssence(out Entity entity, out var essence))
+            {
+                return false;
+            }
+
+            long current = essence.Current < 0 ? 0 : essence.Current;
+            essence.Current = current > long.MaxValue - amount
+                ? long.MaxValue
+                : current + amount;
+            _entityManager.SetComponentData(entity, essence);
+            HeartEssence = essence;
+            OnGameStateChanged?.Invoke();
+            return true;
+        }
+
+        private bool TryGetGraveEssence(out Entity entity, out GraveEssence essence)
+        {
+            entity = _gameStateEntity;
+            essence = default;
+            if (!CanAccessEntityManager() || !_entityManager.Exists(entity)
+                || !_entityManager.HasComponent<GraveEssence>(entity))
+            {
+                return false;
+            }
+
+            essence = _entityManager.GetComponentData<GraveEssence>(entity);
+            return true;
         }
 
         public int GetArrowPackageSize()
@@ -2931,6 +3009,7 @@ namespace DeadWalls
                 ArrowAccumulator = ArrowSupply.Accumulator,
                 ArrowCapacityLevel = ArrowSupply.CapacityLevel,
                 ArrowEfficiencyLevel = ArrowSupply.EfficiencyLevel,
+                GraveEssence = GraveEssenceAmount,
                 PopulationTotal = Population.Total,
                 PopulationCapacity = Population.Capacity,
                 PopulationBaseCapacity = Population.BaseCapacity,
@@ -3223,6 +3302,11 @@ namespace DeadWalls
                 EfficiencyLevel = math.max(0, save.ArrowEfficiencyLevel),
                 Accumulator = save.ArrowAccumulator
             });
+            _entityManager.SetComponentData(_gameStateEntity, new GraveEssence
+            {
+                Current = save.GraveEssence < 0 ? 0 : save.GraveEssence
+            });
+            HeartEssence = _entityManager.GetComponentData<GraveEssence>(_gameStateEntity);
 
             if (_entityManager.HasComponent<EconomyFocusState>(mobileConfigEntity))
             {
@@ -5229,6 +5313,10 @@ namespace DeadWalls
                 ? ArrowEconomyUtility.GetCapacity(resetArrowSupply, GetEconomyPriceTuning())
                 : 50;
             _entityManager.SetComponentData(_gameStateEntity, resetArrowSupply);
+
+            // Grave Essence yalniz run state'idir; yeni kosu/restart her zaman sifirlar.
+            HeartEssence = new GraveEssence { Current = 0 };
+            _entityManager.SetComponentData(_gameStateEntity, HeartEssence);
 
             // Nufus resetle
             _entityManager.SetComponentData(_gameStateEntity, new PopulationState
