@@ -25,7 +25,7 @@ V1 tek düşman akışında sürekli `Instantiate/DestroyEntity` churn'ü yerine
 
 ## Projectile güvenliği
 
-`ArrowProjectile.TargetPoolGeneration`, okun atıldığı anda hedefteki `EnemyPoolMember.Generation` değerini kaydeder. `ArrowMoveSystem` ve `ArrowHitSystem` şu durumlarda oku deterministik olarak siler:
+`ArrowProjectile.TargetPoolGeneration`, okun atıldığı anda hedefteki `EnemyPoolMember.Generation` değerini kaydeder. `ArrowMoveSystem` ve `ArrowHitSystem` şu durumlarda oku deterministik olarak kendi pool'una döndürür:
 
 - Hedef entity artık yoksa
 - Hedef `ZombieTag` disabled olduğu için pool rezervindeyse
@@ -50,6 +50,6 @@ Bu sözleşme, eski okun yeniden kullanılan aynı entity kimliğindeki yeni zom
 
 ## Kapsam dışı
 
-- Arrow entity pooling bu işte yoktur.
+- Arrow entity pooling ayrı `ARROW_POOL_ARCHITECTURE.md` işinde tamamlanmıştır; bu doküman yalnız enemy pool owner'ını tarif eder.
 - VFX/SFX pool'ları `CombatFeedbackBridge` sorumluluğunda kalır.
 - 10.000 aktif enemy death/allocation optimizasyonu ölçüldü; GPU draw-call ve build save/restore bütçesi `DW-B-SCALE-OPT` altında açık kalır.

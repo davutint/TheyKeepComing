@@ -25,6 +25,8 @@ namespace DeadWalls
 
     public struct ArrowProjectile : IComponentData
     {
+        public const float DefaultLifetimeSeconds = 5f;
+
         public float Speed;
         public float Damage;
         public Entity Target;
@@ -32,9 +34,10 @@ namespace DeadWalls
         public ArcherType ArcherType;
         public float SlowDuration;
         public float SlowMultiplier;
+        public float RemainingLifetime;
     }
 
-    public struct ArrowTag : IComponentData { }
+    public struct ArrowTag : IComponentData, IEnableableComponent { }
 
     public static class ArcherVisualStyle
     {

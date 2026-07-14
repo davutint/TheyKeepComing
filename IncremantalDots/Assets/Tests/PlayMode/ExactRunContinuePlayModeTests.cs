@@ -994,7 +994,11 @@ namespace DeadWalls.Tests
 
             Entity arrowPrefab = entityManager.GetComponentData<ArrowPrefabData>(
                 entityManager.CreateEntityQuery(typeof(ArrowPrefabData)).GetSingletonEntity()).ArrowPrefab;
-            Entity arrow = entityManager.Instantiate(arrowPrefab);
+            Entity arrowPoolEntity = entityManager.CreateEntityQuery(
+                typeof(ArrowPoolRuntimeData), typeof(ArrowPoolAvailable)).GetSingletonEntity();
+            ArrowPoolRuntimeUtility.ReturnAllActive(entityManager, arrowPoolEntity);
+            Assert.That(ArrowPoolRuntimeUtility.TryRent(
+                entityManager, arrowPoolEntity, arrowPrefab, out Entity arrow), Is.True);
             entityManager.SetComponentData(arrow, LocalTransform.FromPosition(new float3(-3f, 0f, 0f)));
             entityManager.SetComponentData(arrow, new ArrowProjectile
             {
@@ -1004,7 +1008,8 @@ namespace DeadWalls.Tests
                 TargetPoolGeneration = firstGeneration,
                 ArcherType = ArcherType.Basic,
                 SlowDuration = 0f,
-                SlowMultiplier = 1f
+                SlowMultiplier = 1f,
+                RemainingLifetime = ArrowProjectile.DefaultLifetimeSeconds
             });
 
             var poolBeforeReturn = entityManager.GetComponentData<EnemyPoolRuntimeData>(poolEntity);
@@ -1026,7 +1031,12 @@ namespace DeadWalls.Tests
                 LocalTransform.FromPositionRotationScale(new float3(3f, 0f, 0f), quaternion.identity, 1.4f));
 
             yield return null;
-            Assert.That(entityManager.Exists(arrow), Is.False);
+            Assert.That(entityManager.Exists(arrow), Is.True);
+            Assert.That(entityManager.IsComponentEnabled<ArrowTag>(arrow), Is.False);
+            Assert.That(ArrowPoolRuntimeUtility.TryRent(
+                entityManager, arrowPoolEntity, arrowPrefab, out Entity reusedArrow), Is.True);
+            Assert.That(reusedArrow, Is.EqualTo(arrow));
+            ArrowPoolRuntimeUtility.Return(entityManager, arrowPoolEntity, reusedArrow);
             EnemyPoolRuntimeUtility.Return(entityManager, poolEntity, reused);
         }
     }

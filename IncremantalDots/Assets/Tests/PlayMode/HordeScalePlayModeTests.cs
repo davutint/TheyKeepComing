@@ -213,6 +213,10 @@ namespace DeadWalls.Tests
             using EntityQuery archerQuery = entityManager.CreateEntityQuery(typeof(ArcherUnit));
             using EntityQuery projectileQuery = entityManager.CreateEntityQuery(
                 typeof(ArrowTag), typeof(ArrowProjectile));
+            Entity arrowPrefab = entityManager.GetComponentData<ArrowPrefabData>(
+                entityManager.CreateEntityQuery(typeof(ArrowPrefabData)).GetSingletonEntity()).ArrowPrefab;
+            Entity arrowPoolEntity = entityManager.CreateEntityQuery(
+                typeof(ArrowPoolRuntimeData), typeof(ArrowPoolAvailable)).GetSingletonEntity();
             Assert.That(archerQuery.CalculateEntityCount(), Is.EqualTo(ArcherTarget));
 
             for (int frame = 0; frame < WarmupFrames; frame++)
@@ -276,6 +280,15 @@ namespace DeadWalls.Tests
             int projectileCountAfterSample = projectileQuery.CalculateEntityCount();
             Assert.That(projectileCountAfterSample, Is.GreaterThan(0),
                 "1K archer hedefleme turu projectile uretmedi.");
+            Assert.That(ArrowPoolRuntimeUtility.Maintain(
+                entityManager, arrowPoolEntity, arrowPrefab), Is.True);
+            ArrowPoolRuntimeData arrowPoolAfterSample =
+                entityManager.GetComponentData<ArrowPoolRuntimeData>(arrowPoolEntity);
+            Assert.That(arrowPoolAfterSample.TotalCreated,
+                Is.GreaterThanOrEqualTo(arrowPoolAfterSample.PrewarmTarget));
+            Assert.That(arrowPoolAfterSample.TotalRentCount, Is.GreaterThan(0));
+            Assert.That(arrowPoolAfterSample.TotalReturnCount, Is.GreaterThan(0));
+            Assert.That(arrowPoolAfterSample.ActiveCount, Is.EqualTo(projectileCountAfterSample));
             Array.Sort(frameTimes);
             double averageFrameMs = frameTotalMs / SampleFrames;
             double p95FrameMs = frameTimes[(int)Math.Ceiling(SampleFrames * 0.95) - 1];
@@ -367,6 +380,12 @@ namespace DeadWalls.Tests
                 "[DW-B-SCALE] " +
                 $"enemy={EnemyTarget}; archer={ArcherTarget}; " +
                 $"projectile_after_sample={projectileCountAfterSample}; " +
+                $"arrow_pool_total={arrowPoolAfterSample.TotalCreated}; " +
+                $"arrow_pool_available={arrowPoolAfterSample.AvailableCount}; " +
+                $"arrow_pool_active={arrowPoolAfterSample.ActiveCount}; " +
+                $"arrow_pool_expansions={arrowPoolAfterSample.ExpansionCount}; " +
+                $"arrow_pool_rents={arrowPoolAfterSample.TotalRentCount}; " +
+                $"arrow_pool_returns={arrowPoolAfterSample.TotalReturnCount}; " +
                 $"pool_total={poolAtTenK.TotalCreated}; " +
                 $"pool_available={poolAtTenK.AvailableCount}; expansions={poolAtTenK.ExpansionCount}; " +
                 $"active_chunks={activeChunkCount}; entities_per_chunk={averageActiveEntitiesPerChunk:F2}; " +
@@ -381,6 +400,7 @@ namespace DeadWalls.Tests
                 $"restore_ms={restoreMs:F2}; backlog={restoredBudget.PendingEnemies}");
 
             EnemyPoolRuntimeUtility.ReturnAllActive(entityManager, poolEntity);
+            ArrowPoolRuntimeUtility.ReturnAllActive(entityManager, arrowPoolEntity);
             wave = entityManager.GetComponentData<WaveStateData>(waveEntity);
             wave.StressTestMode = false;
             wave.ZombiesAlive = 0;

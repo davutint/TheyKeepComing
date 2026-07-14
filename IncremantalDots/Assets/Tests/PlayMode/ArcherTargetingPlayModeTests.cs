@@ -81,11 +81,12 @@ namespace DeadWalls.Tests
                 typeof(EnemyPoolAvailable),
                 typeof(EnemyCatalogEntryData)).GetSingletonEntity();
             EnemyPoolRuntimeUtility.ReturnAllActive(entityManager, poolEntity);
+            Entity arrowPoolEntity = entityManager.CreateEntityQuery(
+                typeof(ArrowPoolRuntimeData), typeof(ArrowPoolAvailable)).GetSingletonEntity();
+            ArrowPoolRuntimeUtility.ReturnAllActive(entityManager, arrowPoolEntity);
 
             using (EntityQuery archerQuery = entityManager.CreateEntityQuery(typeof(ArcherUnit)))
                 entityManager.DestroyEntity(archerQuery);
-            using (EntityQuery arrowQuery = entityManager.CreateEntityQuery(typeof(ArrowTag)))
-                entityManager.DestroyEntity(arrowQuery);
 
             Entity waveEntity = entityManager.CreateEntityQuery(typeof(WaveStateData))
                 .GetSingletonEntity();
@@ -167,7 +168,7 @@ namespace DeadWalls.Tests
             for (int i = 0; i < targets.Length; i++)
                 Assert.That(selectedTargets.Contains(targets[i]), Is.True);
 
-            entityManager.DestroyEntity(projectileQuery);
+            ArrowPoolRuntimeUtility.ReturnAllActive(entityManager, arrowPoolEntity);
             for (int i = 0; i < archers.Length; i++)
                 if (entityManager.Exists(archers[i]))
                     entityManager.DestroyEntity(archers[i]);

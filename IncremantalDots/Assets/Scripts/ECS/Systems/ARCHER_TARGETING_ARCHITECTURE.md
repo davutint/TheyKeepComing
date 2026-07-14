@@ -7,8 +7,8 @@ okçu başına tekrar taramaz. Aynı sistemin persistent coarse spatial map'i, r
 query alias'ı ve frame-local incoming damage reservation map'i hedef seçiminin tek
 runtime owner'ıdır.
 
-Projectile pooling ve Arrow ekonomisi bu sözleşmenin parçası değildir. Bunlar
-Package D içindeki ayrı takip işleridir.
+Projectile pooling ayrı `ARROW_POOL_ARCHITECTURE.md` sözleşmesinde tamamlanmıştır.
+Arrow ekonomisi Package D içindeki sıradaki ayrı takip işidir.
 
 ## Frame Akışı
 
@@ -25,12 +25,12 @@ Package D içindeki ayrı takip işleridir.
    `DeathTimer` hedefleri reddedilir.
 6. Range içindeki en yakın ve `reservedDamage < CurrentHP` olan hedef seçilir.
    Eşit mesafede düşük `Entity.Index`, ardından düşük `Entity.Version` kazanır.
-7. Yeni ok oluşturulmadan önce hasarı aynı reservation map'ine eklenir. Böylece aynı
+7. Yeni ok pool'dan başarıyla rent edildikten sonra hasarı aynı reservation map'ine eklenir. Böylece aynı
    frame'deki sonraki okçular ölümcül hasarı zaten rezerve edilmiş hedefi atlar.
 
 Range içindeki bütün hedefler ölümcül incoming damage ile doluysa okçu o frame
 bekler. Uçuşta olan ok başka hedefe yönlendirilmez; pool generation uyuşmazlığında
-mevcut projectile sistemleri deterministik cleanup yapar.
+mevcut projectile sistemleri deterministik pool return yapar.
 
 ## Ortak Policy
 
@@ -62,12 +62,12 @@ projectile, HUD/feedback ve Fireball return ile birlikte hedefleme örnekler.
 Benchmark okçuları run-state owner'ını bypass ettiği için bu test 1K archer save
 kanıtı sayılmaz; 10K enemy Continue regresyonu ayrı korunur.
 
-2026-07-14 Editor ölçümü:
+2026-07-14 projectile pool sonrası Editor ölçümü:
 
-- frame average: `8,84 ms`
-- frame P95: `9,66 ms`
-- main-thread average: `8,73 ms`
-- sample sonu aktif projectile: `353`
+- frame average: `9,61 ms`
+- frame P95: `12,50 ms`
+- main-thread average: `9,50 ms`
+- sample sonu aktif pooled projectile: `105`
 - aktif düşman: test boyunca `10.000`
 
 Player/hardware frame pacing onayı Release Definition of Done içinde ayrı kapıdır.

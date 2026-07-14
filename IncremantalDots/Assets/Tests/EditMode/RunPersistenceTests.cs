@@ -95,7 +95,8 @@ namespace DeadWalls.Tests
                 Y = 1f,
                 TargetZombieIndex = 0,
                 Damage = 9f,
-                ArcherType = (int)ArcherType.Frost
+                ArcherType = (int)ArcherType.Frost,
+                RemainingLifetime = 2.75f
             });
 
             string json = JsonUtility.ToJson(state);
@@ -128,6 +129,7 @@ namespace DeadWalls.Tests
             Assert.That(restored.ActiveZombies.Count, Is.EqualTo(1));
             Assert.That(restored.ActiveZombies[0].SlowEnabled, Is.True);
             Assert.That(restored.ActiveArrows[0].TargetZombieIndex, Is.EqualTo(0));
+            Assert.That(restored.ActiveArrows[0].RemainingLifetime, Is.EqualTo(2.75f));
             Assert.That(restored.ActiveFireball.Active, Is.True);
             Assert.That(restored.FireballCooldownRemaining, Is.EqualTo(12.5f));
         }

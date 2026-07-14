@@ -12,6 +12,12 @@ namespace DeadWalls
     [UpdateAfter(typeof(ArrowMoveSystem))]
     public partial struct ArrowHitSystem : ISystem
     {
+        public void OnCreate(ref SystemState state)
+        {
+            state.RequireForUpdate<ArrowPoolRuntimeData>();
+            state.RequireForUpdate<ArrowPoolAvailable>();
+        }
+
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
@@ -29,6 +35,8 @@ namespace DeadWalls
                 TransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true),
                 ZombieTagLookup = SystemAPI.GetComponentLookup<ZombieTag>(true),
                 PoolMemberLookup = SystemAPI.GetComponentLookup<EnemyPoolMember>(true),
+                ArrowPoolMemberLookup = SystemAPI.GetComponentLookup<ArrowPoolMember>(true),
+                ArrowPoolEntity = SystemAPI.GetSingletonEntity<ArrowPoolRuntimeData>(),
                 ECB = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>()
                     .CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter()
             }.ScheduleParallel();
@@ -47,6 +55,9 @@ namespace DeadWalls
             [ReadOnly] public ComponentLookup<LocalTransform> TransformLookup;
             [ReadOnly] public ComponentLookup<ZombieTag> ZombieTagLookup;
             [ReadOnly] public ComponentLookup<EnemyPoolMember> PoolMemberLookup;
+            [ReadOnly] public ComponentLookup<ArrowPoolMember> ArrowPoolMemberLookup;
+
+            public Entity ArrowPoolEntity;
 
             public EntityCommandBuffer.ParallelWriter ECB;
 
@@ -55,9 +66,9 @@ namespace DeadWalls
             {
                 var target = arrow.Target;
 
-                if (!IsValidTarget(arrow))
+                if (arrow.RemainingLifetime <= 0f || !IsValidTarget(arrow))
                 {
-                    ECB.DestroyEntity(sortKey, entity);
+                    ReturnToPool(entity, sortKey);
                     return;
                 }
 
@@ -110,8 +121,32 @@ namespace DeadWalls
                         Pitch = 1f
                     });
 
-                    ECB.DestroyEntity(sortKey, entity);
+                    ReturnToPool(entity, sortKey);
                 }
+            }
+
+            private void ReturnToPool(Entity entity, int sortKey)
+            {
+                if (ArrowPoolEntity == Entity.Null || !ArrowPoolMemberLookup.HasComponent(entity))
+                {
+                    // Legacy/non-pool projectile compatibility fallback'i.
+                    ECB.DestroyEntity(sortKey, entity);
+                    return;
+                }
+
+                ECB.SetComponent(sortKey, entity, new ArrowProjectile
+                {
+                    Target = Entity.Null,
+                    SlowMultiplier = 1f,
+                    RemainingLifetime = 0f
+                });
+                ECB.SetComponent(sortKey, entity,
+                    LocalTransform.FromPositionRotationScale(float3.zero, quaternion.identity, 0f));
+                ECB.SetComponent(sortKey, entity,
+                    new SpriteTint { Value = ArcherVisualStyle.NormalTint });
+                ECB.SetComponentEnabled<ArrowTag>(sortKey, entity, false);
+                ECB.AppendToBuffer(sortKey, ArrowPoolEntity,
+                    new ArrowPoolAvailable { Entity = entity });
             }
 
             private bool IsValidTarget(ArrowProjectile arrow)

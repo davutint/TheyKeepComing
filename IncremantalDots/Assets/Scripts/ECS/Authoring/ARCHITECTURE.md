@@ -22,8 +22,8 @@ Baker class'lari authoring degerlerini okuyarak entity'lere IComponentData ekler
 
 ### ArrowAuthoring.cs
 - Ok prefab'ina eklenir
-- ArrowTag, ArrowProjectile bake eder
-- Projectile effect datasini varsayilan prefab degeri olarak tutar; runtime'da ArcherShootSystem okcu tipine gore override eder
+- Enableable ArrowTag, ArrowProjectile ve ArrowPoolMember bake eder
+- Speed, lifetime ve projectile effect datasini varsayilan prefab degeri olarak tutar; runtime'da ArcherShootSystem okcu tipine gore override eder
 - Tint alanini Inspector'da tasir; SpriteSheetAuthoring ayni objede varsa SpriteTint bake ederken bu degeri kaynak olarak kullanir
 
 ### GameStateAuthoring.cs
@@ -37,7 +37,8 @@ Baker class'lari authoring degerlerini okuyarak entity'lere IComponentData ekler
 - `EnemyCatalogSO` ile aktif enemy prefab/stat/pool metadata kaynagini tutar; `ZombiePrefab` yalniz eski sahneler icin migration fallback'idir
 - `EnemyCatalogRuntimeData` ve `EnemyCatalogEntryData` buffer'ini bake eder
 - `EnemyPoolRuntimeData` ve inactive entity rezerv buffer'ini bake eder; prewarm runtime initialization system tarafindan yapilir
-- Aktif catalog kaydindan compatibility `ZombiePrefabData`; ayrica ArrowPrefabData ve ArcherPrefabData bake eder
+- `ArrowPoolRuntimeData` ve inactive ok rezerv buffer'ini bake eder; default prewarm `1024`, expand batch `256`dir
+- Aktif catalog kaydindan compatibility `ZombiePrefabData`; ayrica speed/lifetime tasiyan ArrowPrefabData ve ArcherPrefabData bake eder
 - Sub Scene icinde GameStateAuthoring ile ayni GameObject'e eklenebilir
 
 ### MobileCastleCombatAuthoring.cs
@@ -57,4 +58,4 @@ Mobile castle icin `WaveConfigAuthoring.ArcherPrefab` bake edilir ve `GameManage
 
 WaveConfigAuthoring.EnemyCatalog → EnemyDefinitionSO → EnemyCatalogEntryData buffer → WaveSpawnSystem
 EnemyCatalogEntryData(active).Prefab → ZombiePrefabData.ZombiePrefab (legacy compatibility output)
-WaveConfigAuthoring.ArrowPrefab → Baker.GetEntity() → ArrowPrefabData.ArrowPrefab (Entity)
+WaveConfigAuthoring.ArrowPrefab → Baker.GetEntity() → ArrowPrefabData (Entity + speed + lifetime) → ArrowPoolRuntimeData/ArrowPoolAvailable

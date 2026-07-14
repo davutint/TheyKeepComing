@@ -1,5 +1,6 @@
 using Unity.Burst;
 using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
@@ -25,6 +26,8 @@ namespace DeadWalls
             state.RequireForUpdate<ArrowPrefabData>();
             state.RequireForUpdate<GameStateData>();
             state.RequireForUpdate<ArrowSupply>();
+            state.RequireForUpdate<ArrowPoolRuntimeData>();
+            state.RequireForUpdate<ArrowPoolAvailable>();
 
             _targetMap = new NativeParallelMultiHashMap<int, Entity>(
                 InitialReservationCapacity, Allocator.Persistent);
@@ -95,6 +98,7 @@ namespace DeadWalls
             EntityCommandBuffer ecb = SystemAPI
                 .GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>()
                 .CreateCommandBuffer(state.WorldUnmanaged);
+            ArrowPrefabData arrowPrefabData = SystemAPI.GetSingleton<ArrowPrefabData>();
 
             state.Dependency = new ArcherShootJob
             {
@@ -102,7 +106,9 @@ namespace DeadWalls
                 FireRateMultiplier = fireRateMultiplier,
                 UnlimitedArrows = unlimitedArrows,
                 TargetCellSize = SpatialHash.TargetCellSize,
-                ArrowPrefab = SystemAPI.GetSingleton<ArrowPrefabData>().ArrowPrefab,
+                ArrowSpeed = math.max(0.01f, arrowPrefabData.Speed),
+                ArrowLifetime = math.max(0.1f, arrowPrefabData.Lifetime),
+                ArrowPoolEntity = SystemAPI.GetSingletonEntity<ArrowPoolRuntimeData>(),
                 ArrowSupplyEntity = SystemAPI.GetSingletonEntity<ArrowSupply>(),
                 TargetMap = _targetMap.AsReadOnly(),
                 Reservations = _incomingDamage,
@@ -112,6 +118,10 @@ namespace DeadWalls
                 ZombieTagLookup = SystemAPI.GetComponentLookup<ZombieTag>(true),
                 DeathTimerLookup = SystemAPI.GetComponentLookup<DeathTimer>(true),
                 PoolMemberLookup = SystemAPI.GetComponentLookup<EnemyPoolMember>(true),
+                ArrowPoolMemberLookup = SystemAPI.GetComponentLookup<ArrowPoolMember>(false),
+                ArrowTagLookup = SystemAPI.GetComponentLookup<ArrowTag>(true),
+                ArrowPoolAvailableLookup = SystemAPI.GetBufferLookup<ArrowPoolAvailable>(false),
+                ArrowPoolStateLookup = SystemAPI.GetComponentLookup<ArrowPoolRuntimeData>(false),
                 ArrowSupplyLookup = SystemAPI.GetComponentLookup<ArrowSupply>(false),
                 ECB = ecb
             }.Schedule(seedHandle);
@@ -225,7 +235,9 @@ namespace DeadWalls
             public float FireRateMultiplier;
             public bool UnlimitedArrows;
             public float TargetCellSize;
-            public Entity ArrowPrefab;
+            public float ArrowSpeed;
+            public float ArrowLifetime;
+            public Entity ArrowPoolEntity;
             public Entity ArrowSupplyEntity;
 
             [ReadOnly] public NativeParallelMultiHashMap<int, Entity>.ReadOnly TargetMap;
@@ -237,6 +249,13 @@ namespace DeadWalls
             [ReadOnly] public ComponentLookup<ZombieTag> ZombieTagLookup;
             [ReadOnly] public ComponentLookup<DeathTimer> DeathTimerLookup;
             [ReadOnly] public ComponentLookup<EnemyPoolMember> PoolMemberLookup;
+            [NativeDisableParallelForRestriction]
+            public ComponentLookup<ArrowPoolMember> ArrowPoolMemberLookup;
+            [ReadOnly] public ComponentLookup<ArrowTag> ArrowTagLookup;
+            [NativeDisableParallelForRestriction]
+            public BufferLookup<ArrowPoolAvailable> ArrowPoolAvailableLookup;
+            [NativeDisableParallelForRestriction]
+            public ComponentLookup<ArrowPoolRuntimeData> ArrowPoolStateLookup;
             public ComponentLookup<ArrowSupply> ArrowSupplyLookup;
 
             public EntityCommandBuffer ECB;
@@ -260,7 +279,14 @@ namespace DeadWalls
                     ArrowSupply supply = ArrowSupplyLookup[ArrowSupplyEntity];
                     if (supply.Current <= 0)
                         return;
+                }
 
+                if (!TryRentArrow(out Entity arrow))
+                    return;
+
+                if (!UnlimitedArrows)
+                {
+                    ArrowSupply supply = ArrowSupplyLookup[ArrowSupplyEntity];
                     supply.Current--;
                     ArrowSupplyLookup[ArrowSupplyEntity] = supply;
                 }
@@ -274,7 +300,6 @@ namespace DeadWalls
                     archer.FacingDirection);
                 archer.AttackAnimTimer = GetAttackAnimDuration(effectiveFireRate);
 
-                Entity arrow = ECB.Instantiate(ArrowPrefab);
                 float3 arrowPosition = new float3(
                     archerPosition.x,
                     archerPosition.y,
@@ -282,7 +307,7 @@ namespace DeadWalls
                 ECB.SetComponent(arrow, LocalTransform.FromPosition(arrowPosition));
                 ECB.SetComponent(arrow, new ArrowProjectile
                 {
-                    Speed = 12f,
+                    Speed = ArrowSpeed,
                     Damage = archer.ArrowDamage,
                     Target = target,
                     TargetPoolGeneration = PoolMemberLookup.HasComponent(target)
@@ -290,12 +315,14 @@ namespace DeadWalls
                         : 0u,
                     ArcherType = archer.Type,
                     SlowDuration = archer.SlowDuration,
-                    SlowMultiplier = archer.SlowMultiplier
+                    SlowMultiplier = archer.SlowMultiplier,
+                    RemainingLifetime = ArrowLifetime
                 });
                 ECB.SetComponent(arrow, new SpriteTint
                 {
                     Value = ArcherVisualStyle.GetTint(archer.Type)
                 });
+                ECB.SetComponentEnabled<ArrowTag>(arrow, true);
 
                 Entity sfxEvent = ECB.CreateEntity();
                 ECB.AddComponent(sfxEvent, new CombatSfxEvent
@@ -305,6 +332,49 @@ namespace DeadWalls
                     Volume = 0.35f,
                     Pitch = 1f
                 });
+            }
+
+            private bool TryRentArrow(out Entity arrow)
+            {
+                arrow = Entity.Null;
+                if (ArrowPoolEntity == Entity.Null
+                    || !ArrowPoolAvailableLookup.HasBuffer(ArrowPoolEntity)
+                    || !ArrowPoolStateLookup.HasComponent(ArrowPoolEntity))
+                    return false;
+
+                DynamicBuffer<ArrowPoolAvailable> available =
+                    ArrowPoolAvailableLookup[ArrowPoolEntity];
+                while (available.Length > 0)
+                {
+                    int index = available.Length - 1;
+                    Entity candidate = available[index].Entity;
+                    available.RemoveAt(index);
+                    if (candidate == Entity.Null
+                        || !ArrowPoolMemberLookup.HasComponent(candidate)
+                        || !ArrowTagLookup.HasComponent(candidate)
+                        || ArrowTagLookup.IsComponentEnabled(candidate))
+                        continue;
+
+                    ArrowPoolMember member = ArrowPoolMemberLookup[candidate];
+                    member.Generation++;
+                    if (member.Generation == 0u)
+                        member.Generation = 1u;
+                    ArrowPoolMemberLookup[candidate] = member;
+
+                    var poolState = ArrowPoolStateLookup[ArrowPoolEntity];
+                    poolState.AvailableCount = available.Length;
+                    poolState.ActiveCount++;
+                    poolState.TotalRentCount++;
+                    ArrowPoolStateLookup[ArrowPoolEntity] = poolState;
+                    arrow = candidate;
+                    return true;
+                }
+
+                var exhaustedState = ArrowPoolStateLookup[ArrowPoolEntity];
+                exhaustedState.AvailableCount = 0;
+                exhaustedState.ExpandRequested = 1;
+                ArrowPoolStateLookup[ArrowPoolEntity] = exhaustedState;
+                return false;
             }
 
             private bool TryFindNearestAvailableTarget(

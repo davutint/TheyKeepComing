@@ -53,6 +53,7 @@ Savunma sonucu için tek runtime owner `WallSegment`tir. Gate/Core component ve 
 - `MobileCastleCombatConfig`: kale merkezi, spawn radius, attack radius, wave/siege sayilari, spawn batch, zombie scale/speed, continuous siege tuning, reward tuning, worker economy tuning, event tuning, unlimited arrow flag'i ve stress test limitlerini tutar.
 - `EnemyCatalogRuntimeData` + `EnemyCatalogEntryData`: aktif enemy index'ini; prefab, base stats, scale, XP ve pool metadata'sini tutar. V1'de buffer tek kayittir.
 - `EnemyPoolRuntimeData` + `EnemyPoolAvailable`: prewarm/expand rezervini ve rent/return telemetry'sini tutar.
+- `ArrowPoolRuntimeData` + `ArrowPoolAvailable`: ok prewarm/expand rezervini ve rent/return telemetry'sini tutar.
 - `ContinuousSiegeCycleData`: player-facing `DAY / DUSK / NIGHT` fazini, 60s cycle progress'ini, spawn intensity multiplier'i ve horde pressure degerini tutar.
 - `ContinuousSpawnBudgetData`: day tabanı ile phase multiplier'ını ayrı tutar; pending enemy backlog'u ve demanded/spawned runtime telemetry sayaçlarını taşır.
 - `WaveStateData.Phase`: mobile continuous modda uyumluluk icin `NightCombat` aktif tutulur. Eski DayPrep akisi component seviyesinde kalir ama `ContinuousSiegeCycleData.Enabled` true iken player-facing akisi yonetmez.
@@ -64,7 +65,7 @@ Savunma sonucu için tek runtime owner `WallSegment`tir. Gate/Core component ve 
 - `MobileEconomyEventState`: pending event, cooldown ve secilmis temporary production bonusunu tutar.
 - `ArcherSlotPosition`: legacy/manual pozisyon buffer'idir; mobile NewGameScene tilemap spawn akisi bunu kullanmaz.
 - `ArcherUnit`: okcu tipi, fire rate, hasar, range ve opsiyonel slow degerlerini tutar.
-- `ArrowProjectile`: hedef entity, hasar ve projectile effect datasini tasir.
+- `ArrowProjectile`: hedef entity, hasar, projectile effect datasini ve kalan lifetime'i tasir.
 - `ZombieSlow`: Frost ok etkisini enableable component olarak tasir.
 
 Varsayilan mobile degerleri:
@@ -160,7 +161,7 @@ Okcu ve ok projectile gorunurlugu `SpriteTint` ile okunur:
 - Rapid: sicak sari
 - Frost: soguk mavi
 
-`ArcherShootSystem`, instantiate edilen oka okcu tipinden gelen tint'i yazar.
+`ArcherShootSystem`, pool'dan rent edilen oka okcu tipinden gelen tint'i yazar.
 Ayni `Arrow.prefab` ve `ArrowMat` kullanilmaya devam eder.
 Mobile config ve `UnlimitedArrows = true` iken `ArrowSupply.Current` kontrolu/decrement yapilmaz; legacy config olmayan sahnelerde ok stogu tuketimi korunur.
 Atis aninda `CombatSfxEvent.ArrowShoot` uretilir; shoot particle V1'de kapali tutulur. Playback main scene `CombatFeedbackBridge` tarafindadir.
@@ -170,8 +171,8 @@ Atis aninda okcunun `FacingDirection` degeri hedef zombiye gore guncellenir ve
 row'unu, timer bitince ayni yonde idle row'unu oynatir.
 
 Target tie-break entity index/version ile stabildir. Pool generation uyuşmazlığında
-uçuşta olan ok temizlenir; retarget yapılmaz. Ayrıntı:
-`ARCHER_TARGETING_ARCHITECTURE.md`.
+uçuşta olan ok kendi pool'una döner; retarget yapılmaz. Ayrıntı:
+`ARCHER_TARGETING_ARCHITECTURE.md` ve `ARROW_POOL_ARCHITECTURE.md`.
 
 ### ArrowHitSystem + ZombieSlowTimerSystem
 

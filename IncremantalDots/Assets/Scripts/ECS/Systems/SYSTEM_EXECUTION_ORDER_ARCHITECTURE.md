@@ -127,10 +127,23 @@ Presentation tarafinda `SpriteAnimationSystem` UV rect hesaplarini yapar.
 - Basic/Rapid/Frost aynı deterministic target policy'yi kullanır.
 - Mobile config ve `UnlimitedArrows = true` iken `ArrowSupply.Current` kontrolu/decrement yapmaz.
 - `CastleYardPrepState.RallyTimer > 0` iken fire-rate hesabina rally multiplier uygular.
-- Basic/Rapid/Frost okcu stat'lerini projectile'a tasir.
-- Spawn edilen oka okcu tipinin `SpriteTint` rengini yazar.
+- `ArrowPoolAvailable` rezervinden projectile rent eder; rezerv yoksa expand request yazar ve fire timer/ammo/reservation'i degistirmez.
+- Basic/Rapid/Frost okcu stat'lerini rent edilen projectile'a tasir.
+- Rent edilen oka okcu tipinin `SpriteTint` rengini yazar.
 - Okcunun hedefe bakan `FacingDirection` degerini ve `AttackAnimTimer` degerini yazar.
-- Fire timer'a gore ok spawn eder.
+- Fire timer'a gore pooled oku aktive eder.
+
+### ArrowPoolMaintenanceSystem
+
+- Initialization grubunda `ArrowPoolRuntimeData` owner'ini prewarm eder.
+- Deferred return buffer/state sayaclarini uzlastirir.
+- Rezerv tukendiyse sonraki frame `ExpandBatch` kadar yeni inactive ok hazirlar.
+
+### ArrowMoveSystem / ArrowHitSystem
+
+- Move job'u aktif ok lifetime'ini Burst-parallel azaltir ve valid hedefe hareket eder.
+- Hit job'u isabet, timeout, disabled hedef veya generation mismatch'te ayni return yolunu kullanir.
+- Pool okunu destroy etmez; transform/projectile/tint resetler, `ArrowTag` kapatir ve entity'yi rezerve append eder.
 
 ### ApplyMovementForceSystem
 
@@ -147,11 +160,13 @@ Presentation tarafinda `SpriteAnimationSystem` UV rect hesaplarini yapar.
 ### ArrowMoveSystem
 
 - Oklari hedeflerine dogru hareket ettirir.
-- Hedefi olmayan oklari ECB ile siler.
+- `RemainingLifetime` degerini Burst-parallel azaltir.
+- Invalid hedefte hareket etmez; cleanup'i tek return owner'i olan ArrowHitSystem'a birakir.
 
 ### ArrowHitSystem
 
-- Mesafe `< 0.5` ise hasar uygular ve oku siler.
+- Mesafe `< 0.5` ise hasar uygular ve pooled oku rezerve dondurur.
+- Timeout, disabled hedef ve generation mismatch ayni pool return yolunu kullanir.
 - Frost ok isabetinde hedefteki `ZombieSlow` duration'ini refresh eder.
 
 ### FireballStrikeSystem (M-C buyuculuk)

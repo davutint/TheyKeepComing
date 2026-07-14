@@ -13,6 +13,8 @@ namespace DeadWalls
     public struct ArrowPrefabData : IComponentData
     {
         public Entity ArrowPrefab;
+        public float Speed;
+        public float Lifetime;
     }
 
     public struct ArcherPrefabData : IComponentData
@@ -31,6 +33,10 @@ namespace DeadWalls
         public GameObject ArrowPrefab;
         public GameObject ArcherPrefab;
         public GameObject WorkerPrefab;
+
+        [Header("Arrow Pool")]
+        [Min(0)] public int ArrowPoolPrewarm = 1024;
+        [Min(1)] public int ArrowPoolExpandBatch = 256;
 
         public class Baker : Baker<WaveConfigAuthoring>
         {
@@ -123,6 +129,21 @@ namespace DeadWalls
                 });
                 AddBuffer<EnemyPoolAvailable>(entity);
 
+                AddComponent(entity, new ArrowPoolRuntimeData
+                {
+                    Initialized = 0,
+                    PrewarmTarget = math.max(0, authoring.ArrowPoolPrewarm),
+                    ExpandBatch = math.max(1, authoring.ArrowPoolExpandBatch),
+                    ExpandRequested = 0,
+                    TotalCreated = 0,
+                    AvailableCount = 0,
+                    ActiveCount = 0,
+                    ExpansionCount = 0,
+                    TotalRentCount = 0,
+                    TotalReturnCount = 0
+                });
+                AddBuffer<ArrowPoolAvailable>(entity);
+
                 Entity activeEnemyPrefab = activeEntryIndex >= 0
                     ? entries[activeEntryIndex].Prefab
                     : Entity.Null;
@@ -132,9 +153,18 @@ namespace DeadWalls
                     // Compatibility output: GameManager restore yolu ayni prefab'i okumaya devam eder.
                     ZombiePrefab = activeEnemyPrefab
                 });
+                var arrowAuthoring = authoring.ArrowPrefab != null
+                    ? authoring.ArrowPrefab.GetComponent<ArrowAuthoring>()
+                    : null;
                 AddComponent(entity, new ArrowPrefabData
                 {
-                    ArrowPrefab = GetEntity(authoring.ArrowPrefab, TransformUsageFlags.Dynamic)
+                    ArrowPrefab = GetEntity(authoring.ArrowPrefab, TransformUsageFlags.Dynamic),
+                    Speed = arrowAuthoring != null
+                        ? math.max(0.01f, arrowAuthoring.Speed)
+                        : 12f,
+                    Lifetime = arrowAuthoring != null
+                        ? math.max(0.1f, arrowAuthoring.Lifetime)
+                        : ArrowProjectile.DefaultLifetimeSeconds
                 });
                 AddComponent(entity, new ArcherPrefabData
                 {

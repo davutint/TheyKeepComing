@@ -8,6 +8,7 @@ namespace DeadWalls
     {
         public float Speed = 12f;
         public float Damage = 10f;
+        [Min(0.1f)] public float Lifetime = ArrowProjectile.DefaultLifetimeSeconds;
         public ArcherType ArcherType = ArcherType.Basic;
         public float SlowDuration = 0f;
         public float SlowMultiplier = 1f;
@@ -28,8 +29,10 @@ namespace DeadWalls
                     TargetPoolGeneration = 0u,
                     ArcherType = authoring.ArcherType,
                     SlowDuration = authoring.SlowDuration,
-                    SlowMultiplier = authoring.SlowMultiplier
+                    SlowMultiplier = authoring.SlowMultiplier,
+                    RemainingLifetime = math.max(0.1f, authoring.Lifetime)
                 });
+                AddComponent(entity, new ArrowPoolMember());
 
                 if (authoring.GetComponent<SpriteSheetAuthoring>() == null)
                 {

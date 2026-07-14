@@ -14,6 +14,8 @@ Sub Scene icinde su GameObject'leri olustur:
   - EnemyCatalog → `Assets/ScriptableObject/MobileCastle/Enemies/EnemyCatalog.asset`
   - ZombiePrefab → yalniz catalog'u olmayan legacy sahneler icin fallback
   - ArrowPrefab → Arrow prefab'ini surukle
+  - Arrow Pool Prewarm → `1024`
+  - Arrow Pool Expand Batch → `256`
 
 ### Castle (Bos GameObject veya Quad)
 - CastleAuthoring ekle
@@ -49,5 +51,5 @@ Okcu satin alma/upgrade davranisi SubScene authoring'de degil, ana scene `GameMa
 ## Prefab'lar (Assets/Prefabs/)
 Her prefab'a ilgili Authoring component eklenmeli:
 - Zombie_Surungun: ZombieAuthoring
-- Arrow: ArrowAuthoring + SpriteSheetAuthoring; tint beyaz kalir, projectile tint runtime'da yazilir
+- Arrow: ArrowAuthoring + SpriteSheetAuthoring; Speed `12`, Lifetime `5`, tint beyaz kalir, projectile tint runtime'da yazilir
 - Archer: ArcherAuthoring + SpriteSheetAuthoring; tint beyaz kalir, Basic/Rapid/Frost tint runtime'da yazilir

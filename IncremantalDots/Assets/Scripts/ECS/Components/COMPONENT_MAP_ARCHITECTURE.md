@@ -31,8 +31,11 @@ Tum component'lar unmanaged ECS struct olarak tutulur. Davranis sistemlerde, ver
 - `ArcherType`: `Basic`, `Rapid`, `Frost`.
 - `ArcherUnit`: okcu tipi, atis hizi, hasar, menzil, opsiyonel slow bilgileri, facing direction ve attack anim timer.
 - `ArcherCapacityUtility`: Basic/Rapid/Frost için tek `1000` toplam entity cap'i; kalan kapasite ve bulk izin matematiği.
-- `ArrowProjectile`: okun hizi, hasari, hedef entity referansi, hedef pool generation'i ve projectile effect datasini tasir.
-- `ArrowTag`: ok entity'lerini isaretler.
+- `ArrowProjectile`: okun hizi, hasari, hedef entity referansi, hedef pool generation'i, effect datasini ve kalan lifetime'i tasir.
+- `ArrowTag`: enableable aktif-ok isaretidir; inactive arrow pool rezervinde disabled tutulur.
+- `ArrowPoolRuntimeData`: prewarm/expand ayarlari ile total/available/active ve rent/return telemetry'sini tasir.
+- `ArrowPoolAvailable`: inactive pooled ok entity referanslarinin LIFO buffer'idir.
+- `ArrowPoolMember`: ok entity'sinin pool sahipligini ve rent generation'ini tasir.
 - `ArcherVisualStyle`: Basic/Rapid/Frost ve slow tint renklerini merkezi tutar.
 - `CombatVfxEvent` / `CombatSfxEvent`: DOTS combat sistemlerinden MonoBehaviour feedback bridge'e giden tek frame'lik VFX/SFX event'leridir. Normal arrow/frost hit event'leri bridge tarafinda sprite flipbook impact olarak oynatilir.
 

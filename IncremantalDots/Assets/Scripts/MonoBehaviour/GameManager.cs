@@ -34,6 +34,7 @@ namespace DeadWalls
         private Entity _zombiePrefabEntity;
         private Entity _enemyPoolEntity;
         private Entity _arrowPrefabEntity;
+        private Entity _arrowPoolEntity;
         private Entity _workerPrefabEntity;
         private Entity _mobileConfigEntity;
         private bool _initialized;
@@ -262,6 +263,15 @@ namespace DeadWalls
             if (arrowPrefabQuery.IsEmpty) return false;
             _arrowPrefabEntity = _entityManager.GetComponentData<ArrowPrefabData>(
                 arrowPrefabQuery.GetSingletonEntity()).ArrowPrefab;
+
+            var arrowPoolQuery = _entityManager.CreateEntityQuery(
+                typeof(ArrowPoolRuntimeData), typeof(ArrowPoolAvailable));
+            _arrowPoolEntity = arrowPoolQuery.IsEmpty
+                ? Entity.Null
+                : arrowPoolQuery.GetSingletonEntity();
+            if (_arrowPoolEntity != Entity.Null)
+                ArrowPoolRuntimeUtility.EnsureInitialized(
+                    _entityManager, _arrowPoolEntity, _arrowPrefabEntity);
             TryResolveWorkerPrefabEntity();
 
             var castleQuery = _entityManager.CreateEntityQuery(typeof(WallSegment));
@@ -2959,7 +2969,8 @@ namespace DeadWalls
                         TargetZombieIndex = zombieToIndex.TryGetValue(projectile.Target, out int index) ? index : -1,
                         ArcherType = (int)projectile.ArcherType,
                         SlowDuration = projectile.SlowDuration,
-                        SlowMultiplier = projectile.SlowMultiplier
+                        SlowMultiplier = projectile.SlowMultiplier,
+                        RemainingLifetime = projectile.RemainingLifetime
                     });
                 }
             }
@@ -3193,6 +3204,8 @@ namespace DeadWalls
             var zombieEntities = new List<Entity>(savedZombies.Count);
             if (_enemyPoolEntity != Entity.Null && _entityManager.Exists(_enemyPoolEntity))
                 EnemyPoolRuntimeUtility.ReturnAllActive(_entityManager, _enemyPoolEntity);
+            if (_arrowPoolEntity != Entity.Null && _entityManager.Exists(_arrowPoolEntity))
+                ArrowPoolRuntimeUtility.ReturnAllActive(_entityManager, _arrowPoolEntity);
 
             foreach (var item in savedZombies)
             {
@@ -3257,7 +3270,12 @@ namespace DeadWalls
                 if (item.TargetZombieIndex < 0 || item.TargetZombieIndex >= zombieEntities.Count)
                     continue;
 
-                Entity entity = _entityManager.Instantiate(_arrowPrefabEntity);
+                Entity entity;
+                if (_arrowPoolEntity == Entity.Null
+                    || !_entityManager.Exists(_arrowPoolEntity)
+                    || !ArrowPoolRuntimeUtility.TryRent(
+                        _entityManager, _arrowPoolEntity, _arrowPrefabEntity, out entity))
+                    entity = _entityManager.Instantiate(_arrowPrefabEntity);
                 _entityManager.SetComponentData(entity, LocalTransform.FromPositionRotationScale(
                     new float3(item.X, item.Y, item.Z), quaternion.identity, Mathf.Max(0.01f, item.Scale)));
                 _entityManager.SetComponentData(entity, new ArrowProjectile
@@ -3269,7 +3287,10 @@ namespace DeadWalls
                         _entityManager, zombieEntities[item.TargetZombieIndex]),
                     ArcherType = (ArcherType)item.ArcherType,
                     SlowDuration = item.SlowDuration,
-                    SlowMultiplier = item.SlowMultiplier
+                    SlowMultiplier = item.SlowMultiplier,
+                    RemainingLifetime = item.RemainingLifetime > 0f
+                        ? item.RemainingLifetime
+                        : ArrowProjectile.DefaultLifetimeSeconds
                 });
                 SetSpriteTint(entity, ArcherVisualStyle.GetTint((ArcherType)item.ArcherType));
             }
@@ -4790,9 +4811,19 @@ namespace DeadWalls
             var zombieQuery = _entityManager.CreateEntityQuery(typeof(ZombieTag));
             _entityManager.DestroyEntity(zombieQuery);
 
-            // Tum oklari sil
-            var arrowQuery = _entityManager.CreateEntityQuery(typeof(ArrowTag));
-            _entityManager.DestroyEntity(arrowQuery);
+            // Pool-owned oklari rezerve dondur; yalniz legacy/non-pool oklar silinir.
+            if (_arrowPoolEntity != Entity.Null && _entityManager.Exists(_arrowPoolEntity))
+                ArrowPoolRuntimeUtility.ReturnAllActive(_entityManager, _arrowPoolEntity);
+            var legacyArrowQuery = _entityManager.CreateEntityQuery(new EntityQueryDesc
+            {
+                All = new[] { ComponentType.ReadOnly<ArrowTag>() },
+                None = new[]
+                {
+                    ComponentType.ReadOnly<Prefab>(),
+                    ComponentType.ReadOnly<ArrowPoolMember>()
+                }
+            });
+            _entityManager.DestroyEntity(legacyArrowQuery);
 
             var fireballQuery = _entityManager.CreateEntityQuery(typeof(FireballProjectile));
             _entityManager.DestroyEntity(fireballQuery);

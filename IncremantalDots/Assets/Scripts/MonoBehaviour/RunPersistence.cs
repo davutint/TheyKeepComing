@@ -199,6 +199,7 @@ namespace DeadWalls
         public int TargetZombieIndex = -1;
         public int ArcherType;
         public float SlowDuration, SlowMultiplier;
+        public float RemainingLifetime;
     }
 
     [Serializable]

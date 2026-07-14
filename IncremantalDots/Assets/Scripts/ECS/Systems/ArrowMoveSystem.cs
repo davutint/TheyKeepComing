@@ -27,9 +27,7 @@ namespace DeadWalls
                 Dt = SystemAPI.Time.DeltaTime,
                 TransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true),
                 ZombieTagLookup = SystemAPI.GetComponentLookup<ZombieTag>(true),
-                PoolMemberLookup = SystemAPI.GetComponentLookup<EnemyPoolMember>(true),
-                ECB = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>()
-                    .CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter()
+                PoolMemberLookup = SystemAPI.GetComponentLookup<EnemyPoolMember>(true)
             }.ScheduleParallel();
         }
 
@@ -45,17 +43,13 @@ namespace DeadWalls
             [ReadOnly] public ComponentLookup<ZombieTag> ZombieTagLookup;
             [ReadOnly] public ComponentLookup<EnemyPoolMember> PoolMemberLookup;
 
-            public EntityCommandBuffer.ParallelWriter ECB;
-
-            void Execute(Entity entity, [ChunkIndexInQuery] int sortKey,
-                in ArrowProjectile arrow, ref LocalTransform transform)
+            void Execute(ref ArrowProjectile arrow, ref LocalTransform transform)
             {
-                // Hedef hala var mi?
+                arrow.RemainingLifetime = math.max(0f, arrow.RemainingLifetime - Dt);
+
+                // Invalid target ve timeout cleanup'ini ArrowHitSystem tek return yolundan yapar.
                 if (!IsValidTarget(arrow))
-                {
-                    ECB.DestroyEntity(sortKey, entity);
                     return;
-                }
 
                 float3 targetPos = TransformLookup[arrow.Target].Position;
                 targetPos.z = transform.Position.z;
