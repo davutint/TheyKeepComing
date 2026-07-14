@@ -39,7 +39,7 @@ Gameplay hard max eklenmez; sınır yalnız temsil ve transaction güvenliğidir
 
 `GameManager.GetEconomyPriceTuning` bake edilmiş component'i okur ve savunma amaçlı yeniden
 sanitize eder. Bed ve worker bina cost API'leri aynı snapshot'ı ilgili utility'ye geçirir.
-Tuning içerik verisidir, run-save state'i değildir. Exact save v6 satın alınmış yatak ve sekiz
+Tuning içerik verisidir, run-save state'i değildir. Güncel exact save v7 satın alınmış yatak ve sekiz
 bina seviyesini taşır; Continue sonrası maliyet mevcut profile baseline'ından yeniden hesaplanır.
 
 ## Doğrulama

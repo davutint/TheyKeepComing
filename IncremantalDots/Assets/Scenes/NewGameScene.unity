@@ -69416,13 +69416,12 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier: DeadWalls::DeadWalls.MobileCastleArcherTilePlacement
   spawnTilemap: {fileID: 708134456}
+  formationDefinition: {fileID: 11400000, guid: 6547f09a2966f7c4bb07f9108054f910, type: 2}
   spawnTilemapName: outside
-  maxStackOffset: 0.14
   drawGizmos: 1
-  previewArcherCount: 96
   gizmoPointRadius: 0.065
-  slotColor: {r: 1, g: 0.88, b: 0.25, a: 0.9}
-  repeatColor: {r: 0.25, g: 0.75, b: 1, a: 0.75}
+  firstLayerColor: {r: 1, g: 0.88, b: 0.25, a: 0.95}
+  formationColor: {r: 0.25, g: 0.75, b: 1, a: 0.75}
 --- !u!114 &1504250258 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7919231007725919313, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}

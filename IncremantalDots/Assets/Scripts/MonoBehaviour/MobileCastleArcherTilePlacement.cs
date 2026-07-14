@@ -14,18 +14,24 @@ namespace DeadWalls
         public static MobileCastleArcherTilePlacement Instance { get; private set; }
 
         [SerializeField] private Tilemap spawnTilemap;
+        [SerializeField] private ArcherFormationDefinitionSO formationDefinition;
         [SerializeField] private string spawnTilemapName = DefaultSpawnTilemapName;
-        [SerializeField] private float maxStackOffset = 0.14f;
         [SerializeField] private bool drawGizmos = true;
-        [SerializeField] private int previewArcherCount = 96;
-        [SerializeField] private float gizmoPointRadius = 0.065f;
-        [SerializeField] private Color slotColor = new Color(1f, 0.88f, 0.25f, 0.9f);
-        [SerializeField] private Color repeatColor = new Color(0.25f, 0.75f, 1f, 0.75f);
+        [SerializeField] private float gizmoPointRadius = 0.018f;
+        [SerializeField] private Color firstLayerColor = new Color(1f, 0.88f, 0.25f, 0.95f);
+        [SerializeField] private Color formationColor = new Color(0.25f, 0.75f, 1f, 0.75f);
 
-        private readonly List<Vector3Int> _spawnCells = new List<Vector3Int>();
+        private readonly List<Vector3Int> _spawnCells = new List<Vector3Int>(
+            ArcherFormationUtility.RequiredTileCount);
+        private readonly List<float3> _formationPositions = new List<float3>(
+            ArcherFormationUtility.TotalCapacity);
         private bool _cacheDirty = true;
+        private int _cachedDefinitionFingerprint;
+        private int _cachedFormationVersion = ArcherFormationUtility.CurrentVersion;
+        private Vector2 _cachedRightVertex;
+        private Vector2 _cachedTopVertex;
         private bool _missingTilemapWarningLogged;
-        private bool _emptyTilemapWarningLogged;
+        private bool _invalidFormationWarningLogged;
 
         public int SpawnCellCount
         {
@@ -36,15 +42,39 @@ namespace DeadWalls
             }
         }
 
+        public int FormationCapacity
+        {
+            get
+            {
+                EnsureCache();
+                return _formationPositions.Count;
+            }
+        }
+
+        public int FormationVersion
+        {
+            get
+            {
+                EnsureCache();
+                return _cachedFormationVersion;
+            }
+        }
+
+        public ArcherFormationDefinitionSO FormationDefinition => formationDefinition;
+
         public void Configure(Tilemap tilemap)
         {
-            if (spawnTilemap == tilemap)
+            Configure(tilemap, formationDefinition);
+        }
+
+        public void Configure(Tilemap tilemap, ArcherFormationDefinitionSO definition)
+        {
+            if (spawnTilemap == tilemap && formationDefinition == definition)
                 return;
 
             spawnTilemap = tilemap;
-            _cacheDirty = true;
-            _missingTilemapWarningLogged = false;
-            _emptyTilemapWarningLogged = false;
+            formationDefinition = definition;
+            InvalidateCache();
         }
 
         public static MobileCastleArcherTilePlacement GetOrCreateRuntime()
@@ -72,28 +102,54 @@ namespace DeadWalls
 
         public bool TryGetSpawnPosition(int archerIndex, out float3 position)
         {
+            return TryGetSpawnPosition(archerIndex, FormationVersion, out position);
+        }
+
+        public bool TryGetSpawnPosition(int archerIndex, int requestedVersion, out float3 position)
+        {
             position = default;
             EnsureCache();
 
-            if (_spawnCells.Count == 0)
+            if (archerIndex < 0
+                || archerIndex >= _formationPositions.Count
+                || requestedVersion != _cachedFormationVersion)
             {
-                LogEmptyTilemapWarning();
                 return false;
             }
 
-            int safeIndex = math.max(0, archerIndex);
-            int baseIndex = safeIndex % _spawnCells.Count;
-            int stackIndex = safeIndex / _spawnCells.Count;
-            Vector3 center = spawnTilemap.GetCellCenterWorld(_spawnCells[baseIndex]);
-            Vector2 offset = CalculateStackOffset(stackIndex);
-            position = new float3(center.x + offset.x, center.y + offset.y, SpawnZ);
+            position = _formationPositions[archerIndex];
             return true;
+        }
+
+        public bool TryGetSpawnCell(int tileIndex, out Vector3Int cell)
+        {
+            EnsureCache();
+            if (tileIndex < 0 || tileIndex >= _spawnCells.Count)
+            {
+                cell = default;
+                return false;
+            }
+
+            cell = _spawnCells[tileIndex];
+            return true;
+        }
+
+        public bool TryGetDiamondAxes(out Vector2 rightVertex, out Vector2 topVertex)
+        {
+            EnsureCache();
+            rightVertex = _cachedRightVertex;
+            topVertex = _cachedTopVertex;
+            return _formationPositions.Count == ArcherFormationUtility.TotalCapacity;
         }
 
         public void RebuildCache()
         {
             _cacheDirty = false;
+            _cachedDefinitionFingerprint = CalculateDefinitionFingerprint();
             _spawnCells.Clear();
+            _formationPositions.Clear();
+            _cachedRightVertex = default;
+            _cachedTopVertex = default;
 
             if (spawnTilemap == null)
                 spawnTilemap = FindTilemapByName(spawnTilemapName);
@@ -104,42 +160,111 @@ namespace DeadWalls
                 return;
             }
 
-            BoundsInt bounds = spawnTilemap.cellBounds;
-            foreach (Vector3Int cell in bounds.allPositionsWithin)
+            int version;
+            Vector3Int[] coordinates;
+            float safeInset;
+            float minimumDistance;
+            int candidateAttempts;
+            if (!TryReadDefinition(
+                    out version,
+                    out coordinates,
+                    out safeInset,
+                    out minimumDistance,
+                    out candidateAttempts,
+                    out string problem))
             {
-                if (spawnTilemap.HasTile(cell))
-                    _spawnCells.Add(cell);
+                LogInvalidFormationWarning(problem);
+                return;
             }
 
-            // DUNYA pozisyonuna gore "ortadan disa" siralama: ilk okcular hattin ortasina,
-            // sonrakiler uclara dogru yayilir (izometrik grid'de hucre koordinati dunya
-            // eksenleriyle ortusmedigi icin dunya-Y uzerinden hesaplanir; eski merkez-aci
-            // siralamasi tek-cephe dikey duvarda tum okculari alt uca yigiyordu).
-            var worldPos = new Dictionary<Vector3Int, Vector3>(_spawnCells.Count);
-            float avgY = 0f;
-            foreach (Vector3Int cell in _spawnCells)
+            for (int i = 0; i < coordinates.Length; i++)
             {
-                Vector3 w = spawnTilemap.GetCellCenterWorld(cell);
-                worldPos[cell] = w;
-                avgY += w.y;
+                Vector3Int cell = coordinates[i];
+                if (!spawnTilemap.HasTile(cell))
+                {
+                    LogInvalidFormationWarning(
+                        $"Versioned outside tile eksik: ({cell.x},{cell.y},{cell.z}).");
+                    _spawnCells.Clear();
+                    return;
+                }
+
+                _spawnCells.Add(cell);
             }
-            if (_spawnCells.Count > 0)
-                avgY /= _spawnCells.Count;
 
-            _spawnCells.Sort((a, b) =>
+            Vector3Int referenceCell = _spawnCells[0];
+            Vector3 center = spawnTilemap.GetCellCenterWorld(referenceCell);
+            Vector3 xStep = spawnTilemap.GetCellCenterWorld(referenceCell + Vector3Int.right) - center;
+            Vector3 yStep = spawnTilemap.GetCellCenterWorld(referenceCell + Vector3Int.up) - center;
+            _cachedRightVertex = new Vector2(xStep.x - yStep.x, xStep.y - yStep.y) * 0.5f;
+            _cachedTopVertex = new Vector2(xStep.x + yStep.x, xStep.y + yStep.y) * 0.5f;
+
+            var offsetsByTile = new Vector2[_spawnCells.Count][];
+            for (int tileIndex = 0; tileIndex < _spawnCells.Count; tileIndex++)
             {
-                float distA = Mathf.Abs(worldPos[a].y - avgY);
-                float distB = Mathf.Abs(worldPos[b].y - avgY);
-                int distCompare = distA.CompareTo(distB);
-                if (distCompare != 0)
-                    return distCompare;
+                if (!ArcherFormationUtility.TryGenerateTileOffsets(
+                        _spawnCells[tileIndex],
+                        _cachedRightVertex,
+                        _cachedTopVertex,
+                        version,
+                        ArcherFormationUtility.SlotsPerTile,
+                        safeInset,
+                        minimumDistance,
+                        candidateAttempts,
+                        out offsetsByTile[tileIndex]))
+                {
+                    LogInvalidFormationWarning(
+                        $"Tile {tileIndex} icin 25 minimum-distance slot uretilemedi.");
+                    _spawnCells.Clear();
+                    _formationPositions.Clear();
+                    return;
+                }
+            }
 
-                int yCompare = worldPos[a].y.CompareTo(worldPos[b].y);
-                return yCompare != 0 ? yCompare : worldPos[a].x.CompareTo(worldPos[b].x);
-            });
+            for (int localSlotIndex = 0;
+                 localSlotIndex < ArcherFormationUtility.SlotsPerTile;
+                 localSlotIndex++)
+            {
+                for (int tileIndex = 0; tileIndex < _spawnCells.Count; tileIndex++)
+                {
+                    Vector3 tileCenter = spawnTilemap.GetCellCenterWorld(_spawnCells[tileIndex]);
+                    Vector2 offset = offsetsByTile[tileIndex][localSlotIndex];
+                    _formationPositions.Add(new float3(
+                        tileCenter.x + offset.x,
+                        tileCenter.y + offset.y,
+                        SpawnZ));
+                }
+            }
 
-            if (_spawnCells.Count > 0)
-                _emptyTilemapWarningLogged = false;
+            _cachedFormationVersion = version;
+            _missingTilemapWarningLogged = false;
+            _invalidFormationWarningLogged = false;
+        }
+
+        private bool TryReadDefinition(
+            out int version,
+            out Vector3Int[] coordinates,
+            out float safeInset,
+            out float minimumDistance,
+            out int candidateAttempts,
+            out string problem)
+        {
+            if (formationDefinition != null)
+            {
+                version = formationDefinition.Version;
+                coordinates = formationDefinition.TileCoordinates;
+                safeInset = formationDefinition.SafeInset;
+                minimumDistance = formationDefinition.MinimumLocalDistance;
+                candidateAttempts = formationDefinition.CandidateAttempts;
+                return formationDefinition.ValidateV1(out problem);
+            }
+
+            version = ArcherFormationUtility.CurrentVersion;
+            coordinates = ArcherFormationUtility.CreateCanonicalV1TileCoordinates();
+            safeInset = ArcherFormationUtility.DefaultSafeInset;
+            minimumDistance = ArcherFormationUtility.DefaultMinimumLocalDistance;
+            candidateAttempts = ArcherFormationUtility.DefaultCandidateAttempts;
+            problem = string.Empty;
+            return true;
         }
 
         private void Awake()
@@ -150,8 +275,7 @@ namespace DeadWalls
         private void OnEnable()
         {
             RegisterInstance();
-            _cacheDirty = true;
-            // Boyama sirasinda gizmo/slot listesi CANLI guncellensin (cache bayatlamasin)
+            InvalidateCache();
             Tilemap.tilemapTileChanged += OnTilemapTileChanged;
         }
 
@@ -164,16 +288,17 @@ namespace DeadWalls
 
         private void OnTilemapTileChanged(Tilemap tilemap, Tilemap.SyncTile[] tiles)
         {
-            if (tilemap == spawnTilemap || (spawnTilemap == null && tilemap != null && tilemap.name == spawnTilemapName))
-                _cacheDirty = true;
+            if (tilemap == spawnTilemap
+                || (spawnTilemap == null && tilemap != null && tilemap.name == spawnTilemapName))
+            {
+                InvalidateCache();
+            }
         }
 
         private void OnValidate()
         {
-            maxStackOffset = Mathf.Max(0f, maxStackOffset);
-            previewArcherCount = Mathf.Max(1, previewArcherCount);
-            gizmoPointRadius = Mathf.Max(0.01f, gizmoPointRadius);
-            _cacheDirty = true;
+            gizmoPointRadius = Mathf.Max(0.005f, gizmoPointRadius);
+            InvalidateCache();
         }
 
         private void RegisterInstance()
@@ -184,26 +309,48 @@ namespace DeadWalls
 
         private void EnsureCache()
         {
+            if (CalculateDefinitionFingerprint() != _cachedDefinitionFingerprint)
+                _cacheDirty = true;
+
             if (_cacheDirty)
                 RebuildCache();
         }
 
-        private Vector2 CalculateStackOffset(int stackIndex)
+        private void InvalidateCache()
         {
-            if (stackIndex <= 0 || maxStackOffset <= 0f)
-                return Vector2.zero;
+            _cacheDirty = true;
+            _missingTilemapWarningLogged = false;
+            _invalidFormationWarningLogged = false;
+        }
 
-            const float GoldenAngle = 2.3999632f;
-            const float GoldenRatioConjugate = 0.61803399f;
-            float angle = stackIndex * GoldenAngle;
-            float radius01 = Mathf.Repeat(stackIndex * GoldenRatioConjugate, 1f);
-            float radius = maxStackOffset * Mathf.Sqrt(0.25f + radius01 * 0.75f);
-            return new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * radius;
+        private int CalculateDefinitionFingerprint()
+        {
+            unchecked
+            {
+                if (formationDefinition == null)
+                    return ArcherFormationUtility.CurrentVersion * 397
+                        + ArcherFormationUtility.RequiredTileCount;
+
+                int hash = formationDefinition.Version;
+                hash = hash * 31 + formationDefinition.SafeInset.GetHashCode();
+                hash = hash * 31 + formationDefinition.MinimumLocalDistance.GetHashCode();
+                hash = hash * 31 + formationDefinition.CandidateAttempts;
+                Vector3Int[] coordinates = formationDefinition.TileCoordinates;
+                hash = hash * 31 + (coordinates?.Length ?? 0);
+                if (coordinates != null)
+                {
+                    for (int i = 0; i < coordinates.Length; i++)
+                        hash = hash * 31 + coordinates[i].GetHashCode();
+                }
+
+                return hash;
+            }
         }
 
         private static Tilemap FindTilemapByName(string tilemapName)
         {
-            var tilemaps = UnityEngine.Object.FindObjectsByType<Tilemap>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            var tilemaps = UnityEngine.Object.FindObjectsByType<Tilemap>(
+                FindObjectsInactive.Include, FindObjectsSortMode.None);
             foreach (Tilemap tilemap in tilemaps)
             {
                 if (tilemap != null && tilemap.name == tilemapName)
@@ -219,16 +366,18 @@ namespace DeadWalls
                 return;
 
             _missingTilemapWarningLogged = true;
-            Debug.LogWarning("[MobileCastleArcherTilePlacement] 'outside' tilemap bulunamadi; mobile okcu spawn iptal edilecek.");
+            Debug.LogWarning(
+                "[MobileCastleArcherTilePlacement] 'outside' tilemap bulunamadi; mobile okcu spawn iptal edilecek.");
         }
 
-        private void LogEmptyTilemapWarning()
+        private void LogInvalidFormationWarning(string problem)
         {
-            if (_emptyTilemapWarningLogged)
+            if (_invalidFormationWarningLogged)
                 return;
 
-            _emptyTilemapWarningLogged = true;
-            Debug.LogWarning("[MobileCastleArcherTilePlacement] 'outside' tilemap bos; mobile okcu spawn iptal edilecek.");
+            _invalidFormationWarningLogged = true;
+            Debug.LogWarning(
+                "[MobileCastleArcherTilePlacement] 40x25 formation contract gecersiz: " + problem);
         }
 
         private void OnDrawGizmos()
@@ -237,25 +386,15 @@ namespace DeadWalls
                 return;
 
             EnsureCache();
-            if (spawnTilemap == null || _spawnCells.Count == 0)
-                return;
-
-            Gizmos.color = slotColor;
-            foreach (Vector3Int cell in _spawnCells)
+            for (int i = 0; i < _formationPositions.Count; i++)
             {
-                Vector3 center = spawnTilemap.GetCellCenterWorld(cell);
-                center.z = SpawnZ;
-                Gizmos.DrawWireSphere(center, gizmoPointRadius);
-            }
-
-            Gizmos.color = repeatColor;
-            int previewCount = Mathf.Max(_spawnCells.Count, previewArcherCount);
-            for (int i = _spawnCells.Count; i < previewCount; i++)
-            {
-                if (!TryGetSpawnPosition(i, out float3 position))
-                    return;
-
-                Gizmos.DrawWireSphere(new Vector3(position.x, position.y, position.z), gizmoPointRadius * 0.75f);
+                Gizmos.color = i < ArcherFormationUtility.RequiredTileCount
+                    ? firstLayerColor
+                    : formationColor;
+                float3 position = _formationPositions[i];
+                Gizmos.DrawWireSphere(
+                    new Vector3(position.x, position.y, position.z),
+                    gizmoPointRadius);
             }
         }
     }

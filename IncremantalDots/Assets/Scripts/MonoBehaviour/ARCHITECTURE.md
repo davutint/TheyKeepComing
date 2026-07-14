@@ -21,7 +21,7 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - Tech effect'leri: `UnlockArcherType` (maliyetsiz icsel unlock — `UnlockArcherType()` cagrilmaz, cift harcamayi onler), damage/firerate carpanlari (`GetScaledArcherStats` + `ApplyScaledStatsToArchers`), worker cap / production / population growth (`MobileCastleCombatConfig`'e base'ten yeniden hesaplanarak yazilir), tek Wall MaxHP (CurrentHP orani korunur). Base degerler ilk dokunusta cache'lenir; `RestartGame()` -> `ResetTechTreeState()` hepsini base'e dondurur
 - Worker economy API'leri: `OpenCastleEconomy()`, `CloseCastleEconomy()`, `SetResourceWorkers()`, `ChooseEconomyEvent()`
 - Worker bina yatırım API'leri: `GetWorkerBuildingUpgradeLevel()`, `GetWorkerBuildingUpgradeCost()`, `CanBuyWorkerBuildingUpgrade()` ve `TryBuyWorkerBuildingUpgrade()`; dört hazır binanın bağımsız Capacity/Efficiency seviyelerini baked `MobileEconomyPriceTuning` fiyatıyla Wood + Iron transaction'ı üzerinden büyütür. `ApplyTechEconomyAggregates()` base + Heart + Council + Meta + bina etkilerini tek owner'da birleştirir
-- House bed API'leri: `GetTotalBedCapacity()`, `GetPurchasedBedCapacity()`, `GetBedCapacityPurchaseCost()`, `CanBuyBedCapacity()` ve `TryBuyBedCapacity()`; run-scoped `MobileBedCapacityState`, baked `MobileEconomyPriceTuning` base/interval değerleriyle toplam sahipliği `60` tabanından sonra quadratic büyüten ardışık Wood transaction'ıyla büyür ve exact save `v6` içinde korunur. Mobile Dawn bed + Food kabul bütçesi bu state'i kapasite owner'ı olarak kullanır
+- House bed API'leri: `GetTotalBedCapacity()`, `GetPurchasedBedCapacity()`, `GetBedCapacityPurchaseCost()`, `CanBuyBedCapacity()` ve `TryBuyBedCapacity()`; run-scoped `MobileBedCapacityState`, baked `MobileEconomyPriceTuning` base/interval değerleriyle toplam sahipliği `60` tabanından sonra quadratic büyüten ardışık Wood transaction'ıyla büyür ve güncel exact save içinde korunur. Mobile Dawn bed + Food kabul bütçesi bu state'i kapasite owner'ı olarak kullanır
 - Dawn survivor görsel köprüsü: yeni persistent growth marker'ını ve gerçek accepted count'u gözler; mevcut `VillagerWorker` prefabından en fazla `15` transient arrival entity'si üretir, resource worker/logistics component'lerini kaldırır ve hareketi `SurvivorArrivalVisualSystem`'a bırakır. Population/Food transaction'ını tekrar yazmaz
 - Economy focus API'leri legacy olarak kalir; worker economy aktifken setup tool focus UI'yi gizler
 - Legacy level-up API'leri durur, fakat mobile castle loop'ta XP level-up pause tetiklemez
@@ -52,8 +52,10 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 ### MobileCastleArcherTilePlacement.cs
 
 - `NewGameScene` icindeki `Grid/outside` tilemapini okcu spawn kaynagi olarak kullanir.
-- Tilemap'teki dolu hucreleri deterministic siraya dizer; hucre sayisi cap degildir, ayni hucre tekrar kullanilir.
-- Tekrar kullanilan hucrelerde kucuk mini-offset uygular ve Scene view'da outside spawn noktalarini gizmo ile gosterir.
+- `ArcherFormationV1.asset` icindeki version'li tam 40 canonical hucreyi dogrular; rastgele ek dolu hucreleri formasyona katmaz.
+- Her hucrede seeded blue-noise ile uretilen 25 diamond-inset noktayi layer sirasi ile duzler; toplam kapasite tam `1000` olur.
+- Scene view'da sinirlanmis preview yerine formasyonun butun 1000 noktasini gizmo ile gosterir.
+- Save world position yazmaz; `ArcherFormationVersion` ile ayni deterministik cache'i Continue sirasinda yeniden kurar.
 - Okcu spawn Z degeri `MobileCastleRenderDepth.UnitZ` (`-1`) tutulur. Kale tilemap on/arka iliskisi world z bandlariyla cozulur: back tilemap `0`, unit `-1`, front occluder `-2`, projectile `-2.5`. `DeadWalls/SpriteSheet` shader'i Entities Graphics uyumlulugu icin `Opaque/Geometry` kalir; transparent queue veya depth yazimini kapatma bu Entities hattinda entity gorunurlugunu bozabilir.
 
 ### CombatFeedbackBridge.cs
@@ -186,8 +188,8 @@ Archer Drawer Input -> GameManager.CanBuyArcher() -> ArcherCapacityUtility ortak
 Archer Retrain Input -> GameManager.CanRetrainBasicArcher() -> target-type scaled cost -> mevcut Basic ArcherUnit type/stat/tint in-place degisimi -> count refresh
 Tech Tree Input -> GameManager.TryBuyTechNode() -> reveal/unlock state + MobileCastleCombatConfig/WallSegment/ArcherUnit yazimi -> ECS
 Worker Drawer Input -> GameManager.Set/AdjustWorkerTargetRatioPercent() -> WorkerAllocationUtility -> MobilePopulationAllocation target -> sonraki population auto-allocation -> WorkerVisualRepresentationUtility -> temsili DOTS VillagerWorker count + exact weight -> animation/cargo/fener/delivery feedback
-House Bed Purchase -> GameManager.TryBuyBedCapacity() -> MobileEconomyPriceTuning + MobileBedCapacityUtility owned-capacity sıralı fiyatı -> Wood transaction -> MobileBedCapacityState.PurchasedCapacity -> exact save v6
-Worker Building Purchase -> GameManager.TryBuyWorkerBuildingUpgrade() -> MobileEconomyPriceTuning fiyatı -> Wood + Iron transaction -> MobileWorkerBuildingUpgradeState -> base + Heart + Council + Meta + bina aggregate'i -> exact save v6
+House Bed Purchase -> GameManager.TryBuyBedCapacity() -> MobileEconomyPriceTuning + MobileBedCapacityUtility owned-capacity sıralı fiyatı -> Wood transaction -> MobileBedCapacityState.PurchasedCapacity -> güncel exact save
+Worker Building Purchase -> GameManager.TryBuyWorkerBuildingUpgrade() -> MobileEconomyPriceTuning fiyatı -> Wood + Iron transaction -> MobileWorkerBuildingUpgradeState -> base + Heart + Council + Meta + bina aggregate'i -> güncel exact save
 Dawn accepted marker -> GameManager.SyncSurvivorArrivalVisualsIfNeeded() -> VillagerWorker tabanlı transient survivor entity'leri -> SurvivorArrivalVisualSystem -> Wall arkası varışta destroy
 Legacy Castle Click -> CastleEconomyUI.OpenFromCastle() -> MobilePrepPauseState
 Legacy Worker Slider Input -> GameManager.SetResourceWorkers() -> MobilePopulationAllocation -> WorkerVisualRepresentationUtility -> temsili DOTS VillagerWorker count + exact weight sync

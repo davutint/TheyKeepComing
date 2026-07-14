@@ -50,8 +50,8 @@ Tum component'lar unmanaged ECS struct olarak tutulur. Davranis sistemlerde, ver
 - `WaveClearRewardData`: son wave clear bonusunu HUD feedback'i icin saklar.
 - `CastleYardPrepState`: `Fortify` ve `Rally` tek-gecelik prep buff state'ini tutar.
 - `MobilePopulationAllocation`: Wood/Stone/Iron/Food actual worker sayilarini, `10.000` basis-point target ratio'larini, etkin cap ve idle aynalarini, population auto-allocation/growth checkpoint'lerini ve son Dawn için requested/accepted/Food budget sonucunu tutar.
-- `MobileBedCapacityState`: Run başlangıç yatak kapasitesi ile satın alınmış ek yatak sayısını ayrı tutar; toplam sahiplik `60` tabanından sonra quadratic Wood maliyetini büyütür, gameplay hard max yoktur ve exact save `v6` kapsamındadır.
-- `MobileWorkerBuildingUpgradeState`: Hazır Wood/Stone/Iron/Food worker binalarının bağımsız Capacity/Efficiency seviyelerini tutar. Capacity seviye başına `+10` slot, Efficiency baz kişi üretimine additive `+10%` verir; exact save `v6` kapsamındadır.
+- `MobileBedCapacityState`: Run başlangıç yatak kapasitesi ile satın alınmış ek yatak sayısını ayrı tutar; toplam sahiplik `60` tabanından sonra quadratic Wood maliyetini büyütür, gameplay hard max yoktur ve güncel exact save `v7` kapsamındadır.
+- `MobileWorkerBuildingUpgradeState`: Hazır Wood/Stone/Iron/Food worker binalarının bağımsız Capacity/Efficiency seviyelerini tutar. Capacity seviye başına `+10` slot, Efficiency baz kişi üretimine additive `+10%` verir; güncel exact save `v7` kapsamındadır.
 - `MobileEconomyPriceTuning`: `DifficultyProfileSO` kaynaklı House bed ve worker CAP/EFF başlangıç maliyetleriyle ortak worker bina büyüme çarpanını config entity'sinde taşır. Runtime içerik baseline'ıdır; satın alınmış state değildir ve save'e yazılmaz.
 - `ArcherSlotPosition`: legacy/manual pozisyon buffer'i. NewGameScene mobile tilemap spawn akisi bunu kullanmaz.
 
@@ -85,7 +85,7 @@ DayNightPrepSystem -> Continuous siege kapaliysa legacy DayPrep sayacini azaltir
 WaveSpawnSystem -> Config varsa kale etrafindaki random 360 spawn cemberini ve continuous intensity ritmini kullanir
 ApplyMovementForceSystem -> Config varsa zombiyi CastleCenter'a yonlendirir, ZombieSlow varsa hiz carpanini uygular
 BoundarySystem -> Config varsa AttackRadius icinde Attacking state'e gecirir
-GameManager.BuyArcher(type) -> ArcherCapacityUtility ortak 1000 cap -> main scene `Grid/outside` tilemap hucrelerine okcu spawn eder
+GameManager.BuyArcher(type) -> ArcherCapacityUtility ortak 1000 cap -> MobileCastleArcherTilePlacement + ArcherFormationV1 -> main scene `Grid/outside` uzerindeki 40 x 25 formasyona okcu spawn eder
 MobilePopulationAllocation actual count -> WorkerVisualRepresentationUtility -> GameManager temsili DOTS villager count + exact weight sync -> WorkerLogisticsMovementSystem animation/cargo/fener/teslimat feedback
 GameManager.TryBuyBedCapacity -> MobileEconomyPriceTuning + MobileBedCapacityUtility owned-capacity sıralı fiyatı -> Wood transaction -> MobileBedCapacityState.PurchasedCapacity
 GameManager.TryBuyWorkerBuildingUpgrade -> MobileEconomyPriceTuning fiyatı -> Wood + Iron transaction -> bağımsız bina seviyesi -> base + Heart + Council + Meta + bina config aggregate'i

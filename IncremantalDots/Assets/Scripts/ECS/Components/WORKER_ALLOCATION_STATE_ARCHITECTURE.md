@@ -38,7 +38,7 @@ Cap değeri `0`, mevcut sistem sözleşmesinde uncapped anlamına gelir. Aktif N
 
 ## Save ve Migration
 
-Run save `v6`; gerçek worker sayıları, hedef oranlar, cap aynaları, idle aynası ve population checkpoint'ini birlikte capture/restore eder. Desteklenen `v3` exact snapshot yüklenirken hedef oranlar kayıtlı gerçek worker sayılarından deterministik olarak türetilir; idle ve checkpoint population snapshot'ından kurulur. Ardından v4 -> v5 bed-state ve v5 -> v6 worker-building state migration'ı uygulanır.
+Güncel run save `v7`; gerçek worker sayıları, hedef oranlar, cap aynaları, idle aynası ve population checkpoint'ini birlikte capture/restore eder. Desteklenen `v3` exact snapshot yüklenirken hedef oranlar kayıtlı gerçek worker sayılarından deterministik olarak türetilir; idle ve checkpoint population snapshot'ından kurulur. Ardından v4 -> v5 bed-state, v5 -> v6 worker-building ve v6 -> v7 archer-formation migration'ı uygulanır.
 
 Worker görselleri hedef oran değiştiğinde yeniden üretilmez. Actual worker sayisi
 `WorkerVisualRepresentationUtility` ile temsili sayiya cevrilir; goruntu senkronu
@@ -47,6 +47,6 @@ yalniz temsili count degistiginde tetiklenir. Resource basina visual cap `32`'di
 ## Doğrulama
 
 - `WorkerAllocationUtilityTests`: normalize, exact hedef mutation, ilk baseline, deterministik dağıtım ve cap overflow.
-- `RunPersistenceTests.TryLoad_Version3Snapshot_MigratesWorkerAllocationBedAndBuildingStateToVersion6`: v3 worker state + v5 bed + v6 worker-building state geçişi.
+- `RunPersistenceTests.TryLoad_Version3Snapshot_MigratesWorkerAllocationBedBuildingAndFormationStateToVersion7`: v3 worker state + v5 bed + v6 worker-building + v7 formation state geçişi.
 - `WorkerAllocationPlayModeTests`: gerçek NewGameScene'de yeni nüfus dağıtımı, idle overflow ve drawer hedef kontrollerinin actual worker'lari tasimama contract'i.
 - `ExactRunContinuePlayModeTests`: actual worker ve target ratio exact Continue round-trip.

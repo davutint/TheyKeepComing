@@ -65,8 +65,8 @@ Script eklendikten sonra disaridan manuel compile komutu calistirma. Unity refre
   - Rally Fire Rate Multiplier: `1.25`
   - Archer Slots: mobile tilemap spawn akisi tarafindan kullanilmaz; bos kalabilir.
 - Main scene `Grid`
-  - `MobileCastleArcherTilePlacement` component'i `outside` tilemapini spawn kaynagi olarak kullanir.
-  - Scene view'da Gizmos acikken outside spawn hucreleri ve tekrar kullanim preview noktalar gorunur.
+  - `MobileCastleArcherTilePlacement` component'i `outside` tilemapini ve `ArcherFormationV1.asset` tanimini spawn kaynagi olarak kullanir.
+  - Scene view'da Gizmos acikken 40 tile x 25, toplam 1000 seeded formation noktasi gorunur.
 - `GameStateAuthoring`
   - Initial Zombies To Spawn: `30`
   - Spawn Interval: `0.8`
@@ -112,7 +112,7 @@ Script eklendikten sonra disaridan manuel compile komutu calistirma. Unity refre
 - Basic/Rapid/Frost okcular farkli tint ile okunur.
 - Basic/Rapid/Frost oklari okcu tipinin tint'ini miras alir.
 - Frost isabet eden zombi slow suresince mavi/soguk gorunur, sonra normale doner.
-- Okcular yalnizca `Grid/outside` tilemapindeki dolu hucrelere yerlestirilir; hucreler sinirsiz tekrar kullanilir.
+- Okcular yalnizca `Grid/outside` tilemapinde Formation V1 ile sabitlenen 40 hucrenin 25'er seeded diamond noktasina yerlestirilir; eski tile-center tekrar/stack davranisi kullanilmaz.
 - Drawer toggle ile sag `Archer Recruitment` paneli acilip kapanir ve oyun pause olmaz.
 - Basic buy kaynak dusurup yeni Basic okcu spawn eder.
 - Rapid/Frost locked baslar; sag panelde unlock/upgrade butonu gosterilmez, unlock ileride Tech Tree tarafindan yapilacaktir.

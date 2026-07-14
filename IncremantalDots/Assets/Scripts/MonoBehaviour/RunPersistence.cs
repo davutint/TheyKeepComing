@@ -13,7 +13,7 @@ namespace DeadWalls
     [Serializable]
     public class RunSaveState
     {
-        public const int CurrentVersion = 6;
+        public const int CurrentVersion = 7;
         public const int MinimumSupportedVersion = 3;
 
         public int Version = CurrentVersion;
@@ -116,6 +116,7 @@ namespace DeadWalls
         public int CastleUpgradeLevel;
 
         // Okcular (formasyon stable algorithm ile count'tan yeniden kurulur)
+        public int ArcherFormationVersion = ArcherFormationUtility.CurrentVersion;
         public int BasicArchers;
         public int RapidArchers;
         public int FrostArchers;
@@ -278,6 +279,8 @@ namespace DeadWalls
                 return false;
 
             state.Version = RunSaveState.CurrentVersion;
+            state.ArcherFormationVersion = ArcherFormationUtility.NormalizeVersion(
+                state.ArcherFormationVersion);
             return WriteJson(FilePath, state, "Run save");
         }
 
@@ -337,6 +340,14 @@ namespace DeadWalls
                 state.FoodBuildingCapacityLevel = 0;
                 state.FoodBuildingEfficiencyLevel = 0;
                 state.Version = 6;
+            }
+
+            if (state.Version == 6)
+            {
+                // v6 okcu sayilarini sakliyordu fakat formasyon algoritmasinin surumunu
+                // tasimiyordu. Mevcut exact 40x25 V1 layout'una acik migration yapilir.
+                state.ArcherFormationVersion = ArcherFormationUtility.CurrentVersion;
+                state.Version = 7;
             }
         }
 

@@ -64,7 +64,7 @@ SubScene:
 - `MobileCastleCombatAuthoring`: opening/final ratio `0.20 / 0.20`, interval multiplier `1.35 / 0.65`, batch delta `-1 / +1`
 - `MobileCastleCombatAuthoring`: Castle Yard defaults Fortify damage multiplier `0.70`, Rally duration `10`, Rally fire-rate multiplier `1.25`
 - `MobileCastleCombatAuthoring.ArcherSlots`: mobile tilemap spawn akisi tarafindan kullanilmaz; bos kalabilir
-- `MobileCastleArcherTilePlacement`: main scene `Grid` uzerinde bulunur ve `outside` tilemapini okcu spawn kaynagi olarak kullanir
+- `MobileCastleArcherTilePlacement`: main scene `Grid` uzerinde bulunur; `outside` tilemapini ve `ArcherFormationV1.asset` tanimini kullanir, `40` hucre x `25` seeded nokta ile tam `1000` kapasite kurar
 - `LevelUpUI`: legacy paneldir; mobile loop'ta acilmaz
 - `MobileCastleHudRoot`: generated prefab varsa `Assets/Prefabs/UI/Generated/MobileCastleHudRoot.prefab` instancelanir; yoksa fallback HUD/drawer kurulur
 - `HUDController`: `WoodText`, `StoneText`, `IronText`, `FoodText`, `PopulationText`, `ArrowText`, `WaveRewardText`, `DamageFlashImage` ve varsa cycle/defense module alanlari bagli
@@ -80,7 +80,7 @@ SubScene:
 - `CastleTapHint`, `EconomyEventBadge` ve opsiyonel glow objelerinin raycast target'lari kapatilir; eski castle tap akisi player-facing kullanilmaz
 - `CombatFeedbackBridge`: `fanfx2_cure_small_red/spritesheet.png` hit flipbook frame'leri, opsiyonel particle fallback referanslari, `Arrow & Bow*.wav` random shoot clip listesi, `Rock Impact 37.wav`, pool/rate limit defaultlari ve `DisableInStressMode` bagli. Shoot muzzle VFX V1'de event uretmedigi icin oynatilmaz.
 - `CastleClickTarget`: position `(0,0,0)`, `CastleInteriorClickTarget.ClickRadius` `2.0`
-- `Grid/outside`: dolu hucreler okcu spawn noktalaridir; `inside` ve `outside2` sadece kale gorsel katmanidir
+- `Grid/outside`: Formation V1'de data olarak sabitlenen tam 40 canonical hucreyi tasir; her hucrenin 25 diamond-inset noktasi algoritmayla uretilir, `inside` ve `outside2` sadece kale gorsel katmanidir
 - Castle tilemap render bandlari: `inside` Wall/1/z0, `outside0` Wall/2/z0, `outside` Wall/2/z0, `outside2` Wall/4/z-2; `Archer.prefab` Wall/3 ve runtime z `-1` bandinda olmalidir
 - Economy focus objeleri varsa gizli kalir; yeni ekonomi kontrolu sol ust `WorkerEconomyDrawerUI` panelindedir
 - `DayNightOverlay`: Canvas'in ilk child'i, full-screen siyah `Image`, raycast target kapali, `DayNightOverlayController.OverlayImage` bagli
@@ -132,13 +132,13 @@ Onerilen tile aileleri:
 - Gate gorseli: `Door C1_S`
 - Hafif dekor: `BrokenStone...`, `BrokenWallStone1`, `Tree Shadow`
 
-Bu gorsel katman wall/gate/core HP verisi degildir; HP hala ECS `CastleAuthoring` ve runtime component'lerinden gelir. Okcu spawn icin tek istisna `outside` tilemapidir: dolu hucreler sinirsiz tekrar kullanilabilen spawn noktalaridir.
+Bu gorsel katman wall/gate/core HP verisi degildir; HP hala ECS `CastleAuthoring` ve runtime component'lerinden gelir. Okcu spawn icin tek istisna `outside` tilemapidir: Formation V1 asset'indeki 40 hucre, layer sirali 25'er local noktanin world-space yuzeyidir. Tile merkezini sinirsiz tekrar kullanan eski stack davranisi yoktur.
 
 ## Bilerek Yapilmayanlar
 
 - Yeni coin eklenmez; Wood/Stone/Iron/Food/Population/Arrows mevcut resource akisini kullanir.
 - Eski town-building/grid UI bu sahneye tasinmaz.
 
-Scene setup tool slot objesi veya world visual tilemap uretmez; mobile HUD/drawer controller referanslarini baglar ve varsa main scene `Grid/outside` tilemapini `MobileCastleArcherTilePlacement` ile kullanir. Mobile gameplay artik level-up paneliyle durmaz.
+Scene setup tool slot objesi veya world visual tilemap uretmez; mobile HUD/drawer controller referanslarini baglar ve main scene `Grid/outside` tilemapini version'li `ArcherFormationV1.asset` ile `MobileCastleArcherTilePlacement` uzerinde birlestirir. Yalniz formation onarimi icin `Window -> DeadWalls -> Repair Archer Formation V1` kullanilabilir. Mobile gameplay artik level-up paneliyle durmaz.
 
 Script eklendikten sonra disaridan manuel compile komutu calistirma. Unity refresh sonrasi scriptleri kendisi derler.

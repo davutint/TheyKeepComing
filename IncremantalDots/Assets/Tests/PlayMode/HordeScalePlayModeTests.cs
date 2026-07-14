@@ -64,7 +64,19 @@ namespace DeadWalls.Tests
             }
             Assert.That(runtimeReady, Is.True, "GameManager/SubScene 300 frame icinde hazir olmadi.");
 
+            // Domain reload kapali tam PlayMode turunda onceki terminal-state testi ayni
+            // process state'ini birakabilir. Stress harness aktif, calisan run onkosulunu
+            // acikca kurar; aksi halde FireballStrikeSystem Game Over'da bilerek erken cikar.
+            Time.timeScale = 1f;
+            gameManager.enabled = true;
             EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            Entity gameStateEntity = entityManager.CreateEntityQuery(
+                typeof(GameStateData)).GetSingletonEntity();
+            var gameState = entityManager.GetComponentData<GameStateData>(gameStateEntity);
+            gameState.IsGameOver = false;
+            gameState.IsLevelUpPending = false;
+            entityManager.SetComponentData(gameStateEntity, gameState);
+
             Entity poolEntity = entityManager.CreateEntityQuery(
                 typeof(EnemyPoolRuntimeData), typeof(EnemyPoolAvailable),
                 typeof(EnemyCatalogEntryData)).GetSingletonEntity();
@@ -265,8 +277,28 @@ namespace DeadWalls.Tests
             }
 
             var poolAfterFireball = entityManager.GetComponentData<EnemyPoolRuntimeData>(poolEntity);
+            var gameStateAfterFireball = entityManager.GetComponentData<GameStateData>(gameStateEntity);
+            using EntityQuery pendingStrikeQuery = entityManager.CreateEntityQuery(
+                typeof(FireballStrike));
+            int pendingStrikeCount = pendingStrikeQuery.CalculateEntityCount();
+            float sampleHpAfterFireball = entityManager.Exists(sampleZombie)
+                ? entityManager.GetComponentData<ZombieStats>(sampleZombie).CurrentHP
+                : float.NaN;
+            ZombieStateType sampleStateAfterFireball = entityManager.Exists(sampleZombie)
+                ? entityManager.GetComponentData<ZombieState>(sampleZombie).Value
+                : ZombieStateType.Dead;
+            bool sampleDeathTimerEnabled = entityManager.Exists(sampleZombie)
+                && entityManager.IsComponentEnabled<DeathTimer>(sampleZombie);
+            float sampleDeathTimer = entityManager.Exists(sampleZombie)
+                ? entityManager.GetComponentData<DeathTimer>(sampleZombie).Value
+                : float.NaN;
             Assert.That(poolAfterFireball.ActiveCount, Is.Zero,
-                "Fireball toplu olumleri 300 frame icinde pool'a donmedi.");
+                $"Fireball toplu olumleri 300 frame icinde pool'a donmedi. " +
+                $"pendingStrike={pendingStrikeCount}; sampleHp={sampleHpAfterFireball}; " +
+                $"sampleState={sampleStateAfterFireball}; deathTimer={sampleDeathTimer}; " +
+                $"deathTimerEnabled={sampleDeathTimerEnabled}; " +
+                $"gameOver={gameStateAfterFireball.IsGameOver}; " +
+                $"levelPending={gameStateAfterFireball.IsLevelUpPending}; timeScale={Time.timeScale}");
             Assert.That(poolAfterFireball.TotalReturnCount - returnsBeforeFireball,
                 Is.EqualTo(EnemyTarget));
             Assert.That(poolAfterFireball.TotalCreated, Is.EqualTo(poolAtTenK.TotalCreated),

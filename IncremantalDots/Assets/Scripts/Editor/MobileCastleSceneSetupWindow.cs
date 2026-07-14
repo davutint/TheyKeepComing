@@ -38,6 +38,7 @@ namespace DeadWalls
         private const string BasicArcherDefinitionPath = ArcherDefinitionFolder + "/BasicArcher.asset";
         private const string RapidArcherDefinitionPath = ArcherDefinitionFolder + "/RapidArcher.asset";
         private const string FrostArcherDefinitionPath = ArcherDefinitionFolder + "/FrostArcher.asset";
+        private const string ArcherFormationDefinitionPath = ArcherDefinitionFolder + "/ArcherFormationV1.asset";
         private const string TechTreeFolder = "Assets/ScriptableObject/MobileCastle/TechTree";
         private const string TechTreeCatalogPath = TechTreeFolder + "/TechTreeCatalog.asset";
         private const string MetaFolder = "Assets/ScriptableObject/MobileCastle/Meta";
@@ -109,6 +110,21 @@ namespace DeadWalls
             EnsureArcherRetrainControlInPrefab();
             AssetDatabase.ImportAsset(GeneratedHudPrefabPath, ImportAssetOptions.ForceUpdate);
             Debug.Log("[MobileCastleSceneSetup] Archer retrain kontrolu HUD prefabinda onarildi.");
+        }
+
+        [MenuItem("Window/DeadWalls/Repair Archer Formation V1")]
+        public static void RepairArcherFormationV1()
+        {
+            Scene scene = SceneManager.GetActiveScene();
+            if (!scene.IsValid() || scene.path != TargetScenePath)
+                throw new InvalidOperationException("Archer formation repair icin NewGameScene aktif olmali.");
+
+            ArcherFormationDefinitionSO definition = EnsureDefaultArcherFormationDefinition();
+            EnsureArcherTilePlacement(scene, definition);
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene);
+            AssetDatabase.SaveAssets();
+            Debug.Log("[MobileCastleSceneSetup] 40x25 Archer Formation V1 asset ve scene binding onarildi.");
         }
 
         private void OnGUI()
@@ -839,6 +855,7 @@ namespace DeadWalls
         private static void EnsureManagers(Scene scene, Canvas canvas)
         {
             ArcherRecruitmentCatalogSO archerCatalog = EnsureDefaultArcherRecruitmentCatalog();
+            ArcherFormationDefinitionSO archerFormation = EnsureDefaultArcherFormationDefinition();
             TechTreeCatalogSO techCatalog = EnsureDefaultTechTreeCatalog();
             CouncilEventCatalogSO councilEventCatalog = EnsureDefaultCouncilCatalog();
             AssignDifficultyProfileToAuthoring(EnsureDefaultDifficultyProfile());
@@ -859,7 +876,7 @@ namespace DeadWalls
             var uiManager = EnsureComponent<UIManager>(canvas.gameObject);
             BuildCanvasPanels(canvas.transform, uiManager, archerCatalog);
             EnsureCastleClickTarget(scene);
-            EnsureArcherTilePlacement(scene);
+            EnsureArcherTilePlacement(scene, archerFormation);
             EnsureCombatFeedbackRoot(scene);
             EnsureCameraShaker(scene);
             ConfigureMenuSystem(canvas.transform);
@@ -908,6 +925,25 @@ namespace DeadWalls
             }
 
             return catalog;
+        }
+
+        private static ArcherFormationDefinitionSO EnsureDefaultArcherFormationDefinition()
+        {
+            EnsureAssetFolder(ArcherDefinitionFolder);
+            var definition = AssetDatabase.LoadAssetAtPath<ArcherFormationDefinitionSO>(
+                ArcherFormationDefinitionPath);
+            if (definition == null)
+            {
+                definition = ScriptableObject.CreateInstance<ArcherFormationDefinitionSO>();
+                definition.ApplyV1Defaults();
+                AssetDatabase.CreateAsset(definition, ArcherFormationDefinitionPath);
+                EditorUtility.SetDirty(definition);
+            }
+
+            if (!definition.ValidateV1(out string problem))
+                throw new InvalidOperationException("ArcherFormationV1 asset gecersiz: " + problem);
+
+            return definition;
         }
 
         private static ArcherDefinitionSO EnsureArcherDefinitionAsset(string path, ArcherType type)
@@ -2725,7 +2761,8 @@ namespace DeadWalls
             target.ClickRadius = 2f;
         }
 
-        private static void EnsureArcherTilePlacement(Scene scene)
+        private static void EnsureArcherTilePlacement(
+            Scene scene, ArcherFormationDefinitionSO formationDefinition)
         {
             Tilemap outside = FindSceneTilemap(scene, MobileCastleArcherTilePlacement.DefaultSpawnTilemapName);
             if (outside == null)
@@ -2737,7 +2774,15 @@ namespace DeadWalls
             Grid grid = outside.GetComponentInParent<Grid>();
             GameObject host = grid != null ? grid.gameObject : outside.gameObject;
             var placement = EnsureComponent<MobileCastleArcherTilePlacement>(host);
-            placement.Configure(outside);
+            placement.Configure(outside, formationDefinition);
+            placement.RebuildCache();
+            if (placement.SpawnCellCount != ArcherFormationUtility.RequiredTileCount
+                || placement.FormationCapacity != ArcherFormationUtility.TotalCapacity)
+            {
+                throw new InvalidOperationException(
+                    "NewGameScene outside tilemap 40x25 archer formation contract'ini karsilamiyor.");
+            }
+
             EditorUtility.SetDirty(placement);
         }
 

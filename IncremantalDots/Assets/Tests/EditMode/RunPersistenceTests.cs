@@ -50,6 +50,7 @@ namespace DeadWalls.Tests
                 FoodBuildingCapacityLevel = 9,
                 FoodBuildingEfficiencyLevel = 10,
                 WallCurrentHP = 187.5f,
+                ArcherFormationVersion = ArcherFormationUtility.CurrentVersion,
                 FireballCooldownRemaining = 12.5f,
                 RallyTimer = 4.25f,
                 ActiveCouncilEvent = new ComposedCouncilEvent
@@ -119,6 +120,8 @@ namespace DeadWalls.Tests
             Assert.That(restored.IronBuildingEfficiencyLevel, Is.EqualTo(8));
             Assert.That(restored.FoodBuildingCapacityLevel, Is.EqualTo(9));
             Assert.That(restored.FoodBuildingEfficiencyLevel, Is.EqualTo(10));
+            Assert.That(restored.ArcherFormationVersion,
+                Is.EqualTo(ArcherFormationUtility.CurrentVersion));
             Assert.That(restored.ActiveCouncilEvent.TemplateId, Is.EqualTo("council_test"));
             Assert.That(restored.ActiveCouncilEvent.OptionA.Effects.Count, Is.EqualTo(1));
             Assert.That(restored.ActiveCouncilEvent.OptionA.Effects[0].Amount, Is.EqualTo(50));
@@ -176,7 +179,7 @@ namespace DeadWalls.Tests
         }
 
         [Test]
-        public void TryLoad_Version3Snapshot_MigratesWorkerAllocationBedAndBuildingStateToVersion6()
+        public void TryLoad_Version3Snapshot_MigratesWorkerAllocationBedBuildingAndFormationStateToVersion7()
         {
             string path = Path.Combine(Application.persistentDataPath, "run_save.json");
             byte[] original = File.Exists(path) ? File.ReadAllBytes(path) : null;
@@ -199,7 +202,7 @@ namespace DeadWalls.Tests
                 RunSaveState restored = RunPersistence.TryLoad();
 
                 Assert.That(restored, Is.Not.Null);
-                Assert.That(restored.Version, Is.EqualTo(6));
+                Assert.That(restored.Version, Is.EqualTo(7));
                 Assert.That(restored.WoodWorkerTargetRatioBps, Is.EqualTo(3774));
                 Assert.That(restored.StoneWorkerTargetRatioBps, Is.EqualTo(1887));
                 Assert.That(restored.IronWorkerTargetRatioBps, Is.EqualTo(1509));
@@ -210,6 +213,8 @@ namespace DeadWalls.Tests
                 Assert.That(restored.PurchasedBedCapacity, Is.Zero);
                 Assert.That(restored.WoodBuildingCapacityLevel, Is.Zero);
                 Assert.That(restored.FoodBuildingEfficiencyLevel, Is.Zero);
+                Assert.That(restored.ArcherFormationVersion,
+                    Is.EqualTo(ArcherFormationUtility.CurrentVersion));
             }
             finally
             {
@@ -241,7 +246,7 @@ namespace DeadWalls.Tests
                 RunSaveState restored = RunPersistence.TryLoad();
 
                 Assert.That(restored, Is.Not.Null);
-                Assert.That(restored.Version, Is.EqualTo(6));
+                Assert.That(restored.Version, Is.EqualTo(7));
                 Assert.That(restored.BedBaseCapacity, Is.EqualTo(135));
                 Assert.That(restored.PurchasedBedCapacity, Is.Zero);
                 Assert.That(restored.IronBuildingEfficiencyLevel, Is.Zero);
@@ -273,7 +278,7 @@ namespace DeadWalls.Tests
                 RunSaveState restored = RunPersistence.TryLoad();
 
                 Assert.That(restored, Is.Not.Null);
-                Assert.That(restored.Version, Is.EqualTo(6));
+                Assert.That(restored.Version, Is.EqualTo(7));
                 Assert.That(restored.WoodBuildingCapacityLevel, Is.Zero);
                 Assert.That(restored.WoodBuildingEfficiencyLevel, Is.Zero);
                 Assert.That(restored.StoneBuildingCapacityLevel, Is.Zero);
@@ -282,6 +287,46 @@ namespace DeadWalls.Tests
                 Assert.That(restored.IronBuildingEfficiencyLevel, Is.Zero);
                 Assert.That(restored.FoodBuildingCapacityLevel, Is.Zero);
                 Assert.That(restored.FoodBuildingEfficiencyLevel, Is.Zero);
+                Assert.That(restored.ArcherFormationVersion,
+                    Is.EqualTo(ArcherFormationUtility.CurrentVersion));
+            }
+            finally
+            {
+                if (original != null)
+                    File.WriteAllBytes(path, original);
+                else if (File.Exists(path))
+                    File.Delete(path);
+            }
+        }
+
+        [Test]
+        public void TryLoad_Version6Snapshot_MigratesToFormationVersion1()
+        {
+            string path = Path.Combine(Application.persistentDataPath, "run_save.json");
+            byte[] original = File.Exists(path) ? File.ReadAllBytes(path) : null;
+            var legacy = new RunSaveState
+            {
+                Version = 6,
+                ArcherFormationVersion = 0,
+                RunId = "run_v6_formation_migration_" + Guid.NewGuid().ToString("N"),
+                BasicArchers = 40,
+                RapidArchers = 20,
+                FrostArchers = 5
+            };
+
+            try
+            {
+                File.WriteAllText(path, JsonUtility.ToJson(legacy));
+
+                RunSaveState restored = RunPersistence.TryLoad();
+
+                Assert.That(restored, Is.Not.Null);
+                Assert.That(restored.Version, Is.EqualTo(7));
+                Assert.That(restored.ArcherFormationVersion,
+                    Is.EqualTo(ArcherFormationUtility.CurrentVersion));
+                Assert.That(restored.BasicArchers, Is.EqualTo(40));
+                Assert.That(restored.RapidArchers, Is.EqualTo(20));
+                Assert.That(restored.FrostArchers, Is.EqualTo(5));
             }
             finally
             {

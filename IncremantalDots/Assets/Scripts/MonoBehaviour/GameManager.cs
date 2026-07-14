@@ -72,6 +72,7 @@ namespace DeadWalls
         private float _globalFireRateMultiplier = 1f;
         private bool _missingArcherPlacementWarningLogged;
         private bool _missingWorkerPlacementWarningLogged;
+        private int _archerFormationVersion = ArcherFormationUtility.CurrentVersion;
         private ArcherDefinitionSO[] _runtimeDefaultArcherDefinitions;
 
         // Tech tree run-scoped state (persistence yok; RestartGame sifirlar — _unlockedArcherTypes kalibi)
@@ -165,6 +166,7 @@ namespace DeadWalls
         public ComposedCouncilEvent ActiveCouncilEvent => _activeCouncilEvent;
         public MetaUpgradeCatalogSO MetaCatalog => metaUpgradeCatalog;
         public string CurrentRunId => _currentRunId;
+        public int ActiveArcherFormationVersion => _archerFormationVersion;
         /// <summary>Son biten kosunun meta ozeti (olum ekrani gosterir).</summary>
         public MetaRunResult LastRunResult { get; private set; }
 
@@ -2519,6 +2521,7 @@ namespace DeadWalls
                 IronWorkers = PopulationAllocation.IronWorkers,
                 FoodWorkers = PopulationAllocation.FoodWorkers,
                 WallCurrentHP = Wall.CurrentHP,
+                ArcherFormationVersion = _archerFormationVersion,
                 BasicArchers = BasicArcherCount,
                 RapidArchers = RapidArcherCount,
                 FrostArchers = FrostArcherCount,
@@ -2603,6 +2606,10 @@ namespace DeadWalls
             _archerTypeLevels.Clear();
             foreach (var entry in save.ArcherTypeLevels)
                 _archerTypeLevels[(ArcherType)entry.Type] = entry.Level;
+
+            _archerFormationVersion = ArcherFormationUtility.NormalizeVersion(
+                save.ArcherFormationVersion);
+            RepositionExistingMobileArchersToOutside();
 
             // 4) Okcu sayilarini tamamla (RestartGame seed'i + meta okculari zaten sahnede;
             //    pozisyonlar tilemap slot sirasindan otomatik)
@@ -2798,6 +2805,7 @@ namespace DeadWalls
                 FoodBuildingCapacityLevel = workerBuildings.FoodCapacityLevel,
                 FoodBuildingEfficiencyLevel = workerBuildings.FoodEfficiencyLevel,
                 WallCurrentHP = Wall.CurrentHP,
+                ArcherFormationVersion = _archerFormationVersion,
                 BasicArchers = BasicArcherCount,
                 RapidArchers = RapidArcherCount,
                 FrostArchers = FrostArcherCount,
@@ -3020,6 +3028,10 @@ namespace DeadWalls
             _archerTypeLevels.Clear();
             foreach (var entry in save.ArcherTypeLevels)
                 _archerTypeLevels[(ArcherType)entry.Type] = entry.Level;
+
+            _archerFormationVersion = ArcherFormationUtility.NormalizeVersion(
+                save.ArcherFormationVersion);
+            RepositionExistingMobileArchersToOutside();
 
             RestoreArcherCountsWithinCapacity(
                 save.BasicArchers, save.RapidArchers, save.FrostArchers);
@@ -4133,7 +4145,9 @@ namespace DeadWalls
             var config = _entityManager.GetComponentData<MobileCastleCombatConfig>(configEntity);
 
             MobileCastleArcherTilePlacement placement = MobileCastleArcherTilePlacement.GetOrCreateRuntime();
-            if (placement != null && placement.TryGetSpawnPosition(archerCount, out position))
+            if (placement != null
+                && placement.TryGetSpawnPosition(
+                    archerCount, _archerFormationVersion, out position))
             {
                 // Tek cephe (K4): yalniz duvar hatti bolgesindeki tilemap hucreleri gecerli —
                 // eski 360-duzen hucreleri (kale cevresi) elenir; owner kule tile'larini
@@ -4757,6 +4771,7 @@ namespace DeadWalls
             }
 
             _currentRunId = System.Guid.NewGuid().ToString("N");
+            _archerFormationVersion = ArcherFormationUtility.CurrentVersion;
 
             bool mobileMode = TryGetMobileConfigEntity(out var mobileConfigEntity);
             var mobileConfig = mobileMode

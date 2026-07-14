@@ -254,17 +254,20 @@ Continuous siege varsayilaninda wave bittiginde oyun durmaz, `GameManager.OnWave
 
 ## Okcu Yerlesimi
 
-Mobile mode'da okcular `NewGameScene` main scene'indeki `Grid/outside` tilemap'inin dolu hucrelerine yerlestirilir. `inside` ve `outside2` yalnizca kale gorsel katmanidir.
+Mobile mode'da okcular `NewGameScene` main scene'indeki `Grid/outside` tilemap'i uzerinde Formation V1'in deterministik 40 x 25 noktalarina yerlestirilir. `inside` ve `outside2` yalnizca kale gorsel katmanidir.
 
 - Spawn tilemap: `outside`
 - Spawn Z: `-1`
-- Hucre sayisi hard cap degildir; dolu hucreler tekrar kullanilir
-- Ayni hucreye donen okcular kucuk deterministic mini-offset alir
+- Formation asset'i: `Assets/ScriptableObject/MobileCastle/Archers/ArcherFormationV1.asset`
+- Tam 40 canonical hucre data/version ile sabittir; tilemap contract'i bu hucrelerin hepsini icermelidir
+- Her hucrede tile coordinate + local slot seed'iyle 25 diamond-inset nokta uretilir ve minimum local mesafe korunur
+- Fill order once butun 40 hucrenin slot 0'i, sonra slot 1'i olacak bicimde layer mantigiyla kurulur
+- Save world position yerine formation version + type count tutar; Continue ayni 1000 noktayi yeniden uretir
 - Okcu render'i Entities Graphics uyumlulugu icin `Opaque/Geometry` shader ile calisir. `outside2` Wall/4 ve okcu prefab Wall/3 sirasi korunur, fakat shader/depth kisitlari nedeniyle front-wall occlusion icin sonraki cozum shader'a dokunmadan kurulmalidir.
 
 Basic, Rapid ve Frost toplamı `ArcherCapacityUtility.MaxTotalArchers = 1000` ortak
-hard cap'ini paylaşır. Tilemap hücre tekrarı placement kapasitesi değildir; 1001. spawn
-satın alma, Council, meta, restore ve başlangıç yollarının ortak kapısında reddedilir.
+hard cap'ini paylaşır. Formation V1 de tam `1000` pozisyon üretir; 1001. spawn satın alma,
+Council, meta, restore ve başlangıç yollarının ortak kapısında reddedilir.
 
 ## World Visuals
 

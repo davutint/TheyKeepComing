@@ -24,7 +24,7 @@ Mevcut `GameScene` ve `GameScene/TestSubScene` referans olarak kullanilir, ama y
 
 Tool ayni isimli root ve child objeleri yeniden kullanir. Tekrar calistirildiginda duplicate `Canvas`, `GameManager`, `MobileCastleHudRoot`, `LevelUpPanel` veya SubScene root objesi uretmemelidir.
 
-World visual tilemap'leri owner tarafindan yonetilir. Tool `Grid/outside` tilemapini bulursa sadece `MobileCastleArcherTilePlacement` controller'ina baglar; tile icerigine dokunmaz. Kale occlusion icin renderer sorting ve z-depth band'larini normalize eder: `inside` Wall/1/z0, `outside0` ve `outside` Wall/2/z0, `outside2` Wall/4/z-2.
+World visual tilemap'leri owner tarafindan yonetilir. Tool `Grid/outside` tilemapini bulursa `MobileCastleArcherTilePlacement` controller'ina ve version'li `ArcherFormationV1.asset` tanimina baglar; tile icerigine dokunmaz. Kale occlusion icin renderer sorting ve z-depth band'larini normalize eder: `inside` Wall/1/z0, `outside0` ve `outside` Wall/2/z0, `outside2` Wall/4/z-2.
 
 `Assets/Prefabs/UI/Generated/MobileCastleHudRoot.prefab` varsa `MobileCastleHudRoot` bu prefabdan instancelanir. Prefab yoksa fallback HUD ayni runtime isimleriyle kurulur: economy text'leri, fallback `WaveText`, fallback `KillsText`, fallback `DefenseText`, `WaveRewardText`, `DamageFlashOverlay`, `ArcherDrawerPanel`, Basic/Rapid/Frost row buy alanlari ve `RepairButton`. Onayli prefabda `CyclePanel` varsa fallback `WaveText/KillsText` uretilmez ve varsa kapatilir. Castle Interior economy paneli icin fallback polish UI uretilmez; panel gerekirse dogrudan prefabda kurulur.
 
@@ -36,13 +36,13 @@ DOTS authoring objeleri SubScene icinde tutulur. `GameStateAuthoring`, `WaveConf
 
 `MobileCastleCombatAuthoring`, mobile combat mode switch'idir. Bu component bake edilince `MobileCastleCombatConfig` singleton'i ve `ArcherSlotPosition` buffer'i olusur. Runtime sistemleri config varsa merkezi kale davranisini, config yoksa eski `WallX` davranisini kullanir.
 
-`BasicArcher_01` legacy/seed authoring objesi olarak kalabilir; runtime mobile ilk acilista mevcut okculari `Grid/outside` tilemap spawn hucrelerine yeniden yerlestirir. Sonraki okcular da ayni tilemap hucre listesini kullanir.
+`BasicArcher_01` legacy/seed authoring objesi olarak kalabilir; runtime mobile ilk acilista mevcut okculari Formation V1'in ilk slotlarina yeniden yerlestirir. Sonraki okcular ayni 40 x 25 layer-fill sirasini kullanir.
 
 Tool mobile combat degerlerini de normalize eder: zombi scale/speed eski prefab degerlerinden ayrilir, continuous siege cycle tuning, legacy wave director tuning, kill/wave reward tuning, worker economy tuning, economy event tuning, unlimited arrow flag'i ve stress test batch/interval/cap degerleri `MobileCastleCombatAuthoring` uzerinden tutulur. LevelUpPanel legacy olarak durabilir, fakat mobile loop'ta kullanilmaz.
 
-World visual foundation main scene MonoBehaviour/Tilemap tarafinda ve owner kontrolundedir. Gorsel kale `(0,0)` gameplay center ile hizalanir. `inside/outside/outside2` tilemap'leri gorsel katmandir; yalniz `outside` tilemap'indeki dolu hucreler okcu spawn kaynagi olarak okunur. `outside2` front-wall/occluder katmanidir ve okculardan onde cizilmek icin z `-2` bandinda tutulur. Bir tilemap hem ust yurume yuzeyi hem on duvar yuzu icerirse partial occlusion beklenmez; front-wall pikselleri ayri ondeki tilemapte tutulmalidir.
+World visual foundation main scene MonoBehaviour/Tilemap tarafinda ve owner kontrolundedir. Gorsel kale `(0,0)` gameplay center ile hizalanir. `inside/outside/outside2` tilemap'leri gorsel katmandir; `outside`, Formation V1 asset'indeki tam 40 canonical hucrenin world-space yuzeyidir. `outside2` front-wall/occluder katmanidir ve okculardan onde cizilmek icin z `-2` bandinda tutulur. Bir tilemap hem ust yurume yuzeyi hem on duvar yuzu icerirse partial occlusion beklenmez; front-wall pikselleri ayri ondeki tilemapte tutulmalidir.
 
-Readability polish icin `MobileCastleArcherTilePlacement` Scene view'da `outside` spawn hucrelerini ve tekrar kullanim preview noktalarini cizer. `BasicArcher_01` beyaz tint ile normalize edilir; Basic/Rapid/Frost runtime tint'leri ECS tarafinda `SpriteTint` ile uygulanir. Archer count bilgisi sag drawer row'larinda okunur; eski `ArcherTypeText` placeholder'i mobile HUD'da kullanilmaz.
+Readability polish icin `MobileCastleArcherTilePlacement` Scene view'da 40 tile x 25 seeded noktanin tamamini cizer. `BasicArcher_01` beyaz tint ile normalize edilir; Basic/Rapid/Frost runtime tint'leri ECS tarafinda `SpriteTint` ile uygulanir. Archer count bilgisi sag drawer row'larinda okunur; eski `ArcherTypeText` placeholder'i mobile HUD'da kullanilmaz.
 
 Wave/run loop icin drawer oyun akisi controller'i degil, yalnizca gorsel ve referans root'udur. Davranis `MarketUI`, `UIManager`, `GameManager` ve ECS `DayNightPrepSystem` tarafindan uygulanir. Prefab runtime event barindirmaz. Yeni UI yuzeyi dogrudan `MobileCastleHudRoot.prefab` uzerinde kurulur (eski UIImporter/export pipeline'i 2026-07-06'da kaldirildi).
 

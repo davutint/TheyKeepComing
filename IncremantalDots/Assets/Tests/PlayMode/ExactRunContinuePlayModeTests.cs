@@ -600,6 +600,15 @@ namespace DeadWalls.Tests
             Assert.That(entityManager.GetComponentData<GameStateData>(gameStateEntity).IsGameOver, Is.True);
             Assert.That(entityManager.GetComponentData<GateComponent>(wallEntity).CurrentHP, Is.EqualTo(100f));
             Assert.That(entityManager.GetComponentData<CastleHP>(wallEntity).CurrentHP, Is.EqualTo(500f));
+
+            // Enter Play Mode domain reload kapaliyken sonraki test ayni ECS world'u
+            // gorebilir. Bu testin urettiği terminal state ve attacker disari sizmasin.
+            entityManager.DestroyEntity(attacker);
+            wall.CurrentHP = wall.MaxHP;
+            entityManager.SetComponentData(wallEntity, wall);
+            gameState = entityManager.GetComponentData<GameStateData>(gameStateEntity);
+            gameState.IsGameOver = false;
+            entityManager.SetComponentData(gameStateEntity, gameState);
             gameManager.enabled = true;
         }
 
