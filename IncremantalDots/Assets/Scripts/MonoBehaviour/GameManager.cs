@@ -1492,22 +1492,63 @@ namespace DeadWalls
         {
             var definition = GetArcherDefinition(type);
             if (definition != null)
-                return definition.BuyCost;
+                return GetScaledArcherCost(definition.BuyCost, definition);
 
+            ResourceCost baseCost;
             switch (type)
             {
                 case ArcherType.Rapid:
-                    return new ResourceCost(55, 0, 35, 20);
+                    baseCost = new ResourceCost(55, 0, 35, 20);
+                    break;
                 case ArcherType.Frost:
-                    return new ResourceCost(45, 55, 25, 0);
+                    baseCost = new ResourceCost(45, 55, 25, 0);
+                    break;
                 default:
-                    return new ResourceCost(45, 0, 0, 20);
+                    baseCost = new ResourceCost(45, 0, 0, 20);
+                    break;
             }
+
+            return ArcherRecruitmentCostUtility.GetScaledCost(
+                baseCost,
+                GetArcherTypeCount(type),
+                ArcherRecruitmentCostUtility.DefaultGrowthInterval,
+                ArcherRecruitmentCostUtility.DefaultGrowthExponent);
         }
 
         public ResourceCost GetArcherBuyCost(ArcherDefinitionSO definition)
         {
-            return definition != null ? definition.BuyCost : ResourceCost.Zero;
+            return definition != null
+                ? GetScaledArcherCost(definition.BuyCost, definition)
+                : ResourceCost.Zero;
+        }
+
+        public ResourceCost GetArcherRetrainCost(ArcherType targetType)
+        {
+            if (targetType == ArcherType.Basic)
+                return ResourceCost.Zero;
+
+            var definition = GetArcherDefinition(targetType);
+            if (definition != null)
+                return GetScaledArcherCost(definition.RetrainCost, definition);
+
+            ResourceCost baseCost = targetType == ArcherType.Rapid
+                ? new ResourceCost(55, 0, 35, 0)
+                : new ResourceCost(45, 55, 25, 0);
+            return ArcherRecruitmentCostUtility.GetScaledCost(
+                baseCost,
+                GetArcherTypeCount(targetType),
+                ArcherRecruitmentCostUtility.DefaultGrowthInterval,
+                ArcherRecruitmentCostUtility.DefaultGrowthExponent);
+        }
+
+        private ResourceCost GetScaledArcherCost(
+            ResourceCost baseCost, ArcherDefinitionSO definition)
+        {
+            return ArcherRecruitmentCostUtility.GetScaledCost(
+                baseCost,
+                GetArcherTypeCount(definition.Type),
+                definition.CostGrowthInterval,
+                definition.CostGrowthExponent);
         }
 
         public ResourceCost GetArcherUpgradeCost(ArcherType type)
@@ -1563,7 +1604,7 @@ namespace DeadWalls
                 && IsArcherTypeUnlocked(definition.Type)
                 && CanAddArchers()
                 && HasPopulationForNewArcher(definition.PopulationCost)
-                && CanAfford(definition.BuyCost);
+                && CanAfford(GetArcherBuyCost(definition));
         }
 
         public bool BuyArcher(ArcherType type)
@@ -1577,7 +1618,7 @@ namespace DeadWalls
             if (!CanBuyArcher(definition))
                 return false;
 
-            var cost = definition.BuyCost;
+            var cost = GetArcherBuyCost(definition);
             if (!SpendResources(cost))
                 return false;
 
@@ -1611,6 +1652,41 @@ namespace DeadWalls
             }
 
             ConsumePopulationForNewArcher();
+            ReadArcherTypeCounts();
+            OnGameStateChanged?.Invoke();
+            return true;
+        }
+
+        public bool CanRetrainBasicArcher(ArcherType targetType)
+        {
+            return _initialized
+                && targetType != ArcherType.Basic
+                && CanAccessEntityManager()
+                && IsArcherTypeUnlocked(targetType)
+                && GetArcherTypeCount(ArcherType.Basic) > 0
+                && CanAfford(GetArcherRetrainCost(targetType));
+        }
+
+        public bool RetrainBasicArcher(ArcherType targetType)
+        {
+            if (!CanRetrainBasicArcher(targetType)
+                || !TryFindArcherEntity(ArcherType.Basic, out Entity entity))
+            {
+                return false;
+            }
+
+            ResourceCost cost = GetArcherRetrainCost(targetType);
+            if (!SpendResources(cost))
+                return false;
+
+            if (!_entityManager.Exists(entity))
+            {
+                if (!freeEconomyTestMode)
+                    AddResources(cost);
+                return false;
+            }
+
+            ApplyArcherTypeToEntity(entity, targetType);
             ReadArcherTypeCounts();
             OnGameStateChanged?.Invoke();
             return true;
@@ -3459,6 +3535,53 @@ namespace DeadWalls
                 1f));
             SetSpriteTint(entity, GetArcherTint(type));
             return true;
+        }
+
+        private bool TryFindArcherEntity(ArcherType type, out Entity entity)
+        {
+            entity = Entity.Null;
+            if (!CanAccessEntityManager())
+                return false;
+
+            var query = _entityManager.CreateEntityQuery(new EntityQueryDesc
+            {
+                All = new ComponentType[] { typeof(ArcherUnit) },
+                None = new ComponentType[] { typeof(Prefab) }
+            });
+            var entities = query.ToEntityArray(Allocator.Temp);
+            try
+            {
+                for (int i = 0; i < entities.Length; i++)
+                {
+                    Entity candidate = entities[i];
+                    if (_entityManager.GetComponentData<ArcherUnit>(candidate).Type != type)
+                        continue;
+
+                    entity = candidate;
+                    return true;
+                }
+
+                return false;
+            }
+            finally
+            {
+                entities.Dispose();
+                query.Dispose();
+            }
+        }
+
+        private void ApplyArcherTypeToEntity(Entity entity, ArcherType targetType)
+        {
+            ArcherUnit archer = _entityManager.GetComponentData<ArcherUnit>(entity);
+            ArcherStats stats = GetScaledArcherStats(targetType);
+            archer.FireRate = stats.FireRate;
+            archer.ArrowDamage = stats.Damage;
+            archer.Range = stats.Range;
+            archer.Type = targetType;
+            archer.SlowDuration = stats.SlowDuration;
+            archer.SlowMultiplier = stats.SlowMultiplier;
+            _entityManager.SetComponentData(entity, archer);
+            SetSpriteTint(entity, GetArcherTint(targetType));
         }
 
         private void RestoreArcherCountsWithinCapacity(

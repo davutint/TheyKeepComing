@@ -103,6 +103,14 @@ namespace DeadWalls
                 : "[MobileCastleSceneSetup] Worker drawer controls prefabda onarildi; NewGameScene aktif olmadigi icin sahne degismedi.");
         }
 
+        [MenuItem("Window/DeadWalls/Repair Archer Retrain Control")]
+        public static void RepairArcherRetrainControl()
+        {
+            EnsureArcherRetrainControlInPrefab();
+            AssetDatabase.ImportAsset(GeneratedHudPrefabPath, ImportAssetOptions.ForceUpdate);
+            Debug.Log("[MobileCastleSceneSetup] Archer retrain kontrolu HUD prefabinda onarildi.");
+        }
+
         private void OnGUI()
         {
             EditorGUILayout.Space(6f);
@@ -3049,6 +3057,7 @@ namespace DeadWalls
             DestroyChildIfExists(canvasTransform, "MarketPanel");
 
             EnsureWorkerDrawerTargetControlsInPrefab();
+            EnsureArcherRetrainControlInPrefab();
 
             GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(GeneratedHudPrefabPath);
             Transform existing = canvasTransform.Find("MobileCastleHudRoot");
@@ -3092,6 +3101,25 @@ namespace DeadWalls
                 // Runtime component sahnede otoriter olarak ekleniyor. Prefabda ikinci bir
                 // WorkerEconomyDrawerUI birakmak scene instance'inda cift listener uretir.
                 DestroyComponentIfExists<WorkerEconomyDrawerUI>(root);
+                PrefabUtility.SaveAsPrefabAsset(root, GeneratedHudPrefabPath);
+            }
+            finally
+            {
+                PrefabUtility.UnloadPrefabContents(root);
+            }
+        }
+
+        private static void EnsureArcherRetrainControlInPrefab()
+        {
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(GeneratedHudPrefabPath);
+            if (prefab == null)
+                throw new InvalidOperationException("Archer HUD prefab bulunamadi: " + GeneratedHudPrefabPath);
+
+            GameObject root = PrefabUtility.LoadPrefabContents(GeneratedHudPrefabPath);
+            try
+            {
+                RectTransform template = FindRectTransformByName(root, "ArcherRecruitmentRowTemplate");
+                EnsureArcherRetrainTemplateControl(template);
                 PrefabUtility.SaveAsPrefabAsset(root, GeneratedHudPrefabPath);
             }
             finally
@@ -3352,6 +3380,7 @@ namespace DeadWalls
             EnsureFallbackArcherRows(market.ArcherDrawerPanel);
             EnsureFallbackTechAndPrep(market.ArcherDrawerPanel);
             BindMarketFields(hudRoot, market);
+            EnsureArcherRetrainTemplateControl(market.ArcherRecruitmentRowTemplate);
             HidePlayerFacingPrepButtons(market);
             HidePlayerFacingArcherProgressionControls(market);
 
@@ -3998,6 +4027,42 @@ namespace DeadWalls
             market.RepairStatusText = FindComponentInChildrenByName<TextMeshProUGUI>(root, "RepairStatusText");
             market.FortifyStatusText = FindComponentInChildrenByName<TextMeshProUGUI>(root, "FortifyStatusText");
             market.RallyStatusText = FindComponentInChildrenByName<TextMeshProUGUI>(root, "RallyStatusText");
+        }
+
+        private static void EnsureArcherRetrainTemplateControl(RectTransform rowTemplate)
+        {
+            if (rowTemplate == null || rowTemplate.Find("ArcherRetrainButton") != null)
+                return;
+
+            Button buyButton = FindComponentInChildrenByName<Button>(
+                rowTemplate.gameObject, "ArcherBuyButton");
+            if (buyButton == null)
+                return;
+
+            GameObject retrainObject = UnityEngine.Object.Instantiate(buyButton.gameObject, rowTemplate);
+            retrainObject.name = "ArcherRetrainButton";
+            Undo.RegisterCreatedObjectUndo(retrainObject, "Create Archer Retrain Button");
+
+            RectTransform rect = retrainObject.GetComponent<RectTransform>();
+            rect.anchoredPosition = new Vector2(95f, 0f);
+            rect.sizeDelta = new Vector2(110f, 60f);
+
+            var image = retrainObject.GetComponent<Image>();
+            if (image != null)
+                image.color = new Color(0.20f, 0.46f, 0.74f, 1f);
+
+            var label = retrainObject.GetComponentInChildren<TextMeshProUGUI>(true);
+            if (label != null)
+            {
+                label.gameObject.name = "ArcherRetrainButtonText";
+                label.text = "RETRAIN";
+                label.enableAutoSizing = true;
+                label.fontSizeMin = 8f;
+                label.fontSizeMax = 13f;
+                label.textWrappingMode = TextWrappingModes.NoWrap;
+            }
+
+            retrainObject.SetActive(true);
         }
 
         private static void HidePlayerFacingPrepButtons(MarketUI market)

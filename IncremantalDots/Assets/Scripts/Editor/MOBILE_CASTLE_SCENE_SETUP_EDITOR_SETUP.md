@@ -71,7 +71,7 @@ SubScene:
 - `HUDController` cycle module: `CyclePanel`, `CyclePhaseText`, `CycleDayLabelText`, `CycleDuskLabelText`, `CycleNightLabelText`, `CycleProgressFill`, `CycleProgressMarker`
 - `HordePressurePanel` prefabda varsa player-facing olarak kapali tutulur
 - `HUDController` defense module: `DefensePercentText`, `DefenseWallFill`, `DefenseGateFill`, `DefenseCoreFill`, `DefenseWallText`, `DefenseGateText`, `DefenseCoreText`, opsiyonel `DefenseDamageGlow`
-- `MarketUI`: `ArcherDrawerPanel`, `DrawerToggleButton`, Basic/Rapid/Frost row text ve buy button alanlari bagli
+- `MarketUI`: `ArcherDrawerPanel`, `DrawerToggleButton`, Basic/Rapid/Frost row text, buy ve dynamic `ArcherRetrainButton` alanlari bagli
 - `MarketUI`: Upgrade butonlari, `ArrowTechPanel`, tech unlock butonlari ve repair/prep butonlari prefabda varsa gizli
 - `CastleEconomyUI`: legacy full-screen panel bindingleri bagli kalabilir ama `PlayerFacingPanelEnabled = false`; `CastleEconomyPanel` ve `CastleTapHint` player-facing kapali tutulur
 - `WorkerEconomyDrawerUI`: sol ust worker drawer toggle/panel, summary alanlari, Wood/Stone/Iron/Food target kontrolleri ve `CAP / EFF` bina yatirim butonlari bagli
@@ -113,13 +113,13 @@ pipeline'i 2026-07-06'da kaldirildi.) Setup tool asagidaki isimleri exact-match 
 - Beklenen continuous cycle alanlari: `CyclePanel`, `CyclePhaseText`, `CycleDayLabelText`, `CycleDuskLabelText`, `CycleNightLabelText`, `CycleProgressFill`, `CycleProgressMarker`
 - Opsiyonel defense feedback: `DefenseDamageGlow`, `DefenseWarningIcon`, fallback `DefenseText`
 - Opsiyonel Castle Interior feedback: `CastleTapHintPulse`, `ProjectedIncomeFrame`, `CastleRepairFrame`, `EconomyEventGlow`
-- Sag drawer archer recruitment icindir. `Basic/Rapid/FrostUpgradeButton`, `ArrowTechPanel`, `RapidTechUnlockButton`, `FrostTechUnlockButton`, `RepairButton`, `FortifyButton`, `RallyButton`, `RefillArrowsButton` ve `StartNextWaveButton` prefabda varsa setup tool bunlari player-facing olarak gizler.
+- Sag drawer archer buy ve Basic -> Rapid/Frost retrain icindir. Dynamic satirlarda `ArcherRetrainButton` kullanilir; legacy `Basic/Rapid/FrostUpgradeButton` kontrolleri setup sirasinda player-facing olarak gizli kalir ve yalniz dynamic template bulunamazsa Rapid/Frost retrain fallback'i olabilir. `ArrowTechPanel`, `RapidTechUnlockButton`, `FrostTechUnlockButton`, `RepairButton`, `FortifyButton`, `RallyButton`, `RefillArrowsButton` ve `StartNextWaveButton` prefabda varsa setup tool bunlari player-facing olarak gizler.
 
 Runtime davranisi prefab icinde degildir; `MarketUI` ve scene setup tool baglar.
 
 Mobile continuous siege loop'ta player-facing `StartNextWaveButton` yoktur ve unlimited arrows acikken `RefillArrowsButton` player-facing UI'da gizlenir/disable edilir. Prefab bu objeleri iceriyorsa tool referansi baglar ama aktif kullanima acmaz.
 
-`CastleRepairButton` legacy Castle Interior akisi icindir. Continuous siege varsayilaninda Castle Interior panel player-facing kapali kalir; sag drawer'in sadece archer buy/recruitment aksiyonlari combat sirasinda kullanilmaya devam eder. Upgrade ve tech unlock full-screen Tech Tree milestone'una birakilir. Castle Interior paneli yoksa setup tool polish fallback uretmez; panel gerekirse dogrudan prefabda kurulur.
+`CastleRepairButton` legacy Castle Interior akisi icindir. Continuous siege varsayilaninda Castle Interior panel player-facing kapali kalir; sag drawer'in archer buy ve Basic -> Rapid/Frost retrain aksiyonlari combat sirasinda kullanilmaya devam eder. Stat upgrade ve tech unlock full-screen Tech Tree milestone'una birakilir. Castle Interior paneli yoksa setup tool polish fallback uretmez; panel gerekirse dogrudan prefabda kurulur.
 
 ## World Visuals
 

@@ -16,7 +16,7 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - `StartNextWave()` debug/public API olarak kalir; mobile player-facing akis continuous day/dusk/night cycle ile ilerler
 - `RepairDefenseFull()`, `BuyFortify()`, `BuyRally()` ve `RefillArrows()` legacy/debug API olarak kalir
 - `GetDefensePercent()` wall/gate/castle toplam HP yuzdesini HUD'a verir
-- Mobile archer economy API'leri: `ArcherDefinitionSO` catalog'undan buy cost/base stat okuma, buy, type count/DPS okuma; `GetTotalArcherCount`, `GetRemainingArcherCapacity` ve `CanAddArchers` Basic/Rapid/Frost ortak `1000` cap'ini sunar. Legacy unlock/upgrade API'leri kodda kalir ama sag drawer player-facing kullanmaz
+- Mobile archer economy API'leri: `ArcherDefinitionSO` catalog'undan type-count scaled buy/retrain cost ve base stat okuma, buy, Basic -> Rapid/Frost in-place retrain, type count/DPS okuma; `GetTotalArcherCount`, `GetRemainingArcherCapacity` ve `CanAddArchers` Basic/Rapid/Frost ortak `1000` cap'ini sunar. Legacy unlock/upgrade API'leri kodda kalir ama sag drawer player-facing kullanmaz
 - Tech Tree runtime state'i (run-scoped, persistence yok): `_techNodeLevels` + `_revealedTechNodes`; katalog `techTreeCatalog` (`TechTreeCatalogSO`, setup tool baglar). API: `IsTechNodeRevealed`, `GetTechNodeLevel`, `CanBuyTechNode(node, out reason)`, `TryBuyTechNode`, `GetRevealedTechNodes`. Root (`castle_heart`) otomatik sahipli baslar; satin alma `RevealChildNodeIds`'i gorunur yapar
 - Tech effect'leri: `UnlockArcherType` (maliyetsiz icsel unlock — `UnlockArcherType()` cagrilmaz, cift harcamayi onler), damage/firerate carpanlari (`GetScaledArcherStats` + `ApplyScaledStatsToArchers`), worker cap / production / population growth (`MobileCastleCombatConfig`'e base'ten yeniden hesaplanarak yazilir), tek Wall MaxHP (CurrentHP orani korunur). Base degerler ilk dokunusta cache'lenir; `RestartGame()` -> `ResetTechTreeState()` hepsini base'e dondurur
 - Worker economy API'leri: `OpenCastleEconomy()`, `CloseCastleEconomy()`, `SetResourceWorkers()`, `ChooseEconomyEvent()`
@@ -78,6 +78,8 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - Row `CostText` alanlarinda mevcut cost ile beraber eksik kaynak varsa `NEED ...`, idle population yoksa `NEED POP` yazar
 - `GameManager.Free Economy Test Mode` acikken cost satirlari `FREE` gosterir; kaynak ve population yetersizligi player-facing aksiyonlari bloklamaz
 - Free Economy Test Mode ortak `1000` cap'i bypass etmez; cap'te row `ARMY CAP 1000/1000` ve `MAX` gosterir
+- Rapid/Frost unlock olduktan sonra `RETRAIN`, bir Basic entity'yi yerinde dönüştürür; toplam garnizon/population değişmez ve cap doluyken de çalışır
+- Buy ve retrain maliyetleri hedef tür sayısına göre definition tuning'inden büyür; ayrı archer upgrade/level UI açılmaz
 - Worker economy aktifken `Repair`, `Fortify` ve `Rally` player-facing drawer'da gizlenir; drawer archer recruitment paneli olarak kalir
 - Mobile unlimited arrow modunda `Arrow Refill` gizlenir
 - Mobile continuous siege loop'ta `Start Next Wave` player-facing UI'da gizlenir; oyun durmadan `DAY / DUSK / NIGHT` cycle'i akar
@@ -181,6 +183,7 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 ECS Systems -> Entity Data -> GameManager.ReadECSData() -> Events -> UI Controllers
 Legacy UI Input -> GameManager.CanApplyUpgrade()/ApplyUpgrade() -> EntityManager.SetComponentData -> ECS
 Archer Drawer Input -> GameManager.CanBuyArcher() -> ArcherCapacityUtility ortak 1000 cap -> resource/population transaction -> GameManager.SpawnArcher() son cap kontrolu -> ECS
+Archer Retrain Input -> GameManager.CanRetrainBasicArcher() -> target-type scaled cost -> mevcut Basic ArcherUnit type/stat/tint in-place degisimi -> count refresh
 Tech Tree Input -> GameManager.TryBuyTechNode() -> reveal/unlock state + MobileCastleCombatConfig/WallSegment/ArcherUnit yazimi -> ECS
 Worker Drawer Input -> GameManager.Set/AdjustWorkerTargetRatioPercent() -> WorkerAllocationUtility -> MobilePopulationAllocation target -> sonraki population auto-allocation -> WorkerVisualRepresentationUtility -> temsili DOTS VillagerWorker count + exact weight -> animation/cargo/fener/delivery feedback
 House Bed Purchase -> GameManager.TryBuyBedCapacity() -> MobileEconomyPriceTuning + MobileBedCapacityUtility owned-capacity sıralı fiyatı -> Wood transaction -> MobileBedCapacityState.PurchasedCapacity -> exact save v6

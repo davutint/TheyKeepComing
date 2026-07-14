@@ -22,8 +22,15 @@ MonoBehaviour:
     Stone: 55
     Iron: 25
     Food: 0
+  RetrainCost:
+    Wood: 45
+    Stone: 55
+    Iron: 25
+    Food: 0
   PopulationCost: 1
   RequiredTechId: frost_arrows
+  CostGrowthInterval: 25
+  CostGrowthExponent: 2
   Damage: 5
   FireRate: 1.2
   Range: 14

@@ -269,6 +269,8 @@ namespace DeadWalls
             AddFingerprintValue(ref hash, gm.GetArcherTypeLevel(type));
             AddFingerprintValue(ref hash, gm.IsArcherTypeUnlocked(type));
             AddFingerprintValue(ref hash, gm.CanBuyArcher(type));
+            if (type != ArcherType.Basic)
+                AddFingerprintValue(ref hash, gm.CanRetrainBasicArcher(type));
         }
 
         private static void AddFingerprintValue(ref int hash, int value)
@@ -339,7 +341,18 @@ namespace DeadWalls
                 SetButtonText(buyButton, !unlocked ? "Locked" : capReached ? "Max" : "Buy");
             }
 
-            HideButton(upgradeButton);
+            if (upgradeButton != null)
+            {
+                bool retrainTarget = type != ArcherType.Basic;
+                upgradeButton.gameObject.SetActive(retrainTarget);
+                upgradeButton.interactable = retrainTarget && gm.CanRetrainBasicArcher(type);
+                if (retrainTarget)
+                {
+                    ResourceCost retrainCost = gm.GetArcherRetrainCost(type);
+                    SetButtonText(upgradeButton,
+                        unlocked ? $"Retrain\n{FormatCostWithNeed(retrainCost, gm.Resources, gm.IsFreeEconomyTestMode)}" : "Locked");
+                }
+            }
         }
 
         private void HideTechControls()
@@ -408,6 +421,8 @@ namespace DeadWalls
                 BasicBuyButton?.onClick.AddListener(HandleBasicBuyClicked);
                 RapidBuyButton?.onClick.AddListener(HandleRapidBuyClicked);
                 FrostBuyButton?.onClick.AddListener(HandleFrostBuyClicked);
+                RapidUpgradeButton?.onClick.AddListener(HandleRapidRetrainClicked);
+                FrostUpgradeButton?.onClick.AddListener(HandleFrostRetrainClicked);
             }
         }
 
@@ -422,13 +437,18 @@ namespace DeadWalls
             BasicBuyButton?.onClick.RemoveListener(HandleBasicBuyClicked);
             RapidBuyButton?.onClick.RemoveListener(HandleRapidBuyClicked);
             FrostBuyButton?.onClick.RemoveListener(HandleFrostBuyClicked);
+            RapidUpgradeButton?.onClick.RemoveListener(HandleRapidRetrainClicked);
+            FrostUpgradeButton?.onClick.RemoveListener(HandleFrostRetrainClicked);
 
             for (int i = 0; i < _dynamicRows.Count; i++)
             {
                 var row = _dynamicRows[i];
                 if (row.BuyButton != null && row.BuyAction != null)
                     row.BuyButton.onClick.RemoveListener(row.BuyAction);
+                if (row.RetrainButton != null && row.RetrainAction != null)
+                    row.RetrainButton.onClick.RemoveListener(row.RetrainAction);
                 row.BuyAction = null;
+                row.RetrainAction = null;
             }
         }
 
@@ -465,6 +485,8 @@ namespace DeadWalls
         private void HandleBasicBuyClicked() => BuyArcher(ArcherType.Basic);
         private void HandleRapidBuyClicked() => BuyArcher(ArcherType.Rapid);
         private void HandleFrostBuyClicked() => BuyArcher(ArcherType.Frost);
+        private void HandleRapidRetrainClicked() => RetrainBasicArcher(ArcherType.Rapid);
+        private void HandleFrostRetrainClicked() => RetrainBasicArcher(ArcherType.Frost);
 
         private void BuyArcher(ArcherType type)
         {
@@ -475,6 +497,12 @@ namespace DeadWalls
         private void BuyArcher(ArcherDefinitionSO definition)
         {
             GameManager.Instance?.BuyArcher(definition);
+            Refresh();
+        }
+
+        private void RetrainBasicArcher(ArcherType targetType)
+        {
+            GameManager.Instance?.RetrainBasicArcher(targetType);
             Refresh();
         }
 
@@ -520,6 +548,8 @@ namespace DeadWalls
             {
                 if (_dynamicRows[i].BuyButton != null)
                     _dynamicRows[i].BuyButton.interactable = interactable;
+                if (_dynamicRows[i].RetrainButton != null)
+                    _dynamicRows[i].RetrainButton.interactable = interactable;
             }
             HideButton(BasicUpgradeButton);
             HideButton(RapidUpgradeButton);
@@ -582,7 +612,9 @@ namespace DeadWalls
                     CostText = FindChildComponent<TMP_Text>(rowObject, "ArcherCostText"),
                     StatusText = FindChildComponent<TMP_Text>(rowObject, "ArcherStatusText"),
                     BuyButton = FindChildComponent<Button>(rowObject, "ArcherBuyButton"),
-                    BuyButtonText = FindChildComponent<TMP_Text>(rowObject, "ArcherBuyButtonText")
+                    BuyButtonText = FindChildComponent<TMP_Text>(rowObject, "ArcherBuyButtonText"),
+                    RetrainButton = FindChildComponent<Button>(rowObject, "ArcherRetrainButton"),
+                    RetrainButtonText = FindChildComponent<TMP_Text>(rowObject, "ArcherRetrainButtonText")
                 });
             }
 
@@ -608,6 +640,8 @@ namespace DeadWalls
                 var row = _dynamicRows[i];
                 if (row.BuyButton != null && row.BuyAction != null)
                     row.BuyButton.onClick.RemoveListener(row.BuyAction);
+                if (row.RetrainButton != null && row.RetrainAction != null)
+                    row.RetrainButton.onClick.RemoveListener(row.RetrainAction);
 
                 if (row.Root == null)
                     continue;
@@ -629,38 +663,112 @@ namespace DeadWalls
             ArcherType type = row.Definition.Type;
             bool unlocked = gm.IsArcherTypeUnlocked(type);
             bool canBuy = gm.CanBuyArcher(row.Definition);
+            bool retrainTarget = type != ArcherType.Basic;
+            bool canRetrain = retrainTarget && gm.CanRetrainBasicArcher(type);
             bool capReached = gm.GetRemainingArcherCapacity() <= 0;
 
             SetText(row.NameText, row.Definition.DisplayName);
             SetText(row.CountText, $"x{gm.GetArcherTypeCount(type)}");
             SetText(row.DpsText, unlocked ? $"DPS {gm.GetArcherTypeDps(type):0.#}" : "LOCKED");
             SetText(row.LevelText, unlocked ? $"LV {gm.GetArcherTypeLevel(type)}" : "TECH");
-            SetText(row.CostText, !unlocked
-                ? "LOCKED BY TECH"
-                : capReached
-                    ? $"ARMY CAP {gm.GetTotalArcherCount()}/{ArcherCapacityUtility.MaxTotalArchers}"
-                    : BuildBuyCostLabel(gm, row.Definition));
-            SetText(row.StatusText, BuildStatusLabel(gm, row.Definition, unlocked, canBuy));
+            SetText(row.CostText, BuildArcherCostLabel(
+                gm, row.Definition, unlocked, capReached, retrainTarget));
+            if (row.StatusText != null)
+            {
+                row.StatusText.gameObject.SetActive(!retrainTarget || row.RetrainButton == null);
+                SetText(row.StatusText, retrainTarget
+                    ? BuildRetrainStatusLabel(gm, row.Definition, unlocked, canRetrain)
+                    : BuildStatusLabel(gm, row.Definition, unlocked, canBuy));
+            }
 
             if (row.BuyButton != null)
             {
                 row.BuyButton.interactable = canBuy;
                 SetText(row.BuyButtonText, !unlocked ? "LOCKED" : capReached ? "MAX" : "BUY");
             }
+
+            ConfigureDynamicRowButtons(row, retrainTarget);
+            if (row.RetrainButton != null)
+            {
+                row.RetrainButton.gameObject.SetActive(retrainTarget);
+                row.RetrainButton.interactable = canRetrain;
+                SetText(row.RetrainButtonText, !unlocked ? "LOCKED" : "RETRAIN");
+            }
         }
 
         private static string BuildBuyCostLabel(GameManager gm, ArcherDefinitionSO definition)
         {
-            string label = FormatCostWithNeed(definition.BuyCost, gm.Resources, gm.IsFreeEconomyTestMode);
+            ResourceCost buyCost = gm.GetArcherBuyCost(definition);
+            string label = FormatCostWithNeed(buyCost, gm.Resources, gm.IsFreeEconomyTestMode);
             if (!gm.IsFreeEconomyTestMode
                 && gm.IsMobilePopulationEconomyEnabled()
-                && definition.BuyCost.CanAfford(gm.Resources)
+                && buyCost.CanAfford(gm.Resources)
                 && gm.GetIdlePopulation() < definition.PopulationCost)
             {
                 label = $"{label} NEED POP";
             }
 
             return label;
+        }
+
+        private static string BuildArcherCostLabel(
+            GameManager gm,
+            ArcherDefinitionSO definition,
+            bool unlocked,
+            bool capReached,
+            bool retrainTarget)
+        {
+            if (!unlocked)
+                return "LOCKED BY TECH";
+
+            string buyLabel = capReached
+                ? "BUY MAX"
+                : $"BUY {BuildBuyCostLabel(gm, definition)}";
+            if (!retrainTarget)
+                return buyLabel;
+
+            string retrainLabel = FormatCostWithNeed(
+                gm.GetArcherRetrainCost(definition.Type),
+                gm.Resources,
+                gm.IsFreeEconomyTestMode);
+            return $"{buyLabel} | RET {retrainLabel}";
+        }
+
+        private static string BuildRetrainStatusLabel(
+            GameManager gm,
+            ArcherDefinitionSO definition,
+            bool unlocked,
+            bool canRetrain)
+        {
+            if (!unlocked)
+                return "TECH LOCKED";
+            if (gm.GetArcherTypeCount(ArcherType.Basic) <= 0)
+                return "NEED BASIC";
+            if (canRetrain || gm.IsFreeEconomyTestMode)
+                return "RETRAIN READY";
+
+            string need = gm.GetArcherRetrainCost(definition.Type).ToNeedDisplayString(gm.Resources);
+            return string.IsNullOrEmpty(need) ? "WAIT" : need;
+        }
+
+        private static void ConfigureDynamicRowButtons(DynamicArcherRow row, bool retrainTarget)
+        {
+            if (row?.BuyButton == null)
+                return;
+
+            RectTransform buyRect = row.BuyButton.GetComponent<RectTransform>();
+            if (!retrainTarget || row.RetrainButton == null)
+            {
+                buyRect.anchoredPosition = new Vector2(195f, 0f);
+                buyRect.sizeDelta = new Vector2(100f, 60f);
+                return;
+            }
+
+            buyRect.anchoredPosition = new Vector2(200f, 0f);
+            buyRect.sizeDelta = new Vector2(80f, 60f);
+            RectTransform retrainRect = row.RetrainButton.GetComponent<RectTransform>();
+            retrainRect.anchoredPosition = new Vector2(95f, 0f);
+            retrainRect.sizeDelta = new Vector2(110f, 60f);
         }
 
         private static string BuildStatusLabel(GameManager gm, ArcherDefinitionSO definition, bool unlocked, bool canBuy)
@@ -677,7 +785,7 @@ namespace DeadWalls
             if (gm.IsFreeEconomyTestMode)
                 return "READY";
 
-            string need = definition.BuyCost.ToNeedDisplayString(gm.Resources);
+            string need = gm.GetArcherBuyCost(definition).ToNeedDisplayString(gm.Resources);
             if (!string.IsNullOrEmpty(need))
                 return need;
 
@@ -692,11 +800,18 @@ namespace DeadWalls
             for (int i = 0; i < _dynamicRows.Count; i++)
             {
                 var row = _dynamicRows[i];
-                if (row.BuyButton == null || row.BuyAction != null)
+                if (row.BuyButton != null && row.BuyAction == null)
+                {
+                    row.BuyAction = () => BuyArcher(row.Definition);
+                    row.BuyButton.onClick.AddListener(row.BuyAction);
+                }
+
+                if (row.RetrainButton == null || row.RetrainAction != null)
                     continue;
 
-                row.BuyAction = () => BuyArcher(row.Definition);
-                row.BuyButton.onClick.AddListener(row.BuyAction);
+                ArcherType targetType = row.Definition.Type;
+                row.RetrainAction = () => RetrainBasicArcher(targetType);
+                row.RetrainButton.onClick.AddListener(row.RetrainAction);
             }
         }
 
@@ -759,6 +874,9 @@ namespace DeadWalls
             public Button BuyButton;
             public TMP_Text BuyButtonText;
             public UnityAction BuyAction;
+            public Button RetrainButton;
+            public TMP_Text RetrainButtonText;
+            public UnityAction RetrainAction;
         }
 
         private static void SetButtonText(Button button, string value)

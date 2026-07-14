@@ -18,8 +18,13 @@ namespace DeadWalls
 
         [Header("Recruitment")]
         public ResourceCost BuyCost = new ResourceCost(45, 0, 0, 20);
+        public ResourceCost RetrainCost = ResourceCost.Zero;
         [Min(0)] public int PopulationCost = 1;
         public string RequiredTechId;
+
+        [Header("Incremental Cost")]
+        [Min(1)] public int CostGrowthInterval = ArcherRecruitmentCostUtility.DefaultGrowthInterval;
+        [Min(0.01f)] public float CostGrowthExponent = ArcherRecruitmentCostUtility.DefaultGrowthExponent;
 
         [Header("Combat")]
         [Min(0f)] public float Damage = 10f;
@@ -56,6 +61,7 @@ namespace DeadWalls
                     Description = "Fast shots, lower damage.";
                     SortOrder = 20;
                     BuyCost = new ResourceCost(55, 0, 35, 20);
+                    RetrainCost = new ResourceCost(55, 0, 35, 0);
                     RequiredTechId = "rapid_volley";
                     Damage = 6f;
                     FireRate = 3f;
@@ -71,6 +77,7 @@ namespace DeadWalls
                     Description = "Slows one target.";
                     SortOrder = 30;
                     BuyCost = new ResourceCost(45, 55, 25, 0);
+                    RetrainCost = new ResourceCost(45, 55, 25, 0);
                     RequiredTechId = "frost_arrows";
                     Damage = 5f;
                     FireRate = 1.2f;
@@ -86,6 +93,7 @@ namespace DeadWalls
                     Description = "Balanced single-target defender.";
                     SortOrder = 10;
                     BuyCost = new ResourceCost(45, 0, 0, 20);
+                    RetrainCost = ResourceCost.Zero;
                     RequiredTechId = string.Empty;
                     Damage = 10f;
                     FireRate = 1.5f;
@@ -95,6 +103,9 @@ namespace DeadWalls
                     Tint = Color.white;
                     break;
             }
+
+            CostGrowthInterval = ArcherRecruitmentCostUtility.DefaultGrowthInterval;
+            CostGrowthExponent = ArcherRecruitmentCostUtility.DefaultGrowthExponent;
         }
 
         internal static ArcherDefinitionSO CreateRuntimeDefault(ArcherType type)

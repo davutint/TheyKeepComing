@@ -89,7 +89,7 @@ Script eklendikten sonra disaridan manuel compile komutu calistirma. Unity refre
 - `MobileCastleHudRoot`
   - `HUDController`: economy text'leri, `WaveText`, `KillsText`, `WaveRewardText`, `DamageFlashImage` ve varsa defense module alanlari bagli olmali.
   - Defense module: `DefensePercentText`, `DefenseWallFill`, `DefenseWallText`. Legacy Gate/Core referanslari serialize uyumlulugu icin kalabilir ama runtime'da gizlenir.
-  - `MarketUI`: `ArcherDrawerPanel`, `DrawerToggleButton`, Basic/Rapid/Frost row buy alanlari bagli olmali.
+  - `MarketUI`: `ArcherDrawerPanel`, `DrawerToggleButton`, Basic/Rapid/Frost row buy alanlari ve dynamic template `ArcherRetrainButton` bagli olmali.
   - `MarketUI`: `Basic/Rapid/FrostUpgradeButton`, `ArrowTechPanel`, `RapidTechUnlockButton`, `FrostTechUnlockButton` prefabda varsa player-facing olarak gizlenmelidir.
   - Castle Yard: `RepairButton`; polish prefabda varsa `FortifyButton`, `RallyButton` ve cost/status text'leri.
 - `Canvas/DayNightOverlay`
@@ -116,6 +116,8 @@ Script eklendikten sonra disaridan manuel compile komutu calistirma. Unity refre
 - Drawer toggle ile sag `Archer Recruitment` paneli acilip kapanir ve oyun pause olmaz.
 - Basic buy kaynak dusurup yeni Basic okcu spawn eder.
 - Rapid/Frost locked baslar; sag panelde unlock/upgrade butonu gosterilmez, unlock ileride Tech Tree tarafindan yapilacaktir.
+- Rapid/Frost unlock olduktan sonra `RETRAIN` bir Basic'i yerinde donusturur; toplam archer/population ayni kalir.
+- Prefab retrain binding'i kaybolursa `Window > DeadWalls > Repair Archer Retrain Control` calistirilir.
 - Kaynak yetmiyorsa ilgili row `CostText` alaninda `NEED ...` gorunur.
 - Sag panelde upgrade butonu gorunmez; panel sadece okcu satin alma icindir.
 - Frost oklar hedef zombiyi yavaslatir.

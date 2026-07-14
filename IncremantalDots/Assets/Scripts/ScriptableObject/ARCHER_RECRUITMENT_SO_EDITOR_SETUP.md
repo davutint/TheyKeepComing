@@ -9,7 +9,9 @@ Beklenen asset yolu:
 - `Assets/ScriptableObject/MobileCastle/Archers/FrostArcher.asset`
 - `Assets/ScriptableObject/MobileCastle/Archers/ArcherRecruitmentCatalog.asset`
 
-Setup tool bu catalog'u `GameManager.ArcherCatalog` ve `MarketUI.ArcherCatalog` alanlarina baglar. Default Basic/Rapid/Frost definition'lari catalog'da eksikse ekler ama catalog'daki ekstra definition asset'lerini silmez; yeni okcu ekleme akisi catalog'a yeni asset ekleyerek ilerlemelidir. UI tarafinda `ArcherRecruitmentListRoot` ve inactive `ArcherRecruitmentRowTemplate` varsa `MarketUI` satirlari runtime'da template'ten uretir. Template yoksa eski Basic/Rapid/Frost row binding'leri fallback olarak calismaya devam eder.
+Setup tool bu catalog'u `GameManager.ArcherCatalog` ve `MarketUI.ArcherCatalog` alanlarina baglar. Default Basic/Rapid/Frost definition'lari catalog'da eksikse ekler ama catalog'daki ekstra definition asset'lerini silmez; yeni okcu ekleme akisi catalog'a yeni asset ekleyerek ilerlemelidir. UI tarafinda `ArcherRecruitmentListRoot` ve inactive `ArcherRecruitmentRowTemplate` varsa `MarketUI` satirlari runtime'da template'ten uretir. Template `ArcherRetrainButton` tasir; Basic satirinda gizlenir, acilmis Rapid/Frost satirlarinda Basic'i yerinde donusturur. Template yoksa eski Basic/Rapid/Frost row binding'leri buy ve retrain fallback'i olarak calisir.
 
 Ortak `1000` okcu cap'i catalog veya definition Inspector alani degildir. Cap dolunca
 hem dynamic hem fallback row'lar `ARMY CAP 1000/1000` ve `MAX` gosterir.
+Cap yeni entity buy'ını engeller; toplamı değiştirmeyen retrain'i engellemez. Buy/retrain
+base maliyeti ile growth interval/exponent her definition asset'inde ayarlanır.

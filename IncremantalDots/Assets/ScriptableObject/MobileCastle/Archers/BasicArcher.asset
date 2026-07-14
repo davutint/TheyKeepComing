@@ -22,8 +22,15 @@ MonoBehaviour:
     Stone: 0
     Iron: 0
     Food: 20
+  RetrainCost:
+    Wood: 0
+    Stone: 0
+    Iron: 0
+    Food: 0
   PopulationCost: 1
   RequiredTechId: 
+  CostGrowthInterval: 25
+  CostGrowthExponent: 2
   Damage: 10
   FireRate: 1.5
   Range: 15

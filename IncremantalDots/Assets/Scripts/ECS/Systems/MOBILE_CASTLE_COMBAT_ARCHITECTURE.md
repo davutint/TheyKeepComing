@@ -224,10 +224,12 @@ Mobile normal mode'da `DamageCleanupSystem`, death timer biten zombiler icin kil
 
 ## Archer Economy Drawer
 
-`MarketUI`, `MobileCastleHudRoot` altindaki `ArcherDrawerPanel` controller'idir. Drawer combat sirasinda acilip kapanir ve `Time.timeScale` degistirmez. Sag drawer'in player-facing rolu yalnizca archer recruitment'tir; upgrade ve tech unlock aksiyonlari burada gosterilmez.
+`MarketUI`, `MobileCastleHudRoot` altindaki `ArcherDrawerPanel` controller'idir. Drawer combat sirasinda acilip kapanir ve `Time.timeScale` degistirmez. Sag drawer'in player-facing rolu archer recruitment ve Basic -> Rapid/Frost retrain'dir; ayrı upgrade/level ve tech unlock aksiyonlari burada gosterilmez.
 
 - Basic baslangicta unlocked.
 - Rapid/Frost kilitli baslar; unlock ileride full-screen Tech Tree tarafindan yapilacaktir.
+- Unlock sonrasi retrain mevcut bir Basic entity'yi yerinde hedef type/stat/tint'e cevirir; population, toplam archer ve cap kullanimi degismez.
+- Buy ve retrain maliyeti hedef türün mevcut sayısına göre `ArcherDefinitionSO` tuning'iyle büyür.
 - Basic Buy: `45W + 20F`.
 - Rapid Buy: `55W + 35I + 20F`.
 - Frost Buy: `45W + 55S + 25I`.
