@@ -32,7 +32,9 @@ owner'idir. Yeni katalog legacy catalog ile paralel satin alma owner'i degildir.
 - Cross-link yalniz baska branch'teki bir sonraki depth'e gider. Bu nedenle cycle
   uretemez; source ve target basina en fazla bir cross-link kullanilir.
 - Root run basinda `Revealed`, level `1` ve unlocked'dir. Diger butun node'lar
-  `Hidden`, level `0` ve unlocked uretilir. E3 reveal katmani bu hazir graph'i tuketir.
+  `Hidden`, level `0` ve unlocked uretilir. E3 `HeartGraphRevealService`, generator
+  bittikten sonra root'un yalniz dogrudan komsularini reveal eder; ayrintili redaction
+  contract'i `HEART_GRAPH_REVEAL_ARCHITECTURE.md` belgesindedir.
 
 ## Authored tag sozlesmesi
 
@@ -107,4 +109,3 @@ kanitlar:
 - Disconnected core path detection.
 - Request ile Keystone sayisi uyusmazligi detection.
 - Root disindaki butun node'larin hidden/level 0/unlocked baslamasi.
-
