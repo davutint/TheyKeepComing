@@ -13,7 +13,7 @@ namespace DeadWalls
     [Serializable]
     public class RunSaveState
     {
-        public const int CurrentVersion = 7;
+        public const int CurrentVersion = 8;
         public const int MinimumSupportedVersion = 3;
 
         public int Version = CurrentVersion;
@@ -76,6 +76,8 @@ namespace DeadWalls
         public float FoodAccumulator;
         public int ArrowCurrent;
         public float ArrowAccumulator;
+        public int ArrowCapacityLevel;
+        public int ArrowEfficiencyLevel;
 
         // Nufus + isci dagilimi
         public int PopulationTotal;
@@ -349,6 +351,15 @@ namespace DeadWalls
                 // tasimiyordu. Mevcut exact 40x25 V1 layout'una acik migration yapilir.
                 state.ArcherFormationVersion = ArcherFormationUtility.CurrentVersion;
                 state.Version = 7;
+            }
+
+            if (state.Version == 7)
+            {
+                // v7 finite ammo capacity/efficiency run seviyelerini tasimiyordu.
+                // Legacy mobile stok hedefi 200 oldugu icin temiz level 0 migration'i exact'tir.
+                state.ArrowCapacityLevel = 0;
+                state.ArrowEfficiencyLevel = 0;
+                state.Version = 8;
             }
         }
 

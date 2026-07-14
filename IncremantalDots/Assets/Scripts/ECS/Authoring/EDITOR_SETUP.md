@@ -46,6 +46,10 @@ NewGameScene icin setup tool `GameStateAuthoring` kaynaklarini mobile economy'ye
 - Passive income Wood/Stone/Iron/Food: `90 / 50 / 30 / 75` per minute
 - Initial Arrows: `200`
 
+Arrow stoku finite'tir. Refill/capacity/efficiency kurulumu ve HUD binding'leri icin
+`Assets/Scripts/ECS/Systems/ARROW_AMMO_EDITOR_SETUP.md` izlenir; Fletcher veya
+`ArrowProductionSystem` V1 akimina baglanmaz.
+
 Okcu satin alma/upgrade davranisi SubScene authoring'de degil, ana scene `GameManager` + `MarketUI` drawer akisi tarafindadir.
 
 ## Prefab'lar (Assets/Prefabs/)

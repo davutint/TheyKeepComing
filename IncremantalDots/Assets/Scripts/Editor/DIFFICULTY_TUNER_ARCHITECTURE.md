@@ -32,8 +32,9 @@ tek profil iterasyonuyla, KOD YAZMADAN tasindi).
    - `WaveSpawnSystem` (continuous): batch'e gunun `SpawnBatchMult`'u.
 5. **`DifficultyTunerWindow`** (Window > DeadWalls > Difficulty Tuner):
    - Profil sec/inline duzenle (CurveField'lar dahil), Default olustur/bul.
-   - Ekonomi Fiyat Egrileri foldout'u ayni profil alanlarini duzenler; Play Mode Apply
-     baked `MobileEconomyPriceTuning` component'ini canli gunceller.
+   - Ekonomi Fiyat Egrileri foldout'u bed, worker bina ve finite Arrow refill/CAP/EFF
+     alanlarini duzenler; Play Mode Apply baked `MobileEconomyPriceTuning` component'ini
+     canli gunceller.
    - **Apply**: subscene authoring'e bagla (bake yolu) + play moddaysa CANLI uygula
      (config alanlari SetComponentData + buffer yeniden ornekleme).
    - **Run Bot**: profili canli uygular, RestartGame + Long Run Simulator'u baslatir

@@ -47,8 +47,6 @@ namespace DeadWalls
         private int4 _lastSyncedWorkerVisualCounts;
         private int4 _lastSyncedWorkerVisualActualCounts;
         private UpgradeCard[] _currentUpgradeCards;
-        private const int MobileArrowRefillTarget = 200;
-        private const int LegacyArrowRefillTarget = 50;
         private const float TypeDamageMultiplierPerLevel = 1.12f;
         private const float TypeFireRateMultiplierPerLevel = 1.08f;
         private const float FrostSlowDurationPerLevel = 0.15f;
@@ -699,21 +697,173 @@ namespace DeadWalls
             return true;
         }
 
-        public bool RefillArrows()
+        public int GetArrowCapacity()
         {
-            if (!CanAccessEntityManager() || !_entityManager.Exists(_gameStateEntity)
-                || !_entityManager.HasComponent<ArrowSupply>(_gameStateEntity))
+            ArrowSupply supply = TryGetArrowSupply(out _, out var current) ? current : ArrowSupply;
+            return ArrowEconomyUtility.GetCapacity(supply, GetEconomyPriceTuning());
+        }
+
+        public int GetArrowPackageSize()
+        {
+            return GetEconomyPriceTuning().ArrowRefillPackageSize;
+        }
+
+        public int GetArrowsPerWood()
+        {
+            ArrowSupply supply = TryGetArrowSupply(out _, out var current) ? current : ArrowSupply;
+            return ArrowEconomyUtility.GetArrowsPerWood(supply, GetEconomyPriceTuning());
+        }
+
+        public ArrowRefillQuote GetArrowRefillQuote(int packageCount)
+        {
+            ArrowSupply supply = TryGetArrowSupply(out _, out var current) ? current : ArrowSupply;
+            if (!ArrowEconomyUtility.TryGetPackageQuote(
+                    supply, GetEconomyPriceTuning(), packageCount, out var quote))
+            {
+                return default;
+            }
+
+            return quote;
+        }
+
+        public ArrowRefillQuote GetArrowBuyMaxQuote()
+        {
+            ArrowSupply supply = TryGetArrowSupply(out _, out var current) ? current : ArrowSupply;
+            int availableWood = freeEconomyTestMode ? int.MaxValue : math.max(0, Resources.Wood);
+            return ArrowEconomyUtility.TryGetBuyMaxQuote(
+                supply, GetEconomyPriceTuning(), availableWood, out var quote)
+                ? quote
+                : default;
+        }
+
+        public bool CanBuyArrowRefill(int packageCount)
+        {
+            ArrowRefillQuote quote = GetArrowRefillQuote(packageCount);
+            return _initialized && !GameState.IsGameOver && !GameState.IsLevelUpPending
+                && quote.IsValid
+                && CanAfford(new ResourceCost(quote.WoodCost, 0, 0, 0));
+        }
+
+        public bool CanBuyMaxArrowRefill()
+        {
+            ArrowRefillQuote quote = GetArrowBuyMaxQuote();
+            return _initialized && !GameState.IsGameOver && !GameState.IsLevelUpPending
+                && quote.IsValid
+                && CanAfford(new ResourceCost(quote.WoodCost, 0, 0, 0));
+        }
+
+        public bool TryBuyArrowRefill(int packageCount)
+        {
+            if (!CanBuyArrowRefill(packageCount)
+                || !TryGetArrowSupply(out Entity entity, out var supply))
             {
                 return false;
             }
 
-            var arrowSupply = _entityManager.GetComponentData<ArrowSupply>(_gameStateEntity);
-            int target = TryGetMobileConfigEntity(out _) ? MobileArrowRefillTarget : LegacyArrowRefillTarget;
-            arrowSupply.Current = math.max(arrowSupply.Current, target);
-            arrowSupply.Accumulator = 0f;
-            _entityManager.SetComponentData(_gameStateEntity, arrowSupply);
-            ArrowSupply = arrowSupply;
+            MobileEconomyPriceTuning tuning = GetEconomyPriceTuning();
+            if (!ArrowEconomyUtility.TryGetPackageQuote(supply, tuning, packageCount, out var quote))
+                return false;
+
+            var next = supply;
+            if (!ArrowEconomyUtility.TryApplyRefill(ref next, tuning, quote)
+                || !SpendResources(new ResourceCost(quote.WoodCost, 0, 0, 0)))
+            {
+                return false;
+            }
+
+            _entityManager.SetComponentData(entity, next);
+            ArrowSupply = next;
             OnGameStateChanged?.Invoke();
+            return true;
+        }
+
+        public bool TryBuyMaxArrowRefill()
+        {
+            if (!CanBuyMaxArrowRefill()
+                || !TryGetArrowSupply(out Entity entity, out var supply))
+            {
+                return false;
+            }
+
+            MobileEconomyPriceTuning tuning = GetEconomyPriceTuning();
+            int availableWood = freeEconomyTestMode ? int.MaxValue : math.max(0, Resources.Wood);
+            if (!ArrowEconomyUtility.TryGetBuyMaxQuote(supply, tuning, availableWood, out var quote))
+                return false;
+
+            var next = supply;
+            if (!ArrowEconomyUtility.TryApplyRefill(ref next, tuning, quote)
+                || !SpendResources(new ResourceCost(quote.WoodCost, 0, 0, 0)))
+            {
+                return false;
+            }
+
+            _entityManager.SetComponentData(entity, next);
+            ArrowSupply = next;
+            OnGameStateChanged?.Invoke();
+            return true;
+        }
+
+        public int GetArrowUpgradeLevel(ArrowUpgradeType type)
+        {
+            ArrowSupply supply = TryGetArrowSupply(out _, out var current) ? current : ArrowSupply;
+            return ArrowEconomyUtility.GetUpgradeLevel(supply, type);
+        }
+
+        public ResourceCost GetArrowUpgradeCost(ArrowUpgradeType type)
+        {
+            ArrowSupply supply = TryGetArrowSupply(out _, out var current) ? current : ArrowSupply;
+            if (!ArrowEconomyUtility.TryGetUpgradeCost(
+                    supply, type, GetEconomyPriceTuning(), out var cost))
+            {
+                return ResourceCost.Zero;
+            }
+
+            return new ResourceCost(cost.Wood, 0, cost.Iron, 0);
+        }
+
+        public bool CanBuyArrowUpgrade(ArrowUpgradeType type)
+        {
+            ResourceCost cost = GetArrowUpgradeCost(type);
+            return _initialized && !GameState.IsGameOver && !GameState.IsLevelUpPending
+                && (cost.Wood > 0 || cost.Iron > 0)
+                && CanAfford(cost);
+        }
+
+        public bool TryBuyArrowUpgrade(ArrowUpgradeType type)
+        {
+            if (!CanBuyArrowUpgrade(type)
+                || !TryGetArrowSupply(out Entity entity, out var supply)
+                || !ArrowEconomyUtility.TryGetUpgradeCost(
+                    supply, type, GetEconomyPriceTuning(), out var upgradeCost))
+            {
+                return false;
+            }
+
+            var next = supply;
+            if (!ArrowEconomyUtility.TryIncreaseUpgradeLevel(ref next, type))
+                return false;
+
+            var cost = new ResourceCost(upgradeCost.Wood, 0, upgradeCost.Iron, 0);
+            if (!SpendResources(cost))
+                return false;
+
+            _entityManager.SetComponentData(entity, next);
+            ArrowSupply = next;
+            OnGameStateChanged?.Invoke();
+            return true;
+        }
+
+        private bool TryGetArrowSupply(out Entity entity, out ArrowSupply supply)
+        {
+            entity = _gameStateEntity;
+            supply = default;
+            if (!CanAccessEntityManager() || !_entityManager.Exists(entity)
+                || !_entityManager.HasComponent<ArrowSupply>(entity))
+            {
+                return false;
+            }
+
+            supply = _entityManager.GetComponentData<ArrowSupply>(entity);
             return true;
         }
 
@@ -803,11 +953,6 @@ namespace DeadWalls
             budget = _entityManager.GetComponentData<ContinuousSpawnBudgetData>(mobileConfigEntity);
             ContinuousSpawnBudget = budget;
             return true;
-        }
-
-        public bool IsUnlimitedArrowsEnabled()
-        {
-            return TryGetMobileCombatConfig(out var config) && config.UnlimitedArrows;
         }
 
         public bool IsMobilePopulationEconomyEnabled()
@@ -2784,6 +2929,8 @@ namespace DeadWalls
                 FoodAccumulator = accumulator.Food,
                 ArrowCurrent = ArrowSupply.Current,
                 ArrowAccumulator = ArrowSupply.Accumulator,
+                ArrowCapacityLevel = ArrowSupply.CapacityLevel,
+                ArrowEfficiencyLevel = ArrowSupply.EfficiencyLevel,
                 PopulationTotal = Population.Total,
                 PopulationCapacity = Population.Capacity,
                 PopulationBaseCapacity = Population.BaseCapacity,
@@ -3066,7 +3213,14 @@ namespace DeadWalls
             });
             _entityManager.SetComponentData(_gameStateEntity, new ArrowSupply
             {
-                Current = save.ArrowCurrent,
+                Current = math.clamp(save.ArrowCurrent, 0,
+                    ArrowEconomyUtility.GetCapacity(new ArrowSupply
+                    {
+                        CapacityLevel = math.max(0, save.ArrowCapacityLevel),
+                        EfficiencyLevel = math.max(0, save.ArrowEfficiencyLevel)
+                    }, GetEconomyPriceTuning())),
+                CapacityLevel = math.max(0, save.ArrowCapacityLevel),
+                EfficiencyLevel = math.max(0, save.ArrowEfficiencyLevel),
                 Accumulator = save.ArrowAccumulator
             });
 
@@ -5064,12 +5218,17 @@ namespace DeadWalls
                 Food = 0f
             });
 
-            // Ok envanter resetle
-            _entityManager.SetComponentData(_gameStateEntity, new ArrowSupply
+            // Finite ok envanteri resetle; refill/capacity/efficiency run state'idir.
+            var resetArrowSupply = new ArrowSupply
             {
-                Current = mobileMode ? 200 : 50,
+                CapacityLevel = 0,
+                EfficiencyLevel = 0,
                 Accumulator = 0f
-            });
+            };
+            resetArrowSupply.Current = mobileMode
+                ? ArrowEconomyUtility.GetCapacity(resetArrowSupply, GetEconomyPriceTuning())
+                : 50;
+            _entityManager.SetComponentData(_gameStateEntity, resetArrowSupply);
 
             // Nufus resetle
             _entityManager.SetComponentData(_gameStateEntity, new PopulationState

@@ -18,7 +18,7 @@ Castle Heart teknoloji etkileri ayrı bir katmandır. Doğrudan bina yatırımı
 - Iron Capacity / Efficiency
 - Food Capacity / Efficiency
 
-Kaynak ve yatırım türlerinin seviyeleri birbirinden bağımsızdır. `RestartGame()` sekiz alanı sıfırlar. Exact Continue bu state'i güncel `RunSaveState v7` içinden geri kurar; alanlar ilk kez v6'da eklenmiştir.
+Kaynak ve yatırım türlerinin seviyeleri birbirinden bağımsızdır. `RestartGame()` sekiz alanı sıfırlar. Exact Continue bu state'i güncel `RunSaveState v8` içinden geri kurar; alanlar ilk kez v6'da eklenmiştir.
 
 ## Maliyet eğrisi
 
@@ -52,11 +52,11 @@ Capacity toplamı `int.MaxValue` sınırında saturate edilir. Efficiency bonusu
 
 ## Save sözleşmesi
 
-Schema v6'da eklenen sekiz seviye güncel `v7` snapshot'ta açık alanlar olarak saklanır. `v3 -> v4 -> v5 -> v6`, `v4 -> v5 -> v6` ve `v5 -> v6` migration zincirlerinde eski koşular sıfır bina yatırımıyla devam eder; ardından formation alanıyla v7'ye yükseltilir. Restore state'i Heart/Council aggregate hesabından önce yazar; böylece Continue sonunda bütün katmanlar tek seferde doğru birleşir.
+Schema v6'da eklenen sekiz seviye güncel `v8` snapshot'ta açık alanlar olarak saklanır. `v3 -> v4 -> v5 -> v6`, `v4 -> v5 -> v6` ve `v5 -> v6` migration zincirlerinde eski koşular sıfır bina yatırımıyla devam eder; ardından formation alanıyla v7'ye ve finite Arrow alanlarıyla v8'e yükseltilir. Restore state'i Heart/Council aggregate hesabından önce yazar; böylece Continue sonunda bütün katmanlar tek seferde doğru birleşir.
 
 ## Doğrulama
 
 - `MobileWorkerBuildingUpgradeUtilityTests`: default ve profile-driven maliyetler, sanitize, `1.35^level` eğrisi, bağımsız seviyeler, additive etkiler ve taşma reddi.
 - `WorkerAllocationPlayModeTests.WorkerDrawer_TargetControlsAndBuildingUpgradesUseBoundRuntimeState`: HUD binding, iki kaynak harcaması, cap ve üretim etkisi.
 - `ExactRunContinuePlayModeTests.WorkerBuildingInvestments_SpendBothResourcesAndPersistAcrossExactContinue`: transaction, sonraki fiyat ve exact Continue.
-- `RunPersistenceTests`: güncel v7 round-trip; v3/v4/v5 worker-building ve v6 formation migration'ları.
+- `RunPersistenceTests`: güncel v8 round-trip; v3/v4/v5 worker-building, v6 formation ve v7 Arrow migration'ları.

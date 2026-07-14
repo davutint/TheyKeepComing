@@ -36,6 +36,8 @@ Tum component'lar unmanaged ECS struct olarak tutulur. Davranis sistemlerde, ver
 - `ArrowPoolRuntimeData`: prewarm/expand ayarlari ile total/available/active ve rent/return telemetry'sini tasir.
 - `ArrowPoolAvailable`: inactive pooled ok entity referanslarinin LIFO buffer'idir.
 - `ArrowPoolMember`: ok entity'sinin pool sahipligini ve rent generation'ini tasir.
+- `ArrowSupply`: finite stok ile run ici Capacity/Efficiency seviyelerini tasir; `Accumulator` yalniz legacy uyumluluktur.
+- `ArrowEconomyUtility`: sabit oranli refill, kismi kapasite, Buy Max ve Wood+Iron yatirim fiyat matematik owner'idir.
 - `ArcherVisualStyle`: Basic/Rapid/Frost ve slow tint renklerini merkezi tutar.
 - `CombatVfxEvent` / `CombatSfxEvent`: DOTS combat sistemlerinden MonoBehaviour feedback bridge'e giden tek frame'lik VFX/SFX event'leridir. Normal arrow/frost hit event'leri bridge tarafinda sprite flipbook impact olarak oynatilir.
 
@@ -47,14 +49,14 @@ Tum component'lar unmanaged ECS struct olarak tutulur. Davranis sistemlerde, ver
 
 ## MobileCastleCombatComponents.cs
 
-- `MobileCastleCombatConfig`: `NewGameScene` mobile castle mode singleton'i. Kale merkezi, spawn radius, attack radius, mobile wave/siege sayilari, spawn batch, zombie scale/speed, continuous siege tuning, başlangıç yatak kapasitesi, Dawn survivor isteği ve kişi başına Food maliyeti, worker production/cap tuning, reward/focus tuning, legacy day/night prep tuning, unlimited arrow flag'i ve stress test limitlerini tutar.
+- `MobileCastleCombatConfig`: `NewGameScene` mobile castle mode singleton'i. Kale merkezi, spawn radius, attack radius, mobile wave/siege sayilari, spawn batch, zombie scale/speed, continuous siege tuning, başlangıç yatak kapasitesi, Dawn survivor isteği ve kişi başına Food maliyeti, worker production/cap tuning, reward/focus tuning, legacy day/night prep tuning ve stress test limitlerini tutar.
 - `ContinuousSiegeCycleData`: player-facing `DAY / DUSK / NIGHT` fazini, 60s cycle progress'ini, horde pressure ve spawn intensity degerlerini tutar.
 - `EconomyFocusState`: aktif mobile ekonomi focus'unu tutar. `Balanced` default'tur; Wood/Stone/Iron/Food secimleri passive income, kill reward ve wave clear bonus'u yonlendirir.
 - `WaveClearRewardData`: son wave clear bonusunu HUD feedback'i icin saklar.
 - `CastleYardPrepState`: `Fortify` ve `Rally` tek-gecelik prep buff state'ini tutar.
 - `MobilePopulationAllocation`: Wood/Stone/Iron/Food actual worker sayilarini, `10.000` basis-point target ratio'larini, etkin cap ve idle aynalarini, population auto-allocation/growth checkpoint'lerini ve son Dawn için requested/accepted/Food budget sonucunu tutar.
-- `MobileBedCapacityState`: Run başlangıç yatak kapasitesi ile satın alınmış ek yatak sayısını ayrı tutar; toplam sahiplik `60` tabanından sonra quadratic Wood maliyetini büyütür, gameplay hard max yoktur ve güncel exact save `v7` kapsamındadır.
-- `MobileWorkerBuildingUpgradeState`: Hazır Wood/Stone/Iron/Food worker binalarının bağımsız Capacity/Efficiency seviyelerini tutar. Capacity seviye başına `+10` slot, Efficiency baz kişi üretimine additive `+10%` verir; güncel exact save `v7` kapsamındadır.
+- `MobileBedCapacityState`: Run başlangıç yatak kapasitesi ile satın alınmış ek yatak sayısını ayrı tutar; toplam sahiplik `60` tabanından sonra quadratic Wood maliyetini büyütür, gameplay hard max yoktur ve güncel exact save `v8` kapsamındadır.
+- `MobileWorkerBuildingUpgradeState`: Hazır Wood/Stone/Iron/Food worker binalarının bağımsız Capacity/Efficiency seviyelerini tutar. Capacity seviye başına `+10` slot, Efficiency baz kişi üretimine additive `+10%` verir; güncel exact save `v8` kapsamındadır.
 - `MobileEconomyPriceTuning`: `DifficultyProfileSO` kaynaklı House bed ve worker CAP/EFF başlangıç maliyetleriyle ortak worker bina büyüme çarpanını config entity'sinde taşır. Runtime içerik baseline'ıdır; satın alınmış state değildir ve save'e yazılmaz.
 - `ArcherSlotPosition`: legacy/manual pozisyon buffer'i. NewGameScene mobile tilemap spawn akisi bunu kullanmaz.
 
@@ -97,6 +99,7 @@ MobilePopulationAllocation yeni growth marker + accepted count -> GameManager Vi
 GameManager.BuyFortify()/BuyRally() -> CastleYardPrepState uzerine tek-gecelik buff yazar
 CastleYardPrepSystem -> Rally timer'i NightCombat sirasinda azaltir
 ArcherShootSystem -> Coarse target grid + incoming damage reservation ile nearest yaşayan hedefi seçer; okçu tipine göre projectile effect datasını oka yazar, facing direction + attack timer set eder
+GameManager + ArrowEconomyUtility -> Refill/yatirim transaction'i ile finite ArrowSupply yazar; ArrowSupplyUI Current/Capacity ve satin alma kontrollerini gosterir
 ArrowHitSystem -> Frost ok isabetinde ZombieSlow refresh eder
 ZombieSlowTimerSystem -> Slow suresini dusurur, slow tint'ini yonetir ve bitince pasifler
 ZombieAnimationStateSystem -> Velocity/center yonunden sprite direction row hesaplar

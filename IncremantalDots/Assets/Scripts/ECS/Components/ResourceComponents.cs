@@ -48,12 +48,15 @@ namespace DeadWalls
     }
 
     /// <summary>
-    /// Ok envanter singleton. GameState entity uzerinde tutulur.
-    /// Fletcher ok uretir, ArcherShootSystem ok tuketir.
+    /// Finite ok envanteri singleton'i. GameState entity uzerinde tutulur.
+    /// Refill anlik Wood transaction'idir; Fletcher/production queue V1'de kullanilmaz.
     /// </summary>
     public struct ArrowSupply : IComponentData
     {
-        public int Current;       // Mevcut ok sayisi
-        public float Accumulator; // Kesirli birikim (ResourceAccumulator benzeri)
+        public int Current;
+        public int CapacityLevel;
+        public int EfficiencyLevel;
+        // Eski save semasi icin korunur; V1 castle loop'ta her zaman 0'dir.
+        public float Accumulator;
     }
 }

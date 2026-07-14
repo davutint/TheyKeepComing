@@ -112,6 +112,40 @@ namespace DeadWalls
             Debug.Log("[MobileCastleSceneSetup] Archer retrain kontrolu HUD prefabinda onarildi.");
         }
 
+        [MenuItem("Window/DeadWalls/Repair Finite Arrow Ammo Panel")]
+        public static void RepairFiniteArrowAmmoPanel()
+        {
+            EnsureArrowAmmoPanelInPrefab();
+            AssetDatabase.ImportAsset(GeneratedHudPrefabPath, ImportAssetOptions.ForceUpdate);
+
+            Scene activeScene = SceneManager.GetActiveScene();
+            bool sceneRepaired = false;
+            if (activeScene.IsValid() && activeScene.path == TargetScenePath)
+            {
+                foreach (GameObject root in activeScene.GetRootGameObjects())
+                {
+                    var market = root.GetComponentInChildren<MarketUI>(true);
+                    if (market == null)
+                        continue;
+
+                    EnsureArrowAmmoPanel(market.gameObject);
+                    ConfigureArrowAmmo(market.gameObject);
+                    sceneRepaired = true;
+                }
+
+                if (sceneRepaired)
+                {
+                    EditorSceneManager.MarkSceneDirty(activeScene);
+                    EditorSceneManager.SaveScene(activeScene);
+                }
+            }
+
+            AssetDatabase.SaveAssets();
+            Debug.Log(sceneRepaired
+                ? "[MobileCastleSceneSetup] Finite Arrow ammo paneli prefab ve NewGameScene'de onarildi."
+                : "[MobileCastleSceneSetup] Finite Arrow ammo paneli prefabda onarildi; NewGameScene aktif degildi.");
+        }
+
         [MenuItem("Window/DeadWalls/Repair Archer Formation V1")]
         public static void RepairArcherFormationV1()
         {
@@ -374,7 +408,6 @@ namespace DeadWalls
             mobileAuthoring.DayPrepDuration = 15f;
             mobileAuthoring.DayOverlayAlpha = 0f;
             mobileAuthoring.NightOverlayAlpha = 0.50f;
-            mobileAuthoring.UnlimitedArrows = true;
             mobileAuthoring.ContinuousSiegeEnabled = true;
             mobileAuthoring.SiegeCycleDuration = 60f;
             mobileAuthoring.SiegeDayDuration = 30f;
@@ -1431,6 +1464,22 @@ namespace DeadWalls
                 MobileEconomyPriceTuningUtility.DefaultWorkerEfficiencyBaseIronCost;
             profile.WorkerBuildingCostGrowthMultiplier =
                 MobileEconomyPriceTuningUtility.DefaultWorkerBuildingCostGrowthMultiplier;
+            profile.ArrowBaseCapacity = MobileEconomyPriceTuningUtility.DefaultArrowBaseCapacity;
+            profile.ArrowCapacityPerLevel = MobileEconomyPriceTuningUtility.DefaultArrowCapacityPerLevel;
+            profile.ArrowRefillPackageSize = MobileEconomyPriceTuningUtility.DefaultArrowRefillPackageSize;
+            profile.ArrowBaseArrowsPerWood = MobileEconomyPriceTuningUtility.DefaultArrowBaseArrowsPerWood;
+            profile.ArrowArrowsPerWoodPerEfficiencyLevel =
+                MobileEconomyPriceTuningUtility.DefaultArrowArrowsPerWoodPerEfficiencyLevel;
+            profile.ArrowCapacityBaseWoodCost =
+                MobileEconomyPriceTuningUtility.DefaultArrowCapacityBaseWoodCost;
+            profile.ArrowCapacityBaseIronCost =
+                MobileEconomyPriceTuningUtility.DefaultArrowCapacityBaseIronCost;
+            profile.ArrowEfficiencyBaseWoodCost =
+                MobileEconomyPriceTuningUtility.DefaultArrowEfficiencyBaseWoodCost;
+            profile.ArrowEfficiencyBaseIronCost =
+                MobileEconomyPriceTuningUtility.DefaultArrowEfficiencyBaseIronCost;
+            profile.ArrowUpgradeCostGrowthMultiplier =
+                MobileEconomyPriceTuningUtility.DefaultArrowUpgradeCostGrowthMultiplier;
             AssetDatabase.CreateAsset(profile, DifficultyProfilePath);
             EditorUtility.SetDirty(profile);
             return profile;
@@ -3103,6 +3152,7 @@ namespace DeadWalls
 
             EnsureWorkerDrawerTargetControlsInPrefab();
             EnsureArcherRetrainControlInPrefab();
+            EnsureArrowAmmoPanelInPrefab();
 
             GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(GeneratedHudPrefabPath);
             Transform existing = canvasTransform.Find("MobileCastleHudRoot");
@@ -3171,6 +3221,107 @@ namespace DeadWalls
             {
                 PrefabUtility.UnloadPrefabContents(root);
             }
+        }
+
+        private static void EnsureArrowAmmoPanelInPrefab()
+        {
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(GeneratedHudPrefabPath);
+            if (prefab == null)
+                throw new InvalidOperationException("Arrow ammo HUD prefab bulunamadi: " + GeneratedHudPrefabPath);
+
+            GameObject root = PrefabUtility.LoadPrefabContents(GeneratedHudPrefabPath);
+            try
+            {
+                EnsureArrowAmmoPanel(root);
+                // Runtime controller sahnedeki HUD owner'inda tutulur; prefabda ikinci listener olusmaz.
+                DestroyComponentIfExists<ArrowSupplyUI>(root);
+                PrefabUtility.SaveAsPrefabAsset(root, GeneratedHudPrefabPath);
+            }
+            finally
+            {
+                PrefabUtility.UnloadPrefabContents(root);
+            }
+        }
+
+        private static void EnsureArrowAmmoPanel(GameObject hudRoot)
+        {
+            GameObject arrowChip = FindChildByName(hudRoot, "ArrowChip");
+            if (arrowChip == null)
+                throw new InvalidOperationException("ArrowChip bulunamadi; finite ammo paneli baglanamadi.");
+
+            Button toggle = EnsureComponent<Button>(arrowChip);
+            toggle.targetGraphic = arrowChip.GetComponent<Image>();
+            toggle.transition = Selectable.Transition.ColorTint;
+
+            GameObject panel = FindChildByName(hudRoot, "AmmoPurchasePanel")
+                ?? EnsurePanel(hudRoot.transform, "AmmoPurchasePanel", true,
+                    new Color(0.055f, 0.045f, 0.035f, 0.97f));
+            SetRect(panel.GetComponent<RectTransform>(),
+                new Vector2(0f, 1f), new Vector2(0f, 1f),
+                new Vector2(28f, -236f), new Vector2(760f, -158f));
+
+            var stock = FindOrCreateText(panel.transform, "AmmoStockText", "ARROWS 200 / 200", 16,
+                TextAlignmentOptions.MidlineLeft, new Vector2(0f, 0f), new Vector2(0f, 1f),
+                new Vector2(12f, 8f), new Vector2(170f, -8f));
+            stock.fontStyle = FontStyles.Bold;
+            stock.textWrappingMode = TextWrappingModes.NoWrap;
+            stock.enableAutoSizing = true;
+            stock.fontSizeMin = 10f;
+            stock.fontSizeMax = 16f;
+            var efficiencyText = FindOrCreateText(panel.transform, "AmmoEfficiencyText", "4 / WOOD", 12,
+                TextAlignmentOptions.Center, new Vector2(0f, 0f), new Vector2(0f, 1f),
+                new Vector2(174f, 8f), new Vector2(240f, -8f));
+            efficiencyText.textWrappingMode = TextWrappingModes.NoWrap;
+            efficiencyText.enableAutoSizing = true;
+            efficiencyText.fontSizeMin = 9f;
+            efficiencyText.fontSizeMax = 12f;
+
+            Button package = EnsureAmmoButton(panel.transform, "AmmoPackageButton",
+                new Vector2(244f, 8f), new Vector2(326f, -8f), "BUY +100\n25W",
+                new Color(0.43f, 0.29f, 0.12f, 1f));
+            Button large = EnsureAmmoButton(panel.transform, "AmmoLargePackageButton",
+                new Vector2(330f, 8f), new Vector2(412f, -8f), "BUY x5 +500\n125W",
+                new Color(0.49f, 0.34f, 0.14f, 1f));
+            Button buyMax = EnsureAmmoButton(panel.transform, "AmmoBuyMaxButton",
+                new Vector2(416f, 8f), new Vector2(506f, -8f), "BUY MAX\n50W",
+                new Color(0.60f, 0.40f, 0.13f, 1f));
+            Button capacity = EnsureAmmoButton(panel.transform, "AmmoCapacityUpgradeButton",
+                new Vector2(510f, 8f), new Vector2(612f, -8f), "CAP +200 L0\n150W + 25I",
+                new Color(0.15f, 0.38f, 0.52f, 1f));
+            Button efficiency = EnsureAmmoButton(panel.transform, "AmmoEfficiencyUpgradeButton",
+                new Vector2(616f, 8f), new Vector2(720f, -8f), "EFF 4>5/W L0\n200W + 50I",
+                new Color(0.34f, 0.22f, 0.52f, 1f));
+
+            package.navigation = Navigation.defaultNavigation;
+            large.navigation = Navigation.defaultNavigation;
+            buyMax.navigation = Navigation.defaultNavigation;
+            capacity.navigation = Navigation.defaultNavigation;
+            efficiency.navigation = Navigation.defaultNavigation;
+            panel.SetActive(false);
+        }
+
+        private static Button EnsureAmmoButton(Transform parent, string name,
+            Vector2 offsetMin, Vector2 offsetMax, string label, Color color)
+        {
+            Button button = FindComponentInChildrenByName<Button>(parent.gameObject, name)
+                ?? EnsureButton(parent, name, new Vector2(0f, 0f), offsetMin, offsetMax, out _);
+            RectTransform rect = button.GetComponent<RectTransform>();
+            SetRect(rect, new Vector2(0f, 0f), new Vector2(0f, 1f), offsetMin, offsetMax);
+            if (button.targetGraphic is Image image)
+                image.color = color;
+
+            SetButtonLabel(button, label);
+            TextMeshProUGUI text = button.GetComponentInChildren<TextMeshProUGUI>(true);
+            if (text != null)
+            {
+                text.enableAutoSizing = true;
+                text.fontSizeMin = 7f;
+                text.fontSizeMax = 11f;
+                text.textWrappingMode = TextWrappingModes.Normal;
+                text.alignment = TextAlignmentOptions.Center;
+            }
+
+            return button;
         }
 
         private static void EnsureWorkerDrawerTargetControls(GameObject hudRoot)
@@ -3409,6 +3560,7 @@ namespace DeadWalls
             HideEconomyFocus(hudRoot);
             ConfigureCastleEconomy(hudRoot);
             ConfigureWorkerEconomyDrawer(hudRoot);
+            ConfigureArrowAmmo(hudRoot);
 
             var market = EnsureComponent<MarketUI>(hudRoot);
             market.ArcherCatalog = archerCatalog;
@@ -3433,6 +3585,25 @@ namespace DeadWalls
             ConfigureDefenseRepair(hudRoot);
             ConfigureDawnToast(hudRoot);
             ConfigureCouncilUI(hudRoot);
+        }
+
+        private static void ConfigureArrowAmmo(GameObject hudRoot)
+        {
+            EnsureArrowAmmoPanel(hudRoot);
+            var controller = EnsureComponent<ArrowSupplyUI>(hudRoot);
+            GameObject arrowChip = FindChildByName(hudRoot, "ArrowChip");
+            controller.ToggleButton = arrowChip != null ? arrowChip.GetComponent<Button>() : null;
+            controller.AmmoPanel = FindChildByName(hudRoot, "AmmoPurchasePanel");
+            controller.StockText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "AmmoStockText");
+            controller.EfficiencyText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "AmmoEfficiencyText");
+            controller.PackageButton = FindComponentInChildrenByName<Button>(hudRoot, "AmmoPackageButton");
+            controller.LargePackageButton = FindComponentInChildrenByName<Button>(hudRoot, "AmmoLargePackageButton");
+            controller.BuyMaxButton = FindComponentInChildrenByName<Button>(hudRoot, "AmmoBuyMaxButton");
+            controller.CapacityUpgradeButton =
+                FindComponentInChildrenByName<Button>(hudRoot, "AmmoCapacityUpgradeButton");
+            controller.EfficiencyUpgradeButton =
+                FindComponentInChildrenByName<Button>(hudRoot, "AmmoEfficiencyUpgradeButton");
+            controller.StartOpen = false;
         }
 
         /// <summary>
@@ -4062,7 +4233,6 @@ namespace DeadWalls
             market.RapidTechUnlockButton = FindComponentInChildrenByName<Button>(root, "RapidTechUnlockButton");
             market.FrostTechUnlockButton = FindComponentInChildrenByName<Button>(root, "FrostTechUnlockButton");
             market.RepairButton = FindComponentInChildrenByName<Button>(root, "RepairButton");
-            market.RefillArrowsButton = FindComponentInChildrenByName<Button>(root, "RefillArrowsButton");
             market.StartNextWaveButton = FindComponentInChildrenByName<Button>(root, "StartNextWaveButton");
             market.FortifyButton = FindComponentInChildrenByName<Button>(root, "FortifyButton");
             market.RallyButton = FindComponentInChildrenByName<Button>(root, "RallyButton");
@@ -4122,12 +4292,6 @@ namespace DeadWalls
                 market.RepairCostText.gameObject.SetActive(false);
             if (market.RepairStatusText != null)
                 market.RepairStatusText.gameObject.SetActive(false);
-
-            if (market.RefillArrowsButton != null)
-            {
-                market.RefillArrowsButton.interactable = false;
-                market.RefillArrowsButton.gameObject.SetActive(false);
-            }
 
             if (market.StartNextWaveButton != null)
             {

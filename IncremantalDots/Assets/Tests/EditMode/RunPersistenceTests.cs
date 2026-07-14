@@ -41,6 +41,8 @@ namespace DeadWalls.Tests
                 Food = 77,
                 ArrowCurrent = 456,
                 ArrowAccumulator = 0.75f,
+                ArrowCapacityLevel = 3,
+                ArrowEfficiencyLevel = 4,
                 WoodBuildingCapacityLevel = 3,
                 WoodBuildingEfficiencyLevel = 4,
                 StoneBuildingCapacityLevel = 5,
@@ -113,6 +115,8 @@ namespace DeadWalls.Tests
             Assert.That(restored.TotalBudgetSpawnedEnemies, Is.EqualTo(1157));
             Assert.That(restored.DayBaseSpawnInterval, Is.EqualTo(0.42f));
             Assert.That(restored.ArrowCurrent, Is.EqualTo(456));
+            Assert.That(restored.ArrowCapacityLevel, Is.EqualTo(3));
+            Assert.That(restored.ArrowEfficiencyLevel, Is.EqualTo(4));
             Assert.That(restored.WoodBuildingCapacityLevel, Is.EqualTo(3));
             Assert.That(restored.WoodBuildingEfficiencyLevel, Is.EqualTo(4));
             Assert.That(restored.StoneBuildingCapacityLevel, Is.EqualTo(5));
@@ -181,7 +185,7 @@ namespace DeadWalls.Tests
         }
 
         [Test]
-        public void TryLoad_Version3Snapshot_MigratesWorkerAllocationBedBuildingAndFormationStateToVersion7()
+        public void TryLoad_Version3Snapshot_MigratesWorkerAllocationBedBuildingFormationAndAmmoStateToCurrent()
         {
             string path = Path.Combine(Application.persistentDataPath, "run_save.json");
             byte[] original = File.Exists(path) ? File.ReadAllBytes(path) : null;
@@ -204,7 +208,7 @@ namespace DeadWalls.Tests
                 RunSaveState restored = RunPersistence.TryLoad();
 
                 Assert.That(restored, Is.Not.Null);
-                Assert.That(restored.Version, Is.EqualTo(7));
+                Assert.That(restored.Version, Is.EqualTo(RunSaveState.CurrentVersion));
                 Assert.That(restored.WoodWorkerTargetRatioBps, Is.EqualTo(3774));
                 Assert.That(restored.StoneWorkerTargetRatioBps, Is.EqualTo(1887));
                 Assert.That(restored.IronWorkerTargetRatioBps, Is.EqualTo(1509));
@@ -217,6 +221,8 @@ namespace DeadWalls.Tests
                 Assert.That(restored.FoodBuildingEfficiencyLevel, Is.Zero);
                 Assert.That(restored.ArcherFormationVersion,
                     Is.EqualTo(ArcherFormationUtility.CurrentVersion));
+                Assert.That(restored.ArrowCapacityLevel, Is.Zero);
+                Assert.That(restored.ArrowEfficiencyLevel, Is.Zero);
             }
             finally
             {
@@ -248,7 +254,7 @@ namespace DeadWalls.Tests
                 RunSaveState restored = RunPersistence.TryLoad();
 
                 Assert.That(restored, Is.Not.Null);
-                Assert.That(restored.Version, Is.EqualTo(7));
+                Assert.That(restored.Version, Is.EqualTo(RunSaveState.CurrentVersion));
                 Assert.That(restored.BedBaseCapacity, Is.EqualTo(135));
                 Assert.That(restored.PurchasedBedCapacity, Is.Zero);
                 Assert.That(restored.IronBuildingEfficiencyLevel, Is.Zero);
@@ -280,7 +286,7 @@ namespace DeadWalls.Tests
                 RunSaveState restored = RunPersistence.TryLoad();
 
                 Assert.That(restored, Is.Not.Null);
-                Assert.That(restored.Version, Is.EqualTo(7));
+                Assert.That(restored.Version, Is.EqualTo(RunSaveState.CurrentVersion));
                 Assert.That(restored.WoodBuildingCapacityLevel, Is.Zero);
                 Assert.That(restored.WoodBuildingEfficiencyLevel, Is.Zero);
                 Assert.That(restored.StoneBuildingCapacityLevel, Is.Zero);
@@ -323,7 +329,7 @@ namespace DeadWalls.Tests
                 RunSaveState restored = RunPersistence.TryLoad();
 
                 Assert.That(restored, Is.Not.Null);
-                Assert.That(restored.Version, Is.EqualTo(7));
+                Assert.That(restored.Version, Is.EqualTo(RunSaveState.CurrentVersion));
                 Assert.That(restored.ArcherFormationVersion,
                     Is.EqualTo(ArcherFormationUtility.CurrentVersion));
                 Assert.That(restored.BasicArchers, Is.EqualTo(40));

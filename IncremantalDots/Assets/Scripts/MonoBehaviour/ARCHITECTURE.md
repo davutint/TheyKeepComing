@@ -14,7 +14,8 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - `OnWaveCompleted` legacy wave cleared / market bekleme fazini UI katmanina bildirebilir; continuous siege varsayilaninda tetiklenmez
 - Mobile ilk play'de baked aktif wave state'ini legacy DayPrep baslangicina normalize edebilir; continuous siege system bir sonraki frame aktif cycle'a ceker
 - `StartNextWave()` debug/public API olarak kalir; mobile player-facing akis continuous day/dusk/night cycle ile ilerler
-- `RepairDefenseFull()`, `BuyFortify()`, `BuyRally()` ve `RefillArrows()` legacy/debug API olarak kalir
+- `RepairDefenseFull()`, `BuyFortify()` ve `BuyRally()` legacy/debug API olarak kalir
+- Finite Arrow API'leri: +1/+5/Buy Max Wood refill quote/transaction'ı, Wood+Iron Capacity/Efficiency quote/transaction'ı ve data-driven capacity/verim okuması
 - `GetDefensePercent()` wall/gate/castle toplam HP yuzdesini HUD'a verir
 - Mobile archer economy API'leri: `ArcherDefinitionSO` catalog'undan type-count scaled buy/retrain cost ve base stat okuma, buy, Basic -> Rapid/Frost in-place retrain, type count/DPS okuma; `GetTotalArcherCount`, `GetRemainingArcherCapacity` ve `CanAddArchers` Basic/Rapid/Frost ortak `1000` cap'ini sunar. Legacy unlock/upgrade API'leri kodda kalir ama sag drawer player-facing kullanmaz
 - Tech Tree runtime state'i (run-scoped, persistence yok): `_techNodeLevels` + `_revealedTechNodes`; katalog `techTreeCatalog` (`TechTreeCatalogSO`, setup tool baglar). API: `IsTechNodeRevealed`, `GetTechNodeLevel`, `CanBuyTechNode(node, out reason)`, `TryBuyTechNode`, `GetRevealedTechNodes`. Root (`castle_heart`) otomatik sahipli baslar; satin alma `RevealChildNodeIds`'i gorunur yapar
@@ -42,7 +43,7 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - `CycleProgressFill` ve `CycleProgressMarker` ile 60s cycle progress'ini gosterir
 - `HordePressurePanel` imported prefabda bulunsa bile player-facing olarak kapali tutulur
 - `CyclePanel` yoksa legacy wave fallback text'lerini kullanir
-- Mobile unlimited arrow modunda `ArrowText` degeri `INF` olur
+- `ArrowText`, finite stoku `Current / Capacity` biçiminde gösterir; `INF` modu yoktur
 - Mobile HUD'da yalniz `DefenseWallFill` ve Wall yuzdesi guncellenir; legacy Gate/Core alanlari runtime'da gizlenir
 - `WaveRewardText`, wave clear bonusunu kisa sure `Wave Cleared +...` olarak gosterir
 - Night/high pressure baskisinda threat rengi kullanabilir; savunma hasarinda `DamageFlashImage` kisa red flash verir
@@ -83,7 +84,7 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - Rapid/Frost unlock olduktan sonra `RETRAIN`, bir Basic entity'yi yerinde dönüştürür; toplam garnizon/population değişmez ve cap doluyken de çalışır
 - Buy ve retrain maliyetleri hedef tür sayısına göre definition tuning'inden büyür; ayrı archer upgrade/level UI açılmaz
 - Worker economy aktifken `Repair`, `Fortify` ve `Rally` player-facing drawer'da gizlenir; drawer archer recruitment paneli olarak kalir
-- Mobile unlimited arrow modunda `Arrow Refill` gizlenir
+- Legacy `Arrow Refill` kontrolü gizlenir; Arrow chip'i scene-owned `ArrowSupplyUI` tek satır panelini açar
 - Mobile continuous siege loop'ta `Start Next Wave` player-facing UI'da gizlenir; oyun durmadan `DAY / DUSK / NIGHT` cycle'i akar
 - Runtime davranisi prefaba gomulmez; controller ve scene setup tool tarafinda baglanir
   (UI dogrudan prefab uzerinde uretilir; eski UIImporter/export pipeline'i 2026-07-06'da kaldirildi)

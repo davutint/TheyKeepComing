@@ -58,8 +58,6 @@ namespace DeadWalls
 
             EnsureContainerCapacity(ref state, _targetQuery.CalculateEntityCount());
 
-            bool unlimitedArrows = SystemAPI.HasSingleton<MobileCastleCombatConfig>()
-                && SystemAPI.GetSingleton<MobileCastleCombatConfig>().UnlimitedArrows;
             float fireRateMultiplier = 1f;
             if (SystemAPI.HasSingleton<CastleYardPrepState>())
             {
@@ -104,7 +102,6 @@ namespace DeadWalls
             {
                 Dt = SystemAPI.Time.DeltaTime,
                 FireRateMultiplier = fireRateMultiplier,
-                UnlimitedArrows = unlimitedArrows,
                 TargetCellSize = SpatialHash.TargetCellSize,
                 ArrowSpeed = math.max(0.01f, arrowPrefabData.Speed),
                 ArrowLifetime = math.max(0.1f, arrowPrefabData.Lifetime),
@@ -233,7 +230,6 @@ namespace DeadWalls
         {
             public float Dt;
             public float FireRateMultiplier;
-            public bool UnlimitedArrows;
             public float TargetCellSize;
             public float ArrowSpeed;
             public float ArrowLifetime;
@@ -274,22 +270,15 @@ namespace DeadWalls
                         out float3 targetPosition))
                     return;
 
-                if (!UnlimitedArrows)
-                {
-                    ArrowSupply supply = ArrowSupplyLookup[ArrowSupplyEntity];
-                    if (supply.Current <= 0)
-                        return;
-                }
+                ArrowSupply supply = ArrowSupplyLookup[ArrowSupplyEntity];
+                if (supply.Current <= 0)
+                    return;
 
                 if (!TryRentArrow(out Entity arrow))
                     return;
 
-                if (!UnlimitedArrows)
-                {
-                    ArrowSupply supply = ArrowSupplyLookup[ArrowSupplyEntity];
-                    supply.Current--;
-                    ArrowSupplyLookup[ArrowSupplyEntity] = supply;
-                }
+                supply.Current--;
+                ArrowSupplyLookup[ArrowSupplyEntity] = supply;
 
                 AddReservation(target, math.max(0f, archer.ArrowDamage));
 

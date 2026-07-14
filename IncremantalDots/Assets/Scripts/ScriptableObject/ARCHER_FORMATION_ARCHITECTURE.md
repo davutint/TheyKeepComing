@@ -44,12 +44,13 @@ local noktayı tile merkezine bu iki eksenle taşır. Runtime Z değeri
 
 ## Save ve Continue
 
-Exact save `v7`, archer type count'ları yanında `ArcherFormationVersion` değerini tutar;
+Exact save `v8`, archer type count'ları yanında `ArcherFormationVersion` değerini tutar;
 1000 world position JSON'a yazılmaz. Restore önce kaydın version'ıyla aynı deterministik
 cache'i kurar, mevcut başlangıç okçularını bu sıraya taşır ve sonra eksik type count'larını
 tamamlar. Böylece Main Menu -> Continue aynı formation noktalarını yeniden üretir.
 
-`v6 -> v7` migration, eski deterministic placement kayıtlarını Formation V1'e bağlar.
+`v6 -> v7` migration, eski deterministic placement kayıtlarını Formation V1'e bağlar;
+ardından `v7 -> v8` finite Arrow yatırım alanlarını ekler.
 Bilinmeyen bir formation version sessizce farklı bir düzene çevrilmez.
 
 ## Sınırlar
@@ -67,4 +68,3 @@ Bilinmeyen bir formation version sessizce farklı bir düzene çevrilmez.
   benzersiz noktalar, cache rebuild ve exact Continue sonrası aynı formasyon.
 - `RunPersistenceTests.TryLoad_Version6Snapshot_MigratesToFormationVersion1`: açık v6 -> v7
   migration kanıtı.
-

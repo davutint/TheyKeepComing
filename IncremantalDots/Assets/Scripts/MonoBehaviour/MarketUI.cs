@@ -18,7 +18,6 @@ namespace DeadWalls
 
         [Header("Prep")]
         public Button RepairButton;
-        public Button RefillArrowsButton;
         public Button StartNextWaveButton;
         public Button FortifyButton;
         public Button RallyButton;
@@ -176,13 +175,6 @@ namespace DeadWalls
                 RefreshPrepAction(RallyButton, RallyCostText, RallyStatusText, "Rally",
                     gm.GetRallyCost(), gm.CanBuyRally(), GetRallyStatus(gm));
             }
-            if (RefillArrowsButton != null)
-            {
-                bool showRefill = !mobileMode || !gm.IsUnlimitedArrowsEnabled();
-                RefillArrowsButton.gameObject.SetActive(showRefill);
-                RefillArrowsButton.interactable = showRefill && !gm.GameState.IsGameOver && !gm.GameState.IsLevelUpPending;
-            }
-
             if (StartNextWaveButton != null)
             {
                 bool showStartNextWave = !mobileMode;
@@ -237,7 +229,6 @@ namespace DeadWalls
 
                 AddFingerprintValue(ref hash, gm.IsMobileMode);
                 AddFingerprintValue(ref hash, gm.IsMobilePopulationEconomyEnabled());
-                AddFingerprintValue(ref hash, gm.IsUnlimitedArrowsEnabled());
                 AddFingerprintValue(ref hash, gm.IsFreeEconomyTestMode);
                 AddFingerprintValue(ref hash, gm.GameState.IsGameOver);
                 AddFingerprintValue(ref hash, gm.GameState.IsLevelUpPending);
@@ -407,7 +398,6 @@ namespace DeadWalls
             UnbindButtons();
             DrawerToggleButton?.onClick.AddListener(ToggleDrawer);
             RepairButton?.onClick.AddListener(HandleRepairClicked);
-            RefillArrowsButton?.onClick.AddListener(HandleRefillArrowsClicked);
             StartNextWaveButton?.onClick.AddListener(HandleStartNextWaveClicked);
             FortifyButton?.onClick.AddListener(HandleFortifyClicked);
             RallyButton?.onClick.AddListener(HandleRallyClicked);
@@ -430,7 +420,6 @@ namespace DeadWalls
         {
             DrawerToggleButton?.onClick.RemoveListener(ToggleDrawer);
             RepairButton?.onClick.RemoveListener(HandleRepairClicked);
-            RefillArrowsButton?.onClick.RemoveListener(HandleRefillArrowsClicked);
             StartNextWaveButton?.onClick.RemoveListener(HandleStartNextWaveClicked);
             FortifyButton?.onClick.RemoveListener(HandleFortifyClicked);
             RallyButton?.onClick.RemoveListener(HandleRallyClicked);
@@ -455,12 +444,6 @@ namespace DeadWalls
         private void HandleRepairClicked()
         {
             GameManager.Instance?.RepairDefenseFull();
-            Refresh();
-        }
-
-        private void HandleRefillArrowsClicked()
-        {
-            GameManager.Instance?.RefillArrows();
             Refresh();
         }
 
@@ -537,7 +520,6 @@ namespace DeadWalls
         private void SetAllButtonsInteractable(bool interactable)
         {
             if (RepairButton != null) RepairButton.interactable = interactable;
-            if (RefillArrowsButton != null) RefillArrowsButton.interactable = interactable;
             if (StartNextWaveButton != null) StartNextWaveButton.interactable = interactable;
             if (FortifyButton != null) FortifyButton.interactable = interactable;
             if (RallyButton != null) RallyButton.interactable = interactable;

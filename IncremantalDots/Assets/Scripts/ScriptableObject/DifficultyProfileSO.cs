@@ -92,6 +92,28 @@ namespace DeadWalls
         [Min(1f)] public double WorkerBuildingCostGrowthMultiplier =
             MobileEconomyPriceTuningUtility.DefaultWorkerBuildingCostGrowthMultiplier;
 
+        [Header("Arrow Economy (runtime tuning'e bake edilir)")]
+        [Min(1)] public int ArrowBaseCapacity =
+            MobileEconomyPriceTuningUtility.DefaultArrowBaseCapacity;
+        [Min(1)] public int ArrowCapacityPerLevel =
+            MobileEconomyPriceTuningUtility.DefaultArrowCapacityPerLevel;
+        [Min(1)] public int ArrowRefillPackageSize =
+            MobileEconomyPriceTuningUtility.DefaultArrowRefillPackageSize;
+        [Min(1)] public int ArrowBaseArrowsPerWood =
+            MobileEconomyPriceTuningUtility.DefaultArrowBaseArrowsPerWood;
+        [Min(1)] public int ArrowArrowsPerWoodPerEfficiencyLevel =
+            MobileEconomyPriceTuningUtility.DefaultArrowArrowsPerWoodPerEfficiencyLevel;
+        [Min(1)] public int ArrowCapacityBaseWoodCost =
+            MobileEconomyPriceTuningUtility.DefaultArrowCapacityBaseWoodCost;
+        [Min(1)] public int ArrowCapacityBaseIronCost =
+            MobileEconomyPriceTuningUtility.DefaultArrowCapacityBaseIronCost;
+        [Min(1)] public int ArrowEfficiencyBaseWoodCost =
+            MobileEconomyPriceTuningUtility.DefaultArrowEfficiencyBaseWoodCost;
+        [Min(1)] public int ArrowEfficiencyBaseIronCost =
+            MobileEconomyPriceTuningUtility.DefaultArrowEfficiencyBaseIronCost;
+        [Min(1f)] public double ArrowUpgradeCostGrowthMultiplier =
+            MobileEconomyPriceTuningUtility.DefaultArrowUpgradeCostGrowthMultiplier;
+
         [Header("Spawn Tablosu (M-C hazirlik — sistem HENUZ okumuyor)")]
         public SpawnTableEntry[] SpawnTable = new SpawnTableEntry[0];
 

@@ -79,8 +79,8 @@ namespace DeadWalls
         private float _lastWoodNet, _lastStoneNet, _lastIronNet, _lastFoodNet;
         private int _lastPopTotal = -1, _lastPopCapacity = -1, _lastWorkers = -1, _lastArchers = -1;
         private int _lastArrowCurrent = -1;
+        private int _lastArrowCapacity = -1;
         private string _lastArrowLabel;
-        private bool _lastArrowUnlimited;
         private bool _arrowLabelInitialized;
         private int _lastBasicArchers = -1, _lastRapidArchers = -1, _lastFrostArchers = -1;
         private int _lastDefensePercent = -1;
@@ -221,15 +221,15 @@ namespace DeadWalls
 
             // Ok envanter
             var arrowSupply = gm.ArrowSupply;
-            bool unlimitedArrows = gm.IsUnlimitedArrowsEnabled();
+            int arrowCapacity = gm.GetArrowCapacity();
             if (ArrowText != null && (!_arrowLabelInitialized
                 || _lastArrowCurrent != arrowSupply.Current
-                || _lastArrowUnlimited != unlimitedArrows))
+                || _lastArrowCapacity != arrowCapacity))
             {
-                string arrowLabel = unlimitedArrows ? "INF" : arrowSupply.Current.ToString();
+                string arrowLabel = $"{arrowSupply.Current:N0} / {arrowCapacity:N0}";
                 _arrowLabelInitialized = true;
                 _lastArrowCurrent = arrowSupply.Current;
-                _lastArrowUnlimited = unlimitedArrows;
+                _lastArrowCapacity = arrowCapacity;
                 _lastArrowLabel = arrowLabel;
                 ArrowText.text = arrowLabel;
             }

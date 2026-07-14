@@ -231,7 +231,7 @@ namespace DeadWalls
         private void DrawEconomyPriceSection()
         {
             _foldEconomyPrices = DrawSectionHeader(_foldEconomyPrices,
-                "Ekonomi Fiyat Egrileri", "bed + worker bina CAP/EFF");
+                "Ekonomi Fiyat Egrileri", "bed + worker bina + finite ammo");
             if (!_foldEconomyPrices)
                 return;
 
@@ -249,9 +249,22 @@ namespace DeadWalls
                 DrawProp("WorkerEfficiencyBaseWoodCost");
                 DrawProp("WorkerEfficiencyBaseIronCost");
                 DrawProp("WorkerBuildingCostGrowthMultiplier");
+                EditorGUILayout.Space(6);
+                EditorGUILayout.LabelField("Finite Arrow Supply", EditorStyles.boldLabel);
+                DrawProp("ArrowBaseCapacity");
+                DrawProp("ArrowCapacityPerLevel");
+                DrawProp("ArrowRefillPackageSize");
+                DrawProp("ArrowBaseArrowsPerWood");
+                DrawProp("ArrowArrowsPerWoodPerEfficiencyLevel");
+                DrawProp("ArrowCapacityBaseWoodCost");
+                DrawProp("ArrowCapacityBaseIronCost");
+                DrawProp("ArrowEfficiencyBaseWoodCost");
+                DrawProp("ArrowEfficiencyBaseIronCost");
+                DrawProp("ArrowUpgradeCostGrowthMultiplier");
                 EditorGUILayout.HelpBox(
                     "Butun degerler Apply sirasinda int-safe tuning'e sanitize edilir. "
-                    + "Bed quadratic, bina fiyatlari exponential buyur; temsil edilemeyen "
+                    + "Bed quadratic, bina ve ammo yatirim fiyatlari exponential buyur; refill "
+                    + "birim fiyati satin alma sayisiyla artmaz. Temsil edilemeyen "
                     + "transaction runtime tarafinda reddedilir.", MessageType.None);
             }
         }

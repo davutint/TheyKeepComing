@@ -6,8 +6,8 @@ Okçu atışları artık her projectile için `Instantiate` ve isabet/invalid ta
 `DestroyEntity` üretmez. Tek `Arrow.prefab` entity havuzu prewarm edilir, atışta rent
 edilir ve isabet, timeout veya geçersiz hedefte aynı return yoluyla tekrar kullanılır.
 
-Ammo ekonomisi bu sözleşmenin parçası değildir. `UnlimitedArrows` ve refill davranışı
-Package D içindeki sıradaki ayrı iştir.
+Ammo ekonomisinin ayrı sahibi `ARROW_AMMO_ARCHITECTURE.md` sözleşmesidir. Pool rent'i
+başarılı olmadan Arrow veya fire timer harcanmaz; başarılı rent tam `1 Arrow` tüketir.
 
 ## Veri Sözleşmesi
 

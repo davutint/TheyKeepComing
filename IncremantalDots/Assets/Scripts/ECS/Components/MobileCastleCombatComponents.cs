@@ -48,7 +48,6 @@ namespace DeadWalls
         public float DayPrepDuration;
         public float DayOverlayAlpha;
         public float NightOverlayAlpha;
-        public bool UnlimitedArrows;
         public float BaseSpawnInterval;
         public float SpawnIntervalWaveMultiplier;
         public float MinSpawnInterval;
@@ -234,6 +233,16 @@ namespace DeadWalls
         public int WorkerEfficiencyBaseWoodCost;
         public int WorkerEfficiencyBaseIronCost;
         public double WorkerBuildingCostGrowthMultiplier;
+        public int ArrowBaseCapacity;
+        public int ArrowCapacityPerLevel;
+        public int ArrowRefillPackageSize;
+        public int ArrowBaseArrowsPerWood;
+        public int ArrowArrowsPerWoodPerEfficiencyLevel;
+        public int ArrowCapacityBaseWoodCost;
+        public int ArrowCapacityBaseIronCost;
+        public int ArrowEfficiencyBaseWoodCost;
+        public int ArrowEfficiencyBaseIronCost;
+        public double ArrowUpgradeCostGrowthMultiplier;
     }
 
     public struct MobilePrepPauseState : IComponentData

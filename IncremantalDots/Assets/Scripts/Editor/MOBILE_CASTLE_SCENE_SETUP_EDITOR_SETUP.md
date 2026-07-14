@@ -58,8 +58,8 @@ SubScene:
 - `MobileCastleCombatAuthoring`: worker caps Wood/Stone/Iron/Food `40 / 30 / 24 / 40`
 - `MobileCastleCombatAuthoring`: worker production Wood/Stone/Iron/Food `8 / 5.5 / 3.8 / 7` per minute, reward multiplier `0.25`
 - `MobileCastleCombatAuthoring`: economy event chance `0.15`, cooldown `2` waves
-- `MobileCastleCombatAuthoring`: continuous siege enabled, total cycle `60`, day/dusk/night `25 / 10 / 25`, intensity `0.55 / 1.00->1.35 / 1.65`
-- `MobileCastleCombatAuthoring`: legacy initial day prep `12`, day prep `15`, day/night overlay alpha `0 / 0.50`, unlimited arrows enabled
+- `MobileCastleCombatAuthoring`: continuous siege enabled, total cycle `60`, day/dusk/night/dawn `30 / 5 / 20 / 5`, intensity `0.55 / 1.00->1.35 / 1.65`
+- `MobileCastleCombatAuthoring`: legacy initial day prep `12`, day prep `15`, day/night overlay alpha `0 / 0.50`; unlimited Arrow alani yoktur
 - `MobileCastleCombatAuthoring`: wave director base interval `0.8`, wave multiplier `0.96`, min interval `0.35`
 - `MobileCastleCombatAuthoring`: opening/final ratio `0.20 / 0.20`, interval multiplier `1.35 / 0.65`, batch delta `-1 / +1`
 - `MobileCastleCombatAuthoring`: Castle Yard defaults Fortify damage multiplier `0.70`, Rally duration `10`, Rally fire-rate multiplier `1.25`
@@ -117,7 +117,9 @@ pipeline'i 2026-07-06'da kaldirildi.) Setup tool asagidaki isimleri exact-match 
 
 Runtime davranisi prefab icinde degildir; `MarketUI` ve scene setup tool baglar.
 
-Mobile continuous siege loop'ta player-facing `StartNextWaveButton` yoktur ve unlimited arrows acikken `RefillArrowsButton` player-facing UI'da gizlenir/disable edilir. Prefab bu objeleri iceriyorsa tool referansi baglar ama aktif kullanima acmaz.
+Mobile continuous siege loop'ta player-facing `StartNextWaveButton` yoktur. Legacy
+`RefillArrowsButton` gizli kalır; finite refill, Arrow chip'inden açılan
+`AmmoPurchasePanel` + scene-owned `ArrowSupplyUI` üzerinden çalışır.
 
 `CastleRepairButton` legacy Castle Interior akisi icindir. Continuous siege varsayilaninda Castle Interior panel player-facing kapali kalir; sag drawer'in archer buy ve Basic -> Rapid/Frost retrain aksiyonlari combat sirasinda kullanilmaya devam eder. Stat upgrade ve tech unlock full-screen Tech Tree milestone'una birakilir. Castle Interior paneli yoksa setup tool polish fallback uretmez; panel gerekirse dogrudan prefabda kurulur.
 

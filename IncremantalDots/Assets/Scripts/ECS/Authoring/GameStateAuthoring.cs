@@ -131,6 +131,8 @@ namespace DeadWalls
                 AddComponent(entity, new ArrowSupply
                 {
                     Current = authoring.InitialArrows,
+                    CapacityLevel = 0,
+                    EfficiencyLevel = 0,
                     Accumulator = 0f
                 });
             }

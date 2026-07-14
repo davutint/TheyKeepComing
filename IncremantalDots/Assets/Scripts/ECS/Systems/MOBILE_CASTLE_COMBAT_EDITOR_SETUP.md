@@ -53,7 +53,7 @@ Script eklendikten sonra disaridan manuel compile komutu calistirma. Unity refre
   - Initial Day Prep Duration: `12`
   - Day Prep Duration: `15`
   - Day/Night Overlay Alpha: `0 / 0.50`
-  - Unlimited Arrows: enabled
+  - Arrow stoku finite'tir; `Unlimited Arrows` alani yoktur
   - Wave Director Base Spawn Interval: `0.95` (Difficulty Profile owner)
   - Spawn Interval Wave Multiplier: `0.96`
   - Min Spawn Interval: `0.35`
@@ -91,6 +91,7 @@ Script eklendikten sonra disaridan manuel compile komutu calistirma. Unity refre
   - Defense module: `DefensePercentText`, `DefenseWallFill`, `DefenseWallText`. Legacy Gate/Core referanslari serialize uyumlulugu icin kalabilir ama runtime'da gizlenir.
   - `MarketUI`: `ArcherDrawerPanel`, `DrawerToggleButton`, Basic/Rapid/Frost row buy alanlari ve dynamic template `ArcherRetrainButton` bagli olmali.
   - `MarketUI`: `Basic/Rapid/FrostUpgradeButton`, `ArrowTechPanel`, `RapidTechUnlockButton`, `FrostTechUnlockButton` prefabda varsa player-facing olarak gizlenmelidir.
+  - `ArrowSupplyUI`: ArrowChip toggle, Current/Capacity, paket, Buy Max ve Capacity/Efficiency binding'leri dolu olmalıdır. Repair akışı için `ARROW_AMMO_EDITOR_SETUP.md` izlenir.
   - Castle Yard: `RepairButton`; polish prefabda varsa `FortifyButton`, `RallyButton` ve cost/status text'leri.
 - `Canvas/DayNightOverlay`
   - Full-screen black `Image`, raycast target kapali.

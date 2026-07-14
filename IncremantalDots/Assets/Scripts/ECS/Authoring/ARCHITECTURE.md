@@ -50,7 +50,7 @@ Baker class'lari authoring degerlerini okuyarak entity'lere IComponentData ekler
 - `EconomyFocusState` singleton'ini `Balanced` default'u ile bake eder
 - `WaveClearRewardData` mobile reward feedback state'ini bake eder
 - `CastleYardPrepState` tek-gecelik Fortify/Rally state'ini bake eder
-- Day/night, wave director, unlimited arrow ve Castle Yard prep defaultlarini Inspector'dan ECS config'e tasir
+- Day/night, wave director ve Castle Yard prep defaultlarini Inspector'dan ECS config'e tasir; finite Arrow ekonomisi `ArrowSupply` + `MobileEconomyPriceTuning` tarafindan sahiplenilir
 - Config yoksa runtime sistemleri eski WallX mode'a doner
 
 ## Prefab Referans Akisi

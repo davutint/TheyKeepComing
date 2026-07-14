@@ -8,7 +8,10 @@ SubScene icinde `MobileCastleConfig` objesinde `MobileCastleCombatAuthoring` bul
 - Day Prep Duration: `15`
 - Day Overlay Alpha: `0`
 - Night Overlay Alpha: `0.50`
-- Unlimited Arrows: enabled
+- Initial finite Arrows: `200` (`GameStateAuthoring`)
+
+Bu belge legacy DayPrep akışını tarif eder. Aktif V1 `NewGameScene` finite Arrow
+ekonomisi için `ARROW_AMMO_EDITOR_SETUP.md` sözleşmesini kullanır; unlimited flag yoktur.
 
 `Window -> DeadWalls -> Mobile Castle Scene Setup` bu alanlari idempotent olarak yazar.
 

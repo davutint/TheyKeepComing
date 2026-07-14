@@ -29,10 +29,14 @@ Tum resource component'lari GameState entity uzerinde singleton olarak tutulur.
 
 ### ArrowSupply (IComponentData — M1.6)
 - `Current` (int) — Mevcut ok stoku
-- `Accumulator` (float) — Kesirli birikim tamponu
+- `CapacityLevel` (int) — Run ici kapasite yatirim seviyesi
+- `EfficiencyLevel` (int) — Run ici Arrow/Wood yatirim seviyesi
+- `Accumulator` (float) — Legacy save/serialization uyumlulugu; V1 refill bunu kullanmaz
 
-Ok stogu singleton'u. ArrowProductionSystem Fletcher iscilerinin uretimini accumulator pattern ile biriktirir.
-ArcherShootSystem ok atildiginda `Current -= 1` yapar. Current <= 0 ise ok atilamaz.
+Ok stogu singleton'u. V1'de Fletcher/queue/pasif ok uretimi yoktur. `GameManager`,
+`ArrowEconomyUtility` fiyat sonucuyla Wood refill veya Wood+Iron yatirim transaction'ini
+aninda uygular. `ArcherShootSystem` yalniz pool rent'i basarili projectile icin
+`Current -= 1` yapar. `Current <= 0` ise ok atilamaz.
 GameStateAuthoring Baker'i tarafindan eklenir — `InitialArrows` degeri baslangic stoku olarak yazilir.
 
 ## Veri Akisi
@@ -44,11 +48,11 @@ ResourceConsumptionRate ─┘                                               ↓
                                                                         ↓
                                                               HUDController (gosterim)
 
-ArrowProductionSystem → ArrowSupply.Accumulator → ArrowSupply.Current
-                                                        ↓
-                                              ArcherShootSystem (tuketim)
-                                                        ↓
-                                              HUDController.ArrowText (gosterim)
+GameManager + ArrowEconomyUtility → Wood refill / Wood+Iron yatirimi → ArrowSupply
+                                                                         ↓
+                                                           ArcherShootSystem (-1/shot)
+                                                                         ↓
+                                                  HUDController + ArrowSupplyUI
 ```
 
 ## Singleton Yerlesim

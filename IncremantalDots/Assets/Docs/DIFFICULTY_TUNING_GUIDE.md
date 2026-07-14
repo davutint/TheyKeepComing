@@ -22,6 +22,8 @@ Deger adi ezberleme — asagidaki tablodan hissini bul, hangi ayara dokunacagini
 | "Gunduz cok sakin / cok yogun" | Faz Yogunluklari > **DayIntensity** | 0.55 taban; artir/azalt |
 | "Gece yeterince korkutucu degil" | **NightIntensity** | ARTIR (1.65 taban) |
 | "Belirli bir GUN cok sert/yumusak" | Ilgili egriye o gune keyframe ekle | Egri = gun bazli ince ayar |
+| "Ok cok cabuk bitiyor" | Ekonomi Fiyat Egrileri > **Arrow kapasite / Arrow per Wood** | Kapasiteyi, paket verimini veya efficiency kazancini ARTIR |
+| "Ok ekonomisi anlamsiz ucuz" | **Arrow CAP/EFF Wood+Iron base cost** | Ilgili base maliyetleri ARTIR; refill unit price satin alma sayisiyla buyumez |
 
 ---
 
@@ -58,6 +60,14 @@ Gece Siddeti EGRISI bu degerlerin USTUNE gun carpani olarak biner (Night ve Dusk
 ### Tamir Maliyeti
 Tam yikimda odenen taban (120 odun / 50 tas); kismi hasarda oranla azalir.
 Tech'teki "Repair Efficiency" bunu ayrica dusurur.
+
+### Arrow Ekonomisi
+
+Default finite stok `200`, refill paketi `100`, verim `4 Arrow/Wood`dur. Capacity
+yatirimi seviye basina `+200`, Efficiency yatirimi seviye basina `+1 Arrow/Wood`
+verir. CAP ve EFF alimlari Wood+Iron ister ve fiyatlari kendi seviyeleriyle `1.35`
+carpaninda buyur. Refill birim fiyati kac kez alindigina gore buyumez; Rapid gibi daha
+hizli okcular talebi dogal olarak artirir.
 
 ### M-C Hazirlik (SpawnTable / SpecialNights)
 SIMDILIK BOS BIRAK — zombi cesitliligi milestone'unda (M-C) sistem bunlari okumaya

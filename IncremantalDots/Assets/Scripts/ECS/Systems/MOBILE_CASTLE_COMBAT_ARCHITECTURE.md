@@ -50,7 +50,7 @@ zombie HP/hız/slow state'ini değiştiremediğini kanıtlar.
 
 Savunma sonucu için tek runtime owner `WallSegment`tir. Gate/Core component ve HUD referansları yalnız legacy serialization uyumluluğudur; ayrıntılı sınır `SINGLE_WALL_DEFENSE_ARCHITECTURE.md` dosyasındadır.
 
-- `MobileCastleCombatConfig`: kale merkezi, spawn radius, attack radius, wave/siege sayilari, spawn batch, zombie scale/speed, continuous siege tuning, reward tuning, worker economy tuning, event tuning, unlimited arrow flag'i ve stress test limitlerini tutar.
+- `MobileCastleCombatConfig`: kale merkezi, spawn radius, attack radius, wave/siege sayilari, spawn batch, zombie scale/speed, continuous siege tuning, reward tuning, worker economy tuning, event tuning ve stress test limitlerini tutar.
 - `EnemyCatalogRuntimeData` + `EnemyCatalogEntryData`: aktif enemy index'ini; prefab, base stats, scale, XP ve pool metadata'sini tutar. V1'de buffer tek kayittir.
 - `EnemyPoolRuntimeData` + `EnemyPoolAvailable`: prewarm/expand rezervini ve rent/return telemetry'sini tutar.
 - `ArrowPoolRuntimeData` + `ArrowPoolAvailable`: ok prewarm/expand rezervini ve rent/return telemetry'sini tutar.
@@ -66,6 +66,7 @@ Savunma sonucu için tek runtime owner `WallSegment`tir. Gate/Core component ve 
 - `ArcherSlotPosition`: legacy/manual pozisyon buffer'idir; mobile NewGameScene tilemap spawn akisi bunu kullanmaz.
 - `ArcherUnit`: okcu tipi, fire rate, hasar, range ve opsiyonel slow degerlerini tutar.
 - `ArrowProjectile`: hedef entity, hasar, projectile effect datasini ve kalan lifetime'i tasir.
+- `ArrowSupply`: finite stok ile run ici Capacity/Efficiency seviyelerini tasir.
 - `ZombieSlow`: Frost ok etkisini enableable component olarak tasir.
 
 Varsayilan mobile degerleri:
@@ -94,7 +95,7 @@ Varsayilan mobile degerleri:
 - Initial/day prep duration fields legacy/debug akis icin korunur
 - Day overlay alpha: `0`
 - Night overlay alpha: `0.50`
-- Unlimited arrows: `true`
+- Initial finite Arrow supply: `200`
 - Wave director: base interval `0.95`, wave multiplier `0.96`, min interval `0.35`
 - Wave director phases: opening `20%` at interval `x1.35` and batch `-1`, final `20%` at interval `x0.65` and batch `+1`
 - Castle Yard: Fortify/Rally runtime state korunur, player-facing drawer'da gizlenir
@@ -163,7 +164,9 @@ Okcu ve ok projectile gorunurlugu `SpriteTint` ile okunur:
 
 `ArcherShootSystem`, pool'dan rent edilen oka okcu tipinden gelen tint'i yazar.
 Ayni `Arrow.prefab` ve `ArrowMat` kullanilmaya devam eder.
-Mobile config ve `UnlimitedArrows = true` iken `ArrowSupply.Current` kontrolu/decrement yapilmaz; legacy config olmayan sahnelerde ok stogu tuketimi korunur.
+Stok `0` iken atış durur. Pool rent'i başarılı olduktan sonra tam `1 Arrow` düşer;
+pool rezervi tükenmişse stok ve fire timer değişmez. Refill ve run içi capacity/efficiency
+yatırımları `ARROW_AMMO_ARCHITECTURE.md` sözleşmesinde tanımlanır.
 Atis aninda `CombatSfxEvent.ArrowShoot` uretilir; shoot particle V1'de kapali tutulur. Playback main scene `CombatFeedbackBridge` tarafindadir.
 
 Atis aninda okcunun `FacingDirection` degeri hedef zombiye gore guncellenir ve
@@ -200,7 +203,7 @@ HUD varsa `CastleDefensePanel` uzerindeki tek `DefenseWallFill` ve Wall yuzdesin
 
 Sol ust economy HUD mevcut kaynaklari gosterir: Wood, Stone, Iron, Food, Population, Arrows. Runtime text'ler label tekrar etmez; kutu basligi UI'da, value/rate text'i kod tarafindadir. HUD rate degeri mobile population allocation tarafindan yazilan worker production'dir. NewGameScene mobile default'lari:
 
-- Wood `280`, Stone `120`, Iron `70`, Food `220`, Population `60`, Arrows `INF`
+- Wood `280`, Stone `120`, Iron `70`, Food `220`, Population `60`, Arrows `200 / 200`
 - Initial workers: Wood `20`, Stone `10`, Iron `8`, Food `15`
 - Worker caps: Wood `40`, Stone `30`, Iron `24`, Food `40`
 - Worker income: Wood `8/min`, Stone `5.5/min`, Iron `3.8/min`, Food `7/min` per assigned worker
@@ -260,7 +263,7 @@ Continuous siege varsayilaninda wave bittiginde oyun durmaz, `GameManager.OnWave
 
 - `Repair`: legacy DayPrep sirasinda aktiftir ve `GameManager.RepairDefenseFull()` ile wall/gate/castle HP full olur.
 - `Fortify` ve `Rally`: runtime API olarak kalir, fakat Castle Interior economy ekrani geldikten sonra player-facing drawer'da gizlenir.
-- `Arrow Refill`: unlimited arrow mobile akista oyuncuya gosterilmez.
+- `Arrow Refill`: Arrow chip'inden açılan tek satırlık panelde +1/+5 paket, Buy Max ve Capacity/Efficiency yatırımları gösterilir.
 - `Start Next Wave`: debug/public API olarak kalir, player-facing UI'da gizlidir.
 
 ## Okcu Yerlesimi

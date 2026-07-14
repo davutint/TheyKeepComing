@@ -219,6 +219,16 @@ namespace DeadWalls.Tests
                 typeof(ArrowPoolRuntimeData), typeof(ArrowPoolAvailable)).GetSingletonEntity();
             Assert.That(archerQuery.CalculateEntityCount(), Is.EqualTo(ArcherTarget));
 
+            using (EntityQuery arrowSupplyQuery = entityManager.CreateEntityQuery(typeof(ArrowSupply)))
+            {
+                Entity arrowSupplyEntity = arrowSupplyQuery.GetSingletonEntity();
+                ArrowSupply stressSupply = entityManager.GetComponentData<ArrowSupply>(arrowSupplyEntity);
+                stressSupply.CapacityLevel = 50;
+                stressSupply.Current = ArrowEconomyUtility.GetCapacity(
+                    stressSupply, gameManager.GetEconomyPriceTuning());
+                entityManager.SetComponentData(arrowSupplyEntity, stressSupply);
+            }
+
             for (int frame = 0; frame < WarmupFrames; frame++)
                 yield return null;
 

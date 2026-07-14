@@ -4,11 +4,11 @@
 
 V1 Blueprint kararı: koşu yalnız Wall `0 HP` olduğunda biter. Oyuncu ana menüye dönebilir veya uygulamayı kapatabilir; Continue aynı koşunun aynı anını geri yükler. Aktif koşu varken gönüllü New Run/Restart yolu sunulmaz.
 
-`RunPersistence.cs` içindeki `RunSaveState` bu sözleşmenin disk şemasıdır. Güncel sürüm `v7`, desteklenen en eski sürüm `v3` tür. Eski v2 Dawn-checkpoint kayıtları exact state içermediği için Continue olarak gösterilmez. v3 exact snapshot'lar önce worker target-ratio state'iyle v4'e, ardından açık House bed state'iyle v5'e, sekiz worker bina yatırım seviyesiyle v6'ya ve açık `ArcherFormationVersion` alanıyla v7'ye yükseltilir. v4 exact snapshot'lar mevcut population'ı karşılayan bir `BedBaseCapacity` ve sıfır purchased bed ile v5'e; v5 snapshot'lar sıfır bina yatırımıyla v6'ya; v6 snapshot'lar Formation V1 ile v7'ye migrate edilir.
+`RunPersistence.cs` içindeki `RunSaveState` bu sözleşmenin disk şemasıdır. Güncel sürüm `v8`, desteklenen en eski sürüm `v3` tür. Eski v2 Dawn-checkpoint kayıtları exact state içermediği için Continue olarak gösterilmez. v3 exact snapshot'lar önce worker target-ratio state'iyle v4'e, ardından açık House bed state'iyle v5'e, sekiz worker bina yatırım seviyesiyle v6'ya, açık `ArcherFormationVersion` alanıyla v7'ye ve finite Arrow Capacity/Efficiency seviyeleriyle v8'e yükseltilir. v4 exact snapshot'lar mevcut population'ı karşılayan bir `BedBaseCapacity` ve sıfır purchased bed ile v5'e; v5 snapshot'lar sıfır bina yatırımıyla v6'ya; v6 snapshot'lar Formation V1 ile v7'ye; v7 snapshot'lar sıfır Arrow yatırım seviyesiyle v8'e migrate edilir.
 
-Eski `v5` snapshot'larda bed state yazılmış olsa bile legacy bedelsiz growth nedeniyle population kayıtlı yataktan büyük olabilir. Restore bu durumda mevcut nüfusu silmez; `BedBaseCapacity` değerini population-safe minimuma yükseltir. Runtime'da `MobilePopulationEconomySystem`, `PopulationState.Capacity` aynasını restore edilen toplam yataktan yeniden kurar. v5'te bulunmayan Wood/Stone/Iron/Food Capacity/Efficiency seviyeleri açık migration ile sıfır başlar.
+Eski `v5` snapshot'larda bed state yazılmış olsa bile legacy bedelsiz growth nedeniyle population kayıtlı yataktan büyük olabilir. Restore bu durumda mevcut nüfusu silmez; `BedBaseCapacity` değerini population-safe minimuma yükseltir. Runtime'da `MobilePopulationEconomySystem`, `PopulationState.Capacity` aynasını restore edilen toplam yataktan yeniden kurar. v5'te bulunmayan Wood/Stone/Iron/Food ve v7'de bulunmayan Arrow Capacity/Efficiency seviyeleri açık migration ile sıfır başlar.
 
-Disk çıktısı compact JSON'dur. Pretty-print kullanılmaz; özellikle 10K combat snapshot'ında whitespace dosya boyutu ve senkron I/O maliyeti üretmemelidir. Bu yalnız fiziksel yazım biçimidir; `v7` alan şeması ve `JsonUtility` Continue uyumluluğu değişmez.
+Disk çıktısı compact JSON'dur. Pretty-print kullanılmaz; özellikle 10K combat snapshot'ında whitespace dosya boyutu ve senkron I/O maliyeti üretmemelidir. Bu yalnız fiziksel yazım biçimidir; `v8` alan şeması ve `JsonUtility` Continue uyumluluğu değişmez.
 
 ## Kayıt anları
 
@@ -23,7 +23,7 @@ Kaydedilen state, oyuncunun aynı ana dönmesini etkileyen runtime verisidir:
 
 - Run identity, gün/cycle index, phase, exact cycle timer ve progress değerleri.
 - Wave state, spawn timer/budget ve `SpawnRandomState`.
-- Wood/Stone/Iron/Food, kesirli üretim accumulator'ları, Arrow current ve accumulator.
+- Wood/Stone/Iron/Food, kesirli üretim accumulator'ları; Arrow current, Capacity/Efficiency seviyeleri ve legacy accumulator.
 - Population/legacy capacity; `BedBaseCapacity` ve `PurchasedBedCapacity`; actual worker dağılımı; target ratio, etkin worker cap ve idle aynaları; sekiz worker bina Capacity/Efficiency seviyesi; arrival checkpoint'i ve Dawn/event tekrarını önleyen last-marker alanları.
 - Wall current HP, archer sayıları/level state'i, `ArcherFormationVersion`, tech node level'ları ve legacy upgrade tier'ları.
 - Council hafızası, salt, cooldown/pity/cap bonusları, aktif kart ve seçenek/effect içeriği.
@@ -44,10 +44,10 @@ Dawn survivor transaction'ında düşülen Food, resource snapshot'ının parça
 
 `GameManager.TryRestoreRunFromCheckpoint()` şu sırayı korur:
 
-1. Geçerli `v3`, `v4`, `v5`, `v6` veya `v7` snapshot yüklenir; v3 worker oranları actual count'lardan türetilir, v3/v4 state açık bed alanlarıyla v5'e, eski state'ler bina yatırım alanlarıyla v6'ya ve Formation V1 alanıyla in-memory v7'ye yükseltilir. Ardından temiz runtime tabanı oluşturulur.
+1. Geçerli `v3`, `v4`, `v5`, `v6`, `v7` veya `v8` snapshot yüklenir; v3 worker oranları actual count'lardan türetilir, v3/v4 state açık bed alanlarıyla v5'e, eski state'ler bina yatırım alanlarıyla v6'ya, Formation V1 alanıyla v7'ye ve finite Arrow yatırım alanlarıyla in-memory v8'e yükseltilir. Ardından temiz runtime tabanı oluşturulur.
 2. Aynı `RunId` ve worker bina yatırım state'i geri alınır; tech seviyeleri maliyetsiz uygulanıp base + Heart + Council + Meta + bina aggregate'leri kurulur.
 3. Council hafızası ve aktif Council kartı aynen yüklenir; reroll yapılmaz.
-4. `ArcherFormationVersion` yüklenir; mevcut başlangıç okçuları aynı formation cache'ine taşınır, ardından archer level/count state'i ve kaynak/population/allocation state'i geri yazılır.
+4. `ArcherFormationVersion` yüklenir; mevcut başlangıç okçuları aynı formation cache'ine taşınır, ardından archer level/count state'i, kaynak/population/allocation state'i ve finite Arrow stok/yatırım seviyeleri geri yazılır.
 5. Exact cycle phase/timer, wave state ve spawn RNG state'i geri yazılır. `CycleIndex + 1`, zorunlu Day veya timer `0` uygulanmaz.
 6. Wall current HP, ability cooldown ve süreli effect state'i geri yüklenir.
 7. Zombie'ler oluşturulur; ardından arrow hedefleri restore edilen zombie index'lerine bağlanır ve aktif Fireball kurulur.
@@ -79,7 +79,7 @@ Entity referansı doğrudan JSON'a yazılmaz. Referans gerekiyorsa compact stabl
 - `RunPersistenceTests.JsonRoundTrip_PreservesExactCycleCombatCouncilAndAbilityState`
 - `RunPersistenceTests.DeathReceipt_RoundTrip_PreservesRunIdentityAndRewardInputs`
 - `RunPersistenceTests.Save_WritesCompactJson_AndRemainsLoadable`
-- `RunPersistenceTests.TryLoad_Version3Snapshot_MigratesWorkerAllocationBedBuildingAndFormationStateToVersion7`
+- `RunPersistenceTests.TryLoad_Version3Snapshot_MigratesWorkerAllocationBedBuildingFormationAndAmmoStateToCurrent`
 - `RunPersistenceTests.TryLoad_Version4UnlimitedCapacity_MigratesToPopulationSafeBedBase`
 - `RunPersistenceTests.TryLoad_Version5Snapshot_MigratesToCleanWorkerBuildingLevels`
 - `RunPersistenceTests.TryLoad_Version6Snapshot_MigratesToFormationVersion1`

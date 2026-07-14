@@ -69,12 +69,9 @@ namespace DeadWalls.Tests
             gameState.IsLevelUpPending = false;
             entityManager.SetComponentData(gameStateEntity, gameState);
 
-            Entity configEntity = entityManager.CreateEntityQuery(typeof(MobileCastleCombatConfig))
-                .GetSingletonEntity();
-            MobileCastleCombatConfig config =
-                entityManager.GetComponentData<MobileCastleCombatConfig>(configEntity);
-            config.UnlimitedArrows = true;
-            entityManager.SetComponentData(configEntity, config);
+            ArrowSupply arrowSupply = entityManager.GetComponentData<ArrowSupply>(gameStateEntity);
+            arrowSupply.Current = 100;
+            entityManager.SetComponentData(gameStateEntity, arrowSupply);
 
             Entity poolEntity = entityManager.CreateEntityQuery(
                 typeof(EnemyPoolRuntimeData),

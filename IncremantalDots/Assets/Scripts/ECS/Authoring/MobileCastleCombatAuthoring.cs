@@ -87,8 +87,6 @@ namespace DeadWalls
         public float DayPrepDuration = 15f;
         [Range(0f, 1f)] public float DayOverlayAlpha = 0f;
         [Range(0f, 1f)] public float NightOverlayAlpha = 0.50f;
-        public bool UnlimitedArrows = true;
-
         [Header("Continuous Siege Cycle")]
         public bool ContinuousSiegeEnabled = true;
         public float SiegeCycleDuration = 60f;
@@ -214,7 +212,6 @@ namespace DeadWalls
                     DayPrepDuration = math.max(1f, authoring.DayPrepDuration),
                     DayOverlayAlpha = math.clamp(authoring.DayOverlayAlpha, 0f, 1f),
                     NightOverlayAlpha = math.clamp(authoring.NightOverlayAlpha, 0f, 1f),
-                    UnlimitedArrows = authoring.UnlimitedArrows,
                     ContinuousSiegeEnabled = authoring.ContinuousSiegeEnabled,
                     SiegeCycleDuration = math.max(1f, authoring.SiegeCycleDuration),
                     SiegeDayDuration = math.max(0.1f, authoring.SiegeDayDuration),

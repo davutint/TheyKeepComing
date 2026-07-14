@@ -1,0 +1,72 @@
+# Finite Arrow Supply + Instant Refill - Mimari
+
+## Otorite ve oyuncu sözleşmesi
+
+V1'de Arrow tek sürekli tüketilen kaynaktır. Her başarılı ok atışı tam `1 Arrow`
+harcar. Stok `0` olduğunda okçular hedef seçse bile projectile rent etmez; Wood ile
+satın alınan refill aynı transaction içinde stoka yazılır ve takip eden simulation
+tick'inde atış yeniden başlar. Fletcher, üretim kuyruğu, worker veya bekleme süresi yoktur.
+
+## Veri ve sahiplik
+
+- `ArrowSupply.Current`: mevcut Arrow stoku.
+- `ArrowSupply.CapacityLevel`: run içi kapasite yatırım seviyesi.
+- `ArrowSupply.EfficiencyLevel`: run içi Arrow/Wood yatırım seviyesi.
+- `ArrowSupply.Accumulator`: eski save/serialization uyumluluğu için korunur; V1 refill
+  üretimi bu alanı kullanmaz.
+- `MobileEconomyPriceTuning`: kapasite, paket, verim ve iki yatırım maliyet eğrisinin
+  data-driven baseline'ıdır.
+- `ArrowEconomyUtility`: kapasite, sabit oranlı paket, kısmi dolum, Buy Max ve yatırım
+  maliyeti matematiğinin saf sahibidir.
+- `GameManager`: oyuncu transaction'larının tek owner'ıdır; fiyat okur, kaynak harcar,
+  `ArrowSupply` yazar ve UI event'i yayınlar.
+- `ArcherShootSystem`: yalnız gerçek projectile pool rent'i başarılı olduktan sonra
+  `Current` değerini bir azaltır. Pool boşsa Arrow harcanmaz.
+
+## Varsayılan ekonomi
+
+- Base capacity: `200`.
+- Capacity yatırımı: seviye başına `+200`.
+- Refill paketi: `100 Arrow`.
+- Base verim: `4 Arrow / Wood`.
+- Efficiency yatırımı: seviye başına `+1 Arrow / Wood`.
+- Capacity başlangıç maliyeti: `150 Wood + 25 Iron`.
+- Efficiency başlangıç maliyeti: `200 Wood + 50 Iron`.
+- İki yatırımın fiyat büyümesi: `ceil(base × 1.35^level)`.
+
+Refill birim fiyatı satın alma sayısıyla büyümez. Kapasiteye sığmayan bölüm için Wood
+harcanmaz: örneğin `170/200` stokta paket `30 Arrow` verir ve yalnız bu miktarın
+ceil maliyetini öder. `Buy Max`, mevcut Wood bütçesi ile kapasite boşluğunun minimumunu
+tek transaction'da alır. Capacity ve Efficiency yatırımları birbirinden bağımsızdır
+ve her satın alım hem Wood hem Iron harcar.
+
+## UI sözleşmesi
+
+Üst HUD Arrow chip'i `Current / Capacity` gösterir; `INF` modu yoktur. Chip'e basmak
+tek satırlık `AmmoPurchasePanel` açar. Panel mevcut stok/verim, `+1 paket`, `+5 paket`,
+`Buy Max`, Capacity ve Efficiency yatırımlarını görünür fiyatlarıyla gösterir.
+Kaynak yetersizliği butonu kapatır fakat fiyatı gizlemez; yalnız dolu stok `FULL`,
+Wood ile hiçbir Arrow alınamayan Buy Max durumu `NEED WOOD` yazar.
+
+## Save ve migration
+
+Run save güncel şema `v8`'dir. `ArrowCurrent`, `ArrowCapacityLevel` ve
+`ArrowEfficiencyLevel` exact Continue kapsamında tutulur. `v3-v7` kayıtları in-memory
+`v8`'e yükseltilir; eski kayıtlarda iki yatırım seviyesi `0` başlar. Restore edilen
+stok, data-driven kapasiteye clamp edilir. Restart seviyeleri sıfırlar ve base
+kapasiteyi doldurur.
+
+## Performans ve test sınırı
+
+Refill bir UI/ECS singleton transaction'ıdır; archer başına üretim entity'si veya queue
+oluşturmaz. `Rapid` yüksek fire rate nedeniyle aynı sürede Basic'ten daha fazla Arrow
+tüketir. 1.000 archer refill sonrası mevcut pooled projectile yolunu kullanmaya devam eder.
+
+Doğrulama sahipleri:
+
+- `ArrowEconomyUtilityTests`: sabit birim fiyat, kısmi dolum, Buy Max, efficiency,
+  exponential yatırım ve overflow sınırları.
+- `ArrowAmmoPlayModeTests`: stok `0` iken atışın durması, instant refill sonrası yeniden
+  başlaması, projectile başına `1` tüketim ve Rapid tüketim farkı.
+- `RunPersistenceTests`: şema `v8`, eski kayıt migration'ı ve yatırım seviyeleri.
+

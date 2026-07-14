@@ -37,7 +37,7 @@ Beklenen referanslar:
 - Legacy/hidden tech: `ArrowTechPanel`, `RapidTechUnlockButton`, `FrostTechUnlockButton`
 - Prep: `RepairButton`, optional `RepairCostText`, `RepairStatusText`
 - Castle Yard: `FortifyButton`, `FortifyCostText`, `FortifyStatusText`, `RallyButton`, `RallyCostText`, `RallyStatusText`
-- `RefillArrowsButton` varsa mobile unlimited arrow modda gizlenir
+- Legacy `RefillArrowsButton` varsa gizlenir; `AmmoPurchasePanel` ve `ArrowSupplyUI` binding'leri `ARROW_AMMO_EDITOR_SETUP.md` ile kurulur
 - `StartNextWaveButton` varsa mobile otomatik day/night loop'ta gizlenir
 - `Canvas/DayNightOverlay`: full-screen black `Image` + `DayNightOverlayController`
 
@@ -49,7 +49,9 @@ Drawer gameplay'i pause etmez. Mobile castle loop'ta level-up paneli kullanilmaz
 
 Economy focus butonlari mobile continuous HUD'dan tamamen kaldirildi. Kaynak yonlendirme player-facing olarak sol worker drawer uzerinden yapilir; `EconomyFocusState` ve `EconomyFocusUI` sadece legacy/debug akislar icin kodda kalabilir.
 
-Mobile unlimited arrow modunda HUD `ArrowText` degeri `INF` gosterir. Refill butonu player-facing UI'da kullanilmaz; `GameManager.RefillArrows()` legacy/debug API olarak kalabilir.
+HUD `ArrowText` finite stoku `Current / Capacity` gösterir. Refill player-facing olarak
+Arrow chip'inden açılan `ArrowSupplyUI` panelindedir; legacy `RefillArrowsButton` ve
+Fletcher/queue akışı kullanılmaz.
 
 ## Onemli
 - Bu MonoBehaviour'lar ana scene'de bulunur (Sub Scene'de degil!)

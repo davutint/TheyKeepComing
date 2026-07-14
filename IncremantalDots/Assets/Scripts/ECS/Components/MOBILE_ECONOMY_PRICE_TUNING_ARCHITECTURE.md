@@ -14,8 +14,13 @@ config entity'sine yazar. Runtime utility'leri hardcoded maliyet kullanmaz.
 - Worker CAP: `WorkerCapacityBaseWoodCost`, `WorkerCapacityBaseIronCost`
 - Worker EFF: `WorkerEfficiencyBaseWoodCost`, `WorkerEfficiencyBaseIronCost`
 - Ortak bina eğrisi: `WorkerBuildingCostGrowthMultiplier`
+- Arrow stok: `ArrowBaseCapacity`, `ArrowCapacityPerLevel`, `ArrowRefillPackageSize`
+- Arrow verim: `ArrowBaseArrowsPerWood`, `ArrowArrowsPerWoodPerEfficiencyLevel`
+- Arrow CAP/EFF: Wood + Iron base maliyetleri ve `ArrowUpgradeCostGrowthMultiplier`
 
-Onaylı V1 default'ları sırasıyla `100`, `25`, `100/25`, `150/50`, `1.35` değerleridir.
+Worker/bed V1 default'ları sırasıyla `100`, `25`, `100/25`, `150/50`, `1.35`;
+Arrow default'ları `200`, `+200`, `100`, `4/Wood`, `+1/Wood`, CAP `150W+25I`,
+EFF `200W+50I`, growth `1.35` değerleridir.
 
 ## Formüller
 
@@ -23,6 +28,8 @@ Onaylı V1 default'ları sırasıyla `100`, `25`, `100/25`, `150/50`, `1.35` de�
   `ceil(BedBaseWoodCost * (1 + ownedGrowth / BedCostGrowthCapacityInterval)^2)`
 - Worker building next cost, her kaynak için ayrı:
   `ceil(baseResourceCost * WorkerBuildingCostGrowthMultiplier^currentLevel)`
+- Arrow refill: `ceil(sığan Arrow / mevcut ArrowPerWood)`; purchase count maliyeti büyütmez.
+- Arrow upgrade next cost: `ceil(baseResourceCost * ArrowUpgradeCostGrowthMultiplier^currentLevel)`.
 
 Bed toplu alımı her yatağın ardışık unit maliyetini toplar. Worker CAP ve EFF seviyeleri
 her bina için bağımsızdır; her iki fiyat da Wood ve Iron birlikte gerektirir.
@@ -39,8 +46,9 @@ Gameplay hard max eklenmez; sınır yalnız temsil ve transaction güvenliğidir
 
 `GameManager.GetEconomyPriceTuning` bake edilmiş component'i okur ve savunma amaçlı yeniden
 sanitize eder. Bed ve worker bina cost API'leri aynı snapshot'ı ilgili utility'ye geçirir.
-Tuning içerik verisidir, run-save state'i değildir. Güncel exact save v7 satın alınmış yatak ve sekiz
-bina seviyesini taşır; Continue sonrası maliyet mevcut profile baseline'ından yeniden hesaplanır.
+Tuning içerik verisidir, run-save state'i değildir. Güncel exact save v8 satın alınmış yatak,
+sekiz bina seviyesi ve iki Arrow yatırım seviyesini taşır; Continue sonrası maliyet mevcut
+profile baseline'ından yeniden hesaplanır.
 
 ## Doğrulama
 

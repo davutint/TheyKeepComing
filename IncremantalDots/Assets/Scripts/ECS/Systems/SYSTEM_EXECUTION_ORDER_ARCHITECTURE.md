@@ -125,9 +125,10 @@ Presentation tarafinda `SpriteAnimationSystem` UV rect hesaplarini yapar.
 - Uçuşta olan ok damage'leriyle frame-local incoming load'u seed eder.
 - Range içindeki yaşayan ve lethal load ile dolmamış en yakın zombiyi hedefler.
 - Basic/Rapid/Frost aynı deterministic target policy'yi kullanır.
-- Mobile config ve `UnlimitedArrows = true` iken `ArrowSupply.Current` kontrolu/decrement yapmaz.
+- `ArrowSupply.Current <= 0` ise projectile rent etmez; bütün V1 sahnelerinde finite stok geçerlidir.
 - `CastleYardPrepState.RallyTimer > 0` iken fire-rate hesabina rally multiplier uygular.
 - `ArrowPoolAvailable` rezervinden projectile rent eder; rezerv yoksa expand request yazar ve fire timer/ammo/reservation'i degistirmez.
+- Başarılı pool rent'inden sonra tam `1 Arrow` düşürür; rent başarısızsa stok değişmez.
 - Basic/Rapid/Frost okcu stat'lerini rent edilen projectile'a tasir.
 - Rent edilen oka okcu tipinin `SpriteTint` rengini yazar.
 - Okcunun hedefe bakan `FacingDirection` degerini ve `AttackAnimTimer` degerini yazar.

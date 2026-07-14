@@ -4,8 +4,8 @@
 >
 > **Tracker sürümü:** 2.0  
 > **Son tam kapsam denetimi:** 2026-07-12  
-> **Aktif paket:** Package D - Archers + Ammo
-> **Aktif iş:** `DW-D-AMMO` - Finite Arrow Supply + Instant Refill
+> **Aktif paket:** Package E - Castle Heart
+> **Aktif iş:** `DW-E-DATA` - Heart Data Model + Generated Run Graph State
 
 ---
 
@@ -128,16 +128,16 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Moat | Runtime flag kapalı; slow `1`, damage `0`; tech/meta catalog bağlantıları dormant | Uyumlu |
 | Defense | Damage/Game Over aktif ve testli olarak tek Wall'a çekildi | `[x]` |
 | Normal repair | Stone-only ve yalnız Day/Dusk | `[x]` |
-| Save | Exact same-moment Continue; schema v7, minimum v3; purchased bed, worker bina yatırımı ve Archer Formation V1 version state'i exact | `[x]` |
+| Save | Exact same-moment Continue; schema v8, minimum v3; purchased bed, worker bina yatırımı, Archer Formation V1 ve finite Arrow yatırım state'i exact | `[x]` |
 | Economy | Worker üretimi, bed alımı ve dört hazır binanın capacity/efficiency yatırımları var; bed ve bina fiyat eğrileri `DefaultDifficulty.asset`/Difficulty Tuner üzerinden baked runtime tuning'e bağlı; V1 ana kaynaklarında pasif consumption yok | `[x]` |
 | Population | House bed state + Wood purchase API + exact save var; Dawn isteği boş yatak ve Food/kişi bütçesiyle sınırlı, gerçek accepted count uygulanıyor, Food bir kez düşülüyor ve en fazla 15 temsili survivor sağdan Wall arkasına yürüyor | `[x]` |
 | Workers | Kalıcı target ratio + actual/cap/idle state, +1/+10/+100/direct input, bağımsız bina capacity/efficiency seviyeleri, yeni nüfus auto-allocation, exact save, Low/Medium/High density ve allocation-senkronlu animation/cargo/lantern/delivery feedback var | `[x]` |
 | Council | Curated/deterministic composer ve kart UI var; schedule chance/pity/cooldown | Package F altyapısı var, schedule yanlış |
-| Archers | Basic/Rapid/Frost, instant buy, incremental type maliyeti, yerinde retrain, version'lı 40x25 formation, scalable target load ve pooled projectile lifetime var | Kısmi uyum; ammo açık |
+| Archers | Basic/Rapid/Frost, instant buy, incremental type maliyeti, yerinde retrain, version'lı 40x25 formation, scalable target load ve pooled projectile lifetime var | `[x]` Combat temeli; upgrade owner'ı Package E |
 | Archer cap | `ArcherCapacityUtility` Basic/Rapid/Frost toplamını `1000` ile sınırlar; buy, merkezi spawn, Council, meta, restore ve legacy Barracks aynı guard'ı kullanır | `[x]` |
-| Placement | Formation V1 asset'iyle sabit 40 `outside` tile x 25 seeded diamond nokta; layer-fill sıra, 1000 gizmo ve v7 Continue testli | `[x]` |
+| Placement | Formation V1 asset'iyle sabit 40 `outside` tile x 25 seeded diamond nokta; layer-fill sıra, 1000 gizmo ve v8 Continue testli | `[x]` |
 | Targeting | Persistent coarse spatial query + incoming damage reservation Burst job'ları aktif | `[x]` |
-| Ammo | Config `UnlimitedArrows = true`; refill butonu bağlı değil | Package D uyumsuz |
+| Ammo | Finite stok; gerçek projectile başına `-1`; Wood ile anlık +1/+5/Buy Max refill; Wood+Iron CAP/EFF yatırımı; Current/Capacity HUD ve exact save v8 | `[x]` |
 | Tech/Heart | Sabit SO catalog + reveal graph + ana kaynak maliyeti | Generated Heart değil |
 | Fireball | Dünya hedefli projectile/AoE ve cooldown çalışması mevcut | Korunacak temel |
 | Rally | Wood/Food maliyetli prep purchase | Cooldown-only ability olmalı |
@@ -145,7 +145,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Meta | Ayrı JSON ve Game Over shop var; `StartingTechLevel` aktif | Kısmi uyum |
 | HUD | CyclePanel, DAY/DUSK/NIGHT ve Horde Pressure mevcut; tek Wall runtime gizleme var | Package I polish gerekli |
 | Tutorial | Aktif tutorial/onboarding sistemi bulunmadı | Package I eksik |
-| Testler | EditMode `94/94`; PlayMode `23 pass + 1 explicit skip`; Standalone Player-targeted 10K `1/1` | Güncel değişiklikler full paketle testli |
+| Testler | EditMode `109/109`; PlayMode `28 pass + 1 explicit profiler skip`; Standalone Player-targeted 10K `1/1` | Güncel değişiklikler full paketle testli |
 | Telemetry | Spawn budget demanded/spawned/backlog telemetry mevcut; tam Blueprint event owner'ı eksik | Kısmi |
 
 ---
@@ -157,8 +157,8 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | 1 | A - System Contracts | Tamamlandı | Reset/Continue deterministik; upkeep yok; tek Wall testli |
 | 2 | B - Continuous Horde | Tamamlandı | Sabit stats, backlog/pool ve 10K ürün ölçümü tamamlandı |
 | 3 | C - Economy + Population | Tamamlandı | Pasif drain yok; arrival tek Food öder; cap aşılmaz; fiyat tuning'i testli |
-| 4 | D - Archers + Ammo | **Aktif** | 1.000 x 10.000 targeting/projectile ve Arrow truth çalışır |
-| 5 | E - Castle Heart | Bekliyor | Aynı seed/load aynı valid graph'ı üretir |
+| 4 | D - Archers + Ammo | Tamamlandı | 1.000 x 10.000 targeting/projectile ve Arrow truth çalışır |
+| 5 | E - Castle Heart | **Aktif** | Aynı seed/load aynı valid graph'ı üretir |
 | 6 | F - Council | Bekliyor | 3/6/9 bozulmaz; etkiler ana cap'leri bypass etmez |
 | 7 | G - Active Abilities | Bekliyor | Kaynak tüketmez; Night repair sözleşmesi çalışır |
 | 8 | H - Meta + Persistence | Bekliyor | Ölüm ödülü idempotent; force-close ölümü geri alamaz |
@@ -176,7 +176,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 |---|---|---|
 | Tek Wall truth | Damage, Game Over, authoring, repair ve save defense alanı Wall'a çekildi | `[x]` 19/19 EditMode |
 | Run/meta ayrımı | Exact run `run_save.json`; kalıcı progression `meta_progress.json`; ölüm transaction'ı ayrı receipt | `[x]` |
-| Exact Continue | Schema v7 aynı cycle/phase/timer, kaynak, spawn RNG, worker target/checkpoint, purchased bed, worker bina yatırımı ve Archer Formation V1 state'ini restore ediyor; v3/v4/v5/v6 migrate ediliyor | `[x]` EditMode + PlayMode |
+| Exact Continue | Schema v8 aynı cycle/phase/timer, kaynak, spawn RNG, worker target/checkpoint, purchased bed, worker bina yatırımı, Archer Formation V1 ve finite Arrow state'ini restore ediyor; v3-v7 migrate ediliyor | `[x]` EditMode + PlayMode |
 | Otomatik save | Ana menüye dönmeden önce ve application quit sırasında exact snapshot alınıyor | `[x]` |
 | Gönüllü reset yok | Aktif run sırasında Main Menu New Run ve Pause Restart kapalı; Game Over Restart yeni koşu başlatır | `[x]` |
 | Upkeep yok | V1 ResourceTick consumption'ı yok sayıyor; population Food ve Fletcher Wood yolları castle loop'ta kapalı | `[x]` |
@@ -186,7 +186,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 ### `DW-A-SAVE` - Tamamlandı: Exact Run Snapshot & Continue
 
-- [x] Run save schema güncel `v7`, minimum `v3`; v2 Dawn checkpoint reddediliyor, v3 worker target, v3/v4 bed, v3/v4/v5 worker bina yatırım ve v3-v6 Archer Formation V1 state'iyle deterministik migrate ediliyor.
+- [x] Run save schema güncel `v8`, minimum `v3`; v2 Dawn checkpoint reddediliyor, v3 worker target, v3/v4 bed, v3/v4/v5 worker bina yatırım, v3-v6 Archer Formation V1 ve v3-v7 finite Arrow state'iyle deterministik migrate ediliyor.
 - [x] Gün/cycle index, aktif phase, exact cycle timer/progress ve spawn RNG state'i kaydediliyor.
 - [x] Wood, Stone, Iron, Food, Arrow current ve kesirli accumulator state'i kaydediliyor; data-driven capacity tech/config'ten yeniden hesaplanıyor.
 - [x] Population, bed/capacity, actual worker count, target ratio/cap/idle/checkpoint ve growth/event tekrar gate'leri capture/restore zincirinde kaydediliyor.
@@ -209,7 +209,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [x] `BuildingPopulationSystem`, V1'de serialize kalmış `BuildingFoodCost` değerlerini sıfırlıyor.
 - [x] Legacy `ArrowProductionSystem`, `MobileCastleCombatConfig` bulunduğunda Fletcher arrow üretimi ve Wood consumption uygulamıyor.
 - [x] Ana kaynakların yüksek bir consumption rate enjekte edildiğinde dahi azalmadığını gerçek `NewGameScene` PlayMode testi kanıtlıyor.
-- [x] Wood ile anlık arrow satın alma bu işin parçası olarak sahte biçimde kapatılmadı; aktif config hâlâ `UnlimitedArrows=true`, çözüm Package D'de açık.
+- [x] Bu işte Arrow ekonomisi sahte biçimde kapatılmadı; finite stok ve Wood ile anlık satın alma daha sonra `DW-D-AMMO` kapsamında gerçek owner'larıyla tamamlandı.
 
 ### `DW-A-REPAIR` - Tamamlandı: Stone-only Day/Dusk Repair
 
@@ -457,14 +457,14 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Common 1000 cap | `ArcherCapacityUtility` tek owner; `SpawnArcher` bütün aktif yolların son kapısı, drawer cap'te `MAX` gösteriyor | `[x]` |
 | Basic retrain | `GameManager` bir Basic entity'yi tek seferlik kaynak maliyetiyle yerinde Rapid/Frost'a dönüştürüyor | `[x]` |
 | Type bazlı incremental maliyet | Buy ve retrain maliyeti hedef türün mevcut sayısıyla SO-tunable ortak eğride büyüyor | `[x]` |
-| Archer death yok | Archer HP/death combat yolu yok | `[~]` Regression gerekli |
+| Archer death yok | Archer HP/death combat yolu yok; 1K × 10K runtime testi archer count'un değişmediğini doğruluyor | `[x]` |
 | Upgrade yalnız Heart | Ayrı type level/upgrade ve direct unlock kontrolleri player-facing kapalı; drawer yalnız buy + retrain | `[x]` Heart effect pipeline ayrı açık iş |
 | 40x25 placement | Version'lı 40 canonical tile, tile+slot seeded 25 diamond nokta, minimum mesafe, layer-fill sıra, 1000 gizmo ve stable Continue | `[x]` |
 | Nearest valid target | Persistent coarse grid + Burst job range içindeki yaşayan en yakın hedefi seçiyor | `[x]` |
 | Incoming damage reservation | Uçuşta ve aynı frame üretilen ok damage'i target HP'ye karşı rezerve ediliyor | `[x]` |
-| Arrow -1/shot | Kod destekliyor fakat `UnlimitedArrows=true` bypass ediyor | `[!]` |
-| Wood ile instant refill | Mevcut refill ücretsiz ve sabit target'a çekiyor; UI gizli | `[!]` |
-| Fletcher yok | Legacy Fletcher kodu var; aktif mobile UI'da bağlı değil | `[~]` Leakage guard gerekli |
+| Arrow -1/shot | Başarılı pool rent'inden sonra tam `1`; pool yoksa stok harcanmıyor | `[x]` |
+| Wood ile instant refill | Sabit oranlı +1/+5/Buy Max paketleri; stok aynı transaction'da artıyor, combat sonraki simulation tick'inde sürüyor | `[x]` |
+| Fletcher yok | Legacy kod aktif V1 akışına bağlı değil; refill queue/worker olmadan GameManager transaction'ı | `[x]` |
 
 ### Archer ve retrain işleri
 
@@ -475,8 +475,8 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [x] Retrain toplam archer ve population sayısını değiştirmesin.
 - [x] Type maliyetini aynı türün mevcut sayısına göre büyüt.
 - [x] Market'teki ayrı Basic/Rapid/Frost level ve upgrade akışını kaldır/disable et.
-- [ ] Hasar, fire rate, range, Frost slow upgrade'lerini Heart effect pipeline'ına taşı.
-- [ ] Archer death/individual HP yolunun eklenmesini regression ile engelle.
+- [~] Hasar, fire rate, range, Frost slow upgrade'lerini Heart effect pipeline'ına taşı. Package E / E4 owner'ında.
+- [x] Archer death/individual HP yolunun eklenmesini 1K × 10K runtime archer-count regression'ıyla engelle.
 
 ### 40x25 formation işleri
 
@@ -501,16 +501,16 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 ### Ammo işleri
 
-- [ ] `UnlimitedArrows` V1 active config'ini kaldır/false yap.
-- [ ] Atılan gerçek projectile başına tam 1 Arrow düşür.
-- [ ] Arrow `0` olduğunda okçuları durdur; refill sonrası aynı frame yeniden başlat.
-- [ ] Wood maliyetli sabit oranlı refill paketleri ekle.
-- [ ] Refill'i production queue olmadan anlık uygula.
-- [ ] Current/Capacity, paket fiyatları ve `Buy Max` kontrolünü UI'da göster.
-- [ ] Arrow capacity ve efficiency upgrade'lerini Heart/run purchase owner'ına bağla.
-- [ ] Refill başına birim fiyatın sonsuza büyümesini engelle; ordu/fire rate doğal talebi yaratsın.
-- [ ] Rapid'in yüksek fire rate'inin daha fazla Arrow tükettiğini test et.
-- [ ] Legacy Fletcher/ArrowProduction V1 akışına sızmasın.
+- [x] `UnlimitedArrows` V1 active config'ini kaldır.
+- [x] Atılan gerçek projectile başına tam 1 Arrow düşür; başarısız pool rent'inde stok harcama.
+- [x] Arrow `0` olduğunda okçuları durdur; refill'i aynı transaction'da yaz ve combat'ı sonraki simulation tick'inde sürdür.
+- [x] Wood maliyetli sabit oranlı +1/+5/Buy Max refill paketleri ekle.
+- [x] Refill'i production queue olmadan anlık uygula.
+- [x] Current/Capacity, paket fiyatları ve `Buy Max` kontrolünü UI'da göster.
+- [x] Arrow capacity ve efficiency upgrade'lerini run purchase owner'ına bağla; ikisi de Wood+Iron kullansın.
+- [x] Refill başına birim fiyatın satın alma sayısıyla büyümesini engelle; ordu/fire rate doğal talebi yaratsın.
+- [x] Rapid'in yüksek fire rate'inin daha fazla Arrow tükettiğini test et.
+- [x] Legacy Fletcher/ArrowProduction V1 akışına sızmasın.
 
 ### Package D kabul kapısı
 
@@ -518,7 +518,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [x] Retrain toplam sayıyı değiştirmiyor.
 - [x] 40 tile x 25 stable point save/load sonrası aynı.
 - [x] 1.000 archer x 10.000 enemy gerçek oyun senaryosu çalışıyor.
-- [ ] Ammo truth ve refill davranışı korunuyor.
+- [x] Ammo truth ve refill davranışı korunuyor.
 
 ---
 
@@ -933,7 +933,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Wall | HP 0 + same-frame repair | Game Over kazanır | `[x]` |
 | Enemy catalog | V1 runtime bake + gerçek spawn | Tek `zombie_basic`; prefab/stat/scale tanımla eşleşir | `[x]` |
 | Population | Food yetersiz dawn | Mevcut pop korunur; arrival sınırlı | `[x]` |
-| Ammo | Arrow 0 / refill | Ateş durur / anında başlar | `[ ]` |
+| Ammo | Arrow 0 / refill | Ateş durur / stok aynı transaction'da artar / sonraki simulation tick'inde atış sürer | `[x]` |
 | Archers | 1.001. purchase | Reddedilir; harcama yok | `[x]` |
 | Placement | 40 tile'da 1.000 archer | Her tile 25 stable point | `[x]` |
 | Targeting | Yoğun overkill | Incoming damage hedefleri dağıtır | `[x]` |
@@ -950,9 +950,9 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 ### Mevcut test envanteri
 
-- `[x]` EditMode: `103/103`; arrow pool prewarm/expand/rent/return/reuse, targeting cell/range, lethal reservation ve stable tie-break dahil contract, compact save/migration v3-v7, Formation V1, common archer cap, economy, worker, cycle, quantity-only, backlog, Moat isolation ve enemy pool kapsamı.
-- `[x]` PlayMode: normal set `26 pass + 1 explicit skip`; gerçek `NewGameScene`, pooled arrow lifetime/reuse, Basic/Rapid/Frost ortak target policy + lethal load dağıtımı, 1K archer x 10K enemy, Formation V1, exact Continue, archer cap/retrain, economy/worker, Wall, cycle, backlog ve pool/Fireball kapsamı. Explicit raw profiler ayrıca targeted `1/1` geçti.
-- `[~]` Council schedule/guardrail, ammo ve Player/hardware frame pacing kabulü ilgili paket/kapıları bekliyor; projectile pooling tamamlandı.
+- `[x]` EditMode: `109/109`; finite Arrow paket/Buy Max/CAP/EFF matematiği, arrow pool prewarm/expand/rent/return/reuse, targeting cell/range, lethal reservation ve stable tie-break dahil contract, compact save/migration v3-v8, Formation V1, common archer cap, economy, worker, cycle, quantity-only, backlog, Moat isolation ve enemy pool kapsamı.
+- `[x]` PlayMode: normal set `28 pass + 1 explicit profiler skip`; Arrow 0/refill/Rapid tüketimi, gerçek `NewGameScene`, pooled arrow lifetime/reuse, Basic/Rapid/Frost ortak target policy + lethal load dağıtımı, finite stokla 1K archer x 10K enemy, Formation V1, exact Continue, archer cap/retrain, economy/worker, Wall, cycle, backlog ve pool/Fireball kapsamı. Explicit raw profiler önceki targeted turda `1/1` geçti.
+- `[~]` Council schedule/guardrail ve Player/hardware frame pacing kabulü ilgili paket/kapıları bekliyor; Package D combat + ammo kapsamı tamamlandı.
 
 ---
 
@@ -964,7 +964,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Projectile/VFX flood | Projectile churn kapandı; hit event yoğunluğu açık | Pool tamam; VFX/SFX budget + aggregation |
 | Graph unreachable | Generator henüz yok | Validation + deterministic fallback |
 | Meta runaway | Current reward kills/day ağırlıklı | Diminishing values + telemetry |
-| Ammo click angaryası | Refill tasarımı henüz aktif değil | Paket/capacity/efficiency tune; auto-spend ekleme |
+| Ammo click angaryası | +1/+5/Buy Max, capacity ve efficiency aktif | Telemetry ile paket/verim tune et; Blueprint dışı auto-spend ekleme |
 | HUD tekrar büyür | CyclePanel + HordePressure + çoklu drawers | Tek drawer + fixed layout + mockup gate |
 | Legacy leakage | Gate/Core binding, Fletcher, Barracks training, direct upgrades | Source-owner audit + guard tests |
 | Council generic/slop | Composer authored olsa da launch set review eksik | Human template review + effect budget |
@@ -985,7 +985,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [ ] Worker world feedback representative ve doğru.
 - [x] Basic/Rapid/Frost toplam 1000 cap.
 - [x] 40x25 stable formation.
-- [ ] Arrow Wood ile anında alınır; Fletcher/queue yok.
+- [x] Arrow Wood ile anında alınır; Fletcher/queue yok.
 - [ ] Castle Heart generated, validated, saved ve yalnız Grave Essence kullanıyor.
 - [ ] Council 3/6/9 ve rare emergency schedule'ı bozmuyor.
 - [ ] Council yalnız approved template/effect pool kullanıyor.
@@ -1045,7 +1045,7 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | `MobileCastleHudRoot` live components | CyclePanel, HordePressure, Gate/Core bindings, drawers, worker CAP/EFF ve archer upgrade kontrolleri |
 | `MobileCastleCombatAuthoring.cs` + `DefaultDifficulty.asset` + `BasicZombie.asset` | 30/5/20/5, quantity curves, 900 cap ve ekonomi fiyat baseline'ları; enemy base statları catalog-owned |
 | `GameManager.cs` | Save/restore, repair, worker bina CAP/EFF alımı ve economy aggregate'i, ortak archer spawn/cap guard'ı, archer buy/upgrade, Council, Fireball, meta bridge |
-| `RunPersistence.cs` | Exact schema v7; minimum v3, worker target/checkpoint + bed + worker bina yatırımı + v6->v7 Archer Formation V1 migration'ı ve compact snapshot |
+| `RunPersistence.cs` | Exact schema v8; minimum v3, worker target/checkpoint + bed + worker bina yatırımı + Archer Formation V1 + v7->v8 finite Arrow yatırım migration'ı ve compact snapshot |
 | `ContinuousSiegeCycleSystem.cs` | Phase/intensity ve Blood Moon application |
 | `WaveSpawnSystem.cs` + `EnemyPoolRuntimeUtility.cs` | Tek catalog prefab/stat, cap/backlog ve expandable pool rent |
 | `DamageCleanupSystem.cs` | Reward sonrası enemy pool return |
@@ -1056,7 +1056,8 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | `ArcherCapacityUtility.cs` + `GameManager.SpawnArcher` + `MarketUI.cs` | Basic/Rapid/Frost ortak `1000` entity cap'i; buy öncesi ve merkezi spawn guard'ı, Council/meta/restore sınırı, `ARMY CAP/MAX` feedback'i |
 | `WorkerLogisticsMovementSystem.cs` + `SpriteSheet.shader` + `Villager.mat` | Ayrı Idle/Walk/Work/Celebrate atlas seçimi; resource cargo, Dusk/Night lantern ve weight-scaled hub delivery pulse |
 | `ArcherFormationV1.asset` + `ArcherFormationUtility.cs` + `MobileCastleArcherTilePlacement.cs` | Version'lı exact 40 tile; tile+slot seeded 25 diamond nokta, minimum mesafe, layer-fill 1000 kapasite ve tam gizmo preview |
-| `ArcherShootSystem.cs` + `ArcherTargetingUtility.cs` | Persistent coarse spatial nearest query, stable tie-break, uçuşta/yeni ok incoming damage reservation ve şimdilik unlimited ammo bypass |
+| `ArcherShootSystem.cs` + `ArcherTargetingUtility.cs` | Persistent coarse spatial nearest query, stable tie-break, uçuşta/yeni ok incoming damage reservation; başarılı projectile başına finite stoktan tam `1` tüketim |
+| `ArrowEconomyUtility.cs` + `GameManager.cs` + `ArrowSupplyUI.cs` | Sabit oranlı Wood refill, kısmi kapasite, Buy Max, Wood+Iron CAP/EFF yatırımı, Current/Capacity HUD ve exact save v8 runtime owner'ları |
 | `TechNodeDefinitionSO.cs` + `TechTreeCatalogSO.cs` | Sabit catalog/reveal/cost/effect model |
 | `TechTreeUI.cs` + `TechTreeViewController.cs` | Fullscreen graph, pan/zoom, simulation'ın durmaması |
 | `CouncilComposer.cs` + `CouncilEventUI.cs` | Curated deterministic card infrastructure |
@@ -1116,3 +1117,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-14 | `DW-D-FORMATION` version'lı 40 x 25 stable archer placement | `ArcherFormationV1.asset` exact 40 canonical `outside` tile'ı taşır; her tile'da coordinate+slot seeded best-candidate algoritma 25 inset diamond noktayı minimum mesafeyle üretir, global sıra layer-fill olur. Scene binding/setup repair ve tam 1000 gizmo eklendi; exact save v7 yalnız formation version + type count tutar, v6 migration ve Continue aynı noktaları yeniden kurar. Tam test turunda bulunan 10K sıra bağımlılığı gameplay değiştirilmeden test önkoşul/cleanup izolasyonuyla kapatıldı | Unity compile: 0 error; targeted EditMode 4/4; targeted Formation PlayMode 1/1; full EditMode 98/98; full PlayMode 24 pass + 1 explicit skip; Unity console 0 error |
 | 2026-07-14 | `DW-D-TARGETING` spatial nearest-target + incoming load | `ArcherShootSystem` persistent `2.0` cell target grid'ini Burst-parallel kuruyor; tek deterministic Burst shoot job yaşayan/death-state olmayan nearest unsaturated target'ı seçiyor. Uçuşta ve aynı frame yaratılan ok damage'i target HP'ye rezerve ediliyor; Basic/Rapid/Frost aynı policy'de, pool generation mismatch retarget yapmıyor. Gerçek Formation V1 1K archer + pooled 10K enemy birleşik ürün testi geçti | Targeted EditMode 4/4; targeted targeting PlayMode 1/1; 1K×10K PlayMode 1/1, Editor P95 `9,66 ms`; full EditMode 102/102; full PlayMode 26/26; Unity console 0 error |
 | 2026-07-14 | `DW-D-PROJECTILE` arrow pool + Burst-safe lifetime | Ok atışındaki per-projectile instantiate/destroy kaldırıldı; enableable `ArrowTag`, `1024` prewarm, `256` batch expand, deferred return ve `5s` Burst lifetime kuruldu. İsabet/timeout/invalid target/generation mismatch tek pool return yolunda, Continue kalan lifetime'ı exact restore ediyor ve restart aktif okları rezerve döndürüyor | Unity compile: 0 error; targeted EditMode 2/2; targeted projectile/targeting/stale-generation PlayMode 3/3; 1K×10K pool telemetry `1536 total / 3000 rent / 2895 return`, P95 `12,50 ms`; full EditMode 103/103; full PlayMode 26 pass + 1 explicit skip; explicit profiler 1/1; Unity console 0 error |
+| 2026-07-14 | `DW-D-AMMO` finite Arrow supply + instant refill | Unlimited bypass kaldırıldı; başarılı pooled projectile tam `1 Arrow` tüketiyor, stok `0` iken atış duruyor. Wood ile sabit oranlı +1/+5/Buy Max refill, kısmi dolumda israf etmeyen fiyat, Wood+Iron CAP/EFF yatırımları, profile tuning, compact tek satır HUD ve exact save v8 kuruldu. Legacy Fletcher/queue aktif akış dışında kaldı; 10K fixture finite stokla güncellendi | Unity compile: 0 error; targeted EditMode 16/16; targeted ammo/targeting PlayMode 3/3; 10K targeted 1/1; full EditMode 109/109; full PlayMode 28 pass + 1 explicit profiler skip; Game View QA; Unity console 0 error |

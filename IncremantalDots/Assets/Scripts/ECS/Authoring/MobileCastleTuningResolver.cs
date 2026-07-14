@@ -69,7 +69,17 @@ namespace DeadWalls
                 WorkerCapacityBaseIronCost = profile.WorkerCapacityBaseIronCost,
                 WorkerEfficiencyBaseWoodCost = profile.WorkerEfficiencyBaseWoodCost,
                 WorkerEfficiencyBaseIronCost = profile.WorkerEfficiencyBaseIronCost,
-                WorkerBuildingCostGrowthMultiplier = profile.WorkerBuildingCostGrowthMultiplier
+                WorkerBuildingCostGrowthMultiplier = profile.WorkerBuildingCostGrowthMultiplier,
+                ArrowBaseCapacity = profile.ArrowBaseCapacity,
+                ArrowCapacityPerLevel = profile.ArrowCapacityPerLevel,
+                ArrowRefillPackageSize = profile.ArrowRefillPackageSize,
+                ArrowBaseArrowsPerWood = profile.ArrowBaseArrowsPerWood,
+                ArrowArrowsPerWoodPerEfficiencyLevel = profile.ArrowArrowsPerWoodPerEfficiencyLevel,
+                ArrowCapacityBaseWoodCost = profile.ArrowCapacityBaseWoodCost,
+                ArrowCapacityBaseIronCost = profile.ArrowCapacityBaseIronCost,
+                ArrowEfficiencyBaseWoodCost = profile.ArrowEfficiencyBaseWoodCost,
+                ArrowEfficiencyBaseIronCost = profile.ArrowEfficiencyBaseIronCost,
+                ArrowUpgradeCostGrowthMultiplier = profile.ArrowUpgradeCostGrowthMultiplier
             };
             return MobileEconomyPriceTuningUtility.Sanitize(tuning);
         }

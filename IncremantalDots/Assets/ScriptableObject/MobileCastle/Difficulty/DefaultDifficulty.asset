@@ -136,5 +136,15 @@ MonoBehaviour:
   WorkerEfficiencyBaseWoodCost: 150
   WorkerEfficiencyBaseIronCost: 50
   WorkerBuildingCostGrowthMultiplier: 1.35
+  ArrowBaseCapacity: 200
+  ArrowCapacityPerLevel: 200
+  ArrowRefillPackageSize: 100
+  ArrowBaseArrowsPerWood: 4
+  ArrowArrowsPerWoodPerEfficiencyLevel: 1
+  ArrowCapacityBaseWoodCost: 150
+  ArrowCapacityBaseIronCost: 25
+  ArrowEfficiencyBaseWoodCost: 200
+  ArrowEfficiencyBaseIronCost: 50
+  ArrowUpgradeCostGrowthMultiplier: 1.35
   SpawnTable: []
   SpecialNights: []
