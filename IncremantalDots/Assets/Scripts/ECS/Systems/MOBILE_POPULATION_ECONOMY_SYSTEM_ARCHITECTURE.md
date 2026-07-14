@@ -42,7 +42,7 @@ V1 eventleri geneldir: resource stash, quarry crew, refugee cart. UI metinleri `
 
 ## Bu Alt Pakette Bilerek Yapilmayanlar
 
-- Satın alınabilir `MobileBedCapacityState`, `GameManager` transaction API'si ve exact save `v5` artık vardır; bu sistem henüz bed boşluğunu Dawn arrival limitine bağlamaz.
+- Satın alınabilir `MobileBedCapacityState`, sahip olunan toplam yatakla büyüyen quadratic Wood fiyatı, ardışık toplu transaction API'si ve exact save `v5` artık vardır; bu sistem henüz bed boşluğunu Dawn arrival limitine bağlamaz.
 - Sahip olunan yatağa göre büyüyen maliyet eğrisi ve tek seferlik arrival Food maliyeti sonraki ayrı tracker işleridir.
 - Mevcut worker'ları target ratio değişince zorla retrain/redistribute etmez.
 - Worker world representation actual count'tan ayridir; `WorkerVisualRepresentationUtility` Low/Medium/High egriyle resource basina en fazla `32` temsili visual uretir.

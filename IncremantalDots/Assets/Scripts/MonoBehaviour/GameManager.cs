@@ -58,7 +58,6 @@ namespace DeadWalls
         private static readonly ResourceCost RallyCost = new ResourceCost(35, 0, 0, 45);
         private const int MobileInitialPopulation = 60;
         private const int MobileInternalPopulationCapacity = 999999;
-        private const int MobileBedBaseWoodCost = 100;
         private const int MobileInitialWoodWorkers = 20;
         private const int MobileInitialStoneWorkers = 10;
         private const int MobileInitialIronWorkers = 8;
@@ -1138,11 +1137,14 @@ namespace DeadWalls
 
         public ResourceCost GetBedCapacityPurchaseCost(int requestedCapacity = 1)
         {
-            if (requestedCapacity <= 0)
+            if (requestedCapacity <= 0
+                || !TryGetMobileConfigEntity(out var mobileConfigEntity)
+                || !_entityManager.HasComponent<MobileBedCapacityState>(mobileConfigEntity))
                 return ResourceCost.Zero;
 
-            long wood = (long)MobileBedBaseWoodCost * requestedCapacity;
-            return new ResourceCost(wood >= int.MaxValue ? int.MaxValue : (int)wood, 0, 0, 0);
+            var state = _entityManager.GetComponentData<MobileBedCapacityState>(mobileConfigEntity);
+            int wood = MobileBedCapacityUtility.GetPurchaseWoodCost(state, requestedCapacity);
+            return new ResourceCost(wood, 0, 0, 0);
         }
 
         public bool CanBuyBedCapacity(int requestedCapacity = 1)
@@ -1154,7 +1156,11 @@ namespace DeadWalls
 
             var state = _entityManager.GetComponentData<MobileBedCapacityState>(mobileConfigEntity);
             int addedCapacity = MobileBedCapacityUtility.GetPurchasableIncrement(state, requestedCapacity);
-            return addedCapacity > 0 && CanAfford(GetBedCapacityPurchaseCost(addedCapacity));
+            if (addedCapacity <= 0
+                || !MobileBedCapacityUtility.TryGetPurchaseWoodCost(state, addedCapacity, out int woodCost))
+                return false;
+
+            return CanAfford(new ResourceCost(woodCost, 0, 0, 0));
         }
 
         public bool TryBuyBedCapacity(int requestedCapacity = 1)
@@ -1165,7 +1171,10 @@ namespace DeadWalls
 
             var state = _entityManager.GetComponentData<MobileBedCapacityState>(mobileConfigEntity);
             int addedCapacity = MobileBedCapacityUtility.GetPurchasableIncrement(state, requestedCapacity);
-            ResourceCost cost = GetBedCapacityPurchaseCost(addedCapacity);
+            if (!MobileBedCapacityUtility.TryGetPurchaseWoodCost(state, addedCapacity, out int woodCost))
+                return false;
+
+            ResourceCost cost = new ResourceCost(woodCost, 0, 0, 0);
             if (addedCapacity <= 0
                 || !MobileBedCapacityUtility.TryAddPurchasedCapacity(ref state, addedCapacity, out _)
                 || !SpendResources(cost))

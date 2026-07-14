@@ -49,7 +49,7 @@ Tum component'lar unmanaged ECS struct olarak tutulur. Davranis sistemlerde, ver
 - `WaveClearRewardData`: son wave clear bonusunu HUD feedback'i icin saklar.
 - `CastleYardPrepState`: `Fortify` ve `Rally` tek-gecelik prep buff state'ini tutar.
 - `MobilePopulationAllocation`: Wood/Stone/Iron/Food actual worker sayilarini, `10.000` basis-point target ratio'larini, etkin cap ve idle aynalarini, population auto-allocation checkpoint'ini ve growth checkpoint'lerini tutar.
-- `MobileBedCapacityState`: Run başlangıç yatak kapasitesi ile satın alınmış ek yatak sayısını ayrı tutar; gameplay hard max yoktur ve exact save `v5` kapsamındadır.
+- `MobileBedCapacityState`: Run başlangıç yatak kapasitesi ile satın alınmış ek yatak sayısını ayrı tutar; toplam sahiplik `60` tabanından sonra quadratic Wood maliyetini büyütür, gameplay hard max yoktur ve exact save `v5` kapsamındadır.
 - `ArcherSlotPosition`: legacy/manual pozisyon buffer'i. NewGameScene mobile tilemap spawn akisi bunu kullanmaz.
 
 ## CastleInteriorWorkerComponents.cs
@@ -81,7 +81,7 @@ ApplyMovementForceSystem -> Config varsa zombiyi CastleCenter'a yonlendirir, Zom
 BoundarySystem -> Config varsa AttackRadius icinde Attacking state'e gecirir
 GameManager.BuyArcher(type) -> main scene `Grid/outside` tilemap hucrelerine okcu spawn eder
 MobilePopulationAllocation actual count -> WorkerVisualRepresentationUtility -> GameManager temsili DOTS villager count + exact weight sync -> WorkerLogisticsMovementSystem animation/cargo/fener/teslimat feedback
-GameManager.TryBuyBedCapacity -> Wood transaction -> MobileBedCapacityState.PurchasedCapacity (arrival/capacity bağlama sonraki Package C işi)
+GameManager.TryBuyBedCapacity -> MobileBedCapacityUtility owned-capacity sıralı fiyatı -> Wood transaction -> MobileBedCapacityState.PurchasedCapacity (arrival/capacity bağlama sonraki Package C işi)
 GameManager.BuyFortify()/BuyRally() -> CastleYardPrepState uzerine tek-gecelik buff yazar
 CastleYardPrepSystem -> Rally timer'i NightCombat sirasinda azaltir
 ArcherShootSystem -> Okcu tipine gore projectile effect datasini oka yazar, facing direction + attack timer set eder

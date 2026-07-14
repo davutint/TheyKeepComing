@@ -5,7 +5,7 @@
 > **Tracker sürümü:** 2.0  
 > **Son tam kapsam denetimi:** 2026-07-12  
 > **Aktif paket:** Package C - Economy + Population
-> **Aktif iş:** `DW-C-BED-COST` - Owned-Capacity Bed Cost Curve
+> **Aktif iş:** `DW-C-DAWN-BUDGET` - Bed + Food Dawn Survivor Budget
 
 ---
 
@@ -405,10 +405,10 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | +1/+10/+100/direct input | Drawer target share için ücretsiz/anlık +1%, +10%, +100% ve exact 0-100 input sunuyor | `[x]` |
 | Worker world representation | Actual count Low/Medium/High eğriyle resource başına en fazla 32 visual'a çevriliyor | `[x]` |
 | Worker feedback | Actual count visual weight'lere exact dağılıyor; Idle/Walk/Work/Celebrate, resource cargo, Dusk/Night lantern ve hub delivery pulse aynı DOTS pass'inde çalışıyor | `[x]` |
-| Beds incremental/no hard max | `60` base + purchased House bed state, Wood transaction API, int-safe uncapped utility ve exact save var; arrival/capacity bağlantısı açık | `[~]` |
+| Beds incremental/no hard max | `60` base + purchased House bed state; toplam sahipliği baz alan owner-onaylı quadratic Wood eğrisi, ardışık bulk fiyatı, int-safe transaction ve exact save var | `[x]` |
 | Dawn survivor + one-time Food | Her dawn bedelsiz +15; yürüyen arrival/Food guard yok | `[!]` |
 | Mevcut pop pasif Food tüketmez | V1 castle loop'ta population Food/dk yazmıyor | `[x]` |
-| Fiyatlar adet/seviyeyle büyür | Bazı archer/tech cost growth var; bed/cap/efficiency contract yok | `[~]` |
+| Fiyatlar adet/seviyeyle büyür | Archer/tech yanında bed owned-capacity eğrisi var; bina capacity/efficiency ve ortak tuning yüzeyi açık | `[~]` |
 
 ### Yapılacaklar
 
@@ -420,7 +420,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [x] Worker world representation'ı sayısal truth'tan ayır; düşük/orta/yüksek temsilî density kur.
 - [x] Worker animasyon, fener, taşıma ve üretim feedback'ini allocation ile senkron tut.
 - [x] Houses için satın alınabilir bed capacity state'i kur.
-- [ ] Bed maliyetini sahip olunan capacity ile büyüt; hard max koyma.
+- [x] Bed maliyetini sahip olunan capacity ile büyüt; hard max koyma.
 - [ ] Dawn survivor budget'ını bed boşluğu + Food bütçesiyle hesapla.
 - [ ] Her kabul edilen kişi için Food'u yalnız bir kez azalt.
 - [ ] Survivor'ları sağdan yürüyerek kaleye gelen görsel akışla temsil et.
@@ -1045,7 +1045,7 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | `WaveSpawnSystem.cs` + `EnemyPoolRuntimeUtility.cs` | Tek catalog prefab/stat, cap/backlog ve expandable pool rent |
 | `DamageCleanupSystem.cs` | Reward sonrası enemy pool return |
 | `ResourceTickSystem.cs` + `PopulationTickSystem.cs` | V1 castle loop'ta ana kaynak ve population için pasif consumption yok |
-| `MobilePopulationEconomySystem.cs` + `WorkerAllocationUtility.cs` + `WorkerVisualRepresentationUtility.cs` + `MobileBedCapacityUtility.cs` | Target ratio auto-allocation/cap overflow, temsili visual density ve exact representation weight; satın alınmış bed state hazır, fakat bedelsiz growth ve auto-capacity hâlâ açık Package C işi |
+| `MobilePopulationEconomySystem.cs` + `WorkerAllocationUtility.cs` + `WorkerVisualRepresentationUtility.cs` + `MobileBedCapacityUtility.cs` | Target ratio auto-allocation/cap overflow, temsili visual density ve exact representation weight; purchased bed state ve owned-capacity fiyat eğrisi hazır, fakat bedelsiz Dawn growth ve auto-capacity hâlâ açık Package C işi |
 | `WorkerLogisticsMovementSystem.cs` + `SpriteSheet.shader` + `Villager.mat` | Ayrı Idle/Walk/Work/Celebrate atlas seçimi; resource cargo, Dusk/Night lantern ve weight-scaled hub delivery pulse |
 | `MobileCastleArcherTilePlacement.cs` | Tile center + stack offset, preview 96 |
 | `ArcherShootSystem.cs` | Brute-force nearest target ve unlimited ammo bypass |
@@ -1097,3 +1097,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-13 | `DW-C-VIS-DENSITY` representative worker visuals | Actual worker truth save/production state'inde korundu; Low `1-12` 1:1, Medium `13-60` seyreltilmiş, High `61+` daha güçlü seyreltilmiş ve resource başına `32` visual cap uygulandı; GameManager yalnız temsil sayısı değişince sync ediyor | Unity compile: 0 error; EditMode 58/58; PlayMode 16 pass + 1 explicit skip; başlangıç 53 actual -> 45 visual game-view QA |
 | 2026-07-14 | `DW-C-WORKER-FEEDBACK` allocation-synced worker feedback | Ayrı Idle/Walk/Work/Celebrate atlasları gerçek route state'ine bağlandı; actual count visual weight'lere exact dağıtıldı; küçük resource cargo, Dusk/Night lantern ve weight-scaled hub delivery pulse tek DOTS shader pass'inde eklendi | Unity compile: 0 error; EditMode 61/61; PlayMode 17 pass + 1 explicit skip; Day/Night game-view QA |
 | 2026-07-14 | `DW-C-BEDS` purchased House bed state | `60` base + run içinde satın alınmış yatak state'i, int-safe uncapped utility, geçici sabit `100 Wood/yatak` transaction API'si ve exact save `v5` kuruldu; v3/v4 migration mevcut nüfusu koruyor. Dawn arrival ve legacy `999999` capacity bağlantısı sonraki işlerde açık bırakıldı | Unity compile: 0 error; EditMode 65/65; PlayMode 18 pass + 1 explicit skip; Unity console 0 error |
+| 2026-07-14 | `DW-C-BED-COST` owned-capacity bed curve | Owner-onaylı `ceil(100 × (1 + max(0, ToplamYatak - 60) / 25)^2)` Wood eğrisi kuruldu; bulk alım ardışık fiyatları topluyor, base/meta yataklar sahipliğe dahil oluyor ve temsil edilemeyen int transaction taşırılmadan reddediliyor. Gameplay hard max eklenmedi; generic Inspector/SO tuning ayrı iş olarak açık | Unity compile: 0 error; EditMode 69/69; PlayMode 18 pass + 1 explicit skip; Unity console 0 error |

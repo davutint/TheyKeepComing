@@ -195,14 +195,15 @@ namespace DeadWalls.Tests
 
             MobileBedCapacityState before = entityManager.GetComponentData<MobileBedCapacityState>(bedEntity);
             ResourceCost cost = gameManager.GetBedCapacityPurchaseCost(5);
-            Assert.That(cost.Wood, Is.EqualTo(500));
+            Assert.That(cost.Wood, Is.EqualTo(587));
             Assert.That(gameManager.TryBuyBedCapacity(5), Is.True);
 
             MobileBedCapacityState purchased = entityManager.GetComponentData<MobileBedCapacityState>(bedEntity);
             ResourceData resourcesAfterPurchase = entityManager.GetComponentData<ResourceData>(resourceEntity);
             Assert.That(purchased.BaseCapacity, Is.EqualTo(before.BaseCapacity));
             Assert.That(purchased.PurchasedCapacity, Is.EqualTo(before.PurchasedCapacity + 5));
-            Assert.That(resourcesAfterPurchase.Wood, Is.EqualTo(1_500));
+            Assert.That(resourcesAfterPurchase.Wood, Is.EqualTo(1_413));
+            Assert.That(gameManager.GetBedCapacityPurchaseCost().Wood, Is.EqualTo(144));
             Assert.That(gameManager.SaveRunSnapshot(), Is.True);
 
             purchased.PurchasedCapacity = 0;
@@ -216,6 +217,7 @@ namespace DeadWalls.Tests
             Assert.That(restored.PurchasedCapacity, Is.EqualTo(before.PurchasedCapacity + 5));
             Assert.That(MobileBedCapacityUtility.GetTotalCapacity(restored),
                 Is.EqualTo(MobileBedCapacityUtility.GetTotalCapacity(before) + 5));
+            Assert.That(gameManager.GetBedCapacityPurchaseCost().Wood, Is.EqualTo(144));
             yield return null;
         }
 

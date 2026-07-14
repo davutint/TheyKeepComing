@@ -29,7 +29,7 @@ V1 castle loop'taki satın alınabilir yatak gerçeği `MobileBedCapacityState` 
 
 Toplam yatak `BaseCapacity + PurchasedCapacity` olarak `MobileBedCapacityUtility` tarafından overflow-safe hesaplanır. Gameplay hard max yoktur; yalnız `int.MaxValue` teknik taşma sınırı uygulanır.
 
-`GameManager.TryBuyBedCapacity` bu state'i anlık satın alım transaction'ıyla büyütür. Bu alt pakette geçici taban fiyat yatak başına `100 Wood`'dur. Sahip olunan yatağa göre büyüyen data-driven fiyat eğrisi bir sonraki tracker işidir.
+`GameManager.TryBuyBedCapacity` bu state'i anlık satın alım transaction'ıyla büyütür. Sonraki yatağın Wood maliyeti owner onaylı `ceil(100 × (1 + max(0, ToplamYatak - 60) / 25)^2)` eğrisidir. Varsayılan `60` yatakta fiyat `100`, `160` yatakta `2.500`, `360` yatakta `16.900`, `810` yatakta `96.100` Wood olur. Toplu alım mevcut birim fiyatı adetle çarpmaz; her ek yatağın ardışık fiyatını toplar. Gameplay hard max yoktur; temsil edilemeyen `int` transaction taşırılmadan reddedilir. Eğri katsayılarının Inspector/SO tuning yüzeyine taşınması ayrı tracker işidir.
 
 Bed state exact save `v5` içinde `BedBaseCapacity` ve `PurchasedBedCapacity` olarak saklanır. `v3/v4` kayıtları mevcut nüfusu geçersiz kılmayacak bir base bed değeriyle migrate edilir.
 
@@ -66,7 +66,7 @@ Daha cok okcu = Daha az isci = Daha az kaynak uretimi (ve daha fazla yemek tuket
 
 ## Iliskili Dosyalar
 - `PopulationComponents.cs` — Component tanimi
-- `MobileBedCapacityUtility.cs` — Toplam/purchase increment ve int güvenlik kuralları
+- `MobileBedCapacityUtility.cs` — Toplam/purchase increment, owned-capacity maliyet eğrisi, ardışık toplu fiyat ve int güvenlik kuralları
 - `MobileCastleCombatAuthoring.cs` — Mobile başlangıç yatak state'i bake'i
 - `BuildingPopulationSystem.cs` — Kapasite + bina yemek gideri hesaplama
 - `PopulationTickSystem.cs` — Idle hesaplama + nufus yemek tuketimi (+=)

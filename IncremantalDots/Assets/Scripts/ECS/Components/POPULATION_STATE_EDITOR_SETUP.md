@@ -29,6 +29,8 @@
 
 `NewGameScene/MobileCastleCombatSubScene` içindeki `MobileCastleConfig` objesi bu değeri `60` olarak serialize eder. `GameStateAuthoring.InitialCapacity = 999999` geçici legacy mobile aynadır; Dawn Food+bed kabul bütçesi bağlanana kadar değiştirilmez.
 
+Bed fiyatı şu anda `MobileBedCapacityUtility` içindeki onaylı `100 Wood`, `25 capacity interval`, quadratic eğri sabitleriyle hesaplanır. Bu katsayılar henüz Inspector alanı değildir; ortak fiyat eğrisi tuning yüzeyi tracker'daki ayrı Package C işinde kurulacaktır.
+
 ## Test Senaryolari
 
 ### 1. Temel Idle Hesaplama
