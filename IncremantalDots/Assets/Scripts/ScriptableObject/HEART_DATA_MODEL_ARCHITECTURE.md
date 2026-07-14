@@ -34,7 +34,9 @@ bos Id, gecersiz depth, maliyet/growth ve Keystone conflict hatalarini raporlar.
 - Directed `FromNodeId -> ToNodeId` edge listesi.
 
 DTO yalniz primitive/enum/list alanlari tasir; `ScriptableObject`, `Sprite` veya baska
-Unity object referansi tasimaz. Generator E2'de bu contract'i dolduracak. Graph'in
+Unity object referansi tasimaz. E2 `HeartNodeCatalogSO`, `HeartGraphGenerator` ve
+`HeartGraphValidator` ile bu contract'i deterministic olarak doldurur. Ayrintili
+generation sozlesmesi `HEART_GRAPH_GENERATOR_ARCHITECTURE.md` belgesindedir. Graph'in
 `RunSaveState` capture/restore entegrasyonu E6'ya aittir; E1'de bos/sahte graph save
 edilmez.
 
@@ -69,4 +71,3 @@ kapisina baglanmaz.
 - Generated graph JSON round-trip ve Unity asset referansi olmamasi.
 - Grave Essence run/meta siniri, v8 -> v9 migration ve olumde run save silinmesi.
 - PlayMode transaction, long bakiye, Continue ve Restart davranisi.
-

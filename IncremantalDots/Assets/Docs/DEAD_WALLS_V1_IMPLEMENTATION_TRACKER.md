@@ -5,7 +5,7 @@
 > **Tracker sürümü:** 2.0  
 > **Son tam kapsam denetimi:** 2026-07-12  
 > **Aktif paket:** Package E - Castle Heart
-> **Aktif iş:** `DW-E-GRAPH` - Deterministic Castle Heart Graph Generator
+> **Aktif iş:** `DW-E-REVEAL` - Hidden Graph Reveal + Player Information
 
 ---
 
@@ -138,14 +138,14 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Placement | Formation V1 asset'iyle sabit 40 `outside` tile x 25 seeded diamond nokta; layer-fill sıra, 1000 gizmo ve v9 Continue testli | `[x]` |
 | Targeting | Persistent coarse spatial query + incoming damage reservation Burst job'ları aktif | `[x]` |
 | Ammo | Finite stok; gerçek projectile başına `-1`; Wood ile anlık +1/+5/Buy Max refill; Wood+Iron CAP/EFF yatırımı; Current/Capacity HUD ve exact save v9 | `[x]` |
-| Tech/Heart | Yeni `HeartNodeDefinitionSO` + `GeneratedRunGraph` contract'ı ve run-only Grave Essence/save v9 var; aktif UI/satın alma halen sabit legacy SO catalog + ana kaynak maliyeti | E1 `[x]`; generator/cutover eksik |
+| Tech/Heart | Yeni Heart data contract'ı, run-only Grave Essence/save v9, authored `HeartNodeCatalogSO`, deterministic dört yön generator ve fail-closed validator var; production node catalog'u owner içerik onayı bekliyor, aktif UI/satın alma halen sabit legacy SO catalog + ana kaynak maliyeti | E1-E2 `[x]`; reveal/cutover eksik |
 | Fireball | Dünya hedefli projectile/AoE ve cooldown çalışması mevcut | Korunacak temel |
 | Rally | Wood/Food maliyetli prep purchase | Cooldown-only ability olmalı |
 | Emergency Repair | Ayrı ability yok | Eksik |
 | Meta | Ayrı JSON ve Game Over shop var; `StartingTechLevel` aktif | Kısmi uyum |
 | HUD | CyclePanel, DAY/DUSK/NIGHT ve Horde Pressure mevcut; tek Wall runtime gizleme var | Package I polish gerekli |
 | Tutorial | Aktif tutorial/onboarding sistemi bulunmadı | Package I eksik |
-| Testler | EditMode `119/119`; PlayMode `30/30`; Standalone Player-targeted 10K `1/1` | Güncel değişiklikler full paketle testli |
+| Testler | EditMode `128/128`; PlayMode `29 pass + 1 explicit profiler skip`; Standalone Player-targeted 10K `1/1` | Güncel değişiklikler full paketle testli |
 | Telemetry | Spawn budget demanded/spawned/backlog telemetry mevcut; tam Blueprint event owner'ı eksik | Kısmi |
 
 ---
@@ -553,21 +553,21 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 ### E2 - Graph üretimi
 
-- [ ] Castle Heart merkez/root node'unu sabitle.
-- [ ] Ordu, Savunma, Üretim ve Heart/Büyü yön pusulasını sabitle.
-- [ ] Run seed ve dört yön iskeletini oluştur.
-- [ ] Her ana yönün root'a bağlı olduğunu doğrula.
-- [ ] Rapid, Frost ve Fireball guarantee node'larını izinli derinliğe yerleştir.
-- [ ] Temel Wall/defense erişimini koru.
-- [ ] Her ana yönde en az bir repeatable sink garanti et.
-- [ ] Node havuzunu tag + rarity + depth kurallarıyla doldur.
-- [ ] Duplicate node ve invalid prerequisite üretimini engelle.
-- [ ] Edge ve kontrollü cross-link üret.
-- [ ] Keystone çiftlerini yalnız birbirini kapatacak biçimde yerleştir.
-- [ ] Normal node'un yanlışlıkla başka yolu lock etmesini engelle.
-- [ ] Disconnected graph, dead core path ve unreachable guarantee durumunda validation reroll/fallback uygula.
-- [ ] Graph tamamen run başlangıcında üretilsin; reveal anında RNG kullanma.
-- [ ] Graph valid değilse run'ı sessizce broken state ile başlatma; açık hata/fallback üret.
+- [x] Castle Heart merkez/root node'unu sabitle.
+- [x] Ordu, Savunma, Üretim ve Heart/Büyü yön pusulasını sabitle.
+- [x] Run seed ve dört yön iskeletini oluştur.
+- [x] Her ana yönün root'a bağlı olduğunu doğrula.
+- [x] Rapid, Frost ve Fireball guarantee node'larını izinli derinliğe yerleştir.
+- [x] Temel Wall/defense erişimini koru.
+- [x] Her ana yönde en az bir repeatable sink garanti et.
+- [x] Node havuzunu tag + rarity + depth kurallarıyla doldur.
+- [x] Duplicate node ve invalid prerequisite üretimini engelle.
+- [x] Edge ve kontrollü cross-link üret.
+- [x] Keystone çiftlerini yalnız birbirini kapatacak biçimde yerleştir.
+- [x] Normal node'un yanlışlıkla başka yolu lock etmesini engelle.
+- [x] Disconnected graph, dead core path ve unreachable guarantee durumunda validation reroll/fallback uygula.
+- [x] Graph tamamen run başlangıcında üretilsin; reveal anında RNG kullanma.
+- [x] Graph valid değilse run'ı sessizce broken state ile başlatma; açık hata/fallback üret.
 
 ### E3 - Reveal ve oyuncu bilgisi
 
@@ -1120,3 +1120,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-14 | `DW-D-PROJECTILE` arrow pool + Burst-safe lifetime | Ok atışındaki per-projectile instantiate/destroy kaldırıldı; enableable `ArrowTag`, `1024` prewarm, `256` batch expand, deferred return ve `5s` Burst lifetime kuruldu. İsabet/timeout/invalid target/generation mismatch tek pool return yolunda, Continue kalan lifetime'ı exact restore ediyor ve restart aktif okları rezerve döndürüyor | Unity compile: 0 error; targeted EditMode 2/2; targeted projectile/targeting/stale-generation PlayMode 3/3; 1K×10K pool telemetry `1536 total / 3000 rent / 2895 return`, P95 `12,50 ms`; full EditMode 103/103; full PlayMode 26 pass + 1 explicit skip; explicit profiler 1/1; Unity console 0 error |
 | 2026-07-14 | `DW-D-AMMO` finite Arrow supply + instant refill | Unlimited bypass kaldırıldı; başarılı pooled projectile tam `1 Arrow` tüketiyor, stok `0` iken atış duruyor. Wood ile sabit oranlı +1/+5/Buy Max refill, kısmi dolumda israf etmeyen fiyat, Wood+Iron CAP/EFF yatırımları, profile tuning, compact tek satır HUD ve exact save v8 kuruldu. Legacy Fletcher/queue aktif akış dışında kaldı; 10K fixture finite stokla güncellendi | Unity compile: 0 error; targeted EditMode 16/16; targeted ammo/targeting PlayMode 3/3; 10K targeted 1/1; full EditMode 109/109; full PlayMode 28 pass + 1 explicit profiler skip; Game View QA; Unity console 0 error |
 | 2026-07-14 | `DW-E-DATA` Heart data model + run-only Grave Essence | `HeartNodeDefinitionSO` dört Blueprint node tipi, tags/effects/rarity/depth/cost/conflict verisini source-only taşır; `GeneratedRunGraph` seed/version/node/edge/reveal/level/lock state'ini asset referanssız tanımlar. Grave Essence ayrı ECS singleton, tek Heart harcama kapısı ve exact save v9'a bağlandı; v8 migration `0`, Restart ve ölüm silme matrisi testlendi. Legacy tech graph/purchase bu pakette değiştirilmedi | Unity compile: 0 error; targeted EditMode 20/20; targeted PlayMode 1/1; full EditMode 119/119; full PlayMode 30/30; Unity console 0 error |
+| 2026-07-14 | `DW-E-GRAPH` deterministic Castle Heart graph generator | `HeartNodeCatalogSO` authored havuzu, stable seed/attempt RNG kullanan dört yön generator ve fail-closed validator eklendi. Rapid/Frost/Fireball/Wall guarantee'leri, branch repeatable sink'leri, rarity/depth filler, forward cross-link ve tam Keystone çiftleri sentetik catalog testleriyle kilitlendi; reveal anında RNG yok. Owner onayı bekleyen production node/maliyet/Keystone içeriği üretilmedi; legacy runtime değiştirilmedi | Unity compile: 0 error; targeted EditMode 9/9; full EditMode 128/128; full PlayMode 29 pass + 1 explicit profiler skip; Unity console 0 error |
