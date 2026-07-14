@@ -129,5 +129,12 @@ MonoBehaviour:
   DawnIntensity: 0.15
   RepairBaseWoodCost: 120
   RepairBaseStoneCost: 50
+  BedBaseWoodCost: 100
+  BedCostGrowthCapacityInterval: 25
+  WorkerCapacityBaseWoodCost: 100
+  WorkerCapacityBaseIronCost: 25
+  WorkerEfficiencyBaseWoodCost: 150
+  WorkerEfficiencyBaseIronCost: 50
+  WorkerBuildingCostGrowthMultiplier: 1.35
   SpawnTable: []
   SpecialNights: []

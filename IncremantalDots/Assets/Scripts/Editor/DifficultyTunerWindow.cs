@@ -21,6 +21,7 @@ namespace DeadWalls
         private bool _foldEscalation = true;
         private bool _foldIntensity;
         private bool _foldRepair;
+        private bool _foldEconomyPrices = true;
         private bool _foldFuture;
         private bool _foldBot = true;
 
@@ -73,6 +74,7 @@ namespace DeadWalls
             DrawEscalationSection();
             DrawIntensitySection();
             DrawRepairSection();
+            DrawEconomyPriceSection();
             DrawFutureSection();
 
             _profileSO.ApplyModifiedProperties();
@@ -223,6 +225,34 @@ namespace DeadWalls
             {
                 DrawProp("RepairBaseWoodCost");
                 DrawProp("RepairBaseStoneCost");
+            }
+        }
+
+        private void DrawEconomyPriceSection()
+        {
+            _foldEconomyPrices = DrawSectionHeader(_foldEconomyPrices,
+                "Ekonomi Fiyat Egrileri", "bed + worker bina CAP/EFF");
+            if (!_foldEconomyPrices)
+                return;
+
+            using (new EditorGUILayout.VerticalScope("box"))
+            {
+                EditorGUILayout.LabelField("House Beds", EditorStyles.boldLabel);
+                DrawProp("BedBaseWoodCost");
+                DrawProp("BedCostGrowthCapacityInterval");
+                EditorGUILayout.Space(4);
+                EditorGUILayout.LabelField("Worker Building Capacity", EditorStyles.boldLabel);
+                DrawProp("WorkerCapacityBaseWoodCost");
+                DrawProp("WorkerCapacityBaseIronCost");
+                EditorGUILayout.Space(4);
+                EditorGUILayout.LabelField("Worker Building Efficiency", EditorStyles.boldLabel);
+                DrawProp("WorkerEfficiencyBaseWoodCost");
+                DrawProp("WorkerEfficiencyBaseIronCost");
+                DrawProp("WorkerBuildingCostGrowthMultiplier");
+                EditorGUILayout.HelpBox(
+                    "Butun degerler Apply sirasinda int-safe tuning'e sanitize edilir. "
+                    + "Bed quadratic, bina fiyatlari exponential buyur; temsil edilemeyen "
+                    + "transaction runtime tarafinda reddedilir.", MessageType.None);
             }
         }
 
@@ -412,6 +442,12 @@ namespace DeadWalls
             var config = em.GetComponentData<MobileCastleCombatConfig>(entity);
             MobileCastleTuningResolver.ApplyDifficultyProfile(ref config, p);
             em.SetComponentData(entity, config);
+
+            var economyPriceTuning = MobileCastleTuningResolver.ResolveEconomyPriceTuning(p);
+            if (em.HasComponent<MobileEconomyPriceTuning>(entity))
+                em.SetComponentData(entity, economyPriceTuning);
+            else
+                em.AddComponentData(entity, economyPriceTuning);
 
             var buffer = em.HasBuffer<DifficultyDaySample>(entity)
                 ? em.GetBuffer<DifficultyDaySample>(entity)

@@ -1117,6 +1117,18 @@ namespace DeadWalls
             return SetResourceWorkers(resource, current + 1);
         }
 
+        public MobileEconomyPriceTuning GetEconomyPriceTuning()
+        {
+            if (!TryGetMobileConfigEntity(out var mobileConfigEntity)
+                || !_entityManager.HasComponent<MobileEconomyPriceTuning>(mobileConfigEntity))
+            {
+                return MobileEconomyPriceTuningUtility.Default;
+            }
+
+            var tuning = _entityManager.GetComponentData<MobileEconomyPriceTuning>(mobileConfigEntity);
+            return MobileEconomyPriceTuningUtility.Sanitize(tuning);
+        }
+
         public int GetTotalBedCapacity()
         {
             if (!TryGetMobileConfigEntity(out var mobileConfigEntity)
@@ -1145,7 +1157,8 @@ namespace DeadWalls
                 return ResourceCost.Zero;
 
             var state = _entityManager.GetComponentData<MobileBedCapacityState>(mobileConfigEntity);
-            int wood = MobileBedCapacityUtility.GetPurchaseWoodCost(state, requestedCapacity);
+            var tuning = GetEconomyPriceTuning();
+            int wood = MobileBedCapacityUtility.GetPurchaseWoodCost(state, requestedCapacity, tuning);
             return new ResourceCost(wood, 0, 0, 0);
         }
 
@@ -1158,8 +1171,10 @@ namespace DeadWalls
 
             var state = _entityManager.GetComponentData<MobileBedCapacityState>(mobileConfigEntity);
             int addedCapacity = MobileBedCapacityUtility.GetPurchasableIncrement(state, requestedCapacity);
+            var tuning = GetEconomyPriceTuning();
             if (addedCapacity <= 0
-                || !MobileBedCapacityUtility.TryGetPurchaseWoodCost(state, addedCapacity, out int woodCost))
+                || !MobileBedCapacityUtility.TryGetPurchaseWoodCost(
+                    state, addedCapacity, tuning, out int woodCost))
                 return false;
 
             return CanAfford(new ResourceCost(woodCost, 0, 0, 0));
@@ -1173,7 +1188,9 @@ namespace DeadWalls
 
             var state = _entityManager.GetComponentData<MobileBedCapacityState>(mobileConfigEntity);
             int addedCapacity = MobileBedCapacityUtility.GetPurchasableIncrement(state, requestedCapacity);
-            if (!MobileBedCapacityUtility.TryGetPurchaseWoodCost(state, addedCapacity, out int woodCost))
+            var tuning = GetEconomyPriceTuning();
+            if (!MobileBedCapacityUtility.TryGetPurchaseWoodCost(
+                    state, addedCapacity, tuning, out int woodCost))
                 return false;
 
             ResourceCost cost = new ResourceCost(woodCost, 0, 0, 0);
@@ -1200,9 +1217,10 @@ namespace DeadWalls
         public ResourceCost GetWorkerBuildingUpgradeCost(EconomyFocusType resource,
             WorkerBuildingUpgradeType upgradeType)
         {
+            var tuning = GetEconomyPriceTuning();
             if (!TryGetWorkerBuildingUpgradeState(out var state)
                 || !MobileWorkerBuildingUpgradeUtility.TryGetNextCost(
-                    state, resource, upgradeType, out var cost))
+                    state, resource, upgradeType, tuning, out var cost))
             {
                 return ResourceCost.Zero;
             }
@@ -1214,10 +1232,11 @@ namespace DeadWalls
             WorkerBuildingUpgradeType upgradeType)
         {
             resource = EconomyFocusUtility.Normalize(resource);
+            var tuning = GetEconomyPriceTuning();
             if (!_initialized || GameState.IsGameOver || resource == EconomyFocusType.Balanced
                 || !TryGetWorkerBuildingUpgradeState(out var state)
                 || !MobileWorkerBuildingUpgradeUtility.TryGetNextCost(
-                    state, resource, upgradeType, out var cost))
+                    state, resource, upgradeType, tuning, out var cost))
             {
                 return false;
             }
@@ -1236,8 +1255,9 @@ namespace DeadWalls
             }
 
             var state = _entityManager.GetComponentData<MobileWorkerBuildingUpgradeState>(mobileConfigEntity);
+            var tuning = GetEconomyPriceTuning();
             if (!MobileWorkerBuildingUpgradeUtility.TryGetNextCost(
-                    state, resource, upgradeType, out var upgradeCost))
+                    state, resource, upgradeType, tuning, out var upgradeCost))
             {
                 return false;
             }

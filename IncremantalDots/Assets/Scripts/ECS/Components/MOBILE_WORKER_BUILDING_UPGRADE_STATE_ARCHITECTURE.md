@@ -22,14 +22,20 @@ Kaynak ve yatırım türlerinin seviyeleri birbirinden bağımsızdır. `Restart
 
 ## Maliyet eğrisi
 
-`MobileWorkerBuildingUpgradeUtility`, bir sonraki alım maliyetini mevcut seviyeden hesaplar:
+Maliyet baseline owner'ı `DifficultyProfileSO` içindeki ekonomi fiyat alanlarıdır.
+`MobileCastleTuningResolver` bunları sanitize eder; Baker sonucu config entity'sindeki
+`MobileEconomyPriceTuning` component'ine yazar. `MobileWorkerBuildingUpgradeUtility`,
+bir sonraki alım maliyetini bu component ve mevcut seviyeden hesaplar:
 
 ```text
 Capacity:   ceil(100 Wood × 1.35^level) + ceil(25 Iron × 1.35^level)
 Efficiency: ceil(150 Wood × 1.35^level) + ceil(50 Iron × 1.35^level)
 ```
 
-Her alım hem Wood hem Iron harcar. `GameManager.TryBuyWorkerBuildingUpgrade()` iki kaynağı tek transaction olarak doğrular ve harcar; kaynak yetmezse seviye değişmez.
+Yukarıdaki değerler onaylı `DefaultDifficulty.asset` baseline'ıdır; Difficulty Tuner'dan
+CAP ve EFF için ayrı Wood/Iron başlangıç maliyetleri ile ortak büyüme çarpanı değiştirilebilir.
+Her alım hem Wood hem Iron harcar. `GameManager.TryBuyWorkerBuildingUpgrade()` iki kaynağı
+tek transaction olarak doğrular ve harcar; kaynak yetmezse seviye değişmez.
 
 Gameplay hard max yoktur. `Math.Pow` sonucu veya herhangi bir maliyet `int` ile temsil edilemiyorsa alım güvenli biçimde reddedilir. Bu sınır tasarım seviyesi değildir; sayısal taşma korumasıdır.
 
@@ -50,7 +56,7 @@ Schema `v6`, sekiz seviyeyi açık alanlar olarak saklar. `v3 -> v4 -> v5 -> v6`
 
 ## Doğrulama
 
-- `MobileWorkerBuildingUpgradeUtilityTests`: başlangıç maliyetleri, `1.35^level` eğrisi, bağımsız seviyeler, additive etkiler ve taşma reddi.
+- `MobileWorkerBuildingUpgradeUtilityTests`: default ve profile-driven maliyetler, sanitize, `1.35^level` eğrisi, bağımsız seviyeler, additive etkiler ve taşma reddi.
 - `WorkerAllocationPlayModeTests.WorkerDrawer_TargetControlsAndBuildingUpgradesUseBoundRuntimeState`: HUD binding, iki kaynak harcaması, cap ve üretim etkisi.
 - `ExactRunContinuePlayModeTests.WorkerBuildingInvestments_SpendBothResourcesAndPersistAcrossExactContinue`: transaction, sonraki fiyat ve exact Continue.
 - `RunPersistenceTests`: v6 round-trip ve v3/v4/v5 migration.

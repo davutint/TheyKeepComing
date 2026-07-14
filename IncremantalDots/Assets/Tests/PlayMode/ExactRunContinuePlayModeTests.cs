@@ -443,6 +443,17 @@ namespace DeadWalls.Tests
             Assert.That(config.MoatGameplayEnabled, Is.False);
             Assert.That(config.MoatSlowMultiplier, Is.EqualTo(1f));
             Assert.That(config.MoatDamagePerSecond, Is.Zero);
+            Assert.That(entityManager.HasComponent<MobileEconomyPriceTuning>(configEntity), Is.True);
+            var economyPriceTuning =
+                entityManager.GetComponentData<MobileEconomyPriceTuning>(configEntity);
+            Assert.That(economyPriceTuning.BedBaseWoodCost, Is.EqualTo(100));
+            Assert.That(economyPriceTuning.BedCostGrowthCapacityInterval, Is.EqualTo(25));
+            Assert.That(economyPriceTuning.WorkerCapacityBaseWoodCost, Is.EqualTo(100));
+            Assert.That(economyPriceTuning.WorkerCapacityBaseIronCost, Is.EqualTo(25));
+            Assert.That(economyPriceTuning.WorkerEfficiencyBaseWoodCost, Is.EqualTo(150));
+            Assert.That(economyPriceTuning.WorkerEfficiencyBaseIronCost, Is.EqualTo(50));
+            Assert.That(economyPriceTuning.WorkerBuildingCostGrowthMultiplier,
+                Is.EqualTo(1.35d));
             Assert.That(samples.Length, Is.EqualTo(60));
             Assert.That(samples[0].NightIntensityMult, Is.EqualTo(0.5f));
             Assert.That(samples[4].BloodMoonIntensityMult, Is.EqualTo(1f));
@@ -461,6 +472,50 @@ namespace DeadWalls.Tests
             Assert.That(config.ZombieScale, Is.EqualTo(enemyEntries[0].Scale));
             Assert.That(entityManager.GetComponentData<ZombiePrefabData>(enemyCatalogEntity).ZombiePrefab,
                 Is.EqualTo(enemyEntries[0].Prefab));
+        }
+
+        [UnityTest]
+        public IEnumerator EconomyPriceTuning_RuntimePurchaseApisReadBakedComponent()
+        {
+            var gameManager = GameManager.Instance;
+            bool runtimeReady = false;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                {
+                    runtimeReady = true;
+                    break;
+                }
+                yield return null;
+            }
+            Assert.That(runtimeReady, Is.True);
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            Entity configEntity = entityManager.CreateEntityQuery(
+                typeof(MobileCastleCombatConfig), typeof(MobileEconomyPriceTuning))
+                .GetSingletonEntity();
+            var tuning = new MobileEconomyPriceTuning
+            {
+                BedBaseWoodCost = 333,
+                BedCostGrowthCapacityInterval = 10,
+                WorkerCapacityBaseWoodCost = 222,
+                WorkerCapacityBaseIronCost = 33,
+                WorkerEfficiencyBaseWoodCost = 444,
+                WorkerEfficiencyBaseIronCost = 55,
+                WorkerBuildingCostGrowthMultiplier = 2d
+            };
+            entityManager.SetComponentData(configEntity, tuning);
+
+            Assert.That(gameManager.GetBedCapacityPurchaseCost().Wood, Is.EqualTo(333));
+            ResourceCost capacityCost = gameManager.GetWorkerBuildingUpgradeCost(
+                EconomyFocusType.Wood, WorkerBuildingUpgradeType.Capacity);
+            ResourceCost efficiencyCost = gameManager.GetWorkerBuildingUpgradeCost(
+                EconomyFocusType.Stone, WorkerBuildingUpgradeType.Efficiency);
+            Assert.That(capacityCost.Wood, Is.EqualTo(222));
+            Assert.That(capacityCost.Iron, Is.EqualTo(33));
+            Assert.That(efficiencyCost.Wood, Is.EqualTo(444));
+            Assert.That(efficiencyCost.Iron, Is.EqualTo(55));
+            yield return null;
         }
 
         [UnityTest]

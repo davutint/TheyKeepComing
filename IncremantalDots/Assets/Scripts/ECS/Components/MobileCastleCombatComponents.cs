@@ -221,6 +221,21 @@ namespace DeadWalls
         public int FoodEfficiencyLevel;
     }
 
+    /// <summary>
+    /// DifficultyProfileSO'dan bake edilen ekonomi fiyat parametreleri.
+    /// Run state degildir; satin alinmis seviye/yatak state'i bu baseline'i kullanir.
+    /// </summary>
+    public struct MobileEconomyPriceTuning : IComponentData
+    {
+        public int BedBaseWoodCost;
+        public int BedCostGrowthCapacityInterval;
+        public int WorkerCapacityBaseWoodCost;
+        public int WorkerCapacityBaseIronCost;
+        public int WorkerEfficiencyBaseWoodCost;
+        public int WorkerEfficiencyBaseIronCost;
+        public double WorkerBuildingCostGrowthMultiplier;
+    }
+
     public struct MobilePrepPauseState : IComponentData
     {
         public bool IsPaused;

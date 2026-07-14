@@ -4,8 +4,8 @@
 >
 > **Tracker sürümü:** 2.0  
 > **Son tam kapsam denetimi:** 2026-07-12  
-> **Aktif paket:** Package C - Economy + Population
-> **Aktif iş:** `DW-C-TUNING-SURFACE` - Inspector/SO Price Curve Tuning + Int Safety
+> **Aktif paket:** Package D - Archers + Ammo
+> **Aktif iş:** `DW-D-ARCHER-CAP` - Basic/Rapid/Frost Ortak 1000 Cap Guard
 
 ---
 
@@ -129,7 +129,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Defense | Damage/Game Over aktif ve testli olarak tek Wall'a çekildi | `[x]` |
 | Normal repair | Stone-only ve yalnız Day/Dusk | `[x]` |
 | Save | Exact same-moment Continue; schema v6, minimum v3; purchased bed ve worker bina yatırım state'i exact | `[x]` |
-| Economy | Worker üretimi, bed alımı ve dört hazır binanın capacity/efficiency yatırımları var; V1 ana kaynaklarında pasif consumption yok | `[~]` Ortak Inspector/SO tuning yüzeyi Package C'de açık |
+| Economy | Worker üretimi, bed alımı ve dört hazır binanın capacity/efficiency yatırımları var; bed ve bina fiyat eğrileri `DefaultDifficulty.asset`/Difficulty Tuner üzerinden baked runtime tuning'e bağlı; V1 ana kaynaklarında pasif consumption yok | `[x]` |
 | Population | House bed state + Wood purchase API + exact save var; Dawn isteği boş yatak ve Food/kişi bütçesiyle sınırlı, gerçek accepted count uygulanıyor, Food bir kez düşülüyor ve en fazla 15 temsili survivor sağdan Wall arkasına yürüyor | `[x]` |
 | Workers | Kalıcı target ratio + actual/cap/idle state, +1/+10/+100/direct input, bağımsız bina capacity/efficiency seviyeleri, yeni nüfus auto-allocation, exact save, Low/Medium/High density ve allocation-senkronlu animation/cargo/lantern/delivery feedback var | `[x]` |
 | Council | Curated/deterministic composer ve kart UI var; schedule chance/pity/cooldown | Package F altyapısı var, schedule yanlış |
@@ -145,7 +145,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Meta | Ayrı JSON ve Game Over shop var; `StartingTechLevel` aktif | Kısmi uyum |
 | HUD | CyclePanel, DAY/DUSK/NIGHT ve Horde Pressure mevcut; tek Wall runtime gizleme var | Package I polish gerekli |
 | Tutorial | Aktif tutorial/onboarding sistemi bulunmadı | Package I eksik |
-| Testler | EditMode `77/77`; PlayMode `19 pass + 1 explicit skip`; Standalone Player-targeted 10K `1/1` | Güncel değişiklikler full paketle testli |
+| Testler | EditMode `85/85`; PlayMode `21 pass + 1 explicit skip`; Standalone Player-targeted 10K `1/1` | Güncel değişiklikler full paketle testli |
 | Telemetry | Spawn budget demanded/spawned/backlog telemetry mevcut; tam Blueprint event owner'ı eksik | Kısmi |
 
 ---
@@ -156,8 +156,8 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 |---:|---|---|---|
 | 1 | A - System Contracts | Tamamlandı | Reset/Continue deterministik; upkeep yok; tek Wall testli |
 | 2 | B - Continuous Horde | Tamamlandı | Sabit stats, backlog/pool ve 10K ürün ölçümü tamamlandı |
-| 3 | C - Economy + Population | **Aktif** | Pasif drain yok; arrival tek Food öder; cap aşılmaz |
-| 4 | D - Archers + Ammo | Bekliyor | 1.000 x 10.000; 40x25; Arrow truth çalışır |
+| 3 | C - Economy + Population | Tamamlandı | Pasif drain yok; arrival tek Food öder; cap aşılmaz; fiyat tuning'i testli |
+| 4 | D - Archers + Ammo | **Aktif** | 1.000 x 10.000; 40x25; Arrow truth çalışır |
 | 5 | E - Castle Heart | Bekliyor | Aynı seed/load aynı valid graph'ı üretir |
 | 6 | F - Council | Bekliyor | 3/6/9 bozulmaz; etkiler ana cap'leri bypass etmez |
 | 7 | G - Active Abilities | Bekliyor | Kaynak tüketmez; Night repair sözleşmesi çalışır |
@@ -176,7 +176,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 |---|---|---|
 | Tek Wall truth | Damage, Game Over, authoring, repair ve save defense alanı Wall'a çekildi | `[x]` 19/19 EditMode |
 | Run/meta ayrımı | Exact run `run_save.json`; kalıcı progression `meta_progress.json`; ölüm transaction'ı ayrı receipt | `[x]` |
-| Exact Continue | Schema v5 aynı cycle/phase/timer, kaynak, spawn RNG, worker target/checkpoint ve purchased bed state'ini restore ediyor; v3/v4 migrate ediliyor | `[x]` EditMode + PlayMode |
+| Exact Continue | Schema v6 aynı cycle/phase/timer, kaynak, spawn RNG, worker target/checkpoint, purchased bed ve worker bina yatırım state'ini restore ediyor; v3/v4/v5 migrate ediliyor | `[x]` EditMode + PlayMode |
 | Otomatik save | Ana menüye dönmeden önce ve application quit sırasında exact snapshot alınıyor | `[x]` |
 | Gönüllü reset yok | Aktif run sırasında Main Menu New Run ve Pause Restart kapalı; Game Over Restart yeni koşu başlatır | `[x]` |
 | Upkeep yok | V1 ResourceTick consumption'ı yok sayıyor; population Food ve Fletcher Wood yolları castle loop'ta kapalı | `[x]` |
@@ -186,7 +186,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 ### `DW-A-SAVE` - Tamamlandı: Exact Run Snapshot & Continue
 
-- [x] Run save schema güncel `v5`, minimum `v3`; v2 Dawn checkpoint reddediliyor, v3 worker target ve v3/v4 bed state'iyle deterministik migrate ediliyor.
+- [x] Run save schema güncel `v6`, minimum `v3`; v2 Dawn checkpoint reddediliyor, v3 worker target, v3/v4 bed ve v3/v4/v5 worker bina yatırım state'iyle deterministik migrate ediliyor.
 - [x] Gün/cycle index, aktif phase, exact cycle timer/progress ve spawn RNG state'i kaydediliyor.
 - [x] Wood, Stone, Iron, Food, Arrow current ve kesirli accumulator state'i kaydediliyor; data-driven capacity tech/config'ten yeniden hesaplanıyor.
 - [x] Population, bed/capacity, actual worker count, target ratio/cap/idle/checkpoint ve growth/event tekrar gate'leri capture/restore zincirinde kaydediliyor.
@@ -393,7 +393,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 ---
 
-## 7. Package C - Economy + Population - Aktif paket
+## 7. Package C - Economy + Population - Tamamlandı
 
 ### Mevcut oyun ile karşılaştırma
 
@@ -408,7 +408,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Beds incremental/no hard max | `60` base + purchased House bed state; toplam sahipliği baz alan owner-onaylı quadratic Wood eğrisi, ardışık bulk fiyatı, int-safe transaction ve exact save var | `[x]` |
 | Dawn survivor + one-time Food | Dawn isteği `15`; boş yatak ve `Food / 1` ile sınırlanıyor, gerçek accepted count uygulanıp toast'ta gösteriliyor ve `accepted × 1 Food` aynı Dawn'da yalnız bir kez düşüyor. En fazla `15` temsili survivor mevcut villager prefabıyla sağdan Wall arkasına yürüyor; worker üretimine karışmadan varışta temizleniyor | `[x]` |
 | Mevcut pop pasif Food tüketmez | V1 castle loop'ta population Food/dk yazmıyor | `[x]` |
-| Fiyatlar adet/seviyeyle büyür | Bed owned-capacity eğrisi yanında bina CAP/EFF maliyetleri Wood+Iron olarak `ceil(base × 1.35^level)` ile bağımsız büyüyor; ortak tuning yüzeyi açık | `[~]` |
+| Fiyatlar adet/seviyeyle büyür | Bed owned-capacity eğrisi yanında bina CAP/EFF maliyetleri Wood+Iron olarak `ceil(base × growth^level)` ile bağımsız büyüyor; `DifficultyProfileSO` + Difficulty Tuner tek tuning yüzeyi, baked `MobileEconomyPriceTuning` runtime owner'ı | `[x]` |
 
 ### Yapılacaklar
 
@@ -427,8 +427,8 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [x] Food yetersizliğinde mevcut popu azaltma; yalnız yeni arrival'ı sınırla.
 - [x] Açlık, göç, population death ve üretim cezası ekleme.
 - [x] Bina capacity ve efficiency satın alımlarını büyüyen maliyet eğrisine bağla.
-- [ ] Fiyat eğrilerini Inspector/SO tuning yüzeyi yap; int güvenlik sınırlarını koy.
-- [ ] Fletcher gameplay binası/worker'ı ve build placement'ı V1 akışına bağlama.
+- [x] Fiyat eğrilerini Inspector/SO tuning yüzeyi yap; int güvenlik sınırlarını koy.
+- [x] Fletcher gameplay binası/worker'ı ve build placement'ı V1 akışına bağlama.
 
 ### Kabul kapısı
 
@@ -442,6 +442,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [x] Her bina ve CAP/EFF seviyesi bağımsız; her alım Wood+Iron'ı tek transaction'da harcıyor.
 - [x] CAP seviyesi `+10` slot, EFF seviyesi base worker üretimine additive `+10%` veriyor.
 - [x] Sekiz bina yatırım seviyesi exact Continue sonrasında maliyet, cap ve üretim aggregate'iyle aynı kalıyor.
+- [x] Bed ve worker bina fiyatları `DefaultDifficulty.asset`/Difficulty Tuner'dan bake ediliyor; invalid değerler sanitize, int dışı transaction reddediliyor.
 
 ---
 
@@ -948,8 +949,8 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 ### Mevcut test envanteri
 
-- `[x]` EditMode: `82/82`; contract, compact save/migration v3-v6, worker target mutation/allocation, bina CAP/EFF seviye-maliyet matematiği, representative density/weight, production feedback strength ve lantern phase rule, tuning, cycle, quantity-only, backlog, Moat isolation, enemy catalog ve pool kapsamı.
-- `[x]` PlayMode: `20 pass + 1 explicit skip`; gerçek `NewGameScene`, worker drawer target/CAP/EFF kontrolleri, çift kaynak transaction'ı, bina exact Continue, Dawn survivor akışı, Low/Medium/High visual density, same-bucket exact weight, work/cargo/delivery/lantern state, worker arrival/cap overflow, Wall, cycle, backlog ve pool kapsamı. 10K profiler capture explicit targeted testtir.
+- `[x]` EditMode: `85/85`; contract, compact save/migration v3-v6, worker target mutation/allocation, profile-driven bed ve bina fiyat tuning'i, bina CAP/EFF seviye-maliyet matematiği, representative density/weight, production feedback strength ve lantern phase rule, cycle, quantity-only, backlog, Moat isolation, enemy catalog ve pool kapsamı.
+- `[x]` PlayMode: `21 pass + 1 explicit skip`; gerçek `NewGameScene`, baked ekonomi fiyat tuning'i, GameManager fiyat API'leri, worker drawer target/CAP/EFF kontrolleri, çift kaynak transaction'ı, bina exact Continue, Dawn survivor akışı, Low/Medium/High visual density, same-bucket exact weight, work/cargo/delivery/lantern state, worker arrival/cap overflow, Wall, cycle, backlog ve pool kapsamı. 10K profiler capture explicit targeted testtir.
 - `[~]` Council schedule/guardrail ve 1k x 10k ürün senaryoları ilgili paketleri bekliyor; enemy pool churn contract testli.
 
 ---
@@ -1041,15 +1042,16 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 |---|---|
 | `NewGameScene.unity` + `MobileCastleCombatSubScene.unity` | Kamera, HUD, active authoring, cycle ve combat values |
 | `MobileCastleHudRoot` live components | CyclePanel, HordePressure, Gate/Core bindings, drawers, worker CAP/EFF ve archer upgrade kontrolleri |
-| `MobileCastleCombatAuthoring.cs` + `DefaultDifficulty.asset` + `BasicZombie.asset` | 30/5/20/5, quantity curves, 900 cap; enemy base statları catalog-owned |
+| `MobileCastleCombatAuthoring.cs` + `DefaultDifficulty.asset` + `BasicZombie.asset` | 30/5/20/5, quantity curves, 900 cap ve ekonomi fiyat baseline'ları; enemy base statları catalog-owned |
 | `GameManager.cs` | Save/restore, repair, worker bina CAP/EFF alımı ve economy aggregate'i, archer buy/upgrade, Council, Fireball, meta bridge |
 | `RunPersistence.cs` | Exact schema v6; minimum v3, worker target/checkpoint + bed + worker bina yatırım migration'ı ve compact snapshot |
 | `ContinuousSiegeCycleSystem.cs` | Phase/intensity ve Blood Moon application |
 | `WaveSpawnSystem.cs` + `EnemyPoolRuntimeUtility.cs` | Tek catalog prefab/stat, cap/backlog ve expandable pool rent |
 | `DamageCleanupSystem.cs` | Reward sonrası enemy pool return |
 | `ResourceTickSystem.cs` + `PopulationTickSystem.cs` | V1 castle loop'ta ana kaynak ve population için pasif consumption yok |
-| `MobilePopulationEconomySystem.cs` + `MobilePopulationArrivalUtility.cs` + `WorkerAllocationUtility.cs` + `WorkerVisualRepresentationUtility.cs` + `MobileBedCapacityUtility.cs` + `SurvivorArrivalVisualSystem.cs` | Target ratio auto-allocation/cap overflow, temsili worker density ve exact weight; purchased bed state ve owned-capacity fiyat eğrisi; Dawn accepted growth + tek Food transaction'ı; mevcut VillagerWorker prefabıyla sağdan Wall arkasına yürüyen, en fazla 15 entity'lik transient arrival sunumu hazır |
-| `MobileWorkerBuildingUpgradeUtility.cs` + `MobileWorkerBuildingUpgradeState` | Dört kaynak için bağımsız CAP/EFF seviyeleri; Wood+Iron base maliyetleri, `1.35^level` büyüme, `+10` cap, additive `+10%` base üretim ve int-safe maliyet reddi |
+| `MobileEconomyPriceTuning` + `MobileCastleTuningResolver.cs` + `DifficultyTunerWindow.cs` | Profile-owned bed base/interval ve worker CAP/EFF Wood/Iron base + ortak growth değerlerini sanitize edip Baker/live Apply ile tek runtime component'e taşır |
+| `MobilePopulationEconomySystem.cs` + `MobilePopulationArrivalUtility.cs` + `WorkerAllocationUtility.cs` + `WorkerVisualRepresentationUtility.cs` + `MobileBedCapacityUtility.cs` + `SurvivorArrivalVisualSystem.cs` | Target ratio auto-allocation/cap overflow, temsili worker density ve exact weight; tuning-driven purchased bed state ve owned-capacity fiyat eğrisi; Dawn accepted growth + tek Food transaction'ı; mevcut VillagerWorker prefabıyla sağdan Wall arkasına yürüyen, en fazla 15 entity'lik transient arrival sunumu hazır |
+| `MobileWorkerBuildingUpgradeUtility.cs` + `MobileWorkerBuildingUpgradeState` | Dört kaynak için bağımsız CAP/EFF seviyeleri; tuning-driven Wood+Iron base maliyetleri ve ortak exponential growth, `+10` cap, additive `+10%` base üretim ve int-safe maliyet reddi |
 | `WorkerLogisticsMovementSystem.cs` + `SpriteSheet.shader` + `Villager.mat` | Ayrı Idle/Walk/Work/Celebrate atlas seçimi; resource cargo, Dusk/Night lantern ve weight-scaled hub delivery pulse |
 | `MobileCastleArcherTilePlacement.cs` | Tile center + stack offset, preview 96 |
 | `ArcherShootSystem.cs` | Brute-force nearest target ve unlimited ammo bypass |
@@ -1106,3 +1108,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-14 | `DW-C-FOOD-SPEND` one-time arrival Food transaction | Dawn bütçesinin `RequiredFood = accepted × 1` sonucu population artışıyla aynı ECS transaction'ında `ResourceData.Food` stokundan düşüldü; persistent cycle/wave marker'ları aynı Dawn ve exact Continue sonrasında çift harcamayı engelliyor | Unity compile: 0 error; targeted PlayMode 2/2; EditMode 74/74; PlayMode 19 pass + 1 explicit skip; Unity console 0 error |
 | 2026-07-14 | `DW-C-ARRIVAL-VISUAL` Dawn survivor walk-in | Gerçek accepted count mevcut `VillagerWorker` prefabıyla en fazla 15 transient görsele exact temsil edildi; survivor'lar sağ battlefield'daki farklı lane/gecikmelerden Wall arkasına yürüyor, resource worker lojistiğine girmiyor, varışta temizleniyor ve exact Continue tamamlanmış Dawn'ı yeniden oynatmıyor | Targeted EditMode 3/3; targeted PlayMode 2/2; full EditMode 77/77; full PlayMode 19 pass + 1 explicit skip; gerçek NewGameScene Game View 15-survivor QA; Unity console 0 error |
 | 2026-07-14 | `DW-C-BUILDING-SCALE` independent worker building investments | Dört hazır worker binasının CAP/EFF seviyeleri bağımsız state'e bağlandı; her alım Wood+Iron harcıyor, owner-onaylı base maliyetler `ceil(base × 1.35^level)` ile büyüyor, CAP `+10` slot ve EFF base üretime additive `+10%` veriyor. Workers drawer'da sekiz buton, int-safe cost limit ve exact save v6 tamamlandı | Targeted EditMode 13/13; targeted PlayMode 2/2; full EditMode 82/82; full PlayMode 20 pass + 1 explicit skip; 1280×720 gerçek Game View QA; Unity console 0 error |
+| 2026-07-14 | `DW-C-TUNING-SURFACE` profile-driven economy price curves | Bed base/interval ve worker CAP/EFF Wood/Iron base + ortak growth `DifficultyProfileSO`/Difficulty Tuner'a taşındı; Baker/live Apply tek `MobileEconomyPriceTuning` owner'ını yazıyor, GameManager bütün fiyat API'lerinde bunu tüketiyor. Onaylı default'lar korundu; invalid değerler sanitize, int dışı alımlar reddediliyor; Package C kapatıldı | Targeted EditMode 17/17; targeted PlayMode 2/2; full EditMode 85/85; full PlayMode 21 pass + 1 explicit skip; DefaultDifficulty live asset audit; Unity console 0 error |

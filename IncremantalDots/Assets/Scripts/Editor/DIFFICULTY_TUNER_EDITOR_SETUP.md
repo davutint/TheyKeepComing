@@ -15,6 +15,8 @@ DefaultDifficulty.asset` seed edilir (varsa DOKUNULMAZ) ve subscene'deki
      cikacagini keyframe'lerle belirle).
    - Gec oyun baskisi: `ZombieHpGrowthPerCycle`, `SpawnBatchGrowthPerCycle`, `MaxSpawnBatch`.
    - Kurtulus ekonomisi: `RepairBase*Cost`.
+   - House/worker yatirim fiyatlari: `Ekonomi Fiyat Egrileri` foldout'unda bed base ve
+     interval, CAP/EFF Wood+Iron base ve ortak worker building growth multiplier.
 4. **Apply** — edit modda subscene'e baglar+kaydeder (bake); play modda ayrica CANLI uygular.
 5. Olcum: Play'e gir -> **Run Bot** (profili uygular, temiz kosu baslatir) ->
    kosular bitince **Son Olcumu Ozetle** ile olum-gunu dagilimini oku.
@@ -23,6 +25,9 @@ DefaultDifficulty.asset` seed edilir (varsa DOKUNULMAZ) ve subscene'deki
 
 - Egriler x=GUN (1..SampleDays), y=CARPAN; 1 = etkisiz. Gun, SampleDays'i asarsa son deger kullanilir.
 - `SpawnTable` ve `SpecialNights` alanlari M-C hazirligidir — sistem henuz okumaz, veri girebilirsin.
+- `DefaultDifficulty.asset` ekonomi default'lari: bed `100W / 25 interval`, CAP
+  `100W+25I`, EFF `150W+50I`, ortak growth `1.35`. Apply, edit modda bunlari bake eder;
+  Play Mode'da mevcut config entity'sine de canli yazar.
 - WallHP / Iron uretimi gibi profil-DISI degerler setup tool sabitlerinde yasar
   (setup her kosuda normalize eder) — kalici degisiklik icin MobileCastleSceneSetupWindow'daki
   degeri guncelle.

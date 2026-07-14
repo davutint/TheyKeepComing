@@ -25,11 +25,16 @@ namespace DeadWalls
     {
         public const int CapacityPerLevel = 10;
         public const float EfficiencyPercentPerLevel = 0.10f;
-        public const int CapacityBaseWoodCost = 100;
-        public const int CapacityBaseIronCost = 25;
-        public const int EfficiencyBaseWoodCost = 150;
-        public const int EfficiencyBaseIronCost = 50;
-        public const double CostGrowthMultiplier = 1.35d;
+        public const int CapacityBaseWoodCost =
+            MobileEconomyPriceTuningUtility.DefaultWorkerCapacityBaseWoodCost;
+        public const int CapacityBaseIronCost =
+            MobileEconomyPriceTuningUtility.DefaultWorkerCapacityBaseIronCost;
+        public const int EfficiencyBaseWoodCost =
+            MobileEconomyPriceTuningUtility.DefaultWorkerEfficiencyBaseWoodCost;
+        public const int EfficiencyBaseIronCost =
+            MobileEconomyPriceTuningUtility.DefaultWorkerEfficiencyBaseIronCost;
+        public const double CostGrowthMultiplier =
+            MobileEconomyPriceTuningUtility.DefaultWorkerBuildingCostGrowthMultiplier;
 
         public static int GetLevel(in MobileWorkerBuildingUpgradeState state,
             EconomyFocusType resource, WorkerBuildingUpgradeType upgradeType)
@@ -95,6 +100,14 @@ namespace DeadWalls
             EconomyFocusType resource, WorkerBuildingUpgradeType upgradeType,
             out WorkerBuildingUpgradeCost cost)
         {
+            var tuning = MobileEconomyPriceTuningUtility.Default;
+            return TryGetNextCost(state, resource, upgradeType, tuning, out cost);
+        }
+
+        public static bool TryGetNextCost(in MobileWorkerBuildingUpgradeState state,
+            EconomyFocusType resource, WorkerBuildingUpgradeType upgradeType,
+            in MobileEconomyPriceTuning tuning, out WorkerBuildingUpgradeCost cost)
+        {
             resource = EconomyFocusUtility.Normalize(resource);
             if (resource == EconomyFocusType.Balanced)
             {
@@ -102,11 +115,19 @@ namespace DeadWalls
                 return false;
             }
 
-            return TryGetCostForLevel(upgradeType, GetLevel(state, resource, upgradeType), out cost);
+            return TryGetCostForLevel(upgradeType, GetLevel(state, resource, upgradeType),
+                tuning, out cost);
         }
 
         public static bool TryGetCostForLevel(WorkerBuildingUpgradeType upgradeType, int currentLevel,
             out WorkerBuildingUpgradeCost cost)
+        {
+            var tuning = MobileEconomyPriceTuningUtility.Default;
+            return TryGetCostForLevel(upgradeType, currentLevel, tuning, out cost);
+        }
+
+        public static bool TryGetCostForLevel(WorkerBuildingUpgradeType upgradeType, int currentLevel,
+            in MobileEconomyPriceTuning tuning, out WorkerBuildingUpgradeCost cost)
         {
             cost = default;
             if (currentLevel < 0
@@ -116,13 +137,15 @@ namespace DeadWalls
                 return false;
             }
 
+            var safeTuning = MobileEconomyPriceTuningUtility.Sanitize(tuning);
             int baseWood = upgradeType == WorkerBuildingUpgradeType.Capacity
-                ? CapacityBaseWoodCost
-                : EfficiencyBaseWoodCost;
+                ? safeTuning.WorkerCapacityBaseWoodCost
+                : safeTuning.WorkerEfficiencyBaseWoodCost;
             int baseIron = upgradeType == WorkerBuildingUpgradeType.Capacity
-                ? CapacityBaseIronCost
-                : EfficiencyBaseIronCost;
-            double multiplier = Math.Pow(CostGrowthMultiplier, currentLevel);
+                ? safeTuning.WorkerCapacityBaseIronCost
+                : safeTuning.WorkerEfficiencyBaseIronCost;
+            double multiplier = Math.Pow(safeTuning.WorkerBuildingCostGrowthMultiplier,
+                currentLevel);
             if (double.IsNaN(multiplier) || double.IsInfinity(multiplier))
                 return false;
 

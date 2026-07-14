@@ -28,6 +28,8 @@ Her tuning alanının tek bir baseline owner'ı olmalıdır. Inspector, Difficul
 - Base/min spawn interval
 - Day, Dusk start/end, Night ve Dawn intensity
 - Repair base Wood/Stone serialized tuning değerleri
+- House bed başlangıç Wood maliyeti ve owned-bed büyüme interval'i
+- Worker CAP/EFF ayrı Wood/Iron başlangıç maliyetleri ve ortak bina büyüme çarpanı
 - Gün eğrileri; SpecialNights schema/content V1'de dormant ve multiplier her zaman 1
 
 Not: Normal V1 repair artık yalnız Stone kullandığı için `RepairBaseWoodCost` serialize uyumluluğu dışında gameplay tarafından okunmaz.
@@ -46,7 +48,10 @@ Profile atanmışken aynı isimli shadow Inspector difficulty alanları fallback
 
 ## Editor araçları
 
-`DifficultyTunerWindow` profile asset'i düzenler. Play Mode canlı uygulama ve Baker aynı `MobileCastleTuningResolver.ApplyDifficultyProfile` metodunu kullanır. Gün eğrisi/SpecialNight sample üretimi de aynı `ResolveDaySample` metodundadır; iki ayrı formül tutulmaz.
+`DifficultyTunerWindow` profile asset'i düzenler. Play Mode canlı uygulama ve Baker
+difficulty config için aynı `MobileCastleTuningResolver.ApplyDifficultyProfile` metodunu,
+ekonomi fiyatları için aynı `ResolveEconomyPriceTuning` metodunu kullanır. Gün eğrisi/
+SpecialNight sample üretimi de aynı `ResolveDaySample` metodundadır; iki ayrı formül tutulmaz.
 
 `MobileCastleSceneSetupWindow` yalnız owner tarafından açıkça çalıştırılan initializer/repair aracıdır. Runtime owner değildir. Tool'un yazdığı değerler scene/profile asset'e kaydedildikten sonra yukarıdaki sahiplik kuralına girer.
 
@@ -61,6 +66,9 @@ Aktif SubScene `DefaultDifficulty.asset` profilini kullanır. Bilinçli olarak f
 | Spawn batch growth/cycle | 0.10 | 0.15 | 0.15 |
 | Max spawn batch | 12 | 16 | 16 |
 | Repair base Stone | 80 | 50 | 50 |
+| Bed base / interval | Profile owner | 100 / 25 | `MobileEconomyPriceTuning`: 100 / 25 |
+| Worker CAP / EFF base | Profile owner | 100W+25I / 150W+50I | `MobileEconomyPriceTuning`: aynı |
+| Worker bina growth | Profile owner | 1.35 | `MobileEconomyPriceTuning`: 1.35 |
 | Cycle Day/Dusk/Night/Dawn | 30/5/20/5 | Profile'da yok | 30/5/20/5 |
 
 Runtime production gibi bazı alanlar tech/meta aggregate sonrasında baseline'dan farklı görünebilir. Örneğin `IronWorkerProductionPerMin` meta production bonusuyla artabilir; bu owner çakışması değildir.
@@ -70,6 +78,7 @@ Runtime production gibi bazı alanlar tech/meta aggregate sonrasında baseline'd
 - `MobileCastleTuningResolverTests.DifficultyProfile_OverridesOnlyProfileOwnedFields`
 - `MobileCastleTuningResolverTests.ActiveSubScene_AssignsDefaultProfile_AndResolvesItsDivergentValues`
 - `MobileCastleTuningResolverTests.DaySample_UsesSameCurveAndSpecialNightRulesForBakeAndLiveApply`
+- `MobileCastleTuningResolverTests.EconomyPriceTuning_UsesProfileValuesAndSanitizesInvalidInputs`
 - `ExactRunContinuePlayModeTests.RuntimeTuning_UsesProfileDifficulty_AndAuthoringCycleDurations`
 - `EnemyCatalogContractTests.Definition_OwnsBaseStatsAndFuturePoolMetadata`
 - `ExactRunContinuePlayModeTests.EnemyCatalog_SpawnsRegisteredPrefabWithDefinitionStats`

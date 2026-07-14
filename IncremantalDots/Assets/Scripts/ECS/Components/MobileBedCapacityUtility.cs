@@ -5,8 +5,9 @@ namespace DeadWalls
     public static class MobileBedCapacityUtility
     {
         public const int DefaultInitialCapacity = 60;
-        public const int BaseWoodCost = 100;
-        public const int CostGrowthCapacityInterval = 25;
+        public const int BaseWoodCost = MobileEconomyPriceTuningUtility.DefaultBedBaseWoodCost;
+        public const int CostGrowthCapacityInterval =
+            MobileEconomyPriceTuningUtility.DefaultBedCostGrowthCapacityInterval;
 
         public static MobileBedCapacityState CreateInitial(int baseCapacity)
         {
@@ -40,30 +41,55 @@ namespace DeadWalls
 
         public static int GetNextPurchaseWoodCost(in MobileBedCapacityState state)
         {
-            return TryCalculateUnitWoodCost(GetOwnedCapacityGrowthCount(state), out int woodCost)
+            var tuning = MobileEconomyPriceTuningUtility.Default;
+            return GetNextPurchaseWoodCost(state, tuning);
+        }
+
+        public static int GetNextPurchaseWoodCost(in MobileBedCapacityState state,
+            in MobileEconomyPriceTuning tuning)
+        {
+            var safeTuning = MobileEconomyPriceTuningUtility.Sanitize(tuning);
+            return TryCalculateUnitWoodCost(GetOwnedCapacityGrowthCount(state), safeTuning,
+                out int woodCost)
                 ? woodCost
                 : int.MaxValue;
         }
 
         public static int GetPurchaseWoodCost(in MobileBedCapacityState state, int requestedCapacity)
         {
-            TryGetPurchaseWoodCost(state, requestedCapacity, out int woodCost);
+            var tuning = MobileEconomyPriceTuningUtility.Default;
+            return GetPurchaseWoodCost(state, requestedCapacity, tuning);
+        }
+
+        public static int GetPurchaseWoodCost(in MobileBedCapacityState state, int requestedCapacity,
+            in MobileEconomyPriceTuning tuning)
+        {
+            TryGetPurchaseWoodCost(state, requestedCapacity, tuning, out int woodCost);
             return woodCost;
         }
 
         public static bool TryGetPurchaseWoodCost(in MobileBedCapacityState state, int requestedCapacity,
             out int woodCost)
         {
+            var tuning = MobileEconomyPriceTuningUtility.Default;
+            return TryGetPurchaseWoodCost(state, requestedCapacity, tuning, out woodCost);
+        }
+
+        public static bool TryGetPurchaseWoodCost(in MobileBedCapacityState state, int requestedCapacity,
+            in MobileEconomyPriceTuning tuning, out int woodCost)
+        {
             woodCost = 0;
             int addedCapacity = GetPurchasableIncrement(state, requestedCapacity);
             if (addedCapacity <= 0)
                 return false;
 
+            var safeTuning = MobileEconomyPriceTuningUtility.Sanitize(tuning);
             long totalCost = 0;
             long startingGrowthCount = GetOwnedCapacityGrowthCount(state);
             for (int index = 0; index < addedCapacity; index++)
             {
-                if (!TryCalculateUnitWoodCost(startingGrowthCount + index, out int unitCost)
+                if (!TryCalculateUnitWoodCost(startingGrowthCount + index, safeTuning,
+                        out int unitCost)
                     || totalCost > int.MaxValue - (long)unitCost)
                 {
                     woodCost = int.MaxValue;
@@ -90,21 +116,20 @@ namespace DeadWalls
             return true;
         }
 
-        private static bool TryCalculateUnitWoodCost(long ownedCapacityGrowthCount, out int woodCost)
+        private static bool TryCalculateUnitWoodCost(long ownedCapacityGrowthCount,
+            in MobileEconomyPriceTuning tuning, out int woodCost)
         {
             long growthCount = ownedCapacityGrowthCount < 0 ? 0 : ownedCapacityGrowthCount;
-            long scaleNumerator = CostGrowthCapacityInterval + growthCount;
-            long squaredScaleNumerator = scaleNumerator * scaleNumerator;
-            long scaleDenominator = (long)CostGrowthCapacityInterval * CostGrowthCapacityInterval;
-            long maximumRepresentableSquaredNumerator = (long)int.MaxValue * scaleDenominator / BaseWoodCost;
-            if (squaredScaleNumerator > maximumRepresentableSquaredNumerator)
+            decimal interval = tuning.BedCostGrowthCapacityInterval;
+            decimal scale = 1m + growthCount / interval;
+            decimal cost = tuning.BedBaseWoodCost * scale * scale;
+            if (cost > int.MaxValue)
             {
                 woodCost = int.MaxValue;
                 return false;
             }
 
-            long costNumerator = BaseWoodCost * squaredScaleNumerator;
-            woodCost = (int)((costNumerator + scaleDenominator - 1) / scaleDenominator);
+            woodCost = (int)decimal.Ceiling(cost);
             return true;
         }
     }

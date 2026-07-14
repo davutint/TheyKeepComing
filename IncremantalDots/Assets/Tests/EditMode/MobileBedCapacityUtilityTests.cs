@@ -99,5 +99,26 @@ namespace DeadWalls.Tests
                 out int unitCost), Is.False);
             Assert.That(unitCost, Is.EqualTo(int.MaxValue));
         }
+
+        [Test]
+        public void PurchaseWoodCost_UsesSanitizedProfileTuningAndRejectsExtremeCurveOverflow()
+        {
+            MobileBedCapacityState state = MobileBedCapacityUtility.CreateInitial(60);
+            var tuning = MobileEconomyPriceTuningUtility.Default;
+            tuning.BedBaseWoodCost = 200;
+            tuning.BedCostGrowthCapacityInterval = 10;
+
+            Assert.That(MobileBedCapacityUtility.GetNextPurchaseWoodCost(state, tuning),
+                Is.EqualTo(200));
+            state.PurchasedCapacity = 10;
+            Assert.That(MobileBedCapacityUtility.GetNextPurchaseWoodCost(state, tuning),
+                Is.EqualTo(800));
+
+            tuning.BedBaseWoodCost = int.MaxValue;
+            tuning.BedCostGrowthCapacityInterval = int.MaxValue;
+            Assert.That(MobileBedCapacityUtility.TryGetPurchaseWoodCost(
+                state, 1, tuning, out int overflowCost), Is.False);
+            Assert.That(overflowCost, Is.EqualTo(int.MaxValue));
+        }
     }
 }

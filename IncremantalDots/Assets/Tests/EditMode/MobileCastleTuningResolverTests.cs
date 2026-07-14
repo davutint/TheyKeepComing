@@ -139,5 +139,41 @@ namespace DeadWalls.Tests
                 Object.DestroyImmediate(profile);
             }
         }
+
+        [Test]
+        public void EconomyPriceTuning_UsesProfileValuesAndSanitizesInvalidInputs()
+        {
+            MobileEconomyPriceTuning fallback =
+                MobileCastleTuningResolver.ResolveEconomyPriceTuning(null);
+            Assert.That(fallback.BedBaseWoodCost, Is.EqualTo(100));
+            Assert.That(fallback.WorkerBuildingCostGrowthMultiplier, Is.EqualTo(1.35d));
+
+            var profile = ScriptableObject.CreateInstance<DifficultyProfileSO>();
+            try
+            {
+                profile.BedBaseWoodCost = 220;
+                profile.BedCostGrowthCapacityInterval = 0;
+                profile.WorkerCapacityBaseWoodCost = -5;
+                profile.WorkerCapacityBaseIronCost = 40;
+                profile.WorkerEfficiencyBaseWoodCost = 500;
+                profile.WorkerEfficiencyBaseIronCost = 0;
+                profile.WorkerBuildingCostGrowthMultiplier = double.NaN;
+
+                MobileEconomyPriceTuning tuning =
+                    MobileCastleTuningResolver.ResolveEconomyPriceTuning(profile);
+
+                Assert.That(tuning.BedBaseWoodCost, Is.EqualTo(220));
+                Assert.That(tuning.BedCostGrowthCapacityInterval, Is.EqualTo(1));
+                Assert.That(tuning.WorkerCapacityBaseWoodCost, Is.EqualTo(1));
+                Assert.That(tuning.WorkerCapacityBaseIronCost, Is.EqualTo(40));
+                Assert.That(tuning.WorkerEfficiencyBaseWoodCost, Is.EqualTo(500));
+                Assert.That(tuning.WorkerEfficiencyBaseIronCost, Is.EqualTo(1));
+                Assert.That(tuning.WorkerBuildingCostGrowthMultiplier, Is.EqualTo(1.35d));
+            }
+            finally
+            {
+                Object.DestroyImmediate(profile);
+            }
+        }
     }
 }

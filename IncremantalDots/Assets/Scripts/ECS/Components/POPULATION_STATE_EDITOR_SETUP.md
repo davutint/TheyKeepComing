@@ -31,7 +31,11 @@
 
 `NewGameScene/MobileCastleCombatSubScene` içindeki `MobileCastleConfig` objesi bu değerleri `60 / 15 / 1` olarak serialize eder. Aynı subscene'deki `GameStateAuthoring.InitialCapacity = 60` değeridir; eski `999999` mobile kapasite aynası kaldırılmıştır.
 
-Bed fiyatı şu anda `MobileBedCapacityUtility` içindeki onaylı `100 Wood`, `25 capacity interval`, quadratic eğri sabitleriyle hesaplanır. Bu katsayılar henüz Inspector alanı değildir; ortak fiyat eğrisi tuning yüzeyi tracker'daki ayrı Package C işinde kurulacaktır.
+Bed fiyatı `DefaultDifficulty.asset` içindeki `BedBaseWoodCost` ve
+`BedCostGrowthCapacityInterval` alanlarından gelir. Onaylı default `100 Wood` ve
+`25 owned bed interval` değeridir; quadratic eğri korunur. Bu alanlar
+`Window > DeadWalls > Difficulty Tuner > Ekonomi Fiyat Eğrileri` bölümünden ayarlanır
+ve Play Mode'da canlı uygulanabilir.
 
 ## Test Senaryolari
 

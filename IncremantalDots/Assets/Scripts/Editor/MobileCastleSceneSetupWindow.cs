@@ -1374,6 +1374,19 @@ namespace DeadWalls
             profile.MaxSpawnBatch = 16;
             // Erken kurtulus yolu: repair'in stone bagimliligi dusuruldu
             profile.RepairBaseStoneCost = 50;
+            profile.BedBaseWoodCost = MobileEconomyPriceTuningUtility.DefaultBedBaseWoodCost;
+            profile.BedCostGrowthCapacityInterval =
+                MobileEconomyPriceTuningUtility.DefaultBedCostGrowthCapacityInterval;
+            profile.WorkerCapacityBaseWoodCost =
+                MobileEconomyPriceTuningUtility.DefaultWorkerCapacityBaseWoodCost;
+            profile.WorkerCapacityBaseIronCost =
+                MobileEconomyPriceTuningUtility.DefaultWorkerCapacityBaseIronCost;
+            profile.WorkerEfficiencyBaseWoodCost =
+                MobileEconomyPriceTuningUtility.DefaultWorkerEfficiencyBaseWoodCost;
+            profile.WorkerEfficiencyBaseIronCost =
+                MobileEconomyPriceTuningUtility.DefaultWorkerEfficiencyBaseIronCost;
+            profile.WorkerBuildingCostGrowthMultiplier =
+                MobileEconomyPriceTuningUtility.DefaultWorkerBuildingCostGrowthMultiplier;
             AssetDatabase.CreateAsset(profile, DifficultyProfilePath);
             EditorUtility.SetDirty(profile);
             return profile;

@@ -62,5 +62,29 @@ namespace DeadWalls.Tests
             Assert.That(MobileWorkerBuildingUpgradeUtility.TryGetCostForLevel(
                 WorkerBuildingUpgradeType.Capacity, 1000, out _), Is.False);
         }
+
+        [Test]
+        public void CostCurve_UsesSanitizedProfileTuningForBothResources()
+        {
+            var tuning = MobileEconomyPriceTuningUtility.Default;
+            tuning.WorkerCapacityBaseWoodCost = 321;
+            tuning.WorkerCapacityBaseIronCost = 45;
+            tuning.WorkerEfficiencyBaseWoodCost = 654;
+            tuning.WorkerEfficiencyBaseIronCost = 87;
+            tuning.WorkerBuildingCostGrowthMultiplier = 2d;
+
+            Assert.That(MobileWorkerBuildingUpgradeUtility.TryGetCostForLevel(
+                WorkerBuildingUpgradeType.Capacity, 3, tuning, out var capacity), Is.True);
+            Assert.That(capacity.Wood, Is.EqualTo(2568));
+            Assert.That(capacity.Iron, Is.EqualTo(360));
+
+            tuning.WorkerEfficiencyBaseWoodCost = 0;
+            tuning.WorkerEfficiencyBaseIronCost = -10;
+            tuning.WorkerBuildingCostGrowthMultiplier = 0d;
+            Assert.That(MobileWorkerBuildingUpgradeUtility.TryGetCostForLevel(
+                WorkerBuildingUpgradeType.Efficiency, 2, tuning, out var sanitized), Is.True);
+            Assert.That(sanitized.Wood, Is.EqualTo(1));
+            Assert.That(sanitized.Iron, Is.EqualTo(1));
+        }
     }
 }

@@ -4,7 +4,13 @@
 
 Ek bir scene objesi gerekmez. `MobileCastleCombatAuthoring.Baker`, `MobileWorkerBuildingUpgradeState` component'ini mevcut mobile config entity'sine sıfır seviyelerle ekler.
 
-Başlangıç maliyetleri, `1.35` büyüme katsayısı, `+10` slot ve additive `+10%` değerleri bu pakette `MobileWorkerBuildingUpgradeUtility` sabitleridir. Inspector/SO tuning yüzeyi ayrı tracker işi olan `DW-C-TUNING-SURFACE` kapsamında açılacaktır.
+Başlangıç maliyetleri ve ortak büyüme katsayısı `DefaultDifficulty.asset` içindeki
+`Ekonomi Fiyat Eğrileri` alanlarından gelir. `Window > DeadWalls > Difficulty Tuner`
+penceresindeki aynı foldout Play Mode'da config entity'sine canlı uygulanabilir.
+
+Onaylı default maliyetler CAP için `100 Wood + 25 Iron`, EFF için
+`150 Wood + 50 Iron`, ortak büyüme için `1.35` değeridir. `+10` slot ve additive
+`+10%` etki büyüklüğü fiyat tuning'inden ayrı gameplay sözleşmesidir.
 
 ## HUD kurulumu
 

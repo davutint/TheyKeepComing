@@ -15,6 +15,8 @@ tek profil iterasyonuyla, KOD YAZMADAN tasindi).
      (erken oyun rampi burada), `ZombieHpMultByDay`, `SpawnBatchMultByDay`; `SampleDays` (60).
    - SKALERLER (config'e yazilir): kutle eskalasyonu (BaseHP/HpGrowth/Damage/Batch/
      MaxSpawnBatch/MaxAlive/interval'lar), faz intensity'leri, repair maliyetleri.
+   - EKONOMI FIYAT EGRILERI: House bed base/interval, worker CAP ve EFF icin ayri
+     Wood/Iron base maliyetleri, iki bina yatirimi icin ortak growth multiplier.
    - M-C HAZIRLIK ISKELETI (sistem henuz okumuyor, veri hazir): `SpawnTable`
      (gun -> dusman tipi agirliklari) + `SpecialNights` (her N gunde ozel gece).
 2. **ECS tasima — `DifficultyDaySample` buffer'i:** AnimationCurve Burst'e giremez;
@@ -30,6 +32,8 @@ tek profil iterasyonuyla, KOD YAZMADAN tasindi).
    - `WaveSpawnSystem` (continuous): batch'e gunun `SpawnBatchMult`'u.
 5. **`DifficultyTunerWindow`** (Window > DeadWalls > Difficulty Tuner):
    - Profil sec/inline duzenle (CurveField'lar dahil), Default olustur/bul.
+   - Ekonomi Fiyat Egrileri foldout'u ayni profil alanlarini duzenler; Play Mode Apply
+     baked `MobileEconomyPriceTuning` component'ini canli gunceller.
    - **Apply**: subscene authoring'e bagla (bake yolu) + play moddaysa CANLI uygula
      (config alanlari SetComponentData + buffer yeniden ornekleme).
    - **Run Bot**: profili canli uygular, RestartGame + Long Run Simulator'u baslatir
@@ -53,3 +57,5 @@ tek profil iterasyonuyla, KOD YAZMADAN tasindi).
   yoksa sonraki SetupScene kosusu ezer (bir kez yasandi).
 - Canli uygulama restart sonrasi config'i bake degerlerine dondurur; Tuner'in Run Bot'u
   bu yuzden restart'tan SONRA da ApplyProfileLive cagirir.
+- Fiyat alanlari sifir/negatif veya gecersiz girilirse resolver int-guvenli minimumlara
+  sanitize eder; runtime UI kendi ayri fiyat formulu tutmaz.

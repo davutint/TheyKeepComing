@@ -50,5 +50,5 @@ hedef kabul eder. Hedef degisikligi mevcut worker sayilarini aninda hareket etti
 Bu controller ekonomi veya dagitim hesaplamasi yapmaz. Source-of-truth
 `GameManager`, `WorkerAllocationUtility`, `PopulationState` ve
 `MobilePopulationAllocation`, `MobileWorkerBuildingUpgradeState` ve
-`MobileWorkerBuildingUpgradeUtility` tarafindadir. Drawer fiyat/effect hesabi yapmaz;
+`MobileEconomyPriceTuning` ve `MobileWorkerBuildingUpgradeUtility` tarafindadir. Drawer fiyat/effect hesabi yapmaz;
 yalniz GameManager API'sini gosterir ve cagirir.

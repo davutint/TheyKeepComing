@@ -55,5 +55,23 @@ namespace DeadWalls
                 BloodMoonIntensityMult = 1f
             };
         }
+
+        public static MobileEconomyPriceTuning ResolveEconomyPriceTuning(DifficultyProfileSO profile)
+        {
+            if (profile == null)
+                return MobileEconomyPriceTuningUtility.Default;
+
+            var tuning = new MobileEconomyPriceTuning
+            {
+                BedBaseWoodCost = profile.BedBaseWoodCost,
+                BedCostGrowthCapacityInterval = profile.BedCostGrowthCapacityInterval,
+                WorkerCapacityBaseWoodCost = profile.WorkerCapacityBaseWoodCost,
+                WorkerCapacityBaseIronCost = profile.WorkerCapacityBaseIronCost,
+                WorkerEfficiencyBaseWoodCost = profile.WorkerEfficiencyBaseWoodCost,
+                WorkerEfficiencyBaseIronCost = profile.WorkerEfficiencyBaseIronCost,
+                WorkerBuildingCostGrowthMultiplier = profile.WorkerBuildingCostGrowthMultiplier
+            };
+            return MobileEconomyPriceTuningUtility.Sanitize(tuning);
+        }
     }
 }

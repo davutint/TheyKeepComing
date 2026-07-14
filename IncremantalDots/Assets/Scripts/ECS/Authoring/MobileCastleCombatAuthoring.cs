@@ -266,6 +266,8 @@ namespace DeadWalls
                 MoatDormancyRules.ApplyV1(ref config);
                 AddComponent(entity, config);
 
+                AddComponent(entity, MobileCastleTuningResolver.ResolveEconomyPriceTuning(profile));
+
                 AddComponent(entity, MobileBedCapacityUtility.CreateInitial(authoring.InitialBedCapacity));
 
                 AddComponent(entity, new EconomyFocusState

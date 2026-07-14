@@ -76,6 +76,22 @@ namespace DeadWalls
         public int RepairBaseWoodCost = 120;
         public int RepairBaseStoneCost = 50;
 
+        [Header("Ekonomi Fiyat Egrileri (runtime tuning'e bake edilir)")]
+        [Min(1)] public int BedBaseWoodCost =
+            MobileEconomyPriceTuningUtility.DefaultBedBaseWoodCost;
+        [Min(1)] public int BedCostGrowthCapacityInterval =
+            MobileEconomyPriceTuningUtility.DefaultBedCostGrowthCapacityInterval;
+        [Min(1)] public int WorkerCapacityBaseWoodCost =
+            MobileEconomyPriceTuningUtility.DefaultWorkerCapacityBaseWoodCost;
+        [Min(1)] public int WorkerCapacityBaseIronCost =
+            MobileEconomyPriceTuningUtility.DefaultWorkerCapacityBaseIronCost;
+        [Min(1)] public int WorkerEfficiencyBaseWoodCost =
+            MobileEconomyPriceTuningUtility.DefaultWorkerEfficiencyBaseWoodCost;
+        [Min(1)] public int WorkerEfficiencyBaseIronCost =
+            MobileEconomyPriceTuningUtility.DefaultWorkerEfficiencyBaseIronCost;
+        [Min(1f)] public double WorkerBuildingCostGrowthMultiplier =
+            MobileEconomyPriceTuningUtility.DefaultWorkerBuildingCostGrowthMultiplier;
+
         [Header("Spawn Tablosu (M-C hazirlik — sistem HENUZ okumuyor)")]
         public SpawnTableEntry[] SpawnTable = new SpawnTableEntry[0];
 
