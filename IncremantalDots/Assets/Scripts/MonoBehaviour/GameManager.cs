@@ -57,7 +57,6 @@ namespace DeadWalls
         private static readonly ResourceCost FortifyCost = new ResourceCost(0, 50, 25, 0);
         private static readonly ResourceCost RallyCost = new ResourceCost(35, 0, 0, 45);
         private const int MobileInitialPopulation = 60;
-        private const int MobileInternalPopulationCapacity = 999999;
         private const int MobileInitialWoodWorkers = 20;
         private const int MobileInitialStoneWorkers = 10;
         private const int MobileInitialIronWorkers = 8;
@@ -1184,6 +1183,17 @@ namespace DeadWalls
             BedCapacity = state;
             OnGameStateChanged?.Invoke();
             return true;
+        }
+
+        public int GetLastAcceptedPopulationArrivalCount()
+        {
+            if (!TryGetMobileConfigEntity(out var mobileConfigEntity)
+                || !_entityManager.HasComponent<MobilePopulationAllocation>(mobileConfigEntity))
+                return 0;
+
+            return Mathf.Max(0,
+                _entityManager.GetComponentData<MobilePopulationAllocation>(mobileConfigEntity)
+                    .LastArrivalAcceptedCount);
         }
 
         public float GetDefensePercent()
@@ -4207,10 +4217,12 @@ namespace DeadWalls
             if (!_entityManager.HasComponent<MobileBedCapacityState>(mobileConfigEntity))
                 return;
 
+            int purchasedCapacity = Mathf.Max(0, save.PurchasedBedCapacity);
+            int minimumPopulationSafeBase = Mathf.Max(0, save.PopulationTotal - purchasedCapacity);
             var state = new MobileBedCapacityState
             {
-                BaseCapacity = Mathf.Max(0, save.BedBaseCapacity),
-                PurchasedCapacity = Mathf.Max(0, save.PurchasedBedCapacity)
+                BaseCapacity = Mathf.Max(Mathf.Max(0, save.BedBaseCapacity), minimumPopulationSafeBase),
+                PurchasedCapacity = purchasedCapacity
             };
             _entityManager.SetComponentData(mobileConfigEntity, state);
             BedCapacity = state;
@@ -4249,6 +4261,11 @@ namespace DeadWalls
                 ? _entityManager.GetComponentData<MobileCastleCombatConfig>(mobileConfigEntity)
                 : default;
             bool continuousSiege = mobileMode && mobileConfig.ContinuousSiegeEnabled;
+            int mobileInitialBedCapacity = mobileMode
+                ? (mobileConfig.InitialBedCapacity > 0
+                    ? mobileConfig.InitialBedCapacity
+                    : MobileBedCapacityUtility.DefaultInitialCapacity)
+                : 0;
 
             // Pool-owned zombileri rezerve geri dondur; legacy/non-pool entity kalirsa sil.
             if (_enemyPoolEntity != Entity.Null && _entityManager.Exists(_enemyPoolEntity))
@@ -4346,6 +4363,9 @@ namespace DeadWalls
                     AutoAllocationInitialized = 1,
                     LastPopulationGrowthWave = 0,
                     LastPopulationGrowthCycle = 0,
+                    LastArrivalRequestedCount = 0,
+                    LastArrivalAcceptedCount = 0,
+                    LastArrivalFoodCost = 0,
                     LastEventPrepWave = 0
                 };
                 WorkerAllocationUtility.InitializeTargetsFromCurrent(ref allocation);
@@ -4499,8 +4519,8 @@ namespace DeadWalls
                 Idle = mobileMode
                     ? MobileInitialPopulation - MobileInitialWoodWorkers - MobileInitialStoneWorkers - MobileInitialIronWorkers - MobileInitialFoodWorkers
                     : 10,
-                Capacity = mobileMode ? MobileInternalPopulationCapacity : 20,
-                BaseCapacity = mobileMode ? MobileInternalPopulationCapacity : 20,
+                Capacity = mobileMode ? mobileInitialBedCapacity : 20,
+                BaseCapacity = mobileMode ? mobileInitialBedCapacity : 20,
                 FoodPerAssignedPerMin = mobileMode ? 0.25f : 2f
             });
 

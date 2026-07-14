@@ -59,6 +59,7 @@ namespace DeadWalls
         public int OpeningBatchDelta;
         public int FinalBatchDelta;
         public int PopulationGrowthPerDayPrep;
+        public int FoodCostPerArrival;
         public int InitialBedCapacity;
         public int WoodWorkerCap;
         public int StoneWorkerCap;
@@ -198,6 +199,9 @@ namespace DeadWalls
         public byte AutoAllocationInitialized;
         public int LastPopulationGrowthWave;
         public int LastPopulationGrowthCycle;
+        public int LastArrivalRequestedCount;
+        public int LastArrivalAcceptedCount;
+        public int LastArrivalFoodCost;
         public int LastEventPrepWave;
     }
 

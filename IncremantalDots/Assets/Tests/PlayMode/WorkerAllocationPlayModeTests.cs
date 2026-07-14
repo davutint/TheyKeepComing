@@ -127,6 +127,80 @@ namespace DeadWalls.Tests
         }
 
         [UnityTest]
+        public IEnumerator DawnArrivalBudget_LimitsGrowthByBedsAndFoodWithoutSpendingFoodYet()
+        {
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            using EntityQuery mobileQuery = entityManager.CreateEntityQuery(
+                typeof(MobileCastleCombatConfig),
+                typeof(MobilePopulationAllocation),
+                typeof(MobileBedCapacityState),
+                typeof(ContinuousSiegeCycleData));
+            using EntityQuery populationQuery = entityManager.CreateEntityQuery(
+                typeof(PopulationState), typeof(ResourceData));
+            Entity mobileEntity = mobileQuery.GetSingletonEntity();
+            Entity populationEntity = populationQuery.GetSingletonEntity();
+
+            var config = entityManager.GetComponentData<MobileCastleCombatConfig>(mobileEntity);
+            config.PopulationGrowthPerDayPrep = 15;
+            config.FoodCostPerArrival = 1;
+            config.WoodWorkerProductionPerMin = 0f;
+            config.StoneWorkerProductionPerMin = 0f;
+            config.IronWorkerProductionPerMin = 0f;
+            config.FoodWorkerProductionPerMin = 0f;
+            entityManager.SetComponentData(mobileEntity, config);
+
+            entityManager.SetComponentData(mobileEntity, new MobileBedCapacityState
+            {
+                BaseCapacity = 65,
+                PurchasedCapacity = 0
+            });
+
+            var population = entityManager.GetComponentData<PopulationState>(populationEntity);
+            population.Total = 60;
+            population.Capacity = 65;
+            population.BaseCapacity = 65;
+            entityManager.SetComponentData(populationEntity, population);
+
+            var resources = entityManager.GetComponentData<ResourceData>(populationEntity);
+            resources.Food = 3;
+            entityManager.SetComponentData(populationEntity, resources);
+
+            var allocation = entityManager.GetComponentData<MobilePopulationAllocation>(mobileEntity);
+            allocation.LastObservedPopulation = population.Total;
+            allocation.AutoAllocationInitialized = 1;
+            allocation.LastPopulationGrowthCycle = 0;
+            allocation.LastArrivalRequestedCount = 0;
+            allocation.LastArrivalAcceptedCount = 0;
+            allocation.LastArrivalFoodCost = 0;
+            entityManager.SetComponentData(mobileEntity, allocation);
+
+            var cycle = entityManager.GetComponentData<ContinuousSiegeCycleData>(mobileEntity);
+            cycle.Enabled = true;
+            cycle.CycleIndex = 0;
+            cycle.CycleTimer = config.SiegeDayDuration + config.SiegeDuskDuration
+                + config.SiegeNightDuration + 0.5f;
+            cycle.Phase = SiegeCyclePhase.Dawn;
+            entityManager.SetComponentData(mobileEntity, cycle);
+
+            yield return null;
+            yield return null;
+
+            population = entityManager.GetComponentData<PopulationState>(populationEntity);
+            resources = entityManager.GetComponentData<ResourceData>(populationEntity);
+            allocation = entityManager.GetComponentData<MobilePopulationAllocation>(mobileEntity);
+
+            Assert.That(population.Total, Is.EqualTo(63));
+            Assert.That(population.Capacity, Is.EqualTo(65));
+            Assert.That(population.BaseCapacity, Is.EqualTo(65));
+            Assert.That(resources.Food, Is.EqualTo(3),
+                "Food harcamasi bir sonraki tracker isine kadar bu pakette uygulanmamali.");
+            Assert.That(allocation.LastPopulationGrowthCycle, Is.EqualTo(1));
+            Assert.That(allocation.LastArrivalRequestedCount, Is.EqualTo(15));
+            Assert.That(allocation.LastArrivalAcceptedCount, Is.EqualTo(3));
+            Assert.That(allocation.LastArrivalFoodCost, Is.EqualTo(3));
+        }
+
+        [UnityTest]
         public IEnumerator WorkerDrawer_TargetButtonsAndDirectInputChangeRatiosWithoutMovingWorkers()
         {
             WorkerEconomyDrawerUI drawer = Object.FindFirstObjectByType<WorkerEconomyDrawerUI>();

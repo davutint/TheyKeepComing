@@ -5,7 +5,7 @@ using UnityEngine;
 namespace DeadWalls
 {
     /// <summary>
-    /// DAWN odul toast'u: faz Dawn'a gectiginde bir kez "DAWN - DAY n SURVIVED +15 POP"
+    /// DAWN odul toast'u: faz Dawn'a gectiginde bir kez gercek kabul edilen population miktarini
     /// gosterir. Nufus odulu MobilePopulationEconomySystem tarafindan Dawn'da verilir;
     /// bu controller yalnizca o ani GORUNUR kilar (GDD 4-faz odul vurusu).
     /// </summary>
@@ -57,9 +57,7 @@ namespace DeadWalls
             if (ToastText == null)
                 return;
 
-            int growth = 15;
-            if (gm.TryGetMobileCombatConfig(out var config) && config.PopulationGrowthPerDayPrep > 0)
-                growth = config.PopulationGrowthPerDayPrep;
+            int growth = gm.GetLastAcceptedPopulationArrivalCount();
 
             int dayNumber = Mathf.Max(1, cycle.CycleIndex + 1);
             ToastText.text = $"DAWN — DAY {dayNumber} SURVIVED  ·  +{growth} POP";

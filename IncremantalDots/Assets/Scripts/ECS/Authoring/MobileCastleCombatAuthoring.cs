@@ -121,6 +121,7 @@ namespace DeadWalls
 
         [Header("Population Economy")]
         public int PopulationGrowthPerDayPrep = 15;
+        [Min(1)] public int FoodCostPerArrival = MobilePopulationArrivalUtility.DefaultFoodCostPerArrival;
         [Tooltip("Run baslangicindaki House yatak kapasitesi. Satin alinmis yataklar ayri run state'inde birikir.")]
         public int InitialBedCapacity = MobileBedCapacityUtility.DefaultInitialCapacity;
         public int InitialWoodWorkers = 20;
@@ -246,6 +247,7 @@ namespace DeadWalls
                     OpeningBatchDelta = authoring.OpeningBatchDelta,
                     FinalBatchDelta = authoring.FinalBatchDelta,
                     PopulationGrowthPerDayPrep = math.max(0, authoring.PopulationGrowthPerDayPrep),
+                    FoodCostPerArrival = math.max(1, authoring.FoodCostPerArrival),
                     InitialBedCapacity = math.max(0, authoring.InitialBedCapacity),
                     WoodWorkerCap = math.max(0, authoring.WoodWorkerCap),
                     StoneWorkerCap = math.max(0, authoring.StoneWorkerCap),
@@ -302,6 +304,9 @@ namespace DeadWalls
                     FoodWorkerCapacity = math.max(0, authoring.FoodWorkerCap),
                     LastPopulationGrowthWave = 0,
                     LastPopulationGrowthCycle = 0,
+                    LastArrivalRequestedCount = 0,
+                    LastArrivalAcceptedCount = 0,
+                    LastArrivalFoodCost = 0,
                     LastEventPrepWave = 0
                 };
                 WorkerAllocationUtility.InitializeTargetsFromCurrent(ref populationAllocation);

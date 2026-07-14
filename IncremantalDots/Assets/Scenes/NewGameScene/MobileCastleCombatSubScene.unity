@@ -290,6 +290,7 @@ MonoBehaviour:
   OpeningBatchDelta: -1
   FinalBatchDelta: 1
   PopulationGrowthPerDayPrep: 15
+  FoodCostPerArrival: 1
   InitialBedCapacity: 60
   InitialWoodWorkers: 20
   InitialStoneWorkers: 10
@@ -414,7 +415,7 @@ MonoBehaviour:
   TestIronConsRate: 0
   TestFoodConsRate: 0
   InitialPopulation: 60
-  InitialCapacity: 999999
+  InitialCapacity: 60
   TestWorkers: 53
   TestArchers: 4
   FoodPerAssignedPerMin: 0.25

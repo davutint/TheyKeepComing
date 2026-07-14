@@ -253,7 +253,7 @@ namespace DeadWalls
             gameStateAuthoring.TestIronProdRate = 30f;
             gameStateAuthoring.TestFoodProdRate = 105f;
             gameStateAuthoring.InitialPopulation = 60;
-            gameStateAuthoring.InitialCapacity = 999999;
+            gameStateAuthoring.InitialCapacity = MobileBedCapacityUtility.DefaultInitialCapacity;
             gameStateAuthoring.TestWorkers = 53;
             gameStateAuthoring.TestArchers = 4;
             gameStateAuthoring.FoodPerAssignedPerMin = 0.25f;
@@ -349,6 +349,7 @@ namespace DeadWalls
             mobileAuthoring.OpeningBatchDelta = -1;
             mobileAuthoring.FinalBatchDelta = 1;
             mobileAuthoring.PopulationGrowthPerDayPrep = 15;
+            mobileAuthoring.FoodCostPerArrival = MobilePopulationArrivalUtility.DefaultFoodCostPerArrival;
             mobileAuthoring.InitialBedCapacity = MobileBedCapacityUtility.DefaultInitialCapacity;
             mobileAuthoring.InitialWoodWorkers = 20;
             mobileAuthoring.InitialStoneWorkers = 10;

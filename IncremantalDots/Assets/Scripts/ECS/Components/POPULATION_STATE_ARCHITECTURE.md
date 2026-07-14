@@ -11,8 +11,8 @@
 | Workers | int | Binalara atanmis isci sayisi |
 | Archers | int | Egitilmis okcu sayisi |
 | Idle | int | Hesaplanan: Total - Workers - Archers (>=0) |
-| Capacity | int | Maksimum nufus kapasitesi (BaseCapacity + evler + kale bonusu) |
-| BaseCapacity | int | Bina/upgrade olmadan temel kapasite (bake: 20) |
+| Capacity | int | Mobile castle loop'ta sahip olunan toplam House yatak sayısı; legacy/non-mobile akışta bina + kale kapasitesi |
+| BaseCapacity | int | Mobile castle loop'ta run başlangıç yatak sayısı; legacy/non-mobile akışta bina/upgrade öncesi temel kapasite |
 | FoodPerAssignedPerMin | float | Atanmis kisi basina yemek tuketimi (dk basina) |
 
 ## Singleton Pattern
@@ -33,7 +33,21 @@ Toplam yatak `BaseCapacity + PurchasedCapacity` olarak `MobileBedCapacityUtility
 
 Bed state exact save `v5` içinde `BedBaseCapacity` ve `PurchasedBedCapacity` olarak saklanır. `v3/v4` kayıtları mevcut nüfusu geçersiz kılmayacak bir base bed değeriyle migrate edilir.
 
-Bu state henüz Dawn arrival ve `PopulationState.Capacity` hesabının aktif owner'ı değildir. Bed boşluğu + tek seferlik Food kabul bütçesi ayrı tracker maddesinde bağlanacaktır; bu nedenle legacy mobile `999999` kapasite aynası bu pakette bilerek kaldırılmamıştır.
+`MobilePopulationEconomySystem`, mobile castle loop'ta `PopulationState.BaseCapacity` ve `PopulationState.Capacity` aynalarını her frame bu bed state'ten senkronlar. Mobile authoring ve restart tabanı `60` yataktır; eski `999999` mobile kapasite aynası kaldırılmıştır.
+
+## Dawn Arrival Budget
+
+Her tamamlanan cycle için istenen survivor sayısı aşağıdaki saf bütçeyle sınırlandırılır:
+
+```text
+accepted = min(requestedDawnCount, totalBeds - currentPopulation, Food / FoodCostPerArrival)
+```
+
+- Varsayılan `requestedDawnCount = 15`.
+- Owner onaylı V1 değeri `FoodCostPerArrival = 1`.
+- Food yetersizse mevcut nüfus azalmaz; yalnız yeni arrival sayısı düşer.
+- `MobilePopulationAllocation`, son istenen/kabul edilen sayıyı ve kabul edilenler için gereken Food tutarını saklar.
+- Bu paket Food'u henüz harcamaz. Tek seferlik gerçek resource transaction'ı tracker'daki `DW-C-FOOD-SPEND` işidir.
 
 ## Nufus Modeli
 ```
@@ -43,21 +57,24 @@ Tum insanlar = TEK HAVUZ
   └─ Idle: Atanmamis, yemek tuketmez
 ```
 
-## Yemek Tuketimi Entegrasyonu
-Toplam yemek tuketimi = bina gideri + nufus gideri. Iki asamali hesaplanir:
-1. `BuildingPopulationSystem`: `FoodPerMin = toplam bina yemek gideri` (Ev'lerin FoodCostPerMin toplami)
-2. `PopulationTickSystem`: `FoodPerMin += assigned * FoodPerAssignedPerMin` (nufus kismi eklenir)
+## V1 Food Sözleşmesi
 
-- `assigned = Workers + Archers`
-- Idle bireyler yemek **tuketmez**
-- ResourceTickSystem guncel FoodPerMin ile tuketim hesaplar
+V1 castle loop'ta population pasif Food tüketmez; açlık, göç, population death ve üretim cezası yoktur. Food yalnız yeni Dawn survivor'ı kabul edilirken kişi başına bir kez kullanılacaktır. Legacy/non-mobile alan ve bina tüketim verileri uyumluluk için component'larda kalır, fakat mobile population sistemi bunları pasif nüfus giderine çevirmez.
 
 ## Kapasite Hesaplama
-`BuildingPopulationSystem` her frame hesaplar:
+
+Mobile castle loop'ta `MobilePopulationEconomySystem`, `BuildingPopulationSystem` sonrasında çalışır ve son kapasite owner'ı olarak bed state'i aynalar:
+
+```text
+Capacity = MobileBedCapacityState.BaseCapacity + PurchasedCapacity
+```
+
+Legacy/non-mobile akışta `BuildingPopulationSystem` mevcut hesabını korur:
+
 ```
 Capacity = BaseCapacity + evlerdenGelen + kaleUpgradeBonus
 ```
-- `BaseCapacity`: Baslangic degeri (20)
+- `BaseCapacity`: Legacy başlangıç değeri
 - `evlerdenGelen`: Tum PopulationProvider entity'lerinin CapacityAmount toplami
 - `kaleUpgradeBonus`: CastleUpgradeData.Level * CapacityPerLevel
 
@@ -67,6 +84,7 @@ Daha cok okcu = Daha az isci = Daha az kaynak uretimi (ve daha fazla yemek tuket
 ## Iliskili Dosyalar
 - `PopulationComponents.cs` — Component tanimi
 - `MobileBedCapacityUtility.cs` — Toplam/purchase increment, owned-capacity maliyet eğrisi, ardışık toplu fiyat ve int güvenlik kuralları
+- `MobilePopulationArrivalUtility.cs` — Dawn istek, boş yatak ve Food bütçesinden kabul edilen survivor sayısını hesaplayan saf sözleşme
 - `MobileCastleCombatAuthoring.cs` — Mobile başlangıç yatak state'i bake'i
 - `BuildingPopulationSystem.cs` — Kapasite + bina yemek gideri hesaplama
 - `PopulationTickSystem.cs` — Idle hesaplama + nufus yemek tuketimi (+=)

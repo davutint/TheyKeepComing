@@ -6,6 +6,8 @@ V1 Blueprint kararı: koşu yalnız Wall `0 HP` olduğunda biter. Oyuncu ana men
 
 `RunPersistence.cs` içindeki `RunSaveState` bu sözleşmenin disk şemasıdır. Güncel sürüm `v5`, desteklenen en eski sürüm `v3` tür. Eski v2 Dawn-checkpoint kayıtları exact state içermediği için Continue olarak gösterilmez. v3 exact snapshot'lar önce worker target-ratio state'iyle v4'e, ardından açık House bed state'iyle v5'e yükseltilir. v4 exact snapshot'lar mevcut population'ı karşılayan bir `BedBaseCapacity` ve sıfır purchased bed ile v5'e migrate edilir.
 
+Eski `v5` snapshot'larda bed state yazılmış olsa bile legacy bedelsiz growth nedeniyle population kayıtlı yataktan büyük olabilir. Restore bu durumda mevcut nüfusu silmez; `BedBaseCapacity` değerini population-safe minimuma yükseltir. Runtime'da `MobilePopulationEconomySystem`, `PopulationState.Capacity` aynasını restore edilen toplam yataktan yeniden kurar.
+
 Disk çıktısı compact JSON'dur. Pretty-print kullanılmaz; özellikle 10K combat snapshot'ında whitespace dosya boyutu ve senkron I/O maliyeti üretmemelidir. Bu yalnız fiziksel yazım biçimidir; `v5` alan şeması ve `JsonUtility` Continue uyumluluğu değişmez.
 
 ## Kayıt anları

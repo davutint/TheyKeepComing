@@ -7,6 +7,7 @@ namespace DeadWalls
     [BurstCompile]
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     [UpdateAfter(typeof(ArrowProductionSystem))]
+    [UpdateAfter(typeof(BuildingPopulationSystem))]
     [UpdateBefore(typeof(PopulationTickSystem))]
     public partial struct MobilePopulationEconomySystem : ISystem
     {
@@ -16,9 +17,11 @@ namespace DeadWalls
             state.RequireForUpdate<GameStateData>();
             state.RequireForUpdate<WaveStateData>();
             state.RequireForUpdate<MobileCastleCombatConfig>();
+            state.RequireForUpdate<MobileBedCapacityState>();
             state.RequireForUpdate<MobilePopulationAllocation>();
             state.RequireForUpdate<MobileEconomyEventState>();
             state.RequireForUpdate<PopulationState>();
+            state.RequireForUpdate<ResourceData>();
             state.RequireForUpdate<ResourceProductionRate>();
         }
 
@@ -31,20 +34,26 @@ namespace DeadWalls
                 return;
 
             var config = SystemAPI.GetSingleton<MobileCastleCombatConfig>();
+            var bedCapacity = SystemAPI.GetSingleton<MobileBedCapacityState>();
             var allocationRW = SystemAPI.GetSingletonRW<MobilePopulationAllocation>();
             var eventRW = SystemAPI.GetSingletonRW<MobileEconomyEventState>();
             var populationRW = SystemAPI.GetSingletonRW<PopulationState>();
             var productionRW = SystemAPI.GetSingletonRW<ResourceProductionRate>();
+            var resources = SystemAPI.GetSingleton<ResourceData>();
+
+            SyncBedCapacity(ref populationRW.ValueRW, bedCapacity);
 
             if (config.ContinuousSiegeEnabled && SystemAPI.HasSingleton<ContinuousSiegeCycleData>())
             {
                 var cycle = SystemAPI.GetSingleton<ContinuousSiegeCycleData>();
-                ApplyContinuousCycleGrowth(ref allocationRW.ValueRW, ref populationRW.ValueRW, config, cycle);
+                ApplyContinuousCycleGrowth(ref allocationRW.ValueRW, ref populationRW.ValueRW,
+                    config, cycle, bedCapacity, resources.Food);
                 ExpireContinuousEventEffects(ref eventRW.ValueRW, cycle);
             }
             else if (!wave.WaveActive && wave.Phase == RunPhaseType.DayPrep && wave.CurrentWave > 0)
             {
-                ApplyDayPrepStart(ref allocationRW.ValueRW, ref eventRW.ValueRW, ref populationRW.ValueRW, config, wave.CurrentWave);
+                ApplyDayPrepStart(ref allocationRW.ValueRW, ref eventRW.ValueRW,
+                    ref populationRW.ValueRW, config, wave.CurrentWave, bedCapacity, resources.Food);
             }
 
             SyncWorkerCapacities(ref allocationRW.ValueRW, config);
@@ -57,11 +66,13 @@ namespace DeadWalls
                 WorkerAllocationUtility.AutoAssignNewPopulation(ref allocationRW.ValueRW, assignable);
                 NormalizeAllocation(ref allocationRW.ValueRW, ref populationRW.ValueRW);
             }
+            SyncBedCapacity(ref populationRW.ValueRW, bedCapacity);
             WriteProductionRates(ref productionRW.ValueRW, allocationRW.ValueRO, eventRW.ValueRO, config);
         }
 
         private static void ApplyContinuousCycleGrowth(ref MobilePopulationAllocation allocation,
-            ref PopulationState population, MobileCastleCombatConfig config, ContinuousSiegeCycleData cycle)
+            ref PopulationState population, MobileCastleCombatConfig config, ContinuousSiegeCycleData cycle,
+            MobileBedCapacityState bedCapacity, int availableFood)
         {
             if (!cycle.Enabled)
                 return;
@@ -89,9 +100,7 @@ namespace DeadWalls
                 allocation.LastPopulationGrowthCycle = cycle.CycleIndex;
             }
 
-            population.Total += math.max(0, config.PopulationGrowthPerDayPrep);
-            population.Capacity = math.max(population.Capacity, population.Total);
-            population.BaseCapacity = math.max(population.BaseCapacity, population.Capacity);
+            ApplyArrivalBudget(ref allocation, ref population, config, bedCapacity, availableFood);
         }
 
         /// <summary>
@@ -121,13 +130,12 @@ namespace DeadWalls
 
         private static void ApplyDayPrepStart(ref MobilePopulationAllocation allocation,
             ref MobileEconomyEventState economyEvent, ref PopulationState population,
-            MobileCastleCombatConfig config, int currentWave)
+            MobileCastleCombatConfig config, int currentWave,
+            MobileBedCapacityState bedCapacity, int availableFood)
         {
             if (allocation.LastPopulationGrowthWave != currentWave)
             {
-                population.Total += math.max(0, config.PopulationGrowthPerDayPrep);
-                population.Capacity = math.max(population.Capacity, population.Total);
-                population.BaseCapacity = math.max(population.BaseCapacity, population.Capacity);
+                ApplyArrivalBudget(ref allocation, ref population, config, bedCapacity, availableFood);
                 allocation.LastPopulationGrowthWave = currentWave;
             }
 
@@ -158,6 +166,30 @@ namespace DeadWalls
             economyEvent.PendingEvent = PickEvent(economyEvent.RandomSeed, currentWave);
             economyEvent.EventWave = currentWave;
             economyEvent.CooldownWavesRemaining = math.max(0, config.EconomyEventCooldownWaves);
+        }
+
+        private static void ApplyArrivalBudget(ref MobilePopulationAllocation allocation,
+            ref PopulationState population, MobileCastleCombatConfig config,
+            MobileBedCapacityState bedCapacity, int availableFood)
+        {
+            MobilePopulationArrivalBudget budget = MobilePopulationArrivalUtility.CalculateBudget(
+                config.PopulationGrowthPerDayPrep,
+                population.Total,
+                MobileBedCapacityUtility.GetTotalCapacity(bedCapacity),
+                availableFood,
+                config.FoodCostPerArrival);
+
+            allocation.LastArrivalRequestedCount = budget.RequestedArrivals;
+            allocation.LastArrivalAcceptedCount = budget.AcceptedArrivals;
+            allocation.LastArrivalFoodCost = budget.RequiredFood;
+            population.Total += budget.AcceptedArrivals;
+        }
+
+        private static void SyncBedCapacity(ref PopulationState population,
+            MobileBedCapacityState bedCapacity)
+        {
+            population.BaseCapacity = math.max(0, bedCapacity.BaseCapacity);
+            population.Capacity = MobileBedCapacityUtility.GetTotalCapacity(bedCapacity);
         }
 
         private static bool ShouldRollEvent(uint seed, int currentWave, float chance)
@@ -215,8 +247,6 @@ namespace DeadWalls
             population.Workers = totalWorkers;
             population.Idle = math.max(0, population.Total - population.Workers - population.Archers);
             allocation.IdlePopulation = population.Idle;
-            population.Capacity = math.max(population.Capacity, population.Total);
-            population.BaseCapacity = math.max(population.BaseCapacity, population.Capacity);
         }
 
         private static int ClampWorkerCount(int value, int cap)
