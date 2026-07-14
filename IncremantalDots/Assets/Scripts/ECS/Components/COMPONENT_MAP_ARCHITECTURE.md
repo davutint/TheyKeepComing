@@ -49,7 +49,8 @@ Tum component'lar unmanaged ECS struct olarak tutulur. Davranis sistemlerde, ver
 - `WaveClearRewardData`: son wave clear bonusunu HUD feedback'i icin saklar.
 - `CastleYardPrepState`: `Fortify` ve `Rally` tek-gecelik prep buff state'ini tutar.
 - `MobilePopulationAllocation`: Wood/Stone/Iron/Food actual worker sayilarini, `10.000` basis-point target ratio'larini, etkin cap ve idle aynalarini, population auto-allocation/growth checkpoint'lerini ve son Dawn için requested/accepted/Food budget sonucunu tutar.
-- `MobileBedCapacityState`: Run başlangıç yatak kapasitesi ile satın alınmış ek yatak sayısını ayrı tutar; toplam sahiplik `60` tabanından sonra quadratic Wood maliyetini büyütür, gameplay hard max yoktur ve exact save `v5` kapsamındadır.
+- `MobileBedCapacityState`: Run başlangıç yatak kapasitesi ile satın alınmış ek yatak sayısını ayrı tutar; toplam sahiplik `60` tabanından sonra quadratic Wood maliyetini büyütür, gameplay hard max yoktur ve exact save `v6` kapsamındadır.
+- `MobileWorkerBuildingUpgradeState`: Hazır Wood/Stone/Iron/Food worker binalarının bağımsız Capacity/Efficiency seviyelerini tutar. Capacity seviye başına `+10` slot, Efficiency baz kişi üretimine additive `+10%` verir; exact save `v6` kapsamındadır.
 - `ArcherSlotPosition`: legacy/manual pozisyon buffer'i. NewGameScene mobile tilemap spawn akisi bunu kullanmaz.
 
 ## CastleInteriorWorkerComponents.cs
@@ -75,7 +76,7 @@ Tum component'lar unmanaged ECS struct olarak tutulur. Davranis sistemlerde, ver
 ## Mobile Castle Mode Akisi
 
 ```
-MobileCastleCombatAuthoring -> MobileCastleCombatConfig + MobileBedCapacityState + ContinuousSiegeCycleData + EconomyFocusState + WaveClearRewardData + CastleYardPrepState + ArcherSlotPosition buffer bake eder
+MobileCastleCombatAuthoring -> MobileCastleCombatConfig + MobileBedCapacityState + MobileWorkerBuildingUpgradeState + ContinuousSiegeCycleData + EconomyFocusState + WaveClearRewardData + CastleYardPrepState + ArcherSlotPosition buffer bake eder
 ContinuousSiegeCycleSystem -> 60s DAY/DUSK/NIGHT cycle, horde pressure ve spawn intensity yazar
 DayNightPrepSystem -> Continuous siege kapaliysa legacy DayPrep sayacini azaltir
 WaveSpawnSystem -> Config varsa kale etrafindaki random 360 spawn cemberini ve continuous intensity ritmini kullanir
@@ -84,6 +85,7 @@ BoundarySystem -> Config varsa AttackRadius icinde Attacking state'e gecirir
 GameManager.BuyArcher(type) -> main scene `Grid/outside` tilemap hucrelerine okcu spawn eder
 MobilePopulationAllocation actual count -> WorkerVisualRepresentationUtility -> GameManager temsili DOTS villager count + exact weight sync -> WorkerLogisticsMovementSystem animation/cargo/fener/teslimat feedback
 GameManager.TryBuyBedCapacity -> MobileBedCapacityUtility owned-capacity sıralı fiyatı -> Wood transaction -> MobileBedCapacityState.PurchasedCapacity
+GameManager.TryBuyWorkerBuildingUpgrade -> Wood + Iron transaction -> bağımsız bina seviyesi -> base + Heart + Council + Meta + bina config aggregate'i
 MobilePopulationEconomySystem -> MobileBedCapacityState kapasite aynası -> MobilePopulationArrivalUtility bed + Food kabul bütçesi -> accepted population growth + tek seferlik ResourceData.Food transaction
 MobilePopulationAllocation yeni growth marker + accepted count -> GameManager VillagerWorker arrival spawn -> SurvivorArrivalVisualSystem sağdan Wall arkasına yürüyüş + varışta destroy
 GameManager.BuyFortify()/BuyRally() -> CastleYardPrepState uzerine tek-gecelik buff yazar

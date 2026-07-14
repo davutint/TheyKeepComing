@@ -74,7 +74,7 @@ SubScene:
 - `MarketUI`: `ArcherDrawerPanel`, `DrawerToggleButton`, Basic/Rapid/Frost row text ve buy button alanlari bagli
 - `MarketUI`: Upgrade butonlari, `ArrowTechPanel`, tech unlock butonlari ve repair/prep butonlari prefabda varsa gizli
 - `CastleEconomyUI`: legacy full-screen panel bindingleri bagli kalabilir ama `PlayerFacingPanelEnabled = false`; `CastleEconomyPanel` ve `CastleTapHint` player-facing kapali tutulur
-- `WorkerEconomyDrawerUI`: sol ust worker drawer toggle/panel, summary alanlari ve Wood/Stone/Iron/Food `+ WORKER` butonlari bagli
+- `WorkerEconomyDrawerUI`: sol ust worker drawer toggle/panel, summary alanlari, Wood/Stone/Iron/Food target kontrolleri ve `CAP / EFF` bina yatirim butonlari bagli
 - `CastleInteriorWorkerPlacement`: Wood/Stone/Iron/Food pickup root'lari ve `CastleWorkerHub/DeliveryPoints` delivery root'u bagli
 - `GameManager`: test icin `Free Economy Test Mode` acilirsa archer buy ve legacy/debug upgrade/unlock/prep API'leri kaynak/population harcamadan calisir; sag drawer player-facing yalnizca buy kullanir
 - `CastleTapHint`, `EconomyEventBadge` ve opsiyonel glow objelerinin raycast target'lari kapatilir; eski castle tap akisi player-facing kullanilmaz
@@ -101,7 +101,8 @@ pipeline'i 2026-07-06'da kaldirildi.) Setup tool asagidaki isimleri exact-match 
 - Beklenen drawer title: `DrawerTitleText` (`ARCHER RECRUITMENT` olarak normalize edilir)
 - Economy focus objeleri artik opsiyoneldir ve setup tool tarafindan gizlenir
 - Beklenen Worker Drawer: `WorkerDrawerToggleButton`, `WorkerEconomyDrawerPanel`, `WorkerDrawerTitleText`, `WorkerIdlePopulationText`, `WorkerTotalText`, `WorkerArcherPopulationText`
-- Beklenen Worker Drawer row alanlari: `WoodWorkerCountText`, `WoodWorkerRateText`, `WoodWorkerAddButton`, `WoodWorkerStatusText`; ayni pattern `Stone`, `Iron`, `Food`
+- Beklenen Worker Drawer row alanlari: `WoodWorkerCountText`, `WoodWorkerRateText`, `WoodWorkerAddButton`, `WoodWorkerTargetPlus10Button`, `WoodWorkerTargetPlus100Button`, `WoodWorkerTargetInput`, `WoodWorkerStatusText`, `WoodCapacityUpgradeButton`, `WoodEfficiencyUpgradeButton`; ayni pattern `Stone`, `Iron`, `Food`
+- `Window > DeadWalls > Repair Worker Drawer Target Controls`, generated prefabdaki sekiz bina yatirim butonunu idempotent kurar ve aktif `NewGameScene` runtime component referanslarini baglar.
 - Legacy Castle Interior paneli varsa baglanabilir ama player-facing ana ekonomi UI'i degildir: `CastleEconomyPanel`, `CastleInteriorImage`, `CloseCastleEconomyButton`, `ConfirmCastleEconomyButton`, `CastleTapHint`, `CastleTapHintText`
 - Beklenen population alanlari: `PopulationTotalText`, `PopulationIdleText`, `PopulationArchersText`, `PopulationGrowthText`, `WorkerBudgetText`
 - Beklenen worker alanlari: `WoodWorkerSlider`, `StoneWorkerSlider`, `IronWorkerSlider`, `FoodWorkerSlider`, `WoodWorkerText`, `StoneWorkerText`, `IronWorkerText`, `FoodWorkerText`, `WoodRateText`, `StoneRateText`, `IronRateText`, `FoodRateText`

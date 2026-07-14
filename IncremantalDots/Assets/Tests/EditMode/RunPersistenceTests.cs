@@ -41,6 +41,14 @@ namespace DeadWalls.Tests
                 Food = 77,
                 ArrowCurrent = 456,
                 ArrowAccumulator = 0.75f,
+                WoodBuildingCapacityLevel = 3,
+                WoodBuildingEfficiencyLevel = 4,
+                StoneBuildingCapacityLevel = 5,
+                StoneBuildingEfficiencyLevel = 6,
+                IronBuildingCapacityLevel = 7,
+                IronBuildingEfficiencyLevel = 8,
+                FoodBuildingCapacityLevel = 9,
+                FoodBuildingEfficiencyLevel = 10,
                 WallCurrentHP = 187.5f,
                 FireballCooldownRemaining = 12.5f,
                 RallyTimer = 4.25f,
@@ -103,6 +111,14 @@ namespace DeadWalls.Tests
             Assert.That(restored.TotalBudgetSpawnedEnemies, Is.EqualTo(1157));
             Assert.That(restored.DayBaseSpawnInterval, Is.EqualTo(0.42f));
             Assert.That(restored.ArrowCurrent, Is.EqualTo(456));
+            Assert.That(restored.WoodBuildingCapacityLevel, Is.EqualTo(3));
+            Assert.That(restored.WoodBuildingEfficiencyLevel, Is.EqualTo(4));
+            Assert.That(restored.StoneBuildingCapacityLevel, Is.EqualTo(5));
+            Assert.That(restored.StoneBuildingEfficiencyLevel, Is.EqualTo(6));
+            Assert.That(restored.IronBuildingCapacityLevel, Is.EqualTo(7));
+            Assert.That(restored.IronBuildingEfficiencyLevel, Is.EqualTo(8));
+            Assert.That(restored.FoodBuildingCapacityLevel, Is.EqualTo(9));
+            Assert.That(restored.FoodBuildingEfficiencyLevel, Is.EqualTo(10));
             Assert.That(restored.ActiveCouncilEvent.TemplateId, Is.EqualTo("council_test"));
             Assert.That(restored.ActiveCouncilEvent.OptionA.Effects.Count, Is.EqualTo(1));
             Assert.That(restored.ActiveCouncilEvent.OptionA.Effects[0].Amount, Is.EqualTo(50));
@@ -160,7 +176,7 @@ namespace DeadWalls.Tests
         }
 
         [Test]
-        public void TryLoad_Version3Snapshot_MigratesWorkerAllocationAndBedStateToVersion5()
+        public void TryLoad_Version3Snapshot_MigratesWorkerAllocationBedAndBuildingStateToVersion6()
         {
             string path = Path.Combine(Application.persistentDataPath, "run_save.json");
             byte[] original = File.Exists(path) ? File.ReadAllBytes(path) : null;
@@ -183,7 +199,7 @@ namespace DeadWalls.Tests
                 RunSaveState restored = RunPersistence.TryLoad();
 
                 Assert.That(restored, Is.Not.Null);
-                Assert.That(restored.Version, Is.EqualTo(5));
+                Assert.That(restored.Version, Is.EqualTo(6));
                 Assert.That(restored.WoodWorkerTargetRatioBps, Is.EqualTo(3774));
                 Assert.That(restored.StoneWorkerTargetRatioBps, Is.EqualTo(1887));
                 Assert.That(restored.IronWorkerTargetRatioBps, Is.EqualTo(1509));
@@ -192,6 +208,8 @@ namespace DeadWalls.Tests
                 Assert.That(restored.LastObservedPopulation, Is.EqualTo(60));
                 Assert.That(restored.BedBaseCapacity, Is.EqualTo(60));
                 Assert.That(restored.PurchasedBedCapacity, Is.Zero);
+                Assert.That(restored.WoodBuildingCapacityLevel, Is.Zero);
+                Assert.That(restored.FoodBuildingEfficiencyLevel, Is.Zero);
             }
             finally
             {
@@ -223,9 +241,47 @@ namespace DeadWalls.Tests
                 RunSaveState restored = RunPersistence.TryLoad();
 
                 Assert.That(restored, Is.Not.Null);
-                Assert.That(restored.Version, Is.EqualTo(5));
+                Assert.That(restored.Version, Is.EqualTo(6));
                 Assert.That(restored.BedBaseCapacity, Is.EqualTo(135));
                 Assert.That(restored.PurchasedBedCapacity, Is.Zero);
+                Assert.That(restored.IronBuildingEfficiencyLevel, Is.Zero);
+            }
+            finally
+            {
+                if (original != null)
+                    File.WriteAllBytes(path, original);
+                else if (File.Exists(path))
+                    File.Delete(path);
+            }
+        }
+
+        [Test]
+        public void TryLoad_Version5Snapshot_MigratesToCleanWorkerBuildingLevels()
+        {
+            string path = Path.Combine(Application.persistentDataPath, "run_save.json");
+            byte[] original = File.Exists(path) ? File.ReadAllBytes(path) : null;
+            var legacy = new RunSaveState
+            {
+                Version = 5,
+                RunId = "run_v5_building_migration_" + Guid.NewGuid().ToString("N")
+            };
+
+            try
+            {
+                File.WriteAllText(path, JsonUtility.ToJson(legacy));
+
+                RunSaveState restored = RunPersistence.TryLoad();
+
+                Assert.That(restored, Is.Not.Null);
+                Assert.That(restored.Version, Is.EqualTo(6));
+                Assert.That(restored.WoodBuildingCapacityLevel, Is.Zero);
+                Assert.That(restored.WoodBuildingEfficiencyLevel, Is.Zero);
+                Assert.That(restored.StoneBuildingCapacityLevel, Is.Zero);
+                Assert.That(restored.StoneBuildingEfficiencyLevel, Is.Zero);
+                Assert.That(restored.IronBuildingCapacityLevel, Is.Zero);
+                Assert.That(restored.IronBuildingEfficiencyLevel, Is.Zero);
+                Assert.That(restored.FoodBuildingCapacityLevel, Is.Zero);
+                Assert.That(restored.FoodBuildingEfficiencyLevel, Is.Zero);
             }
             finally
             {

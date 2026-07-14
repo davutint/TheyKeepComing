@@ -11,6 +11,7 @@
 - Pozitif target'larin cap'i doldugunda dagitilamayan kisileri Idle Population'da birakir.
 - `PopulationState.Workers` ve `PopulationState.Idle` degerlerini allocation + archer sayisina gore gunceller.
 - `ResourceProductionRate` degerlerini worker sayisi x worker production tuning olarak yazar.
+- Etkin worker cap ve kisi basi production tuning'ini `GameManager`in base + Heart + Council + Meta + worker-building aggregate'i yazdigi `MobileCastleCombatConfig` uzerinden tuketir; bina seviyesini burada ikinci kez uygulamaz.
 - Continuous siege aciksa her tamamlanan 60 saniyelik cycle basina bir kez Dawn arrival bütçesi uygular.
 - Legacy DayPrep akisinda her completed wave sonrasi `DayPrep` basinda aynı arrival bütçesini uygular.
 - İstenen arrival'ı boş yatak ve mevcut Food / kişi maliyetiyle sınırlar; requested/accepted/required Food sonucunu allocation state'e yazar.
@@ -64,5 +65,6 @@ V1 eventleri geneldir: resource stash, quarry crew, refugee cart. UI metinleri `
 - `MobilePopulationArrivalUtilityTests`: istek, yatak, Food ve int sınırları için saf EditMode bütçe sözleşmesi.
 - Yeni population, cap ve idle overflow: gerçek `NewGameScene` PlayMode.
 - `WorkerAllocationPlayModeTests.DawnArrivalTransaction_SpendsFoodOnceForAcceptedSurvivors`: Food-limitli kabul, gerçek capacity aynası, iki frame boyunca tek transaction, arrival entity izolasyonu ve varış cleanup doğrulaması.
+- `WorkerAllocationPlayModeTests.WorkerDrawer_TargetControlsAndBuildingUpgradesUseBoundRuntimeState`: building cap/efficiency aggregate'inin bu sistemin tukettigi config'e dogru yansimasi.
 - `SurvivorArrivalVisualUtilityTests`: visual cap, exact represented survivor toplamı ve deterministik lane/hız/gecikme sözleşmesi.
 - Actual worker, target ratio, Food ve persistent growth marker save/Continue: `ExactRunContinuePlayModeTests`.

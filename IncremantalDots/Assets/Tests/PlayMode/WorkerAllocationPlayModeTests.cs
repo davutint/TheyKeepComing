@@ -244,7 +244,7 @@ namespace DeadWalls.Tests
         }
 
         [UnityTest]
-        public IEnumerator WorkerDrawer_TargetButtonsAndDirectInputChangeRatiosWithoutMovingWorkers()
+        public IEnumerator WorkerDrawer_TargetControlsAndBuildingUpgradesUseBoundRuntimeState()
         {
             WorkerEconomyDrawerUI drawer = Object.FindFirstObjectByType<WorkerEconomyDrawerUI>();
             Assert.That(drawer, Is.Not.Null);
@@ -252,6 +252,8 @@ namespace DeadWalls.Tests
             Assert.That(drawer.WoodWorkerTargetPlus10Button, Is.Not.Null);
             Assert.That(drawer.WoodWorkerTargetPlus100Button, Is.Not.Null);
             Assert.That(drawer.WoodWorkerTargetInput, Is.Not.Null);
+            Assert.That(drawer.WoodCapacityUpgradeButton, Is.Not.Null);
+            Assert.That(drawer.WoodEfficiencyUpgradeButton, Is.Not.Null);
 
             EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             using EntityQuery allocationQuery = entityManager.CreateEntityQuery(
@@ -295,6 +297,29 @@ namespace DeadWalls.Tests
             Assert.That(afterPlusHundred.IronTargetRatioBps, Is.Zero);
             Assert.That(afterPlusHundred.FoodTargetRatioBps, Is.Zero);
             AssertWorkerCountsEqual(before, afterPlusHundred);
+
+            Entity resourceEntity = entityManager.CreateEntityQuery(typeof(ResourceData)).GetSingletonEntity();
+            var resources = entityManager.GetComponentData<ResourceData>(resourceEntity);
+            resources.Wood = 1_000;
+            resources.Iron = 1_000;
+            entityManager.SetComponentData(resourceEntity, resources);
+
+            var configBefore = entityManager.GetComponentData<MobileCastleCombatConfig>(allocationEntity);
+            drawer.WoodCapacityUpgradeButton.onClick.Invoke();
+            drawer.WoodEfficiencyUpgradeButton.onClick.Invoke();
+            yield return null;
+
+            var upgrades = entityManager.GetComponentData<MobileWorkerBuildingUpgradeState>(allocationEntity);
+            var configAfter = entityManager.GetComponentData<MobileCastleCombatConfig>(allocationEntity);
+            var resourcesAfter = entityManager.GetComponentData<ResourceData>(resourceEntity);
+            Assert.That(upgrades.WoodCapacityLevel, Is.EqualTo(1));
+            Assert.That(upgrades.WoodEfficiencyLevel, Is.EqualTo(1));
+            Assert.That(upgrades.StoneCapacityLevel, Is.Zero);
+            Assert.That(configAfter.WoodWorkerCap, Is.EqualTo(configBefore.WoodWorkerCap + 10));
+            Assert.That(configAfter.WoodWorkerProductionPerMin - configBefore.WoodWorkerProductionPerMin,
+                Is.EqualTo(0.8f).Within(0.001f));
+            Assert.That(resourcesAfter.Wood, Is.EqualTo(750));
+            Assert.That(resourcesAfter.Iron, Is.EqualTo(925));
         }
 
         [UnityTest]

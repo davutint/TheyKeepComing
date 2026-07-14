@@ -312,6 +312,8 @@ namespace DeadWalls
                 WorkerAllocationUtility.InitializeTargetsFromCurrent(ref populationAllocation);
                 AddComponent(entity, populationAllocation);
 
+                AddComponent(entity, new MobileWorkerBuildingUpgradeState());
+
                 AddComponent(entity, new MobilePrepPauseState
                 {
                     IsPaused = false

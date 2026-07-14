@@ -75,7 +75,32 @@ namespace DeadWalls
         {
             EnsureWorkerDrawerTargetControlsInPrefab();
             AssetDatabase.ImportAsset(GeneratedHudPrefabPath, ImportAssetOptions.ForceUpdate);
-            Debug.Log("[MobileCastleSceneSetup] Worker drawer target controls repaired.");
+
+            Scene activeScene = SceneManager.GetActiveScene();
+            bool sceneRepaired = false;
+            if (activeScene.IsValid() && activeScene.path == TargetScenePath)
+            {
+                foreach (GameObject root in activeScene.GetRootGameObjects())
+                {
+                    var workerDrawer = root.GetComponentInChildren<WorkerEconomyDrawerUI>(true);
+                    if (workerDrawer == null)
+                        continue;
+
+                    EnsureWorkerDrawerTargetControls(workerDrawer.gameObject);
+                    ConfigureWorkerEconomyDrawer(workerDrawer.gameObject);
+                    sceneRepaired = true;
+                }
+
+                if (sceneRepaired)
+                {
+                    EditorSceneManager.MarkSceneDirty(activeScene);
+                    EditorSceneManager.SaveScene(activeScene);
+                }
+            }
+
+            Debug.Log(sceneRepaired
+                ? "[MobileCastleSceneSetup] Worker drawer target + building upgrade controls prefab ve sahnede onarildi."
+                : "[MobileCastleSceneSetup] Worker drawer controls prefabda onarildi; NewGameScene aktif olmadigi icin sahne degismedi.");
         }
 
         private void OnGUI()
@@ -3050,24 +3075,32 @@ namespace DeadWalls
             GameObject root = PrefabUtility.LoadPrefabContents(GeneratedHudPrefabPath);
             try
             {
-                GameObject panelObject = FindChildByName(root, "WorkerEconomyDrawerPanel");
-                if (panelObject == null)
-                    throw new InvalidOperationException("WorkerEconomyDrawerPanel prefab icinde bulunamadi.");
-
-                var panelRect = panelObject.GetComponent<RectTransform>();
-                panelRect.sizeDelta = new Vector2(620f, panelRect.sizeDelta.y);
-                panelRect.anchoredPosition = new Vector2(-600f, panelRect.anchoredPosition.y);
-
-                string[] prefixes = { "Wood", "Stone", "Iron", "Food" };
-                foreach (string prefix in prefixes)
-                    EnsureWorkerDrawerTargetRow(panelObject, prefix);
-
+                EnsureWorkerDrawerTargetControls(root);
+                // Runtime component sahnede otoriter olarak ekleniyor. Prefabda ikinci bir
+                // WorkerEconomyDrawerUI birakmak scene instance'inda cift listener uretir.
+                DestroyComponentIfExists<WorkerEconomyDrawerUI>(root);
                 PrefabUtility.SaveAsPrefabAsset(root, GeneratedHudPrefabPath);
             }
             finally
             {
                 PrefabUtility.UnloadPrefabContents(root);
             }
+        }
+
+        private static void EnsureWorkerDrawerTargetControls(GameObject hudRoot)
+        {
+            GameObject panelObject = FindChildByName(hudRoot, "WorkerEconomyDrawerPanel");
+            if (panelObject == null)
+                throw new InvalidOperationException("WorkerEconomyDrawerPanel bulunamadi.");
+
+            var panelRect = panelObject.GetComponent<RectTransform>();
+            panelRect.sizeDelta = new Vector2(980f, panelRect.sizeDelta.y);
+            // Eski sol kenar (50 px) korunur; panel yalniz saga dogru genisler.
+            panelRect.anchoredPosition = new Vector2(-420f, panelRect.anchoredPosition.y);
+
+            string[] prefixes = { "Wood", "Stone", "Iron", "Food" };
+            foreach (string prefix in prefixes)
+                EnsureWorkerDrawerTargetRow(panelObject, prefix);
         }
 
         private static void EnsureWorkerDrawerTargetRow(GameObject panelObject, string prefix)
@@ -3081,7 +3114,7 @@ namespace DeadWalls
                 throw new InvalidOperationException(prefix + " worker row gerekli legacy kontrolleri icermiyor.");
 
             var rowRect = rowObject.GetComponent<RectTransform>();
-            rowRect.sizeDelta = new Vector2(596f, rowRect.sizeDelta.y);
+            rowRect.sizeDelta = new Vector2(956f, rowRect.sizeDelta.y);
 
             Button plus10Button = FindComponentInChildrenByName<Button>(panelObject,
                 prefix + "WorkerTargetPlus10Button");
@@ -3106,17 +3139,39 @@ namespace DeadWalls
             if (targetInput == null)
                 targetInput = CreateWorkerTargetInput(rowObject.transform, prefix, statusText);
 
+            Button capacityButton = FindComponentInChildrenByName<Button>(panelObject,
+                prefix + "CapacityUpgradeButton");
+            if (capacityButton == null)
+            {
+                GameObject clone = Instantiate(plus1Button.gameObject, rowObject.transform);
+                clone.name = prefix + "CapacityUpgradeButton";
+                capacityButton = clone.GetComponent<Button>();
+            }
+
+            Button efficiencyButton = FindComponentInChildrenByName<Button>(panelObject,
+                prefix + "EfficiencyUpgradeButton");
+            if (efficiencyButton == null)
+            {
+                GameObject clone = Instantiate(plus1Button.gameObject, rowObject.transform);
+                clone.name = prefix + "EfficiencyUpgradeButton";
+                efficiencyButton = clone.GetComponent<Button>();
+            }
+
             SetButtonLabel(plus1Button, "+1%");
             SetButtonLabel(plus10Button, "+10%");
             SetButtonLabel(plus100Button, "+100%");
+            SetButtonLabel(capacityButton, "CAP L0\n100W 25I");
+            SetButtonLabel(efficiencyButton, "EFF L0\n150W 50I");
 
-            SetWorkerDrawerControlRect(countText.rectTransform, -240f, 100f);
-            SetWorkerDrawerControlRect(rateText.rectTransform, -145f, 80f);
-            SetWorkerDrawerControlRect(statusText.rectTransform, -47f, 105f);
-            SetWorkerDrawerControlRect(targetInput.GetComponent<RectTransform>(), 46f, 70f);
-            SetWorkerDrawerControlRect(plus1Button.GetComponent<RectTransform>(), 112f, 52f);
-            SetWorkerDrawerControlRect(plus10Button.GetComponent<RectTransform>(), 174f, 62f);
-            SetWorkerDrawerControlRect(plus100Button.GetComponent<RectTransform>(), 254f, 82f);
+            SetWorkerDrawerControlRect(countText.rectTransform, -420f, 105f);
+            SetWorkerDrawerControlRect(rateText.rectTransform, -315f, 90f);
+            SetWorkerDrawerControlRect(statusText.rectTransform, -220f, 105f);
+            SetWorkerDrawerControlRect(targetInput.GetComponent<RectTransform>(), -127f, 70f);
+            SetWorkerDrawerControlRect(plus1Button.GetComponent<RectTransform>(), -65f, 52f);
+            SetWorkerDrawerControlRect(plus10Button.GetComponent<RectTransform>(), -3f, 62f);
+            SetWorkerDrawerControlRect(plus100Button.GetComponent<RectTransform>(), 78f, 82f);
+            SetWorkerDrawerUpgradeRect(capacityButton, 205f);
+            SetWorkerDrawerUpgradeRect(efficiencyButton, 370f);
         }
 
         private static TMP_InputField CreateWorkerTargetInput(Transform row, string prefix,
@@ -3191,6 +3246,22 @@ namespace DeadWalls
             rect.anchoredPosition = new Vector2(x, 0f);
             rect.sizeDelta = new Vector2(width, 36f);
             rect.localScale = Vector3.one;
+        }
+
+        private static void SetWorkerDrawerUpgradeRect(Button button, float x)
+        {
+            SetWorkerDrawerControlRect(button.GetComponent<RectTransform>(), x, 145f);
+            var text = button.GetComponentInChildren<TextMeshProUGUI>(true);
+            if (text == null)
+                return;
+
+            text.fontSize = 12f;
+            text.enableAutoSizing = true;
+            text.fontSizeMin = 8f;
+            text.fontSizeMax = 12f;
+            text.alignment = TextAlignmentOptions.Center;
+            text.textWrappingMode = TextWrappingModes.NoWrap;
+            text.raycastTarget = false;
         }
 
         private static void ConfigureHudRoot(GameObject hudRoot, ArcherRecruitmentCatalogSO archerCatalog)
@@ -3719,6 +3790,8 @@ namespace DeadWalls
             workerDrawer.WoodWorkerTargetPlus100Button = FindComponentInChildrenByName<Button>(hudRoot, "WoodWorkerTargetPlus100Button");
             workerDrawer.WoodWorkerTargetInput = FindComponentInChildrenByName<TMP_InputField>(hudRoot, "WoodWorkerTargetInput");
             workerDrawer.WoodWorkerStatusText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "WoodWorkerStatusText");
+            workerDrawer.WoodCapacityUpgradeButton = FindComponentInChildrenByName<Button>(hudRoot, "WoodCapacityUpgradeButton");
+            workerDrawer.WoodEfficiencyUpgradeButton = FindComponentInChildrenByName<Button>(hudRoot, "WoodEfficiencyUpgradeButton");
 
             workerDrawer.StoneWorkerCountText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "StoneWorkerCountText");
             workerDrawer.StoneWorkerRateText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "StoneWorkerRateText");
@@ -3727,6 +3800,8 @@ namespace DeadWalls
             workerDrawer.StoneWorkerTargetPlus100Button = FindComponentInChildrenByName<Button>(hudRoot, "StoneWorkerTargetPlus100Button");
             workerDrawer.StoneWorkerTargetInput = FindComponentInChildrenByName<TMP_InputField>(hudRoot, "StoneWorkerTargetInput");
             workerDrawer.StoneWorkerStatusText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "StoneWorkerStatusText");
+            workerDrawer.StoneCapacityUpgradeButton = FindComponentInChildrenByName<Button>(hudRoot, "StoneCapacityUpgradeButton");
+            workerDrawer.StoneEfficiencyUpgradeButton = FindComponentInChildrenByName<Button>(hudRoot, "StoneEfficiencyUpgradeButton");
 
             workerDrawer.IronWorkerCountText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "IronWorkerCountText");
             workerDrawer.IronWorkerRateText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "IronWorkerRateText");
@@ -3735,6 +3810,8 @@ namespace DeadWalls
             workerDrawer.IronWorkerTargetPlus100Button = FindComponentInChildrenByName<Button>(hudRoot, "IronWorkerTargetPlus100Button");
             workerDrawer.IronWorkerTargetInput = FindComponentInChildrenByName<TMP_InputField>(hudRoot, "IronWorkerTargetInput");
             workerDrawer.IronWorkerStatusText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "IronWorkerStatusText");
+            workerDrawer.IronCapacityUpgradeButton = FindComponentInChildrenByName<Button>(hudRoot, "IronCapacityUpgradeButton");
+            workerDrawer.IronEfficiencyUpgradeButton = FindComponentInChildrenByName<Button>(hudRoot, "IronEfficiencyUpgradeButton");
 
             workerDrawer.FoodWorkerCountText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "FoodWorkerCountText");
             workerDrawer.FoodWorkerRateText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "FoodWorkerRateText");
@@ -3743,6 +3820,8 @@ namespace DeadWalls
             workerDrawer.FoodWorkerTargetPlus100Button = FindComponentInChildrenByName<Button>(hudRoot, "FoodWorkerTargetPlus100Button");
             workerDrawer.FoodWorkerTargetInput = FindComponentInChildrenByName<TMP_InputField>(hudRoot, "FoodWorkerTargetInput");
             workerDrawer.FoodWorkerStatusText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "FoodWorkerStatusText");
+            workerDrawer.FoodCapacityUpgradeButton = FindComponentInChildrenByName<Button>(hudRoot, "FoodCapacityUpgradeButton");
+            workerDrawer.FoodEfficiencyUpgradeButton = FindComponentInChildrenByName<Button>(hudRoot, "FoodEfficiencyUpgradeButton");
 
             if (workerDrawer.WorkerDrawerToggleButton != null)
                 workerDrawer.WorkerDrawerToggleButton.gameObject.SetActive(true);

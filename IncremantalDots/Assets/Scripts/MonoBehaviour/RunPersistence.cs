@@ -13,7 +13,7 @@ namespace DeadWalls
     [Serializable]
     public class RunSaveState
     {
-        public const int CurrentVersion = 5;
+        public const int CurrentVersion = 6;
         public const int MinimumSupportedVersion = 3;
 
         public int Version = CurrentVersion;
@@ -100,6 +100,16 @@ namespace DeadWalls
         public int LastPopulationGrowthWave;
         public int LastPopulationGrowthCycle;
         public int LastEventPrepWave;
+
+        // Hazir worker binalarinin run-ici kapasite/verimlilik yatirimlari
+        public int WoodBuildingCapacityLevel;
+        public int WoodBuildingEfficiencyLevel;
+        public int StoneBuildingCapacityLevel;
+        public int StoneBuildingEfficiencyLevel;
+        public int IronBuildingCapacityLevel;
+        public int IronBuildingEfficiencyLevel;
+        public int FoodBuildingCapacityLevel;
+        public int FoodBuildingEfficiencyLevel;
 
         // Savunma
         public float WallCurrentHP;
@@ -312,6 +322,21 @@ namespace DeadWalls
                     Math.Max(0, state.PopulationTotal));
                 state.PurchasedBedCapacity = 0;
                 state.Version = 5;
+            }
+
+            if (state.Version == 5)
+            {
+                // v5'te worker bina yatirimlari yoktu. JsonUtility eksik alanlari zaten
+                // sifirlar; acik migration eski kosuyu sekiz temiz seviye ile devam ettirir.
+                state.WoodBuildingCapacityLevel = 0;
+                state.WoodBuildingEfficiencyLevel = 0;
+                state.StoneBuildingCapacityLevel = 0;
+                state.StoneBuildingEfficiencyLevel = 0;
+                state.IronBuildingCapacityLevel = 0;
+                state.IronBuildingEfficiencyLevel = 0;
+                state.FoodBuildingCapacityLevel = 0;
+                state.FoodBuildingEfficiencyLevel = 0;
+                state.Version = 6;
             }
         }
 

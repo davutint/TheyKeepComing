@@ -229,6 +229,78 @@ namespace DeadWalls.Tests
         }
 
         [UnityTest]
+        public IEnumerator WorkerBuildingInvestments_SpendBothResourcesAndPersistAcrossExactContinue()
+        {
+            var gameManager = GameManager.Instance;
+            bool runtimeReady = false;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                {
+                    runtimeReady = true;
+                    break;
+                }
+                yield return null;
+            }
+            Assert.That(runtimeReady, Is.True, "Worker building snapshot runtime'i hazir olmadi.");
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            Entity resourceEntity = entityManager.CreateEntityQuery(typeof(ResourceData)).GetSingletonEntity();
+            Entity buildingEntity = entityManager.CreateEntityQuery(
+                typeof(MobileCastleCombatConfig), typeof(MobileWorkerBuildingUpgradeState))
+                .GetSingletonEntity();
+
+            var resources = entityManager.GetComponentData<ResourceData>(resourceEntity);
+            resources.Wood = 10_000;
+            resources.Iron = 10_000;
+            entityManager.SetComponentData(resourceEntity, resources);
+
+            var configBefore = entityManager.GetComponentData<MobileCastleCombatConfig>(buildingEntity);
+            Assert.That(gameManager.TryBuyWorkerBuildingUpgrade(
+                EconomyFocusType.Wood, WorkerBuildingUpgradeType.Capacity), Is.True);
+            Assert.That(gameManager.TryBuyWorkerBuildingUpgrade(
+                EconomyFocusType.Wood, WorkerBuildingUpgradeType.Efficiency), Is.True);
+            Assert.That(gameManager.TryBuyWorkerBuildingUpgrade(
+                EconomyFocusType.Stone, WorkerBuildingUpgradeType.Capacity), Is.True);
+
+            var purchased = entityManager.GetComponentData<MobileWorkerBuildingUpgradeState>(buildingEntity);
+            var configPurchased = entityManager.GetComponentData<MobileCastleCombatConfig>(buildingEntity);
+            var resourcesPurchased = entityManager.GetComponentData<ResourceData>(resourceEntity);
+            Assert.That(purchased.WoodCapacityLevel, Is.EqualTo(1));
+            Assert.That(purchased.WoodEfficiencyLevel, Is.EqualTo(1));
+            Assert.That(purchased.StoneCapacityLevel, Is.EqualTo(1));
+            Assert.That(configPurchased.WoodWorkerCap, Is.EqualTo(configBefore.WoodWorkerCap + 10));
+            Assert.That(configPurchased.StoneWorkerCap, Is.EqualTo(configBefore.StoneWorkerCap + 10));
+            Assert.That(configPurchased.WoodWorkerProductionPerMin
+                - configBefore.WoodWorkerProductionPerMin, Is.EqualTo(0.8f).Within(0.001f));
+            Assert.That(resourcesPurchased.Wood, Is.EqualTo(9_650));
+            Assert.That(resourcesPurchased.Iron, Is.EqualTo(9_900));
+            Assert.That(gameManager.GetWorkerBuildingUpgradeCost(
+                EconomyFocusType.Wood, WorkerBuildingUpgradeType.Capacity).Wood, Is.EqualTo(135));
+            Assert.That(gameManager.SaveRunSnapshot(), Is.True);
+
+            entityManager.SetComponentData(buildingEntity, new MobileWorkerBuildingUpgradeState());
+            Assert.That(gameManager.TryRestoreRunFromCheckpoint(), Is.True);
+
+            buildingEntity = entityManager.CreateEntityQuery(
+                typeof(MobileCastleCombatConfig), typeof(MobileWorkerBuildingUpgradeState))
+                .GetSingletonEntity();
+            var restored = entityManager.GetComponentData<MobileWorkerBuildingUpgradeState>(buildingEntity);
+            var configRestored = entityManager.GetComponentData<MobileCastleCombatConfig>(buildingEntity);
+            Assert.That(restored.WoodCapacityLevel, Is.EqualTo(1));
+            Assert.That(restored.WoodEfficiencyLevel, Is.EqualTo(1));
+            Assert.That(restored.StoneCapacityLevel, Is.EqualTo(1));
+            Assert.That(restored.StoneEfficiencyLevel, Is.Zero);
+            Assert.That(configRestored.WoodWorkerCap, Is.EqualTo(configPurchased.WoodWorkerCap));
+            Assert.That(configRestored.StoneWorkerCap, Is.EqualTo(configPurchased.StoneWorkerCap));
+            Assert.That(configRestored.WoodWorkerProductionPerMin,
+                Is.EqualTo(configPurchased.WoodWorkerProductionPerMin).Within(0.001f));
+            Assert.That(gameManager.GetWorkerBuildingUpgradeCost(
+                EconomyFocusType.Wood, WorkerBuildingUpgradeType.Capacity).Wood, Is.EqualTo(135));
+            yield return null;
+        }
+
+        [UnityTest]
         public IEnumerator V1CastleLoop_DoesNotApplyPassiveMainResourceConsumption()
         {
             var gameManager = GameManager.Instance;

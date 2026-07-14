@@ -31,7 +31,7 @@ Toplam yatak `BaseCapacity + PurchasedCapacity` olarak `MobileBedCapacityUtility
 
 `GameManager.TryBuyBedCapacity` bu state'i anlık satın alım transaction'ıyla büyütür. Sonraki yatağın Wood maliyeti owner onaylı `ceil(100 × (1 + max(0, ToplamYatak - 60) / 25)^2)` eğrisidir. Varsayılan `60` yatakta fiyat `100`, `160` yatakta `2.500`, `360` yatakta `16.900`, `810` yatakta `96.100` Wood olur. Toplu alım mevcut birim fiyatı adetle çarpmaz; her ek yatağın ardışık fiyatını toplar. Gameplay hard max yoktur; temsil edilemeyen `int` transaction taşırılmadan reddedilir. Eğri katsayılarının Inspector/SO tuning yüzeyine taşınması ayrı tracker işidir.
 
-Bed state exact save `v5` içinde `BedBaseCapacity` ve `PurchasedBedCapacity` olarak saklanır. `v3/v4` kayıtları mevcut nüfusu geçersiz kılmayacak bir base bed değeriyle migrate edilir.
+Bed state exact save `v6` içinde `BedBaseCapacity` ve `PurchasedBedCapacity` olarak saklanır. `v3/v4` kayıtları mevcut nüfusu geçersiz kılmayacak bir base bed değeriyle migrate edilir; v5 kayıtları sıfır worker-building yatırımıyla v6'ya yükseltilir.
 
 `MobilePopulationEconomySystem`, mobile castle loop'ta `PopulationState.BaseCapacity` ve `PopulationState.Capacity` aynalarını her frame bu bed state'ten senkronlar. Mobile authoring ve restart tabanı `60` yataktır; eski `999999` mobile kapasite aynası kaldırılmıştır.
 
@@ -91,7 +91,7 @@ Daha cok okcu = Daha az isci = Daha az kaynak uretimi (ve daha fazla yemek tuket
 - `PopulationTickSystem.cs` — Idle hesaplama + nufus yemek tuketimi (+=)
 - `GameStateAuthoring.cs` — Baker (baslangic degerleri, BaseCapacity)
 - `GameManager.cs` — MonoBehaviour tarafi okuma + restart reset
-- `RunPersistence.cs` — v5 bed state capture/restore ve v3/v4 migration
+- `RunPersistence.cs` — v6 bed + worker-building state capture/restore ve v3/v4/v5 migration
 - `HUDController.cs` — HUD gosterimi
 
 ## M1.2 Scope

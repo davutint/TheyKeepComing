@@ -205,6 +205,22 @@ namespace DeadWalls
         public int LastEventPrepWave;
     }
 
+    /// <summary>
+    /// Dört hazır worker binasının run içi ekonomik yatırım seviyeleri.
+    /// Castle Heart etkileri bu state'i değiştirmez; config aggregate'inde seviyelerin üstüne eklenir.
+    /// </summary>
+    public struct MobileWorkerBuildingUpgradeState : IComponentData
+    {
+        public int WoodCapacityLevel;
+        public int WoodEfficiencyLevel;
+        public int StoneCapacityLevel;
+        public int StoneEfficiencyLevel;
+        public int IronCapacityLevel;
+        public int IronEfficiencyLevel;
+        public int FoodCapacityLevel;
+        public int FoodEfficiencyLevel;
+    }
+
     public struct MobilePrepPauseState : IComponentData
     {
         public bool IsPaused;

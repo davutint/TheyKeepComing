@@ -150,6 +150,7 @@ namespace DeadWalls
         public ContinuousSpawnBudgetData ContinuousSpawnBudget { get; private set; }
         public MobilePopulationAllocation PopulationAllocation { get; private set; }
         public MobileBedCapacityState BedCapacity { get; private set; }
+        public MobileWorkerBuildingUpgradeState WorkerBuildingUpgrades { get; private set; }
         public MobilePrepPauseState PrepPause { get; private set; }
         public MobileEconomyEventState EconomyEvent { get; private set; }
         public int BasicArcherCount { get; private set; }
@@ -1187,6 +1188,92 @@ namespace DeadWalls
             return true;
         }
 
+        public int GetWorkerBuildingUpgradeLevel(EconomyFocusType resource,
+            WorkerBuildingUpgradeType upgradeType)
+        {
+            if (!TryGetWorkerBuildingUpgradeState(out var state))
+                return 0;
+
+            return MobileWorkerBuildingUpgradeUtility.GetLevel(state, resource, upgradeType);
+        }
+
+        public ResourceCost GetWorkerBuildingUpgradeCost(EconomyFocusType resource,
+            WorkerBuildingUpgradeType upgradeType)
+        {
+            if (!TryGetWorkerBuildingUpgradeState(out var state)
+                || !MobileWorkerBuildingUpgradeUtility.TryGetNextCost(
+                    state, resource, upgradeType, out var cost))
+            {
+                return ResourceCost.Zero;
+            }
+
+            return new ResourceCost(cost.Wood, 0, cost.Iron, 0);
+        }
+
+        public bool CanBuyWorkerBuildingUpgrade(EconomyFocusType resource,
+            WorkerBuildingUpgradeType upgradeType)
+        {
+            resource = EconomyFocusUtility.Normalize(resource);
+            if (!_initialized || GameState.IsGameOver || resource == EconomyFocusType.Balanced
+                || !TryGetWorkerBuildingUpgradeState(out var state)
+                || !MobileWorkerBuildingUpgradeUtility.TryGetNextCost(
+                    state, resource, upgradeType, out var cost))
+            {
+                return false;
+            }
+
+            return CanAfford(new ResourceCost(cost.Wood, 0, cost.Iron, 0));
+        }
+
+        public bool TryBuyWorkerBuildingUpgrade(EconomyFocusType resource,
+            WorkerBuildingUpgradeType upgradeType)
+        {
+            resource = EconomyFocusUtility.Normalize(resource);
+            if (!CanBuyWorkerBuildingUpgrade(resource, upgradeType)
+                || !TryGetMobileConfigEntity(out var mobileConfigEntity))
+            {
+                return false;
+            }
+
+            var state = _entityManager.GetComponentData<MobileWorkerBuildingUpgradeState>(mobileConfigEntity);
+            if (!MobileWorkerBuildingUpgradeUtility.TryGetNextCost(
+                    state, resource, upgradeType, out var upgradeCost))
+            {
+                return false;
+            }
+
+            var nextState = state;
+            if (!MobileWorkerBuildingUpgradeUtility.TryIncreaseLevel(
+                    ref nextState, resource, upgradeType))
+            {
+                return false;
+            }
+
+            var cost = new ResourceCost(upgradeCost.Wood, 0, upgradeCost.Iron, 0);
+            if (!SpendResources(cost))
+                return false;
+
+            _entityManager.SetComponentData(mobileConfigEntity, nextState);
+            WorkerBuildingUpgrades = nextState;
+            ApplyTechEconomyAggregates();
+            OnGameStateChanged?.Invoke();
+            return true;
+        }
+
+        private bool TryGetWorkerBuildingUpgradeState(out MobileWorkerBuildingUpgradeState state)
+        {
+            state = default;
+            if (!TryGetMobileConfigEntity(out var mobileConfigEntity)
+                || !_entityManager.HasComponent<MobileWorkerBuildingUpgradeState>(mobileConfigEntity))
+            {
+                return false;
+            }
+
+            state = _entityManager.GetComponentData<MobileWorkerBuildingUpgradeState>(mobileConfigEntity);
+            WorkerBuildingUpgrades = state;
+            return true;
+        }
+
         public int GetLastAcceptedPopulationArrivalCount()
         {
             if (!TryGetMobileConfigEntity(out var mobileConfigEntity)
@@ -1833,19 +1920,57 @@ namespace DeadWalls
                 }
             }
 
-            // Cap toplamlari = base + tech + council (council bonuslari da ayni aggregate'te yasar,
-            // aksi halde tech satin alimi council kazanimlarini ezerdi)
-            config.WoodWorkerCap = _baseWoodWorkerCap + woodCap + _councilWoodCapBonus;
-            config.StoneWorkerCap = _baseStoneWorkerCap + stoneCap + _councilStoneCapBonus;
-            config.IronWorkerCap = _baseIronWorkerCap + ironCap + _councilIronCapBonus;
-            config.FoodWorkerCap = _baseFoodWorkerCap + foodCap + _councilFoodCapBonus;
-            config.WoodWorkerProductionPerMin = _baseWoodProductionPerMin * (1f + woodProd + _metaProductionPercent);
-            config.StoneWorkerProductionPerMin = _baseStoneProductionPerMin * (1f + stoneProd + _metaProductionPercent);
-            config.IronWorkerProductionPerMin = _baseIronProductionPerMin * (1f + ironProd + _metaProductionPercent);
-            config.FoodWorkerProductionPerMin = _baseFoodProductionPerMin * (1f + foodProd + _metaProductionPercent);
+            var buildings = _entityManager.HasComponent<MobileWorkerBuildingUpgradeState>(configEntity)
+                ? _entityManager.GetComponentData<MobileWorkerBuildingUpgradeState>(configEntity)
+                : default;
+            int woodBuildingCap = MobileWorkerBuildingUpgradeUtility.GetCapacityBonus(
+                buildings.WoodCapacityLevel);
+            int stoneBuildingCap = MobileWorkerBuildingUpgradeUtility.GetCapacityBonus(
+                buildings.StoneCapacityLevel);
+            int ironBuildingCap = MobileWorkerBuildingUpgradeUtility.GetCapacityBonus(
+                buildings.IronCapacityLevel);
+            int foodBuildingCap = MobileWorkerBuildingUpgradeUtility.GetCapacityBonus(
+                buildings.FoodCapacityLevel);
+            float woodBuildingProd = MobileWorkerBuildingUpgradeUtility.GetEfficiencyBonusPercent(
+                buildings.WoodEfficiencyLevel);
+            float stoneBuildingProd = MobileWorkerBuildingUpgradeUtility.GetEfficiencyBonusPercent(
+                buildings.StoneEfficiencyLevel);
+            float ironBuildingProd = MobileWorkerBuildingUpgradeUtility.GetEfficiencyBonusPercent(
+                buildings.IronEfficiencyLevel);
+            float foodBuildingProd = MobileWorkerBuildingUpgradeUtility.GetEfficiencyBonusPercent(
+                buildings.FoodEfficiencyLevel);
+
+            // Cap toplamlari = base + tech + council + bina yatirimi. Hepsi ayni aggregate'te
+            // yasadigi icin bir katmandaki degisiklik diger katmanlarin kazanimini ezmez.
+            config.WoodWorkerCap = SaturatingWorkerCap(
+                _baseWoodWorkerCap, woodCap, _councilWoodCapBonus, woodBuildingCap);
+            config.StoneWorkerCap = SaturatingWorkerCap(
+                _baseStoneWorkerCap, stoneCap, _councilStoneCapBonus, stoneBuildingCap);
+            config.IronWorkerCap = SaturatingWorkerCap(
+                _baseIronWorkerCap, ironCap, _councilIronCapBonus, ironBuildingCap);
+            config.FoodWorkerCap = SaturatingWorkerCap(
+                _baseFoodWorkerCap, foodCap, _councilFoodCapBonus, foodBuildingCap);
+            config.WoodWorkerProductionPerMin = _baseWoodProductionPerMin
+                * Mathf.Max(0f, 1f + woodProd + _metaProductionPercent + woodBuildingProd);
+            config.StoneWorkerProductionPerMin = _baseStoneProductionPerMin
+                * Mathf.Max(0f, 1f + stoneProd + _metaProductionPercent + stoneBuildingProd);
+            config.IronWorkerProductionPerMin = _baseIronProductionPerMin
+                * Mathf.Max(0f, 1f + ironProd + _metaProductionPercent + ironBuildingProd);
+            config.FoodWorkerProductionPerMin = _baseFoodProductionPerMin
+                * Mathf.Max(0f, 1f + foodProd + _metaProductionPercent + foodBuildingProd);
             config.PopulationGrowthPerDayPrep = _basePopulationGrowthPerCycle + growth;
             MoatDormancyRules.ApplyV1(ref config);
             _entityManager.SetComponentData(configEntity, config);
+            WorkerBuildingUpgrades = buildings;
+        }
+
+        private static int SaturatingWorkerCap(int baseValue, int techBonus,
+            int councilBonus, int buildingBonus)
+        {
+            long total = (long)baseValue + techBonus + councilBonus + buildingBonus;
+            if (total <= 0L)
+                return 0;
+            return total >= int.MaxValue ? int.MaxValue : (int)total;
         }
 
         /// <summary>
@@ -2251,6 +2376,14 @@ namespace DeadWalls
                 PopulationBaseCapacity = Population.BaseCapacity,
                 BedBaseCapacity = BedCapacity.BaseCapacity,
                 PurchasedBedCapacity = BedCapacity.PurchasedCapacity,
+                WoodBuildingCapacityLevel = WorkerBuildingUpgrades.WoodCapacityLevel,
+                WoodBuildingEfficiencyLevel = WorkerBuildingUpgrades.WoodEfficiencyLevel,
+                StoneBuildingCapacityLevel = WorkerBuildingUpgrades.StoneCapacityLevel,
+                StoneBuildingEfficiencyLevel = WorkerBuildingUpgrades.StoneEfficiencyLevel,
+                IronBuildingCapacityLevel = WorkerBuildingUpgrades.IronCapacityLevel,
+                IronBuildingEfficiencyLevel = WorkerBuildingUpgrades.IronEfficiencyLevel,
+                FoodBuildingCapacityLevel = WorkerBuildingUpgrades.FoodCapacityLevel,
+                FoodBuildingEfficiencyLevel = WorkerBuildingUpgrades.FoodEfficiencyLevel,
                 WoodWorkers = PopulationAllocation.WoodWorkers,
                 StoneWorkers = PopulationAllocation.StoneWorkers,
                 IronWorkers = PopulationAllocation.IronWorkers,
@@ -2305,6 +2438,8 @@ namespace DeadWalls
                 return false;
 
             RestartGame();
+
+            RestoreWorkerBuildingUpgradeState(mobileConfigEntity, save);
 
             // 1) Tech: seviyeleri maliyetsiz yeniden uygula (reveal + carpan + spell + aggregate)
             foreach (var entry in save.TechNodeLevels)
@@ -2447,6 +2582,9 @@ namespace DeadWalls
             var prep = _entityManager.GetComponentData<CastleYardPrepState>(mobileConfigEntity);
             var economyEvent = _entityManager.GetComponentData<MobileEconomyEventState>(mobileConfigEntity);
             var bedCapacity = _entityManager.GetComponentData<MobileBedCapacityState>(mobileConfigEntity);
+            var workerBuildings = _entityManager.HasComponent<MobileWorkerBuildingUpgradeState>(mobileConfigEntity)
+                ? _entityManager.GetComponentData<MobileWorkerBuildingUpgradeState>(mobileConfigEntity)
+                : default;
             var spawnBudget = _entityManager.HasComponent<ContinuousSpawnBudgetData>(mobileConfigEntity)
                 ? _entityManager.GetComponentData<ContinuousSpawnBudgetData>(mobileConfigEntity)
                 : default;
@@ -2523,6 +2661,14 @@ namespace DeadWalls
                 LastPopulationGrowthWave = allocation.LastPopulationGrowthWave,
                 LastPopulationGrowthCycle = allocation.LastPopulationGrowthCycle,
                 LastEventPrepWave = allocation.LastEventPrepWave,
+                WoodBuildingCapacityLevel = workerBuildings.WoodCapacityLevel,
+                WoodBuildingEfficiencyLevel = workerBuildings.WoodEfficiencyLevel,
+                StoneBuildingCapacityLevel = workerBuildings.StoneCapacityLevel,
+                StoneBuildingEfficiencyLevel = workerBuildings.StoneEfficiencyLevel,
+                IronBuildingCapacityLevel = workerBuildings.IronCapacityLevel,
+                IronBuildingEfficiencyLevel = workerBuildings.IronEfficiencyLevel,
+                FoodBuildingCapacityLevel = workerBuildings.FoodCapacityLevel,
+                FoodBuildingEfficiencyLevel = workerBuildings.FoodEfficiencyLevel,
                 WallCurrentHP = Wall.CurrentHP,
                 BasicArchers = BasicArcherCount,
                 RapidArchers = RapidArcherCount,
@@ -2713,6 +2859,8 @@ namespace DeadWalls
 
             RestartGame();
             _currentRunId = save.RunId;
+
+            RestoreWorkerBuildingUpgradeState(mobileConfigEntity, save);
 
             foreach (var entry in save.TechNodeLevels)
                 GrantTechNodeLevelsFromMeta(entry.Id, entry.Level);
@@ -3720,6 +3868,7 @@ namespace DeadWalls
             ContinuousSpawnBudget = default;
             PopulationAllocation = default;
             BedCapacity = default;
+            WorkerBuildingUpgrades = default;
             PrepPause = default;
             EconomyEvent = default;
 
@@ -3743,6 +3892,12 @@ namespace DeadWalls
 
             if (_entityManager.HasComponent<MobileBedCapacityState>(mobileConfigEntity))
                 BedCapacity = _entityManager.GetComponentData<MobileBedCapacityState>(mobileConfigEntity);
+
+            if (_entityManager.HasComponent<MobileWorkerBuildingUpgradeState>(mobileConfigEntity))
+            {
+                WorkerBuildingUpgrades =
+                    _entityManager.GetComponentData<MobileWorkerBuildingUpgradeState>(mobileConfigEntity);
+            }
 
             if (_entityManager.HasComponent<MobilePrepPauseState>(mobileConfigEntity))
                 PrepPause = _entityManager.GetComponentData<MobilePrepPauseState>(mobileConfigEntity);
@@ -4335,6 +4490,26 @@ namespace DeadWalls
             BedCapacity = state;
         }
 
+        private void RestoreWorkerBuildingUpgradeState(Entity mobileConfigEntity, RunSaveState save)
+        {
+            if (!_entityManager.HasComponent<MobileWorkerBuildingUpgradeState>(mobileConfigEntity))
+                return;
+
+            var state = new MobileWorkerBuildingUpgradeState
+            {
+                WoodCapacityLevel = Mathf.Max(0, save.WoodBuildingCapacityLevel),
+                WoodEfficiencyLevel = Mathf.Max(0, save.WoodBuildingEfficiencyLevel),
+                StoneCapacityLevel = Mathf.Max(0, save.StoneBuildingCapacityLevel),
+                StoneEfficiencyLevel = Mathf.Max(0, save.StoneBuildingEfficiencyLevel),
+                IronCapacityLevel = Mathf.Max(0, save.IronBuildingCapacityLevel),
+                IronEfficiencyLevel = Mathf.Max(0, save.IronBuildingEfficiencyLevel),
+                FoodCapacityLevel = Mathf.Max(0, save.FoodBuildingCapacityLevel),
+                FoodEfficiencyLevel = Mathf.Max(0, save.FoodBuildingEfficiencyLevel)
+            };
+            _entityManager.SetComponentData(mobileConfigEntity, state);
+            WorkerBuildingUpgrades = state;
+        }
+
         private void LogMissingArcherPlacementWarning()
         {
             if (_missingArcherPlacementWarningLogged)
@@ -4429,6 +4604,13 @@ namespace DeadWalls
             ResetArcherEconomyState();
             ResetTechTreeState();
             ResetCouncilState();
+            if (mobileMode
+                && _entityManager.HasComponent<MobileWorkerBuildingUpgradeState>(mobileConfigEntity))
+            {
+                _entityManager.SetComponentData(mobileConfigEntity,
+                    new MobileWorkerBuildingUpgradeState());
+                WorkerBuildingUpgrades = default;
+            }
             if (mobileMode && _entityManager.HasComponent<EconomyFocusState>(mobileConfigEntity))
             {
                 _entityManager.SetComponentData(mobileConfigEntity, new EconomyFocusState
