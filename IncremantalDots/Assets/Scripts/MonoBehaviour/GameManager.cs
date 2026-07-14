@@ -39,6 +39,7 @@ namespace DeadWalls
         private bool _initialized;
         private bool _mobileInitialPrepApplied;
         private bool _workerVisualSyncInitialized;
+        private int _lastSurvivorArrivalVisualMarker;
         private readonly Dictionary<UpgradeType, int> _upgradeTiers = new Dictionary<UpgradeType, int>();
         private readonly Dictionary<ArcherType, int> _archerTypeLevels = new Dictionary<ArcherType, int>();
         private readonly HashSet<ArcherType> _unlockedArcherTypes = new HashSet<ArcherType> { ArcherType.Basic };
@@ -298,6 +299,7 @@ namespace DeadWalls
                 ReadArcherTypeCounts();
             ReadMobileRuntimeData();
             SyncWorkerVisualsIfNeeded();
+            SyncSurvivorArrivalVisualsIfNeeded();
 
             OnGameStateChanged?.Invoke();
 
@@ -3876,6 +3878,111 @@ namespace DeadWalls
             _lastSyncedWorkerVisualActualCounts = actualCounts;
         }
 
+        private void SyncSurvivorArrivalVisualsIfNeeded()
+        {
+            if (!TryGetMobileCombatConfig(out var config)
+                || !TryGetMobileConfigEntity(out var mobileConfigEntity)
+                || !_entityManager.HasComponent<MobilePopulationAllocation>(mobileConfigEntity))
+            {
+                return;
+            }
+
+            MobilePopulationAllocation allocation = PopulationAllocation;
+            int marker = config.ContinuousSiegeEnabled
+                ? allocation.LastPopulationGrowthCycle
+                : allocation.LastPopulationGrowthWave;
+            if (marker <= 0 || marker <= _lastSurvivorArrivalVisualMarker)
+                return;
+
+            int acceptedSurvivors = Mathf.Max(0, allocation.LastArrivalAcceptedCount);
+            if (acceptedSurvivors <= 0)
+            {
+                _lastSurvivorArrivalVisualMarker = marker;
+                return;
+            }
+
+            if (SpawnSurvivorArrivalVisuals(acceptedSurvivors, config))
+                _lastSurvivorArrivalVisualMarker = marker;
+        }
+
+        private bool SpawnSurvivorArrivalVisuals(int acceptedSurvivors,
+            MobileCastleCombatConfig config)
+        {
+            int visualCount = SurvivorArrivalVisualUtility.GetVisualCount(acceptedSurvivors);
+            if (visualCount <= 0)
+                return true;
+
+            if (!TryResolveWorkerPrefabEntity())
+            {
+                LogMissingWorkerVisualWarning(
+                    "WorkerPrefabData bulunamadi. Dawn survivor arrival visual spawn ertelendi.");
+                return false;
+            }
+
+            for (int index = 0; index < visualCount; index++)
+            {
+                Entity entity = _entityManager.Instantiate(_workerPrefabEntity);
+                if (_entityManager.HasComponent<ResourceWorkerVisual>(entity))
+                    _entityManager.RemoveComponent<ResourceWorkerVisual>(entity);
+                if (_entityManager.HasComponent<WorkerLogisticsRoute>(entity))
+                    _entityManager.RemoveComponent<WorkerLogisticsRoute>(entity);
+                if (_entityManager.HasComponent<WorkerLogisticsFeedbackState>(entity))
+                    _entityManager.RemoveComponent<WorkerLogisticsFeedbackState>(entity);
+
+                float3 spawnPosition = SurvivorArrivalVisualUtility.GetSpawnPosition(
+                    config.FrontlineX, config.CastleCenter.y, index);
+                float3 targetPosition = SurvivorArrivalVisualUtility.GetTargetPosition(
+                    config.FrontlineX, config.CastleCenter.y, index);
+                _entityManager.SetComponentData(entity,
+                    LocalTransform.FromPositionRotationScale(
+                        spawnPosition, quaternion.identity, 1f));
+                _entityManager.AddComponentData(entity, new SurvivorArrivalVisual
+                {
+                    TargetPosition = targetPosition,
+                    Speed = SurvivorArrivalVisualUtility.GetMoveSpeed(index),
+                    StartDelay = SurvivorArrivalVisualUtility.GetStartDelay(index),
+                    ArrivalDistance = SurvivorArrivalVisualUtility.DefaultArrivalDistance,
+                    RepresentedSurvivorCount =
+                        SurvivorArrivalVisualUtility.GetRepresentedSurvivorCount(
+                            acceptedSurvivors, visualCount, index)
+                });
+
+                SetSpriteTint(entity, SurvivorArrivalVisualUtility.GetTint());
+                ConfigureSurvivorArrivalSprite(entity, index);
+            }
+
+            return true;
+        }
+
+        private void ConfigureSurvivorArrivalSprite(Entity entity, int index)
+        {
+            if (_entityManager.HasComponent<WorkerAnimationMaterialProperty>(entity))
+            {
+                _entityManager.SetComponentData(entity, new WorkerAnimationMaterialProperty
+                {
+                    Value = (float)WorkerAnimationKind.Walk
+                });
+            }
+
+            if (_entityManager.HasComponent<WorkerFeedbackMaterialProperty>(entity))
+            {
+                _entityManager.SetComponentData(entity, new WorkerFeedbackMaterialProperty
+                {
+                    Value = float4.zero
+                });
+            }
+
+            if (!_entityManager.HasComponent<SpriteAnimation>(entity))
+                return;
+
+            SpriteAnimation animation = _entityManager.GetComponentData<SpriteAnimation>(entity);
+            animation.DirectionRow = math.clamp(4, 0, math.max(0, animation.TotalRows - 1));
+            animation.FrameCount = math.max(1, math.min(15, animation.TotalColumns));
+            animation.CurrentFrame = index % animation.FrameCount;
+            animation.FrameTimer = 0f;
+            _entityManager.SetComponentData(entity, animation);
+        }
+
         private void SyncWorkerVisualsToAllocation()
         {
             SyncWorkerVisualsToAllocation(
@@ -4297,6 +4404,14 @@ namespace DeadWalls
                 });
                 _entityManager.DestroyEntity(workerQuery);
                 _workerVisualSyncInitialized = false;
+
+                var survivorArrivalQuery = _entityManager.CreateEntityQuery(new EntityQueryDesc
+                {
+                    All = new ComponentType[] { typeof(SurvivorArrivalVisual) },
+                    None = new ComponentType[] { typeof(Prefab) }
+                });
+                _entityManager.DestroyEntity(survivorArrivalQuery);
+                _lastSurvivorArrivalVisualMarker = 0;
             }
 
             // Tum bina entity'lerini sil

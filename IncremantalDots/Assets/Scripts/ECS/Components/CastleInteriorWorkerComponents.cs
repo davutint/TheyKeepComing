@@ -55,6 +55,18 @@ namespace DeadWalls
         public float DeliveryPulse01;
     }
 
+    /// <summary>
+    /// Dawn'da kabul edilen nüfusun geçici world-space temsilidir. Gameplay population truth'u değildir.
+    /// </summary>
+    public struct SurvivorArrivalVisual : IComponentData
+    {
+        public float3 TargetPosition;
+        public float Speed;
+        public float StartDelay;
+        public float ArrivalDistance;
+        public int RepresentedSurvivorCount;
+    }
+
     [MaterialProperty("_WorkerAnimation")]
     public struct WorkerAnimationMaterialProperty : IComponentData
     {
@@ -104,6 +116,70 @@ namespace DeadWalls
                 default:
                     return new float4(0.50f, 0.27f, 0.10f, 1f);
             }
+        }
+    }
+
+    public static class SurvivorArrivalVisualUtility
+    {
+        public const int MaxVisualCount = 15;
+        public const float SpawnDistanceFromWall = 15f;
+        public const float TargetDistanceBehindWall = 0.8f;
+        public const float LaneSpacing = 0.55f;
+        public const float BaseMoveSpeed = 2.4f;
+        public const float DefaultArrivalDistance = 0.08f;
+
+        public static int GetVisualCount(int acceptedSurvivors)
+        {
+            return math.clamp(acceptedSurvivors, 0, MaxVisualCount);
+        }
+
+        public static int GetRepresentedSurvivorCount(int acceptedSurvivors, int visualCount, int index)
+        {
+            if (acceptedSurvivors <= 0 || visualCount <= 0 || index < 0 || index >= visualCount)
+                return 0;
+
+            int baseCount = acceptedSurvivors / visualCount;
+            int remainder = acceptedSurvivors % visualCount;
+            return baseCount + (index < remainder ? 1 : 0);
+        }
+
+        public static float3 GetSpawnPosition(float frontlineX, float castleCenterY, int index)
+        {
+            int lane = index % 5;
+            int row = index / 5;
+            float laneOffset = (lane - 2) * LaneSpacing;
+            float rowOffset = (row - 1) * 0.16f;
+            float xOffset = (index % 3) * 0.42f;
+            return new float3(
+                frontlineX + SpawnDistanceFromWall + xOffset,
+                castleCenterY + laneOffset + rowOffset,
+                MobileCastleRenderDepth.UnitZ);
+        }
+
+        public static float3 GetTargetPosition(float frontlineX, float castleCenterY, int index)
+        {
+            int lane = index % 5;
+            float laneOffset = (lane - 2) * LaneSpacing * 0.22f;
+            return new float3(
+                frontlineX - TargetDistanceBehindWall,
+                castleCenterY + laneOffset,
+                MobileCastleRenderDepth.UnitZ);
+        }
+
+        public static float GetMoveSpeed(int index)
+        {
+            return BaseMoveSpeed + (math.max(0, index) % 3) * 0.12f;
+        }
+
+        public static float GetStartDelay(int index)
+        {
+            index = math.max(0, index);
+            return (index % 5) * 0.08f + (index / 5) * 0.16f;
+        }
+
+        public static float4 GetTint()
+        {
+            return new float4(0.82f, 0.95f, 1f, 1f);
         }
     }
 }

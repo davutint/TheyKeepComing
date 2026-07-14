@@ -59,9 +59,11 @@ Tum component'lar unmanaged ECS struct olarak tutulur. Davranis sistemlerde, ver
 - `WorkerLogisticsRoute`: DOTS villager'in pickup, site approach, ortak koridor approach ve
   CastleWorkerHub delivery noktasi arasindaki segmentli rota state'ini tutar.
 - `WorkerLogisticsFeedbackState`: working/carrying/delivering/returning activity, cargo, lantern ve delivery pulse state'ini tutar.
+- `SurvivorArrivalVisual`: Dawn'da kabul edilmiş nüfusun geçici world-space temsilinde hedef, hız, başlangıç gecikmesi, varış mesafesi ve exact represented survivor sayısını tutar; gameplay population truth'u değildir.
 - `WorkerAnimationMaterialProperty`, `WorkerFeedbackMaterialProperty` ve `WorkerCargoColorMaterialProperty`: Idle/Walk/Work/Celebrate atlas secimini, cargo/fener/teslimat shader feedback'ini DOTS instancing ile yollar.
 - `ResourceWorkerVisualStyle`: kaynak tipine gore worker ve tasinan paket tint degerlerini merkezi tutar.
 - `WorkerVisualRepresentationUtility`: actual worker sayisini Low/Medium/High egriyle resource basina en fazla `32` temsili visual'a cevirir; actual sayiyi visual'lara exact weight olarak dagitir ve feedback siddetini cozer.
+- `SurvivorArrivalVisualUtility`: accepted nüfusu en fazla `15` görsele exact weight ile dağıtır; Wall'ın sağındaki lane spawn'larını, Wall arkası hedeflerini, hız/gecikme varyasyonunu ve arrival tint'ini deterministik üretir.
 
 `MobileCastleCombatConfig` sahnede yoksa sistemler eski `WallXPosition` tabanli davranisi kullanir.
 
@@ -83,6 +85,7 @@ GameManager.BuyArcher(type) -> main scene `Grid/outside` tilemap hucrelerine okc
 MobilePopulationAllocation actual count -> WorkerVisualRepresentationUtility -> GameManager temsili DOTS villager count + exact weight sync -> WorkerLogisticsMovementSystem animation/cargo/fener/teslimat feedback
 GameManager.TryBuyBedCapacity -> MobileBedCapacityUtility owned-capacity sıralı fiyatı -> Wood transaction -> MobileBedCapacityState.PurchasedCapacity
 MobilePopulationEconomySystem -> MobileBedCapacityState kapasite aynası -> MobilePopulationArrivalUtility bed + Food kabul bütçesi -> accepted population growth + tek seferlik ResourceData.Food transaction
+MobilePopulationAllocation yeni growth marker + accepted count -> GameManager VillagerWorker arrival spawn -> SurvivorArrivalVisualSystem sağdan Wall arkasına yürüyüş + varışta destroy
 GameManager.BuyFortify()/BuyRally() -> CastleYardPrepState uzerine tek-gecelik buff yazar
 CastleYardPrepSystem -> Rally timer'i NightCombat sirasinda azaltir
 ArcherShootSystem -> Okcu tipine gore projectile effect datasini oka yazar, facing direction + attack timer set eder
@@ -96,6 +99,7 @@ ArcherAnimationStateSystem -> Okculari hedef yonunde idle/attack row'larina ceke
 
 ```
 MobilePopulationEconomySystem -> bed kapasitesini aynalar; Dawn arrival'ını boş yatak + Food bütçesiyle sınırlar; kabul edilen yeni population'i target ratio + cap ile worker/idle state'e dagitir
+GameManager + SurvivorArrivalVisualSystem -> committed accepted count'u yalnız sunum için geçici villager entity'lerine çevirir; population/resource state yazmaz
 PopulationTickSystem -> PopulationState.Idle aggregate'ini hesaplar; V1'de pasif Food consumption yazmaz
 ResourceTickSystem -> EconomyFocusState varsa effective production hesaplar, ResourceAccumulator + ResourceData gunceller
 WaveSpawnSystem -> ZombieStats/ZombieState/PhysicsBody/CollisionRadius olusturur

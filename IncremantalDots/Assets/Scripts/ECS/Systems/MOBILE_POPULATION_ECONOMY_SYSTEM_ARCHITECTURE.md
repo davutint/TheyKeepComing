@@ -37,6 +37,10 @@ Stress mode'da calismaz. Legacy/non-mobile sahnelerde `MobileCastleCombatConfig`
 - Pozitif hedeflerin cap'i doluysa overflow idle kalır.
 - Target ratio değişikliği gerçek worker count'u anında yeniden dağıtmaz; yalnız sonraki arrival'ların yönünü değiştirir.
 
+## Arrival Görsel Tüketicisi
+
+Bu sistem yalnız accepted population transaction'ını ve persistent marker'ı yazar. `GameManager`, yeni marker ile `LastArrivalAcceptedCount` sonucunu gözleyip mevcut `VillagerWorker` prefabından en fazla `15` geçici temsilci üretir. `SurvivorArrivalVisualSystem` bu entity'leri sağ battlefield'dan Wall arkasına yürütür ve varışta yok eder. Görsel akış population, Food veya worker allocation state'ine tekrar yazmaz.
+
 ## Event Modeli
 
 Eventler legacy normal mobile `DayPrep` basinda roll edilir:
@@ -50,7 +54,6 @@ V1 eventleri geneldir: resource stash, quarry crew, refugee cart. UI metinleri `
 
 ## Bu Alt Pakette Bilerek Yapilmayanlar
 
-- Survivor'ların sağdan yürüyerek kaleye geliş görseli ayrı tracker işidir.
 - Mevcut worker'ları target ratio değişince zorla retrain/redistribute etmez.
 - Worker world representation actual count'tan ayridir; `WorkerVisualRepresentationUtility` Low/Medium/High egriyle resource basina en fazla `32` temsili visual uretir.
 - Event popup/polish bu sistemde degil, `CastleEconomyUI` tarafindadir.
@@ -60,5 +63,6 @@ V1 eventleri geneldir: resource stash, quarry crew, refugee cart. UI metinleri `
 - Saf allocation matematiği ve migration: EditMode.
 - `MobilePopulationArrivalUtilityTests`: istek, yatak, Food ve int sınırları için saf EditMode bütçe sözleşmesi.
 - Yeni population, cap ve idle overflow: gerçek `NewGameScene` PlayMode.
-- `WorkerAllocationPlayModeTests.DawnArrivalTransaction_SpendsFoodOnceForAcceptedSurvivors`: Food-limitli kabul, gerçek capacity aynası ve iki frame boyunca tek transaction doğrulaması.
+- `WorkerAllocationPlayModeTests.DawnArrivalTransaction_SpendsFoodOnceForAcceptedSurvivors`: Food-limitli kabul, gerçek capacity aynası, iki frame boyunca tek transaction, arrival entity izolasyonu ve varış cleanup doğrulaması.
+- `SurvivorArrivalVisualUtilityTests`: visual cap, exact represented survivor toplamı ve deterministik lane/hız/gecikme sözleşmesi.
 - Actual worker, target ratio, Food ve persistent growth marker save/Continue: `ExactRunContinuePlayModeTests`.

@@ -34,6 +34,8 @@ Definition asset'lerden güvenle yeniden üretilebilen tech aggregate'leri ve ar
 
 Dawn survivor transaction'ında düşülen Food, resource snapshot'ının parçasıdır. Aynı transaction'ın `LastPopulationGrowthCycle/LastPopulationGrowthWave` marker'ı da allocation snapshot'ında saklandığı için Continue aynı Dawn'ı yeniden oynatıp ikinci kez population veya Food değişikliği yapmaz.
 
+`SurvivorArrivalVisual` entity'leri transient world-space sunumdur; snapshot'a yazılmaz. Restore edilen tamamlanmış growth marker'ı `GameManager` tarafından yeni arrival olarak yorumlanmaz, bu nedenle Continue survivor yürüyüşünü ikinci kez oynatmaz.
+
 ## Determinizm
 
 `WaveStateData.SpawnRandomState` spawn RNG stream'inin sahibidir. `WaveSpawnSystem` her batch öncesi bu state'ten `Unity.Mathematics.Random` kurar ve batch sonunda güncel state'i tekrar component'e yazar. Böylece Continue sonrasındaki spawn konumları kapanmadan önceki stream'den devam eder.

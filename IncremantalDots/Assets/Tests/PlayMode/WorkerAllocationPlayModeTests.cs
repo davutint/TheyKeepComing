@@ -198,6 +198,49 @@ namespace DeadWalls.Tests
             Assert.That(allocation.LastArrivalRequestedCount, Is.EqualTo(15));
             Assert.That(allocation.LastArrivalAcceptedCount, Is.EqualTo(3));
             Assert.That(allocation.LastArrivalFoodCost, Is.EqualTo(3));
+
+            Entity completedArrival;
+            using (EntityQuery arrivalQuery = entityManager.CreateEntityQuery(
+                       typeof(SurvivorArrivalVisual), typeof(LocalTransform)))
+            using (NativeArray<Entity> arrivalEntities =
+                   arrivalQuery.ToEntityArray(Allocator.Temp))
+            using (NativeArray<SurvivorArrivalVisual> arrivalVisuals =
+                   arrivalQuery.ToComponentDataArray<SurvivorArrivalVisual>(Allocator.Temp))
+            {
+                Assert.That(arrivalEntities.Length, Is.EqualTo(3));
+
+                int representedSurvivors = 0;
+                for (int index = 0; index < arrivalEntities.Length; index++)
+                {
+                    Entity entity = arrivalEntities[index];
+                    SurvivorArrivalVisual visual = arrivalVisuals[index];
+                    LocalTransform transform = entityManager.GetComponentData<LocalTransform>(entity);
+                    representedSurvivors += visual.RepresentedSurvivorCount;
+                    Assert.That(transform.Position.x, Is.GreaterThan(visual.TargetPosition.x));
+                    Assert.That(visual.TargetPosition.x,
+                        Is.EqualTo(config.FrontlineX - SurvivorArrivalVisualUtility.TargetDistanceBehindWall)
+                            .Within(0.001f));
+                    Assert.That(entityManager.HasComponent<ResourceWorkerVisual>(entity), Is.False,
+                        "Arrival visual gameplay worker sorgularina dahil olmamali.");
+                }
+                Assert.That(representedSurvivors, Is.EqualTo(3));
+
+                completedArrival = arrivalEntities[0];
+            }
+
+            SurvivorArrivalVisual completedVisual =
+                entityManager.GetComponentData<SurvivorArrivalVisual>(completedArrival);
+            LocalTransform completedTransform =
+                entityManager.GetComponentData<LocalTransform>(completedArrival);
+            completedVisual.StartDelay = 0f;
+            completedVisual.Speed = 100f;
+            completedVisual.TargetPosition = completedTransform.Position + new float3(-0.01f, 0f, 0f);
+            entityManager.SetComponentData(completedArrival, completedVisual);
+
+            yield return null;
+            yield return null;
+            Assert.That(entityManager.Exists(completedArrival), Is.False,
+                "Duvar girisine varan survivor visual entity temizlenmeli.");
         }
 
         [UnityTest]

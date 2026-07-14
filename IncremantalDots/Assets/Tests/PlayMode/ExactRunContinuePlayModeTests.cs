@@ -168,6 +168,11 @@ namespace DeadWalls.Tests
             Assert.That(restoredAllocation.LastObservedPopulation, Is.EqualTo(58));
             Assert.That(restoredAllocation.LastPopulationGrowthCycle, Is.EqualTo(10));
             yield return null;
+
+            using EntityQuery arrivalVisualQuery = entityManager.CreateEntityQuery(
+                typeof(SurvivorArrivalVisual));
+            Assert.That(arrivalVisualQuery.IsEmpty, Is.True,
+                "Exact Continue tamamlanmis Dawn arrival gorselini yeniden oynatmamali.");
         }
 
         [UnityTest]
