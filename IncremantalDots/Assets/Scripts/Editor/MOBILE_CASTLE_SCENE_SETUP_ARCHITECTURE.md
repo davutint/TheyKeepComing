@@ -65,7 +65,7 @@ Mobile HUD economy varsayilanlari NewGameScene setup tarafindan GameStateAuthori
 
 Economy focus UI mobile worker economy ile kullanilmaz. Tool eski `EconomyFocusPanel`, `EconomyFocusText` ve `EconomyBalanced/Wood/Stone/Iron/FoodButton` objelerini root'tan soker; bunlar re-run ile geri uretilmez. Yeni player-facing worker kontrolu `WorkerEconomyDrawerUI` uzerinden sol ust resource bar altindaki drawer ile yapilir; target ratio ile hazir binalarin Capacity/Efficiency yatirimlari ayni panelde sunulur. Prefab yalniz gorsel kontrolleri tasir, runtime controller sahne instance'inda tek owner olarak kalir. `CastleEconomyUI` legacy full-screen panel olarak bagli kalabilir ama `PlayerFacingPanelEnabled = false` ile kapali tutulur. Runtime davranis UI JSON icine gomulmez.
 
-## Tech Tree Kurulumu
+## Castle Heart Kurulumu
 
 Tool `Assets/ScriptableObject/MobileCastle/TechTree/` altinda 13 default `TechNodeDefinitionSO`
 asset'ini ve `TechTreeCatalog.asset`'i idempotent seed eder (`EnsureDefaultTechTreeCatalog`):
@@ -73,11 +73,18 @@ mevcut asset degerlerine DOKUNMAZ, katalogdaki kullanici-eklenmis ekstra node'la
 (merge-only), `RootNodeId` bossa `castle_heart` yazilir, `ValidateCatalog()` sorunlari
 Console'a warning basilir. Catalog `GameManager.techTreeCatalog` alanina baglanir.
 
-`ConfigureTechTree` HUD root'a `TechTreeUI` component'ini ekler ve prefabdaki
-`TechTreePanel/TechTreeOpenButton/TechTreeCloseButton/TechTreeViewport/TechTreeContent/
-TechNodeTemplate/TechConnectionTemplate` objelerini isimle baglar; template'ler inactive,
-panel kapali garanti edilir. Prefabda panel yoksa `EnsureFallbackTechTreePanel` minimal
-iskeleti kurar (normal akista devreye girmez — objeler `MobileCastleHudRoot.prefab` icindedir).
+Legacy catalog seed'i save/migration uyumlulugu icin korunur; aktif production progression
+owner'i degildir. Production `HeartNodeCatalogSO` setup tool tarafindan seed edilmez.
+
+`ConfigureTechTree` once HUD root'taki `TechTreeUI` component'ini kaldirir, sonra
+`HeartScreenUI` ekler ve prefabdaki `CastleHeartPanel/CastleHeartOpenButton/
+CastleHeartCloseButton/HeartViewport/HeartContent/HeartNodeTemplate/
+HeartConnectionTemplate` objelerini isimle baglar. Grave Essence, status, branch compass,
+`+1/+10/MAX`, badge ve toast alanlari da ayni configurator tarafindan bind edilir; template'ler
+inactive ve panel kapali garanti edilir. Eski `Tech...` isimleri yalniz migration fallback'i
+olarak taninir. Prefabda panel yoksa legacy isimli minimal fallback iskelet kurulabilir;
+normal akista kaynak `MobileCastleHudRoot.prefab`dir.
 `ConfigureHudRoot` ayrica HUD root'taki missing-script kalintilarini temizler
 (`GameObjectUtility.RemoveMonoBehavioursWithMissingScript`; eski `CastleTechTreeUI` kalintisi).
-Detay: `MonoBehaviour/TECH_TREE_UI_ARCHITECTURE.md` + `ScriptableObject/TECH_TREE_SO_ARCHITECTURE.md`.
+Detay: `MonoBehaviour/HEART_SCREEN_ARCHITECTURE.md` +
+`ScriptableObject/HEART_PURCHASE_EFFECT_ARCHITECTURE.md`.

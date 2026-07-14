@@ -1,4 +1,7 @@
-# Tech Tree UI - Editor Setup
+# Tech Tree UI - Legacy Editor Setup
+
+> Bu kurulum tarihsel sabit catalog UI'ini anlatir. Aktif prefab/scene binding'i
+> `HEART_SCREEN_EDITOR_SETUP.md` dosyasindadir; `TechTreeUI`yi aktif HUD'a yeniden ekleme.
 
 ## Otomatik Kurulum
 

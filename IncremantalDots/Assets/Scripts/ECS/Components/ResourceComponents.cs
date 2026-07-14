@@ -56,6 +56,10 @@ namespace DeadWalls
         public int Current;
         public int CapacityLevel;
         public int EfficiencyLevel;
+        // Castle Heart run bonuslari. Upgrade level fiyat egrisine katilmaz;
+        // exact Heart graph restore/replay E6 tarafindan yeniden uygulanir.
+        public int HeartCapacityBonus;
+        public int HeartEfficiencyBonus;
         // Eski save semasi icin korunur; V1 castle loop'ta her zaman 0'dir.
         public float Accumulator;
     }

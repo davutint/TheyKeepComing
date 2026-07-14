@@ -56111,6 +56111,72 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 920497644}
   m_CullTransparentMesh: 1
+--- !u!114 &936136941 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2791329939241727908, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
+  m_PrefabInstance: {fileID: 1065689827}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
+--- !u!114 &936136942 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2531201222743972316, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
+  m_PrefabInstance: {fileID: 1065689827}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
+--- !u!114 &936136943 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5252107108491169409, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
+  m_PrefabInstance: {fileID: 1065689827}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
+--- !u!114 &936136944 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8675003843856869038, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
+  m_PrefabInstance: {fileID: 1065689827}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!114 &936136945 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7448174008659107126, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
+  m_PrefabInstance: {fileID: 1065689827}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!114 &936136946 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8429492742839944035, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
+  m_PrefabInstance: {fileID: 1065689827}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!1 &937922256
 GameObject:
   m_ObjectHideFlags: 0
@@ -64594,9 +64660,6 @@ PrefabInstance:
       addedObject: {fileID: 1065689866}
     - targetCorrespondingSourceObject: {fileID: 950060435116642966, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1065689867}
-    - targetCorrespondingSourceObject: {fileID: 950060435116642966, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 1065689869}
     - targetCorrespondingSourceObject: {fileID: 950060435116642966, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
       insertIndex: -1
@@ -64607,6 +64670,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 950060435116642966, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1065689871}
+    - targetCorrespondingSourceObject: {fileID: 950060435116642966, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1065689872}
     - targetCorrespondingSourceObject: {fileID: 3913772761592499137, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
       insertIndex: -1
       addedObject: {fileID: 159962725}
@@ -65099,34 +65165,6 @@ MonoBehaviour:
   FoodWorkerStatusText: {fileID: 421566614}
   FoodCapacityUpgradeButton: {fileID: 697661782}
   FoodEfficiencyUpgradeButton: {fileID: 697661781}
---- !u!114 &1065689867
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1065689828}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ddf518362e8a3c04dabae2108cd6f098, type: 3}
-  m_Name:
-  m_EditorClassIdentifier: DeadWalls::DeadWalls.TechTreeUI
-  TechTreePanel: {fileID: 1611606537}
-  TechTreeOpenButton: {fileID: 1611606536}
-  TechTreeCloseButton: {fileID: 1611606535}
-  TechTreeViewport: {fileID: 1611606534}
-  TechTreeContent: {fileID: 1611606533}
-  TechNodeTemplate: {fileID: 1611606532}
-  TechConnectionTemplate: {fileID: 1065689831}
-  TechTreeOpenBadge: {fileID: 2140906305}
-  ToastText: {fileID: 2140906304}
-  BuyClip: {fileID: 8300000, guid: 51c0af8c46f504864b4246befc49983e, type: 3}
-  RevealClip: {fileID: 8300000, guid: 29b56f80cda21401f89a9ee4b159ff92, type: 3}
-  DeniedClip: {fileID: 8300000, guid: 925ed7778ac2f43dcbc21c28843a0163, type: 3}
-  PanelOpenClip: {fileID: 8300000, guid: 9f2f8e892180d4b18a7aaf8b689712d5, type: 3}
-  NodeSpacingX: 300
-  NodeSpacingY: 132
-  ContentPadding: {x: 90, y: 90}
 --- !u!114 &1065689868
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -65201,6 +65239,41 @@ MonoBehaviour:
   CapacityUpgradeButton: {fileID: 1669116436}
   EfficiencyUpgradeButton: {fileID: 1669116435}
   StartOpen: 0
+--- !u!114 &1065689872
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1065689828}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18bfb76b27dfdd143adac80f602f810f, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: DeadWalls::DeadWalls.HeartScreenUI
+  HeartPanel: {fileID: 1611606537}
+  HeartOpenButton: {fileID: 1611606536}
+  HeartCloseButton: {fileID: 1611606535}
+  HeartViewport: {fileID: 1611606534}
+  HeartContent: {fileID: 1611606533}
+  HeartNodeTemplate: {fileID: 1611606532}
+  HeartConnectionTemplate: {fileID: 1065689831}
+  GraveEssenceText: {fileID: 936136946}
+  ScreenStatusText: {fileID: 936136945}
+  BranchCompassText: {fileID: 936136944}
+  QuantityOneButton: {fileID: 936136943}
+  QuantityTenButton: {fileID: 936136942}
+  QuantityMaxButton: {fileID: 936136941}
+  AffordableBadge: {fileID: 2140906305}
+  ToastText: {fileID: 2140906304}
+  BuyClip: {fileID: 8300000, guid: 51c0af8c46f504864b4246befc49983e, type: 3}
+  RevealClip: {fileID: 8300000, guid: 29b56f80cda21401f89a9ee4b159ff92, type: 3}
+  DeniedClip: {fileID: 8300000, guid: 925ed7778ac2f43dcbc21c28843a0163, type: 3}
+  PanelOpenClip: {fileID: 8300000, guid: 9f2f8e892180d4b18a7aaf8b689712d5, type: 3}
+  NodeSize: {x: 268, y: 172}
+  HorizontalSpacing: 350
+  VerticalSpacing: 250
+  ContentPadding: {x: 170, y: 140}
 --- !u!1 &1071878454
 GameObject:
   m_ObjectHideFlags: 0
@@ -69172,6 +69245,15 @@ MonoBehaviour:
   techTreeCatalog: {fileID: 11400000, guid: 58610c7ef50a5d74cbf7e1d97d39fa2c, type: 2}
   councilCatalog: {fileID: 11400000, guid: 9603e30ca26cba7499e4373d2806638a, type: 2}
   metaUpgradeCatalog: {fileID: 11400000, guid: 62da96a7c9c2d2d4d904c2148a6605d0, type: 2}
+  heartCatalog: {fileID: 0}
+  heartGraphSettings:
+    MinimumBranchDepth: 4
+    MaximumBranchDepth: 5
+    MaximumCrossLinks: 2
+    KeystonePairCount: 1
+    MaximumAttempts: 8
+    StandardRarityWeight: 4
+    RareRarityWeight: 1
 --- !u!4 &1409549148
 Transform:
   m_ObjectHideFlags: 0

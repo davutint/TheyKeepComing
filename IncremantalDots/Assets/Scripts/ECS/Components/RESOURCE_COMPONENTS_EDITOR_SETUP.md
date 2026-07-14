@@ -36,7 +36,12 @@ HUDController Inspector'inda "Resources" header'i altinda 4 TMP_Text referansi a
 ## Grave Essence
 
 `GameStateAuthoring.InitialGraveEssence` normal V1 run icin `0` kalir. Bu paket HUD
-binding'i eklemez; bakiye Castle Heart paneline E5'te baglanacaktir.
+binding'i eklemez; bakiye aktif `HeartScreenUI.GraveEssenceText` alanina E5'te baglanmistir.
+Production `HeartNodeCatalogSO` owner onayi olmadan `GameManager.heartCatalog` alanina asset
+atama.
+
+`ArrowSupply.HeartCapacityBonus` ve `HeartEfficiencyBonus` authoring baseline'i `0`dir.
+Bu alanlar Inspector upgrade'i degildir; Castle Heart runtime sink'i tarafindan uygulanir.
 
 ## Hizli Test
 1. TestWoodProdRate=60 yap → Wood her saniye +1 artmali

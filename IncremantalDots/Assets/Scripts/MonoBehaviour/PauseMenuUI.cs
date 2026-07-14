@@ -4,9 +4,10 @@ using UnityEngine.UI;
 namespace DeadWalls
 {
     /// <summary>
-    /// Pause menusu (M-E): HUD'daki pause butonu paneli acar + timeScale=0 (LevelUp/GameOver
-    /// kalibi). RESUME devam ettirir; SETTINGS ses ayarlarini acar; RESTART UIManager.OnRestart
-    /// yolunu kullanir (checkpoint silinir, temiz kosu). GameOver acikken pause acilmaz.
+    /// Pause menusu (M-E): HUD'daki pause butonu paneli acar ve merkezi lease ile hem
+    /// timeScale'i hem DOTS SimulationSystemGroup'u durdurur. Heart gibi baska modal owner'lar
+    /// varsa RESUME yalniz kendi lease'ini birakir. SETTINGS ses ayarlarini acar; aktif kosuda
+    /// gonullu RESTART yoktur. GameOver acikken pause acilmaz.
     /// </summary>
     public class PauseMenuUI : MonoBehaviour
     {
@@ -18,6 +19,8 @@ namespace DeadWalls
         public Button RestartButton;
         public Button MainMenuButton;
         public SettingsUI Settings;
+
+        private System.IDisposable _pauseLease;
 
         private void Start()
         {
@@ -33,6 +36,17 @@ namespace DeadWalls
                 MainMenuButton.onClick.AddListener(GoToMainMenu);
         }
 
+        private void Update()
+        {
+            if (_pauseLease != null)
+                SimulationPauseService.EnforcePausedState();
+        }
+
+        private void OnDisable()
+        {
+            ReleasePause();
+        }
+
         private void GoToMainMenu()
         {
             var gm = GameManager.Instance;
@@ -42,7 +56,7 @@ namespace DeadWalls
                 return;
             }
 
-            Time.timeScale = 1f;
+            ReleasePause();
             UnityEngine.SceneManagement.SceneManager.LoadScene(GameBootstrap.MainMenuSceneName);
         }
 
@@ -54,14 +68,21 @@ namespace DeadWalls
 
             if (PausePanel != null)
                 PausePanel.SetActive(true);
-            Time.timeScale = 0f;
+            if (_pauseLease == null)
+                _pauseLease = SimulationPauseService.Acquire(nameof(PauseMenuUI));
         }
 
         private void Resume()
         {
             if (PausePanel != null)
                 PausePanel.SetActive(false);
-            Time.timeScale = 1f;
+            ReleasePause();
+        }
+
+        private void ReleasePause()
+        {
+            _pauseLease?.Dispose();
+            _pauseLease = null;
         }
 
     }

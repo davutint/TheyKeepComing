@@ -18,9 +18,10 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - Finite Arrow API'leri: +1/+5/Buy Max Wood refill quote/transaction'ı, Wood+Iron Capacity/Efficiency quote/transaction'ı ve data-driven capacity/verim okuması
 - `GetDefensePercent()` wall/gate/castle toplam HP yuzdesini HUD'a verir
 - Mobile archer economy API'leri: `ArcherDefinitionSO` catalog'undan type-count scaled buy/retrain cost ve base stat okuma, buy, Basic -> Rapid/Frost in-place retrain, type count/DPS okuma; `GetTotalArcherCount`, `GetRemainingArcherCapacity` ve `CanAddArchers` Basic/Rapid/Frost ortak `1000` cap'ini sunar. Legacy unlock/upgrade API'leri kodda kalir ama sag drawer player-facing kullanmaz
-- Tech Tree runtime state'i (run-scoped, persistence yok): `_techNodeLevels` + `_revealedTechNodes`; katalog `techTreeCatalog` (`TechTreeCatalogSO`, setup tool baglar). API: `IsTechNodeRevealed`, `GetTechNodeLevel`, `CanBuyTechNode(node, out reason)`, `TryBuyTechNode`, `GetRevealedTechNodes`. Root (`castle_heart`) otomatik sahipli baslar; satin alma `RevealChildNodeIds`'i gorunur yapar
-- Castle Heart E1 contract'i legacy tech runtime'ini henuz degistirmez. Run-only `GraveEssence` bakiyesi `GrantGraveEssence` ile artar ve yalniz `TrySpendGraveEssenceAtHeart` kapisindan azalir; exact save v9'da korunur, Restart/Game Over'da silinir. Actual Heart purchase cutover E4'tur
-- Tech effect'leri: `UnlockArcherType` (maliyetsiz icsel unlock — `UnlockArcherType()` cagrilmaz, cift harcamayi onler), damage/firerate carpanlari (`GetScaledArcherStats` + `ApplyScaledStatsToArchers`), worker cap / production / population growth (`MobileCastleCombatConfig`'e base'ten yeniden hesaplanarak yazilir), tek Wall MaxHP (CurrentHP orani korunur). Base degerler ilk dokunusta cache'lenir; `RestartGame()` -> `ResetTechTreeState()` hepsini base'e dondurur
+- Legacy Tech Tree state/API (`_techNodeLevels`, `_revealedTechNodes`, `TryBuyTechNode`) migration/debug uyumlulugu icin kodda kalir; aktif `NewGameScene` HUD'inda `TechTreeUI` yoktur ve legacy catalog player-facing progression owner'i degildir
+- Castle Heart runtime'i `GameManager.HeartRuntime.cs` partial'inda generated graph/reveal/presentation, Grave Essence-only quote/purchase ve actual effect adapter'larini birlestirir. Production `heartCatalog` null ise acik hata verir; legacy `TechTreeCatalogSO`'ya fallback yapmaz
+- Run-only `GraveEssence` bakiyesi `GrantGraveEssence` ile artar ve yalniz `TrySpendGraveEssenceAtHeart` kapisindan azalir; exact save v9'da korunur, Restart/Game Over'da silinir
+- Heart effect'leri Heart'siz baseline uzerine uygulanir: Basic/Rapid/Frost damage/fire-rate/range/Frost slow, tek Wall HP/repair, resource-specific worker capacity/production, population growth, Arrow capacity/efficiency ve Fireball damage/radius/cooldown. Arrow Heart bonuslari paid Arrow level'larindan ayri ECS alanlarinda tutulur
 - Worker economy API'leri: `OpenCastleEconomy()`, `CloseCastleEconomy()`, `SetResourceWorkers()`, `ChooseEconomyEvent()`
 - Worker bina yatırım API'leri: `GetWorkerBuildingUpgradeLevel()`, `GetWorkerBuildingUpgradeCost()`, `CanBuyWorkerBuildingUpgrade()` ve `TryBuyWorkerBuildingUpgrade()`; dört hazır binanın bağımsız Capacity/Efficiency seviyelerini baked `MobileEconomyPriceTuning` fiyatıyla Wood + Iron transaction'ı üzerinden büyütür. `ApplyTechEconomyAggregates()` base + Heart + Council + Meta + bina etkilerini tek owner'da birleştirir
 - House bed API'leri: `GetTotalBedCapacity()`, `GetPurchasedBedCapacity()`, `GetBedCapacityPurchaseCost()`, `CanBuyBedCapacity()` ve `TryBuyBedCapacity()`; run-scoped `MobileBedCapacityState`, baked `MobileEconomyPriceTuning` base/interval değerleriyle toplam sahipliği `60` tabanından sonra quadratic büyüten ardışık Wood transaction'ıyla büyür ve güncel exact save içinde korunur. Mobile Dawn bed + Food kabul bütçesi bu state'i kapasite owner'ı olarak kullanır
@@ -90,18 +91,19 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - Runtime davranisi prefaba gomulmez; controller ve scene setup tool tarafinda baglanir
   (UI dogrudan prefab uzerinde uretilir; eski UIImporter/export pipeline'i 2026-07-06'da kaldirildi)
 
+### HeartScreenUI.cs
+
+- Aktif fullscreen Castle Heart controller'idir; `HeartGraphPresentation` hidden-safe modelini cizer
+- Army/Defense/Production/Heart-Magic dallarini sag/sol/yukari/asagi compass layout ile yerlestirir
+- `+1/+10/MAX`, exact Grave Essence quote, actual current/after/delta ve Keystone conflict bilgisini sunar
+- Acilista `SimulationPauseService` lease'i alir; cycle/spawn/movement/combat/worker ve scaled cooldown'lar durur. UI refresh/animasyonlari unscaled zamanda calisir
+- Aktif prefab `CastleHeart...`/`Heart...` isimlerini kullanir; node template lookup'i migration icin eski `TechNode...` child isimlerini de taniyabilir
+- Otoriter dok: `HEART_SCREEN_ARCHITECTURE.md`
+
 ### TechTreeUI.cs
 
-- Fullscreen dinamik Tech Tree paneli controller'idir (`MobileCastleHudRoot` uzerinde, MarketUI gibi ayri component)
-- Sabit kategori/tier/elle-yerlestirilmis agac YOKTUR; gorunur node'lar `GameManager.GetRevealedTechNodes()`'tan gelir, `TechNodeTemplate` runtime'da klonlanir
-- Baglanti cizgileri `RevealChildNodeIds` iliskisinden `TechConnectionTemplate` klonuyla cizilir; layout deterministik agac algoritmasi (derinlik -> x, gorunur yaprak sayisi -> y dagilimi)
-- Panel default kapali; `TechTreeOpenButton` acar, `TechTreeCloseButton` kapatir; PANEL ACIKKEN OYUN DURMAZ (drawer emsali; `MobilePrepPauseState` continuous siege'de olu, `Time.timeScale=0` "oyun durmaz" ilkesiyle catisir)
-- Satin alma `GameManager.TryBuyTechNode()` uzerinden; basarida graf yeniden kurulur (yeni reveal'lar gorunur)
-- Durum etiketleri: `AVAILABLE` / `BOUGHT` / `LOCKED` / `MAX` / `NEED ...` — duz renklerle ayrisir
-- `Icon` null ise `TechNodeIconImage` kapanir, `TechNodeIconFallbackText` baslik bas-harflerini gosterir (art uretilmez)
-- 0.2s unscaled poll ile refresh; gorunur node sayisi degisince INCREMENTAL sync (mevcut view'lar korunur, yeniler cizgi-cizilme + scale-pop animasyonuyla eklenir, yeri degisenler kayar — DOTween, unscaled)
-- Juice: satin alma punch + chip flash + toast, reddetmede shake + kilit SFX'i, TECH butonunda alinabilir-tech badge'i (pulse), satin alinmis yollarin cizgileri yesil, LV pip'leri (MaxLevel 2-4), panel fade acilisi + son alinan node'a odak; SFX'ler Fantasy UI SFX Lite'tan setup tool ile baglanir
-- Otoriter dok: `TECH_TREE_UI_ARCHITECTURE.md`
+- Legacy sabit catalog UI controller'idir; aktif `NewGameScene` HUD instance'inda bulunmaz
+- Save/migration ve eski scene uyumlulugu icin kodda kalir; yeni progression veya UI degisikligi burada yapilmaz
 
 ### TechTreeViewController.cs
 

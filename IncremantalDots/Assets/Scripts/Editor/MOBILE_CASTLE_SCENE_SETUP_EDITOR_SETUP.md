@@ -73,6 +73,8 @@ SubScene:
 - `HUDController` defense module: `DefensePercentText`, `DefenseWallFill`, `DefenseGateFill`, `DefenseCoreFill`, `DefenseWallText`, `DefenseGateText`, `DefenseCoreText`, opsiyonel `DefenseDamageGlow`
 - `MarketUI`: `ArcherDrawerPanel`, `DrawerToggleButton`, Basic/Rapid/Frost row text, buy ve dynamic `ArcherRetrainButton` alanlari bagli
 - `MarketUI`: Upgrade butonlari, `ArrowTechPanel`, tech unlock butonlari ve repair/prep butonlari prefabda varsa gizli
+- `HeartScreenUI`: `CastleHeartPanel`, open/close, viewport/content, node/connection template,
+  Grave Essence, status, compass, `+1/+10/MAX`, badge ve toast alanlari bagli; `TechTreeUI` yok
 - `CastleEconomyUI`: legacy full-screen panel bindingleri bagli kalabilir ama `PlayerFacingPanelEnabled = false`; `CastleEconomyPanel` ve `CastleTapHint` player-facing kapali tutulur
 - `WorkerEconomyDrawerUI`: sol ust worker drawer toggle/panel, summary alanlari, Wood/Stone/Iron/Food target kontrolleri ve `CAP / EFF` bina yatirim butonlari bagli
 - `CastleInteriorWorkerPlacement`: Wood/Stone/Iron/Food pickup root'lari ve `CastleWorkerHub/DeliveryPoints` delivery root'u bagli
@@ -114,6 +116,11 @@ pipeline'i 2026-07-06'da kaldirildi.) Setup tool asagidaki isimleri exact-match 
 - Opsiyonel defense feedback: `DefenseDamageGlow`, `DefenseWarningIcon`, fallback `DefenseText`
 - Opsiyonel Castle Interior feedback: `CastleTapHintPulse`, `ProjectedIncomeFrame`, `CastleRepairFrame`, `EconomyEventGlow`
 - Sag drawer archer buy ve Basic -> Rapid/Frost retrain icindir. Dynamic satirlarda `ArcherRetrainButton` kullanilir; legacy `Basic/Rapid/FrostUpgradeButton` kontrolleri setup sirasinda player-facing olarak gizli kalir ve yalniz dynamic template bulunamazsa Rapid/Frost retrain fallback'i olabilir. `ArrowTechPanel`, `RapidTechUnlockButton`, `FrostTechUnlockButton`, `RepairButton`, `FortifyButton`, `RallyButton`, `RefillArrowsButton` ve `StartNextWaveButton` prefabda varsa setup tool bunlari player-facing olarak gizler.
+- Beklenen Castle Heart alanlari: `CastleHeartOpenButton`, `CastleHeartPanel`,
+  `CastleHeartCloseButton`, `HeartViewport`, `HeartContent`, `HeartNodeTemplate`,
+  `HeartConnectionTemplate`, `GraveEssenceText`, `HeartScreenStatusText`,
+  `HeartBranchCompassText`, `HeartQuantityOneButton`, `HeartQuantityTenButton`,
+  `HeartQuantityMaxButton`, `CastleHeartBadge`, `CastleHeartToastText`.
 
 Runtime davranisi prefab icinde degildir; `MarketUI` ve scene setup tool baglar.
 
@@ -121,7 +128,7 @@ Mobile continuous siege loop'ta player-facing `StartNextWaveButton` yoktur. Lega
 `RefillArrowsButton` gizli kalır; finite refill, Arrow chip'inden açılan
 `AmmoPurchasePanel` + scene-owned `ArrowSupplyUI` üzerinden çalışır.
 
-`CastleRepairButton` legacy Castle Interior akisi icindir. Continuous siege varsayilaninda Castle Interior panel player-facing kapali kalir; sag drawer'in archer buy ve Basic -> Rapid/Frost retrain aksiyonlari combat sirasinda kullanilmaya devam eder. Stat upgrade ve tech unlock full-screen Tech Tree milestone'una birakilir. Castle Interior paneli yoksa setup tool polish fallback uretmez; panel gerekirse dogrudan prefabda kurulur.
+`CastleRepairButton` legacy Castle Interior akisi icindir. Continuous siege varsayilaninda Castle Interior panel player-facing kapali kalir; sag drawer'in archer buy ve Basic -> Rapid/Frost retrain aksiyonlari combat sirasinda kullanilmaya devam eder. Stat upgrade ve tech unlock aktif full-screen Castle Heart owner'indadir. Production Heart catalog owner onayi bekler; setup tool icerik uydurmaz. Castle Interior paneli yoksa setup tool polish fallback uretmez; panel gerekirse dogrudan prefabda kurulur.
 
 ## World Visuals
 

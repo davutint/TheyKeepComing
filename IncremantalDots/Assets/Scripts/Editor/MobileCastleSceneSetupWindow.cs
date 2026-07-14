@@ -3654,43 +3654,52 @@ namespace DeadWalls
         }
 
         /// <summary>
-        /// TechTreeUI component'ini HUD root'a ekler ve prefabdaki Tech Tree objelerini isimle bulup
-        /// baglar. Prefabda eksikse minimal fallback kurar (prefab yeniden kurulum senaryosu).
-        /// Katalog referansi GameManager'dadir (TechCatalog); UI runtime'da oradan okur.
+        /// Generated Castle Heart ekranini HUD root'a baglar. Eski TechTreeUI aktif owner olarak
+        /// birakilmaz; mevcut prefab iskeleti Heart presentation/purchase controller'i tarafindan
+        /// kullanilir. Eksik header kontrolleri yalniz scene fallback senaryosunda uretilir.
         /// </summary>
         private static void ConfigureTechTree(GameObject hudRoot)
         {
-            var techTree = EnsureComponent<TechTreeUI>(hudRoot);
+            var legacy = hudRoot.GetComponent<TechTreeUI>();
+            if (legacy != null)
+                DestroyImmediate(legacy);
 
-            var panel = FindChildByName(hudRoot, "TechTreePanel");
+            var heart = EnsureComponent<HeartScreenUI>(hudRoot);
+
+            var panel = FindChildByName(hudRoot, "CastleHeartPanel")
+                ?? FindChildByName(hudRoot, "TechTreePanel");
             if (panel == null)
                 panel = EnsureFallbackTechTreePanel(hudRoot.transform);
-            techTree.TechTreePanel = panel;
+            heart.HeartPanel = panel;
 
-            techTree.TechTreeOpenButton = FindComponentInChildrenByName<Button>(hudRoot, "TechTreeOpenButton");
-            if (techTree.TechTreeOpenButton == null)
+            heart.HeartOpenButton = FindComponentInChildrenByName<Button>(hudRoot, "CastleHeartOpenButton")
+                ?? FindComponentInChildrenByName<Button>(hudRoot, "TechTreeOpenButton");
+            if (heart.HeartOpenButton == null)
             {
-                techTree.TechTreeOpenButton = EnsureButton(hudRoot.transform, "TechTreeOpenButton",
+                heart.HeartOpenButton = EnsureButton(hudRoot.transform, "CastleHeartOpenButton",
                     new Vector2(0f, 1f), new Vector2(232f, -168f), new Vector2(358f, -130f), out _);
-                SetButtonLabel(techTree.TechTreeOpenButton, "TECH");
             }
+            SetButtonLabel(heart.HeartOpenButton, "HEART");
 
-            techTree.TechTreeCloseButton = FindComponentInChildrenByName<Button>(hudRoot, "TechTreeCloseButton");
-            techTree.TechTreeViewport = FindRectTransformByName(hudRoot, "TechTreeViewport");
-            techTree.TechTreeContent = FindRectTransformByName(hudRoot, "TechTreeContent");
-            techTree.TechNodeTemplate = FindRectTransformByName(hudRoot, "TechNodeTemplate");
-            techTree.TechConnectionTemplate = FindRectTransformByName(hudRoot, "TechConnectionTemplate");
+            heart.HeartCloseButton = FindComponentInChildrenByName<Button>(hudRoot, "CastleHeartCloseButton")
+                ?? FindComponentInChildrenByName<Button>(hudRoot, "TechTreeCloseButton");
+            heart.HeartViewport = FindRectTransformByName(hudRoot, "HeartViewport")
+                ?? FindRectTransformByName(hudRoot, "TechTreeViewport");
+            heart.HeartContent = FindRectTransformByName(hudRoot, "HeartContent")
+                ?? FindRectTransformByName(hudRoot, "TechTreeContent");
+            heart.HeartNodeTemplate = FindRectTransformByName(hudRoot, "HeartNodeTemplate")
+                ?? FindRectTransformByName(hudRoot, "TechNodeTemplate");
+            heart.HeartConnectionTemplate = FindRectTransformByName(hudRoot, "HeartConnectionTemplate")
+                ?? FindRectTransformByName(hudRoot, "TechConnectionTemplate");
 
-            if (techTree.TechNodeTemplate != null)
-                techTree.TechNodeTemplate.gameObject.SetActive(false);
-            if (techTree.TechConnectionTemplate != null)
-                techTree.TechConnectionTemplate.gameObject.SetActive(false);
+            if (heart.HeartNodeTemplate != null)
+                heart.HeartNodeTemplate.gameObject.SetActive(false);
+            if (heart.HeartConnectionTemplate != null)
+                heart.HeartConnectionTemplate.gameObject.SetActive(false);
 
-            // Gezinme: viewport'a pan/zoom controller'i (enum Auto -> platforma gore Desktop/Mobile);
-            // ScrollRect tekerlegi zoom'a devredildigi icin kapatilir, elastic + inertia acilir.
-            if (techTree.TechTreeViewport != null)
+            if (heart.HeartViewport != null)
             {
-                var scroll = techTree.TechTreeViewport.GetComponent<ScrollRect>();
+                var scroll = heart.HeartViewport.GetComponent<ScrollRect>();
                 if (scroll != null)
                 {
                     scroll.movementType = ScrollRect.MovementType.Elastic;
@@ -3699,18 +3708,17 @@ namespace DeadWalls
                     scroll.decelerationRate = 0.15f;
                     scroll.scrollSensitivity = 0f;
                 }
-                EnsureComponent<TechTreeViewController>(techTree.TechTreeViewport.gameObject);
+                EnsureComponent<TechTreeViewController>(heart.HeartViewport.gameObject);
             }
 
-            // Fade acilisi icin CanvasGroup
-            if (techTree.TechTreePanel != null)
-                EnsureComponent<CanvasGroup>(techTree.TechTreePanel);
+            if (heart.HeartPanel != null)
+                EnsureComponent<CanvasGroup>(heart.HeartPanel);
 
-            // Juice binding'leri: badge (TECH butonu nabzi) + toast + SFX clip'leri
-            techTree.TechTreeOpenBadge = FindChildByName(hudRoot, "TechTreeBadge");
-            if (techTree.TechTreeOpenBadge == null && techTree.TechTreeOpenButton != null)
+            heart.AffordableBadge = FindChildByName(hudRoot, "CastleHeartBadge")
+                ?? FindChildByName(hudRoot, "TechTreeBadge");
+            if (heart.AffordableBadge == null && heart.HeartOpenButton != null)
             {
-                var badgeGo = EnsureChild(techTree.TechTreeOpenButton.transform, "TechTreeBadge", true);
+                var badgeGo = EnsureChild(heart.HeartOpenButton.transform, "CastleHeartBadge", true);
                 var badgeRect = badgeGo.GetComponent<RectTransform>();
                 badgeRect.anchorMin = new Vector2(1f, 1f);
                 badgeRect.anchorMax = new Vector2(1f, 1f);
@@ -3720,29 +3728,71 @@ namespace DeadWalls
                 badgeImage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Knob.psd");
                 badgeImage.color = new Color(0.949f, 0.788f, 0.298f, 1f);
                 badgeImage.raycastTarget = false;
-                techTree.TechTreeOpenBadge = badgeGo;
+                heart.AffordableBadge = badgeGo;
             }
-            if (techTree.TechTreeOpenBadge != null)
-                techTree.TechTreeOpenBadge.SetActive(false);
+            if (heart.AffordableBadge != null)
+                heart.AffordableBadge.SetActive(false);
 
-            var toast = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "TechTreeToastText");
+            var title = FindComponentInChildrenByName<TextMeshProUGUI>(panel, "TechTreeTitleText")
+                ?? FindComponentInChildrenByName<TextMeshProUGUI>(panel, "CastleHeartTitleText");
+            if (title != null)
+                title.text = "CASTLE HEART";
+
+            heart.GraveEssenceText = FindComponentInChildrenByName<TextMeshProUGUI>(panel, "GraveEssenceText");
+            if (heart.GraveEssenceText == null)
+            {
+                heart.GraveEssenceText = EnsureText(panel.transform, "GraveEssenceText", "GRAVE ESSENCE  0", 18,
+                    TextAlignmentOptions.Right, new Vector2(1f, 1f), new Vector2(1f, 1f),
+                    new Vector2(-470f, -62f), new Vector2(-28f, -22f));
+            }
+
+            heart.ScreenStatusText = FindComponentInChildrenByName<TextMeshProUGUI>(panel, "HeartScreenStatusText");
+            if (heart.ScreenStatusText == null)
+            {
+                heart.ScreenStatusText = EnsureText(panel.transform, "HeartScreenStatusText", string.Empty, 12,
+                    TextAlignmentOptions.Center, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
+                    new Vector2(-390f, -88f), new Vector2(390f, -66f));
+            }
+
+            heart.BranchCompassText = FindComponentInChildrenByName<TextMeshProUGUI>(panel, "HeartBranchCompassText");
+            if (heart.BranchCompassText == null)
+            {
+                heart.BranchCompassText = EnsureText(panel.transform, "HeartBranchCompassText", string.Empty, 12,
+                    TextAlignmentOptions.Center, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f),
+                    new Vector2(-520f, 20f), new Vector2(520f, 46f));
+            }
+
+            heart.QuantityOneButton = FindComponentInChildrenByName<Button>(panel, "HeartQuantityOneButton")
+                ?? EnsureButton(panel.transform, "HeartQuantityOneButton", new Vector2(1f, 1f),
+                    new Vector2(-378f, -118f), new Vector2(-298f, -82f), out _);
+            heart.QuantityTenButton = FindComponentInChildrenByName<Button>(panel, "HeartQuantityTenButton")
+                ?? EnsureButton(panel.transform, "HeartQuantityTenButton", new Vector2(1f, 1f),
+                    new Vector2(-290f, -118f), new Vector2(-210f, -82f), out _);
+            heart.QuantityMaxButton = FindComponentInChildrenByName<Button>(panel, "HeartQuantityMaxButton")
+                ?? EnsureButton(panel.transform, "HeartQuantityMaxButton", new Vector2(1f, 1f),
+                    new Vector2(-202f, -118f), new Vector2(-112f, -82f), out _);
+            SetButtonLabel(heart.QuantityOneButton, "+1");
+            SetButtonLabel(heart.QuantityTenButton, "+10");
+            SetButtonLabel(heart.QuantityMaxButton, "MAX");
+
+            var toast = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "CastleHeartToastText")
+                ?? FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "TechTreeToastText");
             if (toast == null)
             {
-                toast = EnsureText(hudRoot.transform, "TechTreeToastText", "TECH UNLOCKED", 18,
+                toast = EnsureText(hudRoot.transform, "CastleHeartToastText", "HEART AWAKENED", 18,
                     TextAlignmentOptions.Center, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
                     new Vector2(-220f, 258f), new Vector2(232f, 292f));
                 toast.raycastTarget = false;
             }
-            techTree.ToastText = toast;
+            heart.ToastText = toast;
 
-            techTree.BuyClip = AssetDatabase.LoadAssetAtPath<AudioClip>(TechBuySfxPath);
-            techTree.RevealClip = AssetDatabase.LoadAssetAtPath<AudioClip>(TechRevealSfxPath);
-            techTree.DeniedClip = AssetDatabase.LoadAssetAtPath<AudioClip>(TechDeniedSfxPath);
-            techTree.PanelOpenClip = AssetDatabase.LoadAssetAtPath<AudioClip>(TechPanelOpenSfxPath);
+            heart.BuyClip = AssetDatabase.LoadAssetAtPath<AudioClip>(TechBuySfxPath);
+            heart.RevealClip = AssetDatabase.LoadAssetAtPath<AudioClip>(TechRevealSfxPath);
+            heart.DeniedClip = AssetDatabase.LoadAssetAtPath<AudioClip>(TechDeniedSfxPath);
+            heart.PanelOpenClip = AssetDatabase.LoadAssetAtPath<AudioClip>(TechPanelOpenSfxPath);
 
-            // Panel default kapali; state sahibi TechTreeUI.
-            if (techTree.TechTreePanel != null)
-                techTree.TechTreePanel.SetActive(false);
+            if (heart.HeartPanel != null)
+                heart.HeartPanel.SetActive(false);
         }
 
         /// <summary>

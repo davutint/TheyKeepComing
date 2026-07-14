@@ -13,7 +13,8 @@ contract'ini kurar. Blueprint'teki su kurallari uygular:
 - Numeric effect'in player-facing degeri ile runtime'a uygulanacak deger ayni hesap owner'indan gelir.
 
 Bu paket production node katalogu, Grave Essence drop orani veya denge sayisi uretmez.
-`MobileCastleHudRoot.prefab` cutover'i E5, exact graph save/restore E6 kapsamindadir.
+`MobileCastleHudRoot.prefab` ve canli runtime adapter cutover'i E5'te tamamlanmistir;
+exact graph save/restore E6 kapsamindadir.
 
 ## Transaction owner
 
@@ -130,16 +131,16 @@ Production catalog yalniz owner tarafindan onaylanan behavior'lari kullanir.
 
 ## Runtime cutover ve persistence siniri
 
-Bu pakette production `HeartNodeCatalogSO` bulunmadigi ve generated graph henuz
-`GameManager` run lifecycle'ina baglanmadigi icin legacy `TryBuyTechNode` aktif kalir.
-Iki pipeline ayni production node'u paralel yonetmez.
+E5 tamamlandiginda `GameManager.HeartRuntime` generated graph'i run id'sinin stable seed'iyle
+kurar, reveal/presentation/purchase servislerini tek runtime icinde birlestirir ve bu dosyadaki
+baseline/sink contract'larini canli owner'lara baglar. `HeartScreenUI` yalniz
+`HeartPurchaseService` quote/failure contract'ini tuketir; prefab uzerinde `+1/+10/MAX`,
+Essence ve resolved effect satirlari vardir. Aktif scene HUD instance'inda legacy
+`TechTreeUI` bulunmaz ve archer upgrade/direct unlock yuzeyleri player-facing kapatilmistir.
 
-E5:
-
-- Heart UI yalniz `HeartPurchaseService` quote/failure contract'ini tuketir.
-- `MobileCastleHudRoot.prefab` uzerinde `+1/+10/Buy Max`, Essence ve resolved effect
-  satirlari bind edilir.
-- Legacy archer upgrade/direct unlock yuzeyi cutover ile kapatilir.
+Production `HeartNodeCatalogSO` halen owner icerik onayi bekler. Null catalog acik hata verir;
+legacy `TryBuyTechNode`, `TechTreeCatalogSO` veya ana kaynak maliyetine geri dusulmez. Legacy
+API kodda save/migration uyumlulugu icin kalabilir fakat aktif UI owner'i degildir.
 
 E6:
 
@@ -161,3 +162,6 @@ E6:
 - Exact Keystone pair exclusion.
 - Soft-cap actual delta'nin pozitif fakat azalan olmasi.
 - Range, Frost slow, cooldown ve Arrow numeric hedefleri.
+
+`HeartScreenPauseTests`, E5 canli adapter sinirini Arrow paid-level ayrimi ve runtime graph
+settings kopyasiyla ek olarak kilitler.

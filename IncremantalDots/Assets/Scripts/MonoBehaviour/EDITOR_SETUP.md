@@ -35,6 +35,11 @@ Beklenen referanslar:
 - Row fields: `BasicCountText`, `BasicDpsText`, `BasicLevelText`, `BasicCostText`, `BasicBuyButton`; ayni pattern `Rapid` ve `Frost` icin
 - Legacy/hidden row fields: `BasicUpgradeButton`, `RapidUpgradeButton`, `FrostUpgradeButton`
 - Legacy/hidden tech: `ArrowTechPanel`, `RapidTechUnlockButton`, `FrostTechUnlockButton`
+- Castle Heart: `CastleHeartOpenButton`, `CastleHeartPanel`, `CastleHeartCloseButton`,
+  `HeartViewport`, `HeartContent`, `HeartNodeTemplate`, `HeartConnectionTemplate`,
+  `GraveEssenceText`, `HeartScreenStatusText`, `HeartBranchCompassText`,
+  `HeartQuantityOneButton`, `HeartQuantityTenButton`, `HeartQuantityMaxButton`,
+  `CastleHeartBadge`, `CastleHeartToastText`
 - Prep: `RepairButton`, optional `RepairCostText`, `RepairStatusText`
 - Castle Yard: `FortifyButton`, `FortifyCostText`, `FortifyStatusText`, `RallyButton`, `RallyCostText`, `RallyStatusText`
 - Legacy `RefillArrowsButton` varsa gizlenir; `AmmoPurchasePanel` ve `ArrowSupplyUI` binding'leri `ARROW_AMMO_EDITOR_SETUP.md` ile kurulur
@@ -42,6 +47,12 @@ Beklenen referanslar:
 - `Canvas/DayNightOverlay`: full-screen black `Image` + `DayNightOverlayController`
 
 `Assets/Prefabs/UI/Generated/MobileCastleHudRoot.prefab` UI'nin TEK dogruluk kaynagidir; UI dogrudan bu prefab uzerinde (prefab stage'de) uretilir/duzenlenir. Mobile Castle Scene Setup prefab varsa fallback HUD yerine onu kullanir. (Eski UIImporter/export pipeline'i 2026-07-06'da kaldirildi.)
+
+Aktif scene HUD owner'i `HeartScreenUI`dir; `TechTreeUI` bulunmamalidir. Heart acilinca
+`SimulationPauseService` DOTS SimulationSystemGroup ve time scale'i lease ile durdurur.
+`GameManager.heartCatalog` owner-onayli production catalog gelene kadar null kalabilir; bu
+durumda panel acik hata gosterir ve legacy catalog'a fallback yapmaz. Ayrintili binding/QA:
+`HEART_SCREEN_EDITOR_SETUP.md`.
 
 Drawer gameplay'i pause etmez. Mobile castle loop'ta level-up paneli kullanilmaz; oyuncu surekli oldurur, kaynak toplar ve sag drawer'dan okcu satin alir veya acilmis Rapid/Frost'a Basic retrain eder. Archer recruitment row'lari `ArcherDefinitionSO` asset'lerini iceren `ArcherRecruitmentCatalogSO` catalog'undan uretilir; template yoksa eski Basic/Rapid/Frost row'lari fallback olarak calisir. Upgrade/unlock aksiyonlari sag drawer'da player-facing degildir; Castle Heart tek progression owner'idir. Dynamic template `ArcherRetrainButton/ArcherRetrainButtonText` binding'ini tasir; eksikse `Window -> DeadWalls -> Repair Archer Retrain Control` prefabi idempotent onarir. Kaynak yetmiyorsa row `CostText` alaninda `NEED ...`, idle population yoksa buy icin `NEED POP` gosterilir; Basic/Rapid/Frost toplam ortak cap'i `1000` olduğunda buy `MAX` olur, fakat toplamı değiştirmeyen retrain açık kalabilir.
 

@@ -1,4 +1,8 @@
-# Tech Tree UI - Architecture
+# Tech Tree UI - Legacy Architecture
+
+> Bu controller aktif `NewGameScene` HUD owner'i degildir. E5 cutover sonrasi scene instance'i
+> `HeartScreenUI` kullanir. Yeni Castle Heart davranisi icin
+> `HEART_SCREEN_ARCHITECTURE.md` dosyasina bak.
 
 ## Amac
 

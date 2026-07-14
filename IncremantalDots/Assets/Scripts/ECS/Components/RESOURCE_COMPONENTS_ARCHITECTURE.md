@@ -31,6 +31,8 @@ Tum resource component'lari GameState entity uzerinde singleton olarak tutulur.
 - `Current` (int) — Mevcut ok stoku
 - `CapacityLevel` (int) — Run ici kapasite yatirim seviyesi
 - `EfficiencyLevel` (int) — Run ici Arrow/Wood yatirim seviyesi
+- `HeartCapacityBonus` (int) — Castle Heart'in paid level'dan ayri additive kapasite katkisi
+- `HeartEfficiencyBonus` (int) — Castle Heart'in paid level'dan ayri additive Arrow/Wood katkisi
 - `Accumulator` (float) — Legacy save/serialization uyumlulugu; V1 refill bunu kullanmaz
 
 Ok stogu singleton'u. V1'de Fletcher/queue/pasif ok uretimi yoktur. `GameManager`,
@@ -38,6 +40,9 @@ Ok stogu singleton'u. V1'de Fletcher/queue/pasif ok uretimi yoktur. `GameManager
 aninda uygular. `ArcherShootSystem` yalniz pool rent'i basarili projectile icin
 `Current -= 1` yapar. `Current <= 0` ise ok atilamaz.
 GameStateAuthoring Baker'i tarafindan eklenir — `InitialArrows` degeri baslangic stoku olarak yazilir.
+`ArrowEconomyUtility` effective capacity/efficiency hesabinda paid level ile Heart bonusunu
+birlikte okur; yatirim fiyatini ve Inspector/player-facing paid level'i yalniz
+`CapacityLevel`/`EfficiencyLevel` belirler.
 
 ### GraveEssence (IComponentData — Castle Heart E1)
 - `Current` (`long`) — Yalniz mevcut run icindeki Castle Heart bakiyesi
@@ -56,6 +61,7 @@ ResourceConsumptionRate ─┘                                               ↓
                                                               HUDController (gosterim)
 
 GameManager + ArrowEconomyUtility → Wood refill / Wood+Iron yatirimi → ArrowSupply
+GameManager.HeartRuntime         → Heart CAP/EFF additive bonus ────────┘
                                                                          ↓
                                                            ArcherShootSystem (-1/shot)
                                                                          ↓

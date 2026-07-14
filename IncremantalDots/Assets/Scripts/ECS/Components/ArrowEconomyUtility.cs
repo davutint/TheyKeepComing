@@ -47,7 +47,8 @@ namespace DeadWalls
         {
             MobileEconomyPriceTuning safe = MobileEconomyPriceTuningUtility.Sanitize(tuning);
             long capacity = (long)safe.ArrowBaseCapacity
-                + (long)math.max(0, supply.CapacityLevel) * safe.ArrowCapacityPerLevel;
+                + (long)math.max(0, supply.CapacityLevel) * safe.ArrowCapacityPerLevel
+                + math.max(0, supply.HeartCapacityBonus);
             return capacity >= int.MaxValue ? int.MaxValue : (int)capacity;
         }
 
@@ -55,7 +56,8 @@ namespace DeadWalls
         {
             MobileEconomyPriceTuning safe = MobileEconomyPriceTuningUtility.Sanitize(tuning);
             long rate = (long)safe.ArrowBaseArrowsPerWood
-                + (long)math.max(0, supply.EfficiencyLevel) * safe.ArrowArrowsPerWoodPerEfficiencyLevel;
+                + (long)math.max(0, supply.EfficiencyLevel) * safe.ArrowArrowsPerWoodPerEfficiencyLevel
+                + math.max(0, supply.HeartEfficiencyBonus);
             return rate >= int.MaxValue ? int.MaxValue : (int)rate;
         }
 

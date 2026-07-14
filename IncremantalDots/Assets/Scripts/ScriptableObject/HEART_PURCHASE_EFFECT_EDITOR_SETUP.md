@@ -2,8 +2,9 @@
 
 ## Mevcut durum
 
-E4 transaction/effect cekirdegi hazirdir ancak production Heart catalog ve prefab cutover
-henuz yapilmamistir. Bu belge future binding sirasini tanimlar; mevcut legacy
+E4 transaction/effect cekirdegi ile E5 runtime/prefab cutover'i hazirdir. Aktif
+`NewGameScene/MobileCastleHudRoot` `HeartScreenUI` kullanir; legacy `TechTreeUI` aktif owner
+degildir. Production Heart catalog owner icerik onayi bekler. Bu belge mevcut legacy
 `TechTreeCatalogSO` asset'lerini otomatik migrate etmez.
 
 ## Production node authoring gate
@@ -34,9 +35,9 @@ Legacy Wood/Stone/Iron/Food fiyatini otomatik Grave Essence'a cevirmeyin.
 baseline gerekiyorsa definition'da ayri effect satiri yazin. `EconomyFocusType.Balanced`
 ve tekil resource seciminin actual baseline anlami runtime adapter tarafinda acik olmalidir.
 
-## Runtime adapter gereksinimi
+## Runtime adapter binding'i
 
-E5 binding'den once `GameManager` veya ayri run owner'i su iki adapter'i saglamali:
+`GameManager.HeartRuntime` su iki adapter'i saglar:
 
 - `IHeartEffectBaselineProvider`: Heart bonusu eklenmemis actual baseline degerleri.
 - `IHeartRuntimeEffectSink`: Hazirlanmis numeric actual deger ve behavior enable uygulamasi.
@@ -44,7 +45,7 @@ E5 binding'den once `GameManager` veya ayri run owner'i su iki adapter'i saglama
 Baseline yakalama, mevcut legacy `_tech...` multiplier'larini Heart sonucu diye tekrar
 okumamali. Aksi halde her satin alimda compound drift olusur.
 
-Sink en az su owner'lara route edilmelidir:
+Sink su owner'lara route edilir:
 
 - Basic/Rapid/Frost archer stats ve unlock state.
 - Tek Wall Max HP/repair multiplier.
@@ -70,6 +71,11 @@ Heart node UI:
 - Keystone: `HeartGraphPresentation` partner basligi/safe slot marker'i.
 - Failure reason: hidden/locked/need Essence/max/invalid content ayrimini koru.
 
+Aktif isim sozlesmesi ve Play Mode QA icin
+`MonoBehaviour/HEART_SCREEN_EDITOR_SETUP.md` dosyasini kullan. `GameManager.heartCatalog`
+null ise panel acilir/pause calisir fakat graph fail-closed hata gosterir; legacy catalog'a
+fallback yapilmaz.
+
 ## E6 restore binding
 
 Continue sirasinda:
@@ -86,5 +92,5 @@ Source catalog'tan yeni fiyat veya yeni graph zar atarak eski save'i degistirme.
 
 - Hedefli EditMode: `DeadWalls.Tests.HeartPurchasePipelineTests`.
 - Full EditMode regression.
-- E5 sonrasinda gerçek prefab uzerinde +1/+10/Buy Max ve Keystone UI QA.
+- Gercek prefab uzerinde +1/+10/Buy Max ve Keystone UI QA.
 - E6 sonrasinda Continue replay ve exact balance/level/lock PlayMode testi.

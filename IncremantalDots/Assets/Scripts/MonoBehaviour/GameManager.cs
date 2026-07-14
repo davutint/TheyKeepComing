@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace DeadWalls
 {
-    public class GameManager : MonoBehaviour, IHeartGraveEssenceWallet
+    public partial class GameManager : MonoBehaviour, IHeartGraveEssenceWallet
     {
         public static GameManager Instance { get; private set; }
 
@@ -192,6 +192,7 @@ namespace DeadWalls
             if (!TryInitialize())
                 return;
 
+            EnsureHeartRuntime();
             ReadECSData();
             TickSpellCooldown();
         }
@@ -626,7 +627,9 @@ namespace DeadWalls
                 if (config.RepairBaseStoneCost > 0) baseStone = config.RepairBaseStoneCost;
             }
 
-            float multiplier = missing * Mathf.Max(0.05f, _techRepairCostMultiplier);
+            float multiplier = missing * Mathf.Max(
+                0.05f,
+                _techRepairCostMultiplier * GetHeartRepairCostMultiplier());
             return new ResourceCost(
                 0,
                 Mathf.CeilToInt(baseStone * multiplier),
@@ -2316,6 +2319,7 @@ namespace DeadWalls
             config.FoodWorkerProductionPerMin = _baseFoodProductionPerMin
                 * Mathf.Max(0f, 1f + foodProd + _metaProductionPercent + foodBuildingProd);
             config.PopulationGrowthPerDayPrep = _basePopulationGrowthPerCycle + growth;
+            ApplyHeartEconomyOverrides(ref config);
             MoatDormancyRules.ApplyV1(ref config);
             _entityManager.SetComponentData(configEntity, config);
             WorkerBuildingUpgrades = buildings;
@@ -2368,7 +2372,7 @@ namespace DeadWalls
             float multiplier = Mathf.Max(0f, 1f + totalPercent + _metaWallHpPercent);
             var wall = _entityManager.GetComponentData<WallSegment>(_castleEntity);
             float healthRatio = SingleWallDefenseRules.GetHealthRatio(wall.CurrentHP, wall.MaxHP);
-            wall.MaxHP = _baseWallMaxHp * multiplier;
+            wall.MaxHP = ApplyHeartWallMultiplier(_baseWallMaxHp * multiplier);
             wall.CurrentHP = wall.MaxHP * healthRatio;
             _entityManager.SetComponentData(_castleEntity, wall);
             Wall = wall;
@@ -2377,6 +2381,7 @@ namespace DeadWalls
         /// <summary>Restart'ta tech state'i sifirlar ve config/defense degerlerini base'e dondurur.</summary>
         private void ResetTechTreeState()
         {
+            ResetHeartRuntime();
             _techNodeLevels.Clear();
             _revealedTechNodes.Clear();
             _techTreeInitialized = false;
@@ -3562,9 +3567,15 @@ namespace DeadWalls
         // ---------------------------------------------------------------------------------
 
         public bool FireballUnlocked => _fireballUnlocked;
-        public float FireballDamage => FireballBaseDamage * _spellDamageMultiplier;
-        public float FireballRadius => FireballBaseRadius + _spellRadiusBonus;
-        public float FireballCooldownDuration => FireballBaseCooldown * _spellCooldownMultiplier;
+        public float FireballDamage => GetHeartAdjustedSpellValue(
+            HeartNodeEffectType.ModifySpellDamagePercent,
+            FireballBaseDamage * _spellDamageMultiplier);
+        public float FireballRadius => GetHeartAdjustedSpellValue(
+            HeartNodeEffectType.AddSpellRadius,
+            FireballBaseRadius + _spellRadiusBonus);
+        public float FireballCooldownDuration => GetHeartAdjustedSpellValue(
+            HeartNodeEffectType.ReduceSpellCooldownPercent,
+            FireballBaseCooldown * _spellCooldownMultiplier);
         public float FireballCooldownRemaining => _fireballCooldownRemaining;
         public bool FireballReady => _fireballUnlocked && _fireballCooldownRemaining <= 0f;
 
@@ -3910,6 +3921,13 @@ namespace DeadWalls
         }
 
         private ArcherStats GetScaledArcherStats(ArcherType type)
+        {
+            ArcherStats stats = GetHeartFreeScaledArcherStats(type);
+            ApplyHeartArcherEffects(type, ref stats);
+            return stats;
+        }
+
+        private ArcherStats GetHeartFreeScaledArcherStats(ArcherType type)
         {
             var stats = GetBaseArcherStats(type);
             int extraLevels = GetArcherTypeLevel(type) - 1;
