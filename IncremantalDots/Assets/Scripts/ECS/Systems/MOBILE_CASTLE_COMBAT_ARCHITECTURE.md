@@ -260,7 +260,9 @@ Mobile mode'da okcular `NewGameScene` main scene'indeki `Grid/outside` tilemap'i
 - Ayni hucreye donen okcular kucuk deterministic mini-offset alir
 - Okcu render'i Entities Graphics uyumlulugu icin `Opaque/Geometry` shader ile calisir. `outside2` Wall/4 ve okcu prefab Wall/3 sirasi korunur, fakat shader/depth kisitlari nedeniyle front-wall occlusion icin sonraki cozum shader'a dokunmadan kurulmalidir.
 
-Bu milestone'da okcu hard cap yoktur. Gelecekte limit nufus/kaynak ekonomisinden gelecek.
+Basic, Rapid ve Frost toplamı `ArcherCapacityUtility.MaxTotalArchers = 1000` ortak
+hard cap'ini paylaşır. Tilemap hücre tekrarı placement kapasitesi değildir; 1001. spawn
+satın alma, Council, meta, restore ve başlangıç yollarının ortak kapısında reddedilir.
 
 ## World Visuals
 

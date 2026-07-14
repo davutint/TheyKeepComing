@@ -40,6 +40,15 @@ namespace DeadWalls
             foreach (var _ in SystemAPI.Query<RefRO<ArcherUnit>>())
                 archerCount++;
 
+            // Legacy Barracks V1 mobile loop'ta dormant olsa da, bir trainer sizarsa
+            // devam eden her egitim ortak 1000 cap icin bir slot rezerve eder.
+            int reservedTrainingCount = 0;
+            foreach (var activeTrainer in SystemAPI.Query<RefRO<ArcherTrainer>>())
+            {
+                if (activeTrainer.ValueRO.IsTraining)
+                    reservedTrainingCount++;
+            }
+
             foreach (var trainer in SystemAPI.Query<RefRW<ArcherTrainer>>())
             {
                 if (trainer.ValueRO.IsTraining)
@@ -50,8 +59,13 @@ namespace DeadWalls
                     if (trainer.ValueRO.TrainingTimer <= 0f)
                     {
                         // Egitim tamamlandi — okcu sayacini artir
-                        popRW.ValueRW.Archers++;
+                        reservedTrainingCount = math.max(0, reservedTrainingCount - 1);
                         trainer.ValueRW.IsTraining = false;
+
+                        if (!ArcherCapacityUtility.CanAdd(archerCount))
+                            continue;
+
+                        popRW.ValueRW.Archers++;
 
                         // ECS'de okcu entity spawn et
                         // ArcherPrefabData'dan prefab al, ArcherUnit ayarla
@@ -76,6 +90,12 @@ namespace DeadWalls
                 }
                 else
                 {
+                    if (reservedTrainingCount
+                        >= ArcherCapacityUtility.GetRemainingCapacity(archerCount))
+                    {
+                        continue;
+                    }
+
                     // Egitim bekleniyor — idle nufus ve kaynak kontrolu
                     int idle = popRW.ValueRO.Idle;
                     if (idle <= 0)
@@ -92,6 +112,7 @@ namespace DeadWalls
                     resRW.ValueRW.Wood -= woodCost;
                     trainer.ValueRW.IsTraining = true;
                     trainer.ValueRW.TrainingTimer = trainer.ValueRO.TrainingDuration;
+                    reservedTrainingCount++;
                 }
             }
         }

@@ -30,6 +30,7 @@ Tum component'lar unmanaged ECS struct olarak tutulur. Davranis sistemlerde, ver
 
 - `ArcherType`: `Basic`, `Rapid`, `Frost`.
 - `ArcherUnit`: okcu tipi, atis hizi, hasar, menzil, opsiyonel slow bilgileri, facing direction ve attack anim timer.
+- `ArcherCapacityUtility`: Basic/Rapid/Frost için tek `1000` toplam entity cap'i; kalan kapasite ve bulk izin matematiği.
 - `ArrowProjectile`: okun hizi, hasari, hedef entity referansi, hedef pool generation'i ve projectile effect datasini tasir.
 - `ArrowTag`: ok entity'lerini isaretler.
 - `ArcherVisualStyle`: Basic/Rapid/Frost ve slow tint renklerini merkezi tutar.
@@ -84,7 +85,7 @@ DayNightPrepSystem -> Continuous siege kapaliysa legacy DayPrep sayacini azaltir
 WaveSpawnSystem -> Config varsa kale etrafindaki random 360 spawn cemberini ve continuous intensity ritmini kullanir
 ApplyMovementForceSystem -> Config varsa zombiyi CastleCenter'a yonlendirir, ZombieSlow varsa hiz carpanini uygular
 BoundarySystem -> Config varsa AttackRadius icinde Attacking state'e gecirir
-GameManager.BuyArcher(type) -> main scene `Grid/outside` tilemap hucrelerine okcu spawn eder
+GameManager.BuyArcher(type) -> ArcherCapacityUtility ortak 1000 cap -> main scene `Grid/outside` tilemap hucrelerine okcu spawn eder
 MobilePopulationAllocation actual count -> WorkerVisualRepresentationUtility -> GameManager temsili DOTS villager count + exact weight sync -> WorkerLogisticsMovementSystem animation/cargo/fener/teslimat feedback
 GameManager.TryBuyBedCapacity -> MobileEconomyPriceTuning + MobileBedCapacityUtility owned-capacity sıralı fiyatı -> Wood transaction -> MobileBedCapacityState.PurchasedCapacity
 GameManager.TryBuyWorkerBuildingUpgrade -> MobileEconomyPriceTuning fiyatı -> Wood + Iron transaction -> bağımsız bina seviyesi -> base + Heart + Council + Meta + bina config aggregate'i

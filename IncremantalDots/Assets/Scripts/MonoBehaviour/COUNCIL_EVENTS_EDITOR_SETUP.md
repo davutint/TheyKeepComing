@@ -31,7 +31,7 @@
 1. Play'e gir; DAWN'a kadar bekle (veya birkac gun) — sans %30 + 4 gun pity.
 2. Kart sol-alt bolgede belirir (odul toast'undan ~1.2s sonra); sure seridi DAY sonuna
    kadar akar; DUSK girisinde secilmediyse kaybolur.
-3. Secim kaynak/pop/okcu/savunma etkisini aninda uygular; odeme karsilanamiyorsa buton pasif.
+3. Secim kaynak/pop/okcu/savunma etkisini aninda uygular; odeme karsilanamiyorsa buton pasif. Ücretsiz okçu etkisi Basic/Rapid/Frost ortak `1000` cap'inde durur.
 4. `refugees_at_gate`'te "Take them in" sec -> 2+ gun sonra `AMONG THE REFUGEES` zinciri
    cikabilir (OneShot).
 5. EditMode testleri: Test Runner > EditMode > `DeadWalls.EditMode.Tests` (6 test; composer

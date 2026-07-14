@@ -1426,6 +1426,30 @@ namespace DeadWalls
             }
         }
 
+        public int GetTotalArcherCount()
+        {
+            if (!CanAccessEntityManager())
+            {
+                long cachedTotal = (long)math.max(0, BasicArcherCount)
+                    + math.max(0, RapidArcherCount)
+                    + math.max(0, FrostArcherCount);
+                return cachedTotal >= int.MaxValue ? int.MaxValue : (int)cachedTotal;
+            }
+
+            return GetArcherCount();
+        }
+
+        public int GetRemainingArcherCapacity()
+        {
+            return ArcherCapacityUtility.GetRemainingCapacity(GetTotalArcherCount());
+        }
+
+        public bool CanAddArchers(int requestedCount = 1)
+        {
+            return _initialized
+                && ArcherCapacityUtility.CanAdd(GetTotalArcherCount(), requestedCount);
+        }
+
         public float GetArcherTypeDps(ArcherType type)
         {
             var stats = GetScaledArcherStats(type);
@@ -1523,6 +1547,7 @@ namespace DeadWalls
                 && _archerPrefabEntity != Entity.Null
                 && _entityManager.Exists(_archerPrefabEntity)
                 && IsArcherTypeUnlocked(type)
+                && CanAddArchers()
                 && HasPopulationForNewArcher()
                 && CanAfford(GetArcherBuyCost(type));
         }
@@ -1536,6 +1561,7 @@ namespace DeadWalls
                 && _archerPrefabEntity != Entity.Null
                 && _entityManager.Exists(_archerPrefabEntity)
                 && IsArcherTypeUnlocked(definition.Type)
+                && CanAddArchers()
                 && HasPopulationForNewArcher(definition.PopulationCost)
                 && CanAfford(definition.BuyCost);
         }
@@ -2201,6 +2227,7 @@ namespace DeadWalls
         private void ApplyCouncilEffects(List<ComposedCouncilEffect> effects)
         {
             bool capsDirty = false;
+            bool archerCountsDirty = false;
             foreach (var effect in effects)
             {
                 switch (effect.Kind)
@@ -2216,7 +2243,12 @@ namespace DeadWalls
                         break;
                     case CouncilEffectKind.GainFreeArchers:
                         for (int i = 0; i < effect.Amount; i++)
-                            SpawnArcher(ArcherType.Basic); // bedava: population tuketilmez
+                        {
+                            if (!SpawnArcher(ArcherType.Basic))
+                                break; // ortak 1000 cap; bedava spawn population tuketmez
+
+                            archerCountsDirty = true;
+                        }
                         break;
                     case CouncilEffectKind.HealDefensePercent:
                         HealWallByPercent(Mathf.Abs(effect.Rate));
@@ -2239,6 +2271,8 @@ namespace DeadWalls
 
             if (capsDirty)
                 ApplyTechEconomyAggregates(); // cap toplamlari base+tech+council olarak yeniden yazilir
+            if (archerCountsDirty)
+                ReadArcherTypeCounts();
         }
 
         private static ResourceCost BuildSingleResourceCost(EconomyFocusType resource, int amount)
@@ -2496,10 +2530,8 @@ namespace DeadWalls
 
             // 4) Okcu sayilarini tamamla (RestartGame seed'i + meta okculari zaten sahnede;
             //    pozisyonlar tilemap slot sirasindan otomatik)
-            ReadArcherTypeCounts();
-            for (int i = BasicArcherCount; i < save.BasicArchers; i++) SpawnArcher(ArcherType.Basic);
-            for (int i = RapidArcherCount; i < save.RapidArchers; i++) SpawnArcher(ArcherType.Rapid);
-            for (int i = FrostArcherCount; i < save.FrostArchers; i++) SpawnArcher(ArcherType.Frost);
+            RestoreArcherCountsWithinCapacity(
+                save.BasicArchers, save.RapidArchers, save.FrostArchers);
             ApplyScaledStatsToArchers(ArcherType.Basic, false);
             ApplyScaledStatsToArchers(ArcherType.Rapid, false);
             ApplyScaledStatsToArchers(ArcherType.Frost, false);
@@ -2913,10 +2945,8 @@ namespace DeadWalls
             foreach (var entry in save.ArcherTypeLevels)
                 _archerTypeLevels[(ArcherType)entry.Type] = entry.Level;
 
-            ReadArcherTypeCounts();
-            for (int i = BasicArcherCount; i < save.BasicArchers; i++) SpawnArcher(ArcherType.Basic);
-            for (int i = RapidArcherCount; i < save.RapidArchers; i++) SpawnArcher(ArcherType.Rapid);
-            for (int i = FrostArcherCount; i < save.FrostArchers; i++) SpawnArcher(ArcherType.Frost);
+            RestoreArcherCountsWithinCapacity(
+                save.BasicArchers, save.RapidArchers, save.FrostArchers);
             ApplyScaledStatsToArchers(ArcherType.Basic, false);
             ApplyScaledStatsToArchers(ArcherType.Rapid, false);
             ApplyScaledStatsToArchers(ArcherType.Frost, false);
@@ -3248,6 +3278,7 @@ namespace DeadWalls
             _metaWallHpPercent = 0f;
             _metaDamageMultiplier = 1f;
             _metaProductionPercent = 0f;
+            bool archerCountsDirty = false;
 
             foreach (var upgrade in metaUpgradeCatalog.Upgrades)
             {
@@ -3266,7 +3297,12 @@ namespace DeadWalls
                         break;
                     case MetaUpgradeEffectType.StartingArchers:
                         for (int i = 0; i < Mathf.RoundToInt(total); i++)
-                            SpawnArcher(ArcherType.Basic); // baslangic garnizonu: population tuketmez
+                        {
+                            if (!SpawnArcher(ArcherType.Basic))
+                                break; // ortak 1000 cap; baslangic garnizonu population tuketmez
+
+                            archerCountsDirty = true;
+                        }
                         break;
                     case MetaUpgradeEffectType.StartingTechLevel:
                         GrantTechNodeLevelsFromMeta(upgrade.TechNodeId, level);
@@ -3288,6 +3324,8 @@ namespace DeadWalls
                 ApplyTechDefenseAggregates();
             if (_metaProductionPercent > 0f)
                 ApplyTechEconomyAggregates();
+            if (archerCountsDirty)
+                ReadArcherTypeCounts();
             if (!Mathf.Approximately(_metaDamageMultiplier, 1f))
                 ApplyScaledStatsToArchers(ArcherType.Basic, false);
         }
@@ -3377,7 +3415,17 @@ namespace DeadWalls
 
         private bool SpawnArcher(ArcherType type)
         {
+            if (!CanAccessEntityManager()
+                || _archerPrefabEntity == Entity.Null
+                || !_entityManager.Exists(_archerPrefabEntity))
+            {
+                return false;
+            }
+
             int archerCount = GetArcherCount();
+            if (!ArcherCapacityUtility.CanAdd(archerCount))
+                return false;
+
             float3 spawnPosition;
 
             bool mobileMode = TryGetMobileConfigEntity(out _);
@@ -3411,6 +3459,32 @@ namespace DeadWalls
                 1f));
             SetSpriteTint(entity, GetArcherTint(type));
             return true;
+        }
+
+        private void RestoreArcherCountsWithinCapacity(
+            int basicTarget, int rapidTarget, int frostTarget)
+        {
+            ReadArcherTypeCounts();
+            RestoreArcherTypeWithinCapacity(
+                ArcherType.Basic, BasicArcherCount, basicTarget);
+            RestoreArcherTypeWithinCapacity(
+                ArcherType.Rapid, RapidArcherCount, rapidTarget);
+            RestoreArcherTypeWithinCapacity(
+                ArcherType.Frost, FrostArcherCount, frostTarget);
+            ReadArcherTypeCounts();
+        }
+
+        private void RestoreArcherTypeWithinCapacity(
+            ArcherType type, int currentTypeCount, int targetTypeCount)
+        {
+            int safeTarget = math.min(
+                math.max(0, targetTypeCount), ArcherCapacityUtility.MaxTotalArchers);
+            int missingCount = math.max(0, safeTarget - math.max(0, currentTypeCount));
+            for (int i = 0; i < missingCount; i++)
+            {
+                if (!SpawnArcher(type))
+                    break;
+            }
         }
 
         private bool HasPopulationForNewArcher(int populationCost = 1)
@@ -3989,7 +4063,10 @@ namespace DeadWalls
         {
             int currentCount = GetArcherCount();
             for (int i = currentCount; i < MobileInitialBasicArchers; i++)
-                SpawnArcher(ArcherType.Basic);
+            {
+                if (!SpawnArcher(ArcherType.Basic))
+                    break;
+            }
 
             int actualCount = GetArcherCount();
             if (!_entityManager.Exists(_gameStateEntity) || !_entityManager.HasComponent<PopulationState>(_gameStateEntity))
@@ -4859,8 +4936,10 @@ namespace DeadWalls
             {
                 for (int i = 0; i < MobileInitialBasicArchers; i++)
                 {
-                    if (SpawnArcher(ArcherType.Basic))
-                        ConsumePopulationForNewArcher();
+                    if (!SpawnArcher(ArcherType.Basic))
+                        break;
+
+                    ConsumePopulationForNewArcher();
                 }
             }
 

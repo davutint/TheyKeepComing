@@ -3,6 +3,11 @@
 ## Genel Bakis
 Kisla (Barracks) binalarinda okcu egitimi yapan sistem. Idle nufus ve yeterli kaynak varsa egitim baslatir, timer bitince okcu entity'si spawn eder.
 
+> V1 mobile castle loop'ta Barracks eğitimi dormant/legacy'dir; oyuncu okçuyu Archer
+> Recruitment drawer'dan anında alır. Sistem yalnız legacy sızıntı güvenliği için
+> korunur ve `ArcherCapacityUtility` ortak `1000` cap'ini bypass edemez. Devam eden
+> eğitimler cap hesabında rezerve slot sayılır.
+
 ## Dosya
 `Assets/Scripts/ECS/Systems/BarracksTrainingSystem.cs`
 

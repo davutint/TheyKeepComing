@@ -1,5 +1,9 @@
 # BarracksTrainingSystem — Editor Setup Rehberi (M1.6)
 
+> V1 `NewGameScene` için bu kurulum uygulanmaz. Barracks training legacy/dormant'tır;
+> aktif recruitment anlık drawer satın alımıdır. Aşağıdaki adımlar yalnız eski scene
+> desteği içindir ve ortak `1000` cap'i aşamaz.
+
 ## Gereksinimler
 - Unity 6 LTS + Entities package
 - `BarracksTrainingSystem.cs` → `Assets/Scripts/ECS/Systems/`

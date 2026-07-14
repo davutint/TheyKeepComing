@@ -41,7 +41,7 @@ Uygulama bu adımların arasında kapanırsa `GameManager.Awake` ve ana menü ba
 `MetaUpgradeCatalogSO` kalıcı upgrade tanımlarının sahibidir. Mevcut effect yolları:
 
 - StartingResource -> `AddResources`
-- StartingArchers -> `SpawnArcher`
+- StartingArchers -> `SpawnArcher`; Basic/Rapid/Frost ortak `1000` cap'i bypass edilmez
 - StartingTechLevel -> `GrantTechNodeLevelsFromMeta`
 - WallHpPercent -> defense aggregate
 - ArcherDamagePercent -> archer stat scaling

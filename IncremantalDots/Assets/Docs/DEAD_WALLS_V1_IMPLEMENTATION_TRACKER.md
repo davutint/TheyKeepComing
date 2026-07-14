@@ -5,7 +5,7 @@
 > **Tracker sürümü:** 2.0  
 > **Son tam kapsam denetimi:** 2026-07-12  
 > **Aktif paket:** Package D - Archers + Ammo
-> **Aktif iş:** `DW-D-ARCHER-CAP` - Basic/Rapid/Frost Ortak 1000 Cap Guard
+> **Aktif iş:** `DW-D-RETRAIN` - Basic → Rapid/Frost Tek Seferlik Retrain
 
 ---
 
@@ -134,7 +134,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Workers | Kalıcı target ratio + actual/cap/idle state, +1/+10/+100/direct input, bağımsız bina capacity/efficiency seviyeleri, yeni nüfus auto-allocation, exact save, Low/Medium/High density ve allocation-senkronlu animation/cargo/lantern/delivery feedback var | `[x]` |
 | Council | Curated/deterministic composer ve kart UI var; schedule chance/pity/cooldown | Package F altyapısı var, schedule yanlış |
 | Archers | Basic/Rapid/Frost, instant buy ve population cost var | Kısmi uyum |
-| Archer cap | Ortak 1000 kontrolü yok | Package D uyumsuz |
+| Archer cap | `ArcherCapacityUtility` Basic/Rapid/Frost toplamını `1000` ile sınırlar; buy, merkezi spawn, Council, meta, restore ve legacy Barracks aynı guard'ı kullanır | `[x]` |
 | Placement | `outside` tilemap merkezleri + küçük stack offset | 40x25 değil |
 | Targeting | Her okçu bütün zombileri brute-force tarıyor | 1k x 10k blocker |
 | Ammo | Config `UnlimitedArrows = true`; refill butonu bağlı değil | Package D uyumsuz |
@@ -145,7 +145,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Meta | Ayrı JSON ve Game Over shop var; `StartingTechLevel` aktif | Kısmi uyum |
 | HUD | CyclePanel, DAY/DUSK/NIGHT ve Horde Pressure mevcut; tek Wall runtime gizleme var | Package I polish gerekli |
 | Tutorial | Aktif tutorial/onboarding sistemi bulunmadı | Package I eksik |
-| Testler | EditMode `85/85`; PlayMode `21 pass + 1 explicit skip`; Standalone Player-targeted 10K `1/1` | Güncel değişiklikler full paketle testli |
+| Testler | EditMode `92/92`; PlayMode `22 pass + 1 explicit skip`; Standalone Player-targeted 10K `1/1` | Güncel değişiklikler full paketle testli |
 | Telemetry | Spawn budget demanded/spawned/backlog telemetry mevcut; tam Blueprint event owner'ı eksik | Kısmi |
 
 ---
@@ -453,8 +453,8 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Sözleşme | Mevcut oyun | Durum |
 |---|---|---|
 | Basic/Rapid/Frost | Üç tip ve SO tanımları mevcut | `[x]` Yapısal olarak var |
-| Instant buy + population cost | Satın alım anlık; definition `PopulationCost=1` | `[~]` Cap testleri eksik |
-| Common 1000 cap | `CanBuyArcher` toplam cap kontrolü yapmıyor | `[!]` |
+| Instant buy + population cost | Satın alım anlık; definition `PopulationCost=1`; 1001. deneme transaction başlamadan reddediliyor | `[x]` |
+| Common 1000 cap | `ArcherCapacityUtility` tek owner; `SpawnArcher` bütün aktif yolların son kapısı, drawer cap'te `MAX` gösteriyor | `[x]` |
 | Basic retrain | Unlock ve buy var; Basic -> Rapid/Frost retrain owner'ı yok | `[!]` |
 | Archer death yok | Archer HP/death combat yolu yok | `[~]` Regression gerekli |
 | Upgrade yalnız Heart | Market'te type level ve upgrade butonları aktif | `[!]` |
@@ -467,9 +467,9 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 ### Archer ve retrain işleri
 
-- [ ] Toplam Basic+Rapid+Frost cap'ini `1000` olarak tek owner'da uygula.
-- [ ] 1.001. satın alımı reddet; kaynak/population harcama.
-- [ ] Council, meta başlangıç bonusu ve restore spawn'ında aynı cap guard'ını kullan.
+- [x] Toplam Basic+Rapid+Frost cap'ini `1000` olarak tek owner'da uygula.
+- [x] 1.001. satın alımı reddet; kaynak/population harcama.
+- [x] Council, meta başlangıç bonusu ve restore spawn'ında aynı cap guard'ını kullan.
 - [ ] Basic -> Rapid ve Basic -> Frost retrain işlemini tek seferlik maliyetle uygula.
 - [ ] Retrain toplam archer ve population sayısını değiştirmesin.
 - [ ] Type maliyetini aynı türün mevcut sayısına göre büyüt.
@@ -513,7 +513,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 ### Package D kabul kapısı
 
-- [ ] 1.001. archer alınamıyor.
+- [x] 1.001. archer alınamıyor.
 - [ ] Retrain toplam sayıyı değiştirmiyor.
 - [ ] 40 tile x 25 stable point save/load sonrası aynı.
 - [ ] 1.000 archer x 10.000 enemy gerçek oyun senaryosu çalışıyor.
@@ -933,7 +933,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Enemy catalog | V1 runtime bake + gerçek spawn | Tek `zombie_basic`; prefab/stat/scale tanımla eşleşir | `[x]` |
 | Population | Food yetersiz dawn | Mevcut pop korunur; arrival sınırlı | `[x]` |
 | Ammo | Arrow 0 / refill | Ateş durur / anında başlar | `[ ]` |
-| Archers | 1.001. purchase | Reddedilir; harcama yok | `[ ]` |
+| Archers | 1.001. purchase | Reddedilir; harcama yok | `[x]` |
 | Placement | 40 tile'da 1.000 archer | Her tile 25 stable point | `[ ]` |
 | Targeting | Yoğun overkill | Incoming damage hedefleri dağıtır | `[ ]` |
 | Heart | Invalid generated graph | Reroll/fallback veya açık hata | `[ ]` |
@@ -949,8 +949,8 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 ### Mevcut test envanteri
 
-- `[x]` EditMode: `85/85`; contract, compact save/migration v3-v6, worker target mutation/allocation, profile-driven bed ve bina fiyat tuning'i, bina CAP/EFF seviye-maliyet matematiği, representative density/weight, production feedback strength ve lantern phase rule, cycle, quantity-only, backlog, Moat isolation, enemy catalog ve pool kapsamı.
-- `[x]` PlayMode: `21 pass + 1 explicit skip`; gerçek `NewGameScene`, baked ekonomi fiyat tuning'i, GameManager fiyat API'leri, worker drawer target/CAP/EFF kontrolleri, çift kaynak transaction'ı, bina exact Continue, Dawn survivor akışı, Low/Medium/High visual density, same-bucket exact weight, work/cargo/delivery/lantern state, worker arrival/cap overflow, Wall, cycle, backlog ve pool kapsamı. 10K profiler capture explicit targeted testtir.
+- `[x]` EditMode: `92/92`; contract, compact save/migration v3-v6, ortak 1000 archer cap matematiği, worker target mutation/allocation, profile-driven bed ve bina fiyat tuning'i, bina CAP/EFF seviye-maliyet matematiği, representative density/weight, production feedback strength ve lantern phase rule, cycle, quantity-only, backlog, Moat isolation, enemy catalog ve pool kapsamı.
+- `[x]` PlayMode: `22 pass + 1 explicit skip`; gerçek `NewGameScene`, 1000. archer kabulü ve 1001. buy/Council/restore reddi, baked ekonomi fiyat tuning'i, GameManager fiyat API'leri, worker drawer target/CAP/EFF kontrolleri, çift kaynak transaction'ı, bina exact Continue, Dawn survivor akışı, Low/Medium/High visual density, same-bucket exact weight, work/cargo/delivery/lantern state, worker arrival/cap overflow, Wall, cycle, backlog ve pool kapsamı. 10K profiler capture explicit targeted testtir.
 - `[~]` Council schedule/guardrail ve 1k x 10k ürün senaryoları ilgili paketleri bekliyor; enemy pool churn contract testli.
 
 ---
@@ -982,7 +982,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [ ] Wood/Stone/Iron/Food pasif negatif akmıyor; Arrow tek sürekli tüketim.
 - [ ] Population, beds ve worker ratios exact save/load.
 - [ ] Worker world feedback representative ve doğru.
-- [ ] Basic/Rapid/Frost toplam 1000 cap.
+- [x] Basic/Rapid/Frost toplam 1000 cap.
 - [ ] 40x25 stable formation.
 - [ ] Arrow Wood ile anında alınır; Fletcher/queue yok.
 - [ ] Castle Heart generated, validated, saved ve yalnız Grave Essence kullanıyor.
@@ -1043,7 +1043,7 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | `NewGameScene.unity` + `MobileCastleCombatSubScene.unity` | Kamera, HUD, active authoring, cycle ve combat values |
 | `MobileCastleHudRoot` live components | CyclePanel, HordePressure, Gate/Core bindings, drawers, worker CAP/EFF ve archer upgrade kontrolleri |
 | `MobileCastleCombatAuthoring.cs` + `DefaultDifficulty.asset` + `BasicZombie.asset` | 30/5/20/5, quantity curves, 900 cap ve ekonomi fiyat baseline'ları; enemy base statları catalog-owned |
-| `GameManager.cs` | Save/restore, repair, worker bina CAP/EFF alımı ve economy aggregate'i, archer buy/upgrade, Council, Fireball, meta bridge |
+| `GameManager.cs` | Save/restore, repair, worker bina CAP/EFF alımı ve economy aggregate'i, ortak archer spawn/cap guard'ı, archer buy/upgrade, Council, Fireball, meta bridge |
 | `RunPersistence.cs` | Exact schema v6; minimum v3, worker target/checkpoint + bed + worker bina yatırım migration'ı ve compact snapshot |
 | `ContinuousSiegeCycleSystem.cs` | Phase/intensity ve Blood Moon application |
 | `WaveSpawnSystem.cs` + `EnemyPoolRuntimeUtility.cs` | Tek catalog prefab/stat, cap/backlog ve expandable pool rent |
@@ -1052,6 +1052,7 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | `MobileEconomyPriceTuning` + `MobileCastleTuningResolver.cs` + `DifficultyTunerWindow.cs` | Profile-owned bed base/interval ve worker CAP/EFF Wood/Iron base + ortak growth değerlerini sanitize edip Baker/live Apply ile tek runtime component'e taşır |
 | `MobilePopulationEconomySystem.cs` + `MobilePopulationArrivalUtility.cs` + `WorkerAllocationUtility.cs` + `WorkerVisualRepresentationUtility.cs` + `MobileBedCapacityUtility.cs` + `SurvivorArrivalVisualSystem.cs` | Target ratio auto-allocation/cap overflow, temsili worker density ve exact weight; tuning-driven purchased bed state ve owned-capacity fiyat eğrisi; Dawn accepted growth + tek Food transaction'ı; mevcut VillagerWorker prefabıyla sağdan Wall arkasına yürüyen, en fazla 15 entity'lik transient arrival sunumu hazır |
 | `MobileWorkerBuildingUpgradeUtility.cs` + `MobileWorkerBuildingUpgradeState` | Dört kaynak için bağımsız CAP/EFF seviyeleri; tuning-driven Wood+Iron base maliyetleri ve ortak exponential growth, `+10` cap, additive `+10%` base üretim ve int-safe maliyet reddi |
+| `ArcherCapacityUtility.cs` + `GameManager.SpawnArcher` + `MarketUI.cs` | Basic/Rapid/Frost ortak `1000` entity cap'i; buy öncesi ve merkezi spawn guard'ı, Council/meta/restore sınırı, `ARMY CAP/MAX` feedback'i |
 | `WorkerLogisticsMovementSystem.cs` + `SpriteSheet.shader` + `Villager.mat` | Ayrı Idle/Walk/Work/Celebrate atlas seçimi; resource cargo, Dusk/Night lantern ve weight-scaled hub delivery pulse |
 | `MobileCastleArcherTilePlacement.cs` | Tile center + stack offset, preview 96 |
 | `ArcherShootSystem.cs` | Brute-force nearest target ve unlimited ammo bypass |
@@ -1109,3 +1110,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-14 | `DW-C-ARRIVAL-VISUAL` Dawn survivor walk-in | Gerçek accepted count mevcut `VillagerWorker` prefabıyla en fazla 15 transient görsele exact temsil edildi; survivor'lar sağ battlefield'daki farklı lane/gecikmelerden Wall arkasına yürüyor, resource worker lojistiğine girmiyor, varışta temizleniyor ve exact Continue tamamlanmış Dawn'ı yeniden oynatmıyor | Targeted EditMode 3/3; targeted PlayMode 2/2; full EditMode 77/77; full PlayMode 19 pass + 1 explicit skip; gerçek NewGameScene Game View 15-survivor QA; Unity console 0 error |
 | 2026-07-14 | `DW-C-BUILDING-SCALE` independent worker building investments | Dört hazır worker binasının CAP/EFF seviyeleri bağımsız state'e bağlandı; her alım Wood+Iron harcıyor, owner-onaylı base maliyetler `ceil(base × 1.35^level)` ile büyüyor, CAP `+10` slot ve EFF base üretime additive `+10%` veriyor. Workers drawer'da sekiz buton, int-safe cost limit ve exact save v6 tamamlandı | Targeted EditMode 13/13; targeted PlayMode 2/2; full EditMode 82/82; full PlayMode 20 pass + 1 explicit skip; 1280×720 gerçek Game View QA; Unity console 0 error |
 | 2026-07-14 | `DW-C-TUNING-SURFACE` profile-driven economy price curves | Bed base/interval ve worker CAP/EFF Wood/Iron base + ortak growth `DifficultyProfileSO`/Difficulty Tuner'a taşındı; Baker/live Apply tek `MobileEconomyPriceTuning` owner'ını yazıyor, GameManager bütün fiyat API'lerinde bunu tüketiyor. Onaylı default'lar korundu; invalid değerler sanitize, int dışı alımlar reddediliyor; Package C kapatıldı | Targeted EditMode 17/17; targeted PlayMode 2/2; full EditMode 85/85; full PlayMode 21 pass + 1 explicit skip; DefaultDifficulty live asset audit; Unity console 0 error |
+| 2026-07-14 | `DW-D-ARCHER-CAP` common 1000 archer guard | Basic/Rapid/Frost toplamı tek `ArcherCapacityUtility` owner'ında `1000` ile sınırlandı; satın alma harcamadan önce, bütün aktif yollar merkezi spawn'da tekrar kontrol ediliyor. Council/meta/restore aşırı miktarları cap'te duruyor, dormant Barracks rezerve slotlarla guard'ı bypass edemiyor; drawer `ARMY CAP/MAX` gösteriyor | Targeted EditMode 7/7; targeted PlayMode 1/1; full EditMode 92/92; full PlayMode 22 pass + 1 explicit skip; Unity console 0 error |

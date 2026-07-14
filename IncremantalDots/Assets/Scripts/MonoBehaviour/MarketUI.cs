@@ -298,6 +298,7 @@ namespace DeadWalls
                 return;
 
             bool unlocked = gm.IsArcherTypeUnlocked(type);
+            bool capReached = gm.GetRemainingArcherCapacity() <= 0;
             if (countText != null)
                 countText.text = $"x{gm.GetArcherTypeCount(type)}";
             if (dpsText != null)
@@ -307,28 +308,35 @@ namespace DeadWalls
 
             if (costText != null)
             {
-                var resources = gm.Resources;
-                var buyCost = gm.GetArcherBuyCost(type);
-                bool freeMode = gm.IsFreeEconomyTestMode;
-                string buyCostLabel = FormatCostWithNeed(buyCost, resources, freeMode);
-                if (!freeMode
-                    && unlocked
-                    && gm.IsMobilePopulationEconomyEnabled()
-                    && buyCost.CanAfford(resources)
-                    && gm.GetIdlePopulation() <= 0)
+                if (unlocked && capReached)
                 {
-                    buyCostLabel = $"{buyCostLabel} NEED POP";
+                    costText.text = $"ARMY CAP {gm.GetTotalArcherCount()}/{ArcherCapacityUtility.MaxTotalArchers}";
                 }
+                else
+                {
+                    var resources = gm.Resources;
+                    var buyCost = gm.GetArcherBuyCost(type);
+                    bool freeMode = gm.IsFreeEconomyTestMode;
+                    string buyCostLabel = FormatCostWithNeed(buyCost, resources, freeMode);
+                    if (!freeMode
+                        && unlocked
+                        && gm.IsMobilePopulationEconomyEnabled()
+                        && buyCost.CanAfford(resources)
+                        && gm.GetIdlePopulation() <= 0)
+                    {
+                        buyCostLabel = $"{buyCostLabel} NEED POP";
+                    }
 
-                costText.text = unlocked
-                    ? $"BUY {buyCostLabel}"
-                    : "LOCKED BY TECH";
+                    costText.text = unlocked
+                        ? $"BUY {buyCostLabel}"
+                        : "LOCKED BY TECH";
+                }
             }
 
             if (buyButton != null)
             {
                 buyButton.interactable = gm.CanBuyArcher(type);
-                SetButtonText(buyButton, unlocked ? "Buy" : "Locked");
+                SetButtonText(buyButton, !unlocked ? "Locked" : capReached ? "Max" : "Buy");
             }
 
             HideButton(upgradeButton);
@@ -621,18 +629,23 @@ namespace DeadWalls
             ArcherType type = row.Definition.Type;
             bool unlocked = gm.IsArcherTypeUnlocked(type);
             bool canBuy = gm.CanBuyArcher(row.Definition);
+            bool capReached = gm.GetRemainingArcherCapacity() <= 0;
 
             SetText(row.NameText, row.Definition.DisplayName);
             SetText(row.CountText, $"x{gm.GetArcherTypeCount(type)}");
             SetText(row.DpsText, unlocked ? $"DPS {gm.GetArcherTypeDps(type):0.#}" : "LOCKED");
             SetText(row.LevelText, unlocked ? $"LV {gm.GetArcherTypeLevel(type)}" : "TECH");
-            SetText(row.CostText, unlocked ? BuildBuyCostLabel(gm, row.Definition) : "LOCKED BY TECH");
+            SetText(row.CostText, !unlocked
+                ? "LOCKED BY TECH"
+                : capReached
+                    ? $"ARMY CAP {gm.GetTotalArcherCount()}/{ArcherCapacityUtility.MaxTotalArchers}"
+                    : BuildBuyCostLabel(gm, row.Definition));
             SetText(row.StatusText, BuildStatusLabel(gm, row.Definition, unlocked, canBuy));
 
             if (row.BuyButton != null)
             {
                 row.BuyButton.interactable = canBuy;
-                SetText(row.BuyButtonText, unlocked ? "BUY" : "LOCKED");
+                SetText(row.BuyButtonText, !unlocked ? "LOCKED" : capReached ? "MAX" : "BUY");
             }
         }
 
@@ -654,6 +667,9 @@ namespace DeadWalls
         {
             if (!unlocked)
                 return string.IsNullOrEmpty(definition.RequiredTechId) ? "LOCKED" : "TECH LOCKED";
+
+            if (gm.GetRemainingArcherCapacity() <= 0)
+                return $"ARMY CAP {gm.GetTotalArcherCount()}/{ArcherCapacityUtility.MaxTotalArchers}";
 
             if (canBuy)
                 return "READY";
