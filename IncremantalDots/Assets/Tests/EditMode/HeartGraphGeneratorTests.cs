@@ -27,7 +27,90 @@ namespace DeadWalls.Tests
             GeneratedRunGraph first = HeartGraphGenerator.GenerateOrThrow(request);
             GeneratedRunGraph second = HeartGraphGenerator.GenerateOrThrow(request);
 
+            Assert.That(first.CatalogVersion, Is.EqualTo(catalog.CatalogVersion));
             Assert.That(JsonUtility.ToJson(first), Is.EqualTo(JsonUtility.ToJson(second)));
+        }
+
+        [Test]
+        public void PersistedGraph_ExactClonePreservesHiddenLevelsLocksAndDoesNotAliasSource()
+        {
+            HeartNodeCatalogSO catalog = CreateValidCatalog();
+            GeneratedRunGraph graph = HeartGraphGenerator.GenerateOrThrow(CreateRequest(catalog, 731u));
+            HeartGraphRevealService.InitializeRunVisibility(graph);
+            GeneratedHeartNodeState sink = graph.Nodes.Single(node => node.NodeId == "army_sink");
+            sink.Visibility = HeartNodeVisibility.Revealed;
+            sink.Level = 17;
+            GeneratedHeartNodeState source = graph.Nodes.Single(node => node.NodeId == "keystone_army");
+            GeneratedHeartNodeState partner = graph.Nodes.Single(node => node.NodeId == "keystone_defense");
+            source.Visibility = HeartNodeVisibility.Revealed;
+            source.Level = 1;
+            partner.LockState = HeartNodeLockState.KeystoneConflict;
+            partner.LockedByNodeId = source.NodeId;
+
+            GeneratedRunGraph clone = HeartGraphPersistenceUtility.CloneExact(graph);
+            bool valid = HeartGraphPersistenceUtility.TryValidateForRestore(
+                clone,
+                catalog,
+                out List<string> errors);
+
+            Assert.That(valid, Is.True, string.Join(" | ", errors));
+            Assert.That(JsonUtility.ToJson(clone), Is.EqualTo(JsonUtility.ToJson(graph)));
+            Assert.That(clone, Is.Not.SameAs(graph));
+            Assert.That(clone.Nodes, Is.Not.SameAs(graph.Nodes));
+            clone.Nodes.Single(node => node.NodeId == "army_sink").Level = 99;
+            Assert.That(sink.Level, Is.EqualTo(17));
+        }
+
+        [Test]
+        public void PersistedGraph_CatalogVersionMismatchFailsWithoutRegeneration()
+        {
+            HeartNodeCatalogSO catalog = CreateValidCatalog();
+            catalog.CatalogVersion = 7;
+            GeneratedRunGraph graph = HeartGraphGenerator.GenerateOrThrow(CreateRequest(catalog, 991u));
+            string exactJson = JsonUtility.ToJson(graph);
+            catalog.CatalogVersion = 8;
+
+            bool valid = HeartGraphPersistenceUtility.TryValidateForRestore(
+                graph,
+                catalog,
+                out List<string> errors);
+
+            Assert.That(valid, Is.False);
+            Assert.That(errors, Has.Some.Contains("uyusmuyor"));
+            Assert.That(JsonUtility.ToJson(graph), Is.EqualTo(exactJson));
+        }
+
+        [Test]
+        public void PersistedGraph_ReplaysPurchasedNumericAndBehaviorEffectsBeforeActivation()
+        {
+            HeartNodeCatalogSO catalog = CreateValidCatalog();
+            GeneratedRunGraph graph = HeartGraphGenerator.GenerateOrThrow(CreateRequest(catalog, 1199u));
+            GeneratedHeartNodeState rapid = graph.Nodes.Single(node => node.NodeId == "rapid_unlock");
+            GeneratedHeartNodeState wall = graph.Nodes.Single(node => node.NodeId == "wall_access");
+            rapid.Visibility = HeartNodeVisibility.Revealed;
+            rapid.Level = 1;
+            wall.Visibility = HeartNodeVisibility.Revealed;
+            wall.Level = 1;
+            var provider = new AnyBaselineProvider();
+            var sink = new RecordingEffectSink();
+
+            bool restored = HeartGraphPersistenceUtility.TryCreateRestoredPipeline(
+                graph,
+                catalog,
+                provider,
+                sink,
+                out HeartEffectPipeline pipeline,
+                out string error);
+
+            Assert.That(restored, Is.True, error);
+            Assert.That(pipeline, Is.Not.Null);
+            Assert.That(sink.EnabledBehaviorTypes, Does.Contain(HeartNodeEffectType.UnlockArcherType));
+            var wallTarget = new HeartEffectTargetKey(
+                HeartNodeEffectType.ModifyWallMaxHpPercent,
+                default,
+                default);
+            Assert.That(sink.NumericValues.ContainsKey(wallTarget), Is.True);
+            Assert.That(sink.NumericValues[wallTarget], Is.GreaterThan(100d));
         }
 
         [Test]
@@ -361,6 +444,35 @@ namespace DeadWalls.Tests
                 }),
                 Is.True,
                 $"Graph '{tag}' guarantee node'unu tasimali.");
+        }
+
+        private sealed class AnyBaselineProvider : IHeartEffectBaselineProvider
+        {
+            public bool TryGetBaseline(
+                HeartEffectTargetKey target,
+                out HeartEffectBaseline baseline)
+            {
+                baseline = new HeartEffectBaseline(target.ToString(), 100d, string.Empty, 2);
+                return true;
+            }
+        }
+
+        private sealed class RecordingEffectSink : IHeartRuntimeEffectSink
+        {
+            public readonly Dictionary<HeartEffectTargetKey, double> NumericValues =
+                new Dictionary<HeartEffectTargetKey, double>();
+            public readonly List<HeartNodeEffectType> EnabledBehaviorTypes =
+                new List<HeartNodeEffectType>();
+
+            public void ApplyNumericEffect(HeartEffectTargetKey target, double actualValue)
+            {
+                NumericValues[target] = actualValue;
+            }
+
+            public void EnableBehaviorEffect(HeartNodeEffect effect)
+            {
+                EnabledBehaviorTypes.Add(effect.Type);
+            }
         }
     }
 }

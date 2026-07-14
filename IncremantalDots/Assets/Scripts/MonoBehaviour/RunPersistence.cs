@@ -13,7 +13,7 @@ namespace DeadWalls
     [Serializable]
     public class RunSaveState
     {
-        public const int CurrentVersion = 9;
+        public const int CurrentVersion = 10;
         public const int MinimumSupportedVersion = 3;
 
         public int Version = CurrentVersion;
@@ -79,6 +79,11 @@ namespace DeadWalls
         public int ArrowCapacityLevel;
         public int ArrowEfficiencyLevel;
         public long GraveEssence;
+
+        // JsonUtility null nested class'i default object olarak yazabildigi icin explicit
+        // discriminator otoritedir. False ise HeartGraph payload'i ignore edilir.
+        public bool HasHeartGraph;
+        public GeneratedRunGraph HeartGraph;
 
         // Nufus + isci dagilimi
         public int PopulationTotal;
@@ -369,6 +374,16 @@ namespace DeadWalls
                 // beslenmez; eski exact snapshot temiz 0 bakiye ile devam eder.
                 state.GraveEssence = 0;
                 state.Version = 9;
+            }
+
+            if (state.Version == 9)
+            {
+                // v9 Grave Essence tasiyordu fakat generated graph'i tasimiyordu. Eksik
+                // graph'i aktif catalog'dan sessizce yeniden uretmek yerine null migration
+                // acikca korunur; runtime bu kosuda Heart'i exact-state gate'inde kilitler.
+                state.HasHeartGraph = false;
+                state.HeartGraph = null;
+                state.Version = 10;
             }
         }
 

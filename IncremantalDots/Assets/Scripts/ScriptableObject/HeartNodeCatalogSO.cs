@@ -41,6 +41,10 @@ namespace DeadWalls
         menuName = "DeadWalls/Castle Heart/Heart Node Catalog")]
     public sealed class HeartNodeCatalogSO : ScriptableObject
     {
+        [Min(1)]
+        [Tooltip("Her launch catalog degisikliginde artirilir. Eski run graph'lari farkli version'a sessiz map edilmez.")]
+        public int CatalogVersion = 1;
+
         [Tooltip("System-owned root kimligi. Authored node havuzunda bu Id kullanilamaz.")]
         public string RootNodeId = HeartGraphConstants.RootNodeId;
 
@@ -74,6 +78,8 @@ namespace DeadWalls
             {
                 errors.Add($"RootNodeId sabit '{HeartGraphConstants.RootNodeId}' olmalidir.");
             }
+            if (CatalogVersion <= 0)
+                errors.Add("CatalogVersion sifirdan buyuk olmalidir.");
 
             HeartNodeDefinitionSO[] nodes = Nodes ?? Array.Empty<HeartNodeDefinitionSO>();
             var definitionsById = new Dictionary<string, HeartNodeDefinitionSO>(StringComparer.Ordinal);

@@ -186,7 +186,11 @@ namespace DeadWalls
                 branchLengths.Add(branch, branchLength);
             }
 
-            graph = BuildGraph(request.Seed, placements, branchLengths);
+            graph = BuildGraph(
+                request.Seed,
+                request.Catalog.CatalogVersion,
+                placements,
+                branchLengths);
             AddControlledCrossLinks(graph, request.MaximumCrossLinks, ref random);
             return true;
         }
@@ -520,11 +524,13 @@ namespace DeadWalls
 
         private static GeneratedRunGraph BuildGraph(
             uint runSeed,
+            int catalogVersion,
             Dictionary<HeartNodeBranch, Dictionary<int, HeartNodeDefinitionSO>> placements,
             Dictionary<HeartNodeBranch, int> branchLengths)
         {
             var graph = new GeneratedRunGraph
             {
+                CatalogVersion = catalogVersion,
                 Seed = runSeed,
                 RootNodeId = HeartGraphConstants.RootNodeId
             };

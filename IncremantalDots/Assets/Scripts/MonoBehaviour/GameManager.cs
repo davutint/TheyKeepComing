@@ -2947,6 +2947,13 @@ namespace DeadWalls
 
             ReadECSData();
             EnsureCurrentRunId();
+            if (!TryCaptureHeartGraphForSave(
+                    out GeneratedRunGraph heartGraphSnapshot,
+                    out string heartSaveError))
+            {
+                Debug.LogError("[GameManager] Castle Heart exact save reddedildi: " + heartSaveError);
+                return false;
+            }
 
             var cycle = _entityManager.GetComponentData<ContinuousSiegeCycleData>(mobileConfigEntity);
             var wave = _entityManager.GetComponentData<WaveStateData>(_gameStateEntity);
@@ -3015,6 +3022,8 @@ namespace DeadWalls
                 ArrowCapacityLevel = ArrowSupply.CapacityLevel,
                 ArrowEfficiencyLevel = ArrowSupply.EfficiencyLevel,
                 GraveEssence = GraveEssenceAmount,
+                HasHeartGraph = heartGraphSnapshot != null,
+                HeartGraph = heartGraphSnapshot,
                 PopulationTotal = Population.Total,
                 PopulationCapacity = Population.Capacity,
                 PopulationBaseCapacity = Population.BaseCapacity,
@@ -3234,6 +3243,13 @@ namespace DeadWalls
             var save = RunPersistence.TryLoad();
             if (save == null || !_initialized || !TryGetMobileConfigEntity(out var mobileConfigEntity))
                 return false;
+            GeneratedRunGraph savedHeartGraph = save.HasHeartGraph ? save.HeartGraph : null;
+            if (!TryValidateSavedHeartGraphForRestore(savedHeartGraph, out string heartPreflightError))
+            {
+                Debug.LogError("[GameManager] Castle Heart Continue preflight reddedildi: "
+                               + heartPreflightError);
+                return false;
+            }
 
             RestartGame();
             _currentRunId = save.RunId;
@@ -3297,12 +3313,7 @@ namespace DeadWalls
             });
             _entityManager.SetComponentData(_gameStateEntity, new ArrowSupply
             {
-                Current = math.clamp(save.ArrowCurrent, 0,
-                    ArrowEconomyUtility.GetCapacity(new ArrowSupply
-                    {
-                        CapacityLevel = math.max(0, save.ArrowCapacityLevel),
-                        EfficiencyLevel = math.max(0, save.ArrowEfficiencyLevel)
-                    }, GetEconomyPriceTuning())),
+                Current = math.max(0, save.ArrowCurrent),
                 CapacityLevel = math.max(0, save.ArrowCapacityLevel),
                 EfficiencyLevel = math.max(0, save.ArrowEfficiencyLevel),
                 Accumulator = save.ArrowAccumulator
@@ -3312,6 +3323,13 @@ namespace DeadWalls
                 Current = save.GraveEssence < 0 ? 0 : save.GraveEssence
             });
             HeartEssence = _entityManager.GetComponentData<GraveEssence>(_gameStateEntity);
+            if (!TryRestoreHeartRuntime(savedHeartGraph, out string heartRestoreError))
+            {
+                Debug.LogError("[GameManager] Castle Heart Continue replay reddedildi: "
+                               + heartRestoreError);
+                return false;
+            }
+            ClampRestoredArrowSupplyToEffectiveCapacity();
 
             if (_entityManager.HasComponent<EconomyFocusState>(mobileConfigEntity))
             {

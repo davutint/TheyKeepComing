@@ -25,6 +25,7 @@ namespace DeadWalls
         public const int CurrentGraphVersion = 1;
 
         public int GraphVersion = CurrentGraphVersion;
+        public int CatalogVersion = 1;
         public uint Seed;
         public string RootNodeId = "castle_heart";
         public List<GeneratedHeartNodeState> Nodes = new List<GeneratedHeartNodeState>();

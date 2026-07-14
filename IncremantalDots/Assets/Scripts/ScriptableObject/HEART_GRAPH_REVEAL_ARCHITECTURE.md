@@ -99,14 +99,15 @@ purchase pipeline'inin sorumlulugudur.
 
 - Graph node listesi ve hidden icerik E2'de run basinda kesinlesir.
 - E3 reveal servisinde yeni RNG yoktur.
-- `GeneratedRunGraph` exact save/load baglantisi ve schema migration E6'da yapilacaktir.
+- `GeneratedRunGraph` exact save/load baglantisi schema v10 ile aktiftir; Continue saved
+  visibility state'ini genisletmeden oldugu gibi kurar.
 - Numeric effect'in effective runtime hesabini E4 resolver'i saglar; production runtime
   adapter binding'i E5'te tamamlanir.
 - Prefabda branch damari, hidden slot, tooltip ve Keystone conflict cizimi E5 Heart UI
   cutover'inda yapilir.
 
-Bu nedenle tracker'daki persistence, tam numeric bilgi ve gercek UI sunum maddeleri
-ilgili owner paketleri tamamlanana kadar partial kalir.
+Persistence, numeric bilgi ve gercek UI sunumu E3-E6 owner paketleriyle canli runtime'a
+baglidir.
 
 ## Test kapsami
 

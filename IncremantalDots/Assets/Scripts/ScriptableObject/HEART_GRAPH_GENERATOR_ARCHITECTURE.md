@@ -14,7 +14,7 @@ Generator sentetik EditMode kataloglariyla dogrulandi.
 
 - `HeartNodeDefinitionSO`: tek authored node tanimi; branch, type, rarity, depth,
   tags, effects, maliyet girdileri ve Keystone partner Id'si.
-- `HeartNodeCatalogSO`: generator'in immutable authored node havuzu.
+- `HeartNodeCatalogSO`: generator'in immutable authored node havuzu ve explicit `CatalogVersion` owner'i.
 - `HeartGraphGenerationRequest`: run seed'i ve acik generation/tuning sinirlari.
 - `GeneratedRunGraph`: run basinda uretilen, asset referanssiz exact graph state'i.
 - `HeartGraphGenerator`: deterministic secim, yerlestirme, edge ve cross-link owner'i.
@@ -51,7 +51,8 @@ gercegi soylemelidir; yalniz node adina bakilarak guarantee kabul edilmez.
 
 ## Deterministic generation
 
-Generator global `UnityEngine.Random` state'ini kullanmaz. Run seed'inden her attempt
+Generator global `UnityEngine.Random` state'ini kullanmaz. Graph, catalog version'ini de
+exact state'e yazar. Run seed'inden her attempt
 icin stable xorshift state turetilir. Catalog girdisi Id'ye gore siralandigi icin ayni
 catalog icerigi, request ve seed ayni graph JSON'unu uretir.
 

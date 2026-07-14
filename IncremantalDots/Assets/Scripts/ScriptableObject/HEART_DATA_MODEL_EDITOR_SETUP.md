@@ -26,6 +26,10 @@ Elle deneme asset'i olusturulursa:
 3. Yalniz Keystone icin tam bir karsi Keystone Id'si yazilir.
 4. Asset'te runtime level/reveal/lock verisi aranmaz; bunlar generated run state'tir.
 
+Catalog asset'inde `CatalogVersion >= 1` olmalidir. Node/effect/cost/conflict veya
+player-facing content degisikliginde version artirilir; eski run graph'i yeni catalog'a
+sessizce map edilmez. Ayrintili kural `HEART_GRAPH_PERSISTENCE_EDITOR_SETUP.md` dosyasindadir.
+
 ## Dogrulama
 
 - EditMode: `HeartDataModelTests` ve `RunPersistenceTests`.
@@ -34,4 +38,3 @@ Elle deneme asset'i olusturulursa:
 
 Graph layout, guarantee node'lari, reveal ve fallback testi E2/E3 kapsamindadir.
 Heart panel pause, +1/+10/Buy Max ve effect uygulama E4/E5 kapsamindadir.
-

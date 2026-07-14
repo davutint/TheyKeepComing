@@ -51,12 +51,14 @@ ve setup binding tool'u birlikte guncellenerek yapilmalidir.
 ## E6 save/load entegrasyonu
 
 Exact snapshot `GeneratedRunGraph` icindeki node Id, edge, visibility, level, lock ve
-locked-by state'ini oldugu gibi kaydetmelidir. Continue:
+locked-by state'ini oldugu gibi kaydeder. Continue:
 
-- Generator'i tekrar cagirmamali.
-- `InitializeRunVisibility` ile eski reveal state'ini yeniden genisletmemeli.
-- Saved graph version/catalog uyumsuzlugunda sessiz reroll yapmamali.
-- Presentation'i restore edilen exact graph'tan yeniden kurmalidir.
+- Generator'i tekrar cagirmaz.
+- `InitializeRunVisibility` ile eski reveal state'ini yeniden genisletmez.
+- Saved graph version/catalog uyumsuzlugunda sessiz reroll yapmaz.
+- Presentation'i restore edilen exact graph'tan yeniden kurar.
+
+Owner ve test ayrintisi `HEART_GRAPH_PERSISTENCE_EDITOR_SETUP.md` dosyasindadir.
 
 ## Hedefli test
 

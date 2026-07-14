@@ -75,5 +75,5 @@ partneri, numeric value/soft-cap ve Evolution pool'u ayri owner onayi gerektirir
 - Full PlayMode regression.
 - Console: compile/runtime error `0`.
 
-Exact graph save/restore, catalog version migration ve Continue replay `DW-E-SAVE` paketinde
-test edilir.
+Exact graph save/restore, catalog version gate ve Continue replay
+`HeartGraphContinuePlayModeTests` ile test edilir.

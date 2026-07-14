@@ -44,6 +44,13 @@ namespace DeadWalls.Tests
                 ArrowCapacityLevel = 3,
                 ArrowEfficiencyLevel = 4,
                 GraveEssence = 9_876_543_210L,
+                HasHeartGraph = true,
+                HeartGraph = new GeneratedRunGraph
+                {
+                    CatalogVersion = 7,
+                    Seed = 777u,
+                    RootNodeId = HeartGraphConstants.RootNodeId
+                },
                 WoodBuildingCapacityLevel = 3,
                 WoodBuildingEfficiencyLevel = 4,
                 StoneBuildingCapacityLevel = 5,
@@ -101,6 +108,31 @@ namespace DeadWalls.Tests
                 ArcherType = (int)ArcherType.Frost,
                 RemainingLifetime = 2.75f
             });
+            state.HeartGraph.Nodes.Add(new GeneratedHeartNodeState
+            {
+                NodeId = HeartGraphConstants.RootNodeId,
+                Branch = HeartNodeBranch.HeartMagic,
+                Depth = 0,
+                Visibility = HeartNodeVisibility.Revealed,
+                Level = 1,
+                LockState = HeartNodeLockState.Available,
+                LockedByNodeId = string.Empty
+            });
+            state.HeartGraph.Nodes.Add(new GeneratedHeartNodeState
+            {
+                NodeId = "hidden_army",
+                Branch = HeartNodeBranch.Army,
+                Depth = 1,
+                Visibility = HeartNodeVisibility.Hidden,
+                Level = 0,
+                LockState = HeartNodeLockState.KeystoneConflict,
+                LockedByNodeId = "chosen_keystone"
+            });
+            state.HeartGraph.Edges.Add(new GeneratedHeartEdge
+            {
+                FromNodeId = HeartGraphConstants.RootNodeId,
+                ToNodeId = "hidden_army"
+            });
 
             string json = JsonUtility.ToJson(state);
             RunSaveState restored = JsonUtility.FromJson<RunSaveState>(json);
@@ -119,6 +151,13 @@ namespace DeadWalls.Tests
             Assert.That(restored.ArrowCapacityLevel, Is.EqualTo(3));
             Assert.That(restored.ArrowEfficiencyLevel, Is.EqualTo(4));
             Assert.That(restored.GraveEssence, Is.EqualTo(9_876_543_210L));
+            Assert.That(restored.HasHeartGraph, Is.True);
+            Assert.That(restored.HeartGraph, Is.Not.Null);
+            Assert.That(restored.HeartGraph.CatalogVersion, Is.EqualTo(7));
+            Assert.That(restored.HeartGraph.Seed, Is.EqualTo(777u));
+            Assert.That(restored.HeartGraph.Nodes[1].Visibility, Is.EqualTo(HeartNodeVisibility.Hidden));
+            Assert.That(restored.HeartGraph.Nodes[1].LockedByNodeId, Is.EqualTo("chosen_keystone"));
+            Assert.That(restored.HeartGraph.Edges[0].ToNodeId, Is.EqualTo("hidden_army"));
             Assert.That(restored.WoodBuildingCapacityLevel, Is.EqualTo(3));
             Assert.That(restored.WoodBuildingEfficiencyLevel, Is.EqualTo(4));
             Assert.That(restored.StoneBuildingCapacityLevel, Is.EqualTo(5));
@@ -369,6 +408,40 @@ namespace DeadWalls.Tests
                 Assert.That(restored, Is.Not.Null);
                 Assert.That(restored.Version, Is.EqualTo(RunSaveState.CurrentVersion));
                 Assert.That(restored.GraveEssence, Is.Zero);
+            }
+            finally
+            {
+                if (original != null)
+                    File.WriteAllBytes(path, original);
+                else if (File.Exists(path))
+                    File.Delete(path);
+            }
+        }
+
+        [Test]
+        public void TryLoad_Version9Snapshot_DoesNotInventMissingHeartGraph()
+        {
+            string path = Path.Combine(Application.persistentDataPath, "run_save.json");
+            byte[] original = File.Exists(path) ? File.ReadAllBytes(path) : null;
+            var legacy = new RunSaveState
+            {
+                Version = 9,
+                RunId = "run_v9_graph_migration_" + Guid.NewGuid().ToString("N"),
+                GraveEssence = 125
+            };
+
+            try
+            {
+                File.WriteAllText(path, JsonUtility.ToJson(legacy));
+
+                RunSaveState restored = RunPersistence.TryLoad();
+
+                Assert.That(restored, Is.Not.Null);
+                Assert.That(restored.Version, Is.EqualTo(RunSaveState.CurrentVersion));
+                Assert.That(restored.GraveEssence, Is.EqualTo(125));
+                Assert.That(restored.HasHeartGraph, Is.False);
+                Assert.That(restored.HeartGraph, Is.Null,
+                    "v9 eksik graph'i aktif catalog'dan sessizce uretilemez.");
             }
             finally
             {

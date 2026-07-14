@@ -22,6 +22,7 @@ namespace DeadWalls
         private GeneratedRunGraph _generatedHeartGraph;
         private HeartEffectPipeline _heartEffectPipeline;
         private bool _heartRuntimeAttempted;
+        private bool _heartRuntimeRestoreInProgress;
         private string _heartRuntimeError = string.Empty;
 
         public string HeartRuntimeError => _heartRuntimeError;
@@ -379,8 +380,11 @@ namespace DeadWalls
             else
                 supply.HeartEfficiencyBonus = safeBonus;
 
-            int capacity = ArrowEconomyUtility.GetCapacity(supply, GetEconomyPriceTuning());
-            supply.Current = math.clamp(supply.Current, 0, capacity);
+            if (!_heartRuntimeRestoreInProgress)
+            {
+                int capacity = ArrowEconomyUtility.GetCapacity(supply, GetEconomyPriceTuning());
+                supply.Current = math.clamp(supply.Current, 0, capacity);
+            }
             _entityManager.SetComponentData(entity, supply);
             ArrowSupply = supply;
         }
@@ -429,11 +433,118 @@ namespace DeadWalls
             return false;
         }
 
+        private bool TryCaptureHeartGraphForSave(
+            out GeneratedRunGraph graphSnapshot,
+            out string error)
+        {
+            graphSnapshot = null;
+            error = string.Empty;
+            if (heartCatalog == null)
+                return true;
+            if (!EnsureHeartRuntime())
+            {
+                error = string.IsNullOrWhiteSpace(_heartRuntimeError)
+                    ? "Castle Heart runtime save icin hazirlanamadi."
+                    : _heartRuntimeError;
+                return false;
+            }
+            if (!HeartGraphPersistenceUtility.TryValidateForRestore(
+                    _generatedHeartGraph,
+                    heartCatalog,
+                    out List<string> validationErrors))
+            {
+                error = string.Join(" | ", validationErrors);
+                return false;
+            }
+
+            graphSnapshot = HeartGraphPersistenceUtility.CloneExact(_generatedHeartGraph);
+            return true;
+        }
+
+        private bool TryValidateSavedHeartGraphForRestore(
+            GeneratedRunGraph savedGraph,
+            out string error)
+        {
+            error = string.Empty;
+            if (savedGraph == null)
+                return true;
+            if (!HeartGraphPersistenceUtility.TryValidateForRestore(
+                    savedGraph,
+                    heartCatalog,
+                    out List<string> validationErrors))
+            {
+                error = string.Join(" | ", validationErrors);
+                return false;
+            }
+            return true;
+        }
+
+        private bool TryRestoreHeartRuntime(
+            GeneratedRunGraph savedGraph,
+            out string error)
+        {
+            ResetHeartRuntime();
+            error = string.Empty;
+            if (savedGraph == null)
+            {
+                _heartRuntimeAttempted = true;
+                _heartRuntimeError = heartCatalog == null
+                    ? "Production HeartNodeCatalogSO atanmamis."
+                    : "Kayitli kosu exact Castle Heart graph'i tasimiyor; yeni graph uretilmedi.";
+                return true;
+            }
+
+            GeneratedRunGraph restoredGraph = HeartGraphPersistenceUtility.CloneExact(savedGraph);
+            _generatedHeartGraph = restoredGraph;
+            _heartRuntimeRestoreInProgress = true;
+            bool restored;
+            HeartEffectPipeline restoredPipeline;
+            try
+            {
+                restored = HeartGraphPersistenceUtility.TryCreateRestoredPipeline(
+                    restoredGraph,
+                    heartCatalog,
+                    this,
+                    this,
+                    out restoredPipeline,
+                    out error);
+            }
+            finally
+            {
+                _heartRuntimeRestoreInProgress = false;
+            }
+
+            if (!restored)
+            {
+                ResetHeartRuntime();
+                _heartRuntimeAttempted = true;
+                _heartRuntimeError = error;
+                return false;
+            }
+
+            _heartEffectPipeline = restoredPipeline;
+            _heartRuntimeAttempted = true;
+            _heartRuntimeError = string.Empty;
+            return true;
+        }
+
+        private void ClampRestoredArrowSupplyToEffectiveCapacity()
+        {
+            if (!TryGetArrowSupply(out Unity.Entities.Entity entity, out ArrowSupply supply))
+                return;
+
+            int capacity = ArrowEconomyUtility.GetCapacity(supply, GetEconomyPriceTuning());
+            supply.Current = math.clamp(supply.Current, 0, capacity);
+            _entityManager.SetComponentData(entity, supply);
+            ArrowSupply = supply;
+        }
+
         private void ResetHeartRuntime()
         {
             _generatedHeartGraph = null;
             _heartEffectPipeline = null;
             _heartRuntimeAttempted = false;
+            _heartRuntimeRestoreInProgress = false;
             _heartRuntimeError = string.Empty;
             _heartBaselines.Clear();
             _heartActualValues.Clear();

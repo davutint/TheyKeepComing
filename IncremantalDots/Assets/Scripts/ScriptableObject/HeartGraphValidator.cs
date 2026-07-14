@@ -43,6 +43,11 @@ namespace DeadWalls
 
             if (graph.GraphVersion != GeneratedRunGraph.CurrentGraphVersion)
                 errors.Add($"Desteklenmeyen graph version: {graph.GraphVersion}.");
+            if (graph.CatalogVersion != catalog.CatalogVersion)
+            {
+                errors.Add($"Graph catalog version {graph.CatalogVersion}, aktif catalog version "
+                           + $"{catalog.CatalogVersion} ile ayni degil.");
+            }
             if (graph.Seed != request.Seed)
                 errors.Add($"Graph seed {graph.Seed}, request seed {request.Seed} ile ayni degil.");
             if (!string.Equals(graph.RootNodeId, HeartGraphConstants.RootNodeId, StringComparison.Ordinal))

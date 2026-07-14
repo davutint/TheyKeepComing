@@ -78,13 +78,13 @@ fallback yapilmaz.
 
 ## E6 restore binding
 
-Continue sirasinda:
+Continue sirasindaki canli binding:
 
-1. Exact graph DTO'yu restore et.
-2. Effect pipeline'i sifir state ile olustur.
-3. Satin alinmis node'lari graph level sirasindan deterministic replay et.
-4. Baseline/sink apply bittikten sonra UI/resolver'i ac.
-5. Graph level ile pipeline tracked level uyusmazsa sessizce devam etme.
+1. Exact graph DTO restore preflight'inden gecer.
+2. Effect pipeline sifir state ve deferred sink ile olusturulur.
+3. Satin alinmis node'lar depth + Id sirasinda deterministic replay edilir.
+4. Butun replay basarili olunca sink aktive edilir ve UI/resolver acilir.
+5. Graph/pipeline/catalog uyusmazligi Continue'i acik hata ile reddeder.
 
 Source catalog'tan yeni fiyat veya yeni graph zar atarak eski save'i degistirme.
 
@@ -93,4 +93,4 @@ Source catalog'tan yeni fiyat veya yeni graph zar atarak eski save'i degistirme.
 - Hedefli EditMode: `DeadWalls.Tests.HeartPurchasePipelineTests`.
 - Full EditMode regression.
 - Gercek prefab uzerinde +1/+10/Buy Max ve Keystone UI QA.
-- E6 sonrasinda Continue replay ve exact balance/level/lock PlayMode testi.
+- `HeartGraphContinuePlayModeTests` exact Continue replay ve level/lock JSON testi.

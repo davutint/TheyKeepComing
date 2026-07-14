@@ -93,9 +93,9 @@ bu cutover'i idempotent uygular ve eski isimleri yalniz migration fallback'i ola
 
 ## Persistence siniri
 
-E5 runtime graph'i canli kosu icinde deterministic uretir. Exact graph DTO, reveal, level ve
-Keystone lock replay'i E6 `DW-E-SAVE` kapsamindadir. E6 tamamlanmadan Continue'in catalog'dan
-yeniden graph uretmesine izin verilmemelidir.
+E5 runtime graph'i canli kosu icinde deterministic uretir. E6 `DW-E-SAVE`, exact graph DTO,
+reveal, level ve Keystone lock state'ini schema v10'a yazar. Continue saved graph'i clone ve
+validate eder; catalog'dan yeniden graph uretmez ve purchased effect'leri replay eder.
 
 ## Performans
 

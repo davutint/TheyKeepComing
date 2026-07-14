@@ -4,8 +4,8 @@
 >
 > **Tracker sürümü:** 2.0  
 > **Son tam kapsam denetimi:** 2026-07-12  
-> **Aktif paket:** Package E - Castle Heart
-> **Aktif iş:** `DW-E-SAVE` - Exact Graph Save, Migration + Continue Replay
+> **Aktif paket:** Package F - Council
+> **Aktif iş:** `DW-F-SCHEDULE` - Exact 3/6/9 Regular Council
 
 ---
 
@@ -128,7 +128,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Moat | Runtime flag kapalı; slow `1`, damage `0`; tech/meta catalog bağlantıları dormant | Uyumlu |
 | Defense | Damage/Game Over aktif ve testli olarak tek Wall'a çekildi | `[x]` |
 | Normal repair | Stone-only ve yalnız Day/Dusk | `[x]` |
-| Save | Exact same-moment Continue; schema v9, minimum v3; purchased bed, worker bina yatırımı, Archer Formation V1, finite Arrow yatırımı ve Grave Essence exact | `[x]` |
+| Save | Exact same-moment Continue; schema v10, minimum v3; purchased bed, worker bina yatırımı, Archer Formation V1, finite Arrow yatırımı, Grave Essence ve exact Heart graph replay | `[x]` |
 | Economy | Worker üretimi, bed alımı ve dört hazır binanın capacity/efficiency yatırımları var; bed ve bina fiyat eğrileri `DefaultDifficulty.asset`/Difficulty Tuner üzerinden baked runtime tuning'e bağlı; V1 ana kaynaklarında pasif consumption yok | `[x]` |
 | Population | House bed state + Wood purchase API + exact save var; Dawn isteği boş yatak ve Food/kişi bütçesiyle sınırlı, gerçek accepted count uygulanıyor, Food bir kez düşülüyor ve en fazla 15 temsili survivor sağdan Wall arkasına yürüyor | `[x]` |
 | Workers | Kalıcı target ratio + actual/cap/idle state, +1/+10/+100/direct input, bağımsız bina capacity/efficiency seviyeleri, yeni nüfus auto-allocation, exact save, Low/Medium/High density ve allocation-senkronlu animation/cargo/lantern/delivery feedback var | `[x]` |
@@ -137,15 +137,15 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Archer cap | `ArcherCapacityUtility` Basic/Rapid/Frost toplamını `1000` ile sınırlar; buy, merkezi spawn, Council, meta, restore ve legacy Barracks aynı guard'ı kullanır | `[x]` |
 | Placement | Formation V1 asset'iyle sabit 40 `outside` tile x 25 seeded diamond nokta; layer-fill sıra, 1000 gizmo ve v9 Continue testli | `[x]` |
 | Targeting | Persistent coarse spatial query + incoming damage reservation Burst job'ları aktif | `[x]` |
-| Ammo | Finite stok; gerçek projectile başına `-1`; Wood ile anlık +1/+5/Buy Max refill; Wood+Iron CAP/EFF yatırımı; Current/Capacity HUD ve exact save v9 | `[x]` |
-| Tech/Heart | Generated graph/reveal, Grave Essence-only purchase, actual effect adapter'i, hidden-safe fullscreen `HeartScreenUI` ve full simulation pause aktif scene/prefabda bağlı; legacy `TechTreeUI` aktif owner değil. Production node catalog'u owner içerik onayı bekliyor ve null durumda açık hata veriliyor | E1-E5 runtime/UI hazır; exact graph persistence/Continue replay E6 |
+| Ammo | Finite stok; gerçek projectile başına `-1`; Wood ile anlık +1/+5/Buy Max refill; Wood+Iron CAP/EFF yatırımı; Current/Capacity HUD ve exact save v10 | `[x]` |
+| Tech/Heart | Generated graph/reveal, Grave Essence-only purchase, actual effect adapter'i, hidden-safe fullscreen `HeartScreenUI`, full simulation pause ve schema v10 exact graph/effect replay aktif; legacy `TechTreeUI` aktif owner değil. Production node catalog'u owner içerik onayı bekliyor ve null durumda açık hata veriliyor | E1-E6 runtime kabulü tamamlandı; launch content owner gate |
 | Fireball | Dünya hedefli projectile/AoE ve cooldown çalışması mevcut | Korunacak temel |
 | Rally | Wood/Food maliyetli prep purchase | Cooldown-only ability olmalı |
 | Emergency Repair | Ayrı ability yok | Eksik |
 | Meta | Ayrı JSON ve Game Over shop var; `StartingTechLevel` aktif | Kısmi uyum |
 | HUD | CyclePanel, DAY/DUSK/NIGHT ve Horde Pressure mevcut; tek Wall runtime gizleme var | Package I polish gerekli |
 | Tutorial | Aktif tutorial/onboarding sistemi bulunmadı | Package I eksik |
-| Testler | EditMode `158/158`; PlayMode `29 pass + 1 explicit profiler skip`; Standalone Player-targeted 10K `1/1` | Güncel değişiklikler full paketle testli |
+| Testler | EditMode `162/162`; PlayMode `30 pass + 1 explicit profiler skip`; Standalone Player-targeted 10K `1/1` | Güncel değişiklikler full paketle testli |
 | Telemetry | Spawn budget demanded/spawned/backlog telemetry mevcut; tam Blueprint event owner'ı eksik | Kısmi |
 
 ---
@@ -158,8 +158,8 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | 2 | B - Continuous Horde | Tamamlandı | Sabit stats, backlog/pool ve 10K ürün ölçümü tamamlandı |
 | 3 | C - Economy + Population | Tamamlandı | Pasif drain yok; arrival tek Food öder; cap aşılmaz; fiyat tuning'i testli |
 | 4 | D - Archers + Ammo | Tamamlandı | 1.000 x 10.000 targeting/projectile ve Arrow truth çalışır |
-| 5 | E - Castle Heart | **Aktif** | Aynı seed/load aynı valid graph'ı üretir |
-| 6 | F - Council | Bekliyor | 3/6/9 bozulmaz; etkiler ana cap'leri bypass etmez |
+| 5 | E - Castle Heart | Tamamlandı | Aynı seed/load aynı valid graph'ı üretir; production content owner gate ayrı |
+| 6 | F - Council | **Aktif** | 3/6/9 bozulmaz; etkiler ana cap'leri bypass etmez |
 | 7 | G - Active Abilities | Bekliyor | Kaynak tüketmez; Night repair sözleşmesi çalışır |
 | 8 | H - Meta + Persistence | Bekliyor | Ölüm ödülü idempotent; force-close ölümü geri alamaz |
 | 9 | I - Product Gate | Bekliyor | 10k scenario, tutorial ve temiz görsel inceleme |
@@ -536,7 +536,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Effects | Archer unlock/stats, worker, Wall, moat, Fireball etkileri var | Effect pipeline genişletilip tek progression owner yapılmalı |
 | UI | Fullscreen graph, runtime layout, pan/zoom controller var | Kullanışlı temel; hidden graph/branch compass/Keystone sunumu eksik |
 | Pause | Panel açıkken oyun özellikle durmuyor | Heart bütün simulation/cycle/spawn/worker/cooldown'u durdurmalı |
-| Save | Sabit node level'ları save ediliyor | Generated graph, edge, hidden/reveal, locks ve version save edilmeli |
+| Save | Schema v10 exact graph, catalog version, edge, hidden/reveal, level ve lock state'ini kaydedip Continue'da effect replay ediyor | `[x]` |
 | Guarantees | Sabit catalog içeriğine bağlı | Her graph Rapid/Frost/Fireball reachable validation gerekli |
 | Node türleri | Generic node/effect yapısı | Unlock/Repeatable/Evolution/Keystone semantiği eksik |
 | Duplicate upgrades | Market archer level/upgrade butonları aktif | Heart tek teknoloji owner'ı olmalı |
@@ -573,9 +573,9 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 - [x] Başlangıçta Heart ve bağlı ilk seçenekleri tamamen gösteren idempotent reveal state geçişini kur.
 - [x] Uzak node'larda yalnız yön rengi/damarını göster; exact node'u hidden-safe presentation contract'ında gizle ve gerçek prefabda VEILED slot olarak çiz.
-- [~] Gizli node içeriği run başında kesinleşiyor; exact graph save binding ve schema migration E6'da.
+- [x] Gizli node içeriği run başında kesinleşiyor; exact graph schema v10'a clone edilip Continue'da reroll olmadan restore ediliyor.
 - [x] İlk satın alımda, `0 -> N` bulk geçişi dahil, yalnız outgoing bağlı komşuları reveal et.
-- [~] Reveal anında RNG yok; save-scum karşıtı exact graph restore E6'da tamamlanacak.
+- [x] Reveal anında RNG yok; save-scum karşıtı exact graph restore PlayMode round-trip ile doğrulandı.
 - [x] Görünür node effect bilgisini production baseline/sink resolver'ından gerçek numeric current/after/delta olarak prefabda göster.
 - [x] Görünür Keystone karşı başlık + kapanacak safe slot contract'ını gerçek conflict marker olarak çiz.
 
@@ -608,24 +608,24 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 ### E6 - Save, migration ve test
 
-- [ ] Seed, graph version, node ids, edge'ler, hidden/reveal, levels ve locks run save'e yazılsın.
-- [ ] Continue source asset'ten yeniden zar atmasın; kaydedilmiş graph'ı kursun.
-- [ ] Aynı seed + aynı catalog version aynı graph'ı üretsin.
-- [ ] Catalog değişiminde eski run graph'ı sessizce başka graph'a map edilmesin.
-- [ ] Rapid/Frost/Fireball unreachable graph testi ekle.
-- [ ] Normal node accidental lock testi ekle.
-- [ ] Keystone pair exclusion testi ekle.
-- [ ] Hidden graph save/load testi ekle.
-- [ ] Heart full-pause testi ekle.
+- [x] Seed, graph version, catalog version, node ids, edge'ler, hidden/reveal, levels ve locks run save'e yazılıyor.
+- [x] Continue source asset'ten yeniden zar atmıyor; kaydedilmiş graph'ı exact clone edip effect pipeline'ı replay ediyor.
+- [x] Aynı seed + aynı catalog version byte-equivalent graph üretiyor.
+- [x] Catalog version değişiminde eski run graph'ı sessizce başka graph'a map edilmiyor; preflight açık hata veriyor.
+- [x] Rapid/Frost/Fireball unreachable graph testi generator validation suite'inde.
+- [x] Normal node accidental lock testi restore validator ve purchase suite'inde.
+- [x] Keystone pair exclusion testi generator/purchase/restore validation suite'inde.
+- [x] Hidden graph save/load testi JSON round-trip, deep clone ve gerçek Continue PlayMode ile doğrulandı.
+- [x] Heart full-pause testi nested time scale + SimulationSystemGroup state'iyle doğrulandı.
 
 ### Package E kabul kapısı
 
-- [ ] Aynı seed/load aynı graph.
-- [ ] Rapid, Frost ve Fireball her run'da reachable.
-- [ ] Hidden graph save-scum ile değişmiyor.
-- [ ] Heart yalnız Grave Essence kullanıyor.
-- [ ] Heart açıkken bütün simulation ve cooldown duruyor.
-- [ ] Ayrı archer upgrade owner'ı kalmıyor.
+- [x] Aynı seed/load aynı graph.
+- [x] Rapid, Frost ve Fireball her run'da reachable.
+- [x] Hidden graph save-scum ile değişmiyor.
+- [x] Heart yalnız Grave Essence kullanıyor.
+- [x] Heart açıkken bütün simulation ve cooldown duruyor.
+- [x] Ayrı archer upgrade owner'ı kalmıyor.
 
 ---
 
@@ -848,7 +848,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Workers | `MobilePopulationEconomySystem`, GameManager worker visuals | Target ratios + caps + representative density |
 | Archers | `GameManager`, `ArcherShootSystem` | Common 1000 cap + scalable target load |
 | Placement | `MobileCastleArcherTilePlacement` | 40x25 stable local points + version |
-| Heart | `GameManager.HeartRuntime` + `HeartScreenUI` generated graph/reveal/purchase/effect/pause owner'ı; legacy `TechTreeUI` aktif scene'den kaldırıldı, production catalog owner onayı bekliyor | Exact graph save/migration + Continue replay; onaylı production node content'i |
+| Heart | `GameManager.HeartRuntime` + `HeartScreenUI` generated graph/reveal/purchase/effect/pause ve exact v10 Continue replay owner'ı; legacy `TechTreeUI` aktif scene'den kaldırıldı, production catalog owner onayı bekliyor | Yalnız onaylı production node/balance content'i |
 | Council | `CouncilComposer`, `CouncilEventUI`, catalog | 3/6/9 + emergency + guarded effects |
 | Meta | `MetaProgression` | Death-only fixed list + idempotent receipt |
 | HUD | `MobileCastleHudRoot`, `HUDController` | Single Wall + minimal cycle + bottom abilities |
@@ -939,13 +939,13 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Archers | 1.001. purchase | Reddedilir; harcama yok | `[x]` |
 | Placement | 40 tile'da 1.000 archer | Her tile 25 stable point | `[x]` |
 | Targeting | Yoğun overkill | Incoming damage hedefleri dağıtır | `[x]` |
-| Heart | Invalid generated graph | Reroll/fallback veya açık hata | `[ ]` |
+| Heart | Invalid generated graph | Reroll/fallback veya açık hata | `[x]` |
 | Heart | Source/runtime state + Grave Essence lifecycle | Asset runtime state taşımaz; Continue exact, Restart/ölüm siler | `[x]` |
-| Heart | Guarantee reachability | Rapid/Frost/Fireball reachable | `[ ]` |
-| Heart | Full pause | Cycle/spawn/worker/cooldown durur | `[ ]` |
+| Heart | Guarantee reachability | Rapid/Frost/Fireball reachable | `[x]` |
+| Heart | Full pause | Cycle/spawn/worker/cooldown durur | `[x]` |
 | Council | Day 3 + arada emergency | Regular schedule kaymaz | `[ ]` |
 | Council | Guarded effects | Bed/Food, 1000, Wall-only, count-only | `[ ]` |
-| Save | Menu çıkış / Continue | Aynı graph/phase/Wall/economy | `[ ]` |
+| Save | Menu çıkış / Continue | Aynı graph/phase/Wall/economy | `[x]` |
 | Death | Process restart | Meta bir kez; run geri gelmez | `[ ]` |
 | HUD | 16:9 / ultrawide | Kritik UI ve dünya kırpılmaz | `[ ]` |
 | Tutorial | İkinci run | Otomatik tekrar etmez | `[ ]` |
@@ -1128,3 +1128,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-14 | `DW-E-REVEAL` hidden graph reveal + player information core | `HeartGraphRevealService` root komşularını initial reveal ediyor ve yalnız ilk `0 -> N` satın alımında outgoing komşuları açıyor; reveal anında RNG yok. `HeartGraphPresentationBuilder` hidden node Id/title/effect bilgisini safe branch/depth slotlarına redakte ediyor, numeric effect için E4 resolver'ını zorunlu tutuyor ve görünür Keystone karşı başlık/kapanacak slot bilgisini internal partner Id'sini sızdırmadan; pre/post-purchase lock durumuyla taşıyor. Exact graph save E6, gerçek numeric resolver E4 ve prefab rendering E5'e açık bırakıldı; legacy runtime değiştirilmedi | Unity compile: 0 error; targeted EditMode 8/8; full EditMode 136/136; full PlayMode 29 pass + 1 explicit profiler skip; Unity console 0 error |
 | 2026-07-14 | `DW-E-PURCHASE` Grave Essence purchase + actual effect pipeline | `HeartPurchaseService` graph/catalog/visibility/lock/type preflight'inden sonra yalnız GameManager'ın Grave Essence kapısını kullanıyor; exact +1/+10/Buy Max maliyeti arithmetic-series + binary search ile hesaplıyor. Unlock/repeatable/evolution/Keystone state geçişleri, exact partner exclusion ve ilk bulk reveal tek commit'te. `HeartEffectPipeline` long/double büyük değer, actual baseline, archer/Wall/worker/Arrow/Fireball target'ları, authored soft-cap ve current/after/delta resolver'ını aynı raw state'ten üretiyor. Production catalog veya balance değeri eklenmedi; live sink/UI E5, exact replay E6 | Targeted EditMode 14/14; full EditMode 150/150; ilk full PlayMode'da 10K projectile assertion bir kez flake etti, targeted 1/1 ve full rerun 29 pass + 1 explicit profiler skip; Unity console 0 error |
 | 2026-07-14 | `DW-E-UI` Castle Heart screen + full simulation pause | `HeartScreenUI` hidden-safe generated graph presentation'ını Army/Defense/Production/Heart-Magic compass layout, actual current/after/delta, exact GE quote, Keystone conflict ve `+1/+10/MAX` ile aktif prefab/sahneye bağladı. `GameManager.HeartRuntime` live archer/Wall/worker/Arrow/Fireball baseline/sink adapter'ını kurdu; Arrow Heart bonusları paid level'lardan ayrıldı. Lease tabanlı `SimulationPauseService` time scale ve DOTS `SimulationSystemGroup` state'ini nested owner'larla exact durdurup geri yüklüyor; `PauseMenuUI` aynı owner'a taşındı. Aktif HUD'dan legacy `TechTreeUI` kaldırıldı; Heart paneli override-sorted modal Canvas olarak HUD canvas'larının üstüne alındı. Production catalog/balance/Evolution içeriği owner onayı olmadan üretilmedi ve null catalog açık hata veriyor | Unity compile: 0 error; targeted EditMode 8/8; full EditMode 158/158; full PlayMode 29 pass + 1 explicit profiler skip; active scene HeartScreenUI 1 / TechTreeUI 0; Game View modal QA sırasında `Time.timeScale = 0`, `SimulationSystemGroup.Enabled = false`; Unity console 0 error |
+| 2026-07-14 | `DW-E-SAVE` exact Castle Heart graph persistence + deterministic Continue replay | `RunSaveState` v10'a çıkarıldı; `HasHeartGraph` discriminator'ı, graph/catalog version, seed, node/edge, hidden/reveal, level ve Keystone lock state'i exact JSON'a bağlandı. `HeartGraphPersistenceUtility` deep clone, structural/runtime validation, catalog mismatch fail-closed ve deferred effect replay kurdu. Continue source catalog'dan reroll etmiyor; Arrow current final effective capacity ile tek kez clamp ediliyor. v9 eksik graph uydurmadan null-state migrate ediyor. Production catalog/content üretilmedi | Unity compile: 0 error; targeted EditMode 25/25; targeted exact Continue PlayMode 2/2; full EditMode 162/162; full PlayMode 30 pass + 1 explicit profiler skip; Unity console 0 error |

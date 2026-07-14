@@ -36,12 +36,14 @@ bulunmali ve esleme simetrik yapilmalidir:
 ## Catalog asset'i
 
 1. `Assets > Create > DeadWalls > Castle Heart > Heart Node Catalog` kullan.
-2. `RootNodeId` degerini `castle_heart` olarak koru.
-3. Yalniz onayli `HeartNodeDefinitionSO` asset'lerini `Nodes` listesine ekle.
-4. Duplicate Id, duplicate/bos tag ve eksik Keystone partner birakma.
-5. Her dort branch'te izinli depth araliginda en az bir `sink:repeatable` bulundur.
+2. `CatalogVersion` degerini en az `1` yap; launch catalog icerigi her degistiginde artir.
+3. `RootNodeId` degerini `castle_heart` olarak koru.
+4. Yalniz onayli `HeartNodeDefinitionSO` asset'lerini `Nodes` listesine ekle.
+5. Duplicate Id, duplicate/bos tag ve eksik Keystone partner birakma.
+6. Her dort branch'te izinli depth araliginda en az bir `sink:repeatable` bulundur.
 
 Catalog array sirasi sonucu degistirmez; generator node'lari stable Id'ye gore siralar.
+Version uyusmazligi Continue'da reroll degil acik restore hatasidir.
 
 ## Runtime request
 
@@ -68,4 +70,3 @@ EditMode hedefli test:
 Production catalog eklendiginde ayrica asset-bazli catalog validation ve ayni catalog
 version + seed determinism regression testi eklenmelidir. E2 sentetik testleri launch
 icerik review'unun yerine gecmez.
-

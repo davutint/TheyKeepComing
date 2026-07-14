@@ -13,8 +13,8 @@ contract'ini kurar. Blueprint'teki su kurallari uygular:
 - Numeric effect'in player-facing degeri ile runtime'a uygulanacak deger ayni hesap owner'indan gelir.
 
 Bu paket production node katalogu, Grave Essence drop orani veya denge sayisi uretmez.
-`MobileCastleHudRoot.prefab` ve canli runtime adapter cutover'i E5'te tamamlanmistir;
-exact graph save/restore E6 kapsamindadir.
+`MobileCastleHudRoot.prefab` ve canli runtime adapter cutover'i E5'te; exact graph
+save/restore ve deterministic effect replay E6'da tamamlanmistir.
 
 ## Transaction owner
 
@@ -142,11 +142,12 @@ Production `HeartNodeCatalogSO` halen owner icerik onayi bekler. Null catalog ac
 legacy `TryBuyTechNode`, `TechTreeCatalogSO` veya ana kaynak maliyetine geri dusulmez. Legacy
 API kodda save/migration uyumlulugu icin kalabilir fakat aktif UI owner'i degildir.
 
-E6:
+E6 runtime:
 
 - Graph level/reveal/lock exact save edilir.
 - Restore sirasinda `HeartEffectPipeline` graph level'larindan deterministic replay edilir.
 - Replay tamamlanmadan resolver veya purchase acilmaz; graph/pipeline level mismatch fail eder.
+- Catalog version uyusmazligi source asset'ten reroll veya silent mapping yapmaz.
 
 ## Test kapsami
 
