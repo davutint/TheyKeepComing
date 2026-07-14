@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace DeadWalls
 {
-    public class GameManager : MonoBehaviour
+    public class GameManager : MonoBehaviour, IHeartGraveEssenceWallet
     {
         public static GameManager Instance { get; private set; }
 

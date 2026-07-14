@@ -5,7 +5,7 @@
 > **Tracker sürümü:** 2.0  
 > **Son tam kapsam denetimi:** 2026-07-12  
 > **Aktif paket:** Package E - Castle Heart
-> **Aktif iş:** `DW-E-PURCHASE` - Grave Essence Purchase + Effect Pipeline
+> **Aktif iş:** `DW-E-UI` - Heart Screen + Full Simulation Pause
 
 ---
 
@@ -138,14 +138,14 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Placement | Formation V1 asset'iyle sabit 40 `outside` tile x 25 seeded diamond nokta; layer-fill sıra, 1000 gizmo ve v9 Continue testli | `[x]` |
 | Targeting | Persistent coarse spatial query + incoming damage reservation Burst job'ları aktif | `[x]` |
 | Ammo | Finite stok; gerçek projectile başına `-1`; Wood ile anlık +1/+5/Buy Max refill; Wood+Iron CAP/EFF yatırımı; Current/Capacity HUD ve exact save v9 | `[x]` |
-| Tech/Heart | Yeni Heart data contract'ı, run-only Grave Essence/save v9, deterministic dört yön generator/validator, RNG'siz reveal servisi ve hidden-safe presentation contract'ı var; production node catalog'u owner içerik onayı bekliyor, aktif UI/satın alma halen sabit legacy SO catalog + ana kaynak maliyeti | E1-E2 `[x]`; E3 core hazır, persistence/effect/UI binding ilgili paketleri bekliyor |
+| Tech/Heart | Yeni Heart data/graph/reveal contract'ları, Grave Essence-only purchase/pricing ve actual numeric effect pipeline core'u var; production node catalog'u owner içerik onayı bekliyor, aktif UI/satın alma halen sabit legacy SO catalog + ana kaynak maliyeti | E1-E4 core hazır; production runtime/UI binding E5, exact persistence E6 |
 | Fireball | Dünya hedefli projectile/AoE ve cooldown çalışması mevcut | Korunacak temel |
 | Rally | Wood/Food maliyetli prep purchase | Cooldown-only ability olmalı |
 | Emergency Repair | Ayrı ability yok | Eksik |
 | Meta | Ayrı JSON ve Game Over shop var; `StartingTechLevel` aktif | Kısmi uyum |
 | HUD | CyclePanel, DAY/DUSK/NIGHT ve Horde Pressure mevcut; tek Wall runtime gizleme var | Package I polish gerekli |
 | Tutorial | Aktif tutorial/onboarding sistemi bulunmadı | Package I eksik |
-| Testler | EditMode `136/136`; PlayMode `29 pass + 1 explicit profiler skip`; Standalone Player-targeted 10K `1/1` | Güncel değişiklikler full paketle testli |
+| Testler | EditMode `150/150`; PlayMode `29 pass + 1 explicit profiler skip`; Standalone Player-targeted 10K `1/1` | Güncel değişiklikler full paketle testli |
 | Telemetry | Spawn budget demanded/spawned/backlog telemetry mevcut; tam Blueprint event owner'ı eksik | Kısmi |
 
 ---
@@ -576,23 +576,23 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [~] Gizli node içeriği run başında kesinleşiyor; exact graph save binding ve schema migration E6'da.
 - [x] İlk satın alımda, `0 -> N` bulk geçişi dahil, yalnız outgoing bağlı komşuları reveal et.
 - [~] Reveal anında RNG yok; save-scum karşıtı exact graph restore E6'da tamamlanacak.
-- [~] Görünür node effect bilgi contract'ı var; gerçek numeric current/after/delta resolver E4, UI rendering E5'te.
+- [~] Görünür node effect bilgi contract'ı ve gerçek numeric current/after/delta E4 resolver'ı var; production baseline/sink ve UI rendering E5'te.
 - [~] Görünür Keystone karşı başlık + kapanacak safe slot contract'ı var; gerçek conflict marker çizimi E5'te.
 
 ### E4 - Node satın alma ve etkiler
 
-- [ ] Bütün Heart satın alımlarını yalnız Grave Essence ile yap.
-- [ ] Unlock node'u tek satın alma ile sistemi ve devam yolunu açsın.
-- [ ] Repeatable node için `+1 / +10 / Buy Max` ekle.
-- [ ] Evolution node'larını davranış değiştirici tek seferlik effect olarak uygula.
-- [ ] Keystone seçiminin yalnız eş Keystone'u kapatmasını sağla.
-- [ ] Damage/maliyet gibi büyük değerleri destekle.
-- [ ] Fire rate, cooldown, slow ve range için soft-cap/diminishing return uygula.
-- [ ] Soft-cap yüzünden node'u görünmez biçimde etkisizleştirme; kalan gerçek değeri UI'da göster.
-- [ ] Archer damage/fire rate/range/Frost slow upgrade'lerini Heart effect pipeline'ına taşı.
-- [ ] Wall Max HP, worker capacity/efficiency, Arrow capacity/efficiency ve ability upgrade'lerini aynı pipeline'a bağla.
-- [ ] Fireball damage/radius/cooldown repeatable node'larını destekle.
-- [ ] Burning ground/second blast gibi evolution'ları yalnız onaylı pool'dan üret.
+- [~] Yeni Heart purchase service yalnız `IHeartGraveEssenceWallet` kullanıyor; aktif legacy UI cutover'ı E5'te.
+- [x] Unlock node tek satın alma ile level 1 olur ve outgoing devam yolunu reveal eder.
+- [x] Repeatable node için exact `+1 / +10 / Buy Max` quote ve commit ekle.
+- [~] Evolution tek seferlik authored behavior effect'i uygular; production behavior pool'u owner onayı/E5 binding'i bekliyor.
+- [x] Keystone seçimi yalnız exact ve simetrik eş Keystone'u kapatır.
+- [x] Maliyette `long`, effect value/raw/actual hesabında `double` ve açık overflow fail'i kullan.
+- [x] Fire rate, cooldown, Frost slow, archer range ve spell radius için authored soft-cap/diminishing return uygula.
+- [~] Resolver kalan gerçek current/after/delta'yı üretiyor; gerçek prefab gösterimi E5'te.
+- [~] Archer damage/fire rate/range/Frost slow target/policy contract'ı hazır; production GameManager baseline/sink adapter'i E5'te.
+- [~] Wall HP/repair, worker capacity/production/population ve Arrow capacity/efficiency target'ları aynı pipeline'da; live owner binding E5'te.
+- [~] Fireball unlock/damage/radius/cooldown contract'ı hazır; live ability state binding E5'te.
+- [~] Split Shot/Burning Ground/Second Blast behavior contract'ı yalnız authored effect'i kabul ediyor; launch pool içeriği owner onayı bekliyor.
 
 ### E5 - Heart ekranı ve pause
 
@@ -860,6 +860,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [x] `HeartNodeDefinition`: tags, effects, rarity, depth, repeatable, cost growth, conflicts.
 - [x] `GeneratedRunGraph`: seed/version, node ids, edges, hidden/revealed, levels, locks.
 - [x] `HeartGraphPresentation`: safe slots, hidden redaction, resolved effect rows, Keystone conflict marker data.
+- [x] `HeartPurchaseService` + `HeartEffectPipeline`: Grave Essence quote/commit, bulk fiyat, actual effect resolver ve Keystone exclusion.
 - [ ] `WorkerAllocation`: four target ratios, actual counts, caps, idle population.
 - [ ] `ArcherFormation`: 40 cells, 25 local points, algorithm version.
 - [ ] `ActiveAbilityState`: unlocks, cooldown remaining, tuning multipliers.
@@ -1060,6 +1061,7 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | `ArcherFormationV1.asset` + `ArcherFormationUtility.cs` + `MobileCastleArcherTilePlacement.cs` | Version'lı exact 40 tile; tile+slot seeded 25 diamond nokta, minimum mesafe, layer-fill 1000 kapasite ve tam gizmo preview |
 | `ArcherShootSystem.cs` + `ArcherTargetingUtility.cs` | Persistent coarse spatial nearest query, stable tie-break, uçuşta/yeni ok incoming damage reservation; başarılı projectile başına finite stoktan tam `1` tüketim |
 | `ArrowEconomyUtility.cs` + `GameManager.cs` + `ArrowSupplyUI.cs` | Sabit oranlı Wood refill, kısmi kapasite, Buy Max, Wood+Iron CAP/EFF yatırımı, Current/Capacity HUD ve exact save v8 runtime owner'ları |
+| `HeartPurchaseService.cs` + `HeartEffectPipeline.cs` | Grave Essence-only +1/+10/Buy Max transaction, bulk-safe long fiyat, double actual effect, authored soft-cap ve exact Keystone partner lock core'u; production adapter/UI binding E5 |
 | `TechNodeDefinitionSO.cs` + `TechTreeCatalogSO.cs` | Sabit catalog/reveal/cost/effect model |
 | `TechTreeUI.cs` + `TechTreeViewController.cs` | Fullscreen graph, pan/zoom, simulation'ın durmaması |
 | `CouncilComposer.cs` + `CouncilEventUI.cs` | Curated deterministic card infrastructure |
@@ -1123,3 +1125,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-14 | `DW-E-DATA` Heart data model + run-only Grave Essence | `HeartNodeDefinitionSO` dört Blueprint node tipi, tags/effects/rarity/depth/cost/conflict verisini source-only taşır; `GeneratedRunGraph` seed/version/node/edge/reveal/level/lock state'ini asset referanssız tanımlar. Grave Essence ayrı ECS singleton, tek Heart harcama kapısı ve exact save v9'a bağlandı; v8 migration `0`, Restart ve ölüm silme matrisi testlendi. Legacy tech graph/purchase bu pakette değiştirilmedi | Unity compile: 0 error; targeted EditMode 20/20; targeted PlayMode 1/1; full EditMode 119/119; full PlayMode 30/30; Unity console 0 error |
 | 2026-07-14 | `DW-E-GRAPH` deterministic Castle Heart graph generator | `HeartNodeCatalogSO` authored havuzu, stable seed/attempt RNG kullanan dört yön generator ve fail-closed validator eklendi. Rapid/Frost/Fireball/Wall guarantee'leri, branch repeatable sink'leri, rarity/depth filler, forward cross-link ve tam Keystone çiftleri sentetik catalog testleriyle kilitlendi; reveal anında RNG yok. Owner onayı bekleyen production node/maliyet/Keystone içeriği üretilmedi; legacy runtime değiştirilmedi | Unity compile: 0 error; targeted EditMode 9/9; full EditMode 128/128; full PlayMode 29 pass + 1 explicit profiler skip; Unity console 0 error |
 | 2026-07-14 | `DW-E-REVEAL` hidden graph reveal + player information core | `HeartGraphRevealService` root komşularını initial reveal ediyor ve yalnız ilk `0 -> N` satın alımında outgoing komşuları açıyor; reveal anında RNG yok. `HeartGraphPresentationBuilder` hidden node Id/title/effect bilgisini safe branch/depth slotlarına redakte ediyor, numeric effect için E4 resolver'ını zorunlu tutuyor ve görünür Keystone karşı başlık/kapanacak slot bilgisini internal partner Id'sini sızdırmadan; pre/post-purchase lock durumuyla taşıyor. Exact graph save E6, gerçek numeric resolver E4 ve prefab rendering E5'e açık bırakıldı; legacy runtime değiştirilmedi | Unity compile: 0 error; targeted EditMode 8/8; full EditMode 136/136; full PlayMode 29 pass + 1 explicit profiler skip; Unity console 0 error |
+| 2026-07-14 | `DW-E-PURCHASE` Grave Essence purchase + actual effect pipeline | `HeartPurchaseService` graph/catalog/visibility/lock/type preflight'inden sonra yalnız GameManager'ın Grave Essence kapısını kullanıyor; exact +1/+10/Buy Max maliyeti arithmetic-series + binary search ile hesaplıyor. Unlock/repeatable/evolution/Keystone state geçişleri, exact partner exclusion ve ilk bulk reveal tek commit'te. `HeartEffectPipeline` long/double büyük değer, actual baseline, archer/Wall/worker/Arrow/Fireball target'ları, authored soft-cap ve current/after/delta resolver'ını aynı raw state'ten üretiyor. Production catalog veya balance değeri eklenmedi; live sink/UI E5, exact replay E6 | Targeted EditMode 14/14; full EditMode 150/150; ilk full PlayMode'da 10K projectile assertion bir kez flake etti, targeted 1/1 ve full rerun 29 pass + 1 explicit profiler skip; Unity console 0 error |

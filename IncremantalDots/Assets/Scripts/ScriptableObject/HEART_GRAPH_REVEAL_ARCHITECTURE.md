@@ -60,7 +60,7 @@ Blueprint, oyuncunun gordugu numeric effect'in ham authored degeri yerine gercek
 ve satin alim sonrasi sonucunu bilmesini zorunlu tutar. Bu nedenle presentation builder
 numeric effect'i kendi basina formatlamaz.
 
-`IHeartEffectValueResolver`, E4 purchase/effect pipeline'inin uygulayacagi contract'tir.
+`IHeartEffectValueResolver`, E4 `HeartEffectPipeline` tarafindan uygulanir.
 Resolver su degerleri birlikte dondurur:
 
 - Player-facing label.
@@ -71,6 +71,9 @@ Resolver su degerleri birlikte dondurur:
 Numeric effect gorunur olup resolver yoksa veya eksik sonuc dondururse builder fail-closed
 hata verir ve node'u `EffectInformationComplete = false` isaretler. UI bu state'te sahte
 veya tahmini sayi gostermemelidir.
+
+Pipeline; runtime baseline, raw Heart investment ve soft-cap policy'sinden current/after/delta
+uretir. Production baseline/sink adapter'lari E5 runtime cutover'i ile baglanacaktir.
 
 Unlock/Evolution davranis effect'leri numeric soft-cap gerektirmedigi icin contract
 tarafindan dogrudan cozulur: archer unlock, spellcasting unlock, split shot ve burning
@@ -97,7 +100,8 @@ purchase pipeline'inin sorumlulugudur.
 - Graph node listesi ve hidden icerik E2'de run basinda kesinlesir.
 - E3 reveal servisinde yeni RNG yoktur.
 - `GeneratedRunGraph` exact save/load baglantisi ve schema migration E6'da yapilacaktir.
-- Numeric effect'in effective runtime hesabini E4 resolver'i saglar.
+- Numeric effect'in effective runtime hesabini E4 resolver'i saglar; production runtime
+  adapter binding'i E5'te tamamlanir.
 - Prefabda branch damari, hidden slot, tooltip ve Keystone conflict cizimi E5 Heart UI
   cutover'inda yapilir.
 

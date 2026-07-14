@@ -25,7 +25,9 @@ pipeline'lari ayni node'u paralel yonetmeyecek.
 Aktif ve Blueprint ile uyumlu legacy etkiler yeni enum'da acik karsilik tasir:
 archer unlock/damage/fire rate, worker capacity/production, population growth, tek Wall
 HP/repair cost ve Fireball unlock/damage/radius/cooldown. Blueprint ornekleri split shot
-ve burning ground Evolution etkisi olarak temsil edilebilir.
+ve burning ground Evolution etkisi olarak temsil edilebilir. E4 pipeline'i ayrica archer
+range, Frost slow, Arrow capacity/efficiency ve onayli second blast behavior contract'ini
+destekler; bu destek production node icerigi onayi anlamina gelmez.
 
 Legacy moat etkileri V1'de dormant oldugu icin otomatik migrate edilmez. Runtime'da
 destegi olmayan bir effect yalniz asset doldurmak icin eklenmez.
@@ -38,7 +40,8 @@ destegi olmayan bir effect yalniz asset doldurmak icin eklenmez.
 3. Icerik review: Basic, Rapid, Frost, Fireball ve Wall guarantee yollarinin node tipi,
    depth, Essence maliyeti ve effect eslemesi owner tarafindan onaylanir.
 4. E4: tek Heart purchase/effect pipeline'i Grave Essence harcama kapisina baglanir.
-   Legacy `TryBuyTechNode` ayni frame/node icin owner olmaktan cikarilir.
+   Production UI/catalog cutover'i E5'te yapilir; legacy `TryBuyTechNode` ayni production
+   node icin owner olarak birakilmaz.
 5. E6: `GeneratedRunGraph` exact save/load ve graph version validation'a baglanir.
 6. Kabul sonrasi legacy catalog/UI yolu kaldirilir veya acik dormant migration fallback'i
    olarak isaretlenir; gizli ikinci progression owner birakilmaz.
@@ -53,4 +56,3 @@ destegi olmayan bir effect yalniz asset doldurmak icin eklenmez.
 - Essence drop kaynagi/orani.
 
 Bu kararlar Blueprint + gameplay tuning review'u olmadan script tarafindan tahmin edilmez.
-

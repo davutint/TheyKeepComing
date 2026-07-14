@@ -19,8 +19,9 @@ bir owner eklemez.
 - Conflict: yalniz Keystone icin tam bir karsi node Id'si.
 
 `IsRepeatable`, `Type == Repeatable` sonucundan turetilir; ayni gercegi tasiyan ikinci
-bir serialized bool yoktur. Cost growth'un satin alma formulu E4 effect/purchase
-pipeline'inin sorumlulugudur; E1 yalniz tuning verisini tasir.
+bir serialized bool yoktur. E4 `HeartPurchasePricing`, base cost ve growth girdisini
+bulk-safe linear evaluator ile hesaplar; ayrinti `HEART_PURCHASE_EFFECT_ARCHITECTURE.md`
+belgesindedir.
 
 Definition asset'te level, hidden/revealed veya lock state bulunmaz. Validation;
 bos Id, gecersiz depth, maliyet/growth ve Keystone conflict hatalarini raporlar.
@@ -52,9 +53,10 @@ Runtime transaction siniri `GameManager` uzerindedir:
 - `TrySpendGraveEssenceAtHeart(cost)`: Heart satin alimlarinin tek harcama kapisi.
 - `GraveEssenceAmount`: guncel bakiye.
 
-Bu paket Essence drop kaynagi, oran veya node fiyat formulu uydurmaz. Mevcut
-`TryBuyTechNode` halen legacy ResourceCost yoludur ve E4 cutover'a kadar yeni harcama
-kapisina baglanmaz.
+Bu paket Essence drop kaynagi veya oran uydurmaz. Yeni `HeartPurchaseService`,
+`IHeartGraveEssenceWallet` uzerinden yalniz Heart harcama kapisini kullanir. Production
+catalog/UI cutover'i yapilmadigi icin mevcut `TryBuyTechNode` halen yalniz legacy
+catalog'un ResourceCost owner'idir.
 
 ## Lifecycle ve persistence
 
@@ -71,3 +73,5 @@ kapisina baglanmaz.
 - Generated graph JSON round-trip ve Unity asset referansi olmamasi.
 - Grave Essence run/meta siniri, v8 -> v9 migration ve olumde run save silinmesi.
 - PlayMode transaction, long bakiye, Continue ve Restart davranisi.
+- E4 quote/commit, bulk pricing, effect ve Keystone contract'lari
+  `HeartPurchasePipelineTests` fixture'indadir.

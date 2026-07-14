@@ -303,6 +303,9 @@ namespace DeadWalls
                 case HeartNodeEffectType.EnableBurningGround:
                     summary = "Enable Burning Ground";
                     break;
+                case HeartNodeEffectType.EnableSecondBlast:
+                    summary = "Enable Second Blast";
+                    break;
                 default:
                     presentation = null;
                     return false;

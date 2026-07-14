@@ -42,16 +42,24 @@ namespace DeadWalls
         AddSpellRadius = 11,
         ReduceSpellCooldownPercent = 12,
         EnableSplitShot = 13,
-        EnableBurningGround = 14
+        EnableBurningGround = 14,
+        AddArcherRange = 15,
+        ReduceFrostSlowMultiplier = 16,
+        IncreaseArrowCapacity = 17,
+        IncreaseArrowEfficiency = 18,
+        EnableSecondBlast = 19
     }
 
     [Serializable]
     public struct HeartNodeEffect
     {
         public HeartNodeEffectType Type;
-        public float Value;
+        public double Value;
         public ArcherType ArcherType;
         public EconomyFocusType Resource;
+
+        [Tooltip("Soft-cap kullanan effect icin authored asimptotik limit. Linear effect'lerde 0 kalir.")]
+        public double SoftCap;
     }
 
     /// <summary>
@@ -133,6 +141,71 @@ namespace DeadWalls
                 if (!seenConflicts.Add(conflictId))
                     errors.Add($"Tekrarlanan conflict Id: {conflictId}");
             }
+
+            HeartNodeEffect[] effects = Effects ?? Array.Empty<HeartNodeEffect>();
+            for (int i = 0; i < effects.Length; i++)
+                CollectEffectValidationErrors(effects[i], i, errors);
+        }
+
+        private static void CollectEffectValidationErrors(
+            HeartNodeEffect effect,
+            int index,
+            List<string> errors)
+        {
+            if (effect.Type == HeartNodeEffectType.None)
+            {
+                errors.Add($"Effects[{index}] None olamaz.");
+                return;
+            }
+
+            if (IsBehaviorEffect(effect.Type))
+                return;
+
+            if (double.IsNaN(effect.Value)
+                || double.IsInfinity(effect.Value)
+                || effect.Value <= 0f)
+            {
+                errors.Add($"Effects[{index}] Value sonlu ve sifirdan buyuk olmalidir.");
+            }
+
+            if (RequiresPositiveSoftCap(effect.Type)
+                && (double.IsNaN(effect.SoftCap)
+                    || double.IsInfinity(effect.SoftCap)
+                    || effect.SoftCap <= 0f))
+            {
+                errors.Add($"Effects[{index}] {effect.Type} icin pozitif SoftCap gerektirir.");
+            }
+
+            if ((effect.Type == HeartNodeEffectType.ReduceSpellCooldownPercent
+                 || effect.Type == HeartNodeEffectType.ReduceFrostSlowMultiplier)
+                && effect.SoftCap >= 1f)
+            {
+                errors.Add($"Effects[{index}] {effect.Type} SoftCap degeri 1'den kucuk olmalidir.");
+            }
+
+            if (effect.Type == HeartNodeEffectType.ReduceFrostSlowMultiplier
+                && effect.ArcherType != ArcherType.Frost)
+            {
+                errors.Add($"Effects[{index}] Frost slow effect'i ArcherType.Frost hedeflemelidir.");
+            }
+        }
+
+        private static bool IsBehaviorEffect(HeartNodeEffectType type)
+        {
+            return type == HeartNodeEffectType.UnlockArcherType
+                   || type == HeartNodeEffectType.UnlockSpellcasting
+                   || type == HeartNodeEffectType.EnableSplitShot
+                   || type == HeartNodeEffectType.EnableBurningGround
+                   || type == HeartNodeEffectType.EnableSecondBlast;
+        }
+
+        private static bool RequiresPositiveSoftCap(HeartNodeEffectType type)
+        {
+            return type == HeartNodeEffectType.ModifyArcherFireRatePercent
+                   || type == HeartNodeEffectType.AddArcherRange
+                   || type == HeartNodeEffectType.ReduceFrostSlowMultiplier
+                   || type == HeartNodeEffectType.AddSpellRadius
+                   || type == HeartNodeEffectType.ReduceSpellCooldownPercent;
         }
     }
 }
