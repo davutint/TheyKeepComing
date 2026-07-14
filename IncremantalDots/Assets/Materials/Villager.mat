@@ -31,6 +31,18 @@ Material:
         m_Texture: {fileID: 2800000, guid: ed6490e912ff8924185ce9a6e9674cf7, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _WalkTex:
+        m_Texture: {fileID: 2800000, guid: a03dd2beccc66c145bfd18631c5e0a9e, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _WorkTex:
+        m_Texture: {fileID: 2800000, guid: 0cac38bde24513a4aac088e7f652dcf3, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _CelebrateTex:
+        m_Texture: {fileID: 2800000, guid: f010a716339623549b1ba2060344e2ad, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _MaskTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -43,10 +55,13 @@ Material:
     m_Floats:
     - _Cutoff: 0.5
     - _EnableExternalAlpha: 0
+    - _WorkerAnimation: 0
     - _ZWrite: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
     - _UVRect: {r: 0, g: 0, b: 1, a: 1}
+    - _WorkerCargoColor: {r: 0.5, g: 0.27, b: 0.1, a: 1}
+    - _WorkerFeedback: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

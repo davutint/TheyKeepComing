@@ -60,5 +60,49 @@ namespace DeadWalls.Tests
             Assert.That(WorkerVisualRepresentationUtility.GetRepresentativeTotal(allocation),
                 Is.EqualTo(45));
         }
+
+        [Test]
+        public void RepresentedWorkerCounts_PreserveExactActualTotalAcrossDensityLevels()
+        {
+            int[] actualCounts = { 0, 1, 12, 13, 60, 61, 101, 119, 220, 10000 };
+            for (int sample = 0; sample < actualCounts.Length; sample++)
+            {
+                int actualCount = actualCounts[sample];
+                int visualCount = WorkerVisualRepresentationUtility.GetRepresentativeCount(actualCount);
+                int representedTotal = 0;
+                for (int index = 0; index < visualCount; index++)
+                {
+                    representedTotal += WorkerVisualRepresentationUtility.GetRepresentedWorkerCount(
+                        actualCount, visualCount, index);
+                }
+
+                Assert.That(representedTotal, Is.EqualTo(actualCount),
+                    $"Actual {actualCount}, {visualCount} visual arasinda exact dagilmadi.");
+            }
+        }
+
+        [Test]
+        public void ProductionFeedbackStrength_GrowsWithRepresentedWorkersAndStaysBounded()
+        {
+            float empty = WorkerVisualRepresentationUtility.GetProductionFeedbackStrength(0);
+            float single = WorkerVisualRepresentationUtility.GetProductionFeedbackStrength(1);
+            float group = WorkerVisualRepresentationUtility.GetProductionFeedbackStrength(8);
+            float largeGroup = WorkerVisualRepresentationUtility.GetProductionFeedbackStrength(1000);
+
+            Assert.That(empty, Is.Zero);
+            Assert.That(single, Is.GreaterThan(0f));
+            Assert.That(group, Is.GreaterThan(single));
+            Assert.That(largeGroup, Is.GreaterThanOrEqualTo(group));
+            Assert.That(largeGroup, Is.LessThanOrEqualTo(1f));
+        }
+
+        [Test]
+        public void LanternRule_IsActiveOnlyDuringDuskAndNight()
+        {
+            Assert.That(WorkerVisualRepresentationUtility.ShouldUseLantern(SiegeCyclePhase.Day), Is.False);
+            Assert.That(WorkerVisualRepresentationUtility.ShouldUseLantern(SiegeCyclePhase.Dusk), Is.True);
+            Assert.That(WorkerVisualRepresentationUtility.ShouldUseLantern(SiegeCyclePhase.Night), Is.True);
+            Assert.That(WorkerVisualRepresentationUtility.ShouldUseLantern(SiegeCyclePhase.Dawn), Is.False);
+        }
     }
 }

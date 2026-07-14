@@ -33,3 +33,8 @@ CastleInteriorEconomyArea
 2. `CastleWorkerHub` ve site markerlarini sol ekonomi alanina yerlestir.
 3. Play'de worker assignment yap.
 4. Villagerlar ilgili site ile hub arasinda gidip gelmelidir.
+5. Pickup'ta work, gidiste resource renkli kucuk cargo, hub'da teslimat pulse/celebrate gorulmelidir.
+6. Cycle'i `Dusk` veya `Night` fazina al; worker feneri yanmali, `Day`/`Dawn` fazinda kapanmalidir.
+
+Worker feedback `VillagerWorker.prefab` + `Villager.mat` uzerinden bake edilir. Scene'e
+ayri lantern/cargo prefab'i yerlestirilmez.

@@ -3,6 +3,8 @@ using System.IO;
 using NUnit.Framework;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Mathematics;
+using Unity.Transforms;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
@@ -219,6 +221,101 @@ namespace DeadWalls.Tests
             Assert.That(ReadWoodWorkerCount(entityManager, allocationEntity), Is.Zero);
         }
 
+        [UnityTest]
+        public IEnumerator WorkerFeedback_TracksActualWeightRouteDeliveryAndNightLantern()
+        {
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            using EntityQuery allocationQuery = entityManager.CreateEntityQuery(
+                typeof(MobileCastleCombatConfig), typeof(MobilePopulationAllocation));
+            using EntityQuery populationQuery = entityManager.CreateEntityQuery(typeof(PopulationState));
+            using EntityQuery waveQuery = entityManager.CreateEntityQuery(typeof(WaveStateData));
+            using EntityQuery cycleQuery = entityManager.CreateEntityQuery(typeof(ContinuousSiegeCycleData));
+            Entity allocationEntity = allocationQuery.GetSingletonEntity();
+            Entity populationEntity = populationQuery.GetSingletonEntity();
+            Entity waveEntity = waveQuery.GetSingletonEntity();
+            Entity cycleEntity = cycleQuery.GetSingletonEntity();
+
+            WaveStateData wave = entityManager.GetComponentData<WaveStateData>(waveEntity);
+            wave.StressTestMode = true;
+            entityManager.SetComponentData(waveEntity, wave);
+
+            SetWoodWorkerCount(entityManager, allocationEntity, populationEntity, 101);
+            yield return WaitForWorkerVisualCount(entityManager, EconomyFocusType.Wood, 27);
+            yield return null;
+            Assert.That(SumRepresentedWorkers(entityManager, EconomyFocusType.Wood), Is.EqualTo(101));
+
+            SetWoodWorkerCount(entityManager, allocationEntity, populationEntity, 119);
+            yield return null;
+            yield return null;
+            Assert.That(CountWorkerVisuals(entityManager, EconomyFocusType.Wood), Is.EqualTo(27),
+                "Ayni density bucket'inda visual entity sayisi degismemeli.");
+            Assert.That(SumRepresentedWorkers(entityManager, EconomyFocusType.Wood), Is.EqualTo(119),
+                "Actual count degisimi ayni visual bucket'inda representation weight'e yansimadi.");
+
+            ContinuousSiegeCycleData cycle =
+                entityManager.GetComponentData<ContinuousSiegeCycleData>(cycleEntity);
+            cycle.Phase = SiegeCyclePhase.Night;
+            entityManager.SetComponentData(cycleEntity, cycle);
+            yield return null;
+
+            Entity worker = FindWorkerVisual(entityManager, EconomyFocusType.Wood);
+            WorkerLogisticsFeedbackState feedback =
+                entityManager.GetComponentData<WorkerLogisticsFeedbackState>(worker);
+            WorkerFeedbackMaterialProperty materialFeedback =
+                entityManager.GetComponentData<WorkerFeedbackMaterialProperty>(worker);
+            Assert.That(feedback.LanternActive, Is.EqualTo(1));
+            Assert.That(materialFeedback.Value.y, Is.EqualTo(1f).Within(0.001f));
+
+            WorkerLogisticsRoute route = entityManager.GetComponentData<WorkerLogisticsRoute>(worker);
+            LocalTransform transform = entityManager.GetComponentData<LocalTransform>(worker);
+            route.MovingToHub = 0;
+            route.RouteLeg = 2;
+            route.WaitTimer = 0f;
+            transform.Position = route.PickupPosition;
+            feedback.IsCarrying = 0;
+            entityManager.SetComponentData(worker, route);
+            entityManager.SetComponentData(worker, transform);
+            entityManager.SetComponentData(worker, feedback);
+            yield return null;
+
+            feedback = entityManager.GetComponentData<WorkerLogisticsFeedbackState>(worker);
+            materialFeedback = entityManager.GetComponentData<WorkerFeedbackMaterialProperty>(worker);
+            WorkerAnimationMaterialProperty animation =
+                entityManager.GetComponentData<WorkerAnimationMaterialProperty>(worker);
+            Assert.That(feedback.Activity, Is.EqualTo(WorkerLogisticsActivity.Working));
+            Assert.That(feedback.IsCarrying, Is.EqualTo(1));
+            Assert.That(animation.Value, Is.EqualTo((float)WorkerAnimationKind.Work));
+            Assert.That(materialFeedback.Value.x, Is.EqualTo(1f).Within(0.001f));
+
+            route = entityManager.GetComponentData<WorkerLogisticsRoute>(worker);
+            transform = entityManager.GetComponentData<LocalTransform>(worker);
+            route.MovingToHub = 1;
+            route.RouteLeg = 2;
+            route.WaitTimer = 0f;
+            transform.Position = route.DeliveryPosition;
+            feedback.IsCarrying = 1;
+            entityManager.SetComponentData(worker, route);
+            entityManager.SetComponentData(worker, transform);
+            entityManager.SetComponentData(worker, feedback);
+            yield return null;
+
+            feedback = entityManager.GetComponentData<WorkerLogisticsFeedbackState>(worker);
+            materialFeedback = entityManager.GetComponentData<WorkerFeedbackMaterialProperty>(worker);
+            animation = entityManager.GetComponentData<WorkerAnimationMaterialProperty>(worker);
+            Assert.That(feedback.Activity, Is.EqualTo(WorkerLogisticsActivity.Delivering));
+            Assert.That(feedback.IsCarrying, Is.Zero);
+            Assert.That(feedback.DeliveryPulse01, Is.GreaterThan(0.8f));
+            Assert.That(animation.Value, Is.EqualTo((float)WorkerAnimationKind.Celebrate));
+            Assert.That(materialFeedback.Value.z, Is.GreaterThan(0.8f));
+
+            cycle = entityManager.GetComponentData<ContinuousSiegeCycleData>(cycleEntity);
+            cycle.Phase = SiegeCyclePhase.Day;
+            entityManager.SetComponentData(cycleEntity, cycle);
+            yield return null;
+            feedback = entityManager.GetComponentData<WorkerLogisticsFeedbackState>(worker);
+            Assert.That(feedback.LanternActive, Is.Zero);
+        }
+
         private static int TargetRatioTotal(MobilePopulationAllocation allocation)
         {
             return allocation.WoodTargetRatioBps
@@ -296,6 +393,46 @@ namespace DeadWalls.Tests
                     count++;
             }
             return count;
+        }
+
+        private static int SumRepresentedWorkers(EntityManager entityManager,
+            EconomyFocusType resource)
+        {
+            using EntityQuery query = entityManager.CreateEntityQuery(new EntityQueryDesc
+            {
+                All = new[] { ComponentType.ReadOnly<ResourceWorkerVisual>() },
+                None = new[] { ComponentType.ReadOnly<Prefab>() }
+            });
+            using NativeArray<ResourceWorkerVisual> visuals =
+                query.ToComponentDataArray<ResourceWorkerVisual>(Allocator.Temp);
+            int total = 0;
+            for (int i = 0; i < visuals.Length; i++)
+            {
+                if (EconomyFocusUtility.Normalize(visuals[i].Resource) == resource)
+                    total += math.max(0, visuals[i].RepresentedWorkerCount);
+            }
+
+            return total;
+        }
+
+        private static Entity FindWorkerVisual(EntityManager entityManager, EconomyFocusType resource)
+        {
+            using EntityQuery query = entityManager.CreateEntityQuery(new EntityQueryDesc
+            {
+                All = new[] { ComponentType.ReadOnly<ResourceWorkerVisual>() },
+                None = new[] { ComponentType.ReadOnly<Prefab>() }
+            });
+            using NativeArray<Entity> entities = query.ToEntityArray(Allocator.Temp);
+            using NativeArray<ResourceWorkerVisual> visuals =
+                query.ToComponentDataArray<ResourceWorkerVisual>(Allocator.Temp);
+            for (int i = 0; i < entities.Length; i++)
+            {
+                if (EconomyFocusUtility.Normalize(visuals[i].Resource) == resource)
+                    return entities[i];
+            }
+
+            Assert.Fail($"{resource} worker visual bulunamadi.");
+            return Entity.Null;
         }
     }
 }

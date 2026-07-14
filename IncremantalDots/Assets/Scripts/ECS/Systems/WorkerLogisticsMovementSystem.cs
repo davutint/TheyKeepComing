@@ -9,18 +9,29 @@ namespace DeadWalls
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     public partial struct WorkerLogisticsMovementSystem : ISystem
     {
-        private const int WalkOffset = 0;
-        private const int IdleOffset = 24;
         private const int FrameCount = 15;
         private const float ArrivalDistance = 0.035f;
+        private const float DeliveryPulseDecayPerSecond = 1.8f;
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             float deltaTime = SystemAPI.Time.DeltaTime;
+            bool lanternActive = false;
+            if (SystemAPI.HasSingleton<ContinuousSiegeCycleData>())
+            {
+                lanternActive = WorkerVisualRepresentationUtility.ShouldUseLantern(
+                    SystemAPI.GetSingleton<ContinuousSiegeCycleData>().Phase);
+            }
+            else if (SystemAPI.HasSingleton<WaveStateData>())
+            {
+                lanternActive = SystemAPI.GetSingleton<WaveStateData>().Phase == RunPhaseType.NightCombat;
+            }
+
             new WorkerLogisticsMoveJob
             {
-                DeltaTime = deltaTime
+                DeltaTime = deltaTime,
+                LanternActive = lanternActive ? (byte)1 : (byte)0
             }.ScheduleParallel();
         }
 
@@ -28,13 +39,35 @@ namespace DeadWalls
         partial struct WorkerLogisticsMoveJob : IJobEntity
         {
             public float DeltaTime;
+            public byte LanternActive;
 
-            void Execute(ref LocalTransform transform, ref WorkerLogisticsRoute route, ref SpriteAnimation anim)
+            void Execute(
+                ref LocalTransform transform,
+                ref WorkerLogisticsRoute route,
+                ref SpriteAnimation anim,
+                ref WorkerLogisticsFeedbackState feedback,
+                ref WorkerAnimationMaterialProperty animationProperty,
+                ref WorkerFeedbackMaterialProperty feedbackProperty,
+                in ResourceWorkerVisual visual)
             {
+                feedback.LanternActive = LanternActive;
+                feedback.DeliveryPulse01 = math.max(0f,
+                    feedback.DeliveryPulse01 - DeltaTime * DeliveryPulseDecayPerSecond);
+
                 if (route.WaitTimer > 0f)
                 {
                     route.WaitTimer = math.max(0f, route.WaitTimer - DeltaTime);
-                    SetAnimation(ref anim, IdleOffset + ResolveDirection(route.LastDirection, anim.DirectionRow % 8));
+                    bool workingAtPickup = route.MovingToHub != 0;
+                    feedback.Activity = workingAtPickup
+                        ? WorkerLogisticsActivity.Working
+                        : WorkerLogisticsActivity.Delivering;
+                    feedback.IsCarrying = workingAtPickup ? (byte)1 : (byte)0;
+                    SetAnimation(
+                        ref anim,
+                        ref animationProperty,
+                        ResolveDirection(route.LastDirection, anim.DirectionRow % 8),
+                        workingAtPickup ? WorkerAnimationKind.Work : WorkerAnimationKind.Celebrate);
+                    SetFeedbackProperty(ref feedbackProperty, feedback, visual.RepresentedWorkerCount);
                     return;
                 }
 
@@ -55,7 +88,19 @@ namespace DeadWalls
                     route.MovingToHub = arrivedAtHub ? (byte)0 : (byte)1;
                     route.RouteLeg = 0;
                     route.WaitTimer = arrivedAtHub ? route.DeliveryDuration : route.WorkDuration;
-                    SetAnimation(ref anim, IdleOffset + ResolveDirection(route.LastDirection, anim.DirectionRow % 8));
+                    feedback.IsCarrying = arrivedAtHub ? (byte)0 : (byte)1;
+                    feedback.Activity = arrivedAtHub
+                        ? WorkerLogisticsActivity.Delivering
+                        : WorkerLogisticsActivity.Working;
+                    if (arrivedAtHub)
+                        feedback.DeliveryPulse01 = 1f;
+
+                    SetAnimation(
+                        ref anim,
+                        ref animationProperty,
+                        ResolveDirection(route.LastDirection, anim.DirectionRow % 8),
+                        arrivedAtHub ? WorkerAnimationKind.Celebrate : WorkerAnimationKind.Work);
+                    SetFeedbackProperty(ref feedbackProperty, feedback, visual.RepresentedWorkerCount);
                     return;
                 }
 
@@ -64,7 +109,15 @@ namespace DeadWalls
                 float step = math.min(distance, math.max(0f, route.Speed) * DeltaTime);
                 transform.Position += new float3(direction * step, target.z - transform.Position.z);
                 route.LastDirection = direction;
-                SetAnimation(ref anim, WalkOffset + ResolveDirection(direction, anim.DirectionRow % 8));
+                feedback.Activity = feedback.IsCarrying != 0
+                    ? WorkerLogisticsActivity.Carrying
+                    : WorkerLogisticsActivity.Returning;
+                SetAnimation(
+                    ref anim,
+                    ref animationProperty,
+                    ResolveDirection(direction, anim.DirectionRow % 8),
+                    WorkerAnimationKind.Walk);
+                SetFeedbackProperty(ref feedbackProperty, feedback, visual.RepresentedWorkerCount);
             }
 
             private static float3 ResolveTarget(WorkerLogisticsRoute route)
@@ -85,15 +138,38 @@ namespace DeadWalls
                 return route.PickupPosition;
             }
 
-            private static void SetAnimation(ref SpriteAnimation anim, int targetRow)
+            private static void SetAnimation(
+                ref SpriteAnimation anim,
+                ref WorkerAnimationMaterialProperty animationProperty,
+                int directionRow,
+                WorkerAnimationKind animationKind)
             {
-                if (anim.DirectionRow == targetRow && anim.FrameCount == FrameCount)
+                float targetAnimation = (float)animationKind;
+                if (anim.DirectionRow == directionRow
+                    && anim.FrameCount == FrameCount
+                    && animationProperty.Value == targetAnimation)
+                {
                     return;
+                }
 
-                anim.DirectionRow = targetRow;
+                anim.DirectionRow = directionRow;
                 anim.FrameCount = FrameCount;
                 anim.CurrentFrame = 0;
                 anim.FrameTimer = 0f;
+                animationProperty.Value = targetAnimation;
+            }
+
+            private static void SetFeedbackProperty(
+                ref WorkerFeedbackMaterialProperty property,
+                WorkerLogisticsFeedbackState feedback,
+                int representedWorkerCount)
+            {
+                property.Value = new float4(
+                    feedback.IsCarrying,
+                    feedback.LanternActive,
+                    feedback.DeliveryPulse01,
+                    WorkerVisualRepresentationUtility.GetProductionFeedbackStrength(
+                        representedWorkerCount));
             }
 
             private static int ResolveDirection(float2 direction, int fallbackDirection)

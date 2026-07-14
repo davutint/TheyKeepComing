@@ -65,6 +65,35 @@ namespace DeadWalls
             return math.csum(GetRepresentativeCounts(allocation));
         }
 
+        public static int GetRepresentedWorkerCount(int actualWorkerCount, int visualWorkerCount,
+            int visualIndex)
+        {
+            actualWorkerCount = math.max(0, actualWorkerCount);
+            visualWorkerCount = math.max(0, visualWorkerCount);
+            if (actualWorkerCount == 0 || visualWorkerCount == 0
+                || visualIndex < 0 || visualIndex >= visualWorkerCount)
+            {
+                return 0;
+            }
+
+            int workersPerVisual = actualWorkerCount / visualWorkerCount;
+            int remainder = actualWorkerCount % visualWorkerCount;
+            return workersPerVisual + (visualIndex < remainder ? 1 : 0);
+        }
+
+        public static float GetProductionFeedbackStrength(int representedWorkerCount)
+        {
+            if (representedWorkerCount <= 0)
+                return 0f;
+
+            return math.saturate(0.50f + math.log2(representedWorkerCount + 1f) * 0.10f);
+        }
+
+        public static bool ShouldUseLantern(SiegeCyclePhase phase)
+        {
+            return phase == SiegeCyclePhase.Dusk || phase == SiegeCyclePhase.Night;
+        }
+
         private static int CeilPositive(int value, int divisor)
         {
             return (math.max(0, value) + divisor - 1) / divisor;

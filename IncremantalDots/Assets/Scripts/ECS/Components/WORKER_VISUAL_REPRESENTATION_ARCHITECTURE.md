@@ -27,25 +27,34 @@ Baslangic actual dagilimi `20 / 10 / 8 / 15`, dunya temsiline
 ```text
 MobilePopulationAllocation actual counts
 -> WorkerVisualRepresentationUtility.GetRepresentativeCounts()
--> GameManager representative int4 cache
--> Yalniz temsil sayisi degistiyse worker visual sync
--> ResourceWorkerVisual + WorkerLogisticsRoute
+-> GameManager representative count + actual count cache
+-> Temsil sayisi degistiyse worker visual spawn/destroy sync
+-> Ayni bucket icindeki actual degisiminde yalniz representation weight sync
+-> ResourceWorkerVisual.RepresentedWorkerCount + WorkerLogisticsRoute
 -> WorkerLogisticsMovementSystem
 ```
 
 Actual worker sayisi ayni temsili bucket icinde artsa bile gameplay ve save truth
-hemen guncellenir; gereksiz visual spawn/destroy veya route rewrite yapilmaz.
+hemen guncellenir; visual'lara dagitilan weight toplami actual sayiya exact esitlenir,
+gereksiz visual spawn/destroy veya route rewrite yapilmaz.
 Temsil sayisi degistiginde mevcut entity'ler deterministik index sirasiyla korunur,
 fazlalik silinir ve eksik visual `VillagerWorker.prefab` uzerinden tamamlanir.
+
+`RepresentedWorkerCount`, yalniz dunya feedback siddetini olceklendirir. Kaynak
+uretimi `MobilePopulationAllocation` ve production rate sistemlerinde kalir; visual
+teslimatlar kaynak eklemez ve save edilmez.
 
 ## Doğrulama
 
 - `WorkerVisualRepresentationUtilityTests`: tier sinirlari, monotonic davranis,
-  resource basi `32` cap ve baslangic dagilimi.
+  resource basi `32` cap, exact representation weight toplami, feedback siddeti,
+  Dusk/Night lantern kurali ve baslangic dagilimi.
 - `WorkerAllocationPlayModeTests`: gercek `NewGameScene` icinde
   `12 -> 60 -> 1000 -> 5000 -> 0` actual gecisinde
-  `12 -> 24 -> 32 -> 32 -> 0` visual contract'i.
-- Game View QA: baslangic state'inde `53` actual worker icin `45` okunabilir visual.
+  `12 -> 24 -> 32 -> 32 -> 0` visual contract'i; ayni bucket icinde `101 -> 119`
+  actual weight sync'i; pickup cargo/work, hub delivery pulse ve Night lantern state'i.
+- Game View QA: baslangic state'inde `53` actual worker icin `45` okunabilir visual;
+  Night'ta worker olceginde kucuk resource cargo ve sicak lantern noktasi.
 
 Eşikler ürün tuning'i degistiginde yalnız bu utility sabitlerinden ayarlanir;
 allocation, save veya worker production contract'i degistirilmez.

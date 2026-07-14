@@ -176,9 +176,9 @@ ECS Systems -> Entity Data -> GameManager.ReadECSData() -> Events -> UI Controll
 Legacy UI Input -> GameManager.CanApplyUpgrade()/ApplyUpgrade() -> EntityManager.SetComponentData -> ECS
 Archer Drawer Input -> GameManager.BuyArcher() -> EntityManager.SetComponentData -> ECS
 Tech Tree Input -> GameManager.TryBuyTechNode() -> reveal/unlock state + MobileCastleCombatConfig/WallSegment/ArcherUnit yazimi -> ECS
-Worker Drawer Input -> GameManager.Set/AdjustWorkerTargetRatioPercent() -> WorkerAllocationUtility -> MobilePopulationAllocation target -> sonraki population auto-allocation -> WorkerVisualRepresentationUtility -> temsili DOTS VillagerWorker visual sync
+Worker Drawer Input -> GameManager.Set/AdjustWorkerTargetRatioPercent() -> WorkerAllocationUtility -> MobilePopulationAllocation target -> sonraki population auto-allocation -> WorkerVisualRepresentationUtility -> temsili DOTS VillagerWorker count + exact weight -> animation/cargo/fener/delivery feedback
 Legacy Castle Click -> CastleEconomyUI.OpenFromCastle() -> MobilePrepPauseState
-Legacy Worker Slider Input -> GameManager.SetResourceWorkers() -> MobilePopulationAllocation -> WorkerVisualRepresentationUtility -> temsili DOTS VillagerWorker visual sync
+Legacy Worker Slider Input -> GameManager.SetResourceWorkers() -> MobilePopulationAllocation -> WorkerVisualRepresentationUtility -> temsili DOTS VillagerWorker count + exact weight sync
 Economy Event Input -> GameManager.ChooseEconomyEvent() -> Resources/Population/MobileEconomyEventState
 Castle Interior Repair -> GameManager.RepairDefenseFull() -> EntityManager.SetComponentData -> ECS
 DayNightOverlayController -> GameManager.WaveState + MobileCastleCombatConfig -> Overlay alpha

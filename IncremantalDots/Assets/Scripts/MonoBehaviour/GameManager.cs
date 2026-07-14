@@ -43,6 +43,7 @@ namespace DeadWalls
         private readonly Dictionary<ArcherType, int> _archerTypeLevels = new Dictionary<ArcherType, int>();
         private readonly HashSet<ArcherType> _unlockedArcherTypes = new HashSet<ArcherType> { ArcherType.Basic };
         private int4 _lastSyncedWorkerVisualCounts;
+        private int4 _lastSyncedWorkerVisualActualCounts;
         private UpgradeCard[] _currentUpgradeCards;
         private const int MobileArrowRefillTarget = 200;
         private const int LegacyArrowRefillTarget = 50;
@@ -3762,22 +3763,34 @@ namespace DeadWalls
             if (!IsMobilePopulationEconomyEnabled())
                 return;
 
+            int4 actualCounts = GetActualWorkerCounts(PopulationAllocation);
             int4 representativeCounts = WorkerVisualRepresentationUtility.GetRepresentativeCounts(
                 PopulationAllocation);
-            if (_workerVisualSyncInitialized
-                && math.all(_lastSyncedWorkerVisualCounts == representativeCounts))
+            bool representativeCountsChanged = !_workerVisualSyncInitialized
+                || !math.all(_lastSyncedWorkerVisualCounts == representativeCounts);
+            bool actualCountsChanged = !_workerVisualSyncInitialized
+                || !math.all(_lastSyncedWorkerVisualActualCounts == actualCounts);
+            if (!representativeCountsChanged && !actualCountsChanged)
                 return;
 
-            SyncWorkerVisualsToAllocation(representativeCounts);
+            if (representativeCountsChanged)
+            {
+                SyncWorkerVisualsToAllocation(representativeCounts, actualCounts);
+                return;
+            }
+
+            SyncWorkerVisualRepresentationWeights(representativeCounts, actualCounts);
+            _lastSyncedWorkerVisualActualCounts = actualCounts;
         }
 
         private void SyncWorkerVisualsToAllocation()
         {
             SyncWorkerVisualsToAllocation(
-                WorkerVisualRepresentationUtility.GetRepresentativeCounts(PopulationAllocation));
+                WorkerVisualRepresentationUtility.GetRepresentativeCounts(PopulationAllocation),
+                GetActualWorkerCounts(PopulationAllocation));
         }
 
-        private void SyncWorkerVisualsToAllocation(int4 representativeCounts)
+        private void SyncWorkerVisualsToAllocation(int4 representativeCounts, int4 actualCounts)
         {
             if (!CanAccessEntityManager() || !IsMobilePopulationEconomyEnabled())
                 return;
@@ -3795,18 +3808,59 @@ namespace DeadWalls
                 return;
             }
 
-            SyncResourceWorkerVisuals(EconomyFocusType.Wood, representativeCounts.x);
-            SyncResourceWorkerVisuals(EconomyFocusType.Stone, representativeCounts.y);
-            SyncResourceWorkerVisuals(EconomyFocusType.Iron, representativeCounts.z);
-            SyncResourceWorkerVisuals(EconomyFocusType.Food, representativeCounts.w);
+            SyncResourceWorkerVisuals(EconomyFocusType.Wood, representativeCounts.x, actualCounts.x);
+            SyncResourceWorkerVisuals(EconomyFocusType.Stone, representativeCounts.y, actualCounts.y);
+            SyncResourceWorkerVisuals(EconomyFocusType.Iron, representativeCounts.z, actualCounts.z);
+            SyncResourceWorkerVisuals(EconomyFocusType.Food, representativeCounts.w, actualCounts.w);
 
             _lastSyncedWorkerVisualCounts = representativeCounts;
+            _lastSyncedWorkerVisualActualCounts = actualCounts;
             _workerVisualSyncInitialized = true;
         }
 
-        private void SyncResourceWorkerVisuals(EconomyFocusType resource, int targetCount)
+        private void SyncWorkerVisualRepresentationWeights(int4 representativeCounts,
+            int4 actualCounts)
+        {
+            if (!CanAccessEntityManager())
+                return;
+
+            var query = _entityManager.CreateEntityQuery(new EntityQueryDesc
+            {
+                All = new ComponentType[] { typeof(ResourceWorkerVisual) },
+                None = new ComponentType[] { typeof(Prefab) }
+            });
+            using var entities = query.ToEntityArray(Unity.Collections.Allocator.Temp);
+            for (int i = 0; i < entities.Length; i++)
+            {
+                ResourceWorkerVisual visual =
+                    _entityManager.GetComponentData<ResourceWorkerVisual>(entities[i]);
+                int resourceIndex = GetWorkerResourceIndex(visual.Resource);
+                int representedWorkerCount = WorkerVisualRepresentationUtility.GetRepresentedWorkerCount(
+                    actualCounts[resourceIndex],
+                    representativeCounts[resourceIndex],
+                    visual.Index);
+                if (visual.RepresentedWorkerCount == representedWorkerCount)
+                    continue;
+
+                visual.RepresentedWorkerCount = representedWorkerCount;
+                _entityManager.SetComponentData(entities[i], visual);
+            }
+        }
+
+        private static int4 GetActualWorkerCounts(MobilePopulationAllocation allocation)
+        {
+            return math.max(new int4(
+                allocation.WoodWorkers,
+                allocation.StoneWorkers,
+                allocation.IronWorkers,
+                allocation.FoodWorkers), new int4(0));
+        }
+
+        private void SyncResourceWorkerVisuals(EconomyFocusType resource, int targetCount,
+            int actualCount)
         {
             targetCount = Mathf.Max(0, targetCount);
+            actualCount = Mathf.Max(0, actualCount);
             int kept = 0;
             var destroy = new List<Entity>();
             var query = _entityManager.CreateEntityQuery(new EntityQueryDesc
@@ -3837,6 +3891,8 @@ namespace DeadWalls
 
                 visual.Resource = resource;
                 visual.Index = kept;
+                visual.RepresentedWorkerCount = WorkerVisualRepresentationUtility.GetRepresentedWorkerCount(
+                    actualCount, targetCount, kept);
                 _entityManager.SetComponentData(entities[i], visual);
                 UpdateWorkerVisualRoute(entities[i], resource, kept, false);
                 ConfigureWorkerSprite(entities[i], resource, kept);
@@ -3847,10 +3903,11 @@ namespace DeadWalls
                 _entityManager.DestroyEntity(entity);
 
             for (int index = kept; index < targetCount; index++)
-                SpawnWorkerVisual(resource, index);
+                SpawnWorkerVisual(resource, index, actualCount, targetCount);
         }
 
-        private bool SpawnWorkerVisual(EconomyFocusType resource, int index)
+        private bool SpawnWorkerVisual(EconomyFocusType resource, int index, int actualCount,
+            int visualCount)
         {
             if (!TryResolveWorkerPrefabEntity())
             {
@@ -3871,7 +3928,9 @@ namespace DeadWalls
             _entityManager.SetComponentData(entity, new ResourceWorkerVisual
             {
                 Resource = resource,
-                Index = index
+                Index = index,
+                RepresentedWorkerCount = WorkerVisualRepresentationUtility.GetRepresentedWorkerCount(
+                    actualCount, visualCount, index)
             });
             _entityManager.SetComponentData(entity, Unity.Transforms.LocalTransform.FromPositionRotationScale(
                 pickup,
@@ -3986,6 +4045,14 @@ namespace DeadWalls
         private void ConfigureWorkerSprite(Entity entity, EconomyFocusType resource, int index)
         {
             SetSpriteTint(entity, ResourceWorkerVisualStyle.GetTint(resource));
+
+            if (_entityManager.HasComponent<WorkerCargoColorMaterialProperty>(entity))
+            {
+                _entityManager.SetComponentData(entity, new WorkerCargoColorMaterialProperty
+                {
+                    Value = ResourceWorkerVisualStyle.GetCargoTint(resource)
+                });
+            }
 
             if (!_entityManager.HasComponent<SpriteAnimation>(entity))
                 return;

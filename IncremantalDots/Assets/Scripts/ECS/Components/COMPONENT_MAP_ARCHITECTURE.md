@@ -54,11 +54,13 @@ Tum component'lar unmanaged ECS struct olarak tutulur. Davranis sistemlerde, ver
 ## CastleInteriorWorkerComponents.cs
 
 - `WorkerPrefabData`: SubScene `WaveConfigAuthoring` tarafindan bake edilen DOTS villager worker prefab referansi.
-- `ResourceWorkerVisual`: sahnede gorunen temsili DOTS villager entity'sinin Wood/Stone/Iron/Food kaynagini ve site icindeki index'ini tutar; actual worker truth degildir.
+- `ResourceWorkerVisual`: sahnede gorunen temsili DOTS villager entity'sinin Wood/Stone/Iron/Food kaynagini, site index'ini ve o visual'in temsil ettigi exact actual worker sayisini tutar; gameplay truth degildir.
 - `WorkerLogisticsRoute`: DOTS villager'in pickup, site approach, ortak koridor approach ve
   CastleWorkerHub delivery noktasi arasindaki segmentli rota state'ini tutar.
-- `ResourceWorkerVisualStyle`: kaynak tipine gore hafif worker tint degerlerini merkezi tutar.
-- `WorkerVisualRepresentationUtility`: actual worker sayisini Low/Medium/High egriyle resource basina en fazla `32` temsili visual'a cevirir.
+- `WorkerLogisticsFeedbackState`: working/carrying/delivering/returning activity, cargo, lantern ve delivery pulse state'ini tutar.
+- `WorkerAnimationMaterialProperty`, `WorkerFeedbackMaterialProperty` ve `WorkerCargoColorMaterialProperty`: Idle/Walk/Work/Celebrate atlas secimini, cargo/fener/teslimat shader feedback'ini DOTS instancing ile yollar.
+- `ResourceWorkerVisualStyle`: kaynak tipine gore worker ve tasinan paket tint degerlerini merkezi tutar.
+- `WorkerVisualRepresentationUtility`: actual worker sayisini Low/Medium/High egriyle resource basina en fazla `32` temsili visual'a cevirir; actual sayiyi visual'lara exact weight olarak dagitir ve feedback siddetini cozer.
 
 `MobileCastleCombatConfig` sahnede yoksa sistemler eski `WallXPosition` tabanli davranisi kullanir.
 
@@ -77,7 +79,7 @@ WaveSpawnSystem -> Config varsa kale etrafindaki random 360 spawn cemberini ve c
 ApplyMovementForceSystem -> Config varsa zombiyi CastleCenter'a yonlendirir, ZombieSlow varsa hiz carpanini uygular
 BoundarySystem -> Config varsa AttackRadius icinde Attacking state'e gecirir
 GameManager.BuyArcher(type) -> main scene `Grid/outside` tilemap hucrelerine okcu spawn eder
-MobilePopulationAllocation actual count -> WorkerVisualRepresentationUtility -> GameManager temsili DOTS villager route visual sync
+MobilePopulationAllocation actual count -> WorkerVisualRepresentationUtility -> GameManager temsili DOTS villager count + exact weight sync -> WorkerLogisticsMovementSystem animation/cargo/fener/teslimat feedback
 GameManager.BuyFortify()/BuyRally() -> CastleYardPrepState uzerine tek-gecelik buff yazar
 CastleYardPrepSystem -> Rally timer'i NightCombat sirasinda azaltir
 ArcherShootSystem -> Okcu tipine gore projectile effect datasini oka yazar, facing direction + attack timer set eder
