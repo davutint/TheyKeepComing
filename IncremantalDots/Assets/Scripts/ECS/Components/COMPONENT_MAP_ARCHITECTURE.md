@@ -93,7 +93,7 @@ MobilePopulationEconomySystem -> MobileBedCapacityState kapasite aynası -> Mobi
 MobilePopulationAllocation yeni growth marker + accepted count -> GameManager VillagerWorker arrival spawn -> SurvivorArrivalVisualSystem sağdan Wall arkasına yürüyüş + varışta destroy
 GameManager.BuyFortify()/BuyRally() -> CastleYardPrepState uzerine tek-gecelik buff yazar
 CastleYardPrepSystem -> Rally timer'i NightCombat sirasinda azaltir
-ArcherShootSystem -> Okcu tipine gore projectile effect datasini oka yazar, facing direction + attack timer set eder
+ArcherShootSystem -> Coarse target grid + incoming damage reservation ile nearest yaşayan hedefi seçer; okçu tipine göre projectile effect datasını oka yazar, facing direction + attack timer set eder
 ArrowHitSystem -> Frost ok isabetinde ZombieSlow refresh eder
 ZombieSlowTimerSystem -> Slow suresini dusurur, slow tint'ini yonetir ve bitince pasifler
 ZombieAnimationStateSystem -> Velocity/center yonunden sprite direction row hesaplar

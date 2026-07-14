@@ -121,7 +121,10 @@ Presentation tarafinda `SpriteAnimationSystem` UV rect hesaplarini yapar.
 
 ### ArcherShootSystem
 
-- Range icindeki en yakin zombiyi hedefler.
+- Aktif target'ları coarse spatial map'e Burst-parallel yazar.
+- Uçuşta olan ok damage'leriyle frame-local incoming load'u seed eder.
+- Range içindeki yaşayan ve lethal load ile dolmamış en yakın zombiyi hedefler.
+- Basic/Rapid/Frost aynı deterministic target policy'yi kullanır.
 - Mobile config ve `UnlimitedArrows = true` iken `ArrowSupply.Current` kontrolu/decrement yapmaz.
 - `CastleYardPrepState.RallyTimer > 0` iken fire-rate hesabina rally multiplier uygular.
 - Basic/Rapid/Frost okcu stat'lerini projectile'a tasir.

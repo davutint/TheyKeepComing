@@ -142,7 +142,13 @@ Mobile mode'da zombi `AttackRadius` icine girince `Attacking` state'e gecer ve k
 
 ### ArcherShootSystem
 
-Okcu hedefleme sistemi range icindeki en yakin zombiyi secer. Basic, Rapid ve Frost ayni `Archer.prefab` uzerinden farkli `ArcherUnit` stat'leriyle calisir. `CastleYardPrepState.RallyTimer > 0` ise fire-rate hesabina `RallyFireRateMultiplier` uygulanir.
+Okcu hedefleme sistemi persistent `2.0` cell coarse spatial map'i Burst-parallel kurar;
+ateşe hazır okçular read-only map üzerinde range içindeki yaşayan en yakın hedefi
+seçer. Uçuşta olan ve aynı frame oluşturulan okların incoming damage'i target HP'yi
+karşılıyorsa sonraki okçu o hedefi atlar; bütün range lethal olarak rezerve edilmişse
+o frame bekler. Basic, Rapid ve Frost aynı policy'yi kullanır.
+`CastleYardPrepState.RallyTimer > 0` ise fire-rate hesabına
+`RallyFireRateMultiplier` uygulanır.
 
 - Basic: fire rate `1.5`, damage `10`, range `15`
 - Rapid: fire rate `3.0`, damage `6`, range `14`
@@ -162,6 +168,10 @@ Atis aninda `CombatSfxEvent.ArrowShoot` uretilir; shoot particle V1'de kapali tu
 Atis aninda okcunun `FacingDirection` degeri hedef zombiye gore guncellenir ve
 `AttackAnimTimer` baslatilir. `ArcherAnimationStateSystem`, timer aktifken attack
 row'unu, timer bitince ayni yonde idle row'unu oynatir.
+
+Target tie-break entity index/version ile stabildir. Pool generation uyuşmazlığında
+uçuşta olan ok temizlenir; retarget yapılmaz. Ayrıntı:
+`ARCHER_TARGETING_ARCHITECTURE.md`.
 
 ### ArrowHitSystem + ZombieSlowTimerSystem
 

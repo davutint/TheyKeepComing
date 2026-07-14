@@ -17,6 +17,7 @@ namespace DeadWalls.Tests
     public class HordeScalePlayModeTests
     {
         private const int EnemyTarget = 10_000;
+        private const int ArcherTarget = 1_000;
         private const int WarmupFrames = 30;
         private const int SampleFrames = 120;
 
@@ -172,6 +173,48 @@ namespace DeadWalls.Tests
             Assert.That(poolAtTenK.AvailableCount + poolAtTenK.ActiveCount,
                 Is.EqualTo(poolAtTenK.TotalCreated));
 
+            using (EntityQuery existingArcherQuery =
+                   entityManager.CreateEntityQuery(typeof(ArcherUnit)))
+                entityManager.DestroyEntity(existingArcherQuery);
+
+            Entity archerPrefab = entityManager.GetComponentData<ArcherPrefabData>(
+                entityManager.CreateEntityQuery(typeof(ArcherPrefabData))
+                    .GetSingletonEntity()).ArcherPrefab;
+            MobileCastleArcherTilePlacement placement =
+                UnityEngine.Object.FindFirstObjectByType<MobileCastleArcherTilePlacement>();
+            Assert.That(placement, Is.Not.Null);
+            Assert.That(placement.FormationCapacity, Is.EqualTo(ArcherTarget));
+
+            using (NativeArray<Entity> stressArchers =
+                   entityManager.Instantiate(archerPrefab, ArcherTarget, Allocator.Temp))
+            {
+                for (int i = 0; i < stressArchers.Length; i++)
+                {
+                    Assert.That(placement.TryGetSpawnPosition(i, out float3 archerPosition), Is.True);
+                    entityManager.SetComponentData(stressArchers[i], new ArcherUnit
+                    {
+                        FireRate = 1.5f,
+                        FireTimer = 0f,
+                        ArrowDamage = 10f,
+                        Range = 15f,
+                        Type = ArcherType.Basic,
+                        SlowDuration = 0f,
+                        SlowMultiplier = 1f,
+                        FacingDirection = new float2(1f, 0f),
+                        AttackAnimTimer = 0f
+                    });
+                    entityManager.SetComponentData(
+                        stressArchers[i],
+                        LocalTransform.FromPositionRotationScale(
+                            archerPosition, quaternion.identity, 1f));
+                }
+            }
+
+            using EntityQuery archerQuery = entityManager.CreateEntityQuery(typeof(ArcherUnit));
+            using EntityQuery projectileQuery = entityManager.CreateEntityQuery(
+                typeof(ArrowTag), typeof(ArrowProjectile));
+            Assert.That(archerQuery.CalculateEntityCount(), Is.EqualTo(ArcherTarget));
+
             for (int frame = 0; frame < WarmupFrames; frame++)
                 yield return null;
 
@@ -228,6 +271,11 @@ namespace DeadWalls.Tests
 
             Assert.That(activeQuery.CalculateEntityCount(), Is.EqualTo(EnemyTarget),
                 "Steady-state sample sirasinda aktif enemy sayisi degisti.");
+            Assert.That(archerQuery.CalculateEntityCount(), Is.EqualTo(ArcherTarget),
+                "Steady-state sample sirasinda archer sayisi degisti.");
+            int projectileCountAfterSample = projectileQuery.CalculateEntityCount();
+            Assert.That(projectileCountAfterSample, Is.GreaterThan(0),
+                "1K archer hedefleme turu projectile uretmedi.");
             Array.Sort(frameTimes);
             double averageFrameMs = frameTotalMs / SampleFrames;
             double p95FrameMs = frameTimes[(int)Math.Ceiling(SampleFrames * 0.95) - 1];
@@ -257,7 +305,7 @@ namespace DeadWalls.Tests
             using (var mainThreadDeath = ProfilerRecorder.StartNew(
                        ProfilerCategory.Internal, "Main Thread", 1))
             {
-                for (; deathFrames < 300; deathFrames++)
+                for (; deathFrames < 900; deathFrames++)
                 {
                     yield return null;
                     double frameMs = Time.unscaledDeltaTime * 1000.0;
@@ -293,7 +341,7 @@ namespace DeadWalls.Tests
                 ? entityManager.GetComponentData<DeathTimer>(sampleZombie).Value
                 : float.NaN;
             Assert.That(poolAfterFireball.ActiveCount, Is.Zero,
-                $"Fireball toplu olumleri 300 frame icinde pool'a donmedi. " +
+                $"Fireball toplu olumleri 900 frame icinde pool'a donmedi. " +
                 $"pendingStrike={pendingStrikeCount}; sampleHp={sampleHpAfterFireball}; " +
                 $"sampleState={sampleStateAfterFireball}; deathTimer={sampleDeathTimer}; " +
                 $"deathTimerEnabled={sampleDeathTimerEnabled}; " +
@@ -317,7 +365,9 @@ namespace DeadWalls.Tests
 
             Debug.Log(
                 "[DW-B-SCALE] " +
-                $"enemy={EnemyTarget}; pool_total={poolAtTenK.TotalCreated}; " +
+                $"enemy={EnemyTarget}; archer={ArcherTarget}; " +
+                $"projectile_after_sample={projectileCountAfterSample}; " +
+                $"pool_total={poolAtTenK.TotalCreated}; " +
                 $"pool_available={poolAtTenK.AvailableCount}; expansions={poolAtTenK.ExpansionCount}; " +
                 $"active_chunks={activeChunkCount}; entities_per_chunk={averageActiveEntitiesPerChunk:F2}; " +
                 $"activation_ms={activationMs:F2}; frame_avg_ms={averageFrameMs:F2}; " +

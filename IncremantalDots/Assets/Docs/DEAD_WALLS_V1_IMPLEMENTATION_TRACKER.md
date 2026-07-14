@@ -5,7 +5,7 @@
 > **Tracker sürümü:** 2.0  
 > **Son tam kapsam denetimi:** 2026-07-12  
 > **Aktif paket:** Package D - Archers + Ammo
-> **Aktif iş:** `DW-D-TARGETING` - Spatial Nearest-Target Query + Load Reservation
+> **Aktif iş:** `DW-D-PROJECTILE` - Arrow Pool + Burst-Safe Lifetime
 
 ---
 
@@ -133,10 +133,10 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Population | House bed state + Wood purchase API + exact save var; Dawn isteği boş yatak ve Food/kişi bütçesiyle sınırlı, gerçek accepted count uygulanıyor, Food bir kez düşülüyor ve en fazla 15 temsili survivor sağdan Wall arkasına yürüyor | `[x]` |
 | Workers | Kalıcı target ratio + actual/cap/idle state, +1/+10/+100/direct input, bağımsız bina capacity/efficiency seviyeleri, yeni nüfus auto-allocation, exact save, Low/Medium/High density ve allocation-senkronlu animation/cargo/lantern/delivery feedback var | `[x]` |
 | Council | Curated/deterministic composer ve kart UI var; schedule chance/pity/cooldown | Package F altyapısı var, schedule yanlış |
-| Archers | Basic/Rapid/Frost, instant buy, incremental type maliyeti, yerinde retrain ve version'lı 40x25 formation var | Kısmi uyum; targeting/ammo açık |
+| Archers | Basic/Rapid/Frost, instant buy, incremental type maliyeti, yerinde retrain, version'lı 40x25 formation ve scalable target load var | Kısmi uyum; projectile pool/ammo açık |
 | Archer cap | `ArcherCapacityUtility` Basic/Rapid/Frost toplamını `1000` ile sınırlar; buy, merkezi spawn, Council, meta, restore ve legacy Barracks aynı guard'ı kullanır | `[x]` |
 | Placement | Formation V1 asset'iyle sabit 40 `outside` tile x 25 seeded diamond nokta; layer-fill sıra, 1000 gizmo ve v7 Continue testli | `[x]` |
-| Targeting | Her okçu bütün zombileri brute-force tarıyor | 1k x 10k blocker |
+| Targeting | Persistent coarse spatial query + incoming damage reservation Burst job'ları aktif | `[x]` |
 | Ammo | Config `UnlimitedArrows = true`; refill butonu bağlı değil | Package D uyumsuz |
 | Tech/Heart | Sabit SO catalog + reveal graph + ana kaynak maliyeti | Generated Heart değil |
 | Fireball | Dünya hedefli projectile/AoE ve cooldown çalışması mevcut | Korunacak temel |
@@ -460,8 +460,8 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Archer death yok | Archer HP/death combat yolu yok | `[~]` Regression gerekli |
 | Upgrade yalnız Heart | Ayrı type level/upgrade ve direct unlock kontrolleri player-facing kapalı; drawer yalnız buy + retrain | `[x]` Heart effect pipeline ayrı açık iş |
 | 40x25 placement | Version'lı 40 canonical tile, tile+slot seeded 25 diamond nokta, minimum mesafe, layer-fill sıra, 1000 gizmo ve stable Continue | `[x]` |
-| Nearest valid target | Brute-force ile nearest-to-archer uygulanıyor | `[~]` Davranış doğru, ölçek yanlış |
-| Incoming damage reservation | Yok | `[!]` |
+| Nearest valid target | Persistent coarse grid + Burst job range içindeki yaşayan en yakın hedefi seçiyor | `[x]` |
+| Incoming damage reservation | Uçuşta ve aynı frame üretilen ok damage'i target HP'ye karşı rezerve ediliyor | `[x]` |
 | Arrow -1/shot | Kod destekliyor fakat `UnlimitedArrows=true` bypass ediyor | `[!]` |
 | Wood ile instant refill | Mevcut refill ücretsiz ve sabit target'a çekiyor; UI gizli | `[!]` |
 | Fletcher yok | Legacy Fletcher kodu var; aktif mobile UI'da bağlı değil | `[~]` Leakage guard gerekli |
@@ -491,12 +491,12 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 ### Targeting ve projectile işleri
 
-- [ ] Mevcut spatial hash'i archer target query için uygun read-only query owner'ına dönüştür.
-- [ ] Her okçu range içindeki yaşayan/death-state olmayan en yakın düşmanı seçsin.
-- [ ] Basic/Rapid/Frost aynı target policy'yi kullansın.
+- [x] Mevcut spatial hash utility'sini archer target query için uygun read-only query owner'ına dönüştür.
+- [x] Her okçu range içindeki yaşayan/death-state olmayan en yakın düşmanı seçsin.
+- [x] Basic/Rapid/Frost aynı target policy'yi kullansın.
 - [x] Projectile target pool'a döner/yeniden rent edilirse generation mismatch ile deterministik cleanup uygula; retarget yapma.
-- [ ] Incoming damage reservation/load ile overkill'i dağıt.
-- [ ] Target search'ü Burst/job ölçeğinde 1k x 10k için ölç.
+- [x] Incoming damage reservation/load ile overkill'i dağıt.
+- [x] Target search'ü Burst/job ölçeğinde 1k x 10k için ölç.
 - [ ] Projectile instantiate/destroy churn'ünü pooling veya burst-safe lifetime yaklaşımıyla çöz.
 
 ### Ammo işleri
@@ -517,7 +517,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [x] 1.001. archer alınamıyor.
 - [x] Retrain toplam sayıyı değiştirmiyor.
 - [x] 40 tile x 25 stable point save/load sonrası aynı.
-- [ ] 1.000 archer x 10.000 enemy gerçek oyun senaryosu çalışıyor.
+- [x] 1.000 archer x 10.000 enemy gerçek oyun senaryosu çalışıyor.
 - [ ] Ammo truth ve refill davranışı korunuyor.
 
 ---
@@ -881,7 +881,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Alan | Mevcut durum | Gerekli iş |
 |---|---|---|
 | Enemy spawn/death | Prewarm/expand + rent/return; backlog bağımsız | 10K frame pacing ve allocation ölçümü |
-| Archer target search | 1 archer x all enemies brute-force | Spatial query + target load |
+| Archer target search | Persistent coarse grid + deterministic nearest unsaturated target | `[x]` Spatial query + target load |
 | Projectiles | Instantiate/destroy | Pool/burst-safe lifetime |
 | VFX/SFX | CombatFeedbackBridge pool ve bazı min interval'lar var | 10k budget/aggregation audit |
 | Worker visuals | Low/Medium/High representative density; resource başına 32 visual cap | `[x]` |
@@ -889,12 +889,12 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 ### Ölçüm senaryoları
 
-- [ ] 1.000 archer + 10.000 enemy + projectile peak + Night presentation.
+- [~] 1.000 archer + 10.000 enemy + aktif projectile gerçek sahnede geçti; explicit Night görsel kabulü bekliyor.
 - [x] Fireball 10K horde içinde aynı-frame lethal damage ve toplu pool return correctness geçti; optimize peak iki temiz koşuda `79,13-83,72 ms`.
 - [ ] Arrow refill sonrası 1.000 archer yeniden ateş başlangıcı.
-- [ ] Tam maksimum run state ana menü save/Continue; 10K enemy Player snapshot/Continue geçti (`4,24 MB`, `52,58 / 86,19 ms`), 1K archer Package D'yi bekliyor.
+- [~] 10K enemy save/Continue exact geçti; 1K archer benchmark entity'leri doğrudan ECS stress harness'ine ait olduğu için run-save kanıtı sayılmaz. Player snapshot/Continue ölçümü `4,24 MB` ve `52,58 / 86,19 ms`.
 - [x] Düşük/orta/yüksek worker visual density geçişi; actual `12/60/1000/5000/0`, visual `12/24/32/32/0`.
-- [ ] Target search frame spike ve allocation ölçümü.
+- [~] Birleşik target scenario Editor frame average `8,84 ms`, P95 `9,66 ms`; isolated Player system allocation/spike ölçümü bekliyor.
 - [ ] Long-run soak ve active cap/backlog saturation ölçümü.
 
 ### Tuning yüzeyleri
@@ -935,8 +935,8 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Population | Food yetersiz dawn | Mevcut pop korunur; arrival sınırlı | `[x]` |
 | Ammo | Arrow 0 / refill | Ateş durur / anında başlar | `[ ]` |
 | Archers | 1.001. purchase | Reddedilir; harcama yok | `[x]` |
-| Placement | 40 tile'da 1.000 archer | Her tile 25 stable point | `[ ]` |
-| Targeting | Yoğun overkill | Incoming damage hedefleri dağıtır | `[ ]` |
+| Placement | 40 tile'da 1.000 archer | Her tile 25 stable point | `[x]` |
+| Targeting | Yoğun overkill | Incoming damage hedefleri dağıtır | `[x]` |
 | Heart | Invalid generated graph | Reroll/fallback veya açık hata | `[ ]` |
 | Heart | Guarantee reachability | Rapid/Frost/Fireball reachable | `[ ]` |
 | Heart | Full pause | Cycle/spawn/worker/cooldown durur | `[ ]` |
@@ -946,13 +946,13 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Death | Process restart | Meta bir kez; run geri gelmez | `[ ]` |
 | HUD | 16:9 / ultrawide | Kritik UI ve dünya kırpılmaz | `[ ]` |
 | Tutorial | İkinci run | Otomatik tekrar etmez | `[ ]` |
-| Stress | 1k archer x 10k enemy | 10K enemy-only Player P95 `6,97 ms`; `535` draw call / `202` chunk ölçüldü, 1K archer ve projectile peak bekliyor | `[~]` |
+| Stress | 1k archer x 10k enemy | Gerçek NewGameScene Editor P95 `9,66 ms`, average `8,84 ms`, main average `8,73 ms`, sample sonunda `353` projectile; Player/hardware kabulü bekliyor | `[~]` |
 
 ### Mevcut test envanteri
 
-- `[x]` EditMode: `98/98`; contract, compact save/migration v3-v7, Formation V1 exact 40 tile/seeded diamond/minimum mesafe/layer-fill ve ortak 1000 archer cap dahil utility, economy, worker, cycle, quantity-only, backlog, Moat isolation, enemy catalog ve pool kapsamı.
-- `[x]` PlayMode: `24 pass + 1 explicit skip`; gerçek `NewGameScene`, 40x25 Formation V1 asset/scene binding'i, 1000 benzersiz stable nokta ve exact Continue, archer cap/retrain, economy/worker, Wall, cycle, backlog ve 10K pool/Fireball kapsamı. 10K raw profiler capture explicit targeted testtir.
-- `[~]` Council schedule/guardrail ve 1k x 10k ürün senaryoları ilgili paketleri bekliyor; enemy pool churn contract testli.
+- `[x]` EditMode: `102/102`; targeting cell/range, lethal reservation ve stable tie-break dahil contract, compact save/migration v3-v7, Formation V1, common archer cap, economy, worker, cycle, quantity-only, backlog, Moat isolation, enemy catalog ve pool kapsamı.
+- `[x]` PlayMode: `26/26`; gerçek `NewGameScene`, Basic/Rapid/Frost ortak target policy + lethal load dağıtımı, 1K archer x 10K enemy, Formation V1, exact Continue, archer cap/retrain, economy/worker, Wall, cycle, backlog, pool/Fireball ve targeted raw profiler capture kapsamı.
+- `[~]` Council schedule/guardrail, projectile pooling, ammo ve Player/hardware frame pacing kabulü ilgili paket/kapıları bekliyor.
 
 ---
 
@@ -960,7 +960,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 | Risk | Mevcut erken sinyal | Mitigation / kill rule |
 |---|---|---|
-| 1k x 10k targeting collapse | ArcherShoot brute-force | Spatial query + target load; HP scaling'e kaçma |
+| 1k x 10k targeting collapse | Editor birleşik P95 `9,66 ms`; projectile churn hâlâ açık | Coarse spatial query + target load tamam; sırada arrow pool, sonra Player kabulü |
 | Projectile/VFX flood | Projectile destroy churn; hit yoğunluğu | Pool + budget + aggregation |
 | Graph unreachable | Generator henüz yok | Validation + deterministic fallback |
 | Meta runaway | Current reward kills/day ağırlıklı | Diminishing values + telemetry |
@@ -1056,7 +1056,7 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | `ArcherCapacityUtility.cs` + `GameManager.SpawnArcher` + `MarketUI.cs` | Basic/Rapid/Frost ortak `1000` entity cap'i; buy öncesi ve merkezi spawn guard'ı, Council/meta/restore sınırı, `ARMY CAP/MAX` feedback'i |
 | `WorkerLogisticsMovementSystem.cs` + `SpriteSheet.shader` + `Villager.mat` | Ayrı Idle/Walk/Work/Celebrate atlas seçimi; resource cargo, Dusk/Night lantern ve weight-scaled hub delivery pulse |
 | `ArcherFormationV1.asset` + `ArcherFormationUtility.cs` + `MobileCastleArcherTilePlacement.cs` | Version'lı exact 40 tile; tile+slot seeded 25 diamond nokta, minimum mesafe, layer-fill 1000 kapasite ve tam gizmo preview |
-| `ArcherShootSystem.cs` | Brute-force nearest target ve unlimited ammo bypass |
+| `ArcherShootSystem.cs` + `ArcherTargetingUtility.cs` | Persistent coarse spatial nearest query, stable tie-break, uçuşta/yeni ok incoming damage reservation ve şimdilik unlimited ammo bypass |
 | `TechNodeDefinitionSO.cs` + `TechTreeCatalogSO.cs` | Sabit catalog/reveal/cost/effect model |
 | `TechTreeUI.cs` + `TechTreeViewController.cs` | Fullscreen graph, pan/zoom, simulation'ın durmaması |
 | `CouncilComposer.cs` + `CouncilEventUI.cs` | Curated deterministic card infrastructure |
@@ -1114,3 +1114,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-14 | `DW-D-ARCHER-CAP` common 1000 archer guard | Basic/Rapid/Frost toplamı tek `ArcherCapacityUtility` owner'ında `1000` ile sınırlandı; satın alma harcamadan önce, bütün aktif yollar merkezi spawn'da tekrar kontrol ediliyor. Council/meta/restore aşırı miktarları cap'te duruyor, dormant Barracks rezerve slotlarla guard'ı bypass edemiyor; drawer `ARMY CAP/MAX` gösteriyor | Targeted EditMode 7/7; targeted PlayMode 1/1; full EditMode 92/92; full PlayMode 22 pass + 1 explicit skip; Unity console 0 error |
 | 2026-07-14 | `DW-D-RETRAIN` Basic -> Rapid/Frost retrain + type cost curve | Unlock edilmiş Rapid/Frost satırında tek bir Basic entity yeni tip/stat/tint ile yerinde dönüştürülüyor; entity, toplam archer, population/cap ve transform korunuyor. Buy ve retrain fiyatı hedef tür sayısına göre `ceil(base × (1 + count / interval)^exponent)` ile büyüyor; base/interval/exponent archer SO datasında. Dynamic HUD template'ine ayrı retrain kontrolü ve idempotent prefab repair eklendi; ayrı type upgrade/direct unlock yüzeyi kapalı kaldı | Targeted EditMode 2/2; targeted PlayMode 1/1; full EditMode 94/94; full PlayMode 23 pass + 1 explicit skip; Unity console 0 error |
 | 2026-07-14 | `DW-D-FORMATION` version'lı 40 x 25 stable archer placement | `ArcherFormationV1.asset` exact 40 canonical `outside` tile'ı taşır; her tile'da coordinate+slot seeded best-candidate algoritma 25 inset diamond noktayı minimum mesafeyle üretir, global sıra layer-fill olur. Scene binding/setup repair ve tam 1000 gizmo eklendi; exact save v7 yalnız formation version + type count tutar, v6 migration ve Continue aynı noktaları yeniden kurar. Tam test turunda bulunan 10K sıra bağımlılığı gameplay değiştirilmeden test önkoşul/cleanup izolasyonuyla kapatıldı | Unity compile: 0 error; targeted EditMode 4/4; targeted Formation PlayMode 1/1; full EditMode 98/98; full PlayMode 24 pass + 1 explicit skip; Unity console 0 error |
+| 2026-07-14 | `DW-D-TARGETING` spatial nearest-target + incoming load | `ArcherShootSystem` persistent `2.0` cell target grid'ini Burst-parallel kuruyor; tek deterministic Burst shoot job yaşayan/death-state olmayan nearest unsaturated target'ı seçiyor. Uçuşta ve aynı frame yaratılan ok damage'i target HP'ye rezerve ediliyor; Basic/Rapid/Frost aynı policy'de, pool generation mismatch retarget yapmıyor. Gerçek Formation V1 1K archer + pooled 10K enemy birleşik ürün testi geçti | Targeted EditMode 4/4; targeted targeting PlayMode 1/1; 1K×10K PlayMode 1/1, Editor P95 `9,66 ms`; full EditMode 102/102; full PlayMode 26/26; Unity console 0 error |

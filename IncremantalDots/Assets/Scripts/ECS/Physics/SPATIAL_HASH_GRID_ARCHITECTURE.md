@@ -1,12 +1,14 @@
 # Spatial Hash Grid - Mimari
 
 ## Amac
-O(n^2) brute-force yerine O(n*k) broadphase carpisma tespiti. k = ortalama komsu sayisi (~26).
+O(n^2) brute-force yerine yoğunluğa göre ayrılmış spatial broadphase/query sağlamak.
+Collision ve archer targeting aynı cell size'a zorlanmaz.
 
 ## Nasil Calisiyor
-1. Dunya 2D grid'e bolunur (cell size = 0.6, zombi capi 0.30 ile daha iyi eslesir)
-2. Her zombinin pozisyonu hash fonksiyonu ile bir hucreye eslesir
-3. Carpisma tespitinde sadece ayni + 8 komsu hucre kontrol edilir
+1. Collision grid `BuildSpatialHashSystem` tarafından `0.35` cell size ile çift buffer kurulur.
+2. Archer target grid `ArcherShootSystem` tarafından `2.0` cell size ile her frame kurulur.
+3. Her zombinin pozisyonu aynı hash fonksiyonu ile ilgili grid hücresine eşlenir.
+4. Collision yalnız aynı + 8 komşu hücreyi; targeting range halkalarını ve cell AABB prune'u kullanır.
 
 ## Hash Fonksiyonu
 ```
@@ -24,9 +26,13 @@ Prime-based hash — uniform dagilim saglar.
 | Sistem | Kullanim |
 |--------|----------|
 | PhysicsCollisionSystem | 3x3 komsu hucre tarasi, circle-circle test |
-| ArcherShootSystem | Artik spatial hash kullanmiyor — brute-force SystemAPI.Query ile Burst derlemeli |
-| ClickDamageSystem | Click pozisyonu etrafindaki hucreleri tara |
+| BoundarySystem | Durmuş komşu overlap sorgusu için collision read map |
+| ArcherShootSystem | Persistent coarse target map + read-only nearest query + incoming load |
 
 ## Static Erisim
-`BuildSpatialHashSystem.SpatialMap` static field uzerinden tum sistemler erisebirlir.
-Bu field job'lara [ReadOnly] olarak kopyalanir — thread-safe.
+Collision/Boundary `BuildSpatialHashSystem.ReadMap` snapshot'ını `[ReadOnly]` kullanır.
+Archer target map sistem-local owner'da kalır ve yalnız
+`NativeParallelMultiHashMap.ReadOnly` alias olarak target job'a geçirilir.
+
+Ayrıntılı hedefleme sözleşmesi:
+`Assets/Scripts/ECS/Systems/ARCHER_TARGETING_ARCHITECTURE.md`.
