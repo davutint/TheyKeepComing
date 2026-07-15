@@ -6,7 +6,8 @@
 
 1. `Assets/ScriptableObject/MobileCastle/Council/` altina 11 atom (`Atom_*.asset`) +
    9 sablon (`Template_*.asset`) + `CouncilEventCatalog.asset` seed edilir — MERGE-ONLY:
-   mevcut asset degerlerine ve kullanicinin ekledigi atom/sablonlara dokunulmaz.
+   mevcut asset degerlerine ve kullanicinin ekledigi atom/sablonlara dokunulmaz. Mevcut iki
+   authored follow-up, `CuratedChains` allowlist'ine merge edilir.
 2. Katalog `GameManager.councilCatalog` alanina baglanir.
 3. `CouncilEventUI` HUD root'a eklenir; kart objeleri isimle bulunur, SFX baglanir
    (Appear = `Book Handle 1-2.wav`, Choose = `Card Place 1-1.wav`); `CouncilEffectBadgeText`
@@ -22,10 +23,13 @@
   buyuklugu MinutesOfProduction (kaynak) veya Rate/PerDay (adet/oran) ile ver; BudgetMinutes
   dakika-degeri; director carpanlarini ayarla. Kataloga ekle. TEK atom onlarca varyant dogurur.
 - **Yeni sablon:** Create > ... > Council Template. Karsitlik tipini sec; OptionA/BAtomIds ile
-  atom kisitla (bos = tur-uyumlu havuz); zincir icin RequiredFlags + ChainDelayDays (+OneShot).
-  Kataloga ekle.
-- `RecentTemplateMemory` katalog asset'inde anti-tekrar sunum hafizasidir. Regular takvim
-  asset-tunable degildir: `CouncilRegularSchedule` sabit Day `3,6,9,12...` owner'idir.
+  atom kisitla (bos = tur-uyumlu havuz). Zincir icin RequiredFlags + ChainDelayDays (+OneShot)
+  yetmez: catalog `CuratedChains` listesine source template/branch/flag/target dordulusunu da
+  ekle. `ValidateCatalog()` onaysiz veya kopuk zinciri reddeder.
+- `RecentTemplateMemory` katalog asset'inde hard anti-tekrar hafizasidir. Alternatif uygun
+  template varken recent template secilemez; tum adaylar recent ise scheduled fallback acilir.
+  Regular takvim asset-tunable degildir: `CouncilRegularSchedule` sabit Day `3,6,9,12...`
+  owner'idir.
 - Legacy `DailyEventChance/PityDays/CooldownDays` serialized uyumluluk icin saklanir ve
   Inspector'da gizlidir; regular Council'i etkilemez.
 
@@ -38,8 +42,9 @@
 3. Iki butonun ikinci satirinda exact sonuc gorunur: population `+N PEOPLE -M FOOD`, free
    archer `+N BASIC ARCHERS -N IDLE PEOPLE`, Wall heal gercek uygulanacak HP ve gece etkisi
    exact count yuzdesi. Karsilanamayan exact sonuc butonu pasif yapar ve eksigi yazar.
-4. `refugees_at_gate`'te "Take them in" sec -> 2+ gun sonra `AMONG THE REFUGEES` zinciri
-   cikabilir (OneShot).
+4. `refugees_at_gate`'te A sec -> catalog'daki exact curated link sayesinde 2+ gun sonra
+   `AMONG THE REFUGEES` zinciri cikabilir (OneShot). Link allowlist'ten cikarilirsa context'te
+   flag bulunsa bile target fail-closed acilmaz.
 5. EditMode: `CouncilComposerTests`, `CouncilRegularScheduleTests`, `RunPersistenceTests`.
 6. PlayMode: `CouncilRegularSchedulePlayModeTests` gercek sahnede Day 1-12 cadence ve
    ayni scheduled gunde ikinci acilisi dogrular. `CouncilEffectGuardPlayModeTests` exact quote
@@ -51,6 +56,13 @@
 `CouncilTimerText` ekler, title alanini timer ile cakismayacak sekilde daraltir ve aktif
 `NewGameScene` icindeki `CouncilEventUI` binding'ini kaydeder. Tam scene setup da ayni prefab
 repair adimini otomatik cagirir.
+
+## Context / Curated Chain Onarimi
+
+`Window > DeadWalls > Repair Council Curated Context Contract`, production catalog'a yalniz
+mevcut iki authored link'i merge eder: Refugees A -> Among the Refugees ve Merchant A -> An Old
+Friend. Var olan custom chain girdilerini silmez; yeni chain veya anlati uretmez. Islem sonunda
+`ValidateCatalog()` calisir ve kopuk/onaysiz source/flag/target baglantilarini Console'a yazar.
 
 ## Effect Guardrail Testi
 

@@ -2566,7 +2566,18 @@ namespace DeadWalls
             SetCouncilFlag("council_" + active.TemplateId + (optionA ? "_a" : "_b"), day);
             string extraFlag = optionA ? active.SetsFlagOnA : active.SetsFlagOnB;
             if (!string.IsNullOrEmpty(extraFlag))
-                SetCouncilFlag(extraFlag, day);
+            {
+                if (councilCatalog != null
+                    && councilCatalog.IsApprovedChainSource(active.TemplateId, optionA, extraFlag))
+                {
+                    SetCouncilFlag(extraFlag, day);
+                }
+                else
+                {
+                    Debug.LogError($"[GameManager] Council '{active.TemplateId}' "
+                                   + $"onaysiz chain flag'i setlemeye calisti: '{extraFlag}'.");
+                }
+            }
 
             _activeCouncilEvent = null;
             OnGameStateChanged?.Invoke();

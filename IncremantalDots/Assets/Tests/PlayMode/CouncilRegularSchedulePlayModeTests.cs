@@ -20,15 +20,26 @@ namespace DeadWalls.Tests
         public IEnumerator SetUp()
         {
             GameBootstrap.PendingAction = GameBootstrap.StartAction.None;
+            int previousGameManagerId = GameManager.Instance != null
+                ? GameManager.Instance.GetInstanceID()
+                : 0;
             SceneManager.LoadScene("NewGameScene", LoadSceneMode.Single);
             for (int frame = 0; frame < 300; frame++)
             {
-                if (GameManager.Instance != null && GameManager.Instance.ContinuousSiegeCycle.Enabled)
+                GameManager current = GameManager.Instance;
+                bool newSceneOwnerReady = current != null
+                    && current.GetInstanceID() != previousGameManagerId
+                    && SceneManager.GetActiveScene().name == "NewGameScene"
+                    && current.ContinuousSiegeCycle.Enabled;
+                if (newSceneOwnerReady)
                     break;
                 yield return null;
             }
 
             Assert.That(GameManager.Instance, Is.Not.Null);
+            Assert.That(SceneManager.GetActiveScene().name, Is.EqualTo("NewGameScene"));
+            Assert.That(GameManager.Instance.GetInstanceID(), Is.Not.EqualTo(previousGameManagerId),
+                "Test eski sahnenin GameManager owner'ina baglandi.");
             Assert.That(GameManager.Instance.ContinuousSiegeCycle.Enabled, Is.True,
                 "GameManager continuous cycle runtime'i hazir olmadi.");
 
@@ -109,6 +120,32 @@ namespace DeadWalls.Tests
             yield return null;
         }
 
+        [UnityTest]
+        public IEnumerator ApprovedCouncilChoice_WritesCuratedChainFlagInLiveGameManager()
+        {
+            GameManager gameManager = GameManager.Instance;
+            ContinuousSiegeCycleData cycle = gameManager.ContinuousSiegeCycle;
+            cycle.Enabled = true;
+            cycle.CycleIndex = 2;
+            cycle.Phase = SiegeCyclePhase.Dawn;
+            _cycleSetter.Invoke(gameManager, new object[] { cycle });
+
+            Assert.That(gameManager.TryOpenRegularCouncilEvent(), Is.True);
+            Assert.That(gameManager.ActiveCouncilEvent.TemplateId, Is.EqualTo("schedule_template"));
+            Assert.That(gameManager.ChooseCouncilOption(true), Is.True);
+
+            FieldInfo flagsField = typeof(GameManager).GetField(
+                "_councilFlags",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.That(flagsField, Is.Not.Null);
+            var flags = flagsField.GetValue(gameManager) as Dictionary<string, int>;
+            Assert.That(flags, Is.Not.Null);
+            Assert.That(flags.ContainsKey("schedule_followup_ready"), Is.True,
+                "Approved source/branch flag'i live GameManager state'ine yazilmadi.");
+            Assert.That(flags["schedule_followup_ready"], Is.EqualTo(3));
+            yield return null;
+        }
+
         private CouncilEventCatalogSO CreateCatalog()
         {
             CouncilEffectAtomSO gain = ScriptableObject.CreateInstance<CouncilEffectAtomSO>();
@@ -136,12 +173,33 @@ namespace DeadWalls.Tests
             template.OptionAAtomIds = new[] { gain.Id };
             template.OptionBAtomIds = new[] { boost.Id };
             template.MinDay = 1;
+            template.SetsFlagOnA = "schedule_followup_ready";
             _createdObjects.Add(template);
+
+            CouncilTemplateSO followup = ScriptableObject.CreateInstance<CouncilTemplateSO>();
+            followup.Id = "schedule_followup";
+            followup.Title = "SCHEDULE FOLLOWUP";
+            followup.Contrast = CouncilContrastType.NowVsLater;
+            followup.OptionAAtomIds = new[] { gain.Id };
+            followup.OptionBAtomIds = new[] { boost.Id };
+            followup.RequiredFlags = new[] { "schedule_followup_ready" };
+            followup.BaseWeight = 0f;
+            _createdObjects.Add(followup);
 
             CouncilEventCatalogSO catalog = ScriptableObject.CreateInstance<CouncilEventCatalogSO>();
             catalog.Atoms = new[] { gain, boost };
-            catalog.Templates = new[] { template };
+            catalog.Templates = new[] { template, followup };
             catalog.RecentTemplateMemory = 1;
+            catalog.CuratedChains = new[]
+            {
+                new CouncilCuratedChain
+                {
+                    SourceTemplateId = template.Id,
+                    SourceBranch = CouncilChoiceBranch.OptionA,
+                    Flag = "schedule_followup_ready",
+                    TargetTemplateId = followup.Id,
+                },
+            };
             _createdObjects.Add(catalog);
             return catalog;
         }

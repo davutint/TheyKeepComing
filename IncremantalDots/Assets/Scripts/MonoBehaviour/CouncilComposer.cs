@@ -62,7 +62,6 @@ namespace DeadWalls
         private const float SmallBand = 0.7f;
         private const float FairBand = 1.0f;
         private const float GenerousBand = 1.4f;
-        private const float RecentTemplateWeightMult = 0.15f;
         private const float BudgetTolerance = 1.25f; // A/B butce orani bu katsayiyi asarsa dusuk taraf yukseltilir
 
         // ---------------------------------------------------------------
@@ -116,9 +115,8 @@ namespace DeadWalls
         private static CouncilTemplateSO PickTemplate(CouncilEventCatalogSO catalog,
             ref Unity.Mathematics.Random rng, in CouncilContext context)
         {
-            var candidates = new List<CouncilTemplateSO>();
-            var weights = new List<float>();
-            float totalWeight = 0f;
+            var eligible = new List<CouncilTemplateSO>();
+            bool hasFreshCandidate = false;
 
             foreach (var template in catalog.Templates)
             {
@@ -129,14 +127,28 @@ namespace DeadWalls
                 if (template.OneShot && context.UsedOneShotTemplateIds != null
                     && context.UsedOneShotTemplateIds.Contains(template.Id))
                     continue;
-                if (!FlagsSatisfied(template, context))
+                if (!FlagsSatisfied(catalog, template, context))
+                    continue;
+
+                eligible.Add(template);
+                if (!IsRecent(template.Id, context.RecentTemplateIds))
+                    hasFreshCandidate = true;
+            }
+
+            var candidates = new List<CouncilTemplateSO>(eligible.Count);
+            var weights = new List<float>();
+            float totalWeight = 0f;
+
+            foreach (var template in eligible)
+            {
+                // Alternatif varsa recent template kesin dislanir. Tum uygun adaylar recent ise
+                // scheduled Council'in bos kalmamasi icin ayni havuz fallback olarak kullanilir.
+                if (hasFreshCandidate && IsRecent(template.Id, context.RecentTemplateIds))
                     continue;
 
                 float weight = template.BaseWeight;
-                if (context.RecentTemplateIds != null && context.RecentTemplateIds.Contains(template.Id))
-                    weight *= RecentTemplateWeightMult;
-
-                // Director on-skoru: sablonun A-taraf atom adaylarindan en yuksek baglam carpani
+                // Director on-skoru iki secenegin authored atomlarindan en yuksek baglam
+                // carpanini okur; Wall heal gibi B-tarafi baglami da template'i etkiler.
                 weight *= MaxDirectorMult(catalog, template, context);
 
                 candidates.Add(template);
@@ -158,7 +170,8 @@ namespace DeadWalls
             return candidates[candidates.Count - 1];
         }
 
-        private static bool FlagsSatisfied(CouncilTemplateSO template, in CouncilContext context)
+        private static bool FlagsSatisfied(CouncilEventCatalogSO catalog, CouncilTemplateSO template,
+            in CouncilContext context)
         {
             if (template.RequiredFlags != null)
             {
@@ -166,6 +179,8 @@ namespace DeadWalls
                 {
                     if (string.IsNullOrEmpty(flag))
                         continue;
+                    if (!catalog.IsApprovedChainConstraint(template.Id, flag))
+                        return false;
                     if (context.Flags == null || !context.Flags.TryGetValue(flag, out int setDay))
                         return false;
                     if (template.ChainDelayDays > 0 && context.Day < setDay + template.ChainDelayDays)
@@ -173,11 +188,15 @@ namespace DeadWalls
                 }
             }
 
-            if (template.ForbiddenFlags != null && context.Flags != null)
+            if (template.ForbiddenFlags != null)
             {
                 foreach (var flag in template.ForbiddenFlags)
                 {
-                    if (!string.IsNullOrEmpty(flag) && context.Flags.ContainsKey(flag))
+                    if (!string.IsNullOrEmpty(flag)
+                        && !catalog.IsApprovedChainConstraint(template.Id, flag))
+                        return false;
+                    if (!string.IsNullOrEmpty(flag) && context.Flags != null
+                        && context.Flags.ContainsKey(flag))
                         return false;
                 }
             }
@@ -185,12 +204,20 @@ namespace DeadWalls
             return true;
         }
 
+        private static bool IsRecent(string templateId, List<string> recentTemplateIds)
+        {
+            return recentTemplateIds != null && recentTemplateIds.Contains(templateId);
+        }
+
         private static float MaxDirectorMult(CouncilEventCatalogSO catalog, CouncilTemplateSO template,
             in CouncilContext context)
         {
             float best = 1f;
-            var pool = ResolveAtomPool(catalog, template.OptionAAtomIds, CouncilEffectKind.None);
-            foreach (var atom in pool)
+            var optionAPool = ResolveAtomPool(catalog, template.OptionAAtomIds, CouncilEffectKind.None);
+            foreach (var atom in optionAPool)
+                best = Mathf.Max(best, DirectorMult(atom, context));
+            var optionBPool = ResolveAtomPool(catalog, template.OptionBAtomIds, CouncilEffectKind.None);
+            foreach (var atom in optionBPool)
                 best = Mathf.Max(best, DirectorMult(atom, context));
             return best;
         }

@@ -179,6 +179,15 @@ namespace DeadWalls
                 : "[MobileCastleSceneSetup] Council exact karar UI prefabda onarildi; NewGameScene aktif degildi.");
         }
 
+        [MenuItem("Window/DeadWalls/Repair Council Curated Context Contract")]
+        public static void RepairCouncilCuratedContextContract()
+        {
+            EnsureDefaultCouncilCatalog();
+            AssetDatabase.SaveAssets();
+            AssetDatabase.ImportAsset(CouncilCatalogPath, ImportAssetOptions.ForceUpdate);
+            Debug.Log("[MobileCastleSceneSetup] Council context memory ve curated chain contract'i onarildi.");
+        }
+
         [MenuItem("Window/DeadWalls/Repair Archer Formation V1")]
         public static void RepairArcherFormationV1()
         {
@@ -1748,6 +1757,23 @@ namespace DeadWalls
             }
 
             MergeCouncilList(catalog, atoms, templates);
+            MergeCouncilCuratedChains(catalog, new[]
+            {
+                new CouncilCuratedChain
+                {
+                    SourceTemplateId = "refugees_at_gate",
+                    SourceBranch = CouncilChoiceBranch.OptionA,
+                    Flag = "refugees_taken",
+                    TargetTemplateId = "among_the_refugees",
+                },
+                new CouncilCuratedChain
+                {
+                    SourceTemplateId = "merchant_caravan",
+                    SourceBranch = CouncilChoiceBranch.OptionA,
+                    Flag = "traded_with_merchant",
+                    TargetTemplateId = "an_old_friend",
+                },
+            });
 
             var problems = catalog.ValidateCatalog();
             foreach (var problem in problems)
@@ -1795,6 +1821,44 @@ namespace DeadWalls
                 catalog.Templates = mergedTemplates.ToArray();
                 EditorUtility.SetDirty(catalog);
             }
+        }
+
+        private static void MergeCouncilCuratedChains(CouncilEventCatalogSO catalog,
+            CouncilCuratedChain[] defaults)
+        {
+            var merged = new List<CouncilCuratedChain>();
+            if (catalog.CuratedChains != null)
+                merged.AddRange(catalog.CuratedChains);
+
+            bool changed = false;
+            foreach (CouncilCuratedChain candidate in defaults)
+            {
+                bool exists = false;
+                foreach (CouncilCuratedChain current in merged)
+                {
+                    if (current.SourceTemplateId == candidate.SourceTemplateId
+                        && current.SourceBranch == candidate.SourceBranch
+                        && current.Flag == candidate.Flag
+                        && current.TargetTemplateId == candidate.TargetTemplateId)
+                    {
+                        exists = true;
+                        break;
+                    }
+                }
+
+                if (exists)
+                    continue;
+
+                merged.Add(candidate);
+                changed = true;
+            }
+
+            if (!changed)
+                return;
+
+            Undo.RecordObject(catalog, "Configure Council Curated Chains");
+            catalog.CuratedChains = merged.ToArray();
+            EditorUtility.SetDirty(catalog);
         }
 
         private static CouncilEffectAtomSO EnsureCouncilAtom(string id, CouncilEffectKind kind,

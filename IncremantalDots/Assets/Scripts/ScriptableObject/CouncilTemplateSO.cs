@@ -28,7 +28,8 @@ namespace DeadWalls
     /// Council event sablonu: tema/metin iskeleti + karsitlik tipi + flag kosullari.
     /// Somut sayilar ve secenek etiketleri runtime'da CouncilComposer tarafindan atomlardan
     /// uretilir; ayni sablon farkli gunlerde/baglamda farkli event'ler dogurur.
-    /// Zincirler flag'lerle kurulur: bir secenegin SetsFlag'i, baska sablonun RequiredFlags'ini acar.
+    /// Zincirler flag'lerle kurulur; ancak runtime'da acilmasi icin source/branch/flag/target
+    /// baginin CouncilEventCatalogSO.CuratedChains listesinde explicit onayli olmasi gerekir.
     /// </summary>
     [CreateAssetMenu(fileName = "CouncilTemplate", menuName = "DeadWalls/Mobile Castle/Council Template")]
     public class CouncilTemplateSO : ScriptableObject
@@ -64,11 +65,11 @@ namespace DeadWalls
         public int MinDay = 1;
 
         [Header("Memory / Chains")]
-        [Tooltip("Bu flag'lerin HEPSI setliyse sablon havuza girer (zincir cocuklari icin).")]
+        [Tooltip("Bu flag'lerin HEPSI setliyse sablon havuza girer. Her flag catalog CuratedChains allowlist'inde bu target icin onayli olmalidir.")]
         public string[] RequiredFlags = new string[0];
         [Tooltip("Bu flag'lerden herhangi biri setliyse sablon CIKMAZ.")]
         public string[] ForbiddenFlags = new string[0];
-        [Tooltip("A secilirse setlenecek flag (bos = yok). Ayrica 'council_{Id}_a' otomatik setlenir.")]
+        [Tooltip("A secilirse setlenecek flag. Catalog CuratedChains source/OptionA kaydi yoksa runtime fail-closed reddeder. Ayrica 'council_{Id}_a' otomatik setlenir.")]
         public string SetsFlagOnA = string.Empty;
         public string SetsFlagOnB = string.Empty;
         [Tooltip("Zincir cocugu: parent seciminden kac gun sonra cikabilir (RequiredFlags ile birlikte). 0 = kisit yok.")]

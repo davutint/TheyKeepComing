@@ -13,18 +13,21 @@ varyant dogurur ve yeni atom/sablon eklemek cesitliligi CARPARAK buyutur.
 1. **Veri (ScriptableObject/):** `CouncilEffectAtomSO` (etki parcacigi: tur + uretim-oranli
    buyukluk + director agirlik kurallari + butce degeri), `CouncilTemplateSO` (tema/metin +
    karsitlik tipi + flag kosullari + zincir alanlari), `CouncilEventCatalogSO` (havuz +
-   RecentTemplateMemory 3). Legacy DailyEventChance/PityDays/CooldownDays alanlari serialized
-   asset uyumlulugu icin saklidir fakat regular schedule tarafindan kullanilmaz.
+   RecentTemplateMemory 3 + explicit `CuratedChains` allowlist'i). Legacy
+   DailyEventChance/PityDays/CooldownDays alanlari serialized asset uyumlulugu icin saklidir
+   fakat regular schedule tarafindan kullanilmaz.
 2. **Composer (`CouncilComposer.cs`, pure static):** seed + `CouncilContext` -> sablon sec
-   (flag/gun filtreleri + anti-tekrar + director on-skoru) -> karsitlik recetesine gore A/B
+   (curated flag/gun filtreleri + hard anti-tekrar + iki secenekli director on-skoru) ->
+   karsitlik recetesine gore A/B
    atomlari -> uretim-oranli miktarlar (`perMin * MinutesOfProduction * band`; band 0.7/1.0/1.4)
    -> butce dengeleme (A/B "dakika-degeri" toleransi asarsa dusuk taraf olceklenir).
    DETERMINISTIK: ayni seed + ayni context = ayni event (EditMode testli). Rng warm-up
    ardisik-seed korelasyonunu kirar.
 3. **Runtime state (GameManager):** `TryOpenRegularCouncilEvent` (yalniz Day 3/6/9...;
    seed = hash(ECS RandomSeed, run salt, gun)), `ChooseCouncilOption` (efekt uygulama + flag yazimi:
-   otomatik `council_{template}_{a|b}` + SetsFlagOnA/B), `ExpireCouncilEvent`. Flag'ler
-   `Dictionary<string,int>` (flag -> setlendigi gun; zincir gecikmeleri icin). Restart sifirlar.
+   otomatik `council_{template}_{a|b}` + yalniz catalog allowlist'indeki SetsFlagOnA/B),
+   `ExpireCouncilEvent`. Flag'ler `Dictionary<string,int>` (flag -> setlendigi gun; zincir
+   gecikmeleri icin). Restart sifirlar.
 4. **UI (`CouncilEventUI.cs`):** faz gecislerini 0.2s poll ile izler (Dawn -> scheduled open,
    Dusk -> expire); kart DOTween slide+fade ile belirir (Dawn odul toast'undan 1.2s gecikmeli),
    sure seridi + `DECIDE Ns` sayaci authoritative cycle state'inden kalan Dawn+Day penceresini
@@ -91,10 +94,17 @@ varyant dogurur ve yeni atom/sablon eklemek cesitliligi CARPARAK buyutur.
 
 - **Director:** atom bazli baglam carpanlari — kit kaynagi kayirma (ScarcityWeightMult),
   bollukta gider/risk eventleri (AbundanceWeightMult), dusuk savunmada savunma atomlari
-  (LowDefenseWeightMult). Oyuncu "sistem beni okuyor" hisseder.
-- **Hafiza/zincir:** flag'ler + RequiredFlags/ForbiddenFlags/ChainDelayDays/OneShot —
-  `refugees_at_gate`'te A secimi 2 gun sonra `among_the_refugees`'i acar;
-  `merchant_caravan` takasi `an_old_friend`'i tohumlar.
+  (LowDefenseWeightMult). Template skoru hem Option A hem Option B authored atomlarini okur;
+  heal B tarafindaysa bile dusuk Wall baglami secimi etkiler. Balanced resource atomlari
+  gercek stock/production dakikasindan en kit ve en bol kaynagi secer.
+- **Hard recent memory:** Son `RecentTemplateMemory` template, baska uygun aday varsa havuzdan
+  tamamen cikar. Butun uygun adaylar recent ise scheduled kartin bos kalmamasi icin ayni havuz
+  deterministik fallback olur.
+- **Curated zincir:** RequiredFlags/ForbiddenFlags/SetsFlag alanlari tek basina yetmez.
+  `CouncilEventCatalogSO.CuratedChains`, source template + source branch + flag + target template
+  dordulusunu explicit onaylamalidir; composer ve choice writer onaysiz zinciri fail-closed
+  reddeder. Mevcut iki approved bag: `refugees_at_gate A -> refugees_taken ->
+  among_the_refugees` ve `merchant_caravan A -> traded_with_merchant -> an_old_friend`.
 - **Olcek:** miktarlar dakikalik uretimden turetilir; DAY 3'te de DAY 30'da da anlamli.
 - **Butce:** her etkinin "dakika-degeri" var; A/B normalize edilir — kirik kombinasyon
   (bedava kazanc/haksiz ceza) matematiksel olarak engellenir.
@@ -130,7 +140,9 @@ transaction'ina cevirir.
 - `NextNightSpawnDelta` yalniz `MobileEconomyEventState.NextNightSpawnMultiplier` alanini
   `0.25..2.0` araliginda yazar. Zombie HP, damage ve speed alanlarina dokunmaz.
 
-Test owner'lari: `CouncilEffectGuardUtilityTests` saf limitleri;
+Test owner'lari: `CouncilComposerTests` scarcity/production, iki tarafli Wall director,
+hard recent exclusion/fallback, curated source/target contract ve production catalog asset'ini;
+`CouncilEffectGuardUtilityTests` saf limitleri;
 `CouncilEffectGuardPlayModeTests` gercek ECS population/Food/archer/Wall/count-only
 transaction'larini ve scene timer binding'ini dogrular. `CouncilOptionPresentationUtilityTests`
 exact metin, affordability, cycle countdown ve generated HUD prefab timer'ini kilitler.
@@ -149,4 +161,5 @@ exact metin, affordability, cycle countdown ve generated HUD prefab timer'ini ki
 - Ayni anda tek temp-production bonusu (slot kisiti) ve tek aktif kart olur.
 - Testler: `CouncilComposerTests` composer determinizmi/butce/zincir/olcekleme;
   `CouncilRegularScheduleTests` exact cadence/tek-acilis/v10 migration;
-  `CouncilRegularSchedulePlayModeTests` gercek `NewGameScene` Day 1-12 entegrasyonu.
+  `CouncilRegularSchedulePlayModeTests` gercek `NewGameScene` Day 1-12 entegrasyonu
+  ve onayli secimin curated chain flag'ini live `GameManager` state'ine yazmasini dogrular.

@@ -38,3 +38,12 @@ MonoBehaviour:
   PityDays: 3
   CooldownDays: 1
   RecentTemplateMemory: 3
+  CuratedChains:
+  - SourceTemplateId: refugees_at_gate
+    SourceBranch: 0
+    Flag: refugees_taken
+    TargetTemplateId: among_the_refugees
+  - SourceTemplateId: merchant_caravan
+    SourceBranch: 0
+    Flag: traded_with_merchant
+    TargetTemplateId: an_old_friend

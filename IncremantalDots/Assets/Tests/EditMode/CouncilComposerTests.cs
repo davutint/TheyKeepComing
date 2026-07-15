@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using NUnit.Framework;
+using UnityEditor;
 using UnityEngine;
 
 namespace DeadWalls.Tests
@@ -92,6 +93,16 @@ namespace DeadWalls.Tests
                     t.OutcomeA = "+{GAIN_N} {GAIN_RES}.";
                     t.OutcomeB = "{BOOST_RES} +{BOOST_PCT}% for {BOOST_D} days.";
                 }),
+            };
+            _catalog.CuratedChains = new[]
+            {
+                new CouncilCuratedChain
+                {
+                    SourceTemplateId = "refugees",
+                    SourceBranch = CouncilChoiceBranch.OptionA,
+                    Flag = "refugees_taken",
+                    TargetTemplateId = "chain_child",
+                },
             };
         }
 
@@ -235,6 +246,116 @@ namespace DeadWalls.Tests
             Assert.GreaterOrEqual(comparisons, 5, "yeterli karsilastirilabilir ornek uretilemedi");
         }
 
+        [Test]
+        public void KaynakSecimi_StokDakikasinaGoreEnKitKaynagiKullanir()
+        {
+            SetOnlyTemplateActive("cache");
+            var context = MakeContext(day: 6);
+            context.Wood = 800;
+            context.Stone = 800;
+            context.Iron = 800;
+            context.Food = 1;
+            context.WoodPerMin = 100f;
+            context.StonePerMin = 100f;
+            context.IronPerMin = 100f;
+            context.FoodPerMin = 100f;
+
+            ComposedCouncilEvent composed = CouncilComposer.Compose(_catalog, 9182u, context);
+
+            Assert.That(composed, Is.Not.Null);
+            Assert.That(composed.TemplateId, Is.EqualTo("cache"));
+            Assert.That(composed.OptionA.Effects[0].Resource, Is.EqualTo(EconomyFocusType.Food));
+            Assert.That(composed.OptionB.Effects[0].Resource, Is.EqualTo(EconomyFocusType.Food));
+        }
+
+        [Test]
+        public void DusukWall_BTarafiHealAtomuylaDefenseTemplateAgirliginiArtirir()
+        {
+            SetOnlyTemplatesActive("cache", "veterans");
+            FindAtom("free_archers").LowDefenseWeightMult = 1f;
+            FindAtom("heal_defense").LowDefenseWeightMult = 8f;
+
+            var healthy = MakeContext(day: 6);
+            healthy.Defense01 = 0.9f;
+            var damaged = MakeContext(day: 6);
+            damaged.Defense01 = 0.2f;
+
+            int healthyDefenseCards = CountTemplate("veterans", healthy, 800);
+            int damagedDefenseCards = CountTemplate("veterans", damaged, 800);
+
+            Assert.That(damagedDefenseCards, Is.GreaterThan(healthyDefenseCards + 200),
+                $"Wall context B-tarafi heal atomuna yansimadi: healthy={healthyDefenseCards}, damaged={damagedDefenseCards}");
+        }
+
+        [Test]
+        public void RecentTemplate_AlternatifVarkenHavuzdanTamamenCikarilir()
+        {
+            var context = MakeContext(day: 6);
+            context.RecentTemplateIds.Add("trade");
+
+            for (uint seed = 1; seed <= 400; seed++)
+            {
+                ComposedCouncilEvent composed = CouncilComposer.Compose(_catalog, seed, context);
+                Assert.That(composed, Is.Not.Null);
+                Assert.That(composed.TemplateId, Is.Not.EqualTo("trade"),
+                    $"Alternatif varken recent template tekrarlandi; seed={seed}.");
+            }
+        }
+
+        [Test]
+        public void RecentTemplate_TekUygunAdayIseScheduledFallbackOlarakKullanilir()
+        {
+            SetOnlyTemplateActive("trade");
+            var context = MakeContext(day: 6);
+            context.RecentTemplateIds.Add("trade");
+
+            ComposedCouncilEvent composed = CouncilComposer.Compose(_catalog, 77u, context);
+
+            Assert.That(composed, Is.Not.Null);
+            Assert.That(composed.TemplateId, Is.EqualTo("trade"));
+        }
+
+        [Test]
+        public void ChainFlag_ContextteOlsaBileCuratedContractYoksaTargetAcilmaz()
+        {
+            SetOnlyTemplateActive("chain_child");
+            _catalog.CuratedChains = new CouncilCuratedChain[0];
+            var context = MakeContext(day: 6);
+            context.Flags["refugees_taken"] = 3;
+
+            Assert.That(CouncilComposer.Compose(_catalog, 42u, context), Is.Null);
+        }
+
+        [Test]
+        public void ValidateCatalog_CuratedSourceFlagTargetContractiniDogrular()
+        {
+            Assert.That(_catalog.ValidateCatalog(), Is.Empty);
+
+            _catalog.CuratedChains = new CouncilCuratedChain[0];
+            List<string> problems = _catalog.ValidateCatalog();
+
+            Assert.That(problems, Has.Some.Contains("onaysiz Council chain"));
+        }
+
+        [Test]
+        public void ProductionCatalog_YalnizIkiMevcutCuratedChainiTasirVeValidedir()
+        {
+            const string path = "Assets/ScriptableObject/MobileCastle/Council/CouncilEventCatalog.asset";
+            CouncilEventCatalogSO production = AssetDatabase.LoadAssetAtPath<CouncilEventCatalogSO>(path);
+
+            Assert.That(production, Is.Not.Null);
+            Assert.That(production.CuratedChains, Has.Length.EqualTo(2));
+            Assert.That(production.IsApprovedChainSource(
+                "refugees_at_gate", true, "refugees_taken"), Is.True);
+            Assert.That(production.IsApprovedChainConstraint(
+                "among_the_refugees", "refugees_taken"), Is.True);
+            Assert.That(production.IsApprovedChainSource(
+                "merchant_caravan", true, "traded_with_merchant"), Is.True);
+            Assert.That(production.IsApprovedChainConstraint(
+                "an_old_friend", "traded_with_merchant"), Is.True);
+            Assert.That(production.ValidateCatalog(), Is.Empty);
+        }
+
         // ---------------------------------------------------------------
         // Yardimcilar
         // ---------------------------------------------------------------
@@ -271,6 +392,43 @@ namespace DeadWalls.Tests
                 RecentTemplateIds = new List<string>(),
                 UsedOneShotTemplateIds = new HashSet<string>(),
             };
+        }
+
+        private void SetOnlyTemplateActive(string templateId)
+        {
+            SetOnlyTemplatesActive(templateId);
+        }
+
+        private void SetOnlyTemplatesActive(params string[] templateIds)
+        {
+            var active = new HashSet<string>(templateIds);
+            foreach (CouncilTemplateSO template in _catalog.Templates)
+                template.BaseWeight = active.Contains(template.Id) ? 1f : 0f;
+        }
+
+        private CouncilEffectAtomSO FindAtom(string atomId)
+        {
+            foreach (CouncilEffectAtomSO atom in _catalog.Atoms)
+            {
+                if (atom.Id == atomId)
+                    return atom;
+            }
+
+            Assert.Fail($"Test atomu bulunamadi: {atomId}");
+            return null;
+        }
+
+        private int CountTemplate(string templateId, CouncilContext context, int sampleCount)
+        {
+            int count = 0;
+            for (uint seed = 1; seed <= sampleCount; seed++)
+            {
+                ComposedCouncilEvent composed = CouncilComposer.Compose(_catalog, seed, context);
+                if (composed != null && composed.TemplateId == templateId)
+                    count++;
+            }
+
+            return count;
         }
 
         private static int FirstResourceAmount(ComposedCouncilEvent composed)
