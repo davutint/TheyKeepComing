@@ -75,6 +75,9 @@ namespace DeadWalls
         private GameObject _basicLegacyRow;
         private GameObject _rapidLegacyRow;
         private GameObject _frostLegacyRow;
+        private ManagementDrawerCoordinatorUI _drawerCoordinator;
+
+        public bool IsDrawerOpen => _drawerOpen;
 
         private void OnEnable()
         {
@@ -102,6 +105,12 @@ namespace DeadWalls
 
         public void SetDrawerOpen(bool open, bool instant = false)
         {
+            ManagementDrawerCoordinatorUI coordinator = ResolveDrawerCoordinator();
+            if (open)
+                coordinator?.Claim(ManagementDrawerId.ArcherRecruitment);
+            else
+                coordinator?.Release(ManagementDrawerId.ArcherRecruitment);
+
             _drawerOpen = open;
             EnsureDrawerPositions();
 
@@ -109,6 +118,12 @@ namespace DeadWalls
                 ArcherDrawerPanel.anchoredPosition = _drawerOpen ? _drawerOpenPosition : _drawerClosedPosition;
 
             Refresh();
+        }
+
+        private ManagementDrawerCoordinatorUI ResolveDrawerCoordinator()
+        {
+            _drawerCoordinator ??= GetComponent<ManagementDrawerCoordinatorUI>();
+            return _drawerCoordinator;
         }
 
         public void ToggleDrawer()

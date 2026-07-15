@@ -64379,6 +64379,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 950060435116642966, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1065689873}
+    - targetCorrespondingSourceObject: {fileID: 950060435116642966, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1065689874}
     - targetCorrespondingSourceObject: {fileID: 3913772761592499137, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
       insertIndex: -1
       addedObject: {fileID: 159962725}
@@ -65034,6 +65037,18 @@ MonoBehaviour:
   - {fileID: -7342315053162181326, guid: 8c20046015c0e2c46a34b7b3d372974d, type: 3}
   ProjectileFps: 20
   BlastFps: 30
+--- !u!114 &1065689874
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1065689828}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4359e2555023ba4ba57560e39504304, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: DeadWalls::DeadWalls.ManagementDrawerCoordinatorUI
 --- !u!1 &1071878454
 GameObject:
   m_ObjectHideFlags: 0

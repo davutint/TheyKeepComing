@@ -48,6 +48,10 @@ Wave/run loop icin drawer oyun akisi controller'i degil, yalnizca gorsel ve refe
 
 Castle Yard prep aksiyonlari sag drawer'da player-facing degildir. Tool `RepairButton`, `FortifyButton`, `RallyButton`, legacy `RefillArrowsButton` ve `StartNextWaveButton` bulursa gizler. Finite refill için Arrow chip'ine bağlı tek satırlık `AmmoPurchasePanel` ve scene-owned `ArrowSupplyUI` kurar. Tool ayrica `Basic/Rapid/FrostUpgradeButton`, `ArrowTechPanel`, `RapidTechUnlockButton` ve `FrostTechUnlockButton` bulursa gizler; sag drawer yalnizca archer recruitment icin kullanilir. `CastleRepairButton` legacy Castle Interior akisi icin bagli kalabilir, fakat continuous siege varsayilaninda Castle Interior player-facing kapali tutulur.
 
+`ConfigureHudRoot`, scene root'a tek `ManagementDrawerCoordinatorUI` ekler. Bu owner
+Workers/Housing, Archer Recruitment ve Arrow Supply acilislarini exclusive tutar; prefab
+presentation kaynagi olarak runtime component tasimaz.
+
 Sag drawer buy ve Basic -> Rapid/Frost retrain data'si `Assets/ScriptableObject/MobileCastle/Archers` altindaki `ArcherDefinitionSO` asset'lerinden gelir. Tool Basic/Rapid/Frost default definition asset'lerini ve `ArcherRecruitmentCatalogSO` catalog'unu idempotent olusturur, sonra catalog'u `GameManager` ve `MarketUI` alanlarina baglar. Catalog'daki ekstra definition asset'leri korunur; setup tool sadece eksik defaultlari tamamlar. `ArcherRecruitmentListRoot` + inactive `ArcherRecruitmentRowTemplate` varsa `MarketUI` runtime satirlari template'ten basar; template icindeki `ArcherRetrainButton` eksikse idempotent prefab repair ekler. Legacy Basic/Rapid/Frost row'lari sadece fallback'tir.
 
 `DayNightOverlay` Canvas'in ilk child'i olarak kurulur. Full-screen siyah Image sadece world'u karartir; `MobileCastleHudRoot` sonradan geldigi icin HUD/drawer overlay'in ustunde kalir. Overlay alpha runtime'da `DayNightOverlayController` tarafindan mobile config'teki day/night alpha ve `WaveStateData.PrepTimer` degerlerine gore guncellenir.

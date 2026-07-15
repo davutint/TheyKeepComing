@@ -59,6 +59,11 @@ durumda panel acik hata gosterir ve legacy catalog'a fallback yapmaz. Ayrintili 
 
 Drawer gameplay'i pause etmez ve HUD acilisinda kapali baslar. Mobile castle loop'ta level-up paneli kullanilmaz; oyuncu surekli oldurur, kaynak toplar ve sag drawer'dan okcu satin alir veya acilmis Rapid/Frost'a Basic retrain eder. Archer recruitment row'lari `ArcherDefinitionSO` asset'lerini iceren `ArcherRecruitmentCatalogSO` catalog'undan uretilir; template yoksa eski Basic/Rapid/Frost row'lari fallback olarak calisir. Upgrade/unlock aksiyonlari sag drawer'da player-facing degildir; Castle Heart tek progression owner'idir. Dynamic template `ArcherRetrainButton/ArcherRetrainButtonText` binding'ini tasir; eksikse `Window -> DeadWalls -> Repair Archer Retrain Control` prefabi idempotent onarir. Kaynak yetmiyorsa row `CostText` alaninda `NEED ...`, idle population yoksa buy icin `NEED POP` gosterilir; Basic/Rapid/Frost toplam ortak cap'i `1000` olduğunda buy `MAX` olur, fakat toplamı değiştirmeyen retrain açık kalabilir.
 
+`ManagementDrawerCoordinatorUI`, Workers/Housing, Archer Recruitment ve Arrow Supply
+yuzeylerinden ayni anda yalniz birini acik tutar. Aktif scene root'ta tek component olmali;
+generated prefab runtime owner tasimaz. Kurulum ve QA:
+`MANAGEMENT_DRAWER_COORDINATOR_EDITOR_SETUP.md`.
+
 `Repair`, `Fortify` ve `Rally` sag drawer'da player-facing olarak gizlenir. Archer buy combat sirasinda kullanilmaya devam eder; sag panel komple kilitlenmez. Castle Yard aksiyonlari polish prefabda yoksa tool yeni Fortify/Rally gorseli uretmez, sadece mevcut isimleri baglar.
 
 Economy focus butonlari mobile continuous HUD'dan tamamen kaldirildi. Kaynak yonlendirme player-facing olarak sol worker drawer uzerinden yapilir; `EconomyFocusState` ve `EconomyFocusUI` sadece legacy/debug akislar icin kodda kalabilir.

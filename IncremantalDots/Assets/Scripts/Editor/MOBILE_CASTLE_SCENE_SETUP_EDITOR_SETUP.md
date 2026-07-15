@@ -74,6 +74,7 @@ SubScene:
 - Aktif prefab ve `HUDController` setup binding'inde `HordePressurePanel` bulunmaz; setup tool forecast/pressure UI baglamaz veya yeniden uretmez
 - `HUDController` defense module: `DefensePercentText`, `DefenseWallFill`, `DefenseWallText`, opsiyonel `DefenseDamageGlow`; legacy Gate/Core alanlari prefabda ve controller binding'inde bulunmaz
 - `MarketUI`: alt-sag `ArcherDrawerPanel` (`540 x 350`, `(-24,160)`), sabit `DrawerToggleButton` (`156 x 56`, `(-190,28)`), Basic/Rapid/Frost row text, buy ve dynamic `ArcherRetrainButton` alanlari bagli; HUD acilisinda drawer kapali
+- `ManagementDrawerCoordinatorUI`: scene HUD root'ta tek component; Workers/Housing, Archer Recruitment ve Arrow Supply yuzeylerini mutual-exclusive tutar
 - `MarketUI`: Upgrade butonlari, `ArrowTechPanel`, tech unlock butonlari ve repair/prep butonlari prefabda varsa gizli
 - `HeartScreenUI`: alt-sag sabit `CastleHeartOpenButton` (`156 x 56`, `(-24,28)`, `CASTLE HEART`), `CastleHeartPanel`, close, viewport/content, node/connection template,
   Grave Essence, status, compass, `+1/+10/MAX`, badge ve toast alanlari bagli; `TechTreeUI` yok

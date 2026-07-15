@@ -22,6 +22,9 @@ namespace DeadWalls
         public bool StartOpen;
 
         private float _nextRefreshTime;
+        private ManagementDrawerCoordinatorUI _drawerCoordinator;
+
+        public bool IsOpen => AmmoPanel != null && AmmoPanel.activeSelf;
 
         private void OnEnable()
         {
@@ -51,8 +54,20 @@ namespace DeadWalls
 
         public void SetOpen(bool open)
         {
+            ManagementDrawerCoordinatorUI coordinator = ResolveDrawerCoordinator();
+            if (open)
+                coordinator?.Claim(ManagementDrawerId.ArrowSupply);
+            else
+                coordinator?.Release(ManagementDrawerId.ArrowSupply);
+
             if (AmmoPanel != null)
                 AmmoPanel.SetActive(open);
+        }
+
+        private ManagementDrawerCoordinatorUI ResolveDrawerCoordinator()
+        {
+            _drawerCoordinator ??= GetComponent<ManagementDrawerCoordinatorUI>();
+            return _drawerCoordinator;
         }
 
         public void Refresh()

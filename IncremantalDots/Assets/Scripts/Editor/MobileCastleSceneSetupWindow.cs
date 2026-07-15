@@ -3977,6 +3977,7 @@ namespace DeadWalls
             ConfigureDefenseRepair(hudRoot);
             ConfigureDawnToast(hudRoot);
             ConfigureCouncilUI(hudRoot);
+            EnsureComponent<ManagementDrawerCoordinatorUI>(hudRoot);
         }
 
         private static void EnsureArcherHeartDockLayout(GameObject hudRoot)

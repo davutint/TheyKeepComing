@@ -71,6 +71,9 @@ namespace DeadWalls
         private float _nextRefreshTime;
         private bool _hasRefreshFingerprint;
         private int _lastRefreshFingerprint;
+        private ManagementDrawerCoordinatorUI _drawerCoordinator;
+
+        public bool IsOpen => _isOpen;
 
         private void OnEnable()
         {
@@ -209,13 +212,25 @@ namespace DeadWalls
             SetOpen(!_isOpen);
         }
 
-        private void SetOpen(bool open)
+        public void SetOpen(bool open)
         {
+            ManagementDrawerCoordinatorUI coordinator = ResolveDrawerCoordinator();
+            if (open)
+                coordinator?.Claim(ManagementDrawerId.WorkersHousing);
+            else
+                coordinator?.Release(ManagementDrawerId.WorkersHousing);
+
             _isOpen = open;
             if (WorkerEconomyDrawerPanel != null)
                 WorkerEconomyDrawerPanel.SetActive(open);
             SetButtonText(WorkerDrawerToggleButton, "WORKERS + HOUSING");
             Refresh();
+        }
+
+        private ManagementDrawerCoordinatorUI ResolveDrawerCoordinator()
+        {
+            _drawerCoordinator ??= GetComponent<ManagementDrawerCoordinatorUI>();
+            return _drawerCoordinator;
         }
 
         private void Refresh()

@@ -107,6 +107,14 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - Aktif prefab `CastleHeart...`/`Heart...` isimlerini kullanir; node template lookup'i migration icin eski `TechNode...` child isimlerini de taniyabilir
 - Otoriter dok: `HEART_SCREEN_ARCHITECTURE.md`
 
+### ManagementDrawerCoordinatorUI.cs
+
+- Workers/Housing, Archer Recruitment ve Arrow Supply yuzeylerinin tek exclusive owner'idir
+- Yeni drawer claim edildiginde diger iki yuzeyi aninda kapatir; gameplay transaction veya presentation verisi yazmaz
+- Castle Heart, Council, Pause ve Game Over modal akislarina sahip olmaz
+- Scene-owned tek component'tir; aktif generated prefab runtime controller tasimaz
+- Otoriter dok: `MANAGEMENT_DRAWER_COORDINATOR_ARCHITECTURE.md`
+
 ### TechTreeUI.cs
 
 - Legacy sabit catalog UI controller'idir; aktif `NewGameScene` HUD instance'inda bulunmaz

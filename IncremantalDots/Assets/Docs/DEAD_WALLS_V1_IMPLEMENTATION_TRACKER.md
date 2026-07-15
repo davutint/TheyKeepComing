@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.2
 > **Son tam kapsam denetimi:** 2026-07-15
 > **Aktif paket:** Package I - HUD, Onboarding ve Creative Polish
-> **Aktif iş:** `DW-I-HUD-EXCLUSIVE-DRAWER` - Build Single Management Drawer Owner
-> **İlerleme:** `356 / 441` tracker checkbox'ı tamamlandı - `%80,73`
+> **Aktif iş:** `DW-I-HUD-COUNCIL-CARD` - Show Two Exact Council Effects and Decision Time
+> **İlerleme:** `357 / 441` tracker checkbox'ı tamamlandı - `%80,95`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -788,7 +788,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 | Abilities alt orta | Tek `496 x 90` bottom-center panelde Fireball/Rally/Emergency Repair; üç vertical cooldown overlay, tek `SpellCastUI`, legacy panel yok ve prefab guard testi aktif | `[x]` |
 | Workers/Housing alt sol | Tek bottom-left `Workers + Housing` toggle/drawer yüzeyi; worker ratio ve bina CAP/EFF yanında limitsiz `+1/+10/+100 Beds` Wood alımı, canlı population/bed/free/purchased aynaları ve prefab guard testi var | `[x]` |
 | Archers/Heart alt sağ | Sabit `ARCHERS` + `CASTLE HEART` bottom-right dock; drawer `540 x 350` olarak dock üstünde açılır, HUD başlangıcında kapalıdır ve Heart modal pause davranışını korur | `[x]` |
-| Tek drawer | Birden fazla controller bağımsız panel yönetiyor | `[~]` Exclusive owner testi yok |
+| Tek drawer | Scene-owned `ManagementDrawerCoordinatorUI`, Workers/Housing, Archers ve Arrow Supply yüzeylerinde mutual exclusion kuruyor; Castle Heart bağımsız modal kalıyor | `[x]` |
 | Council geçici kart | Geçici iki-option kart UI mevcut | `[~]` Schedule/effect sunumu güncellenecek |
 | Fixed camera/ratio | Kamera sabit; ultrawide critical crop testi yok | `[~]` |
 
@@ -802,7 +802,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 - [x] Fireball/Rally/Emergency Repair'ı alt orta tek cooldown barına taşı.
 - [x] Workers/Housing alt sol yerleşimini kur.
 - [x] Archers/Castle Heart alt sağ yerleşimini kur.
-- [ ] Aynı anda yalnız bir management drawer açık olacak owner kur.
+- [x] Aynı anda yalnız bir management drawer açık olacak owner kur.
 - [ ] Council kartında iki exact effect ve karar süresini göster.
 - [ ] 16:9 ve ultrawide'da battlefield ve kritik UI crop testleri yap.
 
@@ -977,7 +977,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 | Graph unreachable | Generator henüz yok | Validation + deterministic fallback |
 | Meta runaway | Current reward kills/day ağırlıklı | Diminishing values + telemetry |
 | Ammo click angaryası | +1/+5/Buy Max, capacity ve efficiency aktif | Telemetry ile paket/verim tune et; Blueprint dışı auto-spend ekleme |
-| HUD tekrar büyür | Forecast kaldırıldı; management drawer'ların ortak exclusive owner'ı henüz yok | Tek drawer + fixed layout + mockup gate |
+| HUD tekrar büyür | Forecast kaldırıldı; üç management yüzeyi ortak exclusive owner altında ve aynı anda yalnız biri açık | Fixed layout + mockup gate + presentation guard testleri |
 | Legacy leakage | Gate/Core binding, Fletcher, Barracks training, direct upgrades | Source-owner audit + guard tests |
 | Council generic/slop | Çözüldü: 9 template human-review, iki body varyantı, staged MinDay, distinct follow-up recipe ve honest transaction copy taşıyor | 5.400 compose budget/token/content regression gate |
 | Unapproved lore/content | Narrative açık karar | Owner review olmadan canon/content ekleme |
@@ -1157,3 +1157,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-15 | `DW-I-HUD-ABILITIES` bottom-center ability bar audit + regression guard | Package G'de zaten tamamlanmış aktif sistem Package I sunum hedefiyle yeniden denetlendi. Aktif prefabın tek `496 x 90` bottom-center `AbilityBarPanel` taşıdığı; Fireball, Rally ve Emergency Repair slotlarının çakışmadan soldan sağa dizildiği; her slotta raycast kapalı vertical cooldown overlay bulunduğu doğrulandı. Canlı sahnede tek `SpellCastUI`, eksiksiz altı button/fill binding ve sıfır legacy `SpellUiRoot`/`SpellPanel` var. Yeniden UI üretmek yerine bu gerçek `HudAbilityBarPresentationTests` ile kilitlendi; architecture/setup dokümanlarına exact geometri ve fill contract'ı eklendi | Unity compile: 0 error; new presentation EditMode 2/2, presentation + ability rules EditMode 5/5; MCP Play audit: Fireball `45s`, Rally `60s`, Repair `120s` duration ve üç fill `0.5`; 1920x1080 overlay QA bottom-center temiz; final Console 0 error; tracker `354/441` |
 | 2026-07-15 | `DW-I-HUD-WORKERS-HOUSING` bottom-left Workers + Housing surface | Aktif Worker drawer ayrı bir Housing controller/panel üretmeden ortak `Workers + Housing` yüzeyine dönüştürüldü. Toggle bottom-left `(24,28)` / `206x56`, panel bottom-left `(24,160)` / `980x382` oldu; panel canlı ability content'inin `17 px` üstünde kalıyor. Housing satırı population/total beds, free beds ve purchased beds aynalarını; toplam sahipliğe göre büyüyen exact Wood maliyetli `+1/+10/+100 Beds` alımlarını gösteriyor. Sahnedeki tek `WorkerEconomyDrawerUI` yeni kontrolleri isim sözleşmesiyle runtime çözüyor; aktif prefab doğrudan Prefab Stage'de güncellendi, `NewGameScene` değişmedi | Unity compile: 0 error; new presentation/binding EditMode 2/2; presentation + bed utility EditMode 10/10; exact bed purchase/Continue PlayMode 1/1; MCP Play audit: tek controller, altı Housing binding, drawer toggle `false -> true`, 1920x1080 görsel QA temiz; final Console 0 error; tracker `355/441` |
 | 2026-07-15 | `DW-I-HUD-ARCHERS-HEART` bottom-right Archers + Castle Heart surface | Mevcut `MarketUI` ve `HeartScreenUI` owner'ları korunarak `DrawerToggleButton` kayan panelin dışına çıkarıldı. Sabit bottom-right dock'ta `ARCHERS` `(-190,28)` / `156x56`, `CASTLE HEART` `(-24,28)` / `156x56`; Archer drawer üstlerinde `(-24,160)` / `540x350` oldu. HUD ve yeni run açılışında drawer kapalı başlıyor; legacy `OpenOnWaveCompleted` davranışı korunuyor. Aktif prefab doğrudan Prefab Stage'de güncellendi, setup tool aynı geometriyi idempotent normalize ediyor ve `NewGameScene` içerik diff'i bırakılmadı | Unity compile: 0 error; new presentation/behavior EditMode 3/3; Ability/Workers/Heart regression EditMode 12/12; MCP Play audit: tek `MarketUI`, tek `HeartScreenUI`, drawer click `closed -> open`, Heart pause `1 -> 0 -> 1`; 1920x1080 kapalı/açık görsel QA temiz; final Console 0 error; tracker `356/441` |
+| 2026-07-15 | `DW-I-HUD-EXCLUSIVE-DRAWER` single management drawer owner | Scene-owned `ManagementDrawerCoordinatorUI`, mevcut presentation ve transaction owner'larını değiştirmeden Workers/Housing, Archer Recruitment ve Arrow Supply yüzeylerini mutual exclusion altında topladı. Yeni bir yüzey açıldığında diğer ikisi anında kapanıyor; aktif owner kapanınca state `None` oluyor. Castle Heart fullscreen modal olduğu için coordinator kapsamı dışında ve mevcut pause sözleşmesini koruyor. Scene setup tool coordinator'ı idempotent ekliyor; aktif `NewGameScene` yalnız bu component override'ını taşıyor | Unity compile: 0 error; targeted + related EditMode 15/15; MCP Play audit: owner sayıları `1/1/1/1`, akış `None > WorkersHousing > ArcherRecruitment > ArrowSupply > WorkersHousing`, her adımda yalnız tek yüzey açık; 1920x1080 görsel QA temiz; Play/exit Console 0 error; tracker `357/441` |
