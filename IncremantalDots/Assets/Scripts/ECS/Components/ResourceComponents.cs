@@ -56,6 +56,8 @@ namespace DeadWalls
         public int Current;
         public int CapacityLevel;
         public int EfficiencyLevel;
+        // Kalici meta bonusu paid run seviyesinden ayri tutulur; run fiyat egrisini ilerletmez.
+        public int MetaEfficiencyBonus;
         // Castle Heart run bonuslari. Upgrade level fiyat egrisine katilmaz;
         // exact Heart graph restore/replay E6 tarafindan yeniden uygulanir.
         public int HeartCapacityBonus;
@@ -71,5 +73,7 @@ namespace DeadWalls
     public struct GraveEssence : IComponentData
     {
         public long Current;
+        // Essence meta yuzdesinin 1'in altindaki payini exact Continue boyunca korur.
+        public double MetaGainAccumulator;
     }
 }

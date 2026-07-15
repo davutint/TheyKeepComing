@@ -57,6 +57,7 @@ namespace DeadWalls
             MobileEconomyPriceTuning safe = MobileEconomyPriceTuningUtility.Sanitize(tuning);
             long rate = (long)safe.ArrowBaseArrowsPerWood
                 + (long)math.max(0, supply.EfficiencyLevel) * safe.ArrowArrowsPerWoodPerEfficiencyLevel
+                + math.max(0, supply.MetaEfficiencyBonus)
                 + math.max(0, supply.HeartEfficiencyBonus);
             return rate >= int.MaxValue ? int.MaxValue : (int)rate;
         }

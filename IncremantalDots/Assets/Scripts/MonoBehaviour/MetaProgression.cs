@@ -374,15 +374,21 @@ namespace DeadWalls
                 };
             }
 
-            bool newRecord = day > s.BestDay;
-            int earned = Mathf.Max(0, kills) + (newRecord ? day * RecordBonusPerDay : 0);
+            int safeDay = Mathf.Max(0, day);
+            int safeKills = Mathf.Max(0, kills);
+            bool newRecord = safeDay > s.BestDay;
+            long rawEarned = (long)safeKills
+                             + (newRecord ? (long)safeDay * RecordBonusPerDay : 0L);
+            int earned = rawEarned >= int.MaxValue ? int.MaxValue : (int)rawEarned;
 
-            s.Souls += earned;
-            s.TotalSoulsEarned += earned;
-            s.TotalKillsAllTime += Mathf.Max(0, kills);
-            s.TotalRuns++;
+            s.Souls = SaturatingAddNonNegative(s.Souls, earned);
+            s.TotalSoulsEarned = SaturatingAddNonNegative(s.TotalSoulsEarned, earned);
+            s.TotalKillsAllTime = s.TotalKillsAllTime > long.MaxValue - safeKills
+                ? long.MaxValue
+                : s.TotalKillsAllTime + safeKills;
+            s.TotalRuns = SaturatingAddNonNegative(s.TotalRuns, 1);
             if (newRecord)
-                s.BestDay = day;
+                s.BestDay = safeDay;
 
             s.RewardedRunIds.Add(runId);
             const int MaxRewardReceipts = 128;
@@ -397,6 +403,15 @@ namespace DeadWalls
                 NewRecord = newRecord,
                 AlreadyRewarded = false
             };
+        }
+
+        private static int SaturatingAddNonNegative(int current, int amount)
+        {
+            int safeCurrent = Mathf.Max(0, current);
+            int safeAmount = Mathf.Max(0, amount);
+            return safeCurrent > int.MaxValue - safeAmount
+                ? int.MaxValue
+                : safeCurrent + safeAmount;
         }
 
         public static int GetUpgradeLevel(string id)
@@ -479,17 +494,25 @@ namespace DeadWalls
             return false;
         }
 
-        /// <summary>Satin alma: bakiye + MaxLevel kontrolu; basarida seviye artar ve kaydedilir.</summary>
+        /// <summary>
+        /// Satin alma: bakiye/cap/content kontrolu tek disk transaction'inda commit edilir.
+        /// Node pool unlock, upgrade seviyesiyle ayni atomik Save icinde yazilir.
+        /// </summary>
         internal static bool TryBuyUpgrade(MetaUpgradeSO upgrade)
         {
             if (upgrade == null
                 || string.IsNullOrWhiteSpace(upgrade.Id)
-                || !MetaUpgradePolicy.IsRunGraphIsolatedEffect(upgrade.EffectType)
+                || !upgrade.IsConfigurationValid()
                 || !CanPersist)
                 return false;
 
             int level = GetUpgradeLevel(upgrade.Id);
-            if (level >= upgrade.MaxLevel)
+            if (upgrade.IsMaxLevel(level))
+                return false;
+
+            bool unlocksContent = MetaUpgradePolicy.IsContentUnlockEffect(upgrade.EffectType);
+            string poolId = unlocksContent ? upgrade.PoolContentId.Trim() : null;
+            if (unlocksContent && ContainsId(State.UnlockedPoolIds, poolId))
                 return false;
 
             int cost = upgrade.GetCost(level);
@@ -499,12 +522,16 @@ namespace DeadWalls
             int previousSouls = State.Souls;
             State.Souls -= cost;
             SetUpgradeLevel(upgrade.Id, level + 1);
+            if (unlocksContent)
+                State.UnlockedPoolIds.Add(poolId);
             if (Save())
                 return true;
 
-            // Disk transaction basarisizsa satin alma in-memory de commit edilmez.
+            // Disk transaction basarisizsa Souls, seviye ve pool unlock birlikte geri alinir.
             State.Souls = previousSouls;
             SetUpgradeLevel(upgrade.Id, level);
+            if (unlocksContent)
+                State.UnlockedPoolIds.Remove(poolId);
             return false;
         }
 

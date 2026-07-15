@@ -1406,8 +1406,8 @@ namespace DeadWalls
         // ---------------------------------------------------------------------------------
 
         // ---------------------------------------------------------------------------------
-        // Meta upgrade seed (roguelite magazasi): ivme + hafif guc paketi (M-B karari).
-        // Aktif V1 seed'leri merge edilir; rezerve dormant Moat id'si catalog disinda tutulur.
+        // Blueprint v1.0 sabit meta upgrade katalogu. Tuning assetlerde kalir; bu arac yalniz
+        // eksik default assetleri olusturur ve katalog sirasini authoritative listeye ceker.
         // ---------------------------------------------------------------------------------
 
         private static MetaUpgradeCatalogSO EnsureDefaultMetaUpgradeCatalog()
@@ -1418,47 +1418,86 @@ namespace DeadWalls
             {
                 EnsureMetaUpgrade("start_wood", u =>
                 {
-                    u.Title = "Timber Cache";
+                    u.Title = "Starting Wood";
                     u.Description = "Start each run with extra wood.";
                     u.EffectType = MetaUpgradeEffectType.StartingResource;
                     u.Resource = EconomyFocusType.Wood;
-                    u.ValuePerLevel = 75f; u.MaxLevel = 5; u.BaseCost = 150; u.CostGrowthPerLevel = 0.6f;
+                    u.ValuePerLevel = 75f; u.MaxLevel = 0; u.BaseCost = 150; u.CostGrowthPerLevel = 0.6f;
+                }),
+                EnsureMetaUpgrade("start_stone", u =>
+                {
+                    u.Title = "Starting Stone";
+                    u.Description = "Start each run with extra stone.";
+                    u.EffectType = MetaUpgradeEffectType.StartingResource;
+                    u.Resource = EconomyFocusType.Stone;
+                    u.ValuePerLevel = 50f; u.MaxLevel = 0; u.BaseCost = 175; u.CostGrowthPerLevel = 0.65f;
+                }),
+                EnsureMetaUpgrade("start_iron", u =>
+                {
+                    u.Title = "Starting Iron";
+                    u.Description = "Start each run with extra iron.";
+                    u.EffectType = MetaUpgradeEffectType.StartingResource;
+                    u.Resource = EconomyFocusType.Iron;
+                    u.ValuePerLevel = 30f; u.MaxLevel = 0; u.BaseCost = 225; u.CostGrowthPerLevel = 0.7f;
                 }),
                 EnsureMetaUpgrade("start_food", u =>
                 {
-                    u.Title = "Grain Stores";
+                    u.Title = "Starting Food";
                     u.Description = "Start each run with extra food.";
                     u.EffectType = MetaUpgradeEffectType.StartingResource;
                     u.Resource = EconomyFocusType.Food;
-                    u.ValuePerLevel = 60f; u.MaxLevel = 5; u.BaseCost = 150; u.CostGrowthPerLevel = 0.6f;
+                    u.ValuePerLevel = 60f; u.MaxLevel = 0; u.BaseCost = 150; u.CostGrowthPerLevel = 0.6f;
                 }),
                 EnsureMetaUpgrade("start_archers", u =>
                 {
-                    u.Title = "Veteran Guard";
-                    u.Description = "Start each run with extra archers on the wall.";
+                    u.Title = "Starting Basic Archers";
+                    u.Description = "Start each run with extra Basic Archers. Does not unlock other types.";
                     u.EffectType = MetaUpgradeEffectType.StartingArchers;
-                    u.ValuePerLevel = 1f; u.MaxLevel = 3; u.BaseCost = 400; u.CostGrowthPerLevel = 1.0f;
+                    u.ValuePerLevel = 1f; u.MaxLevel = ArcherCapacityUtility.MaxTotalArchers;
+                    u.BaseCost = 400; u.CostGrowthPerLevel = 1.0f;
+                }),
+                EnsureMetaUpgrade("start_beds", u =>
+                {
+                    u.Title = "Starting Beds";
+                    u.Description = "Start each run with extra beds. Run bed costs still grow.";
+                    u.EffectType = MetaUpgradeEffectType.StartingBeds;
+                    u.ValuePerLevel = 5f; u.MaxLevel = 0; u.BaseCost = 250; u.CostGrowthPerLevel = 0.75f;
                 }),
                 EnsureMetaUpgrade("wall_hp", u =>
                 {
-                    u.Title = "Reinforced Foundations";
-                    u.Description = "+5% defense max HP per level (permanent).";
+                    u.Title = "Base Wall HP";
+                    u.Description = "+5% Wall max HP per level.";
                     u.EffectType = MetaUpgradeEffectType.WallHpPercent;
                     u.ValuePerLevel = 0.05f; u.MaxLevel = 5; u.BaseCost = 300; u.CostGrowthPerLevel = 0.8f;
                 }),
-                EnsureMetaUpgrade("archer_damage", u =>
-                {
-                    u.Title = "Sharpened Arrows";
-                    u.Description = "+3% archer damage per level (permanent).";
-                    u.EffectType = MetaUpgradeEffectType.ArcherDamagePercent;
-                    u.ValuePerLevel = 0.03f; u.MaxLevel = 5; u.BaseCost = 350; u.CostGrowthPerLevel = 0.8f;
-                }),
                 EnsureMetaUpgrade("production", u =>
                 {
-                    u.Title = "Efficient Tools";
-                    u.Description = "+3% worker production per level (permanent).";
+                    u.Title = "Worker Production";
+                    u.Description = "+3% worker production per level. Run building upgrades remain separate.";
                     u.EffectType = MetaUpgradeEffectType.ProductionPercent;
                     u.ValuePerLevel = 0.03f; u.MaxLevel = 5; u.BaseCost = 350; u.CostGrowthPerLevel = 0.8f;
+                }),
+                EnsureMetaUpgrade("arrow_efficiency", u =>
+                {
+                    u.Title = "Arrow Efficiency";
+                    u.Description = "+1 arrow per Wood per level. Run Arrow upgrades remain separate.";
+                    u.EffectType = MetaUpgradeEffectType.ArrowEfficiency;
+                    u.ValuePerLevel = 1f; u.MaxLevel = 10; u.BaseCost = 500; u.CostGrowthPerLevel = 0.9f;
+                }),
+                EnsureMetaUpgrade("essence_gain", u =>
+                {
+                    u.Title = "Essence Gain";
+                    u.Description = "+5% Grave Essence gained per level.";
+                    u.EffectType = MetaUpgradeEffectType.EssenceGainPercent;
+                    u.ValuePerLevel = 0.05f; u.MaxLevel = 10; u.BaseCost = 600; u.CostGrowthPerLevel = 0.9f;
+                }),
+                EnsureMetaUpgrade("node_pool_unlock", u =>
+                {
+                    u.Title = "Additional Heart Pool";
+                    u.Description = "Adds the approved bonus content pool to future Heart graphs.";
+                    u.EffectType = MetaUpgradeEffectType.NodePoolUnlock;
+                    u.ValuePerLevel = 0f; u.MaxLevel = 1; u.BaseCost = 2000; u.CostGrowthPerLevel = 0f;
+                    u.PoolContentId = "heart.approved_bonus_pool.v1";
                 }),
             };
 
@@ -1469,24 +1508,22 @@ namespace DeadWalls
                 AssetDatabase.CreateAsset(catalog, MetaCatalogPath);
             }
 
-            var merged = new List<MetaUpgradeSO>();
-            if (catalog.Upgrades != null)
+            bool changed = catalog.Upgrades == null || catalog.Upgrades.Length != upgrades.Count;
+            if (!changed)
             {
-                foreach (var u in catalog.Upgrades)
-                    if (u != null
-                        && !MoatDormancyRules.IsDormantMetaUpgradeId(u.Id)
-                        && !merged.Contains(u))
-                        merged.Add(u);
+                for (int i = 0; i < upgrades.Count; i++)
+                {
+                    if (catalog.Upgrades[i] != upgrades[i])
+                    {
+                        changed = true;
+                        break;
+                    }
+                }
             }
-            bool changed = false;
-            foreach (var u in upgrades)
-            {
-                if (u != null && !merged.Contains(u)) { merged.Add(u); changed = true; }
-            }
-            if (changed || merged.Count != (catalog.Upgrades?.Length ?? 0))
+            if (changed)
             {
                 Undo.RecordObject(catalog, "Configure Meta Upgrade Catalog");
-                catalog.Upgrades = merged.ToArray();
+                catalog.Upgrades = upgrades.ToArray();
                 EditorUtility.SetDirty(catalog);
             }
 

@@ -44,6 +44,7 @@ namespace DeadWalls.Tests
                 ArrowCapacityLevel = 3,
                 ArrowEfficiencyLevel = 4,
                 GraveEssence = 9_876_543_210L,
+                GraveEssenceMetaGainAccumulator = 0.375d,
                 HasHeartGraph = true,
                 HeartGraph = new GeneratedRunGraph
                 {
@@ -173,6 +174,7 @@ namespace DeadWalls.Tests
             Assert.That(restored.ArrowCapacityLevel, Is.EqualTo(3));
             Assert.That(restored.ArrowEfficiencyLevel, Is.EqualTo(4));
             Assert.That(restored.GraveEssence, Is.EqualTo(9_876_543_210L));
+            Assert.That(restored.GraveEssenceMetaGainAccumulator, Is.EqualTo(0.375d));
             Assert.That(restored.HasHeartGraph, Is.True);
             Assert.That(restored.HeartGraph, Is.Not.Null);
             Assert.That(restored.HeartGraph.CatalogVersion, Is.EqualTo(7));
@@ -491,6 +493,39 @@ namespace DeadWalls.Tests
                 Assert.That(restored.HasHeartGraph, Is.False);
                 Assert.That(restored.HeartGraph, Is.Null,
                     "v9 eksik graph'i aktif catalog'dan sessizce uretilemez.");
+            }
+            finally
+            {
+                if (original != null)
+                    File.WriteAllBytes(path, original);
+                else if (File.Exists(path))
+                    File.Delete(path);
+            }
+        }
+
+        [Test]
+        public void TryLoad_Version12Snapshot_InitializesMetaEssenceRemainderToZero()
+        {
+            string path = Path.Combine(Application.persistentDataPath, "run_save.json");
+            byte[] original = File.Exists(path) ? File.ReadAllBytes(path) : null;
+            var legacy = new RunSaveState
+            {
+                Version = 12,
+                RunId = "run_v12_essence_meta_migration_" + Guid.NewGuid().ToString("N"),
+                GraveEssence = 125,
+                GraveEssenceMetaGainAccumulator = 0.75d
+            };
+
+            try
+            {
+                File.WriteAllText(path, JsonUtility.ToJson(legacy));
+
+                RunSaveState restored = RunPersistence.TryLoad();
+
+                Assert.That(restored, Is.Not.Null);
+                Assert.That(restored.Version, Is.EqualTo(RunSaveState.CurrentVersion));
+                Assert.That(restored.GraveEssence, Is.EqualTo(125));
+                Assert.That(restored.GraveEssenceMetaGainAccumulator, Is.Zero);
             }
             finally
             {

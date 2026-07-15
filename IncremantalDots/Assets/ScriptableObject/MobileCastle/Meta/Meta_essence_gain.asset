@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4162ec2ce66fd1a439e5110d43e55e18, type: 3}
-  m_Name: Meta_start_food
+  m_Name: Meta_essence_gain
   m_EditorClassIdentifier: DeadWalls::DeadWalls.MetaUpgradeSO
-  Id: start_food
-  Title: Starting Food
-  Description: Start each run with extra food.
-  BaseCost: 150
-  CostGrowthPerLevel: 0.6
-  MaxLevel: 0
-  EffectType: 1
-  ValuePerLevel: 60
-  Resource: 4
+  Id: essence_gain
+  Title: Essence Gain
+  Description: +5% Grave Essence gained per level.
+  BaseCost: 600
+  CostGrowthPerLevel: 0.9
+  MaxLevel: 10
+  EffectType: 9
+  ValuePerLevel: 0.05
+  Resource: 0
   PoolContentId:

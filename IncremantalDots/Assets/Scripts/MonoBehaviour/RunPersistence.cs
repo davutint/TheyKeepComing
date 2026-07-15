@@ -13,7 +13,7 @@ namespace DeadWalls
     [Serializable]
     public class RunSaveState
     {
-        public const int CurrentVersion = 12;
+        public const int CurrentVersion = 13;
         public const int MinimumSupportedVersion = 3;
 
         public int Version = CurrentVersion;
@@ -79,6 +79,7 @@ namespace DeadWalls
         public int ArrowCapacityLevel;
         public int ArrowEfficiencyLevel;
         public long GraveEssence;
+        public double GraveEssenceMetaGainAccumulator;
 
         // JsonUtility null nested class'i default object olarak yazabildigi icin explicit
         // discriminator otoritedir. False ise HeartGraph payload'i ignore edilir.
@@ -433,6 +434,14 @@ namespace DeadWalls
                 state.RallyCooldownRemaining = 0f;
                 state.EmergencyRepairCooldownRemaining = 0f;
                 state.Version = 12;
+            }
+
+            if (state.Version == 12)
+            {
+                // v12 Grave Essence bakiyesini tasiyordu fakat meta gain'in kesirli payini
+                // tasimiyordu. Eski kosu temiz 0 remainder ile exact devam eder.
+                state.GraveEssenceMetaGainAccumulator = 0d;
+                state.Version = 13;
             }
         }
 

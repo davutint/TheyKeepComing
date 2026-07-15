@@ -22,7 +22,7 @@ iyileştirir.
 - `CastleYardPrepSystem`: Rally timer'ını bütün continuous-cycle fazlarında azaltır.
 - `MobileCastleCombatConfig`: normal repair, Rally ve Emergency Repair runtime tuning'ini
   taşır; `MobileCastleTuningResolver` değerleri `DifficultyProfileSO` kaynağından yazar.
-- `RunPersistence`: v12 şemasında Rally ve Emergency Repair cooldown'larını exact saklar;
+- `RunPersistence`: güncel v13 şemasında Rally ve Emergency Repair cooldown'larını exact saklar;
   v11 kayıtları iki ability hazır başlayacak şekilde migrate edilir.
 
 ## Ability kuralları
@@ -65,7 +65,6 @@ legacy prep etkisi ayrı kalır. Arrow Storm V1'e eklenmez.
 
 - `ActiveAbilityRulesTests`: cooldown, phase, Wall ölüm/full-health ve Game Over guard'ları.
 - `MobileCastleTuningResolverTests`: profile tuning'inin runtime config'e aktarımı.
-- `RunPersistenceTests`: v12 migration ve cooldown serialization sözleşmesi.
+- `RunPersistenceTests`: v11->v12 cooldown ve v12->v13 Essence remainder migration sözleşmesi.
 - `ExactRunContinuePlayModeTests`: cost-free kullanım, Night normal repair reddi ve
   Rally/Emergency cooldown + Wall HP exact Continue doğrulaması.
-

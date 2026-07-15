@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.2
 > **Son tam kapsam denetimi:** 2026-07-15
 > **Aktif paket:** Package H - Meta + Persistence
-> **Aktif iş:** `DW-H-META-CATALOG` - Fixed Upgrade Catalog + Incremental Cost Curves
-> **İlerleme:** `335 / 441` tracker checkbox'ı tamamlandı - `%75,96`
+> **Aktif iş:** `DW-H-SAVE-REBUILD` - Deterministic 10K Combat Rebuild Policy
+> **İlerleme:** `344 / 441` tracker checkbox'ı tamamlandı - `%78,00`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -140,15 +140,15 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Archer cap | `ArcherCapacityUtility` Basic/Rapid/Frost toplamını `1000` ile sınırlar; buy, merkezi spawn, Council, meta, restore ve legacy Barracks aynı guard'ı kullanır | `[x]` |
 | Placement | Formation V1 asset'iyle sabit 40 `outside` tile x 25 seeded diamond nokta; layer-fill sıra, 1000 gizmo ve v9 Continue testli | `[x]` |
 | Targeting | Persistent coarse spatial query + incoming damage reservation Burst job'ları aktif | `[x]` |
-| Ammo | Finite stok; gerçek projectile başına `-1`; Wood ile anlık +1/+5/Buy Max refill; Wood+Iron CAP/EFF yatırımı; Current/Capacity HUD ve exact save v11 | `[x]` |
+| Ammo | Finite stok; gerçek projectile başına `-1`; Wood ile anlık +1/+5/Buy Max refill; Wood+Iron CAP/EFF yatırımı; Current/Capacity HUD ve exact save v13 | `[x]` |
 | Tech/Heart | Generated graph/reveal, Grave Essence-only purchase, actual effect adapter'i, hidden-safe fullscreen `HeartScreenUI`, full simulation pause ve schema v11 exact graph/effect replay aktif; legacy `TechTreeUI` aktif owner değil. Production node catalog'u owner içerik onayı bekliyor ve null durumda açık hata veriliyor | E1-E6 runtime kabulü tamamlandı; launch content owner gate |
 | Fireball | Dünya hedefli projectile/AoE ve cooldown çalışması mevcut | Korunacak temel |
 | Rally | Wood/Food maliyetli prep purchase | Cooldown-only ability olmalı |
 | Emergency Repair | Ayrı ability yok | Eksik |
-| Meta | Ayrı JSON, durable ölüm kapılı shop ve run-graph-isolated effect allowlist aktif; fixed launch catalog/balance işi sırada | Kısmi uyum |
+| Meta | Ayrı JSON, durable ölüm kapılı shop, Blueprint exact 11-definition katalog, üstel repeatable sink'ler ve atomik tek-seferlik pool unlock aktif | `[x]` Teknik katalog ve runtime sınırı tamamlandı; exact reward tuning ayrı |
 | HUD | CyclePanel, DAY/DUSK/NIGHT ve Horde Pressure mevcut; tek Wall runtime gizleme var | Package I polish gerekli |
 | Tutorial | Aktif tutorial/onboarding sistemi bulunmadı | Package I eksik |
-| Testler | Son full baseline: EditMode `209/209`, PlayMode `37 pass + 1 explicit profiler skip`; Package H death receipt `18/18 + 3/3`; meta schema `7/7 + 20/20 + 2/2`; meta boundary yeni EditMode `5/5`, ilgili regresyon `9/9`, PlayMode `1/1 + 3/3`; Standalone Player-targeted 10K `1/1` | Package H schema, death-only purchase ve graph isolation hedefli regresyonları temiz; full baseline tarihsel olarak korunuyor |
+| Testler | Son full baseline: EditMode `209/209`, PlayMode `37 pass + 1 explicit profiler skip`; Package H meta katalog/regresyon EditMode `50/50`, run-start/Continue + death shop PlayMode `2/2`; Standalone Player-targeted 10K `1/1` | Fixed catalog, exponential cost, v13 migration, runtime effect ayrımı ve atomik pool purchase temiz; full baseline tarihsel olarak korunuyor |
 | Telemetry | Spawn budget demanded/spawned/backlog telemetry mevcut; tam Blueprint event owner'ı eksik | Kısmi |
 
 ---
@@ -164,7 +164,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | 5 | E - Castle Heart | Tamamlandı | Aynı seed/load aynı valid graph'ı üretir; production content owner gate ayrı |
 | 6 | F - Council | Tamamlandı | 9 template staged launch set, curated repeat/follow-up, 5.400-sample budget ve full regression geçti |
 | 7 | G - Active Abilities | Tamamlandı | Kaynak tüketmez; Night repair sözleşmesi ve exact cooldown save testli |
-| 8 | H - Meta + Persistence | **Aktif** | Ölüm ödülü idempotent; meta v3 fail-closed; death-only shop ve run graph isolation tamamlandı; fixed catalog sırada |
+| 8 | H - Meta + Persistence | **Aktif** | Ölüm ödülü idempotent; meta v3 fail-closed; fixed katalog ve incremental cost tamamlandı; deterministic 10K rebuild policy sırada |
 | 9 | I - Product Gate | Bekliyor | 10k scenario, tutorial ve temiz görsel inceleme |
 
 > “A1/A2” resmî Blueprint paketi değildir. Resmî paketler A-I'dır; iş kimlikleri yalnız tracker içinde `DW-A-SAVE` gibi kullanılır.
@@ -734,21 +734,21 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 | Death-only shop | UI ve transaction `GameManager` durable-death kapısından geçiyor; aktif run/Pause/Main Menu reset bypass'ı yok | `[x]` |
 | Reward inputs | Day+kills+record bonus | Nights/peak pop/record weighting eksik/tuning |
 | Idempotent reward | Durable death receipt, `RewardedRunIds`, atomic write ve fail-closed Continue guard aktif | `[x]` |
-| Fixed upgrade list | Catalog var; mevcut effect listesi Blueprint ile tam eşleşmiyor | `[~]` |
+| Fixed upgrade list | Exact 11-definition katalog Blueprint sırasını taşır; legacy Archer Damage kaldırıldı | `[x]` |
 | StartingTechLevel yok | Enum, `TechNodeId`, runtime case ve dormant `Meta_start_moat.asset` kaldırıldı | `[x]` |
 | Meta graph'ı değiştirmez | Fail-closed effect allowlist yalnız run-start/aggregate etkilerini kabul ediyor; pool Id storage mevcut graph'a yazmıyor | `[x]` |
 | Tutorial flag | v3 `TutorialFlags` canonical state/API hazır; onboarding consumer Package I işi | `[~]` Schema hazır |
 
 ### Hedef meta upgrade listesi
 
-- [ ] Starting resources - Wood/Stone/Iron/Food; node açmaz.
-- [ ] Starting Basic Archers - Rapid/Frost açmaz.
-- [ ] Starting beds - run bed price curve'ünü silmez.
-- [ ] Base Wall HP - Heart Wall node'larını değersizleştirmez.
-- [ ] Worker production - küçük global multiplier; run capacity/efficiency devam eder.
-- [ ] Arrow efficiency - ammo kararını yok etmez.
-- [ ] Essence gain - graph sonucunu değiştirmez.
-- [ ] Node pool unlock - yeni olası content ekler; mevcut run'a zorla enjekte etmez.
+- [x] Starting resources - Wood/Stone/Iron/Food; node açmaz.
+- [x] Starting Basic Archers - Rapid/Frost açmaz.
+- [x] Starting beds - run bed price curve'ünü silmez.
+- [x] Base Wall HP - Heart Wall node'larını değersizleştirmez.
+- [x] Worker production - küçük global multiplier; run capacity/efficiency devam eder.
+- [x] Arrow efficiency - ammo kararını yok etmez.
+- [x] Essence gain - graph sonucunu değiştirmez.
+- [x] Node pool unlock - stable future-pool Id'sini tek sefer açar; mevcut run'a zorla enjekte etmez. Gerçek node/evolution content'i ayrı owner onayıdır.
 
 ### Persistence işleri
 
@@ -761,7 +761,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 - [x] Aktif run sırasında meta satın alımını engelle.
 - [x] `StartingTechLevel` effect ve content'ini yeni modelden kaldır.
 - [x] Meta'nın generated graph edges/Keystone/result seçmesini engelle.
-- [ ] Repeatable meta sink'lerde büyüyen maliyet; content unlock'ta tek sefer uygula.
+- [x] Repeatable meta sink'lerde büyüyen maliyet; content unlock'ta tek sefer uygula.
 - [x] Eski Mobile save'i yeni run contract'a sessiz yanlış map etme.
 - [ ] 10k enemy pozisyonlarını tek tek save etmek yerine perceptually faithful deterministik rebuild policy tanımla.
 
@@ -1147,3 +1147,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-15 | `DW-H-DEATH-RECEIPT` death-only durable reward transaction | Ölüm akışı journal-first yapıldı: same-volume temp + flush + replace kullanan `AtomicJsonFile`, unique `RunDeathReceipt`, `RewardedRunIds` idempotency ve meta durable olmadan receipt silmeme sözleşmesi kuruldu. Matching veya corrupt receipt marker yaşayan snapshot'ı fail-closed geçersiz kılıyor; `SaveRunSnapshot()` taze ECS lethal state'ini capture öncesi işleyerek application quit sırasında ölü koşunun yeniden yazılmasını engelliyor. GameManager/MainMenu startup recovery process restart sonrasında yarım transaction'ı tamamlıyor | Unity compile: 0 error; targeted EditMode 18/18; targeted PlayMode 3/3; Unity console'da gerçek error 0; tracker `325/441` |
 | 2026-07-15 | `DW-H-META-SCHEMA` canonical meta v3 schema + migration guard | `MetaProgressState v3`, Souls/istatistik/upgrades/son 128 reward receipt yanında stable `UnlockedPoolIds` ve `TutorialFlags` sahiplerini kurdu. v1 ve v2 açık zincirle currency, upgrade ve receipt kaybetmeden v3'e taşınıyor; unknown upgrade Id'leri korunuyor. Future version veya corrupt JSON artık boş state'e sessiz map edilip üzerine yazılmıyor: `LoadStatus` ve `CanPersist` bütün meta mutation/reward write yollarını fail-closed kilitliyor. Pool/tutorial mutation'ları ile upgrade purchase disk write başarısızsa in-memory rollback yapıyor. Run v3-v12 explicit migration guard'ı ayrıca denetlenerek stale tracker satırı kapatıldı; önceki death receipt process-restart test satırı kanıtıyla eşlendi | Unity compile: 0 error; new schema EditMode 7/7; related EditMode regression 20/20; targeted PlayMode 2/2; Unity Console'da gerçek error 0; tracker `329/441` |
 | 2026-07-15 | `DW-H-META-BOUNDARY` death-only shop + run graph isolation | Meta purchase otoritesi `GameManager`a taşındı; aktif koşu, toplanmamış/durable olmayan ölüm ve fail-closed meta state satın alamıyor. Canonical catalog asset identity aynı Id'li spoof definition'ı reddediyor; persistence mutation API'si internal kaldı. `MetaUpgradePolicy` yalnız run-start/aggregate effect'lerini allowlist yaptı; `StartingTechLevel`, `TechNodeId`, runtime case ve dormant `Meta_start_moat.asset` kaldırıldı. Exact Continue'un saved tech replay'i `RestoreSavedTechNodeLevels` adıyla run-save sahibinde korundu; pool unlock state'i mevcut generated graph'a yazmıyor | Unity compile: 0 error; new boundary EditMode 5/5; schema+dormancy regression 9/9; death purchase PlayMode 1/1; exact Continue/death/Heart graph PlayMode regression 3/3; Unity Console 0 error; tracker `335/441` |
+| 2026-07-15 | `DW-H-META-CATALOG` fixed launch catalog + incremental cost curves | Blueprint sabit listesi dört starting resource, Basic-only Archer, limitsiz starting beds, Wall HP, worker production, Arrow efficiency, Essence gain ve future node-pool unlock olarak 11 canonical assete çekildi; eski `Meta_archer_damage` effect/asset/runtime yolu kaldırıldı. Kaynak/yatak sink'leri `MaxLevel=0` limitsiz, bütün fiyatlar üstel ve saturating; Basic Archer ortak 1000 cap'ini koruyor. Arrow meta verimi paid/Heart level'dan ayrıldı, Essence yüzdesinin kesirli payı exact save v13'e eklendi, Continue başlangıç bonuslarını çift uygulamadan derived etkileri yeniden kuruyor. Node-pool seviyesi/Id'si/Souls aynı atomik transaction'da tek kez commit ediliyor | Unity compile: 0 error; targeted EditMode `50/50`; targeted PlayMode `2/2`; Unity Console gerçek error 0; catalog validation 0 problem; tracker `344/441` |

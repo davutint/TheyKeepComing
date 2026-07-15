@@ -13,11 +13,12 @@ MonoBehaviour:
   m_Name: Meta_start_wood
   m_EditorClassIdentifier: DeadWalls::DeadWalls.MetaUpgradeSO
   Id: start_wood
-  Title: Timber Cache
+  Title: Starting Wood
   Description: Start each run with extra wood.
   BaseCost: 150
   CostGrowthPerLevel: 0.6
-  MaxLevel: 5
+  MaxLevel: 0
   EffectType: 1
   ValuePerLevel: 75
   Resource: 1
+  PoolContentId:

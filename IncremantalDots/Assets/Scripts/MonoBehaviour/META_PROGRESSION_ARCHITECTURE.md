@@ -77,25 +77,47 @@ başarısızsa receipt silinmez ve sonraki açılış yeniden dener. Ayrıntıl�
 
 ## Upgrade kataloğu ve koşu başı uygulama
 
-`MetaUpgradeCatalogSO` kalıcı upgrade tanımlarının sahibidir. Mevcut effect yolları:
+`MetaUpgradeCatalogSO` Blueprint v1.0 sabit sırasındaki 11 definition'ın sahibidir:
 
-- StartingResource -> `AddResources`
-- StartingArchers -> `SpawnArcher`; Basic/Rapid/Frost ortak `1000` cap'i bypass edilmez
-- WallHpPercent -> defense aggregate
-- ArcherDamagePercent -> archer stat scaling
-- ProductionPercent -> economy aggregate
+1. `start_wood`, `start_stone`, `start_iron`, `start_food`
+2. `start_archers`
+3. `start_beds`
+4. `wall_hp`
+5. `production`
+6. `arrow_efficiency`
+7. `essence_gain`
+8. `node_pool_unlock`
 
-`MetaUpgradePolicy.IsRunGraphIsolatedEffect()` bu beş effect yolunun fail-closed allowlist'idir.
-`None`, legacy numeric `3` ve gelecekte eklenecek tanımsız effect'ler catalog validation'da
-reddedilir; stale bir asset runtime'a ulaşırsa `ApplyMetaProgressionAtRunStart()` onu loglayıp
-uygulamaz. `StartingTechLevel`, `TechNodeId` ve dormant `Meta_start_moat.asset` üretim modelinden
-kaldırılmıştır. Enum'da `WallHpPercent = 4` ve sonraki numeric değerler serialized uyumluluk için
-yerini korur; boşalan `3` bilerek yeniden kullanılmaz.
+Runtime effect yolları açıkça ayrıdır:
+
+- `StartingResource` -> saturating `AddResources`; Heart node açmaz.
+- `StartingArchers` -> yalnız Basic `SpawnArcher`; ortak `1000` cap'i bypass etmez ve Rapid/Frost açmaz.
+- `StartingBeds` -> `MobileBedCapacityState.BaseCapacity`; run satın alım fiyatı toplam sahip olunan
+  kapasiteden büyümeye devam eder.
+- `WallHpPercent` ve `ProductionPercent` -> mevcut defense/economy aggregate katmanları.
+- `ArrowEfficiency` -> `ArrowSupply.MetaEfficiencyBonus`; paid run `EfficiencyLevel` ve Heart bonusundan ayrıdır.
+- `EssenceGainPercent` -> `GrantGraveEssence`; kesirli kazanç `MetaGainAccumulator` ile birikir ve
+  exact Continue'da korunur.
+- `NodePoolUnlock` -> yalnız stable `UnlockedPoolIds`; aktif koşuya uygulanmaz.
+
+`MetaUpgradePolicy.IsRunGraphIsolatedEffect()` bu sekiz effect yolunun fail-closed allowlist'idir.
+`None`, legacy numeric `3`, Blueprint dışı eski numeric `5` ve gelecekte eklenecek tanımsız
+effect'ler catalog validation'da reddedilir. `StartingTechLevel`, `ArcherDamagePercent`,
+`TechNodeId`, `Meta_start_moat.asset` ve `Meta_archer_damage.asset` üretim modelinden kaldırılmıştır;
+boşalan serialized değerler bilerek yeniden kullanılmaz.
+
+Katalogdaki kaynak ve yatak sink'lerinde `MaxLevel=0` limitsiz anlamına gelir. Maliyet doğrusal
+değil, `ceil(BaseCost * (1 + growth)^currentLevel)` formülüyle üstel büyür ve temsil sınırında
+`int.MaxValue` değerine saturate olur. Basic Archer `1000` hard cap'ine kadar tanımlıdır; güç
+yüzdeleri sınırlı level taşır; node-pool unlock tam bir kez alınabilir.
 
 `GameManager.ApplyMetaProgressionAtRunStart()` her yeni koşuda state'i mevcut gameplay
 kanallarından uygular. `_metaAppliedThisRun` aynı runtime başlangıcında çift uygulamayı önler.
-Exact Continue içindeki saved legacy tech level replay'i `RestoreSavedTechNodeLevels()` sahibinde
-kalır; bu metottan meta catalog'a açılan bir çağrı yolu yoktur.
+Exact Continue başlangıç kaynak/yatak/okçu değerlerini snapshot'tan restore ettiği için bu
+etkileri ikinci kez eklemez. Derived Arrow efficiency ve Essence gain yüzdesi kalıcı seviyelerden
+yeniden kurulur; `RunSaveState v13` yalnız Essence kesirli remainder'ını run state olarak taşır.
+Saved legacy tech level replay'i `RestoreSavedTechNodeLevels()` sahibinde kalır; bu metottan meta
+catalog'a açılan bir çağrı yolu yoktur.
 
 ## Death-only satın alma sınırı
 
@@ -120,13 +142,14 @@ Keystone lock veya result state'ine retroaktif yazamaz.
 
 ## Kurallar
 
-- Meta yüzdeleri tech/Council ile aynı aggregate kanallarından geçer; runtime component'e ayrı bir sürekli override yazılmaz.
+- Wall HP ve worker production yüzdeleri tech/Council aggregate kanallarından geçer; Arrow meta
+  verimi paid/Heart level'dan ayrı derived alandır, Essence gain ise yalnız grant kapısında uygulanır.
 - Run sonucu yalnız kesin Game Over geçişinde toplanır; frame polling ile ödül verilmez.
 - `MetaProgression.ResetAll` yalnız debug içindir ve oyuncu yüzeyine bağlanmaz.
 - Run save ile meta save ayrı otoritelerdir. Meta state hiçbir zaman canlı koşunun phase/timer/combat snapshot'ını taşımaz.
 - Meta write `AtomicJsonFile` üzerinden temp + flush + replace sözleşmesiyle yapılır; durable
   sonuç alınmadan death receipt temizlenmez.
-- Meta satın alımı disk write başarısızsa Souls/seviye değişikliğini in-memory geri alır.
+- Meta satın alımı disk write başarısızsa Souls/seviye/pool unlock değişikliğini birlikte geri alır.
 - Aktif koşuda, reward durable değilken veya meta persistence fail-closed iken satın alma yoktur.
 - Pause Restart gizlidir; yaşayan save varken Main Menu New Run açılamaz. Game Over Restart yeni
   koşudur ve gönüllü prestige/reset sayılmaz.

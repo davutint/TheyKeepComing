@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace DeadWalls
 {
-    /// <summary>Meta magaza katalogu. Setup tool aktif V1 seed'lerini merge eder; rezerve dormant id'leri disarida tutar.</summary>
+    /// <summary>Blueprint v1.0 sabit meta magaza katalogu.</summary>
     [CreateAssetMenu(fileName = "MetaUpgradeCatalog", menuName = "DeadWalls/Mobile Castle/Meta Upgrade Catalog")]
     public class MetaUpgradeCatalogSO : ScriptableObject
     {
@@ -36,8 +36,7 @@ namespace DeadWalls
                     else if (!ids.Add(upgrade.Id)) problems.Add($"Duplicate Id: '{upgrade.Id}'.");
                     if (MoatDormancyRules.IsDormantMetaUpgradeId(upgrade.Id))
                         problems.Add($"'{upgrade.Id}' dormant V1 meta content; aktif catalog'da bulunamaz.");
-                    if (!MetaUpgradePolicy.IsRunGraphIsolatedEffect(upgrade.EffectType))
-                        problems.Add($"'{upgrade.Id}' effect '{upgrade.EffectType}' run graph isolation politikasina aykiri.");
+                    upgrade.CollectValidationErrors(problems);
                 }
             }
 

@@ -13,11 +13,12 @@ MonoBehaviour:
   m_Name: Meta_wall_hp
   m_EditorClassIdentifier: DeadWalls::DeadWalls.MetaUpgradeSO
   Id: wall_hp
-  Title: Reinforced Foundations
-  Description: +5% defense max HP per level (permanent).
+  Title: Base Wall HP
+  Description: +5% Wall max HP per level.
   BaseCost: 300
   CostGrowthPerLevel: 0.8
   MaxLevel: 5
   EffectType: 4
   ValuePerLevel: 0.05
   Resource: 0
+  PoolContentId:

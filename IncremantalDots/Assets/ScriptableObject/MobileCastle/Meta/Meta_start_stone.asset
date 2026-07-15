@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4162ec2ce66fd1a439e5110d43e55e18, type: 3}
-  m_Name: Meta_start_food
+  m_Name: Meta_start_stone
   m_EditorClassIdentifier: DeadWalls::DeadWalls.MetaUpgradeSO
-  Id: start_food
-  Title: Starting Food
-  Description: Start each run with extra food.
-  BaseCost: 150
-  CostGrowthPerLevel: 0.6
+  Id: start_stone
+  Title: Starting Stone
+  Description: Start each run with extra stone.
+  BaseCost: 175
+  CostGrowthPerLevel: 0.65
   MaxLevel: 0
   EffectType: 1
-  ValuePerLevel: 60
-  Resource: 4
+  ValuePerLevel: 50
+  Resource: 2
   PoolContentId:

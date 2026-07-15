@@ -127,8 +127,9 @@ namespace DeadWalls
         private bool _metaRunCollected;
         private string _currentRunId;
         private float _metaWallHpPercent;
-        private float _metaDamageMultiplier = 1f;
         private float _metaProductionPercent;
+        private int _metaArrowEfficiencyBonus;
+        private double _metaEssenceGainPercent;
 
         public GameStateData GameState { get; private set; }
         public WaveStateData WaveState { get; private set; }
@@ -188,11 +189,18 @@ namespace DeadWalls
             }
 
             MetaUpgradeSO canonical = metaUpgradeCatalog.GetUpgrade(upgrade.Id);
-            if (canonical != upgrade || !MetaUpgradePolicy.IsRunGraphIsolatedEffect(canonical.EffectType))
+            if (canonical != upgrade || !canonical.IsConfigurationValid())
                 return false;
 
             int level = MetaProgression.GetUpgradeLevel(canonical.Id);
-            return level < canonical.MaxLevel && MetaProgression.State.Souls >= canonical.GetCost(level);
+            if (canonical.IsMaxLevel(level)
+                || (MetaUpgradePolicy.IsContentUnlockEffect(canonical.EffectType)
+                    && MetaProgression.HasPoolUnlock(canonical.PoolContentId)))
+            {
+                return false;
+            }
+
+            return MetaProgression.State.Souls >= canonical.GetCost(level);
         }
 
         public bool TryBuyMetaUpgrade(MetaUpgradeSO upgrade)
@@ -897,9 +905,44 @@ namespace DeadWalls
             }
 
             long current = essence.Current < 0 ? 0 : essence.Current;
-            essence.Current = current > long.MaxValue - amount
+            long metaBonus = 0;
+            double nextAccumulator = essence.MetaGainAccumulator < 0d
+                || double.IsNaN(essence.MetaGainAccumulator)
+                || double.IsInfinity(essence.MetaGainAccumulator)
+                    ? 0d
+                    : essence.MetaGainAccumulator;
+
+            if (_metaEssenceGainPercent > 0d)
+            {
+                try
+                {
+                    decimal exactBonus = (decimal)amount * (decimal)_metaEssenceGainPercent
+                                         + (decimal)nextAccumulator;
+                    if (exactBonus >= long.MaxValue)
+                    {
+                        metaBonus = long.MaxValue;
+                        nextAccumulator = 0d;
+                    }
+                    else
+                    {
+                        decimal wholeBonus = decimal.Floor(exactBonus);
+                        metaBonus = decimal.ToInt64(wholeBonus);
+                        nextAccumulator = (double)(exactBonus - wholeBonus);
+                    }
+                }
+                catch (System.OverflowException)
+                {
+                    metaBonus = long.MaxValue;
+                    nextAccumulator = 0d;
+                }
+            }
+
+            long granted = metaBonus > long.MaxValue - amount
                 ? long.MaxValue
-                : current + amount;
+                : amount + metaBonus;
+            bool saturated = current > long.MaxValue - granted;
+            essence.Current = saturated ? long.MaxValue : current + granted;
+            essence.MetaGainAccumulator = saturated ? 0d : nextAccumulator;
             _entityManager.SetComponentData(entity, essence);
             HeartEssence = essence;
             OnGameStateChanged?.Invoke();
@@ -3335,6 +3378,7 @@ namespace DeadWalls
                 ArrowCapacityLevel = ArrowSupply.CapacityLevel,
                 ArrowEfficiencyLevel = ArrowSupply.EfficiencyLevel,
                 GraveEssence = GraveEssenceAmount,
+                GraveEssenceMetaGainAccumulator = HeartEssence.MetaGainAccumulator,
                 HasHeartGraph = heartGraphSnapshot != null,
                 HeartGraph = heartGraphSnapshot,
                 PopulationTotal = Population.Total,
@@ -3636,11 +3680,17 @@ namespace DeadWalls
                 Current = math.max(0, save.ArrowCurrent),
                 CapacityLevel = math.max(0, save.ArrowCapacityLevel),
                 EfficiencyLevel = math.max(0, save.ArrowEfficiencyLevel),
+                MetaEfficiencyBonus = math.max(0, _metaArrowEfficiencyBonus),
                 Accumulator = save.ArrowAccumulator
             });
             _entityManager.SetComponentData(_gameStateEntity, new GraveEssence
             {
-                Current = save.GraveEssence < 0 ? 0 : save.GraveEssence
+                Current = save.GraveEssence < 0 ? 0 : save.GraveEssence,
+                MetaGainAccumulator = double.IsNaN(save.GraveEssenceMetaGainAccumulator)
+                                      || double.IsInfinity(save.GraveEssenceMetaGainAccumulator)
+                                      || save.GraveEssenceMetaGainAccumulator < 0d
+                    ? 0d
+                    : save.GraveEssenceMetaGainAccumulator
             });
             HeartEssence = _entityManager.GetComponentData<GraveEssence>(_gameStateEntity);
             if (!TryRestoreHeartRuntime(savedHeartGraph, out string heartRestoreError))
@@ -3978,8 +4028,9 @@ namespace DeadWalls
 
             _metaAppliedThisRun = true;
             _metaWallHpPercent = 0f;
-            _metaDamageMultiplier = 1f;
             _metaProductionPercent = 0f;
+            _metaArrowEfficiencyBonus = 0;
+            _metaEssenceGainPercent = 0d;
             bool archerCountsDirty = false;
 
             foreach (var upgrade in metaUpgradeCatalog.Upgrades)
@@ -3987,25 +4038,33 @@ namespace DeadWalls
                 if (upgrade == null)
                     continue;
 
-                if (!MetaUpgradePolicy.IsRunGraphIsolatedEffect(upgrade.EffectType))
+                if (!upgrade.IsConfigurationValid())
                 {
                     Debug.LogError($"[GameManager] Meta upgrade '{upgrade.Id}' effect '{upgrade.EffectType}' "
-                                   + "run graph isolation politikasina aykiri; kosuya uygulanmadi.");
+                                   + "gecersiz veya run graph isolation politikasina aykiri; uygulanmadi.");
                     continue;
                 }
+
+                // Pool unlock yalniz kalici future-content state'idir; aktif kosuya yazilmaz.
+                if (!MetaUpgradePolicy.IsRunStartEffect(upgrade.EffectType))
+                    continue;
 
                 int level = MetaProgression.GetUpgradeLevel(upgrade.Id);
                 if (level <= 0)
                     continue;
 
-                float total = upgrade.ValuePerLevel * level;
+                double total = (double)upgrade.ValuePerLevel * level;
                 switch (upgrade.EffectType)
                 {
                     case MetaUpgradeEffectType.StartingResource:
-                        AddResources(BuildMetaStartingResourceCost(upgrade.Resource, Mathf.RoundToInt(total)));
+                        AddResources(BuildMetaStartingResourceCost(
+                            upgrade.Resource, SaturatingPositiveInt(total)));
                         break;
                     case MetaUpgradeEffectType.StartingArchers:
-                        for (int i = 0; i < Mathf.RoundToInt(total); i++)
+                    {
+                        int archerCount = math.min(
+                            SaturatingPositiveInt(total), ArcherCapacityUtility.MaxTotalArchers);
+                        for (int i = 0; i < archerCount; i++)
                         {
                             if (!SpawnArcher(ArcherType.Basic))
                                 break; // ortak 1000 cap; baslangic garnizonu population tuketmez
@@ -4013,18 +4072,29 @@ namespace DeadWalls
                             archerCountsDirty = true;
                         }
                         break;
-                    case MetaUpgradeEffectType.WallHpPercent:
-                        _metaWallHpPercent += total;
+                    }
+                    case MetaUpgradeEffectType.StartingBeds:
+                        ApplyMetaStartingBeds(SaturatingPositiveInt(total));
                         break;
-                    case MetaUpgradeEffectType.ArcherDamagePercent:
-                        _metaDamageMultiplier *= 1f + total;
+                    case MetaUpgradeEffectType.WallHpPercent:
+                        _metaWallHpPercent = SaturatingPositiveFloat(_metaWallHpPercent + total);
                         break;
                     case MetaUpgradeEffectType.ProductionPercent:
-                        _metaProductionPercent += total;
+                        _metaProductionPercent = SaturatingPositiveFloat(_metaProductionPercent + total);
+                        break;
+                    case MetaUpgradeEffectType.ArrowEfficiency:
+                        _metaArrowEfficiencyBonus = SaturatingAddNonNegative(
+                            _metaArrowEfficiencyBonus, SaturatingPositiveInt(total));
+                        break;
+                    case MetaUpgradeEffectType.EssenceGainPercent:
+                        _metaEssenceGainPercent = total >= double.MaxValue - _metaEssenceGainPercent
+                            ? double.MaxValue
+                            : _metaEssenceGainPercent + total;
                         break;
                 }
             }
 
+            ApplyMetaArrowEfficiencyBonus();
             // Yuzdesel katkilar aggregate katmanlarindan akar (tech/council ile ayni kanal)
             if (_metaWallHpPercent > 0f)
                 ApplyTechDefenseAggregates();
@@ -4032,8 +4102,69 @@ namespace DeadWalls
                 ApplyTechEconomyAggregates();
             if (archerCountsDirty)
                 ReadArcherTypeCounts();
-            if (!Mathf.Approximately(_metaDamageMultiplier, 1f))
-                ApplyScaledStatsToArchers(ArcherType.Basic, false);
+        }
+
+        private void ApplyMetaStartingBeds(int amount)
+        {
+            if (amount <= 0
+                || !TryGetMobileConfigEntity(out Entity configEntity)
+                || !_entityManager.HasComponent<MobileBedCapacityState>(configEntity))
+            {
+                return;
+            }
+
+            var beds = _entityManager.GetComponentData<MobileBedCapacityState>(configEntity);
+            beds.BaseCapacity = SaturatingAddNonNegative(beds.BaseCapacity, amount);
+            _entityManager.SetComponentData(configEntity, beds);
+            BedCapacity = beds;
+
+            if (_entityManager.HasComponent<PopulationState>(_gameStateEntity))
+            {
+                var population = _entityManager.GetComponentData<PopulationState>(_gameStateEntity);
+                population.BaseCapacity = math.max(0, beds.BaseCapacity);
+                population.Capacity = MobileBedCapacityUtility.GetTotalCapacity(beds);
+                _entityManager.SetComponentData(_gameStateEntity, population);
+                Population = population;
+            }
+        }
+
+        private void ApplyMetaArrowEfficiencyBonus()
+        {
+            if (!TryGetArrowSupply(out Entity entity, out ArrowSupply supply))
+                return;
+
+            supply.MetaEfficiencyBonus = math.max(0, _metaArrowEfficiencyBonus);
+            _entityManager.SetComponentData(entity, supply);
+            ArrowSupply = supply;
+        }
+
+        private static int SaturatingPositiveInt(double value)
+        {
+            if (double.IsNaN(value) || value <= 0d)
+                return 0;
+            if (double.IsInfinity(value) || value >= int.MaxValue)
+                return int.MaxValue;
+
+            return (int)System.Math.Round(value, System.MidpointRounding.AwayFromZero);
+        }
+
+        private static float SaturatingPositiveFloat(double value)
+        {
+            if (double.IsNaN(value) || value <= 0d)
+                return 0f;
+            if (double.IsInfinity(value) || value >= float.MaxValue)
+                return float.MaxValue;
+
+            return (float)value;
+        }
+
+        private static int SaturatingAddNonNegative(int current, int amount)
+        {
+            int safeCurrent = math.max(0, current);
+            int safeAmount = math.max(0, amount);
+            return safeCurrent > int.MaxValue - safeAmount
+                ? int.MaxValue
+                : safeCurrent + safeAmount;
         }
 
         private static ResourceCost BuildMetaStartingResourceCost(EconomyFocusType resource, int amount)
@@ -4284,8 +4415,7 @@ namespace DeadWalls
             float fireRateScale = math.pow(TypeFireRateMultiplierPerLevel, extraLevels) * _globalFireRateMultiplier;
 
             // Tech tree carpanlari son degere uygulanir (flat bonus dahil) — bkz. TECH_TREE_SO_ARCHITECTURE.md
-            // Meta-progression kalici hasar carpani ayni kanaldan biner
-            stats.Damage = (stats.Damage * damageScale + _globalArrowDamageBonus) * _techDamageMultiplier * _metaDamageMultiplier;
+            stats.Damage = (stats.Damage * damageScale + _globalArrowDamageBonus) * _techDamageMultiplier;
             stats.FireRate *= fireRateScale * _techFireRateMultiplier;
 
             if (type == ArcherType.Frost)
@@ -4479,10 +4609,10 @@ namespace DeadWalls
                 return;
 
             var resources = _entityManager.GetComponentData<ResourceData>(_gameStateEntity);
-            resources.Wood += cost.Wood;
-            resources.Stone += cost.Stone;
-            resources.Iron += cost.Iron;
-            resources.Food += cost.Food;
+            resources.Wood = SaturatingAddNonNegative(resources.Wood, cost.Wood);
+            resources.Stone = SaturatingAddNonNegative(resources.Stone, cost.Stone);
+            resources.Iron = SaturatingAddNonNegative(resources.Iron, cost.Iron);
+            resources.Food = SaturatingAddNonNegative(resources.Food, cost.Food);
             _entityManager.SetComponentData(_gameStateEntity, resources);
             Resources = resources;
         }
@@ -5702,6 +5832,7 @@ namespace DeadWalls
             {
                 CapacityLevel = 0,
                 EfficiencyLevel = 0,
+                MetaEfficiencyBonus = 0,
                 Accumulator = 0f
             };
             resetArrowSupply.Current = mobileMode
@@ -5710,7 +5841,7 @@ namespace DeadWalls
             _entityManager.SetComponentData(_gameStateEntity, resetArrowSupply);
 
             // Grave Essence yalniz run state'idir; yeni kosu/restart her zaman sifirlar.
-            HeartEssence = new GraveEssence { Current = 0 };
+            HeartEssence = new GraveEssence { Current = 0, MetaGainAccumulator = 0d };
             _entityManager.SetComponentData(_gameStateEntity, HeartEssence);
 
             // Nufus resetle

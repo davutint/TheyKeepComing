@@ -13,11 +13,12 @@ MonoBehaviour:
   m_Name: Meta_start_archers
   m_EditorClassIdentifier: DeadWalls::DeadWalls.MetaUpgradeSO
   Id: start_archers
-  Title: Veteran Guard
-  Description: Start each run with extra archers on the wall.
+  Title: Starting Basic Archers
+  Description: Start each run with extra Basic Archers. Does not unlock other types.
   BaseCost: 400
   CostGrowthPerLevel: 1
-  MaxLevel: 3
+  MaxLevel: 1000
   EffectType: 2
   ValuePerLevel: 1
   Resource: 0
+  PoolContentId:

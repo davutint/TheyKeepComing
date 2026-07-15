@@ -70,6 +70,26 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void MetaEfficiency_IsAdditiveWithoutAdvancingPaidRunLevel()
+        {
+            var tuning = MobileEconomyPriceTuningUtility.Default;
+            var supply = new ArrowSupply
+            {
+                Current = 0,
+                EfficiencyLevel = 0,
+                MetaEfficiencyBonus = 3,
+                HeartEfficiencyBonus = 2
+            };
+
+            Assert.That(ArrowEconomyUtility.GetArrowsPerWood(supply, tuning), Is.EqualTo(9));
+            Assert.That(supply.EfficiencyLevel, Is.Zero);
+            Assert.That(ArrowEconomyUtility.TryGetUpgradeCost(
+                supply, ArrowUpgradeType.Efficiency, tuning, out var firstPaidCost), Is.True);
+            Assert.That(firstPaidCost.Wood, Is.EqualTo(200));
+            Assert.That(firstPaidCost.Iron, Is.EqualTo(50));
+        }
+
+        [Test]
         public void CapacityAndEfficiencyUpgrades_HaveIndependentGrowingCosts()
         {
             var tuning = MobileEconomyPriceTuningUtility.Default;

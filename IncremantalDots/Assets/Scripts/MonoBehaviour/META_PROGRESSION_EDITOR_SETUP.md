@@ -6,10 +6,19 @@ Meta v3 schema için Inspector, prefab veya scene alanı eklenmez. `MetaProgress
 sahibidir ve `persistentDataPath/meta_progress.json` kullanır. Aktif `NewGameScene`
 `GameManager` binding'i Unity MCP ile `MetaUpgradeCatalog.asset` yolunu göstermelidir.
 
-Unity MCP denetiminde aktif katalog altı run-graph-isolated upgrade taşır. Legacy
-`Meta_start_moat.asset`, `StartingTechLevel` enum yolu ve `MetaUpgradeSO.TechNodeId` kaldırılmıştır.
-Katalog validation yalnız `StartingResource`, `StartingArchers`, `WallHpPercent`,
-`ArcherDamagePercent` ve `ProductionPercent` effect'lerini kabul eder.
+Unity MCP denetiminde aktif katalog şu exact sıradaki 11 run-graph-isolated upgrade'i taşır:
+`start_wood`, `start_stone`, `start_iron`, `start_food`, `start_archers`, `start_beds`, `wall_hp`,
+`production`, `arrow_efficiency`, `essence_gain`, `node_pool_unlock`.
+
+Legacy `Meta_start_moat.asset`, `Meta_archer_damage.asset`, `StartingTechLevel`,
+`ArcherDamagePercent` ve `MetaUpgradeSO.TechNodeId` kaldırılmıştır. Numeric `3` ve `5` yeni effect
+için yeniden kullanılmaz. `node_pool_unlock` definition'ı `MaxLevel=1` ve stable
+`heart.approved_bonus_pool.v1` Id'si taşır; gerçek node/evolution content'i ayrı owner onayıyla
+bu pool'a bağlanır ve mevcut run graph'ına retroaktif enjekte edilemez.
+
+Kaynak/yatak definition'larında `MaxLevel=0` repeatable anlamına gelir. UI bunları `LV N` olarak
+gösterir; `MAX` yalnız pozitif hard cap'e ulaşıldığında görünür. Bütün fiyatlar assetteki
+`BaseCost` ve `CostGrowthPerLevel` üzerinden üstel hesaplanır.
 
 Game Over `MetaProgressionUI`, satın alma için doğrudan `MetaProgression` çağırmaz;
 `GameManager.CanBuyMetaUpgrade/TryBuyMetaUpgrade` binding'ini kullanır. Yeni bir meta UI/prefab
@@ -43,10 +52,14 @@ yeniden doğrulanır.
 
 Boundary kabulü için ayrıca:
 
-- EditMode `MetaProgressionBoundaryTests`: death-only kural matrisi, effect allowlist'i, legacy
-  numeric `3` reddi, production catalog ve public contract reflection denetimi.
+- EditMode `MetaProgressionBoundaryTests`: death-only kural matrisi, exact 11 definition sırası,
+  legacy numeric `3/5` reddi, üstel repeatable maliyet ve tek-seferlik pool contract denetimi.
 - PlayMode `ExactRunContinuePlayModeTests.MetaPurchase_ActiveRunRejectedAndDurableDeathAllowsCanonicalUpgrade`:
-  aktif koşuda red, durable ölümden sonra canonical satın alma ve aynı Id'li spoof asset reddi.
+  aktif koşuda red, durable ölümden sonra canonical satın alma, atomik pool unlock ve aynı Id'li
+  spoof asset reddi.
+- PlayMode `ExactRunContinuePlayModeTests.MetaCatalog_RunStartEffectsRemainSeparateAndExactAcrossContinue`:
+  dört kaynak, Basic-only garnizon, yatak fiyat sınırı, Wall/production, Arrow efficiency ve
+  kesirli Essence gain etkilerinin yeni koşu/Continue davranışı.
 - PlayMode `HeartGraphContinuePlayModeTests.Continue_ReplaysExactSavedHeartGraphWithoutReroll`:
   meta boundary değişikliğinin saved generated graph replay'ini etkilemediğini doğrular.
 
@@ -60,7 +73,7 @@ Boundary kabulü için ayrıca:
   transaction tamamlanmış sayılmaz.
 - Game Over görünür fakat shop disabled ise `LastRunResult.Persisted`, `CanPersist` ve death
   receipt Console hatalarını kontrol et; UI üzerinden zorla satın alma açma.
-- Catalog validation legacy numeric `3` bildirirse stale StartingTech asset'ini yeniden ekleme;
+- Catalog validation legacy numeric `3/5` bildirirse stale StartingTech/ArcherDamage asset'ini yeniden ekleme;
   ilgili upgrade tanımını run-graph-isolated effect modeline açıkça taşı.
 - Migration sonrası dosya v3 değilse Console'daki atomik write hatasını ve dosya kilidini denetle.
 

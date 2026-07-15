@@ -10,7 +10,7 @@ Bu sözleşme üç ayrı disk sahibine bölünür:
 
 | Dosya | Sahip | İçerik |
 |---|---|---|
-| `run_save.json` | `RunPersistence` | Yalnız yaşayan koşunun exact v12 snapshot'ı |
+| `run_save.json` | `RunPersistence` | Yalnız yaşayan koşunun exact v13 snapshot'ı |
 | `run_death_receipt.json` | `RunPersistence` | Kapanmakta olan koşunun `{ RunId, Day, Kills }` transaction journal'ı |
 | `meta_progress.json` | `MetaProgression` | v3 Souls/istatistik, upgrade seviyeleri, pool unlocks, tutorial flags ve son 128 `RewardedRunIds` |
 

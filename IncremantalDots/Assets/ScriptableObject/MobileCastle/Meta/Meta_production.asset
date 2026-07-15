@@ -13,11 +13,12 @@ MonoBehaviour:
   m_Name: Meta_production
   m_EditorClassIdentifier: DeadWalls::DeadWalls.MetaUpgradeSO
   Id: production
-  Title: Efficient Tools
-  Description: +3% worker production per level (permanent).
+  Title: Worker Production
+  Description: +3% worker production per level. Run building upgrades remain separate.
   BaseCost: 350
   CostGrowthPerLevel: 0.8
   MaxLevel: 5
   EffectType: 6
   ValuePerLevel: 0.03
   Resource: 0
+  PoolContentId:

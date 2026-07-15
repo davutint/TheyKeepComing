@@ -107,7 +107,7 @@ namespace DeadWalls
         private void BindRow(GameObject row, MetaUpgradeSO upgrade, GameManager gm)
         {
             int level = MetaProgression.GetUpgradeLevel(upgrade.Id);
-            bool maxed = level >= upgrade.MaxLevel;
+            bool maxed = upgrade.IsMaxLevel(level);
             int cost = maxed ? 0 : upgrade.GetCost(level);
 
             var title = FindText(row, "RowTitleText");
@@ -116,7 +116,9 @@ namespace DeadWalls
 
             var levelText = FindText(row, "RowLevelText");
             if (levelText != null)
-                levelText.text = $"LV {level}/{upgrade.MaxLevel}";
+                levelText.text = upgrade.IsRepeatable
+                    ? $"LV {level}"
+                    : $"LV {level}/{upgrade.MaxLevel}";
 
             var costText = FindText(row, "RowCostText");
             if (costText != null)

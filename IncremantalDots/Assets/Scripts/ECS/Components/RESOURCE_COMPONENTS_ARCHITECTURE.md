@@ -40,15 +40,17 @@ Ok stogu singleton'u. V1'de Fletcher/queue/pasif ok uretimi yoktur. `GameManager
 aninda uygular. `ArcherShootSystem` yalniz pool rent'i basarili projectile icin
 `Current -= 1` yapar. `Current <= 0` ise ok atilamaz.
 GameStateAuthoring Baker'i tarafindan eklenir — `InitialArrows` degeri baslangic stoku olarak yazilir.
-`ArrowEconomyUtility` effective capacity/efficiency hesabinda paid level ile Heart bonusunu
-birlikte okur; yatirim fiyatini ve Inspector/player-facing paid level'i yalniz
+`ArrowEconomyUtility` effective capacity/efficiency hesabinda paid level, kalıcı
+`MetaEfficiencyBonus` ve Heart bonusunu birlikte okur; yatirim fiyatini ve
+Inspector/player-facing paid level'i yalniz
 `CapacityLevel`/`EfficiencyLevel` belirler.
 
 ### GraveEssence (IComponentData — Castle Heart E1)
 - `Current` (`long`) — Yalniz mevcut run icindeki Castle Heart bakiyesi
+- `MetaGainAccumulator` (`double`) — Meta Essence gain yüzdesinin 1'in altındaki exact run payı
 - `ResourceData`'dan ayri tutulur; Wood/Stone/Iron/Food transaction'ina girmez
 - Yalniz `GameManager.TrySpendGraveEssenceAtHeart()` harcama kapisindan azalir
-- Exact save v11'de generated Heart graph ile birlikte korunur; Restart ve Game Over sonrasi `0` olur
+- Exact save v13'te bakiye ve meta remainder generated Heart graph ile birlikte korunur; Restart ve Game Over sonrasi `0` olur
 - Meta progression state'ine yazilmaz
 
 ## Veri Akisi
@@ -61,6 +63,7 @@ ResourceConsumptionRate ─┘                                               ↓
                                                               HUDController (gosterim)
 
 GameManager + ArrowEconomyUtility → Wood refill / Wood+Iron yatirimi → ArrowSupply
+MetaProgression                  → kalici Arrow EFF additive bonus ─────┤
 GameManager.HeartRuntime         → Heart CAP/EFF additive bonus ────────┘
                                                                          ↓
                                                            ArcherShootSystem (-1/shot)

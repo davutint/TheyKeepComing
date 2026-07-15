@@ -1177,6 +1177,92 @@ namespace DeadWalls.Tests
         }
 
         [UnityTest]
+        public IEnumerator MetaCatalog_RunStartEffectsRemainSeparateAndExactAcrossContinue()
+        {
+            var gameManager = GameManager.Instance;
+            bool runtimeReady = false;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                {
+                    runtimeReady = true;
+                    break;
+                }
+                yield return null;
+            }
+            Assert.That(runtimeReady, Is.True);
+            Time.timeScale = 0f;
+
+            MetaProgression.State.Upgrades.Clear();
+            MetaProgression.State.UnlockedPoolIds.Clear();
+            Assert.That(MetaProgression.Save(), Is.True);
+            gameManager.RestartGame();
+            yield return null;
+
+            ResourceData baseResources = gameManager.Resources;
+            int baseBasicArchers = gameManager.BasicArcherCount;
+            int baseRapidArchers = gameManager.RapidArcherCount;
+            int baseFrostArchers = gameManager.FrostArcherCount;
+            int baseBeds = gameManager.BedCapacity.BaseCapacity;
+            int baseNextBedCost = MobileBedCapacityUtility.GetNextPurchaseWoodCost(gameManager.BedCapacity);
+            float baseWallHp = gameManager.Wall.MaxHP;
+            float baseWoodProduction = gameManager.GetWorkerProductionRate(EconomyFocusType.Wood);
+            int baseArrowsPerWood = gameManager.GetArrowsPerWood();
+
+            string[] levelOneIds =
+            {
+                "start_wood", "start_stone", "start_iron", "start_food",
+                "start_archers", "start_beds", "wall_hp", "production",
+                "arrow_efficiency", "essence_gain"
+            };
+            foreach (string id in levelOneIds)
+                MetaProgression.State.Upgrades.Add(new MetaUpgradeLevel { Id = id, Level = 1 });
+            Assert.That(MetaProgression.Save(), Is.True);
+
+            gameManager.RestartGame();
+            yield return null;
+
+            Assert.That(gameManager.Resources.Wood, Is.EqualTo(baseResources.Wood + 75));
+            Assert.That(gameManager.Resources.Stone, Is.EqualTo(baseResources.Stone + 50));
+            Assert.That(gameManager.Resources.Iron, Is.EqualTo(baseResources.Iron + 30));
+            Assert.That(gameManager.Resources.Food, Is.EqualTo(baseResources.Food + 60));
+            Assert.That(gameManager.BasicArcherCount, Is.EqualTo(baseBasicArchers + 1));
+            Assert.That(gameManager.RapidArcherCount, Is.EqualTo(baseRapidArchers));
+            Assert.That(gameManager.FrostArcherCount, Is.EqualTo(baseFrostArchers));
+            Assert.That(gameManager.BedCapacity.BaseCapacity, Is.EqualTo(baseBeds + 5));
+            Assert.That(MobileBedCapacityUtility.GetNextPurchaseWoodCost(gameManager.BedCapacity),
+                Is.GreaterThan(baseNextBedCost), "Meta beds run-ici yatak fiyat egrisini silmemeli.");
+            Assert.That(gameManager.Wall.MaxHP, Is.EqualTo(baseWallHp * 1.05f).Within(0.01f));
+            Assert.That(gameManager.GetWorkerProductionRate(EconomyFocusType.Wood),
+                Is.EqualTo(baseWoodProduction * 1.03f).Within(0.001f));
+            Assert.That(gameManager.GetArrowsPerWood(), Is.EqualTo(baseArrowsPerWood + 1));
+            Assert.That(gameManager.ArrowSupply.EfficiencyLevel, Is.Zero,
+                "Meta Arrow verimi run-ici paid efficiency level'ini ilerletmemeli.");
+
+            Assert.That(gameManager.GrantGraveEssence(10), Is.True);
+            Assert.That(gameManager.GraveEssenceAmount, Is.EqualTo(10));
+            Assert.That(gameManager.HeartEssence.MetaGainAccumulator, Is.EqualTo(0.5d).Within(0.0001d));
+
+            ResourceData savedResources = gameManager.Resources;
+            int savedBeds = gameManager.BedCapacity.BaseCapacity;
+            int savedArrowsPerWood = gameManager.GetArrowsPerWood();
+            Assert.That(gameManager.SaveRunSnapshot(), Is.True);
+            Assert.That(gameManager.TryRestoreRunFromCheckpoint(), Is.True);
+            yield return null;
+
+            Assert.That(gameManager.Resources.Wood, Is.EqualTo(savedResources.Wood),
+                "Continue starting resource meta'sini ikinci kez eklememeli.");
+            Assert.That(gameManager.BedCapacity.BaseCapacity, Is.EqualTo(savedBeds),
+                "Continue starting bed meta'sini ikinci kez eklememeli.");
+            Assert.That(gameManager.GetArrowsPerWood(), Is.EqualTo(savedArrowsPerWood),
+                "Continue derived meta Arrow bonusunu yeniden kurmali.");
+            Assert.That(gameManager.GraveEssenceAmount, Is.EqualTo(10));
+            Assert.That(gameManager.GrantGraveEssence(10), Is.True);
+            Assert.That(gameManager.GraveEssenceAmount, Is.EqualTo(21),
+                "Kesirli Essence meta kazanci exact Continue sonrasinda kaybolmamali.");
+        }
+
+        [UnityTest]
         public IEnumerator MetaPurchase_ActiveRunRejectedAndDurableDeathAllowsCanonicalUpgrade()
         {
             var gameManager = GameManager.Instance;
@@ -1194,7 +1280,8 @@ namespace DeadWalls.Tests
 
             MetaUpgradeSO upgrade = gameManager.MetaCatalog.GetUpgrade("start_wood");
             Assert.That(upgrade, Is.Not.Null);
-            MetaProgression.State.Souls = 1_000;
+            Assert.That(upgrade.IsRepeatable, Is.True);
+            MetaProgression.State.Souls = 10_000;
             Assert.That(MetaProgression.Save(), Is.True);
 
             int levelBefore = MetaProgression.GetUpgradeLevel(upgrade.Id);
@@ -1228,6 +1315,18 @@ namespace DeadWalls.Tests
             Assert.That(gameManager.TryBuyMetaUpgrade(upgrade), Is.True);
             Assert.That(MetaProgression.GetUpgradeLevel(upgrade.Id), Is.EqualTo(levelBefore + 1));
             Assert.That(MetaProgression.State.Souls, Is.EqualTo(soulsBeforePurchase - expectedCost));
+
+            MetaUpgradeSO poolUnlock = gameManager.MetaCatalog.GetUpgrade("node_pool_unlock");
+            Assert.That(poolUnlock, Is.Not.Null);
+            Assert.That(MetaProgression.HasPoolUnlock(poolUnlock.PoolContentId), Is.False);
+            int poolCost = poolUnlock.GetCost(0);
+            int soulsBeforePool = MetaProgression.State.Souls;
+            Assert.That(gameManager.TryBuyMetaUpgrade(poolUnlock), Is.True);
+            Assert.That(MetaProgression.GetUpgradeLevel(poolUnlock.Id), Is.EqualTo(1));
+            Assert.That(MetaProgression.HasPoolUnlock(poolUnlock.PoolContentId), Is.True);
+            Assert.That(MetaProgression.State.Souls, Is.EqualTo(soulsBeforePool - poolCost));
+            Assert.That(gameManager.TryBuyMetaUpgrade(poolUnlock), Is.False,
+                "Content pool unlock ikinci kez satin alinamamali.");
             yield return null;
         }
 
