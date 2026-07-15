@@ -12,6 +12,14 @@ WorkerIdlePopulationText
 WorkerTotalText
 WorkerArcherPopulationText
 
+HousingRow
+HousingCapacityText
+HousingAvailabilityText
+HousingPurchasedText
+HousingBuyOneButton
+HousingBuyTenButton
+HousingBuyHundredButton
+
 WoodWorkerCountText
 WoodWorkerRateText
 WoodWorkerAddButton
@@ -62,9 +70,10 @@ FoodEfficiencyUpgradeButton
 - `WorkerEconomyDrawerPanel` baslangicta kapali tutulur.
 - Eski `CastleEconomyPanel` ve `CastleTapHint` player-facing olarak kapali kalir.
 
-`Window > DeadWalls > Repair Worker Drawer Target Controls`, hedef ve bina yatirimi
-kontrollerini generated HUD prefabinda idempotent olarak kurar. Satirlari `980 px`
-drawer duzenine getirir; eski sol kenari koruyup paneli saga genisletir. Aktif sahne
+`Window > DeadWalls > Repair Worker Drawer Target Controls`, hedef, bina yatirimi ve
+Housing kontrollerini generated HUD prefabinda idempotent olarak kurar. Toggle'i
+bottom-left `(24, 28)` / `206 x 56`, paneli bottom-left `(24, 160)` / `980 x 382`
+duzenine getirir. Housing satiri `+1 / +10 / +100 Beds` bulk alimlarini sunar. Aktif sahne
 `NewGameScene` ise sahnedeki otoriter `WorkerEconomyDrawerUI` referanslarini baglayip
 sahneyi kaydeder. Prefabda ikinci bir runtime controller birakmaz. Ana scene setup da
 prefab instantiate edilmeden once ayni repair adimini otomatik calistirir.
@@ -73,7 +82,7 @@ prefab instantiate edilmeden once ayni repair adimini otomatik calistirir.
 
 1. `Assets/Prefabs/UI/Generated/MobileCastleHudRoot.prefab` guncel olmali (UI dogrudan prefabda duzenlenir).
 2. `Mobile Castle Scene Setup` calistir.
-3. Play modunda sol ust `Workers` toggle'ina bas.
+3. Play modunda alt sol `Workers + Housing` toggle'ina bas.
 4. `+1%` ve `+10%` secilen hedefi yuzde puan olarak artirmali; dort hedef toplami `%100` kalmalidir.
 5. `+100%` secilen hedefi `%100`'e tasimali, diger hedefleri sifirlamalidir.
 6. Direct input `0-100` araliginda exact hedefi uygulamalidir.
@@ -82,3 +91,7 @@ prefab instantiate edilmeden once ayni repair adimini otomatik calistirir.
 9. Her satirdaki `CAP` ve `EFF` butonlari level + sonraki Wood/Iron maliyetini gostermelidir.
 10. CAP alimi ilgili cap'i `10`, EFF alimi baz kisi uretimini additive `%10` artirmalidir.
 11. Iki alimin da Wood ve Iron'i ayni transaction'da harcadigi dogrulanmalidir.
+12. Housing satiri population/total beds, free beds ve purchased beds degerlerini gostermelidir.
+13. `+1 / +10 / +100 Beds` butonlari exact bulk Wood maliyetini gostermeli ve tek transaction'la satin almalidir.
+14. Housing alimi hard max'e takilmamali; fiyat toplam sahip olunan yatak kapasitesiyle artmalidir.
+15. Drawer acikken bottom-center ability bar ile cakismamali; kapaliyken yalniz bottom-left toggle kalmalidir.

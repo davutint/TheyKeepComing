@@ -1,6 +1,6 @@
 # Worker Economy Drawer UI - Architecture
 
-`WorkerEconomyDrawerUI`, mobile HUD'un sol ust resource bar altinda acilip kapanan worker yonetim panelini kontrol eder.
+`WorkerEconomyDrawerUI`, HUD'un alt solunda acilip kapanan ortak Workers + Housing yonetim yuzeyini kontrol eder.
 
 ## Amac
 
@@ -13,6 +13,13 @@
 ```text
 WorkerDrawerToggleButton
 -> WorkerEconomyDrawerPanel ac/kapat
+
+Housing +1 / +10 / +100 Beds
+-> GameManager.TryBuyBedCapacity(requestedCapacity)
+-> MobileBedCapacityUtility toplam sahip olunan kapasiteye gore ardışık Wood maliyetini hesaplar
+-> Wood tek transaction olarak harcanir
+-> MobileBedCapacityState.PurchasedCapacity limitsiz artar
+-> Dawn kabul butcesindeki bos yatak sayisi ve exact run save ayni state'i kullanir
 
 Wood/Stone/Iron/Food +1% / +10% / +100% / direct input
 -> GameManager.AdjustWorkerTargetRatioPercent() veya SetWorkerTargetRatioPercent()
@@ -38,6 +45,8 @@ hedef kabul eder. Hedef degisikligi mevcut worker sayilarini aninda hareket etti
 - Idle population
 - Total worker count
 - Archer population count
+- Housing current population / total bed capacity, bos yatak ve run icinde satin alinmis yatak miktari
+- Housing icin `+1 / +10 / +100 Beds` butonlari; her biri toplam sahipligi baz alan exact bulk Wood maliyetini gosterir
 - Wood/Stone/Iron/Food worker count ve resource cap (`WOOD 20/40`)
 - Wood/Stone/Iron/Food production rate
 - Her resource icin `TGT xx%`; actual count cap'teyse `CAP` eki
@@ -48,7 +57,14 @@ hedef kabul eder. Hedef degisikligi mevcut worker sayilarini aninda hareket etti
 ## Scope
 
 Bu controller ekonomi veya dagitim hesaplamasi yapmaz. Source-of-truth
-`GameManager`, `WorkerAllocationUtility`, `PopulationState` ve
+`GameManager`, `WorkerAllocationUtility`, `PopulationState`, `MobileBedCapacityState` ve
 `MobilePopulationAllocation`, `MobileWorkerBuildingUpgradeState` ve
 `MobileEconomyPriceTuning` ve `MobileWorkerBuildingUpgradeUtility` tarafindadir. Drawer fiyat/effect hesabi yapmaz;
 yalniz GameManager API'sini gosterir ve cagirir.
+
+## Yerlesim Sozlesmesi
+
+- `WorkerDrawerToggleButton`: 1920x1080 referansta bottom-left anchor, `(24, 28)`, `206 x 56`.
+- `WorkerEconomyDrawerPanel`: bottom-left anchor, `(24, 160)`, `980 x 382`; kapaliyken battlefield'i kaplamaz.
+- `HousingRow`: panelin son satiri; worker bina yatirimlariyla ayni drawer icindedir, ayri Housing controller/panel yoktur.
+- Panel alt kenari bottom-center `AbilityBarPanel` ust kenarinin uzerinde kalir.

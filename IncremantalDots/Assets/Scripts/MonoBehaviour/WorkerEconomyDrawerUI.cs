@@ -15,6 +15,14 @@ namespace DeadWalls
         public TMP_Text WorkerTotalText;
         public TMP_Text WorkerArcherPopulationText;
 
+        [Header("Housing")]
+        public TMP_Text HousingCapacityText;
+        public TMP_Text HousingAvailabilityText;
+        public TMP_Text HousingPurchasedText;
+        public Button HousingBuyOneButton;
+        public Button HousingBuyTenButton;
+        public Button HousingBuyHundredButton;
+
         [Header("Wood")]
         public TMP_Text WoodWorkerCountText;
         public TMP_Text WoodWorkerRateText;
@@ -67,6 +75,7 @@ namespace DeadWalls
         private void OnEnable()
         {
             ResolveMissingUpgradeButtons();
+            ResolveMissingHousingControls();
             BindControls();
             SetOpen(false);
             Refresh();
@@ -89,12 +98,33 @@ namespace DeadWalls
             FoodEfficiencyUpgradeButton ??= FindButton("FoodEfficiencyUpgradeButton");
         }
 
+        private void ResolveMissingHousingControls()
+        {
+            HousingCapacityText ??= FindText("HousingCapacityText");
+            HousingAvailabilityText ??= FindText("HousingAvailabilityText");
+            HousingPurchasedText ??= FindText("HousingPurchasedText");
+            HousingBuyOneButton ??= FindButton("HousingBuyOneButton");
+            HousingBuyTenButton ??= FindButton("HousingBuyTenButton");
+            HousingBuyHundredButton ??= FindButton("HousingBuyHundredButton");
+        }
+
         private Button FindButton(string objectName)
         {
             foreach (Button button in GetComponentsInChildren<Button>(true))
             {
                 if (button.gameObject.name == objectName)
                     return button;
+            }
+
+            return null;
+        }
+
+        private TMP_Text FindText(string objectName)
+        {
+            foreach (TMP_Text text in GetComponentsInChildren<TMP_Text>(true))
+            {
+                if (text.gameObject.name == objectName)
+                    return text;
             }
 
             return null;
@@ -137,6 +167,9 @@ namespace DeadWalls
             FoodWorkerTargetInput?.onEndEdit.AddListener(HandleFoodTargetInput);
             FoodCapacityUpgradeButton?.onClick.AddListener(HandleFoodCapacityClicked);
             FoodEfficiencyUpgradeButton?.onClick.AddListener(HandleFoodEfficiencyClicked);
+            HousingBuyOneButton?.onClick.AddListener(HandleHousingBuyOneClicked);
+            HousingBuyTenButton?.onClick.AddListener(HandleHousingBuyTenClicked);
+            HousingBuyHundredButton?.onClick.AddListener(HandleHousingBuyHundredClicked);
         }
 
         private void UnbindControls()
@@ -166,6 +199,9 @@ namespace DeadWalls
             FoodWorkerTargetInput?.onEndEdit.RemoveListener(HandleFoodTargetInput);
             FoodCapacityUpgradeButton?.onClick.RemoveListener(HandleFoodCapacityClicked);
             FoodEfficiencyUpgradeButton?.onClick.RemoveListener(HandleFoodEfficiencyClicked);
+            HousingBuyOneButton?.onClick.RemoveListener(HandleHousingBuyOneClicked);
+            HousingBuyTenButton?.onClick.RemoveListener(HandleHousingBuyTenClicked);
+            HousingBuyHundredButton?.onClick.RemoveListener(HandleHousingBuyHundredClicked);
         }
 
         private void Toggle()
@@ -178,7 +214,7 @@ namespace DeadWalls
             _isOpen = open;
             if (WorkerEconomyDrawerPanel != null)
                 WorkerEconomyDrawerPanel.SetActive(open);
-            SetButtonText(WorkerDrawerToggleButton, open ? "Workers" : "Workers");
+            SetButtonText(WorkerDrawerToggleButton, "WORKERS + HOUSING");
             Refresh();
         }
 
@@ -203,10 +239,19 @@ namespace DeadWalls
             int totalWorkers = gm.GetResourceWorkers(EconomyFocusType.Balanced);
             int idle = gm.GetIdlePopulation();
 
-            SetText(WorkerDrawerTitleText, "WORKERS");
+            SetText(WorkerDrawerTitleText, "WORKERS + HOUSING");
             SetText(WorkerIdlePopulationText, $"IDLE {idle}");
             SetText(WorkerTotalText, $"WORKERS {totalWorkers}/{gm.GetAvailablePopulation()}");
             SetText(WorkerArcherPopulationText, $"ARCHERS {population.Archers}");
+
+            int totalBedCapacity = gm.GetTotalBedCapacity();
+            int availableBeds = Mathf.Max(0, totalBedCapacity - population.Total);
+            SetText(HousingCapacityText, $"HOUSING {population.Total}/{totalBedCapacity}");
+            SetText(HousingAvailabilityText, $"FREE {availableBeds}");
+            SetText(HousingPurchasedText, $"BOUGHT +{gm.GetPurchasedBedCapacity()}");
+            ConfigureBedPurchaseButton(gm, HousingBuyOneButton, 1);
+            ConfigureBedPurchaseButton(gm, HousingBuyTenButton, 10);
+            ConfigureBedPurchaseButton(gm, HousingBuyHundredButton, 100);
 
             RefreshRow(gm, EconomyFocusType.Wood, "WOOD", WoodWorkerCountText, WoodWorkerRateText,
                 WoodWorkerAddButton, WoodWorkerTargetPlus10Button, WoodWorkerTargetPlus100Button,
@@ -257,6 +302,11 @@ namespace DeadWalls
                 AddFingerprintValue(ref hash, gm.Resources.Wood);
                 AddFingerprintValue(ref hash, gm.Resources.Iron);
                 AddFingerprintValue(ref hash, gm.GameState.IsGameOver);
+                AddFingerprintValue(ref hash, gm.GetTotalBedCapacity());
+                AddFingerprintValue(ref hash, gm.GetPurchasedBedCapacity());
+                AddBedPurchaseFingerprint(ref hash, gm, 1);
+                AddBedPurchaseFingerprint(ref hash, gm, 10);
+                AddBedPurchaseFingerprint(ref hash, gm, 100);
                 AddResourceFingerprint(ref hash, gm, EconomyFocusType.Wood);
                 AddResourceFingerprint(ref hash, gm, EconomyFocusType.Stone);
                 AddResourceFingerprint(ref hash, gm, EconomyFocusType.Iron);
@@ -284,6 +334,13 @@ namespace DeadWalls
             AddFingerprintValue(ref hash, cost.Wood);
             AddFingerprintValue(ref hash, cost.Iron);
             AddFingerprintValue(ref hash, gm.CanBuyWorkerBuildingUpgrade(resource, upgradeType));
+        }
+
+        private static void AddBedPurchaseFingerprint(ref int hash, GameManager gm, int capacity)
+        {
+            ResourceCost cost = gm.GetBedCapacityPurchaseCost(capacity);
+            AddFingerprintValue(ref hash, cost.Wood);
+            AddFingerprintValue(ref hash, gm.CanBuyBedCapacity(capacity));
         }
 
         private static void AddFingerprintValue(ref int hash, int value)
@@ -357,6 +414,15 @@ namespace DeadWalls
             EconomyFocusType.Food, WorkerBuildingUpgradeType.Capacity);
         private void HandleFoodEfficiencyClicked() => BuyUpgrade(
             EconomyFocusType.Food, WorkerBuildingUpgradeType.Efficiency);
+        private void HandleHousingBuyOneClicked() => BuyBeds(1);
+        private void HandleHousingBuyTenClicked() => BuyBeds(10);
+        private void HandleHousingBuyHundredClicked() => BuyBeds(100);
+
+        private void BuyBeds(int capacity)
+        {
+            GameManager.Instance?.TryBuyBedCapacity(capacity);
+            Refresh();
+        }
 
         private void BuyUpgrade(EconomyFocusType resource, WorkerBuildingUpgradeType upgradeType)
         {
@@ -406,6 +472,20 @@ namespace DeadWalls
             SetButtonText(button, validCost
                 ? $"{label} L{level}\n{cost.ToDisplayString()}"
                 : $"{label} L{level}\nCOST LIMIT");
+        }
+
+        private static void ConfigureBedPurchaseButton(GameManager gm, Button button, int capacity)
+        {
+            if (button == null)
+                return;
+
+            ResourceCost cost = gm.GetBedCapacityPurchaseCost(capacity);
+            bool validCost = cost.Wood > 0;
+            button.interactable = validCost && gm.CanBuyBedCapacity(capacity);
+            string unit = capacity == 1 ? "BED" : "BEDS";
+            SetButtonText(button, validCost
+                ? $"+{capacity} {unit}\n{cost.ToDisplayString()}"
+                : $"+{capacity} {unit}\nCOST LIMIT");
         }
 
         private static void SetText(TMP_Text text, string value)

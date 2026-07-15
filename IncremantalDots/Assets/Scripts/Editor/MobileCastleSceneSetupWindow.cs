@@ -3597,13 +3597,137 @@ namespace DeadWalls
                 throw new InvalidOperationException("WorkerEconomyDrawerPanel bulunamadi.");
 
             var panelRect = panelObject.GetComponent<RectTransform>();
-            panelRect.sizeDelta = new Vector2(980f, panelRect.sizeDelta.y);
-            // Eski sol kenar (50 px) korunur; panel yalniz saga dogru genisler.
-            panelRect.anchoredPosition = new Vector2(-420f, panelRect.anchoredPosition.y);
+            panelRect.anchorMin = Vector2.zero;
+            panelRect.anchorMax = Vector2.zero;
+            panelRect.pivot = Vector2.zero;
+            panelRect.anchoredPosition = new Vector2(24f, 160f);
+            panelRect.sizeDelta = new Vector2(980f, 382f);
+
+            Button toggle = FindComponentInChildrenByName<Button>(hudRoot, "WorkerDrawerToggleButton");
+            if (toggle != null)
+            {
+                RectTransform toggleRect = toggle.GetComponent<RectTransform>();
+                toggleRect.anchorMin = Vector2.zero;
+                toggleRect.anchorMax = Vector2.zero;
+                toggleRect.pivot = Vector2.zero;
+                toggleRect.anchoredPosition = new Vector2(24f, 28f);
+                toggleRect.sizeDelta = new Vector2(206f, 56f);
+                SetButtonLabel(toggle, "WORKERS + HOUSING");
+            }
+
+            TextMeshProUGUI title = FindComponentInChildrenByName<TextMeshProUGUI>(
+                panelObject, "WorkerDrawerTitleText");
+            if (title != null)
+            {
+                title.rectTransform.anchoredPosition = new Vector2(-88f, 0f);
+                title.rectTransform.sizeDelta = new Vector2(220f, 24f);
+                title.text = "WORKERS + HOUSING";
+            }
 
             string[] prefixes = { "Wood", "Stone", "Iron", "Food" };
             foreach (string prefix in prefixes)
                 EnsureWorkerDrawerTargetRow(panelObject, prefix);
+
+            EnsureWorkerHousingRow(panelObject);
+        }
+
+        private static void EnsureWorkerHousingRow(GameObject panelObject)
+        {
+            GameObject sourceRow = FindChildByName(panelObject, "FoodWorkerRow");
+            var capacitySource = FindComponentInChildrenByName<TextMeshProUGUI>(
+                panelObject, "FoodWorkerCountText");
+            var availabilitySource = FindComponentInChildrenByName<TextMeshProUGUI>(
+                panelObject, "FoodWorkerRateText");
+            var purchasedSource = FindComponentInChildrenByName<TextMeshProUGUI>(
+                panelObject, "FoodWorkerStatusText");
+            var buttonSource = FindComponentInChildrenByName<Button>(
+                panelObject, "FoodCapacityUpgradeButton");
+            if (sourceRow == null || capacitySource == null || availabilitySource == null
+                || purchasedSource == null || buttonSource == null)
+            {
+                throw new InvalidOperationException("Housing satiri icin worker UI stil kaynaklari bulunamadi.");
+            }
+
+            GameObject rowObject = FindChildByName(panelObject, "HousingRow");
+            if (rowObject == null)
+            {
+                rowObject = Instantiate(sourceRow, panelObject.transform);
+                rowObject.name = "HousingRow";
+                for (int i = rowObject.transform.childCount - 1; i >= 0; i--)
+                    DestroyImmediate(rowObject.transform.GetChild(i).gameObject);
+            }
+
+            RectTransform rowRect = rowObject.GetComponent<RectTransform>();
+            rowRect.anchorMin = new Vector2(0.5f, 0.5f);
+            rowRect.anchorMax = new Vector2(0.5f, 0.5f);
+            rowRect.pivot = new Vector2(0.5f, 0.5f);
+            rowRect.anchoredPosition = new Vector2(0f, -146f);
+            rowRect.sizeDelta = new Vector2(956f, 44f);
+            rowRect.localScale = Vector3.one;
+            if (rowObject.GetComponent<Image>() is Image rowImage)
+                rowImage.color = new Color(0.10f, 0.145f, 0.16f, 0.96f);
+
+            TextMeshProUGUI capacity = EnsureWorkerHousingText(rowObject.transform,
+                "HousingCapacityText", capacitySource, "HOUSING 60/60", -390f, 160f,
+                new Color(0.91f, 0.925f, 0.945f, 1f), TextAlignmentOptions.Left);
+            TextMeshProUGUI availability = EnsureWorkerHousingText(rowObject.transform,
+                "HousingAvailabilityText", availabilitySource, "FREE 0", -245f, 110f,
+                new Color(0.349f, 0.765f, 0.416f, 1f), TextAlignmentOptions.Center);
+            TextMeshProUGUI purchased = EnsureWorkerHousingText(rowObject.transform,
+                "HousingPurchasedText", purchasedSource, "BOUGHT +0", -125f, 120f,
+                new Color(0.596f, 0.635f, 0.678f, 1f), TextAlignmentOptions.Center);
+
+            EnsureWorkerHousingButton(rowObject.transform, "HousingBuyOneButton", buttonSource,
+                "+1 BED\n100W", 50f);
+            EnsureWorkerHousingButton(rowObject.transform, "HousingBuyTenButton", buttonSource,
+                "+10 BEDS\n1,000W", 210f);
+            EnsureWorkerHousingButton(rowObject.transform, "HousingBuyHundredButton", buttonSource,
+                "+100 BEDS\nCOST", 370f);
+
+            capacity.raycastTarget = false;
+            availability.raycastTarget = false;
+            purchased.raycastTarget = false;
+        }
+
+        private static TextMeshProUGUI EnsureWorkerHousingText(Transform row, string name,
+            TextMeshProUGUI styleSource, string label, float x, float width, Color color,
+            TextAlignmentOptions alignment)
+        {
+            TextMeshProUGUI text = FindComponentInChildrenByName<TextMeshProUGUI>(row.gameObject, name);
+            if (text == null)
+            {
+                GameObject clone = Instantiate(styleSource.gameObject, row);
+                clone.name = name;
+                text = clone.GetComponent<TextMeshProUGUI>();
+            }
+
+            SetWorkerDrawerControlRect(text.rectTransform, x, width);
+            text.text = label;
+            text.color = color;
+            text.alignment = alignment;
+            text.textWrappingMode = TextWrappingModes.NoWrap;
+            text.raycastTarget = false;
+            return text;
+        }
+
+        private static Button EnsureWorkerHousingButton(Transform row, string name,
+            Button styleSource, string label, float x)
+        {
+            Button button = FindComponentInChildrenByName<Button>(row.gameObject, name);
+            if (button == null)
+            {
+                GameObject clone = Instantiate(styleSource.gameObject, row);
+                clone.name = name;
+                button = clone.GetComponent<Button>();
+            }
+
+            button.onClick = new Button.ButtonClickedEvent();
+            button.navigation = Navigation.defaultNavigation;
+            SetWorkerDrawerUpgradeRect(button, x);
+            SetButtonLabel(button, label);
+            if (button.targetGraphic is Image image)
+                image.color = new Color(0.78f, 0.52f, 0.16f, 1f);
+            return button;
         }
 
         private static void EnsureWorkerDrawerTargetRow(GameObject panelObject, string prefix)
@@ -4485,6 +4609,12 @@ namespace DeadWalls
             workerDrawer.WorkerIdlePopulationText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "WorkerIdlePopulationText");
             workerDrawer.WorkerTotalText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "WorkerTotalText");
             workerDrawer.WorkerArcherPopulationText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "WorkerArcherPopulationText");
+            workerDrawer.HousingCapacityText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "HousingCapacityText");
+            workerDrawer.HousingAvailabilityText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "HousingAvailabilityText");
+            workerDrawer.HousingPurchasedText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "HousingPurchasedText");
+            workerDrawer.HousingBuyOneButton = FindComponentInChildrenByName<Button>(hudRoot, "HousingBuyOneButton");
+            workerDrawer.HousingBuyTenButton = FindComponentInChildrenByName<Button>(hudRoot, "HousingBuyTenButton");
+            workerDrawer.HousingBuyHundredButton = FindComponentInChildrenByName<Button>(hudRoot, "HousingBuyHundredButton");
 
             workerDrawer.WoodWorkerCountText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "WoodWorkerCountText");
             workerDrawer.WoodWorkerRateText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "WoodWorkerRateText");
