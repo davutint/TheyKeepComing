@@ -15,6 +15,9 @@
 HUD prefabinda su isimler varsa `HUDController` alanlarina baglanir:
 
 - `CyclePanel`
+- `CycleDayCounterText`
+- `CycleProgressTrack` (`CycleCelestialArc` binding'i)
+- `CycleCelestialGlow`
 - `CyclePhaseText`
 - `CycleDayLabelText`
 - `CycleDuskLabelText`
@@ -22,4 +25,4 @@ HUD prefabinda su isimler varsa `HUDController` alanlarina baglanir:
 - `CycleProgressFill`
 - `CycleProgressMarker`
 
-`CyclePanel` varsa setup tool eski fallback `WaveText` ve `KillsText` objelerini uretmez; sahnede kalmislarsa kapatir. `HordePressurePanel` prefabda varsa player-facing olarak kapali tutulur. Bu dosya UI uretmez; prefabdaki isimler baglanir.
+Owner-secili Celestial Dial'da setup tool `CycleProgressMarker`i `CycleProgress01` yay hareketine, `CycleCelestialGlow`u phase-color crossfade'e baglar. `CyclePhaseText`, uc ham phase label'i ve linear fill player-facing kapali kalir. `CyclePanel` varsa eski fallback `WaveText` ve `KillsText` uretilmez; sahnede kalmislarsa kapatilir. `HordePressurePanel` prefabda varsa player-facing olarak kapali tutulur. Bu dosya UI uretmez; prefabdaki isimler baglanir.

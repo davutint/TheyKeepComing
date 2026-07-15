@@ -4230,6 +4230,8 @@ namespace DeadWalls
             hud.CycleNightLabelText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "CycleNightLabelText");
             hud.CycleProgressFill = FindComponentInChildrenByName<Image>(hudRoot, "CycleProgressFill");
             hud.CycleProgressMarker = FindRectTransformByName(hudRoot, "CycleProgressMarker");
+            hud.CycleCelestialArc = FindRectTransformByName(hudRoot, "CycleProgressTrack");
+            hud.CycleCelestialGlow = FindComponentInChildrenByName<Image>(hudRoot, "CycleCelestialGlow");
 
             hud.HordePressurePanel = FindChildByName(hudRoot, "HordePressurePanel");
             hud.HordePressureTitleText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "HordePressureTitleText");
@@ -4237,17 +4239,21 @@ namespace DeadWalls
             hud.HordePressureText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "HordePressureText");
             hud.HordePressureLevelText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "HordePressureLevelText");
 
-            ConfigureCycleProgressLayout(hud.CycleProgressFill, hud.CycleProgressMarker);
+            bool hasCelestialDial = hud.CycleCelestialArc != null && hud.CycleCelestialGlow != null;
+            if (hasCelestialDial)
+                ConfigureCelestialDialLayout(hud);
+            else
+                ConfigureCycleProgressLayout(hud.CycleProgressFill, hud.CycleProgressMarker);
             if (hud.HordePressurePanel != null)
                 hud.HordePressurePanel.SetActive(false);
 
-            if (hud.CyclePhaseText != null)
+            if (!hasCelestialDial && hud.CyclePhaseText != null)
                 hud.CyclePhaseText.text = "DAY";
-            if (hud.CycleDayLabelText != null)
+            if (!hasCelestialDial && hud.CycleDayLabelText != null)
                 hud.CycleDayLabelText.text = "DAY";
-            if (hud.CycleDuskLabelText != null)
+            if (!hasCelestialDial && hud.CycleDuskLabelText != null)
                 hud.CycleDuskLabelText.text = "DUSK";
-            if (hud.CycleNightLabelText != null)
+            if (!hasCelestialDial && hud.CycleNightLabelText != null)
                 hud.CycleNightLabelText.text = "NIGHT";
             if (hud.HordePressureTitleText != null)
                 hud.HordePressureTitleText.text = "HORDE PRESSURE";
@@ -4284,6 +4290,84 @@ namespace DeadWalls
             marker.anchorMax = new Vector2(0f, 0.5f);
             marker.pivot = new Vector2(0.5f, 0.5f);
             marker.anchoredPosition = new Vector2(0f, marker.anchoredPosition.y);
+        }
+
+        private static void ConfigureCelestialDialLayout(HUDController hud)
+        {
+            SetOptionalComponentActive(hud.CyclePhaseText, false);
+            SetOptionalComponentActive(hud.CycleDayLabelText, false);
+            SetOptionalComponentActive(hud.CycleDuskLabelText, false);
+            SetOptionalComponentActive(hud.CycleNightLabelText, false);
+            SetOptionalComponentActive(hud.CycleProgressFill, false);
+
+            if (hud.CyclePanel != null)
+            {
+                RectTransform panelRect = hud.CyclePanel.GetComponent<RectTransform>();
+                if (panelRect != null)
+                {
+                    panelRect.anchorMin = new Vector2(0.5f, 1f);
+                    panelRect.anchorMax = new Vector2(0.5f, 1f);
+                    panelRect.pivot = new Vector2(0.5f, 0.5f);
+                    panelRect.anchoredPosition = new Vector2(0f, -68f);
+                    panelRect.sizeDelta = new Vector2(290f, 68f);
+                }
+
+                GameObject divider = FindChildByName(hud.CyclePanel, "CycleDayDivider");
+                if (divider != null)
+                    divider.SetActive(false);
+            }
+
+            if (hud.CycleDayCounterText != null)
+            {
+                RectTransform dayRect = hud.CycleDayCounterText.rectTransform;
+                dayRect.anchorMin = new Vector2(0.5f, 0.5f);
+                dayRect.anchorMax = new Vector2(0.5f, 0.5f);
+                dayRect.pivot = new Vector2(0.5f, 0.5f);
+                dayRect.anchoredPosition = new Vector2(-102f, 0f);
+                dayRect.sizeDelta = new Vector2(54f, 24f);
+                hud.CycleDayCounterText.enableAutoSizing = false;
+                hud.CycleDayCounterText.fontSize = 11f;
+                hud.CycleDayCounterText.alignment = TextAlignmentOptions.MidlineLeft;
+                hud.CycleDayCounterText.raycastTarget = false;
+            }
+
+            if (hud.CycleCelestialArc != null)
+            {
+                hud.CycleCelestialArc.anchorMin = new Vector2(0.5f, 0.5f);
+                hud.CycleCelestialArc.anchorMax = new Vector2(0.5f, 0.5f);
+                hud.CycleCelestialArc.pivot = new Vector2(0.5f, 0.5f);
+                hud.CycleCelestialArc.anchoredPosition = new Vector2(22f, -1f);
+                hud.CycleCelestialArc.sizeDelta = new Vector2(178f, 44f);
+                Image arcBackground = hud.CycleCelestialArc.GetComponent<Image>();
+                if (arcBackground != null)
+                {
+                    arcBackground.color = Color.clear;
+                    arcBackground.raycastTarget = false;
+                }
+            }
+
+            if (hud.CycleProgressMarker != null)
+            {
+                hud.CycleProgressMarker.anchorMin = new Vector2(0.5f, 0.5f);
+                hud.CycleProgressMarker.anchorMax = new Vector2(0.5f, 0.5f);
+                hud.CycleProgressMarker.pivot = new Vector2(0.5f, 0.5f);
+                hud.CycleProgressMarker.sizeDelta = new Vector2(8f, 8f);
+                Image markerImage = hud.CycleProgressMarker.GetComponent<Image>();
+                if (markerImage != null)
+                    markerImage.raycastTarget = false;
+            }
+
+            if (hud.CycleCelestialGlow != null)
+            {
+                hud.CycleCelestialGlow.rectTransform.sizeDelta = new Vector2(24f, 24f);
+                hud.CycleCelestialGlow.raycastTarget = false;
+            }
+        }
+
+        private static void SetOptionalComponentActive(Component component, bool active)
+        {
+            if (component != null)
+                component.gameObject.SetActive(active);
         }
 
         private static void EnsureDayNightOverlay(Transform canvasTransform)

@@ -49,6 +49,8 @@ namespace DeadWalls
         public TMP_Text CycleNightLabelText;
         public Image CycleProgressFill;
         public RectTransform CycleProgressMarker;
+        public RectTransform CycleCelestialArc;
+        public Image CycleCelestialGlow;
         public GameObject HordePressurePanel;
         public TMP_Text HordePressureTitleText;
         public Image HordePressureFill;
@@ -80,6 +82,11 @@ namespace DeadWalls
         private int _lastCycleDay = int.MinValue;
         private bool _lastCycleBloodMoon;
         private bool _cycleStaticLabelsInitialized;
+        private int _lastCelestialPhase = int.MinValue;
+        private Color _celestialColor;
+        private Color _celestialColorFrom;
+        private Color _celestialColorTarget;
+        private float _celestialColorTransitionElapsed;
         private float _rewardDisplayTimer;
         private float _damageFlashTimer;
         private Color _waveDefaultColor;
@@ -88,6 +95,7 @@ namespace DeadWalls
         private bool _colorsCached;
         private const float RewardDisplayDuration = 3f;
         private const float DamageFlashDuration = 0.28f;
+        private const float CelestialColorTransitionDuration = 0.25f;
 
         private void OnEnable()
         {
@@ -312,6 +320,8 @@ namespace DeadWalls
             if (KillsText != null)
                 SetActiveIfChanged(KillsText.gameObject, false);
 
+            EnsureCelestialDialBindings();
+
             string phase = FormatSiegePhase(cycle.Phase);
             // Kanli ay gecesi: etiket "BLOOD MOON" + text rengi kirmizi.
             // NOT: prefab'taki CyclePhaseText rich text render etmiyor — renk TAG DEGIL
@@ -340,6 +350,18 @@ namespace DeadWalls
                 _lastCycleDay = cycleDay;
                 CycleDayCounterText.text = "DAY " + cycleDay;
             }
+            bool hasCelestialDial = CycleCelestialArc != null && CycleCelestialGlow != null;
+            if (hasCelestialDial)
+            {
+                SetActiveIfChanged(CyclePhaseText != null ? CyclePhaseText.gameObject : null, false);
+                SetActiveIfChanged(CycleDayLabelText != null ? CycleDayLabelText.gameObject : null, false);
+                SetActiveIfChanged(CycleDuskLabelText != null ? CycleDuskLabelText.gameObject : null, false);
+                SetActiveIfChanged(CycleNightLabelText != null ? CycleNightLabelText.gameObject : null, false);
+                SetActiveIfChanged(CycleProgressFill != null ? CycleProgressFill.gameObject : null, false);
+                UpdateCelestialDial(cycle.CycleProgress01, cycle.Phase);
+                return;
+            }
+
             if (!_cycleStaticLabelsInitialized)
             {
                 if (CycleDayLabelText != null)
@@ -353,6 +375,113 @@ namespace DeadWalls
 
             UpdateProgressFill(CycleProgressFill, cycle.CycleProgress01);
             UpdateProgressMarker(CycleProgressMarker, cycle.CycleProgress01);
+        }
+
+        private void EnsureCelestialDialBindings()
+        {
+            if (CyclePanel == null || (CycleCelestialArc != null && CycleCelestialGlow != null))
+                return;
+
+            RectTransform[] descendants = CyclePanel.GetComponentsInChildren<RectTransform>(true);
+            for (int i = 0; i < descendants.Length; i++)
+            {
+                RectTransform descendant = descendants[i];
+                if (CycleCelestialArc == null && descendant.name == "CycleProgressTrack")
+                    CycleCelestialArc = descendant;
+
+                if (CycleCelestialGlow == null && descendant.name == "CycleCelestialGlow")
+                    CycleCelestialGlow = descendant.GetComponent<Image>();
+
+                if (CycleCelestialArc != null && CycleCelestialGlow != null)
+                    break;
+            }
+        }
+
+        private void UpdateCelestialDial(float ratio, SiegeCyclePhase phase)
+        {
+            if (CycleCelestialArc == null || CycleProgressMarker == null)
+                return;
+
+            RectTransform marker = CycleProgressMarker;
+            marker.anchorMin = new Vector2(0.5f, 0.5f);
+            marker.anchorMax = new Vector2(0.5f, 0.5f);
+            marker.pivot = new Vector2(0.5f, 0.5f);
+            marker.anchoredPosition = CalculateCelestialMarkerPosition(
+                CycleCelestialArc.rect.width,
+                CycleCelestialArc.rect.height,
+                marker.rect.width,
+                ratio);
+
+            int phaseValue = (int)phase;
+            Color targetColor = GetCelestialPhaseColor(phase);
+            if (_lastCelestialPhase == int.MinValue)
+            {
+                _lastCelestialPhase = phaseValue;
+                _celestialColor = targetColor;
+                _celestialColorFrom = targetColor;
+                _celestialColorTarget = targetColor;
+                _celestialColorTransitionElapsed = CelestialColorTransitionDuration;
+            }
+            else if (_lastCelestialPhase != phaseValue)
+            {
+                _lastCelestialPhase = phaseValue;
+                _celestialColorFrom = _celestialColor;
+                _celestialColorTarget = targetColor;
+                _celestialColorTransitionElapsed = 0f;
+            }
+
+            if (_celestialColorTransitionElapsed < CelestialColorTransitionDuration)
+            {
+                _celestialColorTransitionElapsed += Time.unscaledDeltaTime;
+                float transition = Mathf.Clamp01(
+                    _celestialColorTransitionElapsed / CelestialColorTransitionDuration);
+                transition = Mathf.SmoothStep(0f, 1f, transition);
+                _celestialColor = Color.Lerp(_celestialColorFrom, _celestialColorTarget, transition);
+            }
+            else
+            {
+                _celestialColor = _celestialColorTarget;
+            }
+
+            Image markerImage = marker.GetComponent<Image>();
+            if (markerImage != null)
+                markerImage.color = Color.Lerp(_celestialColor, Color.white, 0.18f);
+
+            if (CycleCelestialGlow != null)
+            {
+                Color glowColor = _celestialColor;
+                glowColor.a = 0.22f;
+                CycleCelestialGlow.color = glowColor;
+            }
+        }
+
+        private static Vector2 CalculateCelestialMarkerPosition(
+            float arcWidth,
+            float arcHeight,
+            float markerWidth,
+            float ratio)
+        {
+            ratio = Mathf.Clamp01(ratio);
+            float halfTravel = Mathf.Max(1f, (arcWidth - markerWidth) * 0.5f);
+            float x = Mathf.Lerp(-halfTravel, halfTravel, ratio);
+            float baseY = -arcHeight * 0.28f;
+            float y = baseY + Mathf.Sin(ratio * Mathf.PI) * arcHeight * 0.62f;
+            return new Vector2(x, y);
+        }
+
+        private static Color GetCelestialPhaseColor(SiegeCyclePhase phase)
+        {
+            switch (phase)
+            {
+                case SiegeCyclePhase.Dusk:
+                    return new Color(0.54f, 0.36f, 0.84f, 1f);
+                case SiegeCyclePhase.Night:
+                    return new Color(0.29f, 0.46f, 0.79f, 1f);
+                case SiegeCyclePhase.Dawn:
+                    return new Color(0.38f, 0.84f, 0.82f, 1f);
+                default:
+                    return new Color(0.96f, 0.66f, 0.13f, 1f);
+            }
         }
 
         private void UpdateWaveReward(GameManager gm)

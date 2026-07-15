@@ -43,9 +43,11 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - Mobile HUD'da resource text'leri label tekrar etmez; amount ve signed `/m` rate'i tek satırlı kompakt value olarak yazar
 - `ResourceBar`, üst solda `560 x 48` tek şerittir; Wood/Stone/Iron/Food/Population/Arrow altı adet `84 x 42` chip içinde kalır ve label renkleri hızlı taramayı destekler
 - Resource rate gosteriminde base production yerine effective production'i kullanir; mobile worker economy aktifken bu deger worker allocation'dan gelir
-- `CyclePanel` varsa `CyclePhaseText` degerini sadece `DAY / DUSK / NIGHT` olarak yazar
-- `CyclePanel`, top-center anchor'li `340 x 78` minimal phase slotudur; day counter, phase title, progress track/marker ve uc legacy phase label'i bu footprint icinde kalir
-- `CycleProgressFill` ve `CycleProgressMarker` ile 60s cycle progress'ini gosterir
+- Owner tarafindan secilen `B - Celestial Dial`, top-center anchor'li `290 x 68` gercek pill siluetli `CyclePanel` icinde yalniz `DAY N` sayacini player-facing tutar
+- `CycleProgressMarker`, `CycleProgress01` ile `178 x 44` ve 44 segmentli sig yay uzerinde hareket eder; faz degisiminde marker/halo rengi `250 ms` crossfade yapar
+- Sahne instance'inda yeni serialized referanslar yoksa `HUDController`, `CycleProgressTrack` ve `CycleCelestialGlow` isimlerini aktif prefab hiyerarsisinden bir kez bulup cache'ler; per-frame hiyerarsi taramasi yapmaz
+- `CyclePhaseText`, uc ham `DAY / DUSK / NIGHT` label'i ve linear `CycleProgressFill` serialized uyumluluk icin korunur fakat Celestial Dial'da player-facing kapali kalir
+- A alternatifi ve B karar sozlesmesi `Assets/Docs/DW_I_PHASE_HUD_PRESENTATION_DECISION.md` dosyasinda korunur
 - `HordePressurePanel` imported prefabda bulunsa bile player-facing olarak kapali tutulur
 - `CyclePanel` yoksa legacy wave fallback text'lerini kullanir
 - `ArrowText`, finite stoku `Current / Capacity` biçiminde gösterir; `INF` modu yoktur

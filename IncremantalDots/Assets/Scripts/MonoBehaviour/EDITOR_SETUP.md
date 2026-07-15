@@ -27,7 +27,8 @@ Beklenen referanslar:
 - Worker drawer: `WorkerEconomyDrawerPanel`, `WorkerDrawerToggleButton`, `WorkerIdlePopulationText`, `WorkerTotalText`, `WorkerArcherPopulationText`
 - Worker rows: `WoodWorkerCountText`, `WoodWorkerRateText`, `WoodWorkerAddButton`, `WoodWorkerStatusText`; ayni pattern `Stone`, `Iron` ve `Food` icin
 - Top center: `WaveText`, `KillsText`, `WaveRewardText`
-- Phase area: top-center `CyclePanel` (`340 x 78`), `CycleProgressTrack` (`280 x 10`) ve mevcut day/phase/marker/label binding'leri
+- Phase area: owner-secili Celestial Dial; top-center gercek pill `CyclePanel` (`290 x 68`), `CycleProgressTrack`/`CycleCelestialArc` (`178 x 44`), `CycleProgressMarker`, `CycleCelestialGlow`, crescent moon ve horizon-dawn glyph'leri. Legacy phase/label/fill objeleri player-facing kapali
+- Pill kapaklari, hazir `Knob` sprite'inin gradient/seam artefact'ini tasimayan `Assets/UI/CelestialPillCircle.asset` flat shape'ini kullanir
 - Defense module: `CastleDefensePanel`, `DefensePercentText`, `DefenseWallFill`, `DefenseWallText`; legacy Gate/Core gorseli ve binding'i yoktur
 - Optional defense feedback: `DefenseDamageGlow`, `DefenseWarningIcon`, fallback `DefenseText`
 - Feedback: `DamageFlashOverlay` full-screen red `Image`, `HUDController.DamageFlashImage` alanina baglanir

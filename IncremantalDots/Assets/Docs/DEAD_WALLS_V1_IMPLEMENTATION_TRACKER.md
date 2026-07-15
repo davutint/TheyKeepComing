@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.2
 > **Son tam kapsam denetimi:** 2026-07-15
 > **Aktif paket:** Package I - HUD, Onboarding ve Creative Polish
-> **Aktif iş:** `DW-I-HUD-PHASE-POLISH` - Owner-Approved Phase Presentation
-> **İlerleme:** `348 / 441` tracker checkbox'ı tamamlandı - `%78,91`
+> **Aktif iş:** `DW-I-HUD-FORECAST` - Remove Horde Forecast/Pressure Surface
+> **İlerleme:** `351 / 441` tracker checkbox'ı tamamlandı - `%79,59`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -783,7 +783,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 | Blueprint hedefi | Mevcut canlı HUD | Durum |
 |---|---|---|
 | Tek minimal Wall bar | Aktif prefab, sahne binding'i ve HUDController yalnız Wall sunumu taşıyor | `[x]` |
-| Minimal phase area | Top-center `340 x 78` CyclePanel; day counter, phase title, progress/marker ve mevcut label binding'leri kompakt slotta korunuyor | `[x]` |
+| Minimal phase area | Owner-secili `B - Celestial Dial`: top-center gerçek pill `290 x 68`, yalnız `DAY N`, 44 segmentli `178 x 44` göksel yay, crescent/dawn glyph'leri ve hareketli phase-color marker/halo; A alternatifi karar dokümanında arşivli | `[x]` |
 | Forecast yok | HordePressurePanel aktif bağlı | `[!]` |
 | Abilities alt orta | Fireball/Rally/Emergency Repair tek alt orta cooldown barında | `[x]` |
 | Workers/Housing alt sol | Worker drawer var; Housing owner yok | `[~]` |
@@ -797,7 +797,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 - [x] Gate/Core serialized binding ve görsel kalıntılarını active prefabdan temizle veya açık dormant guard koy.
 - [x] Üst kaynak HUD'ını kompakt tut.
 - [x] Üst ortada minimal phase alanı ayır.
-- [ ] Büyük CyclePanel ve ham DAY/DUSK/NIGHT sunumunu owner-approved mockup ile değiştir.
+- [x] Büyük CyclePanel ve ham DAY/DUSK/NIGHT sunumunu owner-approved mockup ile değiştir.
 - [ ] Horde forecast/pressure panelini kaldır.
 - [ ] Fireball/Rally/Emergency Repair'ı alt orta tek cooldown barına taşı.
 - [ ] Workers/Housing alt sol yerleşimini kur.
@@ -839,7 +839,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 ### Package I kabul kapısı
 
 - [ ] İlk-run tutorial tamamlanıyor; ikinci run'da otomatik açılmıyor.
-- [ ] Tek Wall bar ve minimal phase UI owner onayından geçiyor.
+- [x] Tek Wall bar ve minimal phase UI owner onayından geçiyor.
 - [ ] 16:9/ultrawide temiz render.
 - [ ] 10k horde okunabilir.
 - [ ] Day/night lighting, audio ve combat feedback görsel/işitsel review'dan geçiyor.
@@ -1004,7 +1004,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 - [x] Council ana guardrail'leri bypass etmiyor.
 - [ ] Fireball/Rally/Emergency Repair bottom-center cooldown barında.
 - [x] Meta yalnız ölümde bir kez reward veriyor; voluntary reset yok.
-- [ ] HUD tek Wall barı ve owner-approved minimal phase UI kullanıyor.
+- [x] HUD tek Wall barı ve owner-approved minimal phase UI kullanıyor.
 - [ ] İlk-run tutorial tamamlanıyor; sonraki run'da tekrarlamıyor.
 - [ ] 1k archer + 10k enemy target hardware frame pacing kabul edildi.
 - [ ] EditMode/PlayMode, save migration ve long-run soak raporları temiz.
@@ -1152,3 +1152,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-15 | `DW-I-HUD-LEGACY` active HUD Gate/Core cleanup | Aktif HUD prefabındaki Gate/Core text, track ve fill objeleri kaldırıldı; `HUDController` ile scene setup binding sözleşmesi Wall-only hale getirildi. Connected `NewGameScene` instance'ındaki eski serialize referanslar temizlendi; Wall text/fill bağları korundu ve eski runtime hide guard'ına ihtiyaç kalmadı | Unity compile: 0 error / 0 warning; targeted EditMode 3/3; targeted PlayMode 1/1; MCP prefab ve canlı sahne denetiminde Gate/Core obje 0, Wall bindingleri sağlam; tracker `346/441` |
 | 2026-07-15 | `DW-I-HUD-RESOURCES` compact top resource strip | Üst soldaki altı kartlık resource alanı `700 x 84` yerine `560 x 48` tek şeride, chip'ler `84 x 42` ölçüsüne çekildi. Wood/Stone/Iron/Food değerleri signed `/m` rate ile tek satıra alındı; altı label kaynak bazlı hafif renk kodu aldı. Population ve finite Arrow aynı şeritte kaldı; `ArrowChip` ammo panel toggle sahipliğini korudu | Unity compile: 0 error; targeted EditMode 2/2; MCP runtime binding audit: `ResourceBar 560 x 48`, single-line values, Arrow toggle `false -> true -> false`; 1920x1080 Game View görsel QA temiz; tracker `347/441` |
 | 2026-07-15 | `DW-I-HUD-PHASE-AREA` minimal top-center phase area | Aktif HUD prefabındaki `384 x 106` phase panel top-center anchor'lı `340 x 78` sabit slota çekildi; day counter, phase title, `280 x 10` progress track, canlı fill/marker ve üç phase label binding'i korundu. Ham `DAY / DUSK / NIGHT` görsel dili sonraki owner-approved polish işine bırakıldı | Unity compile: 0 error; targeted EditMode 1/1; MCP runtime audit: `340 x 78`, top-center anchor, fill/marker senkron; 1920x1080 Game View görsel QA temiz; tracker `348/441` |
+| 2026-07-15 | `DW-I-HUD-PHASE-POLISH` owner-approved Celestial Dial | Owner A/B/C mockup turunda `B - Celestial Dial` yönünü seçti. İlk işlevsel geçişten sonra owner görsel eşleşmenin yetersiz olduğunu belirtti; aktif HUD referans B oranlarına göre `290 x 68` gerçek pill gövde/flat kapak silueti, `DAY N` sayacı, 44 segmentli `178 x 44` renk yayı, crescent/dawn glyph'leri, küçük parlak orb ve düşük-alpha halo ile yeniden işlendi. Referansta olmayan divider ile büyük phase başlığı, ham DAY/DUSK/NIGHT label satırı ve linear fill player-facing kapatıldı. `A - Horizon Ribbon` karşılaştırma görseli ve geri dönüş prosedürüyle `DW_I_PHASE_HUD_PRESENTATION_DECISION.md` içinde arşivlendi | Unity compile: 0 error; targeted EditMode 2/2; MCP runtime audit `290x68`, `178x44`, divider inactive, halo `0.22`, marker motion clean; 1920x1080 Game View B-parity QA temiz; tracker `351/441` |
