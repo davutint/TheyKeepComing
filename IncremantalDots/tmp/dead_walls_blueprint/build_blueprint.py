@@ -457,7 +457,7 @@ def make_delivery_sequence() -> Path:
         ("C","Ekonomi","4 bina\nİşçi oranı\nYatak + nüfus"),
         ("D","Okçular","1.000 cap\n40×25 yerleşim\nAmmo"),
         ("E","Castle Heart","Run graph\nEssence\nUpgrade etkileri"),
-        ("F","Council","3/6/9... takvim\nAcil toplantı\nCurated içerik"),
+        ("F","Council","3/6/9... takvim\nBağlam duyarlı\nCurated içerik"),
         ("G","Yetenekler","Fireball\nRally\nEmergency Repair"),
         ("H","Meta + Save","Game Over\nMeta listesi\nContinue"),
         ("I","Ürün Kapısı","HUD polish\n10k stress\nOnboarding + QA"),
@@ -996,7 +996,7 @@ def build_document(fig):
               [
                   ("Run / Koşu", "Duvar ayaktayken devam eden ve Game Over ile sıfırlanan aktif oyun"),
                   ("Castle Heart", "Run teknolojisinin procedural graph ekranı ve Grave Essence harcama yüzeyi"),
-                  ("Council", "Her üç günde bir toplanan ve nadir krizlerde acil karar açan koşu içi yönetim katmanı"),
+                  ("Council", "Her üç günde bir toplanan koşu içi yönetim ve risk kararları katmanı"),
                   ("Meta", "Ölümden sonra kalan, sonraki koşuya ivme veren kalıcı upgrade listesi"),
                   ("Grave Essence", "Yalnızca run içinde teknoloji için kullanılan ve ölümde silinen kaynak"),
                   ("Spawn budget", "Düşman prefabını güçlendirmek yerine sahaya çıkarılacak adet baskısını yöneten değer"),
@@ -1036,7 +1036,7 @@ def build_document(fig):
                   ("Sık", "İşçi oranlarını değiştirir", "Farm / Lumberyard / Quarry / Mine"),
                   ("Sık", "Okçu alır veya yeniden eğitir", "Basic / Rapid / Frost ortak 1.000 cap"),
                   ("Dönemsel", "Duvarı gündüz onarır", "Stone ile tek seferlik repair"),
-                  ("Dönemsel", "Council kararını verir", "3/6/9... günleri + nadir acil toplantı"),
+                  ("Dönemsel", "Council kararını verir", "3/6/9... günlerinin Dawn başlangıcı"),
                   ("Dönemsel", "Castle Heart node'u alır", "Grave Essence + pause"),
                   ("Taktik", "Fireball, Rally veya Emergency Repair kullanır", "Alt orta cooldown barı"),
               ], [1400, 3300, 4660])
@@ -1201,12 +1201,11 @@ def build_document(fig):
 
     # 13 COUNCIL
     begin_page(doc, "Council: Koşu İçi Karar Meclisi", "Section 04 | Council", "Council kaldırılan veya dormant bir yan özellik değildir. Castle Heart teknoloji build'ini kurarken Council, koşunun yaşayan ekonomik ve savunma kararlarını yönetir.")
-    add_status_strip(doc, [("3 GÜN", "DÜZENLİ TAKVİM"), ("NADİR", "ACİL TOPLANTI"), ("2", "NET SEÇENEK"), ("CURATED", "ONAYLI İÇERİK")])
+    add_status_strip(doc, [("3 GÜN", "DÜZENLİ TAKVİM"), ("BAĞLAM", "DUYARLI SEÇİM"), ("2", "NET SEÇENEK"), ("CURATED", "ONAYLI İÇERİK")])
     add_table(doc,
               ["Toplantı", "Tetik", "Takvim davranışı", "Karar rolü"],
               [
-                  ("Düzenli Council", "3, 6, 9, 12... günlerinin Dawn başlangıcı", "Kesindir; acil toplantı bu takvimi taşımaz veya sıfırlamaz", "Ekonomi, nüfus, Wall ve sonraki gece arasında anlamlı trade-off"),
-                  ("Acil Council", "Nadir kritik koşu durumu veya yaklaşan gece baskısı", "Düzenli Council gününü bozmaz", "Oyuncuya kriz maliyeti, savunma hazırlığı veya kontrollü risk seçimi"),
+                  ("Düzenli Council", "3, 6, 9, 12... günlerinin Dawn başlangıcı", "Kesindir; aynı gün yalnız bir kez açılır", "Ekonomi, nüfus, Wall ve sonraki gece arasında anlamlı trade-off"),
               ], [1700, 2450, 2600, 2610], compact=True)
     add_heading(doc, "İçerik üretim sözleşmesi", 2)
     for text in [
@@ -1222,7 +1221,7 @@ def build_document(fig):
         "Okçu kazancı toplam nüfus ve ortak 1.000 okçu cap'ini bypass edemez.",
         "Savunma etkisi yalnız Wall HP / Wall Max HP üzerinde çalışır; Gate veya Core geri getirmez.",
         "Gece baskısı etkisi düşman HP, hasar veya hızını değil yalnız adet ve akış çarpanını değiştirir.",
-        "Düzenli/acil takvim, seçilmiş seçenekler, zincir flag'leri ve aktif süreli etkiler exact run save içinde korunur.",
+        "Düzenli takvim, seçilmiş seçenekler, zincir flag'leri ve aktif süreli etkiler exact run save içinde korunur.",
     ]:
         add_bullet(doc, text, bullet_num)
     add_callout(doc, "Ownership", "Castle Heart = teknoloji build'i. Council = koşu içi yönetim ve risk kararları. Meta = ölüm sonrası kalıcı ilerleme. Bu üç yüzey birbirinin para birimini veya upgrade rolünü devralmaz.", "frost", "pale_blue")
@@ -1526,7 +1525,7 @@ def build_document(fig):
                   ("Archers", "GameManager, ArcherShootSystem", "1.000 ortak cap, scalable targeting"),
                   ("Placement", "MobileCastleArcherTilePlacement", "40×25 stable local points"),
                   ("Heart", "TechNodeDefinitionSO, TechTreeUI", "Run graph generator + Essence currency"),
-                  ("Council", "CouncilComposer, CouncilEventUI, CouncilEventCatalog", "3/6/9... schedule + emergency trigger + guarded effects"),
+                  ("Council", "CouncilComposer, CouncilEventUI, CouncilEventCatalog", "3/6/9... schedule + guarded effects + context memory"),
                   ("Meta", "MetaProgression", "Death-only reward + fixed upgrade list"),
                   ("HUD", "MobileCastleHudRoot, HUDController", "Single Wall, minimal cycle, bottom abilities"),
               ], [1750, 3650, 3960], compact=True)
@@ -1544,7 +1543,7 @@ def build_document(fig):
                   ("WorkerAllocation", "Four target ratios, actual counts, caps, idle population", "ECS singleton"),
                   ("ArcherFormation", "40 cells, 25 local seeds/points, version", "Placement owner"),
                   ("ActiveAbilityState", "Unlock, cooldown remaining, tuning multipliers", "Run save"),
-                  ("CouncilRunState", "Regular day index, emergency trigger, flags, recent templates, active effects", "Run save"),
+                  ("CouncilRunState", "Regular day index, flags, recent templates, active effects", "Run save"),
                   ("MetaState", "Currency, upgrade levels, pool unlocks, tutorial flags", "Meta save"),
               ], [2050, 5000, 2310], compact=True)
     add_heading(doc, "Migration ilkesi", 2)
@@ -1587,7 +1586,7 @@ def build_document(fig):
                   ("Population", "Food per arrival, bed curve, dawn count", "Pop growth; unused beds"),
                   ("Archers", "Type base stats, cost growth, retrain cost", "Type mix; DPS; arrow drain"),
                   ("Heart", "Essence drop, node base cost, growth, rarity", "Node depth; unspent Essence"),
-                  ("Council", "Regular cadence fixed; emergency rarity, effect bands, repeat memory", "Choice rate; expiry rate; option split; run impact"),
+                  ("Council", "Regular cadence fixed; effect bands, repeat memory, decision timer", "Choice rate; expiry rate; option split; run impact"),
                   ("Meta", "Reward weights, upgrade costs/effects", "Run-to-run acceleration"),
               ], [1500, 4700, 3160], compact=True)
     add_heading(doc, "Önerilen event'ler", 2)
@@ -1599,7 +1598,7 @@ def build_document(fig):
                   ("resource_spent", "resource, amount, purchase type, resulting level/count"),
                   ("archer_changed", "buy/retrain, type from/to, total cap usage"),
                   ("heart_node_bought", "node id, level, depth, cost, revealed children"),
-                  ("council_resolved", "day, regular/emergency, template id, option/expired, effects, next-night delta"),
+                  ("council_resolved", "day, template id, option/expired, effects, next-night delta"),
                   ("ability_cast", "ability, phase, cooldown, targets hit / repair amount"),
                   ("wall_repaired", "phase, Stone cost, HP before/after"),
                   ("run_ended", "day, kills, peak enemies, peak pop, Wall damage timeline, meta reward"),
@@ -1636,7 +1635,7 @@ def build_document(fig):
     begin_page(doc, "Work Packages E-I", "Section 13 | Production", "İkinci grup procedural build, Council, aktif yetenek, meta/save ve ürün kalite kapısını tamamlar.")
     packages2 = [
         ("E | Castle Heart", "Generated graph, Essence currency, reveal, repeatable/evolution/Keystone.", "Guaranteed core nodes + saved hidden graph", "Aynı seed/load aynı graph"),
-        ("F | Council", "3/6/9... regular cadence, rare emergency path, curated context-aware choices.", "Schedule + effect guardrails + saved memory", "Takvim bozulmaz; hiçbir etki ana cap'leri bypass etmez"),
+        ("F | Council", "3/6/9... regular cadence, curated context-aware choices.", "Schedule + effect guardrails + saved memory", "Takvim bozulmaz; hiçbir etki ana cap'leri bypass etmez"),
         ("G | Active Abilities", "Fireball, Rally, Emergency Repair tek cooldown barında.", "World targeting, global buff, Night repair", "Kaynak tüketmez; input UI ile çakışmaz"),
         ("H | Meta + Persistence", "Death-only reward, fixed upgrade list, single run save.", "Idempotent reward + migration guard", "Force-close ölümü geri alamaz"),
         ("I | Product Gate", "Minimal HUD, first-run tutorial, day/night art/audio, stress QA.", "PC input, single Wall bar, polish mockups", "10k scenario + clean render + tutorial pass"),
@@ -1647,7 +1646,7 @@ def build_document(fig):
         "Graph hiçbir koşuda Rapid/Frost/Fireball'ı unreachable üretmez.",
         "Normal node Keystone gibi başka yolu kapatmaz.",
         "Heart açıkken cycle, spawn, worker ve cooldown tamamen durur.",
-        "Council günleri 3/6/9... düzenini korur; acil toplantı düzenli takvimi sıfırlamaz.",
+        "Council günleri 3/6/9... düzenini korur ve aynı gün yalnız bir kez açılır.",
         "Council nüfus, okçu, Wall ve horde etkileri ilgili ana sistem guardrail'lerini aşmaz.",
         "Meta upgrade aktif run graph'ını geriye dönük değiştirmez.",
         "Tutorial tamamlandıktan sonra ikinci run'da otomatik görünmez.",
@@ -1669,7 +1668,7 @@ def build_document(fig):
                   ("Archers", "40 tile'da 1.000 spawn", "Her tile 25 stable point; cap aşılmaz"),
                   ("Targeting", "Yoğun overkill", "Incoming damage load hedefleri dağıtır"),
                   ("Heart", "Invalid generated graph", "Validation reroll; run başlamazsa açık hata"),
-                  ("Council", "Day 3 + arada acil toplantı", "Düzenli kart gelir; acil kart takvimi taşımaz"),
+                  ("Council", "Day 3/6/9 Dawn + reload/phase replay", "Düzenli kart aynı gün yalnız bir kez gelir; takvim kaymaz"),
                   ("Council", "Pop/archer/defense/horde etkisi", "Bed+Food, 1.000 cap, Wall-only ve count-only korunur"),
                   ("Save", "Menu çıkış / Continue", "Aynı graph, phase, Wall, economy"),
                   ("Death", "Process restart after Game Over", "Meta bir kez; run sıfır"),
@@ -1705,7 +1704,7 @@ def build_document(fig):
         "Basic/Rapid/Frost toplam 1.000 cap ve 40×25 stable placement sözleşmesine uyar.",
         "Arrow satın alma anlıktır; Fletcher / production queue yoktur.",
         "Castle Heart generated graph doğrulanır, save edilir ve yalnız Grave Essence kullanır.",
-        "Council 3/6/9... günlerinde çalışır; nadir acil toplantı takvimi bozmaz ve yalnız onaylı şablon/etki havuzunu kullanır.",
+        "Council 3/6/9... günlerinde çalışır ve yalnız onaylı şablon/etki havuzunu kullanır.",
         "Council etkileri yatak+Food, 1.000 okçu cap, tek Wall ve count-only difficulty sözleşmelerini bypass etmez.",
         "Fireball, Rally ve Emergency Repair alt orta HUD'da cooldown ile çalışır.",
         "Meta ödülü yalnız ölümde bir kez verilir; gönüllü reset yoktur.",
@@ -1723,7 +1722,7 @@ def build_document(fig):
     begin_page(doc, "Bilinçli Kapsam Dışı", "Section 15 | Guardrails", "Aşağıdaki sistemler bu blueprint'in çıkış sözleşmesine dahil değildir. Varlıkları ancak yeni owner kararıyla yeniden değerlendirilir.")
     out = [
         ("Boss / miniboss / elite / enemy variant", "Tek prefab ve sayı tehdidi kararını bozar"),
-        ("Blood Moon / sabit special-night takvimi", "Council acil kararı gece adet baskısını değiştirebilir; ayrı isimli/periyodik mod henüz onaylanmadı"),
+        ("Blood Moon / sabit special-night takvimi", "Sabit special-night pacing tek prefab ve sayı tehdidi kararını bozar; ayrı isimli/periyodik mod onaylanmamıştır"),
         ("Düşman scout / forecast", "Oyuncuya anlamlı karar üretmediği için reddedildi"),
         ("Enemy lane / front selection", "Düşman saldırıyı seçer; oyuncu geleni seçmez"),
         ("Build grid / building placement", "İzometrik kompozisyon hazır ve art-directed kalır"),
@@ -1749,7 +1748,6 @@ def build_document(fig):
                   ("Meta para adı", "Ölüm sonrası kalıcı currency", "İsim + ikon + death screen copy"),
                   ("Narrative premise", "Heart / Essence sistemleriyle çelişmez", "World pitch + opening copy"),
                   ("Heart node pool", "Rapid/Frost/Fireball garanti", "Launch node catalog + effect specs"),
-                  ("Council acil tetikleri", "Regular takvim 3/6/9... ve acil kart bunu bozmaz", "Owner onaylı kriz trigger listesi + rarity tuning"),
                   ("Council launch içeriği", "Free-form AI yok; yalnız curated şablon ve etkiler", "Onaylı template/atom listesi + tekrar ve bütçe testi"),
                   ("Keystone çiftleri", "Yalnız birbirini kapatır", "En az 3 onaylı trade-off çifti"),
                   ("Fireball evolution pool", "İlk büyü; mana yok", "VFX ve 2-3 evolution spec"),

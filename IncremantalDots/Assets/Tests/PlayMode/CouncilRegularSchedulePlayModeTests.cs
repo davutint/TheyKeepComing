@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
+using Unity.Entities;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
@@ -16,10 +18,15 @@ namespace DeadWalls.Tests
         private CouncilEventCatalogSO _originalCatalog;
         private MethodInfo _resetCouncilState;
         private MethodInfo _cycleSetter;
+        private string _runSavePath;
+        private byte[] _originalRunSave;
 
         [UnitySetUp]
         public IEnumerator SetUp()
         {
+            _runSavePath = Path.Combine(Application.persistentDataPath, "run_save.json");
+            _originalRunSave = File.Exists(_runSavePath) ? File.ReadAllBytes(_runSavePath) : null;
+            RunPersistence.Delete();
             GameBootstrap.PendingAction = GameBootstrap.StartAction.None;
             int previousGameManagerId = GameManager.Instance != null
                 ? GameManager.Instance.GetInstanceID()
@@ -76,6 +83,9 @@ namespace DeadWalls.Tests
             for (int i = _createdObjects.Count - 1; i >= 0; i--)
                 Object.Destroy(_createdObjects[i]);
             _createdObjects.Clear();
+            RunPersistence.Delete();
+            if (_originalRunSave != null)
+                File.WriteAllBytes(_runSavePath, _originalRunSave);
             yield return null;
         }
 
@@ -177,6 +187,167 @@ namespace DeadWalls.Tests
             Assert.That(gameManager.ActiveCouncilEvent, Is.SameAs(active));
             Assert.That(gameManager.GraveEssenceAmount, Is.EqualTo(graveEssenceBefore));
             yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator ActiveRegularCouncil_ContinueRestoresExactPayloadMemoryAndHandledDay()
+        {
+            GameManager gameManager = GameManager.Instance;
+            yield return WaitForSnapshotReady(gameManager);
+
+            SetCycle(gameManager, 3, SiegeCyclePhase.Dawn, 2.25f);
+            Assert.That(gameManager.TryOpenRegularCouncilEvent(), Is.True);
+            string activePayloadJson = JsonUtility.ToJson(gameManager.ActiveCouncilEvent);
+
+            Dictionary<string, int> flags = GetPrivateField<Dictionary<string, int>>(
+                gameManager, "_councilFlags");
+            List<string> recent = GetPrivateField<List<string>>(
+                gameManager, "_recentCouncilTemplates");
+            HashSet<string> usedOneShots = GetPrivateField<HashSet<string>>(
+                gameManager, "_usedOneShotCouncils");
+            flags["prior_choice_b"] = 1;
+            usedOneShots.Add("used_one_shot_memory");
+
+            var expectedRecent = new List<string>(recent);
+            uint expectedRunSalt = GetPrivateField<uint>(gameManager, "_councilRunSalt");
+            Assert.That(gameManager.SaveRunSnapshot(), Is.True);
+
+            _resetCouncilState.Invoke(gameManager, null);
+            Assert.That(gameManager.ActiveCouncilEvent, Is.Null);
+            Assert.That(gameManager.TryRestoreRunFromCheckpoint(), Is.True);
+
+            Assert.That(gameManager.ActiveCouncilEvent, Is.Not.Null);
+            Assert.That(JsonUtility.ToJson(gameManager.ActiveCouncilEvent), Is.EqualTo(activePayloadJson),
+                "Continue aktif Council kartini yeniden compose etmemeli veya payload'i degistirmemeli.");
+            Assert.That(GetPrivateField<int>(gameManager, "_lastRegularCouncilDay"), Is.EqualTo(3));
+            Assert.That(GetPrivateField<uint>(gameManager, "_councilRunSalt"),
+                Is.EqualTo(expectedRunSalt));
+            Assert.That(GetPrivateField<Dictionary<string, int>>(gameManager, "_councilFlags")
+                ["prior_choice_b"], Is.EqualTo(1));
+            Assert.That(GetPrivateField<List<string>>(gameManager, "_recentCouncilTemplates"),
+                Is.EqualTo(expectedRecent));
+            Assert.That(GetPrivateField<HashSet<string>>(gameManager, "_usedOneShotCouncils"),
+                Does.Contain("used_one_shot_memory"));
+
+            gameManager.ExpireCouncilEvent();
+            SetCycle(gameManager, 3, SiegeCyclePhase.Dawn, 2.25f);
+            Assert.That(gameManager.TryOpenRegularCouncilEvent(), Is.False,
+                "Continue sonrasi ayni scheduled gun ikinci Council kartini acmamali.");
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator ChosenRegularCouncil_ContinueRestoresDecisionAndTimedEffects()
+        {
+            GameManager gameManager = GameManager.Instance;
+            yield return WaitForSnapshotReady(gameManager);
+
+            SetCycle(gameManager, 3, SiegeCyclePhase.Dawn, 1.5f);
+            Assert.That(gameManager.TryOpenRegularCouncilEvent(), Is.True);
+            Assert.That(gameManager.ActiveCouncilEvent.TemplateId, Is.EqualTo("schedule_template"));
+            Assert.That(gameManager.ChooseCouncilOption(false), Is.True,
+                "Test catalog Option B sureli production etkisini uygulayamadi.");
+            Assert.That(gameManager.ActiveCouncilEvent, Is.Null);
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            Entity configEntity = GetConfigEntity(entityManager);
+            MobileEconomyEventState expectedEffect =
+                entityManager.GetComponentData<MobileEconomyEventState>(configEntity);
+            Assert.That(expectedEffect.ProductionBonusMultiplier, Is.GreaterThan(1f));
+            Assert.That(expectedEffect.ProductionBonusExpiresAfterWave, Is.EqualTo(4));
+            expectedEffect.NextNightSpawnMultiplier = 0.72f;
+            expectedEffect.NightSpawnExpiresAfterWave = 5;
+            entityManager.SetComponentData(configEntity, expectedEffect);
+
+            Assert.That(gameManager.SaveRunSnapshot(), Is.True);
+
+            _resetCouncilState.Invoke(gameManager, null);
+            MobileEconomyEventState mutatedEffect = expectedEffect;
+            mutatedEffect.ProductionBonusResource = EconomyFocusType.Balanced;
+            mutatedEffect.ProductionBonusMultiplier = 1f;
+            mutatedEffect.ProductionBonusExpiresAfterWave = 0;
+            mutatedEffect.NextNightSpawnMultiplier = 1f;
+            mutatedEffect.NightSpawnExpiresAfterWave = 0;
+            entityManager.SetComponentData(configEntity, mutatedEffect);
+
+            Assert.That(gameManager.TryRestoreRunFromCheckpoint(), Is.True);
+            configEntity = GetConfigEntity(entityManager);
+            MobileEconomyEventState restoredEffect =
+                entityManager.GetComponentData<MobileEconomyEventState>(configEntity);
+
+            Assert.That(gameManager.ActiveCouncilEvent, Is.Null,
+                "Cozulmus Council karari Continue sonrasinda tekrar aktif karta donmemeli.");
+            Dictionary<string, int> restoredFlags = GetPrivateField<Dictionary<string, int>>(
+                gameManager, "_councilFlags");
+            Assert.That(restoredFlags["council_schedule_template_b"], Is.EqualTo(3));
+            Assert.That(GetPrivateField<int>(gameManager, "_lastRegularCouncilDay"), Is.EqualTo(3));
+            Assert.That(restoredEffect.ProductionBonusResource,
+                Is.EqualTo(expectedEffect.ProductionBonusResource));
+            Assert.That(restoredEffect.ProductionBonusMultiplier,
+                Is.EqualTo(expectedEffect.ProductionBonusMultiplier).Within(0.0001f));
+            Assert.That(restoredEffect.ProductionBonusExpiresAfterWave,
+                Is.EqualTo(expectedEffect.ProductionBonusExpiresAfterWave));
+            Assert.That(restoredEffect.NextNightSpawnMultiplier,
+                Is.EqualTo(expectedEffect.NextNightSpawnMultiplier).Within(0.0001f));
+            Assert.That(restoredEffect.NightSpawnExpiresAfterWave,
+                Is.EqualTo(expectedEffect.NightSpawnExpiresAfterWave));
+
+            SetCycle(gameManager, 3, SiegeCyclePhase.Dawn, 1.5f);
+            Assert.That(gameManager.TryOpenRegularCouncilEvent(), Is.False,
+                "Cozulmus Day 3 karari Continue sonrasi tekrar acilmamali.");
+            SetCycle(gameManager, 6, SiegeCyclePhase.Dawn, 0.5f);
+            Assert.That(gameManager.TryOpenRegularCouncilEvent(), Is.True,
+                "Continue future regular Day 6 toplantisini engellememeli.");
+            gameManager.ExpireCouncilEvent();
+            yield return null;
+        }
+
+        private IEnumerator WaitForSnapshotReady(GameManager gameManager)
+        {
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                    yield break;
+                yield return null;
+            }
+
+            Assert.Fail("GameManager/SubScene Council exact save testi icin hazir olmadi.");
+        }
+
+        private void SetCycle(
+            GameManager gameManager,
+            int day,
+            SiegeCyclePhase phase,
+            float cycleTimer)
+        {
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            Entity configEntity = GetConfigEntity(entityManager);
+            ContinuousSiegeCycleData cycle =
+                entityManager.GetComponentData<ContinuousSiegeCycleData>(configEntity);
+            cycle.Enabled = true;
+            cycle.CycleIndex = day - 1;
+            cycle.Phase = phase;
+            cycle.CycleTimer = cycleTimer;
+            entityManager.SetComponentData(configEntity, cycle);
+            _cycleSetter.Invoke(gameManager, new object[] { cycle });
+        }
+
+        private static Entity GetConfigEntity(EntityManager entityManager)
+        {
+            using EntityQuery query = entityManager.CreateEntityQuery(
+                typeof(MobileCastleCombatConfig),
+                typeof(ContinuousSiegeCycleData),
+                typeof(MobileEconomyEventState));
+            return query.GetSingletonEntity();
+        }
+
+        private static T GetPrivateField<T>(GameManager gameManager, string fieldName)
+        {
+            FieldInfo field = typeof(GameManager).GetField(
+                fieldName,
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.That(field, Is.Not.Null, $"GameManager.{fieldName} bulunamadi.");
+            return (T)field.GetValue(gameManager);
         }
 
         private CouncilEventCatalogSO CreateCatalog()

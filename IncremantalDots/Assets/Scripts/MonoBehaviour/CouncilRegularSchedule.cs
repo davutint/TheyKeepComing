@@ -1,9 +1,8 @@
 namespace DeadWalls
 {
     /// <summary>
-    /// Regular Council takviminin tek owner'i. Regular kartlar ilk kez Day 3'te ve
-    /// sonrasinda her uc gunde bir acilir. Emergency Council bu state'i okuyabilir
-    /// fakat ilerletemez veya sifirlayamaz.
+    /// V1 Council takviminin tek owner'i. Regular kartlar ilk kez Day 3'te ve
+    /// sonrasinda her uc gunde bir acilir; ayni scheduled gun yalniz bir kez islenir.
     /// </summary>
     public static class CouncilRegularSchedule
     {

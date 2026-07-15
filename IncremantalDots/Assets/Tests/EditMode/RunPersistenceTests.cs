@@ -64,6 +64,11 @@ namespace DeadWalls.Tests
                 FireballCooldownRemaining = 12.5f,
                 RallyTimer = 4.25f,
                 LastRegularCouncilDay = 6,
+                CouncilRunSalt = 987654321u,
+                CouncilWoodCapBonus = 11,
+                CouncilStoneCapBonus = 12,
+                CouncilIronCapBonus = 13,
+                CouncilFoodCapBonus = 14,
                 HasActiveCouncilEvent = true,
                 ActiveCouncilEvent = new ComposedCouncilEvent
                 {
@@ -82,8 +87,21 @@ namespace DeadWalls.Tests
                     TargetY = 2f,
                     Damage = 90f,
                     Radius = 3.5f
-                }
+                },
+                PendingEconomyEvent = 2,
+                EconomyEventWave = 8,
+                EconomyEventCooldownWaves = 3,
+                ProductionBonusResource = (int)EconomyFocusType.Stone,
+                ProductionBonusMultiplier = 1.35f,
+                ProductionBonusExpiresAfterWave = 10,
+                EconomyRandomSeed = 246813579u,
+                NextNightSpawnMultiplier = 0.72f,
+                NightSpawnExpiresAfterWave = 9
             };
+            state.CouncilFlags.Add(new CouncilFlagEntry { Flag = "council_prior_choice_b", Day = 3 });
+            state.RecentCouncilTemplates.Add("prior_choice");
+            state.RecentCouncilTemplates.Add("council_test");
+            state.UsedOneShotCouncils.Add("one_shot_used");
             state.ActiveCouncilEvent.OptionA.Effects.Add(new ComposedCouncilEffect
             {
                 Kind = CouncilEffectKind.GainResource,
@@ -171,6 +189,17 @@ namespace DeadWalls.Tests
             Assert.That(restored.ArcherFormationVersion,
                 Is.EqualTo(ArcherFormationUtility.CurrentVersion));
             Assert.That(restored.LastRegularCouncilDay, Is.EqualTo(6));
+            Assert.That(restored.CouncilRunSalt, Is.EqualTo(987654321u));
+            Assert.That(restored.CouncilWoodCapBonus, Is.EqualTo(11));
+            Assert.That(restored.CouncilStoneCapBonus, Is.EqualTo(12));
+            Assert.That(restored.CouncilIronCapBonus, Is.EqualTo(13));
+            Assert.That(restored.CouncilFoodCapBonus, Is.EqualTo(14));
+            Assert.That(restored.CouncilFlags.Count, Is.EqualTo(1));
+            Assert.That(restored.CouncilFlags[0].Flag, Is.EqualTo("council_prior_choice_b"));
+            Assert.That(restored.CouncilFlags[0].Day, Is.EqualTo(3));
+            Assert.That(restored.RecentCouncilTemplates,
+                Is.EqualTo(new[] { "prior_choice", "council_test" }));
+            Assert.That(restored.UsedOneShotCouncils, Is.EqualTo(new[] { "one_shot_used" }));
             Assert.That(restored.HasActiveCouncilEvent, Is.True);
             Assert.That(restored.ActiveCouncilEvent.TemplateId, Is.EqualTo("council_test"));
             Assert.That(restored.ActiveCouncilEvent.OptionA.Effects.Count, Is.EqualTo(1));
@@ -181,6 +210,15 @@ namespace DeadWalls.Tests
             Assert.That(restored.ActiveArrows[0].RemainingLifetime, Is.EqualTo(2.75f));
             Assert.That(restored.ActiveFireball.Active, Is.True);
             Assert.That(restored.FireballCooldownRemaining, Is.EqualTo(12.5f));
+            Assert.That(restored.PendingEconomyEvent, Is.EqualTo(2));
+            Assert.That(restored.EconomyEventWave, Is.EqualTo(8));
+            Assert.That(restored.EconomyEventCooldownWaves, Is.EqualTo(3));
+            Assert.That(restored.ProductionBonusResource, Is.EqualTo((int)EconomyFocusType.Stone));
+            Assert.That(restored.ProductionBonusMultiplier, Is.EqualTo(1.35f));
+            Assert.That(restored.ProductionBonusExpiresAfterWave, Is.EqualTo(10));
+            Assert.That(restored.EconomyRandomSeed, Is.EqualTo(246813579u));
+            Assert.That(restored.NextNightSpawnMultiplier, Is.EqualTo(0.72f));
+            Assert.That(restored.NightSpawnExpiresAfterWave, Is.EqualTo(9));
         }
 
         [Test]

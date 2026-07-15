@@ -33,9 +33,9 @@ namespace DeadWalls
         public CouncilTemplateSO[] Templates = new CouncilTemplateSO[0];
         public CouncilEffectAtomSO[] Atoms = new CouncilEffectAtomSO[0];
 
-        // v10 ve daha eski authored asset uyumlulugu icin serialized tutulur. Regular Council
+        // v10 ve daha eski authored asset uyumlulugu icin serialized tutulur. V1 Council
         // schedule'i bunlari kullanmaz; exact 3/6/9 takviminin tek owner'i
-        // CouncilRegularSchedule'dir. Emergency pacing owner onayi sonrasi ayri data alacaktir.
+        // CouncilRegularSchedule'dir.
         [HideInInspector]
         [Range(0f, 1f)] public float DailyEventChance = 0.30f;
         [HideInInspector]

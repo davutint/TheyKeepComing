@@ -43,8 +43,8 @@ varyant dogurur ve yeni atom/sablon eklemek cesitliligi CARPARAK buyutur.
 - `_lastRegularCouncilDay` ayni Dawn'da ikinci karti engeller ve exact save v11'de korunur.
 - Compose gecersiz catalog nedeniyle null donerse scheduled gun fail-closed islenir; ayni gun
   hot-reload veya tekrar cagri ile farkli kart reroll edilmez.
-- Emergency Council bu owner'dan ayridir. Trigger/type/list owner onayi gelmeden runtime'a
-  eklenmez ve ileride `_lastRegularCouncilDay` degerini degistiremez.
+- V1 Council regular-only'dir; Day `3/6/9...` disinda ikinci bir meeting type veya trigger
+  yolu yoktur.
 
 ## Persistence
 
@@ -58,6 +58,9 @@ varyant dogurur ve yeni atom/sablon eklemek cesitliligi CARPARAK buyutur.
 - Continue active Council payload'ini `CouncilContentPolicy` ile production catalog'a karsi
   preflight eder. Catalog disi template, authored flag uyusmazligi, bilinmeyen role veya option
   recetesi disi effect varsa kosu restart edilmeden restore fail-closed reddedilir.
+- Cozulmus secimin otomatik/curated flag'leri ile temp-production ve next-night effect
+  multiplier/expiry alanlari ayni snapshot'ta korunur. Continue cozulmus karti yeniden acmaz,
+  aktif karti yeniden compose etmez ve future `3/6/9...` regular schedule'i engellemez.
 
 ## Karsitlik Receteleri (composer'in gramerleri)
 
@@ -141,8 +144,7 @@ enum degeri ve gelecekte eklenebilecek baska domain'ler varsayilan olarak redded
   `CONTENT BLOCKED` olarak kilitler; `ChooseCouncilOption` karti kapatmadan veya flag yazmadan
   composed event'i authored catalog'a karsi yeniden dogrular.
 - Bu teknik gate mevcut 9 template/11 atomu launch-approved ilan etmez. Launch metin/atom listesi,
-  budget ve tekrar review'u owner karari bekleyen ayri kabul kapisidir. Emergency type/trigger
-  content'i bu paket tarafindan uretilmez.
+  budget ve tekrar review'u owner karari bekleyen ayri kabul kapisidir.
 
 ## Effect Guardrail Owner'i
 
@@ -174,7 +176,8 @@ transaction'larini ve scene timer binding'ini dogrular. `CouncilOptionPresentati
 exact metin, affordability, cycle countdown ve generated HUD prefab timer'ini kilitler.
 `CouncilRegularSchedulePlayModeTests` bozuk payload'in karar/on-state mutation yapamadigini;
 `ExactRunContinuePlayModeTests` ayni payload'in Continue preflight'ta restart oncesi
-reddedildigini dogrular.
+reddedildigini; `CouncilRegularSchedulePlayModeTests` active payload/memory/handled-day ile
+cozulmus secim ve sureli effect state'inin exact Continue davranisini dogrular.
 
 ## Isim Sozlesmesi
 

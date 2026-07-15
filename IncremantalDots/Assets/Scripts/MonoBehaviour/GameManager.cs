@@ -107,8 +107,7 @@ namespace DeadWalls
         private bool _techDefenseBaselineCaptured;
         private float _baseWallMaxHp;
 
-        // Council event run-state. Regular schedule exact 3/6/9... kuralini kullanir;
-        // emergency owner ileride ayri state tasiyacak ve bu index'e dokunmayacak.
+        // Council event run-state. V1 yalniz exact 3/6/9... regular schedule'i kullanir.
         private readonly Dictionary<string, int> _councilFlags = new Dictionary<string, int>();
         private readonly List<string> _recentCouncilTemplates = new List<string>();
         private readonly HashSet<string> _usedOneShotCouncils = new HashSet<string>();
@@ -121,9 +120,6 @@ namespace DeadWalls
         private int _councilStoneCapBonus;
         private int _councilIronCapBonus;
         private int _councilFoodCapBonus;
-
-        // Safak-checkpoint (M-E): Dawn'a giris kenarinda kosu kaydedilir (RunPersistence)
-        private SiegeCyclePhase _lastPhaseForCheckpoint = SiegeCyclePhase.Day;
 
         // Meta-progression kosu-ici state'i: her kosu basinda kalici seviyelerden yeniden kurulur
         private bool _metaAppliedThisRun;
@@ -193,21 +189,6 @@ namespace DeadWalls
             EnsureHeartRuntime();
             ReadECSData();
             TickSpellCooldown();
-        }
-
-        /// <summary>Safak checkpoint'i (M-E): Dawn'a giris kenarinda kosuyu kaydeder.</summary>
-        private void TrackDawnCheckpoint()
-        {
-            if (!ContinuousSiegeCycle.Enabled)
-                return;
-
-            var phase = ContinuousSiegeCycle.Phase;
-            if (phase == SiegeCyclePhase.Dawn && _lastPhaseForCheckpoint != SiegeCyclePhase.Dawn
-                && !GameState.IsGameOver)
-            {
-                SaveRunSnapshot();
-            }
-            _lastPhaseForCheckpoint = phase;
         }
 
         private void TickSpellCooldown()
@@ -3079,8 +3060,6 @@ namespace DeadWalls
                 _entityManager.SetComponentData(mobileConfigEntity, cycle);
                 ContinuousSiegeCycle = cycle;
             }
-            _lastPhaseForCheckpoint = SiegeCyclePhase.Day;
-
             var gameState = _entityManager.GetComponentData<GameStateData>(_gameStateEntity);
             gameState.XP = save.XP;
             gameState.Level = save.Level;
@@ -3565,8 +3544,6 @@ namespace DeadWalls
             cycle.IsBloodMoonNight = false;
             _entityManager.SetComponentData(mobileConfigEntity, cycle);
             ContinuousSiegeCycle = cycle;
-            _lastPhaseForCheckpoint = cycle.Phase;
-
             if (_entityManager.HasComponent<ContinuousSpawnBudgetData>(mobileConfigEntity))
             {
                 var spawnBudget = new ContinuousSpawnBudgetData

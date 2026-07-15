@@ -79,8 +79,8 @@ Friend. Var olan custom chain girdilerini silmez; yeni chain veya anlati uretmez
 - Template OptionA/B atom Id'leri secilen `CouncilContrastType` recetesiyle uyusmalidir;
   aksi halde `ValidateCatalog()` acik hata verir ve runtime compose fail-closed kalir.
 - Setup/repair menu mevcut katalog icerigini **launch-approved** ilan etmez. Mevcut 9 template
-  ve 11 atomun metin/budget/repeat owner review'u ayri acik konudur; menu yeni launch veya
-  Emergency content uretmez.
+  ve 11 atomun metin/budget/repeat owner review'u ayri acik konudur; menu yeni launch content'i
+  uretmez.
 
 ## Effect Guardrail Testi
 
