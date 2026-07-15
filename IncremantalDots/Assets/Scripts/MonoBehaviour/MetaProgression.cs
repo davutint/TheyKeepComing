@@ -5,17 +5,34 @@ using UnityEngine;
 
 namespace DeadWalls
 {
+    public enum MetaProgressLoadStatus
+    {
+        NotLoaded = 0,
+        CreatedNew = 1,
+        Loaded = 2,
+        Migrated = 3,
+        UnsupportedVersion = 4,
+        Corrupt = 5
+    }
+
     /// <summary>Kalici meta durumunun serilestirilebilir govdesi (JsonUtility uyumlu).</summary>
     [Serializable]
     public class MetaProgressState
     {
-        public int Version = 2;
+        public const int CurrentVersion = 3;
+        public const int MinimumSupportedVersion = 1;
+
+        public int Version = CurrentVersion;
         public int Souls;                 // harcanabilir bakiye (1 kill = 1 Ruh)
         public int TotalSoulsEarned;
         public int BestDay;
         public int TotalRuns;
         public long TotalKillsAllTime;
         public List<MetaUpgradeLevel> Upgrades = new List<MetaUpgradeLevel>();
+        // Meta yalniz olasi content havuzunu genisletir; aktif run graph'ini degistirmez.
+        public List<string> UnlockedPoolIds = new List<string>();
+        // Package I onboarding adimlari kendi stable flag Id'lerini bu listede saklar.
+        public List<string> TutorialFlags = new List<string>();
         // Death journal recovery ayni kosuya ikinci kez odul yazamasin.
         public List<string> RewardedRunIds = new List<string>();
     }
@@ -51,9 +68,14 @@ namespace DeadWalls
         // Owner karari (2026-07-08): kavram RUH, oyun dili INGILIZCE -> ekranda "SOULS"
         public const string CurrencyName = "SOULS";
         public const int RecordBonusPerDay = 50;  // yeni rekor: bonus = yeniBestDay * bu
+        private const int MaxRewardReceipts = 128;
 
         private static MetaProgressState _state;
+        private static bool _persistenceBlocked;
         private static string FilePath => Path.Combine(Application.persistentDataPath, "meta_progress.json");
+
+        public static MetaProgressLoadStatus LoadStatus { get; private set; } = MetaProgressLoadStatus.NotLoaded;
+        public static bool CanPersist => !_persistenceBlocked;
 
         public static MetaProgressState State
         {
@@ -68,36 +90,238 @@ namespace DeadWalls
         public static void Load()
         {
             _state = null;
+            _persistenceBlocked = false;
+            LoadStatus = MetaProgressLoadStatus.NotLoaded;
             try
             {
                 if (!AtomicJsonFile.TryRecoverOrphanedTemp(FilePath, out string recoveryError))
                     Debug.LogWarning($"[MetaProgression] Yetim temp meta kaydi kurtarilamadi: {recoveryError}");
-                if (File.Exists(FilePath))
-                    _state = JsonUtility.FromJson<MetaProgressState>(File.ReadAllText(FilePath));
+
+                if (!File.Exists(FilePath))
+                {
+                    _state = CreateDefaultState();
+                    LoadStatus = MetaProgressLoadStatus.CreatedNew;
+                    return;
+                }
+
+                string json = File.ReadAllText(FilePath);
+                if (!TryDeserializeState(
+                        json,
+                        out MetaProgressState loaded,
+                        out MetaProgressLoadStatus status,
+                        out string loadError))
+                {
+                    // Bilinmeyen/corrupt schema mevcut dosyanin ustune sessizce yazilamaz.
+                    // In-memory temiz state UI'nin acik kalmasini saglar; Save fail-closed olur.
+                    _state = CreateDefaultState();
+                    _persistenceBlocked = true;
+                    LoadStatus = status;
+                    Debug.LogError($"[MetaProgression] Meta save fail-closed kilitlendi: {loadError}");
+                    return;
+                }
+
+                _state = loaded;
+                LoadStatus = status;
+                if (status == MetaProgressLoadStatus.Migrated && !Save())
+                    Debug.LogError("[MetaProgression] Migrated meta schema durable yazilamadi.");
             }
             catch (Exception e)
             {
-                Debug.LogWarning($"[MetaProgression] Kayit okunamadi, sifirdan baslaniyor: {e.Message}");
+                _state = CreateDefaultState();
+                _persistenceBlocked = true;
+                LoadStatus = MetaProgressLoadStatus.Corrupt;
+                Debug.LogError($"[MetaProgression] Meta save okunamadi; yazma fail-closed kilitlendi: {e.Message}");
             }
-
-            if (_state == null)
-                _state = new MetaProgressState();
-
-            _state.Version = 2;
-            _state.Upgrades ??= new List<MetaUpgradeLevel>();
-            _state.RewardedRunIds ??= new List<string>();
         }
 
         public static bool Save()
         {
-            if (_state == null)
+            if (_state == null || _persistenceBlocked)
+            {
+                if (_persistenceBlocked)
+                    Debug.LogError($"[MetaProgression] Save reddedildi; load status: {LoadStatus}.");
                 return false;
+            }
+
+            NormalizeState(_state);
 
             if (AtomicJsonFile.TryWrite(FilePath, JsonUtility.ToJson(_state, true), out string error))
                 return true;
 
             Debug.LogError($"[MetaProgression] Kayit yazilamadi: {error}");
             return false;
+        }
+
+        internal static bool TryDeserializeState(
+            string json,
+            out MetaProgressState state,
+            out MetaProgressLoadStatus status,
+            out string error)
+        {
+            state = null;
+            status = MetaProgressLoadStatus.Corrupt;
+            error = null;
+
+            if (string.IsNullOrWhiteSpace(json))
+            {
+                error = "Meta JSON bos.";
+                return false;
+            }
+
+            try
+            {
+                var header = JsonUtility.FromJson<MetaVersionHeader>(json);
+                int version = header != null ? header.Version : 0;
+                if (!IsSupportedVersion(version))
+                {
+                    status = MetaProgressLoadStatus.UnsupportedVersion;
+                    error = $"Desteklenmeyen meta schema v{version}; desteklenen aralik "
+                            + $"v{MetaProgressState.MinimumSupportedVersion}-v{MetaProgressState.CurrentVersion}.";
+                    return false;
+                }
+
+                state = JsonUtility.FromJson<MetaProgressState>(json);
+                if (state == null)
+                {
+                    error = "Meta JSON deserialize sonucu null.";
+                    return false;
+                }
+
+                int sourceVersion = state.Version;
+                if (!TryUpgradeToCurrent(state, out error))
+                {
+                    status = MetaProgressLoadStatus.UnsupportedVersion;
+                    state = null;
+                    return false;
+                }
+
+                NormalizeState(state);
+                status = sourceVersion == MetaProgressState.CurrentVersion
+                    ? MetaProgressLoadStatus.Loaded
+                    : MetaProgressLoadStatus.Migrated;
+                return true;
+            }
+            catch (Exception exception)
+            {
+                state = null;
+                status = MetaProgressLoadStatus.Corrupt;
+                error = exception.Message;
+                return false;
+            }
+        }
+
+        internal static bool IsSupportedVersion(int version)
+        {
+            return version >= MetaProgressState.MinimumSupportedVersion
+                && version <= MetaProgressState.CurrentVersion;
+        }
+
+        private static bool TryUpgradeToCurrent(MetaProgressState state, out string error)
+        {
+            error = null;
+            if (state == null || !IsSupportedVersion(state.Version))
+            {
+                error = state == null
+                    ? "Meta state null."
+                    : $"Desteklenmeyen meta schema v{state.Version}.";
+                return false;
+            }
+
+            if (state.Version == 1)
+            {
+                // v1 Souls/istatistik/upgrades tasiyordu; death receipt gecmisi yoktu.
+                state.RewardedRunIds = new List<string>();
+                state.Version = 2;
+            }
+
+            if (state.Version == 2)
+            {
+                // v2 idempotent death receipt gecmisini tasiyordu fakat future pool ve
+                // onboarding state'inin canonical sahipleri yoktu.
+                state.UnlockedPoolIds = new List<string>();
+                state.TutorialFlags = new List<string>();
+                state.Version = 3;
+            }
+
+            return state.Version == MetaProgressState.CurrentVersion;
+        }
+
+        private static MetaProgressState CreateDefaultState()
+        {
+            var state = new MetaProgressState();
+            NormalizeState(state);
+            return state;
+        }
+
+        private static void NormalizeState(MetaProgressState state)
+        {
+            if (state == null)
+                return;
+
+            state.Version = MetaProgressState.CurrentVersion;
+            state.Souls = Mathf.Max(0, state.Souls);
+            state.TotalSoulsEarned = Mathf.Max(0, state.TotalSoulsEarned);
+            state.BestDay = Mathf.Max(0, state.BestDay);
+            state.TotalRuns = Mathf.Max(0, state.TotalRuns);
+            state.TotalKillsAllTime = Math.Max(0L, state.TotalKillsAllTime);
+            state.Upgrades = NormalizeUpgradeLevels(state.Upgrades);
+            state.UnlockedPoolIds = NormalizeIds(state.UnlockedPoolIds, 0);
+            state.TutorialFlags = NormalizeIds(state.TutorialFlags, 0);
+            state.RewardedRunIds = NormalizeIds(state.RewardedRunIds, MaxRewardReceipts);
+        }
+
+        private static List<MetaUpgradeLevel> NormalizeUpgradeLevels(List<MetaUpgradeLevel> source)
+        {
+            var normalized = new List<MetaUpgradeLevel>();
+            var byId = new Dictionary<string, MetaUpgradeLevel>(StringComparer.Ordinal);
+            if (source == null)
+                return normalized;
+
+            foreach (var entry in source)
+            {
+                string id = entry?.Id?.Trim();
+                int level = entry != null ? Mathf.Max(0, entry.Level) : 0;
+                if (string.IsNullOrEmpty(id) || level == 0)
+                    continue;
+
+                if (byId.TryGetValue(id, out MetaUpgradeLevel existing))
+                {
+                    existing.Level = Mathf.Max(existing.Level, level);
+                    continue;
+                }
+
+                var copy = new MetaUpgradeLevel { Id = id, Level = level };
+                byId.Add(id, copy);
+                normalized.Add(copy);
+            }
+
+            return normalized;
+        }
+
+        private static List<string> NormalizeIds(List<string> source, int maxCount)
+        {
+            var reversed = new List<string>();
+            var seen = new HashSet<string>(StringComparer.Ordinal);
+            if (source != null)
+            {
+                for (int i = source.Count - 1; i >= 0; i--)
+                {
+                    string id = source[i]?.Trim();
+                    if (!string.IsNullOrEmpty(id) && seen.Add(id))
+                        reversed.Add(id);
+                }
+            }
+
+            reversed.Reverse();
+            if (maxCount > 0 && reversed.Count > maxCount)
+                reversed.RemoveRange(0, reversed.Count - maxCount);
+            return reversed;
+        }
+
+        [Serializable]
+        private class MetaVersionHeader
+        {
+            public int Version;
         }
 
         /// <summary>
@@ -172,17 +396,83 @@ namespace DeadWalls
 
             foreach (var u in State.Upgrades)
             {
-                if (u.Id == id)
+                if (u != null && string.Equals(u.Id, id, StringComparison.Ordinal))
                     return u.Level;
             }
 
             return 0;
         }
 
+        public static bool HasPoolUnlock(string poolId)
+        {
+            return ContainsId(State.UnlockedPoolIds, poolId);
+        }
+
+        public static bool TryUnlockPoolContent(string poolId)
+        {
+            string id = poolId?.Trim();
+            if (string.IsNullOrEmpty(id) || !CanPersist)
+                return false;
+            if (ContainsId(State.UnlockedPoolIds, id))
+                return true;
+
+            State.UnlockedPoolIds.Add(id);
+            if (Save())
+                return true;
+
+            State.UnlockedPoolIds.Remove(id);
+            return false;
+        }
+
+        public static bool HasTutorialFlag(string flagId)
+        {
+            return ContainsId(State.TutorialFlags, flagId);
+        }
+
+        public static bool SetTutorialFlag(string flagId, bool enabled)
+        {
+            string id = flagId?.Trim();
+            if (string.IsNullOrEmpty(id) || !CanPersist)
+                return false;
+
+            bool current = ContainsId(State.TutorialFlags, id);
+            if (current == enabled)
+                return true;
+
+            if (enabled)
+                State.TutorialFlags.Add(id);
+            else
+                State.TutorialFlags.Remove(id);
+
+            if (Save())
+                return true;
+
+            if (enabled)
+                State.TutorialFlags.Remove(id);
+            else
+                State.TutorialFlags.Add(id);
+            return false;
+        }
+
+        private static bool ContainsId(List<string> source, string id)
+        {
+            if (source == null || string.IsNullOrWhiteSpace(id))
+                return false;
+
+            string normalized = id.Trim();
+            foreach (string candidate in source)
+            {
+                if (string.Equals(candidate, normalized, StringComparison.Ordinal))
+                    return true;
+            }
+
+            return false;
+        }
+
         /// <summary>Satin alma: bakiye + MaxLevel kontrolu; basarida seviye artar ve kaydedilir.</summary>
         public static bool TryBuyUpgrade(MetaUpgradeSO upgrade)
         {
-            if (upgrade == null)
+            if (upgrade == null || string.IsNullOrWhiteSpace(upgrade.Id) || !CanPersist)
                 return false;
 
             int level = GetUpgradeLevel(upgrade.Id);
@@ -193,30 +483,43 @@ namespace DeadWalls
             if (State.Souls < cost)
                 return false;
 
+            int previousSouls = State.Souls;
             State.Souls -= cost;
             SetUpgradeLevel(upgrade.Id, level + 1);
-            Save();
-            return true;
+            if (Save())
+                return true;
+
+            // Disk transaction basarisizsa satin alma in-memory de commit edilmez.
+            State.Souls = previousSouls;
+            SetUpgradeLevel(upgrade.Id, level);
+            return false;
         }
 
         private static void SetUpgradeLevel(string id, int level)
         {
-            foreach (var u in State.Upgrades)
+            for (int i = State.Upgrades.Count - 1; i >= 0; i--)
             {
-                if (u.Id == id)
+                var u = State.Upgrades[i];
+                if (u != null && string.Equals(u.Id, id, StringComparison.Ordinal))
                 {
-                    u.Level = level;
+                    if (level <= 0)
+                        State.Upgrades.RemoveAt(i);
+                    else
+                        u.Level = level;
                     return;
                 }
             }
 
-            State.Upgrades.Add(new MetaUpgradeLevel { Id = id, Level = level });
+            if (level > 0)
+                State.Upgrades.Add(new MetaUpgradeLevel { Id = id, Level = level });
         }
 
         /// <summary>Test/debug: tum meta ilerlemeyi siler (oyuncu-yuzeyinde KULLANILMAZ).</summary>
         public static void ResetAll()
         {
-            _state = new MetaProgressState();
+            _persistenceBlocked = false;
+            LoadStatus = MetaProgressLoadStatus.CreatedNew;
+            _state = CreateDefaultState();
             Save();
         }
     }

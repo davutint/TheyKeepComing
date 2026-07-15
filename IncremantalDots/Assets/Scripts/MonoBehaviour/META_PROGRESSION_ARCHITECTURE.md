@@ -8,14 +8,48 @@ Player-facing bütün metinler İngilizcedir. Kod tarafındaki para birimi otori
 
 ## Kalıcı state
 
-`MetaProgression.cs` içindeki `MetaProgressState v2`, `persistentDataPath/meta_progress.json` dosyasına yazılır:
+`MetaProgression.cs` içindeki `MetaProgressState v3`, `persistentDataPath/meta_progress.json` dosyasına yazılır:
 
 - Souls ve TotalSoulsEarned,
 - BestDay, TotalRuns ve TotalKillsAllTime,
 - `MetaUpgradeLevel` listesi,
+- Gelecekteki Heart/ability content olasılık havuzlarını açacak stable `UnlockedPoolIds`,
+- Package I onboarding sahibinin kullanacağı stable `TutorialFlags`,
 - Aynı koşunun iki kez ödüllendirilmesini önleyen sınırlı `RewardedRunIds` listesi.
 
-JsonUtility dictionary serialize etmediği için upgrade state list olarak tutulur. `RewardedRunIds` son 128 run identity'siyle sınırlıdır.
+JsonUtility dictionary serialize etmediği için upgrade ve kimlik state'leri list olarak tutulur.
+Load/Save normalizasyonu boş kimlikleri temizler, duplicate kimlikleri tekilleştirir, duplicate
+upgrade seviyelerinde en yüksek değeri korur ve negatif sayısal state'i sıfıra çeker. Bilinmeyen
+upgrade Id'leri silinmez; gelecekteki veya geçici catalog içeriğinin kalıcı seviyesini kaybetmez.
+`RewardedRunIds` son 128 run identity'siyle sınırlıdır.
+
+## Sürüm ve migration sözleşmesi
+
+- Güncel schema `v3`, desteklenen en eski schema `v1`dir.
+- `v1 -> v2`: Souls, istatistik ve upgrade seviyeleri korunur; bulunmayan reward receipt
+  geçmişi boş başlar.
+- `v2 -> v3`: mevcut bütün state korunur; pool unlock ve tutorial flag listeleri boş başlar.
+- Güncel sürümden büyük, minimumdan küçük veya bozuk JSON otomatik sıfırlanmaz.
+  `LoadStatus` `UnsupportedVersion/Corrupt` olur ve `CanPersist = false` ile bütün meta write
+  yolları fail-closed kilitlenir.
+- Fail-closed durumda in-memory temiz state yalnız UI/runtime'ın açık kalmasını sağlar; orijinal
+  dosyanın üzerine yazılmaz. Death receipt meta durable olana kadar beklemede kalır.
+- `ResetAll()` yalnız explicit debug sahibidir; bilinmeyen dosyayı bilinçsiz migration yerine
+  sessizce silemez.
+
+Migration başarılıysa v3 state atomik biçimde hemen durable yazılır. `TryDeserializeState()`
+saf schema/migration test sahibidir; Player-facing kod doğrudan çağırmaz.
+
+## Pool unlock ve tutorial flag API'si
+
+- `HasPoolUnlock` / `TryUnlockPoolContent`: yalnız stable content-pool Id'sini saklar. Bu state
+  mevcut run'ın generated graph node/edge/Keystone sonucuna zorla içerik enjekte etmez.
+- `HasTutorialFlag` / `SetTutorialFlag`: onboarding tamamlanma/reset state'inin canonical disk
+  sınırıdır; tutorial davranışının kendisi Package I sahibinde kalır.
+- Her iki mutation API'si atomik save başarısızsa in-memory değişikliği geri alır.
+
+Pool unlock consumer'ı, tutorial akışı, aktif run sırasında meta satın alma guard'ı ve
+`StartingTechLevel` temizliği bu schema işinin dışında ayrı tracker maddeleridir.
 
 ## Koşu sonucu transaction'ı
 
@@ -62,3 +96,6 @@ başarısızsa receipt silinmez ve sonraki açılış yeniden dener. Ayrıntıl�
 - Run save ile meta save ayrı otoritelerdir. Meta state hiçbir zaman canlı koşunun phase/timer/combat snapshot'ını taşımaz.
 - Meta write `AtomicJsonFile` üzerinden temp + flush + replace sözleşmesiyle yapılır; durable
   sonuç alınmadan death receipt temizlenmez.
+- Meta satın alımı disk write başarısızsa Souls/seviye değişikliğini in-memory geri alır.
+- Canonical schema alanları run save'e kopyalanmaz; run-only Grave Essence, Heart graph,
+  phase/timer ve combat snapshot yalnız `RunSaveState` sahibindedir.
