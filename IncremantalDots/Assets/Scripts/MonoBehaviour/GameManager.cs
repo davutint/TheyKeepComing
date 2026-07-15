@@ -164,12 +164,45 @@ namespace DeadWalls
         public int ActiveArcherFormationVersion => _archerFormationVersion;
         /// <summary>Son biten kosunun meta ozeti (olum ekrani gosterir).</summary>
         public MetaRunResult LastRunResult { get; private set; }
+        /// <summary>Meta magazasi yalniz durable olum sonucu sonrasinda harcama kabul eder.</summary>
+        public bool IsMetaShopPurchaseAllowed => _initialized && MetaPurchaseRules.CanPurchase(
+            GameState.IsGameOver,
+            _metaRunCollected,
+            LastRunResult.Persisted,
+            MetaProgression.CanPersist);
 
         public event System.Action OnGameOver;
         public event System.Action OnLevelUp;
         public event System.Action OnWaveCompleted;
         public event System.Action OnWaveChanged;
         public event System.Action OnGameStateChanged;
+
+        public bool CanBuyMetaUpgrade(MetaUpgradeSO upgrade)
+        {
+            if (!IsMetaShopPurchaseAllowed
+                || upgrade == null
+                || metaUpgradeCatalog == null
+                || string.IsNullOrWhiteSpace(upgrade.Id))
+            {
+                return false;
+            }
+
+            MetaUpgradeSO canonical = metaUpgradeCatalog.GetUpgrade(upgrade.Id);
+            if (canonical != upgrade || !MetaUpgradePolicy.IsRunGraphIsolatedEffect(canonical.EffectType))
+                return false;
+
+            int level = MetaProgression.GetUpgradeLevel(canonical.Id);
+            return level < canonical.MaxLevel && MetaProgression.State.Souls >= canonical.GetCost(level);
+        }
+
+        public bool TryBuyMetaUpgrade(MetaUpgradeSO upgrade)
+        {
+            if (!CanBuyMetaUpgrade(upgrade))
+                return false;
+
+            MetaUpgradeSO canonical = metaUpgradeCatalog.GetUpgrade(upgrade.Id);
+            return canonical != null && MetaProgression.TryBuyUpgrade(canonical);
+        }
 
         private void Awake()
         {
@@ -3090,7 +3123,7 @@ namespace DeadWalls
 
             // 1) Tech: seviyeleri maliyetsiz yeniden uygula (reveal + carpan + spell + aggregate)
             foreach (var entry in save.TechNodeLevels)
-                GrantTechNodeLevelsFromMeta(entry.Id, entry.Level);
+                RestoreSavedTechNodeLevels(entry.Id, entry.Level);
 
             // 2) Council hafizasi (salt DAHIL — kosu-ici RNG determinizmi korunur)
             _councilFlags.Clear();
@@ -3546,7 +3579,7 @@ namespace DeadWalls
             RestoreWorkerBuildingUpgradeState(mobileConfigEntity, save);
 
             foreach (var entry in save.TechNodeLevels)
-                GrantTechNodeLevelsFromMeta(entry.Id, entry.Level);
+                RestoreSavedTechNodeLevels(entry.Id, entry.Level);
 
             _councilFlags.Clear();
             foreach (var flag in save.CouncilFlags)
@@ -3954,6 +3987,13 @@ namespace DeadWalls
                 if (upgrade == null)
                     continue;
 
+                if (!MetaUpgradePolicy.IsRunGraphIsolatedEffect(upgrade.EffectType))
+                {
+                    Debug.LogError($"[GameManager] Meta upgrade '{upgrade.Id}' effect '{upgrade.EffectType}' "
+                                   + "run graph isolation politikasina aykiri; kosuya uygulanmadi.");
+                    continue;
+                }
+
                 int level = MetaProgression.GetUpgradeLevel(upgrade.Id);
                 if (level <= 0)
                     continue;
@@ -3972,9 +4012,6 @@ namespace DeadWalls
 
                             archerCountsDirty = true;
                         }
-                        break;
-                    case MetaUpgradeEffectType.StartingTechLevel:
-                        GrantTechNodeLevelsFromMeta(upgrade.TechNodeId, level);
                         break;
                     case MetaUpgradeEffectType.WallHpPercent:
                         _metaWallHpPercent += total;
@@ -4010,8 +4047,8 @@ namespace DeadWalls
             return BuildSingleResourceCost(resource, amount);
         }
 
-        /// <summary>Meta ile acilan tech: maliyetsiz, hedef seviyeye tamamlar (reveal + effect'ler dahil).</summary>
-        private void GrantTechNodeLevelsFromMeta(string nodeId, int targetLevel)
+        /// <summary>Exact Continue icin kayitli legacy tech seviyesini maliyetsiz yeniden kurar.</summary>
+        private void RestoreSavedTechNodeLevels(string nodeId, int targetLevel)
         {
             if (techTreeCatalog == null
                 || string.IsNullOrEmpty(nodeId)

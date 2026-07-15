@@ -34,8 +34,10 @@ namespace DeadWalls
                     if (upgrade == null) { problems.Add("Upgrades listesinde null giris."); continue; }
                     if (string.IsNullOrEmpty(upgrade.Id)) problems.Add($"'{upgrade.name}' Id bos.");
                     else if (!ids.Add(upgrade.Id)) problems.Add($"Duplicate Id: '{upgrade.Id}'.");
-                    if (upgrade.EffectType == MetaUpgradeEffectType.StartingTechLevel && string.IsNullOrEmpty(upgrade.TechNodeId))
-                        problems.Add($"'{upgrade.Id}' StartingTechLevel ama TechNodeId bos.");
+                    if (MoatDormancyRules.IsDormantMetaUpgradeId(upgrade.Id))
+                        problems.Add($"'{upgrade.Id}' dormant V1 meta content; aktif catalog'da bulunamaz.");
+                    if (!MetaUpgradePolicy.IsRunGraphIsolatedEffect(upgrade.EffectType))
+                        problems.Add($"'{upgrade.Id}' effect '{upgrade.EffectType}' run graph isolation politikasina aykiri.");
                 }
             }
 

@@ -48,8 +48,8 @@ saf schema/migration test sahibidir; Player-facing kod doğrudan çağırmaz.
   sınırıdır; tutorial davranışının kendisi Package I sahibinde kalır.
 - Her iki mutation API'si atomik save başarısızsa in-memory değişikliği geri alır.
 
-Pool unlock consumer'ı, tutorial akışı, aktif run sırasında meta satın alma guard'ı ve
-`StartingTechLevel` temizliği bu schema işinin dışında ayrı tracker maddeleridir.
+Pool unlock consumer'ı ve tutorial akışı sonraki tracker işlerinde kalır. Satın alma ve graph
+izolasyon sınırı aşağıdaki runtime sözleşmesiyle tamamlanmıştır.
 
 ## Koşu sonucu transaction'ı
 
@@ -81,12 +81,42 @@ başarısızsa receipt silinmez ve sonraki açılış yeniden dener. Ayrıntıl�
 
 - StartingResource -> `AddResources`
 - StartingArchers -> `SpawnArcher`; Basic/Rapid/Frost ortak `1000` cap'i bypass edilmez
-- StartingTechLevel -> `GrantTechNodeLevelsFromMeta`
 - WallHpPercent -> defense aggregate
 - ArcherDamagePercent -> archer stat scaling
 - ProductionPercent -> economy aggregate
 
-`GameManager.ApplyMetaProgressionAtRunStart()` her yeni koşuda state'i mevcut gameplay kanallarından uygular. `_metaAppliedThisRun` aynı runtime başlangıcında çift uygulamayı önler.
+`MetaUpgradePolicy.IsRunGraphIsolatedEffect()` bu beş effect yolunun fail-closed allowlist'idir.
+`None`, legacy numeric `3` ve gelecekte eklenecek tanımsız effect'ler catalog validation'da
+reddedilir; stale bir asset runtime'a ulaşırsa `ApplyMetaProgressionAtRunStart()` onu loglayıp
+uygulamaz. `StartingTechLevel`, `TechNodeId` ve dormant `Meta_start_moat.asset` üretim modelinden
+kaldırılmıştır. Enum'da `WallHpPercent = 4` ve sonraki numeric değerler serialized uyumluluk için
+yerini korur; boşalan `3` bilerek yeniden kullanılmaz.
+
+`GameManager.ApplyMetaProgressionAtRunStart()` her yeni koşuda state'i mevcut gameplay
+kanallarından uygular. `_metaAppliedThisRun` aynı runtime başlangıcında çift uygulamayı önler.
+Exact Continue içindeki saved legacy tech level replay'i `RestoreSavedTechNodeLevels()` sahibinde
+kalır; bu metottan meta catalog'a açılan bir çağrı yolu yoktur.
+
+## Death-only satın alma sınırı
+
+Game Over panelinde görünmek tek başına yetki değildir. Otoriter satın alma API'si
+`GameManager.TryBuyMetaUpgrade()` metodudur ve dört koşulu birlikte zorunlu tutar:
+
+1. ECS/Mono cache Game Over durumundadır.
+2. O koşunun death transaction'ı `GameManager` tarafından toplanmıştır.
+3. `LastRunResult.Persisted`, reward receipt dahil meta state'in durable olduğunu doğrular.
+4. `MetaProgression.CanPersist` true'dur.
+
+`CanBuyMetaUpgrade()` ayrıca verilen definition'ın aktif `MetaUpgradeCatalogSO` içindeki aynı
+canonical asset olduğunu doğrular. Aynı Id'yi taşıyan katalog dışı bir asset farklı fiyat veya
+effect ile satın alma yapamaz. `MetaProgression.TryBuyUpgrade()` persistence katmanında internal
+kaldığı için Player-facing kod bu ölüm sınırını doğrudan bypass edemez. `MetaProgressionUI`
+button interactability ve click transaction'ını aynı `GameManager` kapısından geçirir.
+
+Satın alınan seviye ölmüş koşuyu veya o koşunun generated Heart graph'ını değiştirmez; etkiler
+yalnız sonraki `RestartGame()` / yeni koşu başlangıcında uygulanır. `UnlockedPoolIds` yalnız
+gelecekte üretilecek graph için olası content havuzunu genişletebilir; mevcut graph node, edge,
+Keystone lock veya result state'ine retroaktif yazamaz.
 
 ## Kurallar
 
@@ -97,5 +127,8 @@ başarısızsa receipt silinmez ve sonraki açılış yeniden dener. Ayrıntıl�
 - Meta write `AtomicJsonFile` üzerinden temp + flush + replace sözleşmesiyle yapılır; durable
   sonuç alınmadan death receipt temizlenmez.
 - Meta satın alımı disk write başarısızsa Souls/seviye değişikliğini in-memory geri alır.
+- Aktif koşuda, reward durable değilken veya meta persistence fail-closed iken satın alma yoktur.
+- Pause Restart gizlidir; yaşayan save varken Main Menu New Run açılamaz. Game Over Restart yeni
+  koşudur ve gönüllü prestige/reset sayılmaz.
 - Canonical schema alanları run save'e kopyalanmaz; run-only Grave Essence, Heart graph,
   phase/timer ve combat snapshot yalnız `RunSaveState` sahibindedir.

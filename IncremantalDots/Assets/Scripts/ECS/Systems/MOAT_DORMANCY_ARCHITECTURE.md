@@ -18,13 +18,20 @@ Bu kural Baker, tech aggregate ve runtime reset yollarında uygulanır. Böylece
 
 ## Content Sınırı
 
-Assetler fiziksel olarak korunur fakat aktif ürün catalog'larında yer almaz:
+Legacy tech asset'leri fiziksel olarak korunur fakat aktif ürün catalog'unda yer almaz:
 
 - `DeeperMoat.asset` (`moat_dig`)
 - `BurningMoat.asset` (`moat_flame`)
-- `Meta_start_moat.asset` (`start_moat`)
 
-`TechTreeCatalog.asset`, `MetaUpgradeCatalog.asset` ve `WallReinforcement.asset` reveal bağlantısı bu içerikleri dışarıda bırakır. Setup tool aynı dormant id'leri yeniden seed veya merge etmez. `GameManager`, stale bir catalog/save üzerinden Moat effect'i gelirse effect'i yok sayar; meta restore da Moat node level'i grant etmez.
+Legacy `Meta_start_moat.asset` (`start_moat`) artık yalnız dormant değildir; Package H meta
+boundary kapsamında `StartingTechLevel` effect modeliyle birlikte fiziksel olarak kaldırılmıştır.
+`MoatDormancyRules.StartingMoatMetaId` ve setup filter'ı eski checkout/asset kopyalarının aktif
+catalog'a yeniden merge edilmesini engelleyen compatibility guard olarak kalır.
+
+`TechTreeCatalog.asset` ve `WallReinforcement.asset` reveal bağlantısı moat tech içeriğini
+dışarıda bırakır. Setup tool aynı dormant id'leri yeniden seed veya merge etmez. `GameManager`,
+stale bir run save üzerinden Moat tech effect'i gelirse exact Continue restore'unda yok sayar;
+meta catalog'un tech node grant yolu artık mevcut değildir.
 
 Hendek görseli ve `MoatXMin/MoatXMax` geometri alanları world-art/migration verisi olarak kalabilir. Görsel hendek gameplay etkisi anlamına gelmez.
 

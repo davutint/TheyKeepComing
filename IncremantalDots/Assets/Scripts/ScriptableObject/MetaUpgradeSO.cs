@@ -17,9 +17,6 @@ namespace DeadWalls
         /// <summary>Kosuya ekstra Basic okcuyla basla (population tuketmez).</summary>
         StartingArchers = 2,
 
-        /// <summary>Kosuya belirli tech node'u acik basla (TechNodeId; seviye = upgrade seviyesi, maliyetsiz).</summary>
-        StartingTechLevel = 3,
-
         /// <summary>Duvar/Kapi/Cekirdek MaxHP'sine kalici yuzde (0.05 = +%5/seviye).</summary>
         WallHpPercent = 4,
 
@@ -28,6 +25,29 @@ namespace DeadWalls
 
         /// <summary>Tum worker uretimine kalici yuzde (0.03 = +%3/seviye).</summary>
         ProductionPercent = 6,
+    }
+
+    /// <summary>
+    /// Meta etkilerinin kosu sinirini tek yerde tanimlar. Meta yalniz yeni kosunun baslangic
+    /// degerlerine ve kalici aggregate carpanlarina katkida bulunabilir; generated Heart graph
+    /// node/edge/Keystone sonucunu secemez veya acamaz.
+    /// </summary>
+    public static class MetaUpgradePolicy
+    {
+        public static bool IsRunGraphIsolatedEffect(MetaUpgradeEffectType effectType)
+        {
+            switch (effectType)
+            {
+                case MetaUpgradeEffectType.StartingResource:
+                case MetaUpgradeEffectType.StartingArchers:
+                case MetaUpgradeEffectType.WallHpPercent:
+                case MetaUpgradeEffectType.ArcherDamagePercent:
+                case MetaUpgradeEffectType.ProductionPercent:
+                    return true;
+                default:
+                    return false;
+            }
+        }
     }
 
     /// <summary>
@@ -54,8 +74,6 @@ namespace DeadWalls
         public float ValuePerLevel = 75f;
         [Tooltip("StartingResource icin hedef kaynak (Balanced = 4 kaynaga esit dagitilir).")]
         public EconomyFocusType Resource = EconomyFocusType.Balanced;
-        [Tooltip("StartingTechLevel icin tech node id'si (orn. moat_dig).")]
-        public string TechNodeId = "";
 
         public int GetCost(int currentLevel)
         {

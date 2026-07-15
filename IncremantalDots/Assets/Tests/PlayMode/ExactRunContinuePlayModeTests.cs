@@ -1177,6 +1177,61 @@ namespace DeadWalls.Tests
         }
 
         [UnityTest]
+        public IEnumerator MetaPurchase_ActiveRunRejectedAndDurableDeathAllowsCanonicalUpgrade()
+        {
+            var gameManager = GameManager.Instance;
+            bool runtimeReady = false;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                {
+                    runtimeReady = true;
+                    break;
+                }
+                yield return null;
+            }
+            Assert.That(runtimeReady, Is.True);
+
+            MetaUpgradeSO upgrade = gameManager.MetaCatalog.GetUpgrade("start_wood");
+            Assert.That(upgrade, Is.Not.Null);
+            MetaProgression.State.Souls = 1_000;
+            Assert.That(MetaProgression.Save(), Is.True);
+
+            int levelBefore = MetaProgression.GetUpgradeLevel(upgrade.Id);
+            int activeRunSouls = MetaProgression.State.Souls;
+            Assert.That(gameManager.IsMetaShopPurchaseAllowed, Is.False);
+            Assert.That(gameManager.TryBuyMetaUpgrade(upgrade), Is.False);
+            Assert.That(MetaProgression.GetUpgradeLevel(upgrade.Id), Is.EqualTo(levelBefore));
+            Assert.That(MetaProgression.State.Souls, Is.EqualTo(activeRunSouls));
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            Entity gameStateEntity = entityManager.CreateEntityQuery(typeof(GameStateData)).GetSingletonEntity();
+            var gameState = entityManager.GetComponentData<GameStateData>(gameStateEntity);
+            gameState.TotalKills = 17;
+            gameState.IsGameOver = true;
+            entityManager.SetComponentData(gameStateEntity, gameState);
+
+            Assert.That(gameManager.SaveRunSnapshot(), Is.False);
+            Assert.That(gameManager.LastRunResult.Persisted, Is.True);
+            Assert.That(gameManager.IsMetaShopPurchaseAllowed, Is.True);
+
+            var spoofed = ScriptableObject.CreateInstance<MetaUpgradeSO>();
+            spoofed.Id = upgrade.Id;
+            spoofed.EffectType = upgrade.EffectType;
+            spoofed.BaseCost = 1;
+            Assert.That(gameManager.TryBuyMetaUpgrade(spoofed), Is.False,
+                "Catalog disi ayni Id asset'i canonical fiyat/definition owner'ini bypass etmemeli.");
+            UnityEngine.Object.Destroy(spoofed);
+
+            int soulsBeforePurchase = MetaProgression.State.Souls;
+            int expectedCost = upgrade.GetCost(levelBefore);
+            Assert.That(gameManager.TryBuyMetaUpgrade(upgrade), Is.True);
+            Assert.That(MetaProgression.GetUpgradeLevel(upgrade.Id), Is.EqualTo(levelBefore + 1));
+            Assert.That(MetaProgression.State.Souls, Is.EqualTo(soulsBeforePurchase - expectedCost));
+            yield return null;
+        }
+
+        [UnityTest]
         public IEnumerator SaveRunSnapshot_LethalEcsState_CannotRewriteContinueAfterDeath()
         {
             var gameManager = GameManager.Instance;

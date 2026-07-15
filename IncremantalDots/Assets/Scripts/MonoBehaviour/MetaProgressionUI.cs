@@ -100,11 +100,11 @@ namespace DeadWalls
                 row.name = "MetaRow_" + upgrade.Id;
                 row.SetActive(true);
                 _rows.Add(row);
-                BindRow(row, upgrade);
+                BindRow(row, upgrade, gm);
             }
         }
 
-        private void BindRow(GameObject row, MetaUpgradeSO upgrade)
+        private void BindRow(GameObject row, MetaUpgradeSO upgrade, GameManager gm)
         {
             int level = MetaProgression.GetUpgradeLevel(upgrade.Id);
             bool maxed = level >= upgrade.MaxLevel;
@@ -127,16 +127,16 @@ namespace DeadWalls
                 return;
 
             buyButton.onClick.RemoveAllListeners();
-            buyButton.interactable = !maxed && MetaProgression.State.Souls >= cost;
+            buyButton.interactable = !maxed && gm.CanBuyMetaUpgrade(upgrade);
             buyButton.onClick.AddListener(() =>
             {
-                if (MetaProgression.TryBuyUpgrade(upgrade))
+                if (gm.TryBuyMetaUpgrade(upgrade))
                 {
                     UiSoundFeedback.Instance?.PlaySuccess();
                     var rect = (RectTransform)buyButton.transform;
                     rect.DOKill(true);
                     rect.DOPunchScale(Vector3.one * 0.08f, 0.18f, 8, 0.7f).SetUpdate(true);
-                    RebuildShop(GameManager.Instance);
+                    RebuildShop(gm);
                 }
                 else
                 {

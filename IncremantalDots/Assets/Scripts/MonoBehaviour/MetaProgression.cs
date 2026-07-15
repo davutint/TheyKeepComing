@@ -56,6 +56,16 @@ namespace DeadWalls
         public bool Persisted;
     }
 
+    /// <summary>Meta magazasinin yalniz durable olum sonucu sonrasinda acilmasini tanimlar.</summary>
+    public static class MetaPurchaseRules
+    {
+        public static bool CanPurchase(bool isGameOver, bool deathCollected, bool rewardPersisted,
+            bool canPersist)
+        {
+            return isGameOver && deathCollected && rewardPersisted && canPersist;
+        }
+    }
+
     /// <summary>
     /// Roguelite meta-progression'in kalici katmani (K2 karari). Kosular ARASI yasar:
     /// olumde kill'ler Ruh'a cevrilir (1 kill = 1 Ruh + yeni rekorda gun x RecordBonusPerDay),
@@ -470,9 +480,12 @@ namespace DeadWalls
         }
 
         /// <summary>Satin alma: bakiye + MaxLevel kontrolu; basarida seviye artar ve kaydedilir.</summary>
-        public static bool TryBuyUpgrade(MetaUpgradeSO upgrade)
+        internal static bool TryBuyUpgrade(MetaUpgradeSO upgrade)
         {
-            if (upgrade == null || string.IsNullOrWhiteSpace(upgrade.Id) || !CanPersist)
+            if (upgrade == null
+                || string.IsNullOrWhiteSpace(upgrade.Id)
+                || !MetaUpgradePolicy.IsRunGraphIsolatedEffect(upgrade.EffectType)
+                || !CanPersist)
                 return false;
 
             int level = GetUpgradeLevel(upgrade.Id);
