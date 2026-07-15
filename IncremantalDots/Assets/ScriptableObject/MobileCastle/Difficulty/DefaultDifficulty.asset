@@ -129,6 +129,12 @@ MonoBehaviour:
   DawnIntensity: 0.15
   RepairBaseWoodCost: 120
   RepairBaseStoneCost: 50
+  NormalRepairHealPercent: 0.25
+  RepairStonePerMissingHp: 0.1
+  RepairDayPriceMultiplier: 1
+  RallyCooldown: 60
+  EmergencyRepairHealPercent: 0.2
+  EmergencyRepairCooldown: 120
   BedBaseWoodCost: 100
   BedCostGrowthCapacityInterval: 25
   WorkerCapacityBaseWoodCost: 100

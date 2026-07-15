@@ -85,6 +85,16 @@ namespace DeadWalls
         // Repair maliyeti: tam kayipta odenen taban (kayip oranıyla olceklenir)
         public int RepairBaseWoodCost;
         public int RepairBaseStoneCost;
+        // V1 normal repair: Day/Dusk'ta MaxHP yuzdesi kadar paket heal; Stone maliyeti
+        // gercek iyilestirilen HP * birim fiyat * gun carpani ile hesaplanir.
+        public float NormalRepairHealPercent;
+        public float RepairStonePerMissingHp;
+        public float RepairDayPriceMultiplier;
+        // V1 aktif ability tuning'i. Rally effect state'i CastleYardPrepState'te kalir;
+        // cooldown ve Emergency Repair tuning'i bu profile-owned config'ten okunur.
+        public float RallyCooldown;
+        public float EmergencyRepairHealPercent;
+        public float EmergencyRepairCooldown;
         // --- Tek Cephe (K4, M-0): dusmanlar yalniz SAGDAN gelir ---
         // true iken 360-ring spawn/hedefleme devre disi; false = eski davranis (geri alinabilir)
         public bool SingleFrontEnabled;

@@ -2,11 +2,11 @@
 
 > **Amaç:** V1 Blueprint hedefi ile mevcut Unity projesi arasındaki farkı tek yerde tutmak; nerede kaldığımızı, sıradaki işi ve tamamlanma kanıtını kaybetmemek.
 >
-> **Tracker sürümü:** 2.1
+> **Tracker sürümü:** 2.2
 > **Son tam kapsam denetimi:** 2026-07-15
-> **Aktif paket:** Package G - Active Abilities
-> **Aktif iş:** `DW-G-ABILITY-BAR` - Unified Ability Bar + Cost-Free Cooldown Contract
-> **İlerleme:** `295 / 441` tracker checkbox'ı tamamlandı - `%66,89`
+> **Aktif paket:** Package H - Meta + Persistence
+> **Aktif iş:** `DW-H-DEATH-RECEIPT` - Death-Only Meta + Idempotent Reward Contract
+> **İlerleme:** `318 / 441` tracker checkbox'ı tamamlandı - `%72,11`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -148,7 +148,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Meta | Ayrı JSON ve Game Over shop var; `StartingTechLevel` aktif | Kısmi uyum |
 | HUD | CyclePanel, DAY/DUSK/NIGHT ve Horde Pressure mevcut; tek Wall runtime gizleme var | Package I polish gerekli |
 | Tutorial | Aktif tutorial/onboarding sistemi bulunmadı | Package I eksik |
-| Testler | EditMode `209/209`; PlayMode `37 pass + 1 explicit profiler skip`; Standalone Player-targeted 10K `1/1` | Güncel değişiklikler full paketle testli |
+| Testler | Son full baseline: EditMode `209/209`, PlayMode `37 pass + 1 explicit profiler skip`; Package G hedefli doğrulama: EditMode `22/22`, PlayMode `2/2`; Standalone Player-targeted 10K `1/1` | Package G hedefli regresyonu temiz; full baseline tarihsel olarak korunuyor |
 | Telemetry | Spawn budget demanded/spawned/backlog telemetry mevcut; tam Blueprint event owner'ı eksik | Kısmi |
 
 ---
@@ -163,8 +163,8 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | 4 | D - Archers + Ammo | Tamamlandı | 1.000 x 10.000 targeting/projectile ve Arrow truth çalışır |
 | 5 | E - Castle Heart | Tamamlandı | Aynı seed/load aynı valid graph'ı üretir; production content owner gate ayrı |
 | 6 | F - Council | Tamamlandı | 9 template staged launch set, curated repeat/follow-up, 5.400-sample budget ve full regression geçti |
-| 7 | G - Active Abilities | **Aktif** | Kaynak tüketmez; Night repair sözleşmesi çalışır |
-| 8 | H - Meta + Persistence | Bekliyor | Ölüm ödülü idempotent; force-close ölümü geri alamaz |
+| 7 | G - Active Abilities | Tamamlandı | Kaynak tüketmez; Night repair sözleşmesi ve exact cooldown save testli |
+| 8 | H - Meta + Persistence | **Aktif** | Ölüm ödülü idempotent; force-close ölümü geri alamaz |
 | 9 | I - Product Gate | Bekliyor | 10k scenario, tutorial ve temiz görsel inceleme |
 
 > “A1/A2” resmî Blueprint paketi değildir. Resmî paketler A-I'dır; iş kimlikleri yalnız tracker içinde `DW-A-SAVE` gibi kullanılır.
@@ -680,40 +680,47 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 | Ability | Mevcut oyun | Blueprint hedefi |
 |---|---|---|
-| Fireball | World target, AoE projectile ve cooldown mevcut | Koru; Heart guarantee/evolution/save ekle |
-| Rally | Wood+Food maliyetli prep purchase | Key `2`, global fire-rate buff, cooldown-only |
-| Emergency Repair | Yok | Key `3`, Night Wall % heal, uzun cooldown |
-| Fortify | Resource-cost prep etkisi mevcut | V1 üçlü ability barında yok; aktif rolü kaldır/ayır |
-| Arrow Storm | Aktif bulunmadı | Eklenmeyecek |
+| Fireball | Alt orta bar `[1]`; world target, AoE projectile, Heart damage/radius/cooldown ve exact save aktif | `[x]` Blueprint hedefiyle uyumlu |
+| Rally | Alt orta bar `[2]`; cost-free global fire-rate buff ve cooldown aktif | `[x]` Blueprint hedefiyle uyumlu |
+| Emergency Repair | Alt orta bar `[3]`; cost-free, Night-only Wall yüzde heal ve uzun cooldown aktif | `[x]` Blueprint hedefiyle uyumlu |
+| Fortify | Resource-cost legacy prep etkisi ayrı; üçlü ability barında yok | `[x]` Aktif ability rolünden ayrıldı |
+| Arrow Storm | Aktif bulunmadı | `[x]` V1'e eklenmedi |
 
 ### Yapılacaklar
 
-- [ ] Alt orta tek ability barı oluştur: Fireball, Rally, Emergency Repair.
-- [ ] Fireball input'unu `1 + world area selection` yap.
-- [ ] Rally input'unu `2` yap ve bütün okçulara kısa fire-rate boost uygula.
-- [ ] Emergency Repair input'unu `3` yap ve yalnız Night sırasında Wall Max HP yüzdesi heal et.
-- [ ] Üç ability'den Wood/Stone/Iron/Food/mana maliyetini kaldır.
-- [ ] Ability kullanımını yalnız unlock + cooldown + phase/input guard ile sınırla.
-- [ ] Fireball targeting sırasında UI click'lerini cast sayma.
-- [ ] Fireball damage/radius/cooldown'u Heart node'larına bağla.
-- [ ] Çıkış ability/spell içeriğini Fireball ile sınırla; yeni büyüleri yalnız ileride meta pool unlock yolu için data-driven bırak.
-- [ ] Rally ve Emergency Repair cooldown state'ini exact save et.
-- [ ] Night normal repair'i kapat; Stone harcanmamasını garanti et.
-- [ ] Night başlangıcında açık repair drawer/input davranışını deterministik kapat.
-- [ ] Normal repair paket formülünü tuning verisi yap: fixed HP, percent HP veya approved hybrid.
-- [ ] Eksik HP başına Stone maliyeti ve day price multiplier tuning alanlarını tanımla.
-- [ ] Emergency Repair yüzdesi ve cooldown tabanını tuning alanı yap.
-- [ ] Wall `0 HP` ile aynı frame Emergency Repair gelirse Game Over kazansın.
-- [ ] Fortify/Rally legacy prep purchase yollarının V1 ability sistemiyle çakışmasını kaldır.
-- [ ] Arrow Storm ekleme.
+- [x] Alt orta tek ability barı oluştur: Fireball, Rally, Emergency Repair.
+- [x] Fireball input'unu `1 + world area selection` yap.
+- [x] Rally input'unu `2` yap ve bütün okçulara kısa fire-rate boost uygula.
+- [x] Emergency Repair input'unu `3` yap ve yalnız Night sırasında Wall Max HP yüzdesi heal et.
+- [x] Üç ability'den Wood/Stone/Iron/Food/mana maliyetini kaldır.
+- [x] Ability kullanımını yalnız unlock + cooldown + phase/input guard ile sınırla.
+- [x] Fireball targeting sırasında UI click'lerini cast sayma.
+- [x] Fireball damage/radius/cooldown'u Heart node'larına bağla.
+- [x] Çıkış ability/spell içeriğini Fireball ile sınırla; yeni büyüleri yalnız ileride meta pool unlock yolu için data-driven bırak.
+- [x] Rally ve Emergency Repair cooldown state'ini exact save et.
+- [x] Night normal repair'i kapat; Stone harcanmamasını garanti et.
+- [x] Night başlangıcında açık repair drawer/input davranışını deterministik kapat.
+- [x] Normal repair paket formülünü tuning verisi yap: fixed HP, percent HP veya approved hybrid.
+- [x] Eksik HP başına Stone maliyeti ve day price multiplier tuning alanlarını tanımla.
+- [x] Emergency Repair yüzdesi ve cooldown tabanını tuning alanı yap.
+- [x] Wall `0 HP` ile aynı frame Emergency Repair gelirse Game Over kazansın.
+- [x] Fortify/Rally legacy prep purchase yollarının V1 ability sistemiyle çakışmasını kaldır.
+- [x] Arrow Storm ekleme.
 
 ### Kabul kapısı
 
-- [ ] Ability'ler ana kaynak tüketmiyor.
-- [ ] Night normal repair harcama yapmıyor.
-- [ ] Emergency Repair ölümü geri çevirmiyor.
-- [ ] Input ile UI aynı state'i gösteriyor.
-- [ ] Cooldown save/load exact.
+- [x] Ability'ler ana kaynak tüketmiyor.
+- [x] Night normal repair harcama yapmıyor.
+- [x] Emergency Repair ölümü geri çevirmiyor.
+- [x] Input ile UI aynı state'i gösteriyor.
+- [x] Cooldown save/load exact.
+
+**Tamamlanma kanıtı (2026-07-15):** `ActiveAbilityRulesTests`,
+`MobileCastleTuningResolverTests` ve `RunPersistenceTests` hedefli EditMode koşusunda
+`22/22`; normal repair phase/Stone sözleşmesi ile exact cooldown/Wall Continue hedefli
+PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
+`SpellCastUI`, eksiksiz üçlü binding, aktif `AbilityBarPanel` ve sıfır legacy
+`SpellUiRoot` doğrulandı.
 
 ---
 
@@ -777,7 +784,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Tek minimal Wall bar | Runtime Wall-only yönü var; prefabda Gate/Core binding'leri hâlâ serialize | `[~]` |
 | Minimal phase area | Büyük CyclePanel + DAY/DUSK/NIGHT labels | `[!]` |
 | Forecast yok | HordePressurePanel aktif bağlı | `[!]` |
-| Abilities alt orta | Fireball ayrı Spell panelinde; Rally drawer'da; Emergency yok | `[!]` |
+| Abilities alt orta | Fireball/Rally/Emergency Repair tek alt orta cooldown barında | `[x]` |
 | Workers/Housing alt sol | Worker drawer var; Housing owner yok | `[~]` |
 | Archers/Heart alt sağ | Archer drawer ve Heart button var; yerleşim/polish doğrulanmalı | `[~]` |
 | Tek drawer | Birden fazla controller bağımsız panel yönetiyor | `[~]` Exclusive owner testi yok |

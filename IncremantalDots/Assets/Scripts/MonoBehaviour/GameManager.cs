@@ -55,7 +55,6 @@ namespace DeadWalls
         private const float GlobalFireRateCardMultiplier = 1.15f;
         private const float GlobalDamageCardBonus = 5f;
         private static readonly ResourceCost FortifyCost = new ResourceCost(0, 50, 25, 0);
-        private static readonly ResourceCost RallyCost = new ResourceCost(35, 0, 0, 45);
         private const int MobileInitialPopulation = 60;
         private const int MobileInitialWoodWorkers = 20;
         private const int MobileInitialStoneWorkers = 10;
@@ -92,6 +91,8 @@ namespace DeadWalls
         private float _spellRadiusBonus;
         private float _spellCooldownMultiplier = 1f;
         private float _fireballCooldownRemaining;
+        private float _rallyCooldownRemaining;
+        private float _emergencyRepairCooldownRemaining;
         // Config/defense base degerleri: tech ilk dokunmadan once yakalanir, her satin almada
         // toplam etki base'ten YENIDEN hesaplanir (compound hatasi yok), restart'ta base geri yazilir.
         private bool _techConfigBaselineCaptured;
@@ -188,15 +189,21 @@ namespace DeadWalls
 
             EnsureHeartRuntime();
             ReadECSData();
-            TickSpellCooldown();
+            TickAbilityCooldowns();
         }
 
-        private void TickSpellCooldown()
+        private void TickAbilityCooldowns()
         {
-            if (_fireballCooldownRemaining <= 0f || GameState.IsGameOver)
+            if (GameState.IsGameOver)
                 return;
 
-            _fireballCooldownRemaining = Mathf.Max(0f, _fireballCooldownRemaining - Time.deltaTime);
+            float deltaTime = Time.deltaTime;
+            if (_fireballCooldownRemaining > 0f)
+                _fireballCooldownRemaining = Mathf.Max(0f, _fireballCooldownRemaining - deltaTime);
+            if (_rallyCooldownRemaining > 0f)
+                _rallyCooldownRemaining = Mathf.Max(0f, _rallyCooldownRemaining - deltaTime);
+            if (_emergencyRepairCooldownRemaining > 0f)
+                _emergencyRepairCooldownRemaining = Mathf.Max(0f, _emergencyRepairCooldownRemaining - deltaTime);
         }
 
         private bool TryInitialize()
@@ -543,7 +550,7 @@ namespace DeadWalls
             if (!SpendResources(GetRepairCost()))
                 return false;
 
-            bool repaired = RepairWallToFull();
+            bool repaired = RepairWallByMaxPercent(GetNormalRepairHealPercent());
             if (repaired)
                 OnGameStateChanged?.Invoke();
 
@@ -590,29 +597,48 @@ namespace DeadWalls
         }
 
         /// <summary>
-        /// Tamir maliyeti kayip oraniyla olceklenir: tam kayipta config taban Stone maliyeti,
-        /// az hasarda orantili ucuz. Tech ReduceRepairCostPercent
-        /// carpani uygulanir. Ana ekonomi sink'lerinden biridir.
+        /// Normal repair gercek iyilestirilecek HP kadar fiyatlanir. Paket buyuklugu,
+        /// HP basina Stone ve day-price carpani DifficultyProfile tarafindan tune edilir.
+        /// Tech/Heart repair indirimi son fiyat carpanina uygulanir.
         /// </summary>
         public ResourceCost GetRepairCost()
         {
-            float missing = Mathf.Clamp01(1f - GetDefensePercent());
-            if (missing <= 0.005f)
+            if (!CanAccessEntityManager() || !_entityManager.Exists(_castleEntity))
                 return ResourceCost.Zero;
 
-            int baseStone = 80;
+            var wall = _entityManager.GetComponentData<WallSegment>(_castleEntity);
+            float missingHp = Mathf.Max(0f, wall.MaxHP - wall.CurrentHP);
+            if (missingHp <= 0.005f || wall.MaxHP <= 0f)
+                return ResourceCost.Zero;
+
+            float healHp = Mathf.Min(missingHp, wall.MaxHP * GetNormalRepairHealPercent());
+            float stonePerHp = 0.10f;
+            float dayPriceMultiplier = 1f;
             if (TryGetMobileCombatConfig(out var config))
             {
-                if (config.RepairBaseStoneCost > 0) baseStone = config.RepairBaseStoneCost;
+                stonePerHp = config.RepairStonePerMissingHp > 0f
+                    ? config.RepairStonePerMissingHp
+                    : config.RepairBaseStoneCost / Mathf.Max(1f, wall.MaxHP);
+                dayPriceMultiplier = config.RepairDayPriceMultiplier > 0f
+                    ? config.RepairDayPriceMultiplier
+                    : 1f;
             }
 
-            float multiplier = missing * Mathf.Max(
+            float multiplier = dayPriceMultiplier * Mathf.Max(
                 0.05f,
                 _techRepairCostMultiplier * GetHeartRepairCostMultiplier());
             return new ResourceCost(
                 0,
-                Mathf.CeilToInt(baseStone * multiplier),
+                Mathf.Max(1, Mathf.CeilToInt(healHp * stonePerHp * multiplier)),
                 0, 0);
+        }
+
+        public float GetNormalRepairHealPercent()
+        {
+            if (TryGetMobileCombatConfig(out var config) && config.NormalRepairHealPercent > 0f)
+                return Mathf.Clamp01(config.NormalRepairHealPercent);
+
+            return 0.25f;
         }
 
         public ResourceCost GetFortifyCost()
@@ -622,7 +648,7 @@ namespace DeadWalls
 
         public ResourceCost GetRallyCost()
         {
-            return RallyCost;
+            return ResourceCost.Zero;
         }
 
         public bool CanBuyFortify()
@@ -654,19 +680,50 @@ namespace DeadWalls
 
         public bool CanBuyRally()
         {
-            if (!CanUseMobilePrepAction() || !TryGetCastleYardPrepEntity(out var prepEntity))
-                return false;
-
-            var prep = _entityManager.GetComponentData<CastleYardPrepState>(prepEntity);
-            return prep.RallyTimer <= 0f && CanAfford(RallyCost);
+            return CanUseRally();
         }
 
         public bool BuyRally()
         {
-            if (!CanBuyRally())
+            return TryUseRally();
+        }
+
+        public bool RallyUnlocked => true;
+        public float RallyCooldownRemaining => _rallyCooldownRemaining;
+        public float RallyCooldownDuration
+        {
+            get
+            {
+                return TryGetMobileCombatConfig(out var config) && config.RallyCooldown > 0f
+                    ? config.RallyCooldown
+                    : 60f;
+            }
+        }
+        public float RallyActiveRemaining => CastleYardPrep.RallyTimer;
+        public bool RallyActive => RallyActiveRemaining > 0f;
+        public bool RallyReady => CanUseRally();
+
+        public bool CanUseRally()
+        {
+            if (!_initialized
+                || Time.timeScale <= 0f
+                || !TryGetCastleYardPrepEntity(out var prepEntity)
+                || !_entityManager.Exists(_gameStateEntity))
                 return false;
 
-            if (!TryGetCastleYardPrepEntity(out var prepEntity) || !SpendResources(RallyCost))
+            var gameState = _entityManager.GetComponentData<GameStateData>(_gameStateEntity);
+            var prep = _entityManager.GetComponentData<CastleYardPrepState>(prepEntity);
+            return ActiveAbilityRules.CanUseRally(
+                RallyUnlocked,
+                _rallyCooldownRemaining,
+                prep.RallyTimer,
+                gameState.IsGameOver,
+                gameState.IsLevelUpPending);
+        }
+
+        public bool TryUseRally()
+        {
+            if (!CanUseRally() || !TryGetCastleYardPrepEntity(out var prepEntity))
                 return false;
 
             var prep = _entityManager.GetComponentData<CastleYardPrepState>(prepEntity);
@@ -674,9 +731,78 @@ namespace DeadWalls
                 prep.RallyDuration = 10f;
             if (prep.RallyFireRateMultiplier <= 0f)
                 prep.RallyFireRateMultiplier = 1.25f;
+
             prep.RallyTimer = prep.RallyDuration;
+            _rallyCooldownRemaining = RallyCooldownDuration;
             _entityManager.SetComponentData(prepEntity, prep);
             CastleYardPrep = prep;
+            OnGameStateChanged?.Invoke();
+            return true;
+        }
+
+        public bool EmergencyRepairUnlocked => true;
+        public float EmergencyRepairCooldownRemaining => _emergencyRepairCooldownRemaining;
+        public float EmergencyRepairCooldownDuration
+        {
+            get
+            {
+                return TryGetMobileCombatConfig(out var config) && config.EmergencyRepairCooldown > 0f
+                    ? config.EmergencyRepairCooldown
+                    : 120f;
+            }
+        }
+        public float EmergencyRepairHealPercent
+        {
+            get
+            {
+                return TryGetMobileCombatConfig(out var config) && config.EmergencyRepairHealPercent > 0f
+                    ? Mathf.Clamp01(config.EmergencyRepairHealPercent)
+                    : 0.20f;
+            }
+        }
+        public bool EmergencyRepairReady => CanUseEmergencyRepair();
+
+        public bool CanUseEmergencyRepair()
+        {
+            if (!_initialized
+                || Time.timeScale <= 0f
+                || !CanAccessEntityManager()
+                || !_entityManager.Exists(_gameStateEntity)
+                || !_entityManager.Exists(_castleEntity))
+                return false;
+
+            var gameState = _entityManager.GetComponentData<GameStateData>(_gameStateEntity);
+            var wall = _entityManager.GetComponentData<WallSegment>(_castleEntity);
+            SiegeCyclePhase phase = TryGetContinuousSiegeCycle(out var cycle)
+                ? cycle.Phase
+                : SiegeCyclePhase.Day;
+            return ActiveAbilityRules.CanUseEmergencyRepair(
+                EmergencyRepairUnlocked,
+                _emergencyRepairCooldownRemaining,
+                phase,
+                wall.CurrentHP,
+                wall.MaxHP,
+                gameState.IsGameOver,
+                gameState.IsLevelUpPending);
+        }
+
+        public bool TryUseEmergencyRepair()
+        {
+            if (!CanUseEmergencyRepair())
+                return false;
+
+            var wall = _entityManager.GetComponentData<WallSegment>(_castleEntity);
+            float healedHp = SingleWallDefenseRules.HealByMaxPercent(
+                wall.CurrentHP,
+                wall.MaxHP,
+                EmergencyRepairHealPercent);
+            if (healedHp <= wall.CurrentHP + 0.001f)
+                return false;
+
+            wall.CurrentHP = healedHp;
+            _entityManager.SetComponentData(_castleEntity, wall);
+            Wall = wall;
+            _emergencyRepairCooldownRemaining = EmergencyRepairCooldownDuration;
             OnGameStateChanged?.Invoke();
             return true;
         }
@@ -3223,6 +3349,8 @@ namespace DeadWalls
                 RallyTimer = prep.RallyTimer,
                 RallyDuration = prep.RallyDuration,
                 RallyFireRateMultiplier = prep.RallyFireRateMultiplier,
+                RallyCooldownRemaining = _rallyCooldownRemaining,
+                EmergencyRepairCooldownRemaining = _emergencyRepairCooldownRemaining,
                 PendingEconomyEvent = (int)economyEvent.PendingEvent,
                 EconomyEventWave = economyEvent.EventWave,
                 EconomyEventCooldownWaves = economyEvent.CooldownWavesRemaining,
@@ -3602,6 +3730,10 @@ namespace DeadWalls
             _entityManager.SetComponentData(_castleEntity, wall);
             Wall = wall;
             _fireballCooldownRemaining = Mathf.Max(0f, save.FireballCooldownRemaining);
+            _rallyCooldownRemaining = Mathf.Max(0f, save.RallyCooldownRemaining);
+            _emergencyRepairCooldownRemaining = Mathf.Max(
+                0f,
+                save.EmergencyRepairCooldownRemaining);
 
             RestoreCombatSnapshot(save);
             ReadECSData();
@@ -3763,7 +3895,11 @@ namespace DeadWalls
         /// </summary>
         public bool TryCastFireball(Vector2 worldPosition)
         {
-            if (!_initialized || !FireballReady || GameState.IsGameOver)
+            if (!_initialized
+                || !FireballReady
+                || Time.timeScale <= 0f
+                || GameState.IsGameOver
+                || GameState.IsLevelUpPending)
                 return false;
 
             _fireballCooldownRemaining = FireballCooldownDuration;
@@ -4228,6 +4364,32 @@ namespace DeadWalls
                 return false;
 
             float repairedHp = SingleWallDefenseRules.RepairToFull(wall.CurrentHP, wall.MaxHP);
+            if (repairedHp <= wall.CurrentHP + 0.001f)
+                return false;
+
+            wall.CurrentHP = repairedHp;
+            _entityManager.SetComponentData(_castleEntity, wall);
+            Wall = wall;
+            return true;
+        }
+
+        private bool RepairWallByMaxPercent(float percent)
+        {
+            if (!CanAccessEntityManager()
+                || !_entityManager.Exists(_castleEntity)
+                || !_entityManager.Exists(_gameStateEntity)
+                || percent <= 0f)
+                return false;
+
+            var gameState = _entityManager.GetComponentData<GameStateData>(_gameStateEntity);
+            var wall = _entityManager.GetComponentData<WallSegment>(_castleEntity);
+            if (gameState.IsGameOver || SingleWallDefenseRules.IsDestroyed(wall.CurrentHP))
+                return false;
+
+            float repairedHp = SingleWallDefenseRules.HealByMaxPercent(
+                wall.CurrentHP,
+                wall.MaxHP,
+                percent);
             if (repairedHp <= wall.CurrentHP + 0.001f)
                 return false;
 
@@ -5331,6 +5493,8 @@ namespace DeadWalls
                 _entityManager.SetComponentData(mobileConfigEntity, prep);
                 CastleYardPrep = prep;
             }
+            _rallyCooldownRemaining = 0f;
+            _emergencyRepairCooldownRemaining = 0f;
             if (mobileMode && _entityManager.HasComponent<MobilePopulationAllocation>(mobileConfigEntity))
             {
                 var allocation = new MobilePopulationAllocation

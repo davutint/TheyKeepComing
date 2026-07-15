@@ -105,6 +105,9 @@ namespace DeadWalls
         [Tooltip("Tam kayipta odenen tamir maliyeti; gercek maliyet kayip oraniyla olceklenir.")]
         public int RepairBaseWoodCost = 120;
         public int RepairBaseStoneCost = 80;
+        [Range(0.01f, 1f)] public float NormalRepairHealPercent = 0.25f;
+        [Min(0.001f)] public float RepairStonePerMissingHp = 0.10f;
+        [Min(0.01f)] public float RepairDayPriceMultiplier = 1f;
 
         [Header("Wave Director")]
         public float BaseSpawnInterval = 0.95f;
@@ -141,10 +144,13 @@ namespace DeadWalls
         public int EconomyEventCooldownWaves = 2;
         public uint EconomyEventSeed = 91273u;
 
-        [Header("Castle Yard Prep")]
+        [Header("Active Abilities")]
         [Range(0.05f, 1f)] public float FortifyDamageMultiplier = 0.70f;
         public float RallyDuration = 10f;
         public float RallyFireRateMultiplier = 1.25f;
+        public float RallyCooldown = 60f;
+        [Range(0.01f, 1f)] public float EmergencyRepairHealPercent = 0.20f;
+        public float EmergencyRepairCooldown = 120f;
 
         public Transform[] ArcherSlots;
 
@@ -225,6 +231,12 @@ namespace DeadWalls
                     SiegeDawnIntensityMultiplier = math.max(0.01f, authoring.SiegeDawnIntensityMultiplier),
                     RepairBaseWoodCost = math.max(0, authoring.RepairBaseWoodCost),
                     RepairBaseStoneCost = math.max(0, authoring.RepairBaseStoneCost),
+                    NormalRepairHealPercent = math.clamp(authoring.NormalRepairHealPercent, 0.01f, 1f),
+                    RepairStonePerMissingHp = math.max(0.001f, authoring.RepairStonePerMissingHp),
+                    RepairDayPriceMultiplier = math.max(0.01f, authoring.RepairDayPriceMultiplier),
+                    RallyCooldown = math.max(0.1f, authoring.RallyCooldown),
+                    EmergencyRepairHealPercent = math.clamp(authoring.EmergencyRepairHealPercent, 0.01f, 1f),
+                    EmergencyRepairCooldown = math.max(0.1f, authoring.EmergencyRepairCooldown),
                     SingleFrontEnabled = authoring.SingleFrontEnabled,
                     FrontlineX = authoring.FrontlineX,
                     SpawnLineX = authoring.SpawnLineX,

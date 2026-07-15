@@ -75,6 +75,17 @@ namespace DeadWalls
         [Header("Savunma Maliyeti (config'e yazilir)")]
         public int RepairBaseWoodCost = 120;
         public int RepairBaseStoneCost = 50;
+        [Tooltip("Normal repair tek kullanimda Wall MaxHP'nin bu orani kadar iyilestirir.")]
+        [Range(0.01f, 1f)] public float NormalRepairHealPercent = 0.25f;
+        [Tooltip("Normal repair'de gercek iyilestirilen her HP icin Stone fiyati.")]
+        [Min(0.001f)] public float RepairStonePerMissingHp = 0.10f;
+        [Tooltip("Day ve Dusk normal repair fiyatina uygulanan global carpan.")]
+        [Min(0.01f)] public float RepairDayPriceMultiplier = 1f;
+
+        [Header("Active Abilities (config'e yazilir)")]
+        [Min(0.1f)] public float RallyCooldown = 60f;
+        [Range(0.01f, 1f)] public float EmergencyRepairHealPercent = 0.20f;
+        [Min(0.1f)] public float EmergencyRepairCooldown = 120f;
 
         [Header("Ekonomi Fiyat Egrileri (runtime tuning'e bake edilir)")]
         [Min(1)] public int BedBaseWoodCost =

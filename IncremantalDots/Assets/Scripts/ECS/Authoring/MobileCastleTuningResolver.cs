@@ -31,6 +31,12 @@ namespace DeadWalls
             config.SiegeDawnIntensityMultiplier = math.max(0.01f, profile.DawnIntensity);
             config.RepairBaseWoodCost = math.max(0, profile.RepairBaseWoodCost);
             config.RepairBaseStoneCost = math.max(0, profile.RepairBaseStoneCost);
+            config.NormalRepairHealPercent = math.clamp(profile.NormalRepairHealPercent, 0.01f, 1f);
+            config.RepairStonePerMissingHp = math.max(0.001f, profile.RepairStonePerMissingHp);
+            config.RepairDayPriceMultiplier = math.max(0.01f, profile.RepairDayPriceMultiplier);
+            config.RallyCooldown = math.max(0.1f, profile.RallyCooldown);
+            config.EmergencyRepairHealPercent = math.clamp(profile.EmergencyRepairHealPercent, 0.01f, 1f);
+            config.EmergencyRepairCooldown = math.max(0.1f, profile.EmergencyRepairCooldown);
         }
 
         public static DifficultyDaySample ResolveDaySample(DifficultyProfileSO profile, int day)

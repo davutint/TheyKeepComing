@@ -26,9 +26,6 @@ namespace DeadWalls
             if (gameState.IsGameOver || gameState.IsLevelUpPending || waveState.StressTestMode)
                 return;
 
-            if (!waveState.WaveActive || waveState.Phase != RunPhaseType.NightCombat)
-                return;
-
             var prep = SystemAPI.GetSingletonRW<CastleYardPrepState>();
             if (prep.ValueRO.RallyTimer <= 0f)
                 return;

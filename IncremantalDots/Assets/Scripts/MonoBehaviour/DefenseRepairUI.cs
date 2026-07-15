@@ -7,10 +7,9 @@ namespace DeadWalls
 {
     /// <summary>
     /// CastleDefensePanel'deki player-facing REPAIR butonunun controller'i.
-    /// Tamir artik continuous siege sirasinda HER ZAMAN denenebilir ve kayip oraniyla
-    /// olceklenen bir kaynak maliyeti vardir (GameManager.GetRepairCost) — ana ekonomi
-    /// sink'lerinden biri. HUDController read-only kaldigi icin buton ayri controller'dadir
-    /// (WorkerDrawerToggleButton/TechTreeOpenButton emsali).
+    /// Normal tamir yalniz Day/Dusk sirasinda denenebilir; gercek iyilesecek HP kadar
+    /// Stone maliyeti vardir. Night basladiginda buton gizlenir ve maliyet harcanamaz.
+    /// HUDController read-only kaldigi icin buton ayri controller'dadir.
     /// </summary>
     public class DefenseRepairUI : MonoBehaviour
     {
@@ -58,18 +57,23 @@ namespace DeadWalls
             }
 
             bool damaged = gm.GetDefensePercent() < 0.995f;
+            bool phaseAvailable = gm.IsRepairPhaseAvailable();
             var cost = gm.GetRepairCost();
 
             if (RepairButton != null)
+            {
+                if (RepairButton.gameObject.activeSelf != phaseAvailable)
+                    RepairButton.gameObject.SetActive(phaseAvailable);
                 RepairButton.interactable = gm.CanRepairDefenseFull();
+            }
 
             if (RepairCostText != null)
             {
                 string label;
                 if (!damaged)
                     label = "FULL";
-                else if (!gm.IsRepairPhaseAvailable())
-                    label = "DAY / DUSK ONLY";
+                else if (!phaseAvailable)
+                    label = string.Empty;
                 else
                 {
                     label = cost.ToDisplayString();

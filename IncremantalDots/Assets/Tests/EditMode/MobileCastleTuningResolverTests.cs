@@ -21,6 +21,12 @@ namespace DeadWalls.Tests
                 profile.DayIntensity = 0.4f;
                 profile.NightIntensity = 2.2f;
                 profile.RepairBaseStoneCost = 77;
+                profile.NormalRepairHealPercent = 0.30f;
+                profile.RepairStonePerMissingHp = 0.42f;
+                profile.RepairDayPriceMultiplier = 1.3f;
+                profile.RallyCooldown = 48f;
+                profile.EmergencyRepairHealPercent = 0.35f;
+                profile.EmergencyRepairCooldown = 95f;
 
                 var config = new MobileCastleCombatConfig
                 {
@@ -46,6 +52,12 @@ namespace DeadWalls.Tests
                 Assert.That(config.SiegeDayIntensityMultiplier, Is.EqualTo(0.4f));
                 Assert.That(config.SiegeNightIntensityMultiplier, Is.EqualTo(2.2f));
                 Assert.That(config.RepairBaseStoneCost, Is.EqualTo(77));
+                Assert.That(config.NormalRepairHealPercent, Is.EqualTo(0.30f));
+                Assert.That(config.RepairStonePerMissingHp, Is.EqualTo(0.42f));
+                Assert.That(config.RepairDayPriceMultiplier, Is.EqualTo(1.3f));
+                Assert.That(config.RallyCooldown, Is.EqualTo(48f));
+                Assert.That(config.EmergencyRepairHealPercent, Is.EqualTo(0.35f));
+                Assert.That(config.EmergencyRepairCooldown, Is.EqualTo(95f));
                 Assert.That(config.SiegeCycleDuration, Is.EqualTo(91f));
                 Assert.That(config.SiegeDayDuration, Is.EqualTo(31f));
                 Assert.That(config.SpawnLineX, Is.EqualTo(27f));

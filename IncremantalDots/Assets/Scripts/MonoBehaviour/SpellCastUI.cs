@@ -22,6 +22,12 @@ namespace DeadWalls
         public Button FireballButton;
         public Image FireballCooldownFill;
         public TMP_Text FireballLabelText;
+        public Button RallyButton;
+        public Image RallyCooldownFill;
+        public TMP_Text RallyLabelText;
+        public Button EmergencyRepairButton;
+        public Image EmergencyRepairCooldownFill;
+        public TMP_Text EmergencyRepairLabelText;
 
         [Header("Flipbook kareleri (setup tool sheet'lerden atar)")]
         public Sprite[] ProjectileFrames;
@@ -35,6 +41,7 @@ namespace DeadWalls
         private SpriteRenderer _targetingIndicator;
         private Sprite _circleSprite;
         private Camera _camera;
+        private bool _buttonsBound;
 
         // mermi takibi
         private Entity _trackedProjectile = Entity.Null;
@@ -50,21 +57,21 @@ namespace DeadWalls
         private float _blastFrameTimer;
         private int _blastFrame = -1; // -1 = oynamiyor
 
-        private void Start()
+        private void OnEnable()
         {
-            if (FireballButton != null)
-                FireballButton.onClick.AddListener(ToggleTargeting);
+            BindButtons();
         }
 
         private void OnDisable()
         {
+            UnbindButtons();
             CancelTargeting();
         }
 
         private void Update()
         {
             var gm = GameManager.Instance;
-            bool visible = gm != null && gm.FireballUnlocked && !gm.GameState.IsGameOver;
+            bool visible = gm != null && !gm.GameState.IsGameOver;
             if (SpellPanel != null && SpellPanel.activeSelf != visible)
                 SpellPanel.SetActive(visible);
 
@@ -77,10 +84,68 @@ namespace DeadWalls
                 return;
             }
 
-            UpdateCooldownVisual(gm);
+            HandleHotkeys(gm);
+            UpdateAbilityVisuals(gm);
 
-            if (_targeting)
+            if (_targeting && !gm.FireballReady)
+                CancelTargeting();
+            else if (_targeting)
                 UpdateTargeting(gm);
+        }
+
+        private void BindButtons()
+        {
+            if (_buttonsBound)
+                return;
+
+            _buttonsBound = true;
+            FireballButton?.onClick.AddListener(ToggleTargeting);
+            RallyButton?.onClick.AddListener(HandleRallyClicked);
+            EmergencyRepairButton?.onClick.AddListener(HandleEmergencyRepairClicked);
+        }
+
+        private void UnbindButtons()
+        {
+            if (!_buttonsBound)
+                return;
+
+            _buttonsBound = false;
+            FireballButton?.onClick.RemoveListener(ToggleTargeting);
+            RallyButton?.onClick.RemoveListener(HandleRallyClicked);
+            EmergencyRepairButton?.onClick.RemoveListener(HandleEmergencyRepairClicked);
+        }
+
+        private void HandleHotkeys(GameManager gm)
+        {
+            if (IsTypingInInputField())
+                return;
+
+            if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1))
+            {
+                ToggleTargeting();
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2))
+            {
+                CancelTargeting();
+                if (gm.TryUseRally())
+                    UiSoundFeedback.Instance?.PlaySuccess();
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha3) || Input.GetKeyDown(KeyCode.Keypad3))
+            {
+                CancelTargeting();
+                if (gm.TryUseEmergencyRepair())
+                    UiSoundFeedback.Instance?.PlaySuccess();
+            }
+        }
+
+        private static bool IsTypingInInputField()
+        {
+            GameObject selected = EventSystem.current != null
+                ? EventSystem.current.currentSelectedGameObject
+                : null;
+            return selected != null
+                && (selected.GetComponent<TMP_InputField>() != null
+                    || selected.GetComponent<InputField>() != null);
         }
 
         // ---------------------------------------------------------------------------
@@ -200,20 +265,86 @@ namespace DeadWalls
 
         // ---------------------------------------------------------------------------
 
-        private void UpdateCooldownVisual(GameManager gm)
+        private void UpdateAbilityVisuals(GameManager gm)
         {
-            float duration = Mathf.Max(0.01f, gm.FireballCooldownDuration);
-            float remaining = gm.FireballCooldownRemaining;
-            bool ready = gm.FireballReady;
-
-            if (FireballCooldownFill != null)
-                FireballCooldownFill.fillAmount = Mathf.Clamp01(remaining / duration);
-
+            SetCooldownFill(
+                FireballCooldownFill,
+                gm.FireballCooldownRemaining,
+                gm.FireballCooldownDuration);
             if (FireballLabelText != null)
-                FireballLabelText.text = ready ? "FIREBALL" : $"{Mathf.CeilToInt(remaining)}s";
-
+            {
+                string state = !gm.FireballUnlocked
+                    ? "LOCKED"
+                    : _targeting
+                        ? "SELECT AREA"
+                        : FormatCooldownState(gm.FireballCooldownRemaining);
+                FireballLabelText.text = $"[1] FIREBALL\n{state}";
+            }
             if (FireballButton != null)
-                FireballButton.interactable = ready;
+                FireballButton.interactable = gm.FireballReady;
+
+            SetCooldownFill(
+                RallyCooldownFill,
+                gm.RallyCooldownRemaining,
+                gm.RallyCooldownDuration);
+            if (RallyLabelText != null)
+            {
+                string state = !gm.RallyUnlocked
+                    ? "LOCKED"
+                    : gm.RallyActive
+                        ? $"ACTIVE {Mathf.CeilToInt(gm.RallyActiveRemaining)}s"
+                        : FormatCooldownState(gm.RallyCooldownRemaining);
+                RallyLabelText.text = $"[2] RALLY\n{state}";
+            }
+            if (RallyButton != null)
+                RallyButton.interactable = gm.RallyReady;
+
+            SetCooldownFill(
+                EmergencyRepairCooldownFill,
+                gm.EmergencyRepairCooldownRemaining,
+                gm.EmergencyRepairCooldownDuration);
+            if (EmergencyRepairLabelText != null)
+            {
+                string state;
+                if (!gm.EmergencyRepairUnlocked)
+                    state = "LOCKED";
+                else if (gm.EmergencyRepairCooldownRemaining > 0f)
+                    state = FormatCooldownState(gm.EmergencyRepairCooldownRemaining);
+                else if (gm.ContinuousSiegeCycle.Phase != SiegeCyclePhase.Night)
+                    state = "NIGHT ONLY";
+                else if (gm.GetDefensePercent() >= 0.995f)
+                    state = "WALL FULL";
+                else
+                    state = "READY";
+                EmergencyRepairLabelText.text = $"[3] REPAIR\n{state}";
+            }
+            if (EmergencyRepairButton != null)
+                EmergencyRepairButton.interactable = gm.EmergencyRepairReady;
+        }
+
+        private static void SetCooldownFill(Image fill, float remaining, float duration)
+        {
+            if (fill != null)
+                fill.fillAmount = Mathf.Clamp01(remaining / Mathf.Max(0.01f, duration));
+        }
+
+        private static string FormatCooldownState(float remaining)
+        {
+            return remaining > 0f ? $"{Mathf.CeilToInt(remaining)}s" : "READY";
+        }
+
+        private void HandleRallyClicked()
+        {
+            CancelTargeting();
+            if (GameManager.Instance != null && GameManager.Instance.TryUseRally())
+                UiSoundFeedback.Instance?.PlaySuccess();
+        }
+
+        private void HandleEmergencyRepairClicked()
+        {
+            CancelTargeting();
+            if (GameManager.Instance != null && GameManager.Instance.TryUseEmergencyRepair())
+                UiSoundFeedback.Instance?.PlaySuccess();
         }
 
         private void ToggleTargeting()

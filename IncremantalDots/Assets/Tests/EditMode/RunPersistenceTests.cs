@@ -63,6 +63,8 @@ namespace DeadWalls.Tests
                 ArcherFormationVersion = ArcherFormationUtility.CurrentVersion,
                 FireballCooldownRemaining = 12.5f,
                 RallyTimer = 4.25f,
+                RallyCooldownRemaining = 31.5f,
+                EmergencyRepairCooldownRemaining = 74.25f,
                 LastRegularCouncilDay = 6,
                 CouncilRunSalt = 987654321u,
                 CouncilWoodCapBonus = 11,
@@ -210,6 +212,8 @@ namespace DeadWalls.Tests
             Assert.That(restored.ActiveArrows[0].RemainingLifetime, Is.EqualTo(2.75f));
             Assert.That(restored.ActiveFireball.Active, Is.True);
             Assert.That(restored.FireballCooldownRemaining, Is.EqualTo(12.5f));
+            Assert.That(restored.RallyCooldownRemaining, Is.EqualTo(31.5f));
+            Assert.That(restored.EmergencyRepairCooldownRemaining, Is.EqualTo(74.25f));
             Assert.That(restored.PendingEconomyEvent, Is.EqualTo(2));
             Assert.That(restored.EconomyEventWave, Is.EqualTo(8));
             Assert.That(restored.EconomyEventCooldownWaves, Is.EqualTo(3));

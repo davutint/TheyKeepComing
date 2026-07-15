@@ -13,7 +13,7 @@ namespace DeadWalls
     [Serializable]
     public class RunSaveState
     {
-        public const int CurrentVersion = 11;
+        public const int CurrentVersion = 12;
         public const int MinimumSupportedVersion = 3;
 
         public int Version = CurrentVersion;
@@ -164,6 +164,8 @@ namespace DeadWalls
         public float RallyTimer;
         public float RallyDuration;
         public float RallyFireRateMultiplier;
+        public float RallyCooldownRemaining;
+        public float EmergencyRepairCooldownRemaining;
 
         // Council'in kullandigi sureli economy/horde effect state'i
         public int PendingEconomyEvent;
@@ -409,6 +411,15 @@ namespace DeadWalls
                     state.CouncilDaysSinceEvent,
                     legacyHasActiveEvent);
                 state.Version = 11;
+            }
+
+            if (state.Version == 11)
+            {
+                // v11 aktif Rally etkisini tasiyordu fakat Rally/Emergency cooldown
+                // state'leri yoktu. Eski kosular iki ability'yi hazir durumda devralir.
+                state.RallyCooldownRemaining = 0f;
+                state.EmergencyRepairCooldownRemaining = 0f;
+                state.Version = 12;
             }
         }
 

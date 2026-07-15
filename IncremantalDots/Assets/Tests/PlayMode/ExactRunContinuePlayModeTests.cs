@@ -63,6 +63,7 @@ namespace DeadWalls.Tests
             Entity resourceEntity = entityManager.CreateEntityQuery(typeof(ResourceData), typeof(WaveStateData)).GetSingletonEntity();
             Entity allocationEntity = entityManager.CreateEntityQuery(
                 typeof(MobileCastleCombatConfig), typeof(MobilePopulationAllocation)).GetSingletonEntity();
+            Entity wallEntity = entityManager.CreateEntityQuery(typeof(WallSegment)).GetSingletonEntity();
 
             var cycle = entityManager.GetComponentData<ContinuousSiegeCycleData>(cycleEntity);
             cycle.CycleIndex = 9;
@@ -107,6 +108,24 @@ namespace DeadWalls.Tests
             workerAllocation.LastPopulationGrowthCycle = 10;
             entityManager.SetComponentData(allocationEntity, workerAllocation);
 
+            // Package G: Rally/Emergency kaynak harcamadan calisir ve iki cooldown exact save olur.
+            var wall = entityManager.GetComponentData<WallSegment>(wallEntity);
+            wall.CurrentHP = wall.MaxHP * 0.50f;
+            entityManager.SetComponentData(wallEntity, wall);
+            ResourceData resourcesBeforeAbilities = entityManager.GetComponentData<ResourceData>(resourceEntity);
+            Assert.That(gameManager.RepairDefenseFull(), Is.False,
+                "Night normal repair kapali kalmali ve Stone harcamamali.");
+            Assert.That(gameManager.TryUseRally(), Is.True);
+            Assert.That(gameManager.TryUseEmergencyRepair(), Is.True);
+            float savedRallyCooldown = gameManager.RallyCooldownRemaining;
+            float savedEmergencyCooldown = gameManager.EmergencyRepairCooldownRemaining;
+            float savedWallHp = entityManager.GetComponentData<WallSegment>(wallEntity).CurrentHP;
+            ResourceData resourcesAfterAbilities = entityManager.GetComponentData<ResourceData>(resourceEntity);
+            Assert.That(resourcesAfterAbilities.Wood, Is.EqualTo(resourcesBeforeAbilities.Wood));
+            Assert.That(resourcesAfterAbilities.Stone, Is.EqualTo(resourcesBeforeAbilities.Stone));
+            Assert.That(resourcesAfterAbilities.Iron, Is.EqualTo(resourcesBeforeAbilities.Iron));
+            Assert.That(resourcesAfterAbilities.Food, Is.EqualTo(resourcesBeforeAbilities.Food));
+
             Assert.That(gameManager.SaveRunSnapshot(), Is.True);
             string savedRunId = gameManager.CurrentRunId;
 
@@ -139,11 +158,14 @@ namespace DeadWalls.Tests
             resourceEntity = entityManager.CreateEntityQuery(typeof(ResourceData), typeof(WaveStateData)).GetSingletonEntity();
             allocationEntity = entityManager.CreateEntityQuery(
                 typeof(MobileCastleCombatConfig), typeof(MobilePopulationAllocation)).GetSingletonEntity();
+            wallEntity = entityManager.CreateEntityQuery(typeof(WallSegment)).GetSingletonEntity();
             var restoredCycle = entityManager.GetComponentData<ContinuousSiegeCycleData>(cycleEntity);
             var restoredBudget = entityManager.GetComponentData<ContinuousSpawnBudgetData>(cycleEntity);
             var restoredResources = entityManager.GetComponentData<ResourceData>(resourceEntity);
             var restoredWave = entityManager.GetComponentData<WaveStateData>(resourceEntity);
             var restoredAllocation = entityManager.GetComponentData<MobilePopulationAllocation>(allocationEntity);
+            var restoredPrep = entityManager.GetComponentData<CastleYardPrepState>(allocationEntity);
+            var restoredWall = entityManager.GetComponentData<WallSegment>(wallEntity);
 
             Assert.That(gameManager.CurrentRunId, Is.EqualTo(savedRunId));
             Assert.That(restoredCycle.CycleIndex, Is.EqualTo(9));
@@ -168,6 +190,11 @@ namespace DeadWalls.Tests
             Assert.That(restoredAllocation.FoodTargetRatioBps, Is.EqualTo(4000));
             Assert.That(restoredAllocation.LastObservedPopulation, Is.EqualTo(58));
             Assert.That(restoredAllocation.LastPopulationGrowthCycle, Is.EqualTo(10));
+            Assert.That(restoredPrep.RallyTimer, Is.GreaterThan(0f));
+            Assert.That(gameManager.RallyCooldownRemaining, Is.EqualTo(savedRallyCooldown).Within(0.05f));
+            Assert.That(gameManager.EmergencyRepairCooldownRemaining,
+                Is.EqualTo(savedEmergencyCooldown).Within(0.05f));
+            Assert.That(restoredWall.CurrentHP, Is.EqualTo(savedWallHp).Within(0.01f));
             yield return null;
 
             using EntityQuery arrivalVisualQuery = entityManager.CreateEntityQuery(
@@ -493,10 +520,13 @@ namespace DeadWalls.Tests
             Assert.That(gameManager.CanRepairDefenseFull(), Is.True);
 
             int stoneBefore = entityManager.GetComponentData<ResourceData>(resourceEntity).Stone;
+            float expectedHp = Mathf.Min(
+                wall.MaxHP,
+                wall.CurrentHP + wall.MaxHP * gameManager.GetNormalRepairHealPercent());
             Assert.That(gameManager.RepairDefenseFull(), Is.True);
             var repairedWall = entityManager.GetComponentData<WallSegment>(wallEntity);
             var resourcesAfter = entityManager.GetComponentData<ResourceData>(resourceEntity);
-            Assert.That(repairedWall.CurrentHP, Is.EqualTo(repairedWall.MaxHP));
+            Assert.That(repairedWall.CurrentHP, Is.EqualTo(expectedHp).Within(0.01f));
             Assert.That(resourcesAfter.Wood, Is.Zero);
             Assert.That(resourcesAfter.Stone, Is.EqualTo(stoneBefore - cost.Stone));
         }

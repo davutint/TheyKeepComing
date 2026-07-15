@@ -1,18 +1,10 @@
 fileFormatVersion: 2
-guid: 95e460ca124353745b2fcc8aeae7cd20
-AssetOrigin:
-  serializedVersion: 1
-  productId: 336410
-  packageName: 2D Fantasy Tileset
-  packageVersion: 1.1.0
-  assetPath: Assets/SmallScaleInt/Fantasy kingdom Tileset/Environment/Sprites/Roof
-    C10_W.png
-  uploadId: 853508
+guid: a853538869faff54e9e4ac0ee8c395d0
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 8771128628619242332
-    second: Roof C10_W_0
+      213: -4517271986657665965
+    second: dw_g_ability_bar_playmode_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -83,7 +75,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -121,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Roof C10_W_0
+      name: dw_g_ability_bar_playmode_0
       rect:
         serializedVersion: 2
-        x: 50
-        y: 47
-        width: 145
-        height: 86
+        x: 0
+        y: 0
+        width: 1920
+        height: 1080
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -136,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: c5beb1c240f49b970800000000000000
-      internalID: 8771128628619242332
+      spriteID: 35c5279cf0d6f41c0800000000000000
+      internalID: -4517271986657665965
       vertices: []
       indices: 
       edges: []
@@ -156,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Roof C10_W_0: 8771128628619242332
+      dw_g_ability_bar_playmode_0: -4517271986657665965
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

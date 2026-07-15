@@ -179,6 +179,53 @@ namespace DeadWalls
                 : "[MobileCastleSceneSetup] Council exact karar UI prefabda onarildi; NewGameScene aktif degildi.");
         }
 
+        [MenuItem("Window/DeadWalls/Repair Unified Ability Bar")]
+        public static void RepairUnifiedAbilityBar()
+        {
+            EnsureUnifiedAbilityBarInPrefab();
+            EnsureActiveAbilityTuning();
+            AssetDatabase.ImportAsset(GeneratedHudPrefabPath, ImportAssetOptions.ForceUpdate);
+
+            Scene activeScene = SceneManager.GetActiveScene();
+            bool sceneRepaired = false;
+            if (activeScene.IsValid() && activeScene.path == TargetScenePath)
+            {
+                GameObject hudRoot = null;
+                foreach (GameObject root in activeScene.GetRootGameObjects())
+                {
+                    HUDController hud = root.GetComponentInChildren<HUDController>(true);
+                    if (hud != null)
+                    {
+                        hudRoot = hud.gameObject;
+                        break;
+                    }
+                }
+
+                if (hudRoot != null)
+                {
+                    ConfigureUnifiedAbilityBar(hudRoot);
+                    foreach (GameObject root in activeScene.GetRootGameObjects())
+                    {
+                        var controllers = root.GetComponentsInChildren<SpellCastUI>(true);
+                        foreach (SpellCastUI controller in controllers)
+                        {
+                            if (controller != null && controller.gameObject != hudRoot)
+                                Undo.DestroyObjectImmediate(controller.gameObject);
+                        }
+                    }
+
+                    EditorSceneManager.MarkSceneDirty(activeScene);
+                    EditorSceneManager.SaveScene(activeScene);
+                    sceneRepaired = true;
+                }
+            }
+
+            AssetDatabase.SaveAssets();
+            Debug.Log(sceneRepaired
+                ? "[MobileCastleSceneSetup] Unified ability bar prefab ve NewGameScene'de onarildi."
+                : "[MobileCastleSceneSetup] Unified ability bar prefabda onarildi; NewGameScene aktif degildi.");
+        }
+
         [MenuItem("Window/DeadWalls/Repair Council Curated Context Contract")]
         public static void RepairCouncilCuratedContextContract()
         {
@@ -1493,6 +1540,12 @@ namespace DeadWalls
             profile.MaxSpawnBatch = 16;
             // Erken kurtulus yolu: repair'in stone bagimliligi dusuruldu
             profile.RepairBaseStoneCost = 50;
+            profile.NormalRepairHealPercent = 0.25f;
+            profile.RepairStonePerMissingHp = 0.10f;
+            profile.RepairDayPriceMultiplier = 1f;
+            profile.RallyCooldown = 60f;
+            profile.EmergencyRepairHealPercent = 0.20f;
+            profile.EmergencyRepairCooldown = 120f;
             profile.BedBaseWoodCost = MobileEconomyPriceTuningUtility.DefaultBedBaseWoodCost;
             profile.BedCostGrowthCapacityInterval =
                 MobileEconomyPriceTuningUtility.DefaultBedCostGrowthCapacityInterval;
@@ -2740,7 +2793,7 @@ namespace DeadWalls
                 "GameOverPanel",
                 "MenuUiRoot/PausePanel",
                 "MenuUiRoot/SettingsPanel",
-                "SpellUiRoot/SpellPanel",
+                "MobileCastleHudRoot/AbilityBarPanel",
                 "LevelUpPanel",
                 "GameOverPanel/MetaShopListRoot/MetaShopRowTemplate"
             };
@@ -3029,7 +3082,6 @@ namespace DeadWalls
             restartText.text = "Restart";
 
             ConfigureMetaProgressionUI(gameOverPanel);
-            ConfigureSpellUI(canvasTransform);
             ConfigureBloodMoonWarning(canvasTransform);
             ConfigureUiSounds(canvasTransform.gameObject); // Polish 3: tik/basari/fail/sting
 
@@ -3146,82 +3198,6 @@ namespace DeadWalls
             EditorUtility.SetDirty(meta);
         }
 
-        /// <summary>
-        /// Ates Topu UI'i (M-C buyuculuk): SpellUiRoot (hep aktif; controller burada yasar ki
-        /// panel kapaliyken de Update kossun) altinda SpellPanel (sag-alt buton + cooldown fill).
-        /// Isim sozlesmesi: SpellPanel / FireballButton / FireballCooldownFill (buton child'i).
-        /// </summary>
-        private static void ConfigureSpellUI(Transform canvasTransform)
-        {
-            GameObject root = FindDirectChild(canvasTransform, "SpellUiRoot");
-            if (root == null)
-            {
-                root = new GameObject("SpellUiRoot", typeof(RectTransform));
-                Undo.RegisterCreatedObjectUndo(root, "Create Spell UI Root");
-                root.layer = canvasTransform.gameObject.layer;
-                root.transform.SetParent(canvasTransform, false);
-            }
-            var rootRect = (RectTransform)root.transform;
-            rootRect.anchorMin = Vector2.zero;
-            rootRect.anchorMax = Vector2.one;
-            rootRect.offsetMin = Vector2.zero;
-            rootRect.offsetMax = Vector2.zero;
-
-            var spell = EnsureComponent<SpellCastUI>(root);
-
-            GameObject panel = FindDirectChild(root.transform, "SpellPanel");
-            if (panel == null)
-                panel = EnsurePanel(root.transform, "SpellPanel", false, new Color(0.06f, 0.05f, 0.10f, 0.85f));
-            var panelRect = (RectTransform)panel.transform;
-            panelRect.anchorMin = new Vector2(1f, 0f);
-            panelRect.anchorMax = new Vector2(1f, 0f);
-            panelRect.offsetMin = new Vector2(-190f, 96f);
-            panelRect.offsetMax = new Vector2(-16f, 168f);
-            spell.SpellPanel = panel;
-
-            var button = EnsureButton(panel.transform, "FireballButton",
-                new Vector2(0.5f, 0.5f), new Vector2(-80f, -30f), new Vector2(80f, 30f), out var label);
-            label.text = "FIREBALL";
-            label.fontSize = 18;
-            var colors = button.colors;
-            colors.normalColor = new Color(0.72f, 0.32f, 0.10f, 1f);
-            colors.highlightedColor = new Color(0.85f, 0.42f, 0.15f, 1f);
-            colors.pressedColor = new Color(0.55f, 0.24f, 0.08f, 1f);
-            colors.disabledColor = new Color(0.30f, 0.22f, 0.18f, 0.85f);
-            button.colors = colors;
-            spell.FireballButton = button;
-            spell.FireballLabelText = label;
-
-            // Cooldown overlay: butonun ustunde asagidan dolan karartma (kalan sure orani)
-            GameObject fillGo = FindDirectChild(button.transform, "FireballCooldownFill");
-            if (fillGo == null)
-            {
-                fillGo = new GameObject("FireballCooldownFill", typeof(RectTransform));
-                Undo.RegisterCreatedObjectUndo(fillGo, "Create Fireball Cooldown Fill");
-                fillGo.layer = panel.layer;
-                fillGo.transform.SetParent(button.transform, false);
-            }
-            var fillRect = (RectTransform)fillGo.transform;
-            fillRect.anchorMin = Vector2.zero;
-            fillRect.anchorMax = Vector2.one;
-            fillRect.offsetMin = Vector2.zero;
-            fillRect.offsetMax = Vector2.zero;
-            var fillImage = EnsureComponent<UnityEngine.UI.Image>(fillGo);
-            fillImage.color = new Color(0f, 0f, 0f, 0.55f);
-            fillImage.type = UnityEngine.UI.Image.Type.Filled;
-            fillImage.fillMethod = UnityEngine.UI.Image.FillMethod.Vertical;
-            fillImage.fillOrigin = (int)UnityEngine.UI.Image.OriginVertical.Bottom;
-            fillImage.fillAmount = 0f;
-            fillImage.raycastTarget = false;
-            // Label fill'in ustunde okunur kalsin
-            label.transform.SetAsLastSibling();
-            spell.FireballCooldownFill = fillImage;
-
-            panel.SetActive(false); // unlock'a kadar gizli; SpellCastUI acar
-            ConfigureFireballVisuals(spell); // ucus + patlama flipbook kareleri (polish)
-            EditorUtility.SetDirty(spell);
-        }
-
         /// <summary>Kanli ay gunduz uyarisi (M-C): ust-orta toast text'i + BloodMoonWarningUI controller'i.</summary>
         private static void ConfigureBloodMoonWarning(Transform canvasTransform)
         {
@@ -3257,6 +3233,7 @@ namespace DeadWalls
             EnsureArcherRetrainControlInPrefab();
             EnsureArrowAmmoPanelInPrefab();
             EnsureCouncilDecisionUIInPrefab();
+            EnsureUnifiedAbilityBarInPrefab();
 
             GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(GeneratedHudPrefabPath);
             Transform existing = canvasTransform.Find("MobileCastleHudRoot");
@@ -3365,6 +3342,106 @@ namespace DeadWalls
             {
                 PrefabUtility.UnloadPrefabContents(root);
             }
+        }
+
+        private static void EnsureUnifiedAbilityBarInPrefab()
+        {
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(GeneratedHudPrefabPath);
+            if (prefab == null)
+                throw new InvalidOperationException("Ability bar HUD prefab bulunamadi: " + GeneratedHudPrefabPath);
+
+            GameObject root = PrefabUtility.LoadPrefabContents(GeneratedHudPrefabPath);
+            try
+            {
+                EnsureUnifiedAbilityBar(root);
+                // Runtime controller scene owner'inda tutulur; prefab yalniz gorsel truth'tur.
+                DestroyComponentIfExists<SpellCastUI>(root);
+                PrefabUtility.SaveAsPrefabAsset(root, GeneratedHudPrefabPath);
+            }
+            finally
+            {
+                PrefabUtility.UnloadPrefabContents(root);
+            }
+        }
+
+        private static void EnsureUnifiedAbilityBar(GameObject hudRoot)
+        {
+            GameObject panel = FindChildByName(hudRoot, "AbilityBarPanel");
+            if (panel == null)
+                panel = EnsurePanel(hudRoot.transform, "AbilityBarPanel", true,
+                    new Color(0.035f, 0.045f, 0.065f, 0.94f));
+
+            SetRect((RectTransform)panel.transform,
+                new Vector2(0.5f, 0f), new Vector2(0.5f, 0f),
+                new Vector2(-248f, 18f), new Vector2(248f, 108f));
+            panel.SetActive(true);
+
+            Button fireball = EnsureAbilityButton(panel.transform, "FireballButton",
+                new Vector2(-232f, 10f), new Vector2(-78f, 80f),
+                "[1] FIREBALL\nLOCKED", new Color(0.72f, 0.28f, 0.10f, 1f),
+                out _, out _);
+            Button rally = EnsureAbilityButton(panel.transform, "RallyAbilityButton",
+                new Vector2(-72f, 10f), new Vector2(72f, 80f),
+                "[2] RALLY\nREADY", new Color(0.20f, 0.48f, 0.72f, 1f),
+                out _, out _);
+            Button emergency = EnsureAbilityButton(panel.transform, "EmergencyRepairAbilityButton",
+                new Vector2(78f, 10f), new Vector2(232f, 80f),
+                "[3] REPAIR\nNIGHT ONLY", new Color(0.24f, 0.60f, 0.38f, 1f),
+                out _, out _);
+
+            Sprite rounded = EnsureRoundedRectAsset();
+            if (rounded != null)
+            {
+                ApplyRoundedSkin(panel.GetComponent<Image>(), rounded);
+                ApplyRoundedSkin(fireball.GetComponent<Image>(), rounded, null, 1.6f);
+                ApplyRoundedSkin(rally.GetComponent<Image>(), rounded, null, 1.6f);
+                ApplyRoundedSkin(emergency.GetComponent<Image>(), rounded, null, 1.6f);
+            }
+        }
+
+        private static Button EnsureAbilityButton(
+            Transform parent,
+            string name,
+            Vector2 offsetMin,
+            Vector2 offsetMax,
+            string labelValue,
+            Color normalColor,
+            out TMP_Text label,
+            out Image cooldownFill)
+        {
+            Button button = EnsureButton(parent, name, new Vector2(0.5f, 0.5f),
+                offsetMin, offsetMax, out label);
+            label.text = labelValue;
+            label.fontSize = 15f;
+            label.fontStyle = FontStyles.Bold;
+            label.textWrappingMode = TextWrappingModes.NoWrap;
+            label.raycastTarget = false;
+
+            ColorBlock colors = button.colors;
+            colors.normalColor = normalColor;
+            colors.highlightedColor = Color.Lerp(normalColor, Color.white, 0.18f);
+            colors.pressedColor = Color.Lerp(normalColor, Color.black, 0.22f);
+            colors.disabledColor = new Color(0.18f, 0.20f, 0.24f, 0.82f);
+            button.colors = colors;
+
+            GameObject fillObject = FindDirectChild(button.transform, name + "CooldownFill");
+            if (fillObject == null)
+            {
+                fillObject = new GameObject(name + "CooldownFill", typeof(RectTransform));
+                fillObject.layer = parent.gameObject.layer;
+                fillObject.transform.SetParent(button.transform, false);
+            }
+
+            Stretch((RectTransform)fillObject.transform);
+            cooldownFill = EnsureComponent<Image>(fillObject);
+            cooldownFill.color = new Color(0f, 0f, 0f, 0.62f);
+            cooldownFill.type = Image.Type.Filled;
+            cooldownFill.fillMethod = Image.FillMethod.Vertical;
+            cooldownFill.fillOrigin = (int)Image.OriginVertical.Bottom;
+            cooldownFill.fillAmount = 0f;
+            cooldownFill.raycastTarget = false;
+            label.transform.SetAsLastSibling();
+            return button;
         }
 
         private static void EnsureCouncilDecisionUI(GameObject hudRoot)
@@ -3734,6 +3811,7 @@ namespace DeadWalls
             HidePlayerFacingArcherProgressionControls(market);
 
             ConfigureTechTree(hudRoot);
+            ConfigureUnifiedAbilityBar(hudRoot);
             ConfigureDefenseRepair(hudRoot);
             ConfigureDawnToast(hudRoot);
             ConfigureCouncilUI(hudRoot);
@@ -3789,6 +3867,65 @@ namespace DeadWalls
             var repairUi = EnsureComponent<DefenseRepairUI>(hudRoot);
             repairUi.RepairButton = FindComponentInChildrenByName<Button>(hudRoot, "DefenseRepairButton");
             repairUi.RepairCostText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "DefenseRepairCostText");
+        }
+
+        private static void ConfigureUnifiedAbilityBar(GameObject hudRoot)
+        {
+            EnsureUnifiedAbilityBar(hudRoot);
+            var abilityBar = EnsureComponent<SpellCastUI>(hudRoot);
+            abilityBar.SpellPanel = FindChildByName(hudRoot, "AbilityBarPanel");
+            abilityBar.FireballButton = FindComponentInChildrenByName<Button>(hudRoot, "FireballButton");
+            abilityBar.FireballLabelText =
+                FindComponentInChildrenByName<TextMeshProUGUI>(abilityBar.FireballButton.gameObject, "Text");
+            abilityBar.FireballCooldownFill =
+                FindComponentInChildrenByName<Image>(abilityBar.FireballButton.gameObject, "FireballButtonCooldownFill");
+            abilityBar.RallyButton = FindComponentInChildrenByName<Button>(hudRoot, "RallyAbilityButton");
+            abilityBar.RallyLabelText =
+                FindComponentInChildrenByName<TextMeshProUGUI>(abilityBar.RallyButton.gameObject, "Text");
+            abilityBar.RallyCooldownFill =
+                FindComponentInChildrenByName<Image>(abilityBar.RallyButton.gameObject, "RallyAbilityButtonCooldownFill");
+            abilityBar.EmergencyRepairButton =
+                FindComponentInChildrenByName<Button>(hudRoot, "EmergencyRepairAbilityButton");
+            abilityBar.EmergencyRepairLabelText = FindComponentInChildrenByName<TextMeshProUGUI>(
+                abilityBar.EmergencyRepairButton.gameObject, "Text");
+            abilityBar.EmergencyRepairCooldownFill = FindComponentInChildrenByName<Image>(
+                abilityBar.EmergencyRepairButton.gameObject,
+                "EmergencyRepairAbilityButtonCooldownFill");
+            ConfigureFireballVisuals(abilityBar);
+            EditorUtility.SetDirty(abilityBar);
+        }
+
+        private static void EnsureActiveAbilityTuning()
+        {
+            DifficultyProfileSO profile = EnsureDefaultDifficultyProfile();
+            if (profile.NormalRepairHealPercent <= 0f)
+            {
+                profile.NormalRepairHealPercent = 0.25f;
+            }
+            if (profile.RepairStonePerMissingHp <= 0f)
+            {
+                profile.RepairStonePerMissingHp = 0.10f;
+            }
+            if (profile.RepairDayPriceMultiplier <= 0f)
+            {
+                profile.RepairDayPriceMultiplier = 1f;
+            }
+            if (profile.RallyCooldown <= 0f)
+            {
+                profile.RallyCooldown = 60f;
+            }
+            if (profile.EmergencyRepairHealPercent <= 0f)
+            {
+                profile.EmergencyRepairHealPercent = 0.20f;
+            }
+            if (profile.EmergencyRepairCooldown <= 0f)
+            {
+                profile.EmergencyRepairCooldown = 120f;
+            }
+
+            // Yeni serialize alanlari mevcut asset'e de yazilsin; mevcut pozitif owner
+            // tuning'i korunur, yalniz eksik/sifir alanlar default ile tamamlanir.
+            EditorUtility.SetDirty(profile);
         }
 
         /// <summary>DAWN odul toast'u: faz Dawn'a gecince gorunur nufus odulu bildirimi.</summary>
