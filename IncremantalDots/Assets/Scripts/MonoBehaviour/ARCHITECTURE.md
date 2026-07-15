@@ -44,6 +44,7 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - `ResourceBar`, üst solda `560 x 48` tek şerittir; Wood/Stone/Iron/Food/Population/Arrow altı adet `84 x 42` chip içinde kalır ve label renkleri hızlı taramayı destekler
 - Resource rate gosteriminde base production yerine effective production'i kullanir; mobile worker economy aktifken bu deger worker allocation'dan gelir
 - `CyclePanel` varsa `CyclePhaseText` degerini sadece `DAY / DUSK / NIGHT` olarak yazar
+- `CyclePanel`, top-center anchor'li `340 x 78` minimal phase slotudur; day counter, phase title, progress track/marker ve uc legacy phase label'i bu footprint icinde kalir
 - `CycleProgressFill` ve `CycleProgressMarker` ile 60s cycle progress'ini gosterir
 - `HordePressurePanel` imported prefabda bulunsa bile player-facing olarak kapali tutulur
 - `CyclePanel` yoksa legacy wave fallback text'lerini kullanir

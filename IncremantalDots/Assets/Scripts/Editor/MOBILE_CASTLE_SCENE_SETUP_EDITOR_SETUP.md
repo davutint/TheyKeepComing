@@ -70,6 +70,7 @@ SubScene:
 - `HUDController`: `WoodText`, `StoneText`, `IronText`, `FoodText`, `PopulationText`, `ArrowText`, `WaveRewardText`, `DamageFlashImage` ve varsa cycle/defense module alanlari bagli
 - `ResourceBar`: üst solda `560 x 48`; altı resource/population/Arrow chip'i `84 x 42`, value/rate tek satır ve `ArrowChip` finite ammo toggle olmaya devam eder
 - `HUDController` cycle module: `CyclePanel`, `CyclePhaseText`, `CycleDayLabelText`, `CycleDuskLabelText`, `CycleNightLabelText`, `CycleProgressFill`, `CycleProgressMarker`
+- `CyclePanel`: top-center anchor, `340 x 78`; `280 x 10` progress track ve butun mevcut phase binding'leri korunur. Ham label visual polish'i ayri Package I isidir
 - `HordePressurePanel` prefabda varsa player-facing olarak kapali tutulur
 - `HUDController` defense module: `DefensePercentText`, `DefenseWallFill`, `DefenseWallText`, opsiyonel `DefenseDamageGlow`; legacy Gate/Core alanlari prefabda ve controller binding'inde bulunmaz
 - `MarketUI`: `ArcherDrawerPanel`, `DrawerToggleButton`, Basic/Rapid/Frost row text, buy ve dynamic `ArcherRetrainButton` alanlari bagli

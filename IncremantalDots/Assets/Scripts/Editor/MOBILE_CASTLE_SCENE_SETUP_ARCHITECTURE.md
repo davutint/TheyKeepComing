@@ -28,7 +28,7 @@ World visual tilemap'leri owner tarafindan yonetilir. Tool `Grid/outside` tilema
 
 `Assets/Prefabs/UI/Generated/MobileCastleHudRoot.prefab` varsa `MobileCastleHudRoot` bu prefabdan instancelanir. Prefab yoksa fallback HUD ayni runtime isimleriyle kurulur: economy text'leri, fallback `WaveText`, fallback `KillsText`, fallback `DefenseText`, `WaveRewardText`, `DamageFlashOverlay`, `ArcherDrawerPanel`, Basic/Rapid/Frost row buy alanlari ve `RepairButton`. Onayli prefabda `CyclePanel` varsa fallback `WaveText/KillsText` uretilmez ve varsa kapatilir. Castle Interior economy paneli icin fallback polish UI uretilmez; panel gerekirse dogrudan prefabda kurulur.
 
-Onayli polish prefab gelirse tool `CastleDefensePanel` altindaki `DefensePercentText`, `DefenseWallFill`, `DefenseWallText` ve opsiyonel `DefenseDamageGlow` alanlarini baglar. Legacy Gate/Core gorseli veya binding'i kurulmaz. Wall fill image'i setup sirasinda horizontal left fill moduna alinir.
+Onayli polish prefab gelirse tool `CastleDefensePanel` altindaki `DefensePercentText`, `DefenseWallFill`, `DefenseWallText` ve opsiyonel `DefenseDamageGlow` alanlarini baglar. Legacy Gate/Core gorseli veya binding'i kurulmaz. Wall fill image'i setup sirasinda horizontal left fill moduna alinir. Ust-orta `CyclePanel`, top-center anchor'li `340 x 78` minimal slot olarak kalir; ham phase label polish'i ayri Package I gorevidir.
 
 ## ECS Notu
 
