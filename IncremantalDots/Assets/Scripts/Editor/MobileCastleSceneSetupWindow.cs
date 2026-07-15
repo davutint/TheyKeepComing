@@ -1612,12 +1612,14 @@ namespace DeadWalls
                         "Traders out of the burned valley. Their wagons carry good {GAIN_RES} — and they know exactly how badly we need it.",
                     };
                     t.OutcomeA = "Hands are shaken. Their crew unloads {GAIN_N} {GAIN_RES} while ours counts out {PAY_N} {PAY_RES}. The caravan is over the ridge before dusk.";
-                    t.OutcomeB = "The master shrugs — 'Your loss.' They leave {GAIN_N} {GAIN_RES} at the gate anyway. Goodwill, or an advertisement.";
+                    t.OutcomeB = "We decline the full trade. The master leaves {GAIN_N} {GAIN_RES} as a sample of what his next caravan could bring.";
                     t.Contrast = CouncilContrastType.ResourceTrade;
                     t.OptionAAtomIds = new[] { "pay_resource" };
                     t.OptionBAtomIds = new[] { "gain_resource" };
-                    t.OptionAVerb = "Make the trade"; t.OptionBVerb = "Send them away";
+                    t.OptionAVerb = "Make the trade"; t.OptionBVerb = "Take the sample";
                     t.SetsFlagOnA = "traded_with_merchant";
+                    t.ForbiddenFlags = new[] { "traded_with_merchant" };
+                    t.MinDay = 3;
                 }),
                 EnsureCouncilTemplate("abandoned_cache", t =>
                 {
@@ -1633,7 +1635,7 @@ namespace DeadWalls
                     t.OptionAAtomIds = new[] { "gain_cache" };
                     t.OptionBAtomIds = new[] { "boost_production" };
                     t.OptionAVerb = "Strip it now"; t.OptionBVerb = "Work it properly";
-                    t.BaseWeight = 1.2f;
+                    t.BaseWeight = 1.2f; t.MinDay = 3;
                 }),
                 EnsureCouncilTemplate("refugees_at_gate", t =>
                 {
@@ -1644,12 +1646,14 @@ namespace DeadWalls
                         "A column of refugees followed the smoke to our walls. Shelter costs food — but people are the one thing the dead can't give us.",
                     };
                     t.OutcomeA = "The gate opens. {POP_N} souls file in — by evening they're hauling timber like they were born here.";
-                    t.OutcomeB = "We keep the gate shut and pass rations over the wall. Their leader leaves {GAIN_N} {GAIN_RES} in thanks — salvage they couldn't carry.";
+                    t.OutcomeB = "The gate stays shut. Their leader trades {GAIN_N} {GAIN_RES} for a marked route away from the horde.";
                     t.Contrast = CouncilContrastType.PopulationVsResource;
                     t.OptionAAtomIds = new[] { "gain_population" };
                     t.OptionBAtomIds = new[] { "gain_resource" };
-                    t.OptionAVerb = "Open the gate"; t.OptionBVerb = "Rations only";
+                    t.OptionAVerb = "Open the gate"; t.OptionBVerb = "Trade at the gate";
                     t.SetsFlagOnA = "refugees_taken";
+                    t.ForbiddenFlags = new[] { "refugees_taken" };
+                    t.MinDay = 6;
                 }),
                 EnsureCouncilTemplate("wandering_veterans", t =>
                 {
@@ -1665,7 +1669,7 @@ namespace DeadWalls
                     t.OptionAAtomIds = new[] { "free_archers" };
                     t.OptionBAtomIds = new[] { "heal_defense" };
                     t.OptionAVerb = "Feed them"; t.OptionBVerb = "Repairs for directions";
-                    t.BaseWeight = 0.9f;
+                    t.BaseWeight = 0.9f; t.MinDay = 6;
                 }),
                 EnsureCouncilTemplate("strange_bonfires", t =>
                 {
@@ -1676,12 +1680,12 @@ namespace DeadWalls
                         "Scouts mapped the bonfire camps. Torching them thins tonight's assault. Picking them clean first is worth a fortune — if we're fast enough.",
                     };
                     t.OutcomeA = "The camps go up in oily smoke. Whatever was gathering out there scatters — tonight should be {NIGHT_PCT}% quieter.";
-                    t.OutcomeB = "The crews grab {GAIN_N} {GAIN_RES} and everything else worth carrying — but the noise travels. Tonight comes {NIGHT_PCT}% harder.";
+                    t.OutcomeB = "The crews strip two stockpiles before torching the camps. Both hauls reach the wall, but tonight comes {NIGHT_PCT}% harder.";
                     t.Contrast = CouncilContrastType.SafeVsRisky;
                     t.OptionAAtomIds = new[] { "calm_night" };
                     t.OptionBAtomIds = new[] { "wild_night" };
                     t.OptionAVerb = "Burn it all"; t.OptionBVerb = "Loot first, then burn";
-                    t.MinDay = 2; t.BaseWeight = 0.9f;
+                    t.MinDay = 9; t.BaseWeight = 0.9f;
                 }),
                 EnsureCouncilTemplate("cold_snap", t =>
                 {
@@ -1697,37 +1701,38 @@ namespace DeadWalls
                     t.OptionAAtomIds = new[] { "penalty_production" };
                     t.OptionBAtomIds = new[] { "pay_resource" };
                     t.OptionAVerb = "Grit through it"; t.OptionBVerb = "Burn extra fuel";
-                    t.MinDay = 3; t.BaseWeight = 0.8f;
+                    t.MinDay = 6; t.BaseWeight = 0.8f;
                 }),
                 EnsureCouncilTemplate("quarry_crew", t =>
                 {
                     t.Title = "IDLE WORK CREW";
                     t.BodyVariants = new[]
                     {
-                        "A master's work crew, idle since the roads closed, offers their backs. One brutal contract — or keep them on and expand the yards.",
-                        "Skilled hands looking for work. They'll do one big job for cheap, or settle in for good if we make room.",
+                        "A quarry crew, cut off from its old contracts, offers one hard night's labor. Take the haul now, or have them reorganize the yards before they leave.",
+                        "Skilled quarry hands are waiting for the roads to reopen. They can fill the stores tonight, or spend their time improving the yard crews' output.",
                     };
                     t.OutcomeA = "They work through the night and hand over {GAIN_N} {GAIN_RES}, then drift on down the road.";
-                    t.OutcomeB = "They raise their own bunkhouse by the yards. {CAP_RES} crew capacity up by {CAP_N}.";
+                    t.OutcomeB = "Before leaving, the crew redraws every route through the yards. {BOOST_RES} output is up {BOOST_PCT}% for the next {BOOST_D} days.";
                     t.Contrast = CouncilContrastType.NowVsLater;
                     t.OptionAAtomIds = new[] { "gain_cache" };
-                    t.OptionBAtomIds = new[] { "cap_bonus" };
-                    t.OptionAVerb = "One big job"; t.OptionBVerb = "Keep them on";
-                    t.MinDay = 2;
+                    t.OptionBAtomIds = new[] { "boost_production" };
+                    t.OptionAVerb = "One big job"; t.OptionBVerb = "Rework the yards";
+                    t.MinDay = 3;
                 }),
                 EnsureCouncilTemplate("among_the_refugees", t =>
                 {
                     t.Title = "AMONG THE REFUGEES";
                     t.BodyVariants = new[]
                     {
-                        "One of the newcomers turns out to be a guild craftsman — the kind cities used to fight over. He owes us for the open gate, and he knows it.",
+                        "One of the newcomers is a guild craftsman — the kind cities used to fight over. He can spend the day resetting the Wall, or reorganize one yard before opening his workshop.",
+                        "The newcomers have been inside for two days when the yard foreman recognizes a guild mason among them. He offers one favor: restore the Wall, or put one production yard back in order.",
                     };
-                    t.OutcomeA = "He works a week's worth in a single day: {GAIN_N} {GAIN_RES}, guild-stamped. 'Debt paid,' he says — and means it.";
-                    t.OutcomeB = "He hangs his tools by the {BOOST_RES} yards. Output up {BOOST_PCT}% for {BOOST_D} days.";
-                    t.Contrast = CouncilContrastType.NowVsLater;
-                    t.OptionAAtomIds = new[] { "gain_cache" };
+                    t.OutcomeA = "He spends the day at the Wall, resetting stone and braces. The damage is repaired by {HEAL_PCT}%.";
+                    t.OutcomeB = "He reorganizes the {BOOST_RES} yards before opening his workshop. Output is up {BOOST_PCT}% for {BOOST_D} days.";
+                    t.Contrast = CouncilContrastType.DefenseVsProduction;
+                    t.OptionAAtomIds = new[] { "heal_defense" };
                     t.OptionBAtomIds = new[] { "boost_production" };
-                    t.OptionAVerb = "A parting gift"; t.OptionBVerb = "Set up his workshop";
+                    t.OptionAVerb = "Repair the Wall"; t.OptionBVerb = "Rework the yards";
                     t.RequiredFlags = new[] { "refugees_taken" };
                     t.ChainDelayDays = 2; t.OneShot = true; t.BaseWeight = 2f;
                 }),
@@ -1736,14 +1741,15 @@ namespace DeadWalls
                     t.Title = "AN OLD FRIEND";
                     t.BodyVariants = new[]
                     {
-                        "The caravan master is back, grinning through the road dust. 'For my favorite customer — one last haul, or a standing arrangement. Dealer's choice.'",
+                        "The caravan master is back with a final offer: one last haul, or seats for skilled families searching for walls. People will need beds and food.",
+                        "The same caravan rolls back under our banner. Its master can unload a final cache, or bring skilled families willing to settle behind the Wall. They will need beds and food.",
                     };
                     t.OutcomeA = "The wagons empty at our gate: {GAIN_N} {GAIN_RES}. He tips his hat. 'Pleasure as always.'";
-                    t.OutcomeB = "Papers signed over a shared drink. His runners will keep the {BOOST_RES} flowing — up {BOOST_PCT}% for {BOOST_D} days.";
-                    t.Contrast = CouncilContrastType.NowVsLater;
+                    t.OutcomeB = "The wagons arrive full of people instead of goods. {POP_N} skilled settlers enter the gate and join the idle workforce.";
+                    t.Contrast = CouncilContrastType.ResourceVsPopulation;
                     t.OptionAAtomIds = new[] { "gain_cache" };
-                    t.OptionBAtomIds = new[] { "boost_production" };
-                    t.OptionAVerb = "One last haul"; t.OptionBVerb = "A standing contract";
+                    t.OptionBAtomIds = new[] { "gain_population" };
+                    t.OptionAVerb = "One last haul"; t.OptionBVerb = "Bring the settlers";
                     t.RequiredFlags = new[] { "traded_with_merchant" };
                     t.ChainDelayDays = 2; t.OneShot = true; t.BaseWeight = 1.5f;
                 }),

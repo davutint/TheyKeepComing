@@ -24,8 +24,8 @@ MonoBehaviour:
     them clean first is worth a fortune \u2014 if we're fast enough."
   OutcomeA: "The camps go up in oily smoke. Whatever was gathering out there scatters
     \u2014 tonight should be {NIGHT_PCT}% quieter."
-  OutcomeB: "The crews grab {GAIN_N} {GAIN_RES} and everything else worth carrying
-    \u2014 but the noise travels. Tonight comes {NIGHT_PCT}% harder."
+  OutcomeB: "The crews strip two stockpiles before torching the camps. Both hauls
+    reach the wall \u2014 but tonight comes {NIGHT_PCT}% harder."
   Contrast: 4
   OptionAAtomIds:
   - calm_night
@@ -34,7 +34,7 @@ MonoBehaviour:
   OptionAVerb: Burn it all
   OptionBVerb: Loot first, then burn
   BaseWeight: 0.9
-  MinDay: 2
+  MinDay: 9
   RequiredFlags: []
   ForbiddenFlags: []
   SetsFlagOnA: 

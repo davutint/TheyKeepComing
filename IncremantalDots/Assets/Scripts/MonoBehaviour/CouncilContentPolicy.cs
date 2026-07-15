@@ -45,8 +45,7 @@ namespace DeadWalls
                 case CouncilContrastType.NowVsLater:
                     return optionA
                         ? kind == CouncilEffectKind.GainResource
-                        : kind == CouncilEffectKind.TempProductionBoost
-                          || kind == CouncilEffectKind.WorkerCapBonus;
+                        : kind == CouncilEffectKind.TempProductionBoost;
                 case CouncilContrastType.ResourceTrade:
                     return optionA
                         ? kind == CouncilEffectKind.PayResource
@@ -65,6 +64,14 @@ namespace DeadWalls
                     return optionA
                         ? kind == CouncilEffectKind.TempProductionPenalty
                         : kind == CouncilEffectKind.PayResource;
+                case CouncilContrastType.DefenseVsProduction:
+                    return optionA
+                        ? kind == CouncilEffectKind.HealDefensePercent
+                        : kind == CouncilEffectKind.TempProductionBoost;
+                case CouncilContrastType.ResourceVsPopulation:
+                    return optionA
+                        ? kind == CouncilEffectKind.GainResource
+                        : kind == CouncilEffectKind.GainPopulation;
                 default:
                     return false;
             }
@@ -104,6 +111,9 @@ namespace DeadWalls
                         : kind == CouncilEffectKind.GainResource
                           || kind == CouncilEffectKind.NextNightSpawnDelta;
                 case CouncilContrastType.PayOrSuffer:
+                    return IsReferencedAtomAllowed(contrast, optionA, kind);
+                case CouncilContrastType.DefenseVsProduction:
+                case CouncilContrastType.ResourceVsPopulation:
                     return IsReferencedAtomAllowed(contrast, optionA, kind);
                 default:
                     return false;
@@ -261,6 +271,16 @@ namespace DeadWalls
             CouncilTemplateSO template,
             List<string> problems)
         {
+            if (template.Contrast == CouncilContrastType.SafeVsRisky)
+            {
+                CouncilEffectAtomSO safeLoot = catalog.GetAtom("gain_resource");
+                if (safeLoot == null || safeLoot.Kind != CouncilEffectKind.GainResource)
+                {
+                    problems.Add($"'{template.Id}' composer exact dependency'si catalogda yok: "
+                                 + "'gain_resource' / 'GainResource'.");
+                }
+            }
+
             CouncilEffectKind requiredKind = CouncilEffectKind.None;
             switch (template.Contrast)
             {
@@ -332,6 +352,14 @@ namespace DeadWalls
                     return optionA
                         ? CouncilEffectKind.TempProductionPenalty
                         : CouncilEffectKind.PayResource;
+                case CouncilContrastType.DefenseVsProduction:
+                    return optionA
+                        ? CouncilEffectKind.HealDefensePercent
+                        : CouncilEffectKind.TempProductionBoost;
+                case CouncilContrastType.ResourceVsPopulation:
+                    return optionA
+                        ? CouncilEffectKind.GainResource
+                        : CouncilEffectKind.GainPopulation;
                 default:
                     return CouncilEffectKind.None;
             }

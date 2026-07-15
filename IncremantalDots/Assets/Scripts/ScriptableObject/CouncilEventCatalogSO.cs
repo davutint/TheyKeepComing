@@ -127,6 +127,25 @@ namespace DeadWalls
             return false;
         }
 
+        /// <summary>
+        /// Zinciri baslatan secim yapildiktan sonra source template'in ayni kosuda
+        /// yeniden sunulmasini engelleyen authored ForbiddenFlags constraint'i.
+        /// </summary>
+        public bool IsApprovedChainSourceRetirement(string sourceTemplateId, string flag)
+        {
+            if (string.IsNullOrEmpty(sourceTemplateId) || string.IsNullOrEmpty(flag)
+                || CuratedChains == null)
+                return false;
+
+            foreach (CouncilCuratedChain chain in CuratedChains)
+            {
+                if (chain.SourceTemplateId == sourceTemplateId && chain.Flag == flag)
+                    return true;
+            }
+
+            return false;
+        }
+
         /// <summary>Tutarlilik kontrolu: bos/duplicate Id'ler, sablonlarin bilinmeyen atom referanslari.</summary>
         public List<string> ValidateCatalog()
         {
@@ -219,22 +238,27 @@ namespace DeadWalls
 
             foreach (CouncilTemplateSO template in templatesById.Values)
             {
-                ValidateChainConstraints(template, template.RequiredFlags, problems);
-                ValidateChainConstraints(template, template.ForbiddenFlags, problems);
+                ValidateChainConstraints(template, template.RequiredFlags,
+                    allowSourceRetirement: false, problems);
+                ValidateChainConstraints(template, template.ForbiddenFlags,
+                    allowSourceRetirement: true, problems);
                 ValidateChainSource(template, true, template.SetsFlagOnA, problems);
                 ValidateChainSource(template, false, template.SetsFlagOnB, problems);
             }
         }
 
         private void ValidateChainConstraints(CouncilTemplateSO template, string[] flags,
-            List<string> problems)
+            bool allowSourceRetirement, List<string> problems)
         {
             if (flags == null)
                 return;
 
             foreach (string flag in flags)
             {
-                if (!string.IsNullOrEmpty(flag) && !IsApprovedChainConstraint(template.Id, flag))
+                bool approved = IsApprovedChainConstraint(template.Id, flag)
+                                || (allowSourceRetirement
+                                    && IsApprovedChainSourceRetirement(template.Id, flag));
+                if (!string.IsNullOrEmpty(flag) && !approved)
                     problems.Add($"'{template.Id}' onaysiz Council chain constraint kullaniyor: '{flag}'.");
             }
         }

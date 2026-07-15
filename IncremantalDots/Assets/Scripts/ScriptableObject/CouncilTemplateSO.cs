@@ -22,6 +22,12 @@ namespace DeadWalls
 
         /// <summary>Negatif event: A = cezaya katlan, B = kaynak ode ve gecistir.</summary>
         PayOrSuffer = 5,
+
+        /// <summary>A = Wall onarimi, B = sureli uretim bonusu.</summary>
+        DefenseVsProduction = 6,
+
+        /// <summary>A = anlik kaynak, B = yatak ve tek seferlik Food isteyen nufus.</summary>
+        ResourceVsPopulation = 7,
     }
 
     /// <summary>

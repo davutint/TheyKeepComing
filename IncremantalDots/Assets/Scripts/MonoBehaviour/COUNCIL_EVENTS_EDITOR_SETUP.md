@@ -4,8 +4,9 @@
 
 `Window > DeadWalls > Mobile Castle Scene Setup > Setup NewGameScene`:
 
-1. `Assets/ScriptableObject/MobileCastle/Council/` altina 11 atom (`Atom_*.asset`) +
-   9 sablon (`Template_*.asset`) + `CouncilEventCatalog.asset` seed edilir — MERGE-ONLY:
+1. `Assets/ScriptableObject/MobileCastle/Council/` altina 11 serialized atom
+   (`10 launch + cap_bonus legacy dormant`) + 9 launch sablonu + `CouncilEventCatalog.asset`
+   seed edilir — MERGE-ONLY:
    mevcut asset degerlerine ve kullanicinin ekledigi atom/sablonlara dokunulmaz. Mevcut iki
    authored follow-up, `CuratedChains` allowlist'ine merge edilir.
 2. Katalog `GameManager.councilCatalog` alanina baglanir.
@@ -30,6 +31,8 @@
   template varken recent template secilemez; tum adaylar recent ise scheduled fallback acilir.
   Regular takvim asset-tunable degildir: `CouncilRegularSchedule` sabit Day `3,6,9,12...`
   owner'idir.
+- Launch staging sabittir: Day 3 temel ekonomi; Day 6 population/savunma; Day 9 gece riski.
+  `MinDay=1/2` verip tum karmasik event'leri ilk Council'a yigmak production testini bozar.
 - Legacy `DailyEventChance/PityDays/CooldownDays` serialized uyumluluk icin saklanir ve
   Inspector'da gizlidir; regular Council'i etkilemez.
 - `ValidateCatalog`, yalniz Id/ref kontrolu yapmaz: atom kind'inin Council-owned allowlist'te
@@ -47,7 +50,8 @@
    exact count yuzdesi. Karsilanamayan exact sonuc butonu pasif yapar ve eksigi yazar.
 4. `refugees_at_gate`'te A sec -> catalog'daki exact curated link sayesinde 2+ gun sonra
    `AMONG THE REFUGEES` zinciri cikabilir (OneShot). Link allowlist'ten cikarilirsa context'te
-   flag bulunsa bile target fail-closed acilmaz.
+   flag bulunsa bile target fail-closed acilmaz. A secildikten sonra source event kosu icin
+   emekli olur; B secimi source'u yakmaz ve ileride tekrar teklif edilebilir.
 5. EditMode: `CouncilComposerTests`, `CouncilContentPolicyTests`, `CouncilRegularScheduleTests`,
    `RunPersistenceTests`.
 6. PlayMode: `CouncilRegularSchedulePlayModeTests` gercek sahnede Day 1-12 cadence,
@@ -78,9 +82,12 @@ Friend. Var olan custom chain girdilerini silmez; yeni chain veya anlati uretmez
   content'i olarak eklenemez.
 - Template OptionA/B atom Id'leri secilen `CouncilContrastType` recetesiyle uyusmalidir;
   aksi halde `ValidateCatalog()` acik hata verir ve runtime compose fail-closed kalir.
-- Setup/repair menu mevcut katalog icerigini **launch-approved** ilan etmez. Mevcut 9 template
-  ve 11 atomun metin/budget/repeat owner review'u ayri acik konudur; menu yeni launch content'i
-  uretmez.
+- Production 9 template launch-approved'dur: her biri en az iki authored body varyanti,
+  staged `MinDay`, approved contrast recipe ve `<=1.25` budget gate'i tasir. `cap_bonus`
+  serialized compatibility atomu katalogda kalir ancak hicbir template referanslayamaz;
+  kalici worker capacity yalniz Wood+Iron bina yatirimindan gelir.
+- `CouncilComposerTests.ProductionCatalog_LaunchTemplateButceleriVeTokenlariOnayliSinirdaKalir`
+  9 template x 3 day band x 200 seed = 5.400 compose sonucunu test eder.
 
 ## Effect Guardrail Testi
 

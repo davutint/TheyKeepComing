@@ -22,19 +22,20 @@ MonoBehaviour:
     but people are the one thing the dead can't give us."
   OutcomeA: "The gate opens. {POP_N} souls file in \u2014 by evening they're hauling
     timber like they were born here."
-  OutcomeB: "We keep the gate shut and pass rations over the wall. Their leader leaves
-    {GAIN_N} {GAIN_RES} in thanks \u2014 salvage they couldn't carry."
+  OutcomeB: The gate stays shut. Their leader trades {GAIN_N} {GAIN_RES} for a marked
+    route away from the horde.
   Contrast: 2
   OptionAAtomIds:
   - gain_population
   OptionBAtomIds:
   - gain_resource
   OptionAVerb: Open the gate
-  OptionBVerb: Rations only
+  OptionBVerb: Trade at the gate
   BaseWeight: 1
-  MinDay: 1
+  MinDay: 6
   RequiredFlags: []
-  ForbiddenFlags: []
+  ForbiddenFlags:
+  - refugees_taken
   SetsFlagOnA: refugees_taken
   SetsFlagOnB: 
   ChainDelayDays: 0

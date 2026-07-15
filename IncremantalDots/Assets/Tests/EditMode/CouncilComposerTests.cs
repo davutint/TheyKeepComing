@@ -54,6 +54,7 @@ namespace DeadWalls.Tests
                     t.OptionAAtomIds = new[] { "gain_population" };
                     t.OptionBAtomIds = new[] { "gain_resource" };
                     t.SetsFlagOnA = "refugees_taken";
+                    t.ForbiddenFlags = new[] { "refugees_taken" };
                     t.BodyVariants = new[] { "{POP_N} people at the gate." };
                     t.OutcomeA = "+{POP_N} people.";
                     t.OutcomeB = "+{GAIN_N} {GAIN_RES}.";
@@ -327,6 +328,20 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void ChainSource_TetikleyenSecimeKadarUygun_FlagSonraKosudaEmekliOlur()
+        {
+            SetOnlyTemplateActive("refugees");
+            var context = MakeContext(day: 6);
+
+            ComposedCouncilEvent beforeChoice = CouncilComposer.Compose(_catalog, 42u, context);
+            Assert.That(beforeChoice, Is.Not.Null);
+            Assert.That(beforeChoice.TemplateId, Is.EqualTo("refugees"));
+
+            context.Flags["refugees_taken"] = 6;
+            Assert.That(CouncilComposer.Compose(_catalog, 42u, context), Is.Null);
+        }
+
+        [Test]
         public void ValidateCatalog_CuratedSourceFlagTargetContractiniDogrular()
         {
             Assert.That(_catalog.ValidateCatalog(), Is.Empty);
@@ -347,13 +362,124 @@ namespace DeadWalls.Tests
             Assert.That(production.CuratedChains, Has.Length.EqualTo(2));
             Assert.That(production.IsApprovedChainSource(
                 "refugees_at_gate", true, "refugees_taken"), Is.True);
+            Assert.That(production.IsApprovedChainSourceRetirement(
+                "refugees_at_gate", "refugees_taken"), Is.True);
             Assert.That(production.IsApprovedChainConstraint(
                 "among_the_refugees", "refugees_taken"), Is.True);
             Assert.That(production.IsApprovedChainSource(
                 "merchant_caravan", true, "traded_with_merchant"), Is.True);
+            Assert.That(production.IsApprovedChainSourceRetirement(
+                "merchant_caravan", "traded_with_merchant"), Is.True);
             Assert.That(production.IsApprovedChainConstraint(
                 "an_old_friend", "traded_with_merchant"), Is.True);
+            Assert.That(production.GetTemplate("refugees_at_gate").ForbiddenFlags,
+                Does.Contain("refugees_taken"));
+            Assert.That(production.GetTemplate("merchant_caravan").ForbiddenFlags,
+                Does.Contain("traded_with_merchant"));
             Assert.That(production.ValidateCatalog(), Is.Empty);
+        }
+
+        [Test]
+        public void ProductionCatalog_LaunchTemplateAcilisGunleriniKatmanliTutar()
+        {
+            const string path = "Assets/ScriptableObject/MobileCastle/Council/CouncilEventCatalog.asset";
+            CouncilEventCatalogSO production = AssetDatabase.LoadAssetAtPath<CouncilEventCatalogSO>(path);
+            var expectedDays = new Dictionary<string, int>
+            {
+                { "abandoned_cache", 3 },
+                { "merchant_caravan", 3 },
+                { "quarry_crew", 3 },
+                { "refugees_at_gate", 6 },
+                { "wandering_veterans", 6 },
+                { "cold_snap", 6 },
+                { "strange_bonfires", 9 },
+            };
+
+            Assert.That(production, Is.Not.Null);
+            foreach (KeyValuePair<string, int> expected in expectedDays)
+            {
+                CouncilTemplateSO template = production.GetTemplate(expected.Key);
+                Assert.That(template, Is.Not.Null, $"Production template eksik: {expected.Key}");
+                Assert.That(template.MinDay, Is.EqualTo(expected.Value),
+                    $"{expected.Key} launch staging gununden sapti.");
+            }
+        }
+
+        [Test]
+        public void ProductionCatalog_LaunchTemplateButceleriVeTokenlariOnayliSinirdaKalir()
+        {
+            const string path = "Assets/ScriptableObject/MobileCastle/Council/CouncilEventCatalog.asset";
+            CouncilEventCatalogSO production = AssetDatabase.LoadAssetAtPath<CouncilEventCatalogSO>(path);
+            Assert.That(production, Is.Not.Null);
+
+            int[] sampleDays = { 3, 12, 30 };
+            foreach (CouncilTemplateSO template in production.Templates)
+            {
+                Assert.That(template.BodyVariants, Has.Length.GreaterThanOrEqualTo(2),
+                    $"[{template.Id}] launch metni en az iki authored govde varyanti tasimali.");
+                foreach (int sampleDay in sampleDays)
+                {
+                    int day = Mathf.Max(template.MinDay, sampleDay);
+                    for (uint seed = 1; seed <= 200; seed++)
+                    {
+                        CouncilContext context = MakeContext(day);
+                        foreach (CouncilTemplateSO other in production.Templates)
+                        {
+                            if (other != null && other.Id != template.Id)
+                                context.RecentTemplateIds.Add(other.Id);
+                        }
+
+                        if (template.RequiredFlags != null)
+                        {
+                            foreach (string flag in template.RequiredFlags)
+                            {
+                                if (!string.IsNullOrEmpty(flag))
+                                    context.Flags[flag] = Mathf.Max(1, day - template.ChainDelayDays);
+                            }
+                        }
+
+                        ComposedCouncilEvent composed = CouncilComposer.Compose(
+                            production,
+                            Unity.Mathematics.math.hash(new Unity.Mathematics.uint2(seed, (uint)day)),
+                            context);
+
+                        Assert.That(composed, Is.Not.Null,
+                            $"[{template.Id}] Day {day}, seed {seed}: compose null.");
+                        Assert.That(composed.TemplateId, Is.EqualTo(template.Id),
+                            $"[{template.Id}] isolation recent-memory kontrati bozuldu.");
+
+                        float a = Mathf.Abs(composed.OptionA.BudgetMinutes);
+                        float b = Mathf.Abs(composed.OptionB.BudgetMinutes);
+                        float ratio = Mathf.Max(a, b) / Mathf.Max(0.1f, Mathf.Min(a, b));
+                        Assert.That(ratio, Is.LessThanOrEqualTo(1.2501f),
+                            $"[{template.Id}] Day {day}, seed {seed}: budget ratio {ratio:0.###}.");
+
+                        AssertNoTokens(composed.TemplateId, "Body", composed.Body);
+                        AssertNoTokens(composed.TemplateId, "OutcomeA", composed.OutcomeA);
+                        AssertNoTokens(composed.TemplateId, "OutcomeB", composed.OutcomeB);
+                        Assert.That(CouncilContentPolicy.TryValidateComposedEvent(
+                            production, composed, out string problem), Is.True, problem);
+                    }
+                }
+            }
+        }
+
+        [Test]
+        public void ProductionCatalog_CapBonusAtomuDormantVeLaunchReceteleriDisindaKalir()
+        {
+            const string path = "Assets/ScriptableObject/MobileCastle/Council/CouncilEventCatalog.asset";
+            CouncilEventCatalogSO production = AssetDatabase.LoadAssetAtPath<CouncilEventCatalogSO>(path);
+            Assert.That(production, Is.Not.Null);
+            Assert.That(production.GetAtom("cap_bonus"), Is.Not.Null,
+                "Legacy atom compatibility icin asset korunmali.");
+            Assert.That(CouncilContentPolicy.IsReferencedAtomAllowed(
+                CouncilContrastType.NowVsLater, false, CouncilEffectKind.WorkerCapBonus), Is.False);
+
+            foreach (CouncilTemplateSO template in production.Templates)
+            {
+                CollectionAssert.DoesNotContain(template.OptionAAtomIds, "cap_bonus", template.Id);
+                CollectionAssert.DoesNotContain(template.OptionBAtomIds, "cap_bonus", template.Id);
+            }
         }
 
         // ---------------------------------------------------------------

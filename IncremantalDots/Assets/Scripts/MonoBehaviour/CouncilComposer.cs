@@ -63,6 +63,7 @@ namespace DeadWalls
         private const float FairBand = 1.0f;
         private const float GenerousBand = 1.4f;
         private const float BudgetTolerance = 1.25f; // A/B butce orani bu katsayiyi asarsa dusuk taraf yukseltilir
+        private static readonly string[] SafeVsRiskyLootAtomIds = { "gain_resource" };
 
         // ---------------------------------------------------------------
         // Ana giris
@@ -195,7 +196,8 @@ namespace DeadWalls
                 foreach (var flag in template.ForbiddenFlags)
                 {
                     if (!string.IsNullOrEmpty(flag)
-                        && !catalog.IsApprovedChainConstraint(template.Id, flag))
+                        && !catalog.IsApprovedChainConstraint(template.Id, flag)
+                        && !catalog.IsApprovedChainSourceRetirement(template.Id, flag))
                         return false;
                     if (!string.IsNullOrEmpty(flag) && context.Flags != null
                         && context.Flags.ContainsKey(flag))
@@ -281,7 +283,11 @@ namespace DeadWalls
                 case CouncilContrastType.SafeVsRisky:
                 {
                     var calm = PickAtom(catalog, template.OptionAAtomIds, CouncilEffectKind.NextNightSpawnDelta, ref rng, context);
-                    var loot = PickAtom(catalog, null, CouncilEffectKind.GainResource, ref rng, context);
+                    // Riskli secenek normal, uretim-oranli odulu kullanir. gain_cache burada
+                    // rastgele secilirse ayni gece riski karsiliginda launch butcesini asan
+                    // jackpot'lar olusur ve incremental kaynak dongusu zayiflar.
+                    var loot = PickAtom(catalog, SafeVsRiskyLootAtomIds,
+                        CouncilEffectKind.GainResource, ref rng, context);
                     var danger = PickAtom(catalog, template.OptionBAtomIds, CouncilEffectKind.NextNightSpawnDelta, ref rng, context);
                     if (calm == null || loot == null || danger == null) return;
                     // A: sakin gece (negatif delta atomu)
@@ -302,6 +308,30 @@ namespace DeadWalls
                     var res = ResolveResource(penalty, ref rng, context, preferScarce: false);
                     AddEffect(a, penalty, res, band, context);
                     AddEffect(b, pay, MostAbundantResource(context, exclude: EconomyFocusType.Balanced), band, context);
+                    break;
+                }
+                case CouncilContrastType.DefenseVsProduction:
+                {
+                    var heal = PickAtom(catalog, template.OptionAAtomIds,
+                        CouncilEffectKind.HealDefensePercent, ref rng, context);
+                    var boost = PickAtom(catalog, template.OptionBAtomIds,
+                        CouncilEffectKind.TempProductionBoost, ref rng, context);
+                    if (heal == null || boost == null) return;
+                    var resource = ResolveResource(boost, ref rng, context, preferScarce: true);
+                    AddEffect(a, heal, EconomyFocusType.Balanced, band, context);
+                    AddEffect(b, boost, resource, band, context);
+                    break;
+                }
+                case CouncilContrastType.ResourceVsPopulation:
+                {
+                    var gain = PickAtom(catalog, template.OptionAAtomIds,
+                        CouncilEffectKind.GainResource, ref rng, context);
+                    var population = PickAtom(catalog, template.OptionBAtomIds,
+                        CouncilEffectKind.GainPopulation, ref rng, context);
+                    if (gain == null || population == null) return;
+                    AddEffect(a, gain,
+                        ResolveResource(gain, ref rng, context, preferScarce: true), band, context);
+                    AddEffect(b, population, EconomyFocusType.Balanced, band, context);
                     break;
                 }
                 default:
@@ -348,7 +378,7 @@ namespace DeadWalls
             CouncilEffectKind kind, ref Unity.Mathematics.Random rng, in CouncilContext context)
         {
             // Sablon kisit listesi doluysa tur filtresi kalkar: kisit = tam guven
-            // (orn. NowVsLater'in B'sine WorkerCapBonus atomu baglanabilir)
+            // Explicit liste authored recipe'nin exact atom havuzudur.
             bool restricted = restrictIds != null && restrictIds.Length > 0;
             var pool = ResolveAtomPool(catalog, restrictIds, restricted ? CouncilEffectKind.None : kind);
             if (pool.Count == 0)

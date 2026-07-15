@@ -5,8 +5,9 @@
 Dusuk frekansli, iki secenekli mikro kararlar: kart DAWN'da belirir (dongunun en sakin ani,
 konsey safakta toplanir), DAY boyunca yasar, DUSK girisinde secilmemisse "konsey dagilir".
 Oyun HICBIR zaman durmaz. Event'ler ASSET DEGILDIR — CouncilComposer sablon x atom x
-baglam x olcek carpiminden runtime'da uretir; ~10 atom + ~9 sablon yuzlerce ayirt edilebilir
-varyant dogurur ve yeni atom/sablon eklemek cesitliligi CARPARAK buyutur.
+baglam x olcek carpiminden runtime'da uretir. Production katalog 9 launch sablonu ve 11
+serialized atom tasir; `cap_bonus` yalniz legacy uyumluluk icin dormant kalir ve hicbir launch
+recetesi tarafindan kabul edilmez. Diger 10 atom authored tariflerde kullanilir.
 
 ## Katmanlar
 
@@ -45,6 +46,9 @@ varyant dogurur ve yeni atom/sablon eklemek cesitliligi CARPARAK buyutur.
   hot-reload veya tekrar cagri ile farkli kart reroll edilmez.
 - V1 Council regular-only'dir; Day `3/6/9...` disinda ikinci bir meeting type veya trigger
   yolu yoktur.
+- Launch staging: Day 3 yalniz temel ekonomi (`abandoned_cache`, `merchant_caravan`,
+  `quarry_crew`); Day 6 population/savunma (`refugees_at_gate`, `wandering_veterans`,
+  `cold_snap`); Day 9 gece riski (`strange_bonfires`). Follow-up'lar flag + gecikme ile acilir.
 
 ## Persistence
 
@@ -72,6 +76,8 @@ varyant dogurur ve yeni atom/sablon eklemek cesitliligi CARPARAK buyutur.
 | EconomyVsDefense | FOOD ode, +bedava okcu | savunma HP iyilestir |
 | SafeVsRisky | sonraki gece -%X horde | cift yagma + sonraki gece +%Y horde |
 | PayOrSuffer | uretim cezasina katlan | kaynak ode, gecistir |
+| DefenseVsProduction | Wall onarimi | sureli uretim bonusu |
+| ResourceVsPopulation | anlik kaynak | yatak + tek seferlik Food isteyen population |
 
 ## Anlati Katmani (promise -> choice -> consequence)
 
@@ -114,9 +120,12 @@ varyant dogurur ve yeni atom/sablon eklemek cesitliligi CARPARAK buyutur.
   dordulusunu explicit onaylamalidir; composer ve choice writer onaysiz zinciri fail-closed
   reddeder. Mevcut iki approved bag: `refugees_at_gate A -> refugees_taken ->
   among_the_refugees` ve `merchant_caravan A -> traded_with_merchant -> an_old_friend`.
+  Source event, tetikleyen branch secilene kadar tekrar gelebilir; flag yazilinca kendi
+  `ForbiddenFlags` emeklilik kontratiyla kosu havuzundan cikar. Reddetmek zinciri yakmaz.
 - **Olcek:** miktarlar dakikalik uretimden turetilir; DAY 3'te de DAY 30'da da anlamli.
-- **Butce:** her etkinin "dakika-degeri" var; A/B normalize edilir — kirik kombinasyon
-  (bedava kazanc/haksiz ceza) matematiksel olarak engellenir.
+- **Butce:** her etkinin "dakika-degeri" var; A/B normalize edilir. Production testi 9
+  template x 3 gun bandi x 200 seed = 5.400 compose sonucunu token, content policy ve
+  `<= 1.25` A/B oranina karsi kilitler.
 
 ## ECS Dokunuslari
 
@@ -126,15 +135,17 @@ varyant dogurur ve yeni atom/sablon eklemek cesitliligi CARPARAK buyutur.
   ExpireContinuousEventEffects` ile islenir (legacy ApplyDayPrepStart continuous'ta kosmaz).
 - Temp production bonusu MEVCUT `ProductionBonus*` alanlarini kullanir — TEK aktif slot
   (yeni gelen eskisini ezer; V1 kisiti).
-- Worker cap bonuslari GameManager aggregate'inde tech ile birlesir (base+tech+council) —
-  tech satin alimi council kazanimini ezmez.
+- Legacy WorkerCapBonus runtime destegi save/uyumluluk icin durur; `cap_bonus` launch
+  template'lerinde referanslanmaz ve `CouncilContentPolicy` authored recipe olarak reddeder.
+  Kalici worker capacity yalniz Wood+Iron incremental bina yatiriminin owner'idir.
 
 ## Role / Content Ownership Gate
 
 `CouncilContentPolicy`, Council'in runtime'da sahip olabilecegi effect kind'larinin tek
-allowlist'idir: run kaynak transaction'i, gecici production, run-ici worker cap bonusu,
-population, free Basic archer, Wall heal ve next-night count multiplier. `None`, bilinmeyen
-enum degeri ve gelecekte eklenebilecek baska domain'ler varsayilan olarak reddedilir.
+allowlist'idir: run kaynak transaction'i, gecici production, population, guardli Basic archer,
+Wall heal ve next-night count multiplier. WorkerCapBonus enum/runtime destegi compatibility
+icin korunur fakat hicbir launch contrast recipe'si bu atomu authored secenekte kabul etmez.
+`None`, bilinmeyen enum degeri ve gelecekte eklenebilecek baska domain'ler reddedilir.
 
 - Grave Essence kazanma/harcama, Heart node reveal/purchase/upgrade/evolution ve Meta Souls/shop
   Council rolunde degildir; Council apply switch'i bu owner API'lerini cagiramaz.
@@ -143,8 +154,10 @@ enum degeri ve gelecekte eklenebilecek baska domain'ler varsayilan olarak redded
 - Composer catalog gate'ini gecmeyen havuzdan event uretmez. Live quote bilinmeyen effect'i
   `CONTENT BLOCKED` olarak kilitler; `ChooseCouncilOption` karti kapatmadan veya flag yazmadan
   composed event'i authored catalog'a karsi yeniden dogrular.
-- Bu teknik gate mevcut 9 template/11 atomu launch-approved ilan etmez. Launch metin/atom listesi,
-  budget ve tekrar review'u owner karari bekleyen ayri kabul kapisidir.
+- Production 9 template/11 serialized atom launch review'undan gecmistir. `cap_bonus` dormant
+  compatibility atomudur; 9 template'in hicbiri referanslamaz. Her template en az iki authored
+  govde varyanti, staged MinDay, approved recipe, curated repeat kurali ve 5.400-ornek budget
+  regression gate'i tasir.
 
 ## Effect Guardrail Owner'i
 
@@ -167,7 +180,8 @@ transaction'ina cevirir.
   `0.25..2.0` araliginda yazar. Zombie HP, damage ve speed alanlarina dokunmaz.
 
 Test owner'lari: `CouncilComposerTests` scarcity/production, iki tarafli Wall director,
-hard recent exclusion/fallback, curated source/target contract ve production catalog asset'ini;
+hard recent exclusion/fallback, curated source/target+source-retirement contract'ini, staged
+launch gunlerini, dormant cap isolation'ini ve production 5.400-sample budget/token gate'ini;
 `CouncilContentPolicyTests` effect role whitelist'ini, contrast/branch recetesini, catalog
 provenance'ini ve production asset gate'ini;
 `CouncilEffectGuardUtilityTests` saf limitleri;

@@ -14,21 +14,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: DeadWalls::DeadWalls.CouncilTemplateSO
   Id: among_the_refugees
   Title: AMONG THE REFUGEES
-  Body: One of the newcomers turns out to be a master craftsman.
+  Body: One of the newcomers is a guild craftsman who can restore the Wall or reorganize
+    a production yard.
   BodyVariants:
-  - "One of the newcomers turns out to be a guild craftsman \u2014 the kind cities
-    used to fight over. He owes us for the open gate, and he knows it."
-  OutcomeA: "He works a week's worth in a single day: {GAIN_N} {GAIN_RES}, guild-stamped.
-    'Debt paid,' he says \u2014 and means it."
-  OutcomeB: He hangs his tools by the {BOOST_RES} yards. Output up {BOOST_PCT}% for
-    {BOOST_D} days.
-  Contrast: 0
+  - "One of the newcomers is a guild craftsman \u2014 the kind cities used to fight
+    over. He can spend the day resetting the Wall, or reorganize one yard before
+    opening his workshop."
+  - 'The newcomers have been inside for two days when the yard foreman recognizes
+    a guild mason among them. He offers one favor: restore the Wall, or put one production
+    yard back in order.'
+  OutcomeA: He spends the day at the Wall, resetting stone and braces. The damage
+    is repaired by {HEAL_PCT}%.
+  OutcomeB: He reorganizes the {BOOST_RES} yards before opening his workshop. Output
+    is up {BOOST_PCT}% for {BOOST_D} days.
+  Contrast: 6
   OptionAAtomIds:
-  - gain_cache
+  - heal_defense
   OptionBAtomIds:
   - boost_production
-  OptionAVerb: A parting gift
-  OptionBVerb: Set up his workshop
+  OptionAVerb: Repair the Wall
+  OptionBVerb: Rework the yards
   BaseWeight: 2
   MinDay: 1
   RequiredFlags:

@@ -14,25 +14,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: DeadWalls::DeadWalls.CouncilTemplateSO
   Id: quarry_crew
   Title: IDLE WORK CREW
-  Body: A masters' crew seeks contract work while the roads stay closed.
+  Body: A skilled quarry crew offers one night's labor while the roads stay closed.
   BodyVariants:
-  - "A master's work crew, idle since the roads closed, offers their backs. One brutal
-    contract \u2014 or keep them on and expand the yards."
-  - Skilled hands looking for work. They'll do one big job for cheap, or settle in
-    for good if we make room.
+  - A quarry crew, cut off from its old contracts, offers one hard night's labor.
+    Take the haul now, or have them reorganize the yards before they leave.
+  - Skilled quarry hands are waiting for the roads to reopen. They can fill the stores
+    tonight, or spend their time improving the yard crews' output.
   OutcomeA: They work through the night and hand over {GAIN_N} {GAIN_RES}, then drift
     on down the road.
-  OutcomeB: They raise their own bunkhouse by the yards. {CAP_RES} crew capacity
-    up by {CAP_N}.
+  OutcomeB: Before leaving, the crew redraws every route through the yards. {BOOST_RES}
+    output is up {BOOST_PCT}% for the next {BOOST_D} days.
   Contrast: 0
   OptionAAtomIds:
   - gain_cache
   OptionBAtomIds:
-  - cap_bonus
+  - boost_production
   OptionAVerb: One big job
-  OptionBVerb: Keep them on
+  OptionBVerb: Rework the yards
   BaseWeight: 1
-  MinDay: 2
+  MinDay: 3
   RequiredFlags: []
   ForbiddenFlags: []
   SetsFlagOnA: 

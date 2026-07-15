@@ -23,19 +23,20 @@ MonoBehaviour:
     and they know exactly how badly we need it."
   OutcomeA: Hands are shaken. Their crew unloads {GAIN_N} {GAIN_RES} while ours counts
     out {PAY_N} {PAY_RES}. The caravan is over the ridge before dusk.
-  OutcomeB: "The master shrugs \u2014 'Your loss.' They leave {GAIN_N} {GAIN_RES}
-    at the gate anyway. Goodwill, or an advertisement."
+  OutcomeB: We decline the full trade. The master leaves {GAIN_N} {GAIN_RES} as a
+    sample of what his next caravan could bring.
   Contrast: 1
   OptionAAtomIds:
   - pay_resource
   OptionBAtomIds:
   - gain_resource
   OptionAVerb: Make the trade
-  OptionBVerb: Send them away
+  OptionBVerb: Take the sample
   BaseWeight: 1
-  MinDay: 1
+  MinDay: 3
   RequiredFlags: []
-  ForbiddenFlags: []
+  ForbiddenFlags:
+  - traded_with_merchant
   SetsFlagOnA: traded_with_merchant
   SetsFlagOnB: 
   ChainDelayDays: 0

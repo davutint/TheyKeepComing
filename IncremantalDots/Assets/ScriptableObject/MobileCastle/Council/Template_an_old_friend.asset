@@ -14,21 +14,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: DeadWalls::DeadWalls.CouncilTemplateSO
   Id: an_old_friend
   Title: AN OLD FRIEND
-  Body: The caravan master returns, grinning. 'For my favorite customer...'
+  Body: The caravan master returns with one last haul or skilled settlers seeking
+    shelter.
   BodyVariants:
-  - "The caravan master is back, grinning through the road dust. 'For my favorite
-    customer \u2014 one last haul, or a standing arrangement. Dealer's choice.'"
+  - 'The caravan master is back with a final offer: one last haul, or seats for skilled
+    families searching for walls. People will need beds and food.'
+  - The same caravan rolls back under our banner. Its master can unload a final cache,
+    or bring skilled families willing to settle behind the Wall. They will need beds
+    and food.
   OutcomeA: 'The wagons empty at our gate: {GAIN_N} {GAIN_RES}. He tips his hat.
     ''Pleasure as always.'''
-  OutcomeB: "Papers signed over a shared drink. His runners will keep the {BOOST_RES}
-    flowing \u2014 up {BOOST_PCT}% for {BOOST_D} days."
-  Contrast: 0
+  OutcomeB: The wagons arrive full of people instead of goods. {POP_N} skilled settlers
+    enter the gate and join the idle workforce.
+  Contrast: 7
   OptionAAtomIds:
   - gain_cache
   OptionBAtomIds:
-  - boost_production
+  - gain_population
   OptionAVerb: One last haul
-  OptionBVerb: A standing contract
+  OptionBVerb: Bring the settlers
   BaseWeight: 1.5
   MinDay: 1
   RequiredFlags:
