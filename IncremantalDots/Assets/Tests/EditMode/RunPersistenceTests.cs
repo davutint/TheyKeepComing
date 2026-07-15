@@ -594,9 +594,12 @@ namespace DeadWalls.Tests
                     GraveEssence = 42_000
                 }), Is.True);
 
-                RunPersistence.CommitDeath(new RunDeathReceipt { RunId = runId });
+                Assert.That(
+                    RunPersistence.CommitDeath(new RunDeathReceipt { RunId = runId }),
+                    Is.True);
 
                 Assert.That(File.Exists(runPath), Is.False);
+                Assert.That(File.Exists(receiptPath), Is.True);
                 Assert.That(RunPersistence.TryLoad(), Is.Null);
             }
             finally
@@ -626,6 +629,17 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void CorruptDeathReceiptMarker_FailsClosedAndInvalidatesSnapshot()
+        {
+            var state = new RunSaveState { RunId = "run_corrupt_receipt" };
+
+            Assert.That(RunPersistence.IsLoadableState(state, null), Is.True);
+            Assert.That(
+                RunPersistence.IsLoadableState(state, null, hasPendingDeathMarker: true),
+                Is.False);
+        }
+
+        [Test]
         public void MetaRunResult_SameRunId_IsRewardedOnlyOnce()
         {
             var state = new MetaProgressState();
@@ -642,6 +656,110 @@ namespace DeadWalls.Tests
             Assert.That(state.Souls, Is.EqualTo(soulsAfterFirst));
             Assert.That(state.TotalRuns, Is.EqualTo(runsAfterFirst));
             Assert.That(state.RewardedRunIds, Is.EqualTo(new[] { "run_reward_01" }));
+        }
+
+        [Test]
+        public void PendingDeathReward_RecoversOnceAndSurvivesReload()
+        {
+            string runPath = Path.Combine(Application.persistentDataPath, "run_save.json");
+            string receiptPath = Path.Combine(Application.persistentDataPath, "run_death_receipt.json");
+            string metaPath = Path.Combine(Application.persistentDataPath, "meta_progress.json");
+            byte[] originalRun = File.Exists(runPath) ? File.ReadAllBytes(runPath) : null;
+            byte[] originalReceipt = File.Exists(receiptPath) ? File.ReadAllBytes(receiptPath) : null;
+            byte[] originalMeta = File.Exists(metaPath) ? File.ReadAllBytes(metaPath) : null;
+            string runId = "run_recovery_" + Guid.NewGuid().ToString("N");
+
+            try
+            {
+                DeleteFileAndTemp(runPath);
+                DeleteFileAndTemp(receiptPath);
+                DeleteFileAndTemp(metaPath);
+                MetaProgression.Load();
+
+                Assert.That(RunPersistence.Save(new RunSaveState { RunId = runId }), Is.True);
+                Assert.That(RunPersistence.CommitDeath(new RunDeathReceipt
+                {
+                    RunId = runId,
+                    Day = 4,
+                    Kills = 100
+                }), Is.True);
+                Assert.That(File.Exists(runPath), Is.False);
+                Assert.That(File.Exists(receiptPath), Is.True);
+
+                Assert.That(RunPersistence.RecoverPendingDeathReward(), Is.True);
+                Assert.That(File.Exists(receiptPath), Is.False);
+                Assert.That(MetaProgression.HasRewardedRun(runId), Is.True);
+                Assert.That(MetaProgression.State.Souls, Is.EqualTo(300));
+                Assert.That(MetaProgression.State.TotalRuns, Is.EqualTo(1));
+
+                MetaProgression.Load(); // process restart simulation
+                int soulsAfterReload = MetaProgression.State.Souls;
+                int runsAfterReload = MetaProgression.State.TotalRuns;
+                Assert.That(MetaProgression.HasRewardedRun(runId), Is.True);
+                Assert.That(RunPersistence.RecoverPendingDeathReward(), Is.False);
+                Assert.That(MetaProgression.State.Souls, Is.EqualTo(soulsAfterReload));
+                Assert.That(MetaProgression.State.TotalRuns, Is.EqualTo(runsAfterReload));
+            }
+            finally
+            {
+                RestoreFile(runPath, originalRun);
+                RestoreFile(receiptPath, originalReceipt);
+                RestoreFile(metaPath, originalMeta);
+                MetaProgression.Load();
+            }
+        }
+
+        [Test]
+        public void PendingDeathReceipt_RecoversOrphanedDurableTemp()
+        {
+            string receiptPath = Path.Combine(Application.persistentDataPath, "run_death_receipt.json");
+            string tempPath = receiptPath + ".tmp";
+            byte[] originalReceipt = File.Exists(receiptPath) ? File.ReadAllBytes(receiptPath) : null;
+            byte[] originalTemp = File.Exists(tempPath) ? File.ReadAllBytes(tempPath) : null;
+            var expected = new RunDeathReceipt
+            {
+                RunId = "run_temp_" + Guid.NewGuid().ToString("N"),
+                Day = 7,
+                Kills = 321
+            };
+
+            try
+            {
+                DeleteFileAndTemp(receiptPath);
+                File.WriteAllText(tempPath, JsonUtility.ToJson(expected, false));
+
+                RunDeathReceipt recovered = RunPersistence.TryLoadPendingDeath();
+
+                Assert.That(recovered, Is.Not.Null);
+                Assert.That(recovered.RunId, Is.EqualTo(expected.RunId));
+                Assert.That(recovered.Day, Is.EqualTo(7));
+                Assert.That(recovered.Kills, Is.EqualTo(321));
+                Assert.That(File.Exists(receiptPath), Is.True);
+                Assert.That(File.Exists(tempPath), Is.False);
+            }
+            finally
+            {
+                DeleteFileAndTemp(receiptPath);
+                if (originalReceipt != null)
+                    File.WriteAllBytes(receiptPath, originalReceipt);
+                if (originalTemp != null)
+                    File.WriteAllBytes(tempPath, originalTemp);
+            }
+        }
+
+        private static void DeleteFileAndTemp(string path)
+        {
+            if (File.Exists(path))
+                File.Delete(path);
+            if (File.Exists(path + ".tmp"))
+                File.Delete(path + ".tmp");
+        }
+
+        private static void RestoreFile(string path, byte[] contents)
+        {
+            DeleteFileAndTemp(path);
+            if (contents != null)
+                File.WriteAllBytes(path, contents);
         }
     }
 }

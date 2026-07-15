@@ -252,12 +252,21 @@ namespace DeadWalls
                 && version <= RunSaveState.CurrentVersion;
         }
 
-        internal static bool IsLoadableState(RunSaveState state, RunDeathReceipt pendingDeath)
+        internal static bool IsLoadableState(
+            RunSaveState state,
+            RunDeathReceipt pendingDeath,
+            bool hasPendingDeathMarker = false)
         {
             if (state == null || state.IsDead || string.IsNullOrEmpty(state.RunId))
                 return false;
 
             if (!IsSupportedVersion(state.Version))
+                return false;
+
+            // Journal dosyasi var fakat payload parse edilemiyorsa fail-closed davran:
+            // corrupt/yarim receipt oyuncuya olum oncesi snapshot'i geri veremez.
+            if (hasPendingDeathMarker
+                && (pendingDeath == null || string.IsNullOrEmpty(pendingDeath.RunId)))
                 return false;
 
             return pendingDeath == null || pendingDeath.RunId != state.RunId;
@@ -267,12 +276,16 @@ namespace DeadWalls
         {
             try
             {
+                if (!AtomicJsonFile.TryRecoverOrphanedTemp(FilePath, out string recoveryError))
+                    Debug.LogWarning($"[RunPersistence] Yetim run temp kaydi kurtarilamadi: {recoveryError}");
                 if (!File.Exists(FilePath))
                     return null;
 
                 var state = JsonUtility.FromJson<RunSaveState>(File.ReadAllText(FilePath));
                 var pendingDeath = TryLoadPendingDeath();
-                if (!IsLoadableState(state, pendingDeath))
+                bool hasPendingDeathMarker = File.Exists(DeathReceiptPath)
+                    || File.Exists(DeathReceiptPath + ".tmp");
+                if (!IsLoadableState(state, pendingDeath, hasPendingDeathMarker))
                 {
                     if (state != null && !IsSupportedVersion(state.Version))
                         Debug.LogWarning($"[RunPersistence] Run save v{state.Version} exact snapshot schema ile uyumlu degil; sessiz migration yapilmadi.");
@@ -443,20 +456,36 @@ namespace DeadWalls
                 && composed.OptionB != null;
         }
 
-        public static void CommitDeath(RunDeathReceipt receipt)
+        public static bool CommitDeath(RunDeathReceipt receipt)
         {
             if (receipt == null || string.IsNullOrEmpty(receipt.RunId))
-                return;
+                return false;
+
+            RunDeathReceipt pending = TryLoadPendingDeath();
+            if (pending != null && pending.RunId != receipt.RunId)
+            {
+                Debug.LogError(
+                    $"[RunPersistence] Cozulmemis death receipt varken yeni run receipt'i yazilamaz. " +
+                    $"pending={pending.RunId}, incoming={receipt.RunId}");
+                return false;
+            }
 
             // Journal once: bu dosya varsa ayni run artik Continue edilemez.
-            WriteJson(DeathReceiptPath, receipt, "Death receipt");
+            if (pending == null && !WriteJson(DeathReceiptPath, receipt, "Death receipt"))
+                return false;
+
+            // Receipt authoritative olduktan sonra snapshot silinemese bile TryLoad matching
+            // RunId'yi reddeder. Silme burada yalniz fiziksel cleanup'tir.
             Delete();
+            return true;
         }
 
         public static RunDeathReceipt TryLoadPendingDeath()
         {
             try
             {
+                if (!AtomicJsonFile.TryRecoverOrphanedTemp(DeathReceiptPath, out string recoveryError))
+                    Debug.LogWarning($"[RunPersistence] Yetim death receipt temp kaydi kurtarilamadi: {recoveryError}");
                 if (!File.Exists(DeathReceiptPath))
                     return null;
 
@@ -469,25 +498,25 @@ namespace DeadWalls
             }
         }
 
-        public static void RecoverPendingDeathReward()
+        public static bool TryFinalizePendingDeathReward(out MetaRunResult result)
         {
+            result = default;
             var receipt = TryLoadPendingDeath();
             if (receipt == null || string.IsNullOrEmpty(receipt.RunId))
-                return;
+                return false;
 
-            MetaProgression.AddRunResult(receipt.RunId, receipt.Day, receipt.Kills);
-            if (MetaProgression.HasRewardedRun(receipt.RunId))
-            {
-                Delete();
-                DeleteFile(DeathReceiptPath, "Death receipt");
-            }
+            result = MetaProgression.AddRunResult(receipt.RunId, receipt.Day, receipt.Kills);
+            if (!result.Persisted || !MetaProgression.HasRewardedRun(receipt.RunId))
+                return false;
+
+            Delete();
+            DeleteFile(DeathReceiptPath, "Death receipt");
+            return true;
         }
 
-        public static void ClearPendingDeath(string runId)
+        public static bool RecoverPendingDeathReward()
         {
-            var receipt = TryLoadPendingDeath();
-            if (receipt != null && receipt.RunId == runId)
-                DeleteFile(DeathReceiptPath, "Death receipt");
+            return TryFinalizePendingDeathReward(out _);
         }
 
         public static void Delete()
@@ -497,32 +526,20 @@ namespace DeadWalls
 
         private static bool WriteJson<T>(string path, T state, string label)
         {
-            try
+            string json = JsonUtility.ToJson(state, false);
+            if (AtomicJsonFile.TryWrite(path, json, out string error))
             {
-                // Exact snapshot oyuncuya gosterilen bir dosya degildir. Pretty-print,
-                // 10K combat state'inde milyonlarca gereksiz whitespace byte'i ve ek
-                // serialization/I/O maliyeti uretir; compact JSON ayni schema'yi korur.
-                File.WriteAllText(path, JsonUtility.ToJson(state, false));
                 return true;
             }
-            catch (Exception e)
-            {
-                Debug.LogError($"[RunPersistence] {label} yazilamadi: {e.Message}");
-                return false;
-            }
+
+            Debug.LogError($"[RunPersistence] {label} yazilamadi: {error}");
+            return false;
         }
 
         private static void DeleteFile(string path, string label)
         {
-            try
-            {
-                if (File.Exists(path))
-                    File.Delete(path);
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning($"[RunPersistence] {label} silinemedi: {e.Message}");
-            }
+            if (!AtomicJsonFile.TryDelete(path, out string error))
+                Debug.LogWarning($"[RunPersistence] {label} silinemedi: {error}");
         }
     }
 }

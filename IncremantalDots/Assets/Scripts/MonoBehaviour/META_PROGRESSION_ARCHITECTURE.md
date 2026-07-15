@@ -21,14 +21,19 @@ JsonUtility dictionary serialize etmediği için upgrade state list olarak tutul
 
 Otoriter API `AddRunResult(string runId, int day, int kills)` metodudur. Boş RunId kabul edilmez. Daha önce ödüllendirilen RunId yeniden gelirse sonuç `AlreadyRewarded` olarak döner ve Souls/istatistik değişmez.
 
-Game Over akışı:
+Game Over akışı journal-first ilerler:
 
-1. `GameManager`, run identity ile `RunDeathReceipt` yazar.
-2. Canlı run save silinir.
-3. `CollectMetaRunResult()` idempotent API'yi çağırır.
-4. Ödüllendirildiği doğrulanan receipt temizlenir.
+1. `GameManager.ProcessRunDeath()`, run identity ile `RunDeathReceipt` üretir.
+2. Receipt atomik ve durable yazılır; bundan sonra matching run save Continue edilemez.
+3. Canlı run save fiziksel olarak temizlenir.
+4. `AddRunResult()` ödülü idempotent uygular ve `RewardedRunIds` dahil meta state'i atomik yazar.
+5. Yalnız meta write başarılı ve RunId ödüllendirilmiş olarak doğrulanmışsa receipt temizlenir.
 
-Uygulama bu adımların arasında kapanırsa `GameManager.Awake` ve ana menü başlangıcı `RunPersistence.RecoverPendingDeathReward()` çağırır. Receipt'teki aynı RunId meta state'te varsa ikinci ödül verilmeden journal temizlenir; yoksa ödül bir kez uygulanır.
+Uygulama bu adımların arasında kapanırsa `GameManager.Awake` ve ana menü başlangıcı
+`RunPersistence.RecoverPendingDeathReward()` çağırır. Receipt'teki aynı RunId meta state'te
+varsa ikinci ödül verilmeden yalnız cleanup yapılır; yoksa ödül bir kez uygulanır. Meta write
+başarısızsa receipt silinmez ve sonraki açılış yeniden dener. Ayrıntılı çökme matrisi
+`DEATH_RECEIPT_ARCHITECTURE.md` içindedir.
 
 ## Ödül hesabı
 
@@ -55,3 +60,5 @@ Uygulama bu adımların arasında kapanırsa `GameManager.Awake` ve ana menü ba
 - Run sonucu yalnız kesin Game Over geçişinde toplanır; frame polling ile ödül verilmez.
 - `MetaProgression.ResetAll` yalnız debug içindir ve oyuncu yüzeyine bağlanmaz.
 - Run save ile meta save ayrı otoritelerdir. Meta state hiçbir zaman canlı koşunun phase/timer/combat snapshot'ını taşımaz.
+- Meta write `AtomicJsonFile` üzerinden temp + flush + replace sözleşmesiyle yapılır; durable
+  sonuç alınmadan death receipt temizlenmez.

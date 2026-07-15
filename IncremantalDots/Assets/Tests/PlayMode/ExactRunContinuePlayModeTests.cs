@@ -14,14 +14,27 @@ namespace DeadWalls.Tests
     public class ExactRunContinuePlayModeTests
     {
         private string _runSavePath;
+        private string _deathReceiptPath;
+        private string _metaSavePath;
         private byte[] _originalRunSave;
+        private byte[] _originalDeathReceipt;
+        private byte[] _originalMetaSave;
 
         [UnitySetUp]
         public IEnumerator SetUp()
         {
             _runSavePath = Path.Combine(Application.persistentDataPath, "run_save.json");
+            _deathReceiptPath = Path.Combine(Application.persistentDataPath, "run_death_receipt.json");
+            _metaSavePath = Path.Combine(Application.persistentDataPath, "meta_progress.json");
             _originalRunSave = File.Exists(_runSavePath) ? File.ReadAllBytes(_runSavePath) : null;
-            RunPersistence.Delete();
+            _originalDeathReceipt = File.Exists(_deathReceiptPath)
+                ? File.ReadAllBytes(_deathReceiptPath)
+                : null;
+            _originalMetaSave = File.Exists(_metaSavePath) ? File.ReadAllBytes(_metaSavePath) : null;
+            DeleteFileAndTemp(_runSavePath);
+            DeleteFileAndTemp(_deathReceiptPath);
+            DeleteFileAndTemp(_metaSavePath);
+            MetaProgression.Load();
             GameBootstrap.PendingAction = GameBootstrap.StartAction.None;
 
             SceneManager.LoadScene("NewGameScene", LoadSceneMode.Single);
@@ -35,9 +48,11 @@ namespace DeadWalls.Tests
         [UnityTearDown]
         public IEnumerator TearDown()
         {
-            RunPersistence.Delete();
-            if (_originalRunSave != null)
-                File.WriteAllBytes(_runSavePath, _originalRunSave);
+            Time.timeScale = 1f;
+            RestoreFile(_runSavePath, _originalRunSave);
+            RestoreFile(_deathReceiptPath, _originalDeathReceipt);
+            RestoreFile(_metaSavePath, _originalMetaSave);
+            MetaProgression.Load();
             yield return null;
         }
 
@@ -1159,6 +1174,64 @@ namespace DeadWalls.Tests
             Assert.That(reusedArrow, Is.EqualTo(arrow));
             ArrowPoolRuntimeUtility.Return(entityManager, arrowPoolEntity, reusedArrow);
             EnemyPoolRuntimeUtility.Return(entityManager, poolEntity, reused);
+        }
+
+        [UnityTest]
+        public IEnumerator SaveRunSnapshot_LethalEcsState_CannotRewriteContinueAfterDeath()
+        {
+            var gameManager = GameManager.Instance;
+            bool runtimeReady = false;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                {
+                    runtimeReady = true;
+                    break;
+                }
+                yield return null;
+            }
+            Assert.That(runtimeReady, Is.True);
+
+            string runId = gameManager.CurrentRunId;
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            Entity gameStateEntity = entityManager.CreateEntityQuery(typeof(GameStateData)).GetSingletonEntity();
+            var gameState = entityManager.GetComponentData<GameStateData>(gameStateEntity);
+            gameState.TotalKills = 17;
+            gameState.IsGameOver = true;
+            entityManager.SetComponentData(gameStateEntity, gameState);
+
+            // Cached Mono state henuz alive olsa bile SaveRunSnapshot ECS truth'ini yeniden
+            // okur; death transaction kazanir ve ikinci bir canli snapshot yazilamaz.
+            Assert.That(gameManager.SaveRunSnapshot(), Is.False);
+            Assert.That(File.Exists(_runSavePath), Is.False);
+            Assert.That(File.Exists(_deathReceiptPath), Is.False,
+                "Durable meta yazimi basariliysa receipt cleanup tamamlanmali.");
+            Assert.That(RunPersistence.TryLoad(), Is.Null);
+            Assert.That(MetaProgression.HasRewardedRun(runId), Is.True);
+
+            int soulsAfterDeath = MetaProgression.State.Souls;
+            int runsAfterDeath = MetaProgression.State.TotalRuns;
+            MetaRunResult duplicate = MetaProgression.AddRunResult(runId, 1, 17);
+            Assert.That(duplicate.AlreadyRewarded, Is.True);
+            Assert.That(duplicate.Persisted, Is.True);
+            Assert.That(MetaProgression.State.Souls, Is.EqualTo(soulsAfterDeath));
+            Assert.That(MetaProgression.State.TotalRuns, Is.EqualTo(runsAfterDeath));
+            yield return null;
+        }
+
+        private static void DeleteFileAndTemp(string path)
+        {
+            if (File.Exists(path))
+                File.Delete(path);
+            if (File.Exists(path + ".tmp"))
+                File.Delete(path + ".tmp");
+        }
+
+        private static void RestoreFile(string path, byte[] contents)
+        {
+            DeleteFileAndTemp(path);
+            if (contents != null)
+                File.WriteAllBytes(path, contents);
         }
     }
 }

@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.2
 > **Son tam kapsam denetimi:** 2026-07-15
 > **Aktif paket:** Package H - Meta + Persistence
-> **Aktif iş:** `DW-H-DEATH-RECEIPT` - Death-Only Meta + Idempotent Reward Contract
-> **İlerleme:** `318 / 441` tracker checkbox'ı tamamlandı - `%72,11`
+> **Aktif iş:** `DW-H-META-SCHEMA` - Canonical Meta State Schema + Migration Guard
+> **İlerleme:** `325 / 441` tracker checkbox'ı tamamlandı - `%73,70`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -148,7 +148,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Meta | Ayrı JSON ve Game Over shop var; `StartingTechLevel` aktif | Kısmi uyum |
 | HUD | CyclePanel, DAY/DUSK/NIGHT ve Horde Pressure mevcut; tek Wall runtime gizleme var | Package I polish gerekli |
 | Tutorial | Aktif tutorial/onboarding sistemi bulunmadı | Package I eksik |
-| Testler | Son full baseline: EditMode `209/209`, PlayMode `37 pass + 1 explicit profiler skip`; Package G hedefli doğrulama: EditMode `22/22`, PlayMode `2/2`; Standalone Player-targeted 10K `1/1` | Package G hedefli regresyonu temiz; full baseline tarihsel olarak korunuyor |
+| Testler | Son full baseline: EditMode `209/209`, PlayMode `37 pass + 1 explicit profiler skip`; Package G hedefli doğrulama: EditMode `22/22`, PlayMode `2/2`; Package H death receipt: EditMode `18/18`, PlayMode `3/3`; Standalone Player-targeted 10K `1/1` | Package H hedefli ölüm/Continue regresyonu temiz; full baseline tarihsel olarak korunuyor |
 | Telemetry | Spawn budget demanded/spawned/backlog telemetry mevcut; tam Blueprint event owner'ı eksik | Kısmi |
 
 ---
@@ -733,7 +733,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 | Meta ayrı save | `MetaProgression` ayrı JSON kullanıyor | `[x]` Yapısal ayrım var |
 | Death-only shop | `MetaProgressionUI` GameOver panelinde | `[~]` Voluntary reset yolları riskli |
 | Reward inputs | Day+kills+record bonus | Nights/peak pop/record weighting eksik/tuning |
-| Idempotent reward | GameOver transition bir kez çağırmayı varsayıyor; persistent receipt yok | `[!]` |
+| Idempotent reward | Durable death receipt, `RewardedRunIds`, atomic write ve fail-closed Continue guard aktif | `[x]` |
 | Fixed upgrade list | Catalog var; mevcut effect listesi Blueprint ile tam eşleşmiyor | `[~]` |
 | StartingTechLevel yok | Enum ve uygulama aktif | `[!]` |
 | Meta graph'ı değiştirmez | StartingTechLevel graph'ı atlıyor; pool unlock contract yok | `[!]` |
@@ -752,12 +752,12 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 
 ### Persistence işleri
 
-- [ ] Run save ve meta save alanlarının açık schema sahiplerini ayır.
-- [ ] Game Over'da run save içindeki tüm run state'i sil.
+- [x] Run save ve meta save alanlarının açık schema sahiplerini ayır.
+- [x] Game Over'da run save içindeki tüm run state'i sil.
 - [ ] Meta currency, upgrade levels, pool unlocks ve tutorial flag'lerini koru.
-- [ ] Death reward'a unique run identity/receipt ekle.
-- [ ] Process restart sonrası aynı ölümün ikinci reward yazmasını engelle.
-- [ ] Force-close ile Game Over öncesi snapshot'a dönmeyi engelle.
+- [x] Death reward'a unique run identity/receipt ekle.
+- [x] Process restart sonrası aynı ölümün ikinci reward yazmasını engelle.
+- [x] Force-close ile Game Over öncesi snapshot'a dönmeyi engelle.
 - [ ] Aktif run sırasında meta satın alımını engelle.
 - [ ] `StartingTechLevel` effect ve content'ini yeni modelden kaldır.
 - [ ] Meta'nın generated graph edges/Keystone/result seçmesini engelle.
@@ -767,9 +767,9 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 
 ### Kabul kapısı
 
-- [ ] Meta ödülü yalnız ölümde ve bir kez yazılıyor.
+- [x] Meta ödülü yalnız ölümde ve bir kez yazılıyor.
 - [ ] Gönüllü reset/prestige yok.
-- [ ] Force-close ölümü geri alamıyor.
+- [x] Force-close ölümü geri alamıyor.
 - [ ] Meta mevcut run graph'ını geriye dönük değiştirmiyor.
 - [ ] Migration guard eski save'i yanlış state'e çevirmiyor.
 
@@ -1144,3 +1144,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-15 | `DW-F-SCOPE` regular-only Council authority cleanup | Owner kararıyla Emergency Council V1 kapsamından tamamen çıkarıldı; ikinci meeting type, trigger veya rarity yolu eklenmedi. Blueprint DOCX/PDF, Council architecture/setup sözleşmeleri ve tracker yalnız Day `3/6/9...` regular Council'ı otorite kabul edecek biçimde güncellendi. Dört iptal edilmiş açık checkbox kaldırıldığı için tracker paydası `445 -> 441` değişti; sıradaki iş `DW-F-SAVE` oldu | Blueprint structural scan: 0 cancelled-path hit; PDF 40/40 page render QA clean; tracker count `288/441`; runtime davranış değişikliği yok |
 | 2026-07-15 | `DW-F-SAVE` regular Council exact state + Continue audit | `RunSaveState`/`SaveRunSnapshot`/`TryRestoreRunFromCheckpoint` alanları capture-restore simetrisiyle denetlendi. Active composed payload, regular handled day, run salt, flags, recent/one-shot memory ve Council cap state'i; çözülmüş branch flag'i ile temp-production/next-night multiplier+expiry state'i exact Continue PlayMode akışında kilitlendi. Aktif kart reroll edilmeden dönüyor, çözülmüş kart yeniden açılmıyor ve future Day 6 regular schedule devam ediyor. Gerçek kayıt sözleşmesiyle çelişen çağrısız legacy Dawn checkpoint hook'u kaldırıldı; yeni Council içeriği üretilmedi | Unity compile: 0 error; targeted EditMode 1/1; targeted PlayMode 2/2; full EditMode 205/205; full PlayMode 37 pass + 1 explicit profiler skip; Unity console 0 error; tracker `290/441` |
 | 2026-07-15 | `DW-F-CONTENT` regular Council launch content + effect budget | Production 9 template human-review ile staged Day 3 ekonomi / Day 6 population-savunma / Day 9 gece riski havuzuna ayrıldı. Quarry'nin bedava permanent worker-cap ödülü 2 günlük production boost'a çevrildi; `cap_bonus` compatibility için serialized kaldı fakat launch recipe gate'inden çıkarıldı. Strange Bonfires normal production-scaled loot'a sabitlendi; Refugees/Merchant transaction metinleri gerçek effect ile eşlendi. Curated source event'ler tetikleyici branch'e kadar tekrar edebilir, flag sonrası kosuda emekli olur. Follow-up'lar `DefenseVsProduction` ve `ResourceVsPopulation` recipe'leriyle ana cache kartından ayrıldı; bütün template'ler en az iki authored body varyantı taşıyor | Unity compile: 0 error; production 5.400 compose budget/token/content gate; targeted Council EditMode 22/22; full EditMode 209/209; full PlayMode 37 pass + 1 explicit profiler skip; expected fail-closed test logları dışında Unity console 0 error; tracker `295/441` |
+| 2026-07-15 | `DW-H-DEATH-RECEIPT` death-only durable reward transaction | Ölüm akışı journal-first yapıldı: same-volume temp + flush + replace kullanan `AtomicJsonFile`, unique `RunDeathReceipt`, `RewardedRunIds` idempotency ve meta durable olmadan receipt silmeme sözleşmesi kuruldu. Matching veya corrupt receipt marker yaşayan snapshot'ı fail-closed geçersiz kılıyor; `SaveRunSnapshot()` taze ECS lethal state'ini capture öncesi işleyerek application quit sırasında ölü koşunun yeniden yazılmasını engelliyor. GameManager/MainMenu startup recovery process restart sonrasında yarım transaction'ı tamamlıyor | Unity compile: 0 error; targeted EditMode 18/18; targeted PlayMode 3/3; Unity console'da gerçek error 0; tracker `325/441` |

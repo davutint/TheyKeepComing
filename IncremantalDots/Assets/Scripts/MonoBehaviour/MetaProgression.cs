@@ -35,6 +35,8 @@ namespace DeadWalls
         public int SoulsEarned;
         public bool NewRecord;
         public bool AlreadyRewarded;
+        /// <summary>RewardedRunIds dahil meta state diske durable yazildi.</summary>
+        public bool Persisted;
     }
 
     /// <summary>
@@ -68,6 +70,8 @@ namespace DeadWalls
             _state = null;
             try
             {
+                if (!AtomicJsonFile.TryRecoverOrphanedTemp(FilePath, out string recoveryError))
+                    Debug.LogWarning($"[MetaProgression] Yetim temp meta kaydi kurtarilamadi: {recoveryError}");
                 if (File.Exists(FilePath))
                     _state = JsonUtility.FromJson<MetaProgressState>(File.ReadAllText(FilePath));
             }
@@ -84,19 +88,16 @@ namespace DeadWalls
             _state.RewardedRunIds ??= new List<string>();
         }
 
-        public static void Save()
+        public static bool Save()
         {
             if (_state == null)
-                return;
+                return false;
 
-            try
-            {
-                File.WriteAllText(FilePath, JsonUtility.ToJson(_state, true));
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"[MetaProgression] Kayit yazilamadi: {e.Message}");
-            }
+            if (AtomicJsonFile.TryWrite(FilePath, JsonUtility.ToJson(_state, true), out string error))
+                return true;
+
+            Debug.LogError($"[MetaProgression] Kayit yazilamadi: {error}");
+            return false;
         }
 
         /// <summary>
@@ -115,8 +116,9 @@ namespace DeadWalls
         {
             var s = State;
             var result = ApplyRunResult(s, runId, day, kills);
-            if (!result.AlreadyRewarded)
-                Save();
+            // Duplicate in-memory receipt, onceki Save basarisiz oldugu icin olusmus olabilir.
+            // Bu nedenle AlreadyRewarded olsa bile state tekrar durable yazilir.
+            result.Persisted = Save();
             return result;
         }
 

@@ -305,9 +305,7 @@ namespace DeadWalls
 
             if (GameState.IsGameOver && !prevGameState.IsGameOver)
             {
-                CommitRunDeath();
-                CollectMetaRunResult(); // olum ekrani acilmadan ONCE kill'ler Soul'a cevrilir
-                RunPersistence.ClearPendingDeath(_currentRunId);
+                ProcessRunDeath(); // journal -> durable meta -> receipt cleanup
                 OnGameOver?.Invoke();
             }
 
@@ -3216,10 +3214,18 @@ namespace DeadWalls
         /// <summary>V1 exact run snapshot: oyuncunun ayni ana donebilmesi icin runtime state'i kaydeder.</summary>
         public bool SaveRunSnapshot()
         {
-            if (!TryInitialize() || GameState.IsGameOver || !TryGetMobileConfigEntity(out var mobileConfigEntity))
+            if (!TryInitialize() || !TryGetMobileConfigEntity(out var mobileConfigEntity))
                 return false;
 
             ReadECSData();
+            // ReadECSData ECS truth'ini yeni okur. Lethal state bu cagri icinde tespit
+            // edilmisse death transaction snapshot'tan once kazanir; canli save yazilamaz.
+            if (GameState.IsGameOver || SingleWallDefenseRules.IsDestroyed(Wall.CurrentHP))
+            {
+                ProcessRunDeath();
+                return false;
+            }
+
             EnsureCurrentRunId();
             if (!TryCaptureHeartGraphForSave(
                     out GeneratedRunGraph heartGraphSnapshot,
@@ -3383,7 +3389,7 @@ namespace DeadWalls
 
         private void OnApplicationQuit()
         {
-            if (_initialized && !GameState.IsGameOver)
+            if (_initialized)
                 SaveRunSnapshot();
         }
 
@@ -4036,27 +4042,28 @@ namespace DeadWalls
                 _currentRunId = System.Guid.NewGuid().ToString("N");
         }
 
-        private void CommitRunDeath()
-        {
-            EnsureCurrentRunId();
-            RunPersistence.CommitDeath(new RunDeathReceipt
-            {
-                RunId = _currentRunId,
-                Day = Mathf.Max(1, ContinuousSiegeCycle.CycleIndex + 1),
-                Kills = GameState.TotalKills
-            });
-        }
-
-        /// <summary>Kosu kapanisi: kill'leri Ruh'a cevirir (bir kez); sonuc LastRunResult'ta.</summary>
-        private void CollectMetaRunResult()
+        private void ProcessRunDeath()
         {
             if (_metaRunCollected)
                 return;
 
-            _metaRunCollected = true;
-            int day = Mathf.Max(1, ContinuousSiegeCycle.CycleIndex + 1);
             EnsureCurrentRunId();
-            LastRunResult = MetaProgression.AddRunResult(_currentRunId, day, GameState.TotalKills);
+            var receipt = new RunDeathReceipt
+            {
+                RunId = _currentRunId,
+                Day = Mathf.Max(1, ContinuousSiegeCycle.CycleIndex + 1),
+                Kills = GameState.TotalKills
+            };
+
+            // Journal diske durable yazilmadan run snapshot silinmez ve meta uygulanmaz.
+            if (!RunPersistence.CommitDeath(receipt))
+                return;
+
+            // Meta Save basarisizsa receipt korunur; bir sonraki acilis ayni RunId'yi
+            // idempotent tamamlar. UI mevcut sonucu yine gosterebilir.
+            RunPersistence.TryFinalizePendingDeathReward(out MetaRunResult result);
+            LastRunResult = result;
+            _metaRunCollected = true;
         }
 
         private void ConfigureWaveForCurrentNumber(ref WaveStateData wave)
