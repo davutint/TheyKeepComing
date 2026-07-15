@@ -6,8 +6,9 @@ using UnityEngine.UI;
 namespace DeadWalls
 {
     /// <summary>
-    /// Safak meclisi kartinin controller'i. Faz DAWN'a gecince GameManager.TryRollCouncilEvent
-    /// cagrilir; event ciktiysa kompakt kart sol bolgede belirir (dawn odul toast'undan hafif
+    /// Safak meclisi kartinin controller'i. Faz DAWN'a gecince
+    /// GameManager.TryOpenRegularCouncilEvent cagrilir; scheduled regular event varsa kompakt
+    /// kart sol bolgede belirir (dawn odul toast'undan hafif
     /// gecikmeli), DAY boyunca acik kalir, DUSK girisinde secilmemisse expire olur.
     /// Secimden sonra kart kapanmaz: 3 saniyeligine SONUC metnine donusur (promise -> choice
     /// -> consequence dongusunun son halkasi). Sureli etkiler HUD rozetinde gorunur; riskli
@@ -86,15 +87,15 @@ namespace DeadWalls
                 return;
 
             // IsMobileMode KULLANILMAZ: _initialized frame-arasi dalgalanabiliyor (bkz.
-            // GameManager.TryRollCouncilEvent notu). Cycle cache'i guvenilir sinyaldir.
+            // GameManager.TryOpenRegularCouncilEvent notu). Cycle cache'i guvenilir sinyaldir.
             var cycle = gm.ContinuousSiegeCycle;
             if (!cycle.Enabled)
                 return;
 
-            // Faz gecisleri: Dawn'da roll, Dusk'ta expire, Night'ta kehanet hatirlatmasi
+            // Faz gecisleri: Dawn'da scheduled open, Dusk'ta expire, Night'ta kehanet hatirlatmasi
             if (cycle.Phase == SiegeCyclePhase.Dawn && _lastPhase != SiegeCyclePhase.Dawn)
             {
-                gm.TryRollCouncilEvent();
+                gm.TryOpenRegularCouncilEvent();
             }
             else if (cycle.Phase == SiegeCyclePhase.Dusk && _lastPhase != SiegeCyclePhase.Dusk
                 && gm.ActiveCouncilEvent != null)

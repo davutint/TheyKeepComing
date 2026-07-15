@@ -99,7 +99,7 @@ purchase pipeline'inin sorumlulugudur.
 
 - Graph node listesi ve hidden icerik E2'de run basinda kesinlesir.
 - E3 reveal servisinde yeni RNG yoktur.
-- `GeneratedRunGraph` exact save/load baglantisi schema v10 ile aktiftir; Continue saved
+- `GeneratedRunGraph` exact save/load baglantisi guncel schema v11 ile aktiftir; Continue saved
   visibility state'ini genisletmeden oldugu gibi kurar.
 - Numeric effect'in effective runtime hesabini E4 resolver'i saglar; production runtime
   adapter binding'i E5'te tamamlanir.

@@ -38,7 +38,7 @@ DTO yalniz primitive/enum/list alanlari tasir; `ScriptableObject`, `Sprite` veya
 Unity object referansi tasimaz. E2 `HeartNodeCatalogSO`, `HeartGraphGenerator` ve
 `HeartGraphValidator` ile bu contract'i deterministic olarak doldurur. Ayrintili
 generation sozlesmesi `HEART_GRAPH_GENERATOR_ARCHITECTURE.md` belgesindedir. Graph'in
-`RunSaveState v10`, E6 sonunda bu primitive graph'i exact clone olarak capture/restore eder.
+`RunSaveState v11`, v10'da eklenen bu primitive graph payload'ini exact clone olarak capture/restore eder.
 Saved graph aktif catalog/version ile uyusmazsa yeni graph uretilmez.
 
 ## Grave Essence owner'i
@@ -61,10 +61,10 @@ catalog'un ResourceCost owner'idir.
 ## Lifecycle ve persistence
 
 - Exact Continue: `RunSaveState.GraveEssence` ile aynen korunur.
-- Save schema: v10; v8 ve daha eski snapshot'lar acik migration ile `0` Essence alir.
+- Save schema: guncel v11; v8 ve daha eski snapshot'lar acik migration ile `0` Essence alir.
 - Restart/yeni run: ECS singleton `0` olur.
 - Game Over: run save silinir; Essence meta save'e hic yazilmaz.
-- Generated graph exact save: seed/version/node/edge/reveal/level/lock state'i v10'a bagli.
+- Generated graph exact save: seed/version/node/edge/reveal/level/lock state'i v10'da eklendi ve guncel v11'de korunur.
 
 ## Test kapsami
 

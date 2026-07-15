@@ -21,7 +21,7 @@ Ek GameObject, component veya prefab binding'i yoktur. Aktif owner'lar:
 
 - `GameManager.SaveRunSnapshot`: exact graph capture;
 - `GameManager.TryRestoreRunFromCheckpoint`: preflight + replay;
-- `RunPersistence`: schema v10 JSON ve v9 null-graph migration;
+- `RunPersistence`: guncel schema v11 JSON; v9 null-graph -> v10 ve v10 Council -> v11 migration;
 - `HeartGraphPersistenceUtility`: clone, validation ve effect replay.
 
 Production `heartCatalog` null ise run save calismaya devam eder fakat Heart content gate
@@ -30,7 +30,7 @@ olarak unavailable kalir. Onaysiz test catalog'u scene/prefab asset'ine yazilmaz
 ## Dogrulama
 
 - EditMode: `HeartGraphGeneratorTests` persistence/version/replay testleri.
-- EditMode: `RunPersistenceTests` v10 JSON ve v9 migration testleri.
+- EditMode: `RunPersistenceTests` guncel v11 JSON ve v9/v10 migration testleri.
 - PlayMode: `HeartGraphContinuePlayModeTests.Continue_ReplaysExactSavedHeartGraphWithoutReroll`.
 - Full EditMode ve PlayMode regression.
 - Unity Console compile/runtime error `0`.
@@ -38,4 +38,3 @@ olarak unavailable kalir. Onaysiz test catalog'u scene/prefab asset'ine yazilmaz
 PlayMode testi sentetik runtime catalog kullanir; production balance/content asset'i
 olusturmaz. Test, exact graph JSON'un Continue ve sonraki capture sonrasinda degismedigini,
 Rapid behavior replay'ini ve Heart presentation level state'ini kanitlar.
-

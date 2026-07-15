@@ -20,7 +20,7 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - Mobile archer economy API'leri: `ArcherDefinitionSO` catalog'undan type-count scaled buy/retrain cost ve base stat okuma, buy, Basic -> Rapid/Frost in-place retrain, type count/DPS okuma; `GetTotalArcherCount`, `GetRemainingArcherCapacity` ve `CanAddArchers` Basic/Rapid/Frost ortak `1000` cap'ini sunar. Legacy unlock/upgrade API'leri kodda kalir ama sag drawer player-facing kullanmaz
 - Legacy Tech Tree state/API (`_techNodeLevels`, `_revealedTechNodes`, `TryBuyTechNode`) migration/debug uyumlulugu icin kodda kalir; aktif `NewGameScene` HUD'inda `TechTreeUI` yoktur ve legacy catalog player-facing progression owner'i degildir
 - Castle Heart runtime'i `GameManager.HeartRuntime.cs` partial'inda generated graph/reveal/presentation, Grave Essence-only quote/purchase ve actual effect adapter'larini birlestirir. Production `heartCatalog` null ise acik hata verir; legacy `TechTreeCatalogSO`'ya fallback yapmaz
-- Run-only `GraveEssence` bakiyesi `GrantGraveEssence` ile artar ve yalniz `TrySpendGraveEssenceAtHeart` kapisindan azalir; exact save v10'da generated Heart graph ile birlikte korunur, Restart/Game Over'da silinir
+- Run-only `GraveEssence` bakiyesi `GrantGraveEssence` ile artar ve yalniz `TrySpendGraveEssenceAtHeart` kapisindan azalir; exact save v11'de generated Heart graph ile birlikte korunur, Restart/Game Over'da silinir
 - Continue saved Heart graph'i `CatalogVersion`/structural/runtime-state preflight'inden gecirir ve purchased level'lari deferred `HeartEffectPipeline` replay'iyle canli owner'lara uygular; v9 null-graph migration'i yeni graph uretmez
 - Heart effect'leri Heart'siz baseline uzerine uygulanir: Basic/Rapid/Frost damage/fire-rate/range/Frost slow, tek Wall HP/repair, resource-specific worker capacity/production, population growth, Arrow capacity/efficiency ve Fireball damage/radius/cooldown. Arrow Heart bonuslari paid Arrow level'larindan ayri ECS alanlarinda tutulur
 - Worker economy API'leri: `OpenCastleEconomy()`, `CloseCastleEconomy()`, `SetResourceWorkers()`, `ChooseEconomyEvent()`
@@ -117,7 +117,8 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - Safak meclisi event'leri: kart DAWN'da belirir, DAY boyunca yasar, DUSK'ta expire; oyun durmaz
 - Event'ler asset degil — `CouncilComposer` (pure static, EditMode testli) sablon x atom x baglam x olcek carpimindan uretir; deterministik (seed = hash(ECS RandomSeed, gun))
 - Director: kit kaynak/dusuk savunma/bolluk baglamina gore atom-sablon agirliklari; hafiza: flag'ler + zincir sablonlari (RequiredFlags/ChainDelayDays/OneShot); butce: A/B secenekleri "dakika-degeri" cinsinden dengelenir
-- GameManager API: `TryRollCouncilEvent` (sans 0.30 + pity 4 gun + cooldown), `ChooseCouncilOption`, `ExpireCouncilEvent`, `CanAffordCouncilOption`; efektler mevcut yollara akar (AddResources/AddPopulation/SpawnArcher/config cap aggregate/temp production slotu/NextNightSpawnMultiplier)
+- Regular schedule tek owner'i `CouncilRegularSchedule`: Day `3,6,9,12...`; chance/pity/cooldown regular akis disinda. GameManager API: `TryOpenRegularCouncilEvent`, `ChooseCouncilOption`, `ExpireCouncilEvent`, `CanAffordCouncilOption`; emergency type/trigger owner onayi bekler ve regular index'e dokunamaz
+- Exact save v11 `LastRegularCouncilDay` ve `HasActiveCouncilEvent` discriminator'ini korur; v10 chance fail'i migration'da scheduled gunu tuketmez
 - Otoriter dok: `COUNCIL_EVENTS_ARCHITECTURE.md`
 
 ### DefenseRepairUI.cs

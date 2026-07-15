@@ -14,12 +14,17 @@ namespace DeadWalls
         public CouncilTemplateSO[] Templates = new CouncilTemplateSO[0];
         public CouncilEffectAtomSO[] Atoms = new CouncilEffectAtomSO[0];
 
-        [Header("Pacing")]
+        // v10 ve daha eski authored asset uyumlulugu icin serialized tutulur. Regular Council
+        // schedule'i bunlari kullanmaz; exact 3/6/9 takviminin tek owner'i
+        // CouncilRegularSchedule'dir. Emergency pacing owner onayi sonrasi ayri data alacaktir.
+        [HideInInspector]
         [Range(0f, 1f)] public float DailyEventChance = 0.30f;
-        [Tooltip("Bu kadar gun event cikmadiysa garanti cikar (pity).")]
+        [HideInInspector]
         public int PityDays = 3;
-        [Tooltip("Bir event'ten sonra en az bu kadar gun bosluk.")]
+        [HideInInspector]
         public int CooldownDays = 1;
+
+        [Header("Presentation Memory")]
         [Tooltip("Son N sablon anti-tekrar sogumasina girer.")]
         public int RecentTemplateMemory = 3;
 

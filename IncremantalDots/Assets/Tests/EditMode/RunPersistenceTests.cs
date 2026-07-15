@@ -63,6 +63,8 @@ namespace DeadWalls.Tests
                 ArcherFormationVersion = ArcherFormationUtility.CurrentVersion,
                 FireballCooldownRemaining = 12.5f,
                 RallyTimer = 4.25f,
+                LastRegularCouncilDay = 6,
+                HasActiveCouncilEvent = true,
                 ActiveCouncilEvent = new ComposedCouncilEvent
                 {
                     TemplateId = "council_test",
@@ -168,6 +170,8 @@ namespace DeadWalls.Tests
             Assert.That(restored.FoodBuildingEfficiencyLevel, Is.EqualTo(10));
             Assert.That(restored.ArcherFormationVersion,
                 Is.EqualTo(ArcherFormationUtility.CurrentVersion));
+            Assert.That(restored.LastRegularCouncilDay, Is.EqualTo(6));
+            Assert.That(restored.HasActiveCouncilEvent, Is.True);
             Assert.That(restored.ActiveCouncilEvent.TemplateId, Is.EqualTo("council_test"));
             Assert.That(restored.ActiveCouncilEvent.OptionA.Effects.Count, Is.EqualTo(1));
             Assert.That(restored.ActiveCouncilEvent.OptionA.Effects[0].Amount, Is.EqualTo(50));
@@ -215,6 +219,9 @@ namespace DeadWalls.Tests
                 RunSaveState restored = RunPersistence.TryLoad();
                 Assert.That(restored, Is.Not.Null);
                 Assert.That(restored.RunId, Is.EqualTo(runId));
+                Assert.That(restored.HasActiveCouncilEvent, Is.False);
+                Assert.That(restored.ActiveCouncilEvent, Is.Null,
+                    "JsonUtility bos nested event'i phantom active Council yapmamali.");
             }
             finally
             {
@@ -442,6 +449,82 @@ namespace DeadWalls.Tests
                 Assert.That(restored.HasHeartGraph, Is.False);
                 Assert.That(restored.HeartGraph, Is.Null,
                     "v9 eksik graph'i aktif catalog'dan sessizce uretilemez.");
+            }
+            finally
+            {
+                if (original != null)
+                    File.WriteAllBytes(path, original);
+                else if (File.Exists(path))
+                    File.Delete(path);
+            }
+        }
+
+        [Test]
+        public void TryLoad_Version10ChanceFailure_DoesNotConsumeScheduledRegularCouncil()
+        {
+            string path = Path.Combine(Application.persistentDataPath, "run_save.json");
+            byte[] original = File.Exists(path) ? File.ReadAllBytes(path) : null;
+            var legacy = new RunSaveState
+            {
+                Version = 10,
+                RunId = "run_v10_council_fail_" + Guid.NewGuid().ToString("N"),
+                CycleIndex = 5,
+                LastCouncilRollDay = 6,
+                CouncilDaysSinceEvent = 4,
+                LastRegularCouncilDay = 999
+            };
+
+            try
+            {
+                File.WriteAllText(path, JsonUtility.ToJson(legacy));
+
+                RunSaveState restored = RunPersistence.TryLoad();
+
+                Assert.That(restored, Is.Not.Null);
+                Assert.That(restored.Version, Is.EqualTo(RunSaveState.CurrentVersion));
+                Assert.That(restored.LastRegularCouncilDay, Is.EqualTo(-1));
+            }
+            finally
+            {
+                if (original != null)
+                    File.WriteAllBytes(path, original);
+                else if (File.Exists(path))
+                    File.Delete(path);
+            }
+        }
+
+        [Test]
+        public void TryLoad_Version10ProducedEvent_PreservesHandledScheduledDay()
+        {
+            string path = Path.Combine(Application.persistentDataPath, "run_save.json");
+            byte[] original = File.Exists(path) ? File.ReadAllBytes(path) : null;
+            var legacy = new RunSaveState
+            {
+                Version = 10,
+                RunId = "run_v10_council_handled_" + Guid.NewGuid().ToString("N"),
+                CycleIndex = 5,
+                LastCouncilRollDay = 6,
+                CouncilDaysSinceEvent = 4,
+                LastRegularCouncilDay = -1,
+                ActiveCouncilEvent = new ComposedCouncilEvent
+                {
+                    TemplateId = "legacy_active",
+                    OptionA = new ComposedCouncilOption { Label = "A" },
+                    OptionB = new ComposedCouncilOption { Label = "B" }
+                }
+            };
+
+            try
+            {
+                File.WriteAllText(path, JsonUtility.ToJson(legacy));
+
+                RunSaveState restored = RunPersistence.TryLoad();
+
+                Assert.That(restored, Is.Not.Null);
+                Assert.That(restored.Version, Is.EqualTo(RunSaveState.CurrentVersion));
+                Assert.That(restored.LastRegularCouncilDay, Is.EqualTo(6));
+                Assert.That(restored.HasActiveCouncilEvent, Is.True);
+                Assert.That(restored.ActiveCouncilEvent.TemplateId, Is.EqualTo("legacy_active"));
             }
             finally
             {

@@ -107,17 +107,15 @@ namespace DeadWalls
         private bool _techDefenseBaselineCaptured;
         private float _baseWallMaxHp;
 
-        // Council event run-state (persistence yok; RestartGame sifirlar)
+        // Council event run-state. Regular schedule exact 3/6/9... kuralini kullanir;
+        // emergency owner ileride ayri state tasiyacak ve bu index'e dokunmayacak.
         private readonly Dictionary<string, int> _councilFlags = new Dictionary<string, int>();
         private readonly List<string> _recentCouncilTemplates = new List<string>();
         private readonly HashSet<string> _usedOneShotCouncils = new HashSet<string>();
         private ComposedCouncilEvent _activeCouncilEvent;
-        // 99 = ilk safakta pity garantisi (meclis ilk sabah toplanir — onboarding)
-        private int _councilDaysSinceEvent = 99;
-        private int _councilCooldownRemaining;
-        private int _lastCouncilRollDay = -1;
-        // Kosu basina rastgele tuz: sabit seed'in "ilk 3 gun HER kosuda bos" evrensel
-        // kaderini kirar; kosu ICINDE determinizm korunur (gun basina tek roll).
+        private int _lastRegularCouncilDay = -1;
+        // Kosu basina rastgele tuz: ayni authored catalog farkli kosularda farkli kart icerigi
+        // uretebilir; kosu ICINDE determinizm korunur (scheduled gun basina tek compose).
         private uint _councilRunSalt;
         private int _councilWoodCapBonus;
         private int _councilStoneCapBonus;
@@ -2432,10 +2430,10 @@ namespace DeadWalls
             && councilCatalog.Atoms != null && councilCatalog.Atoms.Length > 0;
 
         /// <summary>
-        /// Gunde bir kez cagrilir (UI Dawn'a geciste). Sans + pity + cooldown zinciri;
-        /// basarida ActiveCouncilEvent dolar. Deterministiktir (seed = gun + ECS RandomSeed).
+        /// UI tarafindan Dawn kenarinda cagrilir. Yalniz Day 3,6,9,12... gunlerinde bir kez
+        /// regular kart acar. Chance/pity/cooldown yoktur; seed run icinde deterministiktir.
         /// </summary>
-        public bool TryRollCouncilEvent()
+        public bool TryOpenRegularCouncilEvent()
         {
             // NOT: _initialized burada KULLANILMAZ — frame-arasi okumalarda dalgalanabiliyor
             // (TryGetMobileConfigEntity'nin dispose-catch'i dusurup Update yeniden kuruyor).
@@ -2445,36 +2443,26 @@ namespace DeadWalls
                 return false;
 
             int day = Mathf.Max(1, ContinuousSiegeCycle.CycleIndex + 1);
-            if (day == _lastCouncilRollDay)
+            if (!CouncilRegularSchedule.ShouldOpen(
+                    day,
+                    _lastRegularCouncilDay,
+                    ContinuousSiegeCycle.Phase))
                 return false;
 
-            _lastCouncilRollDay = day;
-
-            if (_councilCooldownRemaining > 0)
-            {
-                _councilCooldownRemaining--;
-                _councilDaysSinceEvent++;
-                return false;
-            }
-
-            _councilDaysSinceEvent++;
-            bool pity = _councilDaysSinceEvent >= Mathf.Max(1, councilCatalog.PityDays);
+            // Ayni scheduled gun, catalog/runtime problemi olsa bile ikinci kez reroll edilmez.
+            // Bu fail-closed davranis seed veya hot-reload ile farkli kart cikmasini engeller.
+            _lastRegularCouncilDay = day;
             uint seed = GetCouncilSeed(day);
-            if (!pity)
-            {
-                float roll = (math.hash(new uint2(seed, 0x9E3779B9u)) & 0x00FFFFFFu) / 16777215f;
-                if (roll >= Mathf.Clamp01(councilCatalog.DailyEventChance))
-                    return false;
-            }
-
             var context = BuildCouncilContext(day);
             var composed = CouncilComposer.Compose(councilCatalog, seed, context);
             if (composed == null)
+            {
+                Debug.LogError($"[GameManager] Day {day} regular Council compose edilemedi; "
+                               + "scheduled gun fail-closed kapatildi.");
                 return false;
+            }
 
             _activeCouncilEvent = composed;
-            _councilDaysSinceEvent = 0;
-            _councilCooldownRemaining = Mathf.Max(0, councilCatalog.CooldownDays);
 
             _recentCouncilTemplates.Add(composed.TemplateId);
             int memory = Mathf.Max(1, councilCatalog.RecentTemplateMemory);
@@ -2489,6 +2477,15 @@ namespace DeadWalls
 
             OnGameStateChanged?.Invoke();
             return true;
+        }
+
+        /// <summary>
+        /// Legacy API wrapper. Regular schedule disinda chance roll yapmaz.
+        /// Yeni cagrilar TryOpenRegularCouncilEvent kullanmalidir.
+        /// </summary>
+        public bool TryRollCouncilEvent()
+        {
+            return TryOpenRegularCouncilEvent();
         }
 
         /// <summary>Secenegin odeme etkileri karsilanabiliyor mu (UI buton interactable'i icin).</summary>
@@ -2711,9 +2708,7 @@ namespace DeadWalls
             _recentCouncilTemplates.Clear();
             _usedOneShotCouncils.Clear();
             _activeCouncilEvent = null;
-            _councilDaysSinceEvent = 99; // yeni kosunun ilk safaginda da garanti kart
-            _councilCooldownRemaining = 0;
-            _lastCouncilRollDay = -1;
+            _lastRegularCouncilDay = -1;
             _councilRunSalt = (uint)UnityEngine.Random.Range(1, int.MaxValue); // her kosuya taze zar
             _councilWoodCapBonus = 0;
             _councilStoneCapBonus = 0;
@@ -2765,8 +2760,6 @@ namespace DeadWalls
                 FrostArchers = FrostArcherCount,
                 GlobalArrowDamageBonus = _globalArrowDamageBonus,
                 GlobalFireRateMultiplier = _globalFireRateMultiplier,
-                CouncilDaysSinceEvent = _councilDaysSinceEvent,
-                CouncilCooldownRemaining = _councilCooldownRemaining,
                 CouncilRunSalt = _councilRunSalt,
                 CouncilWoodCapBonus = _councilWoodCapBonus,
                 CouncilStoneCapBonus = _councilStoneCapBonus,
@@ -2825,14 +2818,12 @@ namespace DeadWalls
             _usedOneShotCouncils.Clear();
             foreach (var id in save.UsedOneShotCouncils)
                 _usedOneShotCouncils.Add(id);
-            _councilDaysSinceEvent = save.CouncilDaysSinceEvent;
-            _councilCooldownRemaining = save.CouncilCooldownRemaining;
             _councilRunSalt = save.CouncilRunSalt;
             _councilWoodCapBonus = save.CouncilWoodCapBonus;
             _councilStoneCapBonus = save.CouncilStoneCapBonus;
             _councilIronCapBonus = save.CouncilIronCapBonus;
             _councilFoodCapBonus = save.CouncilFoodCapBonus;
-            _lastCouncilRollDay = -1;
+            _lastRegularCouncilDay = -1;
             ApplyTechEconomyAggregates(); // council cap bonuslari fold'lanir
 
             // 3) Level-up kartlari + okcu yukseltme seviyeleri (canli okculara stats yansir)
@@ -2932,8 +2923,8 @@ namespace DeadWalls
             _entityManager.SetComponentData(_castleEntity, wall);
             Wall = wall;
 
-            // 7) Restore gunu Dawn'i atladi — gunun council karti elle roll edilir
-            TryRollCouncilEvent();
+            // 7) Snapshot exact Dawn'daysa ve scheduled gun henuz handled degilse kart acilir.
+            TryOpenRegularCouncilEvent();
 
             OnGameStateChanged?.Invoke();
             return true;
@@ -3061,14 +3052,13 @@ namespace DeadWalls
                 FrostArchers = FrostArcherCount,
                 GlobalArrowDamageBonus = _globalArrowDamageBonus,
                 GlobalFireRateMultiplier = _globalFireRateMultiplier,
-                CouncilDaysSinceEvent = _councilDaysSinceEvent,
-                CouncilCooldownRemaining = _councilCooldownRemaining,
-                LastCouncilRollDay = _lastCouncilRollDay,
+                LastRegularCouncilDay = _lastRegularCouncilDay,
                 CouncilRunSalt = _councilRunSalt,
                 CouncilWoodCapBonus = _councilWoodCapBonus,
                 CouncilStoneCapBonus = _councilStoneCapBonus,
                 CouncilIronCapBonus = _councilIronCapBonus,
                 CouncilFoodCapBonus = _councilFoodCapBonus,
+                HasActiveCouncilEvent = _activeCouncilEvent != null,
                 ActiveCouncilEvent = _activeCouncilEvent,
                 FireballCooldownRemaining = _fireballCooldownRemaining,
                 FortifyActive = prep.FortifyActive,
@@ -3267,15 +3257,13 @@ namespace DeadWalls
             _usedOneShotCouncils.Clear();
             foreach (var id in save.UsedOneShotCouncils)
                 _usedOneShotCouncils.Add(id);
-            _councilDaysSinceEvent = save.CouncilDaysSinceEvent;
-            _councilCooldownRemaining = save.CouncilCooldownRemaining;
-            _lastCouncilRollDay = save.LastCouncilRollDay;
+            _lastRegularCouncilDay = save.LastRegularCouncilDay;
             _councilRunSalt = save.CouncilRunSalt;
             _councilWoodCapBonus = save.CouncilWoodCapBonus;
             _councilStoneCapBonus = save.CouncilStoneCapBonus;
             _councilIronCapBonus = save.CouncilIronCapBonus;
             _councilFoodCapBonus = save.CouncilFoodCapBonus;
-            _activeCouncilEvent = save.ActiveCouncilEvent;
+            _activeCouncilEvent = save.HasActiveCouncilEvent ? save.ActiveCouncilEvent : null;
             ApplyTechEconomyAggregates();
 
             _upgradeTiers.Clear();

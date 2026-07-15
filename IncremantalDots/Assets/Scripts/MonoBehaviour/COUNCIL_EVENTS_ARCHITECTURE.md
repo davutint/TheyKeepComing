@@ -12,21 +12,42 @@ varyant dogurur ve yeni atom/sablon eklemek cesitliligi CARPARAK buyutur.
 
 1. **Veri (ScriptableObject/):** `CouncilEffectAtomSO` (etki parcacigi: tur + uretim-oranli
    buyukluk + director agirlik kurallari + butce degeri), `CouncilTemplateSO` (tema/metin +
-   karsitlik tipi + flag kosullari + zincir alanlari), `CouncilEventCatalogSO` (havuz + pacing:
-   DailyEventChance 0.30, PityDays 4, CooldownDays 1, RecentTemplateMemory 3).
+   karsitlik tipi + flag kosullari + zincir alanlari), `CouncilEventCatalogSO` (havuz +
+   RecentTemplateMemory 3). Legacy DailyEventChance/PityDays/CooldownDays alanlari serialized
+   asset uyumlulugu icin saklidir fakat regular schedule tarafindan kullanilmaz.
 2. **Composer (`CouncilComposer.cs`, pure static):** seed + `CouncilContext` -> sablon sec
    (flag/gun filtreleri + anti-tekrar + director on-skoru) -> karsitlik recetesine gore A/B
    atomlari -> uretim-oranli miktarlar (`perMin * MinutesOfProduction * band`; band 0.7/1.0/1.4)
    -> butce dengeleme (A/B "dakika-degeri" toleransi asarsa dusuk taraf olceklenir).
    DETERMINISTIK: ayni seed + ayni context = ayni event (EditMode testli). Rng warm-up
    ardisik-seed korelasyonunu kirar.
-3. **Runtime state (GameManager):** `TryRollCouncilEvent` (gunde bir; sans+pity+cooldown;
-   seed = hash(ECS RandomSeed, gun)), `ChooseCouncilOption` (efekt uygulama + flag yazimi:
+3. **Runtime state (GameManager):** `TryOpenRegularCouncilEvent` (yalniz Day 3/6/9...;
+   seed = hash(ECS RandomSeed, run salt, gun)), `ChooseCouncilOption` (efekt uygulama + flag yazimi:
    otomatik `council_{template}_{a|b}` + SetsFlagOnA/B), `ExpireCouncilEvent`. Flag'ler
    `Dictionary<string,int>` (flag -> setlendigi gun; zincir gecikmeleri icin). Restart sifirlar.
-4. **UI (`CouncilEventUI.cs`):** faz gecislerini 0.2s poll ile izler (Dawn -> roll,
+4. **UI (`CouncilEventUI.cs`):** faz gecislerini 0.2s poll ile izler (Dawn -> scheduled open,
    Dusk -> expire); kart DOTween slide+fade ile belirir (Dawn odul toast'undan 1.2s gecikmeli),
    sure seridi karar penceresini gosterir; secim punch + Card Place SFX, belirme Book Handle SFX.
+
+## Regular Schedule
+
+- Tek takvim owner'i `CouncilRegularSchedule`'dir: ilk regular gun `3`, interval `3`.
+- Day `1/2/4/5...` hicbir chance roll yapmaz; pity ve cooldown regular akisa dahil degildir.
+- `_lastRegularCouncilDay` ayni Dawn'da ikinci karti engeller ve exact save v11'de korunur.
+- Compose gecersiz catalog nedeniyle null donerse scheduled gun fail-closed islenir; ayni gun
+  hot-reload veya tekrar cagri ile farkli kart reroll edilmez.
+- Emergency Council bu owner'dan ayridir. Trigger/type/list owner onayi gelmeden runtime'a
+  eklenmez ve ileride `_lastRegularCouncilDay` degerini degistiremez.
+
+## Persistence
+
+- v11 `LastRegularCouncilDay`, `HasActiveCouncilEvent`, active composed payload, flags, recent
+  template memory, one-shot list ve run salt'i saklar.
+- `HasActiveCouncilEvent` otoritedir; `JsonUtility` null nested class'i bos nesne yaptigi icin
+  discriminator false ise payload ignore edilip null'a normalize edilir.
+- v10 chance/pity state'i migrate edilirken yalniz mevcut regular gunde aktif/gecerli kart veya
+  `CouncilDaysSinceEvent == 0` kaniti varsa gun handled sayilir. Chance fail'i Day 3/6/9 kartini
+  sessizce yutmaz.
 
 ## Karsitlik Receteleri (composer'in gramerleri)
 
@@ -94,5 +115,6 @@ varyant dogurur ve yeni atom/sablon eklemek cesitliligi CARPARAK buyutur.
 - `IsMobileMode`/`_initialized` frame-arasi dalgalanabildiginden council kodlari
   `ContinuousSiegeCycle.Enabled` cache'ini guard olarak kullanir.
 - Ayni anda tek temp-production bonusu (slot kisiti) ve tek aktif kart olur.
-- Testler: `Assets/Tests/EditMode/CouncilComposerTests.cs` (determinizm, 500-seed butce,
-  zincir filtreleri, uretim olcekleme) — 6/6.
+- Testler: `CouncilComposerTests` composer determinizmi/butce/zincir/olcekleme;
+  `CouncilRegularScheduleTests` exact cadence/tek-acilis/v10 migration;
+  `CouncilRegularSchedulePlayModeTests` gercek `NewGameScene` Day 1-12 entegrasyonu.

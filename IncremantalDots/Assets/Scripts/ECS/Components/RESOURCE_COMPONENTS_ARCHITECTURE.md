@@ -48,7 +48,7 @@ birlikte okur; yatirim fiyatini ve Inspector/player-facing paid level'i yalniz
 - `Current` (`long`) — Yalniz mevcut run icindeki Castle Heart bakiyesi
 - `ResourceData`'dan ayri tutulur; Wood/Stone/Iron/Food transaction'ina girmez
 - Yalniz `GameManager.TrySpendGraveEssenceAtHeart()` harcama kapisindan azalir
-- Exact save v10'da generated Heart graph ile birlikte korunur; Restart ve Game Over sonrasi `0` olur
+- Exact save v11'de generated Heart graph ile birlikte korunur; Restart ve Game Over sonrasi `0` olur
 - Meta progression state'ine yazilmaz
 
 ## Veri Akisi

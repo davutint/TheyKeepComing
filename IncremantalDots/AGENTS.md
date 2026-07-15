@@ -52,6 +52,16 @@ Do not create pull requests, issues, releases, remote branches, or any GitHub-fa
 
 Always communicate with the repository owner in Turkish. This is a standing rule for all future work in this repository.
 
+### Mandatory Unity MCP Availability
+
+Unity MCP is a hard prerequisite for every Unity project task in this repository.
+
+- Before inspecting or changing source code, assets, scenes, prefabs, tests, project settings, or project documentation, verify that Unity MCP responds and that its active instance targets `IncremantalDots`.
+- Filesystem tools may be used for scoped text inspection and edits only while the Unity MCP connection is healthy. Unity MCP remains mandatory for Unity Editor state, asset refresh/import, compilation, Console, scene/prefab, Play Mode, and test verification.
+- If Unity MCP does not respond, disconnects outside an expected domain reload, or cannot target the correct instance, stop immediately. Do not continue through a shell or filesystem fallback.
+- Ask the repository owner to restart or reconnect Unity MCP. Resume work only after the owner confirms readiness and MCP connectivity is verified again.
+- A short disconnect caused by a Unity MCP-triggered domain reload or test run may be retried. If it does not reconnect promptly, stop and ask the repository owner to restart or reconnect it.
+
 GitHub and remote operations are forbidden unless the owner explicitly changes this rule in a later message. Forbidden actions include but are not limited to:
 
 - `git push`

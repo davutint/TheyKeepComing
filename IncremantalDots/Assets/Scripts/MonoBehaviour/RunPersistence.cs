@@ -13,7 +13,7 @@ namespace DeadWalls
     [Serializable]
     public class RunSaveState
     {
-        public const int CurrentVersion = 10;
+        public const int CurrentVersion = 11;
         public const int MinimumSupportedVersion = 3;
 
         public int Version = CurrentVersion;
@@ -142,6 +142,9 @@ namespace DeadWalls
         public List<CouncilFlagEntry> CouncilFlags = new List<CouncilFlagEntry>();
         public List<string> RecentCouncilTemplates = new List<string>();
         public List<string> UsedOneShotCouncils = new List<string>();
+        public int LastRegularCouncilDay = -1;
+
+        // v10 chance/pity migration girdileri. v11 runtime bu alanlari kullanmaz.
         public int CouncilDaysSinceEvent;
         public int CouncilCooldownRemaining;
         public int LastCouncilRollDay;
@@ -150,6 +153,8 @@ namespace DeadWalls
         public int CouncilStoneCapBonus;
         public int CouncilIronCapBonus;
         public int CouncilFoodCapBonus;
+        // JsonUtility null nested class'i bos event nesnesine cevirebildigi icin otorite.
+        public bool HasActiveCouncilEvent;
         public ComposedCouncilEvent ActiveCouncilEvent;
 
         // Run ability / prep state
@@ -273,6 +278,7 @@ namespace DeadWalls
                 }
 
                 UpgradeToCurrent(state);
+                NormalizeActiveCouncilEvent(state);
                 return state;
             }
             catch (Exception e)
@@ -290,6 +296,7 @@ namespace DeadWalls
             state.Version = RunSaveState.CurrentVersion;
             state.ArcherFormationVersion = ArcherFormationUtility.NormalizeVersion(
                 state.ArcherFormationVersion);
+            NormalizeActiveCouncilEvent(state);
             return WriteJson(FilePath, state, "Run save");
         }
 
@@ -385,6 +392,44 @@ namespace DeadWalls
                 state.HeartGraph = null;
                 state.Version = 10;
             }
+
+            if (state.Version == 10)
+            {
+                // v10 regular Council'i chance/pity/cooldown ile her Dawn roll ediyordu.
+                // Yalniz mevcut 3/6/9 gununde gercekten uretilmis bir kart kanitlanabiliyorsa
+                // o gun handled sayilir; eski chance fail'i yeni exact karti yutamaz.
+                int currentDay = Math.Max(1, state.CycleIndex + 1);
+                bool legacyHasActiveEvent = IsValidCouncilEventPayload(state.ActiveCouncilEvent);
+                state.HasActiveCouncilEvent = legacyHasActiveEvent;
+                if (!legacyHasActiveEvent)
+                    state.ActiveCouncilEvent = null;
+                state.LastRegularCouncilDay = CouncilRegularSchedule.MigrateLegacyHandledDay(
+                    currentDay,
+                    state.LastCouncilRollDay,
+                    state.CouncilDaysSinceEvent,
+                    legacyHasActiveEvent);
+                state.Version = 11;
+            }
+        }
+
+        private static void NormalizeActiveCouncilEvent(RunSaveState state)
+        {
+            if (state == null)
+                return;
+
+            if (!state.HasActiveCouncilEvent || !IsValidCouncilEventPayload(state.ActiveCouncilEvent))
+            {
+                state.HasActiveCouncilEvent = false;
+                state.ActiveCouncilEvent = null;
+            }
+        }
+
+        private static bool IsValidCouncilEventPayload(ComposedCouncilEvent composed)
+        {
+            return composed != null
+                && !string.IsNullOrEmpty(composed.TemplateId)
+                && composed.OptionA != null
+                && composed.OptionB != null;
         }
 
         public static void CommitDeath(RunDeathReceipt receipt)

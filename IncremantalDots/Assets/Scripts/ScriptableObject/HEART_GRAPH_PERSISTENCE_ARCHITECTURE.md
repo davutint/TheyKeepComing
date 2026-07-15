@@ -2,8 +2,8 @@
 
 ## Kapsam
 
-`DW-E-SAVE`, generated Castle Heart graph'ini `RunSaveState v10` icinde exact run state
-olarak saklar. Continue yeni graph uretmez; saved graph'i clone eder, structural/runtime
+`DW-E-SAVE`, generated Castle Heart graph'ini v10'da exact run state olarak ekledi; guncel
+`RunSaveState v11` ayni payload'i korur. Continue yeni graph uretmez; saved graph'i clone eder, structural/runtime
 state validation'dan gecirir ve satin alinmis node effect'lerini level state'inden replay eder.
 
 Production node, maliyet, Keystone veya Evolution icerigi bu paket tarafindan uretilmez.
