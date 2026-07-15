@@ -23,6 +23,7 @@
 Beklenen referanslar:
 
 - Economy: `WoodText`, `StoneText`, `IronText`, `FoodText`, `PopulationText`, `ArrowText`
+- Compact top strip: `ResourceBar` (`560 x 48`) içinde `WoodChip`, `StoneChip`, `IronChip`, `FoodChip`, `PopulationChip`, `ArrowChip`; value/rate metni tek satırdır
 - Worker drawer: `WorkerEconomyDrawerPanel`, `WorkerDrawerToggleButton`, `WorkerIdlePopulationText`, `WorkerTotalText`, `WorkerArcherPopulationText`
 - Worker rows: `WoodWorkerCountText`, `WoodWorkerRateText`, `WoodWorkerAddButton`, `WoodWorkerStatusText`; ayni pattern `Stone`, `Iron` ve `Food` icin
 - Top center: `WaveText`, `KillsText`, `WaveRewardText`

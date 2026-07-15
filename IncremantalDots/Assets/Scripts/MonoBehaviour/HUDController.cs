@@ -1,3 +1,4 @@
+using System.Globalization;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -182,28 +183,28 @@ namespace DeadWalls
             {
                 _lastWood = res.Wood;
                 _lastWoodNet = woodNet;
-                WoodText.text = FormatResource("Wood", res.Wood, woodNet);
+                WoodText.text = FormatResourceValue(res.Wood, woodNet);
             }
 
             if (StoneText != null && (_lastStone != res.Stone || _lastStoneNet != stoneNet))
             {
                 _lastStone = res.Stone;
                 _lastStoneNet = stoneNet;
-                StoneText.text = FormatResource("Stone", res.Stone, stoneNet);
+                StoneText.text = FormatResourceValue(res.Stone, stoneNet);
             }
 
             if (IronText != null && (_lastIron != res.Iron || _lastIronNet != ironNet))
             {
                 _lastIron = res.Iron;
                 _lastIronNet = ironNet;
-                IronText.text = FormatResource("Iron", res.Iron, ironNet);
+                IronText.text = FormatResourceValue(res.Iron, ironNet);
             }
 
             if (FoodText != null && (_lastFood != res.Food || _lastFoodNet != foodNet))
             {
                 _lastFood = res.Food;
                 _lastFoodNet = foodNet;
-                FoodText.text = FormatResource("Food", res.Food, foodNet);
+                FoodText.text = FormatResourceValue(res.Food, foodNet);
             }
 
             // Ok envanter
@@ -589,14 +590,14 @@ namespace DeadWalls
                 target.SetActive(active);
         }
 
-        private static string FormatResource(string name, int amount, float netRate)
+        internal static string FormatResourceValue(int amount, float netRate)
         {
-            // Sifir hiz → parantez yok
-            if (netRate > 0.01f)
-                return $"{amount}\n+{netRate:0}/min";
-            if (netRate < -0.01f)
-                return $"{amount}\n{netRate:0}/min";
-            return amount.ToString();
+            string amountText = amount.ToString("N0", CultureInfo.InvariantCulture);
+            if (Mathf.Abs(netRate) <= 0.01f)
+                return amountText;
+
+            string rateText = netRate.ToString("+0;-0;0", CultureInfo.InvariantCulture);
+            return $"{amountText}  {rateText}/m";
         }
 
     }

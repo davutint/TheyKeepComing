@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.2
 > **Son tam kapsam denetimi:** 2026-07-15
 > **Aktif paket:** Package I - HUD, Onboarding ve Creative Polish
-> **Aktif iş:** `DW-I-HUD-RESOURCES` - Compact Top Resource HUD
-> **İlerleme:** `346 / 441` tracker checkbox'ı tamamlandı - `%78,46`
+> **Aktif iş:** `DW-I-HUD-PHASE-AREA` - Minimal Top-Center Phase Area
+> **İlerleme:** `347 / 441` tracker checkbox'ı tamamlandı - `%78,68`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -795,7 +795,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 ### HUD işleri
 
 - [x] Gate/Core serialized binding ve görsel kalıntılarını active prefabdan temizle veya açık dormant guard koy.
-- [ ] Üst kaynak HUD'ını kompakt tut.
+- [x] Üst kaynak HUD'ını kompakt tut.
 - [ ] Üst ortada minimal phase alanı ayır.
 - [ ] Büyük CyclePanel ve ham DAY/DUSK/NIGHT sunumunu owner-approved mockup ile değiştir.
 - [ ] Horde forecast/pressure panelini kaldır.
@@ -1150,3 +1150,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-15 | `DW-H-META-BOUNDARY` death-only shop + run graph isolation | Meta purchase otoritesi `GameManager`a taşındı; aktif koşu, toplanmamış/durable olmayan ölüm ve fail-closed meta state satın alamıyor. Canonical catalog asset identity aynı Id'li spoof definition'ı reddediyor; persistence mutation API'si internal kaldı. `MetaUpgradePolicy` yalnız run-start/aggregate effect'lerini allowlist yaptı; `StartingTechLevel`, `TechNodeId`, runtime case ve dormant `Meta_start_moat.asset` kaldırıldı. Exact Continue'un saved tech replay'i `RestoreSavedTechNodeLevels` adıyla run-save sahibinde korundu; pool unlock state'i mevcut generated graph'a yazmıyor | Unity compile: 0 error; new boundary EditMode 5/5; schema+dormancy regression 9/9; death purchase PlayMode 1/1; exact Continue/death/Heart graph PlayMode regression 3/3; Unity Console 0 error; tracker `335/441` |
 | 2026-07-15 | `DW-H-META-CATALOG` fixed launch catalog + incremental cost curves | Blueprint sabit listesi dört starting resource, Basic-only Archer, limitsiz starting beds, Wall HP, worker production, Arrow efficiency, Essence gain ve future node-pool unlock olarak 11 canonical assete çekildi; eski `Meta_archer_damage` effect/asset/runtime yolu kaldırıldı. Kaynak/yatak sink'leri `MaxLevel=0` limitsiz, bütün fiyatlar üstel ve saturating; Basic Archer ortak 1000 cap'ini koruyor. Arrow meta verimi paid/Heart level'dan ayrıldı, Essence yüzdesinin kesirli payı exact save v13'e eklendi, Continue başlangıç bonuslarını çift uygulamadan derived etkileri yeniden kuruyor. Node-pool seviyesi/Id'si/Souls aynı atomik transaction'da tek kez commit ediliyor | Unity compile: 0 error; targeted EditMode `50/50`; targeted PlayMode `2/2`; Unity Console gerçek error 0; catalog validation 0 problem; tracker `344/441` |
 | 2026-07-15 | `DW-I-HUD-LEGACY` active HUD Gate/Core cleanup | Aktif HUD prefabındaki Gate/Core text, track ve fill objeleri kaldırıldı; `HUDController` ile scene setup binding sözleşmesi Wall-only hale getirildi. Connected `NewGameScene` instance'ındaki eski serialize referanslar temizlendi; Wall text/fill bağları korundu ve eski runtime hide guard'ına ihtiyaç kalmadı | Unity compile: 0 error / 0 warning; targeted EditMode 3/3; targeted PlayMode 1/1; MCP prefab ve canlı sahne denetiminde Gate/Core obje 0, Wall bindingleri sağlam; tracker `346/441` |
+| 2026-07-15 | `DW-I-HUD-RESOURCES` compact top resource strip | Üst soldaki altı kartlık resource alanı `700 x 84` yerine `560 x 48` tek şeride, chip'ler `84 x 42` ölçüsüne çekildi. Wood/Stone/Iron/Food değerleri signed `/m` rate ile tek satıra alındı; altı label kaynak bazlı hafif renk kodu aldı. Population ve finite Arrow aynı şeritte kaldı; `ArrowChip` ammo panel toggle sahipliğini korudu | Unity compile: 0 error; targeted EditMode 2/2; MCP runtime binding audit: `ResourceBar 560 x 48`, single-line values, Arrow toggle `false -> true -> false`; 1920x1080 Game View görsel QA temiz; tracker `347/441` |

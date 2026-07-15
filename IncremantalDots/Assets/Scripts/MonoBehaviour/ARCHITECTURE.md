@@ -40,7 +40,8 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 ### HUDController.cs
 
 - HP, XP, continuous cycle, zombie alive/max, resource, population ve arrow text'lerini gunceller
-- Mobile HUD'da resource text'leri label tekrar etmez; sadece kompakt value/rate yazar
+- Mobile HUD'da resource text'leri label tekrar etmez; amount ve signed `/m` rate'i tek satırlı kompakt value olarak yazar
+- `ResourceBar`, üst solda `560 x 48` tek şerittir; Wood/Stone/Iron/Food/Population/Arrow altı adet `84 x 42` chip içinde kalır ve label renkleri hızlı taramayı destekler
 - Resource rate gosteriminde base production yerine effective production'i kullanir; mobile worker economy aktifken bu deger worker allocation'dan gelir
 - `CyclePanel` varsa `CyclePhaseText` degerini sadece `DAY / DUSK / NIGHT` olarak yazar
 - `CycleProgressFill` ve `CycleProgressMarker` ile 60s cycle progress'ini gosterir
