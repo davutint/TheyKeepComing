@@ -11,11 +11,15 @@
 
 ## Beklenen prefab hiyerarşisi
 
-`Canvas/MobileCastleHudRoot/AbilityBarPanel` altında şu butonlar bulunmalıdır:
+`MobileCastleHudRoot/AbilityBarPanel`, bottom-center anchor'da `496 x 90` tek paneldir.
+Altında soldan sağa şu doğrudan slotlar bulunmalıdır:
 
 - `FireballButton` + `FireballButtonCooldownFill`
 - `RallyAbilityButton` + `RallyAbilityButtonCooldownFill`
 - `EmergencyRepairAbilityButton` + `EmergencyRepairAbilityButtonCooldownFill`
+
+Her cooldown görseli `Image.Type.Filled`, `FillMethod.Vertical`, bottom origin ve
+`raycastTarget=false` sözleşmesini taşır. Slot rect'leri birbiriyle çakışmaz.
 
 Aktif scene'de tek `SpellCastUI`, `MobileCastleHudRoot` üzerinde yaşar. `SpellPanel`,
 üç button/fill/label alanı ve Fireball visual sprite binding'leri dolu olmalıdır.
@@ -46,6 +50,6 @@ Fireball damage/radius/cooldown ise Castle Heart node effect'leriyle değişir.
 - Wall `0 HP` olduktan sonra Emergency Repair çalışmaz.
 - Save/Continue sonrası üç ability cooldown gösterimi runtime state ile aynıdır.
 
-Otomatik regresyon için `ActiveAbilityRulesTests`, `MobileCastleTuningResolverTests`,
-`RunPersistenceTests` ve hedefli `ExactRunContinuePlayModeTests` çalıştırılır.
-
+Otomatik regresyon için `HudAbilityBarPresentationTests`, `ActiveAbilityRulesTests`,
+`MobileCastleTuningResolverTests`, `RunPersistenceTests` ve hedefli
+`ExactRunContinuePlayModeTests` çalıştırılır.

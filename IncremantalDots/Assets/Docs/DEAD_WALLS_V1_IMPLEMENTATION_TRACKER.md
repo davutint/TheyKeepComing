@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.2
 > **Son tam kapsam denetimi:** 2026-07-15
 > **Aktif paket:** Package I - HUD, Onboarding ve Creative Polish
-> **Aktif iş:** `DW-I-HUD-ABILITIES` - Audit Bottom-Center Ability Cooldown Bar
-> **İlerleme:** `352 / 441` tracker checkbox'ı tamamlandı - `%79,82`
+> **Aktif iş:** `DW-I-HUD-WORKERS-HOUSING` - Build Bottom-Left Workers/Housing Surface
+> **İlerleme:** `354 / 441` tracker checkbox'ı tamamlandı - `%80,27`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -785,7 +785,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 | Tek minimal Wall bar | Aktif prefab, sahne binding'i ve HUDController yalnız Wall sunumu taşıyor | `[x]` |
 | Minimal phase area | Owner-secili `B - Celestial Dial`: top-center gerçek pill `290 x 68`, yalnız `DAY N`, 44 segmentli `178 x 44` göksel yay, crescent/dawn glyph'leri ve hareketli phase-color marker/halo; A alternatifi karar dokümanında arşivli | `[x]` |
 | Forecast yok | Aktif prefab, canlı HUD, `HUDController` ve setup binding sözleşmesi forecast/pressure yüzeyi taşımıyor; gameplay `HordePressure01` sinyali korunuyor | `[x]` |
-| Abilities alt orta | Fireball/Rally/Emergency Repair tek alt orta cooldown barında | `[x]` |
+| Abilities alt orta | Tek `496 x 90` bottom-center panelde Fireball/Rally/Emergency Repair; üç vertical cooldown overlay, tek `SpellCastUI`, legacy panel yok ve prefab guard testi aktif | `[x]` |
 | Workers/Housing alt sol | Worker drawer var; Housing owner yok | `[~]` |
 | Archers/Heart alt sağ | Archer drawer ve Heart button var; yerleşim/polish doğrulanmalı | `[~]` |
 | Tek drawer | Birden fazla controller bağımsız panel yönetiyor | `[~]` Exclusive owner testi yok |
@@ -799,7 +799,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 - [x] Üst ortada minimal phase alanı ayır.
 - [x] Büyük CyclePanel ve ham DAY/DUSK/NIGHT sunumunu owner-approved mockup ile değiştir.
 - [x] Horde forecast/pressure panelini kaldır.
-- [ ] Fireball/Rally/Emergency Repair'ı alt orta tek cooldown barına taşı.
+- [x] Fireball/Rally/Emergency Repair'ı alt orta tek cooldown barına taşı.
 - [ ] Workers/Housing alt sol yerleşimini kur.
 - [ ] Archers/Castle Heart alt sağ yerleşimini kur.
 - [ ] Aynı anda yalnız bir management drawer açık olacak owner kur.
@@ -1002,7 +1002,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 - [x] Council 3/6/9 regular schedule'ı koruyor ve aynı gün yalnız bir kart açıyor.
 - [x] Council yalnız approved template/effect pool kullanıyor.
 - [x] Council ana guardrail'leri bypass etmiyor.
-- [ ] Fireball/Rally/Emergency Repair bottom-center cooldown barında.
+- [x] Fireball/Rally/Emergency Repair bottom-center cooldown barında.
 - [x] Meta yalnız ölümde bir kez reward veriyor; voluntary reset yok.
 - [x] HUD tek Wall barı ve owner-approved minimal phase UI kullanıyor.
 - [ ] İlk-run tutorial tamamlanıyor; sonraki run'da tekrarlamıyor.
@@ -1154,3 +1154,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-15 | `DW-I-HUD-PHASE-AREA` minimal top-center phase area | Aktif HUD prefabındaki `384 x 106` phase panel top-center anchor'lı `340 x 78` sabit slota çekildi; day counter, phase title, `280 x 10` progress track, canlı fill/marker ve üç phase label binding'i korundu. Ham `DAY / DUSK / NIGHT` görsel dili sonraki owner-approved polish işine bırakıldı | Unity compile: 0 error; targeted EditMode 1/1; MCP runtime audit: `340 x 78`, top-center anchor, fill/marker senkron; 1920x1080 Game View görsel QA temiz; tracker `348/441` |
 | 2026-07-15 | `DW-I-HUD-PHASE-POLISH` owner-approved Celestial Dial | Owner A/B/C mockup turunda `B - Celestial Dial` yönünü seçti. İlk işlevsel geçişten sonra owner görsel eşleşmenin yetersiz olduğunu belirtti; aktif HUD referans B oranlarına göre `290 x 68` gerçek pill gövde/flat kapak silueti, `DAY N` sayacı, 44 segmentli `178 x 44` renk yayı, crescent/dawn glyph'leri, küçük parlak orb ve düşük-alpha halo ile yeniden işlendi. Referansta olmayan divider ile büyük phase başlığı, ham DAY/DUSK/NIGHT label satırı ve linear fill player-facing kapatıldı. `A - Horizon Ribbon` karşılaştırma görseli ve geri dönüş prosedürüyle `DW_I_PHASE_HUD_PRESENTATION_DECISION.md` içinde arşivlendi | Unity compile: 0 error; targeted EditMode 2/2; MCP runtime audit `290x68`, `178x44`, divider inactive, halo `0.22`, marker motion clean; 1920x1080 Game View B-parity QA temiz; tracker `351/441` |
 | 2026-07-15 | `DW-I-HUD-FORECAST` remove Horde forecast/pressure surface | Aktif HUD prefabındaki `HordePressurePanel` ve beş child yüzeyi Prefab Stage içinde kaldırıldı. `HUDController` serialized alanları, runtime hide guard'ı ve scene setup arama/başlık yolları silindi; mimari/setup dokümanları forecast'siz sözleşmeye çekildi. `HordePressure01` spawn, save ve gameplay yoğunluk sinyali olarak korunarak UI scope ile gameplay scope ayrıldı. `NewGameScene` serializer spillover'ı temiz `HEAD` sürümüne döndürüldü; sahne task sonunda değişmeden ve dirty olmadan kaldı | Unity compile: 0 error; new EditMode 2/2, related HUD EditMode 9/9; MCP Edit/Play audit: forecast object 0, controller field 0, CyclePanel/Wall/AbilityBar sağlam; Play Mode Console 0 error; tracker `352/441` |
+| 2026-07-15 | `DW-I-HUD-ABILITIES` bottom-center ability bar audit + regression guard | Package G'de zaten tamamlanmış aktif sistem Package I sunum hedefiyle yeniden denetlendi. Aktif prefabın tek `496 x 90` bottom-center `AbilityBarPanel` taşıdığı; Fireball, Rally ve Emergency Repair slotlarının çakışmadan soldan sağa dizildiği; her slotta raycast kapalı vertical cooldown overlay bulunduğu doğrulandı. Canlı sahnede tek `SpellCastUI`, eksiksiz altı button/fill binding ve sıfır legacy `SpellUiRoot`/`SpellPanel` var. Yeniden UI üretmek yerine bu gerçek `HudAbilityBarPresentationTests` ile kilitlendi; architecture/setup dokümanlarına exact geometri ve fill contract'ı eklendi | Unity compile: 0 error; new presentation EditMode 2/2, presentation + ability rules EditMode 5/5; MCP Play audit: Fireball `45s`, Rally `60s`, Repair `120s` duration ve üç fill `0.5`; 1920x1080 overlay QA bottom-center temiz; final Console 0 error; tracker `354/441` |

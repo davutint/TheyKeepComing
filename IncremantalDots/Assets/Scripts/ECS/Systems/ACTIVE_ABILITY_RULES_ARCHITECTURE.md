@@ -57,9 +57,12 @@ formülüdür. Night guard transaction'dan önce çalıştığı için Stone har
 
 ## UI ve legacy sınırı
 
-Prefab gerçeği `MobileCastleHudRoot.prefab/AbilityBarPanel`'dır. Eski `SpellUiRoot` /
-sağ-alt `SpellPanel` üretim yolu kaldırılmıştır. Fortify üçlü ability barında bulunmaz;
-legacy prep etkisi ayrı kalır. Arrow Storm V1'e eklenmez.
+Prefab gerçeği `MobileCastleHudRoot.prefab/AbilityBarPanel`'dır. Panel bottom-center
+anchor'lı `496 x 90` tek yüzeydir; Fireball, Rally ve Emergency Repair soldan sağa
+üç doğrudan slot taşır. Her slot kendi raycast kapalı, vertical filled cooldown overlay'ine
+sahiptir ve `SpellCastUI` kalan süreyi toplam süreye bölerek aynı state'i görselleştirir.
+Eski `SpellUiRoot` / sağ-alt `SpellPanel` üretim yolu kaldırılmıştır. Fortify üçlü ability
+barında bulunmaz; legacy prep etkisi ayrı kalır. Arrow Storm V1'e eklenmez.
 
 ## Test sahipleri
 
@@ -68,3 +71,5 @@ legacy prep etkisi ayrı kalır. Arrow Storm V1'e eklenmez.
 - `RunPersistenceTests`: v11->v12 cooldown ve v12->v13 Essence remainder migration sözleşmesi.
 - `ExactRunContinuePlayModeTests`: cost-free kullanım, Night normal repair reddi ve
   Rally/Emergency cooldown + Wall HP exact Continue doğrulaması.
+- `HudAbilityBarPresentationTests`: tek bottom-center paneli, üç slot geometrisini,
+  cooldown overlay contract'ını ve legacy panel yokluğunu kilitler.
