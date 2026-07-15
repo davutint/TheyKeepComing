@@ -27,7 +27,8 @@ varyant dogurur ve yeni atom/sablon eklemek cesitliligi CARPARAK buyutur.
    `Dictionary<string,int>` (flag -> setlendigi gun; zincir gecikmeleri icin). Restart sifirlar.
 4. **UI (`CouncilEventUI.cs`):** faz gecislerini 0.2s poll ile izler (Dawn -> scheduled open,
    Dusk -> expire); kart DOTween slide+fade ile belirir (Dawn odul toast'undan 1.2s gecikmeli),
-   sure seridi karar penceresini gosterir; secim punch + Card Place SFX, belirme Book Handle SFX.
+   sure seridi + `DECIDE Ns` sayaci authoritative cycle state'inden kalan Dawn+Day penceresini
+   gosterir; secim punch + Card Place SFX, belirme Book Handle SFX.
 
 ## Regular Schedule
 
@@ -79,6 +80,11 @@ varyant dogurur ve yeni atom/sablon eklemek cesitliligi CARPARAK buyutur.
   nedensellik bagini kapatir.
 - **Renkli buton ozetleri:** DescribeEffects TMP rich-text uretir (kazanc #8FD98A, bedel
   #E08A7A, risk #E5B963).
+- **Canli exact quote:** `CouncilOptionPresentationUtility`, composer label'ini oyuncuya dogrudan
+  basmaz. Authored verb'i korur; canli state'ten population icin tek seferlik Food, free Basic
+  archer icin idle population, Wall icin gercek clamp edilmis HP ve count-only gece yuzdesini
+  yeniden hesaplar. Kilit sebebi ayni satirda gorunur; `GameManager.CanAffordCouncilOption`
+  ayni quote sonucunu kullanir.
 - Testler cozulmemis token kalmadigini garanti eder (300 uretimde `{` taramasi).
 
 ## "Akillilik" Kaynaklari
@@ -126,13 +132,15 @@ transaction'ina cevirir.
 
 Test owner'lari: `CouncilEffectGuardUtilityTests` saf limitleri;
 `CouncilEffectGuardPlayModeTests` gercek ECS population/Food/archer/Wall/count-only
-transaction'larini dogrular.
+transaction'larini ve scene timer binding'ini dogrular. `CouncilOptionPresentationUtilityTests`
+exact metin, affordability, cycle countdown ve generated HUD prefab timer'ini kilitler.
 
 ## Isim Sozlesmesi
 
 `CouncilEventPanel` (+CanvasGroup), `CouncilTitleText`, `CouncilBodyText`, `CouncilTimerFill`
-(Filled/Horizontal), `CouncilOptionAButton` (+`CouncilOptionAText`), `CouncilOptionBButton`
-(+`CouncilOptionBText`). Setup tool bulur+baglar; katalog `GameManager.councilCatalog`'da.
+(Filled/Horizontal), `CouncilTimerText`, `CouncilOptionAButton` (+`CouncilOptionAText`),
+`CouncilOptionBButton` (+`CouncilOptionBText`). Setup tool bulur+baglar; katalog
+`GameManager.councilCatalog`'da.
 
 ## Bilinen Notlar / Tuzaklar
 

@@ -146,6 +146,39 @@ namespace DeadWalls
                 : "[MobileCastleSceneSetup] Finite Arrow ammo paneli prefabda onarildi; NewGameScene aktif degildi.");
         }
 
+        [MenuItem("Window/DeadWalls/Repair Council Exact Decision UI")]
+        public static void RepairCouncilExactDecisionUI()
+        {
+            EnsureCouncilDecisionUIInPrefab();
+            AssetDatabase.ImportAsset(GeneratedHudPrefabPath, ImportAssetOptions.ForceUpdate);
+
+            Scene activeScene = SceneManager.GetActiveScene();
+            bool sceneRepaired = false;
+            if (activeScene.IsValid() && activeScene.path == TargetScenePath)
+            {
+                foreach (GameObject root in activeScene.GetRootGameObjects())
+                {
+                    CouncilEventUI council = root.GetComponentInChildren<CouncilEventUI>(true);
+                    if (council == null)
+                        continue;
+
+                    ConfigureCouncilUI(council.gameObject);
+                    sceneRepaired = true;
+                }
+
+                if (sceneRepaired)
+                {
+                    EditorSceneManager.MarkSceneDirty(activeScene);
+                    EditorSceneManager.SaveScene(activeScene);
+                }
+            }
+
+            AssetDatabase.SaveAssets();
+            Debug.Log(sceneRepaired
+                ? "[MobileCastleSceneSetup] Council exact karar ozeti ve timer prefab/sahne binding'i onarildi."
+                : "[MobileCastleSceneSetup] Council exact karar UI prefabda onarildi; NewGameScene aktif degildi.");
+        }
+
         [MenuItem("Window/DeadWalls/Repair Archer Formation V1")]
         public static void RepairArcherFormationV1()
         {
@@ -3153,6 +3186,7 @@ namespace DeadWalls
             EnsureWorkerDrawerTargetControlsInPrefab();
             EnsureArcherRetrainControlInPrefab();
             EnsureArrowAmmoPanelInPrefab();
+            EnsureCouncilDecisionUIInPrefab();
 
             GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(GeneratedHudPrefabPath);
             Transform existing = canvasTransform.Find("MobileCastleHudRoot");
@@ -3241,6 +3275,54 @@ namespace DeadWalls
             {
                 PrefabUtility.UnloadPrefabContents(root);
             }
+        }
+
+        private static void EnsureCouncilDecisionUIInPrefab()
+        {
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(GeneratedHudPrefabPath);
+            if (prefab == null)
+                throw new InvalidOperationException("Council HUD prefab bulunamadi: " + GeneratedHudPrefabPath);
+
+            GameObject root = PrefabUtility.LoadPrefabContents(GeneratedHudPrefabPath);
+            try
+            {
+                EnsureCouncilDecisionUI(root);
+                // Runtime controller sahnedeki HUD owner'inda tutulur; prefab yalniz gorsel truth'tur.
+                DestroyComponentIfExists<CouncilEventUI>(root);
+                PrefabUtility.SaveAsPrefabAsset(root, GeneratedHudPrefabPath);
+            }
+            finally
+            {
+                PrefabUtility.UnloadPrefabContents(root);
+            }
+        }
+
+        private static void EnsureCouncilDecisionUI(GameObject hudRoot)
+        {
+            GameObject panel = FindChildByName(hudRoot, "CouncilEventPanel");
+            if (panel == null)
+                throw new InvalidOperationException("CouncilEventPanel bulunamadi; exact karar UI baglanamadi.");
+
+            TextMeshProUGUI title =
+                FindComponentInChildrenByName<TextMeshProUGUI>(panel, "CouncilTitleText");
+            if (title != null)
+            {
+                SetRect(title.rectTransform,
+                    new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
+                    new Vector2(-202f, 87f), new Vector2(100f, 109f));
+            }
+
+            TextMeshProUGUI timer = EnsureText(panel.transform, "CouncilTimerText", "DECIDE  35s", 12,
+                TextAlignmentOptions.Right, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
+                new Vector2(108f, 87f), new Vector2(198f, 109f));
+            if (title != null)
+            {
+                timer.font = title.font;
+                timer.fontSharedMaterial = title.fontSharedMaterial;
+            }
+            timer.color = new Color(0.949f, 0.788f, 0.298f, 1f);
+            timer.enableWordWrapping = false;
+            timer.raycastTarget = false;
         }
 
         private static void EnsureArrowAmmoPanel(GameObject hudRoot)
@@ -3617,6 +3699,7 @@ namespace DeadWalls
             council.CouncilTitleText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "CouncilTitleText");
             council.CouncilBodyText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "CouncilBodyText");
             council.CouncilTimerFill = FindComponentInChildrenByName<Image>(hudRoot, "CouncilTimerFill");
+            council.CouncilTimerText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "CouncilTimerText");
             council.CouncilOptionAButton = FindComponentInChildrenByName<Button>(hudRoot, "CouncilOptionAButton");
             council.CouncilOptionAText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "CouncilOptionAText");
             council.CouncilOptionBButton = FindComponentInChildrenByName<Button>(hudRoot, "CouncilOptionBButton");

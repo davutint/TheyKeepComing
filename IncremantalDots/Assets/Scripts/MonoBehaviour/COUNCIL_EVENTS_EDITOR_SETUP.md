@@ -10,7 +10,7 @@
 2. Katalog `GameManager.councilCatalog` alanina baglanir.
 3. `CouncilEventUI` HUD root'a eklenir; kart objeleri isimle bulunur, SFX baglanir
    (Appear = `Book Handle 1-2.wav`, Choose = `Card Place 1-1.wav`); `CouncilEffectBadgeText`
-   (aktif etki rozeti) + `NightToastText` (= `SiegeToastText`) baglanir.
+   (aktif etki rozeti) + `NightToastText` (= `SiegeToastText`) + `CouncilTimerText` baglanir.
 4. `ValidateCatalog()` sorunlari Console'a warning basilir.
 5. **Metin migration:** mevcut Template asset'inde `BodyVariants` BOS ise seed'in guncel
    anlatilari (Title/BodyVariants/OutcomeA-B/Verb'ler) uygulanir. Kullanici metin girdiyse
@@ -33,14 +33,24 @@
 
 1. Play'e gir; Day 1 ve Day 2 Dawn'da kart acilmadigini, Day 3 Dawn'da kartin kesin
    acildigini kontrol et. Ayni duzen Day 6/9/12'de devam eder.
-2. Kart sol-alt bolgede belirir (odul toast'undan ~1.2s sonra); sure seridi DAY sonuna
-   kadar akar; DUSK girisinde secilmediyse kaybolur.
-3. Secim kaynak/pop/okcu/savunma etkisini aninda uygular; odeme karsilanamiyorsa buton pasif. Ücretsiz okçu etkisi Basic/Rapid/Frost ortak `1000` cap'inde durur.
+2. Kart sol-alt bolgede belirir (odul toast'undan ~1.2s sonra); sure seridi ve `DECIDE Ns`
+   sayaci kalan Dawn+Day penceresini gosterir; DUSK girisinde secilmediyse kaybolur.
+3. Iki butonun ikinci satirinda exact sonuc gorunur: population `+N PEOPLE -M FOOD`, free
+   archer `+N BASIC ARCHERS -N IDLE PEOPLE`, Wall heal gercek uygulanacak HP ve gece etkisi
+   exact count yuzdesi. Karsilanamayan exact sonuc butonu pasif yapar ve eksigi yazar.
 4. `refugees_at_gate`'te "Take them in" sec -> 2+ gun sonra `AMONG THE REFUGEES` zinciri
    cikabilir (OneShot).
 5. EditMode: `CouncilComposerTests`, `CouncilRegularScheduleTests`, `RunPersistenceTests`.
 6. PlayMode: `CouncilRegularSchedulePlayModeTests` gercek sahnede Day 1-12 cadence ve
-   ayni scheduled gunde ikinci acilisi dogrular.
+   ayni scheduled gunde ikinci acilisi dogrular. `CouncilEffectGuardPlayModeTests` exact quote
+   ile `CouncilTimerText` scene binding'ini de dogrular.
+
+## Exact Karar UI Onarimi
+
+`Window > DeadWalls > Repair Council Exact Decision UI`, generated HUD prefabina idempotent
+`CouncilTimerText` ekler, title alanini timer ile cakismayacak sekilde daraltir ve aktif
+`NewGameScene` icindeki `CouncilEventUI` binding'ini kaydeder. Tam scene setup da ayni prefab
+repair adimini otomatik cagirir.
 
 ## Effect Guardrail Testi
 

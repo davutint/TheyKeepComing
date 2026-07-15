@@ -2488,35 +2488,63 @@ namespace DeadWalls
             return TryOpenRegularCouncilEvent();
         }
 
-        /// <summary>Secenegin odeme etkileri karsilanabiliyor mu (UI buton interactable'i icin).</summary>
+        /// <summary>
+        /// Secenegin canli state'te tam uygulanacak sayisal ozetini dondurur. UI metni ile
+        /// interactable karari ayni quote'tan gelir; composer'in eski yaklaşık etiketi owner degildir.
+        /// </summary>
+        public CouncilOptionPresentation GetCouncilOptionPresentation(ComposedCouncilOption option)
+        {
+            TryBuildCouncilOptionPresentationContext(out CouncilOptionPresentationContext context);
+            return CouncilOptionPresentationUtility.Build(option, context);
+        }
+
+        /// <summary>Secenegin butun etkileri yazdigi exact sayilarla uygulanabiliyor mu.</summary>
         public bool CanAffordCouncilOption(ComposedCouncilOption option)
         {
-            if (option == null)
+            return GetCouncilOptionPresentation(option).CanApplyExactly;
+        }
+
+        private bool TryBuildCouncilOptionPresentationContext(
+            out CouncilOptionPresentationContext context)
+        {
+            context = new CouncilOptionPresentationContext
+            {
+                IgnoreResourcePayments = freeEconomyTestMode,
+                FoodCostPerArrival = MobilePopulationArrivalUtility.DefaultFoodCostPerArrival,
+                WallCurrentHp = Wall.CurrentHP,
+                WallMaxHp = Wall.MaxHP,
+            };
+
+            if (!CanAccessEntityManager() || !_entityManager.Exists(_gameStateEntity))
                 return false;
 
-            foreach (var effect in option.Effects)
+            ResourceData resources = _entityManager.GetComponentData<ResourceData>(_gameStateEntity);
+            PopulationState population = _entityManager.GetComponentData<PopulationState>(_gameStateEntity);
+            context.RuntimeReady = true;
+            context.Resources = resources;
+            context.CurrentPopulation = population.Total;
+            context.TotalArchers = GetArcherCount();
+            context.IdlePopulation = GetIdlePopulation();
+
+            if (_entityManager.Exists(_castleEntity)
+                && _entityManager.HasComponent<WallSegment>(_castleEntity))
             {
-                if (effect.Kind == CouncilEffectKind.PayResource
-                    && !CanAfford(BuildSingleResourceCost(effect.Resource, effect.Amount)))
-                    return false;
+                WallSegment wall = _entityManager.GetComponentData<WallSegment>(_castleEntity);
+                context.WallCurrentHp = wall.CurrentHP;
+                context.WallMaxHp = wall.MaxHP;
+            }
 
-                if (effect.Kind == CouncilEffectKind.GainPopulation)
-                {
-                    if (!TryGetCouncilPopulationGainBudget(effect.Amount, out var budget)
-                        || budget.AcceptedArrivals != Mathf.Max(0, effect.Amount))
-                    {
-                        return false;
-                    }
-                }
-
-                if (effect.Kind == CouncilEffectKind.GainFreeArchers
-                    && CouncilEffectGuardUtility.GetAllowedFreeArcherGain(
-                        effect.Amount,
-                        GetArcherCount(),
-                        GetIdlePopulation()) != Mathf.Max(0, effect.Amount))
-                {
-                    return false;
-                }
+            if (TryGetMobileConfigEntity(out Entity configEntity)
+                && _entityManager.HasComponent<MobileCastleCombatConfig>(configEntity)
+                && _entityManager.HasComponent<MobileBedCapacityState>(configEntity))
+            {
+                MobileCastleCombatConfig config =
+                    _entityManager.GetComponentData<MobileCastleCombatConfig>(configEntity);
+                MobileBedCapacityState beds =
+                    _entityManager.GetComponentData<MobileBedCapacityState>(configEntity);
+                context.PopulationRulesReady = true;
+                context.TotalBedCapacity = MobileBedCapacityUtility.GetTotalCapacity(beds);
+                context.FoodCostPerArrival = Mathf.Max(1, config.FoodCostPerArrival);
             }
 
             return true;

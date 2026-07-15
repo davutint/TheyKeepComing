@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.0  
 > **Son tam kapsam denetimi:** 2026-07-12  
 > **Aktif paket:** Package F - Council
-> **Aktif iş:** `DW-F-EXACT` - Exact Numerical Options + Decision Window
-> **İlerleme:** `283 / 445` tracker checkbox'ı tamamlandı - `%63,60`
+> **Aktif iş:** `DW-F-CONTEXT` - Context-Aware Selection + Curated Memory Chains
+> **İlerleme:** `284 / 445` tracker checkbox'ı tamamlandı - `%63,82`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 
 ---
@@ -134,7 +134,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Economy | Worker üretimi, bed alımı ve dört hazır binanın capacity/efficiency yatırımları var; bed ve bina fiyat eğrileri `DefaultDifficulty.asset`/Difficulty Tuner üzerinden baked runtime tuning'e bağlı; V1 ana kaynaklarında pasif consumption yok | `[x]` |
 | Population | House bed state + Wood purchase API + exact save var; Dawn isteği boş yatak ve Food/kişi bütçesiyle sınırlı, gerçek accepted count uygulanıyor, Food bir kez düşülüyor ve en fazla 15 temsili survivor sağdan Wall arkasına yürüyor | `[x]` |
 | Workers | Kalıcı target ratio + actual/cap/idle state, +1/+10/+100/direct input, bağımsız bina capacity/efficiency seviyeleri, yeni nüfus auto-allocation, exact save, Low/Medium/High density ve allocation-senkronlu animation/cargo/lantern/delivery feedback var | `[x]` |
-| Council | Curated/deterministic composer ve kart UI var; regular schedule exact Day 3/6/9..., chance/pity/cooldown regular owner değil | Schedule tamam; emergency, guard ve launch content açık |
+| Council | Curated/deterministic composer, exact kart sunumu ve kart UI var; regular schedule exact Day 3/6/9..., chance/pity/cooldown regular owner değil | Schedule, effect guard ve exact option/timer tamam; context/memory, emergency ve launch content açık |
 | Archers | Basic/Rapid/Frost, instant buy, incremental type maliyeti, yerinde retrain, version'lı 40x25 formation, scalable target load ve pooled projectile lifetime var | `[x]` Combat temeli; upgrade owner'ı Package E |
 | Archer cap | `ArcherCapacityUtility` Basic/Rapid/Frost toplamını `1000` ile sınırlar; buy, merkezi spawn, Council, meta, restore ve legacy Barracks aynı guard'ı kullanır | `[x]` |
 | Placement | Formation V1 asset'iyle sabit 40 `outside` tile x 25 seeded diamond nokta; layer-fill sıra, 1000 gizmo ve v9 Continue testli | `[x]` |
@@ -161,7 +161,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | 3 | C - Economy + Population | Tamamlandı | Pasif drain yok; arrival tek Food öder; cap aşılmaz; fiyat tuning'i testli |
 | 4 | D - Archers + Ammo | Tamamlandı | 1.000 x 10.000 targeting/projectile ve Arrow truth çalışır |
 | 5 | E - Castle Heart | Tamamlandı | Aynı seed/load aynı valid graph'ı üretir; production content owner gate ayrı |
-| 6 | F - Council | **Aktif** | Exact 3/6/9 tamam; emergency owner contract ve effect guard'ları açık |
+| 6 | F - Council | **Aktif** | Schedule, guard ve exact option/timer tamam; context/memory ile emergency owner contract açık |
 | 7 | G - Active Abilities | Bekliyor | Kaynak tüketmez; Night repair sözleşmesi çalışır |
 | 8 | H - Meta + Persistence | Bekliyor | Ölüm ödülü idempotent; force-close ölümü geri alamaz |
 | 9 | I - Product Gate | Bekliyor | 10k scenario, tutorial ve temiz görsel inceleme |
@@ -641,7 +641,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Curated/no runtime AI | Authored template/atom deterministik compose ediliyor | `[~]` Launch content review gerekli |
 | 3/6/9 regular schedule | `CouncilRegularSchedule` Day 3'ten başlayarak her 3 günde bir; aynı gün tek açılış | `[x]` |
 | Rare emergency | Ayrı emergency type/trigger yok | `[!]` |
-| Exact effects visible | İki option ve effect badge mevcut | `[~]` Tüm effects audit gerekli |
+| Exact effects visible | İki seçenek aynı live quote owner'ından tam sayısal sonuç/maliyet, uygulanabilirlik ve Dawn+Day karar süresini gösteriyor | `[x]` |
 | Population guard | Council gain boş yatak + Food bütçesiyle exact preflight edilir; stale/private payload clamp olur, accepted kişi başına Food bir kez harcanır ve capacity büyümez | `[x]` |
 | Archer guard | Free archer exact idle population + ortak 1000 cap preflight'ından geçer; her spawn bir idle kişiyi Archer havuzuna taşır | `[x]` |
 | Wall-only defense | Heal yalnız `WallSegment` current/max HP'ye gider; legacy Gate/Core değişmez | `[x]` |
@@ -654,7 +654,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [x] Chance/pity/cooldown'u regular schedule owner'ı olmaktan çıkar.
 - [ ] Emergency Council için ayrı type ve owner-approved trigger listesi kullan.
 - [ ] Emergency olayın regular day index'ini taşımamasını/sıfırlamamasını sağla.
-- [ ] Her kartta tam sayısal iki seçenek ve karar süresi göster.
+- [x] Her kartta tam sayısal iki seçenek ve karar süresi göster.
 - [ ] Resource scarcity, production, Wall ve previous flags bağlamını koru.
 - [ ] Aynı şablonun anlamsız tekrarını recent memory ile engelle.
 - [ ] Yalnız editoryal onaylı flag chain'leri aç.
@@ -851,7 +851,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Archers | `GameManager`, `ArcherShootSystem` | Common 1000 cap + scalable target load |
 | Placement | `MobileCastleArcherTilePlacement` | 40x25 stable local points + version |
 | Heart | `GameManager.HeartRuntime` + `HeartScreenUI` generated graph/reveal/purchase/effect/pause ve exact v11 Continue replay owner'ı; legacy `TechTreeUI` aktif scene'den kaldırıldı, production catalog owner onayı bekliyor | Yalnız onaylı production node/balance content'i |
-| Council | `CouncilRegularSchedule`, `CouncilComposer`, `CouncilEventUI`, catalog | Exact 3/6/9 hazır; emergency + guarded effects açık |
+| Council | `CouncilRegularSchedule`, `CouncilComposer`, `CouncilOptionPresentationUtility`, `CouncilEventUI`, catalog | Exact 3/6/9, guarded effects ve exact option/timer hazır; context/memory + emergency açık |
 | Meta | `MetaProgression` | Death-only fixed list + idempotent receipt |
 | HUD | `MobileCastleHudRoot`, `HUDController` | Single Wall + minimal cycle + bottom abilities |
 
@@ -947,7 +947,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Heart | Full pause | Cycle/spawn/worker/cooldown durur | `[x]` |
 | Council | Day 1-12 regular cadence | Yalnız Dawn 3/6/9/12; aynı gün tek kart | `[x]` |
 | Council | Regular günler arasında emergency | Regular schedule kaymaz | `[ ]` |
-| Council | Guarded effects | Bed/Food, 1000, Wall-only, count-only | `[ ]` |
+| Council | Guarded effects | Bed/Food, 1000, Wall-only, count-only | `[x]` |
 | Save | Menu çıkış / Continue | Aynı graph/phase/Wall/economy | `[x]` |
 | Death | Process restart | Meta bir kez; run geri gelmez | `[ ]` |
 | HUD | 16:9 / ultrawide | Kritik UI ve dünya kırpılmaz | `[ ]` |
@@ -1134,3 +1134,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-14 | `DW-E-SAVE` exact Castle Heart graph persistence + deterministic Continue replay | `RunSaveState` v10'a çıkarıldı; `HasHeartGraph` discriminator'ı, graph/catalog version, seed, node/edge, hidden/reveal, level ve Keystone lock state'i exact JSON'a bağlandı. `HeartGraphPersistenceUtility` deep clone, structural/runtime validation, catalog mismatch fail-closed ve deferred effect replay kurdu. Continue source catalog'dan reroll etmiyor; Arrow current final effective capacity ile tek kez clamp ediliyor. v9 eksik graph uydurmadan null-state migrate ediyor. Production catalog/content üretilmedi | Unity compile: 0 error; targeted EditMode 25/25; targeted exact Continue PlayMode 2/2; full EditMode 162/162; full PlayMode 30 pass + 1 explicit profiler skip; Unity console 0 error |
 | 2026-07-15 | `DW-F-SCHEDULE` exact 3/6/9 regular Council cadence | `CouncilRegularSchedule` regular kartı yalnız Dawn Day `3,6,9,12...` ve aynı gün tek kez açan owner oldu; chance/pity/cooldown regular akıştan çıkarıldı, legacy catalog alanları yalnız serialized uyumluluk için gizlendi. Save schema v11'e çıktı; `LastRegularCouncilDay` ile `HasActiveCouncilEvent` discriminator'ı exact state'e bağlandı. v10 migration yalnız gerçekten üretilmiş event'i handled sayıyor; chance fail scheduled kartı yutmuyor. Emergency type/trigger/content üretilmedi ve owner gate açık bırakıldı | Unity compile: 0 error; targeted EditMode 36/36; targeted NewGameScene PlayMode 1/1; full EditMode 185/185; full PlayMode 31 pass + 1 explicit profiler skip; Unity console 0 error |
 | 2026-07-15 | `DW-F-GUARDS` canonical Council effect guardrails | `CouncilEffectGuardUtility` population, free archer ve next-night count sınırlarının saf owner'ı oldu. Council population gain boş yatak + Food ile sınırlandı, accepted kişi başına Food tek transaction'da harcandı ve capacity büyütme bypass'ı kaldırıldı. Free archer gerçek idle population tüketiyor ve ortak 1000 cap'i koruyor. Defense yalnız Wall'a, horde etkisi yalnız bounded count multiplier'a yazıyor; exact kart sonucu tam uygulanamıyorsa seçenek preflight'ta kilitleniyor. Emergency trigger listesi Blueprint gereği owner gate'inde açık kaldı | Unity compile: 0 error; targeted EditMode 3/3; targeted NewGameScene PlayMode 1/1; full EditMode 188/188; full PlayMode 32 pass + 1 explicit profiler skip; Unity console 0 error |
+| 2026-07-15 | `DW-F-EXACT` live exact Council option quote + authoritative decision window | `CouncilOptionPresentationUtility` iki seçeneğin authored eylem başlığını live ECS/resource/population/archer/Wall context'iyle birleştirerek tam sayısal sonuç, tek seferlik maliyet ve uygulanabilirlik sebebini aynı quote'tan üretiyor. UI aynı quote ile label ve interactability'yi yeniliyor; Dawn+Day karar süresi wall-clock yerine `ContinuousSiegeCycleData` üzerinden `CouncilTimerText` ve fill'e bağlandı. Generated HUD prefabı, aktif sahne binding'i, font/material ve idempotent repair menüsü tamamlandı | Unity compile: 0 error; targeted EditMode 6/6; targeted NewGameScene PlayMode 1/1; full EditMode 194/194; full PlayMode 32 pass + 1 explicit profiler skip; Unity console 0 error |

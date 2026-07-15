@@ -28,10 +28,10 @@ namespace DeadWalls
         /// <summary>Aninda nufus kazanci.</summary>
         GainPopulation = 6,
 
-        /// <summary>Bedava Basic okcu (population maliyetsiz).</summary>
+        /// <summary>Aninda Basic okcu; her okcu bir idle population kullanir ve ortak 1000 cap'e tabidir.</summary>
         GainFreeArchers = 7,
 
-        /// <summary>Savunma HP'sinin yuzdesini iyilestirir (Wall->Gate->Core sirali).</summary>
+        /// <summary>Yalniz Wall Max HP yuzdesi kadar, eksik HP ile sinirli iyilestirme.</summary>
         HealDefensePercent = 8,
 
         /// <summary>SONRAKI gece spawn yogunlugu delta'si (risk atomu: +0.20 tehlike, -0.25 sakin gece).</summary>

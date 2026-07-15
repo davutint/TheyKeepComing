@@ -65208,6 +65208,7 @@ MonoBehaviour:
   CouncilTitleText: {fileID: 1523538279}
   CouncilBodyText: {fileID: 1523538278}
   CouncilTimerFill: {fileID: 1523538277}
+  CouncilTimerText: {fileID: 1840559075}
   CouncilOptionAButton: {fileID: 1523538276}
   CouncilOptionAText: {fileID: 1523538275}
   CouncilOptionBButton: {fileID: 1523538274}
@@ -74165,6 +74166,17 @@ MonoBehaviour:
 --- !u!114 &1831577051 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5625939468267000559, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
+  m_PrefabInstance: {fileID: 1065689827}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!114 &1840559075 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7774139120620751442, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
   m_PrefabInstance: {fileID: 1065689827}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}

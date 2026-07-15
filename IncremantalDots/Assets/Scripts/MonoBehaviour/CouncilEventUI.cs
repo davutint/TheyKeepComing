@@ -21,6 +21,7 @@ namespace DeadWalls
         public TMP_Text CouncilTitleText;
         public TMP_Text CouncilBodyText;
         public Image CouncilTimerFill;
+        public TMP_Text CouncilTimerText;
         public Button CouncilOptionAButton;
         public TMP_Text CouncilOptionAText;
         public Button CouncilOptionBButton;
@@ -48,7 +49,6 @@ namespace DeadWalls
         private float _nextPollTime;
         private SiegeCyclePhase _lastPhase = SiegeCyclePhase.Day;
         private ComposedCouncilEvent _shownEvent;
-        private float _windowEndsAt;
         private float _windowDuration = 1f;
         private bool _outcomePlaying;
         private bool _buttonsBound;
@@ -138,20 +138,12 @@ namespace DeadWalls
 
             SetText(CouncilTitleText, composed.Title);
             SetText(CouncilBodyText, composed.Body);
-            SetText(CouncilOptionAText, composed.OptionA.Label);
-            SetText(CouncilOptionBText, composed.OptionB.Label);
             SetCardInteractiveElements(true);
 
             // Karar penceresi: kalan Dawn + tum Day (Dusk girisinde kapanir)
-            float remaining;
-            if (cycle.Phase == SiegeCyclePhase.Dawn)
-                remaining = cycle.DawnDuration * (1f - cycle.PhaseProgress01) + cycle.DayDuration;
-            else if (cycle.Phase == SiegeCyclePhase.Day)
-                remaining = cycle.DayDuration * (1f - cycle.PhaseProgress01);
-            else
-                remaining = cycle.DayDuration;
+            float remaining = CouncilDecisionWindowUtility.GetRemainingSeconds(cycle);
             _windowDuration = Mathf.Max(1f, remaining);
-            _windowEndsAt = Time.unscaledTime + _windowDuration;
+            RefreshCard(gm);
 
             _appearTween?.Kill();
             CouncilPanel.SetActive(true);
@@ -188,13 +180,21 @@ namespace DeadWalls
 
         private void RefreshCard(GameManager gm)
         {
+            float remaining = CouncilDecisionWindowUtility.GetRemainingSeconds(gm.ContinuousSiegeCycle);
             if (CouncilTimerFill != null)
-                CouncilTimerFill.fillAmount = Mathf.Clamp01((_windowEndsAt - Time.unscaledTime) / _windowDuration);
+                CouncilTimerFill.fillAmount = Mathf.Clamp01(remaining / _windowDuration);
+            SetText(CouncilTimerText, CouncilDecisionWindowUtility.FormatCountdown(remaining));
 
+            CouncilOptionPresentation optionA =
+                gm.GetCouncilOptionPresentation(_shownEvent.OptionA);
+            CouncilOptionPresentation optionB =
+                gm.GetCouncilOptionPresentation(_shownEvent.OptionB);
+            SetText(CouncilOptionAText, optionA.RichText);
+            SetText(CouncilOptionBText, optionB.RichText);
             if (CouncilOptionAButton != null)
-                CouncilOptionAButton.interactable = gm.CanAffordCouncilOption(_shownEvent.OptionA);
+                CouncilOptionAButton.interactable = optionA.CanApplyExactly;
             if (CouncilOptionBButton != null)
-                CouncilOptionBButton.interactable = gm.CanAffordCouncilOption(_shownEvent.OptionB);
+                CouncilOptionBButton.interactable = optionB.CanApplyExactly;
         }
 
         // ---------------------------------------------------------------
@@ -275,6 +275,8 @@ namespace DeadWalls
                 CouncilOptionBButton.gameObject.SetActive(visible);
             if (CouncilTimerFill != null)
                 CouncilTimerFill.gameObject.SetActive(visible);
+            if (CouncilTimerText != null)
+                CouncilTimerText.gameObject.SetActive(visible);
         }
 
         // ---------------------------------------------------------------

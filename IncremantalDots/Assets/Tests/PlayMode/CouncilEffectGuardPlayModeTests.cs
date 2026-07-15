@@ -54,6 +54,12 @@ namespace DeadWalls.Tests
 
             Assert.That(runtimeReady, Is.True,
                 "GameManager/SubScene 300 frame icinde hazir olmadi.");
+
+            CouncilEventUI councilUi = Object.FindFirstObjectByType<CouncilEventUI>(
+                FindObjectsInactive.Include);
+            Assert.That(councilUi, Is.Not.Null);
+            Assert.That(councilUi.CouncilTimerText, Is.Not.Null,
+                "Council exact karar suresi scene binding'inde eksik.");
         }
 
         [UnityTearDown]
@@ -121,6 +127,11 @@ namespace DeadWalls.Tests
                 Kind = CouncilEffectKind.GainPopulation,
                 Amount = 10
             });
+            CouncilOptionPresentation populationQuote =
+                gameManager.GetCouncilOptionPresentation(populationOption);
+            Assert.That(populationQuote.CanApplyExactly, Is.False);
+            StringAssert.Contains("+10 PEOPLE", populationQuote.RichText);
+            StringAssert.Contains("-20 FOOD", populationQuote.RichText);
             Assert.That(gameManager.CanAffordCouncilOption(populationOption), Is.False,
                 "Kart, exact +10 sonucu yatak/Food karsilamiyorken secilebilir olmamali.");
 
@@ -151,6 +162,11 @@ namespace DeadWalls.Tests
                 Kind = CouncilEffectKind.GainFreeArchers,
                 Amount = 10
             });
+            CouncilOptionPresentation archerQuote =
+                gameManager.GetCouncilOptionPresentation(archerOption);
+            Assert.That(archerQuote.CanApplyExactly, Is.False);
+            StringAssert.Contains("+10 BASIC ARCHERS", archerQuote.RichText);
+            StringAssert.Contains("-10 IDLE PEOPLE", archerQuote.RichText);
             Assert.That(gameManager.CanAffordCouncilOption(archerOption), Is.False,
                 "Kart, exact +10 sonucu idle population karsilamiyorken secilebilir olmamali.");
 
