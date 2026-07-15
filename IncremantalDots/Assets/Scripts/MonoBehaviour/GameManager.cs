@@ -3472,7 +3472,11 @@ namespace DeadWalls
 
         private void CaptureCombatSnapshot(RunSaveState save)
         {
-            var zombieToIndex = new Dictionary<Entity, int>();
+            save.ActiveZombies.Clear();
+            save.ActiveArrows.Clear();
+            var zombieToBucketIndex = new Dictionary<Entity, int>();
+            var zombieEntities = new List<Entity>();
+            var zombieSamples = new List<CombatRebuildCaptureSample>();
             var zombieQuery = _entityManager.CreateEntityQuery(new EntityQueryDesc
             {
                 All = new[]
@@ -3493,11 +3497,9 @@ namespace DeadWalls
                     var transform = _entityManager.GetComponentData<LocalTransform>(entity);
                     var stats = _entityManager.GetComponentData<ZombieStats>(entity);
                     var state = _entityManager.GetComponentData<ZombieState>(entity);
-                    var item = new ZombieRunSaveState
+                    var sample = new CombatRebuildCaptureSample
                     {
-                        X = transform.Position.x,
-                        Y = transform.Position.y,
-                        Z = transform.Position.z,
+                        Position = transform.Position,
                         Scale = transform.Scale,
                         MoveSpeed = stats.MoveSpeed,
                         MaxHP = stats.MaxHP,
@@ -3512,31 +3514,43 @@ namespace DeadWalls
                     if (_entityManager.HasComponent<ZombieSlow>(entity))
                     {
                         var slow = _entityManager.GetComponentData<ZombieSlow>(entity);
-                        item.SlowEnabled = _entityManager.IsComponentEnabled<ZombieSlow>(entity);
-                        item.SlowDuration = slow.Duration;
-                        item.SlowMultiplier = slow.SpeedMultiplier;
+                        sample.SlowEnabled = _entityManager.IsComponentEnabled<ZombieSlow>(entity);
+                        sample.SlowDuration = slow.Duration;
+                        sample.SlowMultiplier = slow.SpeedMultiplier;
                     }
 
                     if (_entityManager.HasComponent<PhysicsBody>(entity))
                     {
                         var body = _entityManager.GetComponentData<PhysicsBody>(entity);
-                        item.VelocityX = body.Velocity.x;
-                        item.VelocityY = body.Velocity.y;
-                        item.ForceX = body.Force.x;
-                        item.ForceY = body.Force.y;
+                        sample.Velocity = body.Velocity;
+                        sample.Force = body.Force;
                     }
 
                     if (_entityManager.HasComponent<DeathTimer>(entity)
                         && _entityManager.IsComponentEnabled<DeathTimer>(entity))
                     {
-                        item.HasDeathTimer = true;
-                        item.DeathTimer = _entityManager.GetComponentData<DeathTimer>(entity).Value;
+                        sample.HasDeathTimer = true;
+                        sample.DeathTimer = _entityManager.GetComponentData<DeathTimer>(entity).Value;
                     }
 
-                    zombieToIndex[entity] = save.ActiveZombies.Count;
-                    save.ActiveZombies.Add(item);
+                    zombieEntities.Add(entity);
+                    zombieSamples.Add(sample);
                 }
             }
+            zombieQuery.Dispose();
+
+            uint rebuildSeed = CombatRebuildUtility.CreateSeed(
+                save.SpawnRandomState,
+                save.CycleIndex,
+                save.TotalKills,
+                zombieSamples.Count);
+            save.CombatRebuild = CombatRebuildUtility.BuildSnapshot(
+                zombieSamples,
+                rebuildSeed,
+                out int[] bucketIndicesBySample);
+            save.HasCombatRebuild = true;
+            for (int i = 0; i < zombieEntities.Count; i++)
+                zombieToBucketIndex[zombieEntities[i]] = bucketIndicesBySample[i];
 
             var arrowQuery = _entityManager.CreateEntityQuery(new EntityQueryDesc
             {
@@ -3564,7 +3578,9 @@ namespace DeadWalls
                         Scale = transform.Scale,
                         Speed = projectile.Speed,
                         Damage = projectile.Damage,
-                        TargetZombieIndex = zombieToIndex.TryGetValue(projectile.Target, out int index) ? index : -1,
+                        TargetZombieIndex = -1,
+                        TargetZombieBucketIndex = zombieToBucketIndex.TryGetValue(
+                            projectile.Target, out int bucketIndex) ? bucketIndex : -1,
                         ArcherType = (int)projectile.ArcherType,
                         SlowDuration = projectile.SlowDuration,
                         SlowMultiplier = projectile.SlowMultiplier,
@@ -3572,6 +3588,7 @@ namespace DeadWalls
                     });
                 }
             }
+            arrowQuery.Dispose();
 
             if (ActiveFireballProjectile != Entity.Null
                 && _entityManager.Exists(ActiveFireballProjectile)
@@ -3824,83 +3841,157 @@ namespace DeadWalls
                 0f,
                 save.EmergencyRepairCooldownRemaining);
 
-            RestoreCombatSnapshot(save);
+            if (!RestoreCombatSnapshot(save))
+                return false;
             ReadECSData();
             OnGameStateChanged?.Invoke();
             return true;
         }
 
-        private void RestoreCombatSnapshot(RunSaveState save)
+        private bool RestoreCombatSnapshot(RunSaveState save)
         {
             var savedZombies = save.ActiveZombies ?? new List<ZombieRunSaveState>();
             var savedArrows = save.ActiveArrows ?? new List<ArrowRunSaveState>();
-            var zombieEntities = new List<Entity>(savedZombies.Count);
+            int zombieCapacity = save.HasCombatRebuild && save.CombatRebuild != null
+                ? Mathf.Max(0, save.CombatRebuild.TotalZombies)
+                : savedZombies.Count;
+            var zombieEntities = new List<Entity>(zombieCapacity);
+            List<Entity>[] rebuiltBucketEntities = null;
             if (_enemyPoolEntity != Entity.Null && _entityManager.Exists(_enemyPoolEntity))
                 EnemyPoolRuntimeUtility.ReturnAllActive(_entityManager, _enemyPoolEntity);
             if (_arrowPoolEntity != Entity.Null && _entityManager.Exists(_arrowPoolEntity))
                 ArrowPoolRuntimeUtility.ReturnAllActive(_entityManager, _arrowPoolEntity);
 
-            foreach (var item in savedZombies)
+            if (save.HasCombatRebuild)
             {
-                Entity entity;
-                if (_enemyPoolEntity == Entity.Null
-                    || !_entityManager.Exists(_enemyPoolEntity)
-                    || !EnemyPoolRuntimeUtility.TryRent(_entityManager, _enemyPoolEntity, out entity))
-                    entity = _entityManager.Instantiate(_zombiePrefabEntity);
-
-                _entityManager.SetComponentData(entity, LocalTransform.FromPositionRotationScale(
-                    new float3(item.X, item.Y, item.Z), quaternion.identity, Mathf.Max(0.01f, item.Scale)));
-                _entityManager.SetComponentData(entity, new ZombieStats
+                if (!CombatRebuildUtility.IsValid(save.CombatRebuild, out string rebuildError))
                 {
-                    MoveSpeed = item.MoveSpeed,
-                    MaxHP = item.MaxHP,
-                    CurrentHP = item.CurrentHP,
-                    AttackDamage = item.AttackDamage,
-                    AttackCooldown = item.AttackCooldown,
-                    AttackTimer = item.AttackTimer,
-                    XPReward = item.XPReward
-                });
-                _entityManager.SetComponentData(entity, new ZombieState { Value = (ZombieStateType)item.State });
+                    Debug.LogError("[GameManager] Combat rebuild restore reddedildi: " + rebuildError);
+                    return false;
+                }
 
-                if (_entityManager.HasComponent<ZombieSlow>(entity))
+                CombatRebuildRunSaveState rebuild = save.CombatRebuild;
+                rebuiltBucketEntities = new List<Entity>[rebuild.Buckets.Count];
+                for (int bucketIndex = 0; bucketIndex < rebuild.Buckets.Count; bucketIndex++)
                 {
-                    _entityManager.SetComponentData(entity, new ZombieSlow
+                    CombatRebuildBucketRunSaveState bucket = rebuild.Buckets[bucketIndex];
+                    var bucketEntities = new List<Entity>(bucket.Count);
+                    rebuiltBucketEntities[bucketIndex] = bucketEntities;
+                    for (int itemIndex = 0; itemIndex < bucket.Count; itemIndex++)
                     {
-                        Duration = item.SlowDuration,
-                        SpeedMultiplier = item.SlowMultiplier
+                        Entity entity = RentZombieForCombatRestore();
+                        float3 rebuiltPosition = CombatRebuildUtility.GetRebuiltPosition(
+                            rebuild, bucketIndex, itemIndex);
+                        _entityManager.SetComponentData(entity, LocalTransform.FromPositionRotationScale(
+                            rebuiltPosition, quaternion.identity, Mathf.Max(0.01f, bucket.Scale)));
+                        _entityManager.SetComponentData(entity, new ZombieStats
+                        {
+                            MoveSpeed = bucket.MoveSpeed,
+                            MaxHP = bucket.MaxHP,
+                            CurrentHP = Mathf.Clamp(bucket.CurrentHP, 0f, bucket.MaxHP),
+                            AttackDamage = bucket.AttackDamage,
+                            AttackCooldown = bucket.AttackCooldown,
+                            AttackTimer = bucket.AttackTimer,
+                            XPReward = bucket.XPReward
+                        });
+                        _entityManager.SetComponentData(entity,
+                            new ZombieState { Value = (ZombieStateType)bucket.State });
+
+                        if (_entityManager.HasComponent<ZombieSlow>(entity))
+                        {
+                            _entityManager.SetComponentData(entity, new ZombieSlow
+                            {
+                                Duration = bucket.SlowDuration,
+                                SpeedMultiplier = bucket.SlowMultiplier
+                            });
+                            _entityManager.SetComponentEnabled<ZombieSlow>(entity, bucket.SlowEnabled);
+                        }
+
+                        if (_entityManager.HasComponent<PhysicsBody>(entity))
+                        {
+                            var body = _entityManager.GetComponentData<PhysicsBody>(entity);
+                            body.Velocity = new float2(bucket.VelocityX, bucket.VelocityY);
+                            body.Force = new float2(bucket.ForceX, bucket.ForceY);
+                            _entityManager.SetComponentData(entity, body);
+                        }
+
+                        RestoreDeathTimer(entity, bucket.HasDeathTimer, bucket.DeathTimer);
+                        bucketEntities.Add(entity);
+                        zombieEntities.Add(entity);
+                    }
+                }
+            }
+            else
+            {
+                foreach (var item in savedZombies)
+                {
+                    Entity entity = RentZombieForCombatRestore();
+
+                    _entityManager.SetComponentData(entity, LocalTransform.FromPositionRotationScale(
+                        new float3(item.X, item.Y, item.Z), quaternion.identity, Mathf.Max(0.01f, item.Scale)));
+                    _entityManager.SetComponentData(entity, new ZombieStats
+                    {
+                        MoveSpeed = item.MoveSpeed,
+                        MaxHP = item.MaxHP,
+                        CurrentHP = item.CurrentHP,
+                        AttackDamage = item.AttackDamage,
+                        AttackCooldown = item.AttackCooldown,
+                        AttackTimer = item.AttackTimer,
+                        XPReward = item.XPReward
                     });
-                    _entityManager.SetComponentEnabled<ZombieSlow>(entity, item.SlowEnabled);
-                }
+                    _entityManager.SetComponentData(entity, new ZombieState { Value = (ZombieStateType)item.State });
 
-                if (_entityManager.HasComponent<PhysicsBody>(entity))
-                {
-                    var body = _entityManager.GetComponentData<PhysicsBody>(entity);
-                    body.Velocity = new float2(item.VelocityX, item.VelocityY);
-                    body.Force = new float2(item.ForceX, item.ForceY);
-                    _entityManager.SetComponentData(entity, body);
-                }
+                    if (_entityManager.HasComponent<ZombieSlow>(entity))
+                    {
+                        _entityManager.SetComponentData(entity, new ZombieSlow
+                        {
+                            Duration = item.SlowDuration,
+                            SpeedMultiplier = item.SlowMultiplier
+                        });
+                        _entityManager.SetComponentEnabled<ZombieSlow>(entity, item.SlowEnabled);
+                    }
 
-                if (item.HasDeathTimer)
-                {
-                    var deathTimer = new DeathTimer { Value = item.DeathTimer };
-                    if (_entityManager.HasComponent<DeathTimer>(entity))
-                        _entityManager.SetComponentData(entity, deathTimer);
-                    else
-                        _entityManager.AddComponentData(entity, deathTimer);
-                    _entityManager.SetComponentEnabled<DeathTimer>(entity, true);
-                }
-                else if (_entityManager.HasComponent<DeathTimer>(entity))
-                {
-                    _entityManager.SetComponentData(entity, new DeathTimer { Value = 0f });
-                    _entityManager.SetComponentEnabled<DeathTimer>(entity, false);
-                }
+                    if (_entityManager.HasComponent<PhysicsBody>(entity))
+                    {
+                        var body = _entityManager.GetComponentData<PhysicsBody>(entity);
+                        body.Velocity = new float2(item.VelocityX, item.VelocityY);
+                        body.Force = new float2(item.ForceX, item.ForceY);
+                        _entityManager.SetComponentData(entity, body);
+                    }
 
-                zombieEntities.Add(entity);
+                    RestoreDeathTimer(entity, item.HasDeathTimer, item.DeathTimer);
+
+                    zombieEntities.Add(entity);
+                }
             }
 
-            foreach (var item in savedArrows)
+            for (int arrowIndex = 0; arrowIndex < savedArrows.Count; arrowIndex++)
             {
-                if (item.TargetZombieIndex < 0 || item.TargetZombieIndex >= zombieEntities.Count)
+                ArrowRunSaveState item = savedArrows[arrowIndex];
+                Entity targetZombie = Entity.Null;
+                if (rebuiltBucketEntities != null)
+                {
+                    if (item.TargetZombieBucketIndex >= 0
+                        && item.TargetZombieBucketIndex < rebuiltBucketEntities.Length)
+                    {
+                        List<Entity> targetBucket = rebuiltBucketEntities[item.TargetZombieBucketIndex];
+                        if (targetBucket != null && targetBucket.Count > 0)
+                        {
+                            int targetOrdinal = CombatRebuildUtility.SelectTargetOrdinal(
+                                save.CombatRebuild.Seed,
+                                item.TargetZombieBucketIndex,
+                                arrowIndex,
+                                targetBucket.Count);
+                            targetZombie = targetBucket[targetOrdinal];
+                        }
+                    }
+                }
+                else if (item.TargetZombieIndex >= 0 && item.TargetZombieIndex < zombieEntities.Count)
+                {
+                    targetZombie = zombieEntities[item.TargetZombieIndex];
+                }
+
+                if (targetZombie == Entity.Null)
                     continue;
 
                 Entity entity;
@@ -3915,9 +4006,9 @@ namespace DeadWalls
                 {
                     Speed = item.Speed,
                     Damage = item.Damage,
-                    Target = zombieEntities[item.TargetZombieIndex],
+                    Target = targetZombie,
                     TargetPoolGeneration = EnemyPoolRuntimeUtility.GetGeneration(
-                        _entityManager, zombieEntities[item.TargetZombieIndex]),
+                        _entityManager, targetZombie),
                     ArcherType = (ArcherType)item.ArcherType,
                     SlowDuration = item.SlowDuration,
                     SlowMultiplier = item.SlowMultiplier,
@@ -3948,6 +4039,28 @@ namespace DeadWalls
             var wave = _entityManager.GetComponentData<WaveStateData>(_gameStateEntity);
             wave.ZombiesAlive = zombieEntities.Count;
             _entityManager.SetComponentData(_gameStateEntity, wave);
+            return true;
+        }
+
+        private Entity RentZombieForCombatRestore()
+        {
+            if (_enemyPoolEntity != Entity.Null
+                && _entityManager.Exists(_enemyPoolEntity)
+                && EnemyPoolRuntimeUtility.TryRent(
+                    _entityManager, _enemyPoolEntity, out Entity pooledEntity))
+                return pooledEntity;
+
+            return _entityManager.Instantiate(_zombiePrefabEntity);
+        }
+
+        private void RestoreDeathTimer(Entity entity, bool enabled, float timer)
+        {
+            var deathTimer = new DeathTimer { Value = enabled ? timer : 0f };
+            if (_entityManager.HasComponent<DeathTimer>(entity))
+                _entityManager.SetComponentData(entity, deathTimer);
+            else
+                _entityManager.AddComponentData(entity, deathTimer);
+            _entityManager.SetComponentEnabled<DeathTimer>(entity, enabled);
         }
 
         // ---------------------------------------------------------------------------------

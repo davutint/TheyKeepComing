@@ -115,7 +115,7 @@ yüzdeleri sınırlı level taşır; node-pool unlock tam bir kez alınabilir.
 kanallarından uygular. `_metaAppliedThisRun` aynı runtime başlangıcında çift uygulamayı önler.
 Exact Continue başlangıç kaynak/yatak/okçu değerlerini snapshot'tan restore ettiği için bu
 etkileri ikinci kez eklemez. Derived Arrow efficiency ve Essence gain yüzdesi kalıcı seviyelerden
-yeniden kurulur; `RunSaveState v13` yalnız Essence kesirli remainder'ını run state olarak taşır.
+yeniden kurulur; v13'te eklenen Essence kesirli remainder'ı güncel `RunSaveState v14` içinde run state olarak taşınır.
 Saved legacy tech level replay'i `RestoreSavedTechNodeLevels()` sahibinde kalır; bu metottan meta
 catalog'a açılan bir çağrı yolu yoktur.
 

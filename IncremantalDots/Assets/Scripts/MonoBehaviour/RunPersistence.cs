@@ -6,14 +6,14 @@ using UnityEngine;
 namespace DeadWalls
 {
     /// <summary>
-    /// V1 exact-run snapshot. JsonUtility Dictionary serilestirmedigi icin dictionary state'leri
-    /// list pair olarak tutulur. Definition asset'lerden turetilebilen carpanlar kaydedilmez;
-    /// oyuncunun Continue sonrasinda ayni ani algilamasini etkileyen runtime state kaydedilir.
+    /// V1 run snapshot. Kritik kosu state'i exact; buyuk combat alani perceptually faithful
+    /// deterministik rebuild policy ile korunur. JsonUtility Dictionary serilestirmedigi icin
+    /// dictionary state'leri list pair olarak tutulur.
     /// </summary>
     [Serializable]
     public class RunSaveState
     {
-        public const int CurrentVersion = 13;
+        public const int CurrentVersion = 14;
         public const int MinimumSupportedVersion = 3;
 
         public int Version = CurrentVersion;
@@ -182,7 +182,12 @@ namespace DeadWalls
         // Oyuncu secimleri
         public int EconomyFocus;
 
-        // Compact combat snapshot. Formation ve worker world entity'leri sayisal state'ten kurulur.
+        // v14: 10K horde entity pozisyonlarini tek tek yazmaz. Discriminator false ise
+        // v3-v13 legacy exact entity listesi restore edilir; true ise aggregate rebuild otoritedir.
+        public bool HasCombatRebuild;
+        public CombatRebuildRunSaveState CombatRebuild;
+
+        // Legacy v3-v13 exact combat fallback. Yeni v14 capture bu listeyi bos birakir.
         public List<ZombieRunSaveState> ActiveZombies = new List<ZombieRunSaveState>();
         public List<ArrowRunSaveState> ActiveArrows = new List<ArrowRunSaveState>();
         public FireballRunSaveState ActiveFireball;
@@ -192,6 +197,48 @@ namespace DeadWalls
     [Serializable] public class ArcherLevelEntry { public int Type; public int Level; }
     [Serializable] public class UpgradeTierEntry { public int Type; public int Tier; }
     [Serializable] public class CouncilFlagEntry { public string Flag; public int Day; }
+
+    [Serializable]
+    public class CombatRebuildRunSaveState
+    {
+        public int PolicyVersion = CombatRebuildUtility.CurrentPolicyVersion;
+        public uint Seed;
+        public int TotalZombies;
+        public int XCellCount;
+        public int YCellCount;
+        public int HealthBandCount;
+        public float MinX, MaxX, MinY, MaxY;
+        public List<CombatRebuildBucketRunSaveState> Buckets =
+            new List<CombatRebuildBucketRunSaveState>();
+    }
+
+    [Serializable]
+    public class CombatRebuildBucketRunSaveState
+    {
+        public int XCell;
+        public int YCell;
+        public int State;
+        public int HealthBand;
+        public int Count;
+        public bool SlowEnabled;
+        public bool HasDeathTimer;
+        public float Z;
+        public float Scale;
+        public float MoveSpeed;
+        public float MaxHP;
+        public float CurrentHP;
+        public float AttackDamage;
+        public float AttackCooldown;
+        public float AttackTimer;
+        public int XPReward;
+        public float SlowDuration;
+        public float SlowMultiplier;
+        public float VelocityX;
+        public float VelocityY;
+        public float ForceX;
+        public float ForceY;
+        public float DeathTimer;
+    }
 
     [Serializable]
     public class ZombieRunSaveState
@@ -213,6 +260,7 @@ namespace DeadWalls
         public float X, Y, Z, Scale;
         public float Speed, Damage;
         public int TargetZombieIndex = -1;
+        public int TargetZombieBucketIndex = -1;
         public int ArcherType;
         public float SlowDuration, SlowMultiplier;
         public float RemainingLifetime;
@@ -295,6 +343,11 @@ namespace DeadWalls
 
                 UpgradeToCurrent(state);
                 NormalizeActiveCouncilEvent(state);
+                if (!NormalizeCombatRebuild(state, out string combatError))
+                {
+                    Debug.LogWarning($"[RunPersistence] Combat rebuild snapshot gecersiz: {combatError}");
+                    return null;
+                }
                 return state;
             }
             catch (Exception e)
@@ -313,6 +366,11 @@ namespace DeadWalls
             state.ArcherFormationVersion = ArcherFormationUtility.NormalizeVersion(
                 state.ArcherFormationVersion);
             NormalizeActiveCouncilEvent(state);
+            if (!NormalizeCombatRebuild(state, out string combatError))
+            {
+                Debug.LogWarning($"[RunPersistence] Combat rebuild snapshot yazilmadi: {combatError}");
+                return false;
+            }
             return WriteJson(FilePath, state, "Run save");
         }
 
@@ -443,6 +501,33 @@ namespace DeadWalls
                 state.GraveEssenceMetaGainAccumulator = 0d;
                 state.Version = 13;
             }
+
+            if (state.Version == 13)
+            {
+                // v13 her zombie pozisyonunu exact listede tasiyordu. Migration bu veriyi
+                // aggregate'e tahminle map etmez; ilk v14 save'e kadar legacy exact fallback kalir.
+                state.HasCombatRebuild = false;
+                state.CombatRebuild = null;
+                state.Version = 14;
+            }
+        }
+
+        private static bool NormalizeCombatRebuild(RunSaveState state, out string error)
+        {
+            error = string.Empty;
+            if (state == null)
+            {
+                error = "Run state null.";
+                return false;
+            }
+
+            if (!state.HasCombatRebuild)
+            {
+                state.CombatRebuild = null;
+                return true;
+            }
+
+            return CombatRebuildUtility.IsValid(state.CombatRebuild, out error);
         }
 
         private static void NormalizeActiveCouncilEvent(RunSaveState state)

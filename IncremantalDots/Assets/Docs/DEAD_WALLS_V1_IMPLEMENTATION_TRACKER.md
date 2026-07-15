@@ -4,9 +4,9 @@
 >
 > **Tracker sürümü:** 2.2
 > **Son tam kapsam denetimi:** 2026-07-15
-> **Aktif paket:** Package H - Meta + Persistence
-> **Aktif iş:** `DW-H-SAVE-REBUILD` - Deterministic 10K Combat Rebuild Policy
-> **İlerleme:** `344 / 441` tracker checkbox'ı tamamlandı - `%78,00`
+> **Aktif paket:** Package I - HUD, Onboarding ve Creative Polish
+> **Aktif iş:** `DW-I-HUD-LEGACY` - Active HUD Gate/Core Legacy Cleanup
+> **İlerleme:** `345 / 441` tracker checkbox'ı tamamlandı - `%78,23`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -763,7 +763,8 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 - [x] Meta'nın generated graph edges/Keystone/result seçmesini engelle.
 - [x] Repeatable meta sink'lerde büyüyen maliyet; content unlock'ta tek sefer uygula.
 - [x] Eski Mobile save'i yeni run contract'a sessiz yanlış map etme.
-- [ ] 10k enemy pozisyonlarını tek tek save etmek yerine perceptually faithful deterministik rebuild policy tanımla.
+- [x] 10k enemy pozisyonlarını tek tek save etmek yerine perceptually faithful deterministik rebuild policy tanımla.
+  - Kanıt: `RunSaveState v14`, `CombatRebuildUtility` policy v1, v13 legacy fallback ve üç temiz 10K deterministic fingerprint kabulü. `372-375` bucket; aktif Arrow'a bağlı `165.957-227.597 B`; save `31,42-32,93 ms`; restore `75,09-213,32 ms`.
 
 ### Kabul kapısı
 
@@ -895,14 +896,14 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 | Projectiles | Enableable `ArrowTag`, 1024 prewarm + 256 batch expand, rent/return ve 5s Burst lifetime | `[x]` |
 | VFX/SFX | CombatFeedbackBridge pool ve bazı min interval'lar var | 10k budget/aggregation audit |
 | Worker visuals | Low/Medium/High representative density; resource başına 32 visual cap | `[x]` |
-| Save | Exact aktif combat snapshot var; inactive pool catalog'dan yeniden kurulur | 10K maksimum-state Continue ölçümü |
+| Save | v14 exact-critical + deterministic combat rebuild; inactive pool catalog'dan yeniden kurulur | `[x]` 10K aggregate Continue ölçümü |
 
 ### Ölçüm senaryoları
 
 - [~] 1.000 archer + 10.000 enemy + aktif projectile gerçek sahnede geçti; explicit Night görsel kabulü bekliyor.
 - [x] Fireball 10K horde içinde aynı-frame lethal damage ve toplu pool return correctness geçti; optimize peak iki temiz koşuda `79,13-83,72 ms`.
 - [ ] Arrow refill sonrası 1.000 archer yeniden ateş başlangıcı.
-- [~] 10K enemy save/Continue exact geçti; 1K archer benchmark entity'leri doğrudan ECS stress harness'ine ait olduğu için run-save kanıtı sayılmaz. Player snapshot/Continue ölçümü `4,24 MB` ve `52,58 / 86,19 ms`.
+- [~] 10K enemy v14 deterministic rebuild Continue üç temiz koşuda geçti; `372-375` bucket, `165.957-227.597 B`, save `31,42-32,93 ms`, restore `75,09-213,32 ms`. 1K archer benchmark entity'leri doğrudan ECS stress harness'ine ait olduğu için run-save kanıtı sayılmaz; bu nedenle madde partial kalır.
 - [x] Düşük/orta/yüksek worker visual density geçişi; actual `12/60/1000/5000/0`, visual `12/24/32/32/0`.
 - [~] Projectile pool sonrası birleşik target scenario Editor frame average `9,61 ms`, P95 `12,50 ms`; isolated Player system allocation/spike ölçümü bekliyor.
 - [ ] Long-run soak ve active cap/backlog saturation ölçümü.

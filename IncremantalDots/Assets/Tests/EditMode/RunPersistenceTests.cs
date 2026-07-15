@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using NUnit.Framework;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace DeadWalls.Tests
@@ -13,6 +16,80 @@ namespace DeadWalls.Tests
             Assert.That(RunPersistence.IsSupportedVersion(2), Is.False);
             Assert.That(RunPersistence.IsSupportedVersion(RunSaveState.CurrentVersion), Is.True);
             Assert.That(RunPersistence.IsSupportedVersion(RunSaveState.CurrentVersion + 1), Is.False);
+        }
+
+        [Test]
+        public void CombatRebuildPolicy_10KField_IsCompactValidAndDeterministic()
+        {
+            const int enemyCount = 10_000;
+            var samples = new List<CombatRebuildCaptureSample>(enemyCount);
+            for (int i = 0; i < enemyCount; i++)
+            {
+                int column = i % 100;
+                int row = i / 100;
+                samples.Add(new CombatRebuildCaptureSample
+                {
+                    Position = new float3(
+                        10f + column * 0.12f,
+                        -6.5f + row * 0.13f,
+                        MobileCastleRenderDepth.UnitZ),
+                    Scale = 1.4f,
+                    MoveSpeed = 0.85f,
+                    MaxHP = 20f,
+                    CurrentHP = 20f,
+                    AttackDamage = 5f,
+                    AttackCooldown = 1f,
+                    AttackTimer = 0.25f,
+                    XPReward = 10,
+                    State = (int)ZombieStateType.Moving,
+                    SlowMultiplier = 1f
+                });
+            }
+
+            uint seed = CombatRebuildUtility.CreateSeed(987654321u, 9, 777, enemyCount);
+            CombatRebuildRunSaveState first = CombatRebuildUtility.BuildSnapshot(
+                samples, seed, out int[] firstMapping);
+            CombatRebuildRunSaveState second = CombatRebuildUtility.BuildSnapshot(
+                samples, seed, out int[] secondMapping);
+
+            Assert.That(CombatRebuildUtility.IsValid(first, out string error), Is.True, error);
+            Assert.That(first.TotalZombies, Is.EqualTo(enemyCount));
+            Assert.That(first.Buckets.Count,
+                Is.LessThanOrEqualTo(
+                    CombatRebuildUtility.DefaultXCellCount
+                    * CombatRebuildUtility.DefaultYCellCount));
+            Assert.That(firstMapping, Is.EqualTo(secondMapping));
+
+            int rebuiltCount = 0;
+            for (int bucketIndex = 0; bucketIndex < first.Buckets.Count; bucketIndex++)
+            {
+                Assert.That(second.Buckets[bucketIndex].Count,
+                    Is.EqualTo(first.Buckets[bucketIndex].Count));
+                for (int itemIndex = 0; itemIndex < first.Buckets[bucketIndex].Count; itemIndex++)
+                {
+                    float3 firstPosition = CombatRebuildUtility.GetRebuiltPosition(
+                        first, bucketIndex, itemIndex);
+                    float3 secondPosition = CombatRebuildUtility.GetRebuiltPosition(
+                        second, bucketIndex, itemIndex);
+                    Assert.That(secondPosition, Is.EqualTo(firstPosition));
+                    Assert.That(firstPosition.x, Is.InRange(first.MinX, first.MaxX));
+                    Assert.That(firstPosition.y, Is.InRange(first.MinY, first.MaxY));
+                    rebuiltCount++;
+                }
+            }
+            Assert.That(rebuiltCount, Is.EqualTo(enemyCount));
+
+            var save = new RunSaveState
+            {
+                RunId = "run_rebuild_10k",
+                HasCombatRebuild = true,
+                CombatRebuild = first
+            };
+            int jsonBytes = Encoding.UTF8.GetByteCount(JsonUtility.ToJson(save, false));
+            Assert.That(save.ActiveZombies, Is.Empty,
+                "v14 aggregate snapshot entity basina legacy liste yazmamali.");
+            Assert.That(jsonBytes, Is.LessThan(512 * 1024),
+                "Deterministik 10K rebuild payload'i 512 KiB compact budget'i asmamali.");
         }
 
         [Test]
@@ -266,6 +343,88 @@ namespace DeadWalls.Tests
                 Assert.That(restored.HasActiveCouncilEvent, Is.False);
                 Assert.That(restored.ActiveCouncilEvent, Is.Null,
                     "JsonUtility bos nested event'i phantom active Council yapmamali.");
+            }
+            finally
+            {
+                if (original != null)
+                    File.WriteAllBytes(path, original);
+                else if (File.Exists(path))
+                    File.Delete(path);
+            }
+        }
+
+        [Test]
+        public void TryLoad_Version13ExactCombat_MigratesWithoutInventingAggregatePayload()
+        {
+            string path = Path.Combine(Application.persistentDataPath, "run_save.json");
+            byte[] original = File.Exists(path) ? File.ReadAllBytes(path) : null;
+            var legacy = new RunSaveState
+            {
+                Version = 13,
+                RunId = "run_v13_combat_migration_" + Guid.NewGuid().ToString("N")
+            };
+            legacy.ActiveZombies.Add(new ZombieRunSaveState
+            {
+                X = 12f,
+                Y = -2f,
+                MaxHP = 20f,
+                CurrentHP = 13f,
+                State = (int)ZombieStateType.Attacking
+            });
+
+            try
+            {
+                File.WriteAllText(path, JsonUtility.ToJson(legacy));
+
+                RunSaveState restored = RunPersistence.TryLoad();
+
+                Assert.That(restored, Is.Not.Null);
+                Assert.That(restored.Version, Is.EqualTo(RunSaveState.CurrentVersion));
+                Assert.That(restored.HasCombatRebuild, Is.False);
+                Assert.That(restored.CombatRebuild, Is.Null);
+                Assert.That(restored.ActiveZombies.Count, Is.EqualTo(1));
+                Assert.That(restored.ActiveZombies[0].X, Is.EqualTo(12f));
+            }
+            finally
+            {
+                if (original != null)
+                    File.WriteAllBytes(path, original);
+                else if (File.Exists(path))
+                    File.Delete(path);
+            }
+        }
+
+        [Test]
+        public void TryLoad_Version14InvalidCombatRebuild_FailsClosed()
+        {
+            string path = Path.Combine(Application.persistentDataPath, "run_save.json");
+            byte[] original = File.Exists(path) ? File.ReadAllBytes(path) : null;
+            var corrupt = new RunSaveState
+            {
+                Version = RunSaveState.CurrentVersion,
+                RunId = "run_v14_corrupt_rebuild_" + Guid.NewGuid().ToString("N"),
+                HasCombatRebuild = true,
+                CombatRebuild = new CombatRebuildRunSaveState
+                {
+                    PolicyVersion = CombatRebuildUtility.CurrentPolicyVersion,
+                    Seed = 123u,
+                    TotalZombies = 1,
+                    XCellCount = CombatRebuildUtility.DefaultXCellCount,
+                    YCellCount = CombatRebuildUtility.DefaultYCellCount,
+                    HealthBandCount = CombatRebuildUtility.DefaultHealthBandCount,
+                    MinX = 0f,
+                    MaxX = 1f,
+                    MinY = 0f,
+                    MaxY = 1f
+                }
+            };
+
+            try
+            {
+                File.WriteAllText(path, JsonUtility.ToJson(corrupt));
+
+                Assert.That(RunPersistence.TryLoad(), Is.Null,
+                    "Discriminator true iken eksik bucket payload'i sifir horde gibi acilmamali.");
             }
             finally
             {

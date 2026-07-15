@@ -310,6 +310,16 @@ namespace DeadWalls.Tests
             Assert.That(gameManager.SaveRunSnapshot(), Is.True);
             double saveMs = (Time.realtimeSinceStartupAsDouble - saveStarted) * 1000.0;
             long saveBytes = new FileInfo(_runSavePath).Length;
+            RunSaveState compactCombatSave = RunPersistence.TryLoad();
+            Assert.That(compactCombatSave, Is.Not.Null);
+            Assert.That(compactCombatSave.HasCombatRebuild, Is.True);
+            Assert.That(compactCombatSave.CombatRebuild, Is.Not.Null);
+            Assert.That(compactCombatSave.CombatRebuild.TotalZombies, Is.EqualTo(EnemyTarget));
+            Assert.That(compactCombatSave.ActiveZombies, Is.Empty,
+                "v14 10K zombie pozisyonlarini entity basina legacy listede yazmamali.");
+            Assert.That(compactCombatSave.CombatRebuild.Buckets.Count, Is.LessThan(EnemyTarget));
+            Assert.That(saveBytes, Is.LessThan(2L * 1024L * 1024L),
+                "10K horde + aktif projectile snapshot'i 2 MiB compact kabul budget'ini asmamali.");
 
             long returnsBeforeFireball = entityManager
                 .GetComponentData<EnemyPoolRuntimeData>(poolEntity).TotalReturnCount;
@@ -385,6 +395,12 @@ namespace DeadWalls.Tests
             Assert.That(restoredPool.ActiveCount, Is.EqualTo(EnemyTarget));
             Assert.That(restoredPool.TotalCreated, Is.EqualTo(poolAtTenK.TotalCreated));
             Assert.That(restoredBudget.PendingEnemies, Is.EqualTo(777));
+            ulong firstRestoreFingerprint = BuildActivePositionFingerprint(entityManager);
+
+            Assert.That(gameManager.TryRestoreRunFromCheckpoint(), Is.True);
+            ulong secondRestoreFingerprint = BuildActivePositionFingerprint(entityManager);
+            Assert.That(secondRestoreFingerprint, Is.EqualTo(firstRestoreFingerprint),
+                "Ayni v14 snapshot iki Continue'da ayni rebuilt position multiset'ini uretmeli.");
 
             Debug.Log(
                 "[DW-B-SCALE] " +
@@ -405,6 +421,9 @@ namespace DeadWalls.Tests
                 $"gc_avg_bytes={averageGcBytes}; gc_max_bytes={gcMaxBytes}; " +
                 $"draw_calls_avg={averageDrawCalls}; used_memory_bytes={usedMemoryBytes}; " +
                 $"save_ms={saveMs:F2}; save_bytes={saveBytes}; " +
+                $"rebuild_policy={compactCombatSave.CombatRebuild.PolicyVersion}; " +
+                $"rebuild_buckets={compactCombatSave.CombatRebuild.Buckets.Count}; " +
+                $"rebuild_deterministic={firstRestoreFingerprint == secondRestoreFingerprint}; " +
                 $"fireball_return_frames={deathFrames + 1}; death_peak_ms={deathPeakFrameMs:F2}; " +
                 $"death_peak_frame={deathPeakFrameIndex}; death_peak_active={deathPeakActiveCount}; " +
                 $"restore_ms={restoreMs:F2}; backlog={restoredBudget.PendingEnemies}");
@@ -416,6 +435,38 @@ namespace DeadWalls.Tests
             wave.ZombiesAlive = 0;
             entityManager.SetComponentData(waveEntity, wave);
             activeQuery.Dispose();
+        }
+
+        private static ulong BuildActivePositionFingerprint(EntityManager entityManager)
+        {
+            using EntityQuery query = entityManager.CreateEntityQuery(new EntityQueryDesc
+            {
+                All = new[]
+                {
+                    ComponentType.ReadOnly<ZombieTag>(),
+                    ComponentType.ReadOnly<LocalTransform>()
+                },
+                None = new[] { ComponentType.ReadOnly<Prefab>() }
+            });
+            using NativeArray<LocalTransform> transforms =
+                query.ToComponentDataArray<LocalTransform>(Allocator.Temp);
+            var packedPositions = new ulong[transforms.Length];
+            for (int i = 0; i < transforms.Length; i++)
+            {
+                int x = Mathf.RoundToInt(transforms[i].Position.x * 10_000f);
+                int y = Mathf.RoundToInt(transforms[i].Position.y * 10_000f);
+                packedPositions[i] = ((ulong)unchecked((uint)x) << 32)
+                                     | unchecked((uint)y);
+            }
+
+            Array.Sort(packedPositions);
+            ulong fingerprint = 1469598103934665603UL;
+            for (int i = 0; i < packedPositions.Length; i++)
+            {
+                fingerprint ^= packedPositions[i];
+                fingerprint *= 1099511628211UL;
+            }
+            return fingerprint;
         }
 
         private static string BuildArchetypeTelemetry(
