@@ -79,8 +79,9 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 
 ### MarketUI.cs
 
-- `MobileCastleHudRoot` uzerindeki sag `ArcherDrawerPanel` controller'idir
-- Drawer combat sirasinda acilip kapanir; oyun pause olmaz
+- `MobileCastleHudRoot` uzerindeki alt-sag `ArcherDrawerPanel` controller'idir
+- HUD ve yeni run acilisinda drawer kapali baslar; sabit `ARCHERS` butonu kayan panelin disindadir
+- Drawer combat sirasinda acilip kapanir; oyun pause olmaz. `OpenOnWaveCompleted` legacy wave-complete acilisini korur
 - `ArcherRecruitmentListRoot` + inactive `ArcherRecruitmentRowTemplate` varsa satirlari `ArcherRecruitmentCatalogSO` definition listesinden runtime'da uretir
 - Template yoksa legacy Basic/Rapid/Frost row'larinda yalnizca `Buy` aksiyonunu `GameManager.BuyArcher()` API'sine baglar
 - Upgrade butonlari, Rapid/Frost tech unlock butonlari ve `ArrowTechPanel` player-facing olarak gizlenir
@@ -99,6 +100,7 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 ### HeartScreenUI.cs
 
 - Aktif fullscreen Castle Heart controller'idir; `HeartGraphPresentation` hidden-safe modelini cizer
+- Alt-sag dock'taki sabit `CASTLE HEART` butonu fullscreen paneli acar; button Archer drawer'in hareketinden bagimsizdir
 - Army/Defense/Production/Heart-Magic dallarini sag/sol/yukari/asagi compass layout ile yerlestirir
 - `+1/+10/MAX`, exact Grave Essence quote, actual current/after/delta ve Keystone conflict bilgisini sunar
 - Acilista `SimulationPauseService` lease'i alir; cycle/spawn/movement/combat/worker ve scaled cooldown'lar durur. UI refresh/animasyonlari unscaled zamanda calisir

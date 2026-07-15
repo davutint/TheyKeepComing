@@ -3972,10 +3972,80 @@ namespace DeadWalls
             HidePlayerFacingArcherProgressionControls(market);
 
             ConfigureTechTree(hudRoot);
+            EnsureArcherHeartDockLayout(hudRoot);
             ConfigureUnifiedAbilityBar(hudRoot);
             ConfigureDefenseRepair(hudRoot);
             ConfigureDawnToast(hudRoot);
             ConfigureCouncilUI(hudRoot);
+        }
+
+        private static void EnsureArcherHeartDockLayout(GameObject hudRoot)
+        {
+            RectTransform drawerPanel = FindRectTransformByName(hudRoot, "ArcherDrawerPanel");
+            Button archerButton = FindComponentInChildrenByName<Button>(hudRoot, "DrawerToggleButton");
+            Button heartButton = FindComponentInChildrenByName<Button>(hudRoot, "CastleHeartOpenButton");
+            if (drawerPanel == null || archerButton == null || heartButton == null)
+                return;
+
+            Transform dockRoot = drawerPanel.parent;
+            RectTransform archerRect = archerButton.GetComponent<RectTransform>();
+            if (archerRect.parent != dockRoot)
+            {
+                archerRect.SetParent(dockRoot, false);
+                archerRect.SetSiblingIndex(Mathf.Min(drawerPanel.GetSiblingIndex() + 1, dockRoot.childCount - 1));
+            }
+
+            drawerPanel.anchorMin = new Vector2(1f, 0f);
+            drawerPanel.anchorMax = new Vector2(1f, 0f);
+            drawerPanel.pivot = new Vector2(1f, 0f);
+            drawerPanel.anchoredPosition = new Vector2(-24f, 160f);
+            drawerPanel.sizeDelta = new Vector2(540f, 350f);
+            drawerPanel.gameObject.SetActive(true);
+
+            archerRect.anchorMin = new Vector2(1f, 0f);
+            archerRect.anchorMax = new Vector2(1f, 0f);
+            archerRect.pivot = new Vector2(1f, 0f);
+            archerRect.anchoredPosition = new Vector2(-190f, 28f);
+            archerRect.sizeDelta = new Vector2(156f, 56f);
+            archerRect.localScale = Vector3.one;
+            archerButton.gameObject.SetActive(true);
+            SetButtonLabel(archerButton, "ARCHERS");
+            NormalizeDockButtonLabel(archerButton);
+
+            RectTransform heartRect = heartButton.GetComponent<RectTransform>();
+            if (heartRect.parent != dockRoot)
+                heartRect.SetParent(dockRoot, false);
+            heartRect.anchorMin = new Vector2(1f, 0f);
+            heartRect.anchorMax = new Vector2(1f, 0f);
+            heartRect.pivot = new Vector2(1f, 0f);
+            heartRect.anchoredPosition = new Vector2(-24f, 28f);
+            heartRect.sizeDelta = new Vector2(156f, 56f);
+            heartRect.localScale = Vector3.one;
+            heartButton.gameObject.SetActive(true);
+            SetButtonLabel(heartButton, "CASTLE HEART");
+            NormalizeDockButtonLabel(heartButton);
+        }
+
+        private static void NormalizeDockButtonLabel(Button button)
+        {
+            TextMeshProUGUI label = button.GetComponentInChildren<TextMeshProUGUI>(true);
+            if (label == null)
+                return;
+
+            RectTransform labelRect = label.rectTransform;
+            labelRect.anchorMin = Vector2.zero;
+            labelRect.anchorMax = Vector2.one;
+            labelRect.pivot = new Vector2(0.5f, 0.5f);
+            labelRect.anchoredPosition = Vector2.zero;
+            labelRect.sizeDelta = Vector2.zero;
+            labelRect.localRotation = Quaternion.identity;
+            labelRect.localScale = Vector3.one;
+            label.alignment = TextAlignmentOptions.Center;
+            label.enableAutoSizing = true;
+            label.fontSizeMin = 12f;
+            label.fontSizeMax = 20f;
+            label.textWrappingMode = TextWrappingModes.NoWrap;
+            label.raycastTarget = false;
         }
 
         private static void ConfigureArrowAmmo(GameObject hudRoot)
@@ -4130,7 +4200,7 @@ namespace DeadWalls
                 heart.HeartOpenButton = EnsureButton(hudRoot.transform, "CastleHeartOpenButton",
                     new Vector2(0f, 1f), new Vector2(232f, -168f), new Vector2(358f, -130f), out _);
             }
-            SetButtonLabel(heart.HeartOpenButton, "HEART");
+            SetButtonLabel(heart.HeartOpenButton, "CASTLE HEART");
 
             heart.HeartCloseButton = FindComponentInChildrenByName<Button>(hudRoot, "CastleHeartCloseButton")
                 ?? FindComponentInChildrenByName<Button>(hudRoot, "TechTreeCloseButton");

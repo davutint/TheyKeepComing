@@ -73,9 +73,9 @@ SubScene:
 - `CyclePanel`: owner-secili Celestial Dial, top-center anchor ve `290 x 68` gercek pill; `CycleProgressTrack` `178 x 44`, 44 segmentli sig yaydir. Dikey ayirici ile legacy phase/label/linear fill player-facing kapali kalir
 - Aktif prefab ve `HUDController` setup binding'inde `HordePressurePanel` bulunmaz; setup tool forecast/pressure UI baglamaz veya yeniden uretmez
 - `HUDController` defense module: `DefensePercentText`, `DefenseWallFill`, `DefenseWallText`, opsiyonel `DefenseDamageGlow`; legacy Gate/Core alanlari prefabda ve controller binding'inde bulunmaz
-- `MarketUI`: `ArcherDrawerPanel`, `DrawerToggleButton`, Basic/Rapid/Frost row text, buy ve dynamic `ArcherRetrainButton` alanlari bagli
+- `MarketUI`: alt-sag `ArcherDrawerPanel` (`540 x 350`, `(-24,160)`), sabit `DrawerToggleButton` (`156 x 56`, `(-190,28)`), Basic/Rapid/Frost row text, buy ve dynamic `ArcherRetrainButton` alanlari bagli; HUD acilisinda drawer kapali
 - `MarketUI`: Upgrade butonlari, `ArrowTechPanel`, tech unlock butonlari ve repair/prep butonlari prefabda varsa gizli
-- `HeartScreenUI`: `CastleHeartPanel`, open/close, viewport/content, node/connection template,
+- `HeartScreenUI`: alt-sag sabit `CastleHeartOpenButton` (`156 x 56`, `(-24,28)`, `CASTLE HEART`), `CastleHeartPanel`, close, viewport/content, node/connection template,
   Grave Essence, status, compass, `+1/+10/MAX`, badge ve toast alanlari bagli; `TechTreeUI` yok
 - `CastleEconomyUI`: legacy full-screen panel bindingleri bagli kalabilir ama `PlayerFacingPanelEnabled = false`; `CastleEconomyPanel` ve `CastleTapHint` player-facing kapali tutulur
 - `WorkerEconomyDrawerUI`: sol ust worker drawer toggle/panel, summary alanlari, Wood/Stone/Iron/Food target kontrolleri ve `CAP / EFF` bina yatirim butonlari bagli

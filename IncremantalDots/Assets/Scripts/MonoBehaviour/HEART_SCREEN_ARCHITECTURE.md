@@ -82,6 +82,10 @@ Aktif prefab isim sozlesmesi:
 - `CastleHeartBadge`, `CastleHeartToastText`;
 - `HeartNode...` template alt alanlari.
 
+`CastleHeartOpenButton`, alt-sag dock'ta `CASTLE HEART` label'iyle `156 x 56` sabit
+butondur (`anchoredPosition = (-24,28)`). Yanindaki `ARCHERS` butonu ayni dock'ta
+`(-190,28)` konumundadir; Archer drawer kayarken iki giris butonu sabit kalir.
+
 `CastleHeartPanel`, `overrideSorting = true` ve `sortingOrder = 200` kullanan nested
 `Canvas` ile kendi `GraphicRaycaster`'ini tasir. Boylece pause ve soul gibi ayri HUD
 canvas'lari acik Heart ekraninin ustune cikamaz. `CastleHeartToastText` de ayni modal

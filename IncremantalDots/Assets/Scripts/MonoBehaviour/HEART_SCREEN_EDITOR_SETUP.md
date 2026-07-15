@@ -10,7 +10,8 @@ UI export/import pipeline'ini veya scene-only gorsel child uretimini kullanmayin
 
 Prefab stage'de su objeleri dogrula:
 
-- `CastleHeartOpenButton` label: `HEART`.
+- `CastleHeartOpenButton`: alt-sag anchor/pivot, `156 x 56`, `(-24,28)`, label `CASTLE HEART`.
+- `DrawerToggleButton`: ayni dock'ta `156 x 56`, `(-190,28)`, label `ARCHERS`; `ArcherDrawerPanel` child'i degil, ortak HUD parent'inin child'idir.
 - `CastleHeartPanel` default inactive, fullscreen; `CanvasGroup`, `overrideSorting = true`,
   `sortingOrder = 200` nested `Canvas` ve `GraphicRaycaster` sahibi.
 - `CastleHeartTitleText` label: `CASTLE HEART`.
@@ -57,7 +58,7 @@ partneri, numeric value/soft-cap ve Evolution pool'u ayri owner onayi gerektirir
 
 ## Play Mode QA
 
-1. Play'e gir ve `HEART` butonuna bas.
+1. Play'e gir ve alt-sag `CASTLE HEART` butonuna bas.
 2. Panelin fullscreen acildigini ve world/cycle'in durdugunu dogrula.
 3. Pause menu ile Heart'i ust uste ac/kapat; ilk kapanan owner simulation'i baslatmamali.
 4. Heart'i kapat; onceki time scale ve DOTS group enabled state exact donmeli.

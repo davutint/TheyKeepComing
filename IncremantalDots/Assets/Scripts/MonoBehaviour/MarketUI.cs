@@ -12,7 +12,6 @@ namespace DeadWalls
         public RectTransform ArcherDrawerPanel;
         public Button DrawerToggleButton;
         public TMP_Text DrawerTitleText;
-        public bool OpenOnHudShown = true;
         public bool OpenOnWaveCompleted = true;
         public float SlideDuration = 0.18f;
 
@@ -82,7 +81,7 @@ namespace DeadWalls
             EnsureDynamicRows(GameManager.Instance);
             BindButtons();
             EnsureDrawerPositions();
-            SetDrawerOpen(OpenOnHudShown, true);
+            SetDrawerOpen(false, true);
         }
 
         private void OnDisable()

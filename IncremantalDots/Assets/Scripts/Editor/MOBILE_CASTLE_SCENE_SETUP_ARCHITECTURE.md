@@ -86,5 +86,8 @@ olarak taninir. Prefabda panel yoksa legacy isimli minimal fallback iskelet kuru
 normal akista kaynak `MobileCastleHudRoot.prefab`dir.
 `ConfigureHudRoot` ayrica HUD root'taki missing-script kalintilarini temizler
 (`GameObjectUtility.RemoveMonoBehavioursWithMissingScript`; eski `CastleTechTreeUI` kalintisi).
+`EnsureArcherHeartDockLayout`, `ArcherDrawerPanel` ile `ARCHERS` / `CASTLE HEART`
+girislerini alt-sag layout'a normalize eder; Archer toggle kayan panelin child'i olarak
+birakilmaz. Runtime owner'lar prefabda degil scene root'taki `MarketUI` ve `HeartScreenUI`dir.
 Detay: `MonoBehaviour/HEART_SCREEN_ARCHITECTURE.md` +
 `ScriptableObject/HEART_PURCHASE_EFFECT_ARCHITECTURE.md`.

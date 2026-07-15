@@ -53,7 +53,7 @@ namespace DeadWalls
             LevelUpPanel?.SetActive(false);
             MarketPanel?.SetActive(true);
             GameOverPanel?.SetActive(false);
-            MarketPanel?.GetComponent<MarketUI>()?.SetDrawerOpen(true, true);
+            MarketPanel?.GetComponent<MarketUI>()?.SetDrawerOpen(false, true);
         }
 
         public void ShowLevelUp()
@@ -111,7 +111,7 @@ namespace DeadWalls
         {
             GameOverPanel?.SetActive(false);
             MarketPanel?.SetActive(true);
-            MarketPanel?.GetComponent<MarketUI>()?.SetDrawerOpen(true, true);
+            MarketPanel?.GetComponent<MarketUI>()?.SetDrawerOpen(false, true);
             LevelUpPanel?.SetActive(false);
             Time.timeScale = 1f;
             RunPersistence.Delete(); // yeni kosu = eski checkpoint gecersiz
