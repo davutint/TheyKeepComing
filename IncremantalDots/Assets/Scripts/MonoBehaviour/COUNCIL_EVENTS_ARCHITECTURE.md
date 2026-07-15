@@ -35,7 +35,9 @@ recetesi tarafindan kabul edilmez. Diger 10 atom authored tariflerde kullanilir.
 4. **UI (`CouncilEventUI.cs`):** faz gecislerini 0.2s poll ile izler (Dawn -> scheduled open,
    Dusk -> expire); kart DOTween slide+fade ile belirir (Dawn odul toast'undan 1.2s gecikmeli),
    sure seridi + `DECIDE Ns` sayaci authoritative cycle state'inden kalan Dawn+Day penceresini
-   gosterir; secim punch + Card Place SFX, belirme Book Handle SFX.
+   gosterir; iki buton `CouncilOptionPresentationUtility` canli quote'unu rich text olarak basar;
+   sure seridi Filled/Horizontal/Left contract'inda sayacla birlikte azalir. Secim punch +
+   Card Place SFX, belirme Book Handle SFX.
 
 ## Regular Schedule
 

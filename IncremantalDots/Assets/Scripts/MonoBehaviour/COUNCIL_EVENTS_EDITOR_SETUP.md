@@ -64,7 +64,8 @@
 ## Exact Karar UI Onarimi
 
 `Window > DeadWalls > Repair Council Exact Decision UI`, generated HUD prefabina idempotent
-`CouncilTimerText` ekler, title alanini timer ile cakismayacak sekilde daraltir ve aktif
+`CouncilTimerText` ekler, title alanini timer ile cakismayacak sekilde daraltir,
+`CouncilTimerFill` Image'ini Filled/Horizontal/Left olarak normalize eder ve aktif
 `NewGameScene` icindeki `CouncilEventUI` binding'ini kaydeder. Tam scene setup da ayni prefab
 repair adimini otomatik cagirir.
 

@@ -131,7 +131,8 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - Safak meclisi event'leri: kart DAWN'da belirir, DAY boyunca yasar, DUSK'ta expire; oyun durmaz
 - Event'ler asset degil — `CouncilComposer` (pure static, EditMode testli) sablon x atom x baglam x olcek carpimindan uretir; deterministik (seed = hash(ECS RandomSeed, gun))
 - Director: kit kaynak/dusuk savunma/bolluk baglamina gore atom-sablon agirliklari; hafiza: flag'ler + zincir sablonlari (RequiredFlags/ChainDelayDays/OneShot); butce: A/B secenekleri "dakika-degeri" cinsinden dengelenir
-- Regular schedule tek owner'i `CouncilRegularSchedule`: Day `3,6,9,12...`; chance/pity/cooldown regular akis disinda. GameManager API: `TryOpenRegularCouncilEvent`, `ChooseCouncilOption`, `ExpireCouncilEvent`, `CanAffordCouncilOption`; emergency type/trigger owner onayi bekler ve regular index'e dokunamaz
+- Regular schedule tek owner'i `CouncilRegularSchedule`: Day `3,6,9,12...`; chance/pity/cooldown regular akis disinda. V1 regular-only'dir ve ikinci emergency meeting yolu yoktur. GameManager API: `TryOpenRegularCouncilEvent`, `ChooseCouncilOption`, `ExpireCouncilEvent`, `CanAffordCouncilOption`
+- `CouncilOptionPresentationUtility` iki secenegi canli state'ten exact quote eder; `CouncilDecisionWindowUtility` kalan Dawn + Day suresini `DECIDE Ns` ve azalan Filled/Horizontal seride verir
 - Exact save v13 `LastRegularCouncilDay`, `HasActiveCouncilEvent` ve Essence meta remainder'ını korur; v10 chance fail'i migration'da scheduled gunu tuketmez
 - Otoriter dok: `COUNCIL_EVENTS_ARCHITECTURE.md`
 

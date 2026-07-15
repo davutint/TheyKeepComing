@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.2
 > **Son tam kapsam denetimi:** 2026-07-15
 > **Aktif paket:** Package I - HUD, Onboarding ve Creative Polish
-> **Aktif iş:** `DW-I-HUD-COUNCIL-CARD` - Show Two Exact Council Effects and Decision Time
-> **İlerleme:** `357 / 441` tracker checkbox'ı tamamlandı - `%80,95`
+> **Aktif iş:** `DW-I-HUD-RATIO-CROP` - Validate 16:9 and Ultrawide Critical Framing
+> **İlerleme:** `358 / 441` tracker checkbox'ı tamamlandı - `%81,18`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -789,7 +789,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 | Workers/Housing alt sol | Tek bottom-left `Workers + Housing` toggle/drawer yüzeyi; worker ratio ve bina CAP/EFF yanında limitsiz `+1/+10/+100 Beds` Wood alımı, canlı population/bed/free/purchased aynaları ve prefab guard testi var | `[x]` |
 | Archers/Heart alt sağ | Sabit `ARCHERS` + `CASTLE HEART` bottom-right dock; drawer `540 x 350` olarak dock üstünde açılır, HUD başlangıcında kapalıdır ve Heart modal pause davranışını korur | `[x]` |
 | Tek drawer | Scene-owned `ManagementDrawerCoordinatorUI`, Workers/Housing, Archers ve Arrow Supply yüzeylerinde mutual exclusion kuruyor; Castle Heart bağımsız modal kalıyor | `[x]` |
-| Council geçici kart | Geçici iki-option kart UI mevcut | `[~]` Schedule/effect sunumu güncellenecek |
+| Council geçici kart | Tek compact regular Council kartı; iki seçenek `CouncilOptionPresentationUtility` üzerinden live exact effect/bedel quote'u gösteriyor, karar penceresi Dawn + Day cycle süresine bağlı sayısal sayaç ve gerçekten azalan Filled bar taşıyor | `[x]` |
 | Fixed camera/ratio | Kamera sabit; ultrawide critical crop testi yok | `[~]` |
 
 ### HUD işleri
@@ -803,7 +803,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 - [x] Workers/Housing alt sol yerleşimini kur.
 - [x] Archers/Castle Heart alt sağ yerleşimini kur.
 - [x] Aynı anda yalnız bir management drawer açık olacak owner kur.
-- [ ] Council kartında iki exact effect ve karar süresini göster.
+- [x] Council kartında iki exact effect ve karar süresini göster.
 - [ ] 16:9 ve ultrawide'da battlefield ve kritik UI crop testleri yap.
 
 ### I2 - İlk koşu onboarding
@@ -1158,3 +1158,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-15 | `DW-I-HUD-WORKERS-HOUSING` bottom-left Workers + Housing surface | Aktif Worker drawer ayrı bir Housing controller/panel üretmeden ortak `Workers + Housing` yüzeyine dönüştürüldü. Toggle bottom-left `(24,28)` / `206x56`, panel bottom-left `(24,160)` / `980x382` oldu; panel canlı ability content'inin `17 px` üstünde kalıyor. Housing satırı population/total beds, free beds ve purchased beds aynalarını; toplam sahipliğe göre büyüyen exact Wood maliyetli `+1/+10/+100 Beds` alımlarını gösteriyor. Sahnedeki tek `WorkerEconomyDrawerUI` yeni kontrolleri isim sözleşmesiyle runtime çözüyor; aktif prefab doğrudan Prefab Stage'de güncellendi, `NewGameScene` değişmedi | Unity compile: 0 error; new presentation/binding EditMode 2/2; presentation + bed utility EditMode 10/10; exact bed purchase/Continue PlayMode 1/1; MCP Play audit: tek controller, altı Housing binding, drawer toggle `false -> true`, 1920x1080 görsel QA temiz; final Console 0 error; tracker `355/441` |
 | 2026-07-15 | `DW-I-HUD-ARCHERS-HEART` bottom-right Archers + Castle Heart surface | Mevcut `MarketUI` ve `HeartScreenUI` owner'ları korunarak `DrawerToggleButton` kayan panelin dışına çıkarıldı. Sabit bottom-right dock'ta `ARCHERS` `(-190,28)` / `156x56`, `CASTLE HEART` `(-24,28)` / `156x56`; Archer drawer üstlerinde `(-24,160)` / `540x350` oldu. HUD ve yeni run açılışında drawer kapalı başlıyor; legacy `OpenOnWaveCompleted` davranışı korunuyor. Aktif prefab doğrudan Prefab Stage'de güncellendi, setup tool aynı geometriyi idempotent normalize ediyor ve `NewGameScene` içerik diff'i bırakılmadı | Unity compile: 0 error; new presentation/behavior EditMode 3/3; Ability/Workers/Heart regression EditMode 12/12; MCP Play audit: tek `MarketUI`, tek `HeartScreenUI`, drawer click `closed -> open`, Heart pause `1 -> 0 -> 1`; 1920x1080 kapalı/açık görsel QA temiz; final Console 0 error; tracker `356/441` |
 | 2026-07-15 | `DW-I-HUD-EXCLUSIVE-DRAWER` single management drawer owner | Scene-owned `ManagementDrawerCoordinatorUI`, mevcut presentation ve transaction owner'larını değiştirmeden Workers/Housing, Archer Recruitment ve Arrow Supply yüzeylerini mutual exclusion altında topladı. Yeni bir yüzey açıldığında diğer ikisi anında kapanıyor; aktif owner kapanınca state `None` oluyor. Castle Heart fullscreen modal olduğu için coordinator kapsamı dışında ve mevcut pause sözleşmesini koruyor. Scene setup tool coordinator'ı idempotent ekliyor; aktif `NewGameScene` yalnız bu component override'ını taşıyor | Unity compile: 0 error; targeted + related EditMode 15/15; MCP Play audit: owner sayıları `1/1/1/1`, akış `None > WorkersHousing > ArcherRecruitment > ArrowSupply > WorkersHousing`, her adımda yalnız tek yüzey açık; 1920x1080 görsel QA temiz; Play/exit Console 0 error; tracker `357/441` |
+| 2026-07-15 | `DW-I-HUD-COUNCIL-CARD` exact regular Council card + live decision fill | Mevcut regular-only Council sunum sahibi korunarak iki option'ın authored eylem başlığı, live exact effect/maliyet quote'u ve uygulanabilirlik durumu tek compact kartta doğrulandı. `CouncilTimerFill` hatalı Sliced tipten Horizontal/Left Filled tipe geçirildi; Dawn + Day karar penceresinin sayısal metniyle aynı authoritative cycle değerinden gerçekten azalıyor. Scene setup repair aynı fill sözleşmesini idempotent normalize ediyor; yeni Council sistemi veya içerik üretilmedi. Prefab geometri, exact quote yüzeyleri, font/rich-text ve timer binding'i yeni guard testiyle kilitlendi | Unity compile: 0 error; targeted EditMode 29/29; targeted Council PlayMode 6/6; MCP live audit: `35s / 1.0000` -> `15s / 0.4286`, type `Filled`, iki exact option aktif; 1920x1080 Game View QA temiz; final Console 0 error; tracker `358/441` |

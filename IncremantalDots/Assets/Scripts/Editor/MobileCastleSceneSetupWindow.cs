@@ -3507,6 +3507,17 @@ namespace DeadWalls
             timer.color = new Color(0.949f, 0.788f, 0.298f, 1f);
             timer.enableWordWrapping = false;
             timer.raycastTarget = false;
+
+            Image timerFill = FindComponentInChildrenByName<Image>(panel, "CouncilTimerFill");
+            if (timerFill != null)
+            {
+                timerFill.type = Image.Type.Filled;
+                timerFill.fillMethod = Image.FillMethod.Horizontal;
+                timerFill.fillOrigin = (int)Image.OriginHorizontal.Left;
+                timerFill.fillClockwise = true;
+                timerFill.fillAmount = 1f;
+                timerFill.raycastTarget = false;
+            }
         }
 
         private static void EnsureArrowAmmoPanel(GameObject hudRoot)
