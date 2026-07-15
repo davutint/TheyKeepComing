@@ -5,7 +5,9 @@
 > **Tracker sürümü:** 2.0  
 > **Son tam kapsam denetimi:** 2026-07-12  
 > **Aktif paket:** Package F - Council
-> **Aktif iş:** `DW-F-EMERGENCY` - Owner-Approved Rare Emergency Contract
+> **Aktif iş:** `DW-F-EXACT` - Exact Numerical Options + Decision Window
+> **İlerleme:** `283 / 445` tracker checkbox'ı tamamlandı - `%63,60`
+> İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 
 ---
 
@@ -640,10 +642,10 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | 3/6/9 regular schedule | `CouncilRegularSchedule` Day 3'ten başlayarak her 3 günde bir; aynı gün tek açılış | `[x]` |
 | Rare emergency | Ayrı emergency type/trigger yok | `[!]` |
 | Exact effects visible | İki option ve effect badge mevcut | `[~]` Tüm effects audit gerekli |
-| Population guard | `AddPopulation` capacity/Food'u bypass ediyor | `[!]` |
-| Archer guard | Free archer population ve 1000 cap'i bypass ediyor | `[!]` |
-| Wall-only defense | Heal Wall'a yönlendirildi | `[~]` Test gerekli |
-| Count-only night effect | Next-night spawn multiplier mevcut | `[~]` Stat effect leakage testi gerekli |
+| Population guard | Council gain boş yatak + Food bütçesiyle exact preflight edilir; stale/private payload clamp olur, accepted kişi başına Food bir kez harcanır ve capacity büyümez | `[x]` |
+| Archer guard | Free archer exact idle population + ortak 1000 cap preflight'ından geçer; her spawn bir idle kişiyi Archer havuzuna taşır | `[x]` |
+| Wall-only defense | Heal yalnız `WallSegment` current/max HP'ye gider; legacy Gate/Core değişmez | `[x]` |
+| Count-only night effect | Council delta yalnız bounded next-night spawn multiplier yazar; zombie HP/damage/speed değişmez | `[x]` |
 | Exact save | Flags/recent/cooldown kısmen save; active card/effects eksik | `[!]` |
 
 ### Yapılacaklar
@@ -656,10 +658,10 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [ ] Resource scarcity, production, Wall ve previous flags bağlamını koru.
 - [ ] Aynı şablonun anlamsız tekrarını recent memory ile engelle.
 - [ ] Yalnız editoryal onaylı flag chain'leri aç.
-- [ ] Population gain'i available beds + one-time Food ile sınırla.
-- [ ] Free archer gain'i idle population + common 1000 cap ile sınırla.
-- [ ] Defense effect'lerini yalnız Wall current/max HP ile sınırla.
-- [ ] Horde effect'lerini yalnız count/flow multiplier ile sınırla.
+- [x] Population gain'i available beds + one-time Food ile sınırla.
+- [x] Free archer gain'i idle population + common 1000 cap ile sınırla.
+- [x] Defense effect'lerini yalnız Wall current/max HP ile sınırla.
+- [x] Horde effect'lerini yalnız count/flow multiplier ile sınırla.
 - [~] Regular handled day ve active-card discriminator schema v11'de exact; emergency state ve bütün chosen/effect duration audit'i açık.
 - [ ] Council'ın Heart currency/upgrade rolünü veya Meta rolünü devralmasını engelle.
 - [ ] Launch template/atom listesi için owner review ve effect budget testi yap.
@@ -668,7 +670,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 - [x] Regular günler daima 3/6/9 düzeninde.
 - [ ] Aradaki emergency regular schedule'ı değiştirmiyor.
-- [ ] Hiçbir effect bed+Food, population, 1000 archer, Wall-only veya count-only guard'ını aşmıyor.
+- [x] Hiçbir effect bed+Food, population, 1000 archer, Wall-only veya count-only guard'ını aşmıyor.
 - [ ] Save/Continue aynı Council state'ini koruyor.
 
 ---
@@ -1131,3 +1133,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-14 | `DW-E-UI` Castle Heart screen + full simulation pause | `HeartScreenUI` hidden-safe generated graph presentation'ını Army/Defense/Production/Heart-Magic compass layout, actual current/after/delta, exact GE quote, Keystone conflict ve `+1/+10/MAX` ile aktif prefab/sahneye bağladı. `GameManager.HeartRuntime` live archer/Wall/worker/Arrow/Fireball baseline/sink adapter'ını kurdu; Arrow Heart bonusları paid level'lardan ayrıldı. Lease tabanlı `SimulationPauseService` time scale ve DOTS `SimulationSystemGroup` state'ini nested owner'larla exact durdurup geri yüklüyor; `PauseMenuUI` aynı owner'a taşındı. Aktif HUD'dan legacy `TechTreeUI` kaldırıldı; Heart paneli override-sorted modal Canvas olarak HUD canvas'larının üstüne alındı. Production catalog/balance/Evolution içeriği owner onayı olmadan üretilmedi ve null catalog açık hata veriyor | Unity compile: 0 error; targeted EditMode 8/8; full EditMode 158/158; full PlayMode 29 pass + 1 explicit profiler skip; active scene HeartScreenUI 1 / TechTreeUI 0; Game View modal QA sırasında `Time.timeScale = 0`, `SimulationSystemGroup.Enabled = false`; Unity console 0 error |
 | 2026-07-14 | `DW-E-SAVE` exact Castle Heart graph persistence + deterministic Continue replay | `RunSaveState` v10'a çıkarıldı; `HasHeartGraph` discriminator'ı, graph/catalog version, seed, node/edge, hidden/reveal, level ve Keystone lock state'i exact JSON'a bağlandı. `HeartGraphPersistenceUtility` deep clone, structural/runtime validation, catalog mismatch fail-closed ve deferred effect replay kurdu. Continue source catalog'dan reroll etmiyor; Arrow current final effective capacity ile tek kez clamp ediliyor. v9 eksik graph uydurmadan null-state migrate ediyor. Production catalog/content üretilmedi | Unity compile: 0 error; targeted EditMode 25/25; targeted exact Continue PlayMode 2/2; full EditMode 162/162; full PlayMode 30 pass + 1 explicit profiler skip; Unity console 0 error |
 | 2026-07-15 | `DW-F-SCHEDULE` exact 3/6/9 regular Council cadence | `CouncilRegularSchedule` regular kartı yalnız Dawn Day `3,6,9,12...` ve aynı gün tek kez açan owner oldu; chance/pity/cooldown regular akıştan çıkarıldı, legacy catalog alanları yalnız serialized uyumluluk için gizlendi. Save schema v11'e çıktı; `LastRegularCouncilDay` ile `HasActiveCouncilEvent` discriminator'ı exact state'e bağlandı. v10 migration yalnız gerçekten üretilmiş event'i handled sayıyor; chance fail scheduled kartı yutmuyor. Emergency type/trigger/content üretilmedi ve owner gate açık bırakıldı | Unity compile: 0 error; targeted EditMode 36/36; targeted NewGameScene PlayMode 1/1; full EditMode 185/185; full PlayMode 31 pass + 1 explicit profiler skip; Unity console 0 error |
+| 2026-07-15 | `DW-F-GUARDS` canonical Council effect guardrails | `CouncilEffectGuardUtility` population, free archer ve next-night count sınırlarının saf owner'ı oldu. Council population gain boş yatak + Food ile sınırlandı, accepted kişi başına Food tek transaction'da harcandı ve capacity büyütme bypass'ı kaldırıldı. Free archer gerçek idle population tüketiyor ve ortak 1000 cap'i koruyor. Defense yalnız Wall'a, horde etkisi yalnız bounded count multiplier'a yazıyor; exact kart sonucu tam uygulanamıyorsa seçenek preflight'ta kilitleniyor. Emergency trigger listesi Blueprint gereği owner gate'inde açık kaldı | Unity compile: 0 error; targeted EditMode 3/3; targeted NewGameScene PlayMode 1/1; full EditMode 188/188; full PlayMode 32 pass + 1 explicit profiler skip; Unity console 0 error |

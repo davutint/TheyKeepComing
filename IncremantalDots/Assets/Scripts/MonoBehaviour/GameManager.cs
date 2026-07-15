@@ -2499,6 +2499,24 @@ namespace DeadWalls
                 if (effect.Kind == CouncilEffectKind.PayResource
                     && !CanAfford(BuildSingleResourceCost(effect.Resource, effect.Amount)))
                     return false;
+
+                if (effect.Kind == CouncilEffectKind.GainPopulation)
+                {
+                    if (!TryGetCouncilPopulationGainBudget(effect.Amount, out var budget)
+                        || budget.AcceptedArrivals != Mathf.Max(0, effect.Amount))
+                    {
+                        return false;
+                    }
+                }
+
+                if (effect.Kind == CouncilEffectKind.GainFreeArchers
+                    && CouncilEffectGuardUtility.GetAllowedFreeArcherGain(
+                        effect.Amount,
+                        GetArcherCount(),
+                        GetIdlePopulation()) != Mathf.Max(0, effect.Amount))
+                {
+                    return false;
+                }
             }
 
             return true;
@@ -2552,18 +2570,13 @@ namespace DeadWalls
                         SpendResources(BuildSingleResourceCost(effect.Resource, effect.Amount));
                         break;
                     case CouncilEffectKind.GainPopulation:
-                        AddPopulation(effect.Amount);
+                        ApplyCouncilPopulationGain(effect.Amount);
                         break;
                     case CouncilEffectKind.GainFreeArchers:
-                        for (int i = 0; i < effect.Amount; i++)
-                        {
-                            if (!SpawnArcher(ArcherType.Basic))
-                                break; // ortak 1000 cap; bedava spawn population tuketmez
-
-                            archerCountsDirty = true;
-                        }
+                        archerCountsDirty |= ApplyCouncilFreeArcherGain(effect.Amount) > 0;
                         break;
                     case CouncilEffectKind.HealDefensePercent:
+                        // Council savunma etkisinin tek hedefi Wall'dur; Gate/Core yolu yoktur.
                         HealWallByPercent(Mathf.Abs(effect.Rate));
                         break;
                     case CouncilEffectKind.WorkerCapBonus:
@@ -2577,7 +2590,7 @@ namespace DeadWalls
                         ApplyCouncilProductionModifier(effect.Resource, Mathf.Clamp(1f - Mathf.Abs(effect.Rate), 0.1f, 1f), effect.DurationDays);
                         break;
                     case CouncilEffectKind.NextNightSpawnDelta:
-                        ApplyCouncilNightModifier(1f + effect.Rate);
+                        ApplyCouncilNightModifier(effect.Rate);
                         break;
                 }
             }
@@ -2586,6 +2599,109 @@ namespace DeadWalls
                 ApplyTechEconomyAggregates(); // cap toplamlari base+tech+council olarak yeniden yazilir
             if (archerCountsDirty)
                 ReadArcherTypeCounts();
+        }
+
+        private bool TryGetCouncilPopulationGainBudget(
+            int requestedPopulation,
+            out MobilePopulationArrivalBudget budget)
+        {
+            budget = default;
+            if (!CanAccessEntityManager()
+                || !_entityManager.Exists(_gameStateEntity)
+                || !TryGetMobileConfigEntity(out var configEntity)
+                || !_entityManager.HasComponent<MobileCastleCombatConfig>(configEntity)
+                || !_entityManager.HasComponent<MobileBedCapacityState>(configEntity))
+            {
+                return false;
+            }
+
+            var population = _entityManager.GetComponentData<PopulationState>(_gameStateEntity);
+            var resources = _entityManager.GetComponentData<ResourceData>(_gameStateEntity);
+            var config = _entityManager.GetComponentData<MobileCastleCombatConfig>(configEntity);
+            var beds = _entityManager.GetComponentData<MobileBedCapacityState>(configEntity);
+            budget = CouncilEffectGuardUtility.CalculatePopulationGain(
+                requestedPopulation,
+                population.Total,
+                MobileBedCapacityUtility.GetTotalCapacity(beds),
+                resources.Food,
+                config.FoodCostPerArrival);
+            return true;
+        }
+
+        private int ApplyCouncilPopulationGain(int requestedPopulation)
+        {
+            if (!TryGetCouncilPopulationGainBudget(requestedPopulation, out var budget)
+                || budget.AcceptedArrivals <= 0
+                || !TryGetMobileConfigEntity(out var configEntity))
+            {
+                return 0;
+            }
+
+            var beds = _entityManager.GetComponentData<MobileBedCapacityState>(configEntity);
+            var population = _entityManager.GetComponentData<PopulationState>(_gameStateEntity);
+            var resources = _entityManager.GetComponentData<ResourceData>(_gameStateEntity);
+
+            resources.Food = math.max(0, resources.Food - budget.RequiredFood);
+            population.Total += budget.AcceptedArrivals;
+            population.BaseCapacity = math.max(0, beds.BaseCapacity);
+            population.Capacity = MobileBedCapacityUtility.GetTotalCapacity(beds);
+            population.Idle = math.max(0, population.Total - population.Workers - population.Archers);
+
+            _entityManager.SetComponentData(_gameStateEntity, resources);
+            _entityManager.SetComponentData(_gameStateEntity, population);
+            Resources = resources;
+            Population = population;
+            return budget.AcceptedArrivals;
+        }
+
+        private int ApplyCouncilFreeArcherGain(int requestedArchers)
+        {
+            int allowed = CouncilEffectGuardUtility.GetAllowedFreeArcherGain(
+                requestedArchers,
+                GetArcherCount(),
+                GetIdlePopulation());
+            int spawned = 0;
+            for (int i = 0; i < allowed; i++)
+            {
+                if (!SpawnArcher(ArcherType.Basic))
+                    break;
+
+                if (!ConsumePopulationForCouncilArcher())
+                {
+                    Debug.LogError("[GameManager] Council archer spawn population commit olmadan tamamlandi.");
+                    break;
+                }
+
+                spawned++;
+            }
+
+            return spawned;
+        }
+
+        private bool ConsumePopulationForCouncilArcher()
+        {
+            if (!IsMobilePopulationEconomyEnabled()
+                || !CanAccessEntityManager()
+                || !_entityManager.Exists(_gameStateEntity))
+            {
+                return false;
+            }
+
+            var population = _entityManager.GetComponentData<PopulationState>(_gameStateEntity);
+            int workers = PopulationAllocation.WoodWorkers
+                + PopulationAllocation.StoneWorkers
+                + PopulationAllocation.IronWorkers
+                + PopulationAllocation.FoodWorkers;
+            int idle = math.max(0, population.Total - population.Archers - workers);
+            if (idle <= 0)
+                return false;
+
+            population.Workers = workers;
+            population.Archers = math.min(population.Total, population.Archers + 1);
+            population.Idle = math.max(0, population.Total - population.Workers - population.Archers);
+            _entityManager.SetComponentData(_gameStateEntity, population);
+            Population = population;
+            return true;
         }
 
         private static ResourceCost BuildSingleResourceCost(EconomyFocusType resource, int amount)
@@ -2639,7 +2755,7 @@ namespace DeadWalls
             EconomyEvent = eventState;
         }
 
-        private void ApplyCouncilNightModifier(float multiplier)
+        private void ApplyCouncilNightModifier(float rateDelta)
         {
             if (!TryGetMobileConfigEntity(out var configEntity)
                 || !_entityManager.HasComponent<MobileEconomyEventState>(configEntity))
@@ -2650,7 +2766,8 @@ namespace DeadWalls
             // Day/Dusk'ta secildiyse bu cycle'in gecesi (expire +1).
             bool inDawn = ContinuousSiegeCycle.Phase == SiegeCyclePhase.Dawn;
             var eventState = _entityManager.GetComponentData<MobileEconomyEventState>(configEntity);
-            eventState.NextNightSpawnMultiplier = Mathf.Clamp(multiplier, 0.25f, 2f);
+            eventState.NextNightSpawnMultiplier =
+                CouncilEffectGuardUtility.ResolveNightCountMultiplier(rateDelta);
             eventState.NightSpawnExpiresAfterWave = day + (inDawn ? 2 : 1);
             _entityManager.SetComponentData(configEntity, eventState);
             EconomyEvent = eventState;

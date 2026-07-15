@@ -42,6 +42,17 @@
 6. PlayMode: `CouncilRegularSchedulePlayModeTests` gercek sahnede Day 1-12 cadence ve
    ayni scheduled gunde ikinci acilisi dogrular.
 
+## Effect Guardrail Testi
+
+- Population karti exact miktar icin yeterli bos yatak + Food yoksa pasif olmalidir.
+- Uygulanan her Council population kazanimi kabul edilen kisi basina Food'u yalniz bir kez
+  harcamali; yatak capacity'sini buyutmemelidir.
+- Ucretsiz okcu karti exact miktar icin yeterli idle population + ortak `1000` cap yoksa pasif
+  olmali; her gelen okcu bir idle kisiyi kullanmalidir.
+- `CouncilEffectGuardPlayModeTests`, Wall heal sirasinda legacy Gate/Core degerlerinin
+  degismedigini ve gece etkisinin zombie HP/damage/speed yerine yalniz count multiplier
+  yazdigini gercek `NewGameScene` ECS state'inde dogrular.
+
 ## Dikkat
 
 - Kart objeleri PREFABDADIR (`CouncilEventPanel`) — sahne-override degil. Prefab TEK dogruluk

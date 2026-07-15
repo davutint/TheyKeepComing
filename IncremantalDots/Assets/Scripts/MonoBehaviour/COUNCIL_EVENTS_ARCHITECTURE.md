@@ -104,6 +104,30 @@ varyant dogurur ve yeni atom/sablon eklemek cesitliligi CARPARAK buyutur.
 - Worker cap bonuslari GameManager aggregate'inde tech ile birlesir (base+tech+council) —
   tech satin alimi council kazanimini ezmez.
 
+## Effect Guardrail Owner'i
+
+`CouncilEffectGuardUtility`, Council sonucunu ana sistemlerin mevcut sinirlarina baglayan saf
+sayisal owner'dir. `GameManager.ApplyCouncilEffects` bu utility'nin sonucunu gercek ECS
+transaction'ina cevirir.
+
+- `GainPopulation`, Dawn arrival ile ayni `MobilePopulationArrivalUtility` butcesini kullanir.
+  Kabul edilen kisi sayisi bos yatak ve Food ile sinirlanir; kabul edilen her kisi Food'u tam
+  bir kez harcar. Council population kazanimi `PopulationState.Capacity/BaseCapacity` degerini
+  buyutemez.
+- `GainFreeArchers`, Basic/Rapid/Frost ortak `1000` cap'i ile gercek idle population'in minimumu
+  kadar calisir ve her spawn icin bir idle kisiyi `PopulationState.Archers` havuzuna tasir.
+  Free Economy Test Mode bu urun guard'ini bypass etmez.
+- Kartin yazdigi exact population/archer sonucunun tamami uygulanamiyorsa
+  `CanAffordCouncilOption` secenegi kilitler. Private effect uygulayiciya bozuk/stale payload
+  gelirse ikinci guard sonucu guvenli bicimde clamp eder.
+- `HealDefensePercent` yalniz `WallSegment` owner'ina gider; Gate/Core okunmaz veya yazilmaz.
+- `NextNightSpawnDelta` yalniz `MobileEconomyEventState.NextNightSpawnMultiplier` alanini
+  `0.25..2.0` araliginda yazar. Zombie HP, damage ve speed alanlarina dokunmaz.
+
+Test owner'lari: `CouncilEffectGuardUtilityTests` saf limitleri;
+`CouncilEffectGuardPlayModeTests` gercek ECS population/Food/archer/Wall/count-only
+transaction'larini dogrular.
+
 ## Isim Sozlesmesi
 
 `CouncilEventPanel` (+CanvasGroup), `CouncilTitleText`, `CouncilBodyText`, `CouncilTimerFill`

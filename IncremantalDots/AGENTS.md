@@ -62,6 +62,15 @@ Unity MCP is a hard prerequisite for every Unity project task in this repository
 - Ask the repository owner to restart or reconnect Unity MCP. Resume work only after the owner confirms readiness and MCP connectivity is verified again.
 - A short disconnect caused by a Unity MCP-triggered domain reload or test run may be retried. If it does not reconnect promptly, stop and ask the repository owner to restart or reconnect it.
 
+### Mandatory Task Completion Progress Report
+
+After completing and verifying each development task, report the project's overall tracked progress to the repository owner.
+
+- Use the authoritative development tracker as the source of truth; do not estimate progress from conversation history.
+- State the exact completed-task count, total-task count, and completion percentage in the form `X/Y tasks completed — Z%`.
+- Count the just-finished task only after its implementation and required verification are complete and its tracker status is updated.
+- If the tracker scope or denominator changes, state that explicitly so the percentage remains auditable.
+
 GitHub and remote operations are forbidden unless the owner explicitly changes this rule in a later message. Forbidden actions include but are not limited to:
 
 - `git push`
