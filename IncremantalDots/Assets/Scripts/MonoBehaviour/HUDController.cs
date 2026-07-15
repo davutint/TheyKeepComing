@@ -8,10 +8,6 @@ namespace DeadWalls
     {
         [Header("HP Bars")]
         public Slider WallHPBar;
-        [HideInInspector]
-        public Slider GateHPBar;
-        [HideInInspector]
-        public Slider CastleHPBar;
 
         [Header("Text")]
         public TMP_Text XPText;
@@ -23,16 +19,8 @@ namespace DeadWalls
         public TMP_Text DefenseText;
         public TMP_Text DefensePercentText;
         public TMP_Text DefenseWallText;
-        [HideInInspector]
-        public TMP_Text DefenseGateText;
-        [HideInInspector]
-        public TMP_Text DefenseCoreText;
         public TMP_Text WaveRewardText;
         public Image DefenseWallFill;
-        [HideInInspector]
-        public Image DefenseGateFill;
-        [HideInInspector]
-        public Image DefenseCoreFill;
         public Image DefenseDamageGlow;
         public Image DamageFlashImage;
 
@@ -102,7 +90,6 @@ namespace DeadWalls
 
         private void OnEnable()
         {
-            EnforceSingleWallPresentation();
             HideLegacyArcherTypeText();
             CacheDefaultColors();
         }
@@ -254,33 +241,6 @@ namespace DeadWalls
 
             ArcherTypeText.gameObject.SetActive(false);
             ArcherTypeText = null;
-        }
-
-        private void EnforceSingleWallPresentation()
-        {
-            if (GateHPBar != null)
-                GateHPBar.gameObject.SetActive(false);
-            if (CastleHPBar != null)
-                CastleHPBar.gameObject.SetActive(false);
-            if (DefenseGateText != null)
-                DefenseGateText.gameObject.SetActive(false);
-            if (DefenseCoreText != null)
-                DefenseCoreText.gameObject.SetActive(false);
-
-            HideLegacyDefenseTrack(DefenseGateFill, "Gate");
-            HideLegacyDefenseTrack(DefenseCoreFill, "Core");
-        }
-
-        private static void HideLegacyDefenseTrack(Image fill, string expectedName)
-        {
-            if (fill == null)
-                return;
-
-            Transform parent = fill.transform.parent;
-            if (parent != null && parent.name.Contains(expectedName))
-                parent.gameObject.SetActive(false);
-            else
-                fill.gameObject.SetActive(false);
         }
 
         private void CacheDefaultColors()

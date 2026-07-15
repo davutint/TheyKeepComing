@@ -670,23 +670,6 @@ namespace DeadWalls.Tests
             }
             Assert.That(runtimeReady, Is.True);
 
-            var hudControllers = Object.FindObjectsByType<HUDController>(
-                FindObjectsInactive.Include, FindObjectsSortMode.None);
-            foreach (var hud in hudControllers)
-            {
-                if (!hud.gameObject.activeInHierarchy)
-                    continue;
-
-                if (hud.GateHPBar != null)
-                    Assert.That(hud.GateHPBar.gameObject.activeSelf, Is.False);
-                if (hud.CastleHPBar != null)
-                    Assert.That(hud.CastleHPBar.gameObject.activeSelf, Is.False);
-                if (hud.DefenseGateText != null)
-                    Assert.That(hud.DefenseGateText.gameObject.activeSelf, Is.False);
-                if (hud.DefenseCoreText != null)
-                    Assert.That(hud.DefenseCoreText.gameObject.activeSelf, Is.False);
-            }
-
             // GameManager'in meta/death transaction'ini bu ECS owner testinden ayir.
             gameManager.enabled = false;
 

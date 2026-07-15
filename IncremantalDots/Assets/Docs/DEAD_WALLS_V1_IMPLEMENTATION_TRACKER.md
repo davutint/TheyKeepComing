@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.2
 > **Son tam kapsam denetimi:** 2026-07-15
 > **Aktif paket:** Package I - HUD, Onboarding ve Creative Polish
-> **Aktif iş:** `DW-I-HUD-LEGACY` - Active HUD Gate/Core Legacy Cleanup
-> **İlerleme:** `345 / 441` tracker checkbox'ı tamamlandı - `%78,23`
+> **Aktif iş:** `DW-I-HUD-RESOURCES` - Compact Top Resource HUD
+> **İlerleme:** `346 / 441` tracker checkbox'ı tamamlandı - `%78,46`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -782,7 +782,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 
 | Blueprint hedefi | Mevcut canlı HUD | Durum |
 |---|---|---|
-| Tek minimal Wall bar | Runtime Wall-only yönü var; prefabda Gate/Core binding'leri hâlâ serialize | `[~]` |
+| Tek minimal Wall bar | Aktif prefab, sahne binding'i ve HUDController yalnız Wall sunumu taşıyor | `[x]` |
 | Minimal phase area | Büyük CyclePanel + DAY/DUSK/NIGHT labels | `[!]` |
 | Forecast yok | HordePressurePanel aktif bağlı | `[!]` |
 | Abilities alt orta | Fireball/Rally/Emergency Repair tek alt orta cooldown barında | `[x]` |
@@ -794,7 +794,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 
 ### HUD işleri
 
-- [ ] Gate/Core serialized binding ve görsel kalıntılarını active prefabdan temizle veya açık dormant guard koy.
+- [x] Gate/Core serialized binding ve görsel kalıntılarını active prefabdan temizle veya açık dormant guard koy.
 - [ ] Üst kaynak HUD'ını kompakt tut.
 - [ ] Üst ortada minimal phase alanı ayır.
 - [ ] Büyük CyclePanel ve ham DAY/DUSK/NIGHT sunumunu owner-approved mockup ile değiştir.
@@ -1149,3 +1149,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-15 | `DW-H-META-SCHEMA` canonical meta v3 schema + migration guard | `MetaProgressState v3`, Souls/istatistik/upgrades/son 128 reward receipt yanında stable `UnlockedPoolIds` ve `TutorialFlags` sahiplerini kurdu. v1 ve v2 açık zincirle currency, upgrade ve receipt kaybetmeden v3'e taşınıyor; unknown upgrade Id'leri korunuyor. Future version veya corrupt JSON artık boş state'e sessiz map edilip üzerine yazılmıyor: `LoadStatus` ve `CanPersist` bütün meta mutation/reward write yollarını fail-closed kilitliyor. Pool/tutorial mutation'ları ile upgrade purchase disk write başarısızsa in-memory rollback yapıyor. Run v3-v12 explicit migration guard'ı ayrıca denetlenerek stale tracker satırı kapatıldı; önceki death receipt process-restart test satırı kanıtıyla eşlendi | Unity compile: 0 error; new schema EditMode 7/7; related EditMode regression 20/20; targeted PlayMode 2/2; Unity Console'da gerçek error 0; tracker `329/441` |
 | 2026-07-15 | `DW-H-META-BOUNDARY` death-only shop + run graph isolation | Meta purchase otoritesi `GameManager`a taşındı; aktif koşu, toplanmamış/durable olmayan ölüm ve fail-closed meta state satın alamıyor. Canonical catalog asset identity aynı Id'li spoof definition'ı reddediyor; persistence mutation API'si internal kaldı. `MetaUpgradePolicy` yalnız run-start/aggregate effect'lerini allowlist yaptı; `StartingTechLevel`, `TechNodeId`, runtime case ve dormant `Meta_start_moat.asset` kaldırıldı. Exact Continue'un saved tech replay'i `RestoreSavedTechNodeLevels` adıyla run-save sahibinde korundu; pool unlock state'i mevcut generated graph'a yazmıyor | Unity compile: 0 error; new boundary EditMode 5/5; schema+dormancy regression 9/9; death purchase PlayMode 1/1; exact Continue/death/Heart graph PlayMode regression 3/3; Unity Console 0 error; tracker `335/441` |
 | 2026-07-15 | `DW-H-META-CATALOG` fixed launch catalog + incremental cost curves | Blueprint sabit listesi dört starting resource, Basic-only Archer, limitsiz starting beds, Wall HP, worker production, Arrow efficiency, Essence gain ve future node-pool unlock olarak 11 canonical assete çekildi; eski `Meta_archer_damage` effect/asset/runtime yolu kaldırıldı. Kaynak/yatak sink'leri `MaxLevel=0` limitsiz, bütün fiyatlar üstel ve saturating; Basic Archer ortak 1000 cap'ini koruyor. Arrow meta verimi paid/Heart level'dan ayrıldı, Essence yüzdesinin kesirli payı exact save v13'e eklendi, Continue başlangıç bonuslarını çift uygulamadan derived etkileri yeniden kuruyor. Node-pool seviyesi/Id'si/Souls aynı atomik transaction'da tek kez commit ediliyor | Unity compile: 0 error; targeted EditMode `50/50`; targeted PlayMode `2/2`; Unity Console gerçek error 0; catalog validation 0 problem; tracker `344/441` |
+| 2026-07-15 | `DW-I-HUD-LEGACY` active HUD Gate/Core cleanup | Aktif HUD prefabındaki Gate/Core text, track ve fill objeleri kaldırıldı; `HUDController` ile scene setup binding sözleşmesi Wall-only hale getirildi. Connected `NewGameScene` instance'ındaki eski serialize referanslar temizlendi; Wall text/fill bağları korundu ve eski runtime hide guard'ına ihtiyaç kalmadı | Unity compile: 0 error / 0 warning; targeted EditMode 3/3; targeted PlayMode 1/1; MCP prefab ve canlı sahne denetiminde Gate/Core obje 0, Wall bindingleri sağlam; tracker `346/441` |

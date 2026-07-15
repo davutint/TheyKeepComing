@@ -25514,17 +25514,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1094158081}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &75996992 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8679438947662373711, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
-  m_PrefabInstance: {fileID: 1065689827}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!1 &86939543
 GameObject:
   m_ObjectHideFlags: 0
@@ -54288,17 +54277,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 3913772761592499137, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
   m_PrefabInstance: {fileID: 1065689827}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &780522193 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8696252476015529449, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
-  m_PrefabInstance: {fileID: 1065689827}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!1 &795542574
 GameObject:
   m_ObjectHideFlags: 0
@@ -64743,8 +64721,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: DeadWalls::DeadWalls.HUDController
   WallHPBar: {fileID: 0}
-  GateHPBar: {fileID: 0}
-  CastleHPBar: {fileID: 0}
   XPText: {fileID: 0}
   WaveText: {fileID: 1425645767}
   KillsText: {fileID: 1952876610}
@@ -64754,12 +64730,8 @@ MonoBehaviour:
   DefenseText: {fileID: 2015881144}
   DefensePercentText: {fileID: 512202526}
   DefenseWallText: {fileID: 1379357705}
-  DefenseGateText: {fileID: 2002220394}
-  DefenseCoreText: {fileID: 75996992}
   WaveRewardText: {fileID: 1669444123}
   DefenseWallFill: {fileID: 1334934229}
-  DefenseGateFill: {fileID: 1661740285}
-  DefenseCoreFill: {fileID: 780522193}
   DefenseDamageGlow: {fileID: 410454274}
   DamageFlashImage: {fileID: 1753078278}
   WoodText: {fileID: 1065689861}
@@ -72046,17 +72018,6 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
---- !u!114 &1661740285 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 80233959812301494, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
-  m_PrefabInstance: {fileID: 1065689827}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!114 &1669116435 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7378859549815185947, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
@@ -75466,17 +75427,6 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
---- !u!114 &2002220394 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8728113427047038980, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
-  m_PrefabInstance: {fileID: 1065689827}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!114 &2004445180 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6089532577689449051, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}

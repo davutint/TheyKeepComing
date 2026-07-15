@@ -4212,16 +4212,10 @@ namespace DeadWalls
         {
             hud.DefensePercentText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "DefensePercentText");
             hud.DefenseWallText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "DefenseWallText");
-            hud.DefenseGateText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "DefenseGateText");
-            hud.DefenseCoreText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "DefenseCoreText");
             hud.DefenseWallFill = FindComponentInChildrenByName<Image>(hudRoot, "DefenseWallFill");
-            hud.DefenseGateFill = FindComponentInChildrenByName<Image>(hudRoot, "DefenseGateFill");
-            hud.DefenseCoreFill = FindComponentInChildrenByName<Image>(hudRoot, "DefenseCoreFill");
             hud.DefenseDamageGlow = FindComponentInChildrenByName<Image>(hudRoot, "DefenseDamageGlow");
 
             ConfigureDefenseFillImage(hud.DefenseWallFill);
-            ConfigureDefenseFillImage(hud.DefenseGateFill);
-            ConfigureDefenseFillImage(hud.DefenseCoreFill);
 
             if (hud.DefensePercentText != null && hud.DefenseText != null)
                 hud.DefenseText.gameObject.SetActive(false);

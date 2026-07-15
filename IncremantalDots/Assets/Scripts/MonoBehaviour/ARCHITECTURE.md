@@ -47,7 +47,7 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - `HordePressurePanel` imported prefabda bulunsa bile player-facing olarak kapali tutulur
 - `CyclePanel` yoksa legacy wave fallback text'lerini kullanir
 - `ArrowText`, finite stoku `Current / Capacity` biçiminde gösterir; `INF` modu yoktur
-- Mobile HUD'da yalniz `DefenseWallFill` ve Wall yuzdesi guncellenir; legacy Gate/Core alanlari runtime'da gizlenir
+- Mobile HUD'da yalniz `DefenseWallFill` ve Wall yuzdesi guncellenir; aktif prefab ve `HUDController` legacy Gate/Core gorseli ya da binding'i tasimaz
 - `WaveRewardText`, wave clear bonusunu kisa sure `Wave Cleared +...` olarak gosterir
 - Night/high pressure baskisinda threat rengi kullanabilir; savunma hasarinda `DamageFlashImage` kisa red flash verir
 - Archer count bilgisi sag drawer row'larinda okunur; mobile setup eski `ArcherTypeText` placeholder'ini kullanmaz

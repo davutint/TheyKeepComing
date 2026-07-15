@@ -26,7 +26,7 @@ Beklenen referanslar:
 - Worker drawer: `WorkerEconomyDrawerPanel`, `WorkerDrawerToggleButton`, `WorkerIdlePopulationText`, `WorkerTotalText`, `WorkerArcherPopulationText`
 - Worker rows: `WoodWorkerCountText`, `WoodWorkerRateText`, `WoodWorkerAddButton`, `WoodWorkerStatusText`; ayni pattern `Stone`, `Iron` ve `Food` icin
 - Top center: `WaveText`, `KillsText`, `WaveRewardText`
-- Defense module: `CastleDefensePanel`, `DefensePercentText`, `DefenseWallFill`, `DefenseGateFill`, `DefenseCoreFill`, `DefenseWallText`, `DefenseGateText`, `DefenseCoreText`
+- Defense module: `CastleDefensePanel`, `DefensePercentText`, `DefenseWallFill`, `DefenseWallText`; legacy Gate/Core gorseli ve binding'i yoktur
 - Optional defense feedback: `DefenseDamageGlow`, `DefenseWarningIcon`, fallback `DefenseText`
 - Feedback: `DamageFlashOverlay` full-screen red `Image`, `HUDController.DamageFlashImage` alanina baglanir
 - Combat feedback: main scene'de `CombatFeedbackRoot` + `CombatFeedbackBridge` bulunur; setup tool arrow hit/frost VFX prefablarini, opsiyonel muzzle referansini ve arrow/castle SFX clip'lerini otomatik baglar. Shoot muzzle VFX V1'de oynatilmaz.

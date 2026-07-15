@@ -70,7 +70,7 @@ SubScene:
 - `HUDController`: `WoodText`, `StoneText`, `IronText`, `FoodText`, `PopulationText`, `ArrowText`, `WaveRewardText`, `DamageFlashImage` ve varsa cycle/defense module alanlari bagli
 - `HUDController` cycle module: `CyclePanel`, `CyclePhaseText`, `CycleDayLabelText`, `CycleDuskLabelText`, `CycleNightLabelText`, `CycleProgressFill`, `CycleProgressMarker`
 - `HordePressurePanel` prefabda varsa player-facing olarak kapali tutulur
-- `HUDController` defense module: `DefensePercentText`, `DefenseWallFill`, `DefenseGateFill`, `DefenseCoreFill`, `DefenseWallText`, `DefenseGateText`, `DefenseCoreText`, opsiyonel `DefenseDamageGlow`
+- `HUDController` defense module: `DefensePercentText`, `DefenseWallFill`, `DefenseWallText`, opsiyonel `DefenseDamageGlow`; legacy Gate/Core alanlari prefabda ve controller binding'inde bulunmaz
 - `MarketUI`: `ArcherDrawerPanel`, `DrawerToggleButton`, Basic/Rapid/Frost row text, buy ve dynamic `ArcherRetrainButton` alanlari bagli
 - `MarketUI`: Upgrade butonlari, `ArrowTechPanel`, tech unlock butonlari ve repair/prep butonlari prefabda varsa gizli
 - `HeartScreenUI`: `CastleHeartPanel`, open/close, viewport/content, node/connection template,
@@ -111,7 +111,7 @@ pipeline'i 2026-07-06'da kaldirildi.) Setup tool asagidaki isimleri exact-match 
 - Beklenen projected gain alanlari: `ProjectedIncomeText`, `ProjectedWoodText`, `ProjectedStoneText`, `ProjectedIronText`, `ProjectedFoodText`
 - Beklenen Castle Interior repair alanlari: `CastleRepairButton`, `CastleRepairStatusText`, opsiyonel `CastleRepairCostText`
 - Beklenen event alanlari: `EconomyEventPanel`, `EconomyEventTitleText`, `EconomyEventDescriptionText`, `EconomyEventChoiceAButton`, `EconomyEventChoiceBButton`, `EconomyEventChoiceAText`, `EconomyEventChoiceBText`, `EconomyEventBadge`, `EconomyEventBadgeText`
-- Beklenen readability alanlari: `WaveRewardText`, `DefensePercentText`, `DefenseWallFill`, `DefenseGateFill`, `DefenseCoreFill`, `DefenseWallText`, `DefenseGateText`, `DefenseCoreText`
+- Beklenen readability alanlari: `WaveRewardText`, `DefensePercentText`, `DefenseWallFill`, `DefenseWallText`
 - Beklenen continuous cycle alanlari: `CyclePanel`, `CyclePhaseText`, `CycleDayLabelText`, `CycleDuskLabelText`, `CycleNightLabelText`, `CycleProgressFill`, `CycleProgressMarker`
 - Opsiyonel defense feedback: `DefenseDamageGlow`, `DefenseWarningIcon`, fallback `DefenseText`
 - Opsiyonel Castle Interior feedback: `CastleTapHintPulse`, `ProjectedIncomeFrame`, `CastleRepairFrame`, `EconomyEventGlow`
