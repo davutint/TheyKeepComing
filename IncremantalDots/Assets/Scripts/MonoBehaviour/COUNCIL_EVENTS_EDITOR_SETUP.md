@@ -32,6 +32,9 @@
   owner'idir.
 - Legacy `DailyEventChance/PityDays/CooldownDays` serialized uyumluluk icin saklanir ve
   Inspector'da gizlidir; regular Council'i etkilemez.
+- `ValidateCatalog`, yalniz Id/ref kontrolu yapmaz: atom kind'inin Council-owned allowlist'te
+  olmasini, explicit OptionA/B atomunun template contrast recetesine uymasini ve composer'in
+  global dependency atomlarini da zorunlu tutar. Gate'i gecmeyen katalog runtime'da compose edilmez.
 
 ## Test Adimlari
 
@@ -45,8 +48,12 @@
 4. `refugees_at_gate`'te A sec -> catalog'daki exact curated link sayesinde 2+ gun sonra
    `AMONG THE REFUGEES` zinciri cikabilir (OneShot). Link allowlist'ten cikarilirsa context'te
    flag bulunsa bile target fail-closed acilmaz.
-5. EditMode: `CouncilComposerTests`, `CouncilRegularScheduleTests`, `RunPersistenceTests`.
-6. PlayMode: `CouncilRegularSchedulePlayModeTests` gercek sahnede Day 1-12 cadence ve
+5. EditMode: `CouncilComposerTests`, `CouncilContentPolicyTests`, `CouncilRegularScheduleTests`,
+   `RunPersistenceTests`.
+6. PlayMode: `CouncilRegularSchedulePlayModeTests` gercek sahnede Day 1-12 cadence,
+   onayli flag yazimi ve bozuk role payload'inin fail-closed karar kilidini;
+   `ExactRunContinuePlayModeTests` bozuk active Council payload'inin restart oncesi Continue
+   preflight'ta reddini;
    ayni scheduled gunde ikinci acilisi dogrular. `CouncilEffectGuardPlayModeTests` exact quote
    ile `CouncilTimerText` scene binding'ini de dogrular.
 
@@ -63,6 +70,17 @@ repair adimini otomatik cagirir.
 mevcut iki authored link'i merge eder: Refugees A -> Among the Refugees ve Merchant A -> An Old
 Friend. Var olan custom chain girdilerini silmez; yeni chain veya anlati uretmez. Islem sonunda
 `ValidateCatalog()` calisir ve kopuk/onaysiz source/flag/target baglantilarini Console'a yazar.
+
+## Role / Content Ownership Gate
+
+- Yeni atomun `Kind` degeri yalniz `CouncilContentPolicy` allowlist'indeki run-decision
+  domain'lerinden biri olabilir. Heart currency/node/upgrade veya Meta progression Council
+  content'i olarak eklenemez.
+- Template OptionA/B atom Id'leri secilen `CouncilContrastType` recetesiyle uyusmalidir;
+  aksi halde `ValidateCatalog()` acik hata verir ve runtime compose fail-closed kalir.
+- Setup/repair menu mevcut katalog icerigini **launch-approved** ilan etmez. Mevcut 9 template
+  ve 11 atomun metin/budget/repeat owner review'u ayri acik konudur; menu yeni launch veya
+  Emergency content uretmez.
 
 ## Effect Guardrail Testi
 

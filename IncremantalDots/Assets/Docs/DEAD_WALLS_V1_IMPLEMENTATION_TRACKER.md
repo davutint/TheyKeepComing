@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.0  
 > **Son tam kapsam denetimi:** 2026-07-12  
 > **Aktif paket:** Package F - Council
-> **Aktif iş:** `DW-F-BOUNDARY` - Council Role Isolation + Content Ownership Gate
-> **İlerleme:** `287 / 445` tracker checkbox'ı tamamlandı - `%64,49`
+> **Aktif iş:** `DW-F-EMERGENCY` - Emergency Council Type + Regular Schedule Isolation
+> **İlerleme:** `288 / 445` tracker checkbox'ı tamamlandı - `%64,72`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 
 ---
@@ -134,7 +134,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Economy | Worker üretimi, bed alımı ve dört hazır binanın capacity/efficiency yatırımları var; bed ve bina fiyat eğrileri `DefaultDifficulty.asset`/Difficulty Tuner üzerinden baked runtime tuning'e bağlı; V1 ana kaynaklarında pasif consumption yok | `[x]` |
 | Population | House bed state + Wood purchase API + exact save var; Dawn isteği boş yatak ve Food/kişi bütçesiyle sınırlı, gerçek accepted count uygulanıyor, Food bir kez düşülüyor ve en fazla 15 temsili survivor sağdan Wall arkasına yürüyor | `[x]` |
 | Workers | Kalıcı target ratio + actual/cap/idle state, +1/+10/+100/direct input, bağımsız bina capacity/efficiency seviyeleri, yeni nüfus auto-allocation, exact save, Low/Medium/High density ve allocation-senkronlu animation/cargo/lantern/delivery feedback var | `[x]` |
-| Council | Curated/deterministic composer, exact kart sunumu ve kart UI var; stock/production + Wall context, hard recent memory ve explicit curated chain allowlist aktif; regular schedule exact Day 3/6/9... | Schedule, effect guard, exact option/timer ve context/memory tamam; role boundary, emergency ve launch content açık |
+| Council | Curated/deterministic composer, exact kart sunumu ve kart UI var; stock/production + Wall context, hard recent memory, explicit curated chain allowlist ve fail-closed role/content policy aktif; regular schedule exact Day 3/6/9... | Schedule, effect guard, exact option/timer, context/memory ve role boundary tamam; emergency ve launch content açık |
 | Archers | Basic/Rapid/Frost, instant buy, incremental type maliyeti, yerinde retrain, version'lı 40x25 formation, scalable target load ve pooled projectile lifetime var | `[x]` Combat temeli; upgrade owner'ı Package E |
 | Archer cap | `ArcherCapacityUtility` Basic/Rapid/Frost toplamını `1000` ile sınırlar; buy, merkezi spawn, Council, meta, restore ve legacy Barracks aynı guard'ı kullanır | `[x]` |
 | Placement | Formation V1 asset'iyle sabit 40 `outside` tile x 25 seeded diamond nokta; layer-fill sıra, 1000 gizmo ve v9 Continue testli | `[x]` |
@@ -147,7 +147,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Meta | Ayrı JSON ve Game Over shop var; `StartingTechLevel` aktif | Kısmi uyum |
 | HUD | CyclePanel, DAY/DUSK/NIGHT ve Horde Pressure mevcut; tek Wall runtime gizleme var | Package I polish gerekli |
 | Tutorial | Aktif tutorial/onboarding sistemi bulunmadı | Package I eksik |
-| Testler | EditMode `201/201`; PlayMode `33 pass + 1 explicit profiler skip`; Standalone Player-targeted 10K `1/1` | Güncel değişiklikler full paketle testli |
+| Testler | EditMode `205/205`; PlayMode `35 pass + 1 explicit profiler skip`; Standalone Player-targeted 10K `1/1` | Güncel değişiklikler full paketle testli |
 | Telemetry | Spawn budget demanded/spawned/backlog telemetry mevcut; tam Blueprint event owner'ı eksik | Kısmi |
 
 ---
@@ -161,7 +161,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | 3 | C - Economy + Population | Tamamlandı | Pasif drain yok; arrival tek Food öder; cap aşılmaz; fiyat tuning'i testli |
 | 4 | D - Archers + Ammo | Tamamlandı | 1.000 x 10.000 targeting/projectile ve Arrow truth çalışır |
 | 5 | E - Castle Heart | Tamamlandı | Aynı seed/load aynı valid graph'ı üretir; production content owner gate ayrı |
-| 6 | F - Council | **Aktif** | Schedule, guard, exact option/timer ve context/memory tamam; role boundary, emergency ve launch content açık |
+| 6 | F - Council | **Aktif** | Schedule, guard, exact option/timer, context/memory ve role boundary tamam; emergency ve launch content açık |
 | 7 | G - Active Abilities | Bekliyor | Kaynak tüketmez; Night repair sözleşmesi çalışır |
 | 8 | H - Meta + Persistence | Bekliyor | Ölüm ödülü idempotent; force-close ölümü geri alamaz |
 | 9 | I - Product Gate | Bekliyor | 10k scenario, tutorial ve temiz görsel inceleme |
@@ -643,11 +643,12 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Rare emergency | Ayrı emergency type/trigger yok | `[!]` |
 | Exact effects visible | İki seçenek aynı live quote owner'ından tam sayısal sonuç/maliyet, uygulanabilirlik ve Dawn+Day karar süresini gösteriyor | `[x]` |
 | Context-aware selection | En kit/en bol kaynak stock/production dakikasından seçiliyor; template director iki option atomundan Wall bağlamını okuyor; recent template alternatif varken hard-exclude ediliyor | `[x]` |
+| Role/content isolation | `CouncilContentPolicy` katalog, composed event, live karar ve Continue preflight'ta yalnız Council-owned run effect/recipe allowlist'ini kabul ediyor; Heart/Meta domain'leri yok | `[x]` |
 | Population guard | Council gain boş yatak + Food bütçesiyle exact preflight edilir; stale/private payload clamp olur, accepted kişi başına Food bir kez harcanır ve capacity büyümez | `[x]` |
 | Archer guard | Free archer exact idle population + ortak 1000 cap preflight'ından geçer; her spawn bir idle kişiyi Archer havuzuna taşır | `[x]` |
 | Wall-only defense | Heal yalnız `WallSegment` current/max HP'ye gider; legacy Gate/Core değişmez | `[x]` |
 | Count-only night effect | Council delta yalnız bounded next-night spawn multiplier yazar; zombie HP/damage/speed değişmez | `[x]` |
-| Exact save | Flags/recent/one-shot/run salt, regular handled day ve active-card discriminator schema v11'de; emergency state ve bütün chosen/effect duration audit'i açık | `[~]` |
+| Exact save | Flags/recent/one-shot/run salt, regular handled day ve active-card discriminator schema v11'de; active payload role/content preflight testli; emergency state ve bütün chosen/effect duration audit'i açık | `[~]` |
 
 ### Yapılacaklar
 
@@ -664,7 +665,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [x] Defense effect'lerini yalnız Wall current/max HP ile sınırla.
 - [x] Horde effect'lerini yalnız count/flow multiplier ile sınırla.
 - [~] Regular handled day ve active-card discriminator schema v11'de exact; emergency state ve bütün chosen/effect duration audit'i açık.
-- [ ] Council'ın Heart currency/upgrade rolünü veya Meta rolünü devralmasını engelle.
+- [x] Council'ın Heart currency/upgrade rolünü veya Meta rolünü devralmasını engelle.
 - [ ] Launch template/atom listesi için owner review ve effect budget testi yap.
 
 ### Kabul kapısı
@@ -852,7 +853,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Archers | `GameManager`, `ArcherShootSystem` | Common 1000 cap + scalable target load |
 | Placement | `MobileCastleArcherTilePlacement` | 40x25 stable local points + version |
 | Heart | `GameManager.HeartRuntime` + `HeartScreenUI` generated graph/reveal/purchase/effect/pause ve exact v11 Continue replay owner'ı; legacy `TechTreeUI` aktif scene'den kaldırıldı, production catalog owner onayı bekliyor | Yalnız onaylı production node/balance content'i |
-| Council | `CouncilRegularSchedule`, `CouncilComposer`, `CouncilOptionPresentationUtility`, `CouncilEventUI`, catalog | Exact 3/6/9, guarded effects, exact option/timer ve curated context/memory hazır; role boundary + emergency açık |
+| Council | `CouncilRegularSchedule`, `CouncilComposer`, `CouncilContentPolicy`, `CouncilOptionPresentationUtility`, `CouncilEventUI`, catalog | Exact 3/6/9, guarded effects, exact option/timer, curated context/memory ve Heart/Meta role boundary hazır; emergency açık |
 | Meta | `MetaProgression` | Death-only fixed list + idempotent receipt |
 | HUD | `MobileCastleHudRoot`, `HUDController` | Single Wall + minimal cycle + bottom abilities |
 
@@ -957,9 +958,9 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 ### Mevcut test envanteri
 
-- `[x]` EditMode: `201/201`; exact Council 3/6/9 cadence, context/recent/curated-chain kontratı, v10->v11 Council migration/discriminator, Heart graph, finite Arrow, pool, targeting, Formation V1, common archer cap, economy, worker, cycle, quantity-only, backlog, Moat isolation ve enemy pool kapsamı.
-- `[x]` PlayMode: `33 pass + 1 explicit profiler skip`; gerçek `NewGameScene` Day 1-12 Council cadence, onaylı Council chain flag live yazımı, Heart Continue, Arrow/pool/targeting, 1K archer x 10K enemy, Formation V1, exact Continue, archer cap/retrain, economy/worker, Wall, cycle, backlog ve Fireball kapsamı.
-- `[~]` Council emergency/role-boundary/content ownership ve Player/hardware frame pacing kabulü ilgili paket/kapıları bekliyor; exact regular schedule, guardrail ve context memory tamamlandı.
+- `[x]` EditMode: `205/205`; exact Council 3/6/9 cadence, context/recent/curated-chain, role/content recipe kontratı, v10->v11 Council migration/discriminator, Heart graph, finite Arrow, pool, targeting, Formation V1, common archer cap, economy, worker, cycle, quantity-only, backlog, Moat isolation ve enemy pool kapsamı.
+- `[x]` PlayMode: `35 pass + 1 explicit profiler skip`; gerçek `NewGameScene` Day 1-12 Council cadence, onaylı Council chain flag live yazımı, bozuk Council karar/Continue payload preflight'ı, Heart Continue, Arrow/pool/targeting, 1K archer x 10K enemy, Formation V1, exact Continue, archer cap/retrain, economy/worker, Wall, cycle, backlog ve Fireball kapsamı.
+- `[~]` Council emergency/launch content ownership ve Player/hardware frame pacing kabulü ilgili paket/kapıları bekliyor; exact regular schedule, guardrail, context memory ve role boundary tamamlandı.
 
 ---
 
@@ -1069,7 +1070,7 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | `TechNodeDefinitionSO.cs` + `TechTreeCatalogSO.cs` | Sabit catalog/reveal/cost/effect model |
 | `HeartScreenUI.cs` + `SimulationPauseService.cs` + `TechTreeViewController.cs` | Hidden-safe fullscreen generated graph, compass layout, GE quote/effect/Keystone UI, pan/zoom ve nested exact full-simulation pause |
 | `TechTreeUI.cs` | Legacy sabit catalog UI; aktif NewGameScene owner'ı değil |
-| `CouncilRegularSchedule.cs` + `CouncilComposer.cs` + `CouncilEventUI.cs` | Exact Day 3/6/9 cadence + curated deterministic card infrastructure |
+| `CouncilRegularSchedule.cs` + `CouncilComposer.cs` + `CouncilContentPolicy.cs` + `CouncilEventUI.cs` | Exact Day 3/6/9 cadence + curated deterministic card infrastructure + fail-closed Heart/Meta role/content boundary |
 | `MetaProgression.cs` + `MetaUpgradeSO.cs` | Separate meta save, current reward/effects |
 | `CombatFeedbackBridge.cs` | VFX/audio pools ve rate limiting altyapısı |
 | `Assets/Tests/EditMode` + `Assets/Tests/PlayMode` | V1 contract ve gerçek scene/runtime regression testleri |
@@ -1137,3 +1138,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-15 | `DW-F-GUARDS` canonical Council effect guardrails | `CouncilEffectGuardUtility` population, free archer ve next-night count sınırlarının saf owner'ı oldu. Council population gain boş yatak + Food ile sınırlandı, accepted kişi başına Food tek transaction'da harcandı ve capacity büyütme bypass'ı kaldırıldı. Free archer gerçek idle population tüketiyor ve ortak 1000 cap'i koruyor. Defense yalnız Wall'a, horde etkisi yalnız bounded count multiplier'a yazıyor; exact kart sonucu tam uygulanamıyorsa seçenek preflight'ta kilitleniyor. Emergency trigger listesi Blueprint gereği owner gate'inde açık kaldı | Unity compile: 0 error; targeted EditMode 3/3; targeted NewGameScene PlayMode 1/1; full EditMode 188/188; full PlayMode 32 pass + 1 explicit profiler skip; Unity console 0 error |
 | 2026-07-15 | `DW-F-EXACT` live exact Council option quote + authoritative decision window | `CouncilOptionPresentationUtility` iki seçeneğin authored eylem başlığını live ECS/resource/population/archer/Wall context'iyle birleştirerek tam sayısal sonuç, tek seferlik maliyet ve uygulanabilirlik sebebini aynı quote'tan üretiyor. UI aynı quote ile label ve interactability'yi yeniliyor; Dawn+Day karar süresi wall-clock yerine `ContinuousSiegeCycleData` üzerinden `CouncilTimerText` ve fill'e bağlandı. Generated HUD prefabı, aktif sahne binding'i, font/material ve idempotent repair menüsü tamamlandı | Unity compile: 0 error; targeted EditMode 6/6; targeted NewGameScene PlayMode 1/1; full EditMode 194/194; full PlayMode 32 pass + 1 explicit profiler skip; Unity console 0 error |
 | 2026-07-15 | `DW-F-CONTEXT` context-aware Council selection + curated memory chains | `CouncilComposer` resource scarcity/abundance'ı stock-per-production dakikasından koruyor; template director artık iki option'ın authored atomlarını okuyarak B-tarafı Wall heal bağlamını da ağırlığa katıyor. Recent template, fresh alternatif varsa havuzdan tamamen çıkarılıyor; bütün uygun adaylar recent ise scheduled kart için deterministik fallback kullanılıyor. `CouncilEventCatalogSO.CuratedChains`, source template + branch + flag + target dörtlüsünü merkezi allowlist yaptı; composer ve `GameManager` onaysız chain'i fail-closed reddediyor. Production catalog'a yalnız mevcut Refugees ve Merchant follow-up bağları merge edildi; yeni içerik üretilmedi | Unity compile: 0 error; targeted Council EditMode 14/14; targeted Council PlayMode 2/2; full EditMode 201/201; full PlayMode 33 pass + 1 explicit profiler skip; Unity console 0 error |
+| 2026-07-15 | `DW-F-BOUNDARY` Council role isolation + content ownership gate | `CouncilContentPolicy` yalnız run resources/production/worker cap/population/free Basic archer/Wall/count effect domain'lerini allowlist yaptı; Heart Grave Essence/node upgrade ve Meta progression Council rolü dışında kaldı. Catalog atom/contrast/branch recipe validation, composer fail-closed gate, live quote/choice preflight ve active Council Continue preflight aynı policy'ye bağlandı. Production 9 template/11 atom teknik gate'ten geçiyor ancak launch content review owner kararı beklemeye devam ediyor; Emergency content üretilmedi | Unity compile: 0 error; targeted Council EditMode 18/18; targeted Council/Continue PlayMode 4/4; full EditMode 205/205; full PlayMode 35 pass + 1 explicit profiler skip; Unity console 0 error |

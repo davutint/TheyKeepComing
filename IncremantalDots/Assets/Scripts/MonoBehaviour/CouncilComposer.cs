@@ -71,6 +71,8 @@ namespace DeadWalls
         {
             if (catalog == null || catalog.Templates == null || catalog.Atoms == null)
                 return null;
+            if (!catalog.TryValidateRuntimeContent(out _))
+                return null;
 
             var rng = new Unity.Mathematics.Random(seed == 0u ? 1u : seed);
             // Warm-up: ardisik/kucuk seed'lerde ilk orneklemin korelasyonunu kirar

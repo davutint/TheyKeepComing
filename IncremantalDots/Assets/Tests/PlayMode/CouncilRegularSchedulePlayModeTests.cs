@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -143,6 +144,38 @@ namespace DeadWalls.Tests
             Assert.That(flags.ContainsKey("schedule_followup_ready"), Is.True,
                 "Approved source/branch flag'i live GameManager state'ine yazilmadi.");
             Assert.That(flags["schedule_followup_ready"], Is.EqualTo(3));
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator UnapprovedCouncilPayload_IsBlockedBeforeHeartOrRunStateMutation()
+        {
+            GameManager gameManager = GameManager.Instance;
+            ContinuousSiegeCycleData cycle = gameManager.ContinuousSiegeCycle;
+            cycle.Enabled = true;
+            cycle.CycleIndex = 2;
+            cycle.Phase = SiegeCyclePhase.Dawn;
+            _cycleSetter.Invoke(gameManager, new object[] { cycle });
+
+            Assert.That(gameManager.TryOpenRegularCouncilEvent(), Is.True);
+            ComposedCouncilEvent active = gameManager.ActiveCouncilEvent;
+            Assert.That(active, Is.Not.Null);
+
+            ComposedCouncilEffect invalid = active.OptionA.Effects[0];
+            invalid.Kind = (CouncilEffectKind)999;
+            active.OptionA.Effects[0] = invalid;
+
+            long graveEssenceBefore = gameManager.GraveEssenceAmount;
+            CouncilOptionPresentation quote = gameManager.GetCouncilOptionPresentation(active.OptionA);
+            Assert.That(quote.CanApplyExactly, Is.False);
+            Assert.That(quote.UnavailableReason,
+                Does.StartWith(CouncilContentPolicy.BlockedReason));
+
+            LogAssert.Expect(LogType.Error,
+                new Regex("\\[GameManager\\] Council content gate karari reddetti:"));
+            Assert.That(gameManager.ChooseCouncilOption(true), Is.False);
+            Assert.That(gameManager.ActiveCouncilEvent, Is.SameAs(active));
+            Assert.That(gameManager.GraveEssenceAmount, Is.EqualTo(graveEssenceBefore));
             yield return null;
         }
 

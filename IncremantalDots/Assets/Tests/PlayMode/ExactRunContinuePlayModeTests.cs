@@ -1,5 +1,6 @@
 using System.Collections;
 using System.IO;
+using System.Text.RegularExpressions;
 using NUnit.Framework;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -206,6 +207,62 @@ namespace DeadWalls.Tests
 
             gameManager.RestartGame();
             Assert.That(gameManager.GraveEssenceAmount, Is.Zero);
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator Continue_RejectsCouncilPayloadOutsideRolePolicyBeforeRestart()
+        {
+            GameManager gameManager = GameManager.Instance;
+            bool runtimeReady = false;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                {
+                    runtimeReady = true;
+                    break;
+                }
+                yield return null;
+            }
+            Assert.That(runtimeReady, Is.True,
+                "GameManager/SubScene Council Continue preflight testi icin hazir olmadi.");
+
+            RunSaveState save = RunPersistence.TryLoad();
+            Assert.That(save, Is.Not.Null);
+            Assert.That(gameManager.CouncilCatalog, Is.Not.Null);
+            Assert.That(gameManager.CouncilCatalog.Templates, Is.Not.Empty);
+            CouncilTemplateSO template = gameManager.CouncilCatalog.Templates[0];
+
+            save.HasActiveCouncilEvent = true;
+            save.ActiveCouncilEvent = new ComposedCouncilEvent
+            {
+                TemplateId = template.Id,
+                SetsFlagOnA = template.SetsFlagOnA,
+                SetsFlagOnB = template.SetsFlagOnB,
+                OptionA = new ComposedCouncilOption
+                {
+                    Effects = new System.Collections.Generic.List<ComposedCouncilEffect>
+                    {
+                        new ComposedCouncilEffect { Kind = (CouncilEffectKind)999 },
+                    },
+                },
+                OptionB = new ComposedCouncilOption
+                {
+                    Effects = new System.Collections.Generic.List<ComposedCouncilEffect>
+                    {
+                        new ComposedCouncilEffect { Kind = CouncilEffectKind.GainResource, Amount = 1 },
+                    },
+                },
+            };
+            Assert.That(RunPersistence.Save(save), Is.True);
+
+            string runIdBefore = gameManager.CurrentRunId;
+            long graveEssenceBefore = gameManager.GraveEssenceAmount;
+            LogAssert.Expect(LogType.Error,
+                new Regex("\\[GameManager\\] Council Continue content preflight reddedildi:"));
+            Assert.That(gameManager.TryRestoreRunFromCheckpoint(), Is.False);
+            Assert.That(gameManager.CurrentRunId, Is.EqualTo(runIdBefore));
+            Assert.That(gameManager.GraveEssenceAmount, Is.EqualTo(graveEssenceBefore));
             yield return null;
         }
 

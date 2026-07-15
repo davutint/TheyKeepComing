@@ -13,10 +13,12 @@ varyant dogurur ve yeni atom/sablon eklemek cesitliligi CARPARAK buyutur.
 1. **Veri (ScriptableObject/):** `CouncilEffectAtomSO` (etki parcacigi: tur + uretim-oranli
    buyukluk + director agirlik kurallari + butce degeri), `CouncilTemplateSO` (tema/metin +
    karsitlik tipi + flag kosullari + zincir alanlari), `CouncilEventCatalogSO` (havuz +
-   RecentTemplateMemory 3 + explicit `CuratedChains` allowlist'i). Legacy
+   RecentTemplateMemory 3 + explicit `CuratedChains` allowlist'i). `ValidateCatalog`,
+   `CouncilContentPolicy` role/recipe kontratini da zorunlu tutar. Legacy
    DailyEventChance/PityDays/CooldownDays alanlari serialized asset uyumlulugu icin saklidir
    fakat regular schedule tarafindan kullanilmaz.
-2. **Composer (`CouncilComposer.cs`, pure static):** seed + `CouncilContext` -> sablon sec
+2. **Composer (`CouncilComposer.cs`, pure static):** yalniz runtime-content gate'inden gecen
+   katalogla seed + `CouncilContext` -> sablon sec
    (curated flag/gun filtreleri + hard anti-tekrar + iki secenekli director on-skoru) ->
    karsitlik recetesine gore A/B
    atomlari -> uretim-oranli miktarlar (`perMin * MinutesOfProduction * band`; band 0.7/1.0/1.4)
@@ -27,7 +29,8 @@ varyant dogurur ve yeni atom/sablon eklemek cesitliligi CARPARAK buyutur.
    seed = hash(ECS RandomSeed, run salt, gun)), `ChooseCouncilOption` (efekt uygulama + flag yazimi:
    otomatik `council_{template}_{a|b}` + yalniz catalog allowlist'indeki SetsFlagOnA/B),
    `ExpireCouncilEvent`. Flag'ler `Dictionary<string,int>` (flag -> setlendigi gun; zincir
-   gecikmeleri icin). Restart sifirlar.
+   gecikmeleri icin). `ChooseCouncilOption` composed payload'i catalog template/contrast/branch
+   recetesiyle yeniden dogrulamadan effect veya flag uygulamaz. Restart sifirlar.
 4. **UI (`CouncilEventUI.cs`):** faz gecislerini 0.2s poll ile izler (Dawn -> scheduled open,
    Dusk -> expire); kart DOTween slide+fade ile belirir (Dawn odul toast'undan 1.2s gecikmeli),
    sure seridi + `DECIDE Ns` sayaci authoritative cycle state'inden kalan Dawn+Day penceresini
@@ -52,6 +55,9 @@ varyant dogurur ve yeni atom/sablon eklemek cesitliligi CARPARAK buyutur.
 - v10 chance/pity state'i migrate edilirken yalniz mevcut regular gunde aktif/gecerli kart veya
   `CouncilDaysSinceEvent == 0` kaniti varsa gun handled sayilir. Chance fail'i Day 3/6/9 kartini
   sessizce yutmaz.
+- Continue active Council payload'ini `CouncilContentPolicy` ile production catalog'a karsi
+  preflight eder. Catalog disi template, authored flag uyusmazligi, bilinmeyen role veya option
+  recetesi disi effect varsa kosu restart edilmeden restore fail-closed reddedilir.
 
 ## Karsitlik Receteleri (composer'in gramerleri)
 
@@ -120,6 +126,24 @@ varyant dogurur ve yeni atom/sablon eklemek cesitliligi CARPARAK buyutur.
 - Worker cap bonuslari GameManager aggregate'inde tech ile birlesir (base+tech+council) —
   tech satin alimi council kazanimini ezmez.
 
+## Role / Content Ownership Gate
+
+`CouncilContentPolicy`, Council'in runtime'da sahip olabilecegi effect kind'larinin tek
+allowlist'idir: run kaynak transaction'i, gecici production, run-ici worker cap bonusu,
+population, free Basic archer, Wall heal ve next-night count multiplier. `None`, bilinmeyen
+enum degeri ve gelecekte eklenebilecek baska domain'ler varsayilan olarak reddedilir.
+
+- Grave Essence kazanma/harcama, Heart node reveal/purchase/upgrade/evolution ve Meta Souls/shop
+  Council rolunde degildir; Council apply switch'i bu owner API'lerini cagiramaz.
+- Katalog validation her template'in OptionA/B atom referansini kendi contrast recetesiyle
+  eslestirir ve composer'in global dependency atomlarini kontrol eder.
+- Composer catalog gate'ini gecmeyen havuzdan event uretmez. Live quote bilinmeyen effect'i
+  `CONTENT BLOCKED` olarak kilitler; `ChooseCouncilOption` karti kapatmadan veya flag yazmadan
+  composed event'i authored catalog'a karsi yeniden dogrular.
+- Bu teknik gate mevcut 9 template/11 atomu launch-approved ilan etmez. Launch metin/atom listesi,
+  budget ve tekrar review'u owner karari bekleyen ayri kabul kapisidir. Emergency type/trigger
+  content'i bu paket tarafindan uretilmez.
+
 ## Effect Guardrail Owner'i
 
 `CouncilEffectGuardUtility`, Council sonucunu ana sistemlerin mevcut sinirlarina baglayan saf
@@ -142,10 +166,15 @@ transaction'ina cevirir.
 
 Test owner'lari: `CouncilComposerTests` scarcity/production, iki tarafli Wall director,
 hard recent exclusion/fallback, curated source/target contract ve production catalog asset'ini;
+`CouncilContentPolicyTests` effect role whitelist'ini, contrast/branch recetesini, catalog
+provenance'ini ve production asset gate'ini;
 `CouncilEffectGuardUtilityTests` saf limitleri;
 `CouncilEffectGuardPlayModeTests` gercek ECS population/Food/archer/Wall/count-only
 transaction'larini ve scene timer binding'ini dogrular. `CouncilOptionPresentationUtilityTests`
 exact metin, affordability, cycle countdown ve generated HUD prefab timer'ini kilitler.
+`CouncilRegularSchedulePlayModeTests` bozuk payload'in karar/on-state mutation yapamadigini;
+`ExactRunContinuePlayModeTests` ayni payload'in Continue preflight'ta restart oncesi
+reddedildigini dogrular.
 
 ## Isim Sozlesmesi
 
@@ -160,6 +189,8 @@ exact metin, affordability, cycle countdown ve generated HUD prefab timer'ini ki
   `ContinuousSiegeCycle.Enabled` cache'ini guard olarak kullanir.
 - Ayni anda tek temp-production bonusu (slot kisiti) ve tek aktif kart olur.
 - Testler: `CouncilComposerTests` composer determinizmi/butce/zincir/olcekleme;
+  `CouncilContentPolicyTests` role/content ownership gate'i;
   `CouncilRegularScheduleTests` exact cadence/tek-acilis/v10 migration;
   `CouncilRegularSchedulePlayModeTests` gercek `NewGameScene` Day 1-12 entegrasyonu
-  ve onayli secimin curated chain flag'ini live `GameManager` state'ine yazmasini dogrular.
+  ve onayli secimin curated chain flag'ini live `GameManager` state'ine yazmasini;
+  `ExactRunContinuePlayModeTests` active Council save preflight'ini dogrular.

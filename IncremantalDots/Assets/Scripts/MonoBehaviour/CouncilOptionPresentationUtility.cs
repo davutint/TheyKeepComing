@@ -54,6 +54,13 @@ namespace DeadWalls
             if (option == null)
                 return new CouncilOptionPresentation(string.Empty, false, "NO OPTION");
 
+            if (!CouncilContentPolicy.TryValidateOptionRole(option, out string contentProblem))
+            {
+                string blockedText = $"<color={CostColor}>{BlockedContentLabel()}</color>";
+                return new CouncilOptionPresentation(blockedText, false,
+                    CouncilContentPolicy.BlockedReason + ": " + contentProblem);
+            }
+
             ResourceData resources = context.Resources;
             int population = Mathf.Max(0, context.CurrentPopulation);
             int totalArchers = Mathf.Max(0, context.TotalArchers);
@@ -309,6 +316,7 @@ namespace DeadWalls
         private static string Gain(string text) => $"<color={GainColor}>{text}</color>";
         private static string Cost(string text) => $"<color={CostColor}>{text}</color>";
         private static string Risk(string text) => $"<color={RiskColor}>{text}</color>";
+        private static string BlockedContentLabel() => "CONTENT BLOCKED";
     }
 
     /// <summary>Karar kartinin Dawn + Day penceresini cycle state'inden sayisal olarak uretir.</summary>

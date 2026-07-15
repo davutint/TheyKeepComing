@@ -2452,6 +2452,13 @@ namespace DeadWalls
             // Ayni scheduled gun, catalog/runtime problemi olsa bile ikinci kez reroll edilmez.
             // Bu fail-closed davranis seed veya hot-reload ile farkli kart cikmasini engeller.
             _lastRegularCouncilDay = day;
+            if (!councilCatalog.TryValidateRuntimeContent(out string contentProblem))
+            {
+                Debug.LogError($"[GameManager] Day {day} Council content gate reddetti: "
+                               + contentProblem);
+                return false;
+            }
+
             uint seed = GetCouncilSeed(day);
             var context = BuildCouncilContext(day);
             var composed = CouncilComposer.Compose(councilCatalog, seed, context);
@@ -2556,6 +2563,14 @@ namespace DeadWalls
             if (active == null)
                 return false;
 
+            if (!CouncilContentPolicy.TryValidateComposedEvent(
+                    councilCatalog, active, out string contentProblem))
+            {
+                Debug.LogError("[GameManager] Council content gate karari reddetti: "
+                               + contentProblem);
+                return false;
+            }
+
             var option = optionA ? active.OptionA : active.OptionB;
             if (!CanAffordCouncilOption(option))
                 return false;
@@ -2600,6 +2615,13 @@ namespace DeadWalls
             bool archerCountsDirty = false;
             foreach (var effect in effects)
             {
+                if (!CouncilContentPolicy.IsCouncilOwnedEffectKind(effect.Kind))
+                {
+                    Debug.LogError($"[GameManager] Council-owned olmayan effect apply reddedildi: "
+                                   + $"'{effect.Kind}' ({(int)effect.Kind}).");
+                    continue;
+                }
+
                 switch (effect.Kind)
                 {
                     case CouncilEffectKind.GainResource:
@@ -3394,6 +3416,14 @@ namespace DeadWalls
             {
                 Debug.LogError("[GameManager] Castle Heart Continue preflight reddedildi: "
                                + heartPreflightError);
+                return false;
+            }
+            if (save.HasActiveCouncilEvent
+                && !CouncilContentPolicy.TryValidateComposedEvent(
+                    councilCatalog, save.ActiveCouncilEvent, out string councilPreflightError))
+            {
+                Debug.LogError("[GameManager] Council Continue content preflight reddedildi: "
+                               + councilPreflightError);
                 return false;
             }
 

@@ -65,6 +65,33 @@ namespace DeadWalls
             return null;
         }
 
+        public CouncilTemplateSO GetTemplate(string id)
+        {
+            if (string.IsNullOrEmpty(id) || Templates == null)
+                return null;
+
+            for (int i = 0; i < Templates.Length; i++)
+            {
+                if (Templates[i] != null && Templates[i].Id == id)
+                    return Templates[i];
+            }
+
+            return null;
+        }
+
+        public bool TryValidateRuntimeContent(out string problem)
+        {
+            List<string> problems = ValidateCatalog();
+            if (problems.Count > 0)
+            {
+                problem = problems[0];
+                return false;
+            }
+
+            problem = string.Empty;
+            return true;
+        }
+
         public bool IsApprovedChainSource(string sourceTemplateId, bool optionA, string flag)
         {
             if (string.IsNullOrEmpty(sourceTemplateId) || string.IsNullOrEmpty(flag)
@@ -132,6 +159,7 @@ namespace DeadWalls
                 }
             }
 
+            CouncilContentPolicy.ValidateCatalog(this, problems);
             ValidateCuratedChains(templatesById, problems);
 
             if (atomIds.Count == 0) problems.Add("Katalogda hic atom yok.");
