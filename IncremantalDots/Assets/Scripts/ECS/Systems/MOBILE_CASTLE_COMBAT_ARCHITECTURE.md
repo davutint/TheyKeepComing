@@ -196,7 +196,7 @@ Yeni imported HUD varsa cycle paneli player-facing zaman bilgisini gosterir:
 - `CyclePhaseText`: `DAY`, `DUSK` veya `NIGHT`
 - `CycleDayLabelText`, `CycleDuskLabelText`, `CycleNightLabelText`: segment label'lari
 - `CycleProgressFill` ve `CycleProgressMarker`: 60s dongu progress'i
-- `HordePressurePanel`: prefabda bulunsa bile player-facing olarak kapali tutulur
+- Forecast/pressure surface: aktif prefab ve `HUDController` binding sozlesmesinde bulunmaz; `HordePressure01` spawn/gameplay sinyali olarak korunur
 - Fallback eski HUD varsa wave text sadece `DAY/DUSK/NIGHT`, kills text ise hedef sayi olmadan `KILLS x` yazar.
 
 HUD varsa `CastleDefensePanel` uzerindeki tek `DefenseWallFill` ve Wall yuzdesini gunceller. Legacy Gate/Core track ve text'leri runtime'da gizlenir. Night/high pressure durumunda threat rengi kullanilabilir; Wall hasar aldiginda kisa red flash feedback'i verilir.

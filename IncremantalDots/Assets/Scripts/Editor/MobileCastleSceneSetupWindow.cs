@@ -4233,19 +4233,11 @@ namespace DeadWalls
             hud.CycleCelestialArc = FindRectTransformByName(hudRoot, "CycleProgressTrack");
             hud.CycleCelestialGlow = FindComponentInChildrenByName<Image>(hudRoot, "CycleCelestialGlow");
 
-            hud.HordePressurePanel = FindChildByName(hudRoot, "HordePressurePanel");
-            hud.HordePressureTitleText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "HordePressureTitleText");
-            hud.HordePressureFill = FindComponentInChildrenByName<Image>(hudRoot, "HordePressureFill");
-            hud.HordePressureText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "HordePressureText");
-            hud.HordePressureLevelText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "HordePressureLevelText");
-
             bool hasCelestialDial = hud.CycleCelestialArc != null && hud.CycleCelestialGlow != null;
             if (hasCelestialDial)
                 ConfigureCelestialDialLayout(hud);
             else
                 ConfigureCycleProgressLayout(hud.CycleProgressFill, hud.CycleProgressMarker);
-            if (hud.HordePressurePanel != null)
-                hud.HordePressurePanel.SetActive(false);
 
             if (!hasCelestialDial && hud.CyclePhaseText != null)
                 hud.CyclePhaseText.text = "DAY";
@@ -4255,8 +4247,6 @@ namespace DeadWalls
                 hud.CycleDuskLabelText.text = "DUSK";
             if (!hasCelestialDial && hud.CycleNightLabelText != null)
                 hud.CycleNightLabelText.text = "NIGHT";
-            if (hud.HordePressureTitleText != null)
-                hud.HordePressureTitleText.text = "HORDE PRESSURE";
         }
 
         private static void ConfigureDefenseFillImage(Image image)

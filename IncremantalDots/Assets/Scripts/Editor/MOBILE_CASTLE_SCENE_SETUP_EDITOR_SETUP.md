@@ -71,7 +71,7 @@ SubScene:
 - `ResourceBar`: üst solda `560 x 48`; altı resource/population/Arrow chip'i `84 x 42`, value/rate tek satır ve `ArrowChip` finite ammo toggle olmaya devam eder
 - `HUDController` cycle module: `CyclePanel`, `CycleDayCounterText`, `CycleProgressMarker`, `CycleCelestialArc`, `CycleCelestialGlow`; legacy `CyclePhaseText`, label ve fill binding'leri uyumluluk icin kalabilir
 - `CyclePanel`: owner-secili Celestial Dial, top-center anchor ve `290 x 68` gercek pill; `CycleProgressTrack` `178 x 44`, 44 segmentli sig yaydir. Dikey ayirici ile legacy phase/label/linear fill player-facing kapali kalir
-- `HordePressurePanel` prefabda varsa player-facing olarak kapali tutulur
+- Aktif prefab ve `HUDController` setup binding'inde `HordePressurePanel` bulunmaz; setup tool forecast/pressure UI baglamaz veya yeniden uretmez
 - `HUDController` defense module: `DefensePercentText`, `DefenseWallFill`, `DefenseWallText`, opsiyonel `DefenseDamageGlow`; legacy Gate/Core alanlari prefabda ve controller binding'inde bulunmaz
 - `MarketUI`: `ArcherDrawerPanel`, `DrawerToggleButton`, Basic/Rapid/Frost row text, buy ve dynamic `ArcherRetrainButton` alanlari bagli
 - `MarketUI`: Upgrade butonlari, `ArrowTechPanel`, tech unlock butonlari ve repair/prep butonlari prefabda varsa gizli

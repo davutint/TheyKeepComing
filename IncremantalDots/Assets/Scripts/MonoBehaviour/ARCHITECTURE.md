@@ -48,7 +48,7 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - Sahne instance'inda yeni serialized referanslar yoksa `HUDController`, `CycleProgressTrack` ve `CycleCelestialGlow` isimlerini aktif prefab hiyerarsisinden bir kez bulup cache'ler; per-frame hiyerarsi taramasi yapmaz
 - `CyclePhaseText`, uc ham `DAY / DUSK / NIGHT` label'i ve linear `CycleProgressFill` serialized uyumluluk icin korunur fakat Celestial Dial'da player-facing kapali kalir
 - A alternatifi ve B karar sozlesmesi `Assets/Docs/DW_I_PHASE_HUD_PRESENTATION_DECISION.md` dosyasinda korunur
-- `HordePressurePanel` imported prefabda bulunsa bile player-facing olarak kapali tutulur
+- Aktif HUD prefabinda ve `HUDController` sozlesmesinde `HordePressurePanel` ya da child binding'i bulunmaz; gameplay `HordePressure01` yogunluk verisi korunur fakat player-facing forecast uretilmez
 - `CyclePanel` yoksa legacy wave fallback text'lerini kullanir
 - `ArrowText`, finite stoku `Current / Capacity` biçiminde gösterir; `INF` modu yoktur
 - Mobile HUD'da yalniz `DefenseWallFill` ve Wall yuzdesi guncellenir; aktif prefab ve `HUDController` legacy Gate/Core gorseli ya da binding'i tasimaz

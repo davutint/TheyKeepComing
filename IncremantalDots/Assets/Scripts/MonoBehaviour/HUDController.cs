@@ -51,11 +51,6 @@ namespace DeadWalls
         public RectTransform CycleProgressMarker;
         public RectTransform CycleCelestialArc;
         public Image CycleCelestialGlow;
-        public GameObject HordePressurePanel;
-        public TMP_Text HordePressureTitleText;
-        public Image HordePressureFill;
-        public TMP_Text HordePressureText;
-        public TMP_Text HordePressureLevelText;
 
         // Onceki degerler — sadece degisince string alloc yap
         private int _lastXP = -1, _lastXPToNext = -1;
@@ -304,7 +299,6 @@ namespace DeadWalls
                 && cycle.Enabled;
 
             SetActiveIfChanged(CyclePanel, active);
-            SetActiveIfChanged(HordePressurePanel, false);
 
             if (!active)
             {
