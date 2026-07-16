@@ -30,11 +30,16 @@ scene setup tool tarafindan scene owner'ina eklenir ve isimle baglanir.
   `CastleDefensePanel/DefenseRepairButton`; `OnboardingHintPanel` top-center `0,-294` konumuna
   tasinir. Stone yetmese de maliyet gorunur, fakat tutorial butonu enable etmez veya repair
   transaction'i cagirmaz.
+- First Night ability-key target: `AbilityBarPanel` icindeki ilk gercek hazir slot;
+  `[1] Fireball -> [2] Rally -> [3] Emergency Repair` onceligi kullanilir. Ilk kosunun mevcut
+  kilit/state'inde `[2] RallyAbilityButton` pulse olur ve `OnboardingHintPanel` bottom-center
+  `0,170` konumuna tasinir. Tutorial butona basmaz veya cooldown/ability state'i yazmaz.
 
 Scene `FirstRunOnboardingUI.CastleHeart` referansi ayni HUD root'taki tek `HeartScreenUI`
 component'ine; `FirstRunOnboardingUI.Council` referansi ayni root'taki tek `CouncilEventUI`
 component'ine; `FirstRunOnboardingUI.NormalRepair` referansi ayni root'taki tek
-`DefenseRepairUI` component'ine bagli olmalidir.
+`DefenseRepairUI` component'ine; `FirstRunOnboardingUI.Abilities` referansi ayni root'taki tek
+`SpellCastUI` component'ine bagli olmalidir.
 
 Idempotent onarim: `Window -> DeadWalls -> Repair First Run Onboarding`.
 
@@ -61,3 +66,7 @@ Idempotent onarim: `Window -> DeadWalls -> Repair First Run Onboarding`.
 - Daytime repair PlayMode testi hasarli Wall + Day kapisini, gercek REPAIR button hedefini,
   affordability'den bagimsiz cue'yu, basarisiz denemenin HP/Stone/flag degistirmemesini ve yalniz
   basarili player repair'in exact Stone harcayip `tutorial.v1.repair` flag'ini yazmasini dogrular.
+- First Night ability-key PlayMode testi ilk Night'ta ilk hazir gercek slotu ve dynamic English
+  copy'yi, locked hotkey reddini, mouse button kullaniminin flag yazmamasini, kabul edilmis `[2]`
+  hotkey'inin `tutorial.v1.ability_key` flag'ini durable yazmasini ve tutorial'in resource
+  state'ine dokunmamasini dogrular.

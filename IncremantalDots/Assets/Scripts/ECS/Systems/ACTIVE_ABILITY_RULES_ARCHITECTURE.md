@@ -47,6 +47,18 @@ iyileştirir.
 - `CurrentHP > 0` guard'ı nedeniyle Wall aynı frame sıfıra ulaştıysa Game Over kazanır;
   ability ölümü geri çeviremez.
 
+## First Night key-hint siniri
+
+- `SpellCastUI.TryGetFirstReadyAbility`, player-facing slotlar arasinda authoritative readiness
+  sonucunu `[1] Fireball -> [2] Rally -> [3] Emergency Repair` sirasiyla cozer ve gercek aktif
+  button rect'ini onboarding sahibine verir.
+- `AbilityHotkeyAcceptedByPlayer` yalniz `HandleHotkeys` tarafindan cagrilan ve gameplay
+  transaction'i kabul edilen keyboard yolunda yayilir. Ayni ability'nin UI button handler'i bu
+  event'i yaymaz; boylece mouse click key-hint ogretimini tamamlamaz.
+- `FirstRunOnboardingUI` bu read-only readiness/accepted-input sinirini yalniz ilk Night cue'su
+  icin kullanir. Ability unlock, cooldown, targeting, Wall HP ve kaynak state'inin sahibi olmaya
+  calismaz.
+
 ## Normal repair sınırı
 
 Normal repair ability değildir. Yalnız Day/Dusk sırasında görünür ve çalışır. Her paket
@@ -73,3 +85,6 @@ barında bulunmaz; legacy prep etkisi ayrı kalır. Arrow Storm V1'e eklenmez.
   Rally/Emergency cooldown + Wall HP exact Continue doğrulaması.
 - `HudAbilityBarPresentationTests`: tek bottom-center paneli, üç slot geometrisini,
   cooldown overlay contract'ını ve legacy panel yokluğunu kilitler.
+- `FirstRunOnboardingTests` + `WorkerAllocationPlayModeTests`: ilk Night gate'ini, ilk hazir
+  slot secimini, dynamic key copy'yi ve yalniz kabul edilmis keyboard yolunun durable flag
+  yazmasini kilitler.

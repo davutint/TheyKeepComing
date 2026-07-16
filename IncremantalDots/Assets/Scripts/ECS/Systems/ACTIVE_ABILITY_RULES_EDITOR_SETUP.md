@@ -24,6 +24,8 @@ Her cooldown görseli `Image.Type.Filled`, `FillMethod.Vertical`, bottom origin 
 Aktif scene'de tek `SpellCastUI`, `MobileCastleHudRoot` üzerinde yaşar. `SpellPanel`,
 üç button/fill/label alanı ve Fireball visual sprite binding'leri dolu olmalıdır.
 Scene'de ikinci `SpellCastUI` veya `SpellUiRoot` kalmamalıdır.
+Scene-owned tek `FirstRunOnboardingUI.Abilities` referansi da bu ayni `SpellCastUI` owner'ina
+bagli olmalidir; onboarding ayri bir ability transaction veya input handler uretmez.
 
 ## Tuning
 
@@ -49,6 +51,8 @@ Fireball damage/radius/cooldown ise Castle Heart node effect'leriyle değişir.
   transaction reddedilir.
 - Wall `0 HP` olduktan sonra Emergency Repair çalışmaz.
 - Save/Continue sonrası üç ability cooldown gösterimi runtime state ile aynıdır.
+- Ilk Night'ta ilk hazir gercek slot pulse olur; kabul edilmis `1/2/3` hotkey durable key-hint
+  flag'ini yazar, ayni slotun mouse button'i bu ogretim flag'ini yazmaz.
 
 Otomatik regresyon için `HudAbilityBarPresentationTests`, `ActiveAbilityRulesTests`,
 `MobileCastleTuningResolverTests`, `RunPersistenceTests` ve hedefli

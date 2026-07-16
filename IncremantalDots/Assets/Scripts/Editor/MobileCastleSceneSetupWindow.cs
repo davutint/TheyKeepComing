@@ -4941,6 +4941,7 @@ namespace DeadWalls
             onboarding.CastleHeart = hudRoot.GetComponent<HeartScreenUI>();
             onboarding.Council = hudRoot.GetComponent<CouncilEventUI>();
             onboarding.NormalRepair = hudRoot.GetComponent<DefenseRepairUI>();
+            onboarding.Abilities = hudRoot.GetComponent<SpellCastUI>();
             onboarding.HintPanel = FindChildByName(hudRoot, "OnboardingHintPanel");
             onboarding.HintText = FindComponentInChildrenByName<TextMeshProUGUI>(
                 hudRoot, "OnboardingHintText");

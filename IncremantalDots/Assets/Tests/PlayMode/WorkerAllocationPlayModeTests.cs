@@ -1,5 +1,6 @@
 using System.Collections;
 using System.IO;
+using System.Reflection;
 using NUnit.Framework;
 using Unity.Collections;
 using Unity.Entities;
@@ -509,6 +510,152 @@ namespace DeadWalls.Tests
                 FirstRunOnboardingUI.DaytimeRepairFlagId), Is.True);
             yield return null;
             Assert.That(onboarding.IsDaytimeRepairStepVisible, Is.False);
+            Assert.That(onboarding.HintPanel.activeSelf, Is.False);
+            Assert.That(onboarding.PulseFrame.gameObject.activeSelf, Is.False);
+        }
+
+        [UnityTest]
+        public IEnumerator FirstNightAbilityKeyOnboarding_PulsesFirstReadySlot_AndCompletesOnlyOnAcceptedHotkey()
+        {
+            GameManager gameManager = GameManager.Instance;
+            FirstRunOnboardingUI onboarding =
+                Object.FindFirstObjectByType<FirstRunOnboardingUI>();
+            SpellCastUI abilities = Object.FindFirstObjectByType<SpellCastUI>();
+            Assert.That(onboarding, Is.Not.Null);
+            Assert.That(abilities, Is.Not.Null);
+            Assert.That(abilities.RallyButton, Is.Not.Null);
+            Assert.That(MetaProgression.SetTutorialFlag(
+                FirstRunOnboardingUI.WorkerRatioFlagId, true), Is.True);
+            Assert.That(MetaProgression.SetTutorialFlag(
+                FirstRunOnboardingUI.BasicArcherFlagId, true), Is.True);
+            Assert.That(MetaProgression.SetTutorialFlag(
+                FirstRunOnboardingUI.LowAmmoFlagId, true), Is.True);
+            Assert.That(MetaProgression.SetTutorialFlag(
+                FirstRunOnboardingUI.HeartEntryFlagId, true), Is.True);
+            Assert.That(MetaProgression.SetTutorialFlag(
+                FirstRunOnboardingUI.CouncilExactFlagId, true), Is.True);
+            Assert.That(MetaProgression.SetTutorialFlag(
+                FirstRunOnboardingUI.DaytimeRepairFlagId, true), Is.True);
+            Assert.That(MetaProgression.HasTutorialFlag(
+                FirstRunOnboardingUI.NightAbilityKeyFlagId), Is.False);
+
+            bool runtimeReady = false;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                {
+                    runtimeReady = true;
+                    break;
+                }
+                yield return null;
+            }
+            Assert.That(runtimeReady, Is.True,
+                "GameManager/SubScene 300 frame icinde hazir olmadi.");
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            using EntityQuery cycleQuery = entityManager.CreateEntityQuery(
+                typeof(ContinuousSiegeCycleData));
+            using EntityQuery prepQuery = entityManager.CreateEntityQuery(typeof(CastleYardPrepState));
+            using EntityQuery resourceQuery = entityManager.CreateEntityQuery(typeof(ResourceData));
+            Entity cycleEntity = cycleQuery.GetSingletonEntity();
+            Entity prepEntity = prepQuery.GetSingletonEntity();
+            Entity resourceEntity = resourceQuery.GetSingletonEntity();
+
+            ContinuousSiegeCycleData cycle =
+                entityManager.GetComponentData<ContinuousSiegeCycleData>(cycleEntity);
+            cycle.CycleIndex = 0;
+            cycle.CycleTimer = cycle.DayDuration + cycle.DuskDuration + 0.5f;
+            cycle.Phase = SiegeCyclePhase.Night;
+            entityManager.SetComponentData(cycleEntity, cycle);
+
+            FieldInfo rallyCooldownField = typeof(GameManager).GetField(
+                "_rallyCooldownRemaining",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            PropertyInfo prepProperty = typeof(GameManager).GetProperty(
+                "CastleYardPrep",
+                BindingFlags.Instance | BindingFlags.Public);
+            MethodInfo hotkeyMethod = typeof(SpellCastUI).GetMethod(
+                "TryActivateHotkey",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.That(rallyCooldownField, Is.Not.Null);
+            Assert.That(prepProperty, Is.Not.Null);
+            Assert.That(hotkeyMethod, Is.Not.Null);
+
+            CastleYardPrepState prep =
+                entityManager.GetComponentData<CastleYardPrepState>(prepEntity);
+            prep.RallyTimer = 0f;
+            entityManager.SetComponentData(prepEntity, prep);
+            rallyCooldownField.SetValue(gameManager, 0f);
+            prepProperty.SetValue(gameManager, prep);
+
+            for (int frame = 0; frame < 120 && !onboarding.IsNightAbilityKeyStepVisible; frame++)
+                yield return null;
+
+            Assert.That(gameManager.FireballUnlocked, Is.False,
+                "Ilk kosuda tech-acilmamis Fireball key-hint hedefi olmamalidir.");
+            Assert.That(gameManager.RallyReady, Is.True);
+            Assert.That(onboarding.IsNightAbilityKeyStepVisible, Is.True);
+            Assert.That(onboarding.HintText.text,
+                Is.EqualTo(FirstRunOnboardingUI.RallyAbilityKeyHint));
+            Assert.That(onboarding.ActivePulseTarget,
+                Is.SameAs(abilities.RallyButton.GetComponent<RectTransform>()));
+            Assert.That(onboarding.HintPanel.GetComponent<RectTransform>().anchoredPosition,
+                Is.EqualTo(new Vector2(0f, 170f)));
+
+            bool lockedFireballAccepted = (bool)hotkeyMethod.Invoke(
+                abilities,
+                new object[] { AbilityHotkeySlot.Fireball, gameManager });
+            Assert.That(lockedFireballAccepted, Is.False);
+            Assert.That(MetaProgression.HasTutorialFlag(
+                FirstRunOnboardingUI.NightAbilityKeyFlagId), Is.False);
+
+            ResourceData resourcesBeforeButton =
+                entityManager.GetComponentData<ResourceData>(resourceEntity);
+            abilities.RallyButton.onClick.Invoke();
+            Assert.That(gameManager.RallyActive, Is.True);
+            Assert.That(MetaProgression.HasTutorialFlag(
+                FirstRunOnboardingUI.NightAbilityKeyFlagId), Is.False,
+                "Mouse button kullanimi key-hint tutorial'ini tamamlamamalidir.");
+            ResourceData resourcesAfterButton =
+                entityManager.GetComponentData<ResourceData>(resourceEntity);
+            Assert.That(resourcesAfterButton.Wood, Is.EqualTo(resourcesBeforeButton.Wood));
+            Assert.That(resourcesAfterButton.Stone, Is.EqualTo(resourcesBeforeButton.Stone));
+            Assert.That(resourcesAfterButton.Iron, Is.EqualTo(resourcesBeforeButton.Iron));
+            Assert.That(resourcesAfterButton.Food, Is.EqualTo(resourcesBeforeButton.Food));
+
+            prep = entityManager.GetComponentData<CastleYardPrepState>(prepEntity);
+            prep.RallyTimer = 0f;
+            entityManager.SetComponentData(prepEntity, prep);
+            rallyCooldownField.SetValue(gameManager, 0f);
+            prepProperty.SetValue(gameManager, prep);
+            for (int frame = 0;
+                frame < 90 && (!gameManager.RallyReady || !onboarding.IsNightAbilityKeyStepVisible);
+                frame++)
+            {
+                yield return null;
+            }
+
+            Assert.That(gameManager.RallyReady, Is.True);
+            Assert.That(onboarding.IsNightAbilityKeyStepVisible, Is.True);
+            ResourceData resourcesBeforeHotkey =
+                entityManager.GetComponentData<ResourceData>(resourceEntity);
+            bool rallyHotkeyAccepted = (bool)hotkeyMethod.Invoke(
+                abilities,
+                new object[] { AbilityHotkeySlot.Rally, gameManager });
+            Assert.That(rallyHotkeyAccepted, Is.True);
+            Assert.That(gameManager.RallyActive, Is.True);
+            Assert.That(MetaProgression.HasTutorialFlag(
+                FirstRunOnboardingUI.NightAbilityKeyFlagId), Is.True);
+            Assert.That(entityManager.GetComponentData<ResourceData>(resourceEntity).Wood,
+                Is.EqualTo(resourcesBeforeHotkey.Wood));
+            Assert.That(entityManager.GetComponentData<ResourceData>(resourceEntity).Stone,
+                Is.EqualTo(resourcesBeforeHotkey.Stone));
+            Assert.That(entityManager.GetComponentData<ResourceData>(resourceEntity).Iron,
+                Is.EqualTo(resourcesBeforeHotkey.Iron));
+            Assert.That(entityManager.GetComponentData<ResourceData>(resourceEntity).Food,
+                Is.EqualTo(resourcesBeforeHotkey.Food));
+            yield return null;
+            Assert.That(onboarding.IsNightAbilityKeyStepVisible, Is.False);
             Assert.That(onboarding.HintPanel.activeSelf, Is.False);
             Assert.That(onboarding.PulseFrame.gameObject.activeSelf, Is.False);
         }

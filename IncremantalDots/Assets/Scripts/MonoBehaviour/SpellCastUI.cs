@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using Unity.Entities;
 using Unity.Transforms;
@@ -7,6 +8,13 @@ using UnityEngine.UI;
 
 namespace DeadWalls
 {
+    public enum AbilityHotkeySlot
+    {
+        Fireball = 1,
+        Rally = 2,
+        EmergencyRepair = 3
+    }
+
     /// <summary>
     /// Ates Topu UI'i (M-C buyuculuk + polish): cooldown gostergeli buton + hedefleme modu +
     /// UCAN MERMI gorseli + varista patlama flipbook'u. Sim otoritesi ECS'tedir:
@@ -17,6 +25,8 @@ namespace DeadWalls
     /// </summary>
     public class SpellCastUI : MonoBehaviour
     {
+        public event Action<AbilityHotkeySlot> AbilityHotkeyAcceptedByPlayer;
+
         [Header("Bindings (setup tool baglar)")]
         public GameObject SpellPanel;
         public Button FireballButton;
@@ -42,6 +52,8 @@ namespace DeadWalls
         private Sprite _circleSprite;
         private Camera _camera;
         private bool _buttonsBound;
+
+        public bool IsTargeting => _targeting;
 
         // mermi takibi
         private Entity _trackedProjectile = Entity.Null;
@@ -122,20 +134,90 @@ namespace DeadWalls
 
             if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1))
             {
-                ToggleTargeting();
+                TryActivateHotkey(AbilityHotkeySlot.Fireball, gm);
             }
             else if (Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2))
             {
-                CancelTargeting();
-                if (gm.TryUseRally())
-                    UiSoundFeedback.Instance?.PlaySuccess();
+                TryActivateHotkey(AbilityHotkeySlot.Rally, gm);
             }
             else if (Input.GetKeyDown(KeyCode.Alpha3) || Input.GetKeyDown(KeyCode.Keypad3))
             {
-                CancelTargeting();
-                if (gm.TryUseEmergencyRepair())
-                    UiSoundFeedback.Instance?.PlaySuccess();
+                TryActivateHotkey(AbilityHotkeySlot.EmergencyRepair, gm);
             }
+        }
+
+        public bool TryGetFirstReadyAbility(
+            out AbilityHotkeySlot slot,
+            out RectTransform target)
+        {
+            GameManager gm = GameManager.Instance;
+            if (gm != null && TryGetReadyTarget(gm.FireballReady, FireballButton, out target))
+            {
+                slot = AbilityHotkeySlot.Fireball;
+                return true;
+            }
+
+            if (gm != null && TryGetReadyTarget(gm.RallyReady, RallyButton, out target))
+            {
+                slot = AbilityHotkeySlot.Rally;
+                return true;
+            }
+
+            if (gm != null
+                && TryGetReadyTarget(gm.EmergencyRepairReady, EmergencyRepairButton, out target))
+            {
+                slot = AbilityHotkeySlot.EmergencyRepair;
+                return true;
+            }
+
+            slot = default;
+            target = null;
+            return false;
+        }
+
+        private static bool TryGetReadyTarget(
+            bool ready,
+            Button button,
+            out RectTransform target)
+        {
+            target = button != null ? button.transform as RectTransform : null;
+            return ready && target != null && target.gameObject.activeInHierarchy;
+        }
+
+        private bool TryActivateHotkey(AbilityHotkeySlot slot, GameManager gm)
+        {
+            if (gm == null)
+                return false;
+
+            bool accepted = false;
+            switch (slot)
+            {
+                case AbilityHotkeySlot.Fireball:
+                {
+                    bool wasTargeting = _targeting;
+                    ToggleTargeting();
+                    accepted = !wasTargeting && _targeting;
+                    break;
+                }
+
+                case AbilityHotkeySlot.Rally:
+                    CancelTargeting();
+                    accepted = gm.TryUseRally();
+                    break;
+
+                case AbilityHotkeySlot.EmergencyRepair:
+                    CancelTargeting();
+                    accepted = gm.TryUseEmergencyRepair();
+                    break;
+            }
+
+            if (!accepted)
+                return false;
+
+            AbilityHotkeyAcceptedByPlayer?.Invoke(slot);
+            if (slot != AbilityHotkeySlot.Fireball)
+                UiSoundFeedback.Instance?.PlaySuccess();
+            return true;
         }
 
         private static bool IsTypingInInputField()

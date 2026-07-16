@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.2
 > **Son tam kapsam denetimi:** 2026-07-15
 > **Aktif paket:** Package I - HUD, Onboarding ve Creative Polish
-> **Aktif iş:** `DW-I-ONBOARD-ABILITY-KEY-HINT` - Teach the First Night Ability Key Hint
-> **İlerleme:** `366 / 441` tracker checkbox'ı tamamlandı - `%82,99`
+> **Aktif iş:** `DW-I-ONBOARD-NO-AUTO-TRANSACTION` - Prove Onboarding Never Spends Resources or Reassigns Workers
+> **İlerleme:** `367 / 441` tracker checkbox'ı tamamlandı - `%83,22`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -147,7 +147,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Emergency Repair | Ayrı ability yok | Eksik |
 | Meta | Ayrı JSON, durable ölüm kapılı shop, Blueprint exact 11-definition katalog, üstel repeatable sink'ler ve atomik tek-seferlik pool unlock aktif | `[x]` Teknik katalog ve runtime sınırı tamamlandı; exact reward tuning ayrı |
 | HUD | CyclePanel, DAY/DUSK/NIGHT ve Horde Pressure mevcut; tek Wall runtime gizleme var | Package I polish gerekli |
-| Tutorial | İlk Day worker ratio ve ilk affordable Basic Archer adımları non-modal pulse, tek satır English yönlendirme ve durable meta flag ile aktif | `[~]` Package I ilk iki adım tamamlandı |
+| Tutorial | İlk Day worker ratio, affordable Basic Archer, low ammo, Castle Heart, regular Council, Day repair ve ilk Night ability-key adımları non-modal pulse, English yönlendirme ve durable meta flag ile aktif | `[~]` Package I ilk yedi adım tamamlandı |
 | Testler | Son full baseline: EditMode `209/209`, PlayMode `37 pass + 1 explicit profiler skip`; Package H meta katalog/regresyon EditMode `50/50`, run-start/Continue + death shop PlayMode `2/2`; Standalone Player-targeted 10K `1/1` | Fixed catalog, exponential cost, v13 migration, runtime effect ayrımı ve atomik pool purchase temiz; full baseline tarihsel olarak korunuyor |
 | Telemetry | Spawn budget demanded/spawned/backlog telemetry mevcut; tam Blueprint event owner'ı eksik | Kısmi |
 
@@ -164,8 +164,8 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | 5 | E - Castle Heart | Tamamlandı | Aynı seed/load aynı valid graph'ı üretir; production content owner gate ayrı |
 | 6 | F - Council | Tamamlandı | 9 template staged launch set, curated repeat/follow-up, 5.400-sample budget ve full regression geçti |
 | 7 | G - Active Abilities | Tamamlandı | Kaynak tüketmez; Night repair sözleşmesi ve exact cooldown save testli |
-| 8 | H - Meta + Persistence | **Aktif** | Ölüm ödülü idempotent; meta v3 fail-closed; fixed katalog ve incremental cost tamamlandı; deterministic 10K rebuild policy sırada |
-| 9 | I - Product Gate | Bekliyor | 10k scenario, tutorial ve temiz görsel inceleme |
+| 8 | H - Meta + Persistence | Tamamlandı | Ölüm ödülü idempotent; meta v3 fail-closed; fixed katalog ve incremental cost tamamlandı; deterministic 10K rebuild policy ayrı ürün kapısına taşındı |
+| 9 | I - Product Gate | **Aktif** | 10k scenario, tutorial ve temiz görsel inceleme |
 
 > “A1/A2” resmî Blueprint paketi değildir. Resmî paketler A-I'dır; iş kimlikleri yalnız tracker içinde `DW-A-SAVE` gibi kullanılır.
 
@@ -814,7 +814,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 - [x] İlk kill/Essence: Heart butonunu pulse et; açılınca full pause öğret.
 - [x] İlk regular Council/Day 3: bedel ve iki exact sonucu öğret.
 - [x] İlk Wall hasarı sonrası Day: normal repair action'ı highlight et.
-- [ ] İlk Night: unlock olan ability üzerinde key hint göster.
+- [x] İlk Night: unlock olan ability üzerinde key hint göster.
 - [ ] Tutorial oyuncu adına kaynak harcamasın veya worker dağıtmasın.
 - [ ] Sürekli modal pause zinciri kurma.
 - [ ] İşlem prompt'tan önce yapılırsa adımı tamamlanmış say.
@@ -1166,3 +1166,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-16 | `DW-I-ONBOARD-HEART-HIGHLIGHT` first Essence-funded Castle Heart entry cue | `FirstRunOnboardingUI`, kill/drop oranı uydurmadan authoritative ilk `GraveEssenceAmount > 0` bakiyesini gözlüyor ve alt-sağ dock'taki gerçek `CastleHeartOpenButton` kontrolünü `OPEN THE CASTLE HEART.` metniyle pulse ediyor; panel oyuncu adına açılmıyor. `HeartScreenUI`, yalnız gerçek button/Escape akışında `HeartOpenedByPlayer` / `HeartClosedByPlayer` event'lerini yayıyor. Açılışta mevcut `SimulationPauseService` lease'i `Time.timeScale = 0` ve `SimulationSystemGroup.Enabled = false` sözleşmesini korurken pulse kapanıyor; `THE CASTLE HEART FULLY PAUSES THE BATTLE.` hint'i raycast'siz nested Canvas order `260` ile Heart modal `200` üstünde görünüyor. `tutorial.v1.heart` durable flag'i yalnız oyuncu Heart'i kapattıktan sonra yazılıyor; programmatic open/close tamamlanma sayılmıyor | Unity compile: 0 error; FirstRun onboarding EditMode `5/5`; Heart pause regression EditMode `8/8`; Worker/onboarding PlayMode `9/9`; MCP scene audit: tek `FirstRunOnboardingUI`, tek `HeartScreenUI`, `CastleHeart` binding'i dolu ve scene dirty false; 1920x1080 giriş pulse + full-pause modal görsel QA temiz; final Console 0 error; tracker `364/441` |
 | 2026-07-16 | `DW-I-ONBOARD-COUNCIL-EXACT` first regular Council exact-choice cue | `FirstRunOnboardingUI`, regular Council kartı gerçek oyuncu seçimine açıldığında tek bir branch'i öne çıkarmadan bütün `CouncilEventPanel` rect'ini non-modal pulse ediyor ve `COMPARE BOTH EXACT OUTCOMES AND THEIR COSTS.` metnini gösteriyor. İki option'ın sayısal sonucu, bedeli ve uygulanabilirliği mevcut `CouncilOptionPresentationUtility` live quote owner'ında kaldı. Tutorial Council açmıyor, seçim yapmıyor, timer/pause/resource transaction'ına dokunmuyor; yalnız başarılı gerçek option button commit'i `CouncilChoiceCommittedByPlayer` yayıp `tutorial.v1.council` durable flag'ini yazıyor. Dusk expire'i ve kartın yalnız açılması completion sayılmıyor; süreli Council cue'su Heart pause dışındaki opportunistic prompt'lara geçici sunum önceliği taşıyor | Unity compile: 0 error; onboarding + exact quote EditMode `12/12`; full Council schedule/choice/Continue PlayMode `6/6`; MCP scene audit: tek `FirstRunOnboardingUI`, tek `CouncilEventUI`, `Council` binding'i dolu ve scene dirty false; 1920x1080 full-card pulse + hint görsel QA temiz; final Console 0 error; tracker `365/441` |
 | 2026-07-16 | `DW-I-ONBOARD-REPAIR-HIGHLIGHT` first Daytime Wall repair cue | `FirstRunOnboardingUI`, continuous cycle gercek Day phase'indeyken yasayan Wall `%99,5` altina dustugunde top-center savunma panelindeki gercek `DefenseRepairButton` kontrolunu `REPAIR THE WALL DURING THE DAY.` metniyle pulse ediyor. Stone affordability prompt kapisi degil; oyuncu authoritative maliyeti disabled buton yaninda gorebiliyor. Tutorial Wall HP, Stone veya phase yazmiyor. Yalniz `DefenseRepairUI` butonundan baslayip `GameManager.RepairDefenseFull()` tarafindan basariyla commit edilen action `NormalRepairCommittedByPlayer` yayip `tutorial.v1.repair` durable flag'ini yaziyor; basarisiz veya programmatic repair tamamlanma sayilmiyor. Scene reload ilk frame'inde gizli hedefe cue acilmasini engelleyen active-hierarchy kapisi eklendi | Unity compile: 0 error; onboarding EditMode `7/7`; yeni repair onboarding PlayMode `1/1`; onboarding + normal repair regresyon PlayMode `6/6`; MCP scene audit: tek `FirstRunOnboardingUI`, tek `DefenseRepairUI`, `NormalRepair` binding'i dolu ve scene dirty false; 1920x1080 Game View QA temiz; final Console 0 error; tracker `366/441` |
+| 2026-07-16 | `DW-I-ONBOARD-ABILITY-KEY-HINT` first Night ready-ability keyboard cue | `FirstRunOnboardingUI`, ilk kosunun ilk Night phase'inde gercek ability barindaki ilk hazir slotu `[1] Fireball -> [2] Rally -> [3] Emergency Repair` onceligiyle cozer; mevcut ilk kosuda kilitli Fireball ve full Wall nedeniyle `[2] Rally` pulse olur. Dynamic English key copy bottom-center `0,170` konumunda slotlardan ayrik okunur. Yalniz kabul edilmis `SpellCastUI` keyboard yolu `AbilityHotkeyAcceptedByPlayer` yayip `tutorial.v1.ability_key` durable flag'ini yazar; locked/cooldown reddi, mouse button ve programmatic gameplay cagrisi completion sayilmaz. Tutorial ability kullanmaz, cooldown/state yazmaz veya resource harcamaz | Unity compile: 0 error; FirstRun onboarding EditMode `8/8`; yeni key-hint PlayMode `1/1`; onboarding + exact ability Continue regresyon PlayMode `7/7`; MCP scene audit: tek `FirstRunOnboardingUI`, tek `SpellCastUI`, `Abilities` binding'i dolu ve scene dirty false; 1920x1080 Game View QA ilk `0,122` overlap'ini yakalayip final `0,170` yerlesimini temiz dogruladi; final Console 0 error; tracker `367/441` |

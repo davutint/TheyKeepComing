@@ -135,6 +135,37 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void NightAbilityKeyRule_ShowsOnlyForAReadyAbilityDuringTheFirstNight()
+        {
+            Assert.That(FirstRunOnboardingRules.ShouldShowNightAbilityKeyStep(
+                false, true, false, true, 0, SiegeCyclePhase.Night, true), Is.True);
+
+            Assert.That(FirstRunOnboardingRules.ShouldShowNightAbilityKeyStep(
+                true, true, false, true, 0, SiegeCyclePhase.Night, true), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldShowNightAbilityKeyStep(
+                false, false, false, true, 0, SiegeCyclePhase.Night, true), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldShowNightAbilityKeyStep(
+                false, true, true, true, 0, SiegeCyclePhase.Night, true), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldShowNightAbilityKeyStep(
+                false, true, false, false, 0, SiegeCyclePhase.Night, true), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldShowNightAbilityKeyStep(
+                false, true, false, true, 1, SiegeCyclePhase.Night, true), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldShowNightAbilityKeyStep(
+                false, true, false, true, 0, SiegeCyclePhase.Day, true), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldShowNightAbilityKeyStep(
+                false, true, false, true, 0, SiegeCyclePhase.Dusk, true), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldShowNightAbilityKeyStep(
+                false, true, false, true, 0, SiegeCyclePhase.Night, false), Is.False);
+
+            Assert.That(FirstRunOnboardingUI.GetAbilityKeyHint(AbilityHotkeySlot.Fireball),
+                Is.EqualTo(FirstRunOnboardingUI.FireballAbilityKeyHint));
+            Assert.That(FirstRunOnboardingUI.GetAbilityKeyHint(AbilityHotkeySlot.Rally),
+                Is.EqualTo(FirstRunOnboardingUI.RallyAbilityKeyHint));
+            Assert.That(FirstRunOnboardingUI.GetAbilityKeyHint(AbilityHotkeySlot.EmergencyRepair),
+                Is.EqualTo(FirstRunOnboardingUI.EmergencyRepairAbilityKeyHint));
+        }
+
+        [Test]
         public void ActiveHudPrefab_HasSingleNonBlockingEnglishWorkerRatioPresentation()
         {
             GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(HudPrefabPath);
@@ -174,6 +205,12 @@ namespace DeadWalls.Tests
             Assert.That(FirstRunOnboardingUI.HeartPauseHint, Does.Match("^[A-Z0-9 .+]+$"));
             Assert.That(FirstRunOnboardingUI.CouncilExactHint, Does.Match("^[A-Z0-9 .+]+$"));
             Assert.That(FirstRunOnboardingUI.DaytimeRepairHint, Does.Match("^[A-Z0-9 .+]+$"));
+            Assert.That(FirstRunOnboardingUI.FireballAbilityKeyHint,
+                Does.Match("^[A-Z0-9 .+]+$"));
+            Assert.That(FirstRunOnboardingUI.RallyAbilityKeyHint,
+                Does.Match("^[A-Z0-9 .+]+$"));
+            Assert.That(FirstRunOnboardingUI.EmergencyRepairAbilityKeyHint,
+                Does.Match("^[A-Z0-9 .+]+$"));
         }
 
         private static RectTransform FindUniqueRect(GameObject root, string objectName)

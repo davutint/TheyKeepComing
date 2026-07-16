@@ -100,6 +100,25 @@ owner'larinin player-action event'lerini dinler; yalniz non-modal hint ve pulse 
 - Tutorial Wall HP, Stone, phase veya button state'i yazmaz; repair miktari, exact Stone maliyeti
   ve transaction tamamen `GameManager` / `DefenseRepairUI` otoritesinde kalir.
 
+## Ilk Night Ability Key Adimi
+
+- Stable meta flag: `tutorial.v1.ability_key`.
+- Gorunme kapisi: mobile worker economy aktif, oyun bitmemis, continuous cycle ilk kosunun
+  `CycleIndex = 0` Night phase'inde ve en az bir aktif ability gercekten hazir.
+- Hedef secimi gercek ability barinda sabit oncelikle yapilir: hazirsa `[1] Fireball`, degilse
+  `[2] Rally`, degilse `[3] Emergency Repair`. Ilk kosunun mevcut baslangicinda Fireball tech
+  kilitli ve Emergency Repair hasarli Wall istedigi icin garanti hedef hazir `[2] Rally` slotudur.
+- Dynamic English metin hedefe gore `PRESS 1 TO TARGET FIREBALL.`, `PRESS 2 TO USE RALLY.` veya
+  `PRESS 3 TO REPAIR THE WALL.` olur. Hint bottom-center ability barinin ustunde `0,170`
+  konumlanir; pulse gercek slot `RectTransform`unu izler.
+- Yalniz `SpellCastUI` icindeki kabul edilmis `1/2/3` keyboard yolu
+  `AbilityHotkeyAcceptedByPlayer` event'ini yayar ve durable flag'i yazar. Locked/cooldown/
+  phase tarafindan reddedilen tus, ability butonuna mouse click veya programmatic gameplay
+  cagrisi key-hint ogretimini tamamlamaz.
+- Kabul edilmis hotkey prompt gorunmeden once kullanilmissa adim tekrar gosterilmez. Tutorial
+  ability kullanmaz, targeting baslatmaz, cooldown/state yazmaz ve resource harcamaz; butun
+  transaction `SpellCastUI` ile `GameManager` otoritesinde kalir.
+
 ## Sunum Siniri
 
 `OnboardingHintPanel` ve `OnboardingPulseFrame`, aktif generated HUD prefabinin responsive
@@ -112,6 +131,5 @@ mevcut full-pause davranisini aciklar. `OnboardingHintPanel` nested `Canvas`i no
 parent siralamasini kullanir; yalniz Heart pause adiminda `overrideSorting = true / 260` olur ve
 Heart modalinin `200` sorting order'i ustunde okunur.
 
-Sonraki ability onboarding adimlari ayni scene-owned controller ve stable meta flag siniri
-uzerinden eklenir; bu adim final tutorial
-complete flag'i yerine gecmez.
+Ability key adimi da ayni scene-owned controller ve stable meta flag sinirini kullanir; hicbir
+tekil adim final tutorial complete flag'i yerine gecmez.
