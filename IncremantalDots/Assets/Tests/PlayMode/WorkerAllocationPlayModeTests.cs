@@ -1834,6 +1834,176 @@ namespace DeadWalls.Tests
                 "Ayni Dusk fazinda polling riser'i tekrar oynatmamalidir.");
         }
 
+        [UnityTest]
+        public IEnumerator NightPresentation_UsesColdMoonWindowsDensityBedAndAggregatedSalvoBudget()
+        {
+            GameManager gameManager = GameManager.Instance;
+            DayNightOverlayController presentation =
+                Object.FindFirstObjectByType<DayNightOverlayController>();
+            AmbientAudioController ambient =
+                Object.FindFirstObjectByType<AmbientAudioController>();
+            CombatFeedbackBridge feedback =
+                Object.FindFirstObjectByType<CombatFeedbackBridge>();
+            Assert.That(gameManager, Is.Not.Null);
+            Assert.That(presentation, Is.Not.Null);
+            Assert.That(presentation.GlobalLight, Is.Not.Null);
+            Assert.That(presentation.CastleWindowLights, Is.Not.Null);
+            Assert.That(presentation.CastleWindowLights.Length, Is.EqualTo(4),
+                "NewGameScene tam dort canonical castle-window glow binding'i tasimali.");
+            Assert.That(ambient, Is.Not.Null);
+            Assert.That(ambient.NightHordeLoop, Is.Not.Null);
+            Assert.That(ambient.NightHordeSource, Is.Not.Null);
+            Assert.That(feedback, Is.Not.Null);
+            Assert.That(feedback.ArrowShootClip, Is.Not.Null);
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            using EntityQuery waveQuery = entityManager.CreateEntityQuery(typeof(WaveStateData));
+            using EntityQuery cycleQuery = entityManager.CreateEntityQuery(typeof(ContinuousSiegeCycleData));
+            using EntityQuery sfxQuery = entityManager.CreateEntityQuery(typeof(CombatSfxEvent));
+            Entity waveEntity = waveQuery.GetSingletonEntity();
+            Entity cycleEntity = cycleQuery.GetSingletonEntity();
+            PropertyInfo cycleProperty = typeof(GameManager).GetProperty(
+                "ContinuousSiegeCycle",
+                BindingFlags.Instance | BindingFlags.Public);
+            PropertyInfo waveProperty = typeof(GameManager).GetProperty(
+                "WaveState",
+                BindingFlags.Instance | BindingFlags.Public);
+            MethodInfo cycleSetter = cycleProperty?.GetSetMethod(true);
+            MethodInfo waveSetter = waveProperty?.GetSetMethod(true);
+            Assert.That(cycleSetter, Is.Not.Null);
+            Assert.That(waveSetter, Is.Not.Null);
+
+            Time.timeScale = 0f;
+            presentation.LightMoveSpeed = 100f;
+            presentation.WindowLightMoveSpeed = 100f;
+            presentation.WindowLightFlickerAmount = 0f;
+            ambient.NightHordeFadeSpeed = 100f;
+            SetOnboardingCycle(
+                entityManager,
+                cycleEntity,
+                gameManager,
+                cycleSetter,
+                0,
+                SiegeCyclePhase.Night);
+
+            WaveStateData wave = entityManager.GetComponentData<WaveStateData>(waveEntity);
+            wave.ZombiesAlive = 10_000;
+            wave.StressTestMode = false;
+            entityManager.SetComponentData(waveEntity, wave);
+            waveSetter.Invoke(gameManager, new object[] { wave });
+
+            for (int frame = 0; frame < 20; frame++)
+                yield return null;
+
+            Assert.That(gameManager.ContinuousSiegeCycle.Phase, Is.EqualTo(SiegeCyclePhase.Night));
+            Assert.That(presentation.GlobalLight.color.r,
+                Is.EqualTo(presentation.NightLightColor.r).Within(0.02f));
+            Assert.That(presentation.GlobalLight.color.g,
+                Is.EqualTo(presentation.NightLightColor.g).Within(0.02f));
+            Assert.That(presentation.GlobalLight.color.b,
+                Is.EqualTo(presentation.NightLightColor.b).Within(0.02f));
+            Assert.That(presentation.GlobalLight.intensity,
+                Is.EqualTo(presentation.NightLightIntensity).Within(0.02f));
+            Assert.That(presentation.GlobalLight.color.b,
+                Is.GreaterThan(presentation.GlobalLight.color.r + 0.40f),
+                "Night global light soguk-ay siluetini mavi kanalda tasimali.");
+
+            for (int i = 0; i < presentation.CastleWindowLights.Length; i++)
+            {
+                var windowLight = presentation.CastleWindowLights[i];
+                Assert.That(windowLight, Is.Not.Null);
+                Assert.That(windowLight.lightType,
+                    Is.EqualTo(UnityEngine.Rendering.Universal.Light2D.LightType.Point));
+                Assert.That(windowLight.overlapOperation,
+                    Is.EqualTo(UnityEngine.Rendering.Universal.Light2D.OverlapOperation.Additive));
+                Assert.That(windowLight.intensity,
+                    Is.EqualTo(presentation.WindowLightIntensity).Within(0.02f));
+            }
+
+            float expectedNightHordeActivity = AmbientAudioController.ResolveNightHordeActivity01(
+                gameManager.ContinuousSiegeCycle.Phase,
+                gameManager.ContinuousSiegeCycle.HordePressure01,
+                gameManager.WaveState.ZombiesAlive);
+            Assert.That(ambient.NightHordeActivity01,
+                Is.EqualTo(expectedNightHordeActivity).Within(0.01f));
+            Assert.That(ambient.NightHordeActivity01, Is.GreaterThan(0.5f));
+            Assert.That(ambient.NightHordeActivity01, Is.LessThanOrEqualTo(1f));
+            Assert.That(ambient.NightHordeSource.loop, Is.True);
+            Assert.That(ambient.NightHordeSource.spatialBlend, Is.Zero.Within(0.001f));
+            Assert.That(ambient.NightHordeSource.isPlaying, Is.True);
+            Assert.That(ambient.NightHordeSource.volume,
+                Is.EqualTo(ambient.NightHordeVolume
+                    * ambient.NightHordeActivity01
+                    * SoundSettings.AmbienceVolume).Within(0.02f));
+
+            if (!sfxQuery.IsEmptyIgnoreFilter)
+                entityManager.DestroyEntity(sfxQuery);
+            FieldInfo lastSfxTimesField = typeof(CombatFeedbackBridge).GetField(
+                "_lastSfxTimes",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.That(lastSfxTimesField, Is.Not.Null);
+            var lastSfxTimes = (float[])lastSfxTimesField.GetValue(feedback);
+            lastSfxTimes[(int)CombatSfxType.ArrowShoot] = -999f;
+
+            int audioSourceCount = feedback.GetComponentsInChildren<AudioSource>(true).Length;
+            int baselineSalvos = feedback.TotalArrowSalvosPlayed;
+            const int archerCapSalvo = 1_000;
+            for (int i = 0; i < archerCapSalvo; i++)
+            {
+                Entity sfxEntity = entityManager.CreateEntity();
+                entityManager.AddComponentData(sfxEntity, new CombatSfxEvent
+                {
+                    Position = new float3(i % 40, i / 40, 0f),
+                    Type = CombatSfxType.ArrowShoot,
+                    Volume = 0.35f,
+                    Pitch = 1f
+                });
+            }
+
+            for (int frame = 0; frame < 30
+                && feedback.TotalArrowSalvosPlayed == baselineSalvos; frame++)
+            {
+                yield return null;
+            }
+
+            Assert.That(feedback.LastProcessedSfxEventCount, Is.EqualTo(archerCapSalvo));
+            Assert.That(feedback.LastArrowSalvoSize, Is.EqualTo(archerCapSalvo));
+            Assert.That(feedback.TotalArrowSalvosPlayed, Is.EqualTo(baselineSalvos + 1),
+                "Bir frame'deki 1000 archer shoot event'i tek salvo cue olmali.");
+            Assert.That(feedback.LastFrameSfxPlayedCount,
+                Is.LessThanOrEqualTo(feedback.MaxSfxPlayedPerFrame));
+            Assert.That(sfxQuery.CalculateEntityCount(), Is.Zero);
+            Assert.That(feedback.GetComponentsInChildren<AudioSource>(true).Length,
+                Is.EqualTo(audioSourceCount),
+                "Salvo yogunlugu yeni AudioSource uretmemeli; sabit pool korunmali.");
+
+            int firstSalvoTotal = feedback.TotalArrowSalvosPlayed;
+            for (int i = 0; i < 16; i++)
+            {
+                Entity sfxEntity = entityManager.CreateEntity();
+                entityManager.AddComponentData(sfxEntity, new CombatSfxEvent
+                {
+                    Position = float3.zero,
+                    Type = CombatSfxType.ArrowShoot,
+                    Volume = 0.35f,
+                    Pitch = 1f
+                });
+            }
+
+            for (int frame = 0; frame < 10
+                && feedback.LastProcessedSfxEventCount != 16; frame++)
+            {
+                yield return null;
+            }
+
+            Assert.That(feedback.LastProcessedSfxEventCount, Is.EqualTo(16));
+            Assert.That(feedback.LastArrowSalvoSize, Is.EqualTo(16));
+            Assert.That(feedback.TotalArrowSalvosPlayed, Is.EqualTo(firstSalvoTotal),
+                "Night shoot rate-limit ayni scaled-time anindaki ikinci salvolari yutmali.");
+            Assert.That(feedback.LastFrameSfxPlayedCount, Is.Zero);
+            Assert.That(sfxQuery.CalculateEntityCount(), Is.Zero);
+        }
+
         private readonly struct OnboardingEconomySnapshot
         {
             public readonly ResourceData Resources;

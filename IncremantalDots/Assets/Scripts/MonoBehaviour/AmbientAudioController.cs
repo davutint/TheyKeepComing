@@ -3,13 +3,14 @@ using UnityEngine;
 namespace DeadWalls
 {
     /// <summary>
-    /// Faz ve worker ambiyansinin tek runtime sahibidir. Faz polling ile (DawnRewardToast kalibi):
+    /// Faz, worker ve bounded horde ambiyansinin tek runtime sahibidir. Faz polling ile (DawnRewardToast kalibi):
     /// - DAY: gercek aktif worker sayisina gore seyrek, dusuk sesli uretim foley ritmi
     /// - DUSK girisi: scene-load'da tekrar etmeyen, tek seferlik dusuk tension riser
     /// - DUSK + NIGHT: gece drone loop'u (normal gece = NightLoop, kanli ay = BloodMoonLoop)
+    /// - NIGHT: zombie sayisi/baskisiyla logaritmik buyuyen tek 2D horde-bed loop'u
     /// - DAY + DAWN: gece drone'u sessiz (Day'de yalniz worker foley)
     /// - Kanli ay gecesine giris aninda tek seferlik sting (canavar kukremesi).
-    /// Iki AudioSource arasinda crossfade; kaynaklar 2D (spatialBlend 0) ve loop'ludur.
+    /// Faz loop'lari crossfade olur; horde katmani ayri fakat tek, 2D ve bounded bir kaynaktir.
     /// Setup tool kurar ve clip'leri yalniz-bossa atar.
     /// </summary>
     public class AmbientAudioController : MonoBehaviour
@@ -19,6 +20,7 @@ namespace DeadWalls
         public AudioClip BloodMoonLoop;
         public AudioClip BloodMoonSting;
         public AudioClip DuskRiser;
+        public AudioClip NightHordeLoop;
 
         [Header("Day Worker Foley (setup atar)")]
         public AudioClip[] WorkerFoleyClips;
@@ -29,7 +31,9 @@ namespace DeadWalls
         [Range(0f, 1f)] public float StingVolume = 0.65f;
         [Range(0f, 1f)] public float DuskRiserVolume = 0.23f;
         [Range(0.5f, 1.5f)] public float DuskRiserPitch = 0.90f;
+        [Range(0f, 1f)] public float NightHordeVolume = 0.18f;
         public float FadeSpeed = 0.5f;
+        public float NightHordeFadeSpeed = 0.4f;
 
         [Header("Day Worker Mix")]
         [Range(0f, 1f)] public float WorkerFoleyVolume = 0.11f;
@@ -38,10 +42,12 @@ namespace DeadWalls
         [Range(0f, 0.2f)] public float WorkerPitchVariation = 0.06f;
 
         public float WorkerActivity01 { get; private set; }
+        public float NightHordeActivity01 { get; private set; }
         public int WorkerFoleyPlayCount { get; private set; }
         public int DuskRiserPlayCount { get; private set; }
         public AudioSource WorkerFoleySource => _workerFoleySource;
         public AudioSource DuskRiserSource => _phaseTransitionSource;
+        public AudioSource NightHordeSource => _nightHordeSource;
 
         private const float CheckInterval = 0.2f;
         private float _checkTimer;
@@ -50,8 +56,10 @@ namespace DeadWalls
         private AudioSource _stingSource;
         private AudioSource _phaseTransitionSource;
         private AudioSource _workerFoleySource;
+        private AudioSource _nightHordeSource;
         private AudioSource _activeSource; // hedef klibi calan kaynak
         private float _targetVolume;
+        private float _targetNightHordeVolume;
         private float _workerFoleyTimer;
         private bool _workerFoleyEligible;
         private bool _hasObservedPhase;
@@ -65,6 +73,7 @@ namespace DeadWalls
             _stingSource = CreateSource("AmbientSting", false);
             _phaseTransitionSource = CreateSource("PhaseTransition", false);
             _workerFoleySource = CreateSource("WorkerAmbience", false);
+            _nightHordeSource = CreateSource("NightHordeBed", true);
             _activeSource = _sourceA;
         }
 
@@ -101,6 +110,17 @@ namespace DeadWalls
                     other.Stop();
             }
 
+            if (_nightHordeSource != null)
+            {
+                float hordeStep = Mathf.Max(0f, NightHordeFadeSpeed) * Time.unscaledDeltaTime;
+                _nightHordeSource.volume = Mathf.MoveTowards(
+                    _nightHordeSource.volume,
+                    _targetNightHordeVolume,
+                    hordeStep);
+                if (_nightHordeSource.volume <= 0f && _nightHordeSource.isPlaying)
+                    _nightHordeSource.Stop();
+            }
+
             UpdateWorkerFoley();
         }
 
@@ -111,7 +131,9 @@ namespace DeadWalls
             {
                 _hasObservedPhase = false;
                 _targetVolume = 0f;
+                _targetNightHordeVolume = 0f;
                 WorkerActivity01 = 0f;
+                NightHordeActivity01 = 0f;
                 _workerFoleyEligible = false;
                 _workerFoleyTimer = 0f;
                 if (_workerFoleySource != null && _workerFoleySource.isPlaying)
@@ -122,6 +144,27 @@ namespace DeadWalls
             var cycle = gm.ContinuousSiegeCycle;
             bool nightSide = cycle.Phase == SiegeCyclePhase.Dusk || cycle.Phase == SiegeCyclePhase.Night;
             bool bloodMoon = cycle.IsBloodMoonNight;
+            NightHordeActivity01 = ResolveNightHordeActivity01(
+                cycle.Phase,
+                cycle.HordePressure01,
+                gm.WaveState.ZombiesAlive);
+            bool nightHordeEligible = cycle.Phase == SiegeCyclePhase.Night
+                && NightHordeActivity01 > 0f
+                && NightHordeLoop != null
+                && !gm.GameState.IsGameOver;
+            _targetNightHordeVolume = nightHordeEligible
+                ? NightHordeVolume * NightHordeActivity01 * SoundSettings.AmbienceVolume
+                : 0f;
+            if (nightHordeEligible && _nightHordeSource != null)
+            {
+                if (_nightHordeSource.clip != NightHordeLoop)
+                {
+                    _nightHordeSource.Stop();
+                    _nightHordeSource.clip = NightHordeLoop;
+                }
+                if (!_nightHordeSource.isPlaying)
+                    _nightHordeSource.Play();
+            }
 
             int activeWorkers = gm.GetResourceWorkers(EconomyFocusType.Balanced);
             WorkerActivity01 = ResolveWorkerActivity01(activeWorkers);
@@ -200,6 +243,20 @@ namespace DeadWalls
                 return 0f;
 
             return Mathf.Clamp01(Mathf.Log(activeWorkers + 1f, 2f) / 7f);
+        }
+
+        public static float ResolveNightHordeActivity01(
+            SiegeCyclePhase phase,
+            float hordePressure01,
+            int zombiesAlive)
+        {
+            if (phase != SiegeCyclePhase.Night || zombiesAlive <= 0)
+                return 0f;
+
+            float countActivity = Mathf.Clamp01(
+                Mathf.Log(zombiesAlive + 1f, 2f) / Mathf.Log(10001f, 2f));
+            float pressureScale = Mathf.Lerp(0.55f, 1f, Mathf.Clamp01(hordePressure01));
+            return Mathf.Clamp01(countActivity * pressureScale);
         }
 
         public static float ResolveWorkerFoleyInterval(

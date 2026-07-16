@@ -109,5 +109,76 @@ namespace DeadWalls.Tests
             Assert.That(activeInterval, Is.LessThan(noWorkersInterval));
             Assert.That(hugeInterval, Is.EqualTo(1.6f).Within(0.001f));
         }
+
+        [Test]
+        public void NightPresentation_UsesColdMoonAndBoundedWindowIgnitionEnvelope()
+        {
+            var gameObject = new GameObject("NightPhasePresentationTest");
+            var controller = gameObject.AddComponent<DayNightOverlayController>();
+            try
+            {
+                controller.ResolvePhaseLightTarget(
+                    SiegeCyclePhase.Night,
+                    0.5f,
+                    out Color nightColor,
+                    out float nightIntensity);
+
+                Assert.That(nightColor, Is.EqualTo(controller.NightLightColor));
+                Assert.That(nightIntensity, Is.EqualTo(controller.NightLightIntensity));
+                Assert.That(nightColor.b, Is.GreaterThan(nightColor.r + 0.40f));
+                Assert.That(nightIntensity, Is.LessThan(controller.DayLightIntensity));
+
+                Assert.That(controller.ResolvePhaseWindowLightIntensity(
+                    SiegeCyclePhase.Day, 1f), Is.Zero);
+                Assert.That(controller.ResolvePhaseWindowLightIntensity(
+                    SiegeCyclePhase.Dusk,
+                    DayNightOverlayController.DuskWindowIgnitionProgress), Is.Zero);
+                Assert.That(controller.ResolvePhaseWindowLightIntensity(
+                    SiegeCyclePhase.Dusk,
+                    DayNightOverlayController.DuskWindowFullProgress),
+                    Is.EqualTo(controller.WindowLightIntensity).Within(0.001f));
+                Assert.That(controller.ResolvePhaseWindowLightIntensity(
+                    SiegeCyclePhase.Night, 0.5f),
+                    Is.EqualTo(controller.WindowLightIntensity).Within(0.001f));
+                Assert.That(controller.ResolvePhaseWindowLightIntensity(
+                    SiegeCyclePhase.Dawn, 1f), Is.Zero);
+            }
+            finally
+            {
+                Object.DestroyImmediate(gameObject);
+            }
+        }
+
+        [Test]
+        public void NightMix_ScalesHordeBedAndAggregatesSalvoWithoutUnboundedGain()
+        {
+            float noEnemies = AmbientAudioController.ResolveNightHordeActivity01(
+                SiegeCyclePhase.Night, 1f, 0);
+            float dayEnemies = AmbientAudioController.ResolveNightHordeActivity01(
+                SiegeCyclePhase.Day, 1f, 10_000);
+            float smallHorde = AmbientAudioController.ResolveNightHordeActivity01(
+                SiegeCyclePhase.Night, 0.2f, 32);
+            float largeHorde = AmbientAudioController.ResolveNightHordeActivity01(
+                SiegeCyclePhase.Night, 1f, 10_000);
+
+            Assert.That(noEnemies, Is.Zero);
+            Assert.That(dayEnemies, Is.Zero);
+            Assert.That(smallHorde, Is.GreaterThan(0f));
+            Assert.That(largeHorde, Is.GreaterThan(smallHorde));
+            Assert.That(largeHorde, Is.EqualTo(1f).Within(0.001f));
+
+            float singleVolume = CombatFeedbackBridge.ResolveArcherSalvoVolume(1, 0.35f, 0.62f);
+            float groupVolume = CombatFeedbackBridge.ResolveArcherSalvoVolume(32, 0.35f, 0.62f);
+            float hugeVolume = CombatFeedbackBridge.ResolveArcherSalvoVolume(10_000, 0.35f, 0.62f);
+            float groupPitch = CombatFeedbackBridge.ResolveArcherSalvoPitchMultiplier(32, 0.08f);
+            float hugePitch = CombatFeedbackBridge.ResolveArcherSalvoPitchMultiplier(10_000, 0.08f);
+
+            Assert.That(groupVolume, Is.GreaterThan(singleVolume));
+            Assert.That(hugeVolume, Is.GreaterThanOrEqualTo(groupVolume));
+            Assert.That(hugeVolume, Is.LessThanOrEqualTo(0.62f));
+            Assert.That(groupPitch, Is.LessThan(1f));
+            Assert.That(hugePitch, Is.LessThanOrEqualTo(groupPitch));
+            Assert.That(hugePitch, Is.GreaterThanOrEqualTo(0.92f));
+        }
     }
 }

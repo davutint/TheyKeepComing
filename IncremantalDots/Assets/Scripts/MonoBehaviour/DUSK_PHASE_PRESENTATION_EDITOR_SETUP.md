@@ -13,7 +13,7 @@
 - `GlobalLight`: sahnedeki tek `Global Light 2D`
 - `DayLightColor`: `(1.00, 0.93, 0.82)`
 - `DuskLightColor`: `(1.00, 0.72, 0.47)`
-- `NightLightColor`: `(0.56, 0.64, 0.88)`
+- `NightLightColor`: `(0.46, 0.58, 0.94)`
 - `LightMoveSpeed`: `2.5`
 
 `AmbientAudioRoot/AmbientAudioController`:

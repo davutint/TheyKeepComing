@@ -23,15 +23,18 @@
 - Particle VFX pool per type: `24`
 - Max VFX per frame: `24`
 - Audio pool size: `16`
+- Max SFX per frame: `4`
 - Disable in stress mode: enabled
 - Muzzle / Castle hit particle scale: `0.18 / 0.35`
-- Shoot / Hit / Castle SFX min interval: `0.045 / 0.08 / 0.18`
+- Shoot / Night Shoot / Hit / Castle SFX min interval: `0.075 / 0.12 / 0.08 / 0.18`
+- Archer salvo volume cap / pitch depth: `0.62 / 0.08`
 - Pitch random range: `0.94 - 1.06`
 - VFX sorting: `Wall`, order `12`
 
 ## Play Test
 
-- Okcu ates edince random bow/arrow kliplerinden biri calinmali; shoot muzzle VFX V1'de kapali kalmali.
+- Okcular ayni frame'de ates edince random bow/arrow kliplerinden tek aggregated salvo cue
+  calinmali; shoot muzzle VFX V1'de kapali kalmali.
 - Basic/Rapid/Frost isabette kirmizi-sari sprite flipbook impact hedef uzerinde gorunmeli.
 - Kale hasar alinca castle hit sesi ve VFX calismali.
 - Stress mode'da VFX/SFX oynatilmamali.

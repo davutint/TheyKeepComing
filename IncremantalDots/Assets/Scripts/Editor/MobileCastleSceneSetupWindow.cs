@@ -66,6 +66,8 @@ namespace DeadWalls
         private const string WorkerNailSfxPath = FantasyUiSfxRoot + "/Nail Wood 1-1.wav";
         private const string WorkerSmithSfxPath = FantasyUiSfxRoot + "/Blacksmithing 2-2.wav";
         private const string WorkerStoneSfxPath = FantasyUiSfxRoot + "/Rock Impact 37.wav";
+        private const string CastleWindowSouthSpritePath = "Assets/SmallScaleInt/Fantasy kingdom Tileset/Environment/Sprites/Wall A5_S.png";
+        private const string CastleWindowNorthSpritePath = "Assets/SmallScaleInt/Fantasy kingdom Tileset/Environment/Sprites/Wall A5_N.png";
 
         private string _status = "Hazir.";
 
@@ -188,7 +190,19 @@ namespace DeadWalls
                 "Amber-indigo Dusk light, worker lantern ve tek-sefer tension riser NewGameScene icin onarildi.");
         }
 
-        private static void RepairPhasePresentation(string contextName, string successMessage)
+        [MenuItem("Window/DeadWalls/Repair Night Presentation")]
+        public static void RepairNightPresentation()
+        {
+            RepairPhasePresentation(
+                "Night presentation",
+                "Cold-moon Night light, castle windows, bounded horde bed ve aggregated archer salvo mix NewGameScene icin onarildi.",
+                true);
+        }
+
+        private static void RepairPhasePresentation(
+            string contextName,
+            string successMessage,
+            bool includeNightOwners = false)
         {
             Scene activeScene = SceneManager.GetActiveScene();
             if (!activeScene.IsValid() || activeScene.path != TargetScenePath)
@@ -197,6 +211,11 @@ namespace DeadWalls
 
             EnsureGlobalLight(activeScene);
             EnsureAmbientAudio(activeScene);
+            Light2D[] windowLights = includeNightOwners
+                ? EnsureNightWindowLights(activeScene)
+                : null;
+            if (includeNightOwners)
+                EnsureCombatFeedbackRoot(activeScene);
 
             DayNightOverlayController dayPresentation = null;
             Light2D globalLight = null;
@@ -205,7 +224,17 @@ namespace DeadWalls
                 if (dayPresentation == null)
                     dayPresentation = root.GetComponentInChildren<DayNightOverlayController>(true);
                 if (globalLight == null)
-                    globalLight = root.GetComponentInChildren<Light2D>(true);
+                {
+                    Light2D[] lights = root.GetComponentsInChildren<Light2D>(true);
+                    for (int i = 0; i < lights.Length; i++)
+                    {
+                        if (lights[i].lightType != Light2D.LightType.Global)
+                            continue;
+
+                        globalLight = lights[i];
+                        break;
+                    }
+                }
             }
 
             if (dayPresentation == null || globalLight == null)
@@ -213,6 +242,11 @@ namespace DeadWalls
                     $"{contextName} repair gerekli overlay veya Global Light 2D owner'ini bulamadi.");
 
             ConfigureDayPresentation(dayPresentation, globalLight);
+            if (windowLights != null)
+            {
+                dayPresentation.CastleWindowLights = windowLights;
+                EditorUtility.SetDirty(dayPresentation);
+            }
             EditorSceneManager.MarkSceneDirty(activeScene);
             EditorSceneManager.SaveScene(activeScene);
             AssetDatabase.SaveAssets();
@@ -1060,6 +1094,115 @@ namespace DeadWalls
             serializedLight.ApplyModifiedPropertiesWithoutUndo();
         }
 
+        private static Light2D[] EnsureNightWindowLights(Scene scene)
+        {
+            var positions = new List<Vector3>();
+            Tilemap[] tilemaps = UnityEngine.Object.FindObjectsByType<Tilemap>(
+                FindObjectsInactive.Include,
+                FindObjectsSortMode.None);
+            for (int i = 0; i < tilemaps.Length; i++)
+            {
+                Tilemap tilemap = tilemaps[i];
+                if (tilemap.gameObject.scene != scene)
+                    continue;
+
+                foreach (Vector3Int cell in tilemap.cellBounds.allPositionsWithin)
+                {
+                    Sprite sprite = tilemap.GetSprite(cell);
+                    if (sprite == null)
+                        continue;
+
+                    string spritePath = AssetDatabase.GetAssetPath(sprite);
+                    if (spritePath != CastleWindowSouthSpritePath
+                        && spritePath != CastleWindowNorthSpritePath)
+                        continue;
+
+                    Vector3 world = tilemap.GetCellCenterWorld(cell);
+                    world.z = -1.5f;
+                    bool duplicate = false;
+                    for (int p = 0; p < positions.Count; p++)
+                    {
+                        if ((positions[p] - world).sqrMagnitude > 0.0001f)
+                            continue;
+
+                        duplicate = true;
+                        break;
+                    }
+                    if (!duplicate)
+                        positions.Add(world);
+                }
+            }
+
+            positions.Sort((a, b) =>
+            {
+                int y = a.y.CompareTo(b.y);
+                return y != 0 ? y : a.x.CompareTo(b.x);
+            });
+
+            GameObject root = FindRoot(scene, "CastleNightWindowLights");
+            if (root == null)
+            {
+                root = new GameObject("CastleNightWindowLights");
+                Undo.RegisterCreatedObjectUndo(root, "Create Castle Night Window Lights");
+                SceneManager.MoveGameObjectToScene(root, scene);
+            }
+            root.transform.position = Vector3.zero;
+
+            var lights = new Light2D[positions.Count];
+            for (int i = 0; i < positions.Count; i++)
+            {
+                GameObject lightObject = EnsureChild(
+                    root.transform,
+                    $"WindowGlow_{i + 1:00}",
+                    false);
+                lightObject.transform.position = positions[i];
+                Light2D light = EnsureComponent<Light2D>(lightObject);
+                light.lightType = Light2D.LightType.Point;
+                light.overlapOperation = Light2D.OverlapOperation.Additive;
+                light.color = DayNightOverlayController.DefaultWindowLightColor;
+                light.intensity = 0f;
+                light.pointLightInnerRadius = 0.08f;
+                light.pointLightOuterRadius = 0.72f;
+                light.falloffIntensity = 0.85f;
+                EditorUtility.SetDirty(light);
+                EditorUtility.SetDirty(lightObject);
+                lights[i] = light;
+            }
+
+            for (int i = root.transform.childCount - 1; i >= 0; i--)
+            {
+                Transform child = root.transform.GetChild(i);
+                if (!child.name.StartsWith("WindowGlow_", StringComparison.Ordinal))
+                    continue;
+
+                string suffix = child.name.Substring("WindowGlow_".Length);
+                if (int.TryParse(suffix, out int oneBasedIndex)
+                    && oneBasedIndex > 0
+                    && oneBasedIndex <= positions.Count)
+                    continue;
+
+                Undo.DestroyObjectImmediate(child.gameObject);
+            }
+
+            DayNightOverlayController controller = null;
+            foreach (GameObject sceneRoot in scene.GetRootGameObjects())
+            {
+                controller = sceneRoot.GetComponentInChildren<DayNightOverlayController>(true);
+                if (controller != null)
+                    break;
+            }
+            if (controller != null)
+            {
+                controller.CastleWindowLights = lights;
+                EditorUtility.SetDirty(controller);
+            }
+
+            EditorUtility.SetDirty(root);
+            if (lights.Length == 0)
+                Debug.LogWarning("[MobileCastleSceneSetup] Castle window sprite'lari bulunamadi; Night window light binding'i bos kaldi.");
+            return lights;
+        }
+
         private static void EnsureEventSystem(Scene scene)
         {
             GameObject eventSystemObject = FindRoot(scene, "EventSystem");
@@ -1134,6 +1277,7 @@ namespace DeadWalls
             BuildCanvasPanels(canvas.transform, uiManager, archerCatalog);
             EnsureCastleClickTarget(scene);
             EnsureArcherTilePlacement(scene, archerFormation);
+            EnsureNightWindowLights(scene);
             EnsureCombatFeedbackRoot(scene);
             EnsureCameraShaker(scene);
             ConfigureMenuSystem(canvas.transform);
@@ -2413,6 +2557,7 @@ namespace DeadWalls
             bridge.VfxPoolSizePerType = 24;
             bridge.MaxVfxPlayedPerFrame = 24;
             bridge.AudioPoolSize = 16;
+            bridge.MaxSfxPlayedPerFrame = 4;
             bridge.DisableInStressMode = true;
             bridge.ArrowMuzzleScale = 0.18f;
             bridge.ArrowHitScale = 0.08f;
@@ -2422,9 +2567,12 @@ namespace DeadWalls
             bridge.ArrowHitRotationOffsetDegrees = 90f;
             bridge.FrostHitRotationOffsetDegrees = 0f;
             bridge.CastleHitRotationOffsetDegrees = 0f;
-            bridge.ShootSfxMinInterval = 0.045f;
+            bridge.ShootSfxMinInterval = 0.075f;
+            bridge.NightShootSfxMinInterval = 0.12f;
             bridge.HitSfxMinInterval = 0.08f;
             bridge.CastleHitSfxMinInterval = 0.18f;
+            bridge.MaxArcherSalvoVolume = 0.62f;
+            bridge.ArcherSalvoPitchDepth = 0.08f;
             bridge.PitchRandomMin = 0.94f;
             bridge.PitchRandomMax = 1.06f;
             bridge.SpatialBlend = 0.45f;
@@ -2855,6 +3003,8 @@ namespace DeadWalls
                 ambient.BloodMoonSting = LoadSfx("UI, Pads, Enchantments and Misc/RPG3_MONSTER_Roar01.wav");
             if (ambient.DuskRiser == null)
                 ambient.DuskRiser = LoadSfx("Wind Magic/RPG3_WindMagicEpic_Cast01_P1.wav");
+            if (ambient.NightHordeLoop == null)
+                ambient.NightHordeLoop = LoadSfx("Wind Magic/RPG3_WindMagic_Drone01_DarkWindLoop.wav");
             if (ambient.WorkerFoleyClips == null || ambient.WorkerFoleyClips.Length != 4)
                 ambient.WorkerFoleyClips = new AudioClip[4];
             if (ambient.WorkerFoleyClips[0] == null)
@@ -2871,6 +3021,8 @@ namespace DeadWalls
             ambient.WorkerPitchVariation = 0.06f;
             ambient.DuskRiserVolume = 0.23f;
             ambient.DuskRiserPitch = 0.90f;
+            ambient.NightHordeVolume = 0.18f;
+            ambient.NightHordeFadeSpeed = 0.4f;
             EditorUtility.SetDirty(ambient);
         }
 
@@ -4903,7 +5055,15 @@ namespace DeadWalls
             Scene scene = canvasTransform.gameObject.scene;
             foreach (GameObject root in scene.GetRootGameObjects())
             {
-                globalLight = root.GetComponentInChildren<Light2D>(true);
+                Light2D[] lights = root.GetComponentsInChildren<Light2D>(true);
+                for (int i = 0; i < lights.Length; i++)
+                {
+                    if (lights[i].lightType != Light2D.LightType.Global)
+                        continue;
+
+                    globalLight = lights[i];
+                    break;
+                }
                 if (globalLight != null)
                     break;
             }
@@ -4924,6 +5084,11 @@ namespace DeadWalls
             controller.DuskLightIntensity = DayNightOverlayController.DefaultDuskLightIntensity;
             controller.NightLightIntensity = DayNightOverlayController.DefaultNightLightIntensity;
             controller.DawnLightIntensity = DayNightOverlayController.DefaultDawnLightIntensity;
+            controller.WindowLightColor = DayNightOverlayController.DefaultWindowLightColor;
+            controller.WindowLightIntensity = DayNightOverlayController.DefaultWindowLightIntensity;
+            controller.WindowLightMoveSpeed = 3.5f;
+            controller.WindowLightFlickerAmount = 0.035f;
+            controller.WindowLightFlickerSpeed = 2.2f;
             EditorUtility.SetDirty(controller);
 
             if (globalLight == null)

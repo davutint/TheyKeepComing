@@ -13,13 +13,17 @@ namespace DeadWalls
     {
         public static readonly Color DefaultDayLightColor = new Color(1f, 0.93f, 0.82f, 1f);
         public static readonly Color DefaultDuskLightColor = new Color(1f, 0.72f, 0.47f, 1f);
-        public static readonly Color DefaultNightLightColor = new Color(0.56f, 0.64f, 0.88f, 1f);
+        public static readonly Color DefaultNightLightColor = new Color(0.46f, 0.58f, 0.94f, 1f);
         public static readonly Color DefaultDawnLightColor = new Color(1f, 0.80f, 0.60f, 1f);
+        public static readonly Color DefaultWindowLightColor = new Color(1f, 0.47f, 0.12f, 1f);
         public const float DefaultDayLightIntensity = 1.08f;
         public const float DefaultDuskLightIntensity = 0.90f;
-        public const float DefaultNightLightIntensity = 0.72f;
+        public const float DefaultNightLightIntensity = 0.68f;
         public const float DefaultDawnLightIntensity = 0.96f;
         public const float DuskAmberPeakProgress = 0.45f;
+        public const float DuskWindowIgnitionProgress = 0.18f;
+        public const float DuskWindowFullProgress = 0.72f;
+        public const float DefaultWindowLightIntensity = 0.82f;
 
         public Image OverlayImage;
         public float AlphaMoveSpeed = 8f;
@@ -35,6 +39,14 @@ namespace DeadWalls
         [Min(0f)] public float DuskLightIntensity = DefaultDuskLightIntensity;
         [Min(0f)] public float NightLightIntensity = DefaultNightLightIntensity;
         [Min(0f)] public float DawnLightIntensity = DefaultDawnLightIntensity;
+
+        [Header("Castle Night Windows")]
+        public Light2D[] CastleWindowLights;
+        public Color WindowLightColor = DefaultWindowLightColor;
+        [Min(0f)] public float WindowLightIntensity = DefaultWindowLightIntensity;
+        public float WindowLightMoveSpeed = 3.5f;
+        [Range(0f, 0.15f)] public float WindowLightFlickerAmount = 0.035f;
+        [Min(0f)] public float WindowLightFlickerSpeed = 2.2f;
 
         // Faz atmosfer renkleri (owner Inspector'dan degistirebilsin diye public)
         public Color DuskColor = new Color(0.55f, 0.24f, 0.06f);   // amber gun batimi
@@ -79,6 +91,7 @@ namespace DeadWalls
 
             ResolveLightTarget(out Color lightColor, out float lightIntensity);
             ApplyGlobalLight(lightColor, lightIntensity, dt);
+            ApplyWindowLights(ResolveWindowLightTarget(), dt);
         }
 
         public void ResolveLightTarget(out Color color, out float intensity)
@@ -144,6 +157,41 @@ namespace DeadWalls
             }
         }
 
+        public float ResolveWindowLightTarget()
+        {
+            var gm = GameManager.Instance;
+            if (gm != null && gm.TryGetContinuousSiegeCycle(out var cycle))
+                return ResolvePhaseWindowLightIntensity(cycle.Phase, cycle.PhaseProgress01);
+
+            bool night = gm != null && gm.WaveState.Phase == RunPhaseType.NightCombat;
+            return night ? Mathf.Max(0f, WindowLightIntensity) : 0f;
+        }
+
+        public float ResolvePhaseWindowLightIntensity(
+            SiegeCyclePhase phase,
+            float phaseProgress01)
+        {
+            float maxIntensity = Mathf.Max(0f, WindowLightIntensity);
+            float progress = Mathf.Clamp01(phaseProgress01);
+            switch (phase)
+            {
+                case SiegeCyclePhase.Dusk:
+                {
+                    float ignition = Mathf.InverseLerp(
+                        DuskWindowIgnitionProgress,
+                        DuskWindowFullProgress,
+                        progress);
+                    return Mathf.SmoothStep(0f, maxIntensity, ignition);
+                }
+                case SiegeCyclePhase.Night:
+                    return maxIntensity;
+                case SiegeCyclePhase.Dawn:
+                    return Mathf.SmoothStep(maxIntensity, 0f, Mathf.Clamp01(progress / 0.65f));
+                default:
+                    return 0f;
+            }
+        }
+
         private void ApplyGlobalLight(Color targetColor, float targetIntensity, float deltaTime)
         {
             if (GlobalLight == null)
@@ -160,6 +208,30 @@ namespace DeadWalls
                 GlobalLight.intensity,
                 Mathf.Max(0f, targetIntensity),
                 colorStep);
+        }
+
+        private void ApplyWindowLights(float targetIntensity, float deltaTime)
+        {
+            if (CastleWindowLights == null || CastleWindowLights.Length == 0)
+                return;
+
+            float step = Mathf.Max(0f, WindowLightMoveSpeed) * deltaTime;
+            float time = Time.unscaledTime * Mathf.Max(0f, WindowLightFlickerSpeed);
+            for (int i = 0; i < CastleWindowLights.Length; i++)
+            {
+                Light2D light = CastleWindowLights[i];
+                if (light == null)
+                    continue;
+
+                light.color = WindowLightColor;
+                float flicker = targetIntensity > 0f
+                    ? 1f + Mathf.Sin(time + i * 1.73f) * WindowLightFlickerAmount
+                    : 1f;
+                light.intensity = Mathf.MoveTowards(
+                    light.intensity,
+                    Mathf.Max(0f, targetIntensity * flicker),
+                    step);
+            }
         }
 
         private void ResolveTarget(out Color color, out float alpha)

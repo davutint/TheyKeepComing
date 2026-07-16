@@ -9,7 +9,8 @@
 - ECS sistemleri `CombatVfxEvent` ve `CombatSfxEvent` entity'leri uretir.
 - `CombatFeedbackBridge`, `CombatFeedbackRoot` altinda bu event entity'lerini okur.
 - Arrow/Frost hit VFX icin sprite flipbook pool kullanir; diger VFX icin prefab ParticleSystem pool kullanir ve event entity'sini siler.
-- SFX icin AudioSource pool kullanir, type bazli rate limit uygular ve event entity'sini siler.
+- SFX icin sabit AudioSource pool kullanir; bir frame'deki event'leri type bazinda aggregate eder,
+  oncelik + frame budget + type rate-limit uygular ve event entity'lerini siler.
 
 ## V1 Event Kaynaklari
 
@@ -51,7 +52,12 @@ castle impact prefab'i atayabilir (yalniz-bossa kurali onu korur).
 - Stress mode'da `DisableInStressMode = true` ise event'ler temizlenir ama oynatilmaz.
 - Hit flipbook pool varsayilan `1024`; pool bosalirsa en eski aktif flipbook recycle edilir.
 - ParticleSystem pool type basina varsayilan `24`, frame basi maksimum particle oynatma `24`.
-- SFX type bazli min interval ile kisilir; cok okcuda ses yigini olusmasi engellenir.
+- SFX playback frame basi en fazla `4` cue ile sinirlidir. Oncelik Fireball, Castle, Frost,
+  ArrowShoot, ZombieDeath ve ArrowHit sirasidir; kritik cue'lar kalabalikta kaybolmaz.
+- Bir frame'deki butun `ArrowShoot` event'leri ortalama world position'da tek salvo cue'ya
+  donusturulur. Logaritmik gain `0.62` tavanda kalir; pitch en fazla `%8` alcalir.
+- Shoot rate-limit Day/Dusk/Dawn icin `0.075s`, Night icin `0.12s` alt siniridir.
+  Bin okcu yeni AudioSource veya bin ayri ses uretmez.
 - Arrow shoot SFX icin `ArrowShootClips` doluysa random clip secilir; bos kalirsa eski `ArrowShootClip` fallback'i kullanilir.
 - VFX world z degeri `MobileCastleRenderDepth.ProjectileZ` bandina normalize edilir.
 - Hit flipbook world z degeri `MobileCastleRenderDepth.ProjectileZ` bandina normalize edilir.

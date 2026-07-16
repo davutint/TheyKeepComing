@@ -71,6 +71,8 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 
 - ECS `CombatVfxEvent` ve `CombatSfxEvent` entity'lerini okur, hit flipbook, pooled ParticleSystem ve AudioSource ile oynatir.
 - Arrow/Frost hit feedback'i hafif sprite flipbook pool ile, castle hit ParticleSystem ile, shoot feedback'i random AudioSource pool ile yonetilir; shoot particle V1'de kapali tutulur.
+- Bir frame'deki shoot event'lerini tek salvo cue'ya aggregate eder; sabit `16` AudioSource pool,
+  frame basi `4` cue budget'i ve Night `0.12s` shoot rate-limit'i ile kalabalik mix'i sinirlar.
 - Stress mode'da event'leri temizleyip playback'i kapatabilir; bu sayede performans testleri VFX/SFX yukunden etkilenmez.
 
 ### LevelUpUI.cs
@@ -171,6 +173,9 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 ### DayNightOverlayController.cs
 
 - `Canvas/DayNightOverlay` full-screen black `Image` alpha degerini yonetir.
+- Sahnedeki tek Global Light 2D'yi warm Day, amber-indigo Dusk ve cold-moon Night hedefleriyle surer.
+- Tam dort canonical kale pencere sprite'ina bagli Point Light 2D, Dusk'ta yumusak yanar,
+  Night boyunca sicak kalir ve Dawn'da soner; yeni cycle veya gameplay owner'i olusturmaz.
 - Continuous siege aktifken Day alpha acik kalir, Dusk boyunca day/night alpha arasinda kararir, Night alpha sabit kalir.
 - Legacy `DayPrep` sirasinda alpha'yi config'teki day/night degerleri arasinda sayac progress'ine gore artirir.
 - Legacy `NightCombat` sirasinda night alpha sabit kalir.

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 
@@ -37,6 +38,7 @@ namespace DeadWalls
         public int VfxPoolSizePerType = 24;
         public int MaxVfxPlayedPerFrame = 24;
         public int AudioPoolSize = 16;
+        public int MaxSfxPlayedPerFrame = 4;
         public bool DisableInStressMode = true;
 
         [Header("VFX Scale")]
@@ -52,11 +54,14 @@ namespace DeadWalls
         public float CastleHitRotationOffsetDegrees;
 
         [Header("Audio Rate Limit")]
-        public float ShootSfxMinInterval = 0.045f;
+        public float ShootSfxMinInterval = 0.075f;
+        public float NightShootSfxMinInterval = 0.12f;
         public float HitSfxMinInterval = 0.08f;
         public float CastleHitSfxMinInterval = 0.18f;
         public float ZombieDeathSfxMinInterval = 0.09f;
         public float FireballBlastSfxMinInterval = 0.2f;
+        [Range(0f, 1f)] public float MaxArcherSalvoVolume = 0.62f;
+        [Range(0f, 0.2f)] public float ArcherSalvoPitchDepth = 0.08f;
 
         [Header("Castle Hit Feel (M-D)")]
         [Tooltip("CastleHit SFX calindiginda kamera sarsintisi siddeti (0 = kapali).")]
@@ -78,6 +83,26 @@ namespace DeadWalls
         private readonly List<AudioSource> _audioSources = new List<AudioSource>();
         // Boyut enum uzunlugundan buyuk tutulur (yeni SFX tipi eklerken tasma olmasin)
         private readonly float[] _lastSfxTimes = { -999f, -999f, -999f, -999f, -999f, -999f, -999f, -999f };
+        private readonly int[] _sfxAggregateCounts = new int[8];
+        private readonly float3[] _sfxAggregatePositions = new float3[8];
+        private readonly float[] _sfxAggregateVolumes = new float[8];
+        private readonly float[] _sfxAggregatePitches = new float[8];
+
+        private static readonly CombatSfxType[] SfxPlaybackPriority =
+        {
+            CombatSfxType.FireballBlast,
+            CombatSfxType.CastleHit,
+            CombatSfxType.FrostHit,
+            CombatSfxType.ArrowShoot,
+            CombatSfxType.ZombieDeath,
+            CombatSfxType.ArrowHit
+        };
+
+        public int LastProcessedSfxEventCount { get; private set; }
+        public int LastFrameSfxPlayedCount { get; private set; }
+        public int LastArrowSalvoSize { get; private set; }
+        public int TotalSfxPlayedCount { get; private set; }
+        public int TotalArrowSalvosPlayed { get; private set; }
 
         private World _world;
         private EntityManager _entityManager;
@@ -214,14 +239,82 @@ namespace DeadWalls
                 return;
 
             using NativeArray<CombatSfxEvent> events = _sfxQuery.ToComponentDataArray<CombatSfxEvent>(Allocator.Temp);
+            LastProcessedSfxEventCount = events.Length;
+            LastFrameSfxPlayedCount = 0;
+            LastArrowSalvoSize = 0;
 
             if (!skipPlayback)
             {
+                ResetSfxAggregates();
                 for (int i = 0; i < events.Length; i++)
-                    PlaySfx(events[i]);
+                    AggregateSfxEvent(events[i]);
+
+                LastArrowSalvoSize = _sfxAggregateCounts[(int)CombatSfxType.ArrowShoot];
+                int playbackBudget = Mathf.Max(1, MaxSfxPlayedPerFrame);
+                for (int i = 0; i < SfxPlaybackPriority.Length; i++)
+                {
+                    CombatSfxType type = SfxPlaybackPriority[i];
+                    int typeIndex = (int)type;
+                    int count = _sfxAggregateCounts[typeIndex];
+                    if (count <= 0)
+                        continue;
+
+                    if (!TryPlaySfx(BuildAggregatedSfxEvent(type, count)))
+                        continue;
+
+                    LastFrameSfxPlayedCount++;
+                    TotalSfxPlayedCount++;
+                    if (type == CombatSfxType.ArrowShoot)
+                        TotalArrowSalvosPlayed++;
+                    if (LastFrameSfxPlayedCount >= playbackBudget)
+                        break;
+                }
             }
 
             _entityManager.DestroyEntity(entities);
+        }
+
+        private void ResetSfxAggregates()
+        {
+            Array.Clear(_sfxAggregateCounts, 0, _sfxAggregateCounts.Length);
+            Array.Clear(_sfxAggregatePositions, 0, _sfxAggregatePositions.Length);
+            Array.Clear(_sfxAggregateVolumes, 0, _sfxAggregateVolumes.Length);
+            Array.Clear(_sfxAggregatePitches, 0, _sfxAggregatePitches.Length);
+        }
+
+        private void AggregateSfxEvent(CombatSfxEvent sfxEvent)
+        {
+            int index = (int)sfxEvent.Type;
+            if ((uint)index >= (uint)_sfxAggregateCounts.Length)
+                return;
+
+            _sfxAggregateCounts[index]++;
+            _sfxAggregatePositions[index] += sfxEvent.Position;
+            _sfxAggregateVolumes[index] = Mathf.Max(
+                _sfxAggregateVolumes[index],
+                Mathf.Clamp01(sfxEvent.Volume));
+            _sfxAggregatePitches[index] += Mathf.Max(0.05f, sfxEvent.Pitch);
+        }
+
+        private CombatSfxEvent BuildAggregatedSfxEvent(CombatSfxType type, int count)
+        {
+            int index = (int)type;
+            float safeCount = Mathf.Max(1, count);
+            float volume = _sfxAggregateVolumes[index];
+            float pitch = _sfxAggregatePitches[index] / safeCount;
+            if (type == CombatSfxType.ArrowShoot)
+            {
+                volume = ResolveArcherSalvoVolume(count, volume, MaxArcherSalvoVolume);
+                pitch *= ResolveArcherSalvoPitchMultiplier(count, ArcherSalvoPitchDepth);
+            }
+
+            return new CombatSfxEvent
+            {
+                Position = _sfxAggregatePositions[index] / safeCount,
+                Type = type,
+                Volume = volume,
+                Pitch = pitch
+            };
         }
 
         private bool PlayVfx(CombatVfxEvent vfxEvent)
@@ -522,16 +615,16 @@ namespace DeadWalls
             }
         }
 
-        private void PlaySfx(CombatSfxEvent sfxEvent)
+        private bool TryPlaySfx(CombatSfxEvent sfxEvent)
         {
             AudioClip clip = GetSfxClip(sfxEvent.Type);
             if (clip == null)
-                return;
+                return false;
 
             int index = (int)sfxEvent.Type;
             float now = Time.time;
             if (now - _lastSfxTimes[index] < GetSfxMinInterval(sfxEvent.Type))
-                return;
+                return false;
 
             _lastSfxTimes[index] = now;
 
@@ -553,6 +646,30 @@ namespace DeadWalls
             source.pitch = Mathf.Max(0.05f, sfxEvent.Pitch * UnityEngine.Random.Range(PitchRandomMin, PitchRandomMax));
             source.spatialBlend = SpatialBlend;
             source.Play();
+            return true;
+        }
+
+        public static float ResolveArcherSalvoVolume(
+            int arrowCount,
+            float eventVolume,
+            float maxVolume)
+        {
+            if (arrowCount <= 0)
+                return 0f;
+
+            float densityGain = 1f + Mathf.Log(Mathf.Max(1, arrowCount), 2f) * 0.055f;
+            return Mathf.Min(
+                Mathf.Clamp01(maxVolume),
+                Mathf.Clamp01(eventVolume) * densityGain);
+        }
+
+        public static float ResolveArcherSalvoPitchMultiplier(int arrowCount, float pitchDepth)
+        {
+            if (arrowCount <= 1)
+                return 1f;
+
+            float density = Mathf.Clamp01(Mathf.Log(arrowCount, 2f) / 10f);
+            return 1f - density * Mathf.Clamp(pitchDepth, 0f, 0.2f);
         }
 
         private AudioSource GetNextAudioSource()
@@ -654,7 +771,9 @@ namespace DeadWalls
         {
             return type switch
             {
-                CombatSfxType.ArrowShoot => ShootSfxMinInterval,
+                CombatSfxType.ArrowShoot => IsNightPhase()
+                    ? Mathf.Max(ShootSfxMinInterval, NightShootSfxMinInterval)
+                    : ShootSfxMinInterval,
                 CombatSfxType.ArrowHit => HitSfxMinInterval,
                 CombatSfxType.FrostHit => HitSfxMinInterval,
                 CombatSfxType.CastleHit => CastleHitSfxMinInterval,
@@ -662,6 +781,14 @@ namespace DeadWalls
                 CombatSfxType.FireballBlast => FireballBlastSfxMinInterval,
                 _ => 0.05f
             };
+        }
+
+        private static bool IsNightPhase()
+        {
+            GameManager gameManager = GameManager.Instance;
+            return gameManager != null
+                && gameManager.ContinuousSiegeCycle.Enabled
+                && gameManager.ContinuousSiegeCycle.Phase == SiegeCyclePhase.Night;
         }
 
         private Quaternion ResolveHitFlipbookRotation(CombatVfxEvent vfxEvent)
