@@ -83,6 +83,7 @@ SubScene:
   Grave Essence, status, compass, `+1/+10/MAX`, badge ve toast alanlari bagli; `TechTreeUI` yok
 - `CastleEconomyUI`: legacy full-screen panel bindingleri bagli kalabilir ama `PlayerFacingPanelEnabled = false`; `CastleEconomyPanel` ve `CastleTapHint` player-facing kapali tutulur
 - `WorkerEconomyDrawerUI`: sol ust worker drawer toggle/panel, summary alanlari, Wood/Stone/Iron/Food target kontrolleri ve `CAP / EFF` bina yatirim butonlari bagli
+- `FirstRunOnboardingUI`: scene HUD root'ta tek component; `WorkerEconomyDrawerUI`, `OnboardingHintPanel/Text` ve `OnboardingPulseFrame` referanslari dolu
 - `CastleInteriorWorkerPlacement`: Wood/Stone/Iron/Food pickup root'lari ve `CastleWorkerHub/DeliveryPoints` delivery root'u bagli
 - `GameManager`: test icin `Free Economy Test Mode` acilirsa archer buy ve legacy/debug upgrade/unlock/prep API'leri kaynak/population harcamadan calisir; sag drawer player-facing yalnizca buy kullanir
 - `CastleTapHint`, `EconomyEventBadge` ve opsiyonel glow objelerinin raycast target'lari kapatilir; eski castle tap akisi player-facing kullanilmaz
@@ -110,7 +111,9 @@ pipeline'i 2026-07-06'da kaldirildi.) Setup tool asagidaki isimleri exact-match 
 - Economy focus objeleri artik opsiyoneldir ve setup tool tarafindan gizlenir
 - Beklenen Worker Drawer: `WorkerDrawerToggleButton`, `WorkerEconomyDrawerPanel`, `WorkerDrawerTitleText`, `WorkerIdlePopulationText`, `WorkerTotalText`, `WorkerArcherPopulationText`
 - Beklenen Worker Drawer row alanlari: `WoodWorkerCountText`, `WoodWorkerRateText`, `WoodWorkerAddButton`, `WoodWorkerTargetPlus10Button`, `WoodWorkerTargetPlus100Button`, `WoodWorkerTargetInput`, `WoodWorkerStatusText`, `WoodCapacityUpgradeButton`, `WoodEfficiencyUpgradeButton`; ayni pattern `Stone`, `Iron`, `Food`
+- Beklenen onboarding presentation: `OnboardingHintPanel`, `OnboardingHintText`, `OnboardingHintAccent`, `OnboardingPulseFrame`; prefabda inactive/raycast kapali, runtime scene owner'i tarafindan acilir
 - `Window > DeadWalls > Repair Worker Drawer Target Controls`, generated prefabdaki sekiz bina yatirim butonunu idempotent kurar ve aktif `NewGameScene` runtime component referanslarini baglar.
+- `Window > DeadWalls > Repair First Day Worker Ratio Onboarding`, presentation'i idempotent kurar ve aktif sahnedeki tek controller binding'ini onarir.
 - Legacy Castle Interior paneli varsa baglanabilir ama player-facing ana ekonomi UI'i degildir: `CastleEconomyPanel`, `CastleInteriorImage`, `CloseCastleEconomyButton`, `ConfirmCastleEconomyButton`, `CastleTapHint`, `CastleTapHintText`
 - Beklenen population alanlari: `PopulationTotalText`, `PopulationIdleText`, `PopulationArchersText`, `PopulationGrowthText`, `WorkerBudgetText`
 - Beklenen worker alanlari: `WoodWorkerSlider`, `StoneWorkerSlider`, `IronWorkerSlider`, `FoodWorkerSlider`, `WoodWorkerText`, `StoneWorkerText`, `IronWorkerText`, `FoodWorkerText`, `WoodRateText`, `StoneRateText`, `IronRateText`, `FoodRateText`

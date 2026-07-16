@@ -14,7 +14,7 @@ Player-facing bütün metinler İngilizcedir. Kod tarafındaki para birimi otori
 - BestDay, TotalRuns ve TotalKillsAllTime,
 - `MetaUpgradeLevel` listesi,
 - Gelecekteki Heart/ability content olasılık havuzlarını açacak stable `UnlockedPoolIds`,
-- Package I onboarding sahibinin kullanacağı stable `TutorialFlags`,
+- Package I onboarding sahibinin kullandığı stable `TutorialFlags`,
 - Aynı koşunun iki kez ödüllendirilmesini önleyen sınırlı `RewardedRunIds` listesi.
 
 JsonUtility dictionary serialize etmediği için upgrade ve kimlik state'leri list olarak tutulur.
@@ -48,8 +48,11 @@ saf schema/migration test sahibidir; Player-facing kod doğrudan çağırmaz.
   sınırıdır; tutorial davranışının kendisi Package I sahibinde kalır.
 - Her iki mutation API'si atomik save başarısızsa in-memory değişikliği geri alır.
 
-Pool unlock consumer'ı ve tutorial akışı sonraki tracker işlerinde kalır. Satın alma ve graph
-izolasyon sınırı aşağıdaki runtime sözleşmesiyle tamamlanmıştır.
+Ilk aktif consumer `FirstRunOnboardingUI`, `tutorial.v1.worker_ratio` flag'ini yalnız başarılı
+gerçek player ratio action'ından sonra yazar. Kalan tutorial adımları ve final complete/reset
+flag'leri sonraki Package I tracker işlerinde kalır. Pool unlock consumer'ı da owner onaylı
+content işini bekler. Satın alma ve graph izolasyon sınırı aşağıdaki runtime sözleşmesiyle
+tamamlanmıştır.
 
 ## Koşu sonucu transaction'ı
 

@@ -104,6 +104,40 @@ namespace DeadWalls
                 : "[MobileCastleSceneSetup] Worker drawer controls prefabda onarildi; NewGameScene aktif olmadigi icin sahne degismedi.");
         }
 
+        [MenuItem("Window/DeadWalls/Repair First Day Worker Ratio Onboarding")]
+        public static void RepairFirstDayWorkerRatioOnboarding()
+        {
+            EnsureFirstDayWorkerRatioOnboardingInPrefab();
+            AssetDatabase.ImportAsset(GeneratedHudPrefabPath, ImportAssetOptions.ForceUpdate);
+
+            Scene activeScene = SceneManager.GetActiveScene();
+            bool sceneRepaired = false;
+            if (activeScene.IsValid() && activeScene.path == TargetScenePath)
+            {
+                foreach (GameObject root in activeScene.GetRootGameObjects())
+                {
+                    HUDController hud = root.GetComponentInChildren<HUDController>(true);
+                    if (hud == null)
+                        continue;
+
+                    ConfigureFirstRunOnboarding(hud.gameObject);
+                    sceneRepaired = true;
+                    break;
+                }
+
+                if (sceneRepaired)
+                {
+                    EditorSceneManager.MarkSceneDirty(activeScene);
+                    EditorSceneManager.SaveScene(activeScene);
+                }
+            }
+
+            AssetDatabase.SaveAssets();
+            Debug.Log(sceneRepaired
+                ? "[MobileCastleSceneSetup] First Day worker ratio onboarding prefab ve sahnede onarildi."
+                : "[MobileCastleSceneSetup] First Day worker ratio onboarding prefabda onarildi; NewGameScene aktif degildi.");
+        }
+
         [MenuItem("Window/DeadWalls/Repair Archer Retrain Control")]
         public static void RepairArcherRetrainControl()
         {
@@ -3267,6 +3301,7 @@ namespace DeadWalls
             DestroyChildIfExists(canvasTransform, "MarketPanel");
 
             EnsureResponsiveHudVisualRootInPrefab();
+            EnsureFirstDayWorkerRatioOnboardingInPrefab();
             EnsureWorkerDrawerTargetControlsInPrefab();
             EnsureArcherRetrainControlInPrefab();
             EnsureArrowAmmoPanelInPrefab();
@@ -3366,6 +3401,26 @@ namespace DeadWalls
                 // Runtime component sahnede otoriter olarak ekleniyor. Prefabda ikinci bir
                 // WorkerEconomyDrawerUI birakmak scene instance'inda cift listener uretir.
                 DestroyComponentIfExists<WorkerEconomyDrawerUI>(root);
+                PrefabUtility.SaveAsPrefabAsset(root, GeneratedHudPrefabPath);
+            }
+            finally
+            {
+                PrefabUtility.UnloadPrefabContents(root);
+            }
+        }
+
+        private static void EnsureFirstDayWorkerRatioOnboardingInPrefab()
+        {
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(GeneratedHudPrefabPath);
+            if (prefab == null)
+                throw new InvalidOperationException("Onboarding HUD prefab bulunamadi: " + GeneratedHudPrefabPath);
+
+            GameObject root = PrefabUtility.LoadPrefabContents(GeneratedHudPrefabPath);
+            try
+            {
+                EnsureFirstDayWorkerRatioPresentation(root);
+                // Runtime state scene owner'inda kalir; prefab yalniz presentation truth'tur.
+                DestroyComponentIfExists<FirstRunOnboardingUI>(root);
                 PrefabUtility.SaveAsPrefabAsset(root, GeneratedHudPrefabPath);
             }
             finally
@@ -3651,6 +3706,79 @@ namespace DeadWalls
             }
 
             return button;
+        }
+
+        private static void EnsureFirstDayWorkerRatioPresentation(GameObject hudRoot)
+        {
+            Transform visualRoot = hudRoot.transform.Find("MobileCastleHudRoot") ?? hudRoot.transform;
+            Sprite rounded = EnsureRoundedRectAsset();
+
+            GameObject hintPanel = EnsurePanel(visualRoot, "OnboardingHintPanel", false,
+                new Color(0.035f, 0.045f, 0.065f, 0.96f));
+            RectTransform hintRect = hintPanel.GetComponent<RectTransform>();
+            hintRect.anchorMin = Vector2.zero;
+            hintRect.anchorMax = Vector2.zero;
+            hintRect.pivot = Vector2.zero;
+            hintRect.anchoredPosition = new Vector2(24f, 96f);
+            hintRect.sizeDelta = new Vector2(360f, 42f);
+            hintRect.localScale = Vector3.one;
+
+            Image hintImage = hintPanel.GetComponent<Image>();
+            hintImage.sprite = rounded;
+            hintImage.type = rounded != null ? Image.Type.Sliced : Image.Type.Simple;
+            hintImage.raycastTarget = false;
+            var hintOutline = EnsureComponent<Outline>(hintPanel);
+            hintOutline.effectColor = new Color(1f, 0.64f, 0.16f, 0.34f);
+            hintOutline.effectDistance = new Vector2(1f, -1f);
+
+            GameObject accent = EnsurePanel(hintPanel.transform, "OnboardingHintAccent", true,
+                new Color(1f, 0.64f, 0.16f, 0.95f));
+            RectTransform accentRect = accent.GetComponent<RectTransform>();
+            accentRect.anchorMin = Vector2.zero;
+            accentRect.anchorMax = new Vector2(0f, 1f);
+            accentRect.pivot = Vector2.zero;
+            accentRect.offsetMin = new Vector2(6f, 6f);
+            accentRect.offsetMax = new Vector2(10f, -6f);
+            accent.GetComponent<Image>().raycastTarget = false;
+
+            TextMeshProUGUI hintText = EnsureText(
+                hintPanel.transform,
+                "OnboardingHintText",
+                FirstRunOnboardingUI.WorkerRatioHint,
+                14,
+                TextAlignmentOptions.MidlineLeft,
+                Vector2.zero,
+                Vector2.one,
+                new Vector2(20f, 0f),
+                new Vector2(-10f, 0f));
+            hintText.enableAutoSizing = true;
+            hintText.fontSizeMin = 9f;
+            hintText.fontSizeMax = 14f;
+            hintText.textWrappingMode = TextWrappingModes.NoWrap;
+            hintText.raycastTarget = false;
+            hintText.color = new Color(0.94f, 0.96f, 1f, 1f);
+
+            GameObject pulseObject = EnsurePanel(visualRoot, "OnboardingPulseFrame", false,
+                new Color(1f, 0.64f, 0.16f, 0.12f));
+            RectTransform pulseRect = pulseObject.GetComponent<RectTransform>();
+            pulseRect.anchorMin = new Vector2(0.5f, 0.5f);
+            pulseRect.anchorMax = new Vector2(0.5f, 0.5f);
+            pulseRect.pivot = new Vector2(0.5f, 0.5f);
+            pulseRect.anchoredPosition = Vector2.zero;
+            pulseRect.sizeDelta = new Vector2(220f, 70f);
+            pulseRect.localScale = Vector3.one;
+
+            Image pulseImage = pulseObject.GetComponent<Image>();
+            pulseImage.sprite = rounded;
+            pulseImage.type = rounded != null ? Image.Type.Sliced : Image.Type.Simple;
+            pulseImage.raycastTarget = false;
+            var pulseOutline = EnsureComponent<Outline>(pulseObject);
+            pulseOutline.effectColor = new Color(1f, 0.68f, 0.20f, 0.75f);
+            pulseOutline.effectDistance = new Vector2(2f, -2f);
+            pulseObject.transform.SetAsLastSibling();
+
+            hintPanel.SetActive(false);
+            pulseObject.SetActive(false);
         }
 
         private static void EnsureWorkerDrawerTargetControls(GameObject hudRoot)
@@ -4015,6 +4143,7 @@ namespace DeadWalls
             HideEconomyFocus(hudRoot);
             ConfigureCastleEconomy(hudRoot);
             ConfigureWorkerEconomyDrawer(hudRoot);
+            ConfigureFirstRunOnboarding(hudRoot);
             ConfigureArrowAmmo(hudRoot);
 
             var market = EnsureComponent<MarketUI>(hudRoot);
@@ -4798,6 +4927,29 @@ namespace DeadWalls
                 workerDrawer.WorkerEconomyDrawerPanel.SetActive(false);
 
             EditorUtility.SetDirty(workerDrawer);
+        }
+
+        private static void ConfigureFirstRunOnboarding(GameObject hudRoot)
+        {
+            var onboarding = EnsureComponent<FirstRunOnboardingUI>(hudRoot);
+            onboarding.WorkerDrawer = hudRoot.GetComponent<WorkerEconomyDrawerUI>();
+            onboarding.HintPanel = FindChildByName(hudRoot, "OnboardingHintPanel");
+            onboarding.HintText = FindComponentInChildrenByName<TextMeshProUGUI>(
+                hudRoot, "OnboardingHintText");
+            onboarding.PulseFrame = FindRectTransformByName(hudRoot, "OnboardingPulseFrame");
+            onboarding.PulseImage = onboarding.PulseFrame != null
+                ? onboarding.PulseFrame.GetComponent<Image>()
+                : null;
+            onboarding.PulseOutline = onboarding.PulseFrame != null
+                ? onboarding.PulseFrame.GetComponent<Outline>()
+                : null;
+
+            if (onboarding.HintPanel != null)
+                onboarding.HintPanel.SetActive(false);
+            if (onboarding.PulseFrame != null)
+                onboarding.PulseFrame.gameObject.SetActive(false);
+
+            EditorUtility.SetDirty(onboarding);
         }
 
         private static void SetOptionalChildActive(GameObject root, string name, bool active)

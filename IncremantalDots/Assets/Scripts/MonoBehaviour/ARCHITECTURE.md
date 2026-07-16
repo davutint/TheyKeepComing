@@ -116,6 +116,14 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - Scene-owned tek component'tir; aktif generated prefab runtime controller tasimaz
 - Otoriter dok: `MANAGEMENT_DRAWER_COORDINATOR_ARCHITECTURE.md`
 
+### FirstRunOnboardingUI.cs
+
+- Package I ilk-kosu ogretiminin scene-owned, non-modal presentation sahibidir
+- Ilk Day worker ratio adiminda drawer kapaliyken Workers/Housing toggle'ini, acikken ilk ratio kontrolunu pulse eder; tek satir English hint gosterir
+- Gameplay transaction'i, otomatik drawer acma, resource harcama veya worker dagitma yapmaz
+- Basarili gercek player ratio action'ini `WorkerEconomyDrawerUI` event'inden alir ve `tutorial.v1.worker_ratio` stable flag'ini canonical `MetaProgression` API'siyle durable yazar
+- Otoriter dok: `FIRST_RUN_ONBOARDING_UI_ARCHITECTURE.md`
+
 ### TechTreeUI.cs
 
 - Legacy sabit catalog UI controller'idir; aktif `NewGameScene` HUD instance'inda bulunmaz
@@ -177,6 +185,7 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - `WorkerDrawerToggleButton` ile drawer panelini acip kapatir.
 - Idle pop, total worker, archer count ve resource worker rate alanlarini gunceller.
 - Wood/Stone/Iron/Food `+1% / +10% / +100% / direct input` kontrollerini target ratio API'lerine baglar.
+- Basarili target-ratio player action'inda `WorkerTargetRatioChangedByPlayer` event'i yayar; onboarding bu event'i dinler, drawer transaction sahibi degismez.
 - Her resource satirindaki `CAP` ve `EFF` butonlarini bagimsiz worker bina yatirim API'lerine baglar; level ve bir sonraki Wood + Iron maliyetini butonda gosterir.
 - Secilen exact hedef korunurken diger uc hedef deterministik yeniden dagilir; toplam `%100` kalir.
 - Mevcut actual worker'lari aninda tasimaz; hedef yalniz sonraki yeni population dagitimini yonlendirir.

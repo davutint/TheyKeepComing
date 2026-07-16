@@ -33,6 +33,9 @@ eklerken aynı API'yi kullan; yalnız paneli Game Over altında tutmak yeterli g
 - `TutorialFlags`
 - `RewardedRunIds`
 
+İlk Package I consumer flag'i `tutorial.v1.worker_ratio`dur. Id, yayınlandıktan sonra yeniden
+adlandırılmaz; `FirstRunOnboardingUI` yalnız başarılı player ratio action'ında bu flag'i yazar.
+
 Inspector'dan elle JSON üretme. Stable Id'lerde case ve yazım değişikliği yeni kimlik sayılır;
 upgrade/pool/tutorial içerik sahibi Id'yi yayımlandıktan sonra değiştirmemelidir.
 
@@ -45,6 +48,8 @@ EditMode'da `MetaProgressionSchemaTests` çalıştır:
 - Bilinmeyen future version ile corrupt JSON yazmayı kilitler ve orijinal dosyayı korur.
 - Duplicate/negatif alanlar deterministic normalize edilir; bilinmeyen upgrade Id'si korunur.
 - Pool unlock ve tutorial flag atomik save/reload round-trip yapar.
+- First Day worker ratio PlayMode testi gerçek UI action'ının flag yazdığını ve test öncesi
+  `meta_progress.json` / temp dosyalarının byte-for-byte geri yüklendiğini doğrular.
 
 Mevcut persistence regresyonu için `RunPersistenceTests`, Grave Essence meta ayrımı ve aktif
 catalog dormancy testleri birlikte çalıştırılır. PlayMode'da exact Continue ile lethal save guard

@@ -15,12 +15,27 @@ namespace DeadWalls.Tests
     {
         private string _runSavePath;
         private byte[] _originalRunSave;
+        private string _metaPath;
+        private string _metaTempPath;
+        private byte[] _originalMeta;
+        private byte[] _originalMetaTemp;
+        private bool _hadMeta;
+        private bool _hadMetaTemp;
 
         [UnitySetUp]
         public IEnumerator SetUp()
         {
             _runSavePath = Path.Combine(Application.persistentDataPath, "run_save.json");
             _originalRunSave = File.Exists(_runSavePath) ? File.ReadAllBytes(_runSavePath) : null;
+            _metaPath = Path.Combine(Application.persistentDataPath, "meta_progress.json");
+            _metaTempPath = _metaPath + ".tmp";
+            _hadMeta = File.Exists(_metaPath);
+            _hadMetaTemp = File.Exists(_metaTempPath);
+            _originalMeta = _hadMeta ? File.ReadAllBytes(_metaPath) : null;
+            _originalMetaTemp = _hadMetaTemp ? File.ReadAllBytes(_metaTempPath) : null;
+            DeleteIfExists(_metaPath);
+            DeleteIfExists(_metaTempPath);
+            MetaProgression.Load();
             RunPersistence.Delete();
             GameBootstrap.PendingAction = GameBootstrap.StartAction.None;
 
@@ -61,7 +76,69 @@ namespace DeadWalls.Tests
             RunPersistence.Delete();
             if (_originalRunSave != null)
                 File.WriteAllBytes(_runSavePath, _originalRunSave);
+            DeleteIfExists(_metaPath);
+            DeleteIfExists(_metaTempPath);
+            RestoreIfNeeded(_metaPath, _hadMeta, _originalMeta);
+            RestoreIfNeeded(_metaTempPath, _hadMetaTemp, _originalMetaTemp);
+            MetaProgression.Load();
             yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator FirstDayWorkerRatioOnboarding_PulsesRealControlAndCompletesOnPlayerAction()
+        {
+            FirstRunOnboardingUI onboarding =
+                Object.FindFirstObjectByType<FirstRunOnboardingUI>();
+            WorkerEconomyDrawerUI drawer =
+                Object.FindFirstObjectByType<WorkerEconomyDrawerUI>();
+            Assert.That(onboarding, Is.Not.Null);
+            Assert.That(drawer, Is.Not.Null);
+            Assert.That(MetaProgression.HasTutorialFlag(
+                FirstRunOnboardingUI.WorkerRatioFlagId), Is.False);
+
+            for (int frame = 0; frame < 90 && !onboarding.IsWorkerRatioStepVisible; frame++)
+                yield return null;
+
+            Assert.That(onboarding.IsWorkerRatioStepVisible, Is.True);
+            Assert.That(onboarding.HintPanel.activeSelf, Is.True);
+            Assert.That(onboarding.HintText.text,
+                Is.EqualTo(FirstRunOnboardingUI.WorkerRatioHint));
+            Assert.That(onboarding.ActivePulseTarget,
+                Is.SameAs(drawer.WorkerDrawerToggleButton.GetComponent<RectTransform>()));
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            using EntityQuery allocationQuery = entityManager.CreateEntityQuery(
+                typeof(MobileCastleCombatConfig), typeof(MobilePopulationAllocation));
+            using EntityQuery resourceQuery = entityManager.CreateEntityQuery(typeof(ResourceData));
+            Entity allocationEntity = allocationQuery.GetSingletonEntity();
+            Entity resourceEntity = resourceQuery.GetSingletonEntity();
+            MobilePopulationAllocation beforeAllocation =
+                entityManager.GetComponentData<MobilePopulationAllocation>(allocationEntity);
+            ResourceData beforeResources = entityManager.GetComponentData<ResourceData>(resourceEntity);
+
+            drawer.SetOpen(true);
+            yield return null;
+            Assert.That(onboarding.ActivePulseTarget,
+                Is.SameAs(drawer.WoodWorkerTargetPlus10Button.GetComponent<RectTransform>()));
+
+            drawer.WoodWorkerTargetPlus10Button.onClick.Invoke();
+            yield return null;
+
+            MobilePopulationAllocation afterAllocation =
+                entityManager.GetComponentData<MobilePopulationAllocation>(allocationEntity);
+            ResourceData afterResources = entityManager.GetComponentData<ResourceData>(resourceEntity);
+            Assert.That(afterAllocation.WoodTargetRatioBps,
+                Is.Not.EqualTo(beforeAllocation.WoodTargetRatioBps));
+            AssertWorkerCountsEqual(beforeAllocation, afterAllocation);
+            Assert.That(afterResources.Wood, Is.EqualTo(beforeResources.Wood));
+            Assert.That(afterResources.Stone, Is.EqualTo(beforeResources.Stone));
+            Assert.That(afterResources.Iron, Is.EqualTo(beforeResources.Iron));
+            Assert.That(afterResources.Food, Is.EqualTo(beforeResources.Food));
+            Assert.That(MetaProgression.HasTutorialFlag(
+                FirstRunOnboardingUI.WorkerRatioFlagId), Is.True);
+            Assert.That(onboarding.IsWorkerRatioStepVisible, Is.False);
+            Assert.That(onboarding.HintPanel.activeSelf, Is.False);
+            Assert.That(onboarding.PulseFrame.gameObject.activeSelf, Is.False);
         }
 
         [UnityTest]
@@ -575,6 +652,18 @@ namespace DeadWalls.Tests
 
             Assert.Fail($"{resource} worker visual bulunamadi.");
             return Entity.Null;
+        }
+
+        private static void DeleteIfExists(string path)
+        {
+            if (File.Exists(path))
+                File.Delete(path);
+        }
+
+        private static void RestoreIfNeeded(string path, bool existed, byte[] contents)
+        {
+            if (existed && contents != null)
+                File.WriteAllBytes(path, contents);
         }
     }
 }

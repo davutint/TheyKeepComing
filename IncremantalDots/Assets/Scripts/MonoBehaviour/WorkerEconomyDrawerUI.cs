@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using TMPro;
 using UnityEngine;
@@ -74,6 +75,7 @@ namespace DeadWalls
         private ManagementDrawerCoordinatorUI _drawerCoordinator;
 
         public bool IsOpen => _isOpen;
+        public event Action<EconomyFocusType> WorkerTargetRatioChangedByPlayer;
 
         private void OnEnable()
         {
@@ -447,7 +449,9 @@ namespace DeadWalls
 
         private void AdjustTarget(EconomyFocusType resource, int deltaPercent)
         {
-            GameManager.Instance?.AdjustWorkerTargetRatioPercent(resource, deltaPercent);
+            GameManager gm = GameManager.Instance;
+            if (gm != null && gm.AdjustWorkerTargetRatioPercent(resource, deltaPercent))
+                WorkerTargetRatioChangedByPlayer?.Invoke(resource);
             Refresh();
         }
 
@@ -459,7 +463,9 @@ namespace DeadWalls
             if (float.TryParse(normalized, NumberStyles.Float, CultureInfo.InvariantCulture,
                     out float targetPercent))
             {
-                GameManager.Instance?.SetWorkerTargetRatioPercent(resource, targetPercent);
+                GameManager gm = GameManager.Instance;
+                if (gm != null && gm.SetWorkerTargetRatioPercent(resource, targetPercent))
+                    WorkerTargetRatioChangedByPlayer?.Invoke(resource);
             }
             Refresh();
         }

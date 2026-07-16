@@ -1,0 +1,77 @@
+using System.Linq;
+using NUnit.Framework;
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace DeadWalls.Tests
+{
+    public class FirstRunOnboardingTests
+    {
+        private const string HudPrefabPath =
+            "Assets/Prefabs/UI/Generated/MobileCastleHudRoot.prefab";
+
+        [Test]
+        public void WorkerRatioRule_ShowsOnlyDuringIncompleteFirstDay()
+        {
+            Assert.That(FirstRunOnboardingRules.ShouldShowWorkerRatioStep(
+                false, true, false, true, 0, SiegeCyclePhase.Day), Is.True);
+
+            Assert.That(FirstRunOnboardingRules.ShouldShowWorkerRatioStep(
+                true, true, false, true, 0, SiegeCyclePhase.Day), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldShowWorkerRatioStep(
+                false, false, false, true, 0, SiegeCyclePhase.Day), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldShowWorkerRatioStep(
+                false, true, true, true, 0, SiegeCyclePhase.Day), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldShowWorkerRatioStep(
+                false, true, false, false, 0, SiegeCyclePhase.Day), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldShowWorkerRatioStep(
+                false, true, false, true, 1, SiegeCyclePhase.Day), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldShowWorkerRatioStep(
+                false, true, false, true, 0, SiegeCyclePhase.Night), Is.False);
+        }
+
+        [Test]
+        public void ActiveHudPrefab_HasSingleNonBlockingEnglishWorkerRatioPresentation()
+        {
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(HudPrefabPath);
+            Assert.That(prefab, Is.Not.Null);
+
+            RectTransform visualRoot = prefab.transform.Find("MobileCastleHudRoot")
+                as RectTransform;
+            Assert.That(visualRoot, Is.Not.Null);
+
+            RectTransform hint = FindUniqueRect(prefab, "OnboardingHintPanel");
+            Assert.That(hint.parent, Is.SameAs(visualRoot));
+            Assert.That(hint.gameObject.activeSelf, Is.False);
+            Assert.That(hint.anchorMin, Is.EqualTo(Vector2.zero));
+            Assert.That(hint.anchorMax, Is.EqualTo(Vector2.zero));
+            Assert.That(hint.pivot, Is.EqualTo(Vector2.zero));
+            Assert.That(hint.anchoredPosition, Is.EqualTo(new Vector2(24f, 96f)));
+            Assert.That(hint.sizeDelta, Is.EqualTo(new Vector2(360f, 42f)));
+            Assert.That(hint.GetComponent<Image>().raycastTarget, Is.False);
+
+            RectTransform pulse = FindUniqueRect(prefab, "OnboardingPulseFrame");
+            Assert.That(pulse.parent, Is.SameAs(visualRoot));
+            Assert.That(pulse.gameObject.activeSelf, Is.False);
+            Assert.That(pulse.GetComponent<Image>().raycastTarget, Is.False);
+            Assert.That(pulse.GetComponent<Outline>(), Is.Not.Null);
+
+            Component text = prefab.GetComponentsInChildren<Component>(true)
+                .Single(component => component.gameObject.name == "OnboardingHintText"
+                    && component.GetType().Name == "TextMeshProUGUI");
+            string copy = (string)text.GetType().GetProperty("text").GetValue(text);
+            Assert.That(copy, Is.EqualTo(FirstRunOnboardingUI.WorkerRatioHint));
+            Assert.That(copy, Does.Match("^[A-Z0-9 .+]+$"));
+        }
+
+        private static RectTransform FindUniqueRect(GameObject root, string objectName)
+        {
+            RectTransform[] matches = root.GetComponentsInChildren<RectTransform>(true)
+                .Where(rect => rect.gameObject.name == objectName)
+                .ToArray();
+            Assert.That(matches.Length, Is.EqualTo(1), objectName);
+            return matches[0];
+        }
+    }
+}

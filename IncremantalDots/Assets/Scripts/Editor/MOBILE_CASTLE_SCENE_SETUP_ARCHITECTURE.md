@@ -64,6 +64,12 @@ Council karti generated prefabda `CouncilEventPanel` presentation'i olarak kalir
 scene root'taki tek `CouncilEventUI` owner'ini iki option rich-text yuzeyi, `DECIDE Ns` sayaci ve
 Filled/Horizontal/Left azalan sure seridine baglar; V1'de yalniz regular Day `3/6/9...` akisi vardir.
 
+Ilk Day worker ratio onboarding sunumu generated prefabda raycast kapali
+`OnboardingHintPanel` ve `OnboardingPulseFrame` olarak kalir. Runtime state prefab assetine
+gomulmez; setup tool scene HUD root'una tek `FirstRunOnboardingUI` ekler ve mevcut
+`WorkerEconomyDrawerUI` player-action event'ine baglar. Akis oyunu pause etmez, drawer'i
+otomatik acmaz ve ekonomi state'i yazmaz.
+
 Sabit kamera framing sozlesmesi `Main Camera` position `(6,0,-10)`, orthographic size `8`
 ve desteklenen `1920 x 1080` / `3440 x 1440` oranlaridir. Bu araliklarda savunma hatti ile
 kale merkezi gorunur, `SpawnLineX = 27` ise ekranin saginda en az bir world unit gizli kalir.
