@@ -4000,8 +4000,13 @@ namespace DeadWalls
                     || !ArrowPoolRuntimeUtility.TryRent(
                         _entityManager, _arrowPoolEntity, _arrowPrefabEntity, out entity))
                     entity = _entityManager.Instantiate(_arrowPrefabEntity);
+                float restoredProjectileScale = ArcherSalvoPresentationUtility.ResolveProjectileScale(
+                    savedArrows.Count,
+                    arrowIndex + 1L);
                 _entityManager.SetComponentData(entity, LocalTransform.FromPositionRotationScale(
-                    new float3(item.X, item.Y, item.Z), quaternion.identity, Mathf.Max(0.01f, item.Scale)));
+                    new float3(item.X, item.Y, item.Z),
+                    quaternion.identity,
+                    restoredProjectileScale));
                 _entityManager.SetComponentData(entity, new ArrowProjectile
                 {
                     Speed = item.Speed,

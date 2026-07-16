@@ -18,6 +18,7 @@ namespace DeadWalls
         private NativeParallelMultiHashMap<int, Entity> _targetMap;
         private NativeParallelHashMap<Entity, float> _incomingDamage;
         private EntityQuery _targetQuery;
+        private EntityQuery _archerQuery;
         private int _targetMapCapacity;
         private int _reservationCapacity;
 
@@ -38,6 +39,9 @@ namespace DeadWalls
             _targetQuery = SystemAPI.QueryBuilder()
                 .WithAll<ZombieTag, ZombieStats, LocalTransform>()
                 .WithNone<DeathTimer>()
+                .Build();
+            _archerQuery = SystemAPI.QueryBuilder()
+                .WithAll<ArcherUnit, LocalTransform>()
                 .Build();
         }
 
@@ -105,6 +109,7 @@ namespace DeadWalls
                 TargetCellSize = SpatialHash.TargetCellSize,
                 ArrowSpeed = math.max(0.01f, arrowPrefabData.Speed),
                 ArrowLifetime = math.max(0.1f, arrowPrefabData.Lifetime),
+                ArcherCount = _archerQuery.CalculateEntityCount(),
                 ArrowPoolEntity = SystemAPI.GetSingletonEntity<ArrowPoolRuntimeData>(),
                 ArrowSupplyEntity = SystemAPI.GetSingletonEntity<ArrowSupply>(),
                 TargetMap = _targetMap.AsReadOnly(),
@@ -233,6 +238,7 @@ namespace DeadWalls
             public float TargetCellSize;
             public float ArrowSpeed;
             public float ArrowLifetime;
+            public int ArcherCount;
             public Entity ArrowPoolEntity;
             public Entity ArrowSupplyEntity;
 
@@ -274,7 +280,7 @@ namespace DeadWalls
                 if (supply.Current <= 0)
                     return;
 
-                if (!TryRentArrow(out Entity arrow))
+                if (!TryRentArrow(out Entity arrow, out long shotSequence))
                     return;
 
                 supply.Current--;
@@ -293,7 +299,13 @@ namespace DeadWalls
                     archerPosition.x,
                     archerPosition.y,
                     MobileCastleRenderDepth.ProjectileZ);
-                ECB.SetComponent(arrow, LocalTransform.FromPosition(arrowPosition));
+                float projectileScale = ArcherSalvoPresentationUtility.ResolveProjectileScale(
+                    ArcherCount,
+                    shotSequence);
+                ECB.SetComponent(arrow, LocalTransform.FromPositionRotationScale(
+                    arrowPosition,
+                    quaternion.identity,
+                    projectileScale));
                 ECB.SetComponent(arrow, new ArrowProjectile
                 {
                     Speed = ArrowSpeed,
@@ -323,9 +335,10 @@ namespace DeadWalls
                 });
             }
 
-            private bool TryRentArrow(out Entity arrow)
+            private bool TryRentArrow(out Entity arrow, out long shotSequence)
             {
                 arrow = Entity.Null;
+                shotSequence = 0L;
                 if (ArrowPoolEntity == Entity.Null
                     || !ArrowPoolAvailableLookup.HasBuffer(ArrowPoolEntity)
                     || !ArrowPoolStateLookup.HasComponent(ArrowPoolEntity))
@@ -354,6 +367,7 @@ namespace DeadWalls
                     poolState.AvailableCount = available.Length;
                     poolState.ActiveCount++;
                     poolState.TotalRentCount++;
+                    shotSequence = poolState.TotalRentCount;
                     ArrowPoolStateLookup[ArrowPoolEntity] = poolState;
                     arrow = candidate;
                     return true;

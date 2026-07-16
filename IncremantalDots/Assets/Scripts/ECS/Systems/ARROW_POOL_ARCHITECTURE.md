@@ -19,6 +19,10 @@ başarılı olmadan Arrow veya fire timer harcanmaz; başarılı rent tam `1 Arr
 - `ArrowPoolMember`: entity'nin havuz tarafından sahiplenildiğini ve rent generation'ını
   işaretler.
 
+Görsel salvo seçimi ayrı component/archetype üretmez. Aktif projectile'ın
+`LocalTransform.Scale` değeri temsilci için `1`, yalnız sunumdan saklanan fakat gameplay
+olarak aktif ok için `0` olur.
+
 `WaveConfigAuthoring`, aynı singleton entity üzerinde `ArrowPrefabData`,
 `ArrowPoolRuntimeData` ve `ArrowPoolAvailable` buffer'ını bake eder.
 
@@ -30,6 +34,8 @@ başarılı olmadan Arrow veya fire timer harcanmaz; başarılı rent tam `1 Arr
    rent eder. Rent başarısızsa fire timer, ammo ve reservation değiştirilmez.
 3. Rent edilen entity'nin transform, type tint, target generation, damage, speed ve
    lifetime verileri EndSimulation ECB üzerinden yazılır; `ArrowTag` enable edilir.
+   Pool `TotalRentCount` sırası ve canlı okçu sayısı yalnız transform scale'ını bounded
+   temsilci sözleşmesine göre seçer.
 4. `ArrowMoveSystem`, Burst-parallel job içinde lifetime'ı azaltır ve yalnız geçerli
    hedefe doğru hareket uygular.
 5. `ArrowHitSystem`, isabet, lifetime timeout, disabled hedef veya generation mismatch
@@ -57,20 +63,23 @@ döner. Böylece yeni zombiye eski okun hasarı taşınmaz.
 - `ArrowRunSaveState`, pozisyon/target/effect verisinin yanında kalan lifetime'ı tutar.
 - Continue öncesinde mevcut aktif oklar rezerve döner; kaydedilen oklar havuzdan rent
   edilip exact state ile yeniden kurulur.
+- Restore edilen yoğun aktif ok listesi, saved count + ordinal ile tekrar bounded görsel
+  temsilci dağılımına alınır; gameplay projectile sayısı azaltılmaz.
 - Eski save'de lifetime alanı `0` ise restore güvenli `5s` default'u kullanır.
 - Restart aktif pool oklarını destroy etmez; `ReturnAllActive` ile rezerve döndürür.
 - Pool kapasitesi ve telemetry run save'e yazılmaz; authoring ayarından yeniden kurulur.
 
 ## Ölçek Kanıtı
 
-2026-07-14 gerçek `NewGameScene` 1.000 okçu × 10.000 düşman Editor koşusu:
+2026-07-16 gerçek `NewGameScene` 1.000 okçu × 10.000 düşman Editor koşusu:
 
-- frame average: `9,61 ms`
-- frame P95: `12,50 ms`
-- main-thread average: `9,50 ms`
-- sample sonu aktif pooled ok: `105`
-- arrow pool: `1536` total, `3000` rent, `2895` return, `2` expansion
-- draw-call average: `541`
+- frame average: `9,77 ms`
+- frame P95: `12,74 ms`
+- main-thread average: `9,66 ms`
+- sample sonu aktif pooled ok: `745`
+- ilk salvo: `1.000` gameplay projectile / `48` görünür temsilci / stride `21`
+- arrow pool: `1280` total, `3000` rent, `2255` return, `1` expansion
+- draw-call average: `544`
 
 Bu Editor regresyon kanıtıdır. Player/hardware frame-pacing kabulü Release Definition
 of Done içinde açık kalır.
@@ -85,3 +94,5 @@ of Done içinde açık kalır.
 - `ExactRunContinuePlayModeTests`: stale enemy generation okun retarget olmadan pool'a
   dönmesi.
 - `HordeScalePlayModeTests`: 1K × 10K birleşik telemetry ve aktif arrow pool sayaçları.
+- `ArcherSalvoPresentationUtilityTests`: küçük birlik full visibility, 1K bounded
+  temsilci sayısı ve ardışık salvo lane rotasyonu.

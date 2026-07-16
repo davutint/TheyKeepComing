@@ -7,8 +7,8 @@ okçu başına tekrar taramaz. Aynı sistemin persistent coarse spatial map'i, r
 query alias'ı ve frame-local incoming damage reservation map'i hedef seçiminin tek
 runtime owner'ıdır.
 
-Projectile pooling ayrı `ARROW_POOL_ARCHITECTURE.md` sözleşmesinde tamamlanmıştır.
-Arrow ekonomisi Package D içindeki sıradaki ayrı takip işidir.
+Projectile pooling ayrı `ARROW_POOL_ARCHITECTURE.md`, bounded görsel temsil ise
+`ARCHER_SALVO_PRESENTATION_ARCHITECTURE.md` sözleşmesinde tamamlanmıştır.
 
 ## Frame Akışı
 
@@ -27,6 +27,8 @@ Arrow ekonomisi Package D içindeki sıradaki ayrı takip işidir.
    Eşit mesafede düşük `Entity.Index`, ardından düşük `Entity.Version` kazanır.
 7. Yeni ok pool'dan başarıyla rent edildikten sonra hasarı aynı reservation map'ine eklenir. Böylece aynı
    frame'deki sonraki okçular ölümcül hasarı zaten rezerve edilmiş hedefi atlar.
+8. Başarılı rent sırası, gameplay projectile'ı silmeden bounded salvo temsilci scale'ını
+   belirler; targeting ve reservation bu görsel karardan bağımsız kalır.
 
 Range içindeki bütün hedefler ölümcül incoming damage ile doluysa okçu o frame
 bekler. Uçuşta olan ok başka hedefe yönlendirilmez; pool generation uyuşmazlığında
@@ -62,12 +64,13 @@ projectile, HUD/feedback ve Fireball return ile birlikte hedefleme örnekler.
 Benchmark okçuları run-state owner'ını bypass ettiği için bu test 1K archer save
 kanıtı sayılmaz; 10K enemy Continue regresyonu ayrı korunur.
 
-2026-07-14 projectile pool sonrası Editor ölçümü:
+2026-07-16 bounded salvo sunumu sonrası Editor ölçümü:
 
-- frame average: `9,61 ms`
-- frame P95: `12,50 ms`
-- main-thread average: `9,50 ms`
-- sample sonu aktif pooled projectile: `105`
+- frame average: `9,77 ms`
+- frame P95: `12,74 ms`
+- main-thread average: `9,66 ms`
+- sample sonu aktif pooled projectile: `745`
+- ilk salvo: `1.000` gameplay projectile / `48` görünür temsilci
 - aktif düşman: test boyunca `10.000`
 
 Player/hardware frame pacing onayı Release Definition of Done içinde ayrı kapıdır.
@@ -79,4 +82,4 @@ Player/hardware frame pacing onayı Release Definition of Done içinde ayrı kap
 - `ArcherTargetingPlayModeTests`: Basic/Rapid/Frost aynı frame'de üç ölümcül oku
   üç ayrı hedefe dağıtır.
 - `HordeScalePlayModeTests`: 1.000 okçu x 10.000 düşman birleşik ürün senaryosu ve
-  telemetry.
+  telemetry; ilk salvoluk gameplay/visual temsil ayrımı.

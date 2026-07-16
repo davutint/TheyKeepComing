@@ -43,6 +43,7 @@ namespace DeadWalls.Tests
         [UnityTearDown]
         public IEnumerator TearDown()
         {
+            Time.timeScale = 1f;
             RunPersistence.Delete();
             if (_originalRunSave != null)
                 File.WriteAllBytes(_runSavePath, _originalRunSave);
@@ -253,11 +254,14 @@ namespace DeadWalls.Tests
 
             using EntityQuery archerQuery = entityManager.CreateEntityQuery(typeof(ArcherUnit));
             using EntityQuery projectileQuery = entityManager.CreateEntityQuery(
-                typeof(ArrowTag), typeof(ArrowProjectile));
+                typeof(ArrowTag), typeof(ArrowProjectile), typeof(LocalTransform));
             Entity arrowPrefab = entityManager.GetComponentData<ArrowPrefabData>(
                 entityManager.CreateEntityQuery(typeof(ArrowPrefabData)).GetSingletonEntity()).ArrowPrefab;
             Entity arrowPoolEntity = entityManager.CreateEntityQuery(
                 typeof(ArrowPoolRuntimeData), typeof(ArrowPoolAvailable)).GetSingletonEntity();
+            ArrowPoolRuntimeUtility.ReturnAllActive(entityManager, arrowPoolEntity);
+            ArrowPoolRuntimeData arrowPoolBeforeSalvo =
+                entityManager.GetComponentData<ArrowPoolRuntimeData>(arrowPoolEntity);
             Assert.That(archerQuery.CalculateEntityCount(), Is.EqualTo(ArcherTarget));
 
             using (EntityQuery arrowSupplyQuery = entityManager.CreateEntityQuery(typeof(ArrowSupply)))
@@ -269,6 +273,63 @@ namespace DeadWalls.Tests
                     stressSupply, gameManager.GetEconomyPriceTuning());
                 entityManager.SetComponentData(arrowSupplyEntity, stressSupply);
             }
+
+            Time.timeScale = 0f;
+            int firstSalvoProjectileCount = 0;
+            int firstSalvoVisibleCount = 0;
+            for (int frame = 0; frame < 8; frame++)
+            {
+                yield return null;
+                int activeProjectileCount = projectileQuery.CalculateEntityCount();
+                if (activeProjectileCount > firstSalvoProjectileCount)
+                {
+                    firstSalvoProjectileCount = activeProjectileCount;
+                    firstSalvoVisibleCount = CountVisibleProjectiles(projectileQuery);
+                }
+
+                if (firstSalvoProjectileCount == ArcherTarget)
+                    break;
+            }
+
+            ArrowPoolRuntimeData arrowPoolAfterSalvo =
+                entityManager.GetComponentData<ArrowPoolRuntimeData>(arrowPoolEntity);
+            int salvoStride = ArcherSalvoPresentationUtility.GetSamplingStride(ArcherTarget);
+            int minimumVisibleCount = firstSalvoProjectileCount / salvoStride;
+            int maximumVisibleCount = ArcherSalvoPresentationUtility.GetMaximumRepresentativeCount(
+                ArcherTarget,
+                firstSalvoProjectileCount);
+            Assert.That(arrowPoolAfterSalvo.TotalRentCount - arrowPoolBeforeSalvo.TotalRentCount,
+                Is.EqualTo(ArcherTarget),
+                "1K okcunun gameplay projectile salvosu eksiksiz rent edilmelidir.");
+            Assert.That(firstSalvoProjectileCount, Is.EqualTo(ArcherTarget),
+                "TimeScale 0 ilk salvoda 1K gameplay projectile aktif kalmalidir.");
+            Assert.That(firstSalvoVisibleCount,
+                Is.InRange(minimumVisibleCount, maximumVisibleCount),
+                "1K gameplay projectile yalniz bounded temsilci oklarla gorunmelidir.");
+            Assert.That(firstSalvoVisibleCount,
+                Is.LessThanOrEqualTo(ArcherSalvoPresentationUtility.MaxVisibleProjectilesPerSalvo));
+
+            Time.timeScale = 1f;
+            for (int frame = 0; frame < 8; frame++)
+                yield return null;
+            Time.timeScale = 0f;
+
+            string salvoCapturePath = Path.Combine(
+                Application.temporaryCachePath,
+                "DW_I_SALVO_RHYTHM_10K.png");
+            if (File.Exists(salvoCapturePath))
+                File.Delete(salvoCapturePath);
+            ScreenCapture.CaptureScreenshot(salvoCapturePath);
+            yield return new WaitForEndOfFrame();
+            for (int frame = 0; frame < 30 && !File.Exists(salvoCapturePath); frame++)
+                yield return null;
+            Assert.That(File.Exists(salvoCapturePath), Is.True);
+            Assert.That(new FileInfo(salvoCapturePath).Length, Is.GreaterThan(1024));
+            Debug.Log(
+                $"[DW-I-SALVO-RHYTHM] gameplay_projectiles={firstSalvoProjectileCount}; " +
+                $"visual_representatives={firstSalvoVisibleCount}; stride={salvoStride}; " +
+                $"capture={salvoCapturePath}");
+            Time.timeScale = 1f;
 
             for (int frame = 0; frame < WarmupFrames; frame++)
                 yield return null;
@@ -476,6 +537,20 @@ namespace DeadWalls.Tests
             wave.ZombiesAlive = 0;
             entityManager.SetComponentData(waveEntity, wave);
             activeQuery.Dispose();
+        }
+
+        private static int CountVisibleProjectiles(EntityQuery projectileQuery)
+        {
+            using NativeArray<LocalTransform> transforms =
+                projectileQuery.ToComponentDataArray<LocalTransform>(Allocator.Temp);
+            int visibleCount = 0;
+            for (int i = 0; i < transforms.Length; i++)
+            {
+                if (transforms[i].Scale > 0.0001f)
+                    visibleCount++;
+            }
+
+            return visibleCount;
         }
 
         private static ulong BuildActivePositionFingerprint(EntityManager entityManager)
