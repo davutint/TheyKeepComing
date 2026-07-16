@@ -109,6 +109,32 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void DaytimeRepairRule_ShowsForAnyLivingDamagedWallOnlyDuringDay()
+        {
+            Assert.That(FirstRunOnboardingRules.ShouldShowDaytimeRepairStep(
+                false, true, false, true, SiegeCyclePhase.Day, 0.5f), Is.True);
+
+            Assert.That(FirstRunOnboardingRules.ShouldShowDaytimeRepairStep(
+                true, true, false, true, SiegeCyclePhase.Day, 0.5f), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldShowDaytimeRepairStep(
+                false, false, false, true, SiegeCyclePhase.Day, 0.5f), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldShowDaytimeRepairStep(
+                false, true, true, true, SiegeCyclePhase.Day, 0.5f), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldShowDaytimeRepairStep(
+                false, true, false, false, SiegeCyclePhase.Day, 0.5f), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldShowDaytimeRepairStep(
+                false, true, false, true, SiegeCyclePhase.Dusk, 0.5f), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldShowDaytimeRepairStep(
+                false, true, false, true, SiegeCyclePhase.Night, 0.5f), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldShowDaytimeRepairStep(
+                false, true, false, true, SiegeCyclePhase.Day, 0f), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldShowDaytimeRepairStep(
+                false, true, false, true, SiegeCyclePhase.Day, 0.995f), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldShowDaytimeRepairStep(
+                false, true, false, true, SiegeCyclePhase.Day, 1f), Is.False);
+        }
+
+        [Test]
         public void ActiveHudPrefab_HasSingleNonBlockingEnglishWorkerRatioPresentation()
         {
             GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(HudPrefabPath);
@@ -147,6 +173,7 @@ namespace DeadWalls.Tests
             Assert.That(FirstRunOnboardingUI.HeartEntryHint, Does.Match("^[A-Z0-9 .+]+$"));
             Assert.That(FirstRunOnboardingUI.HeartPauseHint, Does.Match("^[A-Z0-9 .+]+$"));
             Assert.That(FirstRunOnboardingUI.CouncilExactHint, Does.Match("^[A-Z0-9 .+]+$"));
+            Assert.That(FirstRunOnboardingUI.DaytimeRepairHint, Does.Match("^[A-Z0-9 .+]+$"));
         }
 
         private static RectTransform FindUniqueRect(GameObject root, string objectName)

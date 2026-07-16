@@ -26,10 +26,15 @@ scene setup tool tarafindan scene owner'ina eklenir ve isimle baglanir.
 - Council exact target: Day 3'te oyuncu secimine acilan `CouncilEventPanel` kartinin tamami;
   `OnboardingHintPanel` bottom-left `24,226` konumuna tasinir, iki option butonundan hicbiri
   ayricalikli pulse edilmez ve Council karti tutorial tarafindan acilmaz.
+- Daytime repair target: Day sirasinda yasayan Wall `%99,5` altina dustugunde
+  `CastleDefensePanel/DefenseRepairButton`; `OnboardingHintPanel` top-center `0,-294` konumuna
+  tasinir. Stone yetmese de maliyet gorunur, fakat tutorial butonu enable etmez veya repair
+  transaction'i cagirmaz.
 
 Scene `FirstRunOnboardingUI.CastleHeart` referansi ayni HUD root'taki tek `HeartScreenUI`
 component'ine; `FirstRunOnboardingUI.Council` referansi ayni root'taki tek `CouncilEventUI`
-component'ine bagli olmalidir.
+component'ine; `FirstRunOnboardingUI.NormalRepair` referansi ayni root'taki tek
+`DefenseRepairUI` component'ine bagli olmalidir.
 
 Idempotent onarim: `Window -> DeadWalls -> Repair First Run Onboarding`.
 
@@ -53,3 +58,6 @@ Idempotent onarim: `Window -> DeadWalls -> Repair First Run Onboarding`.
   olmasini, iki option metninin authoritative live exact quote'larla ayni kalmasini, tutorial'in
   secim yapmamasini ve `tutorial.v1.council` flag'inin yalniz basarili player button commit'inde
   yazilmasini dogrular.
+- Daytime repair PlayMode testi hasarli Wall + Day kapisini, gercek REPAIR button hedefini,
+  affordability'den bagimsiz cue'yu, basarisiz denemenin HP/Stone/flag degistirmemesini ve yalniz
+  basarili player repair'in exact Stone harcayip `tutorial.v1.repair` flag'ini yazmasini dogrular.

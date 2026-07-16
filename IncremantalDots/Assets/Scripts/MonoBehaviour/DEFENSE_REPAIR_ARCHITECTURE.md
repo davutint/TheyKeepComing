@@ -16,9 +16,16 @@ Normal Wall repair:
 - `IsRepairPhaseAvailable()` phase kuralını uygular.
 - `CanRepairDefenseFull()` phase, Game Over, Wall HP ve affordability gate'lerini birleştirir.
 - `GetRepairCost()` yalnız Stone içeren `ResourceCost` üretir.
-- `RepairDefenseFull()` önce gate'i doğrular, Stone transaction'ını yapar ve `SingleWallDefenseRules.RepairToFull()` çağırır.
+- `RepairDefenseFull()` önce gate'i doğrular, Stone transaction'ını yapar ve configured normal
+  repair yuzdesini `SingleWallDefenseRules.HealByMaxPercent()` ile uygular.
 
 `DefenseRepairUI`, `CastleEconomyUI`, `MarketUI` ve editor simulator aynı GameManager API'sini kullanır. UI butonları Night/Dawn sırasında interactable değildir; durum metni `Day / Dusk only` gösterir.
+
+Aktif player-facing owner `DefenseRepairUI`'dir. Gercek `DefenseRepairButton` tiklamasi
+`GameManager.RepairDefenseFull()` ile basariyla commit edilirse
+`NormalRepairCommittedByPlayer` event'i yayilir. Event gameplay transaction'ini tekrar etmez;
+first-run onboarding yalniz bu basari sinyalini durable `tutorial.v1.repair` flag'ine cevirir.
+Afford edilemeyen tik, programmatic GameManager cagrisi veya Wall hasari event yaymaz.
 
 ## Legacy/data notu
 
@@ -29,3 +36,4 @@ Normal Wall repair:
 - `SingleWallDefenseRulesTests.RepairPhase_AllowsOnlyDayAndDusk`
 - `SingleWallDefenseRulesTests.SameFrameLethalDamage_WinsAgainstRepair`
 - `ExactRunContinuePlayModeTests.Repair_IsStoneOnly_AndAllowedOnlyDuringDayOrDusk`
+- `WorkerAllocationPlayModeTests.FirstDamagedWallDayRepairOnboarding_PulsesRealRepairAction_AndCompletesOnSuccessfulPlayerRepair`

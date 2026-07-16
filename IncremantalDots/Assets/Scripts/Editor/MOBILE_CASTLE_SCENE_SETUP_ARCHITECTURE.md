@@ -67,10 +67,12 @@ Filled/Horizontal/Left azalan sure seridine baglar; V1'de yalniz regular Day `3/
 First-run onboarding sunumu generated prefabda raycast kapali
 `OnboardingHintPanel` ve `OnboardingPulseFrame` olarak kalir. Runtime state prefab assetine
 gomulmez; setup tool scene HUD root'una tek `FirstRunOnboardingUI` ekler ve mevcut
-`WorkerEconomyDrawerUI`, `MarketUI`, `ArrowSupplyUI` ve `HeartScreenUI` player-action event'lerine
-baglar. Worker ratio, ilk affordable Basic Archer, ilk `%25` low-ammo ve ilk pozitif Grave
-Essence Heart girisi ayni presentation'i paylasir. Low-ammo hedefi gercek ust HUD `ArrowChip`,
-Heart hedefi gercek alt-sag `CastleHeartOpenButton` kontroludur. Controller drawer/paneli
+`WorkerEconomyDrawerUI`, `MarketUI`, `ArrowSupplyUI`, `HeartScreenUI`, `CouncilEventUI` ve
+`DefenseRepairUI` player-action event'lerine baglar. Worker ratio, ilk affordable Basic Archer,
+ilk `%25` low-ammo, ilk pozitif Grave Essence Heart girisi, ilk regular Council ve ilk Daytime
+Wall repair ayni presentation'i paylasir. Low-ammo hedefi gercek ust HUD `ArrowChip`, Heart hedefi
+gercek alt-sag `CastleHeartOpenButton`, repair hedefi gercek `DefenseRepairButton` kontroludur.
+Controller drawer/paneli
 otomatik acmaz, ekonomi state'i yazmaz veya yeni pause lease'i uretmez; Heart acikken yalniz
 mevcut full-pause davranisini unscaled hint ile aciklar.
 

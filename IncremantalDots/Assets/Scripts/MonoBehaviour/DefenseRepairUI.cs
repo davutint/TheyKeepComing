@@ -1,3 +1,4 @@
+using System;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
@@ -13,8 +14,14 @@ namespace DeadWalls
     /// </summary>
     public class DefenseRepairUI : MonoBehaviour
     {
+        public event Action NormalRepairCommittedByPlayer;
+
         public Button RepairButton;
         public TMP_Text RepairCostText;
+
+        public RectTransform RepairActionRect => RepairButton != null
+            ? RepairButton.transform as RectTransform
+            : null;
 
         private const float RefreshInterval = 0.25f;
         private float _nextRefreshTime;
@@ -94,6 +101,7 @@ namespace DeadWalls
 
             if (gm.RepairDefenseFull())
             {
+                NormalRepairCommittedByPlayer?.Invoke();
                 UiSoundFeedback.Instance?.PlaySuccess();
                 // Basarili tamir: butonda kucuk punch (juice tutarliligi)
                 var rect = RepairButton != null ? (RectTransform)RepairButton.transform : null;

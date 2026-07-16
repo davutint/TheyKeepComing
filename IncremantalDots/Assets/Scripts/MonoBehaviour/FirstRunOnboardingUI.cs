@@ -12,7 +12,8 @@ namespace DeadWalls
         LowAmmo = 3,
         HeartEntry = 4,
         HeartPause = 5,
-        CouncilExact = 6
+        CouncilExact = 6,
+        DaytimeRepair = 7
     }
 
     internal static class FirstRunOnboardingRules
@@ -90,6 +91,23 @@ namespace DeadWalls
                 && !isGameOver
                 && isAwaitingPlayerChoice;
         }
+
+        public static bool ShouldShowDaytimeRepairStep(
+            bool completed,
+            bool mobileWorkerEconomyEnabled,
+            bool isGameOver,
+            bool hasContinuousCycle,
+            SiegeCyclePhase phase,
+            float defenseRatio)
+        {
+            return !completed
+                && mobileWorkerEconomyEnabled
+                && !isGameOver
+                && hasContinuousCycle
+                && phase == SiegeCyclePhase.Day
+                && defenseRatio > 0f
+                && defenseRatio < 0.995f;
+        }
     }
 
     /// <summary>
@@ -112,6 +130,8 @@ namespace DeadWalls
         public const int HeartPauseHintSortingOrder = 260;
         public const string CouncilExactFlagId = "tutorial.v1.council";
         public const string CouncilExactHint = "COMPARE BOTH EXACT OUTCOMES AND THEIR COSTS.";
+        public const string DaytimeRepairFlagId = "tutorial.v1.repair";
+        public const string DaytimeRepairHint = "REPAIR THE WALL DURING THE DAY.";
 
         [Header("Onboarding Owners")]
         public WorkerEconomyDrawerUI WorkerDrawer;
@@ -119,6 +139,7 @@ namespace DeadWalls
         public ArrowSupplyUI AmmoSupply;
         public HeartScreenUI CastleHeart;
         public CouncilEventUI Council;
+        public DefenseRepairUI NormalRepair;
 
         [Header("Shared Presentation")]
         public GameObject HintPanel;
@@ -137,6 +158,7 @@ namespace DeadWalls
         private ArrowSupplyUI _subscribedAmmoSupply;
         private HeartScreenUI _subscribedCastleHeart;
         private CouncilEventUI _subscribedCouncil;
+        private DefenseRepairUI _subscribedNormalRepair;
         private RectTransform _activePulseTarget;
         private FirstRunOnboardingStep _activeStep;
         private bool _heartPauseTeachingActive;
@@ -148,6 +170,7 @@ namespace DeadWalls
         public bool IsHeartEntryStepVisible => _activeStep == FirstRunOnboardingStep.HeartEntry;
         public bool IsHeartPauseStepVisible => _activeStep == FirstRunOnboardingStep.HeartPause;
         public bool IsCouncilExactStepVisible => _activeStep == FirstRunOnboardingStep.CouncilExact;
+        public bool IsDaytimeRepairStepVisible => _activeStep == FirstRunOnboardingStep.DaytimeRepair;
         public RectTransform ActivePulseTarget => _activePulseTarget;
 
         private void OnEnable()
@@ -158,6 +181,7 @@ namespace DeadWalls
             BindAmmoSupply();
             BindCastleHeart();
             BindCouncil();
+            BindNormalRepair();
             SetPresentation(FirstRunOnboardingStep.None, null);
         }
 
@@ -168,6 +192,7 @@ namespace DeadWalls
             UnbindAmmoSupply();
             UnbindCastleHeart();
             UnbindCouncil();
+            UnbindNormalRepair();
             _heartPauseTeachingActive = false;
             SetPresentation(FirstRunOnboardingStep.None, null);
         }
@@ -175,7 +200,7 @@ namespace DeadWalls
         private void Update()
         {
             if (WorkerDrawer == null || ArcherMarket == null || AmmoSupply == null
-                || CastleHeart == null || Council == null)
+                || CastleHeart == null || Council == null || NormalRepair == null)
             {
                 ResolveMissingReferences();
                 BindWorkerDrawer();
@@ -183,6 +208,7 @@ namespace DeadWalls
                 BindAmmoSupply();
                 BindCastleHeart();
                 BindCouncil();
+                BindNormalRepair();
             }
 
             bool workerRatioCompleted = MetaProgression.HasTutorialFlag(WorkerRatioFlagId);
@@ -243,6 +269,15 @@ namespace DeadWalls
                 gm != null && gm.GameState.IsGameOver,
                 Council != null && Council.IsAwaitingPlayerChoice);
 
+            bool daytimeRepairCompleted = MetaProgression.HasTutorialFlag(DaytimeRepairFlagId);
+            bool shouldShowDaytimeRepair = FirstRunOnboardingRules.ShouldShowDaytimeRepairStep(
+                daytimeRepairCompleted,
+                gm != null && gm.IsMobilePopulationEconomyEnabled(),
+                gm != null && gm.GameState.IsGameOver,
+                hasCycle,
+                hasCycle ? cycle.Phase : SiegeCyclePhase.Night,
+                gm != null ? gm.GetDefensePercent() : 1f);
+
             FirstRunOnboardingStep step = FirstRunOnboardingStep.None;
             RectTransform target = null;
             bool showPulse = true;
@@ -255,6 +290,14 @@ namespace DeadWalls
             {
                 step = FirstRunOnboardingStep.CouncilExact;
                 target = Council.ChoiceCardRect;
+            }
+            else if (shouldShowDaytimeRepair
+                && NormalRepair != null
+                && NormalRepair.RepairActionRect != null
+                && NormalRepair.RepairActionRect.gameObject.activeInHierarchy)
+            {
+                step = FirstRunOnboardingStep.DaytimeRepair;
+                target = NormalRepair.RepairActionRect;
             }
             else if (shouldShowWorkerRatio && WorkerDrawer != null)
             {
@@ -303,6 +346,7 @@ namespace DeadWalls
             AmmoSupply ??= GetComponent<ArrowSupplyUI>();
             CastleHeart ??= GetComponent<HeartScreenUI>();
             Council ??= GetComponent<CouncilEventUI>();
+            NormalRepair ??= GetComponent<DefenseRepairUI>();
             HintPanel ??= FindGameObject("OnboardingHintPanel");
             HintText ??= FindComponent<TMP_Text>("OnboardingHintText");
             PulseFrame ??= FindComponent<RectTransform>("OnboardingPulseFrame");
@@ -405,6 +449,24 @@ namespace DeadWalls
             if (_subscribedCouncil != null)
                 _subscribedCouncil.CouncilChoiceCommittedByPlayer -= HandleCouncilChoiceCommitted;
             _subscribedCouncil = null;
+        }
+
+        private void BindNormalRepair()
+        {
+            if (_subscribedNormalRepair == NormalRepair)
+                return;
+
+            UnbindNormalRepair();
+            _subscribedNormalRepair = NormalRepair;
+            if (_subscribedNormalRepair != null)
+                _subscribedNormalRepair.NormalRepairCommittedByPlayer += HandleNormalRepairCommitted;
+        }
+
+        private void UnbindNormalRepair()
+        {
+            if (_subscribedNormalRepair != null)
+                _subscribedNormalRepair.NormalRepairCommittedByPlayer -= HandleNormalRepairCommitted;
+            _subscribedNormalRepair = null;
         }
 
         private void HandleWorkerTargetRatioChanged(EconomyFocusType resource)
@@ -513,6 +575,23 @@ namespace DeadWalls
             Debug.LogWarning("[FirstRunOnboardingUI] Council tutorial flag durable yazilamadi.");
         }
 
+        private void HandleNormalRepairCommitted()
+        {
+            if (MetaProgression.HasTutorialFlag(DaytimeRepairFlagId)
+                || MetaProgression.SetTutorialFlag(DaytimeRepairFlagId, true))
+            {
+                _persistenceWarningLogged = false;
+                SetPresentation(FirstRunOnboardingStep.None, null);
+                return;
+            }
+
+            if (_persistenceWarningLogged)
+                return;
+
+            _persistenceWarningLogged = true;
+            Debug.LogWarning("[FirstRunOnboardingUI] Daytime repair tutorial flag durable yazilamadi.");
+        }
+
         private void SetPresentation(
             FirstRunOnboardingStep step,
             RectTransform target,
@@ -549,6 +628,7 @@ namespace DeadWalls
                 FirstRunOnboardingStep.HeartEntry => HeartEntryHint,
                 FirstRunOnboardingStep.HeartPause => HeartPauseHint,
                 FirstRunOnboardingStep.CouncilExact => CouncilExactHint,
+                FirstRunOnboardingStep.DaytimeRepair => DaytimeRepairHint,
                 _ => WorkerRatioHint
             };
             if (HintText != null && HintText.text != hint)
@@ -563,19 +643,22 @@ namespace DeadWalls
                 bool ammoStep = step == FirstRunOnboardingStep.LowAmmo;
                 bool heartEntryStep = step == FirstRunOnboardingStep.HeartEntry;
                 bool councilExactStep = step == FirstRunOnboardingStep.CouncilExact;
-                hintRect.anchorMin = heartPauseStep
+                bool daytimeRepairStep = step == FirstRunOnboardingStep.DaytimeRepair;
+                hintRect.anchorMin = heartPauseStep || daytimeRepairStep
                     ? new Vector2(0.5f, 1f)
                     : archerStep || heartEntryStep
                     ? new Vector2(1f, 0f)
                     : ammoStep ? new Vector2(0f, 1f) : Vector2.zero;
                 hintRect.anchorMax = hintRect.anchorMin;
-                hintRect.pivot = heartPauseStep
+                hintRect.pivot = heartPauseStep || daytimeRepairStep
                     ? new Vector2(0.5f, 1f)
                     : archerStep || heartEntryStep
                     ? new Vector2(1f, 0f)
                     : ammoStep ? new Vector2(0f, 1f) : Vector2.zero;
                 hintRect.anchoredPosition = heartPauseStep
                     ? new Vector2(0f, -88f)
+                    : daytimeRepairStep
+                        ? new Vector2(0f, -294f)
                     : archerStep
                         ? new Vector2(-24f, ArcherMarket != null && ArcherMarket.IsDrawerOpen ? 522f : 96f)
                     : heartEntryStep

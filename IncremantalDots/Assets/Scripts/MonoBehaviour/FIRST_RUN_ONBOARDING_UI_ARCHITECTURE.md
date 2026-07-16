@@ -81,6 +81,25 @@ owner'larinin player-action event'lerini dinler; yalniz non-modal hint ve pulse 
 - Player secimi prompt gorunmeden once commit edilirse event yine flag'i tamamlar. Tutorial karti
   acmaz, secim yapmaz, timer'i uzatmaz, pause yaratmaz veya resource transaction'i cagirmaz.
 
+## Ilk Daytime Wall Repair Adimi
+
+- Stable meta flag: `tutorial.v1.repair`.
+- Gorunme kapisi: mobile worker economy aktif, oyun bitmemis, continuous cycle gercek `Day`
+  phase'inde ve yasayan Wall `%99,5` altinda hasarli. Normal repair gameplay olarak Dusk'ta da
+  kullanilabilir; onboarding ise ilk guvenli management penceresini ogretmek icin yalniz Day'de
+  sunulur.
+- Stone affordability gorunme kapisi degildir. Oyuncu kaynagi yetmese bile gercek
+  `DefenseRepairButton` pulse edilir ve authoritative `DefenseRepairCostText` maliyeti gosterir;
+  disabled buton ve maliyet dili mevcut `DefenseRepairUI` sahibinde kalir.
+- Tek player-facing metin English'tir: `REPAIR THE WALL DURING THE DAY.` Hint top-center savunma
+  panelinin altinda `0,-294` konumuna tasinir ve gercek repair kontrolu disinda hedef uretmez.
+- Yalniz `DefenseRepairUI` butonundan baslayip `GameManager.RepairDefenseFull()` tarafindan
+  basariyla commit edilen islem `NormalRepairCommittedByPlayer` event'ini yayar ve durable flag'i
+  yazar. Basarisiz/afford edilemeyen deneme, Wall'in yalniz hasar almasi veya baska bir gameplay
+  owner'inin programmatic repair cagrisi tamamlanma sayilmaz.
+- Tutorial Wall HP, Stone, phase veya button state'i yazmaz; repair miktari, exact Stone maliyeti
+  ve transaction tamamen `GameManager` / `DefenseRepairUI` otoritesinde kalir.
+
 ## Sunum Siniri
 
 `OnboardingHintPanel` ve `OnboardingPulseFrame`, aktif generated HUD prefabinin responsive
@@ -93,6 +112,6 @@ mevcut full-pause davranisini aciklar. `OnboardingHintPanel` nested `Canvas`i no
 parent siralamasini kullanir; yalniz Heart pause adiminda `overrideSorting = true / 260` olur ve
 Heart modalinin `200` sorting order'i ustunde okunur.
 
-Sonraki repair ve ability onboarding adimlari ayni scene-owned controller ve stable meta flag
-siniri uzerinden eklenir; bu adim final tutorial
+Sonraki ability onboarding adimlari ayni scene-owned controller ve stable meta flag siniri
+uzerinden eklenir; bu adim final tutorial
 complete flag'i yerine gecmez.

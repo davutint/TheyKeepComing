@@ -400,6 +400,120 @@ namespace DeadWalls.Tests
         }
 
         [UnityTest]
+        public IEnumerator FirstDamagedWallDayRepairOnboarding_PulsesRealRepairAction_AndCompletesOnSuccessfulPlayerRepair()
+        {
+            GameManager gameManager = GameManager.Instance;
+            FirstRunOnboardingUI onboarding =
+                Object.FindFirstObjectByType<FirstRunOnboardingUI>();
+            DefenseRepairUI repair = Object.FindFirstObjectByType<DefenseRepairUI>();
+            Assert.That(onboarding, Is.Not.Null);
+            Assert.That(repair, Is.Not.Null);
+            Assert.That(repair.RepairButton, Is.Not.Null);
+            Assert.That(MetaProgression.SetTutorialFlag(
+                FirstRunOnboardingUI.WorkerRatioFlagId, true), Is.True);
+            Assert.That(MetaProgression.SetTutorialFlag(
+                FirstRunOnboardingUI.BasicArcherFlagId, true), Is.True);
+            Assert.That(MetaProgression.SetTutorialFlag(
+                FirstRunOnboardingUI.LowAmmoFlagId, true), Is.True);
+            Assert.That(MetaProgression.SetTutorialFlag(
+                FirstRunOnboardingUI.HeartEntryFlagId, true), Is.True);
+            Assert.That(MetaProgression.SetTutorialFlag(
+                FirstRunOnboardingUI.CouncilExactFlagId, true), Is.True);
+            Assert.That(MetaProgression.HasTutorialFlag(
+                FirstRunOnboardingUI.DaytimeRepairFlagId), Is.False);
+
+            bool runtimeReady = false;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                {
+                    runtimeReady = true;
+                    break;
+                }
+                yield return null;
+            }
+            Assert.That(runtimeReady, Is.True,
+                "GameManager/SubScene 300 frame icinde hazir olmadi.");
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            using EntityQuery cycleQuery = entityManager.CreateEntityQuery(
+                typeof(ContinuousSiegeCycleData));
+            using EntityQuery resourceQuery = entityManager.CreateEntityQuery(typeof(ResourceData));
+            using EntityQuery wallQuery = entityManager.CreateEntityQuery(typeof(WallSegment));
+            Entity cycleEntity = cycleQuery.GetSingletonEntity();
+            Entity resourceEntity = resourceQuery.GetSingletonEntity();
+            Entity wallEntity = wallQuery.GetSingletonEntity();
+
+            ContinuousSiegeCycleData cycle =
+                entityManager.GetComponentData<ContinuousSiegeCycleData>(cycleEntity);
+            cycle.Phase = SiegeCyclePhase.Day;
+            entityManager.SetComponentData(cycleEntity, cycle);
+
+            WallSegment damagedWall = entityManager.GetComponentData<WallSegment>(wallEntity);
+            damagedWall.CurrentHP = damagedWall.MaxHP * 0.5f;
+            entityManager.SetComponentData(wallEntity, damagedWall);
+
+            ResourceData resources = entityManager.GetComponentData<ResourceData>(resourceEntity);
+            resources.Stone = 0;
+            entityManager.SetComponentData(resourceEntity, resources);
+
+            for (int frame = 0; frame < 90 && !onboarding.IsDaytimeRepairStepVisible; frame++)
+                yield return null;
+
+            Assert.That(onboarding.IsDaytimeRepairStepVisible, Is.True);
+            Assert.That(onboarding.HintPanel.activeSelf, Is.True);
+            Assert.That(onboarding.HintText.text,
+                Is.EqualTo(FirstRunOnboardingUI.DaytimeRepairHint));
+            Assert.That(onboarding.ActivePulseTarget, Is.SameAs(repair.RepairActionRect));
+            Assert.That(repair.RepairButton.gameObject.activeInHierarchy, Is.True);
+            Assert.That(onboarding.HintPanel.GetComponent<RectTransform>().anchoredPosition,
+                Is.EqualTo(new Vector2(0f, -294f)));
+
+            resources = entityManager.GetComponentData<ResourceData>(resourceEntity);
+            resources.Stone = 0;
+            entityManager.SetComponentData(resourceEntity, resources);
+            WallSegment beforeFailedRepair =
+                entityManager.GetComponentData<WallSegment>(wallEntity);
+            repair.RepairButton.onClick.Invoke();
+
+            Assert.That(entityManager.GetComponentData<WallSegment>(wallEntity).CurrentHP,
+                Is.EqualTo(beforeFailedRepair.CurrentHP));
+            Assert.That(entityManager.GetComponentData<ResourceData>(resourceEntity).Stone, Is.Zero);
+            Assert.That(MetaProgression.HasTutorialFlag(
+                FirstRunOnboardingUI.DaytimeRepairFlagId), Is.False,
+                "Basarisiz repair denemesi tutorial'i tamamlamamalidir.");
+
+            resources.Stone = 10_000;
+            entityManager.SetComponentData(resourceEntity, resources);
+            for (int frame = 0; frame < 90 && !repair.RepairButton.interactable; frame++)
+                yield return null;
+
+            Assert.That(repair.RepairButton.interactable, Is.True);
+            ResourceCost repairCost = gameManager.GetRepairCost();
+            Assert.That(repairCost.Wood, Is.Zero);
+            Assert.That(repairCost.Stone, Is.GreaterThan(0));
+            WallSegment beforeRepair = entityManager.GetComponentData<WallSegment>(wallEntity);
+            int stoneBefore = entityManager.GetComponentData<ResourceData>(resourceEntity).Stone;
+            float expectedHp = Mathf.Min(
+                beforeRepair.MaxHP,
+                beforeRepair.CurrentHP
+                    + beforeRepair.MaxHP * gameManager.GetNormalRepairHealPercent());
+
+            repair.RepairButton.onClick.Invoke();
+
+            WallSegment repairedWall = entityManager.GetComponentData<WallSegment>(wallEntity);
+            ResourceData resourcesAfter = entityManager.GetComponentData<ResourceData>(resourceEntity);
+            Assert.That(repairedWall.CurrentHP, Is.EqualTo(expectedHp).Within(0.01f));
+            Assert.That(resourcesAfter.Stone, Is.EqualTo(stoneBefore - repairCost.Stone));
+            Assert.That(MetaProgression.HasTutorialFlag(
+                FirstRunOnboardingUI.DaytimeRepairFlagId), Is.True);
+            yield return null;
+            Assert.That(onboarding.IsDaytimeRepairStepVisible, Is.False);
+            Assert.That(onboarding.HintPanel.activeSelf, Is.False);
+            Assert.That(onboarding.PulseFrame.gameObject.activeSelf, Is.False);
+        }
+
+        [UnityTest]
         public IEnumerator PopulationIncrease_AssignsOnlyNewPeopleToTarget_AndLeavesCapOverflowIdle()
         {
             EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
