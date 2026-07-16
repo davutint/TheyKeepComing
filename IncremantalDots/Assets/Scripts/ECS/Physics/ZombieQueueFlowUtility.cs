@@ -7,6 +7,11 @@ namespace DeadWalls
         public const float ForwardProgressEpsilon = 0.01f;
         public const float ForwardLaneRatio = 1f;
 
+        public static bool ReceivesForwardPressure(ZombieStateType state)
+        {
+            return state == ZombieStateType.Moving || state == ZombieStateType.Queued;
+        }
+
         public static bool IsAheadOf(
             bool mobileMode,
             bool singleFront,

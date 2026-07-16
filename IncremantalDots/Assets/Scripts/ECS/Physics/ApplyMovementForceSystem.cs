@@ -64,8 +64,10 @@ namespace DeadWalls
                 in ZombieState zombieState,
                 in LocalTransform transform)
             {
-                // Dead veya Attacking → kuvvet sifir
-                if (zombieState.Value != ZombieStateType.Moving)
+                // Attacking/Dead sabit kalir. Queued ise saldiramaz ama crowd pressure'i
+                // korur; Fireball gibi bir temizlik onunde alan actiginda kuyruk, lokal
+                // blocker zinciri boslugun etrafindan dolassa bile ileri akmaya devam eder.
+                if (!ZombieQueueFlowUtility.ReceivesForwardPressure(zombieState.Value))
                 {
                     physicsBody.Force = float2.zero;
                     return;

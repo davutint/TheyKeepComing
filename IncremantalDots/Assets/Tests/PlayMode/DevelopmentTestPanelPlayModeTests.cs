@@ -266,6 +266,124 @@ namespace DeadWalls.Tests
             Assert.That(gameManager.CompleteDevelopmentTestSession(), Is.True);
         }
 
+        [UnityTest]
+        public IEnumerator Exact2KHorde_FireballGapRefillsUnderQueuedPressure()
+        {
+            GameManager gameManager = null;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                gameManager = GameManager.Instance;
+                if (gameManager != null && gameManager.IsMobileMode)
+                    break;
+                yield return null;
+            }
+
+            Assert.That(gameManager, Is.Not.Null);
+            Assert.That(gameManager.TrySpawnDevelopmentHorde(
+                DevelopmentTestRules.Horde2K,
+                out int spawned,
+                out string spawnMessage), Is.True, spawnMessage);
+            Assert.That(spawned, Is.EqualTo(DevelopmentTestRules.Horde2K));
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            entityManager.CompleteAllTrackedJobs();
+            using (EntityQuery statsQuery = entityManager.CreateEntityQuery(
+                       typeof(ZombieTag),
+                       typeof(ZombieStats)))
+            using (var zombies = statsQuery.ToEntityArray(Unity.Collections.Allocator.Temp))
+            {
+                for (int i = 0; i < zombies.Length; i++)
+                {
+                    ZombieStats stats = entityManager.GetComponentData<ZombieStats>(zombies[i]);
+                    stats.MaxHP = 1_000_000_000f;
+                    stats.CurrentHP = stats.MaxHP;
+                    stats.AttackDamage = 0f;
+                    entityManager.SetComponentData(zombies[i], stats);
+                }
+            }
+
+            yield return new WaitForSecondsRealtime(15f);
+
+            entityManager.CompleteAllTrackedJobs();
+            float2 strikeCenter = float2.zero;
+            int queuedCount = 0;
+            using (EntityQuery centerQuery = entityManager.CreateEntityQuery(
+                       typeof(ZombieTag),
+                       typeof(ZombieState),
+                       typeof(LocalTransform)))
+            using (var states = centerQuery.ToComponentDataArray<ZombieState>(
+                       Unity.Collections.Allocator.Temp))
+            using (var transforms = centerQuery.ToComponentDataArray<LocalTransform>(
+                       Unity.Collections.Allocator.Temp))
+            {
+                for (int i = 0; i < states.Length; i++)
+                {
+                    if (states[i].Value != ZombieStateType.Queued)
+                        continue;
+
+                    strikeCenter += transforms[i].Position.xy;
+                    queuedCount++;
+                }
+            }
+
+            Assert.That(queuedCount, Is.GreaterThan(0));
+            strikeCenter /= queuedCount;
+            float strikeRadius = gameManager.FireballRadius;
+            Entity strike = entityManager.CreateEntity(typeof(FireballStrike));
+            entityManager.SetComponentData(strike, new FireballStrike
+            {
+                Position = strikeCenter,
+                Radius = strikeRadius,
+                Damage = 10_000_000_000f
+            });
+
+            yield return new WaitForSecondsRealtime(4.5f);
+
+            entityManager.CompleteAllTrackedJobs();
+            int activeAfter;
+            int livingInside = 0;
+            float queuedSpeedSum = 0f;
+            int queuedAfter = 0;
+            using (EntityQuery resultQuery = entityManager.CreateEntityQuery(
+                       typeof(ZombieTag),
+                       typeof(ZombieState),
+                       typeof(LocalTransform),
+                       typeof(PhysicsBody)))
+            using (var states = resultQuery.ToComponentDataArray<ZombieState>(
+                       Unity.Collections.Allocator.Temp))
+            using (var transforms = resultQuery.ToComponentDataArray<LocalTransform>(
+                       Unity.Collections.Allocator.Temp))
+            using (var bodies = resultQuery.ToComponentDataArray<PhysicsBody>(
+                       Unity.Collections.Allocator.Temp))
+            {
+                activeAfter = states.Length;
+                float radiusSq = strikeRadius * strikeRadius;
+                for (int i = 0; i < states.Length; i++)
+                {
+                    if (states[i].Value == ZombieStateType.Dead)
+                        continue;
+
+                    if (math.distancesq(transforms[i].Position.xy, strikeCenter) <= radiusSq)
+                        livingInside++;
+
+                    if (states[i].Value == ZombieStateType.Queued)
+                    {
+                        queuedSpeedSum += math.length(bodies[i].Velocity);
+                        queuedAfter++;
+                    }
+                }
+            }
+
+            int killed = DevelopmentTestRules.Horde2K - activeAfter;
+            float queuedAverageSpeed = queuedSpeedSum / math.max(1, queuedAfter);
+            gameManager.ClearDevelopmentHorde();
+            Assert.That(gameManager.CompleteDevelopmentTestSession(), Is.True);
+
+            Assert.That(killed, Is.GreaterThan(100));
+            Assert.That(livingInside, Is.GreaterThanOrEqualTo(math.ceil(killed * 0.75f)));
+            Assert.That(queuedAverageSpeed, Is.GreaterThan(0.05f));
+        }
+
         private static void SetQueuedZombie(
             EntityManager entityManager,
             Entity zombie,

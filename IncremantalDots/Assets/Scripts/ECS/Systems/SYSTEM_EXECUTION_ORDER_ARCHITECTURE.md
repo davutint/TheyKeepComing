@@ -149,9 +149,9 @@ Presentation tarafinda `SpriteAnimationSystem` UV rect hesaplarini yapar.
 ### ApplyMovementForceSystem
 
 - Mobile mode'da hedef `CastleCenter`, eski mode'da `WallXPosition`.
-- Moving zombilere hedefe dogru kuvvet uygular.
+- Moving ve Queued zombilere hedefe dogru ileri baski uygular; Queued state saldiri izni vermez.
 - `ZombieSlow` enabled ise hareket kuvvetini slow multiplier ile carpar.
-- Attacking/Dead/Queued state'lerinde kuvvet sifirlanir.
+- Attacking/Dead state'lerinde kuvvet sifirlanir. Queued ileri baskisinin korunmasi, Fireball boslugunun etrafindan duvara baglanan blocker zincirinin kalabaligi dondurmesini engeller.
 
 ### BoundarySystem
 

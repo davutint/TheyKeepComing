@@ -5,6 +5,17 @@ namespace DeadWalls.Tests
 {
     public class ZombieQueueFlowUtilityTests
     {
+        [TestCase(ZombieStateType.Moving, true)]
+        [TestCase(ZombieStateType.Queued, true)]
+        [TestCase(ZombieStateType.Attacking, false)]
+        [TestCase(ZombieStateType.Dead, false)]
+        public void ForwardPressure_IsAvailableToMovingAndQueuedOnly(
+            ZombieStateType state,
+            bool expected)
+        {
+            Assert.That(ZombieQueueFlowUtility.ReceivesForwardPressure(state), Is.EqualTo(expected));
+        }
+
         [Test]
         public void SingleFront_OnlyCloserToWallNeighborBlocks()
         {

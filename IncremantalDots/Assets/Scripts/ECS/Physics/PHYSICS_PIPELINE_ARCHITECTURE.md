@@ -35,17 +35,18 @@ Iki daire cakistiginda:
 
 ## Hareket Yonu
 - ApplyMovementForceSystem, WallX singleton'dan duvar pozisyonunu okur
-- Moving zombilere duvara dogru kuvvet uygular (fallback: -X yonu)
+- Moving ve Queued zombilere duvara dogru ileri baski uygular (fallback: -X yonu)
+- Queued state saldiri izni vermez; yalnizca kalabaligin fiziksel ileri basincini korur. Attacking ve Dead zombilerin kuvveti sifirlanir
 - PD Navigation kaldirildi — yon hesabi tamamen custom physics pipeline icinde
 
 ## Domino Queuing (BoundarySystem)
-Moving zombi, Attacking/Queued bir komsusuna cakisiyorsa **Queued** state'e gecer (saldirmaz, yuruyus animasyonu oynar, sadece bekler).
+Moving zombi, Attacking/Queued bir komsusuna cakisiyorsa **Queued** state'e gecer (saldirmaz ve yuruyus animasyonu oynar; fakat ileri crowd pressure'i tasimaya devam eder).
 - Spatial hash (ReadMap) uzerinden 3x3 hucre taranir
 - Attacking/Queued komsu ancak hem hedefe gercekten daha yakinsa hem de follower'in `45 derece` ileri hareket koridorundaysa blocker sayilir
 - Ayni ilerleme hizasindaki, arkadaki ve dairesel temizligin tegetinde kalan capraz komsular birbirini kilitlemez; dogrudan arka arkaya duran kuyruk korunur
 - Her frame sadece bir katman gecer → zincir halinde yayilir
 - Queued zombi her frame komsu kontrol eder: blocker gitti → Moving'e doner
-- Bu yon + koridor kurali, Fireball/okcu temizliginden sonra tegetteki Queued zincirin kusursuz bos halka kurmasini engeller ve acilan alana ileri akisi yeniden baslatir
+- Yon + koridor kurali yan/arka sahte blocker'lari eler; Queued ileri baskisi ise duvara baglanan egri bir blocker zinciri kalsa bile Fireball/okcu temizliginin actigi alani surunun yeniden doldurmasini saglar
 - Duvar onunde ic ice girme problemi cozulur
 
 ## Sync Point Stratejisi
