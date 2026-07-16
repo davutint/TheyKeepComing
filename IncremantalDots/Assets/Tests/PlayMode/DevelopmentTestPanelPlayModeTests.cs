@@ -3,6 +3,8 @@ using System.Collections;
 using System.IO;
 using NUnit.Framework;
 using Unity.Entities;
+using Unity.Mathematics;
+using Unity.Transforms;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
@@ -107,6 +109,105 @@ namespace DeadWalls.Tests
             Assert.That(activeZombies.CalculateEntityCount(), Is.Zero);
             Assert.That(gameManager.CompleteDevelopmentTestSession(), Is.True);
             Assert.That(gameManager.DevelopmentTestSessionActive, Is.False);
+        }
+
+        [UnityTest]
+        public IEnumerator QueuedSideNeighbors_AfterFrontClears_ResumeMovementInsteadOfLeavingCavity()
+        {
+            GameManager gameManager = null;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                gameManager = GameManager.Instance;
+                if (gameManager != null && gameManager.IsMobileMode)
+                    break;
+                yield return null;
+            }
+
+            Assert.That(gameManager, Is.Not.Null);
+            Assert.That(gameManager.TryEnableDevelopmentCombat(out string unlockMessage), Is.True,
+                unlockMessage);
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            Entity poolEntity = entityManager.CreateEntityQuery(
+                typeof(EnemyPoolRuntimeData),
+                typeof(EnemyPoolAvailable),
+                typeof(EnemyCatalogEntryData)).GetSingletonEntity();
+            Entity configEntity = entityManager.CreateEntityQuery(
+                typeof(MobileCastleCombatConfig),
+                typeof(ContinuousSpawnBudgetData)).GetSingletonEntity();
+            Entity waveEntity = entityManager.CreateEntityQuery(
+                typeof(WaveStateData)).GetSingletonEntity();
+
+            EnemyPoolRuntimeUtility.ReturnAllActive(entityManager, poolEntity);
+            Assert.That(EnemyPoolRuntimeUtility.TryRent(
+                entityManager, poolEntity, out Entity first), Is.True);
+            Assert.That(EnemyPoolRuntimeUtility.TryRent(
+                entityManager, poolEntity, out Entity second), Is.True);
+
+            MobileCastleCombatConfig config =
+                entityManager.GetComponentData<MobileCastleCombatConfig>(configEntity);
+            Assert.That(config.SingleFrontEnabled, Is.True,
+                "Regression scenario active single-front Wall akisini gerektirir.");
+
+            float startX = config.FrontlineX + config.AttackRadius + 4f;
+            SetQueuedZombie(entityManager, first, new float3(startX, -0.10f, MobileCastleRenderDepth.UnitZ));
+            SetQueuedZombie(entityManager, second, new float3(startX, 0.10f, MobileCastleRenderDepth.UnitZ));
+
+            config.MaxAliveZombies = 2;
+            config.StressMaxAliveZombies = 2;
+            entityManager.SetComponentData(configEntity, config);
+
+            WaveStateData wave = entityManager.GetComponentData<WaveStateData>(waveEntity);
+            wave.ZombiesAlive = 2;
+            wave.ZombiesSpawned = 2;
+            wave.ZombiesToSpawn = 2;
+            wave.SpawnTimer = float.MaxValue;
+            wave.WaveActive = true;
+            wave.StressTestMode = false;
+            entityManager.SetComponentData(waveEntity, wave);
+
+            for (int frame = 0; frame < 30; frame++)
+                yield return null;
+
+            Assert.That(entityManager.GetComponentData<ZombieState>(first).Value,
+                Is.Not.EqualTo(ZombieStateType.Queued));
+            Assert.That(entityManager.GetComponentData<ZombieState>(first).Value,
+                Is.Not.EqualTo(ZombieStateType.Dead));
+            Assert.That(entityManager.GetComponentData<ZombieState>(second).Value,
+                Is.Not.EqualTo(ZombieStateType.Queued));
+            Assert.That(entityManager.GetComponentData<ZombieState>(second).Value,
+                Is.Not.EqualTo(ZombieStateType.Dead));
+            Assert.That(entityManager.GetComponentData<LocalTransform>(first).Position.x,
+                Is.LessThan(startX - 0.01f));
+            Assert.That(entityManager.GetComponentData<LocalTransform>(second).Position.x,
+                Is.LessThan(startX - 0.01f));
+
+            gameManager.ClearDevelopmentHorde();
+            Assert.That(gameManager.CompleteDevelopmentTestSession(), Is.True);
+        }
+
+        private static void SetQueuedZombie(
+            EntityManager entityManager,
+            Entity zombie,
+            float3 position)
+        {
+            LocalTransform transform = entityManager.GetComponentData<LocalTransform>(zombie);
+            transform.Position = position;
+            entityManager.SetComponentData(zombie, transform);
+            entityManager.SetComponentData(
+                zombie,
+                new ZombieState { Value = ZombieStateType.Queued });
+
+            ZombieStats stats = entityManager.GetComponentData<ZombieStats>(zombie);
+            stats.MaxHP = 1_000_000_000f;
+            stats.CurrentHP = stats.MaxHP;
+            stats.AttackDamage = 0f;
+            entityManager.SetComponentData(zombie, stats);
+
+            PhysicsBody body = entityManager.GetComponentData<PhysicsBody>(zombie);
+            body.Velocity = float2.zero;
+            body.Force = float2.zero;
+            entityManager.SetComponentData(zombie, body);
         }
     }
 }

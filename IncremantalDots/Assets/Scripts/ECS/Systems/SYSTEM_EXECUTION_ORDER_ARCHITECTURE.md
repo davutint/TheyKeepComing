@@ -157,6 +157,7 @@ Presentation tarafinda `SpriteAnimationSystem` UV rect hesaplarini yapar.
 
 - Mobile mode'da `AttackRadius` icine giren zombiler `Attacking` olur.
 - Eski mode'da `WallXPosition` bariyeri korunur.
+- Domino kuyrugunda yalniz hedefe daha yakin duran Attacking/Queued komsu blocker sayilir; ayni hizadaki veya arkadaki Queued komsular bosluk dolumunu durdurmaz.
 
 ### ArrowMoveSystem
 

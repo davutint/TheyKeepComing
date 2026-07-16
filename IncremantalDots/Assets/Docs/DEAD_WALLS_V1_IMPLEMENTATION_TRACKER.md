@@ -4,9 +4,9 @@
 >
 > **Tracker sürümü:** 2.3
 > **Son tam kapsam denetimi:** 2026-07-16
-> **Aktif paket:** Package I - HUD, Onboarding ve Creative Polish
-> **Aktif iş:** `DW-I-ACCEPT-PRESENTATION-REVIEW` - Review Day/Night Lighting, Audio and Combat Feedback
-> **İlerleme:** `387 / 442` tracker checkbox'ı tamamlandı - `%87,56`
+> **Aktif paket:** Post-Package V1 Closure - Contracts, Performance ve Release DoD
+> **Aktif iş:** `DW-V1-CONTRACT-RUN-DIFFICULTY` - Audit the RunDifficultyProfile Source Owner and Close Its Contract
+> **İlerleme:** `392 / 442` tracker checkbox'ı tamamlandı - `%88,69`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -147,7 +147,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Emergency Repair | Ayrı ability yok | Eksik |
 | Meta | Ayrı JSON, durable ölüm kapılı shop, Blueprint exact 11-definition katalog, üstel repeatable sink'ler ve atomik tek-seferlik pool unlock aktif | `[x]` Teknik katalog ve runtime sınırı tamamlandı; exact reward tuning ayrı |
 | HUD | CyclePanel, DAY/DUSK/NIGHT ve Horde Pressure mevcut; tek Wall runtime gizleme var | Package I polish gerekli |
-| Tutorial | İlk Day worker ratio, affordable Basic Archer, low ammo, Castle Heart, regular Council, Day repair ve ilk Night ability-key adımları non-modal pulse, 10 exact approved English hint ve durable meta flag ile aktif; accepted player action prompt'tan önce gelirse completion kaybolmuyor, yedi alt flag tamamlanınca `tutorial.v1.complete` meta save'e yazılıp legacy state backfill ediliyor. Pause ve ana menü Settings yüzeyindeki iki-tık onaylı reset altı exact approved English state metni kullanıp yedi adım + global flag'i tek atomik save'de temizliyor; run/meta yükseltmeleri korunuyor. Controller transaction/assignment/modal açma çağrısı yapmıyor ve blocking pause sırasında cue zinciri kurmuyor | `[~]` Package I ilk yedi adım + global complete/reset + player-facing English-copy contract, preemptive completion, transaction-free ve no-modal-chain invariant'ları tamamlandı |
+| Tutorial | İlk Day worker ratio, affordable Basic Archer, low ammo, Castle Heart, regular Council, Day repair ve ilk Night ability-key adımları non-modal pulse, 10 exact approved English hint ve durable meta flag ile aktif; accepted player action prompt'tan önce gelirse completion kaybolmuyor, yedi alt flag tamamlanınca `tutorial.v1.complete` meta save'e yazılıp legacy state backfill ediliyor. Pause ve ana menü Settings yüzeyindeki iki-tık onaylı reset altı exact approved English state metni kullanıp yedi adım + global flag'i tek atomik save'de temizliyor; run/meta yükseltmeleri korunuyor. Controller transaction/assignment/modal açma çağrısı yapmıyor ve blocking pause sırasında cue zinciri kurmuyor | `[x]` Package I ilk-run completion, second-run suppression, reset ve player-facing copy kabulünden geçti |
 | Testler | Son full baseline: EditMode `209/209`, PlayMode `37 pass + 1 explicit profiler skip`; Package H meta katalog/regresyon EditMode `50/50`, run-start/Continue + death shop PlayMode `2/2`; Standalone Player-targeted 10K `1/1` | Fixed catalog, exponential cost, v13 migration, runtime effect ayrımı ve atomik pool purchase temiz; full baseline tarihsel olarak korunuyor |
 | Telemetry | Spawn budget demanded/spawned/backlog telemetry mevcut; tam Blueprint event owner'ı eksik | Kısmi |
 
@@ -165,7 +165,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | 6 | F - Council | Tamamlandı | 9 template staged launch set, curated repeat/follow-up, 5.400-sample budget ve full regression geçti |
 | 7 | G - Active Abilities | Tamamlandı | Kaynak tüketmez; Night repair sözleşmesi ve exact cooldown save testli |
 | 8 | H - Meta + Persistence | Tamamlandı | Ölüm ödülü idempotent; meta v3 fail-closed; fixed katalog ve incremental cost tamamlandı; deterministic 10K rebuild policy ayrı ürün kapısına taşındı |
-| 9 | I - Product Gate | **Aktif** | 10k scenario, tutorial ve temiz görsel inceleme |
+| 9 | I - Product Gate | Tamamlandı | 10K scenario, tutorial ve owner görsel incelemesi geçti; kapsamlı audio asset polish'i owner kararıyla V1 kabulinin dışında |
 
 > “A1/A2” resmî Blueprint paketi değildir. Resmî paketler A-I'dır; iş kimlikleri yalnız tracker içinde `DW-A-SAVE` gibi kullanılır.
 
@@ -885,7 +885,8 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 - [x] Tek Wall bar ve minimal phase UI owner onayından geçiyor.
 - [x] 16:9/ultrawide temiz render.
 - [x] 10k horde okunabilir.
-- [ ] Day/night lighting, audio ve combat feedback görsel/işitsel review'dan geçiyor.
+- [x] Day/night lighting ve combat feedback owner görsel review'dan geçiyor; kapsamlı audio asset polish'i owner kararıyla bu V1 kabul kapısının dışında.
+  - Kanıt: Owner, Day/Night geçişlerini ve yoğun sürü sunumunu açıkça kabul etti. 10K sürüde Fireball-benzeri `r=3,5` dairesel temizleme `1.029` zombiyi öldürdükten ve ölüm görselleri kalktıktan üç saniye sonra eski boş alana `679` yaşayan zombi yeniden girdi. `BoundarySystem` yalnız hedefe gerçekten daha yakın Attacking/Queued komşuyu blocker sayıyor; aynı hizadaki ve arkadaki Queued zombiler karşılıklı deadlock kurmuyor. Yön kuralı EditMode `4/4`; canlı iki-zombi MCP transaction'ı `x=4,850 -> x=0,847 / Attacking`; final 10K Game View QA temiz.
 
 ---
 
@@ -1048,10 +1049,10 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 - [x] Fireball/Rally/Emergency Repair bottom-center cooldown barında.
 - [x] Meta yalnız ölümde bir kez reward veriyor; voluntary reset yok.
 - [x] HUD tek Wall barı ve owner-approved minimal phase UI kullanıyor.
-- [ ] İlk-run tutorial tamamlanıyor; sonraki run'da tekrarlamıyor.
+- [x] İlk-run tutorial tamamlanıyor; sonraki run'da tekrarlamıyor.
 - [ ] 1k archer + 10k enemy target hardware frame pacing kabul edildi.
 - [ ] EditMode/PlayMode, save migration ve long-run soak raporları temiz.
-- [ ] Day/night lighting, horde mix, Wall bar, phase UI ve combat feedback görsel incelemeden geçti.
+- [x] Day/night lighting, horde mix, Wall bar, phase UI ve combat feedback owner görsel incelemeden geçti.
 
 ---
 
@@ -1079,7 +1080,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 
 Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner kararı, sonra implementation.
 
-- [ ] Faz göstergesi: 2-3 minimal HUD mockup + motion örneği.
+- [x] Faz göstergesi: Owner `B - Celestial Dial` yönünü seçti; uygulandı, görsel eşleşme turundan geçti ve `A - Horizon Ribbon` geri dönüş alternatifi karar dokümanında arşivlendi.
 - [ ] Meta currency adı, ikon ve death-screen copy.
 - [ ] Narrative premise/world pitch/opening copy.
 - [ ] Launch Heart node catalog ve effect specs.
@@ -1087,7 +1088,7 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 - [ ] En az 3 Keystone trade-off çifti.
 - [ ] Fireball için 2-3 evolution spec ve VFX yönü.
 - [ ] Exact spawn/economy/combat/meta tuning curves ve telemetry target'ları.
-- [ ] Day/night audio mix map ve rate-limit budget'ları.
+- [x] Day/night audio mix map ve kapsamlı asset polish'i, owner kararıyla ses paketi import edildikten sonraki final polish turuna ertelendi ve mevcut V1 görsel kabul kapısından çıkarıldı.
 
 ---
 
@@ -1227,3 +1228,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-16 | `DW-I-POLISH-BLOOD-MOON-REMOVAL` remove active special-night presentation wiring | `BloodMoonWarningUI` ve aktif `BloodMoonWarningRoot` tamamen silindi. `AmbientAudioController` yalnız canonical Night loop/horde bed kullanıyor; özel loop/sting kaynağı yok. `DayNightOverlayController`, `MomentVignetteUI` ve `HUDController` kırmızı tint/flash/label dallarını taşımıyor; scene setup bunları yeniden üretmiyor. `IsBloodMoonNight` ve `BloodMoonIntensityMult` yalnız save/config geriye uyumluluk alanları olarak dormant kaldı. Night polling regresyonu gerçek `0,2s` unscaled cadence'i explicit bekleyecek şekilde deterministikleştirildi | Unity compile gerçek error `0`; new removal + phase math EditMode `8/8`; stale special-night + Day/Dusk/Night/Dawn/phase-world PlayMode `5/5`; live reflection presentation field `0`, warning type/root `0`; scene validation `0` issue; 1280x720 normal Night Game View QA; tracker `385/441` |
 | 2026-07-16 | `DW-I-ACCEPT-FIRST-RUN-TUTORIAL` first-run completion + second-run suppression acceptance | Mevcut onboarding implementasyonu acceptance seviyesinde yeniden denetlendi; runtime kodu veya UI yeniden yazılmadı. Yedi zorunlu gerçek oyuncu aksiyonu global durable completion flag'inin tek kapısıdır; legacy step-only meta state backfill olur. Gerçek first-run ölüm transaction'ı ve `UIManager.OnRestart()` ile başlayan yeni run, run kimliğini/cycle'ı sıfırlarken meta tutorial flag'lerini korur; ikinci run boyunca bütün cue yüzeyleri kapalıdır. Tutorial yalnız Settings'teki iki-onaylı explicit reset ile yeniden açılır | EditMode onboarding/meta/reset `25/25`; gerçek onboarding/Council/second-run PlayMode `13/13`; MCP scene audit: tek `FirstRunOnboardingUI`, `0` eksik binding; scene validation `0` issue; final Console `0` error; tracker `386/441` |
 | 2026-07-16 | `DW-I-PRESENTATION-TEST-HARNESS` transient combat unlock + exact horde presets + grounded contact | Editor/Development-only Game View paneli Fireball/Rapid/Frost erişimini, hazır cooldown'ları ve transient ücretsiz recruitment'ı tek aksiyonda kuruyor; mevcut enemy catalog/pool ile exact `2K/5K/10K` horde butonları var. Test state'i run save'e yazılamıyor, test zombileri Wall'a hasar vermiyor ve Stress Mode kullanılmadığı için gerçek grading/VFX/SFX hattı açık kalıyor. Vampire shader temas patch'i hardcoded uzak konumdan materyal-owned atlas ayak bandına taşındı; gameplay transform/physics değişmedi | Unity compile `0 error`; EditMode `12/12`; PlayMode exact `2K/5K/10K` `1/1`; canlı 2K/10K Game View QA; scene validation `0`; final Console `0 error`; tracker kapsamı `441 -> 442`, ilerleme `387/442` |
+| 2026-07-16 | `DW-I-ACCEPT-PRESENTATION-REVIEW` owner acceptance + horde cavity flow fix | Owner Day/Night ve yoğun sürü sunumunu kabul etti; kapsamlı audio asset polish'i V1 kabulinden çıkarıldı. Dairesel Fireball temizliği sonrasında kalan boşluğun nedeni, aynı ilerleme hizasındaki `Queued` zombilerin birbirini blocker sayarak karşılıklı kilitlemesiydi. `ZombieQueueFlowUtility`, yalnız hedefe daha yakın komşuyu blocker kabul edecek biçimde `BoundarySystem` owner'ına bağlandı; single-front, radial ve legacy akış korunurken yan/arka kuyruk deadlock'u kaldırıldı | Unity compile `0 error`; yön kuralı EditMode `4/4`; canlı iki-zombi MCP transaction'ı `x=4,850 -> x=0,847 / Attacking`; gerçek 10K dairesel strike `1.029` ölümden sonra eski alana üç saniyede `679` living refill; final Game View QA temiz. Formal PlayMode regresyonu eklendi fakat Unity Test Framework üç retry'da test başlamadan init timeout verdi; eşdeğer canlı MCP transaction'ı geçti |

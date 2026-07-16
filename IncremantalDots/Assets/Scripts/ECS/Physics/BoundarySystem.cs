@@ -115,6 +115,16 @@ namespace DeadWalls
                                 continue;
 
                             float2 otherPos = TransformLookup[other].Position.xy;
+                            if (!ZombieQueueFlowUtility.IsAheadOf(
+                                    MobileMode,
+                                    SingleFront,
+                                    CastleCenter,
+                                    myPos,
+                                    otherPos))
+                            {
+                                continue;
+                            }
+
                             float distSq = math.lengthsq(myPos - otherPos);
                             float otherRadius = RadiusLookup[other].Value;
                             float minDist = myRadius + otherRadius;
@@ -162,7 +172,7 @@ namespace DeadWalls
                             break;
                         }
 
-                        // 2. Domino kontrolu — komsuda Attacking/Queued zombi varsa ve cakisiyorsa Queued ol
+                        // 2. Domino kontrolu — yalnız hedefe daha yakın duran blocker kuyruğa alır.
                         if (HasSpatialMap && HasStoppedNeighborOverlap(self, pos.xy, radius.Value))
                         {
                             zombieState.Value = ZombieStateType.Queued;
