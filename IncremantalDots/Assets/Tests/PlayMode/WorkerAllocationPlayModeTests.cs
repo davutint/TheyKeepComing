@@ -2133,6 +2133,143 @@ namespace DeadWalls.Tests
             Assert.That(sfxQuery.CalculateEntityCount(), Is.Zero);
         }
 
+        [UnityTest]
+        public IEnumerator PhaseWorldReadability_UsesSkyBoundedParticlesAndNoLargePhaseText()
+        {
+            GameManager gameManager = GameManager.Instance;
+            MomentVignetteUI atmosphere =
+                Object.FindFirstObjectByType<MomentVignetteUI>();
+            DayNightOverlayController grading =
+                Object.FindFirstObjectByType<DayNightOverlayController>();
+            AmbientAudioController audio =
+                Object.FindFirstObjectByType<AmbientAudioController>();
+            Assert.That(gameManager, Is.Not.Null);
+            Assert.That(atmosphere, Is.Not.Null);
+            Assert.That(grading, Is.Not.Null);
+            Assert.That(audio, Is.Not.Null);
+            Assert.That(atmosphere.SkyCamera, Is.SameAs(Camera.main));
+            Assert.That(atmosphere.AtmosphereParticles, Is.Not.Null);
+            Assert.That(atmosphere.AtmosphereParticles.main.maxParticles,
+                Is.EqualTo(MomentVignetteUI.DefaultMaxParticles));
+            Assert.That(atmosphere.AtmosphereParticles.GetComponent<ParticleSystemRenderer>()
+                .sharedMaterial.name, Is.EqualTo("PhaseAtmosphereParticles"));
+            Assert.That(atmosphere.DawnPeak, Is.Zero);
+
+            ParticleSystem[] particleSystems = Object.FindObjectsByType<ParticleSystem>(
+                FindObjectsInactive.Include,
+                FindObjectsSortMode.None);
+            int sceneParticleCount = 0;
+            for (int i = 0; i < particleSystems.Length; i++)
+            {
+                if (particleSystems[i].gameObject.scene == SceneManager.GetActiveScene())
+                    sceneParticleCount++;
+            }
+            Assert.That(sceneParticleCount, Is.EqualTo(1),
+                "Phase readability tek bounded atmosphere ParticleSystem kullanmali.");
+
+            TMPro.TMP_Text[] texts = Object.FindObjectsByType<TMPro.TMP_Text>(
+                FindObjectsInactive.Include,
+                FindObjectsSortMode.None);
+            string[] legacyPhaseObjectNames =
+            {
+                "CyclePhaseText",
+                "CycleDayLabelText",
+                "CycleDuskLabelText",
+                "CycleNightLabelText"
+            };
+            for (int i = 0; i < texts.Length; i++)
+            {
+                for (int n = 0; n < legacyPhaseObjectNames.Length; n++)
+                {
+                    if (texts[i].name != legacyPhaseObjectNames[n])
+                        continue;
+
+                    Assert.That(texts[i].gameObject.activeInHierarchy, Is.False,
+                        texts[i].name + " player-facing olmamali.");
+                }
+            }
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            using EntityQuery cycleQuery = entityManager.CreateEntityQuery(
+                typeof(ContinuousSiegeCycleData));
+            Entity cycleEntity = cycleQuery.GetSingletonEntity();
+            PropertyInfo cycleProperty = typeof(GameManager).GetProperty(
+                "ContinuousSiegeCycle",
+                BindingFlags.Instance | BindingFlags.Public);
+            MethodInfo cycleSetter = cycleProperty?.GetSetMethod(true);
+            Assert.That(cycleSetter, Is.Not.Null);
+
+            SetOnboardingCycle(
+                entityManager,
+                cycleEntity,
+                gameManager,
+                cycleSetter,
+                0,
+                SiegeCyclePhase.Day);
+            for (int frame = 0; frame < 5; frame++)
+                yield return null;
+            Assert.That(atmosphere.TransitionBurstPlayCount, Is.Zero,
+                "Ilk scene gozlemi transition burst uretmemeli.");
+
+            atmosphere.SkyColorMoveSpeed = 100f;
+            SetOnboardingCycle(
+                entityManager,
+                cycleEntity,
+                gameManager,
+                cycleSetter,
+                0,
+                SiegeCyclePhase.Dusk);
+            for (int frame = 0; frame < 12; frame++)
+                yield return null;
+
+            PhaseAtmosphereProfile duskProfile = atmosphere.ResolvePhaseProfile(
+                SiegeCyclePhase.Dusk,
+                gameManager.ContinuousSiegeCycle.PhaseProgress01);
+            Assert.That(atmosphere.TransitionBurstPlayCount, Is.EqualTo(1));
+            Assert.That(atmosphere.LastTransitionBurstCount,
+                Is.EqualTo(MomentVignetteUI.ResolveTransitionBurstCount(
+                    SiegeCyclePhase.Dusk)));
+            Assert.That(atmosphere.CurrentEmissionRate,
+                Is.EqualTo(duskProfile.EmissionRate).Within(0.01f));
+            Assert.That(atmosphere.CurrentParticleColor.r,
+                Is.EqualTo(duskProfile.ParticleColor.r).Within(0.01f));
+            Assert.That(atmosphere.SkyCamera.backgroundColor.r,
+                Is.EqualTo(duskProfile.SkyColor.r).Within(0.02f));
+            Assert.That(atmosphere.AtmosphereParticles.particleCount,
+                Is.LessThanOrEqualTo(MomentVignetteUI.DefaultMaxParticles));
+
+            SetOnboardingCycle(
+                entityManager,
+                cycleEntity,
+                gameManager,
+                cycleSetter,
+                0,
+                SiegeCyclePhase.Night);
+            for (int frame = 0; frame < 8; frame++)
+                yield return null;
+            Assert.That(atmosphere.TransitionBurstPlayCount, Is.EqualTo(2));
+            Assert.That(atmosphere.CurrentEmissionRate,
+                Is.EqualTo(atmosphere.NightEmissionRate).Within(0.01f));
+
+            SetOnboardingCycle(
+                entityManager,
+                cycleEntity,
+                gameManager,
+                cycleSetter,
+                0,
+                SiegeCyclePhase.Dawn);
+            for (int frame = 0; frame < 8; frame++)
+                yield return null;
+            Assert.That(atmosphere.TransitionBurstPlayCount, Is.EqualTo(3));
+            Assert.That(atmosphere.LastTransitionBurstCount,
+                Is.EqualTo(MomentVignetteUI.ResolveTransitionBurstCount(
+                    SiegeCyclePhase.Dawn)));
+            Assert.That(atmosphere.AtmosphereParticles.particleCount,
+                Is.LessThanOrEqualTo(MomentVignetteUI.DefaultMaxParticles));
+            Assert.That(grading.GlobalLight, Is.Not.Null);
+            Assert.That(audio.DawnCue, Is.Not.Null);
+        }
+
         private readonly struct OnboardingEconomySnapshot
         {
             public readonly ResourceData Resources;

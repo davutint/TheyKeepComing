@@ -88,6 +88,11 @@ Sag drawer buy ve Basic -> Rapid/Frost retrain data'si `Assets/ScriptableObject/
 
 `DayNightOverlay` Canvas'in ilk child'i olarak kurulur. Full-screen siyah Image sadece world'u karartir; `MobileCastleHudRoot` sonradan geldigi icin HUD/drawer overlay'in ustunde kalir. Overlay alpha runtime'da `DayNightOverlayController` tarafindan mobile config'teki day/night alpha ve `WaveStateData.PrepTimer` degerlerine gore guncellenir.
 
+`AmbientAudioRoot`, audio owner'ıyla birlikte serialized adı korunan `MomentVignetteUI` phase-world
+owner'ını taşır. Tool tek `PhaseAtmosphereParticles` child'ını, radial mote texture'ını ve URP
+transparent materialini idempotent üretir. Main Camera sky rengi ile `72` cap'li particle field
+Day/Dusk/Night/Dawn boyunca aynı authoritative cycle verisini izler; HUD faz yazısı üretmez.
+
 `CombatFeedbackRoot`, `CombatFeedbackBridge` ile ECS feedback event'lerini hit flipbook, pooled ParticleSystem ve AudioSource playback'e cevirir. Tool `fanfx2_cure_small_red/spritesheet.png` flipbook frame'lerini, opsiyonel particle fallback'lerini, `Arrow & Bow*.wav` random shoot clip listesini ve `Rock Impact 37.wav` referansini baglar. Demo `FX_Shoot_Arrow.prefab` root'u kullanilmaz.
 
 Mobile HUD economy varsayilanlari NewGameScene setup tarafindan GameStateAuthoring'e yazilir:

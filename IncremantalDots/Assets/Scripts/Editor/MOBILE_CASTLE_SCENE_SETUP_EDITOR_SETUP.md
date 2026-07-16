@@ -93,6 +93,7 @@ SubScene:
 - Castle tilemap render bandlari: `inside` Wall/1/z0, `outside0` Wall/2/z0, `outside` Wall/2/z0, `outside2` Wall/4/z-2; `Archer.prefab` Wall/3 ve runtime z `-1` bandinda olmalidir
 - Economy focus objeleri varsa gizli kalir; yeni ekonomi kontrolu sol ust `WorkerEconomyDrawerUI` panelindedir
 - `DayNightOverlay`: Canvas'in ilk child'i, full-screen siyah `Image`, raycast target kapali, `DayNightOverlayController.OverlayImage` bagli
+- `AmbientAudioRoot/MomentVignetteUI`: `Main Camera` sky binding'i ve tek `PhaseAtmosphereParticles`; world simulation, box `29 x 17`, max `72`, `Objects/40`, `PhaseAtmosphereParticles.mat`, canonical `DawnPeak = 0`
 - `GameStateAuthoring`: mobile kaynak baslangici `280/120/70/220`, initial population `60`, initial workers `53`, initial archers `4`, initial arrows `200`
 - `BasicArcher_01`: legacy/seed basic okcudur; Play modunda runtime initial basic archer sayisi 4'e tamamlanir ve `Grid/outside` tilemapindeki ilk spawn noktalarina yerlestirilir
 - `BasicArcher_01`: `ArcherAuthoring.Tint` ve `SpriteSheetAuthoring.Tint` beyaz

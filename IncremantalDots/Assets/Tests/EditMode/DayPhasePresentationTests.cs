@@ -198,5 +198,65 @@ namespace DeadWalls.Tests
             Assert.That(hugePitch, Is.LessThanOrEqualTo(groupPitch));
             Assert.That(hugePitch, Is.GreaterThanOrEqualTo(0.92f));
         }
+
+        [Test]
+        public void PhaseAtmosphere_StagesSkyAndBoundedParticlesAcrossEveryPhase()
+        {
+            var gameObject = new GameObject("PhaseAtmosphereProfileTest");
+            var controller = gameObject.AddComponent<MomentVignetteUI>();
+            try
+            {
+                PhaseAtmosphereProfile day = controller.ResolvePhaseProfile(
+                    SiegeCyclePhase.Day,
+                    0.5f);
+                PhaseAtmosphereProfile dusk = controller.ResolvePhaseProfile(
+                    SiegeCyclePhase.Dusk,
+                    DayNightOverlayController.DuskAmberPeakProgress);
+                PhaseAtmosphereProfile night = controller.ResolvePhaseProfile(
+                    SiegeCyclePhase.Night,
+                    0.5f);
+                PhaseAtmosphereProfile dawnCyan = controller.ResolvePhaseProfile(
+                    SiegeCyclePhase.Dawn,
+                    DayNightOverlayController.DawnCyanPeakProgress);
+                PhaseAtmosphereProfile dawnGold = controller.ResolvePhaseProfile(
+                    SiegeCyclePhase.Dawn,
+                    DayNightOverlayController.DawnGoldPeakProgress);
+                PhaseAtmosphereProfile dawnEnd = controller.ResolvePhaseProfile(
+                    SiegeCyclePhase.Dawn,
+                    1f);
+
+                Assert.That(day.SkyColor, Is.EqualTo(controller.DaySkyColor));
+                Assert.That(dusk.SkyColor, Is.EqualTo(controller.DuskSkyColor));
+                Assert.That(night.SkyColor, Is.EqualTo(controller.NightSkyColor));
+                Assert.That(dawnCyan.SkyColor, Is.EqualTo(controller.DawnCyanSkyColor));
+                Assert.That(dawnGold.SkyColor, Is.EqualTo(controller.DawnGoldSkyColor));
+                Assert.That(dawnEnd.SkyColor, Is.EqualTo(controller.DaySkyColor));
+                Assert.That(dusk.SkyColor.r, Is.GreaterThan(dusk.SkyColor.b + 0.20f));
+                Assert.That(night.SkyColor.b, Is.GreaterThan(night.SkyColor.r + 0.08f));
+                Assert.That(dawnCyan.ParticleColor.b,
+                    Is.GreaterThan(dawnCyan.ParticleColor.r + 0.50f));
+                Assert.That(dawnGold.ParticleColor.r,
+                    Is.GreaterThan(dawnGold.ParticleColor.b + 0.60f));
+
+                Assert.That(day.EmissionRate, Is.EqualTo(controller.DayEmissionRate));
+                Assert.That(dusk.EmissionRate, Is.EqualTo(controller.DuskEmissionRate));
+                Assert.That(night.EmissionRate, Is.EqualTo(controller.NightEmissionRate));
+                Assert.That(dawnCyan.EmissionRate, Is.EqualTo(controller.DawnEmissionRate));
+                Assert.That(dawnGold.EmissionRate,
+                    Is.EqualTo(controller.DawnEmissionRate * 0.82f).Within(0.001f));
+                Assert.That(dawnEnd.EmissionRate, Is.EqualTo(controller.DayEmissionRate));
+                Assert.That(MomentVignetteUI.DefaultMaxParticles, Is.EqualTo(72));
+                Assert.That(MomentVignetteUI.ResolveTransitionBurstCount(
+                    SiegeCyclePhase.Dawn), Is.EqualTo(14));
+                Assert.That(MomentVignetteUI.ResolveTransitionBurstCount(
+                    SiegeCyclePhase.Dusk), Is.LessThanOrEqualTo(14));
+                Assert.That(controller.DawnPeak, Is.Zero,
+                    "Dawn generic full-screen flash yerine world katmanlariyla okunmali.");
+            }
+            finally
+            {
+                Object.DestroyImmediate(gameObject);
+            }
+        }
     }
 }

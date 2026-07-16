@@ -191,6 +191,17 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - Dawn cue yalnız gerçek faz kenarında bir kez oynar; ilk scene/Continue gözleminde tekrar etmez.
 - Night drone/horde bed ile Day worker foley mevcut bounded owner'larında kalır.
 
+### MomentVignetteUI.cs
+
+- Serialized adı korunarak phase sky ve tek bounded atmosfer ParticleSystem owner'ına genişletildi.
+- Main Camera background rengi Day/Dusk/Night/Dawn paletini izler; aynı `ContinuousSiegeCycleData`
+  grading ve audio owner'larıyla ortak truth kaynağıdır.
+- Tek `PhaseAtmosphereParticles`, `72` cap ve faza bağlı bounded emission/burst kullanır; stress ve
+  Game Over yeni parçacık üretmez.
+- İlk scene/Continue gözlemi transition sayılmaz. Canonical Dawn generic full-screen flash değeri
+  sıfırdır; büyük phase text/label objeleri player-facing inactive kalır.
+- Ayrıntı: `PHASE_WORLD_READABILITY_ARCHITECTURE.md`.
+
 ### EconomyFocusUI.cs
 
 - Legacy controller'dir.

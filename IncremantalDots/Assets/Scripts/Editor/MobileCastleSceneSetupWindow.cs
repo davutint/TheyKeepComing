@@ -32,6 +32,8 @@ namespace DeadWalls
         private const string ArcherPrefabPath = "Assets/Prefabs/Archer.prefab";
         private const string WorkerPrefabPath = "Assets/Prefabs/VillagerWorker.prefab";
         private const string WorkerMaterialPath = "Assets/Materials/Villager.mat";
+        private const string PhaseAtmosphereMaterialPath = "Assets/Materials/PhaseAtmosphereParticles.mat";
+        private const string PhaseAtmosphereMotePath = "Assets/Art/Generated/phase_atmosphere_mote.png";
         private const string WorkerIdleSpritesheetPath = "Assets/SmallScaleInt/Character creator - Fantasy/Created Spritesheets/Character_villager/Idle.png";
         private const string GeneratedHudPrefabPath = "Assets/Prefabs/UI/Generated/MobileCastleHudRoot.prefab";
         private const string ArcherDefinitionFolder = "Assets/ScriptableObject/MobileCastle/Archers";
@@ -211,6 +213,14 @@ namespace DeadWalls
                 "Cyan-gold Dawn light, survivor gate arrival ve tek-sefer new-day cue NewGameScene icin onarildi.",
                 false,
                 true);
+        }
+
+        [MenuItem("Window/DeadWalls/Repair Phase World Readability")]
+        public static void RepairPhaseWorldReadability()
+        {
+            RepairPhasePresentation(
+                "Phase world readability",
+                "Full-screen phase text kapali tutuldu; bounded sky, atmosphere particle, grading ve audio katmanlari NewGameScene icin onarildi.");
         }
 
         private static void RepairPhasePresentation(
@@ -3096,7 +3106,7 @@ namespace DeadWalls
             EditorUtility.SetDirty(flash);
         }
 
-        /// <summary>Gece/kanli ay ambiyansi (M-D): sahne kokune AmbientAudioController kurar, clip'leri yalniz-bossa atar.</summary>
+        /// <summary>Faz audio ve world atmosphere owner'larini sahne kokunde tekil kurar.</summary>
         private static void EnsureAmbientAudio(Scene scene)
         {
             GameObject root = FindRoot(scene, "AmbientAudioRoot");
@@ -3108,7 +3118,8 @@ namespace DeadWalls
             }
 
             var ambient = EnsureComponent<AmbientAudioController>(root);
-            EnsureComponent<MomentVignetteUI>(root); // an vurgulari (Polish 2): safak altini + kanli ay kizili
+            var atmosphere = EnsureComponent<MomentVignetteUI>(root);
+            EnsurePhaseAtmosphere(scene, root, atmosphere);
             if (ambient.NightLoop == null)
                 ambient.NightLoop = LoadSfx("Wind Magic/RPG3_WindMagic_Drone01_LowSubtleLoop.wav");
             if (ambient.BloodMoonLoop == null)
@@ -3142,6 +3153,244 @@ namespace DeadWalls
             ambient.NightHordeVolume = 0.18f;
             ambient.NightHordeFadeSpeed = 0.4f;
             EditorUtility.SetDirty(ambient);
+        }
+
+        private static void EnsurePhaseAtmosphere(
+            Scene scene,
+            GameObject ownerRoot,
+            MomentVignetteUI atmosphere)
+        {
+            Camera camera = null;
+            foreach (GameObject sceneRoot in scene.GetRootGameObjects())
+            {
+                Camera[] cameras = sceneRoot.GetComponentsInChildren<Camera>(true);
+                for (int i = 0; i < cameras.Length; i++)
+                {
+                    if (!cameras[i].CompareTag("MainCamera"))
+                        continue;
+
+                    camera = cameras[i];
+                    break;
+                }
+                if (camera != null)
+                    break;
+            }
+
+            if (camera == null)
+                throw new InvalidOperationException(
+                    "Phase atmosphere NewGameScene icinde MainCamera bulamadi.");
+
+            GameObject particleObject = EnsureChild(
+                ownerRoot.transform,
+                "PhaseAtmosphereParticles",
+                false);
+            for (int i = ownerRoot.transform.childCount - 1; i >= 0; i--)
+            {
+                Transform child = ownerRoot.transform.GetChild(i);
+                if (child.gameObject == particleObject
+                    || child.name != "PhaseAtmosphereParticles")
+                    continue;
+
+                Undo.DestroyObjectImmediate(child.gameObject);
+            }
+
+            particleObject.transform.position = new Vector3(
+                camera.transform.position.x,
+                camera.transform.position.y,
+                -1f);
+            particleObject.transform.rotation = Quaternion.identity;
+            particleObject.transform.localScale = Vector3.one;
+
+            ParticleSystem particles = EnsureComponent<ParticleSystem>(particleObject);
+            particles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            ConfigurePhaseAtmosphereParticles(
+                particles,
+                EnsurePhaseAtmosphereMaterial(),
+                atmosphere);
+
+            atmosphere.SkyCamera = camera;
+            atmosphere.AtmosphereParticles = particles;
+            atmosphere.SkyColorMoveSpeed = 2.2f;
+            atmosphere.DaySkyColor = MomentVignetteUI.DefaultDaySkyColor;
+            atmosphere.DuskSkyColor = MomentVignetteUI.DefaultDuskSkyColor;
+            atmosphere.NightSkyColor = MomentVignetteUI.DefaultNightSkyColor;
+            atmosphere.DawnCyanSkyColor = MomentVignetteUI.DefaultDawnCyanSkyColor;
+            atmosphere.DawnGoldSkyColor = MomentVignetteUI.DefaultDawnGoldSkyColor;
+            atmosphere.DayParticleColor = MomentVignetteUI.DefaultDayParticleColor;
+            atmosphere.DuskParticleColor = MomentVignetteUI.DefaultDuskParticleColor;
+            atmosphere.NightParticleColor = MomentVignetteUI.DefaultNightParticleColor;
+            atmosphere.DawnCyanParticleColor = MomentVignetteUI.DefaultDawnCyanParticleColor;
+            atmosphere.DawnGoldParticleColor = MomentVignetteUI.DefaultDawnGoldParticleColor;
+            atmosphere.DayEmissionRate = MomentVignetteUI.DefaultDayEmissionRate;
+            atmosphere.DuskEmissionRate = MomentVignetteUI.DefaultDuskEmissionRate;
+            atmosphere.NightEmissionRate = MomentVignetteUI.DefaultNightEmissionRate;
+            atmosphere.DawnEmissionRate = MomentVignetteUI.DefaultDawnEmissionRate;
+            atmosphere.DawnPeak = 0f;
+            atmosphere.BloodMoonPeak = 0.30f;
+            EditorUtility.SetDirty(atmosphere);
+            EditorUtility.SetDirty(particleObject);
+        }
+
+        private static void ConfigurePhaseAtmosphereParticles(
+            ParticleSystem particles,
+            Material material,
+            MomentVignetteUI atmosphere)
+        {
+            ParticleSystem.MainModule main = particles.main;
+            main.loop = true;
+            main.prewarm = true;
+            main.playOnAwake = true;
+            main.simulationSpace = ParticleSystemSimulationSpace.World;
+            main.scalingMode = ParticleSystemScalingMode.Local;
+            main.cullingMode = ParticleSystemCullingMode.AlwaysSimulate;
+            main.maxParticles = MomentVignetteUI.DefaultMaxParticles;
+            main.startLifetime = new ParticleSystem.MinMaxCurve(4.5f, 7f);
+            main.startSpeed = new ParticleSystem.MinMaxCurve(0.05f, 0.16f);
+            main.startSize = new ParticleSystem.MinMaxCurve(0.035f, 0.12f);
+            main.startRotation = new ParticleSystem.MinMaxCurve(0f, Mathf.PI * 2f);
+            main.startColor = atmosphere.DayParticleColor;
+            main.gravityModifier = 0f;
+
+            ParticleSystem.EmissionModule emission = particles.emission;
+            emission.enabled = true;
+            emission.rateOverTime = atmosphere.DayEmissionRate;
+
+            ParticleSystem.ShapeModule shape = particles.shape;
+            shape.enabled = true;
+            shape.shapeType = ParticleSystemShapeType.Box;
+            shape.scale = new Vector3(29f, 17f, 0.1f);
+            shape.randomDirectionAmount = 1f;
+
+            ParticleSystem.VelocityOverLifetimeModule velocity = particles.velocityOverLifetime;
+            velocity.enabled = true;
+            velocity.space = ParticleSystemSimulationSpace.World;
+            velocity.x = new ParticleSystem.MinMaxCurve(-0.10f, 0.05f);
+            velocity.y = new ParticleSystem.MinMaxCurve(-0.025f, 0.055f);
+            velocity.z = new ParticleSystem.MinMaxCurve(0f, 0f);
+
+            ParticleSystem.NoiseModule noise = particles.noise;
+            noise.enabled = true;
+            noise.separateAxes = false;
+            noise.strength = 0.12f;
+            noise.frequency = 0.24f;
+            noise.scrollSpeed = 0.12f;
+            noise.damping = true;
+            noise.quality = ParticleSystemNoiseQuality.Medium;
+            noise.octaveCount = 1;
+
+            var fade = new Gradient();
+            fade.SetKeys(
+                new[]
+                {
+                    new GradientColorKey(Color.white, 0f),
+                    new GradientColorKey(Color.white, 1f)
+                },
+                new[]
+                {
+                    new GradientAlphaKey(0f, 0f),
+                    new GradientAlphaKey(1f, 0.16f),
+                    new GradientAlphaKey(0.72f, 0.75f),
+                    new GradientAlphaKey(0f, 1f)
+                });
+            ParticleSystem.ColorOverLifetimeModule colorOverLifetime = particles.colorOverLifetime;
+            colorOverLifetime.enabled = true;
+            colorOverLifetime.color = fade;
+
+            ParticleSystemRenderer renderer = particles.GetComponent<ParticleSystemRenderer>();
+            renderer.renderMode = ParticleSystemRenderMode.Billboard;
+            renderer.alignment = ParticleSystemRenderSpace.View;
+            renderer.sortingLayerName = "Objects";
+            renderer.sortingOrder = 40;
+            renderer.material = material;
+            EditorUtility.SetDirty(renderer);
+            EditorUtility.SetDirty(particles);
+        }
+
+        private static Material EnsurePhaseAtmosphereMaterial()
+        {
+            Texture2D texture = EnsurePhaseAtmosphereMoteTexture();
+            Shader shader = Shader.Find("Universal Render Pipeline/Particles/Unlit");
+            if (shader == null)
+                throw new InvalidOperationException(
+                    "Universal Render Pipeline/Particles/Unlit shader bulunamadi.");
+
+            Material material = AssetDatabase.LoadAssetAtPath<Material>(
+                PhaseAtmosphereMaterialPath);
+            if (material == null)
+            {
+                material = new Material(shader)
+                {
+                    name = "PhaseAtmosphereParticles"
+                };
+                AssetDatabase.CreateAsset(material, PhaseAtmosphereMaterialPath);
+            }
+
+            material.shader = shader;
+            material.SetTexture("_BaseMap", texture);
+            material.SetColor("_BaseColor", Color.white);
+            material.SetFloat("_Surface", 1f);
+            material.SetFloat("_Blend", 0f);
+            material.SetFloat("_SrcBlend", (float)UnityEngine.Rendering.BlendMode.SrcAlpha);
+            material.SetFloat("_DstBlend", (float)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+            material.SetFloat("_SrcBlendAlpha", (float)UnityEngine.Rendering.BlendMode.One);
+            material.SetFloat("_DstBlendAlpha", (float)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+            material.SetFloat("_ZWrite", 0f);
+            material.SetOverrideTag("RenderType", "Transparent");
+            material.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+            material.DisableKeyword("_ALPHATEST_ON");
+            material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+            EditorUtility.SetDirty(material);
+            return material;
+        }
+
+        private static Texture2D EnsurePhaseAtmosphereMoteTexture()
+        {
+            EnsureAssetFolder(GeneratedArtFolder);
+            if (!File.Exists(PhaseAtmosphereMotePath))
+            {
+                const int size = 32;
+                var texture = new Texture2D(size, size, TextureFormat.RGBA32, false, true);
+                var pixels = new Color32[size * size];
+                for (int y = 0; y < size; y++)
+                {
+                    for (int x = 0; x < size; x++)
+                    {
+                        float nx = (x + 0.5f) / size * 2f - 1f;
+                        float ny = (y + 0.5f) / size * 2f - 1f;
+                        float radius = Mathf.Sqrt(nx * nx + ny * ny);
+                        float alpha = Mathf.SmoothStep(1f, 0f, Mathf.Clamp01(radius));
+                        alpha *= alpha;
+                        pixels[y * size + x] = new Color32(
+                            255,
+                            255,
+                            255,
+                            (byte)Mathf.RoundToInt(alpha * 255f));
+                    }
+                }
+
+                texture.SetPixels32(pixels);
+                texture.Apply();
+                File.WriteAllBytes(PhaseAtmosphereMotePath, texture.EncodeToPNG());
+                UnityEngine.Object.DestroyImmediate(texture);
+                AssetDatabase.ImportAsset(
+                    PhaseAtmosphereMotePath,
+                    ImportAssetOptions.ForceSynchronousImport);
+            }
+
+            var importer = AssetImporter.GetAtPath(PhaseAtmosphereMotePath) as TextureImporter;
+            if (importer != null)
+            {
+                importer.textureType = TextureImporterType.Default;
+                importer.alphaSource = TextureImporterAlphaSource.FromInput;
+                importer.alphaIsTransparency = true;
+                importer.mipmapEnabled = false;
+                importer.sRGBTexture = true;
+                importer.wrapMode = TextureWrapMode.Clamp;
+                importer.filterMode = FilterMode.Bilinear;
+                importer.SaveAndReimport();
+            }
+
+            return AssetDatabase.LoadAssetAtPath<Texture2D>(PhaseAtmosphereMotePath);
         }
 
         private static Sprite[] FindHitFlipbookSprites()
