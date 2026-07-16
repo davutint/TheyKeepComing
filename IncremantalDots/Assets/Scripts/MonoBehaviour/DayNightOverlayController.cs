@@ -1,18 +1,39 @@
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 
 namespace DeadWalls
 {
     /// <summary>
-    /// Gun/gece atmosfer overlay'i (polish v2 — owner: "duz siyah karartmayi sevmedim").
-    /// Karartma artik faz-RENKLI: Dusk amber gun batimi -> gece koyu mavi-mor -> Dawn
-    /// altin-pembe acilis; kanli ay gecesi kizil. Renk ve alpha faz ilerlemesiyle yumusak
-    /// gecis yapar (MoveTowards). Alpha tavani config'ten (NightOverlayAlpha) gelmeye devam eder.
+    /// Faz atmosferinin tek presentation sahibidir. UI overlay rengini ve sahnedeki tek global
+    /// 2D light'i ayni authoritative cycle verisinden yumusak gecisle surer. Day paleti sicak fakat
+    /// yuksek okunurlukta; Dusk/Night/Dawn hedefleri sonraki faz polish'lerine temiz taban verir.
     /// </summary>
     public class DayNightOverlayController : MonoBehaviour
     {
+        public static readonly Color DefaultDayLightColor = new Color(1f, 0.93f, 0.82f, 1f);
+        public static readonly Color DefaultDuskLightColor = new Color(1f, 0.72f, 0.47f, 1f);
+        public static readonly Color DefaultNightLightColor = new Color(0.56f, 0.64f, 0.88f, 1f);
+        public static readonly Color DefaultDawnLightColor = new Color(1f, 0.80f, 0.60f, 1f);
+        public const float DefaultDayLightIntensity = 1.08f;
+        public const float DefaultDuskLightIntensity = 0.90f;
+        public const float DefaultNightLightIntensity = 0.72f;
+        public const float DefaultDawnLightIntensity = 0.96f;
+
         public Image OverlayImage;
         public float AlphaMoveSpeed = 8f;
+
+        [Header("Global 2D Light")]
+        public Light2D GlobalLight;
+        public float LightMoveSpeed = 2.5f;
+        public Color DayLightColor = DefaultDayLightColor;
+        public Color DuskLightColor = DefaultDuskLightColor;
+        public Color NightLightColor = DefaultNightLightColor;
+        public Color DawnLightColor = DefaultDawnLightColor;
+        [Min(0f)] public float DayLightIntensity = DefaultDayLightIntensity;
+        [Min(0f)] public float DuskLightIntensity = DefaultDuskLightIntensity;
+        [Min(0f)] public float NightLightIntensity = DefaultNightLightIntensity;
+        [Min(0f)] public float DawnLightIntensity = DefaultDawnLightIntensity;
 
         // Faz atmosfer renkleri (owner Inspector'dan degistirebilsin diye public)
         public Color DuskColor = new Color(0.55f, 0.24f, 0.06f);   // amber gun batimi
@@ -23,12 +44,15 @@ namespace DeadWalls
         private void Reset()
         {
             OverlayImage = GetComponent<Image>();
+            GlobalLight = FindFirstObjectByType<Light2D>();
         }
 
         private void Awake()
         {
             if (OverlayImage == null)
                 OverlayImage = GetComponent<Image>();
+            if (GlobalLight == null)
+                GlobalLight = FindFirstObjectByType<Light2D>();
 
             if (OverlayImage != null)
             {
@@ -39,19 +63,91 @@ namespace DeadWalls
 
         private void Update()
         {
-            if (OverlayImage == null)
+            float dt = Time.unscaledDeltaTime;
+            if (OverlayImage != null)
+            {
+                ResolveTarget(out Color targetColor, out float targetAlpha);
+                Color color = OverlayImage.color;
+                float tintSpeed = AlphaMoveSpeed * 0.3f * dt;
+                color.r = Mathf.MoveTowards(color.r, targetColor.r, tintSpeed);
+                color.g = Mathf.MoveTowards(color.g, targetColor.g, tintSpeed);
+                color.b = Mathf.MoveTowards(color.b, targetColor.b, tintSpeed);
+                color.a = Mathf.MoveTowards(color.a, targetAlpha, AlphaMoveSpeed * dt);
+                OverlayImage.color = color;
+            }
+
+            ResolveLightTarget(out Color lightColor, out float lightIntensity);
+            ApplyGlobalLight(lightColor, lightIntensity, dt);
+        }
+
+        public void ResolveLightTarget(out Color color, out float intensity)
+        {
+            var gm = GameManager.Instance;
+            if (gm != null && gm.TryGetContinuousSiegeCycle(out var cycle))
+            {
+                ResolvePhaseLightTarget(cycle.Phase, cycle.PhaseProgress01, out color, out intensity);
+                return;
+            }
+
+            bool night = gm != null && gm.WaveState.Phase == RunPhaseType.NightCombat;
+            color = night ? NightLightColor : DayLightColor;
+            intensity = night ? NightLightIntensity : DayLightIntensity;
+        }
+
+        public void ResolvePhaseLightTarget(
+            SiegeCyclePhase phase,
+            float phaseProgress01,
+            out Color color,
+            out float intensity)
+        {
+            float progress = Mathf.Clamp01(phaseProgress01);
+            switch (phase)
+            {
+                case SiegeCyclePhase.Dusk:
+                    color = Color.Lerp(DayLightColor, DuskLightColor, progress);
+                    intensity = Mathf.Lerp(DayLightIntensity, DuskLightIntensity, progress);
+                    return;
+                case SiegeCyclePhase.Night:
+                    color = NightLightColor;
+                    intensity = NightLightIntensity;
+                    return;
+                case SiegeCyclePhase.Dawn:
+                    if (progress < 0.5f)
+                    {
+                        float dawnIn = progress * 2f;
+                        color = Color.Lerp(NightLightColor, DawnLightColor, dawnIn);
+                        intensity = Mathf.Lerp(NightLightIntensity, DawnLightIntensity, dawnIn);
+                    }
+                    else
+                    {
+                        float dayIn = (progress - 0.5f) * 2f;
+                        color = Color.Lerp(DawnLightColor, DayLightColor, dayIn);
+                        intensity = Mathf.Lerp(DawnLightIntensity, DayLightIntensity, dayIn);
+                    }
+                    return;
+                default:
+                    color = DayLightColor;
+                    intensity = DayLightIntensity;
+                    return;
+            }
+        }
+
+        private void ApplyGlobalLight(Color targetColor, float targetIntensity, float deltaTime)
+        {
+            if (GlobalLight == null)
                 return;
 
-            ResolveTarget(out Color targetColor, out float targetAlpha);
-
-            Color color = OverlayImage.color;
-            float dt = Time.unscaledDeltaTime;
-            float tintSpeed = AlphaMoveSpeed * 0.3f * dt;
-            color.r = Mathf.MoveTowards(color.r, targetColor.r, tintSpeed);
-            color.g = Mathf.MoveTowards(color.g, targetColor.g, tintSpeed);
-            color.b = Mathf.MoveTowards(color.b, targetColor.b, tintSpeed);
-            color.a = Mathf.MoveTowards(color.a, targetAlpha, AlphaMoveSpeed * dt);
-            OverlayImage.color = color;
+            float colorStep = Mathf.Max(0f, LightMoveSpeed) * deltaTime;
+            Color current = GlobalLight.color;
+            current.r = Mathf.MoveTowards(current.r, targetColor.r, colorStep);
+            current.g = Mathf.MoveTowards(current.g, targetColor.g, colorStep);
+            current.b = Mathf.MoveTowards(current.b, targetColor.b, colorStep);
+            current.a = 1f;
+            GlobalLight.color = current;
+            GlobalLight.intensity = Mathf.MoveTowards(
+                GlobalLight.intensity,
+                Mathf.Max(0f, targetIntensity),
+                colorStep);
         }
 
         private void ResolveTarget(out Color color, out float alpha)

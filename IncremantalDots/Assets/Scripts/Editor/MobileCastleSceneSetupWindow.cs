@@ -7,6 +7,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
 using UnityEngine.UI;
@@ -61,6 +62,10 @@ namespace DeadWalls
         private const string FantasyUiSfxRoot = "Assets/Fantasy UI SFX - Lite Edition";
         private const string ArrowShootSfxPath = "Assets/Fantasy UI SFX - Lite Edition/Arrow & Bow 1-2.wav";
         private const string CastleHitSfxPath = "Assets/Fantasy UI SFX - Lite Edition/Rock Impact 37.wav";
+        private const string WorkerSawSfxPath = FantasyUiSfxRoot + "/Sawing Wood 1-1.wav";
+        private const string WorkerNailSfxPath = FantasyUiSfxRoot + "/Nail Wood 1-1.wav";
+        private const string WorkerSmithSfxPath = FantasyUiSfxRoot + "/Blacksmithing 2-2.wav";
+        private const string WorkerStoneSfxPath = FantasyUiSfxRoot + "/Rock Impact 37.wav";
 
         private string _status = "Hazir.";
 
@@ -165,6 +170,39 @@ namespace DeadWalls
             AssetDatabase.SaveAssets();
             Debug.Log(
                 "[MobileCastleSceneSetup] Tutorial reset Settings kontrolu NewGameScene ve MainMenuScene icin onarildi.");
+        }
+
+        [MenuItem("Window/DeadWalls/Repair Day Presentation")]
+        public static void RepairDayPresentation()
+        {
+            Scene activeScene = SceneManager.GetActiveScene();
+            if (!activeScene.IsValid() || activeScene.path != TargetScenePath)
+                throw new InvalidOperationException(
+                    "Day presentation repair icin NewGameScene aktif olmali.");
+
+            EnsureGlobalLight(activeScene);
+            EnsureAmbientAudio(activeScene);
+
+            DayNightOverlayController dayPresentation = null;
+            Light2D globalLight = null;
+            foreach (GameObject root in activeScene.GetRootGameObjects())
+            {
+                if (dayPresentation == null)
+                    dayPresentation = root.GetComponentInChildren<DayNightOverlayController>(true);
+                if (globalLight == null)
+                    globalLight = root.GetComponentInChildren<Light2D>(true);
+            }
+
+            if (dayPresentation == null || globalLight == null)
+                throw new InvalidOperationException(
+                    "Day presentation repair gerekli overlay veya Global Light 2D owner'ini bulamadi.");
+
+            ConfigureDayPresentation(dayPresentation, globalLight);
+            EditorSceneManager.MarkSceneDirty(activeScene);
+            EditorSceneManager.SaveScene(activeScene);
+            AssetDatabase.SaveAssets();
+            Debug.Log(
+                "[MobileCastleSceneSetup] Warm Day light, production readability ve worker ambience NewGameScene icin onarildi.");
         }
 
         private static void RepairTutorialResetSettingsInScene(Scene scene)
@@ -1001,8 +1039,10 @@ namespace DeadWalls
             var light2D = EnsureComponent(lightObject, light2DType);
             var serializedLight = new SerializedObject(light2D);
             SetSerializedInt(serializedLight, "m_LightType", 4);
-            SetSerializedFloat(serializedLight, "m_Intensity", 1f);
-            SetSerializedColor(serializedLight, "m_Color", Color.white);
+            SetSerializedFloat(serializedLight, "m_Intensity",
+                DayNightOverlayController.DefaultDayLightIntensity);
+            SetSerializedColor(serializedLight, "m_Color",
+                DayNightOverlayController.DefaultDayLightColor);
             serializedLight.ApplyModifiedPropertiesWithoutUndo();
         }
 
@@ -2799,6 +2839,20 @@ namespace DeadWalls
                 ambient.BloodMoonLoop = LoadSfx("Dark Magic/RPG3_DarkMagic_DroneUnderworld_Loop.wav");
             if (ambient.BloodMoonSting == null)
                 ambient.BloodMoonSting = LoadSfx("UI, Pads, Enchantments and Misc/RPG3_MONSTER_Roar01.wav");
+            if (ambient.WorkerFoleyClips == null || ambient.WorkerFoleyClips.Length != 4)
+                ambient.WorkerFoleyClips = new AudioClip[4];
+            if (ambient.WorkerFoleyClips[0] == null)
+                ambient.WorkerFoleyClips[0] = AssetDatabase.LoadAssetAtPath<AudioClip>(WorkerSawSfxPath);
+            if (ambient.WorkerFoleyClips[1] == null)
+                ambient.WorkerFoleyClips[1] = AssetDatabase.LoadAssetAtPath<AudioClip>(WorkerNailSfxPath);
+            if (ambient.WorkerFoleyClips[2] == null)
+                ambient.WorkerFoleyClips[2] = AssetDatabase.LoadAssetAtPath<AudioClip>(WorkerSmithSfxPath);
+            if (ambient.WorkerFoleyClips[3] == null)
+                ambient.WorkerFoleyClips[3] = AssetDatabase.LoadAssetAtPath<AudioClip>(WorkerStoneSfxPath);
+            ambient.WorkerFoleyVolume = 0.11f;
+            ambient.WorkerFoleyMinInterval = 1.6f;
+            ambient.WorkerFoleyMaxInterval = 5.2f;
+            ambient.WorkerPitchVariation = 0.06f;
             EditorUtility.SetDirty(ambient);
         }
 
@@ -4827,6 +4881,39 @@ namespace DeadWalls
 
             var controller = EnsureComponent<DayNightOverlayController>(overlay);
             controller.OverlayImage = image;
+            Light2D globalLight = null;
+            Scene scene = canvasTransform.gameObject.scene;
+            foreach (GameObject root in scene.GetRootGameObjects())
+            {
+                globalLight = root.GetComponentInChildren<Light2D>(true);
+                if (globalLight != null)
+                    break;
+            }
+            ConfigureDayPresentation(controller, globalLight);
+        }
+
+        private static void ConfigureDayPresentation(
+            DayNightOverlayController controller,
+            Light2D globalLight)
+        {
+            controller.GlobalLight = globalLight;
+            controller.LightMoveSpeed = 2.5f;
+            controller.DayLightColor = DayNightOverlayController.DefaultDayLightColor;
+            controller.DuskLightColor = DayNightOverlayController.DefaultDuskLightColor;
+            controller.NightLightColor = DayNightOverlayController.DefaultNightLightColor;
+            controller.DawnLightColor = DayNightOverlayController.DefaultDawnLightColor;
+            controller.DayLightIntensity = DayNightOverlayController.DefaultDayLightIntensity;
+            controller.DuskLightIntensity = DayNightOverlayController.DefaultDuskLightIntensity;
+            controller.NightLightIntensity = DayNightOverlayController.DefaultNightLightIntensity;
+            controller.DawnLightIntensity = DayNightOverlayController.DefaultDawnLightIntensity;
+            EditorUtility.SetDirty(controller);
+
+            if (globalLight == null)
+                return;
+
+            globalLight.color = controller.DayLightColor;
+            globalLight.intensity = controller.DayLightIntensity;
+            EditorUtility.SetDirty(globalLight);
         }
 
         private static Image EnsureDamageFlashOverlay(Transform hudRoot)

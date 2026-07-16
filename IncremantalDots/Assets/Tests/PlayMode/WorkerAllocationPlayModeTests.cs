@@ -1613,6 +1613,115 @@ namespace DeadWalls.Tests
             Assert.That(feedback.LanternActive, Is.Zero);
         }
 
+        [UnityTest]
+        public IEnumerator DayPresentation_WarmLightKeepsProductionReadableAndWorkerAmbienceScalesWithWorkers()
+        {
+            GameManager gameManager = GameManager.Instance;
+            DayNightOverlayController dayPresentation =
+                Object.FindFirstObjectByType<DayNightOverlayController>();
+            AmbientAudioController ambient =
+                Object.FindFirstObjectByType<AmbientAudioController>();
+            Assert.That(gameManager, Is.Not.Null);
+            Assert.That(dayPresentation, Is.Not.Null);
+            Assert.That(dayPresentation.GlobalLight, Is.Not.Null);
+            Assert.That(ambient, Is.Not.Null);
+            Assert.That(ambient.WorkerFoleyClips, Has.Length.EqualTo(4));
+            Assert.That(ambient.WorkerFoleyClips, Has.None.Null);
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            using EntityQuery allocationQuery = entityManager.CreateEntityQuery(
+                typeof(MobileCastleCombatConfig), typeof(MobilePopulationAllocation));
+            using EntityQuery populationQuery = entityManager.CreateEntityQuery(typeof(PopulationState));
+            using EntityQuery waveQuery = entityManager.CreateEntityQuery(typeof(WaveStateData));
+            using EntityQuery cycleQuery = entityManager.CreateEntityQuery(typeof(ContinuousSiegeCycleData));
+            Entity allocationEntity = allocationQuery.GetSingletonEntity();
+            Entity populationEntity = populationQuery.GetSingletonEntity();
+            Entity waveEntity = waveQuery.GetSingletonEntity();
+            Entity cycleEntity = cycleQuery.GetSingletonEntity();
+
+            WaveStateData wave = entityManager.GetComponentData<WaveStateData>(waveEntity);
+            wave.StressTestMode = false;
+            entityManager.SetComponentData(waveEntity, wave);
+
+            SetWoodWorkerCount(entityManager, allocationEntity, populationEntity, 101);
+            for (int frame = 0; frame < 10; frame++)
+                yield return null;
+            int authoritativeWoodWorkers = ReadWoodWorkerCount(entityManager, allocationEntity);
+            int expectedWoodVisuals = WorkerVisualRepresentationUtility.GetRepresentativeCount(
+                authoritativeWoodWorkers);
+            Assert.That(authoritativeWoodWorkers, Is.GreaterThan(0));
+            yield return WaitForWorkerVisualCount(
+                entityManager,
+                EconomyFocusType.Wood,
+                expectedWoodVisuals);
+
+            ContinuousSiegeCycleData cycle =
+                entityManager.GetComponentData<ContinuousSiegeCycleData>(cycleEntity);
+            cycle.CycleTimer = cycle.DayDuration + cycle.DuskDuration + cycle.NightDuration + 0.1f;
+            entityManager.SetComponentData(cycleEntity, cycle);
+            for (int frame = 0; frame < 20; frame++)
+                yield return null;
+
+            ambient.WorkerFoleyMinInterval = 0.10f;
+            ambient.WorkerFoleyMaxInterval = 0.10f;
+            dayPresentation.LightMoveSpeed = 100f;
+            cycle = entityManager.GetComponentData<ContinuousSiegeCycleData>(cycleEntity);
+            cycle.CycleTimer = 0f;
+            entityManager.SetComponentData(cycleEntity, cycle);
+
+            for (int frame = 0; frame < 10; frame++)
+                yield return null;
+
+            Assert.That(gameManager.ContinuousSiegeCycle.Phase, Is.EqualTo(SiegeCyclePhase.Day));
+            Assert.That(dayPresentation.GlobalLight.color.r,
+                Is.EqualTo(dayPresentation.DayLightColor.r).Within(0.01f));
+            Assert.That(dayPresentation.GlobalLight.color.g,
+                Is.EqualTo(dayPresentation.DayLightColor.g).Within(0.01f));
+            Assert.That(dayPresentation.GlobalLight.color.b,
+                Is.EqualTo(dayPresentation.DayLightColor.b).Within(0.01f));
+            Assert.That(dayPresentation.GlobalLight.intensity,
+                Is.EqualTo(dayPresentation.DayLightIntensity).Within(0.01f));
+            Assert.That(dayPresentation.DayLightColor.r,
+                Is.GreaterThan(dayPresentation.DayLightColor.b + 0.10f));
+            Assert.That(dayPresentation.DayLightIntensity, Is.GreaterThanOrEqualTo(1f));
+
+            Entity worker = FindWorkerVisual(entityManager, EconomyFocusType.Wood);
+            WorkerFeedbackMaterialProperty materialFeedback =
+                entityManager.GetComponentData<WorkerFeedbackMaterialProperty>(worker);
+            Assert.That(materialFeedback.Value.w, Is.GreaterThan(0.5f),
+                "Day production readability gerçek represented worker weight'ini kullanmali.");
+
+            WorkerLogisticsRoute route = entityManager.GetComponentData<WorkerLogisticsRoute>(worker);
+            LocalTransform transform = entityManager.GetComponentData<LocalTransform>(worker);
+            WorkerLogisticsFeedbackState feedback =
+                entityManager.GetComponentData<WorkerLogisticsFeedbackState>(worker);
+            route.MovingToHub = 1;
+            route.RouteLeg = 2;
+            route.WaitTimer = 0f;
+            transform.Position = route.DeliveryPosition;
+            feedback.IsCarrying = 1;
+            entityManager.SetComponentData(worker, route);
+            entityManager.SetComponentData(worker, transform);
+            entityManager.SetComponentData(worker, feedback);
+            yield return null;
+
+            materialFeedback = entityManager.GetComponentData<WorkerFeedbackMaterialProperty>(worker);
+            Assert.That(materialFeedback.Value.z, Is.GreaterThan(0.8f),
+                "Day delivery pulse production teslimini okunur gostermeli.");
+
+            int baselineFoleyCount = ambient.WorkerFoleyPlayCount;
+            for (int frame = 0; frame < 180
+                && ambient.WorkerFoleyPlayCount == baselineFoleyCount; frame++)
+            {
+                yield return null;
+            }
+
+            Assert.That(ambient.WorkerActivity01, Is.GreaterThan(0f));
+            Assert.That(ambient.WorkerFoleyPlayCount, Is.GreaterThan(baselineFoleyCount));
+            Assert.That(ambient.WorkerFoleySource, Is.Not.Null);
+            Assert.That(ambient.WorkerFoleySource.spatialBlend, Is.Zero.Within(0.001f));
+        }
+
         private readonly struct OnboardingEconomySnapshot
         {
             public readonly ResourceData Resources;

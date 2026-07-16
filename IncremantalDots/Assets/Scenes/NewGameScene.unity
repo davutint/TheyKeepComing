@@ -52852,10 +52852,19 @@ MonoBehaviour:
   NightLoop: {fileID: 8300000, guid: 1105612c71178474b849857051a7a30c, type: 3}
   BloodMoonLoop: {fileID: 8300000, guid: e26cd6f9f4f1d475ca6750305c6a7523, type: 3}
   BloodMoonSting: {fileID: 8300000, guid: 4f09254358c0b4b36a1c65dfadd58ee7, type: 3}
+  WorkerFoleyClips:
+  - {fileID: 8300000, guid: 162a90fc55b3548fdb611e6a86eee576, type: 3}
+  - {fileID: 8300000, guid: dce27cee2edec49ba93a792fae4c105c, type: 3}
+  - {fileID: 8300000, guid: a15e7d4332542433a8c8d71540cd0c6f, type: 3}
+  - {fileID: 8300000, guid: 0dd2569d1b69449e0ae35fab72a5e5b0, type: 3}
   NightVolume: 0.3
   BloodMoonVolume: 0.4
   StingVolume: 0.65
   FadeSpeed: 0.5
+  WorkerFoleyVolume: 0.11
+  WorkerFoleyMinInterval: 1.6
+  WorkerFoleyMaxInterval: 5.2
+  WorkerPitchVariation: 0.06
 --- !u!4 &646220464
 Transform:
   m_ObjectHideFlags: 0
@@ -53274,6 +53283,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: DeadWalls::DeadWalls.DayNightOverlayController
   OverlayImage: {fileID: 687747855}
   AlphaMoveSpeed: 8
+  GlobalLight: {fileID: 1017443876}
+  LightMoveSpeed: 2.5
+  DayLightColor: {r: 1, g: 0.93, b: 0.82, a: 1}
+  DuskLightColor: {r: 1, g: 0.72, b: 0.47, a: 1}
+  NightLightColor: {r: 0.56, g: 0.64, b: 0.88, a: 1}
+  DawnLightColor: {r: 1, g: 0.8, b: 0.6, a: 1}
+  DayLightIntensity: 1.08
+  DuskLightIntensity: 0.9
+  NightLightIntensity: 0.72
+  DawnLightIntensity: 0.96
   DuskColor: {r: 0.55, g: 0.24, b: 0.06, a: 1}
   NightColor: {r: 0.04, g: 0.06, b: 0.17, a: 1}
   DawnColor: {r: 0.55, g: 0.3, b: 0.14, a: 1}
@@ -57495,8 +57514,8 @@ MonoBehaviour:
   m_LightType: 4
   m_BlendStyleIndex: 0
   m_FalloffIntensity: 0.5
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1
+  m_Color: {r: 1, g: 0.93, b: 0.82, a: 1}
+  m_Intensity: 1.08
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
   m_ApplyToSortingLayers: 0000000031fdb5dad9cda60db1640cbacba466fda566733a1d07cc7e2b447636
