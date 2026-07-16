@@ -39,7 +39,10 @@ Tum component'lar unmanaged ECS struct olarak tutulur. Davranis sistemlerde, ver
 - `ArrowSupply`: finite stok ile run ici Capacity/Efficiency seviyelerini tasir; `Accumulator` yalniz legacy uyumluluktur.
 - `ArrowEconomyUtility`: sabit oranli refill, kismi kapasite, Buy Max ve Wood+Iron yatirim fiyat matematik owner'idir.
 - `ArcherVisualStyle`: Basic/Rapid/Frost ve slow tint renklerini merkezi tutar.
-- `CombatVfxEvent` / `CombatSfxEvent`: DOTS combat sistemlerinden MonoBehaviour feedback bridge'e giden tek frame'lik VFX/SFX event'leridir. Normal arrow/frost hit event'leri bridge tarafinda sprite flipbook impact olarak oynatilir.
+- `CombatVfxEvent` / `CombatSfxEvent`: DOTS combat sistemlerinden MonoBehaviour feedback bridge'e giden tek frame'lik VFX/SFX event'leridir. `CombatSfxEvent.Multiplicity`, toplu event'in temsil ettigi spatial candidate sayisini tasir. Normal arrow/frost hit event'leri bridge tarafinda sprite flipbook impact olarak oynatilir.
+- `CombatHitFeedbackBudget`: `0.75` world-unit hucre, `512` candidate ve `24` VFX/frame sabitlerinin; spatial key ve iki hit turu arasindaki slot dagitiminin owner'idir.
+- `CombatHitFeedbackCandidate`: ArrowHit parallel job'undan tek-thread emit job'una tasinan, hucre/tur basina tek hit feedback ornegidir.
+- `CombatFeedbackBudgetTelemetryData`: producer tarafindaki son-frame ve run-toplami candidate/emitted/dropped sayilarini tasiyan singleton'dir.
 
 ## GameStateComponents.cs
 
@@ -100,7 +103,8 @@ GameManager.BuyFortify()/BuyRally() -> CastleYardPrepState uzerine tek-gecelik b
 CastleYardPrepSystem -> Rally timer'i NightCombat sirasinda azaltir
 ArcherShootSystem -> Coarse target grid + incoming damage reservation ile nearest yaşayan hedefi seçer; okçu tipine göre projectile effect datasını oka yazar, facing direction + attack timer set eder
 GameManager + ArrowEconomyUtility -> Refill/yatirim transaction'i ile finite ArrowSupply yazar; ArrowSupplyUI Current/Capacity ve satin alma kontrollerini gosterir
-ArrowHitSystem -> Frost ok isabetinde ZombieSlow refresh eder
+ArrowHitSystem -> Frost ok isabetinde ZombieSlow refresh eder; raw hit'leri spatial
+candidate map'inde toplar ve frame basi en fazla 24 VFX + tur basi tek SFX event'i uretir
 ZombieSlowTimerSystem -> Slow suresini dusurur, slow tint'ini yonetir ve bitince pasifler
 ZombieAnimationStateSystem -> Velocity/center yonunden sprite direction row hesaplar
 ArcherAnimationStateSystem -> Okculari hedef yonunde idle/attack row'larina ceker

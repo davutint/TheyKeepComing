@@ -27,12 +27,16 @@ namespace DeadWalls
 
         [Header("Hit Flipbook")]
         public Sprite[] HitFlipbookSprites;
-        public int HitFlipbookPoolSize = 1024;
+        public int HitFlipbookPoolSize = 128;
         public float HitFlipbookFrameRate = 90f;
         public float HitFlipbookScale = 0.35f;
         public float HitFlipbookRotationOffsetDegrees;
         public string HitFlipbookSortingLayer = "Wall";
         public int HitFlipbookSortingOrder = 12;
+
+        [Header("Hit VFX Budget")]
+        public int MaxHitVfxPlayedPerFrame = CombatHitFeedbackBudget.MaxVfxEventsPerFrame;
+        public float HitVfxMinInterval = 0.04f;
 
         [Header("Pool")]
         public int VfxPoolSizePerType = 24;
@@ -103,6 +107,12 @@ namespace DeadWalls
         public int LastArrowSalvoSize { get; private set; }
         public int TotalSfxPlayedCount { get; private set; }
         public int TotalArrowSalvosPlayed { get; private set; }
+        public int LastProcessedVfxEventCount { get; private set; }
+        public int LastFrameHitVfxPlayedCount { get; private set; }
+        public int LastFrameHitVfxDroppedCount { get; private set; }
+        public long TotalHitVfxPlayedCount { get; private set; }
+        public long TotalHitVfxDroppedCount { get; private set; }
+        public int ActiveHitFlipbookCount => _activeHitFlipbooks.Count;
 
         private World _world;
         private EntityManager _entityManager;
@@ -111,6 +121,7 @@ namespace DeadWalls
         private EntityQuery _waveQuery;
         private bool _queriesReady;
         private int _audioCursor;
+        private float _lastHitVfxPlaybackTime = -999f;
 
         private struct ActiveVfx
         {
@@ -209,17 +220,47 @@ namespace DeadWalls
                 return;
 
             using NativeArray<CombatVfxEvent> events = _vfxQuery.ToComponentDataArray<CombatVfxEvent>(Allocator.Temp);
+            LastProcessedVfxEventCount = events.Length;
+            LastFrameHitVfxPlayedCount = 0;
+            LastFrameHitVfxDroppedCount = 0;
 
             if (!skipPlayback)
             {
+                int hitEventCount = 0;
+                for (int i = 0; i < events.Length; i++)
+                {
+                    if (IsHitFlipbookType(events[i].Type))
+                        hitEventCount++;
+                }
+
+                int hitBudget = Mathf.Max(0, MaxHitVfxPlayedPerFrame);
+                bool hitWindowOpen = Time.time - _lastHitVfxPlaybackTime
+                    >= Mathf.Max(0f, HitVfxMinInterval);
+                if (hitWindowOpen && hitBudget > 0)
+                {
+                    LastFrameHitVfxPlayedCount += PlayHitVfxType(
+                        events,
+                        CombatVfxType.FrostHit,
+                        hitBudget - LastFrameHitVfxPlayedCount);
+                    LastFrameHitVfxPlayedCount += PlayHitVfxType(
+                        events,
+                        CombatVfxType.ArrowHit,
+                        hitBudget - LastFrameHitVfxPlayedCount);
+                    if (LastFrameHitVfxPlayedCount > 0)
+                        _lastHitVfxPlaybackTime = Time.time;
+                }
+
+                LastFrameHitVfxDroppedCount = Mathf.Max(
+                    0,
+                    hitEventCount - LastFrameHitVfxPlayedCount);
+                TotalHitVfxPlayedCount += LastFrameHitVfxPlayedCount;
+                TotalHitVfxDroppedCount += LastFrameHitVfxDroppedCount;
+
                 int particlePlayed = 0;
                 for (int i = 0; i < events.Length; i++)
                 {
                     if (IsHitFlipbookType(events[i].Type))
-                    {
-                        PlayVfx(events[i]);
                         continue;
-                    }
 
                     if (particlePlayed >= MaxVfxPlayedPerFrame)
                         continue;
@@ -230,6 +271,24 @@ namespace DeadWalls
             }
 
             _entityManager.DestroyEntity(entities);
+        }
+
+        private int PlayHitVfxType(
+            NativeArray<CombatVfxEvent> events,
+            CombatVfxType type,
+            int budget)
+        {
+            if (budget <= 0)
+                return 0;
+
+            int played = 0;
+            for (int i = 0; i < events.Length && played < budget; i++)
+            {
+                if (events[i].Type == type && PlayVfx(events[i]))
+                    played++;
+            }
+
+            return played;
         }
 
         private void ProcessSfxEvents(bool skipPlayback)
@@ -288,12 +347,14 @@ namespace DeadWalls
             if ((uint)index >= (uint)_sfxAggregateCounts.Length)
                 return;
 
-            _sfxAggregateCounts[index]++;
-            _sfxAggregatePositions[index] += sfxEvent.Position;
+            int multiplicity = Mathf.Max(1, sfxEvent.Multiplicity);
+            _sfxAggregateCounts[index] += multiplicity;
+            _sfxAggregatePositions[index] += sfxEvent.Position * multiplicity;
             _sfxAggregateVolumes[index] = Mathf.Max(
                 _sfxAggregateVolumes[index],
                 Mathf.Clamp01(sfxEvent.Volume));
-            _sfxAggregatePitches[index] += Mathf.Max(0.05f, sfxEvent.Pitch);
+            _sfxAggregatePitches[index] += Mathf.Max(0.05f, sfxEvent.Pitch)
+                * multiplicity;
         }
 
         private CombatSfxEvent BuildAggregatedSfxEvent(CombatSfxType type, int count)
@@ -313,7 +374,8 @@ namespace DeadWalls
                 Position = _sfxAggregatePositions[index] / safeCount,
                 Type = type,
                 Volume = volume,
-                Pitch = pitch
+                Pitch = pitch,
+                Multiplicity = count
             };
         }
 

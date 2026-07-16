@@ -2134,6 +2134,193 @@ namespace DeadWalls.Tests
         }
 
         [UnityTest]
+        public IEnumerator DenseArrowHits_EmitSpatiallySampledVfxAndAggregatedSfx()
+        {
+            CombatFeedbackBridge feedback =
+                Object.FindFirstObjectByType<CombatFeedbackBridge>();
+            Assert.That(feedback, Is.Not.Null);
+            feedback.enabled = false;
+            Time.timeScale = 0f;
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            using EntityQuery vfxQuery = entityManager.CreateEntityQuery(typeof(CombatVfxEvent));
+            using EntityQuery sfxQuery = entityManager.CreateEntityQuery(typeof(CombatSfxEvent));
+            using EntityQuery telemetryQuery = entityManager.CreateEntityQuery(
+                typeof(CombatFeedbackBudgetTelemetryData));
+            if (!vfxQuery.IsEmptyIgnoreFilter)
+                entityManager.DestroyEntity(vfxQuery);
+            if (!sfxQuery.IsEmptyIgnoreFilter)
+                entityManager.DestroyEntity(sfxQuery);
+            Assert.That(telemetryQuery.CalculateEntityCount(), Is.EqualTo(1));
+
+            const int hitCount = 1_000;
+            const int spatialCellCount = 40;
+            const int frostCellCount = 6;
+            var targets = new Entity[hitCount];
+            for (int i = 0; i < hitCount; i++)
+            {
+                int cellIndex = i % spatialCellCount;
+                float3 position = new float3(
+                    120f + (cellIndex % 10) * 1.5f,
+                    10f + (cellIndex / 10) * 1.5f,
+                    MobileCastleRenderDepth.ProjectileZ);
+                bool frost = cellIndex < frostCellCount;
+
+                Entity target = entityManager.CreateEntity(
+                    typeof(ZombieTag),
+                    typeof(ZombieStats),
+                    typeof(LocalTransform));
+                entityManager.SetComponentData(target, new ZombieStats
+                {
+                    MoveSpeed = 0f,
+                    MaxHP = 100_000f,
+                    CurrentHP = 100_000f
+                });
+                entityManager.SetComponentData(target,
+                    LocalTransform.FromPosition(position));
+                targets[i] = target;
+
+                Entity arrow = entityManager.CreateEntity(
+                    typeof(ArrowTag),
+                    typeof(ArrowProjectile),
+                    typeof(LocalTransform));
+                entityManager.SetComponentData(arrow, new ArrowProjectile
+                {
+                    Speed = 0f,
+                    Damage = 1f,
+                    Target = target,
+                    ArcherType = frost ? ArcherType.Frost : ArcherType.Basic,
+                    SlowMultiplier = 1f,
+                    RemainingLifetime = 1f
+                });
+                entityManager.SetComponentData(arrow,
+                    LocalTransform.FromPosition(position));
+            }
+
+            yield return null;
+
+            Assert.That(vfxQuery.CalculateEntityCount(),
+                Is.EqualTo(CombatHitFeedbackBudget.MaxVfxEventsPerFrame));
+            Assert.That(sfxQuery.CalculateEntityCount(), Is.EqualTo(2),
+                "1000 raw hit yalniz ArrowHit ve FrostHit icin iki toplu SFX event'i uretmeli.");
+            CombatFeedbackBudgetTelemetryData telemetry =
+                telemetryQuery.GetSingleton<CombatFeedbackBudgetTelemetryData>();
+            Assert.That(telemetry.LastSpatialCandidateCount, Is.EqualTo(spatialCellCount));
+            Assert.That(telemetry.LastVfxEventsEmitted,
+                Is.EqualTo(CombatHitFeedbackBudget.MaxVfxEventsPerFrame));
+            Assert.That(telemetry.LastSfxEventsEmitted, Is.EqualTo(2));
+            Assert.That(telemetry.LastVfxCandidatesDropped,
+                Is.EqualTo(spatialCellCount - CombatHitFeedbackBudget.MaxVfxEventsPerFrame));
+
+            using NativeArray<CombatVfxEvent> vfxEvents =
+                vfxQuery.ToComponentDataArray<CombatVfxEvent>(Allocator.Temp);
+            int arrowVfxCount = 0;
+            int frostVfxCount = 0;
+            for (int i = 0; i < vfxEvents.Length; i++)
+            {
+                if (vfxEvents[i].Type == CombatVfxType.FrostHit)
+                    frostVfxCount++;
+                else if (vfxEvents[i].Type == CombatVfxType.ArrowHit)
+                    arrowVfxCount++;
+            }
+            Assert.That(frostVfxCount, Is.EqualTo(frostCellCount));
+            Assert.That(arrowVfxCount,
+                Is.EqualTo(CombatHitFeedbackBudget.MaxVfxEventsPerFrame - frostCellCount));
+
+            using NativeArray<CombatSfxEvent> sfxEvents =
+                sfxQuery.ToComponentDataArray<CombatSfxEvent>(Allocator.Temp);
+            int representedHitCells = 0;
+            for (int i = 0; i < sfxEvents.Length; i++)
+                representedHitCells += sfxEvents[i].Multiplicity;
+            Assert.That(representedHitCells, Is.EqualTo(spatialCellCount));
+
+            entityManager.DestroyEntity(vfxQuery);
+            entityManager.DestroyEntity(sfxQuery);
+            for (int i = 0; i < targets.Length; i++)
+            {
+                if (entityManager.Exists(targets[i]))
+                    entityManager.DestroyEntity(targets[i]);
+            }
+            feedback.enabled = true;
+        }
+
+        [UnityTest]
+        public IEnumerator HitFeedbackBridge_EnforcesPlaybackBudgetAndRateLimit()
+        {
+            CombatFeedbackBridge feedback =
+                Object.FindFirstObjectByType<CombatFeedbackBridge>();
+            Assert.That(feedback, Is.Not.Null);
+            Assert.That(feedback.HitFlipbookSprites, Is.Not.Null.And.Not.Empty);
+            Assert.That(feedback.HitFlipbookPoolSize, Is.EqualTo(128));
+            Assert.That(feedback.MaxHitVfxPlayedPerFrame,
+                Is.EqualTo(CombatHitFeedbackBudget.MaxVfxEventsPerFrame));
+            Time.timeScale = 0f;
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            using EntityQuery vfxQuery = entityManager.CreateEntityQuery(typeof(CombatVfxEvent));
+            if (!vfxQuery.IsEmptyIgnoreFilter)
+                entityManager.DestroyEntity(vfxQuery);
+
+            FieldInfo hitVfxTimeField = typeof(CombatFeedbackBridge).GetField(
+                "_lastHitVfxPlaybackTime",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.That(hitVfxTimeField, Is.Not.Null);
+            hitVfxTimeField.SetValue(feedback, -999f);
+
+            long baselinePlayed = feedback.TotalHitVfxPlayedCount;
+            long baselineDropped = feedback.TotalHitVfxDroppedCount;
+            const int firstBatchSize = 80;
+            for (int i = 0; i < firstBatchSize; i++)
+            {
+                Entity eventEntity = entityManager.CreateEntity();
+                entityManager.AddComponentData(eventEntity, new CombatVfxEvent
+                {
+                    Position = new float3(i * 0.1f, 0f, MobileCastleRenderDepth.ProjectileZ),
+                    Direction = new float3(1f, 0f, 0f),
+                    Type = CombatVfxType.ArrowHit,
+                    Scale = 0.08f
+                });
+            }
+
+            yield return null;
+
+            Assert.That(feedback.LastProcessedVfxEventCount, Is.EqualTo(firstBatchSize));
+            Assert.That(feedback.LastFrameHitVfxPlayedCount,
+                Is.EqualTo(CombatHitFeedbackBudget.MaxVfxEventsPerFrame));
+            Assert.That(feedback.LastFrameHitVfxDroppedCount,
+                Is.EqualTo(firstBatchSize - CombatHitFeedbackBudget.MaxVfxEventsPerFrame));
+            Assert.That(feedback.ActiveHitFlipbookCount,
+                Is.LessThanOrEqualTo(CombatHitFeedbackBudget.MaxVfxEventsPerFrame));
+            Assert.That(vfxQuery.CalculateEntityCount(), Is.Zero);
+
+            const int secondBatchSize = 8;
+            for (int i = 0; i < secondBatchSize; i++)
+            {
+                Entity eventEntity = entityManager.CreateEntity();
+                entityManager.AddComponentData(eventEntity, new CombatVfxEvent
+                {
+                    Position = float3.zero,
+                    Direction = new float3(1f, 0f, 0f),
+                    Type = CombatVfxType.ArrowHit,
+                    Scale = 0.08f
+                });
+            }
+
+            yield return null;
+
+            Assert.That(feedback.LastProcessedVfxEventCount, Is.EqualTo(secondBatchSize));
+            Assert.That(feedback.LastFrameHitVfxPlayedCount, Is.Zero,
+                "Ayni scaled-time penceresindeki ikinci hit burst'u rate-limit tarafindan yutulmali.");
+            Assert.That(feedback.LastFrameHitVfxDroppedCount, Is.EqualTo(secondBatchSize));
+            Assert.That(feedback.TotalHitVfxPlayedCount,
+                Is.EqualTo(baselinePlayed + CombatHitFeedbackBudget.MaxVfxEventsPerFrame));
+            Assert.That(feedback.TotalHitVfxDroppedCount,
+                Is.EqualTo(baselineDropped + firstBatchSize
+                    - CombatHitFeedbackBudget.MaxVfxEventsPerFrame + secondBatchSize));
+            Assert.That(vfxQuery.CalculateEntityCount(), Is.Zero);
+        }
+
+        [UnityTest]
         public IEnumerator PhaseWorldReadability_UsesSkyBoundedParticlesAndNoLargePhaseText()
         {
             GameManager gameManager = GameManager.Instance;

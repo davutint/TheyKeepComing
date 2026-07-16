@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.2
 > **Son tam kapsam denetimi:** 2026-07-15
 > **Aktif paket:** Package I - HUD, Onboarding ve Creative Polish
-> **Aktif iş:** `DW-I-POLISH-HIT-BUDGET` - Budget and Rate-Limit Per-Enemy Hit VFX and SFX
-> **İlerleme:** `381 / 441` tracker checkbox'ı tamamlandı - `%86,39`
+> **Aktif iş:** `DW-I-POLISH-SPELL-HIERARCHY` - Keep Fireball and Frost Feedback Legible Inside the Horde
+> **İlerleme:** `382 / 441` tracker checkbox'ı tamamlandı - `%86,62`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -832,7 +832,15 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 - [x] Faz geçişini büyük tam ekran yazı yerine grading, sky, particles ve audio ile okut.
 - [x] 10k horde için ground contrast, silhouette edge ve motion cadence koru.
   - Kanıt: Vampire materyalinde ek pass/draw/entity üretmeyen muted-cold edge + küçük contact patch; pool generation tabanlı `15/15` frame ve `16/16` timer-band dağılımı; 1920x1080 Night QA; iki final 10K enemy + 1K archer benchmark koşusu `9,21-9,80 ms` ortalama, `10,35-10,71 ms` P95 ve `546` ortalama draw call ile geçti.
-- [ ] Hit VFX/SFX'i her düşmanda üretme; budget/rate limit uygula.
+- [x] Hit VFX/SFX'i her düşmanda üretme; budget/rate limit uygula.
+  - Kanıt: `ArrowHitSystem` aynı `0,75` world-unit hücredeki aynı hit türünü sabit
+    `512` candidate map'inde tek örneğe indiriyor; her frame en fazla `24` hit VFX
+    ve tür başına tek multiplicity taşıyan SFX event'i üretiyor. `CombatFeedbackBridge`
+    ikinci katmanda `128` flipbook pool, `24/frame` playback budget ve `0,04s`
+    rate-limit uyguluyor. EditMode `7/7`; yoğun `1000` gerçek ECS hit + bridge
+    PlayMode `2/2`; ArrowPool regresyonu `1/1`; Night salvo regresyonu `1/1` geçti.
+    Runtime QA `80 requested / 24 played / 56 dropped / 0 remaining event`, scene
+    validation `0` ve final Console `0 error` ile doğrulandı.
 - [ ] Fireball ve Frost feedback'ini horde içinde kaybolmayacak hierarchy ile sun.
 - [ ] Archer salvolarını tek tek projectile görsel kaosu yerine okunur toplu ritme çevir.
 - [ ] Blood Moon görsel/audio/warning active bağlantılarını kaldır.

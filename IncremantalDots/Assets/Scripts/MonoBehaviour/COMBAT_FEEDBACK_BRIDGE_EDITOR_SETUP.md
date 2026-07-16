@@ -17,9 +17,10 @@
 
 ## Default Tuning
 
-- Hit flipbook pool: `1024`
+- Hit flipbook pool: `128`
 - Hit flipbook frame rate / scale: `90 / 0.35`
 - Hit flipbook sorting: `Wall`, order `12`
+- Hit VFX playback budget / min interval: `24 / 0.04s`
 - Particle VFX pool per type: `24`
 - Max VFX per frame: `24`
 - Audio pool size: `16`
@@ -36,5 +37,10 @@
 - Okcular ayni frame'de ates edince random bow/arrow kliplerinden tek aggregated salvo cue
   calinmali; shoot muzzle VFX V1'de kapali kalmali.
 - Basic/Rapid/Frost isabette kirmizi-sari sprite flipbook impact hedef uzerinde gorunmeli.
+- `DenseArrowHits_EmitSpatiallySampledVfxAndAggregatedSfx` testi `1000` gerçek ECS
+  isabetini `40` spatial candidate, `24` VFX ve `2` toplu SFX event'ine indirmeli.
+- `HitFeedbackBridge_EnforcesPlaybackBudgetAndRateLimit` testi `80` hit VFX talebinde
+  `24 played / 56 dropped` üretmeli; aynı scaled-time penceresindeki ikinci burst
+  bütünüyle rate-limit edilmelidir.
 - Kale hasar alinca castle hit sesi ve VFX calismali.
 - Stress mode'da VFX/SFX oynatilmamali.

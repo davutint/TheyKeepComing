@@ -169,6 +169,13 @@ Presentation tarafinda `SpriteAnimationSystem` UV rect hesaplarini yapar.
 - Mesafe `< 0.5` ise hasar uygular ve pooled oku rezerve dondurur.
 - Timeout, disabled hedef ve generation mismatch ayni pool return yolunu kullanir.
 - Frost ok isabetinde hedefteki `ZombieSlow` duration'ini refresh eder.
+- Hit feedback, raw isabet basina entity uretmez. Parallel hit job'u ayni `0.75` world-unit
+  hucredeki ayni hit turunu sabit `512` kapasiteli map'te tek candidate'a indirir.
+- Hit job'undan sonra calisan tek-thread emit job'u Frost/Arrow slotlarini paylastirir,
+  frame basi en fazla `24` `CombatVfxEvent` ve mevcut her tur icin tek
+  `CombatSfxEvent` uretir. Hasar/slow/pool return bundan once tamamlanir ve degismez.
+- Aynı emit job'u `CombatFeedbackBudgetTelemetryData` singleton'ini candidate,
+  emitted ve dropped sayilariyla gunceller.
 
 ### FireballStrikeSystem (M-C buyuculuk)
 

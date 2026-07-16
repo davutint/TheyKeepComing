@@ -6,16 +6,24 @@
 
 ## Akis
 
-- ECS sistemleri `CombatVfxEvent` ve `CombatSfxEvent` entity'leri uretir.
+- ECS sistemleri `CombatVfxEvent` ve `CombatSfxEvent` entity'leri uretir. Arrow hit akisi
+  ham isabet basina event uretmez; `ArrowHitSystem` once `0.75` world-unit hucrelerde
+  tur bazli spatial sample toplar.
 - `CombatFeedbackBridge`, `CombatFeedbackRoot` altinda bu event entity'lerini okur.
-- Arrow/Frost hit VFX icin sprite flipbook pool kullanir; diger VFX icin prefab ParticleSystem pool kullanir ve event entity'sini siler.
+- Arrow/Frost hit VFX icin sprite flipbook pool kullanir; producer tarafindaki `24`
+  event limitine ek olarak bridge tarafinda `24 / frame` global hit playback budget'i
+  ve `0.04s` hit VFX rate-limit uygular. Diger VFX icin prefab ParticleSystem pool
+  kullanir ve event entity'sini siler.
 - SFX icin sabit AudioSource pool kullanir; bir frame'deki event'leri type bazinda aggregate eder,
   oncelik + frame budget + type rate-limit uygular ve event entity'lerini siler.
 
 ## V1 Event Kaynaklari
 
 - `ArcherShootSystem`: `ArrowShoot` SFX. Shoot muzzle VFX V1'de kapali.
-- `ArrowHitSystem`: Basic/Rapid icin `ArrowHit`, Frost icin `FrostHit`; hit VFX hedef pozisyonunda kisa sprite flipbook impact olarak oynar.
+- `ArrowHitSystem`: Basic/Rapid icin `ArrowHit`, Frost icin `FrostHit` spatial
+  candidate'i toplar. Bir frame'de en fazla `24` hit VFX event'i ve mevcut her hit
+  turu icin tek `CombatSfxEvent` uretir; `Multiplicity` o cue'nun temsil ettigi
+  spatial candidate sayisini tasir.
 - `DamageApplySystem`: savunma hasari alindiginda `CastleHit`.
 - `ZombieDeathSystem` (M-D): olum aninda `ZombieDeath` SFX (rate-limit 0.09s — kalabalik yigilmaz).
 - `FireballStrikeSystem` (M-D): patlama aninda `FireballBlast` SFX (gorsel SpellCastUI'da).
@@ -50,7 +58,15 @@ castle impact prefab'i atayabilir (yalniz-bossa kurali onu korur).
 ## Performans Notlari
 
 - Stress mode'da `DisableInStressMode = true` ise event'ler temizlenir ama oynatilmaz.
-- Hit flipbook pool varsayilan `1024`; pool bosalirsa en eski aktif flipbook recycle edilir.
+- Hit flipbook pool varsayilan `128`; pool bosalirsa en eski aktif flipbook recycle edilir.
+- `ArrowHitSystem`, sabit `512` candidate map'i icinde ayni `0.75` world-unit hucredeki
+  ayni hit turunu tek ornege indirir. Basic/Rapid ve Frost birlikteyse `24` VFX slotunun
+  en az `4` slotu mevcut her ture acik kalir; normal dengede Frost `8`, Arrow `16` slot alir.
+- Bridge, producer disindaki event kaynaklarina karsi ikinci guvenlik kati olarak hit
+  flipbook playback'ini frame basi `24` ve `0.04s` burst araligi ile sinirlar.
+- `CombatFeedbackBudgetTelemetryData`, son frame spatial candidate/emitted/dropped
+  sayilarini ve run-toplamlarini ECS singleton olarak tutar. Bridge ayrica processed,
+  played ve dropped hit VFX telemetrisini public read-only property'lerle sunar.
 - ParticleSystem pool type basina varsayilan `24`, frame basi maksimum particle oynatma `24`.
 - SFX playback frame basi en fazla `4` cue ile sinirlidir. Oncelik Fireball, Castle, Frost,
   ArrowShoot, ZombieDeath ve ArrowHit sirasidir; kritik cue'lar kalabalikta kaybolmaz.

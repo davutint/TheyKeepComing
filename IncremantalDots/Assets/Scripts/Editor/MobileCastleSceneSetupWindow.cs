@@ -2672,12 +2672,14 @@ namespace DeadWalls
             bridge.HitFlipbookSprites = FindHitFlipbookSprites();
             if (castleHit != null) bridge.CastleHitClip = castleHit;
 
-            bridge.HitFlipbookPoolSize = 1024;
+            bridge.HitFlipbookPoolSize = 128;
             bridge.HitFlipbookFrameRate = 90f;
             bridge.HitFlipbookScale = 0.35f;
             bridge.HitFlipbookRotationOffsetDegrees = 0f;
             bridge.HitFlipbookSortingLayer = "Wall";
             bridge.HitFlipbookSortingOrder = 12;
+            bridge.MaxHitVfxPlayedPerFrame = CombatHitFeedbackBudget.MaxVfxEventsPerFrame;
+            bridge.HitVfxMinInterval = 0.04f;
             bridge.VfxPoolSizePerType = 24;
             bridge.MaxVfxPlayedPerFrame = 24;
             bridge.AudioPoolSize = 16;

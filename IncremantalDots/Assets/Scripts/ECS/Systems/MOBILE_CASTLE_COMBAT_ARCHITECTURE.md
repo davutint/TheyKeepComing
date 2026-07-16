@@ -184,7 +184,16 @@ Frost ok hedefe vurunca `ZombieSlow` enable edilir veya yenilenir. Slow stack ya
 `ZombieSlowTimerSystem`, slow aktifken zombi `SpriteTint` degerini soguk/mavi yapar.
 Slow biterse veya zombi Dead state'e gecerse tint normal beyaza doner; death akisi
 ayri kalir.
-Isabet aninda Basic/Rapid icin `CombatVfxEvent.ArrowHit`, Frost icin `CombatVfxEvent.FrostHit` uretilir. Hit VFX hedef pozisyonunda kisa sprite flipbook impact olarak oynar; normal arrow/frost hit artik ParticleSystem prefab'i kullanmaz. Hit SFX event'i de uretilir; ilgili clip bridge uzerinde atanmadiginda sessizce atlanir.
+Isabet aninda Basic/Rapid ve Frost ham hit basina feedback entity'si uretmez.
+`ArrowHitSystem`, ayni `0.75` world-unit hucredeki ayni hit turunu tek spatial candidate'a
+indirir. Ardindan frame basi en fazla `24` `CombatVfxEvent` uretir; iki tur ayni
+frame'de mevcutsa ikisi de slot alir. Arrow/Frost icin ayri ayri yalniz birer
+`CombatSfxEvent` uretilir ve `Multiplicity` temsil edilen candidate sayisini tasir.
+Hit VFX hedef pozisyonunda kisa sprite flipbook impact olarak oynar; normal arrow/frost
+hit ParticleSystem prefab'i kullanmaz. Bridge, ikinci guvenlik kati olarak `24` hit
+flipbook/frame ve `0.04s` burst rate-limit uygular; ilgili ses clip'i atanmadiginda cue
+sessizce atlanir. Bu budget yalniz feedback'i azaltir; damage, slow ve pool return
+islemleri her isabet icin aynen uygulanir.
 
 ## HUD Readability
 

@@ -30050,12 +30050,14 @@ MonoBehaviour:
   - {fileID: 6123212246031883711, guid: c3709b07c52c2864d95f5add8a7c975a, type: 3}
   - {fileID: -8158273205997960823, guid: c3709b07c52c2864d95f5add8a7c975a, type: 3}
   - {fileID: -7803645574393991823, guid: c3709b07c52c2864d95f5add8a7c975a, type: 3}
-  HitFlipbookPoolSize: 1024
+  HitFlipbookPoolSize: 128
   HitFlipbookFrameRate: 90
   HitFlipbookScale: 0.35
   HitFlipbookRotationOffsetDegrees: 0
   HitFlipbookSortingLayer: Wall
   HitFlipbookSortingOrder: 12
+  MaxHitVfxPlayedPerFrame: 24
+  HitVfxMinInterval: 0.04
   VfxPoolSizePerType: 24
   MaxVfxPlayedPerFrame: 24
   AudioPoolSize: 16
