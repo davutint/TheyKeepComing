@@ -25483,6 +25483,38 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 68355016}
   m_CullTransparentMesh: 1
+--- !u!1 &70163956
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 70163957}
+  m_Layer: 0
+  m_Name: DawnGatePresentationRoot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &70163957
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 70163956}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 881088329}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &71935859
 GameObject:
   m_ObjectHideFlags: 0
@@ -29086,8 +29118,8 @@ MonoBehaviour:
   m_ShadowVolumeIntensityEnabled: 0
   m_ShadowVolumeIntensity: 0.75
   m_LocalBounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 0, y: 0, z: 0}
+    m_Center: {x: 0, y: -0.00000011920929, z: 0}
+    m_Extent: {x: 0.9985302, y: 0.99853027, z: 0}
   m_PointLightInnerAngle: 360
   m_PointLightOuterAngle: 360
   m_PointLightInnerRadius: 0.08
@@ -52941,6 +52973,7 @@ MonoBehaviour:
   BloodMoonLoop: {fileID: 8300000, guid: e26cd6f9f4f1d475ca6750305c6a7523, type: 3}
   BloodMoonSting: {fileID: 8300000, guid: 4f09254358c0b4b36a1c65dfadd58ee7, type: 3}
   DuskRiser: {fileID: 8300000, guid: 15b621ee2b9194227ae94db04fd4493f, type: 3}
+  DawnCue: {fileID: 8300000, guid: 585d79d005a51440a8068220a52159ca, type: 3}
   NightHordeLoop: {fileID: 8300000, guid: 77b9c069e763b4452948d42109394d2d, type: 3}
   WorkerFoleyClips:
   - {fileID: 8300000, guid: 162a90fc55b3548fdb611e6a86eee576, type: 3}
@@ -52952,6 +52985,8 @@ MonoBehaviour:
   StingVolume: 0.65
   DuskRiserVolume: 0.23
   DuskRiserPitch: 0.9
+  DawnCueVolume: 0.28
+  DawnCuePitch: 1
   NightHordeVolume: 0.18
   FadeSpeed: 0.5
   NightHordeFadeSpeed: 0.4
@@ -53382,10 +53417,12 @@ MonoBehaviour:
   DayLightColor: {r: 1, g: 0.93, b: 0.82, a: 1}
   DuskLightColor: {r: 1, g: 0.72, b: 0.47, a: 1}
   NightLightColor: {r: 0.46, g: 0.58, b: 0.94, a: 1}
+  DawnCyanLightColor: {r: 0.48, g: 0.82, b: 1, a: 1}
   DawnLightColor: {r: 1, g: 0.8, b: 0.6, a: 1}
   DayLightIntensity: 1.08
   DuskLightIntensity: 0.9
   NightLightIntensity: 0.68
+  DawnCyanLightIntensity: 0.84
   DawnLightIntensity: 0.96
   CastleWindowLights:
   - {fileID: 1253847621}
@@ -53399,6 +53436,7 @@ MonoBehaviour:
   WindowLightFlickerSpeed: 2.2
   DuskColor: {r: 0.55, g: 0.24, b: 0.06, a: 1}
   NightColor: {r: 0.04, g: 0.06, b: 0.17, a: 1}
+  DawnCyanColor: {r: 0.08, g: 0.34, b: 0.46, a: 1}
   DawnColor: {r: 0.55, g: 0.3, b: 0.14, a: 1}
   BloodMoonColor: {r: 0.32, g: 0.02, b: 0.02, a: 1}
 --- !u!114 &687747855
@@ -55661,6 +55699,90 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: DeadWalls::DeadWalls.BloodMoonWarningUI
   WarningText: {fileID: 1901414976}
+--- !u!1 &881088328
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 881088329}
+  - component: {fileID: 881088330}
+  m_Layer: 0
+  m_Name: DawnGateGlow
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &881088329
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 881088328}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.5, y: 0.5, z: -1.45}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 70163957}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &881088330
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 881088328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 073797afb82c5a1438f328866b10b3f0, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.2D.Runtime::UnityEngine.Rendering.Universal.Light2D
+  m_ComponentVersion: 2
+  m_LightType: 3
+  m_BlendStyleIndex: 0
+  m_FalloffIntensity: 0.82
+  m_Color: {r: 1, g: 0.68, b: 0.24, a: 1}
+  m_Intensity: 0
+  m_LightVolumeIntensity: 1
+  m_LightVolumeEnabled: 0
+  m_ApplyToSortingLayers: 0000000031fdb5dad9cda60db1640cbacba466fda566733a1d07cc7e2b447636
+  m_LightCookieSprite: {fileID: 0}
+  m_DeprecatedPointLightCookieSprite: {fileID: 0}
+  m_LightOrder: 0
+  m_AlphaBlendOnOverlap: 0
+  m_OverlapOperation: 0
+  m_NormalMapDistance: 3
+  m_NormalMapQuality: 2
+  m_UseNormalMap: 0
+  m_ShadowsEnabled: 1
+  m_ShadowIntensity: 0.75
+  m_ShadowSoftness: 0.3
+  m_ShadowSoftnessFalloffIntensity: 0.5
+  m_ShadowVolumeIntensityEnabled: 0
+  m_ShadowVolumeIntensity: 0.75
+  m_LocalBounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0, y: 0, z: 0}
+  m_PointLightInnerAngle: 360
+  m_PointLightOuterAngle: 360
+  m_PointLightInnerRadius: 0.1
+  m_PointLightOuterRadius: 1.05
+  m_ShapeLightParametricSides: 5
+  m_ShapeLightParametricAngleOffset: 0
+  m_ShapeLightParametricRadius: 1
+  m_ShapeLightFalloffSize: 0.5
+  m_ShapeLightFalloffOffset: {x: 0, y: 0}
+  m_ShapePath:
+  - {x: -0.5, y: -0.5, z: 0}
+  - {x: 0.5, y: -0.5, z: 0}
+  - {x: 0.5, y: 0.5, z: 0}
+  - {x: -0.5, y: 0.5, z: 0}
 --- !u!1 &887136564
 GameObject:
   m_ObjectHideFlags: 0
@@ -65434,6 +65556,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: DeadWalls::DeadWalls.DawnRewardToastUI
   ToastText: {fileID: 1269954045}
+  GateTilemap: {fileID: 2115286955}
+  GateCell: {x: 1, y: 0, z: 0}
+  ClosedGateTile: {fileID: 11400000, guid: ed35ec7016a672e4e9fb3a49d69a52bf, type: 2}
+  OpenGateTile: {fileID: 11400000, guid: 9ee79539ae4f7254b99ab4474a4e5294, type: 2}
+  GateGlow: {fileID: 881088330}
+  GateOpenDelay: 2.05
+  GateOpenDuration: 2.55
+  GateGlowColor: {r: 1, g: 0.68, b: 0.24, a: 1}
+  GateGlowIntensity: 0.76
 --- !u!114 &1065689869
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -68035,8 +68166,8 @@ MonoBehaviour:
   m_ShadowVolumeIntensityEnabled: 0
   m_ShadowVolumeIntensity: 0.75
   m_LocalBounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 0, y: 0, z: 0}
+    m_Center: {x: 0, y: -0.00000011920929, z: 0}
+    m_Extent: {x: 0.9985302, y: 0.99853027, z: 0}
   m_PointLightInnerAngle: 360
   m_PointLightOuterAngle: 360
   m_PointLightInnerRadius: 0.08
@@ -68119,8 +68250,8 @@ MonoBehaviour:
   m_ShadowVolumeIntensityEnabled: 0
   m_ShadowVolumeIntensity: 0.75
   m_LocalBounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 0, y: 0, z: 0}
+    m_Center: {x: 0, y: -0.00000011920929, z: 0}
+    m_Extent: {x: 0.9985302, y: 0.99853027, z: 0}
   m_PointLightInnerAngle: 360
   m_PointLightOuterAngle: 360
   m_PointLightInnerRadius: 0.08
@@ -75256,8 +75387,8 @@ MonoBehaviour:
   m_ShadowVolumeIntensityEnabled: 0
   m_ShadowVolumeIntensity: 0.75
   m_LocalBounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 0, y: 0, z: 0}
+    m_Center: {x: 0, y: -0.00000011920929, z: 0}
+    m_Extent: {x: 0.9985302, y: 0.99853027, z: 0}
   m_PointLightInnerAngle: 360
   m_PointLightOuterAngle: 360
   m_PointLightInnerRadius: 0.08
@@ -80688,3 +80819,4 @@ SceneRoots:
   - {fileID: 358107049}
   - {fileID: 646220464}
   - {fileID: 2012517454}
+  - {fileID: 70163957}

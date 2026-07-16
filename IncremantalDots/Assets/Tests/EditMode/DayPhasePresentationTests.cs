@@ -38,7 +38,7 @@ namespace DeadWalls.Tests
         }
 
         [Test]
-        public void PhaseLightTarget_UsesAmberToIndigoDuskAndTwoStageDawnTransitions()
+        public void PhaseLightTarget_UsesAmberIndigoDuskAndCyanGoldDawnTransitions()
         {
             var gameObject = new GameObject("PhaseLightTransitionTest");
             var controller = gameObject.AddComponent<DayNightOverlayController>();
@@ -61,9 +61,14 @@ namespace DeadWalls.Tests
                     out float duskEndIntensity);
                 controller.ResolvePhaseLightTarget(
                     SiegeCyclePhase.Dawn,
-                    0.5f,
-                    out Color dawnMiddle,
-                    out float dawnMiddleIntensity);
+                    DayNightOverlayController.DawnCyanPeakProgress,
+                    out Color dawnCyan,
+                    out float dawnCyanIntensity);
+                controller.ResolvePhaseLightTarget(
+                    SiegeCyclePhase.Dawn,
+                    DayNightOverlayController.DawnGoldPeakProgress,
+                    out Color dawnGold,
+                    out float dawnGoldIntensity);
                 controller.ResolvePhaseLightTarget(
                     SiegeCyclePhase.Dawn,
                     1f,
@@ -78,10 +83,23 @@ namespace DeadWalls.Tests
                 Assert.That(duskEndIntensity, Is.EqualTo(controller.NightLightIntensity));
                 Assert.That(duskAmber.r, Is.GreaterThan(duskAmber.b + 0.40f));
                 Assert.That(duskEnd.b, Is.GreaterThan(duskEnd.r + 0.20f));
-                Assert.That(dawnMiddle, Is.EqualTo(controller.DawnLightColor));
-                Assert.That(dawnMiddleIntensity, Is.EqualTo(controller.DawnLightIntensity));
+                Assert.That(dawnCyan, Is.EqualTo(controller.DawnCyanLightColor));
+                Assert.That(dawnCyanIntensity, Is.EqualTo(controller.DawnCyanLightIntensity));
+                Assert.That(dawnCyan.b, Is.GreaterThan(dawnCyan.r + 0.40f));
+                Assert.That(dawnGold, Is.EqualTo(controller.DawnLightColor));
+                Assert.That(dawnGoldIntensity, Is.EqualTo(controller.DawnLightIntensity));
+                Assert.That(dawnGold.r, Is.GreaterThan(dawnGold.b + 0.35f));
                 Assert.That(dawnEnd, Is.EqualTo(controller.DayLightColor));
                 Assert.That(dawnEndIntensity, Is.EqualTo(controller.DayLightIntensity));
+
+                Color overlayCyan = controller.ResolveDawnOverlayColor(
+                    controller.NightColor,
+                    DayNightOverlayController.DawnCyanPeakProgress);
+                Color overlayGold = controller.ResolveDawnOverlayColor(
+                    controller.NightColor,
+                    DayNightOverlayController.DawnGoldPeakProgress);
+                Assert.That(overlayCyan, Is.EqualTo(controller.DawnCyanColor));
+                Assert.That(overlayGold, Is.EqualTo(controller.DawnColor));
             }
             finally
             {

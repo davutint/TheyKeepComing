@@ -1284,6 +1284,28 @@ namespace DeadWalls.Tests
         [UnityTest]
         public IEnumerator DawnArrivalTransaction_SpendsFoodOnceForAcceptedSurvivors()
         {
+            DawnRewardToastUI dawnPresentation =
+                Object.FindFirstObjectByType<DawnRewardToastUI>();
+            AmbientAudioController ambient =
+                Object.FindFirstObjectByType<AmbientAudioController>();
+            Assert.That(dawnPresentation, Is.Not.Null);
+            Assert.That(dawnPresentation.GateTilemap, Is.Not.Null);
+            Assert.That(dawnPresentation.ClosedGateTile, Is.Not.Null);
+            Assert.That(dawnPresentation.OpenGateTile, Is.Not.Null);
+            Assert.That(dawnPresentation.GateGlow, Is.Not.Null);
+            Assert.That(ambient, Is.Not.Null);
+            Assert.That(ambient.DawnCue, Is.Not.Null);
+            Assert.That(ambient.DawnCueSource, Is.Not.Null);
+            Assert.That(ambient.DawnCueSource.spatialBlend, Is.Zero.Within(0.001f));
+
+            dawnPresentation.GateOpenDelay = 0f;
+            dawnPresentation.GateOpenDuration = 10f;
+            for (int frame = 0; frame < 20; frame++)
+                yield return null;
+            int baselineGateOpenCount = dawnPresentation.GateOpenCount;
+            int baselineDawnPresentationCount = dawnPresentation.DawnPresentationPlayCount;
+            int baselineDawnCueCount = ambient.DawnCuePlayCount;
+
             EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             using EntityQuery mobileQuery = entityManager.CreateEntityQuery(
                 typeof(MobileCastleCombatConfig),
@@ -1337,8 +1359,18 @@ namespace DeadWalls.Tests
             cycle.Phase = SiegeCyclePhase.Dawn;
             entityManager.SetComponentData(mobileEntity, cycle);
 
-            yield return null;
-            yield return null;
+            for (int frame = 0; frame < 120; frame++)
+            {
+                MobilePopulationAllocation currentAllocation =
+                    entityManager.GetComponentData<MobilePopulationAllocation>(mobileEntity);
+                if (currentAllocation.LastArrivalAcceptedCount == 3
+                    && dawnPresentation.GateOpenCount > baselineGateOpenCount
+                    && ambient.DawnCuePlayCount > baselineDawnCueCount)
+                {
+                    break;
+                }
+                yield return null;
+            }
 
             population = entityManager.GetComponentData<PopulationState>(populationEntity);
             resources = entityManager.GetComponentData<ResourceData>(populationEntity);
@@ -1353,6 +1385,27 @@ namespace DeadWalls.Tests
             Assert.That(allocation.LastArrivalRequestedCount, Is.EqualTo(15));
             Assert.That(allocation.LastArrivalAcceptedCount, Is.EqualTo(3));
             Assert.That(allocation.LastArrivalFoodCost, Is.EqualTo(3));
+            Assert.That(dawnPresentation.LastDisplayedGrowth, Is.EqualTo(3));
+            Assert.That(dawnPresentation.DawnPresentationPlayCount,
+                Is.EqualTo(baselineDawnPresentationCount + 1));
+            Assert.That(dawnPresentation.GateOpenCount, Is.EqualTo(baselineGateOpenCount + 1));
+            Assert.That(dawnPresentation.IsGateOpen, Is.True);
+            Assert.That(dawnPresentation.GateTilemap.GetTile(dawnPresentation.GateCell),
+                Is.SameAs(dawnPresentation.OpenGateTile));
+            Assert.That(dawnPresentation.GateGlow.intensity, Is.GreaterThan(0f));
+            Assert.That(ambient.DawnCuePlayCount, Is.EqualTo(baselineDawnCueCount + 1));
+            Assert.That(ambient.DawnCueSource.pitch,
+                Is.EqualTo(ambient.DawnCuePitch).Within(0.001f));
+
+            int singleDawnCueCount = ambient.DawnCuePlayCount;
+            int singlePresentationCount = dawnPresentation.DawnPresentationPlayCount;
+            for (int frame = 0; frame < 30; frame++)
+                yield return null;
+            Assert.That(ambient.DawnCuePlayCount, Is.EqualTo(singleDawnCueCount),
+                "Ayni Dawn icindeki polling new-day cue'yu tekrar oynatmamali.");
+            Assert.That(dawnPresentation.DawnPresentationPlayCount,
+                Is.EqualTo(singlePresentationCount),
+                "Ayni Dawn icindeki polling gate/toast sunumunu tekrar baslatmamali.");
 
             Entity completedArrival;
             using (EntityQuery arrivalQuery = entityManager.CreateEntityQuery(
@@ -1396,6 +1449,82 @@ namespace DeadWalls.Tests
             yield return null;
             Assert.That(entityManager.Exists(completedArrival), Is.False,
                 "Duvar girisine varan survivor visual entity temizlenmeli.");
+        }
+
+        [UnityTest]
+        public IEnumerator DawnPresentation_FirstObservationDoesNotReplayButNextEdgePlaysOnce()
+        {
+            GameManager gameManager = GameManager.Instance;
+            AmbientAudioController sceneAmbient =
+                Object.FindFirstObjectByType<AmbientAudioController>();
+            Assert.That(gameManager, Is.Not.Null);
+            Assert.That(sceneAmbient, Is.Not.Null);
+            Assert.That(sceneAmbient.DawnCue, Is.Not.Null);
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            using EntityQuery cycleQuery = entityManager.CreateEntityQuery(
+                typeof(ContinuousSiegeCycleData));
+            Entity cycleEntity = cycleQuery.GetSingletonEntity();
+            PropertyInfo cycleProperty = typeof(GameManager).GetProperty(
+                "ContinuousSiegeCycle",
+                BindingFlags.Instance | BindingFlags.Public);
+            MethodInfo cycleSetter = cycleProperty?.GetSetMethod(true);
+            Assert.That(cycleSetter, Is.Not.Null);
+
+            SetOnboardingCycle(
+                entityManager,
+                cycleEntity,
+                gameManager,
+                cycleSetter,
+                0,
+                SiegeCyclePhase.Dawn);
+
+            var presentationObject = new GameObject("DawnFirstObservationPresentationTest");
+            var audioObject = new GameObject("DawnFirstObservationAudioTest");
+            DawnRewardToastUI freshPresentation =
+                presentationObject.AddComponent<DawnRewardToastUI>();
+            AmbientAudioController freshAmbient =
+                audioObject.AddComponent<AmbientAudioController>();
+            freshAmbient.DawnCue = sceneAmbient.DawnCue;
+
+            for (int frame = 0; frame < 30; frame++)
+                yield return null;
+
+            Assert.That(freshPresentation.DawnPresentationPlayCount, Is.Zero,
+                "Dawn icine scene-load/Continue benzeri ilk gozlem sunumu yeniden oynatmamali.");
+            Assert.That(freshAmbient.DawnCuePlayCount, Is.Zero,
+                "Dawn icine scene-load/Continue benzeri ilk gozlem cue'yu yeniden oynatmamali.");
+
+            SetOnboardingCycle(
+                entityManager,
+                cycleEntity,
+                gameManager,
+                cycleSetter,
+                0,
+                SiegeCyclePhase.Day);
+            for (int frame = 0; frame < 30; frame++)
+                yield return null;
+
+            SetOnboardingCycle(
+                entityManager,
+                cycleEntity,
+                gameManager,
+                cycleSetter,
+                0,
+                SiegeCyclePhase.Dawn);
+            for (int frame = 0; frame < 90
+                && (freshPresentation.DawnPresentationPlayCount == 0
+                    || freshAmbient.DawnCuePlayCount == 0); frame++)
+            {
+                yield return null;
+            }
+
+            Assert.That(freshPresentation.DawnPresentationPlayCount, Is.EqualTo(1));
+            Assert.That(freshAmbient.DawnCuePlayCount, Is.EqualTo(1));
+
+            Object.Destroy(presentationObject);
+            Object.Destroy(audioObject);
+            yield return null;
         }
 
         [UnityTest]

@@ -7,20 +7,24 @@ namespace DeadWalls
     /// <summary>
     /// Faz atmosferinin tek presentation sahibidir. UI overlay rengini ve sahnedeki tek global
     /// 2D light'i ayni authoritative cycle verisinden yumusak gecisle surer. Day paleti sicak fakat
-    /// yuksek okunurlukta; Dusk/Night/Dawn hedefleri sonraki faz polish'lerine temiz taban verir.
+    /// yuksek okunurlukta; Dawn geceden cyan kirilmaya, altin safaga ve yeniden Day'e akar.
     /// </summary>
     public class DayNightOverlayController : MonoBehaviour
     {
         public static readonly Color DefaultDayLightColor = new Color(1f, 0.93f, 0.82f, 1f);
         public static readonly Color DefaultDuskLightColor = new Color(1f, 0.72f, 0.47f, 1f);
         public static readonly Color DefaultNightLightColor = new Color(0.46f, 0.58f, 0.94f, 1f);
+        public static readonly Color DefaultDawnCyanLightColor = new Color(0.48f, 0.82f, 1f, 1f);
         public static readonly Color DefaultDawnLightColor = new Color(1f, 0.80f, 0.60f, 1f);
         public static readonly Color DefaultWindowLightColor = new Color(1f, 0.47f, 0.12f, 1f);
         public const float DefaultDayLightIntensity = 1.08f;
         public const float DefaultDuskLightIntensity = 0.90f;
         public const float DefaultNightLightIntensity = 0.68f;
+        public const float DefaultDawnCyanLightIntensity = 0.84f;
         public const float DefaultDawnLightIntensity = 0.96f;
         public const float DuskAmberPeakProgress = 0.45f;
+        public const float DawnCyanPeakProgress = 0.28f;
+        public const float DawnGoldPeakProgress = 0.62f;
         public const float DuskWindowIgnitionProgress = 0.18f;
         public const float DuskWindowFullProgress = 0.72f;
         public const float DefaultWindowLightIntensity = 0.82f;
@@ -34,10 +38,12 @@ namespace DeadWalls
         public Color DayLightColor = DefaultDayLightColor;
         public Color DuskLightColor = DefaultDuskLightColor;
         public Color NightLightColor = DefaultNightLightColor;
+        public Color DawnCyanLightColor = DefaultDawnCyanLightColor;
         public Color DawnLightColor = DefaultDawnLightColor;
         [Min(0f)] public float DayLightIntensity = DefaultDayLightIntensity;
         [Min(0f)] public float DuskLightIntensity = DefaultDuskLightIntensity;
         [Min(0f)] public float NightLightIntensity = DefaultNightLightIntensity;
+        [Min(0f)] public float DawnCyanLightIntensity = DefaultDawnCyanLightIntensity;
         [Min(0f)] public float DawnLightIntensity = DefaultDawnLightIntensity;
 
         [Header("Castle Night Windows")]
@@ -51,6 +57,7 @@ namespace DeadWalls
         // Faz atmosfer renkleri (owner Inspector'dan degistirebilsin diye public)
         public Color DuskColor = new Color(0.55f, 0.24f, 0.06f);   // amber gun batimi
         public Color NightColor = new Color(0.04f, 0.06f, 0.17f);  // koyu mavi-mor gece
+        public Color DawnCyanColor = new Color(0.08f, 0.34f, 0.46f); // soguk sabah kirilmasi
         public Color DawnColor = new Color(0.55f, 0.30f, 0.14f);   // altin-pembe safak
         public Color BloodMoonColor = new Color(0.32f, 0.02f, 0.02f); // kanli ay kizili
 
@@ -137,15 +144,29 @@ namespace DeadWalls
                     intensity = NightLightIntensity;
                     return;
                 case SiegeCyclePhase.Dawn:
-                    if (progress < 0.5f)
+                    if (progress < DawnCyanPeakProgress)
                     {
-                        float dawnIn = progress * 2f;
-                        color = Color.Lerp(NightLightColor, DawnLightColor, dawnIn);
-                        intensity = Mathf.Lerp(NightLightIntensity, DawnLightIntensity, dawnIn);
+                        float cyanIn = progress / DawnCyanPeakProgress;
+                        color = Color.Lerp(NightLightColor, DawnCyanLightColor, cyanIn);
+                        intensity = Mathf.Lerp(
+                            NightLightIntensity,
+                            DawnCyanLightIntensity,
+                            cyanIn);
+                    }
+                    else if (progress < DawnGoldPeakProgress)
+                    {
+                        float goldIn = (progress - DawnCyanPeakProgress)
+                            / (DawnGoldPeakProgress - DawnCyanPeakProgress);
+                        color = Color.Lerp(DawnCyanLightColor, DawnLightColor, goldIn);
+                        intensity = Mathf.Lerp(
+                            DawnCyanLightIntensity,
+                            DawnLightIntensity,
+                            goldIn);
                     }
                     else
                     {
-                        float dayIn = (progress - 0.5f) * 2f;
+                        float dayIn = (progress - DawnGoldPeakProgress)
+                            / (1f - DawnGoldPeakProgress);
                         color = Color.Lerp(DawnLightColor, DayLightColor, dayIn);
                         intensity = Mathf.Lerp(DawnLightIntensity, DayLightIntensity, dayIn);
                     }
@@ -264,8 +285,8 @@ namespace DeadWalls
                         color = nightColor;
                         alpha = nightAlpha;
                         break;
-                    default: // Dawn: geceden altin-pembe safaga, alpha dusurken
-                        color = Color.Lerp(nightColor, DawnColor, cycle.PhaseProgress01);
+                    default: // Dawn: gece -> cyan -> altin, alpha Day'e inerken
+                        color = ResolveDawnOverlayColor(nightColor, cycle.PhaseProgress01);
                         alpha = Mathf.Lerp(nightAlpha, dayAlpha, cycle.PhaseProgress01);
                         break;
                 }
@@ -283,6 +304,22 @@ namespace DeadWalls
             }
 
             alpha = wave.Phase == RunPhaseType.NightCombat ? config.NightOverlayAlpha : config.DayOverlayAlpha;
+        }
+
+        public Color ResolveDawnOverlayColor(Color nightColor, float phaseProgress01)
+        {
+            float progress = Mathf.Clamp01(phaseProgress01);
+            if (progress < DawnCyanPeakProgress)
+            {
+                return Color.Lerp(
+                    nightColor,
+                    DawnCyanColor,
+                    progress / DawnCyanPeakProgress);
+            }
+
+            float goldIn = Mathf.Clamp01((progress - DawnCyanPeakProgress)
+                / (DawnGoldPeakProgress - DawnCyanPeakProgress));
+            return Color.Lerp(DawnCyanColor, DawnColor, goldIn);
         }
     }
 }

@@ -25,4 +25,8 @@ Prefab/component sözleşmesi değişirse önce worker logistics ve arrival test
 6. Aynı Dawn marker'ında ikinci grup doğmamalıdır.
 7. Save/Continue sonrası tamamlanmış Dawn arrival'ı yeniden oynatılmamalıdır.
 
+Ana gate tile ve glow binding'i bu ECS setup'ının değil, `DawnRewardToastUI` sunumunun
+sözleşmesidir. Onarım ve manuel kabul adımları için
+`Assets/Scripts/MonoBehaviour/DAWN_PHASE_PRESENTATION_EDITOR_SETUP.md` kullanılır.
+
 Otomatik doğrulama için `SurvivorArrivalVisualUtilityTests`, ilgili `WorkerAllocationPlayModeTests` ve `ExactRunContinuePlayModeTests` çalıştırılır.

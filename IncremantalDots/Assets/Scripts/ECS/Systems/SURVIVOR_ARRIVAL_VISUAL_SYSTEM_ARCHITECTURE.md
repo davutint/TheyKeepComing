@@ -18,13 +18,17 @@ Yeni scene/prefab bağı yoktur. Arrival sunumu mevcut worker prefabı, atlası,
 
 - Bir arrival en fazla `15` görsel entity üretir.
 - Kabul edilen sayı `15` üzerindeyse `RepresentedSurvivorCount` değerleri gerçek accepted toplamını görsellere exact dağıtır.
-- Spawn noktaları Wall'ın `15` world unit sağında, beş yatay lane ve küçük satır/X farklarıyla üretilir.
+- Spawn noktaları Wall'ın `9.5` world unit sağında, beş yatay lane ve küçük satır/X farklarıyla üretilir.
 - Hedef Wall'ın `0.8` unit arkasındadır; lane'ler kaleye yaklaşırken daralır.
-- Küçük start-delay ve hız farkları tek çizgi halinde yürümeyi engeller.
+- `3.0+` hareket hızı ve küçük start-delay farkları tek çizgi halinde yürümeyi engeller; en geç
+  görsel canonical `5s` Dawn süresi bitmeden Wall arkasına ulaşır.
 - Açık mavi tint arrival grubunu kaynak worker'larından ayırır; cargo, lantern ve delivery feedback'i kapalıdır.
 - Hedef mesafesine giren entity aynı frame sonunda yok edilir.
 
 Rota sabit bir waypoint asset'i değildir; mevcut tek cepheli battlefield için `SurvivorArrivalVisualUtility` tarafından deterministik üretilir.
+
+Ana portcullis tile'ının açılıp kapanması bu ECS sisteminin sorumluluğu değildir;
+`DawnRewardToastUI` aynı accepted marker'ın yalnız presentation kenarını kullanır.
 
 ## Save ve yeniden oynatma sınırı
 
@@ -32,7 +36,8 @@ Arrival entity'leri transient sunumdur ve exact run snapshot'a yazılmaz. Kayded
 
 ## Doğrulama
 
-- `SurvivorArrivalVisualUtilityTests`: visual cap, exact represented toplam ve deterministik rota/hız/gecikme.
+- `SurvivorArrivalVisualUtilityTests`: visual cap, exact represented toplam, deterministik
+  rota/hız/gecikme ve tüm bounded formasyonun Dawn içinde tamamlanması.
 - `WorkerAllocationPlayModeTests.DawnArrivalTransaction_SpendsFoodOnceForAcceptedSurvivors`: gerçek Dawn transaction'ından entity üretimi, worker lojistiğinden izolasyon ve varışta destroy.
 - `ExactRunContinuePlayModeTests.Continue_RestoresSameCyclePhaseTimerResourcesAndSpawnRng`: tamamlanmış saved Dawn'ın arrival görselini tekrar üretmemesi.
 - Game View QA: gerçek `NewGameScene` içinde 15 survivor'ın sağdan Wall arkasına yaklaşması.

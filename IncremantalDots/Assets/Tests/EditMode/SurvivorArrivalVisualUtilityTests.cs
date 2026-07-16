@@ -46,5 +46,25 @@ namespace DeadWalls.Tests
             Assert.That(SurvivorArrivalVisualUtility.GetStartDelay(1),
                 Is.GreaterThan(SurvivorArrivalVisualUtility.GetStartDelay(0)));
         }
+
+        [Test]
+        public void EntireBoundedFormationReachesBehindWallWithinDawn()
+        {
+            const float dawnDuration = 5f;
+            const float frontlineX = -0.5f;
+            float longestArrival = 0f;
+
+            for (int index = 0; index < SurvivorArrivalVisualUtility.MaxVisualCount; index++)
+            {
+                float3 spawn = SurvivorArrivalVisualUtility.GetSpawnPosition(frontlineX, 0f, index);
+                float3 target = SurvivorArrivalVisualUtility.GetTargetPosition(frontlineX, 0f, index);
+                float duration = SurvivorArrivalVisualUtility.GetStartDelay(index)
+                    + math.distance(spawn.xy, target.xy)
+                    / SurvivorArrivalVisualUtility.GetMoveSpeed(index);
+                longestArrival = math.max(longestArrival, duration);
+            }
+
+            Assert.That(longestArrival, Is.LessThan(dawnDuration));
+        }
     }
 }

@@ -68,6 +68,10 @@ namespace DeadWalls
         private const string WorkerStoneSfxPath = FantasyUiSfxRoot + "/Rock Impact 37.wav";
         private const string CastleWindowSouthSpritePath = "Assets/SmallScaleInt/Fantasy kingdom Tileset/Environment/Sprites/Wall A5_S.png";
         private const string CastleWindowNorthSpritePath = "Assets/SmallScaleInt/Fantasy kingdom Tileset/Environment/Sprites/Wall A5_N.png";
+        private const string CastleGateClosedSpritePath = "Assets/SmallScaleInt/Fantasy kingdom Tileset/Environment/Sprites/Door C5_E.png";
+        private const string CastleGateOpenSpritePath = "Assets/SmallScaleInt/Fantasy kingdom Tileset/Environment/Sprites/Door C6_E.png";
+        private const string CastleGateClosedTilePath = SmallScaleTilesRoot + "/Door C5_E.asset";
+        private const string CastleGateOpenTilePath = SmallScaleTilesRoot + "/Door C6_E.asset";
 
         private string _status = "Hazir.";
 
@@ -199,10 +203,21 @@ namespace DeadWalls
                 true);
         }
 
+        [MenuItem("Window/DeadWalls/Repair Dawn Presentation")]
+        public static void RepairDawnPresentation()
+        {
+            RepairPhasePresentation(
+                "Dawn presentation",
+                "Cyan-gold Dawn light, survivor gate arrival ve tek-sefer new-day cue NewGameScene icin onarildi.",
+                false,
+                true);
+        }
+
         private static void RepairPhasePresentation(
             string contextName,
             string successMessage,
-            bool includeNightOwners = false)
+            bool includeNightOwners = false,
+            bool includeDawnOwners = false)
         {
             Scene activeScene = SceneManager.GetActiveScene();
             if (!activeScene.IsValid() || activeScene.path != TargetScenePath)
@@ -211,7 +226,7 @@ namespace DeadWalls
 
             EnsureGlobalLight(activeScene);
             EnsureAmbientAudio(activeScene);
-            Light2D[] windowLights = includeNightOwners
+            Light2D[] windowLights = includeNightOwners || includeDawnOwners
                 ? EnsureNightWindowLights(activeScene)
                 : null;
             if (includeNightOwners)
@@ -247,6 +262,8 @@ namespace DeadWalls
                 dayPresentation.CastleWindowLights = windowLights;
                 EditorUtility.SetDirty(dayPresentation);
             }
+            if (includeDawnOwners)
+                EnsureDawnGatePresentation(activeScene);
             EditorSceneManager.MarkSceneDirty(activeScene);
             EditorSceneManager.SaveScene(activeScene);
             AssetDatabase.SaveAssets();
@@ -1203,6 +1220,102 @@ namespace DeadWalls
             return lights;
         }
 
+        private static void EnsureDawnGatePresentation(Scene scene)
+        {
+            TileBase closedTile = AssetDatabase.LoadAssetAtPath<TileBase>(CastleGateClosedTilePath);
+            TileBase openTile = AssetDatabase.LoadAssetAtPath<TileBase>(CastleGateOpenTilePath);
+            if (closedTile == null || openTile == null)
+                throw new InvalidOperationException(
+                    "Dawn gate presentation Door C5_E/C6_E tile assetlerini bulamadi.");
+
+            Tilemap gateTilemap = null;
+            Vector3Int gateCell = default;
+            int gateCandidateCount = 0;
+            Tilemap[] tilemaps = UnityEngine.Object.FindObjectsByType<Tilemap>(
+                FindObjectsInactive.Include,
+                FindObjectsSortMode.None);
+            for (int i = 0; i < tilemaps.Length; i++)
+            {
+                Tilemap tilemap = tilemaps[i];
+                if (tilemap.gameObject.scene != scene)
+                    continue;
+
+                foreach (Vector3Int cell in tilemap.cellBounds.allPositionsWithin)
+                {
+                    Sprite sprite = tilemap.GetSprite(cell);
+                    if (sprite == null)
+                        continue;
+
+                    string spritePath = AssetDatabase.GetAssetPath(sprite);
+                    if (spritePath != CastleGateClosedSpritePath
+                        && spritePath != CastleGateOpenSpritePath)
+                        continue;
+
+                    gateCandidateCount++;
+                    gateTilemap = tilemap;
+                    gateCell = cell;
+                }
+            }
+
+            if (gateCandidateCount != 1 || gateTilemap == null)
+            {
+                throw new InvalidOperationException(
+                    $"Dawn gate presentation tek ana Door C5_E/C6_E bekliyordu; bulunan: {gateCandidateCount}.");
+            }
+
+            gateTilemap.SetTile(gateCell, closedTile);
+            EditorUtility.SetDirty(gateTilemap);
+
+            GameObject gateRoot = FindRoot(scene, "DawnGatePresentationRoot");
+            if (gateRoot == null)
+            {
+                gateRoot = new GameObject("DawnGatePresentationRoot");
+                Undo.RegisterCreatedObjectUndo(gateRoot, "Create Dawn Gate Presentation Root");
+                SceneManager.MoveGameObjectToScene(gateRoot, scene);
+            }
+            gateRoot.transform.position = Vector3.zero;
+
+            GameObject glowObject = EnsureChild(gateRoot.transform, "DawnGateGlow", false);
+            Vector3 glowPosition = gateTilemap.GetCellCenterWorld(gateCell);
+            glowPosition.z = -1.45f;
+            glowObject.transform.position = glowPosition;
+            Light2D gateGlow = EnsureComponent<Light2D>(glowObject);
+            gateGlow.lightType = Light2D.LightType.Point;
+            gateGlow.overlapOperation = Light2D.OverlapOperation.Additive;
+            gateGlow.color = DawnRewardToastUI.DefaultGateGlowColor;
+            gateGlow.intensity = 0f;
+            gateGlow.pointLightInnerRadius = 0.10f;
+            gateGlow.pointLightOuterRadius = 1.05f;
+            gateGlow.falloffIntensity = 0.82f;
+
+            DawnRewardToastUI dawnPresentation = null;
+            foreach (GameObject root in scene.GetRootGameObjects())
+            {
+                dawnPresentation = root.GetComponentInChildren<DawnRewardToastUI>(true);
+                if (dawnPresentation != null)
+                    break;
+            }
+
+            if (dawnPresentation == null)
+                throw new InvalidOperationException(
+                    "Dawn gate presentation DawnRewardToastUI owner'ini bulamadi.");
+
+            dawnPresentation.GateTilemap = gateTilemap;
+            dawnPresentation.GateCell = gateCell;
+            dawnPresentation.ClosedGateTile = closedTile;
+            dawnPresentation.OpenGateTile = openTile;
+            dawnPresentation.GateGlow = gateGlow;
+            dawnPresentation.GateOpenDelay = DawnRewardToastUI.DefaultGateOpenDelay;
+            dawnPresentation.GateOpenDuration = DawnRewardToastUI.DefaultGateOpenDuration;
+            dawnPresentation.GateGlowColor = DawnRewardToastUI.DefaultGateGlowColor;
+            dawnPresentation.GateGlowIntensity = DawnRewardToastUI.DefaultGateGlowIntensity;
+
+            EditorUtility.SetDirty(gateGlow);
+            EditorUtility.SetDirty(glowObject);
+            EditorUtility.SetDirty(gateRoot);
+            EditorUtility.SetDirty(dawnPresentation);
+        }
+
         private static void EnsureEventSystem(Scene scene)
         {
             GameObject eventSystemObject = FindRoot(scene, "EventSystem");
@@ -1278,6 +1391,7 @@ namespace DeadWalls
             EnsureCastleClickTarget(scene);
             EnsureArcherTilePlacement(scene, archerFormation);
             EnsureNightWindowLights(scene);
+            EnsureDawnGatePresentation(scene);
             EnsureCombatFeedbackRoot(scene);
             EnsureCameraShaker(scene);
             ConfigureMenuSystem(canvas.transform);
@@ -3003,6 +3117,8 @@ namespace DeadWalls
                 ambient.BloodMoonSting = LoadSfx("UI, Pads, Enchantments and Misc/RPG3_MONSTER_Roar01.wav");
             if (ambient.DuskRiser == null)
                 ambient.DuskRiser = LoadSfx("Wind Magic/RPG3_WindMagicEpic_Cast01_P1.wav");
+            if (ambient.DawnCue == null)
+                ambient.DawnCue = LoadSfx("Wind Magic/RPG3_WindMagic_Buff03v2_Shorter.wav");
             if (ambient.NightHordeLoop == null)
                 ambient.NightHordeLoop = LoadSfx("Wind Magic/RPG3_WindMagic_Drone01_DarkWindLoop.wav");
             if (ambient.WorkerFoleyClips == null || ambient.WorkerFoleyClips.Length != 4)
@@ -3021,6 +3137,8 @@ namespace DeadWalls
             ambient.WorkerPitchVariation = 0.06f;
             ambient.DuskRiserVolume = 0.23f;
             ambient.DuskRiserPitch = 0.90f;
+            ambient.DawnCueVolume = 0.28f;
+            ambient.DawnCuePitch = 1f;
             ambient.NightHordeVolume = 0.18f;
             ambient.NightHordeFadeSpeed = 0.4f;
             EditorUtility.SetDirty(ambient);
@@ -5079,11 +5197,14 @@ namespace DeadWalls
             controller.DayLightColor = DayNightOverlayController.DefaultDayLightColor;
             controller.DuskLightColor = DayNightOverlayController.DefaultDuskLightColor;
             controller.NightLightColor = DayNightOverlayController.DefaultNightLightColor;
+            controller.DawnCyanLightColor = DayNightOverlayController.DefaultDawnCyanLightColor;
             controller.DawnLightColor = DayNightOverlayController.DefaultDawnLightColor;
             controller.DayLightIntensity = DayNightOverlayController.DefaultDayLightIntensity;
             controller.DuskLightIntensity = DayNightOverlayController.DefaultDuskLightIntensity;
             controller.NightLightIntensity = DayNightOverlayController.DefaultNightLightIntensity;
+            controller.DawnCyanLightIntensity = DayNightOverlayController.DefaultDawnCyanLightIntensity;
             controller.DawnLightIntensity = DayNightOverlayController.DefaultDawnLightIntensity;
+            controller.DawnCyanColor = new Color(0.08f, 0.34f, 0.46f, 1f);
             controller.WindowLightColor = DayNightOverlayController.DefaultWindowLightColor;
             controller.WindowLightIntensity = DayNightOverlayController.DefaultWindowLightIntensity;
             controller.WindowLightMoveSpeed = 3.5f;

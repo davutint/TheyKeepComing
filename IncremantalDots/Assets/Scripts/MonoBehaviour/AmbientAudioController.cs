@@ -8,6 +8,7 @@ namespace DeadWalls
     /// - DUSK girisi: scene-load'da tekrar etmeyen, tek seferlik dusuk tension riser
     /// - DUSK + NIGHT: gece drone loop'u (normal gece = NightLoop, kanli ay = BloodMoonLoop)
     /// - NIGHT: zombie sayisi/baskisiyla logaritmik buyuyen tek 2D horde-bed loop'u
+    /// - DAWN girisi: scene-load/Continue'da tekrar etmeyen, tek nefes/yeni-gun cue'su
     /// - DAY + DAWN: gece drone'u sessiz (Day'de yalniz worker foley)
     /// - Kanli ay gecesine giris aninda tek seferlik sting (canavar kukremesi).
     /// Faz loop'lari crossfade olur; horde katmani ayri fakat tek, 2D ve bounded bir kaynaktir.
@@ -20,6 +21,7 @@ namespace DeadWalls
         public AudioClip BloodMoonLoop;
         public AudioClip BloodMoonSting;
         public AudioClip DuskRiser;
+        public AudioClip DawnCue;
         public AudioClip NightHordeLoop;
 
         [Header("Day Worker Foley (setup atar)")]
@@ -31,6 +33,8 @@ namespace DeadWalls
         [Range(0f, 1f)] public float StingVolume = 0.65f;
         [Range(0f, 1f)] public float DuskRiserVolume = 0.23f;
         [Range(0.5f, 1.5f)] public float DuskRiserPitch = 0.90f;
+        [Range(0f, 1f)] public float DawnCueVolume = 0.28f;
+        [Range(0.5f, 1.5f)] public float DawnCuePitch = 1f;
         [Range(0f, 1f)] public float NightHordeVolume = 0.18f;
         public float FadeSpeed = 0.5f;
         public float NightHordeFadeSpeed = 0.4f;
@@ -45,8 +49,10 @@ namespace DeadWalls
         public float NightHordeActivity01 { get; private set; }
         public int WorkerFoleyPlayCount { get; private set; }
         public int DuskRiserPlayCount { get; private set; }
+        public int DawnCuePlayCount { get; private set; }
         public AudioSource WorkerFoleySource => _workerFoleySource;
         public AudioSource DuskRiserSource => _phaseTransitionSource;
+        public AudioSource DawnCueSource => _phaseTransitionSource;
         public AudioSource NightHordeSource => _nightHordeSource;
 
         private const float CheckInterval = 0.2f;
@@ -199,6 +205,17 @@ namespace DeadWalls
                     DuskRiser,
                     DuskRiserVolume * SoundSettings.AmbienceVolume);
                 DuskRiserPlayCount++;
+            }
+
+            if (phaseChanged && cycle.Phase == SiegeCyclePhase.Dawn
+                && DawnCue != null && _phaseTransitionSource != null
+                && !gm.GameState.IsGameOver)
+            {
+                _phaseTransitionSource.pitch = DawnCuePitch;
+                _phaseTransitionSource.PlayOneShot(
+                    DawnCue,
+                    DawnCueVolume * SoundSettings.AmbienceVolume);
+                DawnCuePlayCount++;
             }
 
             // Kanli ay gecesine giris sting'i (Night kenari). Ilk scene observation'i

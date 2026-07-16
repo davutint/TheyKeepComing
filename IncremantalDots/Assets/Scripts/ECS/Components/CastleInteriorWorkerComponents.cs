@@ -122,10 +122,10 @@ namespace DeadWalls
     public static class SurvivorArrivalVisualUtility
     {
         public const int MaxVisualCount = 15;
-        public const float SpawnDistanceFromWall = 15f;
+        public const float SpawnDistanceFromWall = 9.5f;
         public const float TargetDistanceBehindWall = 0.8f;
         public const float LaneSpacing = 0.55f;
-        public const float BaseMoveSpeed = 2.4f;
+        public const float BaseMoveSpeed = 3f;
         public const float DefaultArrivalDistance = 0.08f;
 
         public static int GetVisualCount(int acceptedSurvivors)

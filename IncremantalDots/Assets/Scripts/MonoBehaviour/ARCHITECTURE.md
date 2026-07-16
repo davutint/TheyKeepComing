@@ -169,17 +169,27 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 
 - Faz DAWN'a gectiginde bir kez "DAWN — DAY n SURVIVED  +N POP" toast'u (SiegeToastText, DOTween fade)
 - Nufus odulunu `MobilePopulationEconomySystem` verir; bu controller `GameManager.GetLastAcceptedPopulationArrivalCount()` ile config isteği yerine gerçek kabul edilen `N` değerini gösterir
+- Accepted `N > 0` ise tek ana `outside2/Door C5_E` tile'ini survivor yaklaşımında
+  `Door C6_E` ile açar, tek `DawnGateGlow` envelope'u sürer ve geçiş sonunda kapatır.
+- İlk scene/Continue gözlemi faz kenarı sayılmaz; toast ve kapı yalnız gerçek Dawn geçişinde oynar.
 
 ### DayNightOverlayController.cs
 
 - `Canvas/DayNightOverlay` full-screen black `Image` alpha degerini yonetir.
-- Sahnedeki tek Global Light 2D'yi warm Day, amber-indigo Dusk ve cold-moon Night hedefleriyle surer.
+- Sahnedeki tek Global Light 2D'yi warm Day, amber-indigo Dusk, cold-moon Night ve
+  cyan-altın-Day Dawn hedefleriyle surer.
 - Tam dort canonical kale pencere sprite'ina bagli Point Light 2D, Dusk'ta yumusak yanar,
   Night boyunca sicak kalir ve Dawn'da soner; yeni cycle veya gameplay owner'i olusturmaz.
 - Continuous siege aktifken Day alpha acik kalir, Dusk boyunca day/night alpha arasinda kararir, Night alpha sabit kalir.
 - Legacy `DayPrep` sirasinda alpha'yi config'teki day/night degerleri arasinda sayac progress'ine gore artirir.
 - Legacy `NightCombat` sirasinda night alpha sabit kalir.
 - Stress veya non-mobile mode'da alpha `0` olur.
+
+### AmbientAudioController.cs
+
+- Tek phase-transition 2D AudioSource'u Dusk riser ve Dawn nefes/yeni-gün cue'sunu taşır.
+- Dawn cue yalnız gerçek faz kenarında bir kez oynar; ilk scene/Continue gözleminde tekrar etmez.
+- Night drone/horde bed ile Day worker foley mevcut bounded owner'larında kalır.
 
 ### EconomyFocusUI.cs
 
@@ -236,11 +246,11 @@ Tech Tree Input -> GameManager.TryBuyTechNode() -> reveal/unlock state + MobileC
 Worker Drawer Input -> GameManager.Set/AdjustWorkerTargetRatioPercent() -> WorkerAllocationUtility -> MobilePopulationAllocation target -> sonraki population auto-allocation -> WorkerVisualRepresentationUtility -> temsili DOTS VillagerWorker count + exact weight -> animation/cargo/fener/delivery feedback
 House Bed Purchase -> GameManager.TryBuyBedCapacity() -> MobileEconomyPriceTuning + MobileBedCapacityUtility owned-capacity sıralı fiyatı -> Wood transaction -> MobileBedCapacityState.PurchasedCapacity -> güncel exact save
 Worker Building Purchase -> GameManager.TryBuyWorkerBuildingUpgrade() -> MobileEconomyPriceTuning fiyatı -> Wood + Iron transaction -> MobileWorkerBuildingUpgradeState -> base + Heart + Council + Meta + bina aggregate'i -> güncel exact save
-Dawn accepted marker -> GameManager.SyncSurvivorArrivalVisualsIfNeeded() -> VillagerWorker tabanlı transient survivor entity'leri -> SurvivorArrivalVisualSystem -> Wall arkası varışta destroy
+Dawn accepted marker -> GameManager.SyncSurvivorArrivalVisualsIfNeeded() -> VillagerWorker tabanlı transient survivor entity'leri -> SurvivorArrivalVisualSystem -> DawnRewardToastUI ana gate tile sunumu -> Wall arkası varışta destroy/kapı kapanışı
 Legacy Castle Click -> CastleEconomyUI.OpenFromCastle() -> MobilePrepPauseState
 Legacy Worker Slider Input -> GameManager.SetResourceWorkers() -> MobilePopulationAllocation -> WorkerVisualRepresentationUtility -> temsili DOTS VillagerWorker count + exact weight sync
 Economy Event Input -> GameManager.ChooseEconomyEvent() -> Resources/Population/MobileEconomyEventState
 Castle Interior Repair -> GameManager.RepairDefenseFull() -> EntityManager.SetComponentData -> ECS
-DayNightOverlayController -> GameManager.WaveState + MobileCastleCombatConfig -> Overlay alpha
+DayNightOverlayController -> ContinuousSiegeCycleData + MobileCastleCombatConfig -> Global Light + cyan/altın overlay grading
 Mouse Click -> ClickDamageHandler -> EntityManager.SetComponentData -> ECS
 ```
