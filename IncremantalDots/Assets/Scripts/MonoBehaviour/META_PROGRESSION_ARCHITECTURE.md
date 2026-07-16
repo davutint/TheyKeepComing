@@ -46,15 +46,15 @@ saf schema/migration test sahibidir; Player-facing kod doğrudan çağırmaz.
   mevcut run'ın generated graph node/edge/Keystone sonucuna zorla içerik enjekte etmez.
 - `HasTutorialFlag` / `SetTutorialFlag`: onboarding tamamlanma/reset state'inin canonical disk
   sınırıdır; tutorial davranışının kendisi Package I sahibinde kalır.
-- Her iki mutation API'si atomik save başarısızsa in-memory değişikliği geri alır.
+- `ResetTutorialFlags`: Package I'in verdigi exact flag grubunu tek durable save'de temizler;
+  listede olmayan tutorial flag'leriyle pool/unlock/currency/upgrade state'ine dokunmaz.
+- Mutation API'leri atomik save başarısızsa in-memory değişikliği geri alır.
 
-Ilk aktif consumer `FirstRunOnboardingUI`, `tutorial.v1.worker_ratio` flag'ini yalnız başarılı
-gerçek player ratio action'ından; `tutorial.v1.basic_archer` flag'ini yalnız başarılı gerçek
-Basic Archer satın alımından; `tutorial.v1.low_ammo` flag'ini yalnız başarılı gerçek Arrow
-refill satın alımından sonra yazar. Kalan tutorial adımları ve final complete/reset
-flag'leri sonraki Package I tracker işlerinde kalır. Pool unlock consumer'ı da owner onaylı
-content işini bekler. Satın alma ve graph izolasyon sınırı aşağıdaki runtime sözleşmesiyle
-tamamlanmıştır.
+Aktif consumer `FirstRunOnboardingUI`, yedi stable adim flag'ini yalniz ilgili gercek accepted
+player action'larindan sonra yazar ve tamaminda `tutorial.v1.complete` flag'ini turetir. Settings
+reset ayni yedi flag ile global flag'i exact sekizli olarak tek `ResetTutorialFlags` cagrisiyle
+temizler. Pool unlock consumer'ı owner onaylı content işini bekler. Satın alma ve graph izolasyon
+sınırı aşağıdaki runtime sözleşmesiyle tamamlanmıştır.
 
 ## Koşu sonucu transaction'ı
 

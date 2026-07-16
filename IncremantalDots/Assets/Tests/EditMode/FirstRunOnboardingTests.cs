@@ -209,6 +209,31 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void TutorialResetContract_ContainsEveryStepAndGlobalFlagExactlyOnce()
+        {
+            string[] expectedFlags =
+            {
+                FirstRunOnboardingUI.WorkerRatioFlagId,
+                FirstRunOnboardingUI.BasicArcherFlagId,
+                FirstRunOnboardingUI.LowAmmoFlagId,
+                FirstRunOnboardingUI.HeartEntryFlagId,
+                FirstRunOnboardingUI.CouncilExactFlagId,
+                FirstRunOnboardingUI.DaytimeRepairFlagId,
+                FirstRunOnboardingUI.NightAbilityKeyFlagId,
+                FirstRunOnboardingUI.TutorialCompleteFlagId
+            };
+
+            string[] actualFlags = FirstRunOnboardingUI.GetTutorialProgressFlagIds();
+            Assert.That(actualFlags, Is.EqualTo(expectedFlags));
+            Assert.That(actualFlags.Distinct().Count(), Is.EqualTo(expectedFlags.Length));
+
+            actualFlags[0] = "tampered";
+            Assert.That(FirstRunOnboardingUI.GetTutorialProgressFlagIds(),
+                Is.EqualTo(expectedFlags),
+                "Settings consumer canonical reset listesini mutate edememelidir.");
+        }
+
+        [Test]
         public void ActiveHudPrefab_HasSingleNonBlockingEnglishWorkerRatioPresentation()
         {
             GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(HudPrefabPath);

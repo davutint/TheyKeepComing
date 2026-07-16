@@ -186,6 +186,18 @@ namespace DeadWalls
         public const string RallyAbilityKeyHint = "PRESS 2 TO USE RALLY.";
         public const string EmergencyRepairAbilityKeyHint = "PRESS 3 TO REPAIR THE WALL.";
 
+        private static readonly string[] TutorialProgressFlagIds =
+        {
+            WorkerRatioFlagId,
+            BasicArcherFlagId,
+            LowAmmoFlagId,
+            HeartEntryFlagId,
+            CouncilExactFlagId,
+            DaytimeRepairFlagId,
+            NightAbilityKeyFlagId,
+            TutorialCompleteFlagId
+        };
+
         [Header("Onboarding Owners")]
         public WorkerEconomyDrawerUI WorkerDrawer;
         public MarketUI ArcherMarket;
@@ -228,6 +240,16 @@ namespace DeadWalls
         public bool IsDaytimeRepairStepVisible => _activeStep == FirstRunOnboardingStep.DaytimeRepair;
         public bool IsNightAbilityKeyStepVisible => _activeStep == FirstRunOnboardingStep.NightAbilityKey;
         public RectTransform ActivePulseTarget => _activePulseTarget;
+
+        public static string[] GetTutorialProgressFlagIds()
+        {
+            return (string[])TutorialProgressFlagIds.Clone();
+        }
+
+        public static bool ResetTutorialProgress()
+        {
+            return MetaProgression.ResetTutorialFlags(TutorialProgressFlagIds);
+        }
 
         private void OnEnable()
         {

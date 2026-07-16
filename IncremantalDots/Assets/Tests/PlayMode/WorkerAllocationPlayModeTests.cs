@@ -510,6 +510,66 @@ namespace DeadWalls.Tests
         }
 
         [UnityTest]
+        public IEnumerator SettingsTutorialReset_ConfirmsThenRestartsOnboardingDurably()
+        {
+            FirstRunOnboardingUI onboarding =
+                Object.FindFirstObjectByType<FirstRunOnboardingUI>();
+            SettingsUI settings = Object.FindFirstObjectByType<SettingsUI>();
+            PauseMenuUI pauseMenu = Object.FindFirstObjectByType<PauseMenuUI>();
+            Assert.That(onboarding, Is.Not.Null);
+            Assert.That(settings, Is.Not.Null);
+            Assert.That(pauseMenu, Is.Not.Null);
+            Assert.That(settings.TutorialResetButton, Is.Not.Null);
+            Assert.That(settings.TutorialResetLabel, Is.Not.Null);
+            Assert.That(settings.TutorialResetStatusText, Is.Not.Null);
+
+            string[] tutorialFlags = FirstRunOnboardingUI.GetTutorialProgressFlagIds();
+            foreach (string flagId in tutorialFlags)
+                Assert.That(MetaProgression.SetTutorialFlag(flagId, true), Is.True, flagId);
+            const string futureTutorialFlag = "tutorial.future.keep";
+            Assert.That(MetaProgression.SetTutorialFlag(futureTutorialFlag, true), Is.True);
+            yield return null;
+            Assert.That(onboarding.HintPanel.activeSelf, Is.False);
+
+            pauseMenu.PauseButton.onClick.Invoke();
+            yield return null;
+            Assert.That(SimulationPauseService.IsPaused, Is.True);
+            pauseMenu.SettingsButton.onClick.Invoke();
+            yield return null;
+            Assert.That(settings.SettingsPanel.activeSelf, Is.True);
+            Assert.That(settings.TutorialResetLabel.text, Is.EqualTo("RESET TUTORIAL"));
+
+            settings.TutorialResetButton.onClick.Invoke();
+            yield return null;
+            Assert.That(settings.TutorialResetLabel.text, Is.EqualTo("CONFIRM RESET"));
+            foreach (string flagId in tutorialFlags)
+                Assert.That(MetaProgression.HasTutorialFlag(flagId), Is.True, flagId);
+
+            settings.TutorialResetButton.onClick.Invoke();
+            yield return null;
+            Assert.That(settings.TutorialResetLabel.text, Is.EqualTo("RESET TUTORIAL"));
+            Assert.That(settings.TutorialResetStatusText.text,
+                Is.EqualTo("TUTORIAL RESET. IT WILL START AGAIN IN GAME."));
+            foreach (string flagId in tutorialFlags)
+                Assert.That(MetaProgression.HasTutorialFlag(flagId), Is.False, flagId);
+            Assert.That(MetaProgression.HasTutorialFlag(futureTutorialFlag), Is.True);
+
+            MetaProgression.Load();
+            foreach (string flagId in tutorialFlags)
+                Assert.That(MetaProgression.HasTutorialFlag(flagId), Is.False, flagId);
+            Assert.That(MetaProgression.HasTutorialFlag(futureTutorialFlag), Is.True);
+
+            settings.CloseButton.onClick.Invoke();
+            pauseMenu.ResumeButton.onClick.Invoke();
+            for (int frame = 0; frame < 90 && !onboarding.IsWorkerRatioStepVisible; frame++)
+                yield return null;
+
+            Assert.That(SimulationPauseService.IsPaused, Is.False);
+            Assert.That(onboarding.IsWorkerRatioStepVisible, Is.True,
+                "Reset sonrasinda ilk uygun onboarding adimi yeniden baslamalidir.");
+        }
+
+        [UnityTest]
         public IEnumerator FirstRunOnboarding_HeartCloseEndsPauseBeforeNextNonModalCue()
         {
             GameManager gameManager = GameManager.Instance;

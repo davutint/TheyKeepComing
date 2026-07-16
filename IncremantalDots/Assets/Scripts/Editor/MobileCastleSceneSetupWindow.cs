@@ -138,6 +138,53 @@ namespace DeadWalls
                 : "[MobileCastleSceneSetup] First-run onboarding prefabda onarildi; NewGameScene aktif degildi.");
         }
 
+        [MenuItem("Window/DeadWalls/Repair Tutorial Reset Setting")]
+        public static void RepairTutorialResetSetting()
+        {
+            Scene activeScene = SceneManager.GetActiveScene();
+            if (!activeScene.IsValid() || activeScene.path != TargetScenePath)
+                throw new InvalidOperationException(
+                    "Tutorial reset Settings repair icin NewGameScene aktif olmali.");
+
+            RepairTutorialResetSettingsInScene(activeScene);
+            EditorSceneManager.MarkSceneDirty(activeScene);
+            EditorSceneManager.SaveScene(activeScene);
+
+            Scene mainMenuScene = SceneManager.GetSceneByPath(MainMenuScenePath);
+            bool closeMainMenuScene = !mainMenuScene.IsValid() || !mainMenuScene.isLoaded;
+            if (closeMainMenuScene)
+                mainMenuScene = EditorSceneManager.OpenScene(
+                    MainMenuScenePath, OpenSceneMode.Additive);
+
+            RepairTutorialResetSettingsInScene(mainMenuScene);
+            EditorSceneManager.MarkSceneDirty(mainMenuScene);
+            EditorSceneManager.SaveScene(mainMenuScene, MainMenuScenePath);
+            if (closeMainMenuScene)
+                EditorSceneManager.CloseScene(mainMenuScene, true);
+
+            AssetDatabase.SaveAssets();
+            Debug.Log(
+                "[MobileCastleSceneSetup] Tutorial reset Settings kontrolu NewGameScene ve MainMenuScene icin onarildi.");
+        }
+
+        private static void RepairTutorialResetSettingsInScene(Scene scene)
+        {
+            SettingsUI settings = null;
+            foreach (GameObject root in scene.GetRootGameObjects())
+            {
+                settings = root.GetComponentInChildren<SettingsUI>(true);
+                if (settings != null)
+                    break;
+            }
+
+            if (settings == null)
+                throw new InvalidOperationException(
+                    $"{scene.path} icinde SettingsUI bulunamadi.");
+
+            BuildSettingsPanel(settings.transform, settings);
+            EditorUtility.SetDirty(settings);
+        }
+
         [MenuItem("Window/DeadWalls/Repair Archer Retrain Control")]
         public static void RepairArcherRetrainControl()
         {
@@ -2447,11 +2494,11 @@ namespace DeadWalls
             EditorUtility.SetDirty(pauseMenu);
         }
 
-        /// <summary>Ses ayarlari paneli ureticisi — oyun sahnesi (pause) ve ana menu sahnesi paylasir.</summary>
+        /// <summary>Ses + tutorial ayarlari paneli ureticisi — oyun ve ana menu sahnesi paylasir.</summary>
         private static void BuildSettingsPanel(Transform parent, SettingsUI settings)
         {
             GameObject settingsPanel = EnsurePanel(parent, "SettingsPanel", false, new Color(0.03f, 0.03f, 0.06f, 0.96f));
-            Center(settingsPanel.GetComponent<RectTransform>(), new Vector2(520f, 360f));
+            Center(settingsPanel.GetComponent<RectTransform>(), new Vector2(520f, 450f));
             EnsureText(settingsPanel.transform, "SettingsTitleText", "SETTINGS", 34, TextAlignmentOptions.Center,
                 new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(-200f, -70f), new Vector2(200f, -16f));
             EnsureText(settingsPanel.transform, "SfxLabelText", "SFX", 20, TextAlignmentOptions.MidlineLeft,
@@ -2464,12 +2511,27 @@ namespace DeadWalls
             var ambienceSlider = EnsureSlider(settingsPanel.transform, "AmbienceSlider",
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-70f, -44f), new Vector2(220f, -18f),
                 new Color(0.12f, 0.13f, 0.16f, 1f), new Color(0.35f, 0.60f, 0.90f, 1f));
+            var tutorialResetButton = EnsureButton(settingsPanel.transform, "TutorialResetButton",
+                new Vector2(0.5f, 0.5f), new Vector2(-200f, -113f), new Vector2(200f, -57f),
+                out var tutorialResetLabel);
+            tutorialResetLabel.text = "RESET TUTORIAL";
+            tutorialResetLabel.fontSize = 18f;
+            var tutorialResetStatus = EnsureText(settingsPanel.transform, "TutorialResetStatusText",
+                "RESETS ONBOARDING ONLY. RUN AND UPGRADES STAY.", 13,
+                TextAlignmentOptions.Center,
+                new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
+                new Vector2(-220f, -154f), new Vector2(220f, -118f));
+            tutorialResetStatus.color = new Color(0.72f, 0.72f, 0.78f, 1f);
+            tutorialResetStatus.raycastTarget = false;
             var closeButton = EnsureButton(settingsPanel.transform, "SettingsCloseButton",
                 new Vector2(0.5f, 0f), new Vector2(-110f, 18f), new Vector2(110f, 70f), out var closeLabel);
             closeLabel.text = "CLOSE";
             settings.SettingsPanel = settingsPanel;
             settings.SfxSlider = sfxSlider;
             settings.AmbienceSlider = ambienceSlider;
+            settings.TutorialResetButton = tutorialResetButton;
+            settings.TutorialResetLabel = tutorialResetLabel;
+            settings.TutorialResetStatusText = tutorialResetStatus;
             settings.CloseButton = closeButton;
             settingsPanel.SetActive(false);
         }

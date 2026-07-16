@@ -33,9 +33,11 @@ eklerken aynı API'yi kullan; yalnız paneli Game Over altında tutmak yeterli g
 - `TutorialFlags`
 - `RewardedRunIds`
 
-İlk Package I consumer flag'leri `tutorial.v1.worker_ratio`, `tutorial.v1.basic_archer` ve
-`tutorial.v1.low_ammo`dur. Id'ler yayınlandıktan sonra yeniden adlandırılmaz;
-`FirstRunOnboardingUI` yalnız başarılı ilgili player action'ında bu flag'leri yazar.
+Package I consumer flag'leri `tutorial.v1.worker_ratio`, `tutorial.v1.basic_archer`,
+`tutorial.v1.low_ammo`, `tutorial.v1.heart`, `tutorial.v1.council`, `tutorial.v1.repair`,
+`tutorial.v1.ability_key` ve turetilmis `tutorial.v1.complete` flag'idir. Id'ler yayınlandıktan
+sonra yeniden adlandırılmaz; `FirstRunOnboardingUI` yalniz basarili ilgili player action'inda
+adim flag'ini yazar. Settings reset canonical sekizliyi birlikte temizler.
 
 Inspector'dan elle JSON üretme. Stable Id'lerde case ve yazım değişikliği yeni kimlik sayılır;
 upgrade/pool/tutorial içerik sahibi Id'yi yayımlandıktan sonra değiştirmemelidir.
@@ -49,6 +51,8 @@ EditMode'da `MetaProgressionSchemaTests` çalıştır:
 - Bilinmeyen future version ile corrupt JSON yazmayı kilitler ve orijinal dosyayı korur.
 - Duplicate/negatif alanlar deterministic normalize edilir; bilinmeyen upgrade Id'si korunur.
 - Pool unlock ve tutorial flag atomik save/reload round-trip yapar.
+- Tutorial reset exact sekiz onboarding flag'ini tek save'de temizler; future tutorial flag,
+  pool unlock, Souls ve diger meta state reload sonrasinda korunur.
 - First Day worker ratio PlayMode testi gerçek UI action'ının flag yazdığını ve test öncesi
   `meta_progress.json` / temp dosyalarının byte-for-byte geri yüklendiğini doğrular.
 - Basic Archer affordability PlayMode testi yetersiz kaynaktan gerçek buy-ready state'e geçişi,

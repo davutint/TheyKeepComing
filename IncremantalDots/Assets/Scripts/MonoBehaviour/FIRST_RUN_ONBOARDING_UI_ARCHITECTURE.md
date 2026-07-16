@@ -155,11 +155,27 @@ hedefli PlayMode testinde ayrica korunur.
 - Global flag mevcutsa onboarding controller'i step eligibility veya gameplay wallet sorgularina
   girmeden shared hint/pulse sunumunu kapali tutar.
 - Global flag tek basina alt flag'leri uretmez. Yalniz yedi stable flag'in tamaminin kanitindan
-  turetilir; sonraki Settings reset isi global ve alt flag'leri birlikte temizlemelidir.
+  turetilir; Settings reset global ve yedi alt flag'i ayni durable transaction'da birlikte temizler.
 
 Pure completion kurali yedi zorunlu flag'in her birini ayri ayri gerektirir. PlayMode final-action
 ve legacy-backfill testleri `meta_progress.json` reload sonrasinda `tutorial.v1.complete` flag'inin
 durable kaldigini dogrular.
+
+## Settings Tutorial Reset
+
+- `NewGameScene` pause Settings ve `MainMenuScene` Settings ayni `SettingsUI` kontrolunu kullanir.
+- `RESET TUTORIAL` ilk tiklamada yalniz `CONFIRM RESET` durumuna gecer. Ikinci tiklama olmadan
+  hiçbir meta state degismez; modal veya ek pause lease uretilmez.
+- Onayli reset `FirstRunOnboardingUI.GetTutorialProgressFlagIds()` listesindeki yedi adim flag'i
+  ile `tutorial.v1.complete` flag'ini `MetaProgression.ResetTutorialFlags` uzerinden tek atomik
+  save'de temizler.
+- Reset yalniz onboarding state'ine dokunur. Run save, Souls, meta upgrade, pool unlock ve ileride
+  eklenecek listede olmayan tutorial flag'leri korunur.
+- Reset oyun sahnesinde pause altinda yapilirsa onboarding cue'su pause kapanana kadar gizli kalir;
+  Resume sonrasinda ilk gercek uygun adim yeniden sunulur. Ana menude yapilirsa sonraki oyunda
+  ayni davranis baslar.
+- Meta save fail-closed veya disk write basarisizsa onceki tutorial listesi geri yuklenir ve UI
+  `RESET FAILED. META SAVE WAS NOT CHANGED.` bildirimi verir.
 
 ## Global Transaction-Free Siniri
 

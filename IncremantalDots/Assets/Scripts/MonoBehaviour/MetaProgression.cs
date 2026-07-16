@@ -479,6 +479,44 @@ namespace DeadWalls
             return false;
         }
 
+        /// <summary>
+        /// Verilen tutorial flag grubunu tek durable save icinde temizler. Save basarisizsa
+        /// onceki listeyi geri yukler; diger tutorial/content/meta state'ine dokunmaz.
+        /// </summary>
+        public static bool ResetTutorialFlags(IEnumerable<string> flagIds)
+        {
+            if (flagIds == null)
+                return false;
+
+            MetaProgressState state = State;
+            if (!CanPersist || state?.TutorialFlags == null)
+                return false;
+
+            var normalizedIds = new HashSet<string>(StringComparer.Ordinal);
+            foreach (string flagId in flagIds)
+            {
+                string id = flagId?.Trim();
+                if (!string.IsNullOrEmpty(id))
+                    normalizedIds.Add(id);
+            }
+
+            if (normalizedIds.Count == 0)
+                return false;
+
+            var previousFlags = new List<string>(state.TutorialFlags);
+            int removedCount = state.TutorialFlags.RemoveAll(
+                flag => !string.IsNullOrWhiteSpace(flag)
+                    && normalizedIds.Contains(flag.Trim()));
+            if (removedCount == 0)
+                return true;
+
+            if (Save())
+                return true;
+
+            state.TutorialFlags = previousFlags;
+            return false;
+        }
+
         private static bool ContainsId(List<string> source, string id)
         {
             if (source == null || string.IsNullOrWhiteSpace(id))

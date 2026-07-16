@@ -43,6 +43,19 @@ component'ine; `FirstRunOnboardingUI.NormalRepair` referansi ayni root'taki tek
 
 Idempotent onarim: `Window -> DeadWalls -> Repair First Run Onboarding`.
 
+## Settings Tutorial Reset Binding
+
+`NewGameScene/Canvas/MenuUiRoot/SettingsPanel` ve
+`MainMenuScene/Canvas/SettingsPanel` icinde ayni isim sozlesmesi bulunur:
+
+- `TutorialResetButton`
+- `TutorialResetStatusText`
+
+Her iki sahnedeki `SettingsUI`, button/label/status referanslarini tasir. Panel ilk durumda
+`RESET TUTORIAL` ve `RESETS ONBOARDING ONLY. RUN AND UPGRADES STAY.` metinlerini gosterir.
+Idempotent iki-sahne onarimi icin `NewGameScene` aktifken
+`Window -> DeadWalls -> Repair Tutorial Reset Setting` calistirilir.
+
 ## Dogrulama
 
 - EditMode presentation/rule testleri prefab isim, geometri, English copy, raycast, Day 1 ve
@@ -93,3 +106,9 @@ Idempotent onarim: `Window -> DeadWalls -> Repair First Run Onboarding`.
 - Final-action PlayMode testi son eksik adim tamamlandiginda global flag'in ayni run'da yazildigini;
   legacy-backfill testi yedi alt flag tasiyan eski meta save'in global flag'i ureterek iki durumda
   da `MetaProgression.Load()` sonrasinda durable kaldigini dogrular.
+- Tutorial reset EditMode testleri canonical sekiz flag listesini, listenin consumer tarafindan
+  mutate edilememesini, iki sahnede tek ve eksiksiz Settings binding'ini ve hedefli resetin diger
+  meta state'i koruyarak reload sonrasi durable kalmasini dogrular.
+- Tutorial reset PlayMode testi ilk tiklamanin yalniz confirmation kurdugunu, ikinci tiklamanin
+  sekiz flag'i temizledigini, bilinmeyen future tutorial flag'ini korudugunu ve Pause Resume
+  sonrasinda ilk uygun onboarding cue'sunun yeniden basladigini dogrular.

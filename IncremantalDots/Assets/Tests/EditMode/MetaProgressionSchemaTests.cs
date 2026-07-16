@@ -134,6 +134,8 @@ namespace DeadWalls.Tests
             Assert.That(MetaProgression.LoadStatus, Is.EqualTo(MetaProgressLoadStatus.UnsupportedVersion));
             Assert.That(MetaProgression.CanPersist, Is.False);
             Assert.That(MetaProgression.State.Souls, Is.Zero);
+            Assert.That(MetaProgression.ResetTutorialFlags(
+                FirstRunOnboardingUI.GetTutorialProgressFlagIds()), Is.False);
             LogAssert.Expect(LogType.Error, new Regex("Save reddedildi; load status: UnsupportedVersion"));
             Assert.That(MetaProgression.Save(), Is.False);
             Assert.That(File.ReadAllText(_metaPath), Is.EqualTo(futureJson));
@@ -150,6 +152,8 @@ namespace DeadWalls.Tests
 
             Assert.That(MetaProgression.LoadStatus, Is.EqualTo(MetaProgressLoadStatus.Corrupt));
             Assert.That(MetaProgression.CanPersist, Is.False);
+            Assert.That(MetaProgression.ResetTutorialFlags(
+                FirstRunOnboardingUI.GetTutorialProgressFlagIds()), Is.False);
             LogAssert.Expect(LogType.Error, new Regex("Save reddedildi; load status: Corrupt"));
             Assert.That(MetaProgression.Save(), Is.False);
             Assert.That(File.ReadAllText(_metaPath), Is.EqualTo(corruptJson));
@@ -207,6 +211,35 @@ namespace DeadWalls.Tests
             MetaProgression.Load();
             Assert.That(MetaProgression.HasTutorialFlag("tutorial.complete"), Is.False);
             Assert.That(MetaProgression.HasPoolUnlock("future_spell_pool"), Is.True);
+        }
+
+        [Test]
+        public void TutorialReset_ClearsExactOnboardingSetAndPreservesOtherMetaState()
+        {
+            string[] tutorialFlags = FirstRunOnboardingUI.GetTutorialProgressFlagIds();
+            foreach (string flagId in tutorialFlags)
+                Assert.That(MetaProgression.SetTutorialFlag(flagId, true), Is.True, flagId);
+
+            const string futureTutorialFlag = "tutorial.future.keep";
+            Assert.That(MetaProgression.SetTutorialFlag(futureTutorialFlag, true), Is.True);
+            Assert.That(MetaProgression.TryUnlockPoolContent("future_spell_pool"), Is.True);
+            MetaProgression.State.Souls = 321;
+            Assert.That(MetaProgression.Save(), Is.True);
+
+            Assert.That(MetaProgression.ResetTutorialFlags(tutorialFlags), Is.True);
+            foreach (string flagId in tutorialFlags)
+                Assert.That(MetaProgression.HasTutorialFlag(flagId), Is.False, flagId);
+            Assert.That(MetaProgression.HasTutorialFlag(futureTutorialFlag), Is.True);
+            Assert.That(MetaProgression.HasPoolUnlock("future_spell_pool"), Is.True);
+            Assert.That(MetaProgression.State.Souls, Is.EqualTo(321));
+
+            MetaProgression.Load();
+
+            foreach (string flagId in tutorialFlags)
+                Assert.That(MetaProgression.HasTutorialFlag(flagId), Is.False, flagId);
+            Assert.That(MetaProgression.HasTutorialFlag(futureTutorialFlag), Is.True);
+            Assert.That(MetaProgression.HasPoolUnlock("future_spell_pool"), Is.True);
+            Assert.That(MetaProgression.State.Souls, Is.EqualTo(321));
         }
 
         private static List<string> BuildReceiptIds(int count)
