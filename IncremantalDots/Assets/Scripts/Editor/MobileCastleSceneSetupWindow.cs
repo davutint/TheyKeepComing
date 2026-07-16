@@ -4939,6 +4939,7 @@ namespace DeadWalls
             onboarding.ArcherMarket = hudRoot.GetComponent<MarketUI>();
             onboarding.AmmoSupply = hudRoot.GetComponent<ArrowSupplyUI>();
             onboarding.CastleHeart = hudRoot.GetComponent<HeartScreenUI>();
+            onboarding.Council = hudRoot.GetComponent<CouncilEventUI>();
             onboarding.HintPanel = FindChildByName(hudRoot, "OnboardingHintPanel");
             onboarding.HintText = FindComponentInChildrenByName<TextMeshProUGUI>(
                 hudRoot, "OnboardingHintText");

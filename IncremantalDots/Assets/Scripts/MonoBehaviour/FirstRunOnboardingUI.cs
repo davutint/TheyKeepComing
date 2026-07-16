@@ -11,7 +11,8 @@ namespace DeadWalls
         BasicArcher = 2,
         LowAmmo = 3,
         HeartEntry = 4,
-        HeartPause = 5
+        HeartPause = 5,
+        CouncilExact = 6
     }
 
     internal static class FirstRunOnboardingRules
@@ -77,6 +78,18 @@ namespace DeadWalls
                 && !isGameOver
                 && graveEssence > 0L;
         }
+
+        public static bool ShouldShowCouncilExactStep(
+            bool completed,
+            bool mobileWorkerEconomyEnabled,
+            bool isGameOver,
+            bool isAwaitingPlayerChoice)
+        {
+            return !completed
+                && mobileWorkerEconomyEnabled
+                && !isGameOver
+                && isAwaitingPlayerChoice;
+        }
     }
 
     /// <summary>
@@ -97,12 +110,15 @@ namespace DeadWalls
         public const string HeartEntryHint = "OPEN THE CASTLE HEART.";
         public const string HeartPauseHint = "THE CASTLE HEART FULLY PAUSES THE BATTLE.";
         public const int HeartPauseHintSortingOrder = 260;
+        public const string CouncilExactFlagId = "tutorial.v1.council";
+        public const string CouncilExactHint = "COMPARE BOTH EXACT OUTCOMES AND THEIR COSTS.";
 
         [Header("Onboarding Owners")]
         public WorkerEconomyDrawerUI WorkerDrawer;
         public MarketUI ArcherMarket;
         public ArrowSupplyUI AmmoSupply;
         public HeartScreenUI CastleHeart;
+        public CouncilEventUI Council;
 
         [Header("Shared Presentation")]
         public GameObject HintPanel;
@@ -120,6 +136,7 @@ namespace DeadWalls
         private MarketUI _subscribedMarket;
         private ArrowSupplyUI _subscribedAmmoSupply;
         private HeartScreenUI _subscribedCastleHeart;
+        private CouncilEventUI _subscribedCouncil;
         private RectTransform _activePulseTarget;
         private FirstRunOnboardingStep _activeStep;
         private bool _heartPauseTeachingActive;
@@ -130,6 +147,7 @@ namespace DeadWalls
         public bool IsLowAmmoStepVisible => _activeStep == FirstRunOnboardingStep.LowAmmo;
         public bool IsHeartEntryStepVisible => _activeStep == FirstRunOnboardingStep.HeartEntry;
         public bool IsHeartPauseStepVisible => _activeStep == FirstRunOnboardingStep.HeartPause;
+        public bool IsCouncilExactStepVisible => _activeStep == FirstRunOnboardingStep.CouncilExact;
         public RectTransform ActivePulseTarget => _activePulseTarget;
 
         private void OnEnable()
@@ -139,6 +157,7 @@ namespace DeadWalls
             BindArcherMarket();
             BindAmmoSupply();
             BindCastleHeart();
+            BindCouncil();
             SetPresentation(FirstRunOnboardingStep.None, null);
         }
 
@@ -148,19 +167,22 @@ namespace DeadWalls
             UnbindArcherMarket();
             UnbindAmmoSupply();
             UnbindCastleHeart();
+            UnbindCouncil();
             _heartPauseTeachingActive = false;
             SetPresentation(FirstRunOnboardingStep.None, null);
         }
 
         private void Update()
         {
-            if (WorkerDrawer == null || ArcherMarket == null || AmmoSupply == null || CastleHeart == null)
+            if (WorkerDrawer == null || ArcherMarket == null || AmmoSupply == null
+                || CastleHeart == null || Council == null)
             {
                 ResolveMissingReferences();
                 BindWorkerDrawer();
                 BindArcherMarket();
                 BindAmmoSupply();
                 BindCastleHeart();
+                BindCouncil();
             }
 
             bool workerRatioCompleted = MetaProgression.HasTutorialFlag(WorkerRatioFlagId);
@@ -214,6 +236,13 @@ namespace DeadWalls
                     gm.GameState.IsGameOver,
                     graveEssence);
 
+            bool councilExactCompleted = MetaProgression.HasTutorialFlag(CouncilExactFlagId);
+            bool shouldShowCouncilExact = FirstRunOnboardingRules.ShouldShowCouncilExactStep(
+                councilExactCompleted,
+                gm != null && gm.IsMobilePopulationEconomyEnabled(),
+                gm != null && gm.GameState.IsGameOver,
+                Council != null && Council.IsAwaitingPlayerChoice);
+
             FirstRunOnboardingStep step = FirstRunOnboardingStep.None;
             RectTransform target = null;
             bool showPulse = true;
@@ -221,6 +250,11 @@ namespace DeadWalls
             {
                 step = FirstRunOnboardingStep.HeartPause;
                 showPulse = false;
+            }
+            else if (shouldShowCouncilExact && Council != null)
+            {
+                step = FirstRunOnboardingStep.CouncilExact;
+                target = Council.ChoiceCardRect;
             }
             else if (shouldShowWorkerRatio && WorkerDrawer != null)
             {
@@ -268,6 +302,7 @@ namespace DeadWalls
             ArcherMarket ??= GetComponent<MarketUI>();
             AmmoSupply ??= GetComponent<ArrowSupplyUI>();
             CastleHeart ??= GetComponent<HeartScreenUI>();
+            Council ??= GetComponent<CouncilEventUI>();
             HintPanel ??= FindGameObject("OnboardingHintPanel");
             HintText ??= FindComponent<TMP_Text>("OnboardingHintText");
             PulseFrame ??= FindComponent<RectTransform>("OnboardingPulseFrame");
@@ -352,6 +387,24 @@ namespace DeadWalls
             }
 
             _subscribedCastleHeart = null;
+        }
+
+        private void BindCouncil()
+        {
+            if (_subscribedCouncil == Council)
+                return;
+
+            UnbindCouncil();
+            _subscribedCouncil = Council;
+            if (_subscribedCouncil != null)
+                _subscribedCouncil.CouncilChoiceCommittedByPlayer += HandleCouncilChoiceCommitted;
+        }
+
+        private void UnbindCouncil()
+        {
+            if (_subscribedCouncil != null)
+                _subscribedCouncil.CouncilChoiceCommittedByPlayer -= HandleCouncilChoiceCommitted;
+            _subscribedCouncil = null;
         }
 
         private void HandleWorkerTargetRatioChanged(EconomyFocusType resource)
@@ -443,6 +496,23 @@ namespace DeadWalls
             Debug.LogWarning("[FirstRunOnboardingUI] Castle Heart tutorial flag durable yazilamadi.");
         }
 
+        private void HandleCouncilChoiceCommitted()
+        {
+            if (MetaProgression.HasTutorialFlag(CouncilExactFlagId)
+                || MetaProgression.SetTutorialFlag(CouncilExactFlagId, true))
+            {
+                _persistenceWarningLogged = false;
+                SetPresentation(FirstRunOnboardingStep.None, null);
+                return;
+            }
+
+            if (_persistenceWarningLogged)
+                return;
+
+            _persistenceWarningLogged = true;
+            Debug.LogWarning("[FirstRunOnboardingUI] Council tutorial flag durable yazilamadi.");
+        }
+
         private void SetPresentation(
             FirstRunOnboardingStep step,
             RectTransform target,
@@ -478,6 +548,7 @@ namespace DeadWalls
                 FirstRunOnboardingStep.LowAmmo => LowAmmoHint,
                 FirstRunOnboardingStep.HeartEntry => HeartEntryHint,
                 FirstRunOnboardingStep.HeartPause => HeartPauseHint,
+                FirstRunOnboardingStep.CouncilExact => CouncilExactHint,
                 _ => WorkerRatioHint
             };
             if (HintText != null && HintText.text != hint)
@@ -491,6 +562,7 @@ namespace DeadWalls
                 bool archerStep = step == FirstRunOnboardingStep.BasicArcher;
                 bool ammoStep = step == FirstRunOnboardingStep.LowAmmo;
                 bool heartEntryStep = step == FirstRunOnboardingStep.HeartEntry;
+                bool councilExactStep = step == FirstRunOnboardingStep.CouncilExact;
                 hintRect.anchorMin = heartPauseStep
                     ? new Vector2(0.5f, 1f)
                     : archerStep || heartEntryStep
@@ -510,6 +582,8 @@ namespace DeadWalls
                         ? new Vector2(-24f, 96f)
                     : ammoStep
                         ? new Vector2(24f, -96f)
+                    : councilExactStep
+                        ? new Vector2(24f, 226f)
                     : new Vector2(24f, WorkerDrawer != null && WorkerDrawer.IsOpen ? 554f : 96f);
 
                 if (heartPauseStep)

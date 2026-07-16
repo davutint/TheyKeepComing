@@ -62,6 +62,25 @@ owner'larinin player-action event'lerini dinler; yalniz non-modal hint ve pulse 
   `HeartClosedByPlayer` event'inde yazilir. Programmatic open/close cagrilari tutorial'i
   tamamlamaz; pause bilgisi gorulmeden flag yazilmaz.
 
+## Ilk Regular Council Exact Karar Adimi
+
+- Stable meta flag: `tutorial.v1.council`.
+- Gorunme kapisi: mobile worker economy aktif, oyun bitmemis ve regular Council karti oyuncu
+  secimine gercekten acik. Ilk kosuda bu durum regular takvimin ilk toplantisi olan Day 3'tur;
+  tutorial sonradan resetlenmisse bir sonraki aktif regular kart ayni kontrati ogretebilir.
+- Council karar penceresi sureli oldugu icin Heart pause adimi disindaki onceki opportunistic
+  prompt'lari gecici olarak sunum onceliginde ezer. Onceki adimlarin durable state'i degismez.
+- Pulse tek bir secenegi gostermek yerine `CouncilEventPanel` kartinin tamamini kapsar; tutorial
+  Option A/B arasinda yonlendirme yapmaz.
+- Tek player-facing metin English'tir: `COMPARE BOTH EXACT OUTCOMES AND THEIR COSTS.` Karttaki iki
+  exact sonuc ve bedel `CouncilOptionPresentationUtility` live quote owner'inda kalir; tutorial
+  metin veya sayi kopyalamaz.
+- Yalniz `CouncilEventUI` butonundan baslayan ve `GameManager.ChooseCouncilOption` tarafindan
+  basariyla commit edilen secim `CouncilChoiceCommittedByPlayer` event'ini yayar. Kartin acilmasi,
+  Dusk expire'i veya basarisiz/locked tik flag yazmaz.
+- Player secimi prompt gorunmeden once commit edilirse event yine flag'i tamamlar. Tutorial karti
+  acmaz, secim yapmaz, timer'i uzatmaz, pause yaratmaz veya resource transaction'i cagirmaz.
+
 ## Sunum Siniri
 
 `OnboardingHintPanel` ve `OnboardingPulseFrame`, aktif generated HUD prefabinin responsive
@@ -74,6 +93,6 @@ mevcut full-pause davranisini aciklar. `OnboardingHintPanel` nested `Canvas`i no
 parent siralamasini kullanir; yalniz Heart pause adiminda `overrideSorting = true / 260` olur ve
 Heart modalinin `200` sorting order'i ustunde okunur.
 
-Sonraki Council, repair ve ability onboarding adimlari ayni
-scene-owned controller ve stable meta flag siniri uzerinden eklenir; bu adim final tutorial
+Sonraki repair ve ability onboarding adimlari ayni scene-owned controller ve stable meta flag
+siniri uzerinden eklenir; bu adim final tutorial
 complete flag'i yerine gecmez.

@@ -35,9 +35,13 @@ recetesi tarafindan kabul edilmez. Diger 10 atom authored tariflerde kullanilir.
 4. **UI (`CouncilEventUI.cs`):** faz gecislerini 0.2s poll ile izler (Dawn -> scheduled open,
    Dusk -> expire); kart DOTween slide+fade ile belirir (Dawn odul toast'undan 1.2s gecikmeli),
    sure seridi + `DECIDE Ns` sayaci authoritative cycle state'inden kalan Dawn+Day penceresini
-   gosterir; iki buton `CouncilOptionPresentationUtility` canli quote'unu rich text olarak basar;
-   sure seridi Filled/Horizontal/Left contract'inda sayacla birlikte azalir. Secim punch +
-   Card Place SFX, belirme Book Handle SFX.
+    gosterir; iki buton `CouncilOptionPresentationUtility` canli quote'unu rich text olarak basar;
+    sure seridi Filled/Horizontal/Left contract'inda sayacla birlikte azalir. Secim punch +
+    Card Place SFX, belirme Book Handle SFX.
+5. **Ilk-kosu ogretimi (`FirstRunOnboardingUI.cs`):** Council karti gercek secime acildiginda
+   `CouncilEventPanel` tam kartini non-modal pulse eder ve iki exact sonuc/bedelin okunmasini
+   ister. Tek bir branch'i isaretlemez; karti acmaz, secim yapmaz, timer/pause/resource state'ine
+   dokunmaz. `CouncilChoiceCommittedByPlayer` yalniz basarili gercek UI seciminden sonra yayilir.
 
 ## Regular Schedule
 
@@ -201,6 +205,9 @@ cozulmus secim ve sureli effect state'inin exact Continue davranisini dogrular.
 (Filled/Horizontal), `CouncilTimerText`, `CouncilOptionAButton` (+`CouncilOptionAText`),
 `CouncilOptionBButton` (+`CouncilOptionBText`). Setup tool bulur+baglar; katalog
 `GameManager.councilCatalog`'da.
+
+Ilk-kosu binding'i ayni HUD root'ta `FirstRunOnboardingUI.Council -> CouncilEventUI` olarak
+kurulur. Stable completion flag'i `tutorial.v1.council`dir; Dusk expire'i completion sayilmaz.
 
 ## Bilinen Notlar / Tuzaklar
 

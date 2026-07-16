@@ -93,6 +93,22 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void CouncilExactRule_ShowsOnlyForAnIncompleteLivePlayerChoiceCard()
+        {
+            Assert.That(FirstRunOnboardingRules.ShouldShowCouncilExactStep(
+                false, true, false, true), Is.True);
+
+            Assert.That(FirstRunOnboardingRules.ShouldShowCouncilExactStep(
+                true, true, false, true), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldShowCouncilExactStep(
+                false, false, false, true), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldShowCouncilExactStep(
+                false, true, true, true), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldShowCouncilExactStep(
+                false, true, false, false), Is.False);
+        }
+
+        [Test]
         public void ActiveHudPrefab_HasSingleNonBlockingEnglishWorkerRatioPresentation()
         {
             GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(HudPrefabPath);
@@ -130,6 +146,7 @@ namespace DeadWalls.Tests
             Assert.That(FirstRunOnboardingUI.LowAmmoHint, Does.Match("^[A-Z0-9 .+]+$"));
             Assert.That(FirstRunOnboardingUI.HeartEntryHint, Does.Match("^[A-Z0-9 .+]+$"));
             Assert.That(FirstRunOnboardingUI.HeartPauseHint, Does.Match("^[A-Z0-9 .+]+$"));
+            Assert.That(FirstRunOnboardingUI.CouncilExactHint, Does.Match("^[A-Z0-9 .+]+$"));
         }
 
         private static RectTransform FindUniqueRect(GameObject root, string objectName)

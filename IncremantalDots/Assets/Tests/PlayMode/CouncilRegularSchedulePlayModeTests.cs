@@ -8,6 +8,7 @@ using Unity.Entities;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
+using UnityEngine.UI;
 
 namespace DeadWalls.Tests
 {
@@ -20,12 +21,27 @@ namespace DeadWalls.Tests
         private MethodInfo _cycleSetter;
         private string _runSavePath;
         private byte[] _originalRunSave;
+        private string _metaPath;
+        private string _metaTempPath;
+        private byte[] _originalMeta;
+        private byte[] _originalMetaTemp;
+        private bool _hadMeta;
+        private bool _hadMetaTemp;
 
         [UnitySetUp]
         public IEnumerator SetUp()
         {
             _runSavePath = Path.Combine(Application.persistentDataPath, "run_save.json");
             _originalRunSave = File.Exists(_runSavePath) ? File.ReadAllBytes(_runSavePath) : null;
+            _metaPath = Path.Combine(Application.persistentDataPath, "meta_progress.json");
+            _metaTempPath = _metaPath + ".tmp";
+            _hadMeta = File.Exists(_metaPath);
+            _hadMetaTemp = File.Exists(_metaTempPath);
+            _originalMeta = _hadMeta ? File.ReadAllBytes(_metaPath) : null;
+            _originalMetaTemp = _hadMetaTemp ? File.ReadAllBytes(_metaTempPath) : null;
+            DeleteIfExists(_metaPath);
+            DeleteIfExists(_metaTempPath);
+            MetaProgression.Load();
             RunPersistence.Delete();
             GameBootstrap.PendingAction = GameBootstrap.StartAction.None;
             int previousGameManagerId = GameManager.Instance != null
@@ -86,6 +102,11 @@ namespace DeadWalls.Tests
             RunPersistence.Delete();
             if (_originalRunSave != null)
                 File.WriteAllBytes(_runSavePath, _originalRunSave);
+            DeleteIfExists(_metaPath);
+            DeleteIfExists(_metaTempPath);
+            RestoreIfNeeded(_metaPath, _hadMeta, _originalMeta);
+            RestoreIfNeeded(_metaTempPath, _hadMetaTemp, _originalMetaTemp);
+            MetaProgression.Load();
             yield return null;
         }
 
@@ -155,6 +176,76 @@ namespace DeadWalls.Tests
                 "Approved source/branch flag'i live GameManager state'ine yazilmadi.");
             Assert.That(flags["schedule_followup_ready"], Is.EqualTo(3));
             yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator FirstRegularCouncilOnboarding_PulsesWholeExactCard_AndCompletesOnPlayerChoice()
+        {
+            GameManager gameManager = GameManager.Instance;
+            FirstRunOnboardingUI onboarding =
+                Object.FindFirstObjectByType<FirstRunOnboardingUI>();
+            CouncilEventUI council = Object.FindFirstObjectByType<CouncilEventUI>();
+            Assert.That(onboarding, Is.Not.Null);
+            Assert.That(council, Is.Not.Null);
+            Assert.That(onboarding.Council, Is.SameAs(council));
+
+            Assert.That(MetaProgression.SetTutorialFlag(
+                FirstRunOnboardingUI.WorkerRatioFlagId, true), Is.True);
+            Assert.That(MetaProgression.SetTutorialFlag(
+                FirstRunOnboardingUI.BasicArcherFlagId, true), Is.True);
+            Assert.That(MetaProgression.SetTutorialFlag(
+                FirstRunOnboardingUI.LowAmmoFlagId, true), Is.True);
+            Assert.That(MetaProgression.SetTutorialFlag(
+                FirstRunOnboardingUI.HeartEntryFlagId, true), Is.True);
+            Assert.That(MetaProgression.HasTutorialFlag(
+                FirstRunOnboardingUI.CouncilExactFlagId), Is.False);
+
+            SetCycle(gameManager, 3, SiegeCyclePhase.Dawn, 2.25f);
+            Assert.That(gameManager.TryOpenRegularCouncilEvent(), Is.True);
+            ComposedCouncilEvent active = gameManager.ActiveCouncilEvent;
+            Assert.That(active, Is.Not.Null);
+
+            CouncilOptionPresentation optionA =
+                gameManager.GetCouncilOptionPresentation(active.OptionA);
+            CouncilOptionPresentation optionB =
+                gameManager.GetCouncilOptionPresentation(active.OptionB);
+            Assert.That(optionA.CanApplyExactly, Is.True);
+            Assert.That(optionB.CanApplyExactly, Is.True);
+            Assert.That(MetaProgression.HasTutorialFlag(
+                FirstRunOnboardingUI.CouncilExactFlagId), Is.False,
+                "Council kartinin acilmasi secim veya tutorial completion sayilmamali.");
+
+            float presentationDeadline = Time.realtimeSinceStartup + 5f;
+            while (!onboarding.IsCouncilExactStepVisible
+                && Time.realtimeSinceStartup < presentationDeadline)
+                yield return null;
+
+            Assert.That(council.IsAwaitingPlayerChoice, Is.True);
+            Assert.That(onboarding.IsCouncilExactStepVisible, Is.True);
+            Assert.That(onboarding.HintText.text,
+                Is.EqualTo(FirstRunOnboardingUI.CouncilExactHint));
+            Assert.That(onboarding.HintText.text, Does.Contain("OUTCOMES"));
+            Assert.That(onboarding.HintText.text, Does.Contain("COSTS"));
+            Assert.That(onboarding.ActivePulseTarget, Is.SameAs(council.ChoiceCardRect),
+                "Tutorial tek secenegi degil iki exact sonucu kapsayan tum Council kartini gostermeli.");
+            Assert.That(council.CouncilOptionAText.text, Is.EqualTo(optionA.RichText));
+            Assert.That(council.CouncilOptionBText.text, Is.EqualTo(optionB.RichText));
+            Assert.That(council.CouncilOptionAButton.interactable, Is.True);
+            Assert.That(council.CouncilOptionBButton.interactable, Is.True);
+            Assert.That(gameManager.ActiveCouncilEvent, Is.SameAs(active),
+                "Onboarding oyuncu adina Council secimi yapmamali.");
+
+            Button chosenButton = council.CouncilOptionAButton;
+            chosenButton.onClick.Invoke();
+            yield return null;
+
+            Assert.That(gameManager.ActiveCouncilEvent, Is.Null);
+            Assert.That(MetaProgression.HasTutorialFlag(
+                FirstRunOnboardingUI.CouncilExactFlagId), Is.True);
+            Assert.That(onboarding.IsCouncilExactStepVisible, Is.False);
+            Assert.That(onboarding.HintPanel.activeSelf, Is.False);
+            Assert.That(onboarding.PulseFrame.gameObject.activeSelf, Is.False);
+            yield return new WaitForSecondsRealtime(0.25f);
         }
 
         [UnityTest]
@@ -406,6 +497,18 @@ namespace DeadWalls.Tests
             };
             _createdObjects.Add(catalog);
             return catalog;
+        }
+
+        private static void DeleteIfExists(string path)
+        {
+            if (File.Exists(path))
+                File.Delete(path);
+        }
+
+        private static void RestoreIfNeeded(string path, bool existed, byte[] contents)
+        {
+            if (existed && contents != null)
+                File.WriteAllBytes(path, contents);
         }
     }
 }

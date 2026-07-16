@@ -13,6 +13,8 @@
 3. `CouncilEventUI` HUD root'a eklenir; kart objeleri isimle bulunur, SFX baglanir
    (Appear = `Book Handle 1-2.wav`, Choose = `Card Place 1-1.wav`); `CouncilEffectBadgeText`
    (aktif etki rozeti) + `NightToastText` (= `SiegeToastText`) + `CouncilTimerText` baglanir.
+   Ayni root'taki `FirstRunOnboardingUI.Council` referansi da bu `CouncilEventUI` owner'ina
+   baglanir; ilk regular kartin exact karar ogretimi ayri bir kart/popup uretmez.
 4. `ValidateCatalog()` sorunlari Console'a warning basilir.
 5. **Metin migration:** mevcut Template asset'inde `BodyVariants` BOS ise seed'in guncel
    anlatilari (Title/BodyVariants/OutcomeA-B/Verb'ler) uygulanir. Kullanici metin girdiyse
@@ -48,6 +50,8 @@
 3. Iki butonun ikinci satirinda exact sonuc gorunur: population `+N PEOPLE -M FOOD`, free
    archer `+N BASIC ARCHERS -N IDLE PEOPLE`, Wall heal gercek uygulanacak HP ve gece etkisi
    exact count yuzdesi. Karsilanamayan exact sonuc butonu pasif yapar ve eksigi yazar.
+   Ilk incomplete Council tutorial'inda pulse iki butondan birini degil tum `CouncilEventPanel`
+   rect'ini kapsar; `COMPARE BOTH EXACT OUTCOMES AND THEIR COSTS.` hint'i gorunur ve oyun durmaz.
 4. `refugees_at_gate`'te A sec -> catalog'daki exact curated link sayesinde 2+ gun sonra
    `AMONG THE REFUGEES` zinciri cikabilir (OneShot). Link allowlist'ten cikarilirsa context'te
    flag bulunsa bile target fail-closed acilmaz. A secildikten sonra source event kosu icin
@@ -58,7 +62,8 @@
    onayli flag yazimi ve bozuk role payload'inin fail-closed karar kilidini;
    `ExactRunContinuePlayModeTests` bozuk active Council payload'inin restart oncesi Continue
    preflight'ta reddini;
-   ayni scheduled gunde ikinci acilisi dogrular. `CouncilEffectGuardPlayModeTests` exact quote
+   ayni scheduled gunde ikinci acilisi; ilk Council full-card pulse/live quote/player-choice flag
+   kontratini dogrular. `CouncilEffectGuardPlayModeTests` exact quote
    ile `CouncilTimerText` scene binding'ini de dogrular.
 
 ## Exact Karar UI Onarimi

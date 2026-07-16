@@ -1,3 +1,4 @@
+using System;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
@@ -16,6 +17,8 @@ namespace DeadWalls
     /// </summary>
     public class CouncilEventUI : MonoBehaviour
     {
+        public event Action CouncilChoiceCommittedByPlayer;
+
         [Header("Card")]
         public GameObject CouncilPanel;
         public TMP_Text CouncilTitleText;
@@ -56,6 +59,17 @@ namespace DeadWalls
         private CanvasGroup _panelGroup;
         private Tween _appearTween;
         private Tween _outcomeTween;
+
+        public bool IsAwaitingPlayerChoice => _shownEvent != null
+            && !_outcomePlaying
+            && CouncilPanel != null
+            && CouncilPanel.activeInHierarchy
+            && _panelGroup != null
+            && _panelGroup.interactable;
+
+        public RectTransform ChoiceCardRect => CouncilPanel != null
+            ? CouncilPanel.transform as RectTransform
+            : null;
 
         private void OnEnable()
         {
@@ -211,6 +225,7 @@ namespace DeadWalls
 
             if (gm.ChooseCouncilOption(optionA))
             {
+                CouncilChoiceCommittedByPlayer?.Invoke();
                 PlaySfx(ChooseClip, 0.85f);
                 if (source != null)
                 {
