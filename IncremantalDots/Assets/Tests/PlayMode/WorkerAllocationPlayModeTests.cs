@@ -233,6 +233,99 @@ namespace DeadWalls.Tests
         }
 
         [UnityTest]
+        public IEnumerator FirstLowAmmoOnboarding_PulsesArrowChipWithoutOpeningPanel_AndCompletesOnRefill()
+        {
+            GameManager gameManager = GameManager.Instance;
+            FirstRunOnboardingUI onboarding =
+                Object.FindFirstObjectByType<FirstRunOnboardingUI>();
+            ArrowSupplyUI ammoSupply = Object.FindFirstObjectByType<ArrowSupplyUI>();
+            Assert.That(onboarding, Is.Not.Null);
+            Assert.That(ammoSupply, Is.Not.Null);
+            Assert.That(MetaProgression.SetTutorialFlag(
+                FirstRunOnboardingUI.WorkerRatioFlagId, true), Is.True);
+            Assert.That(MetaProgression.SetTutorialFlag(
+                FirstRunOnboardingUI.BasicArcherFlagId, true), Is.True);
+            Assert.That(MetaProgression.HasTutorialFlag(
+                FirstRunOnboardingUI.LowAmmoFlagId), Is.False);
+
+            bool runtimeReady = false;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                {
+                    runtimeReady = true;
+                    break;
+                }
+                yield return null;
+            }
+            Assert.That(runtimeReady, Is.True,
+                "GameManager/SubScene 300 frame icinde hazir olmadi.");
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            using EntityQuery gameStateQuery = entityManager.CreateEntityQuery(
+                typeof(ArrowSupply), typeof(ResourceData));
+            Entity gameStateEntity = gameStateQuery.GetSingletonEntity();
+            int capacity = gameManager.GetArrowCapacity();
+            int threshold = capacity * FirstRunOnboardingUI.LowAmmoThresholdPercent / 100;
+
+            ArrowSupply supply = entityManager.GetComponentData<ArrowSupply>(gameStateEntity);
+            supply.Current = threshold + 1;
+            entityManager.SetComponentData(gameStateEntity, supply);
+            ammoSupply.SetOpen(false);
+            yield return null;
+
+            Assert.That(onboarding.IsLowAmmoStepVisible, Is.False);
+            Assert.That(ammoSupply.IsOpen, Is.False);
+
+            supply.Current = threshold;
+            entityManager.SetComponentData(gameStateEntity, supply);
+            for (int frame = 0; frame < 60 && !onboarding.IsLowAmmoStepVisible; frame++)
+                yield return null;
+
+            Assert.That(onboarding.IsLowAmmoStepVisible, Is.True);
+            Assert.That(onboarding.HintText.text,
+                Is.EqualTo(FirstRunOnboardingUI.LowAmmoHint));
+            Assert.That(onboarding.ActivePulseTarget,
+                Is.SameAs(ammoSupply.ToggleButton.GetComponent<RectTransform>()));
+            Assert.That(ammoSupply.IsOpen, Is.False,
+                "Low-ammo onboarding ammo panelini oyuncu adina acmamalidir.");
+
+            ResourceData resources = entityManager.GetComponentData<ResourceData>(gameStateEntity);
+            resources.Wood = 0;
+            entityManager.SetComponentData(gameStateEntity, resources);
+            yield return null;
+            ammoSupply.PackageButton.onClick.Invoke();
+            yield return null;
+
+            Assert.That(MetaProgression.HasTutorialFlag(
+                FirstRunOnboardingUI.LowAmmoFlagId), Is.False,
+                "Basarisiz refill denemesi tutorial'i tamamlamamalidir.");
+            Assert.That(entityManager.GetComponentData<ArrowSupply>(gameStateEntity).Current,
+                Is.EqualTo(threshold));
+
+            resources.Wood = 1_000_000;
+            entityManager.SetComponentData(gameStateEntity, resources);
+            yield return null;
+            ArrowRefillQuote quote = gameManager.GetArrowRefillQuote(1);
+            Assert.That(quote.IsValid, Is.True);
+            ammoSupply.Refresh();
+            Assert.That(ammoSupply.PackageButton.interactable, Is.True);
+            ammoSupply.PackageButton.onClick.Invoke();
+            yield return null;
+
+            Assert.That(entityManager.GetComponentData<ArrowSupply>(gameStateEntity).Current,
+                Is.EqualTo(threshold + quote.ArrowAmount));
+            Assert.That(entityManager.GetComponentData<ResourceData>(gameStateEntity).Wood,
+                Is.EqualTo(resources.Wood - quote.WoodCost));
+            Assert.That(MetaProgression.HasTutorialFlag(
+                FirstRunOnboardingUI.LowAmmoFlagId), Is.True);
+            Assert.That(onboarding.IsLowAmmoStepVisible, Is.False);
+            Assert.That(onboarding.HintPanel.activeSelf, Is.False);
+            Assert.That(onboarding.PulseFrame.gameObject.activeSelf, Is.False);
+            Assert.That(ammoSupply.IsOpen, Is.False);
+        }
+
+        [UnityTest]
         public IEnumerator PopulationIncrease_AssignsOnlyNewPeopleToTarget_AndLeavesCapOverflowIdle()
         {
             EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;

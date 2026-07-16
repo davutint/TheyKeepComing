@@ -33,8 +33,8 @@ eklerken aynı API'yi kullan; yalnız paneli Game Over altında tutmak yeterli g
 - `TutorialFlags`
 - `RewardedRunIds`
 
-İlk Package I consumer flag'leri `tutorial.v1.worker_ratio` ve
-`tutorial.v1.basic_archer`dir. Id'ler yayınlandıktan sonra yeniden adlandırılmaz;
+İlk Package I consumer flag'leri `tutorial.v1.worker_ratio`, `tutorial.v1.basic_archer` ve
+`tutorial.v1.low_ammo`dur. Id'ler yayınlandıktan sonra yeniden adlandırılmaz;
 `FirstRunOnboardingUI` yalnız başarılı ilgili player action'ında bu flag'leri yazar.
 
 Inspector'dan elle JSON üretme. Stable Id'lerde case ve yazım değişikliği yeni kimlik sayılır;
@@ -53,6 +53,8 @@ EditMode'da `MetaProgressionSchemaTests` çalıştır:
   `meta_progress.json` / temp dosyalarının byte-for-byte geri yüklendiğini doğrular.
 - Basic Archer affordability PlayMode testi yetersiz kaynaktan gerçek buy-ready state'e geçişi,
   başarılı satın alma flag'ini ve aynı meta dosyası geri-yükleme sınırını doğrular.
+- Low Ammo PlayMode testi inclusive `%25` threshold'u, panelin zorla acilmamasini, basarisiz
+  refill'in flag yazmamasini, basarili refill flag'ini ve ayni meta geri-yukleme sinirini dogrular.
 
 Mevcut persistence regresyonu için `RunPersistenceTests`, Grave Essence meta ayrımı ve aktif
 catalog dormancy testleri birlikte çalıştırılır. PlayMode'da exact Continue ile lethal save guard

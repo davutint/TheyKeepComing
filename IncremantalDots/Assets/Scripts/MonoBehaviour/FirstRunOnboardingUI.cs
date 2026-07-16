@@ -8,7 +8,8 @@ namespace DeadWalls
     {
         None = 0,
         WorkerRatio = 1,
-        BasicArcher = 2
+        BasicArcher = 2,
+        LowAmmo = 3
     }
 
     internal static class FirstRunOnboardingRules
@@ -40,6 +41,28 @@ namespace DeadWalls
                 && !isGameOver
                 && canBuyBasicArcher;
         }
+
+        public static bool ShouldShowLowAmmoStep(
+            bool completed,
+            bool mobileWorkerEconomyEnabled,
+            bool isGameOver,
+            int current,
+            int capacity,
+            int thresholdPercent)
+        {
+            if (completed
+                || !mobileWorkerEconomyEnabled
+                || isGameOver
+                || capacity <= 0
+                || thresholdPercent <= 0)
+            {
+                return false;
+            }
+
+            int clampedThreshold = Mathf.Clamp(thresholdPercent, 1, 100);
+            int clampedCurrent = Mathf.Clamp(current, 0, capacity);
+            return (long)clampedCurrent * 100L <= (long)capacity * clampedThreshold;
+        }
     }
 
     /// <summary>
@@ -53,10 +76,14 @@ namespace DeadWalls
         public const string WorkerRatioHint = "ADJUST A WORKER TARGET RATIO.";
         public const string BasicArcherFlagId = "tutorial.v1.basic_archer";
         public const string BasicArcherHint = "RECRUIT A BASIC ARCHER.";
+        public const string LowAmmoFlagId = "tutorial.v1.low_ammo";
+        public const string LowAmmoHint = "RESTOCK YOUR ARROWS.";
+        public const int LowAmmoThresholdPercent = 25;
 
         [Header("Onboarding Owners")]
         public WorkerEconomyDrawerUI WorkerDrawer;
         public MarketUI ArcherMarket;
+        public ArrowSupplyUI AmmoSupply;
 
         [Header("Shared Presentation")]
         public GameObject HintPanel;
@@ -72,12 +99,14 @@ namespace DeadWalls
 
         private WorkerEconomyDrawerUI _subscribedDrawer;
         private MarketUI _subscribedMarket;
+        private ArrowSupplyUI _subscribedAmmoSupply;
         private RectTransform _activePulseTarget;
         private FirstRunOnboardingStep _activeStep;
         private bool _persistenceWarningLogged;
 
         public bool IsWorkerRatioStepVisible => _activeStep == FirstRunOnboardingStep.WorkerRatio;
         public bool IsBasicArcherStepVisible => _activeStep == FirstRunOnboardingStep.BasicArcher;
+        public bool IsLowAmmoStepVisible => _activeStep == FirstRunOnboardingStep.LowAmmo;
         public RectTransform ActivePulseTarget => _activePulseTarget;
 
         private void OnEnable()
@@ -85,6 +114,7 @@ namespace DeadWalls
             ResolveMissingReferences();
             BindWorkerDrawer();
             BindArcherMarket();
+            BindAmmoSupply();
             SetPresentation(FirstRunOnboardingStep.None, null);
         }
 
@@ -92,16 +122,18 @@ namespace DeadWalls
         {
             UnbindWorkerDrawer();
             UnbindArcherMarket();
+            UnbindAmmoSupply();
             SetPresentation(FirstRunOnboardingStep.None, null);
         }
 
         private void Update()
         {
-            if (WorkerDrawer == null || ArcherMarket == null)
+            if (WorkerDrawer == null || ArcherMarket == null || AmmoSupply == null)
             {
                 ResolveMissingReferences();
                 BindWorkerDrawer();
                 BindArcherMarket();
+                BindAmmoSupply();
             }
 
             bool workerRatioCompleted = MetaProgression.HasTutorialFlag(WorkerRatioFlagId);
@@ -127,6 +159,20 @@ namespace DeadWalls
                     gm != null && gm.GameState.IsGameOver,
                     canBuyBasicArcher);
 
+            bool lowAmmoCompleted = MetaProgression.HasTutorialFlag(LowAmmoFlagId);
+            bool shouldEvaluateLowAmmo = !lowAmmoCompleted && gm != null;
+            int arrowCapacity = shouldEvaluateLowAmmo ? gm.GetArrowCapacity() : 0;
+            int arrowCurrent = shouldEvaluateLowAmmo ? gm.ArrowSupply.Current : 0;
+            bool shouldShowLowAmmo = !shouldShowWorkerRatio
+                && !shouldShowBasicArcher
+                && FirstRunOnboardingRules.ShouldShowLowAmmoStep(
+                    lowAmmoCompleted,
+                    gm != null && gm.IsMobilePopulationEconomyEnabled(),
+                    gm != null && gm.GameState.IsGameOver,
+                    arrowCurrent,
+                    arrowCapacity,
+                    LowAmmoThresholdPercent);
+
             FirstRunOnboardingStep step = FirstRunOnboardingStep.None;
             RectTransform target = null;
             if (shouldShowWorkerRatio && WorkerDrawer != null)
@@ -148,6 +194,13 @@ namespace DeadWalls
                         ? ArcherMarket.DrawerToggleButton.GetComponent<RectTransform>()
                         : null;
             }
+            else if (shouldShowLowAmmo && AmmoSupply != null)
+            {
+                step = FirstRunOnboardingStep.LowAmmo;
+                target = AmmoSupply.ToggleButton != null
+                    ? AmmoSupply.ToggleButton.GetComponent<RectTransform>()
+                    : null;
+            }
 
             SetPresentation(target != null ? step : FirstRunOnboardingStep.None, target);
             if (_activeStep != FirstRunOnboardingStep.None)
@@ -158,6 +211,7 @@ namespace DeadWalls
         {
             WorkerDrawer ??= GetComponent<WorkerEconomyDrawerUI>();
             ArcherMarket ??= GetComponent<MarketUI>();
+            AmmoSupply ??= GetComponent<ArrowSupplyUI>();
             HintPanel ??= FindGameObject("OnboardingHintPanel");
             HintText ??= FindComponent<TMP_Text>("OnboardingHintText");
             PulseFrame ??= FindComponent<RectTransform>("OnboardingPulseFrame");
@@ -201,6 +255,24 @@ namespace DeadWalls
             _subscribedMarket = null;
         }
 
+        private void BindAmmoSupply()
+        {
+            if (_subscribedAmmoSupply == AmmoSupply)
+                return;
+
+            UnbindAmmoSupply();
+            _subscribedAmmoSupply = AmmoSupply;
+            if (_subscribedAmmoSupply != null)
+                _subscribedAmmoSupply.ArrowRefillPurchasedByPlayer += HandleArrowRefillPurchased;
+        }
+
+        private void UnbindAmmoSupply()
+        {
+            if (_subscribedAmmoSupply != null)
+                _subscribedAmmoSupply.ArrowRefillPurchasedByPlayer -= HandleArrowRefillPurchased;
+            _subscribedAmmoSupply = null;
+        }
+
         private void HandleWorkerTargetRatioChanged(EconomyFocusType resource)
         {
             if (MetaProgression.HasTutorialFlag(WorkerRatioFlagId)
@@ -238,6 +310,23 @@ namespace DeadWalls
             Debug.LogWarning("[FirstRunOnboardingUI] Basic Archer tutorial flag durable yazilamadi.");
         }
 
+        private void HandleArrowRefillPurchased()
+        {
+            if (MetaProgression.HasTutorialFlag(LowAmmoFlagId)
+                || MetaProgression.SetTutorialFlag(LowAmmoFlagId, true))
+            {
+                _persistenceWarningLogged = false;
+                SetPresentation(FirstRunOnboardingStep.None, null);
+                return;
+            }
+
+            if (_persistenceWarningLogged)
+                return;
+
+            _persistenceWarningLogged = true;
+            Debug.LogWarning("[FirstRunOnboardingUI] Low ammo tutorial flag durable yazilamadi.");
+        }
+
         private void SetPresentation(FirstRunOnboardingStep step, RectTransform target)
         {
             bool visible = step != FirstRunOnboardingStep.None;
@@ -252,9 +341,12 @@ namespace DeadWalls
             if (!visible)
                 return;
 
-            string hint = step == FirstRunOnboardingStep.BasicArcher
-                ? BasicArcherHint
-                : WorkerRatioHint;
+            string hint = step switch
+            {
+                FirstRunOnboardingStep.BasicArcher => BasicArcherHint,
+                FirstRunOnboardingStep.LowAmmo => LowAmmoHint,
+                _ => WorkerRatioHint
+            };
             if (HintText != null && HintText.text != hint)
                 HintText.text = hint;
 
@@ -264,11 +356,18 @@ namespace DeadWalls
             if (hintRect != null)
             {
                 bool archerStep = step == FirstRunOnboardingStep.BasicArcher;
-                hintRect.anchorMin = archerStep ? new Vector2(1f, 0f) : Vector2.zero;
+                bool ammoStep = step == FirstRunOnboardingStep.LowAmmo;
+                hintRect.anchorMin = archerStep
+                    ? new Vector2(1f, 0f)
+                    : ammoStep ? new Vector2(0f, 1f) : Vector2.zero;
                 hintRect.anchorMax = hintRect.anchorMin;
-                hintRect.pivot = archerStep ? new Vector2(1f, 0f) : Vector2.zero;
+                hintRect.pivot = archerStep
+                    ? new Vector2(1f, 0f)
+                    : ammoStep ? new Vector2(0f, 1f) : Vector2.zero;
                 hintRect.anchoredPosition = archerStep
                     ? new Vector2(-24f, ArcherMarket != null && ArcherMarket.IsDrawerOpen ? 522f : 96f)
+                    : ammoStep
+                        ? new Vector2(24f, -96f)
                     : new Vector2(24f, WorkerDrawer != null && WorkerDrawer.IsOpen ? 554f : 96f);
             }
         }

@@ -48,6 +48,33 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void LowAmmoRule_UsesInclusiveTwentyFivePercentCapacityThreshold()
+        {
+            Assert.That(FirstRunOnboardingRules.ShouldShowLowAmmoStep(
+                false, true, false, 50, 200,
+                FirstRunOnboardingUI.LowAmmoThresholdPercent), Is.True);
+            Assert.That(FirstRunOnboardingRules.ShouldShowLowAmmoStep(
+                false, true, false, 51, 200,
+                FirstRunOnboardingUI.LowAmmoThresholdPercent), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldShowLowAmmoStep(
+                false, true, false, 0, 200,
+                FirstRunOnboardingUI.LowAmmoThresholdPercent), Is.True);
+
+            Assert.That(FirstRunOnboardingRules.ShouldShowLowAmmoStep(
+                true, true, false, 50, 200,
+                FirstRunOnboardingUI.LowAmmoThresholdPercent), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldShowLowAmmoStep(
+                false, false, false, 50, 200,
+                FirstRunOnboardingUI.LowAmmoThresholdPercent), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldShowLowAmmoStep(
+                false, true, true, 50, 200,
+                FirstRunOnboardingUI.LowAmmoThresholdPercent), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldShowLowAmmoStep(
+                false, true, false, 0, 0,
+                FirstRunOnboardingUI.LowAmmoThresholdPercent), Is.False);
+        }
+
+        [Test]
         public void ActiveHudPrefab_HasSingleNonBlockingEnglishWorkerRatioPresentation()
         {
             GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(HudPrefabPath);
@@ -79,6 +106,8 @@ namespace DeadWalls.Tests
             string copy = (string)text.GetType().GetProperty("text").GetValue(text);
             Assert.That(copy, Is.EqualTo(FirstRunOnboardingUI.WorkerRatioHint));
             Assert.That(copy, Does.Match("^[A-Z0-9 .+]+$"));
+            Assert.That(FirstRunOnboardingUI.BasicArcherHint, Does.Match("^[A-Z0-9 .+]+$"));
+            Assert.That(FirstRunOnboardingUI.LowAmmoHint, Does.Match("^[A-Z0-9 .+]+$"));
         }
 
         private static RectTransform FindUniqueRect(GameObject root, string objectName)

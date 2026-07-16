@@ -95,6 +95,8 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - Basarili player-facing buy action'i `ArcherPurchasedByPlayer` event'ini yayar; onboarding gibi presentation consumer'lari transaction'i tekrar etmeden bu event'i dinler
 - Worker economy aktifken `Repair`, `Fortify` ve `Rally` player-facing drawer'da gizlenir; drawer archer recruitment paneli olarak kalir
 - Legacy `Arrow Refill` kontrolü gizlenir; Arrow chip'i scene-owned `ArrowSupplyUI` tek satır panelini açar
+- Basarili player-facing `+1`, `+5` veya `Buy Max` refill
+  `ArrowRefillPurchasedByPlayer` event'ini yayar; CAP/EFF yatirimi bu event'i yaymaz
 - Mobile continuous siege loop'ta `Start Next Wave` player-facing UI'da gizlenir; oyun durmadan `DAY / DUSK / NIGHT` cycle'i akar
 - Runtime davranisi prefaba gomulmez; controller ve scene setup tool tarafinda baglanir
   (UI dogrudan prefab uzerinde uretilir; eski UIImporter/export pipeline'i 2026-07-06'da kaldirildi)
@@ -122,9 +124,11 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - Package I ilk-kosu ogretiminin scene-owned, non-modal presentation sahibidir
 - Ilk Day worker ratio adiminda drawer kapaliyken Workers/Housing toggle'ini, acikken ilk ratio kontrolunu pulse eder; tek satir English hint gosterir
 - Basic Archer ilk kez gercekten satin alinabilir oldugunda drawer kapaliyken ARCHERS toggle'ini, acikken runtime Basic BUY kontrolunu pulse eder
+- Finite Arrow stoku effective kapasitenin `%25` veya altina ilk kez indiginde ust HUD'daki gercek `ArrowChip` satirini pulse eder; ammo panelini otomatik acmaz
 - Gameplay transaction'i, otomatik drawer acma, resource harcama veya worker dagitma yapmaz
 - Basarili gercek player ratio action'ini `WorkerEconomyDrawerUI` event'inden alir ve `tutorial.v1.worker_ratio` stable flag'ini canonical `MetaProgression` API'siyle durable yazar
 - Basarili gercek Basic Archer satin alimini `MarketUI` event'inden alir ve `tutorial.v1.basic_archer` stable flag'ini durable yazar
+- Basarili gercek Arrow refill satin alimini `ArrowSupplyUI` event'inden alir ve `tutorial.v1.low_ammo` stable flag'ini durable yazar
 - Otoriter dok: `FIRST_RUN_ONBOARDING_UI_ARCHITECTURE.md`
 
 ### TechTreeUI.cs

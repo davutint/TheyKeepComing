@@ -10,6 +10,8 @@ namespace DeadWalls
     /// </summary>
     public sealed class ArrowSupplyUI : MonoBehaviour
     {
+        public event System.Action ArrowRefillPurchasedByPlayer;
+
         public GameObject AmmoPanel;
         public Button ToggleButton;
         public TMP_Text StockText;
@@ -173,19 +175,25 @@ namespace DeadWalls
 
         private void BuyPackage()
         {
-            GameManager.Instance?.TryBuyArrowRefill(1);
+            GameManager gm = GameManager.Instance;
+            if (gm != null && gm.TryBuyArrowRefill(1))
+                ArrowRefillPurchasedByPlayer?.Invoke();
             Refresh();
         }
 
         private void BuyLargePackage()
         {
-            GameManager.Instance?.TryBuyArrowRefill(5);
+            GameManager gm = GameManager.Instance;
+            if (gm != null && gm.TryBuyArrowRefill(5))
+                ArrowRefillPurchasedByPlayer?.Invoke();
             Refresh();
         }
 
         private void BuyMax()
         {
-            GameManager.Instance?.TryBuyMaxArrowRefill();
+            GameManager gm = GameManager.Instance;
+            if (gm != null && gm.TryBuyMaxArrowRefill())
+                ArrowRefillPurchasedByPlayer?.Invoke();
             Refresh();
         }
 

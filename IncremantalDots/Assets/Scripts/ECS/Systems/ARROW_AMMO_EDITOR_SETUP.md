@@ -24,6 +24,9 @@ oluşmaz.
 - `PackageButton`, `LargePackageButton`, `BuyMaxButton`
 - `CapacityUpgradeButton`, `EfficiencyUpgradeButton`
 
+Scene-owned `FirstRunOnboardingUI.AmmoSupply`, ayni `ArrowSupplyUI` component'ine bagli
+olmalidir. Prefab asseti runtime onboarding controller tasimaz.
+
 Panel varsayılan olarak kapalıdır ve Arrow chip'iyle açılıp kapanır. `HUDController`
 ayrıca chip üzerindeki ana değeri `Current / Capacity` biçiminde günceller.
 
@@ -51,7 +54,9 @@ profile bulunmayan eski sahneler içindir.
 - Capacity/Efficiency al: ikisi de Wood + Iron harcamalı ve fiyatları ayrı seviyeleriyle
   büyümeli.
 - Save/Continue: current stok ve iki yatırım seviyesi aynı kalmalı.
+- Onboarding flag incomplete iken stoku `%25` esigine indir: `ArrowChip` pulse olmali,
+  `AmmoPurchasePanel` kendiliginden acilmamali; basarisiz refill flag yazmamali, basarili refill
+  `tutorial.v1.low_ammo` flag'ini yazmalidir.
 
 Otomatik regresyon için `ArrowEconomyUtilityTests`, `RunPersistenceTests` ve
 `ArrowAmmoPlayModeTests` çalıştırılır.
-

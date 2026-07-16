@@ -83,7 +83,7 @@ SubScene:
   Grave Essence, status, compass, `+1/+10/MAX`, badge ve toast alanlari bagli; `TechTreeUI` yok
 - `CastleEconomyUI`: legacy full-screen panel bindingleri bagli kalabilir ama `PlayerFacingPanelEnabled = false`; `CastleEconomyPanel` ve `CastleTapHint` player-facing kapali tutulur
 - `WorkerEconomyDrawerUI`: sol ust worker drawer toggle/panel, summary alanlari, Wood/Stone/Iron/Food target kontrolleri ve `CAP / EFF` bina yatirim butonlari bagli
-- `FirstRunOnboardingUI`: scene HUD root'ta tek component; `WorkerEconomyDrawerUI`, `MarketUI`, `OnboardingHintPanel/Text` ve `OnboardingPulseFrame` referanslari dolu
+- `FirstRunOnboardingUI`: scene HUD root'ta tek component; `WorkerEconomyDrawerUI`, `MarketUI`, `ArrowSupplyUI`, `OnboardingHintPanel/Text` ve `OnboardingPulseFrame` referanslari dolu
 - `CastleInteriorWorkerPlacement`: Wood/Stone/Iron/Food pickup root'lari ve `CastleWorkerHub/DeliveryPoints` delivery root'u bagli
 - `GameManager`: test icin `Free Economy Test Mode` acilirsa archer buy ve legacy/debug upgrade/unlock/prep API'leri kaynak/population harcamadan calisir; sag drawer player-facing yalnizca buy kullanir
 - `CastleTapHint`, `EconomyEventBadge` ve opsiyonel glow objelerinin raycast target'lari kapatilir; eski castle tap akisi player-facing kullanilmaz

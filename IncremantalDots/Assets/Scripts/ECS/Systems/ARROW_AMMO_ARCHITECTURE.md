@@ -20,6 +20,8 @@ tick'inde atış yeniden başlar. Fletcher, üretim kuyruğu, worker veya beklem
   maliyeti matematiğinin saf sahibidir.
 - `GameManager`: oyuncu transaction'larının tek owner'ıdır; fiyat okur, kaynak harcar,
   `ArrowSupply` yazar ve UI event'i yayınlar.
+- `ArrowSupplyUI`: yalniz basarili player-facing refill sonrasinda
+  `ArrowRefillPurchasedByPlayer` event'ini yayar; onboarding transaction'i tekrar etmeden dinler.
 - `ArcherShootSystem`: yalnız gerçek projectile pool rent'i başarılı olduktan sonra
   `Current` değerini bir azaltır. Pool boşsa Arrow harcanmaz.
 
@@ -48,6 +50,10 @@ tek satırlık `AmmoPurchasePanel` açar. Panel mevcut stok/verim, `+1 paket`, `
 Kaynak yetersizliği butonu kapatır fakat fiyatı gizlemez; yalnız dolu stok `FULL`,
 Wood ile hiçbir Arrow alınamayan Buy Max durumu `NEED WOOD` yazar.
 
+Ilk-kosu onboarding'i finite stok effective kapasitenin inclusive `%25` veya altina indiginde
+yalniz ust HUD `ArrowChip` satirini pulse eder. Paneli otomatik acmaz. Basarili `+1`, `+5` veya
+`Buy Max` refill ammo tutorial flag'ini tamamlar; CAP/EFF yatirimi tamamlamaz.
+
 ## Save ve migration
 
 Run save güncel şema `v8`'dir. `ArrowCurrent`, `ArrowCapacityLevel` ve
@@ -69,4 +75,3 @@ Doğrulama sahipleri:
 - `ArrowAmmoPlayModeTests`: stok `0` iken atışın durması, instant refill sonrası yeniden
   başlaması, projectile başına `1` tüketim ve Rapid tüketim farkı.
 - `RunPersistenceTests`: şema `v8`, eski kayıt migration'ı ve yatırım seviyeleri.
-

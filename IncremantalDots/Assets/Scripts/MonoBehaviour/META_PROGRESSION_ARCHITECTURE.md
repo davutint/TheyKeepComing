@@ -50,7 +50,8 @@ saf schema/migration test sahibidir; Player-facing kod doğrudan çağırmaz.
 
 Ilk aktif consumer `FirstRunOnboardingUI`, `tutorial.v1.worker_ratio` flag'ini yalnız başarılı
 gerçek player ratio action'ından; `tutorial.v1.basic_archer` flag'ini yalnız başarılı gerçek
-Basic Archer satın alımından sonra yazar. Kalan tutorial adımları ve final complete/reset
+Basic Archer satın alımından; `tutorial.v1.low_ammo` flag'ini yalnız başarılı gerçek Arrow
+refill satın alımından sonra yazar. Kalan tutorial adımları ve final complete/reset
 flag'leri sonraki Package I tracker işlerinde kalır. Pool unlock consumer'ı da owner onaylı
 content işini bekler. Satın alma ve graph izolasyon sınırı aşağıdaki runtime sözleşmesiyle
 tamamlanmıştır.

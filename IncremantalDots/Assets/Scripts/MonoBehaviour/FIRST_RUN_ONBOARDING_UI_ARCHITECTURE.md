@@ -30,12 +30,25 @@ owner'larinin player-action event'lerini dinler; yalniz non-modal hint ve pulse 
 - Yalniz `MarketUI` uzerinden basarili gercek Basic satin alma
   `ArcherPurchasedByPlayer` event'ini yayar. Basarisiz/locked/cap-blocked tik flag yazmaz.
 
+## Ilk Dusuk Ammo Adimi
+
+- Stable meta flag: `tutorial.v1.low_ammo`.
+- Gorunme kapisi: mobile worker economy aktif, oyun bitmemis ve finite Arrow stoku effective
+  kapasitenin inclusive `%25` veya altinda.
+- Worker ratio ve Basic Archer adimlari ayni anda uygunsa onceki adimlar sunum onceligini korur;
+  prompt gorunmeden yapilan basarili refill yine ammo adimini tamamlar.
+- Tek hedef, ust resource strip'teki gercek `ArrowSupplyUI.ToggleButton` / `ArrowChip` satiridir.
+  `AmmoPurchasePanel` oyuncu adina acilmaz.
+- Tek player-facing metin English'tir: `RESTOCK YOUR ARROWS.`
+- Yalniz `ArrowSupplyUI` uzerinden basarili `+1`, `+5` veya `Buy Max` refill satin alimi
+  `ArrowRefillPurchasedByPlayer` event'ini yayar. Basarisiz refill ve CAP/EFF yatirimi flag yazmaz.
+
 ## Sunum Siniri
 
 `OnboardingHintPanel` ve `OnboardingPulseFrame`, aktif generated HUD prefabinin responsive
 gorsel root'u altindadir. Raycast kapali oldugu icin combat ve management input'unu engellemez.
 Pulse `Time.unscaledTime` kullanir; simulation pause state'ini degistirmez.
 
-Sonraki ammo, Heart, Council, repair ve ability onboarding adimlari ayni
+Sonraki Heart, Council, repair ve ability onboarding adimlari ayni
 scene-owned controller ve stable meta flag siniri uzerinden eklenir; bu adim final tutorial
 complete flag'i yerine gecmez.

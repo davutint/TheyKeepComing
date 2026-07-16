@@ -67,8 +67,9 @@ Filled/Horizontal/Left azalan sure seridine baglar; V1'de yalniz regular Day `3/
 First-run onboarding sunumu generated prefabda raycast kapali
 `OnboardingHintPanel` ve `OnboardingPulseFrame` olarak kalir. Runtime state prefab assetine
 gomulmez; setup tool scene HUD root'una tek `FirstRunOnboardingUI` ekler ve mevcut
-`WorkerEconomyDrawerUI` ile `MarketUI` player-action event'lerine baglar. Worker ratio ve ilk
-affordable Basic Archer adimlari ayni non-modal sunumu paylasir. Akis oyunu pause etmez,
+`WorkerEconomyDrawerUI`, `MarketUI` ve `ArrowSupplyUI` player-action event'lerine baglar.
+Worker ratio, ilk affordable Basic Archer ve ilk `%25` low-ammo adimlari ayni non-modal
+sunumu paylasir. Low-ammo hedefi gercek ust HUD `ArrowChip` satiridir. Akis oyunu pause etmez,
 drawer'i otomatik acmaz ve ekonomi state'i yazmaz.
 
 Sabit kamera framing sozlesmesi `Main Camera` position `(6,0,-10)`, orthographic size `8`

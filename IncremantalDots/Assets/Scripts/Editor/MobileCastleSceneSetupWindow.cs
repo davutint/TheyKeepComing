@@ -4934,6 +4934,7 @@ namespace DeadWalls
             var onboarding = EnsureComponent<FirstRunOnboardingUI>(hudRoot);
             onboarding.WorkerDrawer = hudRoot.GetComponent<WorkerEconomyDrawerUI>();
             onboarding.ArcherMarket = hudRoot.GetComponent<MarketUI>();
+            onboarding.AmmoSupply = hudRoot.GetComponent<ArrowSupplyUI>();
             onboarding.HintPanel = FindChildByName(hudRoot, "OnboardingHintPanel");
             onboarding.HintText = FindComponentInChildrenByName<TextMeshProUGUI>(
                 hudRoot, "OnboardingHintText");

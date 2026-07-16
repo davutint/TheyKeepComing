@@ -16,6 +16,8 @@ scene setup tool tarafindan scene owner'ina eklenir ve isimle baglanir.
   `WoodWorkerTargetPlus10Button`.
 - Basic Archer target: `DrawerToggleButton` veya Archer drawer acikken runtime-generated
   `ArcherRecruitmentRow_basic_archer/ArcherBuyButton`.
+- Low Ammo target: her durumda ust resource strip'teki `ArrowChip`; threshold effective
+  `Current / Capacity <= %25`, panel otomatik acilmaz.
 
 Idempotent onarim: `Window -> DeadWalls -> Repair First Run Onboarding`.
 
@@ -28,3 +30,6 @@ Idempotent onarim: `Window -> DeadWalls -> Repair First Run Onboarding`.
   state'ini kendi basina degistirmedigini dogrular.
 - Basic Archer PlayMode testi, yetersiz kaynaktan ilk affordability'ye gecisi, kapali/acik drawer
   hedeflerini ve yalniz basarili satin almanin `tutorial.v1.basic_archer` flag'ini yazdigini dogrular.
+- Low Ammo PlayMode testi `%25` inclusive esigi, gercek Arrow chip hedefi, panelin kapali kalmasi,
+  basarisiz refill'in flag yazmamasi ve yalniz basarili refill'in `tutorial.v1.low_ammo` flag'ini
+  durable yazmasini dogrular.
