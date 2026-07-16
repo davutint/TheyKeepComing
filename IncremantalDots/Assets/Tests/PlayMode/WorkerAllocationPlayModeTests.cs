@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.IO;
 using System.Reflection;
@@ -9,6 +10,7 @@ using Unity.Transforms;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
+using Object = UnityEngine.Object;
 using UnityEngine.UI;
 
 namespace DeadWalls.Tests
@@ -75,6 +77,7 @@ namespace DeadWalls.Tests
         [UnityTearDown]
         public IEnumerator TearDown()
         {
+            Time.timeScale = 1f;
             RunPersistence.Delete();
             if (_originalRunSave != null)
                 File.WriteAllBytes(_runSavePath, _originalRunSave);
@@ -217,15 +220,17 @@ namespace DeadWalls.Tests
 
             int countBefore = gameManager.GetArcherTypeCount(ArcherType.Basic);
             ResourceCost cost = gameManager.GetArcherBuyCost(ArcherType.Basic);
+            ResourceData resourcesBeforePurchase =
+                entityManager.GetComponentData<ResourceData>(resourceEntity);
             basicBuyButton.onClick.Invoke();
-            yield return null;
-
             ResourceData resourcesAfter = entityManager.GetComponentData<ResourceData>(resourceEntity);
             Assert.That(gameManager.GetArcherTypeCount(ArcherType.Basic), Is.EqualTo(countBefore + 1));
-            Assert.That(resourcesAfter.Wood, Is.EqualTo(fundedResources.Wood - cost.Wood));
-            Assert.That(resourcesAfter.Stone, Is.EqualTo(fundedResources.Stone - cost.Stone));
-            Assert.That(resourcesAfter.Iron, Is.EqualTo(fundedResources.Iron - cost.Iron));
-            Assert.That(resourcesAfter.Food, Is.EqualTo(fundedResources.Food - cost.Food));
+            Assert.That(resourcesAfter.Wood, Is.EqualTo(resourcesBeforePurchase.Wood - cost.Wood));
+            Assert.That(resourcesAfter.Stone, Is.EqualTo(resourcesBeforePurchase.Stone - cost.Stone));
+            Assert.That(resourcesAfter.Iron, Is.EqualTo(resourcesBeforePurchase.Iron - cost.Iron));
+            Assert.That(resourcesAfter.Food, Is.EqualTo(resourcesBeforePurchase.Food - cost.Food));
+            yield return null;
+
             Assert.That(MetaProgression.HasTutorialFlag(
                 FirstRunOnboardingUI.BasicArcherFlagId), Is.True);
             Assert.That(onboarding.IsBasicArcherStepVisible, Is.False);
@@ -311,13 +316,15 @@ namespace DeadWalls.Tests
             Assert.That(quote.IsValid, Is.True);
             ammoSupply.Refresh();
             Assert.That(ammoSupply.PackageButton.interactable, Is.True);
+            ResourceData resourcesBeforeRefill =
+                entityManager.GetComponentData<ResourceData>(gameStateEntity);
             ammoSupply.PackageButton.onClick.Invoke();
-            yield return null;
-
             Assert.That(entityManager.GetComponentData<ArrowSupply>(gameStateEntity).Current,
                 Is.EqualTo(threshold + quote.ArrowAmount));
             Assert.That(entityManager.GetComponentData<ResourceData>(gameStateEntity).Wood,
-                Is.EqualTo(resources.Wood - quote.WoodCost));
+                Is.EqualTo(resourcesBeforeRefill.Wood - quote.WoodCost));
+            yield return null;
+
             Assert.That(MetaProgression.HasTutorialFlag(
                 FirstRunOnboardingUI.LowAmmoFlagId), Is.True);
             Assert.That(onboarding.IsLowAmmoStepVisible, Is.False);
@@ -658,6 +665,210 @@ namespace DeadWalls.Tests
             Assert.That(onboarding.IsNightAbilityKeyStepVisible, Is.False);
             Assert.That(onboarding.HintPanel.activeSelf, Is.False);
             Assert.That(onboarding.PulseFrame.gameObject.activeSelf, Is.False);
+        }
+
+        [UnityTest]
+        public IEnumerator FirstRunOnboarding_AllSevenCuesRemainPresentationOnlyAndTransactionFree()
+        {
+            GameManager gameManager = GameManager.Instance;
+            FirstRunOnboardingUI onboarding =
+                Object.FindFirstObjectByType<FirstRunOnboardingUI>();
+            WorkerEconomyDrawerUI workerDrawer =
+                Object.FindFirstObjectByType<WorkerEconomyDrawerUI>();
+            MarketUI archerMarket = Object.FindFirstObjectByType<MarketUI>();
+            ArrowSupplyUI ammoSupply = Object.FindFirstObjectByType<ArrowSupplyUI>();
+            HeartScreenUI heart = Object.FindFirstObjectByType<HeartScreenUI>();
+            CouncilEventUI council = Object.FindFirstObjectByType<CouncilEventUI>();
+            Assert.That(onboarding, Is.Not.Null);
+            Assert.That(workerDrawer, Is.Not.Null);
+            Assert.That(archerMarket, Is.Not.Null);
+            Assert.That(ammoSupply, Is.Not.Null);
+            Assert.That(heart, Is.Not.Null);
+            Assert.That(council, Is.Not.Null);
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            using EntityQuery gameStateQuery = entityManager.CreateEntityQuery(
+                typeof(ResourceData),
+                typeof(ArrowSupply),
+                typeof(GraveEssence),
+                typeof(PopulationState));
+            using EntityQuery allocationQuery = entityManager.CreateEntityQuery(
+                typeof(MobilePopulationAllocation),
+                typeof(MobileBedCapacityState),
+                typeof(MobileWorkerBuildingUpgradeState));
+            using EntityQuery cycleQuery = entityManager.CreateEntityQuery(
+                typeof(ContinuousSiegeCycleData));
+            using EntityQuery prepQuery = entityManager.CreateEntityQuery(
+                typeof(CastleYardPrepState));
+            using EntityQuery pauseQuery = entityManager.CreateEntityQuery(
+                typeof(MobilePrepPauseState));
+            using EntityQuery wallQuery = entityManager.CreateEntityQuery(typeof(WallSegment));
+            Assert.That(gameStateQuery.CalculateEntityCount(), Is.EqualTo(1));
+            Assert.That(allocationQuery.CalculateEntityCount(), Is.EqualTo(1));
+            Assert.That(cycleQuery.CalculateEntityCount(), Is.EqualTo(1));
+            Assert.That(prepQuery.CalculateEntityCount(), Is.EqualTo(1));
+            Assert.That(pauseQuery.CalculateEntityCount(), Is.EqualTo(1));
+            Assert.That(wallQuery.CalculateEntityCount(), Is.EqualTo(1));
+
+            Entity gameStateEntity = gameStateQuery.GetSingletonEntity();
+            Entity allocationEntity = allocationQuery.GetSingletonEntity();
+            Entity cycleEntity = cycleQuery.GetSingletonEntity();
+            Entity prepEntity = prepQuery.GetSingletonEntity();
+            Entity pauseEntity = pauseQuery.GetSingletonEntity();
+            Entity wallEntity = wallQuery.GetSingletonEntity();
+            PropertyInfo cycleProperty = typeof(GameManager).GetProperty(
+                "ContinuousSiegeCycle",
+                BindingFlags.Instance | BindingFlags.Public);
+            MethodInfo cycleSetter = cycleProperty?.GetSetMethod(true);
+            FieldInfo rallyCooldownField = typeof(GameManager).GetField(
+                "_rallyCooldownRemaining",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            PropertyInfo prepProperty = typeof(GameManager).GetProperty(
+                "CastleYardPrep",
+                BindingFlags.Instance | BindingFlags.Public);
+            Assert.That(cycleSetter, Is.Not.Null);
+            Assert.That(rallyCooldownField, Is.Not.Null);
+            Assert.That(prepProperty, Is.Not.Null);
+
+            ResourceData fundedResources =
+                entityManager.GetComponentData<ResourceData>(gameStateEntity);
+            fundedResources.Wood = 1_000_000;
+            fundedResources.Stone = 1_000_000;
+            fundedResources.Iron = 1_000_000;
+            fundedResources.Food = 1_000_000;
+            entityManager.SetComponentData(gameStateEntity, fundedResources);
+            SetOnboardingCycle(
+                entityManager,
+                cycleEntity,
+                gameManager,
+                cycleSetter,
+                0,
+                SiegeCyclePhase.Day);
+            Time.timeScale = 0f;
+
+            yield return AssertCueIsTransactionFree(
+                () => onboarding.IsWorkerRatioStepVisible,
+                "Worker ratio cue",
+                entityManager,
+                gameStateEntity,
+                allocationEntity);
+            Assert.That(workerDrawer.IsOpen, Is.False,
+                "Worker onboarding drawer'i oyuncu adina acmamalidir.");
+
+            Assert.That(MetaProgression.SetTutorialFlag(
+                FirstRunOnboardingUI.WorkerRatioFlagId, true), Is.True);
+            yield return AssertCueIsTransactionFree(
+                () => onboarding.IsBasicArcherStepVisible,
+                "Basic Archer cue",
+                entityManager,
+                gameStateEntity,
+                allocationEntity);
+            Assert.That(archerMarket.IsDrawerOpen, Is.False,
+                "Archer onboarding drawer'i oyuncu adina acmamalidir.");
+
+            Assert.That(MetaProgression.SetTutorialFlag(
+                FirstRunOnboardingUI.BasicArcherFlagId, true), Is.True);
+            ArrowSupply arrows = entityManager.GetComponentData<ArrowSupply>(gameStateEntity);
+            arrows.Current = 0;
+            entityManager.SetComponentData(gameStateEntity, arrows);
+            yield return AssertCueIsTransactionFree(
+                () => onboarding.IsLowAmmoStepVisible,
+                "Low ammo cue",
+                entityManager,
+                gameStateEntity,
+                allocationEntity);
+            Assert.That(ammoSupply.IsOpen, Is.False,
+                "Ammo onboarding paneli oyuncu adina acmamalidir.");
+
+            Assert.That(MetaProgression.SetTutorialFlag(
+                FirstRunOnboardingUI.LowAmmoFlagId, true), Is.True);
+            GraveEssence essence =
+                entityManager.GetComponentData<GraveEssence>(gameStateEntity);
+            essence.Current = 1;
+            entityManager.SetComponentData(gameStateEntity, essence);
+            yield return AssertCueIsTransactionFree(
+                () => onboarding.IsHeartEntryStepVisible,
+                "Castle Heart cue",
+                entityManager,
+                gameStateEntity,
+                allocationEntity);
+            Assert.That(heart.IsOpen, Is.False,
+                "Heart onboarding modal'i oyuncu adina acmamalidir.");
+
+            Assert.That(MetaProgression.SetTutorialFlag(
+                FirstRunOnboardingUI.HeartEntryFlagId, true), Is.True);
+            SetOnboardingCycle(
+                entityManager,
+                cycleEntity,
+                gameManager,
+                cycleSetter,
+                2,
+                SiegeCyclePhase.Dawn);
+            Assert.That(gameManager.TryOpenRegularCouncilEvent(), Is.True);
+            ComposedCouncilEvent activeCouncil = gameManager.ActiveCouncilEvent;
+            for (int frame = 0; frame < 3; frame++)
+                yield return null;
+
+            yield return AssertCueIsTransactionFree(
+                () => onboarding.IsCouncilExactStepVisible,
+                "Regular Council cue",
+                entityManager,
+                gameStateEntity,
+                allocationEntity);
+            Assert.That(gameManager.ActiveCouncilEvent, Is.SameAs(activeCouncil),
+                "Council onboarding oyuncu adina option secmemelidir.");
+
+            Assert.That(MetaProgression.SetTutorialFlag(
+                FirstRunOnboardingUI.CouncilExactFlagId, true), Is.True);
+            gameManager.ExpireCouncilEvent();
+            WallSegment wall = entityManager.GetComponentData<WallSegment>(wallEntity);
+            wall.CurrentHP = wall.MaxHP * 0.5f;
+            entityManager.SetComponentData(wallEntity, wall);
+            SetOnboardingCycle(
+                entityManager,
+                cycleEntity,
+                gameManager,
+                cycleSetter,
+                2,
+                SiegeCyclePhase.Day);
+            yield return AssertCueIsTransactionFree(
+                () => onboarding.IsDaytimeRepairStepVisible,
+                "Daytime repair cue",
+                entityManager,
+                gameStateEntity,
+                allocationEntity);
+
+            Assert.That(MetaProgression.SetTutorialFlag(
+                FirstRunOnboardingUI.DaytimeRepairFlagId, true), Is.True);
+            wall.CurrentHP = wall.MaxHP;
+            entityManager.SetComponentData(wallEntity, wall);
+            MobilePrepPauseState pause =
+                entityManager.GetComponentData<MobilePrepPauseState>(pauseEntity);
+            pause.IsPaused = true;
+            entityManager.SetComponentData(pauseEntity, pause);
+            Time.timeScale = 1f;
+            SetOnboardingCycle(
+                entityManager,
+                cycleEntity,
+                gameManager,
+                cycleSetter,
+                0,
+                SiegeCyclePhase.Night);
+            CastleYardPrepState prep =
+                entityManager.GetComponentData<CastleYardPrepState>(prepEntity);
+            prep.RallyTimer = 0f;
+            entityManager.SetComponentData(prepEntity, prep);
+            rallyCooldownField.SetValue(gameManager, 0f);
+            prepProperty.SetValue(gameManager, prep);
+            yield return AssertCueIsTransactionFree(
+                () => onboarding.IsNightAbilityKeyStepVisible,
+                "Night ability-key cue",
+                entityManager,
+                gameStateEntity,
+                allocationEntity);
+            Assert.That(MetaProgression.HasTutorialFlag(
+                FirstRunOnboardingUI.NightAbilityKeyFlagId), Is.False,
+                "Ability cue accepted keyboard action olmadan tamamlanmamalidir.");
         }
 
         [UnityTest]
@@ -1052,6 +1263,134 @@ namespace DeadWalls.Tests
             yield return null;
             feedback = entityManager.GetComponentData<WorkerLogisticsFeedbackState>(worker);
             Assert.That(feedback.LanternActive, Is.Zero);
+        }
+
+        private readonly struct OnboardingEconomySnapshot
+        {
+            public readonly ResourceData Resources;
+            public readonly ArrowSupply Arrows;
+            public readonly GraveEssence Essence;
+            public readonly PopulationState Population;
+            public readonly MobilePopulationAllocation Allocation;
+            public readonly MobileBedCapacityState Beds;
+            public readonly MobileWorkerBuildingUpgradeState WorkerBuildings;
+
+            public OnboardingEconomySnapshot(
+                ResourceData resources,
+                ArrowSupply arrows,
+                GraveEssence essence,
+                PopulationState population,
+                MobilePopulationAllocation allocation,
+                MobileBedCapacityState beds,
+                MobileWorkerBuildingUpgradeState workerBuildings)
+            {
+                Resources = resources;
+                Arrows = arrows;
+                Essence = essence;
+                Population = population;
+                Allocation = allocation;
+                Beds = beds;
+                WorkerBuildings = workerBuildings;
+            }
+        }
+
+        private static IEnumerator AssertCueIsTransactionFree(
+            Func<bool> cueVisible,
+            string cueName,
+            EntityManager entityManager,
+            Entity gameStateEntity,
+            Entity allocationEntity)
+        {
+            OnboardingEconomySnapshot before = CaptureOnboardingEconomy(
+                entityManager,
+                gameStateEntity,
+                allocationEntity);
+            float presentationDeadline = Time.realtimeSinceStartup + 5f;
+            while (!cueVisible() && Time.realtimeSinceStartup < presentationDeadline)
+                yield return null;
+
+            Assert.That(cueVisible(), Is.True, $"{cueName} gorunur olmadi.");
+            for (int frame = 0; frame < 5; frame++)
+                yield return null;
+
+            OnboardingEconomySnapshot after = CaptureOnboardingEconomy(
+                entityManager,
+                gameStateEntity,
+                allocationEntity);
+            Assert.That(after.Resources, Is.EqualTo(before.Resources),
+                $"{cueName} Wood/Stone/Iron/Food state'ini degistirdi.");
+            Assert.That(after.Arrows, Is.EqualTo(before.Arrows),
+                $"{cueName} Arrow state'ini degistirdi.");
+            Assert.That(after.Essence, Is.EqualTo(before.Essence),
+                $"{cueName} Grave Essence state'ini degistirdi.");
+            Assert.That(after.Population, Is.EqualTo(before.Population),
+                $"{cueName} population/worker toplamlarini degistirdi.");
+            AssertWorkerAllocationUnchanged(before.Allocation, after.Allocation, cueName);
+            Assert.That(after.Beds, Is.EqualTo(before.Beds),
+                $"{cueName} bed state'ini degistirdi.");
+            Assert.That(after.WorkerBuildings, Is.EqualTo(before.WorkerBuildings),
+                $"{cueName} worker building yatirim state'ini degistirdi.");
+        }
+
+        private static void AssertWorkerAllocationUnchanged(
+            MobilePopulationAllocation before,
+            MobilePopulationAllocation after,
+            string cueName)
+        {
+            Assert.That(after.WoodWorkers, Is.EqualTo(before.WoodWorkers), cueName);
+            Assert.That(after.StoneWorkers, Is.EqualTo(before.StoneWorkers), cueName);
+            Assert.That(after.IronWorkers, Is.EqualTo(before.IronWorkers), cueName);
+            Assert.That(after.FoodWorkers, Is.EqualTo(before.FoodWorkers), cueName);
+            Assert.That(after.WoodTargetRatioBps, Is.EqualTo(before.WoodTargetRatioBps), cueName);
+            Assert.That(after.StoneTargetRatioBps, Is.EqualTo(before.StoneTargetRatioBps), cueName);
+            Assert.That(after.IronTargetRatioBps, Is.EqualTo(before.IronTargetRatioBps), cueName);
+            Assert.That(after.FoodTargetRatioBps, Is.EqualTo(before.FoodTargetRatioBps), cueName);
+            Assert.That(after.WoodWorkerCapacity, Is.EqualTo(before.WoodWorkerCapacity), cueName);
+            Assert.That(after.StoneWorkerCapacity, Is.EqualTo(before.StoneWorkerCapacity), cueName);
+            Assert.That(after.IronWorkerCapacity, Is.EqualTo(before.IronWorkerCapacity), cueName);
+            Assert.That(after.FoodWorkerCapacity, Is.EqualTo(before.FoodWorkerCapacity), cueName);
+            Assert.That(after.IdlePopulation, Is.EqualTo(before.IdlePopulation), cueName);
+        }
+
+        private static OnboardingEconomySnapshot CaptureOnboardingEconomy(
+            EntityManager entityManager,
+            Entity gameStateEntity,
+            Entity allocationEntity)
+        {
+            return new OnboardingEconomySnapshot(
+                entityManager.GetComponentData<ResourceData>(gameStateEntity),
+                entityManager.GetComponentData<ArrowSupply>(gameStateEntity),
+                entityManager.GetComponentData<GraveEssence>(gameStateEntity),
+                entityManager.GetComponentData<PopulationState>(gameStateEntity),
+                entityManager.GetComponentData<MobilePopulationAllocation>(allocationEntity),
+                entityManager.GetComponentData<MobileBedCapacityState>(allocationEntity),
+                entityManager.GetComponentData<MobileWorkerBuildingUpgradeState>(allocationEntity));
+        }
+
+        private static void SetOnboardingCycle(
+            EntityManager entityManager,
+            Entity cycleEntity,
+            GameManager gameManager,
+            MethodInfo cycleSetter,
+            int cycleIndex,
+            SiegeCyclePhase phase)
+        {
+            ContinuousSiegeCycleData cycle =
+                entityManager.GetComponentData<ContinuousSiegeCycleData>(cycleEntity);
+            cycle.Enabled = true;
+            cycle.CycleIndex = cycleIndex;
+            cycle.Phase = phase;
+            cycle.CycleTimer = phase switch
+            {
+                SiegeCyclePhase.Day => 0.5f,
+                SiegeCyclePhase.Dusk => cycle.DayDuration + 0.5f,
+                SiegeCyclePhase.Night => cycle.DayDuration + cycle.DuskDuration + 0.5f,
+                _ => cycle.DayDuration + cycle.DuskDuration + cycle.NightDuration + 0.5f
+            };
+            cycle.CycleProgress01 = cycle.CycleTimer
+                / Mathf.Max(0.01f, cycle.CycleDuration);
+            entityManager.SetComponentData(cycleEntity, cycle);
+            cycleSetter.Invoke(gameManager, new object[] { cycle });
         }
 
         private static int TargetRatioTotal(MobilePopulationAllocation allocation)

@@ -119,6 +119,26 @@ owner'larinin player-action event'lerini dinler; yalniz non-modal hint ve pulse 
   ability kullanmaz, targeting baslatmaz, cooldown/state yazmaz ve resource harcamaz; butun
   transaction `SpellCastUI` ile `GameManager` otoritesinde kalir.
 
+## Global Transaction-Free Siniri
+
+`FirstRunOnboardingUI` gameplay command sahibi degildir. Controller yalniz authoritative state
+okur, gercek player-action event'lerine subscribe olur, shared hint/pulse sunumunu yazar ve kabul
+edilmis action sonrasinda `MetaProgression.SetTutorialFlag` ile tutorial completion saklar.
+
+- Wood, Stone, Iron, Food, Arrow, Grave Essence veya Souls harcayamaz/veremez.
+- Population, actual worker dagilimi, target ratio, bed veya worker-building yatirim state'i
+  yazamaz.
+- Archer satin alamaz, Council option secemez, Wall repair edemez veya ability kullanamaz.
+- Worker/Archer/Ammo/Heart drawer ya da modalini oyuncu adina acamaz; yalniz gercek kontrolu
+  pulse eder.
+- Gameplay transaction'i yalniz ilgili owner (`WorkerEconomyDrawerUI`, `MarketUI`,
+  `ArrowSupplyUI`, `HeartScreenUI`, `CouncilEventUI`, `DefenseRepairUI`, `SpellCastUI` ve
+  `GameManager`) tarafindan player input sonrasinda baslatilir.
+
+Bu sinir EditMode source guard ile yasak transaction/assignment cagrilarina; PlayMode'da ise
+yedi cue'nun her birinde `ResourceData`, `ArrowSupply`, `GraveEssence`, `PopulationState`,
+`MobilePopulationAllocation`, bed ve worker-building state snapshot'larina karsi kilitlenir.
+
 ## Sunum Siniri
 
 `OnboardingHintPanel` ve `OnboardingPulseFrame`, aktif generated HUD prefabinin responsive

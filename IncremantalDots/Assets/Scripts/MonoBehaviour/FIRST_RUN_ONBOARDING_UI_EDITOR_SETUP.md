@@ -70,3 +70,9 @@ Idempotent onarim: `Window -> DeadWalls -> Repair First Run Onboarding`.
   copy'yi, locked hotkey reddini, mouse button kullaniminin flag yazmamasini, kabul edilmis `[2]`
   hotkey'inin `tutorial.v1.ability_key` flag'ini durable yazmasini ve tutorial'in resource
   state'ine dokunmamasini dogrular.
+- Global transaction-free EditMode guard'i controller source'unda Archer/Ammo/Heart/Council/
+  repair/ability transaction'i, worker assignment, ECS write, programmatic panel open ve button
+  invoke cagrilarini yasaklar; `MetaProgression.SetTutorialFlag` izinli tek persistence yazimidir.
+- Global transaction-free PlayMode testi yedi cue'yu action cagirilmadan sirayla gorunur yapar;
+  her cue boyunca Wood/Stone/Iron/Food, Arrow, Grave Essence, population, actual worker dagilimi,
+  target ratio, bed ve worker-building state'lerinin exact ayni kaldigini dogrular.

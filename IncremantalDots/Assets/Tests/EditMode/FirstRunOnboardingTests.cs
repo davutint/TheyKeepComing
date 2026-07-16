@@ -10,6 +10,8 @@ namespace DeadWalls.Tests
     {
         private const string HudPrefabPath =
             "Assets/Prefabs/UI/Generated/MobileCastleHudRoot.prefab";
+        private const string ControllerScriptPath =
+            "Assets/Scripts/MonoBehaviour/FirstRunOnboardingUI.cs";
 
         [Test]
         public void WorkerRatioRule_ShowsOnlyDuringIncompleteFirstDay()
@@ -211,6 +213,42 @@ namespace DeadWalls.Tests
                 Does.Match("^[A-Z0-9 .+]+$"));
             Assert.That(FirstRunOnboardingUI.EmergencyRepairAbilityKeyHint,
                 Does.Match("^[A-Z0-9 .+]+$"));
+        }
+
+        [Test]
+        public void ControllerSource_HasNoGameplayTransactionOrWorkerAssignmentCalls()
+        {
+            MonoScript controller = AssetDatabase.LoadAssetAtPath<MonoScript>(ControllerScriptPath);
+            Assert.That(controller, Is.Not.Null);
+            string source = controller.text;
+
+            string[] forbiddenCalls =
+            {
+                ".BuyArcher(",
+                ".TryPurchase(",
+                ".TrySpend(",
+                ".SpendResources(",
+                ".GrantGraveEssence(",
+                ".RepairDefenseFull(",
+                ".TryUseRally(",
+                ".TryUseEmergencyRepair(",
+                ".TryCastFireball(",
+                ".ChooseCouncilOption(",
+                ".SetWorkerTargetRatio(",
+                ".SetWorkerCount(",
+                ".AssignWorker(",
+                ".SetComponentData(",
+                ".SetOpen(",
+                ".onClick.Invoke("
+            };
+
+            foreach (string forbiddenCall in forbiddenCalls)
+            {
+                Assert.That(source, Does.Not.Contain(forbiddenCall), forbiddenCall);
+            }
+
+            Assert.That(source, Does.Contain("MetaProgression.SetTutorialFlag"),
+                "Controller yalniz tutorial completion persistence'i yazabilmelidir.");
         }
 
         private static RectTransform FindUniqueRect(GameObject root, string objectName)
