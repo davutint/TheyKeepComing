@@ -17,6 +17,11 @@ materyaline açık `_HordeReadability` sözleşmesini taşır:
 - `z`: quad ayak noktasındaki küçük contact-patch kuvveti (`0.56`).
 - `w`: V1'de kullanılmaz ve `0` kalır.
 
+`_HordeGroundContact = (0.50, 0.30, 0.075, 0.025)` contact patch merkezini ve
+yarıçapını materyal seviyesinde tanımlar. Aktif skeleton atlasının walk frame'lerinde ayak
+altı `quad UV y = 0.324-0.348` bandındadır; ellipse üst sınırı `0.325` olduğu için patch
+ayağa temas eder, sprite'ın altında ayrı bir havada-gölge izi oluşturmaz.
+
 Shader mevcut `Opaque / Geometry`, DOTS instancing ve tek-pass sözleşmesini korur. Edge
 dört komşu alpha örneğinden, contact patch ise aynı quad içinde hesaplanır. Yeni renderer,
 entity, material instance, ikinci pass veya draw çağrısı üretilmez. Worker, archer ve Arrow
@@ -44,6 +49,8 @@ frame düşüşünde ağır çekime dönüşmez.
 - GPU: yalnız Vampire fragmanında dört komşu alpha örneği; tek material/HybridBatch korunur.
 - Contact patch ve edge alpha-cutoff hattında kalır; transparent queue veya `ZWrite Off`
   kullanılmaz.
+- Contact patch konumu yalnız Vampire materyal uniform'udur; entity transform, custom 2D
+  physics, hitbox, movement veya animation state'i değişmez.
 
 ## Doğrulama
 

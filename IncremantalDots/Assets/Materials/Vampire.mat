@@ -61,6 +61,7 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _HordeEdgeColor: {r: 0.18, g: 0.26, b: 0.36, a: 1}
     - _HordeGroundColor: {r: 0.03, g: 0.045, b: 0.065, a: 1}
+    - _HordeGroundContact: {r: 0.5, g: 0.3, b: 0.075, a: 0.025}
     - _HordeReadability: {r: 0.66, g: 1, b: 0.56, a: 0}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
     - _UVRect: {r: 0, g: 0, b: 1, a: 1}

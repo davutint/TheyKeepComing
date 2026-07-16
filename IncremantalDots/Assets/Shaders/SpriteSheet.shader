@@ -14,6 +14,7 @@ Shader "DeadWalls/SpriteSheet"
         _HordeReadability ("Horde Readability (Edge, Pixels, Ground, Reserved)", Vector) = (0, 0, 0, 0)
         _HordeEdgeColor ("Horde Edge Color", Color) = (0.18, 0.26, 0.36, 1)
         _HordeGroundColor ("Horde Ground Color", Color) = (0.03, 0.045, 0.065, 1)
+        _HordeGroundContact ("Horde Ground Contact (Center X/Y, Radius X/Y)", Vector) = (0.50, 0.30, 0.075, 0.025)
         _Cutoff ("Alpha Cutoff", Range(0, 1)) = 0.5
     }
 
@@ -73,6 +74,7 @@ Shader "DeadWalls/SpriteSheet"
                 float4 _HordeReadability;
                 float4 _HordeEdgeColor;
                 float4 _HordeGroundColor;
+                float4 _HordeGroundContact;
                 float _Cutoff;
             CBUFFER_END
 
@@ -147,8 +149,8 @@ Shader "DeadWalls/SpriteSheet"
                         * (1.0 - sourceVisible)
                         * saturate(_HordeReadability.x);
 
-                    float2 groundUv = (IN.quadUV - float2(0.50, 0.085))
-                        / float2(0.075, 0.025);
+                    float2 groundUv = (IN.quadUV - _HordeGroundContact.xy)
+                        / max(float2(0.001, 0.001), _HordeGroundContact.zw);
                     float contactPatch = 1.0 - step(1.0, dot(groundUv, groundUv));
                     groundMask = contactPatch
                         * (1.0 - sourceVisible)

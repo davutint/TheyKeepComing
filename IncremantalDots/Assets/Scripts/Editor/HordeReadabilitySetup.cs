@@ -11,6 +11,7 @@ namespace DeadWalls.Editor
         private static readonly Vector4 Readability = new Vector4(0.66f, 1f, 0.56f, 0f);
         private static readonly Color EdgeColor = new Color(0.18f, 0.26f, 0.36f, 1f);
         private static readonly Color GroundColor = new Color(0.03f, 0.045f, 0.065f, 1f);
+        private static readonly Vector4 GroundContact = new Vector4(0.50f, 0.30f, 0.075f, 0.025f);
 
         [MenuItem("Window/DeadWalls/Repair Horde Readability")]
         public static void Repair()
@@ -29,6 +30,7 @@ namespace DeadWalls.Editor
             material.SetVector("_HordeReadability", Readability);
             material.SetColor("_HordeEdgeColor", EdgeColor);
             material.SetColor("_HordeGroundColor", GroundColor);
+            material.SetVector("_HordeGroundContact", GroundContact);
             EditorUtility.SetDirty(material);
             AssetDatabase.SaveAssets();
             Debug.Log("[HordeReadability] Vampire material repaired without extra passes or renderers.");

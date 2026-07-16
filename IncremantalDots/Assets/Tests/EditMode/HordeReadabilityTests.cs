@@ -62,12 +62,21 @@ namespace DeadWalls.Tests
             Assert.That(material.HasProperty("_HordeReadability"), Is.True);
             Assert.That(material.HasProperty("_HordeEdgeColor"), Is.True);
             Assert.That(material.HasProperty("_HordeGroundColor"), Is.True);
+            Assert.That(material.HasProperty("_HordeGroundContact"), Is.True);
 
             Vector4 readability = material.GetVector("_HordeReadability");
             Assert.That(readability.x, Is.InRange(0.5f, 1f));
             Assert.That(readability.y, Is.InRange(0.5f, 1.25f));
             Assert.That(readability.z, Is.InRange(0.5f, 0.75f));
             Assert.That(readability.w, Is.Zero.Within(0.0001f));
+
+            Vector4 groundContact = material.GetVector("_HordeGroundContact");
+            Assert.That(groundContact.x, Is.EqualTo(0.50f).Within(0.0001f));
+            Assert.That(groundContact.y, Is.EqualTo(0.30f).Within(0.0001f));
+            Assert.That(groundContact.z, Is.EqualTo(0.075f).Within(0.0001f));
+            Assert.That(groundContact.w, Is.EqualTo(0.025f).Within(0.0001f));
+            Assert.That(groundContact.y + groundContact.w, Is.InRange(0.32f, 0.33f),
+                "Contact patch atlas feet bandinin hemen altinda bitmeli.");
         }
 
         private static SpriteAnimation CreateAnimation()

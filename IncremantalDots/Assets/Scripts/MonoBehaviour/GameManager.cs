@@ -3290,6 +3290,14 @@ namespace DeadWalls
         /// <summary>V1 exact run snapshot: oyuncunun ayni ana donebilmesi icin runtime state'i kaydeder.</summary>
         public bool SaveRunSnapshot()
         {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            if (_developmentTestSessionActive)
+            {
+                Debug.LogWarning(
+                    "[DevelopmentTest] Transient combat test is active; run snapshot was not written.");
+                return false;
+            }
+#endif
             if (!TryInitialize() || !TryGetMobileConfigEntity(out var mobileConfigEntity))
                 return false;
 

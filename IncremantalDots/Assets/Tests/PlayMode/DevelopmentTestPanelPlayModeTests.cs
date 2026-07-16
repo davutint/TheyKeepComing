@@ -1,0 +1,113 @@
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+using System.Collections;
+using System.IO;
+using NUnit.Framework;
+using Unity.Entities;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.TestTools;
+
+namespace DeadWalls.Tests
+{
+    public class DevelopmentTestPanelPlayModeTests
+    {
+        private string _runSavePath;
+        private byte[] _originalRunSave;
+
+        [UnitySetUp]
+        public IEnumerator SetUp()
+        {
+            _runSavePath = Path.Combine(Application.persistentDataPath, "run_save.json");
+            _originalRunSave = File.Exists(_runSavePath)
+                ? File.ReadAllBytes(_runSavePath)
+                : null;
+            RunPersistence.Delete();
+            GameBootstrap.PendingAction = GameBootstrap.StartAction.None;
+
+            SceneManager.LoadScene("NewGameScene", LoadSceneMode.Single);
+            for (int frame = 0; frame < 120 && GameManager.Instance == null; frame++)
+                yield return null;
+
+            Assert.That(GameManager.Instance, Is.Not.Null, "NewGameScene GameManager olusturmadi.");
+            yield return null;
+        }
+
+        [UnityTearDown]
+        public IEnumerator TearDown()
+        {
+            Time.timeScale = 1f;
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.ClearDevelopmentHorde();
+                GameManager.Instance.CompleteDevelopmentTestSession();
+            }
+
+            RunPersistence.Delete();
+            if (_originalRunSave != null)
+                File.WriteAllBytes(_runSavePath, _originalRunSave);
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator DevelopmentControls_UnlockCombatAndSpawnExact2K5K10K()
+        {
+            GameManager gameManager = null;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                gameManager = GameManager.Instance;
+                if (gameManager != null && gameManager.IsMobileMode)
+                    break;
+                yield return null;
+            }
+
+            Assert.That(gameManager, Is.Not.Null);
+            Assert.That(gameManager.IsMobileMode, Is.True);
+            Assert.That(gameManager.TryEnableDevelopmentCombat(out string unlockMessage), Is.True,
+                unlockMessage);
+            Assert.That(gameManager.FireballUnlocked, Is.True);
+            Assert.That(gameManager.FireballReady, Is.True);
+            Assert.That(gameManager.IsArcherTypeUnlocked(ArcherType.Rapid), Is.True);
+            Assert.That(gameManager.IsArcherTypeUnlocked(ArcherType.Frost), Is.True);
+            Assert.That(gameManager.IsFreeEconomyTestMode, Is.True);
+            Assert.That(gameManager.SaveRunSnapshot(), Is.False,
+                "Development test state must never overwrite the exact run save.");
+
+            World world = World.DefaultGameObjectInjectionWorld;
+            EntityManager entityManager = world.EntityManager;
+            using EntityQuery activeZombies = entityManager.CreateEntityQuery(new EntityQueryDesc
+            {
+                All = new[] { ComponentType.ReadOnly<ZombieTag>() },
+                None = new[] { ComponentType.ReadOnly<Prefab>() }
+            });
+
+            int[] counts =
+            {
+                DevelopmentTestRules.Horde2K,
+                DevelopmentTestRules.Horde5K,
+                DevelopmentTestRules.Horde10K
+            };
+            foreach (int count in counts)
+            {
+                Assert.That(gameManager.TrySpawnDevelopmentHorde(
+                    count, out int spawned, out string spawnMessage), Is.True, spawnMessage);
+                Assert.That(spawned, Is.EqualTo(count));
+                Assert.That(activeZombies.CalculateEntityCount(), Is.EqualTo(count));
+
+                Entity waveEntity = entityManager.CreateEntityQuery(
+                    typeof(WaveStateData)).GetSingletonEntity();
+                WaveStateData wave = entityManager.GetComponentData<WaveStateData>(waveEntity);
+                Assert.That(wave.ZombiesAlive, Is.EqualTo(count));
+                Assert.That(wave.ZombiesSpawned, Is.EqualTo(count));
+                Assert.That(wave.StressTestMode, Is.False,
+                    "Manual presentation tests must keep combat VFX/SFX enabled.");
+            }
+
+            int cleared = gameManager.ClearDevelopmentHorde();
+            Assert.That(cleared, Is.EqualTo(DevelopmentTestRules.Horde10K));
+            Assert.That(activeZombies.CalculateEntityCount(), Is.Zero);
+            Assert.That(gameManager.CompleteDevelopmentTestSession(), Is.True);
+            Assert.That(gameManager.DevelopmentTestSessionActive, Is.False);
+        }
+    }
+}
+#endif
