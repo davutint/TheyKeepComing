@@ -168,6 +168,19 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void BlockingPauseRule_AllowsOnlyActiveHeartPauseTeaching()
+        {
+            Assert.That(FirstRunOnboardingRules.ShouldSuppressForBlockingPause(
+                false, false, false), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldSuppressForBlockingPause(
+                true, false, false), Is.True);
+            Assert.That(FirstRunOnboardingRules.ShouldSuppressForBlockingPause(
+                true, true, false), Is.True);
+            Assert.That(FirstRunOnboardingRules.ShouldSuppressForBlockingPause(
+                true, true, true), Is.False);
+        }
+
+        [Test]
         public void ActiveHudPrefab_HasSingleNonBlockingEnglishWorkerRatioPresentation()
         {
             GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(HudPrefabPath);
@@ -249,6 +262,27 @@ namespace DeadWalls.Tests
 
             Assert.That(source, Does.Contain("MetaProgression.SetTutorialFlag"),
                 "Controller yalniz tutorial completion persistence'i yazabilmelidir.");
+        }
+
+        [Test]
+        public void ControllerSource_HasNoPauseLeaseOrModalOpenCalls()
+        {
+            MonoScript controller = AssetDatabase.LoadAssetAtPath<MonoScript>(ControllerScriptPath);
+            Assert.That(controller, Is.Not.Null);
+            string source = controller.text;
+
+            string[] forbiddenCalls =
+            {
+                "SimulationPauseService.Acquire(",
+                "SimulationPauseService.EnforcePausedState(",
+                ".OpenPanel(",
+                ".TogglePanel(",
+                ".OpenPause(",
+                ".Settings.Open("
+            };
+
+            foreach (string forbiddenCall in forbiddenCalls)
+                Assert.That(source, Does.Not.Contain(forbiddenCall), forbiddenCall);
         }
 
         private static RectTransform FindUniqueRect(GameObject root, string objectName)

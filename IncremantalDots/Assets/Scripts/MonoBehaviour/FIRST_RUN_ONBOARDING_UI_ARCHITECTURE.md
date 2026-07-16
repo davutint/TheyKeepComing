@@ -139,6 +139,25 @@ Bu sinir EditMode source guard ile yasak transaction/assignment cagrilarina; Pla
 yedi cue'nun her birinde `ResourceData`, `ArrowSupply`, `GraveEssence`, `PopulationState`,
 `MobilePopulationAllocation`, bed ve worker-building state snapshot'larina karsi kilitlenir.
 
+## Modal Pause Zinciri Siniri
+
+Onboarding yeni modal veya pause owner'i degildir. Full-simulation pause gerektiren tek tutorial
+ani, oyuncunun gercek `HeartOpenButton` aksiyonuyla actigi ilk Castle Heart ekranidir.
+
+- Pause lease'ini yalniz `HeartScreenUI` alir; `FirstRunOnboardingUI` lease alamaz, pause state'ini
+  enforce edemez veya Heart/Pause/Settings modalini programmatic acamaz.
+- Ilk Heart acikken tutorial yalniz mevcut modal uzerindeki `HeartPause` aciklamasini gosterir.
+  Ayni anda Council, repair, ability veya baska onboarding cue'su zincirlenmez.
+- Heart tutorial'i tamamlandiktan sonra Heart yeniden acilirsa ya da Pause Menu/LevelUp gibi baska
+  blocking pause aktifse butun onboarding sunumu pause kapanana kadar gizlenir.
+- Player Heart'i kapattiginda `HeartScreenUI` kendi tek lease'ini birakir. Active lease sayisi sifira,
+  `Time.timeScale` onceki degerine doner; sonraki uygun adim yeni modal acmadan non-modal cue olarak
+  devam eder.
+- Regular Council compact karttir ve simulation pause sahibi degildir.
+
+Pure `ShouldSuppressForBlockingPause` kurali ve PlayMode Heart -> Day repair gecis testi bu siniri
+kilitler. Source guard ayrica pause lease/enforce ve modal open cagrilarini controller'da yasaklar.
+
 ## Sunum Siniri
 
 `OnboardingHintPanel` ve `OnboardingPulseFrame`, aktif generated HUD prefabinin responsive

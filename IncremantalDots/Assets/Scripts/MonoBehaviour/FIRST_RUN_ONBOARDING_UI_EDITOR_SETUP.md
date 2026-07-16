@@ -76,3 +76,10 @@ Idempotent onarim: `Window -> DeadWalls -> Repair First Run Onboarding`.
 - Global transaction-free PlayMode testi yedi cue'yu action cagirilmadan sirayla gorunur yapar;
   her cue boyunca Wood/Stone/Iron/Food, Arrow, Grave Essence, population, actual worker dagilimi,
   target ratio, bed ve worker-building state'lerinin exact ayni kaldigini dogrular.
+- Blocking-pause EditMode kurali, pause yokken normal cue'lara izin verir; aktif pause sirasinda
+  yalniz oyuncunun acmis oldugu ilk Heart modalinin `HeartPause` ogretimini allowlist eder.
+- Modal-chain PlayMode testi Heart acikken tek `HeartScreenUI` lease'i bulundugunu, sonraki repair
+  cue'sunun zincirlenmedigini, player close sonrasinda lease/timeScale'in exact geri dondugunu ve
+  repair cue'sunun yeni modal acmadan non-modal devam ettigini dogrular.
+- Modal-chain source guard'i `FirstRunOnboardingUI` icinde pause acquire/enforce ile Heart/Pause/
+  Settings programmatic open cagrilarini yasaklar.

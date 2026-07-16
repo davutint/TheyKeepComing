@@ -127,6 +127,15 @@ namespace DeadWalls
                 && phase == SiegeCyclePhase.Night
                 && hasReadyAbility;
         }
+
+        public static bool ShouldSuppressForBlockingPause(
+            bool blockingPauseActive,
+            bool heartPauseTeachingActive,
+            bool heartOpen)
+        {
+            return blockingPauseActive
+                && !(heartPauseTeachingActive && heartOpen);
+        }
     }
 
     /// <summary>
@@ -327,9 +336,23 @@ namespace DeadWalls
             RectTransform target = null;
             bool showPulse = true;
             string hintOverride = null;
-            if (_heartPauseTeachingActive && CastleHeart != null && CastleHeart.IsOpen)
+            bool heartPauseTeachingVisible = _heartPauseTeachingActive
+                && CastleHeart != null
+                && CastleHeart.IsOpen;
+            bool blockingPauseActive = SimulationPauseService.IsPaused
+                || Time.timeScale <= 0f;
+            bool suppressForBlockingPause =
+                FirstRunOnboardingRules.ShouldSuppressForBlockingPause(
+                    blockingPauseActive,
+                    _heartPauseTeachingActive,
+                    CastleHeart != null && CastleHeart.IsOpen);
+            if (heartPauseTeachingVisible)
             {
                 step = FirstRunOnboardingStep.HeartPause;
+                showPulse = false;
+            }
+            else if (suppressForBlockingPause)
+            {
                 showPulse = false;
             }
             else if (shouldShowCouncilExact && Council != null)

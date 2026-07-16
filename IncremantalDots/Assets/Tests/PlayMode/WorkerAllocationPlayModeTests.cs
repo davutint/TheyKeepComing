@@ -408,6 +408,108 @@ namespace DeadWalls.Tests
         }
 
         [UnityTest]
+        public IEnumerator FirstRunOnboarding_HeartCloseEndsPauseBeforeNextNonModalCue()
+        {
+            GameManager gameManager = GameManager.Instance;
+            FirstRunOnboardingUI onboarding =
+                Object.FindFirstObjectByType<FirstRunOnboardingUI>();
+            HeartScreenUI heart = Object.FindFirstObjectByType<HeartScreenUI>();
+            PauseMenuUI pauseMenu = Object.FindFirstObjectByType<PauseMenuUI>();
+            Assert.That(onboarding, Is.Not.Null);
+            Assert.That(heart, Is.Not.Null);
+            Assert.That(pauseMenu, Is.Not.Null);
+            Assert.That(pauseMenu.PausePanel, Is.Not.Null);
+            Assert.That(MetaProgression.SetTutorialFlag(
+                FirstRunOnboardingUI.WorkerRatioFlagId, true), Is.True);
+            Assert.That(MetaProgression.SetTutorialFlag(
+                FirstRunOnboardingUI.BasicArcherFlagId, true), Is.True);
+            Assert.That(MetaProgression.SetTutorialFlag(
+                FirstRunOnboardingUI.LowAmmoFlagId, true), Is.True);
+            Assert.That(MetaProgression.SetTutorialFlag(
+                FirstRunOnboardingUI.CouncilExactFlagId, true), Is.True);
+            Assert.That(MetaProgression.HasTutorialFlag(
+                FirstRunOnboardingUI.HeartEntryFlagId), Is.False);
+            Assert.That(MetaProgression.HasTutorialFlag(
+                FirstRunOnboardingUI.DaytimeRepairFlagId), Is.False);
+
+            bool runtimeReady = false;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                {
+                    runtimeReady = true;
+                    break;
+                }
+                yield return null;
+            }
+            Assert.That(runtimeReady, Is.True,
+                "GameManager/SubScene 300 frame icinde hazir olmadi.");
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            using EntityQuery cycleQuery = entityManager.CreateEntityQuery(
+                typeof(ContinuousSiegeCycleData));
+            using EntityQuery wallQuery = entityManager.CreateEntityQuery(typeof(WallSegment));
+            Assert.That(cycleQuery.CalculateEntityCount(), Is.EqualTo(1));
+            Assert.That(wallQuery.CalculateEntityCount(), Is.EqualTo(1));
+            Entity cycleEntity = cycleQuery.GetSingletonEntity();
+            Entity wallEntity = wallQuery.GetSingletonEntity();
+            PropertyInfo cycleProperty = typeof(GameManager).GetProperty(
+                "ContinuousSiegeCycle",
+                BindingFlags.Instance | BindingFlags.Public);
+            MethodInfo cycleSetter = cycleProperty?.GetSetMethod(true);
+            Assert.That(cycleSetter, Is.Not.Null);
+            Assert.That(SimulationPauseService.ActiveLeaseCount, Is.Zero);
+            Assert.That(Time.timeScale, Is.EqualTo(1f));
+            Assert.That(pauseMenu.PausePanel.activeSelf, Is.False);
+
+            Assert.That(gameManager.GrantGraveEssence(1L), Is.True);
+            for (int frame = 0; frame < 60 && !onboarding.IsHeartEntryStepVisible; frame++)
+                yield return null;
+            Assert.That(onboarding.IsHeartEntryStepVisible, Is.True);
+
+            heart.HeartOpenButton.onClick.Invoke();
+            yield return null;
+            Assert.That(heart.IsOpen, Is.True);
+            Assert.That(onboarding.IsHeartPauseStepVisible, Is.True);
+            Assert.That(SimulationPauseService.ActiveLeaseCount, Is.EqualTo(1),
+                "Tutorial Heart owner'ina ek pause lease'i bindirmemelidir.");
+            Assert.That(Time.timeScale, Is.Zero);
+            Assert.That(pauseMenu.PausePanel.activeSelf, Is.False);
+
+            WallSegment wall = entityManager.GetComponentData<WallSegment>(wallEntity);
+            wall.CurrentHP = wall.MaxHP * 0.5f;
+            entityManager.SetComponentData(wallEntity, wall);
+            SetOnboardingCycle(
+                entityManager,
+                cycleEntity,
+                gameManager,
+                cycleSetter,
+                0,
+                SiegeCyclePhase.Day);
+            for (int frame = 0; frame < 5; frame++)
+                yield return null;
+            Assert.That(onboarding.IsHeartPauseStepVisible, Is.True);
+            Assert.That(onboarding.IsDaytimeRepairStepVisible, Is.False,
+                "Heart modal acikken sonraki onboarding cue zincirlenmemelidir.");
+            Assert.That(SimulationPauseService.ActiveLeaseCount, Is.EqualTo(1));
+
+            heart.HeartCloseButton.onClick.Invoke();
+            yield return null;
+            for (int frame = 0; frame < 60 && !onboarding.IsDaytimeRepairStepVisible; frame++)
+                yield return null;
+
+            Assert.That(heart.IsOpen, Is.False);
+            Assert.That(onboarding.IsHeartPauseStepVisible, Is.False);
+            Assert.That(onboarding.IsDaytimeRepairStepVisible, Is.True,
+                "Pause kapandiktan sonra sonraki cue non-modal olarak devam etmelidir.");
+            Assert.That(onboarding.HintPanel.activeSelf, Is.True);
+            Assert.That(SimulationPauseService.ActiveLeaseCount, Is.Zero);
+            Assert.That(SimulationPauseService.IsPaused, Is.False);
+            Assert.That(Time.timeScale, Is.EqualTo(1f));
+            Assert.That(pauseMenu.PausePanel.activeSelf, Is.False);
+        }
+
+        [UnityTest]
         public IEnumerator FirstDamagedWallDayRepairOnboarding_PulsesRealRepairAction_AndCompletesOnSuccessfulPlayerRepair()
         {
             GameManager gameManager = GameManager.Instance;
@@ -744,7 +846,11 @@ namespace DeadWalls.Tests
                 cycleSetter,
                 0,
                 SiegeCyclePhase.Day);
-            Time.timeScale = 0f;
+            MobilePrepPauseState pause =
+                entityManager.GetComponentData<MobilePrepPauseState>(pauseEntity);
+            pause.IsPaused = true;
+            entityManager.SetComponentData(pauseEntity, pause);
+            Time.timeScale = 1f;
 
             yield return AssertCueIsTransactionFree(
                 () => onboarding.IsWorkerRatioStepVisible,
@@ -842,11 +948,6 @@ namespace DeadWalls.Tests
                 FirstRunOnboardingUI.DaytimeRepairFlagId, true), Is.True);
             wall.CurrentHP = wall.MaxHP;
             entityManager.SetComponentData(wallEntity, wall);
-            MobilePrepPauseState pause =
-                entityManager.GetComponentData<MobilePrepPauseState>(pauseEntity);
-            pause.IsPaused = true;
-            entityManager.SetComponentData(pauseEntity, pause);
-            Time.timeScale = 1f;
             SetOnboardingCycle(
                 entityManager,
                 cycleEntity,
