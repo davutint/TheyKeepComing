@@ -40,6 +40,7 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 ### HUDController.cs
 
 - HP, XP, continuous cycle, zombie alive/max, resource, population ve arrow text'lerini gunceller
+- Aktif generated HUD prefabinin dogrudan alt gorsel root'u `CanvasScaler` sanal alanina stretch olur; kritik HUD anchor'lari 16:9 ve `3440 x 1440` ultrawide'da ekran icinde kalir
 - Mobile HUD'da resource text'leri label tekrar etmez; amount ve signed `/m` rate'i tek satırlı kompakt value olarak yazar
 - `ResourceBar`, üst solda `560 x 48` tek şerittir; Wood/Stone/Iron/Food/Population/Arrow altı adet `84 x 42` chip içinde kalır ve label renkleri hızlı taramayı destekler
 - Resource rate gosteriminde base production yerine effective production'i kullanir; mobile worker economy aktifken bu deger worker allocation'dan gelir

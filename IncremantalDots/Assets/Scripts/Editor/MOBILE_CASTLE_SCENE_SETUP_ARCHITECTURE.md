@@ -28,6 +28,14 @@ World visual tilemap'leri owner tarafindan yonetilir. Tool `Grid/outside` tilema
 
 `Assets/Prefabs/UI/Generated/MobileCastleHudRoot.prefab` varsa `MobileCastleHudRoot` bu prefabdan instancelanir. Prefab yoksa fallback HUD ayni runtime isimleriyle kurulur: economy text'leri, fallback `WaveText`, fallback `KillsText`, fallback `DefenseText`, `WaveRewardText`, `DamageFlashOverlay`, `ArcherDrawerPanel`, Basic/Rapid/Frost row buy alanlari ve `RepairButton`. Onayli prefabda `CyclePanel` varsa fallback `WaveText/KillsText` uretilmez ve varsa kapatilir. Castle Interior economy paneli icin fallback polish UI uretilmez; panel gerekirse dogrudan prefabda kurulur.
 
+Generated prefabdaki dis root, `CanvasScaler` ile `1920 x 1080` referans ve `0.5`
+width/height match kullanir. Onun dogrudan altindaki ayni isimli gorsel
+`MobileCastleHudRoot` sabit piksel boyutu tasimaz; parent sanal canvas'ina dort yonden stretch
+olur. Setup tool bu sozlesmeyi prefabda ve scene instance'inda idempotent onarir. Boylece
+16:9 yerlesimi korunurken `3440 x 1440` ultrawide sanal alaninda ust/alt kritik HUD
+yuzeyleri kirpilmaz. `CastleDefensePanel` top-center anchor ve `-205` dikey offset ile
+16:9 konumunu korur; daha kisa ultrawide sanal yukseklikte Celestial Dial'a binmez.
+
 Onayli polish prefab gelirse tool `CastleDefensePanel` altindaki `DefensePercentText`, `DefenseWallFill`, `DefenseWallText` ve opsiyonel `DefenseDamageGlow` alanlarini baglar. Legacy Gate/Core gorseli veya binding'i kurulmaz. Wall fill image'i setup sirasinda horizontal left fill moduna alinir. Ust-orta `CyclePanel`, owner-secili `B - Celestial Dial` olarak `290 x 68` gercek pill siluetinde kalir; setup tool `CycleProgressTrack`i `178 x 44` `CycleCelestialArc`, `CycleCelestialGlow`u halo binding'i yapar ve dikey ayirici ile ham phase label/linear fill objelerini player-facing kapatir.
 
 ## ECS Notu
@@ -55,6 +63,12 @@ presentation kaynagi olarak runtime component tasimaz.
 Council karti generated prefabda `CouncilEventPanel` presentation'i olarak kalir. Setup tool,
 scene root'taki tek `CouncilEventUI` owner'ini iki option rich-text yuzeyi, `DECIDE Ns` sayaci ve
 Filled/Horizontal/Left azalan sure seridine baglar; V1'de yalniz regular Day `3/6/9...` akisi vardir.
+
+Sabit kamera framing sozlesmesi `Main Camera` position `(6,0,-10)`, orthographic size `8`
+ve desteklenen `1920 x 1080` / `3440 x 1440` oranlaridir. Bu araliklarda savunma hatti ile
+kale merkezi gorunur, `SpawnLineX = 27` ise ekranin saginda en az bir world unit gizli kalir.
+`HudAspectRatioPresentationTests` hem kritik HUD rect sinirlarini hem bu battlefield/spawn
+sozlesmesini asset ve scene truth'u uzerinden kilitler.
 
 Sag drawer buy ve Basic -> Rapid/Frost retrain data'si `Assets/ScriptableObject/MobileCastle/Archers` altindaki `ArcherDefinitionSO` asset'lerinden gelir. Tool Basic/Rapid/Frost default definition asset'lerini ve `ArcherRecruitmentCatalogSO` catalog'unu idempotent olusturur, sonra catalog'u `GameManager` ve `MarketUI` alanlarina baglar. Catalog'daki ekstra definition asset'leri korunur; setup tool sadece eksik defaultlari tamamlar. `ArcherRecruitmentListRoot` + inactive `ArcherRecruitmentRowTemplate` varsa `MarketUI` runtime satirlari template'ten basar; template icindeki `ArcherRetrainButton` eksikse idempotent prefab repair ekler. Legacy Basic/Rapid/Frost row'lari sadece fallback'tir.
 

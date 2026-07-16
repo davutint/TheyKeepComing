@@ -46,7 +46,7 @@ SubScene:
 
 ## Inspector Kontrolu
 
-- `Main Camera`: Orthographic, size `8`, position `(0, 0, -10)`
+- `Main Camera`: Orthographic, size `8`, position `(6, 0, -10)`
 - `Canvas`: Scale With Screen Size, reference `1920 x 1080`, match `0.5`
 - `WaveConfigAuthoring`: `Zombie`, `Arrow`, `Archer`, `Worker` prefab referanslari dolu
 - `VillagerWorker.prefab`: `Villager.mat` + `Character_villager/Idle.png`, `SpriteSheetAuthoring` rows `8`, columns `15`, `VillagerWorkerAuthoring` ekli
@@ -67,10 +67,12 @@ SubScene:
 - `MobileCastleArcherTilePlacement`: main scene `Grid` uzerinde bulunur; `outside` tilemapini ve `ArcherFormationV1.asset` tanimini kullanir, `40` hucre x `25` seeded nokta ile tam `1000` kapasite kurar
 - `LevelUpUI`: legacy paneldir; mobile loop'ta acilmaz
 - `MobileCastleHudRoot`: generated prefab varsa `Assets/Prefabs/UI/Generated/MobileCastleHudRoot.prefab` instancelanir; yoksa fallback HUD/drawer kurulur
+- Generated prefab dis root'unun dogrudan altindaki ayni isimli gorsel `MobileCastleHudRoot`: anchor min `(0,0)`, anchor max `(1,1)`, anchored position ve size delta `(0,0)`, scale `(1,1,1)`; sabit `1920 x 1080` boyut tasimaz
 - `HUDController`: `WoodText`, `StoneText`, `IronText`, `FoodText`, `PopulationText`, `ArrowText`, `WaveRewardText`, `DamageFlashImage` ve varsa cycle/defense module alanlari bagli
 - `ResourceBar`: üst solda `560 x 48`; altı resource/population/Arrow chip'i `84 x 42`, value/rate tek satır ve `ArrowChip` finite ammo toggle olmaya devam eder
 - `HUDController` cycle module: `CyclePanel`, `CycleDayCounterText`, `CycleProgressMarker`, `CycleCelestialArc`, `CycleCelestialGlow`; legacy `CyclePhaseText`, label ve fill binding'leri uyumluluk icin kalabilir
 - `CyclePanel`: owner-secili Celestial Dial, top-center anchor ve `290 x 68` gercek pill; `CycleProgressTrack` `178 x 44`, 44 segmentli sig yaydir. Dikey ayirici ile legacy phase/label/linear fill player-facing kapali kalir
+- `CastleDefensePanel`: top-center anchor, anchored position `(6,-205)` ve `340 x 140`; 16:9 ile ultrawide'da Celestial Dial'a binmez
 - Aktif prefab ve `HUDController` setup binding'inde `HordePressurePanel` bulunmaz; setup tool forecast/pressure UI baglamaz veya yeniden uretmez
 - `HUDController` defense module: `DefensePercentText`, `DefenseWallFill`, `DefenseWallText`, opsiyonel `DefenseDamageGlow`; legacy Gate/Core alanlari prefabda ve controller binding'inde bulunmaz
 - `MarketUI`: alt-sag `ArcherDrawerPanel` (`540 x 350`, `(-24,160)`), sabit `DrawerToggleButton` (`156 x 56`, `(-190,28)`), Basic/Rapid/Frost row text, buy ve dynamic `ArcherRetrainButton` alanlari bagli; HUD acilisinda drawer kapali
@@ -127,6 +129,13 @@ pipeline'i 2026-07-06'da kaldirildi.) Setup tool asagidaki isimleri exact-match 
   `HeartQuantityMaxButton`, `CastleHeartBadge`, `CastleHeartToastText`.
 
 Runtime davranisi prefab icinde degildir; `MarketUI` ve scene setup tool baglar.
+
+## Aspect Ratio Dogrulamasi
+
+- Game View `Full HD (1920 x 1080)` ve `3440 x 1440` presetlerinde ayri ayri kontrol edilir.
+- `ResourceBar`, `CyclePanel`, tek Wall paneli, ability bar, Workers/Housing, Archer, Arrow Supply, Castle Heart ve Council yuzeylerinin ekran sinirlari disina tasmasina izin verilmez.
+- Sabit kamera her iki oranda savunma hatti ve kale merkezini gosterirken `SpawnLineX = 27` dogum seridini sagda gizli tutar.
+- `DeadWalls.Tests.HudAspectRatioPresentationTests`, responsive prefab root'unu, kritik UI rect'lerini ve battlefield/spawn framing'ini EditMode'da dogrular.
 
 Mobile continuous siege loop'ta player-facing `StartNextWaveButton` yoktur. Legacy
 `RefillArrowsButton` gizli kalır; finite refill, Arrow chip'inden açılan

@@ -3266,6 +3266,7 @@ namespace DeadWalls
             DestroyChildIfExists(canvasTransform, "HUDPanel");
             DestroyChildIfExists(canvasTransform, "MarketPanel");
 
+            EnsureResponsiveHudVisualRootInPrefab();
             EnsureWorkerDrawerTargetControlsInPrefab();
             EnsureArcherRetrainControlInPrefab();
             EnsureArrowAmmoPanelInPrefab();
@@ -3299,6 +3300,57 @@ namespace DeadWalls
             return existing != null
                 ? existing.gameObject
                 : EnsurePanel(canvasTransform, "MobileCastleHudRoot", true, new Color(0f, 0f, 0f, 0f));
+        }
+
+        private static void EnsureResponsiveHudVisualRootInPrefab()
+        {
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(GeneratedHudPrefabPath);
+            if (prefab == null)
+                throw new InvalidOperationException("HUD prefab bulunamadi: " + GeneratedHudPrefabPath);
+
+            GameObject root = PrefabUtility.LoadPrefabContents(GeneratedHudPrefabPath);
+            try
+            {
+                EnsureResponsiveHudVisualRoot(root);
+                EnsureSupportedAspectRatioHudLayout(root);
+                PrefabUtility.SaveAsPrefabAsset(root, GeneratedHudPrefabPath);
+            }
+            finally
+            {
+                PrefabUtility.UnloadPrefabContents(root);
+            }
+        }
+
+        private static void EnsureResponsiveHudVisualRoot(GameObject hudRoot)
+        {
+            Transform visualRootTransform = hudRoot.transform.Find("MobileCastleHudRoot");
+            if (visualRootTransform == null || visualRootTransform.parent != hudRoot.transform)
+            {
+                throw new InvalidOperationException(
+                    "HUD prefabinin dogrudan MobileCastleHudRoot gorsel koku bulunamadi.");
+            }
+
+            RectTransform visualRoot = visualRootTransform as RectTransform;
+            if (visualRoot == null)
+                throw new InvalidOperationException("HUD gorsel koku RectTransform olmali.");
+
+            Stretch(visualRoot);
+            visualRoot.pivot = new Vector2(0.5f, 0.5f);
+            visualRoot.localScale = Vector3.one;
+        }
+
+        private static void EnsureSupportedAspectRatioHudLayout(GameObject hudRoot)
+        {
+            RectTransform defensePanel = FindRectTransformByName(hudRoot, "CastleDefensePanel");
+            if (defensePanel == null)
+                return;
+
+            defensePanel.anchorMin = new Vector2(0.5f, 1f);
+            defensePanel.anchorMax = new Vector2(0.5f, 1f);
+            defensePanel.pivot = new Vector2(0.5f, 0.5f);
+            defensePanel.anchoredPosition = new Vector2(6f, -205f);
+            defensePanel.sizeDelta = new Vector2(340f, 140f);
+            defensePanel.localScale = Vector3.one;
         }
 
         private static void EnsureWorkerDrawerTargetControlsInPrefab()
@@ -3909,6 +3961,8 @@ namespace DeadWalls
             GameObjectUtility.RemoveMonoBehavioursWithMissingScript(hudRoot);
             SetLayerRecursive(hudRoot, LayerMask.NameToLayer("UI"));
             Stretch(hudRoot.GetComponent<RectTransform>());
+            EnsureResponsiveHudVisualRoot(hudRoot);
+            EnsureSupportedAspectRatioHudLayout(hudRoot);
 
             var hud = EnsureComponent<HUDController>(hudRoot);
             bool hasCycleHud = FindChildByName(hudRoot, "CyclePanel") != null;
