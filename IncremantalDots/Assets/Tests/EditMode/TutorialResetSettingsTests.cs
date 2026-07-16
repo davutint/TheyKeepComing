@@ -32,9 +32,9 @@ namespace DeadWalls.Tests
                 Assert.That(settings.TutorialResetButton.gameObject.name,
                     Is.EqualTo("TutorialResetButton"), scenePath);
                 Assert.That(ReadText(tutorialResetLabel),
-                    Is.EqualTo("RESET TUTORIAL"), scenePath);
+                    Is.EqualTo(SettingsUI.TutorialResetDefaultLabel), scenePath);
                 Assert.That(ReadText(tutorialResetStatus),
-                    Is.EqualTo("RESETS ONBOARDING ONLY. RUN AND UPGRADES STAY."), scenePath);
+                    Is.EqualTo(SettingsUI.TutorialResetDefaultStatus), scenePath);
                 Assert.That(settings.TutorialResetButton.transform.IsChildOf(
                     settings.SettingsPanel.transform), Is.True, scenePath);
                 Assert.That(tutorialResetStatus.transform.IsChildOf(
@@ -47,6 +47,33 @@ namespace DeadWalls.Tests
                 if (openedByTest)
                     EditorSceneManager.CloseScene(scene, true);
             }
+        }
+
+        [Test]
+        public void TutorialResetCopy_EveryRuntimeStateUsesApprovedEnglish()
+        {
+            string[] actualCopy =
+            {
+                SettingsUI.TutorialResetDefaultLabel,
+                SettingsUI.TutorialResetDefaultStatus,
+                SettingsUI.TutorialResetConfirmLabel,
+                SettingsUI.TutorialResetConfirmStatus,
+                SettingsUI.TutorialResetSuccessStatus,
+                SettingsUI.TutorialResetFailureStatus
+            };
+            string[] approvedEnglishCopy =
+            {
+                "RESET TUTORIAL",
+                "RESETS ONBOARDING ONLY. RUN AND UPGRADES STAY.",
+                "CONFIRM RESET",
+                "CLICK AGAIN TO RESET ALL TUTORIAL STEPS.",
+                "TUTORIAL RESET. IT WILL START AGAIN IN GAME.",
+                "RESET FAILED. META SAVE WAS NOT CHANGED."
+            };
+
+            Assert.That(actualCopy, Is.EqualTo(approvedEnglishCopy));
+            foreach (string copy in actualCopy)
+                Assert.That(copy, Does.Match("^[A-Z0-9 .]+$"), copy);
         }
 
         private static Scene GetOrOpenScene(string path, out bool openedByTest)

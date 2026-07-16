@@ -2514,10 +2514,10 @@ namespace DeadWalls
             var tutorialResetButton = EnsureButton(settingsPanel.transform, "TutorialResetButton",
                 new Vector2(0.5f, 0.5f), new Vector2(-200f, -113f), new Vector2(200f, -57f),
                 out var tutorialResetLabel);
-            tutorialResetLabel.text = "RESET TUTORIAL";
+            tutorialResetLabel.text = SettingsUI.TutorialResetDefaultLabel;
             tutorialResetLabel.fontSize = 18f;
             var tutorialResetStatus = EnsureText(settingsPanel.transform, "TutorialResetStatusText",
-                "RESETS ONBOARDING ONLY. RUN AND UPGRADES STAY.", 13,
+                SettingsUI.TutorialResetDefaultStatus, 13,
                 TextAlignmentOptions.Center,
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
                 new Vector2(-220f, -154f), new Vector2(220f, -118f));

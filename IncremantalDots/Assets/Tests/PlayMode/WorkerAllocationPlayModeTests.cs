@@ -537,19 +537,26 @@ namespace DeadWalls.Tests
             pauseMenu.SettingsButton.onClick.Invoke();
             yield return null;
             Assert.That(settings.SettingsPanel.activeSelf, Is.True);
-            Assert.That(settings.TutorialResetLabel.text, Is.EqualTo("RESET TUTORIAL"));
+            Assert.That(settings.TutorialResetLabel.text,
+                Is.EqualTo(SettingsUI.TutorialResetDefaultLabel));
+            Assert.That(settings.TutorialResetStatusText.text,
+                Is.EqualTo(SettingsUI.TutorialResetDefaultStatus));
 
             settings.TutorialResetButton.onClick.Invoke();
             yield return null;
-            Assert.That(settings.TutorialResetLabel.text, Is.EqualTo("CONFIRM RESET"));
+            Assert.That(settings.TutorialResetLabel.text,
+                Is.EqualTo(SettingsUI.TutorialResetConfirmLabel));
+            Assert.That(settings.TutorialResetStatusText.text,
+                Is.EqualTo(SettingsUI.TutorialResetConfirmStatus));
             foreach (string flagId in tutorialFlags)
                 Assert.That(MetaProgression.HasTutorialFlag(flagId), Is.True, flagId);
 
             settings.TutorialResetButton.onClick.Invoke();
             yield return null;
-            Assert.That(settings.TutorialResetLabel.text, Is.EqualTo("RESET TUTORIAL"));
+            Assert.That(settings.TutorialResetLabel.text,
+                Is.EqualTo(SettingsUI.TutorialResetDefaultLabel));
             Assert.That(settings.TutorialResetStatusText.text,
-                Is.EqualTo("TUTORIAL RESET. IT WILL START AGAIN IN GAME."));
+                Is.EqualTo(SettingsUI.TutorialResetSuccessStatus));
             foreach (string flagId in tutorialFlags)
                 Assert.That(MetaProgression.HasTutorialFlag(flagId), Is.False, flagId);
             Assert.That(MetaProgression.HasTutorialFlag(futureTutorialFlag), Is.True);

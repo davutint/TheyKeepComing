@@ -112,3 +112,6 @@ Idempotent iki-sahne onarimi icin `NewGameScene` aktifken
 - Tutorial reset PlayMode testi ilk tiklamanin yalniz confirmation kurdugunu, ikinci tiklamanin
   sekiz flag'i temizledigini, bilinmeyen future tutorial flag'ini korudugunu ve Pause Resume
   sonrasinda ilk uygun onboarding cue'sunun yeniden basladigini dogrular.
+- English-copy EditMode guard'i yedi step hint'i, uc ability-key varyanti ve tutorial-reset'in alti
+  UI state metnini exact approved English degerlerle kilitler; prefab ile iki sahnenin serialized
+  baslangic metinleri ayni constant'larla birebir eslesir.

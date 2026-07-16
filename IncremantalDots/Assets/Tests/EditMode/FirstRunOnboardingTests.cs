@@ -266,19 +266,36 @@ namespace DeadWalls.Tests
                     && component.GetType().Name == "TextMeshProUGUI");
             string copy = (string)text.GetType().GetProperty("text").GetValue(text);
             Assert.That(copy, Is.EqualTo(FirstRunOnboardingUI.WorkerRatioHint));
-            Assert.That(copy, Does.Match("^[A-Z0-9 .+]+$"));
-            Assert.That(FirstRunOnboardingUI.BasicArcherHint, Does.Match("^[A-Z0-9 .+]+$"));
-            Assert.That(FirstRunOnboardingUI.LowAmmoHint, Does.Match("^[A-Z0-9 .+]+$"));
-            Assert.That(FirstRunOnboardingUI.HeartEntryHint, Does.Match("^[A-Z0-9 .+]+$"));
-            Assert.That(FirstRunOnboardingUI.HeartPauseHint, Does.Match("^[A-Z0-9 .+]+$"));
-            Assert.That(FirstRunOnboardingUI.CouncilExactHint, Does.Match("^[A-Z0-9 .+]+$"));
-            Assert.That(FirstRunOnboardingUI.DaytimeRepairHint, Does.Match("^[A-Z0-9 .+]+$"));
-            Assert.That(FirstRunOnboardingUI.FireballAbilityKeyHint,
-                Does.Match("^[A-Z0-9 .+]+$"));
-            Assert.That(FirstRunOnboardingUI.RallyAbilityKeyHint,
-                Does.Match("^[A-Z0-9 .+]+$"));
-            Assert.That(FirstRunOnboardingUI.EmergencyRepairAbilityKeyHint,
-                Does.Match("^[A-Z0-9 .+]+$"));
+            string[] actualCopy =
+            {
+                FirstRunOnboardingUI.WorkerRatioHint,
+                FirstRunOnboardingUI.BasicArcherHint,
+                FirstRunOnboardingUI.LowAmmoHint,
+                FirstRunOnboardingUI.HeartEntryHint,
+                FirstRunOnboardingUI.HeartPauseHint,
+                FirstRunOnboardingUI.CouncilExactHint,
+                FirstRunOnboardingUI.DaytimeRepairHint,
+                FirstRunOnboardingUI.FireballAbilityKeyHint,
+                FirstRunOnboardingUI.RallyAbilityKeyHint,
+                FirstRunOnboardingUI.EmergencyRepairAbilityKeyHint
+            };
+            string[] approvedEnglishCopy =
+            {
+                "ADJUST A WORKER TARGET RATIO.",
+                "RECRUIT A BASIC ARCHER.",
+                "RESTOCK YOUR ARROWS.",
+                "OPEN THE CASTLE HEART.",
+                "THE CASTLE HEART FULLY PAUSES THE BATTLE.",
+                "COMPARE BOTH EXACT OUTCOMES AND THEIR COSTS.",
+                "REPAIR THE WALL DURING THE DAY.",
+                "PRESS 1 TO TARGET FIREBALL.",
+                "PRESS 2 TO USE RALLY.",
+                "PRESS 3 TO REPAIR THE WALL."
+            };
+
+            Assert.That(actualCopy, Is.EqualTo(approvedEnglishCopy));
+            foreach (string approvedCopy in actualCopy)
+                Assert.That(approvedCopy, Does.Match("^[A-Z0-9 .+]+$"), approvedCopy);
         }
 
         [Test]

@@ -177,6 +177,22 @@ durable kaldigini dogrular.
 - Meta save fail-closed veya disk write basarisizsa onceki tutorial listesi geri yuklenir ve UI
   `RESET FAILED. META SAVE WAS NOT CHANGED.` bildirimi verir.
 
+## Player-Facing English Copy Contract
+
+- `FirstRunOnboardingUI` player-facing copy sahibi on stable metin tasir: yedi step hint'i ile
+  Fireball, Rally ve Emergency Repair key varyantlari. Hepsi English, uppercase ve noktalama dahil
+  sabit constant'lardan gelir; runtime yalniz bu approved metinlerden birini secer.
+- `SettingsUI` tutorial reset icin alti stable player-facing state metni tasir: default label ve
+  aciklama, confirmation label ve aciklama, success aciklamasi ve failure aciklamasi. Runtime veya
+  scene setup inline alternatif copy uretemez.
+- Generated HUD prefabindaki `OnboardingHintText`, `NewGameScene` ve `MainMenuScene` reset
+  label/status baslangic metinleri ayni runtime constant'lariyla birebir eslesir.
+- Turkce editor loglari, architecture yorumlari ve Inspector header'lari player-facing degildir;
+  English-only test kapsamina yalniz Game View'da oyuncunun okuyabildigi metin girer.
+- EditMode exact-copy guard'i 16 approved metni hem birebir deger hem uppercase ASCII karakter
+  sozlesmesiyle kilitler. PlayMode adim testleri gerçek runtime `HintText` ve reset
+  default/confirm/success state'lerini owner event akislariyla ayrica dogrular.
+
 ## Global Transaction-Free Siniri
 
 `FirstRunOnboardingUI` gameplay command sahibi degildir. Controller yalniz authoritative state

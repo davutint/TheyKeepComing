@@ -20,8 +20,16 @@ namespace DeadWalls
         public TMP_Text TutorialResetStatusText;
         public Button CloseButton;
 
-        private const string ResetLabel = "RESET TUTORIAL";
-        private const string ResetStatus = "RESETS ONBOARDING ONLY. RUN AND UPGRADES STAY.";
+        public const string TutorialResetDefaultLabel = "RESET TUTORIAL";
+        public const string TutorialResetDefaultStatus =
+            "RESETS ONBOARDING ONLY. RUN AND UPGRADES STAY.";
+        public const string TutorialResetConfirmLabel = "CONFIRM RESET";
+        public const string TutorialResetConfirmStatus =
+            "CLICK AGAIN TO RESET ALL TUTORIAL STEPS.";
+        public const string TutorialResetSuccessStatus =
+            "TUTORIAL RESET. IT WILL START AGAIN IN GAME.";
+        public const string TutorialResetFailureStatus =
+            "RESET FAILED. META SAVE WAS NOT CHANGED.";
         private bool _tutorialResetArmed;
 
         private void Start()
@@ -65,8 +73,8 @@ namespace DeadWalls
             {
                 _tutorialResetArmed = true;
                 SetTutorialResetCopy(
-                    "CONFIRM RESET",
-                    "CLICK AGAIN TO RESET ALL TUTORIAL STEPS.");
+                    TutorialResetConfirmLabel,
+                    TutorialResetConfirmStatus);
                 return;
             }
 
@@ -74,22 +82,22 @@ namespace DeadWalls
             if (FirstRunOnboardingUI.ResetTutorialProgress())
             {
                 SetTutorialResetCopy(
-                    ResetLabel,
-                    "TUTORIAL RESET. IT WILL START AGAIN IN GAME.");
+                    TutorialResetDefaultLabel,
+                    TutorialResetSuccessStatus);
                 UiSoundFeedback.Instance?.PlaySuccess();
                 return;
             }
 
             SetTutorialResetCopy(
-                ResetLabel,
-                "RESET FAILED. META SAVE WAS NOT CHANGED.");
+                TutorialResetDefaultLabel,
+                TutorialResetFailureStatus);
             UiSoundFeedback.Instance?.PlayFail();
         }
 
         private void ResetTutorialConfirmation()
         {
             _tutorialResetArmed = false;
-            SetTutorialResetCopy(ResetLabel, ResetStatus);
+            SetTutorialResetCopy(TutorialResetDefaultLabel, TutorialResetDefaultStatus);
         }
 
         private void SetTutorialResetCopy(string label, string status)
