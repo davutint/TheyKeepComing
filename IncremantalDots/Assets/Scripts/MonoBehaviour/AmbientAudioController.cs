@@ -5,6 +5,7 @@ namespace DeadWalls
     /// <summary>
     /// Faz ve worker ambiyansinin tek runtime sahibidir. Faz polling ile (DawnRewardToast kalibi):
     /// - DAY: gercek aktif worker sayisina gore seyrek, dusuk sesli uretim foley ritmi
+    /// - DUSK girisi: scene-load'da tekrar etmeyen, tek seferlik dusuk tension riser
     /// - DUSK + NIGHT: gece drone loop'u (normal gece = NightLoop, kanli ay = BloodMoonLoop)
     /// - DAY + DAWN: gece drone'u sessiz (Day'de yalniz worker foley)
     /// - Kanli ay gecesine giris aninda tek seferlik sting (canavar kukremesi).
@@ -17,6 +18,7 @@ namespace DeadWalls
         public AudioClip NightLoop;
         public AudioClip BloodMoonLoop;
         public AudioClip BloodMoonSting;
+        public AudioClip DuskRiser;
 
         [Header("Day Worker Foley (setup atar)")]
         public AudioClip[] WorkerFoleyClips;
@@ -25,6 +27,8 @@ namespace DeadWalls
         [Range(0f, 1f)] public float NightVolume = 0.30f;
         [Range(0f, 1f)] public float BloodMoonVolume = 0.40f;
         [Range(0f, 1f)] public float StingVolume = 0.65f;
+        [Range(0f, 1f)] public float DuskRiserVolume = 0.23f;
+        [Range(0.5f, 1.5f)] public float DuskRiserPitch = 0.90f;
         public float FadeSpeed = 0.5f;
 
         [Header("Day Worker Mix")]
@@ -35,18 +39,22 @@ namespace DeadWalls
 
         public float WorkerActivity01 { get; private set; }
         public int WorkerFoleyPlayCount { get; private set; }
+        public int DuskRiserPlayCount { get; private set; }
         public AudioSource WorkerFoleySource => _workerFoleySource;
+        public AudioSource DuskRiserSource => _phaseTransitionSource;
 
         private const float CheckInterval = 0.2f;
         private float _checkTimer;
         private AudioSource _sourceA;
         private AudioSource _sourceB;
         private AudioSource _stingSource;
+        private AudioSource _phaseTransitionSource;
         private AudioSource _workerFoleySource;
         private AudioSource _activeSource; // hedef klibi calan kaynak
         private float _targetVolume;
         private float _workerFoleyTimer;
         private bool _workerFoleyEligible;
+        private bool _hasObservedPhase;
         private int _workerClipCursor;
         private SiegeCyclePhase _lastPhase = SiegeCyclePhase.Day;
 
@@ -55,6 +63,7 @@ namespace DeadWalls
             _sourceA = CreateSource("AmbientLoopA", true);
             _sourceB = CreateSource("AmbientLoopB", true);
             _stingSource = CreateSource("AmbientSting", false);
+            _phaseTransitionSource = CreateSource("PhaseTransition", false);
             _workerFoleySource = CreateSource("WorkerAmbience", false);
             _activeSource = _sourceA;
         }
@@ -67,7 +76,7 @@ namespace DeadWalls
             source.loop = loop;
             source.playOnAwake = false;
             source.spatialBlend = 0f; // ambiyans 2D
-            source.volume = 0f;
+            source.volume = loop ? 0f : 1f;
             return source;
         }
 
@@ -100,6 +109,7 @@ namespace DeadWalls
             var gm = GameManager.Instance;
             if (gm == null || !gm.ContinuousSiegeCycle.Enabled)
             {
+                _hasObservedPhase = false;
                 _targetVolume = 0f;
                 WorkerActivity01 = 0f;
                 _workerFoleyEligible = false;
@@ -136,13 +146,27 @@ namespace DeadWalls
             }
             _workerFoleyEligible = workerEligible;
 
-            // kanli ay gecesine giris sting'i (Night kenari)
-            if (cycle.Phase == SiegeCyclePhase.Night && _lastPhase != SiegeCyclePhase.Night
+            bool phaseChanged = _hasObservedPhase && cycle.Phase != _lastPhase;
+            if (phaseChanged && cycle.Phase == SiegeCyclePhase.Dusk
+                && DuskRiser != null && _phaseTransitionSource != null
+                && !gm.GameState.IsGameOver)
+            {
+                _phaseTransitionSource.pitch = DuskRiserPitch;
+                _phaseTransitionSource.PlayOneShot(
+                    DuskRiser,
+                    DuskRiserVolume * SoundSettings.AmbienceVolume);
+                DuskRiserPlayCount++;
+            }
+
+            // Kanli ay gecesine giris sting'i (Night kenari). Ilk scene observation'i
+            // transition sayilmaz; Continue ile Night'a yuklemek sting'i tekrar oynatmaz.
+            if (phaseChanged && cycle.Phase == SiegeCyclePhase.Night
                 && bloodMoon && BloodMoonSting != null && _stingSource != null)
             {
                 _stingSource.PlayOneShot(BloodMoonSting, StingVolume * SoundSettings.AmbienceVolume);
             }
             _lastPhase = cycle.Phase;
+            _hasObservedPhase = true;
 
             AudioClip targetClip = null;
             float targetVolume = 0f;

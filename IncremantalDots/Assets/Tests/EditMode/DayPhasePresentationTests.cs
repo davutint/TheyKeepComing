@@ -38,7 +38,7 @@ namespace DeadWalls.Tests
         }
 
         [Test]
-        public void PhaseLightTarget_UsesContinuousDuskAndTwoStageDawnTransitions()
+        public void PhaseLightTarget_UsesAmberToIndigoDuskAndTwoStageDawnTransitions()
         {
             var gameObject = new GameObject("PhaseLightTransitionTest");
             var controller = gameObject.AddComponent<DayNightOverlayController>();
@@ -49,6 +49,11 @@ namespace DeadWalls.Tests
                     0f,
                     out Color duskStart,
                     out float duskStartIntensity);
+                controller.ResolvePhaseLightTarget(
+                    SiegeCyclePhase.Dusk,
+                    DayNightOverlayController.DuskAmberPeakProgress,
+                    out Color duskAmber,
+                    out float duskAmberIntensity);
                 controller.ResolvePhaseLightTarget(
                     SiegeCyclePhase.Dusk,
                     1f,
@@ -67,8 +72,12 @@ namespace DeadWalls.Tests
 
                 Assert.That(duskStart, Is.EqualTo(controller.DayLightColor));
                 Assert.That(duskStartIntensity, Is.EqualTo(controller.DayLightIntensity));
-                Assert.That(duskEnd, Is.EqualTo(controller.DuskLightColor));
-                Assert.That(duskEndIntensity, Is.EqualTo(controller.DuskLightIntensity));
+                Assert.That(duskAmber, Is.EqualTo(controller.DuskLightColor));
+                Assert.That(duskAmberIntensity, Is.EqualTo(controller.DuskLightIntensity));
+                Assert.That(duskEnd, Is.EqualTo(controller.NightLightColor));
+                Assert.That(duskEndIntensity, Is.EqualTo(controller.NightLightIntensity));
+                Assert.That(duskAmber.r, Is.GreaterThan(duskAmber.b + 0.40f));
+                Assert.That(duskEnd.b, Is.GreaterThan(duskEnd.r + 0.20f));
                 Assert.That(dawnMiddle, Is.EqualTo(controller.DawnLightColor));
                 Assert.That(dawnMiddleIntensity, Is.EqualTo(controller.DawnLightIntensity));
                 Assert.That(dawnEnd, Is.EqualTo(controller.DayLightColor));

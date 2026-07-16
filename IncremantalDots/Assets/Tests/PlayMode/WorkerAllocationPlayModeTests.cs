@@ -1720,6 +1720,118 @@ namespace DeadWalls.Tests
             Assert.That(ambient.WorkerFoleyPlayCount, Is.GreaterThan(baselineFoleyCount));
             Assert.That(ambient.WorkerFoleySource, Is.Not.Null);
             Assert.That(ambient.WorkerFoleySource.spatialBlend, Is.Zero.Within(0.001f));
+            Assert.That(ambient.WorkerFoleySource.volume, Is.EqualTo(1f).Within(0.001f),
+                "One-shot worker ambience source gain'i sifir olmamali.");
+        }
+
+        [UnityTest]
+        public IEnumerator DuskPresentation_CrossesAmberIntoIndigo_LightsLanternsAndPlaysOneRiser()
+        {
+            GameManager gameManager = GameManager.Instance;
+            DayNightOverlayController presentation =
+                Object.FindFirstObjectByType<DayNightOverlayController>();
+            AmbientAudioController ambient =
+                Object.FindFirstObjectByType<AmbientAudioController>();
+            Assert.That(gameManager, Is.Not.Null);
+            Assert.That(presentation, Is.Not.Null);
+            Assert.That(presentation.GlobalLight, Is.Not.Null);
+            Assert.That(ambient, Is.Not.Null);
+            Assert.That(ambient.DuskRiser, Is.Not.Null);
+            Assert.That(ambient.DuskRiserSource, Is.Not.Null);
+            Assert.That(ambient.DuskRiserSource.spatialBlend, Is.Zero.Within(0.001f));
+            Assert.That(ambient.DuskRiserSource.volume, Is.EqualTo(1f).Within(0.001f),
+                "One-shot Dusk riser source gain'i sifir olmamali.");
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            using EntityQuery allocationQuery = entityManager.CreateEntityQuery(
+                typeof(MobileCastleCombatConfig), typeof(MobilePopulationAllocation));
+            using EntityQuery populationQuery = entityManager.CreateEntityQuery(typeof(PopulationState));
+            using EntityQuery waveQuery = entityManager.CreateEntityQuery(typeof(WaveStateData));
+            using EntityQuery cycleQuery = entityManager.CreateEntityQuery(typeof(ContinuousSiegeCycleData));
+            Entity allocationEntity = allocationQuery.GetSingletonEntity();
+            Entity populationEntity = populationQuery.GetSingletonEntity();
+            Entity waveEntity = waveQuery.GetSingletonEntity();
+            Entity cycleEntity = cycleQuery.GetSingletonEntity();
+
+            WaveStateData wave = entityManager.GetComponentData<WaveStateData>(waveEntity);
+            wave.StressTestMode = false;
+            entityManager.SetComponentData(waveEntity, wave);
+
+            SetWoodWorkerCount(entityManager, allocationEntity, populationEntity, 101);
+            for (int frame = 0; frame < 10; frame++)
+                yield return null;
+            int expectedVisuals = WorkerVisualRepresentationUtility.GetRepresentativeCount(
+                ReadWoodWorkerCount(entityManager, allocationEntity));
+            yield return WaitForWorkerVisualCount(
+                entityManager,
+                EconomyFocusType.Wood,
+                expectedVisuals);
+
+            ContinuousSiegeCycleData cycle =
+                entityManager.GetComponentData<ContinuousSiegeCycleData>(cycleEntity);
+            cycle.CycleTimer = 0f;
+            entityManager.SetComponentData(cycleEntity, cycle);
+            for (int frame = 0; frame < 20; frame++)
+                yield return null;
+            Assert.That(gameManager.ContinuousSiegeCycle.Phase, Is.EqualTo(SiegeCyclePhase.Day));
+            int baselineRiserCount = ambient.DuskRiserPlayCount;
+
+            presentation.LightMoveSpeed = 100f;
+            cycle = entityManager.GetComponentData<ContinuousSiegeCycleData>(cycleEntity);
+            cycle.CycleTimer = cycle.DayDuration
+                + cycle.DuskDuration * DayNightOverlayController.DuskAmberPeakProgress;
+            entityManager.SetComponentData(cycleEntity, cycle);
+            for (int frame = 0; frame < 20; frame++)
+                yield return null;
+
+            Assert.That(gameManager.ContinuousSiegeCycle.Phase, Is.EqualTo(SiegeCyclePhase.Dusk),
+                "Amber checkpoint Dusk fazi icinde kalmali.");
+            Assert.That(ambient.DuskRiserPlayCount, Is.EqualTo(baselineRiserCount + 1));
+            Assert.That(ambient.DuskRiserSource.pitch,
+                Is.EqualTo(ambient.DuskRiserPitch).Within(0.001f));
+
+            Entity worker = FindWorkerVisual(entityManager, EconomyFocusType.Wood);
+            WorkerLogisticsFeedbackState feedback =
+                entityManager.GetComponentData<WorkerLogisticsFeedbackState>(worker);
+            WorkerFeedbackMaterialProperty materialFeedback =
+                entityManager.GetComponentData<WorkerFeedbackMaterialProperty>(worker);
+            Assert.That(feedback.LanternActive, Is.EqualTo(1));
+            Assert.That(materialFeedback.Value.y, Is.EqualTo(1f).Within(0.001f));
+
+            cycle = entityManager.GetComponentData<ContinuousSiegeCycleData>(cycleEntity);
+            cycle.CycleTimer = cycle.DayDuration + cycle.DuskDuration * 0.80f;
+            entityManager.SetComponentData(cycleEntity, cycle);
+            for (int frame = 0; frame < 8; frame++)
+                yield return null;
+
+            ContinuousSiegeCycleData runtimeCycle = gameManager.ContinuousSiegeCycle;
+            Assert.That(runtimeCycle.Phase, Is.EqualTo(SiegeCyclePhase.Dusk),
+                "Indigo checkpoint Dusk fazi icinde kalmali.");
+            presentation.ResolvePhaseLightTarget(
+                runtimeCycle.Phase,
+                runtimeCycle.PhaseProgress01,
+                out Color expectedColor,
+                out float expectedIntensity);
+            Assert.That(expectedColor.b, Is.GreaterThan(expectedColor.r),
+                "Dusk'un son bolumu amber'den indigo tarafa gecmis olmali.");
+            Assert.That(presentation.GlobalLight.color.r,
+                Is.EqualTo(expectedColor.r).Within(0.02f));
+            Assert.That(presentation.GlobalLight.color.g,
+                Is.EqualTo(expectedColor.g).Within(0.02f));
+            Assert.That(presentation.GlobalLight.color.b,
+                Is.EqualTo(expectedColor.b).Within(0.02f));
+            Assert.That(presentation.GlobalLight.intensity,
+                Is.EqualTo(expectedIntensity).Within(0.02f));
+
+            cycle = entityManager.GetComponentData<ContinuousSiegeCycleData>(cycleEntity);
+            cycle.CycleTimer = cycle.DayDuration + cycle.DuskDuration * 0.10f;
+            entityManager.SetComponentData(cycleEntity, cycle);
+            for (int frame = 0; frame < 30; frame++)
+                yield return null;
+            Assert.That(gameManager.ContinuousSiegeCycle.Phase, Is.EqualTo(SiegeCyclePhase.Dusk),
+                "Repeated-poll checkpoint Dusk fazi icinde kalmali.");
+            Assert.That(ambient.DuskRiserPlayCount, Is.EqualTo(baselineRiserCount + 1),
+                "Ayni Dusk fazinda polling riser'i tekrar oynatmamalidir.");
         }
 
         private readonly struct OnboardingEconomySnapshot

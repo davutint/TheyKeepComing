@@ -19,6 +19,7 @@ namespace DeadWalls
         public const float DefaultDuskLightIntensity = 0.90f;
         public const float DefaultNightLightIntensity = 0.72f;
         public const float DefaultDawnLightIntensity = 0.96f;
+        public const float DuskAmberPeakProgress = 0.45f;
 
         public Image OverlayImage;
         public float AlphaMoveSpeed = 8f;
@@ -104,8 +105,19 @@ namespace DeadWalls
             switch (phase)
             {
                 case SiegeCyclePhase.Dusk:
-                    color = Color.Lerp(DayLightColor, DuskLightColor, progress);
-                    intensity = Mathf.Lerp(DayLightIntensity, DuskLightIntensity, progress);
+                    if (progress < DuskAmberPeakProgress)
+                    {
+                        float amberIn = progress / DuskAmberPeakProgress;
+                        color = Color.Lerp(DayLightColor, DuskLightColor, amberIn);
+                        intensity = Mathf.Lerp(DayLightIntensity, DuskLightIntensity, amberIn);
+                    }
+                    else
+                    {
+                        float indigoIn = (progress - DuskAmberPeakProgress)
+                            / (1f - DuskAmberPeakProgress);
+                        color = Color.Lerp(DuskLightColor, NightLightColor, indigoIn);
+                        intensity = Mathf.Lerp(DuskLightIntensity, NightLightIntensity, indigoIn);
+                    }
                     return;
                 case SiegeCyclePhase.Night:
                     color = NightLightColor;

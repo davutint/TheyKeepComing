@@ -175,10 +175,25 @@ namespace DeadWalls
         [MenuItem("Window/DeadWalls/Repair Day Presentation")]
         public static void RepairDayPresentation()
         {
+            RepairPhasePresentation(
+                "Day presentation",
+                "Warm Day light, production readability ve worker ambience NewGameScene icin onarildi.");
+        }
+
+        [MenuItem("Window/DeadWalls/Repair Dusk Presentation")]
+        public static void RepairDuskPresentation()
+        {
+            RepairPhasePresentation(
+                "Dusk presentation",
+                "Amber-indigo Dusk light, worker lantern ve tek-sefer tension riser NewGameScene icin onarildi.");
+        }
+
+        private static void RepairPhasePresentation(string contextName, string successMessage)
+        {
             Scene activeScene = SceneManager.GetActiveScene();
             if (!activeScene.IsValid() || activeScene.path != TargetScenePath)
                 throw new InvalidOperationException(
-                    "Day presentation repair icin NewGameScene aktif olmali.");
+                    $"{contextName} repair icin NewGameScene aktif olmali.");
 
             EnsureGlobalLight(activeScene);
             EnsureAmbientAudio(activeScene);
@@ -195,14 +210,13 @@ namespace DeadWalls
 
             if (dayPresentation == null || globalLight == null)
                 throw new InvalidOperationException(
-                    "Day presentation repair gerekli overlay veya Global Light 2D owner'ini bulamadi.");
+                    $"{contextName} repair gerekli overlay veya Global Light 2D owner'ini bulamadi.");
 
             ConfigureDayPresentation(dayPresentation, globalLight);
             EditorSceneManager.MarkSceneDirty(activeScene);
             EditorSceneManager.SaveScene(activeScene);
             AssetDatabase.SaveAssets();
-            Debug.Log(
-                "[MobileCastleSceneSetup] Warm Day light, production readability ve worker ambience NewGameScene icin onarildi.");
+            Debug.Log($"[MobileCastleSceneSetup] {successMessage}");
         }
 
         private static void RepairTutorialResetSettingsInScene(Scene scene)
@@ -2839,6 +2853,8 @@ namespace DeadWalls
                 ambient.BloodMoonLoop = LoadSfx("Dark Magic/RPG3_DarkMagic_DroneUnderworld_Loop.wav");
             if (ambient.BloodMoonSting == null)
                 ambient.BloodMoonSting = LoadSfx("UI, Pads, Enchantments and Misc/RPG3_MONSTER_Roar01.wav");
+            if (ambient.DuskRiser == null)
+                ambient.DuskRiser = LoadSfx("Wind Magic/RPG3_WindMagicEpic_Cast01_P1.wav");
             if (ambient.WorkerFoleyClips == null || ambient.WorkerFoleyClips.Length != 4)
                 ambient.WorkerFoleyClips = new AudioClip[4];
             if (ambient.WorkerFoleyClips[0] == null)
@@ -2853,6 +2869,8 @@ namespace DeadWalls
             ambient.WorkerFoleyMinInterval = 1.6f;
             ambient.WorkerFoleyMaxInterval = 5.2f;
             ambient.WorkerPitchVariation = 0.06f;
+            ambient.DuskRiserVolume = 0.23f;
+            ambient.DuskRiserPitch = 0.90f;
             EditorUtility.SetDirty(ambient);
         }
 

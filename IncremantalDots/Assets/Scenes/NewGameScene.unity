@@ -52852,6 +52852,7 @@ MonoBehaviour:
   NightLoop: {fileID: 8300000, guid: 1105612c71178474b849857051a7a30c, type: 3}
   BloodMoonLoop: {fileID: 8300000, guid: e26cd6f9f4f1d475ca6750305c6a7523, type: 3}
   BloodMoonSting: {fileID: 8300000, guid: 4f09254358c0b4b36a1c65dfadd58ee7, type: 3}
+  DuskRiser: {fileID: 8300000, guid: 15b621ee2b9194227ae94db04fd4493f, type: 3}
   WorkerFoleyClips:
   - {fileID: 8300000, guid: 162a90fc55b3548fdb611e6a86eee576, type: 3}
   - {fileID: 8300000, guid: dce27cee2edec49ba93a792fae4c105c, type: 3}
@@ -52860,6 +52861,8 @@ MonoBehaviour:
   NightVolume: 0.3
   BloodMoonVolume: 0.4
   StingVolume: 0.65
+  DuskRiserVolume: 0.23
+  DuskRiserPitch: 0.9
   FadeSpeed: 0.5
   WorkerFoleyVolume: 0.11
   WorkerFoleyMinInterval: 1.6
