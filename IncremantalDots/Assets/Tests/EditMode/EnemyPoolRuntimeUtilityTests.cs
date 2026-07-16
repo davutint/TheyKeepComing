@@ -34,6 +34,16 @@ namespace DeadWalls.Tests
                 XPReward = 10
             });
             entityManager.SetComponentData(prefab, LocalTransform.Identity);
+            entityManager.SetComponentData(prefab, new SpriteAnimation
+            {
+                TotalColumns = 15,
+                TotalRows = 32,
+                DirectionRow = 4,
+                FrameCount = 15,
+                CurrentFrame = 0,
+                FrameTimer = 0f,
+                FrameInterval = 0.1f
+            });
             entityManager.SetComponentEnabled<ZombieSlow>(prefab, false);
             entityManager.SetComponentEnabled<DeathTimer>(prefab, false);
 
@@ -100,6 +110,10 @@ namespace DeadWalls.Tests
                 Is.Not.EqualTo(firstGeneration));
             Assert.That(entityManager.GetComponentData<ZombieState>(reused).Value,
                 Is.EqualTo(ZombieStateType.Moving));
+            SpriteAnimation reusedAnimation = entityManager.GetComponentData<SpriteAnimation>(reused);
+            Assert.That(reusedAnimation.CurrentFrame, Is.InRange(0, 14));
+            Assert.That(reusedAnimation.FrameTimer, Is.GreaterThan(0f).And.LessThan(0.1f));
+            Assert.That(reusedAnimation.FrameInterval, Is.EqualTo(0.1f).Within(0.0001f));
 
             int totalBeforeChurn = entityManager.GetComponentData<EnemyPoolRuntimeData>(pool).TotalCreated;
             Entity churnEntity = reused;

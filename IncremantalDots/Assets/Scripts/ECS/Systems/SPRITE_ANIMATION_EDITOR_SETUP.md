@@ -260,6 +260,9 @@ ArrowAuthoring ve SpriteSheetAuthoring tint degerleri beyaz kalir. Projectile ti
 Ek readability kontrolu:
 - Oklar okcu tipine gore tint alir.
 - Frost slow alan zombiler slow suresince soguk/mavi tint alir, sonra normal tinte doner.
+- `Window > DeadWalls > Repair Horde Readability` Vampire materyalindeki tek-pass contact
+  patch ve silhouette edge sözleşmesini idempotent yeniler.
+- 10K Night QA'da zombie başlangıç frame/timer değerleri tek noktada senkron olmamalıdır.
 
 ### Beklenen Sonuclar:
 - Animasyonlar 15 frame ile eskisine gore cok daha akici olmali

@@ -16,8 +16,9 @@ Gameplay spawn, okçu ateş temposu, projectile ve damage hesapları değişmez.
 - Canonical Night global-light hedefi `RGB(0.46, 0.58, 0.94)`, intensity `0.68`'dir.
 - Dusk'un ikinci yarısı aynı hedefe aktığı için Night girişinde renk sıçraması oluşmaz.
 - Soğuk mavi ağırlık kale, Wall ve zombie kütlesini zeminden ayıran silhouette tabanıdır.
-- Ayrı `10k ground contrast / silhouette edge / motion cadence` tracker işi bu pakette
-  tamamlanmış sayılmaz; bu paket yalnız faz paleti ve bounded feedback owner'larını kurar.
+- Sonraki `DW-I-POLISH-HORDE-READ` paketi bu tabanı `Vampire` materyalinde tek-pass contact
+  patch/silhouette edge ve deterministic animation phase dağılımıyla tamamlar; ayrıntı
+  `Assets/Scripts/ECS/Systems/HORDE_READABILITY_ARCHITECTURE.md` dosyasındadır.
 
 ## Kale Pencereleri
 

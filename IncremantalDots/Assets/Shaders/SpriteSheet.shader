@@ -11,6 +11,9 @@ Shader "DeadWalls/SpriteSheet"
         _WorkerAnimation ("Worker Animation", Float) = 0
         _WorkerFeedback ("Worker Feedback", Vector) = (0, 0, 0, 0)
         _WorkerCargoColor ("Worker Cargo Color", Color) = (0.72, 0.43, 0.20, 1)
+        _HordeReadability ("Horde Readability (Edge, Pixels, Ground, Reserved)", Vector) = (0, 0, 0, 0)
+        _HordeEdgeColor ("Horde Edge Color", Color) = (0.18, 0.26, 0.36, 1)
+        _HordeGroundColor ("Horde Ground Color", Color) = (0.03, 0.045, 0.065, 1)
         _Cutoff ("Alpha Cutoff", Range(0, 1)) = 0.5
     }
 
@@ -67,6 +70,9 @@ Shader "DeadWalls/SpriteSheet"
                 float _WorkerAnimation;
                 float4 _WorkerFeedback;
                 float4 _WorkerCargoColor;
+                float4 _HordeReadability;
+                float4 _HordeEdgeColor;
+                float4 _HordeGroundColor;
                 float _Cutoff;
             CBUFFER_END
 
@@ -112,6 +118,43 @@ Shader "DeadWalls/SpriteSheet"
 
                 col *= _Color;
 
+                // Vampire material alone enables this uniform branch. It keeps the 10K
+                // horde readable without a second pass, extra entity or material instance.
+                float edgeMask = 0.0;
+                float groundMask = 0.0;
+                if (_HordeReadability.x > 0.001)
+                {
+                    float sourceVisible = step(_Cutoff, col.a);
+                    float2 atlasTexel = (_UVRect.zw / 128.0)
+                        * max(0.5, _HordeReadability.y);
+                    float2 sampleMin = _UVRect.xy + atlasTexel * 0.5;
+                    float2 sampleMax = _UVRect.xy + _UVRect.zw - atlasTexel * 0.5;
+
+                    float neighborAlpha = 0.0;
+                    neighborAlpha = max(neighborAlpha, SAMPLE_TEXTURE2D(
+                        _MainTex, sampler_MainTex,
+                        clamp(IN.uv + float2(atlasTexel.x, 0.0), sampleMin, sampleMax)).a);
+                    neighborAlpha = max(neighborAlpha, SAMPLE_TEXTURE2D(
+                        _MainTex, sampler_MainTex,
+                        clamp(IN.uv - float2(atlasTexel.x, 0.0), sampleMin, sampleMax)).a);
+                    neighborAlpha = max(neighborAlpha, SAMPLE_TEXTURE2D(
+                        _MainTex, sampler_MainTex,
+                        clamp(IN.uv + float2(0.0, atlasTexel.y), sampleMin, sampleMax)).a);
+                    neighborAlpha = max(neighborAlpha, SAMPLE_TEXTURE2D(
+                        _MainTex, sampler_MainTex,
+                        clamp(IN.uv - float2(0.0, atlasTexel.y), sampleMin, sampleMax)).a);
+                    edgeMask = step(_Cutoff, neighborAlpha * _Color.a)
+                        * (1.0 - sourceVisible)
+                        * saturate(_HordeReadability.x);
+
+                    float2 groundUv = (IN.quadUV - float2(0.50, 0.085))
+                        / float2(0.075, 0.025);
+                    float contactPatch = 1.0 - step(1.0, dot(groundUv, groundUv));
+                    groundMask = contactPatch
+                        * (1.0 - sourceVisible)
+                        * saturate(_HordeReadability.z);
+                }
+
                 float productionStrength = saturate(_WorkerFeedback.w);
                 float cargoScale = lerp(0.86, 1.12, productionStrength);
                 float2 cargoUv = (IN.quadUV - float2(0.66, 0.36))
@@ -143,6 +186,10 @@ Shader "DeadWalls/SpriteSheet"
                 col.rgb = lerp(col.rgb, float3(1.0, 0.88, 0.38), lanternCore * _WorkerFeedback.y);
                 col.rgb = lerp(col.rgb, _WorkerCargoColor.rgb * 1.35, pulseMask);
                 col.a = max(col.a, max(cargoMask, max(lanternMask, pulseMask)));
+                col.rgb = lerp(col.rgb, _HordeGroundColor.rgb,
+                    step(edgeMask, groundMask) * step(0.001, groundMask));
+                col.rgb = lerp(col.rgb, _HordeEdgeColor.rgb, step(0.001, edgeMask));
+                col.a = max(col.a, max(edgeMask, groundMask));
                 clip(col.a - _Cutoff);
                 return col;
             }

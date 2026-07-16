@@ -26,19 +26,9 @@ namespace DeadWalls
 
             void Execute(ref SpriteAnimation anim, ref SpriteUVRect uvRect)
             {
-                // Timer guncelle
-                anim.FrameTimer += Dt;
-
-                // Frame ilerlet
-                if (anim.FrameTimer >= anim.FrameInterval)
-                {
-                    anim.FrameTimer -= anim.FrameInterval;
-                    anim.CurrentFrame++;
-
-                    // Dongu: son frame'den sonra basa don
-                    if (anim.CurrentFrame >= anim.FrameCount)
-                        anim.CurrentFrame = 0;
-                }
+                // Bir hitch birden fazla interval atlattiysa tek frame ilerleyip horde
+                // ritmini agirlastirma. O(1) catch-up ile cadence gercek zamana bagli kalir.
+                HordeMotionCadenceUtility.Advance(ref anim, Dt);
 
                 // UV Rect hesapla
                 //  Sprite sheet (gorsel):        UV space:
@@ -50,8 +40,8 @@ namespace DeadWalls
                 int col = anim.CurrentFrame;
                 int uvRow = (anim.TotalRows - 1) - anim.DirectionRow;
 
-                float scaleX = 1f / anim.TotalColumns;
-                float scaleY = 1f / anim.TotalRows;
+                float scaleX = 1f / math.max(1, anim.TotalColumns);
+                float scaleY = 1f / math.max(1, anim.TotalRows);
                 float offsetX = col * scaleX;
                 float offsetY = uvRow * scaleY;
 

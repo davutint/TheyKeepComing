@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.2
 > **Son tam kapsam denetimi:** 2026-07-15
 > **Aktif paket:** Package I - HUD, Onboarding ve Creative Polish
-> **Aktif iş:** `DW-I-POLISH-HORDE-READ` - Preserve 10K Horde Ground Contrast, Silhouette Edge and Motion Cadence
-> **İlerleme:** `379 / 441` tracker checkbox'ı tamamlandı - `%85,94`
+> **Aktif iş:** `DW-I-POLISH-HIT-BUDGET` - Budget and Rate-Limit Per-Enemy Hit VFX and SFX
+> **İlerleme:** `381 / 441` tracker checkbox'ı tamamlandı - `%86,39`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -830,7 +830,8 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 - [x] Night: soğuk ay, güçlü silhouette, pencere/ok salvosu, rate-limited yoğun mix.
 - [x] Dawn: cyan/altın kırılma, kapı/survivor gelişi, nefes/yeni gün cue.
 - [x] Faz geçişini büyük tam ekran yazı yerine grading, sky, particles ve audio ile okut.
-- [ ] 10k horde için ground contrast, silhouette edge ve motion cadence koru.
+- [x] 10k horde için ground contrast, silhouette edge ve motion cadence koru.
+  - Kanıt: Vampire materyalinde ek pass/draw/entity üretmeyen muted-cold edge + küçük contact patch; pool generation tabanlı `15/15` frame ve `16/16` timer-band dağılımı; 1920x1080 Night QA; iki final 10K enemy + 1K archer benchmark koşusu `9,21-9,80 ms` ortalama, `10,35-10,71 ms` P95 ve `546` ortalama draw call ile geçti.
 - [ ] Hit VFX/SFX'i her düşmanda üretme; budget/rate limit uygula.
 - [ ] Fireball ve Frost feedback'ini horde içinde kaybolmayacak hierarchy ile sun.
 - [ ] Archer salvolarını tek tek projectile görsel kaosu yerine okunur toplu ritme çevir.
@@ -841,7 +842,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 - [ ] İlk-run tutorial tamamlanıyor; ikinci run'da otomatik açılmıyor.
 - [x] Tek Wall bar ve minimal phase UI owner onayından geçiyor.
 - [x] 16:9/ultrawide temiz render.
-- [ ] 10k horde okunabilir.
+- [x] 10k horde okunabilir.
 - [ ] Day/night lighting, audio ve combat feedback görsel/işitsel review'dan geçiyor.
 
 ---
@@ -900,7 +901,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 
 ### Ölçüm senaryoları
 
-- [~] 1.000 archer + 10.000 enemy + aktif projectile gerçek sahnede geçti; explicit Night görsel kabulü bekliyor.
+- [~] 1.000 archer + 10.000 enemy + aktif projectile gerçek sahnede geçti; enemy-only 10K explicit Night görsel kabulü de tamamlandı. Aynı Night karesinde 1K archer + aktif projectile birleşik görsel kabulü bekliyor.
 - [x] Fireball 10K horde içinde aynı-frame lethal damage ve toplu pool return correctness geçti; optimize peak iki temiz koşuda `79,13-83,72 ms`.
 - [ ] Arrow refill sonrası 1.000 archer yeniden ateş başlangıcı.
 - [~] 10K enemy v14 deterministic rebuild Continue üç temiz koşuda geçti; `372-375` bucket, `165.957-227.597 B`, save `31,42-32,93 ms`, restore `75,09-213,32 ms`. 1K archer benchmark entity'leri doğrudan ECS stress harness'ine ait olduğu için run-save kanıtı sayılmaz; bu nedenle madde partial kalır.

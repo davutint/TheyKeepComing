@@ -90,12 +90,7 @@ namespace DeadWalls
                         // Walk: Row 0-7, 15 frame
                         int targetRow = WalkOffset + dir;
                         if (anim.DirectionRow != targetRow)
-                        {
-                            anim.DirectionRow = targetRow;
-                            anim.FrameCount = WalkFrameCount;
-                            anim.CurrentFrame = 0;
-                            anim.FrameTimer = 0f;
-                        }
+                            SetLoopAnimation(ref anim, targetRow, WalkFrameCount);
                         break;
                     }
 
@@ -104,12 +99,7 @@ namespace DeadWalls
                         // Attack: Row 8-15, 15 frame
                         int targetRow = AttackOffset + dir;
                         if (anim.DirectionRow != targetRow)
-                        {
-                            anim.DirectionRow = targetRow;
-                            anim.FrameCount = AttackFrameCount;
-                            anim.CurrentFrame = 0;
-                            anim.FrameTimer = 0f;
-                        }
+                            SetLoopAnimation(ref anim, targetRow, AttackFrameCount);
                         break;
                     }
 
@@ -118,12 +108,7 @@ namespace DeadWalls
                         // Queued: Walk animasyonu (Moving ile ayni)
                         int targetRow = WalkOffset + dir;
                         if (anim.DirectionRow != targetRow)
-                        {
-                            anim.DirectionRow = targetRow;
-                            anim.FrameCount = WalkFrameCount;
-                            anim.CurrentFrame = 0;
-                            anim.FrameTimer = 0f;
-                        }
+                            SetLoopAnimation(ref anim, targetRow, WalkFrameCount);
                         break;
                     }
 
@@ -141,6 +126,16 @@ namespace DeadWalls
                         break;
                     }
                 }
+            }
+
+            private static void SetLoopAnimation(ref SpriteAnimation anim, int targetRow,
+                int frameCount)
+            {
+                anim.DirectionRow = targetRow;
+                anim.FrameCount = math.max(1, frameCount);
+                anim.CurrentFrame = math.clamp(anim.CurrentFrame, 0, anim.FrameCount - 1);
+                if (anim.FrameInterval > 0f)
+                    anim.FrameTimer = math.clamp(anim.FrameTimer, 0f, anim.FrameInterval * 0.999f);
             }
 
             private int ResolveDirection(float2 position, float2 velocity, int fallbackDirection)

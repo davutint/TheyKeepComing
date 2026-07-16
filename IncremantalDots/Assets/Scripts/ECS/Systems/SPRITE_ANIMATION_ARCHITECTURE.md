@@ -143,8 +143,10 @@ Dosya: `Assets/Scripts/ECS/Systems/SpriteAnimationSystem.cs`
 
 Her frame'de:
 1. `FrameTimer += deltaTime`
-2. Timer >= interval → `CurrentFrame++` (dongusel)
-3. UV rect hesapla:
+2. `elapsedFrames = floor(FrameTimer / FrameInterval)` hesaplanır.
+3. Bir frame hitch'i birden fazla interval atlattıysa O(1) catch-up ile bütün geçen frame'ler ilerletilir.
+4. `CurrentFrame = (CurrentFrame + elapsedFrames) % FrameCount` uygulanır.
+5. UV rect hesapla:
    - `col = CurrentFrame`
    - `uvRow = (TotalRows - 1) - DirectionRow` ← **Y-flip!**
    - `scaleX = 1/TotalColumns`, `scaleY = 1/TotalRows`
@@ -154,7 +156,8 @@ Her frame'de:
 Sprite sheet'te Row 0 = resmin ustu, ama UV space'te y=0 = resmin alti.
 Bu yuzden `uvRow = (TotalRows-1) - DirectionRow` ile ceviriyoruz.
 
-**Degisiklik yok** — bu system tamamen generic, TotalRows/TotalColumns ne verilirse calisir.
+System generic kalır; TotalRows/TotalColumns ne verilirse çalışır. 10K horde için pool rent
+anında eklenen deterministik phase seed'i yalnız başlangıç frame/timer değerini dağıtır.
 
 ### ZombieAnimationStateSystem (SimulationSystemGroup)
 Dosya: `Assets/Scripts/ECS/Systems/ZombieAnimationStateSystem.cs`
@@ -176,6 +179,18 @@ Yon cikartma: `dir = DirectionRow % 8`
 Hedef satir: `targetRow = offset + dir`
 
 Dead state'te DeathTimer = `DieFrameCount * FrameInterval` (animasyonun tam suresi)
+
+Loop state veya yön değişiminde mevcut animation phase korunur. Yalnız Die state frame 0'dan
+başlar; böylece ölüm süresi ve `DeathTimer` sözleşmesi exact kalır.
+
+### HordeMotionCadenceUtility
+
+Dosya: `Assets/Scripts/ECS/Systems/HordeMotionCadenceUtility.cs`
+
+`EnemyPoolRuntimeUtility.TryRent`, pool generation arttıktan sonra entity index + generation
+hash'ini 15 frame ve 16 timer dilimine dağıtır. Authored `FrameInterval`/FPS değişmez; gameplay
+movement veya attack cooldown bu yardımcıdan veri okumaz. Ayrıntılı render/motion sözleşmesi
+`HORDE_READABILITY_ARCHITECTURE.md` dosyasındadır.
 
 ### DamageCleanupSystem (SimulationSystemGroup)
 Dosya: `Assets/Scripts/ECS/Systems/DamageCleanupSystem.cs`

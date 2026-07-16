@@ -173,6 +173,47 @@ namespace DeadWalls.Tests
             Assert.That(poolAtTenK.AvailableCount + poolAtTenK.ActiveCount,
                 Is.EqualTo(poolAtTenK.TotalCreated));
 
+            using (EntityQuery animationQuery = entityManager.CreateEntityQuery(new EntityQueryDesc
+                   {
+                       All = new[]
+                       {
+                           ComponentType.ReadOnly<ZombieTag>(),
+                           ComponentType.ReadOnly<SpriteAnimation>()
+                       },
+                       None = new[] { ComponentType.ReadOnly<Prefab>() }
+                   }))
+            using (NativeArray<SpriteAnimation> animations =
+                   animationQuery.ToComponentDataArray<SpriteAnimation>(Allocator.Temp))
+            {
+                var occupiedFrames = new bool[15];
+                var occupiedTimerSlices = new bool[HordeMotionCadenceUtility.TimerSlices];
+                for (int i = 0; i < animations.Length; i++)
+                {
+                    SpriteAnimation animation = animations[i];
+                    occupiedFrames[math.clamp(animation.CurrentFrame, 0, occupiedFrames.Length - 1)] = true;
+                    int timerSlice = math.clamp(
+                        (int)math.floor((animation.FrameTimer /
+                            math.max(0.0001f, animation.FrameInterval)) *
+                            HordeMotionCadenceUtility.TimerSlices),
+                        0,
+                        occupiedTimerSlices.Length - 1);
+                    occupiedTimerSlices[timerSlice] = true;
+                }
+
+                int frameBands = 0;
+                for (int i = 0; i < occupiedFrames.Length; i++)
+                    frameBands += occupiedFrames[i] ? 1 : 0;
+                int timerBands = 0;
+                for (int i = 0; i < occupiedTimerSlices.Length; i++)
+                    timerBands += occupiedTimerSlices[i] ? 1 : 0;
+
+                Assert.That(frameBands, Is.EqualTo(15),
+                    "10K horde authored frame bantlarinin tamamini kullanmali.");
+                Assert.That(timerBands, Is.EqualTo(HordeMotionCadenceUtility.TimerSlices),
+                    "10K horde timer cadence bantlarinin tamamini kullanmali.");
+                Debug.Log($"[DW-I-HORDE-READ] frame_bands={frameBands}; timer_bands={timerBands}");
+            }
+
             using (EntityQuery existingArcherQuery =
                    entityManager.CreateEntityQuery(typeof(ArcherUnit)))
                 entityManager.DestroyEntity(existingArcherQuery);

@@ -187,3 +187,32 @@ Editor `Draw Calls Count` sayacı SceneView ve Editor UI render'larını da içe
 Bu `21` değer üst seviye Frame Debugger event sayısıdır; `HybridBatch` kendi içindeki draw komutlarını toplar ve tek draw call anlamına gelmez. ECS topology ölçümünde 10.000 aktif zombie `202` render/simulation chunk'ına dağıldı; örnek chunk `50/50` dolu ve archetype kapasitesi `50` entity'dir. En büyük per-entity alanlar `LocalToWorld 64 B`, `LocalTransform 32 B`, `SpriteAnimation 28 B`, `ZombieStats 28 B`, `PhysicsBody 24 B`, `RenderBounds 24 B` ve `WorldRenderBounds 24 B` olarak ölçüldü.
 
 Sonuç: `535` draw call ileri render-archetype slimming/batching için gerçek optimizasyon borcudur. Buna rağmen aynı standalone koşuda P95 `6,97 ms` ile 60 FPS bütçesinin (`16,67 ms`) belirgin biçimde altında kaldığı için enemy-only V1 blocker'ı değildir. Shader/material körlemesine değiştirilmedi; release cap birleşik 1K archer + 10K enemy testi görülmeden artırılmayacaktır.
+
+---
+
+## DW-I-POLISH-HORDE-READ takip ölçümü - 2026-07-16
+
+Tek `Vampire` materyali ve `DeadWalls/SpriteSheet` shader'ı, ek renderer/entity/material
+instance veya ikinci pass üretmeden genişletildi. Shader `Opaque / Geometry`, tek pass ve DOTS
+instancing sözleşmesini korur; Unity shader audit sonucu `0` mesajdır. Zombie pool rent'i entity
+index + generation hash'iyle authored `15/15` frame ve `16/16` timer bandını kullanır. Authored
+FPS, gameplay movement, attack cooldown ve release `MaxAliveZombies = 900` değişmedi.
+
+İki final gerçek-scene Editor PlayMode koşusu:
+
+| Metrik | Koşu 1 | Koşu 2 |
+|---|---:|---:|
+| Enemy / archer | 10.000 / 1.000 | 10.000 / 1.000 |
+| Aktif projectile | 4 | 56 |
+| Frame average / P95 / max | 9,21 / 10,35 / 22,09 ms | 9,80 / 10,71 / 66,70 ms |
+| Main thread average / max | 9,11 / 21,93 ms | 9,24 / 37,43 ms |
+| Draw call average | 546 | 546 |
+| Death peak | 58,98 ms | 58,20 ms |
+| Save / restore | 42,68 / 93,34 ms | 40,88 / 121,01 ms |
+| Compact snapshot | 163.633 B | 177.749 B |
+
+10K Night görsel QA `1920x1080` Game View'da, stress presentation suppression kapalıyken
+tamamlandı. Küçük contact patch zemine temas verdi; muted-cold tek-texel edge komşu
+silhouette'leri ayırdı; deterministic phase dağılımı senkron frame-0 titreşimini kaldırdı.
+Hedefli doğrulama: `HordeReadabilityTests 3/3`, enemy pool testi `1/1`, gerçek 10K + 1K
+benchmark `1/1`, scene validation `0` issue ve Console `0` error.

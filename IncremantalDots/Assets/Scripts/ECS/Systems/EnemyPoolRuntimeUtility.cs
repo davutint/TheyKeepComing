@@ -54,6 +54,13 @@ namespace DeadWalls
             var member = entityManager.GetComponentData<EnemyPoolMember>(entity);
             member.Generation = NextGeneration(member.Generation);
             entityManager.SetComponentData(entity, member);
+            if (entityManager.HasComponent<SpriteAnimation>(entity))
+            {
+                var animation = entityManager.GetComponentData<SpriteAnimation>(entity);
+                HordeMotionCadenceUtility.Seed(
+                    ref animation, entity.Index, member.Generation);
+                entityManager.SetComponentData(entity, animation);
+            }
             entityManager.SetComponentEnabled<ZombieTag>(entity, true);
 
             var state = entityManager.GetComponentData<EnemyPoolRuntimeData>(poolEntity);

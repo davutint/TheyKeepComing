@@ -18,7 +18,7 @@ V1 tek düşman akışında sürekli `Instantiate/DestroyEntity` churn'ü yerine
 2. Inactive entity'de enableable `ZombieTag` kapalıdır ve `LocalTransform.Scale = 0` olduğu için gameplay query'lerine girmez ve görünmez.
 3. `WaveSpawnSystem`, `EnemyPoolRuntimeUtility.TryRent` ile rezervden entity alır.
 4. Rezerv boşsa utility tam `PoolExpandBatch` kadar yeni entity üretip rezervi genişletir.
-5. Rent, generation değerini artırır ve state/slow/death timer/physics/tint/animation transient verilerini sıfırlar.
+5. Rent, generation değerini artırır; state/slow/death timer/physics/tint transient verilerini sıfırlar ve `HordeMotionCadenceUtility` ile animation frame/timer fazını entity index + generation üzerinden deterministik dağıtır.
 6. `DamageCleanupSystem`, ölüm animasyonu bittiğinde ödülü bir kez yazar; dönecek pool üyelerini toplar, transient component reset'ini Burst-parallel job ile yapar ve bütün entity'leri tek `CommitBulkReturn` buffer/state yazımıyla rezerve ekler.
 
 `ZombieTag` ve `DeathTimer` enableable component'tir. Ölüm animasyonu `DeathTimer` verisini ve enabled state'ini job içinde doğrudan yazar; 10K ölümde entity başına ECB komutu üretmez. Normal rent/return structural archetype değişikliği yapmaz; yalnız gerçek pool genişlemesi entity instantiate eder.
@@ -44,6 +44,7 @@ Bu sözleşme, eski okun yeniden kullanılan aynı entity kimliğindeki yeni zom
 ## Doğrulama
 
 - `EnemyPoolRuntimeUtilityTests.Pool_PrewarmExpandsRentsReturnsAndResetsTransientState`
+- `HordeReadabilityTests.MotionCadence_SeedDistributesFramesAndTimerSlicesDeterministically`
 - `ExactRunContinuePlayModeTests.EnemyPool_DeathReturnsEntityAndRejectsStaleArrowGeneration`
 - Tam regresyon: EditMode `34/34`; PlayMode `13/13`, hedefli profiler capture normal sette explicit skip.
 - 10K runtime ölçümü: `Assets/Docs/DEAD_WALLS_10K_RUNTIME_REPORT.md`.
