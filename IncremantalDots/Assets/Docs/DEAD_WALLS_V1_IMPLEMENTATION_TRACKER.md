@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.2
 > **Son tam kapsam denetimi:** 2026-07-15
 > **Aktif paket:** Package I - HUD, Onboarding ve Creative Polish
-> **Aktif iş:** `DW-I-ACCEPT-FIRST-RUN-TUTORIAL` - Verify First-Run Completion and Second-Run Suppression
-> **İlerleme:** `385 / 441` tracker checkbox'ı tamamlandı - `%87,30`
+> **Aktif iş:** `DW-I-ACCEPT-PRESENTATION-REVIEW` - Review Day/Night Lighting, Audio and Combat Feedback
+> **İlerleme:** `386 / 441` tracker checkbox'ı tamamlandı - `%87,53`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -872,7 +872,14 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 
 ### Package I kabul kapısı
 
-- [ ] İlk-run tutorial tamamlanıyor; ikinci run'da otomatik açılmıyor.
+- [x] İlk-run tutorial tamamlanıyor; ikinci run'da otomatik açılmıyor.
+  - Kanıt: Yedi zorunlu accepted-player-action step'i olmadan global
+    `tutorial.v1.complete` yazılmıyor; son adım flag'i meta save'e durable kaydediyor ve legacy
+    yedi-step save global flag'i backfill ediyor. Gerçek lethal first run + durable death
+    transaction + `UIManager.OnRestart()` ikinci run zincirinde run Id yenileniyor, Day 1
+    temiz başlıyor, sekiz tutorial flag'i meta reload sonrasında korunuyor ve bütün hint/pulse/
+    cue yüzeyleri `120` frame kapalı kalıyor. EditMode `25/25`, PlayMode `13/13`; canlı sahnede
+    tek controller, `0` eksik binding, scene validation `0` issue ve final Console `0` error.
 - [x] Tek Wall bar ve minimal phase UI owner onayından geçiyor.
 - [x] 16:9/ultrawide temiz render.
 - [x] 10k horde okunabilir.
@@ -1216,3 +1223,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-16 | `DW-I-POLISH-SPELL-HIERARCHY` Fireball + Frost hierarchy above dense horde depth | `SpellFeedbackHierarchy`, ordinary/Frost/Fireball sunumunu tek `Wall` sorting contract'ında topladı. `CombatFeedbackBridge` mevcut `128` flipbook pool ve `24/frame` budget içinde Frost slotlarına `3.2x` cyan impact ile genişleyen pooled ring ekledi; ordinary hit küçük kaldı. `SpellCastUI`, Fireball projectile'a sabit aura, blast'a yeniden kullanılan sıcak core/ring katmanları ekledi. Fireball projectile, targeting indicator ve bütün blast render'ları `MobileCastleRenderDepth.ProjectileZ` bandına normalize edilerek opaque/depth-write enemy renderer'larının önüne taşındı; damage, radius, cooldown, Frost slow ve hit sampling değişmedi. Setup tool ve architecture/editor setup belgeleri güncellendi | Unity script validation: 0 error; hierarchy EditMode `3/3`; gerçek 10K pooled-enemy hierarchy PlayMode `1/1`; dense hit + bridge budget + Fireball/Continue 10K regresyon PlayMode `3/3`; `DW_I_SPELL_HIERARCHY_10K.png` görsel QA temiz; scene validation `0` issue; final Console `0 error`; tracker `383/441` |
 | 2026-07-16 | `DW-I-POLISH-SALVO-RHYTHM` bounded visual representatives over full gameplay projectiles | `ArcherShootSystem`, her başarılı pool rent'inin monotonic sırasını ve canlı okçu sayısını `ArcherSalvoPresentationUtility` ile birleştirir. 48 ve altındaki birliklerde full visibility korunur; 1.000 okçuda stride `21` ile aynı salvonun yalnız `47-48` oku görünür, ardışık salvolar temsilci şeritlerini kaydırır. Scale `0` projectile'lar gameplay olarak aktif kalır; damage, target reservation, ammo, pool, Frost, hit feedback ve save truth azaltılmaz. Continue yoğun active-arrow listesine bounded dağılımı yeniden uygular. Targeting/pool mimarisi ve gerçek 10K testi güncellendi | Unity compile/Console `0 error`; utility EditMode `3/3`; gerçek `10.000` enemy + `1.000` archer PlayMode `1/1`, ilk salvo `1000 gameplay / 48 visual / stride 21`; targeting/ammo/pool/generation regresyon PlayMode `5/5`; `1920x1080` screenshot QA; frame average `9,77 ms`, P95 `12,74 ms`, draw call `544`; tracker `384/441` |
 | 2026-07-16 | `DW-I-POLISH-BLOOD-MOON-REMOVAL` remove active special-night presentation wiring | `BloodMoonWarningUI` ve aktif `BloodMoonWarningRoot` tamamen silindi. `AmbientAudioController` yalnız canonical Night loop/horde bed kullanıyor; özel loop/sting kaynağı yok. `DayNightOverlayController`, `MomentVignetteUI` ve `HUDController` kırmızı tint/flash/label dallarını taşımıyor; scene setup bunları yeniden üretmiyor. `IsBloodMoonNight` ve `BloodMoonIntensityMult` yalnız save/config geriye uyumluluk alanları olarak dormant kaldı. Night polling regresyonu gerçek `0,2s` unscaled cadence'i explicit bekleyecek şekilde deterministikleştirildi | Unity compile gerçek error `0`; new removal + phase math EditMode `8/8`; stale special-night + Day/Dusk/Night/Dawn/phase-world PlayMode `5/5`; live reflection presentation field `0`, warning type/root `0`; scene validation `0` issue; 1280x720 normal Night Game View QA; tracker `385/441` |
+| 2026-07-16 | `DW-I-ACCEPT-FIRST-RUN-TUTORIAL` first-run completion + second-run suppression acceptance | Mevcut onboarding implementasyonu acceptance seviyesinde yeniden denetlendi; runtime kodu veya UI yeniden yazılmadı. Yedi zorunlu gerçek oyuncu aksiyonu global durable completion flag'inin tek kapısıdır; legacy step-only meta state backfill olur. Gerçek first-run ölüm transaction'ı ve `UIManager.OnRestart()` ile başlayan yeni run, run kimliğini/cycle'ı sıfırlarken meta tutorial flag'lerini korur; ikinci run boyunca bütün cue yüzeyleri kapalıdır. Tutorial yalnız Settings'teki iki-onaylı explicit reset ile yeniden açılır | EditMode onboarding/meta/reset `25/25`; gerçek onboarding/Council/second-run PlayMode `13/13`; MCP scene audit: tek `FirstRunOnboardingUI`, `0` eksik binding; scene validation `0` issue; final Console `0` error; tracker `386/441` |
