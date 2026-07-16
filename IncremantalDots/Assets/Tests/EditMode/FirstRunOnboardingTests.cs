@@ -32,6 +32,22 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void BasicArcherRule_ShowsOnlyAtFirstRealAffordability()
+        {
+            Assert.That(FirstRunOnboardingRules.ShouldShowBasicArcherStep(
+                false, true, false, true), Is.True);
+
+            Assert.That(FirstRunOnboardingRules.ShouldShowBasicArcherStep(
+                true, true, false, true), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldShowBasicArcherStep(
+                false, false, false, true), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldShowBasicArcherStep(
+                false, true, true, true), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldShowBasicArcherStep(
+                false, true, false, false), Is.False);
+        }
+
+        [Test]
         public void ActiveHudPrefab_HasSingleNonBlockingEnglishWorkerRatioPresentation()
         {
             GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(HudPrefabPath);

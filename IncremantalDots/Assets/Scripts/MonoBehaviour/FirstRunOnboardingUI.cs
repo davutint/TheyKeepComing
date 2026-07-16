@@ -4,6 +4,13 @@ using UnityEngine.UI;
 
 namespace DeadWalls
 {
+    internal enum FirstRunOnboardingStep
+    {
+        None = 0,
+        WorkerRatio = 1,
+        BasicArcher = 2
+    }
+
     internal static class FirstRunOnboardingRules
     {
         public static bool ShouldShowWorkerRatioStep(
@@ -21,6 +28,18 @@ namespace DeadWalls
                 && cycleIndex == 0
                 && phase == SiegeCyclePhase.Day;
         }
+
+        public static bool ShouldShowBasicArcherStep(
+            bool completed,
+            bool mobileWorkerEconomyEnabled,
+            bool isGameOver,
+            bool canBuyBasicArcher)
+        {
+            return !completed
+                && mobileWorkerEconomyEnabled
+                && !isGameOver
+                && canBuyBasicArcher;
+        }
     }
 
     /// <summary>
@@ -32,9 +51,14 @@ namespace DeadWalls
     {
         public const string WorkerRatioFlagId = "tutorial.v1.worker_ratio";
         public const string WorkerRatioHint = "ADJUST A WORKER TARGET RATIO.";
+        public const string BasicArcherFlagId = "tutorial.v1.basic_archer";
+        public const string BasicArcherHint = "RECRUIT A BASIC ARCHER.";
 
-        [Header("Worker Ratio Step")]
+        [Header("Onboarding Owners")]
         public WorkerEconomyDrawerUI WorkerDrawer;
+        public MarketUI ArcherMarket;
+
+        [Header("Shared Presentation")]
         public GameObject HintPanel;
         public TMP_Text HintText;
         public RectTransform PulseFrame;
@@ -47,64 +71,93 @@ namespace DeadWalls
         [Min(0f)] public float PulsePaddingMax = 16f;
 
         private WorkerEconomyDrawerUI _subscribedDrawer;
+        private MarketUI _subscribedMarket;
         private RectTransform _activePulseTarget;
-        private bool _workerRatioStepVisible;
+        private FirstRunOnboardingStep _activeStep;
         private bool _persistenceWarningLogged;
 
-        public bool IsWorkerRatioStepVisible => _workerRatioStepVisible;
+        public bool IsWorkerRatioStepVisible => _activeStep == FirstRunOnboardingStep.WorkerRatio;
+        public bool IsBasicArcherStepVisible => _activeStep == FirstRunOnboardingStep.BasicArcher;
         public RectTransform ActivePulseTarget => _activePulseTarget;
 
         private void OnEnable()
         {
             ResolveMissingReferences();
             BindWorkerDrawer();
-            SetWorkerRatioPresentation(false, null);
+            BindArcherMarket();
+            SetPresentation(FirstRunOnboardingStep.None, null);
         }
 
         private void OnDisable()
         {
             UnbindWorkerDrawer();
-            SetWorkerRatioPresentation(false, null);
+            UnbindArcherMarket();
+            SetPresentation(FirstRunOnboardingStep.None, null);
         }
 
         private void Update()
         {
-            if (WorkerDrawer == null)
+            if (WorkerDrawer == null || ArcherMarket == null)
             {
                 ResolveMissingReferences();
                 BindWorkerDrawer();
+                BindArcherMarket();
             }
 
-            bool completed = MetaProgression.HasTutorialFlag(WorkerRatioFlagId);
+            bool workerRatioCompleted = MetaProgression.HasTutorialFlag(WorkerRatioFlagId);
             GameManager gm = GameManager.Instance;
             ContinuousSiegeCycleData cycle = default;
             bool hasCycle = gm != null && gm.TryGetContinuousSiegeCycle(out cycle);
-            bool shouldShow = FirstRunOnboardingRules.ShouldShowWorkerRatioStep(
-                completed,
+            bool shouldShowWorkerRatio = FirstRunOnboardingRules.ShouldShowWorkerRatioStep(
+                workerRatioCompleted,
                 gm != null && gm.IsMobilePopulationEconomyEnabled(),
                 gm != null && gm.GameState.IsGameOver,
                 hasCycle,
                 hasCycle ? cycle.CycleIndex : -1,
                 hasCycle ? cycle.Phase : SiegeCyclePhase.Day);
 
+            bool basicArcherCompleted = MetaProgression.HasTutorialFlag(BasicArcherFlagId);
+            bool canBuyBasicArcher = !basicArcherCompleted
+                && gm != null
+                && gm.CanBuyArcher(ArcherType.Basic);
+            bool shouldShowBasicArcher = !shouldShowWorkerRatio
+                && FirstRunOnboardingRules.ShouldShowBasicArcherStep(
+                    basicArcherCompleted,
+                    gm != null && gm.IsMobilePopulationEconomyEnabled(),
+                    gm != null && gm.GameState.IsGameOver,
+                    canBuyBasicArcher);
+
+            FirstRunOnboardingStep step = FirstRunOnboardingStep.None;
             RectTransform target = null;
-            if (shouldShow && WorkerDrawer != null)
+            if (shouldShowWorkerRatio && WorkerDrawer != null)
             {
+                step = FirstRunOnboardingStep.WorkerRatio;
                 target = WorkerDrawer.IsOpen && WorkerDrawer.WoodWorkerTargetPlus10Button != null
                     ? WorkerDrawer.WoodWorkerTargetPlus10Button.GetComponent<RectTransform>()
                     : WorkerDrawer.WorkerDrawerToggleButton != null
                         ? WorkerDrawer.WorkerDrawerToggleButton.GetComponent<RectTransform>()
                         : null;
             }
+            else if (shouldShowBasicArcher && ArcherMarket != null)
+            {
+                step = FirstRunOnboardingStep.BasicArcher;
+                Button buyButton = ArcherMarket.GetArcherBuyButton(ArcherType.Basic);
+                target = ArcherMarket.IsDrawerOpen && buyButton != null
+                    ? buyButton.GetComponent<RectTransform>()
+                    : ArcherMarket.DrawerToggleButton != null
+                        ? ArcherMarket.DrawerToggleButton.GetComponent<RectTransform>()
+                        : null;
+            }
 
-            SetWorkerRatioPresentation(shouldShow && target != null, target);
-            if (_workerRatioStepVisible)
+            SetPresentation(target != null ? step : FirstRunOnboardingStep.None, target);
+            if (_activeStep != FirstRunOnboardingStep.None)
                 UpdatePulsePresentation();
         }
 
         private void ResolveMissingReferences()
         {
             WorkerDrawer ??= GetComponent<WorkerEconomyDrawerUI>();
+            ArcherMarket ??= GetComponent<MarketUI>();
             HintPanel ??= FindGameObject("OnboardingHintPanel");
             HintText ??= FindComponent<TMP_Text>("OnboardingHintText");
             PulseFrame ??= FindComponent<RectTransform>("OnboardingPulseFrame");
@@ -130,13 +183,31 @@ namespace DeadWalls
             _subscribedDrawer = null;
         }
 
+        private void BindArcherMarket()
+        {
+            if (_subscribedMarket == ArcherMarket)
+                return;
+
+            UnbindArcherMarket();
+            _subscribedMarket = ArcherMarket;
+            if (_subscribedMarket != null)
+                _subscribedMarket.ArcherPurchasedByPlayer += HandleArcherPurchased;
+        }
+
+        private void UnbindArcherMarket()
+        {
+            if (_subscribedMarket != null)
+                _subscribedMarket.ArcherPurchasedByPlayer -= HandleArcherPurchased;
+            _subscribedMarket = null;
+        }
+
         private void HandleWorkerTargetRatioChanged(EconomyFocusType resource)
         {
             if (MetaProgression.HasTutorialFlag(WorkerRatioFlagId)
                 || MetaProgression.SetTutorialFlag(WorkerRatioFlagId, true))
             {
                 _persistenceWarningLogged = false;
-                SetWorkerRatioPresentation(false, null);
+                SetPresentation(FirstRunOnboardingStep.None, null);
                 return;
             }
 
@@ -147,9 +218,30 @@ namespace DeadWalls
             Debug.LogWarning("[FirstRunOnboardingUI] Worker ratio tutorial flag durable yazilamadi.");
         }
 
-        private void SetWorkerRatioPresentation(bool visible, RectTransform target)
+        private void HandleArcherPurchased(ArcherType type)
         {
-            _workerRatioStepVisible = visible;
+            if (type != ArcherType.Basic)
+                return;
+
+            if (MetaProgression.HasTutorialFlag(BasicArcherFlagId)
+                || MetaProgression.SetTutorialFlag(BasicArcherFlagId, true))
+            {
+                _persistenceWarningLogged = false;
+                SetPresentation(FirstRunOnboardingStep.None, null);
+                return;
+            }
+
+            if (_persistenceWarningLogged)
+                return;
+
+            _persistenceWarningLogged = true;
+            Debug.LogWarning("[FirstRunOnboardingUI] Basic Archer tutorial flag durable yazilamadi.");
+        }
+
+        private void SetPresentation(FirstRunOnboardingStep step, RectTransform target)
+        {
+            bool visible = step != FirstRunOnboardingStep.None;
+            _activeStep = step;
             _activePulseTarget = visible ? target : null;
 
             if (HintPanel != null && HintPanel.activeSelf != visible)
@@ -160,17 +252,24 @@ namespace DeadWalls
             if (!visible)
                 return;
 
-            if (HintText != null && HintText.text != WorkerRatioHint)
-                HintText.text = WorkerRatioHint;
+            string hint = step == FirstRunOnboardingStep.BasicArcher
+                ? BasicArcherHint
+                : WorkerRatioHint;
+            if (HintText != null && HintText.text != hint)
+                HintText.text = hint;
 
             RectTransform hintRect = HintPanel != null
                 ? HintPanel.GetComponent<RectTransform>()
                 : null;
             if (hintRect != null)
             {
-                hintRect.anchoredPosition = WorkerDrawer != null && WorkerDrawer.IsOpen
-                    ? new Vector2(24f, 554f)
-                    : new Vector2(24f, 96f);
+                bool archerStep = step == FirstRunOnboardingStep.BasicArcher;
+                hintRect.anchorMin = archerStep ? new Vector2(1f, 0f) : Vector2.zero;
+                hintRect.anchorMax = hintRect.anchorMin;
+                hintRect.pivot = archerStep ? new Vector2(1f, 0f) : Vector2.zero;
+                hintRect.anchoredPosition = archerStep
+                    ? new Vector2(-24f, ArcherMarket != null && ArcherMarket.IsDrawerOpen ? 522f : 96f)
+                    : new Vector2(24f, WorkerDrawer != null && WorkerDrawer.IsOpen ? 554f : 96f);
             }
         }
 

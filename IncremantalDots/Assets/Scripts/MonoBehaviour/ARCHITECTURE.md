@@ -92,6 +92,7 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - Free Economy Test Mode ortak `1000` cap'i bypass etmez; cap'te row `ARMY CAP 1000/1000` ve `MAX` gosterir
 - Rapid/Frost unlock olduktan sonra `RETRAIN`, bir Basic entity'yi yerinde dönüştürür; toplam garnizon/population değişmez ve cap doluyken de çalışır
 - Buy ve retrain maliyetleri hedef tür sayısına göre definition tuning'inden büyür; ayrı archer upgrade/level UI açılmaz
+- Basarili player-facing buy action'i `ArcherPurchasedByPlayer` event'ini yayar; onboarding gibi presentation consumer'lari transaction'i tekrar etmeden bu event'i dinler
 - Worker economy aktifken `Repair`, `Fortify` ve `Rally` player-facing drawer'da gizlenir; drawer archer recruitment paneli olarak kalir
 - Legacy `Arrow Refill` kontrolü gizlenir; Arrow chip'i scene-owned `ArrowSupplyUI` tek satır panelini açar
 - Mobile continuous siege loop'ta `Start Next Wave` player-facing UI'da gizlenir; oyun durmadan `DAY / DUSK / NIGHT` cycle'i akar
@@ -120,8 +121,10 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 
 - Package I ilk-kosu ogretiminin scene-owned, non-modal presentation sahibidir
 - Ilk Day worker ratio adiminda drawer kapaliyken Workers/Housing toggle'ini, acikken ilk ratio kontrolunu pulse eder; tek satir English hint gosterir
+- Basic Archer ilk kez gercekten satin alinabilir oldugunda drawer kapaliyken ARCHERS toggle'ini, acikken runtime Basic BUY kontrolunu pulse eder
 - Gameplay transaction'i, otomatik drawer acma, resource harcama veya worker dagitma yapmaz
 - Basarili gercek player ratio action'ini `WorkerEconomyDrawerUI` event'inden alir ve `tutorial.v1.worker_ratio` stable flag'ini canonical `MetaProgression` API'siyle durable yazar
+- Basarili gercek Basic Archer satin alimini `MarketUI` event'inden alir ve `tutorial.v1.basic_archer` stable flag'ini durable yazar
 - Otoriter dok: `FIRST_RUN_ONBOARDING_UI_ARCHITECTURE.md`
 
 ### TechTreeUI.cs

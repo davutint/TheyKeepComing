@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.2
 > **Son tam kapsam denetimi:** 2026-07-15
 > **Aktif paket:** Package I - HUD, Onboarding ve Creative Polish
-> **Aktif iş:** `DW-I-ONBOARD-ARCHER-HIGHLIGHT` - Highlight Basic Archer at First Affordability
-> **İlerleme:** `361 / 441` tracker checkbox'ı tamamlandı - `%81,86`
+> **Aktif iş:** `DW-I-ONBOARD-AMMO-HIGHLIGHT` - Highlight the First Low-Ammo State
+> **İlerleme:** `362 / 441` tracker checkbox'ı tamamlandı - `%82,09`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -147,7 +147,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Emergency Repair | Ayrı ability yok | Eksik |
 | Meta | Ayrı JSON, durable ölüm kapılı shop, Blueprint exact 11-definition katalog, üstel repeatable sink'ler ve atomik tek-seferlik pool unlock aktif | `[x]` Teknik katalog ve runtime sınırı tamamlandı; exact reward tuning ayrı |
 | HUD | CyclePanel, DAY/DUSK/NIGHT ve Horde Pressure mevcut; tek Wall runtime gizleme var | Package I polish gerekli |
-| Tutorial | İlk Day worker ratio adımı non-modal pulse, tek satır English yönlendirme ve durable meta flag ile aktif | `[~]` Package I ilk adımı tamamlandı |
+| Tutorial | İlk Day worker ratio ve ilk affordable Basic Archer adımları non-modal pulse, tek satır English yönlendirme ve durable meta flag ile aktif | `[~]` Package I ilk iki adım tamamlandı |
 | Testler | Son full baseline: EditMode `209/209`, PlayMode `37 pass + 1 explicit profiler skip`; Package H meta katalog/regresyon EditMode `50/50`, run-start/Continue + death shop PlayMode `2/2`; Standalone Player-targeted 10K `1/1` | Fixed catalog, exponential cost, v13 migration, runtime effect ayrımı ve atomik pool purchase temiz; full baseline tarihsel olarak korunuyor |
 | Telemetry | Spawn budget demanded/spawned/backlog telemetry mevcut; tam Blueprint event owner'ı eksik | Kısmi |
 
@@ -737,7 +737,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 | Fixed upgrade list | Exact 11-definition katalog Blueprint sırasını taşır; legacy Archer Damage kaldırıldı | `[x]` |
 | StartingTechLevel yok | Enum, `TechNodeId`, runtime case ve dormant `Meta_start_moat.asset` kaldırıldı | `[x]` |
 | Meta graph'ı değiştirmez | Fail-closed effect allowlist yalnız run-start/aggregate etkilerini kabul ediyor; pool Id storage mevcut graph'a yazmıyor | `[x]` |
-| Tutorial flag | v3 `TutorialFlags` canonical state/API ve ilk consumer `tutorial.v1.worker_ratio` aktif; kalan onboarding adımları Package I işi | `[~]` İlk consumer aktif |
+| Tutorial flag | v3 `TutorialFlags` canonical state/API ile `tutorial.v1.worker_ratio` ve `tutorial.v1.basic_archer` consumer'ları aktif; kalan onboarding adımları Package I işi | `[~]` İlk iki consumer aktif |
 
 ### Hedef meta upgrade listesi
 
@@ -809,7 +809,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 ### I2 - İlk koşu onboarding
 
 - [x] İlk Day: worker ratio düğmesini pulse + tek satır metinle öğret.
-- [ ] İlk kaynak yeterliliği: Basic Archer drawer highlight göster.
+- [x] İlk kaynak yeterliliği: Basic Archer drawer highlight göster.
 - [ ] İlk düşük ammo: ammo satırını highlight et; zorunlu popup açma.
 - [ ] İlk kill/Essence: Heart butonunu pulse et; açılınca full pause öğret.
 - [ ] İlk regular Council/Day 3: bedel ve iki exact sonucu öğret.
@@ -1161,3 +1161,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-15 | `DW-I-HUD-COUNCIL-CARD` exact regular Council card + live decision fill | Mevcut regular-only Council sunum sahibi korunarak iki option'ın authored eylem başlığı, live exact effect/maliyet quote'u ve uygulanabilirlik durumu tek compact kartta doğrulandı. `CouncilTimerFill` hatalı Sliced tipten Horizontal/Left Filled tipe geçirildi; Dawn + Day karar penceresinin sayısal metniyle aynı authoritative cycle değerinden gerçekten azalıyor. Scene setup repair aynı fill sözleşmesini idempotent normalize ediyor; yeni Council sistemi veya içerik üretilmedi. Prefab geometri, exact quote yüzeyleri, font/rich-text ve timer binding'i yeni guard testiyle kilitlendi | Unity compile: 0 error; targeted EditMode 29/29; targeted Council PlayMode 6/6; MCP live audit: `35s / 1.0000` -> `15s / 0.4286`, type `Filled`, iki exact option aktif; 1920x1080 Game View QA temiz; final Console 0 error; tracker `358/441` |
 | 2026-07-16 | `DW-I-HUD-RATIO-CROP` responsive 16:9 + ultrawide framing | Generated HUD prefabının sabit `1920 x 1080` iç görsel root'u parent sanal canvas'ına stretch edildi. `CastleDefensePanel`, 16:9 konumunu koruyan top-center anchor'a alınarak kısa ultrawide sanal yükseklikte Celestial Dial ile çakışması giderildi. Scene setup tool iki sözleşmeyi prefab ve scene instance'ında idempotent onarıyor. Sabit kamera, kale/frontline görünürlüğü ve `SpawnLineX = 27` gizli doğum hattı otomatik guard ile kilitlendi | Unity compile: 0 error; new aspect/framing EditMode 4/4; related HUD presentation EditMode 17/17; MCP live audit 1920x1080 + 3440x1440: 13 kritik rect ekran içinde, Archer drawer açıkken taşma yok, Cycle/Defense overlap false; iki çözünürlükte görsel QA temiz; aktif scene dirty false; final Console 0 error; tracker `360/441` |
 | 2026-07-16 | `DW-I-ONBOARD-WORKER-RATIO` first-day worker ratio cue | Scene-owned `FirstRunOnboardingUI`, ilk Day boyunca worker drawer kapalıyken ana toggle'ı, açıkken gerçek Wood `+10` ratio kontrolünü non-modal pulse ile işaretliyor ve `ADJUST A WORKER TARGET RATIO.` metnini gösteriyor. Yalnız başarılı gerçek player ratio action'ı `tutorial.v1.worker_ratio` durable meta flag'ini yazıyor; tutorial kaynak harcamıyor, worker atamıyor ve drawer'ı oyuncu adına açmıyor. Presentation aktif HUD prefabında, runtime state owner'ı tek scene controller'da tutuldu; setup/repair yolu idempotent hale getirildi | Unity compile: 0 error; onboarding/HUD/meta EditMode `15/15`; onboarding + worker drawer PlayMode `2/2`; MCP prefab/scene audit: presentation `1/1/1/1`, prefab controller `0`, scene controller `1`, tüm binding'ler dolu ve scene dirty false; 1920x1080 kapalı/açık drawer görsel QA temiz; final Console 0 error; tracker `361/441` |
+| 2026-07-16 | `DW-I-ONBOARD-ARCHER-HIGHLIGHT` first-affordable Basic Archer cue | `FirstRunOnboardingUI`, authoritative `GameManager.CanBuyArcher(Basic)` ilk kez true olduğunda shared non-modal hint/pulse sunumunu devralıyor. Archer drawer kapalıyken sabit `ARCHERS` toggle'ı, açıkken runtime-generated Basic row'un gerçek `BUY` butonu işaretleniyor; metin `RECRUIT A BASIC ARCHER.`. Yalnız başarılı `MarketUI` satın alımı `tutorial.v1.basic_archer` durable flag'ini yazıyor; başarısız, locked veya cap-blocked tıklama tamamlanma sayılmıyor. Worker ratio tamamlanınca affordable Basic adımı aynı shared yüzeyi kesintisiz devralabiliyor; tutorial drawer açmıyor veya transaction üretmiyor | Unity compile: 0 error; onboarding/HUD/meta EditMode `19/19`; worker-ratio + Basic onboarding PlayMode `2/2`; related retrain/worker drawer PlayMode `2/2`; MCP prefab/scene audit: shared presentation tekil, prefab controller `0`, scene controller `1`, Worker/Market/presentation binding'leri dolu ve scene dirty false; 1920x1080 kapalı/açık Archer drawer görsel QA temiz; final Console 0 error; tracker `362/441` |

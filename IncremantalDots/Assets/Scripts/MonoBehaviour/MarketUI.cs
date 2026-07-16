@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -78,6 +79,7 @@ namespace DeadWalls
         private ManagementDrawerCoordinatorUI _drawerCoordinator;
 
         public bool IsDrawerOpen => _drawerOpen;
+        public event Action<ArcherType> ArcherPurchasedByPlayer;
 
         private void OnEnable()
         {
@@ -129,6 +131,24 @@ namespace DeadWalls
         public void ToggleDrawer()
         {
             SetDrawerOpen(!_drawerOpen);
+        }
+
+        public Button GetArcherBuyButton(ArcherType type)
+        {
+            EnsureDynamicRows(GameManager.Instance);
+            for (int i = 0; i < _dynamicRows.Count; i++)
+            {
+                DynamicArcherRow row = _dynamicRows[i];
+                if (row?.Definition != null && row.Definition.Type == type)
+                    return row.BuyButton;
+            }
+
+            switch (type)
+            {
+                case ArcherType.Rapid: return RapidBuyButton;
+                case ArcherType.Frost: return FrostBuyButton;
+                default: return BasicBuyButton;
+            }
         }
 
         public void Refresh()
@@ -487,13 +507,17 @@ namespace DeadWalls
 
         private void BuyArcher(ArcherType type)
         {
-            GameManager.Instance?.BuyArcher(type);
+            GameManager gm = GameManager.Instance;
+            if (gm != null && gm.BuyArcher(type))
+                ArcherPurchasedByPlayer?.Invoke(type);
             Refresh();
         }
 
         private void BuyArcher(ArcherDefinitionSO definition)
         {
-            GameManager.Instance?.BuyArcher(definition);
+            GameManager gm = GameManager.Instance;
+            if (gm != null && gm.BuyArcher(definition))
+                ArcherPurchasedByPlayer?.Invoke(definition.Type);
             Refresh();
         }
 

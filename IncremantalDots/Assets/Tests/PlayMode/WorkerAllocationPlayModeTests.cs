@@ -8,6 +8,7 @@ using Unity.Transforms;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
+using UnityEngine.UI;
 
 namespace DeadWalls.Tests
 {
@@ -91,8 +92,10 @@ namespace DeadWalls.Tests
                 Object.FindFirstObjectByType<FirstRunOnboardingUI>();
             WorkerEconomyDrawerUI drawer =
                 Object.FindFirstObjectByType<WorkerEconomyDrawerUI>();
+            MarketUI market = Object.FindFirstObjectByType<MarketUI>();
             Assert.That(onboarding, Is.Not.Null);
             Assert.That(drawer, Is.Not.Null);
+            Assert.That(market, Is.Not.Null);
             Assert.That(MetaProgression.HasTutorialFlag(
                 FirstRunOnboardingUI.WorkerRatioFlagId), Is.False);
 
@@ -137,6 +140,94 @@ namespace DeadWalls.Tests
             Assert.That(MetaProgression.HasTutorialFlag(
                 FirstRunOnboardingUI.WorkerRatioFlagId), Is.True);
             Assert.That(onboarding.IsWorkerRatioStepVisible, Is.False);
+            Assert.That(onboarding.IsBasicArcherStepVisible, Is.True);
+            Assert.That(onboarding.HintPanel.activeSelf, Is.True);
+            Assert.That(onboarding.PulseFrame.gameObject.activeSelf, Is.True);
+            Assert.That(onboarding.HintText.text,
+                Is.EqualTo(FirstRunOnboardingUI.BasicArcherHint));
+            Assert.That(onboarding.ActivePulseTarget,
+                Is.SameAs(market.DrawerToggleButton.GetComponent<RectTransform>()));
+        }
+
+        [UnityTest]
+        public IEnumerator FirstAffordableBasicArcherOnboarding_PulsesRealBuyControlAndCompletesOnPurchase()
+        {
+            GameManager gameManager = GameManager.Instance;
+            FirstRunOnboardingUI onboarding =
+                Object.FindFirstObjectByType<FirstRunOnboardingUI>();
+            MarketUI market = Object.FindFirstObjectByType<MarketUI>();
+            Assert.That(onboarding, Is.Not.Null);
+            Assert.That(market, Is.Not.Null);
+            Assert.That(MetaProgression.SetTutorialFlag(
+                FirstRunOnboardingUI.WorkerRatioFlagId, true), Is.True);
+            Assert.That(MetaProgression.HasTutorialFlag(
+                FirstRunOnboardingUI.BasicArcherFlagId), Is.False);
+
+            bool runtimeReady = false;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                {
+                    runtimeReady = true;
+                    break;
+                }
+                yield return null;
+            }
+            Assert.That(runtimeReady, Is.True,
+                "GameManager/SubScene 300 frame icinde hazir olmadi.");
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            using EntityQuery resourceQuery = entityManager.CreateEntityQuery(typeof(ResourceData));
+            Entity resourceEntity = resourceQuery.GetSingletonEntity();
+            entityManager.SetComponentData(resourceEntity, new ResourceData());
+            market.SetDrawerOpen(false, true);
+            market.Refresh();
+            yield return null;
+
+            Assert.That(gameManager.CanBuyArcher(ArcherType.Basic), Is.False);
+            Assert.That(onboarding.IsBasicArcherStepVisible, Is.False);
+
+            var fundedResources = new ResourceData
+            {
+                Wood = 1_000_000,
+                Stone = 1_000_000,
+                Iron = 1_000_000,
+                Food = 1_000_000
+            };
+            entityManager.SetComponentData(resourceEntity, fundedResources);
+            for (int frame = 0; frame < 60 && !onboarding.IsBasicArcherStepVisible; frame++)
+                yield return null;
+
+            Assert.That(gameManager.CanBuyArcher(ArcherType.Basic), Is.True);
+            Assert.That(onboarding.IsBasicArcherStepVisible, Is.True);
+            Assert.That(onboarding.HintText.text,
+                Is.EqualTo(FirstRunOnboardingUI.BasicArcherHint));
+            Assert.That(onboarding.ActivePulseTarget,
+                Is.SameAs(market.DrawerToggleButton.GetComponent<RectTransform>()));
+
+            market.SetDrawerOpen(true, true);
+            market.Refresh();
+            yield return null;
+            Button basicBuyButton = market.GetArcherBuyButton(ArcherType.Basic);
+            Assert.That(basicBuyButton, Is.Not.Null);
+            Assert.That(basicBuyButton.interactable, Is.True);
+            Assert.That(onboarding.ActivePulseTarget,
+                Is.SameAs(basicBuyButton.GetComponent<RectTransform>()));
+
+            int countBefore = gameManager.GetArcherTypeCount(ArcherType.Basic);
+            ResourceCost cost = gameManager.GetArcherBuyCost(ArcherType.Basic);
+            basicBuyButton.onClick.Invoke();
+            yield return null;
+
+            ResourceData resourcesAfter = entityManager.GetComponentData<ResourceData>(resourceEntity);
+            Assert.That(gameManager.GetArcherTypeCount(ArcherType.Basic), Is.EqualTo(countBefore + 1));
+            Assert.That(resourcesAfter.Wood, Is.EqualTo(fundedResources.Wood - cost.Wood));
+            Assert.That(resourcesAfter.Stone, Is.EqualTo(fundedResources.Stone - cost.Stone));
+            Assert.That(resourcesAfter.Iron, Is.EqualTo(fundedResources.Iron - cost.Iron));
+            Assert.That(resourcesAfter.Food, Is.EqualTo(fundedResources.Food - cost.Food));
+            Assert.That(MetaProgression.HasTutorialFlag(
+                FirstRunOnboardingUI.BasicArcherFlagId), Is.True);
+            Assert.That(onboarding.IsBasicArcherStepVisible, Is.False);
             Assert.That(onboarding.HintPanel.activeSelf, Is.False);
             Assert.That(onboarding.PulseFrame.gameObject.activeSelf, Is.False);
         }

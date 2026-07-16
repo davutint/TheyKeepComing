@@ -104,10 +104,10 @@ namespace DeadWalls
                 : "[MobileCastleSceneSetup] Worker drawer controls prefabda onarildi; NewGameScene aktif olmadigi icin sahne degismedi.");
         }
 
-        [MenuItem("Window/DeadWalls/Repair First Day Worker Ratio Onboarding")]
-        public static void RepairFirstDayWorkerRatioOnboarding()
+        [MenuItem("Window/DeadWalls/Repair First Run Onboarding")]
+        public static void RepairFirstRunOnboarding()
         {
-            EnsureFirstDayWorkerRatioOnboardingInPrefab();
+            EnsureFirstRunOnboardingInPrefab();
             AssetDatabase.ImportAsset(GeneratedHudPrefabPath, ImportAssetOptions.ForceUpdate);
 
             Scene activeScene = SceneManager.GetActiveScene();
@@ -134,8 +134,8 @@ namespace DeadWalls
 
             AssetDatabase.SaveAssets();
             Debug.Log(sceneRepaired
-                ? "[MobileCastleSceneSetup] First Day worker ratio onboarding prefab ve sahnede onarildi."
-                : "[MobileCastleSceneSetup] First Day worker ratio onboarding prefabda onarildi; NewGameScene aktif degildi.");
+                ? "[MobileCastleSceneSetup] First-run onboarding prefab ve sahnede onarildi."
+                : "[MobileCastleSceneSetup] First-run onboarding prefabda onarildi; NewGameScene aktif degildi.");
         }
 
         [MenuItem("Window/DeadWalls/Repair Archer Retrain Control")]
@@ -3301,7 +3301,7 @@ namespace DeadWalls
             DestroyChildIfExists(canvasTransform, "MarketPanel");
 
             EnsureResponsiveHudVisualRootInPrefab();
-            EnsureFirstDayWorkerRatioOnboardingInPrefab();
+            EnsureFirstRunOnboardingInPrefab();
             EnsureWorkerDrawerTargetControlsInPrefab();
             EnsureArcherRetrainControlInPrefab();
             EnsureArrowAmmoPanelInPrefab();
@@ -3409,7 +3409,7 @@ namespace DeadWalls
             }
         }
 
-        private static void EnsureFirstDayWorkerRatioOnboardingInPrefab()
+        private static void EnsureFirstRunOnboardingInPrefab()
         {
             GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(GeneratedHudPrefabPath);
             if (prefab == null)
@@ -3418,7 +3418,7 @@ namespace DeadWalls
             GameObject root = PrefabUtility.LoadPrefabContents(GeneratedHudPrefabPath);
             try
             {
-                EnsureFirstDayWorkerRatioPresentation(root);
+                EnsureFirstRunOnboardingPresentation(root);
                 // Runtime state scene owner'inda kalir; prefab yalniz presentation truth'tur.
                 DestroyComponentIfExists<FirstRunOnboardingUI>(root);
                 PrefabUtility.SaveAsPrefabAsset(root, GeneratedHudPrefabPath);
@@ -3708,7 +3708,7 @@ namespace DeadWalls
             return button;
         }
 
-        private static void EnsureFirstDayWorkerRatioPresentation(GameObject hudRoot)
+        private static void EnsureFirstRunOnboardingPresentation(GameObject hudRoot)
         {
             Transform visualRoot = hudRoot.transform.Find("MobileCastleHudRoot") ?? hudRoot.transform;
             Sprite rounded = EnsureRoundedRectAsset();
@@ -4933,6 +4933,7 @@ namespace DeadWalls
         {
             var onboarding = EnsureComponent<FirstRunOnboardingUI>(hudRoot);
             onboarding.WorkerDrawer = hudRoot.GetComponent<WorkerEconomyDrawerUI>();
+            onboarding.ArcherMarket = hudRoot.GetComponent<MarketUI>();
             onboarding.HintPanel = FindChildByName(hudRoot, "OnboardingHintPanel");
             onboarding.HintText = FindComponentInChildrenByName<TextMeshProUGUI>(
                 hudRoot, "OnboardingHintText");
