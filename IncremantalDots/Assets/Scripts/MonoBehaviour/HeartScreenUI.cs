@@ -101,6 +101,9 @@ namespace DeadWalls
         public bool IsOpen => HeartPanel != null && HeartPanel.activeSelf;
         public HeartPurchaseQuantity SelectedQuantity => _selectedQuantity;
 
+        public event Action HeartOpenedByPlayer;
+        public event Action HeartClosedByPlayer;
+
         private IHeartScreenRuntime Runtime => GameManager.Instance;
 
         private sealed class NodeView
@@ -159,7 +162,7 @@ namespace DeadWalls
             SimulationPauseService.EnforcePausedState();
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                ClosePanel();
+                ClosePanelFromPlayer();
                 return;
             }
 
@@ -207,6 +210,23 @@ namespace DeadWalls
                 ClosePanel();
             else
                 OpenPanel();
+        }
+
+        private void OpenPanelFromPlayer()
+        {
+            bool wasOpen = IsOpen;
+            OpenPanel();
+            if (!wasOpen && IsOpen)
+                HeartOpenedByPlayer?.Invoke();
+        }
+
+        private void ClosePanelFromPlayer()
+        {
+            if (!IsOpen)
+                return;
+
+            ClosePanel();
+            HeartClosedByPlayer?.Invoke();
         }
 
         public void SelectQuantityOne() => SetQuantity(HeartPurchaseQuantity.One);
@@ -654,8 +674,8 @@ namespace DeadWalls
             if (_buttonsBound)
                 return;
             _buttonsBound = true;
-            HeartOpenButton?.onClick.AddListener(OpenPanel);
-            HeartCloseButton?.onClick.AddListener(ClosePanel);
+            HeartOpenButton?.onClick.AddListener(OpenPanelFromPlayer);
+            HeartCloseButton?.onClick.AddListener(ClosePanelFromPlayer);
             QuantityOneButton?.onClick.AddListener(SelectQuantityOne);
             QuantityTenButton?.onClick.AddListener(SelectQuantityTen);
             QuantityMaxButton?.onClick.AddListener(SelectQuantityMax);
@@ -664,8 +684,8 @@ namespace DeadWalls
         private void UnbindButtons()
         {
             _buttonsBound = false;
-            HeartOpenButton?.onClick.RemoveListener(OpenPanel);
-            HeartCloseButton?.onClick.RemoveListener(ClosePanel);
+            HeartOpenButton?.onClick.RemoveListener(OpenPanelFromPlayer);
+            HeartCloseButton?.onClick.RemoveListener(ClosePanelFromPlayer);
             QuantityOneButton?.onClick.RemoveListener(SelectQuantityOne);
             QuantityTenButton?.onClick.RemoveListener(SelectQuantityTen);
             QuantityMaxButton?.onClick.RemoveListener(SelectQuantityMax);

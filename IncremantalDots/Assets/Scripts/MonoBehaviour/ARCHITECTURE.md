@@ -108,6 +108,7 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - Army/Defense/Production/Heart-Magic dallarini sag/sol/yukari/asagi compass layout ile yerlestirir
 - `+1/+10/MAX`, exact Grave Essence quote, actual current/after/delta ve Keystone conflict bilgisini sunar
 - Acilista `SimulationPauseService` lease'i alir; cycle/spawn/movement/combat/worker ve scaled cooldown'lar durur. UI refresh/animasyonlari unscaled zamanda calisir
+- Basarili gercek open/close UI aksiyonlari `HeartOpenedByPlayer` / `HeartClosedByPlayer` event'lerini yayar; programmatic panel cagrilari player action sayilmaz
 - Aktif prefab `CastleHeart...`/`Heart...` isimlerini kullanir; node template lookup'i migration icin eski `TechNode...` child isimlerini de taniyabilir
 - Otoriter dok: `HEART_SCREEN_ARCHITECTURE.md`
 
@@ -125,10 +126,12 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - Ilk Day worker ratio adiminda drawer kapaliyken Workers/Housing toggle'ini, acikken ilk ratio kontrolunu pulse eder; tek satir English hint gosterir
 - Basic Archer ilk kez gercekten satin alinabilir oldugunda drawer kapaliyken ARCHERS toggle'ini, acikken runtime Basic BUY kontrolunu pulse eder
 - Finite Arrow stoku effective kapasitenin `%25` veya altina ilk kez indiginde ust HUD'daki gercek `ArrowChip` satirini pulse eder; ammo panelini otomatik acmaz
+- Ilk pozitif Grave Essence bakiyesinde gercek `CASTLE HEART` butonunu pulse eder; oyuncu paneli acinca mevcut full pause'u English hint ile ogretir ve flag'i player close sonrasinda yazar
 - Gameplay transaction'i, otomatik drawer acma, resource harcama veya worker dagitma yapmaz
 - Basarili gercek player ratio action'ini `WorkerEconomyDrawerUI` event'inden alir ve `tutorial.v1.worker_ratio` stable flag'ini canonical `MetaProgression` API'siyle durable yazar
 - Basarili gercek Basic Archer satin alimini `MarketUI` event'inden alir ve `tutorial.v1.basic_archer` stable flag'ini durable yazar
 - Basarili gercek Arrow refill satin alimini `ArrowSupplyUI` event'inden alir ve `tutorial.v1.low_ammo` stable flag'ini durable yazar
+- Gercek Heart open/close event'lerini `HeartScreenUI`dan alir ve `tutorial.v1.heart` stable flag'ini durable yazar; Essence drop miktari uretmez
 - Otoriter dok: `FIRST_RUN_ONBOARDING_UI_ARCHITECTURE.md`
 
 ### TechTreeUI.cs

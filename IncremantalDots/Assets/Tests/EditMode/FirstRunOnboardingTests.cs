@@ -75,6 +75,24 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void HeartEntryRule_UsesFirstPositiveGraveEssenceBalance()
+        {
+            Assert.That(FirstRunOnboardingRules.ShouldShowHeartEntryStep(
+                false, true, false, 1L), Is.True);
+
+            Assert.That(FirstRunOnboardingRules.ShouldShowHeartEntryStep(
+                true, true, false, 1L), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldShowHeartEntryStep(
+                false, false, false, 1L), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldShowHeartEntryStep(
+                false, true, true, 1L), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldShowHeartEntryStep(
+                false, true, false, 0L), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldShowHeartEntryStep(
+                false, true, false, -1L), Is.False);
+        }
+
+        [Test]
         public void ActiveHudPrefab_HasSingleNonBlockingEnglishWorkerRatioPresentation()
         {
             GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(HudPrefabPath);
@@ -93,6 +111,8 @@ namespace DeadWalls.Tests
             Assert.That(hint.anchoredPosition, Is.EqualTo(new Vector2(24f, 96f)));
             Assert.That(hint.sizeDelta, Is.EqualTo(new Vector2(360f, 42f)));
             Assert.That(hint.GetComponent<Image>().raycastTarget, Is.False);
+            Assert.That(hint.GetComponent<Canvas>(), Is.Not.Null);
+            Assert.That(hint.GetComponent<Canvas>().overrideSorting, Is.False);
 
             RectTransform pulse = FindUniqueRect(prefab, "OnboardingPulseFrame");
             Assert.That(pulse.parent, Is.SameAs(visualRoot));
@@ -108,6 +128,8 @@ namespace DeadWalls.Tests
             Assert.That(copy, Does.Match("^[A-Z0-9 .+]+$"));
             Assert.That(FirstRunOnboardingUI.BasicArcherHint, Does.Match("^[A-Z0-9 .+]+$"));
             Assert.That(FirstRunOnboardingUI.LowAmmoHint, Does.Match("^[A-Z0-9 .+]+$"));
+            Assert.That(FirstRunOnboardingUI.HeartEntryHint, Does.Match("^[A-Z0-9 .+]+$"));
+            Assert.That(FirstRunOnboardingUI.HeartPauseHint, Does.Match("^[A-Z0-9 .+]+$"));
         }
 
         private static RectTransform FindUniqueRect(GameObject root, string objectName)

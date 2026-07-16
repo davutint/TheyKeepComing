@@ -36554,6 +36554,7 @@ GameObject:
   - component: {fileID: 7247245205736996535}
   - component: {fileID: 4855469737462530218}
   - component: {fileID: 5217709202052904931}
+  - component: {fileID: 1955625453958762781}
   m_Layer: 5
   m_Name: OnboardingHintPanel
   m_TagString: Untagged
@@ -36635,6 +36636,29 @@ MonoBehaviour:
   m_EffectColor: {r: 1, g: 0.64, b: 0.16, a: 0.34}
   m_EffectDistance: {x: 1, y: -1}
   m_UseGraphicAlpha: 1
+--- !u!223 &1955625453958762781
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6883772579195104637}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 0
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+  m_TargetDisplay: 0
 --- !u!1 &6885080638271438013
 GameObject:
   m_ObjectHideFlags: 0

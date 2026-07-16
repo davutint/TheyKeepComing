@@ -9,7 +9,9 @@ namespace DeadWalls
         None = 0,
         WorkerRatio = 1,
         BasicArcher = 2,
-        LowAmmo = 3
+        LowAmmo = 3,
+        HeartEntry = 4,
+        HeartPause = 5
     }
 
     internal static class FirstRunOnboardingRules
@@ -63,6 +65,18 @@ namespace DeadWalls
             int clampedCurrent = Mathf.Clamp(current, 0, capacity);
             return (long)clampedCurrent * 100L <= (long)capacity * clampedThreshold;
         }
+
+        public static bool ShouldShowHeartEntryStep(
+            bool completed,
+            bool mobileWorkerEconomyEnabled,
+            bool isGameOver,
+            long graveEssence)
+        {
+            return !completed
+                && mobileWorkerEconomyEnabled
+                && !isGameOver
+                && graveEssence > 0L;
+        }
     }
 
     /// <summary>
@@ -79,11 +93,16 @@ namespace DeadWalls
         public const string LowAmmoFlagId = "tutorial.v1.low_ammo";
         public const string LowAmmoHint = "RESTOCK YOUR ARROWS.";
         public const int LowAmmoThresholdPercent = 25;
+        public const string HeartEntryFlagId = "tutorial.v1.heart";
+        public const string HeartEntryHint = "OPEN THE CASTLE HEART.";
+        public const string HeartPauseHint = "THE CASTLE HEART FULLY PAUSES THE BATTLE.";
+        public const int HeartPauseHintSortingOrder = 260;
 
         [Header("Onboarding Owners")]
         public WorkerEconomyDrawerUI WorkerDrawer;
         public MarketUI ArcherMarket;
         public ArrowSupplyUI AmmoSupply;
+        public HeartScreenUI CastleHeart;
 
         [Header("Shared Presentation")]
         public GameObject HintPanel;
@@ -100,13 +119,17 @@ namespace DeadWalls
         private WorkerEconomyDrawerUI _subscribedDrawer;
         private MarketUI _subscribedMarket;
         private ArrowSupplyUI _subscribedAmmoSupply;
+        private HeartScreenUI _subscribedCastleHeart;
         private RectTransform _activePulseTarget;
         private FirstRunOnboardingStep _activeStep;
+        private bool _heartPauseTeachingActive;
         private bool _persistenceWarningLogged;
 
         public bool IsWorkerRatioStepVisible => _activeStep == FirstRunOnboardingStep.WorkerRatio;
         public bool IsBasicArcherStepVisible => _activeStep == FirstRunOnboardingStep.BasicArcher;
         public bool IsLowAmmoStepVisible => _activeStep == FirstRunOnboardingStep.LowAmmo;
+        public bool IsHeartEntryStepVisible => _activeStep == FirstRunOnboardingStep.HeartEntry;
+        public bool IsHeartPauseStepVisible => _activeStep == FirstRunOnboardingStep.HeartPause;
         public RectTransform ActivePulseTarget => _activePulseTarget;
 
         private void OnEnable()
@@ -115,6 +138,7 @@ namespace DeadWalls
             BindWorkerDrawer();
             BindArcherMarket();
             BindAmmoSupply();
+            BindCastleHeart();
             SetPresentation(FirstRunOnboardingStep.None, null);
         }
 
@@ -123,17 +147,20 @@ namespace DeadWalls
             UnbindWorkerDrawer();
             UnbindArcherMarket();
             UnbindAmmoSupply();
+            UnbindCastleHeart();
+            _heartPauseTeachingActive = false;
             SetPresentation(FirstRunOnboardingStep.None, null);
         }
 
         private void Update()
         {
-            if (WorkerDrawer == null || ArcherMarket == null || AmmoSupply == null)
+            if (WorkerDrawer == null || ArcherMarket == null || AmmoSupply == null || CastleHeart == null)
             {
                 ResolveMissingReferences();
                 BindWorkerDrawer();
                 BindArcherMarket();
                 BindAmmoSupply();
+                BindCastleHeart();
             }
 
             bool workerRatioCompleted = MetaProgression.HasTutorialFlag(WorkerRatioFlagId);
@@ -173,9 +200,29 @@ namespace DeadWalls
                     arrowCapacity,
                     LowAmmoThresholdPercent);
 
+            bool heartEntryCompleted = MetaProgression.HasTutorialFlag(HeartEntryFlagId);
+            bool shouldEvaluateHeartEntry = !heartEntryCompleted
+                && !shouldShowWorkerRatio
+                && !shouldShowBasicArcher
+                && !shouldShowLowAmmo
+                && gm != null;
+            long graveEssence = shouldEvaluateHeartEntry ? gm.GraveEssenceAmount : 0L;
+            bool shouldShowHeartEntry = shouldEvaluateHeartEntry
+                && FirstRunOnboardingRules.ShouldShowHeartEntryStep(
+                    heartEntryCompleted,
+                    gm.IsMobilePopulationEconomyEnabled(),
+                    gm.GameState.IsGameOver,
+                    graveEssence);
+
             FirstRunOnboardingStep step = FirstRunOnboardingStep.None;
             RectTransform target = null;
-            if (shouldShowWorkerRatio && WorkerDrawer != null)
+            bool showPulse = true;
+            if (_heartPauseTeachingActive && CastleHeart != null && CastleHeart.IsOpen)
+            {
+                step = FirstRunOnboardingStep.HeartPause;
+                showPulse = false;
+            }
+            else if (shouldShowWorkerRatio && WorkerDrawer != null)
             {
                 step = FirstRunOnboardingStep.WorkerRatio;
                 target = WorkerDrawer.IsOpen && WorkerDrawer.WoodWorkerTargetPlus10Button != null
@@ -201,9 +248,17 @@ namespace DeadWalls
                     ? AmmoSupply.ToggleButton.GetComponent<RectTransform>()
                     : null;
             }
+            else if (shouldShowHeartEntry && CastleHeart != null)
+            {
+                step = FirstRunOnboardingStep.HeartEntry;
+                target = CastleHeart.HeartOpenButton != null
+                    ? CastleHeart.HeartOpenButton.GetComponent<RectTransform>()
+                    : null;
+            }
 
-            SetPresentation(target != null ? step : FirstRunOnboardingStep.None, target);
-            if (_activeStep != FirstRunOnboardingStep.None)
+            bool canPresent = step == FirstRunOnboardingStep.HeartPause || target != null;
+            SetPresentation(canPresent ? step : FirstRunOnboardingStep.None, target, showPulse);
+            if (_activePulseTarget != null)
                 UpdatePulsePresentation();
         }
 
@@ -212,6 +267,7 @@ namespace DeadWalls
             WorkerDrawer ??= GetComponent<WorkerEconomyDrawerUI>();
             ArcherMarket ??= GetComponent<MarketUI>();
             AmmoSupply ??= GetComponent<ArrowSupplyUI>();
+            CastleHeart ??= GetComponent<HeartScreenUI>();
             HintPanel ??= FindGameObject("OnboardingHintPanel");
             HintText ??= FindComponent<TMP_Text>("OnboardingHintText");
             PulseFrame ??= FindComponent<RectTransform>("OnboardingPulseFrame");
@@ -273,6 +329,31 @@ namespace DeadWalls
             _subscribedAmmoSupply = null;
         }
 
+        private void BindCastleHeart()
+        {
+            if (_subscribedCastleHeart == CastleHeart)
+                return;
+
+            UnbindCastleHeart();
+            _subscribedCastleHeart = CastleHeart;
+            if (_subscribedCastleHeart == null)
+                return;
+
+            _subscribedCastleHeart.HeartOpenedByPlayer += HandleHeartOpenedByPlayer;
+            _subscribedCastleHeart.HeartClosedByPlayer += HandleHeartClosedByPlayer;
+        }
+
+        private void UnbindCastleHeart()
+        {
+            if (_subscribedCastleHeart != null)
+            {
+                _subscribedCastleHeart.HeartOpenedByPlayer -= HandleHeartOpenedByPlayer;
+                _subscribedCastleHeart.HeartClosedByPlayer -= HandleHeartClosedByPlayer;
+            }
+
+            _subscribedCastleHeart = null;
+        }
+
         private void HandleWorkerTargetRatioChanged(EconomyFocusType resource)
         {
             if (MetaProgression.HasTutorialFlag(WorkerRatioFlagId)
@@ -327,16 +408,66 @@ namespace DeadWalls
             Debug.LogWarning("[FirstRunOnboardingUI] Low ammo tutorial flag durable yazilamadi.");
         }
 
-        private void SetPresentation(FirstRunOnboardingStep step, RectTransform target)
+        private void HandleHeartOpenedByPlayer()
+        {
+            GameManager gm = GameManager.Instance;
+            if (MetaProgression.HasTutorialFlag(HeartEntryFlagId)
+                || gm == null
+                || gm.GameState.IsGameOver
+                || gm.GraveEssenceAmount <= 0L)
+            {
+                return;
+            }
+
+            _heartPauseTeachingActive = true;
+        }
+
+        private void HandleHeartClosedByPlayer()
+        {
+            if (!_heartPauseTeachingActive)
+                return;
+
+            _heartPauseTeachingActive = false;
+            if (MetaProgression.HasTutorialFlag(HeartEntryFlagId)
+                || MetaProgression.SetTutorialFlag(HeartEntryFlagId, true))
+            {
+                _persistenceWarningLogged = false;
+                SetPresentation(FirstRunOnboardingStep.None, null);
+                return;
+            }
+
+            if (_persistenceWarningLogged)
+                return;
+
+            _persistenceWarningLogged = true;
+            Debug.LogWarning("[FirstRunOnboardingUI] Castle Heart tutorial flag durable yazilamadi.");
+        }
+
+        private void SetPresentation(
+            FirstRunOnboardingStep step,
+            RectTransform target,
+            bool showPulse = true)
         {
             bool visible = step != FirstRunOnboardingStep.None;
+            bool heartPauseStep = step == FirstRunOnboardingStep.HeartPause;
             _activeStep = step;
-            _activePulseTarget = visible ? target : null;
+            _activePulseTarget = visible && showPulse ? target : null;
 
             if (HintPanel != null && HintPanel.activeSelf != visible)
                 HintPanel.SetActive(visible);
-            if (PulseFrame != null && PulseFrame.gameObject.activeSelf != visible)
-                PulseFrame.gameObject.SetActive(visible);
+            bool pulseVisible = visible && showPulse && target != null;
+            if (PulseFrame != null && PulseFrame.gameObject.activeSelf != pulseVisible)
+                PulseFrame.gameObject.SetActive(pulseVisible);
+
+            Canvas hintCanvas = HintPanel != null ? HintPanel.GetComponent<Canvas>() : null;
+            if (hintCanvas != null)
+            {
+                int sortingOrder = heartPauseStep ? HeartPauseHintSortingOrder : 0;
+                if (hintCanvas.overrideSorting != heartPauseStep)
+                    hintCanvas.overrideSorting = heartPauseStep;
+                if (hintCanvas.sortingOrder != sortingOrder)
+                    hintCanvas.sortingOrder = sortingOrder;
+            }
 
             if (!visible)
                 return;
@@ -345,6 +476,8 @@ namespace DeadWalls
             {
                 FirstRunOnboardingStep.BasicArcher => BasicArcherHint,
                 FirstRunOnboardingStep.LowAmmo => LowAmmoHint,
+                FirstRunOnboardingStep.HeartEntry => HeartEntryHint,
+                FirstRunOnboardingStep.HeartPause => HeartPauseHint,
                 _ => WorkerRatioHint
             };
             if (HintText != null && HintText.text != hint)
@@ -357,18 +490,30 @@ namespace DeadWalls
             {
                 bool archerStep = step == FirstRunOnboardingStep.BasicArcher;
                 bool ammoStep = step == FirstRunOnboardingStep.LowAmmo;
-                hintRect.anchorMin = archerStep
+                bool heartEntryStep = step == FirstRunOnboardingStep.HeartEntry;
+                hintRect.anchorMin = heartPauseStep
+                    ? new Vector2(0.5f, 1f)
+                    : archerStep || heartEntryStep
                     ? new Vector2(1f, 0f)
                     : ammoStep ? new Vector2(0f, 1f) : Vector2.zero;
                 hintRect.anchorMax = hintRect.anchorMin;
-                hintRect.pivot = archerStep
+                hintRect.pivot = heartPauseStep
+                    ? new Vector2(0.5f, 1f)
+                    : archerStep || heartEntryStep
                     ? new Vector2(1f, 0f)
                     : ammoStep ? new Vector2(0f, 1f) : Vector2.zero;
-                hintRect.anchoredPosition = archerStep
-                    ? new Vector2(-24f, ArcherMarket != null && ArcherMarket.IsDrawerOpen ? 522f : 96f)
+                hintRect.anchoredPosition = heartPauseStep
+                    ? new Vector2(0f, -88f)
+                    : archerStep
+                        ? new Vector2(-24f, ArcherMarket != null && ArcherMarket.IsDrawerOpen ? 522f : 96f)
+                    : heartEntryStep
+                        ? new Vector2(-24f, 96f)
                     : ammoStep
                         ? new Vector2(24f, -96f)
                     : new Vector2(24f, WorkerDrawer != null && WorkerDrawer.IsOpen ? 554f : 96f);
+
+                if (heartPauseStep)
+                    hintRect.SetAsLastSibling();
             }
         }
 

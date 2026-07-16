@@ -3727,6 +3727,9 @@ namespace DeadWalls
             hintImage.sprite = rounded;
             hintImage.type = rounded != null ? Image.Type.Sliced : Image.Type.Simple;
             hintImage.raycastTarget = false;
+            Canvas hintCanvas = EnsureComponent<Canvas>(hintPanel);
+            hintCanvas.overrideSorting = false;
+            hintCanvas.sortingOrder = 0;
             var hintOutline = EnsureComponent<Outline>(hintPanel);
             hintOutline.effectColor = new Color(1f, 0.64f, 0.16f, 0.34f);
             hintOutline.effectDistance = new Vector2(1f, -1f);
@@ -4935,6 +4938,7 @@ namespace DeadWalls
             onboarding.WorkerDrawer = hudRoot.GetComponent<WorkerEconomyDrawerUI>();
             onboarding.ArcherMarket = hudRoot.GetComponent<MarketUI>();
             onboarding.AmmoSupply = hudRoot.GetComponent<ArrowSupplyUI>();
+            onboarding.CastleHeart = hudRoot.GetComponent<HeartScreenUI>();
             onboarding.HintPanel = FindChildByName(hudRoot, "OnboardingHintPanel");
             onboarding.HintText = FindComponentInChildrenByName<TextMeshProUGUI>(
                 hudRoot, "OnboardingHintText");

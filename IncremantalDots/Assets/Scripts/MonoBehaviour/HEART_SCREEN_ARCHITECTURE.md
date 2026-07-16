@@ -24,6 +24,9 @@ ekran acik bir hata gosterir ve legacy `TechTreeCatalogSO`'ya geri dusmez.
   kullanir.
 - Keystone conflict bilgisini presentation contract'indaki safe baslik/slot ile cizer.
 - Panel, toast ve node animasyonlari unscaled DOTween zamaninda calisir.
+- Gercek open-button aksiyonu basarili panel gecisinden sonra `HeartOpenedByPlayer`, gercek
+  close-button veya Escape aksiyonu ise `HeartClosedByPlayer` event'ini yayar. Programmatic
+  `OpenPanel`/`ClosePanel` cagrilari player action olarak raporlanmaz.
 - `TechTreeViewController` yalniz pan/zoom yardimcisi olarak yeniden kullanilir; progression
   owner'i degildir.
 
@@ -114,3 +117,6 @@ validate eder; catalog'dan yeniden graph uretmez ve purchased effect'leri replay
 `HeartScreenPauseTests` lease nesting/exact restore, external resume repair, missing ECS group,
 compass layout, runtime settings kopyasi ve Arrow Heart bonuslarinin paid level'lardan
 ayrilmasini kapsar. Exact save/load ve gercek Continue pause testi E6'ya aittir.
+`WorkerAllocationPlayModeTests.FirstEssenceHeartOnboarding...` gercek button event'ini,
+pozitif Essence giris kapisini, panel acikken full pause bilgisini ve player close sonrasi
+durable onboarding flag'ini birlikte dogrular.

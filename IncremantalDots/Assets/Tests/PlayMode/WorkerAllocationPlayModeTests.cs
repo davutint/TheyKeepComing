@@ -326,6 +326,80 @@ namespace DeadWalls.Tests
         }
 
         [UnityTest]
+        public IEnumerator FirstEssenceHeartOnboarding_PulsesEntryAndTeachesFullPauseUntilPlayerCloses()
+        {
+            GameManager gameManager = GameManager.Instance;
+            FirstRunOnboardingUI onboarding =
+                Object.FindFirstObjectByType<FirstRunOnboardingUI>();
+            HeartScreenUI heart = Object.FindFirstObjectByType<HeartScreenUI>();
+            Assert.That(onboarding, Is.Not.Null);
+            Assert.That(heart, Is.Not.Null);
+            Assert.That(MetaProgression.SetTutorialFlag(
+                FirstRunOnboardingUI.WorkerRatioFlagId, true), Is.True);
+            Assert.That(MetaProgression.SetTutorialFlag(
+                FirstRunOnboardingUI.BasicArcherFlagId, true), Is.True);
+            Assert.That(MetaProgression.SetTutorialFlag(
+                FirstRunOnboardingUI.LowAmmoFlagId, true), Is.True);
+            Assert.That(MetaProgression.HasTutorialFlag(
+                FirstRunOnboardingUI.HeartEntryFlagId), Is.False);
+
+            bool runtimeReady = false;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                {
+                    runtimeReady = true;
+                    break;
+                }
+                yield return null;
+            }
+            Assert.That(runtimeReady, Is.True,
+                "GameManager/SubScene 300 frame icinde hazir olmadi.");
+            Assert.That(gameManager.GraveEssenceAmount, Is.Zero);
+            Assert.That(onboarding.IsHeartEntryStepVisible, Is.False);
+
+            Assert.That(gameManager.GrantGraveEssence(1L), Is.True);
+            for (int frame = 0; frame < 60 && !onboarding.IsHeartEntryStepVisible; frame++)
+                yield return null;
+
+            Assert.That(onboarding.IsHeartEntryStepVisible, Is.True);
+            Assert.That(onboarding.HintText.text,
+                Is.EqualTo(FirstRunOnboardingUI.HeartEntryHint));
+            Assert.That(onboarding.ActivePulseTarget,
+                Is.SameAs(heart.HeartOpenButton.GetComponent<RectTransform>()));
+            Assert.That(heart.IsOpen, Is.False,
+                "Heart onboarding paneli oyuncu adina acmamalidir.");
+
+            heart.HeartOpenButton.onClick.Invoke();
+            yield return null;
+
+            Assert.That(heart.IsOpen, Is.True);
+            Assert.That(SimulationPauseService.IsPaused, Is.True);
+            Assert.That(Time.timeScale, Is.Zero);
+            Assert.That(onboarding.IsHeartPauseStepVisible, Is.True);
+            Assert.That(onboarding.HintText.text,
+                Is.EqualTo(FirstRunOnboardingUI.HeartPauseHint));
+            Assert.That(onboarding.ActivePulseTarget, Is.Null);
+            Assert.That(onboarding.PulseFrame.gameObject.activeSelf, Is.False);
+            Assert.That(MetaProgression.HasTutorialFlag(
+                FirstRunOnboardingUI.HeartEntryFlagId), Is.False,
+                "Full-pause hint gorulmeden Heart adimi tamamlanmamalidir.");
+
+            heart.HeartCloseButton.onClick.Invoke();
+            yield return null;
+
+            Assert.That(heart.IsOpen, Is.False);
+            Assert.That(SimulationPauseService.IsPaused, Is.False);
+            Assert.That(Time.timeScale, Is.EqualTo(1f));
+            Assert.That(MetaProgression.HasTutorialFlag(
+                FirstRunOnboardingUI.HeartEntryFlagId), Is.True);
+            Assert.That(onboarding.IsHeartEntryStepVisible, Is.False);
+            Assert.That(onboarding.IsHeartPauseStepVisible, Is.False);
+            Assert.That(onboarding.HintPanel.activeSelf, Is.False);
+            Assert.That(onboarding.PulseFrame.gameObject.activeSelf, Is.False);
+        }
+
+        [UnityTest]
         public IEnumerator PopulationIncrease_AssignsOnlyNewPeopleToTarget_AndLeavesCapOverflowIdle()
         {
             EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;

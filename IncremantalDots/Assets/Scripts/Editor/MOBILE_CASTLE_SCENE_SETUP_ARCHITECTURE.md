@@ -67,10 +67,12 @@ Filled/Horizontal/Left azalan sure seridine baglar; V1'de yalniz regular Day `3/
 First-run onboarding sunumu generated prefabda raycast kapali
 `OnboardingHintPanel` ve `OnboardingPulseFrame` olarak kalir. Runtime state prefab assetine
 gomulmez; setup tool scene HUD root'una tek `FirstRunOnboardingUI` ekler ve mevcut
-`WorkerEconomyDrawerUI`, `MarketUI` ve `ArrowSupplyUI` player-action event'lerine baglar.
-Worker ratio, ilk affordable Basic Archer ve ilk `%25` low-ammo adimlari ayni non-modal
-sunumu paylasir. Low-ammo hedefi gercek ust HUD `ArrowChip` satiridir. Akis oyunu pause etmez,
-drawer'i otomatik acmaz ve ekonomi state'i yazmaz.
+`WorkerEconomyDrawerUI`, `MarketUI`, `ArrowSupplyUI` ve `HeartScreenUI` player-action event'lerine
+baglar. Worker ratio, ilk affordable Basic Archer, ilk `%25` low-ammo ve ilk pozitif Grave
+Essence Heart girisi ayni presentation'i paylasir. Low-ammo hedefi gercek ust HUD `ArrowChip`,
+Heart hedefi gercek alt-sag `CastleHeartOpenButton` kontroludur. Controller drawer/paneli
+otomatik acmaz, ekonomi state'i yazmaz veya yeni pause lease'i uretmez; Heart acikken yalniz
+mevcut full-pause davranisini unscaled hint ile aciklar.
 
 Sabit kamera framing sozlesmesi `Main Camera` position `(6,0,-10)`, orthographic size `8`
 ve desteklenen `1920 x 1080` / `3440 x 1440` oranlaridir. Bu araliklarda savunma hatti ile

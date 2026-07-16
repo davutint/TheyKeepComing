@@ -18,6 +18,14 @@ scene setup tool tarafindan scene owner'ina eklenir ve isimle baglanir.
   `ArcherRecruitmentRow_basic_archer/ArcherBuyButton`.
 - Low Ammo target: her durumda ust resource strip'teki `ArrowChip`; threshold effective
   `Current / Capacity <= %25`, panel otomatik acilmaz.
+- Heart entry target: alt-sag dock'taki `CastleHeartOpenButton`; authoritative trigger
+  `GraveEssenceAmount > 0`, panel otomatik acilmaz.
+- Heart pause hint: panel gercek oyuncu aksiyonuyla acikken top-center gorunur; pulse kapali,
+  hint raycast kapali ve nested Canvas yalniz bu adimda `overrideSorting = true`,
+  `sortingOrder = 260` kullanir (`CastleHeartPanel = 200`).
+
+Scene `FirstRunOnboardingUI.CastleHeart` referansi ayni HUD root'taki tek `HeartScreenUI`
+component'ine bagli olmalidir.
 
 Idempotent onarim: `Window -> DeadWalls -> Repair First Run Onboarding`.
 
@@ -33,3 +41,7 @@ Idempotent onarim: `Window -> DeadWalls -> Repair First Run Onboarding`.
 - Low Ammo PlayMode testi `%25` inclusive esigi, gercek Arrow chip hedefi, panelin kapali kalmasi,
   basarisiz refill'in flag yazmamasi ve yalniz basarili refill'in `tutorial.v1.low_ammo` flag'ini
   durable yazmasini dogrular.
+- Heart PlayMode testi sifir bakiyede sessiz kalmayi, ilk pozitif Grave Essence bakiyesinde gercek
+  Heart butonunu pulse etmeyi, panelin oyuncu aksiyonuyla acilmasini, full-pause hint'inin
+  `Time.timeScale = 0` iken gorunmesini ve flag'in yalniz player close sonrasinda yazilmasini
+  dogrular.

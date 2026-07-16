@@ -43,12 +43,37 @@ owner'larinin player-action event'lerini dinler; yalniz non-modal hint ve pulse 
 - Yalniz `ArrowSupplyUI` uzerinden basarili `+1`, `+5` veya `Buy Max` refill satin alimi
   `ArrowRefillPurchasedByPlayer` event'ini yayar. Basarisiz refill ve CAP/EFF yatirimi flag yazmaz.
 
+## Ilk Grave Essence / Castle Heart Adimi
+
+- Stable meta flag: `tutorial.v1.heart`.
+- Gorunme kapisi: mobile worker economy aktif, oyun bitmemis ve authoritative
+  `GameManager.GraveEssenceAmount > 0`.
+- Bu adim kill basina Essence miktari veya drop orani tanimlamaz; yalniz ilk gercek pozitif
+  Heart bakiyesini gozlemler. Essence gain dengesi tracker'daki ayri balance isinin sahibidir.
+- Grave Essence runtime sorgusu yalniz onceki presentation adimlari uygun degilken ve Heart
+  flag'i incomplete iken yapilir; durable completion sonrasinda per-frame Heart wallet okumasi yoktur.
+- Heart kapaliyken gercek `HeartScreenUI.HeartOpenButton` / `CastleHeartOpenButton` pulse olur;
+  panel oyuncu adina acilmaz.
+- Giris metni English'tir: `OPEN THE CASTLE HEART.`
+- Yalniz gercek Heart butonu `HeartOpenedByPlayer` event'ini yayar. Panel acilinca mevcut
+  `SimulationPauseService` lease'i simulation'i durdurur; pulse kapanir ve unscaled, tek satir
+`THE CASTLE HEART FULLY PAUSES THE BATTLE.` hint'i modal yuzeyin ustunde gosterilir.
+- Durable flag, oyuncu Heart'i close butonu veya Escape ile kapattiginda gelen
+  `HeartClosedByPlayer` event'inde yazilir. Programmatic open/close cagrilari tutorial'i
+  tamamlamaz; pause bilgisi gorulmeden flag yazilmaz.
+
 ## Sunum Siniri
 
 `OnboardingHintPanel` ve `OnboardingPulseFrame`, aktif generated HUD prefabinin responsive
 gorsel root'u altindadir. Raycast kapali oldugu icin combat ve management input'unu engellemez.
 Pulse `Time.unscaledTime` kullanir; simulation pause state'ini degistirmez.
 
-Sonraki Heart, Council, repair ve ability onboarding adimlari ayni
+Heart pause hint'i pulse kullanmaz ve `Time.timeScale = 0` iken gorunur kalir. Hint kendi
+basina yeni modal veya pause lease'i olusturmaz; yalniz zaten acik Castle Heart modalinin
+mevcut full-pause davranisini aciklar. `OnboardingHintPanel` nested `Canvas`i normal adimlarda
+parent siralamasini kullanir; yalniz Heart pause adiminda `overrideSorting = true / 260` olur ve
+Heart modalinin `200` sorting order'i ustunde okunur.
+
+Sonraki Council, repair ve ability onboarding adimlari ayni
 scene-owned controller ve stable meta flag siniri uzerinden eklenir; bu adim final tutorial
 complete flag'i yerine gecmez.
