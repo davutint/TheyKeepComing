@@ -51,12 +51,13 @@ odul/nefes fazi. `SiegeDawnDuration=0` bake'lerde legacy 3-faz davranis korunur.
 ## V1: SpecialNights dormant
 
 V1 Blueprint'te special night, Blood Moon veya boss gecesi yoktur. `SpecialNightEntry`,
-`BloodMoonIntensityMult`, `IsBloodMoonNight` ve ilgili UI/audio alanlari gelecekteki content
-uyumlulugu icin kalabilir fakat aktif davranis uretmez.
+`BloodMoonIntensityMult` ve `IsBloodMoonNight` yalniz save/config geriye uyumlulugu ve gelecekteki
+content icin dormant veri olarak kalir; aktif davranis veya presentation uretmez.
 
 - DefaultDifficulty `SpecialNights` listesi bostur; setup tool seed eklemez.
 - `MobileCastleTuningResolver` her sample icin `BloodMoonIntensityMult = 1` yazar.
 - `ContinuousSiegeCycleSystem` stale buffer degeri olsa bile multiplier'i okumaz ve
   `IsBloodMoonNight = false` yazar.
 - Save/Continue legacy bayragi diske geri yazmaz veya runtime'a restore etmez.
-- Warning, color, vignette ve audio dallari false flag nedeniyle dormant kalir.
+- `BloodMoonWarningUI`, warning scene root'u, HUD label/color, overlay tint, vignette flash ve
+  audio loop/sting dallari V1 runtime ve setup akisindan tamamen kaldirilmistir.

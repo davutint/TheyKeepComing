@@ -2023,6 +2023,10 @@ namespace DeadWalls.Tests
 
             for (int frame = 0; frame < 20; frame++)
                 yield return null;
+            // AmbientAudioController authoritative cycle'i 0.2s unscaled cadence ile poll eder.
+            // Test runner frame suresi degisken oldugu icin cadence'in dolmasini explicit bekle.
+            yield return new WaitForSecondsRealtime(0.25f);
+            yield return null;
 
             Assert.That(gameManager.ContinuousSiegeCycle.Phase, Is.EqualTo(SiegeCyclePhase.Night));
             Assert.That(presentation.GlobalLight.color.r,

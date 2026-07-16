@@ -6,11 +6,10 @@ namespace DeadWalls
     /// Faz, worker ve bounded horde ambiyansinin tek runtime sahibidir. Faz polling ile (DawnRewardToast kalibi):
     /// - DAY: gercek aktif worker sayisina gore seyrek, dusuk sesli uretim foley ritmi
     /// - DUSK girisi: scene-load'da tekrar etmeyen, tek seferlik dusuk tension riser
-    /// - DUSK + NIGHT: gece drone loop'u (normal gece = NightLoop, kanli ay = BloodMoonLoop)
+    /// - DUSK + NIGHT: tek canonical NightLoop gece drone'u
     /// - NIGHT: zombie sayisi/baskisiyla logaritmik buyuyen tek 2D horde-bed loop'u
     /// - DAWN girisi: scene-load/Continue'da tekrar etmeyen, tek nefes/yeni-gun cue'su
     /// - DAY + DAWN: gece drone'u sessiz (Day'de yalniz worker foley)
-    /// - Kanli ay gecesine giris aninda tek seferlik sting (canavar kukremesi).
     /// Faz loop'lari crossfade olur; horde katmani ayri fakat tek, 2D ve bounded bir kaynaktir.
     /// Setup tool kurar ve clip'leri yalniz-bossa atar.
     /// </summary>
@@ -18,8 +17,6 @@ namespace DeadWalls
     {
         [Header("Clips (setup atar)")]
         public AudioClip NightLoop;
-        public AudioClip BloodMoonLoop;
-        public AudioClip BloodMoonSting;
         public AudioClip DuskRiser;
         public AudioClip DawnCue;
         public AudioClip NightHordeLoop;
@@ -29,8 +26,6 @@ namespace DeadWalls
 
         [Header("Mix")]
         [Range(0f, 1f)] public float NightVolume = 0.30f;
-        [Range(0f, 1f)] public float BloodMoonVolume = 0.40f;
-        [Range(0f, 1f)] public float StingVolume = 0.65f;
         [Range(0f, 1f)] public float DuskRiserVolume = 0.23f;
         [Range(0.5f, 1.5f)] public float DuskRiserPitch = 0.90f;
         [Range(0f, 1f)] public float DawnCueVolume = 0.28f;
@@ -59,7 +54,6 @@ namespace DeadWalls
         private float _checkTimer;
         private AudioSource _sourceA;
         private AudioSource _sourceB;
-        private AudioSource _stingSource;
         private AudioSource _phaseTransitionSource;
         private AudioSource _workerFoleySource;
         private AudioSource _nightHordeSource;
@@ -76,7 +70,6 @@ namespace DeadWalls
         {
             _sourceA = CreateSource("AmbientLoopA", true);
             _sourceB = CreateSource("AmbientLoopB", true);
-            _stingSource = CreateSource("AmbientSting", false);
             _phaseTransitionSource = CreateSource("PhaseTransition", false);
             _workerFoleySource = CreateSource("WorkerAmbience", false);
             _nightHordeSource = CreateSource("NightHordeBed", true);
@@ -149,7 +142,6 @@ namespace DeadWalls
 
             var cycle = gm.ContinuousSiegeCycle;
             bool nightSide = cycle.Phase == SiegeCyclePhase.Dusk || cycle.Phase == SiegeCyclePhase.Night;
-            bool bloodMoon = cycle.IsBloodMoonNight;
             NightHordeActivity01 = ResolveNightHordeActivity01(
                 cycle.Phase,
                 cycle.HordePressure01,
@@ -218,13 +210,6 @@ namespace DeadWalls
                 DawnCuePlayCount++;
             }
 
-            // Kanli ay gecesine giris sting'i (Night kenari). Ilk scene observation'i
-            // transition sayilmaz; Continue ile Night'a yuklemek sting'i tekrar oynatmaz.
-            if (phaseChanged && cycle.Phase == SiegeCyclePhase.Night
-                && bloodMoon && BloodMoonSting != null && _stingSource != null)
-            {
-                _stingSource.PlayOneShot(BloodMoonSting, StingVolume * SoundSettings.AmbienceVolume);
-            }
             _lastPhase = cycle.Phase;
             _hasObservedPhase = true;
 
@@ -232,8 +217,8 @@ namespace DeadWalls
             float targetVolume = 0f;
             if (nightSide && !gm.GameState.IsGameOver)
             {
-                targetClip = bloodMoon && BloodMoonLoop != null ? BloodMoonLoop : NightLoop;
-                targetVolume = bloodMoon && BloodMoonLoop != null ? BloodMoonVolume : NightVolume;
+                targetClip = NightLoop;
+                targetVolume = NightVolume;
             }
 
             if (targetClip == null)

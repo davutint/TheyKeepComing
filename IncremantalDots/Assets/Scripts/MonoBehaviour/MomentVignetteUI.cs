@@ -81,8 +81,6 @@ namespace DeadWalls
         [Header("Legacy Edge Vignette")]
         [Tooltip("Dawn artik grading/sky/particle/audio ile okunur; sifir canonical degerdir.")]
         [Range(0f, 1f)] public float DawnPeak;
-        [Tooltip("Kanli ay Night kenarindaki kizil vurus; Blood Moon temizleme paketine kadar korunur.")]
-        [Range(0f, 1f)] public float BloodMoonPeak = 0.30f;
 
         public Color CurrentSkyTarget { get; private set; }
         public Color CurrentParticleColor { get; private set; }
@@ -91,7 +89,6 @@ namespace DeadWalls
         public int LastTransitionBurstCount { get; private set; }
 
         private static readonly Color DawnGoldFlash = new Color(0.95f, 0.72f, 0.30f);
-        private static readonly Color BloodRedFlash = new Color(0.85f, 0.10f, 0.05f);
 
         private bool _hasObservedPhase;
         private SiegeCyclePhase _lastPhase = SiegeCyclePhase.Day;
@@ -142,7 +139,7 @@ namespace DeadWalls
 
             bool phaseChanged = _hasObservedPhase && cycle.Phase != _lastPhase;
             if (phaseChanged && !presentationSuppressed)
-                PlayPhaseEdge(cycle.Phase, cycle.IsBloodMoonNight);
+                PlayPhaseEdge(cycle.Phase);
 
             _lastPhase = cycle.Phase;
             _hasObservedPhase = true;
@@ -275,7 +272,7 @@ namespace DeadWalls
             emission.rateOverTime = Mathf.Max(0f, emissionRate);
         }
 
-        private void PlayPhaseEdge(SiegeCyclePhase phase, bool isBloodMoonNight)
+        private void PlayPhaseEdge(SiegeCyclePhase phase)
         {
             LastTransitionBurstCount = ResolveTransitionBurstCount(phase);
             if (AtmosphereParticles != null && LastTransitionBurstCount > 0)
@@ -284,8 +281,6 @@ namespace DeadWalls
 
             if (phase == SiegeCyclePhase.Dawn && DawnPeak > 0f)
                 DamageFlashUI.Instance?.Flash(DawnGoldFlash, DawnPeak);
-            else if (phase == SiegeCyclePhase.Night && isBloodMoonNight && BloodMoonPeak > 0f)
-                DamageFlashUI.Instance?.Flash(BloodRedFlash, BloodMoonPeak);
         }
     }
 }

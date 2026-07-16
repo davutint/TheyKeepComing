@@ -862,13 +862,19 @@ namespace DeadWalls.Tests
             Assert.That(cycle.SpawnIntensityMultiplier,
                 Is.LessThanOrEqualTo(config.SiegeNightIntensityMultiplier + 0.001f));
 
-            var warnings = Object.FindObjectsByType<BloodMoonWarningUI>(
+            int warningObjectCount = 0;
+            var sceneTransforms = Object.FindObjectsByType<Transform>(
                 FindObjectsInactive.Include, FindObjectsSortMode.None);
-            foreach (var warning in warnings)
+            foreach (var sceneTransform in sceneTransforms)
             {
-                if (warning.WarningText != null)
-                    Assert.That(warning.WarningText.gameObject.activeSelf, Is.False);
+                if (sceneTransform.name == "BloodMoonWarningRoot"
+                    || sceneTransform.name == "BloodMoonWarningText")
+                {
+                    warningObjectCount++;
+                }
             }
+            Assert.That(warningObjectCount, Is.Zero,
+                "V1 scene'inde Blood Moon warning presentation objesi bulunmamali.");
         }
 
         [UnityTest]

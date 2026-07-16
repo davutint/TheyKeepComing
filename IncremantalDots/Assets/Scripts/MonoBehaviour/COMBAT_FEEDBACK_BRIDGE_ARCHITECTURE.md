@@ -38,9 +38,9 @@
   `CameraShaker.Instance.AddTrauma` (trauma^2 Perlin offset, base pozisyon cache) +
   `DamageFlashUI.Instance.Flash` (tam-ekran kirmizi vuru; Canvas'in son sibling'i) tetikler.
   Ayar: `CastleHitShakeTrauma` / `CastleHitFlashEnabled`.
-- **Ambiyans:** `AmbientAudioController` (AmbientAudioRoot; setup kurar) — Dusk+Night'ta gece
-  drone'u (WindMagic_Drone01_LowSubtleLoop), kanli ay gecesinde DarkMagic_DroneUnderworld_Loop
-  + Night'a giris aninda MONSTER_Roar01 sting'i; 2 kaynakli crossfade, GameOver'da susar.
+- **Ambiyans:** `AmbientAudioController` (AmbientAudioRoot; setup kurar) — Dusk+Night'ta tek
+  canonical gece drone'u (WindMagic_Drone01_LowSubtleLoop); iki kaynakli crossfade ile akar ve
+  GameOver'da susar. V1'de special-night loop veya sting presentation dali yoktur.
 - `_lastSfxTimes` dizisi enum'dan BUYUK tutulur (8 slot) — yeni SFX tipi eklerken tasma olmaz.
 
 ## Asset Kullanimi

@@ -15,6 +15,8 @@ gameplay state owner'ı kurmaz; mevcut `ContinuousSiegeCycleData` tek truth kayn
 
 `MomentVignetteUI` adı serialized geriye uyumluluk için korunur. Runtime sorumluluğu generic
 full-screen flash üretmek değil, sky ve atmosfer parçacıklarını authoritative faza bağlamaktır.
+V1 faz sunumu yalnız Day/Dusk/Night/Dawn paletlerini kullanır; Blood Moon warning, kırmızı tint,
+vignette, HUD etiketi veya özel audio dalı bulunmaz.
 
 ## Sky ve Particle Eğrisi
 

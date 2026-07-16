@@ -8,7 +8,7 @@
 - `0.00 -> 0.45`: warm Day renginden amber `DuskLightColor` hedefine.
 - `0.45 -> 1.00`: amber'den soguk `NightLightColor` indigosuna.
 
-Overlay de ayni Dusk progress'i ile amber tint'ten normal veya Blood Moon gece tint'ine akar.
+Overlay de ayni Dusk progress'i ile amber tint'ten tek canonical Night tint'ine akar.
 Night basladiginda renk sicramasi olmaz; Dusk zaten Night paletinin baslangic hedefine ulasmistir.
 
 ## Worker Lantern

@@ -3130,10 +3130,6 @@ namespace DeadWalls
             EnsurePhaseAtmosphere(scene, root, atmosphere);
             if (ambient.NightLoop == null)
                 ambient.NightLoop = LoadSfx("Wind Magic/RPG3_WindMagic_Drone01_LowSubtleLoop.wav");
-            if (ambient.BloodMoonLoop == null)
-                ambient.BloodMoonLoop = LoadSfx("Dark Magic/RPG3_DarkMagic_DroneUnderworld_Loop.wav");
-            if (ambient.BloodMoonSting == null)
-                ambient.BloodMoonSting = LoadSfx("UI, Pads, Enchantments and Misc/RPG3_MONSTER_Roar01.wav");
             if (ambient.DuskRiser == null)
                 ambient.DuskRiser = LoadSfx("Wind Magic/RPG3_WindMagicEpic_Cast01_P1.wav");
             if (ambient.DawnCue == null)
@@ -3234,7 +3230,6 @@ namespace DeadWalls
             atmosphere.NightEmissionRate = MomentVignetteUI.DefaultNightEmissionRate;
             atmosphere.DawnEmissionRate = MomentVignetteUI.DefaultDawnEmissionRate;
             atmosphere.DawnPeak = 0f;
-            atmosphere.BloodMoonPeak = 0.30f;
             EditorUtility.SetDirty(atmosphere);
             EditorUtility.SetDirty(particleObject);
         }
@@ -3845,7 +3840,6 @@ namespace DeadWalls
             restartText.text = "Restart";
 
             ConfigureMetaProgressionUI(gameOverPanel);
-            ConfigureBloodMoonWarning(canvasTransform);
             ConfigureUiSounds(canvasTransform.gameObject); // Polish 3: tik/basari/fail/sting
 
             uiManager.HUDPanel = hudRoot;
@@ -3959,32 +3953,6 @@ namespace DeadWalls
             meta.MetaShopRowTemplate = template;
 
             EditorUtility.SetDirty(meta);
-        }
-
-        /// <summary>Kanli ay gunduz uyarisi (M-C): ust-orta toast text'i + BloodMoonWarningUI controller'i.</summary>
-        private static void ConfigureBloodMoonWarning(Transform canvasTransform)
-        {
-            GameObject root = FindDirectChild(canvasTransform, "BloodMoonWarningRoot");
-            if (root == null)
-            {
-                root = new GameObject("BloodMoonWarningRoot", typeof(RectTransform));
-                Undo.RegisterCreatedObjectUndo(root, "Create Blood Moon Warning Root");
-                root.layer = canvasTransform.gameObject.layer;
-                root.transform.SetParent(canvasTransform, false);
-            }
-            var rootRect = (RectTransform)root.transform;
-            rootRect.anchorMin = Vector2.zero;
-            rootRect.anchorMax = Vector2.one;
-            rootRect.offsetMin = Vector2.zero;
-            rootRect.offsetMax = Vector2.zero;
-
-            var warning = EnsureComponent<BloodMoonWarningUI>(root);
-            warning.WarningText = EnsureText(root.transform, "BloodMoonWarningText",
-                "BLOOD MOON RISES TONIGHT", 30, TextAlignmentOptions.Center,
-                new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
-                new Vector2(-380f, -240f), new Vector2(380f, -150f));
-            warning.WarningText.gameObject.SetActive(false);
-            EditorUtility.SetDirty(warning);
         }
 
         private static GameObject EnsureHudRoot(Transform canvasTransform)

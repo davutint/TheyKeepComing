@@ -59,7 +59,6 @@ namespace DeadWalls
         public Color NightColor = new Color(0.04f, 0.06f, 0.17f);  // koyu mavi-mor gece
         public Color DawnCyanColor = new Color(0.08f, 0.34f, 0.46f); // soguk sabah kirilmasi
         public Color DawnColor = new Color(0.55f, 0.30f, 0.14f);   // altin-pembe safak
-        public Color BloodMoonColor = new Color(0.32f, 0.02f, 0.02f); // kanli ay kizili
 
         private void Reset()
         {
@@ -266,7 +265,7 @@ namespace DeadWalls
 
             if (gm.TryGetContinuousSiegeCycle(out var cycle))
             {
-                Color nightColor = cycle.IsBloodMoonNight ? BloodMoonColor : NightColor;
+                Color nightColor = NightColor;
                 float dayAlpha = config.DayOverlayAlpha;
                 float nightAlpha = config.NightOverlayAlpha;
 

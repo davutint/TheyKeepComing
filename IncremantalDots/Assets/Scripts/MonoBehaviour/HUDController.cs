@@ -75,7 +75,6 @@ namespace DeadWalls
         private int _lastRewardSequence = -1;
         private int _lastCyclePhase = int.MinValue;
         private int _lastCycleDay = int.MinValue;
-        private bool _lastCycleBloodMoon;
         private bool _cycleStaticLabelsInitialized;
         private int _lastCelestialPhase = int.MinValue;
         private Color _celestialColor;
@@ -317,15 +316,9 @@ namespace DeadWalls
             EnsureCelestialDialBindings();
 
             string phase = FormatSiegePhase(cycle.Phase);
-            // Kanli ay gecesi: etiket "BLOOD MOON" + text rengi kirmizi.
-            // NOT: prefab'taki CyclePhaseText rich text render etmiyor — renk TAG DEGIL
-            // TMP_Text.color ile verilir (normal fazlarda orijinal renge doner).
-            bool bloodMoonLabel = cycle.IsBloodMoonNight && cycle.Phase == SiegeCyclePhase.Night;
-            if (bloodMoonLabel)
-                phase = "BLOOD MOON";
             int phaseValue = (int)cycle.Phase;
             if (CyclePhaseText != null
-                && (_lastCyclePhase != phaseValue || _lastCycleBloodMoon != bloodMoonLabel))
+                && _lastCyclePhase != phaseValue)
             {
                 if (!_cyclePhaseDefaultColorCached)
                 {
@@ -333,9 +326,8 @@ namespace DeadWalls
                     _cyclePhaseDefaultColorCached = true;
                 }
                 CyclePhaseText.text = phase;
-                CyclePhaseText.color = bloodMoonLabel ? new Color(0.88f, 0.33f, 0.27f, 1f) : _cyclePhaseDefaultColor;
+                CyclePhaseText.color = _cyclePhaseDefaultColor;
                 _lastCyclePhase = phaseValue;
-                _lastCycleBloodMoon = bloodMoonLabel;
             }
             int cycleDay = Mathf.Max(1, cycle.CycleIndex + 1);
             if (CycleDayCounterText != null && _lastCycleDay != cycleDay)
