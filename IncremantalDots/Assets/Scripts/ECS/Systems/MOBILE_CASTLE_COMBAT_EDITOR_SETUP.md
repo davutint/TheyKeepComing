@@ -113,6 +113,10 @@ Script eklendikten sonra disaridan manuel compile komutu calistirma. Unity refre
 - Basic/Rapid/Frost okcular farkli tint ile okunur.
 - Basic/Rapid/Frost oklari okcu tipinin tint'ini miras alir.
 - Frost isabet eden zombi slow suresince mavi/soguk gorunur, sonra normale doner.
+- Frost impact ordinary hit'ten büyük cyan flipbook + ring olarak; Fireball projectile ve
+  blast sıcak aura/core/ring katmanlarıyla 10K horde üzerinde görünür olmalıdır.
+- Exact hierarchy değerleri ve test akışı için
+  `Assets/Scripts/MonoBehaviour/SPELL_FEEDBACK_HIERARCHY_EDITOR_SETUP.md` izlenir.
 - Okcular yalnizca `Grid/outside` tilemapinde Formation V1 ile sabitlenen 40 hucrenin 25'er seeded diamond noktasina yerlestirilir; eski tile-center tekrar/stack davranisi kullanilmaz.
 - Drawer toggle ile sag `Archer Recruitment` paneli acilip kapanir ve oyun pause olmaz.
 - Basic buy kaynak dusurup yeni Basic okcu spawn eder.

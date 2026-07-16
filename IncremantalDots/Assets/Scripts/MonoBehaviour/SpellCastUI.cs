@@ -45,6 +45,39 @@ namespace DeadWalls
         public float ProjectileFps = 20f;
         public float BlastFps = 30f;
 
+        [Header("Spell Feedback Hierarchy")]
+        public string SpellSortingLayer = SpellFeedbackHierarchy.SortingLayer;
+        public int FireballProjectileSortingOrder =
+            SpellFeedbackHierarchy.FireballProjectileSortingOrder;
+        public int FireballProjectileAuraSortingOrder =
+            SpellFeedbackHierarchy.FireballProjectileAuraSortingOrder;
+        public int FireballBlastSortingOrder =
+            SpellFeedbackHierarchy.FireballBlastSortingOrder;
+        public int FireballBlastCoreSortingOrder =
+            SpellFeedbackHierarchy.FireballBlastCoreSortingOrder;
+        public int FireballBlastRingSortingOrder =
+            SpellFeedbackHierarchy.FireballBlastRingSortingOrder;
+        public float FireballProjectileAuraDiameter =
+            SpellFeedbackHierarchy.FireballProjectileAuraDiameter;
+        public float FireballProjectileAuraPulse =
+            SpellFeedbackHierarchy.FireballProjectileAuraPulse;
+        public float FireballBlastDiameterMultiplier =
+            SpellFeedbackHierarchy.FireballBlastDiameterMultiplier;
+        public float FireballBlastCoreDiameterMultiplier =
+            SpellFeedbackHierarchy.FireballBlastCoreDiameterMultiplier;
+        public float FireballBlastRingDiameterMultiplier =
+            SpellFeedbackHierarchy.FireballBlastRingDiameterMultiplier;
+        public float FireballBlastRingStartScale =
+            SpellFeedbackHierarchy.FireballBlastRingStartScale;
+        public float FireballBlastRingEndScale =
+            SpellFeedbackHierarchy.FireballBlastRingEndScale;
+        public Color FireballProjectileAuraColor =
+            SpellFeedbackHierarchy.FireballProjectileAuraColor;
+        public Color FireballBlastCoreColor =
+            SpellFeedbackHierarchy.FireballBlastCoreColor;
+        public Color FireballBlastRingColor =
+            SpellFeedbackHierarchy.FireballBlastRingColor;
+
         private static readonly Color IndicatorColor = new Color(1f, 0.55f, 0.15f, 0.30f);
 
         private bool _targeting;
@@ -61,11 +94,16 @@ namespace DeadWalls
         private Vector2 _pendingBlastPosition;
         private float _pendingBlastRadius;
         private SpriteRenderer _projectileVisual;
+        private SpriteRenderer _projectileAuraVisual;
         private float _projectileFrameTimer;
         private int _projectileFrame;
 
         // patlama
         private SpriteRenderer _blastVisual;
+        private SpriteRenderer _blastCoreVisual;
+        private SpriteRenderer _blastRingVisual;
+        private Sprite _hierarchyRingSprite;
+        private float _blastRingBaseDiameter;
         private float _blastFrameTimer;
         private int _blastFrame = -1; // -1 = oynamiyor
 
@@ -78,6 +116,13 @@ namespace DeadWalls
         {
             UnbindButtons();
             CancelTargeting();
+            HideRuntimeSpellVisuals();
+        }
+
+        private void OnDestroy()
+        {
+            DestroyGeneratedSprite(ref _circleSprite);
+            DestroyGeneratedSprite(ref _hierarchyRingSprite);
         }
 
         private void Update()
@@ -262,8 +307,12 @@ namespace DeadWalls
             if (em.Exists(_trackedProjectile))
             {
                 var transform = em.GetComponentData<LocalTransform>(_trackedProjectile);
-                _lastProjectilePosition = new Vector3(transform.Position.x, transform.Position.y, 0f);
+                _lastProjectilePosition = new Vector3(
+                    transform.Position.x,
+                    transform.Position.y,
+                    MobileCastleRenderDepth.ProjectileZ);
                 _projectileVisual.transform.SetPositionAndRotation(_lastProjectilePosition, transform.Rotation);
+                UpdateProjectileAura();
 
                 if (ProjectileFrames != null && ProjectileFrames.Length > 0)
                 {
@@ -295,9 +344,31 @@ namespace DeadWalls
             _projectileVisual = go.AddComponent<SpriteRenderer>();
             if (ProjectileFrames != null && ProjectileFrames.Length > 0)
                 _projectileVisual.sprite = ProjectileFrames[0];
-            _projectileVisual.sortingLayerName = "Wall"; // savas alani gorselleriyle ayni katman — kesin ustte
-            _projectileVisual.sortingOrder = 210;
+            _projectileVisual.sortingLayerName = SpellSortingLayer;
+            _projectileVisual.sortingOrder = FireballProjectileSortingOrder;
+
+            var auraObject = new GameObject("FireballProjectileHierarchyAura");
+            auraObject.transform.SetParent(go.transform, false);
+            _projectileAuraVisual = auraObject.AddComponent<SpriteRenderer>();
+            _projectileAuraVisual.sprite = GetCircleSprite();
+            _projectileAuraVisual.color = FireballProjectileAuraColor;
+            _projectileAuraVisual.sortingLayerName = SpellSortingLayer;
+            _projectileAuraVisual.sortingOrder = FireballProjectileAuraSortingOrder;
+            UpdateProjectileAura();
             go.SetActive(false);
+        }
+
+        private void UpdateProjectileAura()
+        {
+            if (_projectileAuraVisual == null)
+                return;
+
+            float diameter = SpellFeedbackHierarchy.ResolveProjectileAuraDiameter(
+                FireballProjectileAuraDiameter,
+                FireballProjectileAuraPulse,
+                Time.time);
+            _projectileAuraVisual.transform.localScale = Vector3.one * diameter;
+            _projectileAuraVisual.color = FireballProjectileAuraColor;
         }
 
         private void StartBlast(Vector2 position, float radius)
@@ -309,18 +380,64 @@ namespace DeadWalls
             {
                 var go = new GameObject("FireballBlastVisual");
                 _blastVisual = go.AddComponent<SpriteRenderer>();
-                _blastVisual.sortingLayerName = "Wall";
-                _blastVisual.sortingOrder = 211;
+                _blastVisual.sortingLayerName = SpellSortingLayer;
+                _blastVisual.sortingOrder = FireballBlastSortingOrder;
             }
 
-            // patlama gorseli etki alanini kaplasin: sprite dunya boyutuna gore olcekle
+            if (_blastRingVisual == null)
+            {
+                var ringObject = new GameObject("FireballBlastHierarchyRing");
+                _blastRingVisual = ringObject.AddComponent<SpriteRenderer>();
+                _blastRingVisual.sprite = GetHierarchyRingSprite();
+                _blastRingVisual.sortingLayerName = SpellSortingLayer;
+                _blastRingVisual.sortingOrder = FireballBlastRingSortingOrder;
+            }
+
+            if (_blastCoreVisual == null)
+            {
+                var coreObject = new GameObject("FireballBlastHierarchyCore");
+                _blastCoreVisual = coreObject.AddComponent<SpriteRenderer>();
+                _blastCoreVisual.sprite = GetCircleSprite();
+                _blastCoreVisual.sortingLayerName = SpellSortingLayer;
+                _blastCoreVisual.sortingOrder = FireballBlastCoreSortingOrder;
+            }
+
             float spriteWorldSize = BlastFrames[0].bounds.size.x;
-            float scale = spriteWorldSize > 0.01f ? radius * 2.4f / spriteWorldSize : 1f;
-            _blastVisual.transform.position = new Vector3(position.x, position.y, 0f);
+            float scale = SpellFeedbackHierarchy.ResolveFireballBlastScale(
+                radius,
+                spriteWorldSize,
+                FireballBlastDiameterMultiplier);
+            Vector3 presentationPosition = new Vector3(
+                position.x,
+                position.y,
+                MobileCastleRenderDepth.ProjectileZ);
+            _blastVisual.transform.position = presentationPosition;
             _blastVisual.transform.localScale = Vector3.one * scale;
             _blastVisual.transform.rotation = Quaternion.identity;
             _blastVisual.sprite = BlastFrames[0];
             _blastVisual.gameObject.SetActive(true);
+
+            _blastCoreVisual.transform.position = presentationPosition;
+            _blastCoreVisual.transform.rotation = Quaternion.identity;
+            _blastCoreVisual.transform.localScale = Vector3.one
+                * Mathf.Max(0.1f, radius)
+                * Mathf.Max(1f, FireballBlastCoreDiameterMultiplier);
+            _blastCoreVisual.color = FireballBlastCoreColor;
+            _blastCoreVisual.gameObject.SetActive(true);
+
+            _blastRingBaseDiameter = SpellFeedbackHierarchy.ResolveFireballBlastRingDiameter(
+                radius,
+                FireballBlastRingDiameterMultiplier);
+            _blastRingVisual.transform.position = presentationPosition;
+            _blastRingVisual.transform.rotation = Quaternion.identity;
+            _blastRingVisual.transform.localScale = Vector3.one
+                * SpellFeedbackHierarchy.ResolveFireballBlastRingScale(
+                    _blastRingBaseDiameter,
+                    0f,
+                    FireballBlastRingStartScale,
+                    FireballBlastRingEndScale);
+            _blastRingVisual.color = FireballBlastRingColor;
+            _blastRingVisual.gameObject.SetActive(true);
             _blastFrame = 0;
             _blastFrameTimer = 0f;
         }
@@ -331,7 +448,13 @@ namespace DeadWalls
                 return;
 
             _blastFrameTimer += Time.deltaTime;
-            if (_blastFrameTimer < 1f / Mathf.Max(1f, BlastFps))
+            float frameRate = Mathf.Max(1f, BlastFps);
+            float visualFrame = _blastFrame + _blastFrameTimer * frameRate;
+            float progress01 = BlastFrames != null && BlastFrames.Length > 1
+                ? Mathf.Clamp01(visualFrame / (BlastFrames.Length - 1f))
+                : 1f;
+            UpdateBlastHierarchyRing(progress01);
+            if (_blastFrameTimer < 1f / frameRate)
                 return;
 
             _blastFrameTimer = 0f;
@@ -340,9 +463,36 @@ namespace DeadWalls
             {
                 _blastFrame = -1;
                 _blastVisual.gameObject.SetActive(false);
+                if (_blastCoreVisual != null)
+                    _blastCoreVisual.gameObject.SetActive(false);
+                if (_blastRingVisual != null)
+                    _blastRingVisual.gameObject.SetActive(false);
                 return;
             }
             _blastVisual.sprite = BlastFrames[_blastFrame];
+        }
+
+        private void UpdateBlastHierarchyRing(float progress01)
+        {
+            if (_blastRingVisual == null)
+                return;
+
+            float scale = SpellFeedbackHierarchy.ResolveFireballBlastRingScale(
+                _blastRingBaseDiameter,
+                progress01,
+                FireballBlastRingStartScale,
+                FireballBlastRingEndScale);
+            _blastRingVisual.transform.localScale = Vector3.one * scale;
+            _blastRingVisual.color = SpellFeedbackHierarchy.ResolveFadingColor(
+                FireballBlastRingColor,
+                progress01);
+            if (_blastCoreVisual != null)
+            {
+                float coreProgress = Mathf.Clamp01(progress01 * 0.72f);
+                _blastCoreVisual.color = SpellFeedbackHierarchy.ResolveFadingColor(
+                    FireballBlastCoreColor,
+                    coreProgress);
+            }
         }
 
         // ---------------------------------------------------------------------------
@@ -456,7 +606,10 @@ namespace DeadWalls
 
             Vector3 world = GetMouseWorldPosition();
             float diameter = gm.FireballRadius * 2f;
-            _targetingIndicator.transform.position = new Vector3(world.x, world.y, 0f);
+            _targetingIndicator.transform.position = new Vector3(
+                world.x,
+                world.y,
+                MobileCastleRenderDepth.ProjectileZ);
             _targetingIndicator.transform.localScale = new Vector3(diameter, diameter, 1f);
 
             if (Input.GetMouseButtonDown(0))
@@ -527,6 +680,72 @@ namespace DeadWalls
 
             _circleSprite = Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), size);
             return _circleSprite;
+        }
+
+        private Sprite GetHierarchyRingSprite()
+        {
+            if (_hierarchyRingSprite != null)
+                return _hierarchyRingSprite;
+
+            const int size = 128;
+            var tex = new Texture2D(size, size, TextureFormat.RGBA32, false)
+            {
+                name = "FireballHierarchyRingTexture",
+                filterMode = FilterMode.Bilinear,
+                wrapMode = TextureWrapMode.Clamp
+            };
+            float half = size * 0.5f;
+            var pixels = new Color32[size * size];
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    float distance = Vector2.Distance(
+                        new Vector2(x + 0.5f, y + 0.5f),
+                        new Vector2(half, half)) / half;
+                    float ring = Mathf.Clamp01(1f - Mathf.Abs(distance - 0.82f) / 0.12f);
+                    float edge = Mathf.Clamp01((1f - distance) / 0.03f);
+                    float alpha = ring * edge;
+                    pixels[y * size + x] = new Color32(255, 255, 255,
+                        (byte)(Mathf.Clamp01(alpha) * 255f));
+                }
+            }
+            tex.SetPixels32(pixels);
+            tex.Apply();
+
+            _hierarchyRingSprite = Sprite.Create(
+                tex,
+                new Rect(0, 0, size, size),
+                new Vector2(0.5f, 0.5f),
+                size);
+            _hierarchyRingSprite.name = "FireballHierarchyRingSprite";
+            return _hierarchyRingSprite;
+        }
+
+        private void HideRuntimeSpellVisuals()
+        {
+            _trackedProjectile = Entity.Null;
+            _blastFrame = -1;
+            if (_projectileVisual != null)
+                _projectileVisual.gameObject.SetActive(false);
+            if (_blastVisual != null)
+                _blastVisual.gameObject.SetActive(false);
+            if (_blastCoreVisual != null)
+                _blastCoreVisual.gameObject.SetActive(false);
+            if (_blastRingVisual != null)
+                _blastRingVisual.gameObject.SetActive(false);
+        }
+
+        private static void DestroyGeneratedSprite(ref Sprite sprite)
+        {
+            if (sprite == null)
+                return;
+
+            Texture texture = sprite.texture;
+            Destroy(sprite);
+            if (texture != null)
+                Destroy(texture);
+            sprite = null;
         }
     }
 }

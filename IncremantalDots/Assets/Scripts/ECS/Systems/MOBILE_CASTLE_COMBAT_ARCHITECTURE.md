@@ -195,6 +195,14 @@ flipbook/frame ve `0.04s` burst rate-limit uygular; ilgili ses clip'i atanmadigi
 sessizce atlanir. Bu budget yalniz feedback'i azaltir; damage, slow ve pool return
 islemleri her isabet icin aynen uygulanir.
 
+Presentation hierarchy ordinary hit'i `Wall/12`, sampled Frost ring/hit'i `Wall/47-48`,
+Fireball projectile'i `Wall/219-220` ve blast katmanlarını `Wall/230-232` bandında tutar.
+Frost ve Fireball world pozisyonu `MobileCastleRenderDepth.ProjectileZ` bandına normalize edilir;
+opaque/depth-write enemy renderer'larında sorting order tek başına görünürlük garantisi değildir.
+Frost ring mevcut hit pool slotunda, Fireball aura/core/ring ise sabit yeniden kullanılan
+renderer'larda yaşar; 10K enemy sayısı yeni feedback nesnesi üretmez. Ayrıntı:
+`Assets/Scripts/MonoBehaviour/SPELL_FEEDBACK_HIERARCHY_ARCHITECTURE.md`.
+
 ## HUD Readability
 
 `GameManager`, mevcut `ArcherUnit` entity'lerinden Basic/Rapid/Frost sayilarini okur.

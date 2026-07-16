@@ -30056,6 +30056,12 @@ MonoBehaviour:
   HitFlipbookRotationOffsetDegrees: 0
   HitFlipbookSortingLayer: Wall
   HitFlipbookSortingOrder: 12
+  FrostHitSortingOrder: 48
+  FrostHitScaleMultiplier: 3.2
+  FrostRingStartScale: 1.05
+  FrostRingEndScale: 2.2
+  FrostHitColor: {r: 0.72, g: 0.94, b: 1, a: 1}
+  FrostRingColor: {r: 0.12, g: 0.78, b: 1, a: 0.88}
   MaxHitVfxPlayedPerFrame: 24
   HitVfxMinInterval: 0.04
   VfxPoolSizePerType: 24
@@ -70577,6 +70583,22 @@ MonoBehaviour:
   - {fileID: -7342315053162181326, guid: 8c20046015c0e2c46a34b7b3d372974d, type: 3}
   ProjectileFps: 20
   BlastFps: 30
+  SpellSortingLayer: Wall
+  FireballProjectileSortingOrder: 220
+  FireballProjectileAuraSortingOrder: 219
+  FireballBlastSortingOrder: 230
+  FireballBlastCoreSortingOrder: 231
+  FireballBlastRingSortingOrder: 232
+  FireballProjectileAuraDiameter: 3.4
+  FireballProjectileAuraPulse: 0.08
+  FireballBlastDiameterMultiplier: 2.4
+  FireballBlastCoreDiameterMultiplier: 2.05
+  FireballBlastRingDiameterMultiplier: 2.8
+  FireballBlastRingStartScale: 0.9
+  FireballBlastRingEndScale: 1.18
+  FireballProjectileAuraColor: {r: 1, g: 0.38, b: 0.06, a: 0.32}
+  FireballBlastCoreColor: {r: 1, g: 0.12, b: 0.01, a: 0.72}
+  FireballBlastRingColor: {r: 1, g: 0.42, b: 0.05, a: 1}
 --- !u!114 &1065689874
 MonoBehaviour:
   m_ObjectHideFlags: 0

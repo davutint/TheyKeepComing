@@ -2678,6 +2678,12 @@ namespace DeadWalls
             bridge.HitFlipbookRotationOffsetDegrees = 0f;
             bridge.HitFlipbookSortingLayer = "Wall";
             bridge.HitFlipbookSortingOrder = 12;
+            bridge.FrostHitSortingOrder = SpellFeedbackHierarchy.FrostHitSortingOrder;
+            bridge.FrostHitScaleMultiplier = SpellFeedbackHierarchy.FrostHitScaleMultiplier;
+            bridge.FrostRingStartScale = SpellFeedbackHierarchy.FrostRingStartScale;
+            bridge.FrostRingEndScale = SpellFeedbackHierarchy.FrostRingEndScale;
+            bridge.FrostHitColor = SpellFeedbackHierarchy.FrostHitColor;
+            bridge.FrostRingColor = SpellFeedbackHierarchy.FrostRingColor;
             bridge.MaxHitVfxPlayedPerFrame = CombatHitFeedbackBudget.MaxVfxEventsPerFrame;
             bridge.HitVfxMinInterval = 0.04f;
             bridge.VfxPoolSizePerType = 24;
@@ -3558,6 +3564,37 @@ namespace DeadWalls
 
             spell.ProjectileFrames = LoadSlicedSprites(FireballProjectileSheetPath, 10);
             spell.BlastFrames = LoadSlicedSprites(FireballBlastSheetPath, 23);
+            spell.SpellSortingLayer = SpellFeedbackHierarchy.SortingLayer;
+            spell.FireballProjectileSortingOrder =
+                SpellFeedbackHierarchy.FireballProjectileSortingOrder;
+            spell.FireballProjectileAuraSortingOrder =
+                SpellFeedbackHierarchy.FireballProjectileAuraSortingOrder;
+            spell.FireballBlastSortingOrder =
+                SpellFeedbackHierarchy.FireballBlastSortingOrder;
+            spell.FireballBlastCoreSortingOrder =
+                SpellFeedbackHierarchy.FireballBlastCoreSortingOrder;
+            spell.FireballBlastRingSortingOrder =
+                SpellFeedbackHierarchy.FireballBlastRingSortingOrder;
+            spell.FireballProjectileAuraDiameter =
+                SpellFeedbackHierarchy.FireballProjectileAuraDiameter;
+            spell.FireballProjectileAuraPulse =
+                SpellFeedbackHierarchy.FireballProjectileAuraPulse;
+            spell.FireballBlastDiameterMultiplier =
+                SpellFeedbackHierarchy.FireballBlastDiameterMultiplier;
+            spell.FireballBlastCoreDiameterMultiplier =
+                SpellFeedbackHierarchy.FireballBlastCoreDiameterMultiplier;
+            spell.FireballBlastRingDiameterMultiplier =
+                SpellFeedbackHierarchy.FireballBlastRingDiameterMultiplier;
+            spell.FireballBlastRingStartScale =
+                SpellFeedbackHierarchy.FireballBlastRingStartScale;
+            spell.FireballBlastRingEndScale =
+                SpellFeedbackHierarchy.FireballBlastRingEndScale;
+            spell.FireballProjectileAuraColor =
+                SpellFeedbackHierarchy.FireballProjectileAuraColor;
+            spell.FireballBlastCoreColor =
+                SpellFeedbackHierarchy.FireballBlastCoreColor;
+            spell.FireballBlastRingColor =
+                SpellFeedbackHierarchy.FireballBlastRingColor;
             EditorUtility.SetDirty(spell);
         }
 

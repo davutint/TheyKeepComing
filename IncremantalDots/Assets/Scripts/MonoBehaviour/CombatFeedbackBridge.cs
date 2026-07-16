@@ -34,6 +34,14 @@ namespace DeadWalls
         public string HitFlipbookSortingLayer = "Wall";
         public int HitFlipbookSortingOrder = 12;
 
+        [Header("Frost Feedback Hierarchy")]
+        public int FrostHitSortingOrder = SpellFeedbackHierarchy.FrostHitSortingOrder;
+        public float FrostHitScaleMultiplier = SpellFeedbackHierarchy.FrostHitScaleMultiplier;
+        public float FrostRingStartScale = SpellFeedbackHierarchy.FrostRingStartScale;
+        public float FrostRingEndScale = SpellFeedbackHierarchy.FrostRingEndScale;
+        public Color FrostHitColor = SpellFeedbackHierarchy.FrostHitColor;
+        public Color FrostRingColor = SpellFeedbackHierarchy.FrostRingColor;
+
         [Header("Hit VFX Budget")]
         public int MaxHitVfxPlayedPerFrame = CombatHitFeedbackBudget.MaxVfxEventsPerFrame;
         public float HitVfxMinInterval = 0.04f;
@@ -85,6 +93,7 @@ namespace DeadWalls
         private readonly Queue<FlipbookVfx> _hitFlipbookPool = new Queue<FlipbookVfx>();
         private readonly List<FlipbookVfx> _activeHitFlipbooks = new List<FlipbookVfx>();
         private readonly List<AudioSource> _audioSources = new List<AudioSource>();
+        private Sprite _hitHierarchyRingSprite;
         // Boyut enum uzunlugundan buyuk tutulur (yeni SFX tipi eklerken tasma olmasin)
         private readonly float[] _lastSfxTimes = { -999f, -999f, -999f, -999f, -999f, -999f, -999f, -999f };
         private readonly int[] _sfxAggregateCounts = new int[8];
@@ -110,6 +119,7 @@ namespace DeadWalls
         public int LastProcessedVfxEventCount { get; private set; }
         public int LastFrameHitVfxPlayedCount { get; private set; }
         public int LastFrameHitVfxDroppedCount { get; private set; }
+        public int LastFrameFrostHitVfxPlayedCount { get; private set; }
         public long TotalHitVfxPlayedCount { get; private set; }
         public long TotalHitVfxDroppedCount { get; private set; }
         public int ActiveHitFlipbookCount => _activeHitFlipbooks.Count;
@@ -137,6 +147,8 @@ namespace DeadWalls
         {
             public GameObject Instance;
             public SpriteRenderer Renderer;
+            public SpriteRenderer HierarchyRenderer;
+            public CombatVfxType Type;
             public float Elapsed;
         }
 
@@ -151,6 +163,18 @@ namespace DeadWalls
             ReleaseAllActiveHitFlipbooks();
             ReleaseAllActiveVfx();
             ResetQueryState();
+        }
+
+        private void OnDestroy()
+        {
+            if (_hitHierarchyRingSprite == null)
+                return;
+
+            Texture texture = _hitHierarchyRingSprite.texture;
+            Destroy(_hitHierarchyRingSprite);
+            if (texture != null)
+                Destroy(texture);
+            _hitHierarchyRingSprite = null;
         }
 
         private void Update()
@@ -223,6 +247,7 @@ namespace DeadWalls
             LastProcessedVfxEventCount = events.Length;
             LastFrameHitVfxPlayedCount = 0;
             LastFrameHitVfxDroppedCount = 0;
+            LastFrameFrostHitVfxPlayedCount = 0;
 
             if (!skipPlayback)
             {
@@ -238,10 +263,11 @@ namespace DeadWalls
                     >= Mathf.Max(0f, HitVfxMinInterval);
                 if (hitWindowOpen && hitBudget > 0)
                 {
-                    LastFrameHitVfxPlayedCount += PlayHitVfxType(
+                    LastFrameFrostHitVfxPlayedCount = PlayHitVfxType(
                         events,
                         CombatVfxType.FrostHit,
                         hitBudget - LastFrameHitVfxPlayedCount);
+                    LastFrameHitVfxPlayedCount += LastFrameFrostHitVfxPlayedCount;
                     LastFrameHitVfxPlayedCount += PlayHitVfxType(
                         events,
                         CombatVfxType.ArrowHit,
@@ -426,11 +452,31 @@ namespace DeadWalls
 
             Vector3 position = new Vector3(vfxEvent.Position.x, vfxEvent.Position.y, MobileCastleRenderDepth.ProjectileZ);
             flipbook.Instance.transform.SetPositionAndRotation(position, ResolveHitFlipbookRotation(vfxEvent));
-            flipbook.Instance.transform.localScale = Vector3.one * Mathf.Max(0.001f, HitFlipbookScale);
+            bool frostHit = vfxEvent.Type == CombatVfxType.FrostHit;
+            float scale = frostHit
+                ? SpellFeedbackHierarchy.ResolveFrostHitScale(
+                    HitFlipbookScale,
+                    FrostHitScaleMultiplier)
+                : Mathf.Max(0.001f, HitFlipbookScale);
+            flipbook.Instance.transform.localScale = Vector3.one * scale;
             flipbook.Renderer.sortingLayerName = HitFlipbookSortingLayer;
-            flipbook.Renderer.sortingOrder = HitFlipbookSortingOrder;
+            flipbook.Renderer.sortingOrder = frostHit
+                ? FrostHitSortingOrder
+                : HitFlipbookSortingOrder;
+            flipbook.Renderer.color = frostHit ? FrostHitColor : Color.white;
             flipbook.Renderer.sprite = HitFlipbookSprites[0];
             flipbook.Renderer.enabled = true;
+            if (flipbook.HierarchyRenderer != null)
+            {
+                flipbook.HierarchyRenderer.sortingLayerName = HitFlipbookSortingLayer;
+                flipbook.HierarchyRenderer.sortingOrder = FrostHitSortingOrder - 1;
+                flipbook.HierarchyRenderer.sprite = GetHitHierarchyRingSprite();
+                flipbook.HierarchyRenderer.color = FrostRingColor;
+                flipbook.HierarchyRenderer.transform.localScale = Vector3.one
+                    * Mathf.Max(0.01f, FrostRingStartScale);
+                flipbook.HierarchyRenderer.enabled = frostHit;
+            }
+            flipbook.Type = vfxEvent.Type;
             flipbook.Elapsed = 0f;
             flipbook.Instance.SetActive(true);
             _activeHitFlipbooks.Add(flipbook);
@@ -474,12 +520,22 @@ namespace DeadWalls
             renderer.sortingLayerName = HitFlipbookSortingLayer;
             renderer.sortingOrder = HitFlipbookSortingOrder;
             renderer.enabled = false;
+
+            var hierarchyObject = new GameObject("FrostHierarchyRing");
+            hierarchyObject.transform.SetParent(instance.transform, false);
+            var hierarchyRenderer = hierarchyObject.AddComponent<SpriteRenderer>();
+            hierarchyRenderer.sprite = GetHitHierarchyRingSprite();
+            hierarchyRenderer.sortingLayerName = HitFlipbookSortingLayer;
+            hierarchyRenderer.sortingOrder = FrostHitSortingOrder - 1;
+            hierarchyRenderer.enabled = false;
             instance.SetActive(false);
 
             return new FlipbookVfx
             {
                 Instance = instance,
                 Renderer = renderer,
+                HierarchyRenderer = hierarchyRenderer,
+                Type = CombatVfxType.ArrowHit,
                 Elapsed = 0f
             };
         }
@@ -509,6 +565,22 @@ namespace DeadWalls
                 }
 
                 active.Renderer.sprite = HitFlipbookSprites[frameIndex];
+                if (active.Type == CombatVfxType.FrostHit
+                    && active.HierarchyRenderer != null)
+                {
+                    float duration = HitFlipbookSprites.Length / frameRate;
+                    float progress01 = duration > 0f
+                        ? Mathf.Clamp01(active.Elapsed / duration)
+                        : 1f;
+                    float ringScale = SpellFeedbackHierarchy.ResolveFrostRingScale(
+                        progress01,
+                        FrostRingStartScale,
+                        FrostRingEndScale);
+                    active.HierarchyRenderer.transform.localScale = Vector3.one * ringScale;
+                    active.HierarchyRenderer.color = SpellFeedbackHierarchy.ResolveFadingColor(
+                        FrostRingColor,
+                        progress01);
+                }
                 _activeHitFlipbooks[i] = active;
             }
         }
@@ -529,12 +601,62 @@ namespace DeadWalls
             if (flipbook.Renderer != null)
             {
                 flipbook.Renderer.sprite = null;
+                flipbook.Renderer.color = Color.white;
                 flipbook.Renderer.enabled = false;
             }
 
+            if (flipbook.HierarchyRenderer != null)
+            {
+                flipbook.HierarchyRenderer.color = FrostRingColor;
+                flipbook.HierarchyRenderer.enabled = false;
+            }
+
+            flipbook.Type = CombatVfxType.ArrowHit;
             flipbook.Elapsed = 0f;
             flipbook.Instance.SetActive(false);
             _hitFlipbookPool.Enqueue(flipbook);
+        }
+
+        private Sprite GetHitHierarchyRingSprite()
+        {
+            if (_hitHierarchyRingSprite != null)
+                return _hitHierarchyRingSprite;
+
+            const int size = 64;
+            var texture = new Texture2D(size, size, TextureFormat.RGBA32, false)
+            {
+                name = "FrostHitHierarchyRingTexture",
+                filterMode = FilterMode.Bilinear,
+                wrapMode = TextureWrapMode.Clamp
+            };
+            float half = size * 0.5f;
+            var pixels = new Color32[size * size];
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    float distance = Vector2.Distance(
+                        new Vector2(x + 0.5f, y + 0.5f),
+                        new Vector2(half, half)) / half;
+                    float ring = Mathf.Clamp01(1f - Mathf.Abs(distance - 0.78f) / 0.16f);
+                    float edge = Mathf.Clamp01((1f - distance) / 0.04f);
+                    pixels[y * size + x] = new Color32(
+                        255,
+                        255,
+                        255,
+                        (byte)(Mathf.Clamp01(ring * edge) * 255f));
+                }
+            }
+            texture.SetPixels32(pixels);
+            texture.Apply();
+
+            _hitHierarchyRingSprite = Sprite.Create(
+                texture,
+                new Rect(0, 0, size, size),
+                new Vector2(0.5f, 0.5f),
+                size);
+            _hitHierarchyRingSprite.name = "FrostHitHierarchyRingSprite";
+            return _hitHierarchyRingSprite;
         }
 
         private GameObject GetVfxInstance(CombatVfxType type, GameObject prefab)

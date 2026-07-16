@@ -10,7 +10,8 @@
   ham isabet basina event uretmez; `ArrowHitSystem` once `0.75` world-unit hucrelerde
   tur bazli spatial sample toplar.
 - `CombatFeedbackBridge`, `CombatFeedbackRoot` altinda bu event entity'lerini okur.
-- Arrow/Frost hit VFX icin sprite flipbook pool kullanir; producer tarafindaki `24`
+- Arrow/Frost hit VFX icin sprite flipbook pool kullanir; Frost slotu ayrıca cyan,
+  genişleyen pooled hierarchy ring'i taşır. Producer tarafindaki `24`
   event limitine ek olarak bridge tarafinda `24 / frame` global hit playback budget'i
   ve `0.04s` hit VFX rate-limit uygular. Diger VFX icin prefab ParticleSystem pool
   kullanir ve event entity'sini siler.
@@ -48,7 +49,8 @@
 
 - `FX_Shoot_Arrow_muzzle.prefab` su an otomatik baglanabilir ama V1 playback tarafinda kullanilmaz.
 - `FX_Shoot_Arrow_hit.prefab` normal hit icin oynatilmaz; castle fallback olarak atanabilir.
-- `FX_Shoot_Ice_hit.prefab` normal Frost hit icin oynatilmaz; Frost V1'de ayni hit flipbook + slow tint ile okunur.
+- `FX_Shoot_Ice_hit.prefab` normal Frost hit icin oynatilmaz; Frost V1'de büyütülmüş cyan
+  hit flipbook, pooled genişleyen ring ve persistent slow tint ile okunur.
 
 Castle hit VFX prefab'i VARSAYILAN BOS (polish fix: eski ArrowHitPrefab fallback'i "duvara
 ok saplanmasi" bug'i uretiyordu — kaldirildi; setup atanmis arrowHit'i de temizler).
@@ -64,6 +66,9 @@ castle impact prefab'i atayabilir (yalniz-bossa kurali onu korur).
   en az `4` slotu mevcut her ture acik kalir; normal dengede Frost `8`, Arrow `16` slot alir.
 - Bridge, producer disindaki event kaynaklarina karsi ikinci guvenlik kati olarak hit
   flipbook playback'ini frame basi `24` ve `0.04s` burst araligi ile sinirlar.
+- Ordinary hit `Wall/12`, Frost ring/hit `Wall/47-48` kullanır. Her pool slotunun ring'i
+  kurulumda bir kez oluşturulur; aktif enemy veya ham hit sayısı yeni GameObject üretmez.
+- Ayrıntılı render sözleşmesi `SPELL_FEEDBACK_HIERARCHY_ARCHITECTURE.md` dosyasındadır.
 - `CombatFeedbackBudgetTelemetryData`, son frame spatial candidate/emitted/dropped
   sayilarini ve run-toplamlarini ECS singleton olarak tutar. Bridge ayrica processed,
   played ve dropped hit VFX telemetrisini public read-only property'lerle sunar.
