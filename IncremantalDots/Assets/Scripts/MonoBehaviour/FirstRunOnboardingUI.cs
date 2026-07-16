@@ -623,15 +623,10 @@ namespace DeadWalls
 
         private void HandleHeartOpenedByPlayer()
         {
-            GameManager gm = GameManager.Instance;
-            if (MetaProgression.HasTutorialFlag(HeartEntryFlagId)
-                || gm == null
-                || gm.GameState.IsGameOver
-                || gm.GraveEssenceAmount <= 0L)
-            {
+            if (MetaProgression.HasTutorialFlag(HeartEntryFlagId))
                 return;
-            }
 
+            // Gercek player action'i prompt uygunlugundan bagimsizdir.
             _heartPauseTeachingActive = true;
         }
 

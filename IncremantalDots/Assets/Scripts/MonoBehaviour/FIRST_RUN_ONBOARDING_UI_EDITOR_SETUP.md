@@ -83,3 +83,8 @@ Idempotent onarim: `Window -> DeadWalls -> Repair First Run Onboarding`.
   repair cue'sunun yeni modal acmadan non-modal devam ettigini dogrular.
 - Modal-chain source guard'i `FirstRunOnboardingUI` icinde pause acquire/enforce ile Heart/Pause/
   Settings programmatic open cagrilarini yasaklar.
+- Prompt-independent completion source guard'i yedi accepted player-action handler'inin
+  `_activeStep`, cue visibility veya hint/pulse state'ine baglanmadigini dogrular.
+- Preemptive Heart PlayMode testi Grave Essence sifirken gercek Heart open/close action'inin pause
+  dersini tamamladigini ve Essence daha sonra geldiginde giris prompt'inin tekrar acilmadigini
+  dogrular.

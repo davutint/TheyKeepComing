@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using NUnit.Framework;
 using UnityEditor;
@@ -285,6 +286,42 @@ namespace DeadWalls.Tests
                 Assert.That(source, Does.Not.Contain(forbiddenCall), forbiddenCall);
         }
 
+        [Test]
+        public void AcceptedPlayerActionHandlers_AreIndependentFromPromptVisibility()
+        {
+            MonoScript controller = AssetDatabase.LoadAssetAtPath<MonoScript>(ControllerScriptPath);
+            Assert.That(controller, Is.Not.Null);
+            string source = controller.text;
+
+            (string Handler, string NextHandler, string FlagId)[] completionHandlers =
+            {
+                ("HandleWorkerTargetRatioChanged", "HandleArcherPurchased", "WorkerRatioFlagId"),
+                ("HandleArcherPurchased", "HandleArrowRefillPurchased", "BasicArcherFlagId"),
+                ("HandleArrowRefillPurchased", "HandleHeartOpenedByPlayer", "LowAmmoFlagId"),
+                ("HandleHeartClosedByPlayer", "HandleCouncilChoiceCommitted", "HeartEntryFlagId"),
+                ("HandleCouncilChoiceCommitted", "HandleNormalRepairCommitted", "CouncilExactFlagId"),
+                ("HandleNormalRepairCommitted", "HandleAbilityHotkeyAccepted", "DaytimeRepairFlagId"),
+                ("HandleAbilityHotkeyAccepted", "GetAbilityKeyHint", "NightAbilityKeyFlagId")
+            };
+
+            foreach ((string handler, string nextHandler, string flagId) in completionHandlers)
+            {
+                string handlerSource = ExtractMethodSource(source, handler, nextHandler);
+                AssertPromptIndependent(handlerSource, handler);
+                Assert.That(handlerSource, Does.Contain("MetaProgression.SetTutorialFlag"), handler);
+                Assert.That(handlerSource, Does.Contain(flagId), handler);
+            }
+
+            string heartOpenSource = ExtractMethodSource(
+                source,
+                "HandleHeartOpenedByPlayer",
+                "HandleHeartClosedByPlayer");
+            AssertPromptIndependent(heartOpenSource, "HandleHeartOpenedByPlayer");
+            Assert.That(heartOpenSource, Does.Not.Contain("GraveEssenceAmount"));
+            Assert.That(heartOpenSource, Does.Not.Contain("GameState"));
+            Assert.That(heartOpenSource, Does.Contain("_heartPauseTeachingActive = true"));
+        }
+
         private static RectTransform FindUniqueRect(GameObject root, string objectName)
         {
             RectTransform[] matches = root.GetComponentsInChildren<RectTransform>(true)
@@ -292,6 +329,38 @@ namespace DeadWalls.Tests
                 .ToArray();
             Assert.That(matches.Length, Is.EqualTo(1), objectName);
             return matches[0];
+        }
+
+        private static string ExtractMethodSource(
+            string source,
+            string methodName,
+            string nextMethodName)
+        {
+            string startToken = $"private void {methodName}";
+            string nextToken = nextMethodName == "GetAbilityKeyHint"
+                ? "public static string GetAbilityKeyHint"
+                : $"private void {nextMethodName}";
+            int start = source.IndexOf(startToken, StringComparison.Ordinal);
+            int end = source.IndexOf(nextToken, start + startToken.Length,
+                StringComparison.Ordinal);
+            Assert.That(start, Is.GreaterThanOrEqualTo(0), methodName);
+            Assert.That(end, Is.GreaterThan(start), nextMethodName);
+            return source.Substring(start, end - start);
+        }
+
+        private static void AssertPromptIndependent(string handlerSource, string handlerName)
+        {
+            string[] forbiddenPresentationGates =
+            {
+                "_activeStep",
+                "StepVisible",
+                "ShouldShow",
+                "HintPanel.activeSelf",
+                "PulseFrame.gameObject.activeSelf"
+            };
+
+            foreach (string gate in forbiddenPresentationGates)
+                Assert.That(handlerSource, Does.Not.Contain(gate), $"{handlerName}: {gate}");
         }
     }
 }

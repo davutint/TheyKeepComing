@@ -408,6 +408,60 @@ namespace DeadWalls.Tests
         }
 
         [UnityTest]
+        public IEnumerator FirstRunOnboarding_HeartActionBeforeEssenceStillCompletesWithoutLaterPrompt()
+        {
+            GameManager gameManager = GameManager.Instance;
+            FirstRunOnboardingUI onboarding =
+                Object.FindFirstObjectByType<FirstRunOnboardingUI>();
+            HeartScreenUI heart = Object.FindFirstObjectByType<HeartScreenUI>();
+            Assert.That(onboarding, Is.Not.Null);
+            Assert.That(heart, Is.Not.Null);
+
+            string[] completedOtherSteps =
+            {
+                FirstRunOnboardingUI.WorkerRatioFlagId,
+                FirstRunOnboardingUI.BasicArcherFlagId,
+                FirstRunOnboardingUI.LowAmmoFlagId,
+                FirstRunOnboardingUI.CouncilExactFlagId,
+                FirstRunOnboardingUI.DaytimeRepairFlagId,
+                FirstRunOnboardingUI.NightAbilityKeyFlagId
+            };
+            foreach (string flagId in completedOtherSteps)
+                Assert.That(MetaProgression.SetTutorialFlag(flagId, true), Is.True, flagId);
+
+            Assert.That(gameManager.GraveEssenceAmount, Is.Zero);
+            Assert.That(MetaProgression.HasTutorialFlag(
+                FirstRunOnboardingUI.HeartEntryFlagId), Is.False);
+            yield return null;
+            Assert.That(onboarding.IsHeartEntryStepVisible, Is.False);
+            Assert.That(onboarding.HintPanel.activeSelf, Is.False);
+
+            heart.HeartOpenButton.onClick.Invoke();
+            yield return null;
+
+            Assert.That(heart.IsOpen, Is.True);
+            Assert.That(SimulationPauseService.ActiveLeaseCount, Is.EqualTo(1));
+            Assert.That(onboarding.IsHeartPauseStepVisible, Is.True,
+                "Essence prompt'i gelmeden yapilan gercek Heart action'i pause dersini gostermelidir.");
+            Assert.That(MetaProgression.HasTutorialFlag(
+                FirstRunOnboardingUI.HeartEntryFlagId), Is.False,
+                "Heart close edilmeden iki asamali ders tamamlanmamalidir.");
+
+            heart.HeartCloseButton.onClick.Invoke();
+            yield return null;
+
+            Assert.That(heart.IsOpen, Is.False);
+            Assert.That(SimulationPauseService.ActiveLeaseCount, Is.Zero);
+            Assert.That(MetaProgression.HasTutorialFlag(
+                FirstRunOnboardingUI.HeartEntryFlagId), Is.True);
+            Assert.That(gameManager.GrantGraveEssence(1L), Is.True);
+            yield return null;
+            Assert.That(onboarding.IsHeartEntryStepVisible, Is.False,
+                "Preemptive action ile tamamlanan Heart prompt'i Essence gelince tekrar acilmamalidir.");
+            Assert.That(onboarding.HintPanel.activeSelf, Is.False);
+        }
+
+        [UnityTest]
         public IEnumerator FirstRunOnboarding_HeartCloseEndsPauseBeforeNextNonModalCue()
         {
             GameManager gameManager = GameManager.Instance;

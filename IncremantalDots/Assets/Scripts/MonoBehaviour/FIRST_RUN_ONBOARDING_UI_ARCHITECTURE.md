@@ -61,6 +61,9 @@ owner'larinin player-action event'lerini dinler; yalniz non-modal hint ve pulse 
 - Durable flag, oyuncu Heart'i close butonu veya Escape ile kapattiginda gelen
   `HeartClosedByPlayer` event'inde yazilir. Programmatic open/close cagrilari tutorial'i
   tamamlamaz; pause bilgisi gorulmeden flag yazilmaz.
+- Oyuncu Heart'i ilk Grave Essence prompt'i uygun olmadan once acarsa gercek player event'i
+  yine pause dersini baslatir; close sonrasinda durable flag yazilir ve Essence daha sonra
+  geldiginde giris prompt'i tekrar gosterilmez.
 
 ## Ilk Regular Council Exact Karar Adimi
 
@@ -118,6 +121,26 @@ owner'larinin player-action event'lerini dinler; yalniz non-modal hint ve pulse 
 - Kabul edilmis hotkey prompt gorunmeden once kullanilmissa adim tekrar gosterilmez. Tutorial
   ability kullanmaz, targeting baslatmaz, cooldown/state yazmaz ve resource harcamaz; butun
   transaction `SpellCastUI` ile `GameManager` otoritesinde kalir.
+
+## Prompt Oncesi Completion Siniri
+
+Prompt uygunlugu ve aktif sunum adimi completion kapisi degildir. Tutorial controller'i `Update`
+icindeki cue secimini yalniz sunum icin kullanir; kabul edilmis player-action event handler'lari
+`_activeStep`, hint veya pulse gorunurlugunu sorgulamadan ilgili durable flag'i yazar.
+
+- Worker ratio, Basic Archer, Arrow refill, regular Council secimi, normal repair ve ability
+  hotkey adimlari owner'larinin yalniz basarili transaction sonrasinda yaydigi event ile tamamlanir.
+- Heart iki asamalidir: gercek open event'i pause dersini baslatir, gercek close event'i flag'i
+  yazar. Ilk Essence henuz yoksa da bu accepted action kaybolmaz.
+- Basarisiz, locked, cap-blocked, unaffordable veya programmatic gameplay cagrilari player-action
+  event'i yaymadigi icin adimi tamamlamaz.
+- Daha once tamamlanan flag, daha sonra presentation eligibility true oldugunda cue'nun yeniden
+  acilmasini engeller.
+
+EditMode source guard yedi completion handler'ini prompt/presentation state'inden bagimsiz tutar;
+PlayMode preemptive Heart testi Essence yokken gercek open/close akisinin flag yazdigini ve sonraki
+Essence gain'in prompt'i yeniden acmadigini kanitlar. Her owner'in accepted-event baglantisi kendi
+hedefli PlayMode testinde ayrica korunur.
 
 ## Global Transaction-Free Siniri
 
