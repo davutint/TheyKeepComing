@@ -577,6 +577,84 @@ namespace DeadWalls.Tests
         }
 
         [UnityTest]
+        public IEnumerator CompletedTutorial_RealSecondRunRestartKeepsEveryCueClosed()
+        {
+            GameManager gameManager = GameManager.Instance;
+            UIManager uiManager = UIManager.Instance;
+            FirstRunOnboardingUI onboarding =
+                Object.FindFirstObjectByType<FirstRunOnboardingUI>();
+            Assert.That(gameManager, Is.Not.Null);
+            Assert.That(uiManager, Is.Not.Null);
+            Assert.That(onboarding, Is.Not.Null);
+
+            string[] tutorialFlags = FirstRunOnboardingUI.GetTutorialProgressFlagIds();
+            foreach (string flagId in tutorialFlags)
+                Assert.That(MetaProgression.SetTutorialFlag(flagId, true), Is.True, flagId);
+
+            bool firstRunSnapshotReady = false;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                {
+                    firstRunSnapshotReady = true;
+                    break;
+                }
+                yield return null;
+            }
+            Assert.That(firstRunSnapshotReady, Is.True);
+
+            string firstRunId = gameManager.CurrentRunId;
+            Assert.That(firstRunId, Is.Not.Empty);
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            using EntityQuery gameStateQuery =
+                entityManager.CreateEntityQuery(typeof(GameStateData));
+            Entity gameStateEntity = gameStateQuery.GetSingletonEntity();
+            GameStateData lethalState =
+                entityManager.GetComponentData<GameStateData>(gameStateEntity);
+            lethalState.IsGameOver = true;
+            lethalState.TotalKills = 3;
+            entityManager.SetComponentData(gameStateEntity, lethalState);
+
+            Assert.That(gameManager.SaveRunSnapshot(), Is.False,
+                "Lethal first run canli Continue snapshot'i yazamamali.");
+            Assert.That(MetaProgression.HasRewardedRun(firstRunId), Is.True,
+                "Ikinci run oncesinde ilk run durable death transaction'i tamamlanmali.");
+            Assert.That(RunPersistence.HasSave, Is.False);
+
+            uiManager.OnRestart();
+            yield return null;
+
+            string secondRunId = gameManager.CurrentRunId;
+            Assert.That(secondRunId, Is.Not.Empty);
+            Assert.That(secondRunId, Is.Not.EqualTo(firstRunId),
+                "GameOver restart yeni authoritative run identity uretmelidir.");
+            Assert.That(gameManager.GameState.IsGameOver, Is.False);
+            Assert.That(gameManager.ContinuousSiegeCycle.CycleIndex, Is.Zero);
+            Assert.That(gameManager.ContinuousSiegeCycle.Phase, Is.EqualTo(SiegeCyclePhase.Day));
+            Assert.That(gameManager.IsMobilePopulationEconomyEnabled(), Is.True,
+                "Second run ilk worker cue'sunun normalde eligible oldugu gercek oyun modu olmali.");
+
+            MetaProgression.Load();
+            foreach (string flagId in tutorialFlags)
+                Assert.That(MetaProgression.HasTutorialFlag(flagId), Is.True, flagId);
+
+            for (int frame = 0; frame < 120; frame++)
+                yield return null;
+
+            Assert.That(onboarding.HintPanel.activeSelf, Is.False);
+            Assert.That(onboarding.PulseFrame.gameObject.activeSelf, Is.False);
+            Assert.That(onboarding.ActivePulseTarget, Is.Null);
+            Assert.That(onboarding.IsWorkerRatioStepVisible, Is.False);
+            Assert.That(onboarding.IsBasicArcherStepVisible, Is.False);
+            Assert.That(onboarding.IsLowAmmoStepVisible, Is.False);
+            Assert.That(onboarding.IsHeartEntryStepVisible, Is.False);
+            Assert.That(onboarding.IsHeartPauseStepVisible, Is.False);
+            Assert.That(onboarding.IsCouncilExactStepVisible, Is.False);
+            Assert.That(onboarding.IsDaytimeRepairStepVisible, Is.False);
+            Assert.That(onboarding.IsNightAbilityKeyStepVisible, Is.False);
+        }
+
+        [UnityTest]
         public IEnumerator FirstRunOnboarding_HeartCloseEndsPauseBeforeNextNonModalCue()
         {
             GameManager gameManager = GameManager.Instance;

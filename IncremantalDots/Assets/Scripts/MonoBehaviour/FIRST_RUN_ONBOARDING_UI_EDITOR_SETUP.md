@@ -106,6 +106,12 @@ Idempotent iki-sahne onarimi icin `NewGameScene` aktifken
 - Final-action PlayMode testi son eksik adim tamamlandiginda global flag'in ayni run'da yazildigini;
   legacy-backfill testi yedi alt flag tasiyan eski meta save'in global flag'i ureterek iki durumda
   da `MetaProgression.Load()` sonrasinda durable kaldigini dogrular.
+- Second-run suppression PlayMode testi ilk run'i gercek lethal save/death receipt yoluyla bitirir,
+  `UIManager.OnRestart()` ile farkli `CurrentRunId` tasiyan Day 1 kosusunu baslatir ve sekiz tutorial
+  flag'inin meta reload sonrasinda korundugunu dogrular.
+- Ayni test, ikinci run'da normal ilk-worker eligibility'si aktifken 120 frame boyunca shared hint,
+  pulse target ve sekiz onboarding cue state'inin tamamini kapali kilitler. Yalniz Settings icindeki
+  onayli reset bu kontrati opt-in olarak yeniden acar.
 - Tutorial reset EditMode testleri canonical sekiz flag listesini, listenin consumer tarafindan
   mutate edilememesini, iki sahnede tek ve eksiksiz Settings binding'ini ve hedefli resetin diger
   meta state'i koruyarak reload sonrasi durable kalmasini dogrular.

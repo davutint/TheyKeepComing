@@ -161,6 +161,24 @@ Pure completion kurali yedi zorunlu flag'in her birini ayri ayri gerektirir. Pla
 ve legacy-backfill testleri `meta_progress.json` reload sonrasinda `tutorial.v1.complete` flag'inin
 durable kaldigini dogrular.
 
+## Ikinci Run Suppression Sozlesmesi
+
+- Tamamlanmis tutorial state'i run snapshot'inin parcasi degildir; `MetaProgression` icindeki
+  stable sekiz flag, Game Over ile biten ilk kosudan ve yeni run identity'sinden bagimsiz kalir.
+- Gercek ikinci run yolu `UIManager.OnRestart()` -> `GameManager.RestartGame()` zinciridir. Ilk
+  run'in lethal save islemi durable death receipt'ini tamamlar, living Continue snapshot'ini siler
+  ve restart yeni bir `CurrentRunId` uretir; tutorial flag'leri bu transaction'da temizlenmez.
+- `tutorial.v1.complete` ikinci run baslangicinda yeniden yuklendiginde controller, normalde uygun
+  olan ilk Day worker cue'su dahil butun step eligibility sorgularini kisa devre eder. Shared hint,
+  pulse target ve sekiz onboarding presentation state'i kapali kalir.
+- Tutorial'i yeniden acan tek oyuncu tercihi Settings icindeki iki-onayli `RESET TUTORIAL`
+  islemidir. New Run, Game Over restart veya run save silme tutorial reset sayilmaz.
+
+PlayMode ikinci-run regresyonu ilk run'a gercek snapshot ve lethal ECS state'i kurar, durable death
+transaction'ini tamamlar, gercek Restart butonu owner'ini cagirir ve yeni run kimligi ile Day 1
+state'ini kanitlar. Ardindan meta save'i yeniden yukleyip sekiz flag'in korundugunu ve 120 frame
+boyunca hint/pulse ile butun cue durumlarinin kapali kaldigini dogrular.
+
 ## Settings Tutorial Reset
 
 - `NewGameScene` pause Settings ve `MainMenuScene` Settings ayni `SettingsUI` kontrolunu kullanir.

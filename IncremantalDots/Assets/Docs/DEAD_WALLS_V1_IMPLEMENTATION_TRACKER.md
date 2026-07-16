@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.2
 > **Son tam kapsam denetimi:** 2026-07-15
 > **Aktif paket:** Package I - HUD, Onboarding ve Creative Polish
-> **Aktif iş:** `DW-I-ONBOARD-SECOND-RUN-SUPPRESS` - Verify Tutorial Stays Closed on the Second Run
-> **İlerleme:** `373 / 441` tracker checkbox'ı tamamlandı - `%84,58`
+> **Aktif iş:** `DW-I-POLISH-DAY` - Build Warm Readable Day Presentation and Worker Ambience
+> **İlerleme:** `374 / 441` tracker checkbox'ı tamamlandı - `%84,81`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -821,7 +821,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 - [x] Tutorial complete flag'i meta save'e yaz.
 - [x] Settings içinde tutorial reset ekle.
 - [x] Player-facing bütün tutorial metnini English yap.
-- [ ] İkinci run'da tutorial'ın otomatik açılmadığını test et.
+- [x] İkinci run'da tutorial'ın otomatik açılmadığını test et.
 
 ### I3 - Day/night görsel ve işitsel yön
 
@@ -957,7 +957,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 | Save | Menu çıkış / Continue | Aynı graph/phase/Wall/economy | `[x]` |
 | Death | Process restart | Meta bir kez; run geri gelmez | `[x]` |
 | HUD | 16:9 / ultrawide | Kritik UI ve dünya kırpılmaz | `[x]` |
-| Tutorial | İkinci run | Otomatik tekrar etmez | `[ ]` |
+| Tutorial | İkinci run | Gerçek lethal ilk run -> `UIManager.OnRestart()` yeni run kimliği; sekiz meta flag durable, 120 frame boyunca bütün cue'lar kapalı | `[x]` |
 | Stress | 1k archer x 10k enemy | Gerçek NewGameScene pooled-arrow Editor P95 `12,50 ms`, average `9,61 ms`, main average `9,50 ms`, sample sonunda `105` projectile; arrow pool `1536 total / 3000 rent / 2895 return`; Player/hardware kabulü bekliyor | `[~]` |
 
 ### Mevcut test envanteri
@@ -1173,3 +1173,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-16 | `DW-I-ONBOARD-COMPLETE-FLAG` global tutorial completion + legacy backfill | Stable `tutorial.v1.complete` Id'si yeni schema alanı açmadan mevcut `MetaProgressState v3.TutorialFlags` listesine eklendi. Saf completion kuralı worker ratio, Basic Archer, low ammo, Heart, regular Council, Day repair ve Night ability-key flag'lerinin yedisini de zorunlu tutuyor. Son accepted player action kendi durable alt flag'ini yazdıktan sonra global flag aynı run'da meta save'e kaydediliyor; eski save yedi alt flag'i taşıyıp global flag'i taşımıyorsa controller bunu durable backfill ediyor. Global flag sonraki framelerde eligibility/wallet sorgularını kısa devre edip hint/pulse sunumunu kapalı tutuyor; schema version bump yapılmadı | Unity compile: 0 error; FirstRun onboarding EditMode `13/13`; meta schema EditMode `7/7`; final-action + legacy-backfill PlayMode `2/2`; bütün onboarding + Council regresyon PlayMode `11/11`; MCP active scene `NewGameScene`, scene dirty false; final Console 0 error; tracker `371/441` |
 | 2026-07-16 | `DW-I-ONBOARD-RESET-SETTING` two-confirmation Settings tutorial reset | Pause ve ana menüdeki ortak `SettingsUI` paneline `RESET TUTORIAL` kontrolü eklendi. İlk tıklama yalnız `CONFIRM RESET` durumunu kuruyor; ikinci tıklama yedi onboarding adımı ile `tutorial.v1.complete` flag'ini canonical sekizli olarak tek atomik meta save'de temizliyor. Run save, Souls, upgrade, pool unlock ve listede olmayan future tutorial flag'leri korunuyor; save başarısızsa önceki flag listesi geri yükleniyor. Reset pause altında yeni cue/modal zinciri açmıyor, Resume sonrasında ilk uygun cue yeniden başlıyor. İki sahne yalnız Settings panelini hedefleyen idempotent MCP repair yoluyla güncellendi | Unity compile: 0 error; tutorial/meta/iki-sahne Settings EditMode `24/24`; bütün onboarding + regular Council PlayMode `12/12`; MCP scene audit: tek `SettingsUI`, tek reset button/status, active `NewGameScene` dirty false; 1920x1080 Game View Settings yerleşimi temiz; final Console 0 error; tracker `372/441` |
 | 2026-07-16 | `DW-I-ONBOARD-ENGLISH-COPY` exact player-facing English tutorial contract | Aktif player-facing tutorial yüzeyi source, generated HUD prefabı, NewGameScene, MainMenuScene ve gerçek runtime akışlarında denetlendi. Yedi onboarding step hint'i ile üç ability-key varyantının 10 exact approved English metni `FirstRunOnboardingUI` constant'larında; Settings reset default/confirm/success/failure durumlarının altı exact approved English metni `SettingsUI` constant'larında canonical hale getirildi. Scene setup inline alternatif copy üretmiyor; prefab ve iki sahnenin serialized başlangıç metinleri aynı constant'larla birebir. Türkçe kalan satırlar yalnız editor logu, yorum ve Inspector açıklaması olduğu için player-facing kapsama girmiyor | Unity compile: 0 error; exact copy + prefab + iki-sahne Settings EditMode `17/17`; bütün onboarding + regular Council runtime copy PlayMode `12/12`; MCP active scene `NewGameScene`, dirty false; final Console 0 error; tracker `373/441` |
+| 2026-07-16 | `DW-I-ONBOARD-SECOND-RUN-SUPPRESS` real second-run tutorial suppression | Tamamlanmış tutorial'ın yedi step flag'i ile stable global flag'i ilk run snapshot'ından bağımsız meta state olarak korundu. Yeni PlayMode regresyonu ilk run'a gerçek living snapshot kurup lethal ECS state ile durable death receipt transaction'ını tamamlıyor; living Continue save'inin silindiğini ve gerçek `UIManager.OnRestart()` -> `GameManager.RestartGame()` yolunun farklı `CurrentRunId`, temiz Day 1 cycle ve tutorial için normalde eligible mobile worker economy ürettiğini kanıtlıyor. Meta reload sonrasında sekiz flag durable kalıyor; shared hint, pulse target ve sekiz onboarding cue state'i 120 frame boyunca kapalı. Yalnız iki-onaylı Settings reset tutorial'ı yeniden açabilir | Unity script validation: 0 error / 0 warning; targeted second-run PlayMode `1/1`; exact copy/reset EditMode `17/17`; bütün onboarding + regular Council PlayMode `13/13`; MCP active scene `NewGameScene`, dirty false; final Console 0 error; tracker `374/441` |
