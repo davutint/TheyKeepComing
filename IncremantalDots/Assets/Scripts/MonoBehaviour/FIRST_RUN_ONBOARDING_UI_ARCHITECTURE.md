@@ -142,6 +142,25 @@ PlayMode preemptive Heart testi Essence yokken gercek open/close akisinin flag y
 Essence gain'in prompt'i yeniden acmadigini kanitlar. Her owner'in accepted-event baglantisi kendi
 hedefli PlayMode testinde ayrica korunur.
 
+## Global Tutorial Complete Flag
+
+- Stable meta flag: `tutorial.v1.complete`.
+- Global flag yeni bir serialized schema alani degildir; mevcut `MetaProgressState v3`
+  `TutorialFlags` listesinde diger stable onboarding flag'leriyle ayni atomik JSON save sahibini
+  kullanir.
+- Yedi zorunlu flag'in tamami durable oldugunda controller global flag'i yazar. Son accepted
+  player action ayni frame'de completion kontrolunu tetikler.
+- Eski save'de yedi alt flag mevcut fakat global flag yoksa `Update` ayni kosulu tekrar
+  degerlendirip global flag'i durable backfill eder; meta schema version bump gerekmez.
+- Global flag mevcutsa onboarding controller'i step eligibility veya gameplay wallet sorgularina
+  girmeden shared hint/pulse sunumunu kapali tutar.
+- Global flag tek basina alt flag'leri uretmez. Yalniz yedi stable flag'in tamaminin kanitindan
+  turetilir; sonraki Settings reset isi global ve alt flag'leri birlikte temizlemelidir.
+
+Pure completion kurali yedi zorunlu flag'in her birini ayri ayri gerektirir. PlayMode final-action
+ve legacy-backfill testleri `meta_progress.json` reload sonrasinda `tutorial.v1.complete` flag'inin
+durable kaldigini dogrular.
+
 ## Global Transaction-Free Siniri
 
 `FirstRunOnboardingUI` gameplay command sahibi degildir. Controller yalniz authoritative state

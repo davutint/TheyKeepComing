@@ -429,6 +429,8 @@ namespace DeadWalls.Tests
             foreach (string flagId in completedOtherSteps)
                 Assert.That(MetaProgression.SetTutorialFlag(flagId, true), Is.True, flagId);
 
+            Assert.That(MetaProgression.HasTutorialFlag(
+                FirstRunOnboardingUI.TutorialCompleteFlagId), Is.False);
             Assert.That(gameManager.GraveEssenceAmount, Is.Zero);
             Assert.That(MetaProgression.HasTutorialFlag(
                 FirstRunOnboardingUI.HeartEntryFlagId), Is.False);
@@ -454,11 +456,57 @@ namespace DeadWalls.Tests
             Assert.That(SimulationPauseService.ActiveLeaseCount, Is.Zero);
             Assert.That(MetaProgression.HasTutorialFlag(
                 FirstRunOnboardingUI.HeartEntryFlagId), Is.True);
+            Assert.That(MetaProgression.HasTutorialFlag(
+                FirstRunOnboardingUI.TutorialCompleteFlagId), Is.True,
+                "Son accepted action global tutorial complete flag'ini yazmalidir.");
+            MetaProgression.Load();
+            Assert.That(MetaProgression.HasTutorialFlag(
+                FirstRunOnboardingUI.TutorialCompleteFlagId), Is.True,
+                "Global tutorial complete flag meta save reload sonrasinda kalmalidir.");
             Assert.That(gameManager.GrantGraveEssence(1L), Is.True);
             yield return null;
             Assert.That(onboarding.IsHeartEntryStepVisible, Is.False,
                 "Preemptive action ile tamamlanan Heart prompt'i Essence gelince tekrar acilmamalidir.");
             Assert.That(onboarding.HintPanel.activeSelf, Is.False);
+        }
+
+        [UnityTest]
+        public IEnumerator FirstRunOnboarding_LegacyStepFlagsBackfillGlobalComplete()
+        {
+            FirstRunOnboardingUI onboarding =
+                Object.FindFirstObjectByType<FirstRunOnboardingUI>();
+            Assert.That(onboarding, Is.Not.Null);
+
+            string[] requiredStepFlags =
+            {
+                FirstRunOnboardingUI.WorkerRatioFlagId,
+                FirstRunOnboardingUI.BasicArcherFlagId,
+                FirstRunOnboardingUI.LowAmmoFlagId,
+                FirstRunOnboardingUI.HeartEntryFlagId,
+                FirstRunOnboardingUI.CouncilExactFlagId,
+                FirstRunOnboardingUI.DaytimeRepairFlagId,
+                FirstRunOnboardingUI.NightAbilityKeyFlagId
+            };
+            foreach (string flagId in requiredStepFlags)
+                Assert.That(MetaProgression.SetTutorialFlag(flagId, true), Is.True, flagId);
+
+            Assert.That(MetaProgression.HasTutorialFlag(
+                FirstRunOnboardingUI.TutorialCompleteFlagId), Is.False,
+                "Legacy meta save global complete flag'ini tasimiyor olmali.");
+            for (int frame = 0; frame < 30 && !MetaProgression.HasTutorialFlag(
+                    FirstRunOnboardingUI.TutorialCompleteFlagId); frame++)
+            {
+                yield return null;
+            }
+
+            Assert.That(MetaProgression.HasTutorialFlag(
+                FirstRunOnboardingUI.TutorialCompleteFlagId), Is.True);
+            Assert.That(onboarding.HintPanel.activeSelf, Is.False);
+            Assert.That(onboarding.PulseFrame.gameObject.activeSelf, Is.False);
+            MetaProgression.Load();
+            Assert.That(MetaProgression.HasTutorialFlag(
+                FirstRunOnboardingUI.TutorialCompleteFlagId), Is.True,
+                "Backfill edilen global flag meta save reload sonrasinda kalmalidir.");
         }
 
         [UnityTest]

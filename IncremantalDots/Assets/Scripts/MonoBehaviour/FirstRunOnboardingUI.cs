@@ -136,6 +136,26 @@ namespace DeadWalls
             return blockingPauseActive
                 && !(heartPauseTeachingActive && heartOpen);
         }
+
+        public static bool ShouldPersistTutorialComplete(
+            bool alreadyComplete,
+            bool workerRatioComplete,
+            bool basicArcherComplete,
+            bool lowAmmoComplete,
+            bool heartComplete,
+            bool councilComplete,
+            bool daytimeRepairComplete,
+            bool nightAbilityKeyComplete)
+        {
+            return !alreadyComplete
+                && workerRatioComplete
+                && basicArcherComplete
+                && lowAmmoComplete
+                && heartComplete
+                && councilComplete
+                && daytimeRepairComplete
+                && nightAbilityKeyComplete;
+        }
     }
 
     /// <summary>
@@ -161,6 +181,7 @@ namespace DeadWalls
         public const string DaytimeRepairFlagId = "tutorial.v1.repair";
         public const string DaytimeRepairHint = "REPAIR THE WALL DURING THE DAY.";
         public const string NightAbilityKeyFlagId = "tutorial.v1.ability_key";
+        public const string TutorialCompleteFlagId = "tutorial.v1.complete";
         public const string FireballAbilityKeyHint = "PRESS 1 TO TARGET FIREBALL.";
         public const string RallyAbilityKeyHint = "PRESS 2 TO USE RALLY.";
         public const string EmergencyRepairAbilityKeyHint = "PRESS 3 TO REPAIR THE WALL.";
@@ -248,6 +269,12 @@ namespace DeadWalls
                 BindCouncil();
                 BindNormalRepair();
                 BindAbilities();
+            }
+
+            if (EnsureTutorialCompletionPersisted())
+            {
+                SetPresentation(FirstRunOnboardingStep.None, null);
+                return;
             }
 
             bool workerRatioCompleted = MetaProgression.HasTutorialFlag(WorkerRatioFlagId);
@@ -573,6 +600,7 @@ namespace DeadWalls
                 || MetaProgression.SetTutorialFlag(WorkerRatioFlagId, true))
             {
                 _persistenceWarningLogged = false;
+                EnsureTutorialCompletionPersisted();
                 SetPresentation(FirstRunOnboardingStep.None, null);
                 return;
             }
@@ -593,6 +621,7 @@ namespace DeadWalls
                 || MetaProgression.SetTutorialFlag(BasicArcherFlagId, true))
             {
                 _persistenceWarningLogged = false;
+                EnsureTutorialCompletionPersisted();
                 SetPresentation(FirstRunOnboardingStep.None, null);
                 return;
             }
@@ -610,6 +639,7 @@ namespace DeadWalls
                 || MetaProgression.SetTutorialFlag(LowAmmoFlagId, true))
             {
                 _persistenceWarningLogged = false;
+                EnsureTutorialCompletionPersisted();
                 SetPresentation(FirstRunOnboardingStep.None, null);
                 return;
             }
@@ -640,6 +670,7 @@ namespace DeadWalls
                 || MetaProgression.SetTutorialFlag(HeartEntryFlagId, true))
             {
                 _persistenceWarningLogged = false;
+                EnsureTutorialCompletionPersisted();
                 SetPresentation(FirstRunOnboardingStep.None, null);
                 return;
             }
@@ -657,6 +688,7 @@ namespace DeadWalls
                 || MetaProgression.SetTutorialFlag(CouncilExactFlagId, true))
             {
                 _persistenceWarningLogged = false;
+                EnsureTutorialCompletionPersisted();
                 SetPresentation(FirstRunOnboardingStep.None, null);
                 return;
             }
@@ -674,6 +706,7 @@ namespace DeadWalls
                 || MetaProgression.SetTutorialFlag(DaytimeRepairFlagId, true))
             {
                 _persistenceWarningLogged = false;
+                EnsureTutorialCompletionPersisted();
                 SetPresentation(FirstRunOnboardingStep.None, null);
                 return;
             }
@@ -691,6 +724,7 @@ namespace DeadWalls
                 || MetaProgression.SetTutorialFlag(NightAbilityKeyFlagId, true))
             {
                 _persistenceWarningLogged = false;
+                EnsureTutorialCompletionPersisted();
                 SetPresentation(FirstRunOnboardingStep.None, null);
                 return;
             }
@@ -700,6 +734,39 @@ namespace DeadWalls
 
             _persistenceWarningLogged = true;
             Debug.LogWarning("[FirstRunOnboardingUI] Ability key tutorial flag durable yazilamadi.");
+        }
+
+        private bool EnsureTutorialCompletionPersisted()
+        {
+            bool alreadyComplete = MetaProgression.HasTutorialFlag(TutorialCompleteFlagId);
+            if (alreadyComplete)
+                return true;
+
+            bool shouldPersist = FirstRunOnboardingRules.ShouldPersistTutorialComplete(
+                alreadyComplete,
+                MetaProgression.HasTutorialFlag(WorkerRatioFlagId),
+                MetaProgression.HasTutorialFlag(BasicArcherFlagId),
+                MetaProgression.HasTutorialFlag(LowAmmoFlagId),
+                MetaProgression.HasTutorialFlag(HeartEntryFlagId),
+                MetaProgression.HasTutorialFlag(CouncilExactFlagId),
+                MetaProgression.HasTutorialFlag(DaytimeRepairFlagId),
+                MetaProgression.HasTutorialFlag(NightAbilityKeyFlagId));
+            if (!shouldPersist)
+                return false;
+
+            if (MetaProgression.SetTutorialFlag(TutorialCompleteFlagId, true))
+            {
+                _persistenceWarningLogged = false;
+                return true;
+            }
+
+            if (!_persistenceWarningLogged)
+            {
+                _persistenceWarningLogged = true;
+                Debug.LogWarning(
+                    "[FirstRunOnboardingUI] Global tutorial complete flag durable yazilamadi.");
+            }
+            return false;
         }
 
         public static string GetAbilityKeyHint(AbilityHotkeySlot slot)

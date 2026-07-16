@@ -88,3 +88,8 @@ Idempotent onarim: `Window -> DeadWalls -> Repair First Run Onboarding`.
 - Preemptive Heart PlayMode testi Grave Essence sifirken gercek Heart open/close action'inin pause
   dersini tamamladigini ve Essence daha sonra geldiginde giris prompt'inin tekrar acilmadigini
   dogrular.
+- Global completion EditMode kurali yedi zorunlu alt flag'in tamamini gerektirir ve stable
+  `tutorial.v1.complete` Id'sini kilitler.
+- Final-action PlayMode testi son eksik adim tamamlandiginda global flag'in ayni run'da yazildigini;
+  legacy-backfill testi yedi alt flag tasiyan eski meta save'in global flag'i ureterek iki durumda
+  da `MetaProgression.Load()` sonrasinda durable kaldigini dogrular.

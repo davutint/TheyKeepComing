@@ -182,6 +182,33 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void TutorialCompleteRule_RequiresEveryRequiredStepExactlyOnce()
+        {
+            Assert.That(FirstRunOnboardingRules.ShouldPersistTutorialComplete(
+                false, true, true, true, true, true, true, true), Is.True);
+            Assert.That(FirstRunOnboardingRules.ShouldPersistTutorialComplete(
+                true, true, true, true, true, true, true, true), Is.False);
+
+            for (int missingIndex = 0; missingIndex < 7; missingIndex++)
+            {
+                bool[] steps = { true, true, true, true, true, true, true };
+                steps[missingIndex] = false;
+                Assert.That(FirstRunOnboardingRules.ShouldPersistTutorialComplete(
+                    false,
+                    steps[0],
+                    steps[1],
+                    steps[2],
+                    steps[3],
+                    steps[4],
+                    steps[5],
+                    steps[6]), Is.False, $"missingIndex={missingIndex}");
+            }
+
+            Assert.That(FirstRunOnboardingUI.TutorialCompleteFlagId,
+                Is.EqualTo("tutorial.v1.complete"));
+        }
+
+        [Test]
         public void ActiveHudPrefab_HasSingleNonBlockingEnglishWorkerRatioPresentation()
         {
             GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(HudPrefabPath);
