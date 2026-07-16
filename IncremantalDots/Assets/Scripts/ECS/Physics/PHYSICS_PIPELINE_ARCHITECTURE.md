@@ -41,10 +41,11 @@ Iki daire cakistiginda:
 ## Domino Queuing (BoundarySystem)
 Moving zombi, Attacking/Queued bir komsusuna cakisiyorsa **Queued** state'e gecer (saldirmaz, yuruyus animasyonu oynar, sadece bekler).
 - Spatial hash (ReadMap) uzerinden 3x3 hucre taranir
-- Yalniz hedefe gercekten daha yakin olan Attacking/Queued komsu blocker sayilir; ayni ilerleme hizasindaki ve arkadaki komsular birbirini kilitlemez
+- Attacking/Queued komsu ancak hem hedefe gercekten daha yakinsa hem de follower'in `45 derece` ileri hareket koridorundaysa blocker sayilir
+- Ayni ilerleme hizasindaki, arkadaki ve dairesel temizligin tegetinde kalan capraz komsular birbirini kilitlemez; dogrudan arka arkaya duran kuyruk korunur
 - Her frame sadece bir katman gecer → zincir halinde yayilir
 - Queued zombi her frame komsu kontrol eder: blocker gitti → Moving'e doner
-- Bu yonlu kural, on hat oldugunde veya okcular tarafindan temizlendiginde Queued zombilerin karsilikli deadlock kurup bos halka birakmasini engeller
+- Bu yon + koridor kurali, Fireball/okcu temizliginden sonra tegetteki Queued zincirin kusursuz bos halka kurmasini engeller ve acilan alana ileri akisi yeniden baslatir
 - Duvar onunde ic ice girme problemi cozulur
 
 ## Sync Point Stratejisi

@@ -53,5 +53,38 @@ namespace DeadWalls.Tests
             Assert.That(ZombieQueueFlowUtility.IsAheadOf(
                 false, false, float2.zero, follower, new float2(5f, 0.2f)), Is.False);
         }
+
+        [Test]
+        public void SingleFront_DiagonalAheadNeighbor_DoesNotBlockOpenLane()
+        {
+            float2 follower = new float2(5f, 0f);
+
+            Assert.That(ZombieQueueFlowUtility.CanBlockQueue(
+                true, true, float2.zero, follower, new float2(4.80f, 0.05f)), Is.True);
+            Assert.That(ZombieQueueFlowUtility.CanBlockQueue(
+                true, true, float2.zero, follower, new float2(4.95f, 0.25f)), Is.False);
+        }
+
+        [Test]
+        public void RadialFront_TangentNeighbor_DoesNotBlockOpenLane()
+        {
+            float2 follower = new float2(5f, 0f);
+
+            Assert.That(ZombieQueueFlowUtility.CanBlockQueue(
+                true, false, float2.zero, follower, new float2(4.80f, 0.05f)), Is.True);
+            Assert.That(ZombieQueueFlowUtility.CanBlockQueue(
+                true, false, float2.zero, follower, new float2(4.95f, 0.25f)), Is.False);
+        }
+
+        [Test]
+        public void LegacyWall_DiagonalAheadNeighbor_UsesSameLaneRule()
+        {
+            float2 follower = new float2(5f, 0f);
+
+            Assert.That(ZombieQueueFlowUtility.CanBlockQueue(
+                false, false, float2.zero, follower, new float2(4.80f, 0.05f)), Is.True);
+            Assert.That(ZombieQueueFlowUtility.CanBlockQueue(
+                false, false, float2.zero, follower, new float2(4.95f, 0.25f)), Is.False);
+        }
     }
 }
