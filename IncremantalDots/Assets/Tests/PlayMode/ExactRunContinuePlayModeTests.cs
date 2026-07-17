@@ -1401,6 +1401,29 @@ namespace DeadWalls.Tests
             AssertSingleEcsOwner(entityManager, ComponentType.ReadOnly<MobileEconomyEventState>());
             AssertSingleEcsOwner(entityManager, ComponentType.ReadOnly<CastleYardPrepState>());
             AssertSingleEcsOwner(entityManager, ComponentType.ReadOnly<WallSegment>());
+
+            AssertNoEcsWiring(entityManager, ComponentType.ReadOnly<GateComponent>());
+            AssertNoEcsWiring(entityManager, ComponentType.ReadOnly<CastleHP>());
+            AssertNoEcsWiring(entityManager, ComponentType.ReadOnly<ArcherTrainer>());
+
+            Entity configEntity = entityManager.CreateEntityQuery(
+                typeof(MobileCastleCombatConfig), typeof(DifficultyDaySample)).GetSingletonEntity();
+            MobileCastleCombatConfig config =
+                entityManager.GetComponentData<MobileCastleCombatConfig>(configEntity);
+            Assert.That(config.MoatGameplayEnabled, Is.False,
+                "Dormant Moat gameplay aktif V1 config'ine baglanamaz.");
+            Assert.That(config.MoatSlowMultiplier, Is.EqualTo(1f).Within(0.0001f));
+            Assert.That(config.MoatDamagePerSecond, Is.Zero.Within(0.0001f));
+
+            DynamicBuffer<DifficultyDaySample> difficultySamples =
+                entityManager.GetBuffer<DifficultyDaySample>(configEntity);
+            Assert.That(difficultySamples.Length, Is.GreaterThan(0));
+            for (int i = 0; i < difficultySamples.Length; i++)
+            {
+                Assert.That(difficultySamples[i].BloodMoonIntensityMult,
+                    Is.EqualTo(1f).Within(0.0001f),
+                    $"Dormant special-night sample {i} aktif V1 runtime'ina sizdi.");
+            }
         }
 
         [UnityTest]
@@ -1470,6 +1493,15 @@ namespace DeadWalls.Tests
             using EntityQuery query = entityManager.CreateEntityQuery(componentType);
             Assert.That(query.CalculateEntityCount(), Is.EqualTo(1),
                 $"{componentType} aktif V1 world'unde singleton olmali.");
+        }
+
+        private static void AssertNoEcsWiring(
+            EntityManager entityManager,
+            ComponentType componentType)
+        {
+            using EntityQuery query = entityManager.CreateEntityQuery(componentType);
+            Assert.That(query.CalculateEntityCount(), Is.Zero,
+                $"Dormant {componentType} acik review olmadan aktif V1 world'une baglanamaz.");
         }
 
         private static void RestoreFile(string path, byte[] contents)

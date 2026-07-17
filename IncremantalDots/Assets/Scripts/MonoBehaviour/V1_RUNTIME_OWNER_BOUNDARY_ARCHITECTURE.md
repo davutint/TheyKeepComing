@@ -66,3 +66,29 @@ Yeni V1 tiplerinin `MobileCastle` önekini sürdürme zorunluluğu yoktur; yeni 
 anlatmalıdır. Player-facing metinler ise teknik öneki göstermez ve `Dead Walls`, kale, sur veya
 ilgili gameplay terimini kullanır. Bu kural mevcut serialized yüzeyi korur; tarihsel öneki yeni
 tasarıma yayma zorunluluğu doğurmaz.
+
+## Dormant legacy wiring review sınırı
+
+Legacy etiketli her veri aynı değildir. V1 sınırı iki grubu ayrı tutar:
+
+- Dormant gameplay yüzeyleri: `GateComponent`, `CastleHP`, `ArcherTrainer` /
+  `BarracksTrainingSystem` tetik zinciri, Moat slow/damage gameplay'i ve special-night /
+  Blood Moon davranışı. Bunlar aktif V1 scene, prefab, authoring, catalog veya ECS world'üne
+  bağlanamaz.
+- Onaylı compatibility yüzeyleri: `MobileCastleArcherRingGizmo` serialized type alias'ı,
+  catalog bulunmayan eski scene'ler için `WaveConfigAuthoring` prefab fallback'i ve
+  `RunPersistence` schema migration alanları. Bunlar yalnız eski veriyi okuyup canonical owner'a
+  tek yönlü migrate edebilir; yeni runtime truth yazamaz, ikinci transaction owner olamaz ve
+  player-facing davranış/presentation üretemez.
+
+Dormant bir yüzeyi yeniden bağlamak refactor değildir, scope değişikliğidir. Uygulamadan önce
+owner kararı tracker'a yazılır; Blueprint/V1 kapsam etkisi, mevcut canonical owner, kaldırılacak
+veya dönüştürülecek compatibility yolu, save migration'ı, scene/prefab/asset referansları ve
+regresyon planı birlikte review edilir. Yalnız component eklemek, system query'sini beslemek,
+catalog'a dormant id koymak veya eski UI'ı görünür yapmak açık review yerine geçmez.
+
+`ExactRunContinuePlayModeTests.ActiveV1Runtime_HasSingleSceneAndEcsOwnerPerDomain`, owner
+tekilliğine ek olarak aktif world'de `GateComponent`, `CastleHP` ve `ArcherTrainer` sayısını
+sıfır; Moat config'ini neutral; bütün difficulty sample special-night çarpanlarını `1` olarak
+kilitler. Compatibility kodunun dosyada kalması bu guard'ı ihlal etmez; canonical runtime
+zincirine gameplay state olarak sızması ihlal eder.
