@@ -189,6 +189,11 @@ namespace DeadWalls
         public EconomyFocusType Type;
     }
 
+    /// <summary>
+    /// V1 WorkerAllocation contract'inin tek ECS state owner'i. Dört resource icin actual
+    /// worker sayisi, 10.000 basis-point target ratio ve effective cap aynasini; ayrica
+    /// population/archer/actual-worker toplamindan turetilen idle mirror'i birlikte tasir.
+    /// </summary>
     public struct MobilePopulationAllocation : IComponentData
     {
         public int WoodWorkers;

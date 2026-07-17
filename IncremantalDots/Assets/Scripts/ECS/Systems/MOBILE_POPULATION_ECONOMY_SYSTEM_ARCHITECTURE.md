@@ -9,7 +9,7 @@
 - Mobile `PopulationState.BaseCapacity/Capacity` değerlerini `MobileBedCapacityState` toplamından senkronlar.
 - Kalici target ratio'lari normalize eder ve yalniz yeni gelen population'i bu hedeflere gore deterministik dagitir.
 - Pozitif target'larin cap'i doldugunda dagitilamayan kisileri Idle Population'da birakir.
-- `PopulationState.Workers` ve `PopulationState.Idle` degerlerini allocation + archer sayisina gore gunceller.
+- `PopulationState.Workers` ve `PopulationState.Idle` degerlerini allocation + archer sayisina gore gunceller; idle sonucu `WorkerAllocationUtility.ResolveIdlePopulation` ile `GameManager` player API'siyle ayni owner'dan gelir.
 - `ResourceProductionRate` degerlerini worker sayisi x worker production tuning olarak yazar.
 - Etkin worker cap ve kisi basi production tuning'ini `GameManager`in base + Heart + Council + Meta + worker-building aggregate'i yazdigi `MobileCastleCombatConfig` uzerinden tuketir; bina seviyesini burada ikinci kez uygulamaz.
 - Continuous siege aciksa her tamamlanan 60 saniyelik cycle basina bir kez Dawn arrival bütçesi uygular.

@@ -33,6 +33,31 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void WorkerAllocationContract_OwnsFourRatiosActualCountsCapsAndDerivedIdle()
+        {
+            var allocation = CreateInitialAllocation();
+            WorkerAllocationUtility.InitializeTargetsFromCurrent(ref allocation);
+
+            int idle = WorkerAllocationUtility.ResolveIdlePopulation(
+                allocation,
+                populationTotal: 60,
+                archerCount: 4);
+
+            Assert.That(TargetRatioTotal(allocation),
+                Is.EqualTo(WorkerAllocationUtility.RatioScale));
+            Assert.That(WorkerAllocationUtility.TotalWorkers(allocation), Is.EqualTo(53));
+            Assert.That(allocation.WoodWorkerCapacity, Is.EqualTo(40));
+            Assert.That(allocation.StoneWorkerCapacity, Is.EqualTo(30));
+            Assert.That(allocation.IronWorkerCapacity, Is.EqualTo(24));
+            Assert.That(allocation.FoodWorkerCapacity, Is.EqualTo(40));
+            Assert.That(idle, Is.EqualTo(3));
+            Assert.That(WorkerAllocationUtility.ResolveIdlePopulation(
+                allocation,
+                populationTotal: 40,
+                archerCount: 4), Is.Zero);
+        }
+
+        [Test]
         public void AutoAssignNewPopulation_ReachesSameResultAndRespectsCaps()
         {
             var first = CreateInitialAllocation();

@@ -1289,11 +1289,10 @@ namespace DeadWalls
             if (!IsMobilePopulationEconomyEnabled())
                 return Mathf.Max(0, Population.Idle);
 
-            int allocated = PopulationAllocation.WoodWorkers
-                + PopulationAllocation.StoneWorkers
-                + PopulationAllocation.IronWorkers
-                + PopulationAllocation.FoodWorkers;
-            return Mathf.Max(0, Population.Total - Population.Archers - allocated);
+            return WorkerAllocationUtility.ResolveIdlePopulation(
+                PopulationAllocation,
+                Population.Total,
+                Population.Archers);
         }
 
         public int GetResourceWorkers(EconomyFocusType resource)

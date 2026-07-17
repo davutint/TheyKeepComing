@@ -14,6 +14,17 @@ namespace DeadWalls
                 + math.max(0, allocation.FoodWorkers);
         }
 
+        public static int ResolveIdlePopulation(
+            MobilePopulationAllocation allocation,
+            int populationTotal,
+            int archerCount)
+        {
+            int availableAfterArchers = math.max(
+                0,
+                math.max(0, populationTotal) - math.max(0, archerCount));
+            return math.max(0, availableAfterArchers - TotalWorkers(allocation));
+        }
+
         public static void InitializeTargetsFromCurrent(ref MobilePopulationAllocation allocation)
         {
             allocation.WoodTargetRatioBps = math.max(0, allocation.WoodWorkers);

@@ -248,7 +248,10 @@ namespace DeadWalls
 
             totalWorkers = allocation.WoodWorkers + allocation.StoneWorkers + allocation.IronWorkers + allocation.FoodWorkers;
             population.Workers = totalWorkers;
-            population.Idle = math.max(0, population.Total - population.Workers - population.Archers);
+            population.Idle = WorkerAllocationUtility.ResolveIdlePopulation(
+                allocation,
+                population.Total,
+                population.Archers);
             allocation.IdlePopulation = population.Idle;
         }
 
