@@ -153,6 +153,62 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void RunDifficultyProfile_ClosesSpawnCurvePhaseCapAndPreservedBacklogContract()
+        {
+            const string profilePath =
+                "Assets/ScriptableObject/MobileCastle/Difficulty/DefaultDifficulty.asset";
+            var profile = AssetDatabase.LoadAssetAtPath<DifficultyProfileSO>(profilePath);
+            Assert.That(profile, Is.Not.Null);
+            Assert.That(profile.SpawnBatchMultByDay, Is.Not.Null);
+            Assert.That(profile.SpawnBatchMultByDay.length, Is.GreaterThan(0));
+
+            DifficultyDaySample firstDay =
+                MobileCastleTuningResolver.ResolveDaySample(profile, 1);
+            Assert.That(firstDay.SpawnBatchMult,
+                Is.EqualTo(profile.EvaluateCurve(profile.SpawnBatchMultByDay, 1)));
+
+            var config = new MobileCastleCombatConfig
+            {
+                MaxAliveZombies = -1,
+                MaxSpawnBatch = -1,
+                BaseSpawnInterval = -1f,
+                MinSpawnInterval = -1f
+            };
+            MobileCastleTuningResolver.ApplyDifficultyProfile(ref config, profile);
+
+            Assert.That(config.SiegeDayIntensityMultiplier, Is.EqualTo(profile.DayIntensity));
+            Assert.That(config.SiegeDuskStartIntensityMultiplier,
+                Is.EqualTo(profile.DuskStartIntensity));
+            Assert.That(config.SiegeDuskEndIntensityMultiplier,
+                Is.EqualTo(profile.DuskEndIntensity));
+            Assert.That(config.SiegeNightIntensityMultiplier, Is.EqualTo(profile.NightIntensity));
+            Assert.That(config.SiegeDawnIntensityMultiplier, Is.EqualTo(profile.DawnIntensity));
+            Assert.That(config.MaxAliveZombies, Is.EqualTo(profile.MaxAliveZombies));
+            Assert.That(config.MaxSpawnBatch, Is.EqualTo(profile.MaxSpawnBatch));
+            Assert.That(config.BaseSpawnInterval, Is.EqualTo(profile.BaseSpawnInterval));
+            Assert.That(config.MinSpawnInterval, Is.EqualTo(profile.MinSpawnInterval));
+
+            long pending = ContinuousSpawnBudgetUtility.AddDemand(
+                pendingEnemies: 0,
+                demandPerInterval: 7,
+                elapsedIntervals: 3);
+            Assert.That(pending, Is.EqualTo(21));
+            Assert.That(ContinuousSpawnBudgetUtility.ResolveDrainCount(
+                pending,
+                zombiesAlive: config.MaxAliveZombies,
+                maxAliveZombies: config.MaxAliveZombies,
+                maxDrainPerFrame: config.MaxSpawnBatch), Is.Zero);
+
+            int drained = ContinuousSpawnBudgetUtility.ResolveDrainCount(
+                pending,
+                zombiesAlive: config.MaxAliveZombies - 5,
+                maxAliveZombies: config.MaxAliveZombies,
+                maxDrainPerFrame: config.MaxSpawnBatch);
+            Assert.That(drained, Is.EqualTo(5));
+            Assert.That(pending - drained, Is.EqualTo(16));
+        }
+
+        [Test]
         public void EconomyPriceTuning_UsesProfileValuesAndSanitizesInvalidInputs()
         {
             MobileEconomyPriceTuning fallback =

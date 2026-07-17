@@ -39,6 +39,9 @@ namespace DeadWalls
     ///   gece intensity = faz-intensity * NightIntensityByDay(gun)
     ///   zombi HP       = BaseHP (V1 quantity-only; HP curve/growth dormant)
     ///   spawn batch    = (taban * intensity * cycle buyumesi) * SpawnBatchMultByDay(gun)
+    /// RunDifficultyProfile V1 contract'inda bu asset BaseSpawn egrisi, faz carpanlari ve
+    /// active cap'in icerik owner'idir. Cap doluyken talebi kaybetmeyen backlog politikasi
+    /// designer secenegi degildir; ContinuousSpawnBudgetUtility tarafindan sabit uygulanir.
     /// </summary>
     [CreateAssetMenu(fileName = "DifficultyProfile", menuName = "DeadWalls/Mobile Castle/Difficulty Profile")]
     public class DifficultyProfileSO : ScriptableObject
@@ -48,7 +51,7 @@ namespace DeadWalls
         public AnimationCurve NightIntensityByDay = AnimationCurve.Constant(1f, 60f, 1f);
         [Tooltip("Zombi HP'sine gun carpani (lineer buyumeye EK).")]
         public AnimationCurve ZombieHpMultByDay = AnimationCurve.Constant(1f, 60f, 1f);
-        [Tooltip("Spawn batch'ine gun carpani (intensity ve cycle buyumesine EK).")]
+        [Tooltip("RunDifficultyProfile BaseSpawn gun egrisi: spawn batch'ine intensity ve cycle buyumesinden sonra uygulanan carpan.")]
         public AnimationCurve SpawnBatchMultByDay = AnimationCurve.Constant(1f, 60f, 1f);
         [Tooltip("Egrilerin ornekledigi gun sayisi; sonrasinda son gunun degeri sabit kullanilir.")]
         [Range(10, 200)] public int SampleDays = 60;
@@ -60,7 +63,9 @@ namespace DeadWalls
         public float ZombieDamagePerCycle = 0f;
         public int SpawnBatchSize = 2;
         public float SpawnBatchGrowthPerCycle = 0.15f;
+        [Tooltip("Bir frame'de backlog'dan sahaya aktarilabilecek ve tek intervalde talep edilebilecek quantity tavani.")]
         public int MaxSpawnBatch = 16;
+        [Tooltip("Normal run active zombie tavani. Cap doluyken yeni talep silinmez; PendingEnemies backlog'unda korunur.")]
         public int MaxAliveZombies = 900;
         public float BaseSpawnInterval = 0.95f;
         public float MinSpawnInterval = 0.35f;

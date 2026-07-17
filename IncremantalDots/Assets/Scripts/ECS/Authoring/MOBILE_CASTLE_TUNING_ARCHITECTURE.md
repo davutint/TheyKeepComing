@@ -34,6 +34,32 @@ Her tuning alanının tek bir baseline owner'ı olmalıdır. Inspector, Difficul
 
 Not: Normal V1 repair artık yalnız Stone kullandığı için `RepairBaseWoodCost` serialize uyumluluğu dışında gameplay tarafından okunmaz.
 
+## RunDifficultyProfile contract (V1)
+
+Tracker'daki `RunDifficultyProfile` yeni veya paralel bir ScriptableObject değildir. Canlı
+contract, mevcut owner'ların aşağıdaki tek zinciridir:
+
+1. **BaseSpawn curve:** `DifficultyProfileSO.SpawnBatchMultByDay`, Baker/live apply sırasında
+   `DifficultyDaySample.SpawnBatchMult` olarak örneklenir. `BaseSpawnInterval`,
+   `MinSpawnInterval`, `SpawnBatchSize` ve `SpawnBatchGrowthPerCycle` aynı profile baseline'ına
+   aittir. `WaveSpawnSystem` gün tabanını phase temposundan ayrı çözer.
+2. **Phase multipliers:** Day, Dusk start/end, Night ve Dawn değerleri
+   `MobileCastleTuningResolver` üzerinden `MobileCastleCombatConfig` runtime çıktısına yazılır.
+3. **Active cap:** Normal run tavanının içerik owner'ı `DifficultyProfileSO.MaxAliveZombies`dır.
+   Editor/Development 2K/5K/10K harness'i yalnız transient test oturumunda bu tavana kontrollü
+   istisna uygular; production asset'i değiştirmez.
+4. **Backlog policy:** V1 politikası sabit `PreserveDemand`dır. Active cap doluyken geçen
+   interval talepleri düşürülmez veya görünmezce sıkıştırılmaz; saturating `long`
+   `ContinuousSpawnBudgetData.PendingEnemies` içinde exact save/Continue state'i olarak tutulur.
+   Kapasite açıldığında `ContinuousSpawnBudgetUtility.ResolveDrainCount`, hem boş active
+   kapasiteyi hem `MaxSpawnBatch` frame sınırını aşmadan backlog'u azaltır.
+
+Backlog policy designer tarafından değiştirilebilir bir enum değildir. Talebi düşüren alternatif
+bir mod, oyuncunun göremediği difficulty kaybı ve Continue farkı üreteceği için V1 contract'ının
+dışındadır. İçerik değerleri `DifficultyProfileSO`, politika/matematik
+`ContinuousSpawnBudgetUtility`, runtime telemetry/save state'i ise
+`ContinuousSpawnBudgetData` sahibindedir; bu üçü birbirinin paralel baseline'ı değildir.
+
 ## MobileCastleCombatAuthoring-owned alan örnekleri
 
 - Castle/spawn geometrisi, single-front ve moat baseline
@@ -78,6 +104,7 @@ Runtime production gibi bazı alanlar tech/meta aggregate sonrasında baseline'd
 - `MobileCastleTuningResolverTests.DifficultyProfile_OverridesOnlyProfileOwnedFields`
 - `MobileCastleTuningResolverTests.ActiveSubScene_AssignsDefaultProfile_AndResolvesItsDivergentValues`
 - `MobileCastleTuningResolverTests.DaySample_UsesSameCurveAndSpecialNightRulesForBakeAndLiveApply`
+- `MobileCastleTuningResolverTests.RunDifficultyProfile_ClosesSpawnCurvePhaseCapAndPreservedBacklogContract`
 - `MobileCastleTuningResolverTests.EconomyPriceTuning_UsesProfileValuesAndSanitizesInvalidInputs`
 - `ExactRunContinuePlayModeTests.RuntimeTuning_UsesProfileDifficulty_AndAuthoringCycleDurations`
 - `EnemyCatalogContractTests.Definition_OwnsBaseStatsAndFuturePoolMetadata`
