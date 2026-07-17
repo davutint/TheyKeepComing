@@ -16,6 +16,8 @@ namespace DeadWalls.Tests
             new List<GameplayTelemetryRecord>();
         private readonly List<GameplayTelemetryRecord> _phaseRecords =
             new List<GameplayTelemetryRecord>();
+        private readonly List<GameplayTelemetryRecord> _resourceSpentRecords =
+            new List<GameplayTelemetryRecord>();
         private byte[] _originalRunSave;
         private string _runSavePath;
 
@@ -29,6 +31,7 @@ namespace DeadWalls.Tests
             RunPersistence.Delete();
             _records.Clear();
             _phaseRecords.Clear();
+            _resourceSpentRecords.Clear();
             GameplayTelemetry.Emitted += OnTelemetryEmitted;
             GameBootstrap.PendingAction = GameBootstrap.StartAction.None;
 
@@ -188,12 +191,96 @@ namespace DeadWalls.Tests
             }
         }
 
+        [UnityTest]
+        public IEnumerator PurchaseTransactions_EmitExactCommittedDebits_AndRejectWithoutEvent()
+        {
+            GameManager gameManager = GameManager.Instance;
+            _records.Clear();
+            _phaseRecords.Clear();
+            _resourceSpentRecords.Clear();
+            gameManager.RestartGame();
+
+            for (int frame = 0; frame < 180 && _records.Count == 0; frame++)
+                yield return null;
+            Assert.That(_records.Count, Is.EqualTo(1),
+                "Purchase telemetry oncesi run identity kurulmalidir.");
+
+            World world = World.DefaultGameObjectInjectionWorld;
+            Assert.That(world, Is.Not.Null);
+            EntityManager entityManager = world.EntityManager;
+            using EntityQuery resourceQuery = entityManager.CreateEntityQuery(typeof(ResourceData));
+            Entity resourceEntity = resourceQuery.GetSingletonEntity();
+
+            ResourceData funded = entityManager.GetComponentData<ResourceData>(resourceEntity);
+            funded.Wood = 100_000;
+            funded.Stone = 100_000;
+            funded.Iron = 100_000;
+            funded.Food = 100_000;
+            entityManager.SetComponentData(resourceEntity, funded);
+
+            _resourceSpentRecords.Clear();
+            ResourceCost bedCost = gameManager.GetBedCapacityPurchaseCost(1);
+            int expectedBedCount = gameManager.GetTotalBedCapacity() + 1;
+            Assert.That(gameManager.TryBuyBedCapacity(1), Is.True);
+            Assert.That(_resourceSpentRecords.Count, Is.EqualTo(1));
+            ResourceSpentTelemetryPayload bedPayload =
+                JsonUtility.FromJson<ResourceSpentTelemetryPayload>(
+                    _resourceSpentRecords[0].PayloadJson);
+            Assert.That(bedPayload.Resource, Is.EqualTo("wood"));
+            Assert.That(bedPayload.Amount, Is.EqualTo(bedCost.Wood));
+            Assert.That(bedPayload.PurchaseType, Is.EqualTo("bed_capacity"));
+            Assert.That(bedPayload.ResultingLevel, Is.Zero);
+            Assert.That(bedPayload.ResultingCount, Is.EqualTo(expectedBedCount));
+
+            _resourceSpentRecords.Clear();
+            ResourceCost workerCost = gameManager.GetWorkerBuildingUpgradeCost(
+                EconomyFocusType.Wood,
+                WorkerBuildingUpgradeType.Capacity);
+            Assert.That(workerCost.Wood, Is.GreaterThan(0));
+            Assert.That(workerCost.Iron, Is.GreaterThan(0));
+            Assert.That(gameManager.TryBuyWorkerBuildingUpgrade(
+                EconomyFocusType.Wood,
+                WorkerBuildingUpgradeType.Capacity), Is.True);
+            Assert.That(_resourceSpentRecords.Count, Is.EqualTo(2),
+                "Wood + Iron tek purchase icin kaynak basina bir event uretmelidir.");
+
+            ResourceSpentTelemetryPayload workerWood =
+                JsonUtility.FromJson<ResourceSpentTelemetryPayload>(
+                    _resourceSpentRecords[0].PayloadJson);
+            ResourceSpentTelemetryPayload workerIron =
+                JsonUtility.FromJson<ResourceSpentTelemetryPayload>(
+                    _resourceSpentRecords[1].PayloadJson);
+            Assert.That(workerWood.Resource, Is.EqualTo("wood"));
+            Assert.That(workerWood.Amount, Is.EqualTo(workerCost.Wood));
+            Assert.That(workerIron.Resource, Is.EqualTo("iron"));
+            Assert.That(workerIron.Amount, Is.EqualTo(workerCost.Iron));
+            Assert.That(workerWood.PurchaseType,
+                Is.EqualTo("worker_wood_capacity_upgrade"));
+            Assert.That(workerIron.PurchaseType,
+                Is.EqualTo(workerWood.PurchaseType));
+            Assert.That(workerWood.ResultingLevel, Is.EqualTo(1));
+            Assert.That(workerIron.ResultingLevel, Is.EqualTo(1));
+
+            _resourceSpentRecords.Clear();
+            ResourceData empty = entityManager.GetComponentData<ResourceData>(resourceEntity);
+            empty.Wood = 0;
+            empty.Iron = 0;
+            entityManager.SetComponentData(resourceEntity, empty);
+            Assert.That(gameManager.TryBuyWorkerBuildingUpgrade(
+                EconomyFocusType.Wood,
+                WorkerBuildingUpgradeType.Capacity), Is.False);
+            Assert.That(_resourceSpentRecords, Is.Empty,
+                "Reddedilen transaction resource_spent uretmemeli.");
+        }
+
         private void OnTelemetryEmitted(GameplayTelemetryRecord record)
         {
             if (record.EventName == GameplayTelemetry.RunStartedEventName)
                 _records.Add(record);
             else if (record.EventName == GameplayTelemetry.PhaseChangedEventName)
                 _phaseRecords.Add(record);
+            else if (record.EventName == GameplayTelemetry.ResourceSpentEventName)
+                _resourceSpentRecords.Add(record);
         }
     }
 }

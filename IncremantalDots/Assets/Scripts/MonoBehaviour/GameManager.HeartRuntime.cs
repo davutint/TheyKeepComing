@@ -203,7 +203,15 @@ namespace DeadWalls
                 this,
                 _heartEffectPipeline);
             if (result.Succeeded)
+            {
+                TryEmitResourceSpentTelemetry(
+                    ResourceSpentTelemetryContract.GraveEssence,
+                    result.Quote.TotalGraveEssenceCost,
+                    ResourceSpentTelemetryContract.HeartNode,
+                    result.Quote.NewLevel,
+                    0);
                 OnGameStateChanged?.Invoke();
+            }
             return result;
         }
 

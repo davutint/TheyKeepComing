@@ -152,5 +152,58 @@ namespace DeadWalls
                 day,
                 ContinuousSiegeCycle.Phase);
         }
+
+        private void TryEmitResourceSpentTelemetry(
+            ResourceCost cost,
+            string purchaseType,
+            int resultingLevel,
+            int resultingCount)
+        {
+            if (freeEconomyTestMode)
+                return;
+
+            System.Collections.Generic.List<ResourceSpentTelemetryPayload> payloads =
+                ResourceSpentTelemetryFactory.Create(
+                    cost,
+                    purchaseType,
+                    resultingLevel,
+                    resultingCount);
+            for (int i = 0; i < payloads.Count; i++)
+                TryEmitResourceSpentTelemetry(payloads[i]);
+        }
+
+        private void TryEmitResourceSpentTelemetry(
+            string resource,
+            long amount,
+            string purchaseType,
+            int resultingLevel,
+            int resultingCount)
+        {
+            TryEmitResourceSpentTelemetry(ResourceSpentTelemetryFactory.CreateSingle(
+                resource,
+                amount,
+                purchaseType,
+                resultingLevel,
+                resultingCount));
+        }
+
+        private void TryEmitResourceSpentTelemetry(ResourceSpentTelemetryPayload payload)
+        {
+            if (!_initialized || string.IsNullOrWhiteSpace(_currentRunId)
+                || !IsRunIdentityReadyForPhaseTelemetry())
+            {
+                return;
+            }
+
+            if (!GameplayTelemetry.TryEmitResourceSpent(
+                    _currentRunId,
+                    payload,
+                    out _,
+                    out string error))
+            {
+                UnityEngine.Debug.LogError(
+                    $"[GameManager] resource_spent telemetry reddedildi: {error}");
+            }
+        }
     }
 }

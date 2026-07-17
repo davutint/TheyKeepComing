@@ -264,6 +264,122 @@ namespace DeadWalls.Tests
             Assert.That(backlogError, Does.Contain("horde snapshot"));
         }
 
+        [Test]
+        public void ResourceSpentFactory_ExpandsMultiResourceCostInCanonicalOrder()
+        {
+            List<ResourceSpentTelemetryPayload> payloads =
+                ResourceSpentTelemetryFactory.Create(
+                    new ResourceCost(120, 0, 35, 20),
+                    ResourceSpentTelemetryContract.ArcherRapidBuy,
+                    0,
+                    7);
+
+            Assert.That(payloads.Count, Is.EqualTo(3));
+            Assert.That(payloads[0].Resource, Is.EqualTo("wood"));
+            Assert.That(payloads[0].Amount, Is.EqualTo(120L));
+            Assert.That(payloads[1].Resource, Is.EqualTo("iron"));
+            Assert.That(payloads[1].Amount, Is.EqualTo(35L));
+            Assert.That(payloads[2].Resource, Is.EqualTo("food"));
+            Assert.That(payloads[2].Amount, Is.EqualTo(20L));
+            for (int i = 0; i < payloads.Count; i++)
+            {
+                Assert.That(payloads[i].PurchaseType,
+                    Is.EqualTo(ResourceSpentTelemetryContract.ArcherRapidBuy));
+                Assert.That(payloads[i].ResultingLevel, Is.Zero);
+                Assert.That(payloads[i].ResultingCount, Is.EqualTo(7));
+            }
+        }
+
+        [Test]
+        public void TryEmitResourceSpent_ProducesVersionedMachineReadableEnvelope()
+        {
+            GameplayTelemetryRecord observed = default;
+            bool received = false;
+            void OnEmitted(GameplayTelemetryRecord record)
+            {
+                observed = record;
+                received = true;
+            }
+
+            ResourceSpentTelemetryPayload payload =
+                ResourceSpentTelemetryFactory.CreateSingle(
+                    ResourceSpentTelemetryContract.GraveEssence,
+                    4_250L,
+                    ResourceSpentTelemetryContract.HeartNode,
+                    12,
+                    0);
+
+            GameplayTelemetry.Emitted += OnEmitted;
+            try
+            {
+                Assert.That(GameplayTelemetry.TryEmitResourceSpent(
+                    " run_spend_12 ", payload, out GameplayTelemetryRecord emitted,
+                    out string error), Is.True, error);
+                Assert.That(received, Is.True);
+                Assert.That(observed.RunId, Is.EqualTo("run_spend_12"));
+                Assert.That(emitted.EventName, Is.EqualTo("resource_spent"));
+                Assert.That(emitted.SchemaVersion, Is.EqualTo(1));
+
+                GameplayTelemetryEnvelope envelope =
+                    JsonUtility.FromJson<GameplayTelemetryEnvelope>(emitted.SerializedEnvelope);
+                ResourceSpentTelemetryPayload decoded =
+                    JsonUtility.FromJson<ResourceSpentTelemetryPayload>(envelope.PayloadJson);
+                Assert.That(envelope.EventName, Is.EqualTo("resource_spent"));
+                Assert.That(envelope.SchemaVersion, Is.EqualTo(1));
+                Assert.That(decoded.Resource, Is.EqualTo("grave_essence"));
+                Assert.That(decoded.Amount, Is.EqualTo(4_250L));
+                Assert.That(decoded.PurchaseType, Is.EqualTo("heart_node"));
+                Assert.That(decoded.ResultingLevel, Is.EqualTo(12));
+                Assert.That(decoded.ResultingCount, Is.Zero);
+            }
+            finally
+            {
+                GameplayTelemetry.Emitted -= OnEmitted;
+            }
+        }
+
+        [Test]
+        public void TryEmitResourceSpent_RejectsInvalidIdentityAmountAndResult()
+        {
+            var unknownResource = new ResourceSpentTelemetryPayload
+            {
+                Resource = "gold",
+                Amount = 10L,
+                PurchaseType = ResourceSpentTelemetryContract.BedCapacity,
+                ResultingCount = 61
+            };
+            Assert.That(GameplayTelemetry.TryEmitResourceSpent(
+                "run_invalid_resource", unknownResource, out _, out string resourceError),
+                Is.False);
+            Assert.That(resourceError, Does.Contain("resource kimligi"));
+
+            var invalidAmount = new ResourceSpentTelemetryPayload
+            {
+                Resource = ResourceSpentTelemetryContract.Wood,
+                Amount = 0L,
+                PurchaseType = ResourceSpentTelemetryContract.BedCapacity,
+                ResultingCount = 61
+            };
+            Assert.That(GameplayTelemetry.TryEmitResourceSpent(
+                "run_invalid_amount", invalidAmount, out _, out string amountError), Is.False);
+            Assert.That(amountError, Does.Contain("amount"));
+
+            var missingResult = new ResourceSpentTelemetryPayload
+            {
+                Resource = ResourceSpentTelemetryContract.Iron,
+                Amount = 25L,
+                PurchaseType = "legacy_upgrade"
+            };
+            Assert.That(GameplayTelemetry.TryEmitResourceSpent(
+                "run_invalid_purchase", missingResult, out _, out string purchaseError), Is.False);
+            Assert.That(purchaseError, Does.Contain("purchase type"));
+
+            missingResult.PurchaseType = ResourceSpentTelemetryContract.ArrowCapacityUpgrade;
+            Assert.That(GameplayTelemetry.TryEmitResourceSpent(
+                "run_missing_result", missingResult, out _, out string resultError), Is.False);
+            Assert.That(resultError, Does.Contain("resulting level/count"));
+        }
+
         private MetaUpgradeSO CreateUpgrade(string id, int maxLevel)
         {
             MetaUpgradeSO upgrade = ScriptableObject.CreateInstance<MetaUpgradeSO>();

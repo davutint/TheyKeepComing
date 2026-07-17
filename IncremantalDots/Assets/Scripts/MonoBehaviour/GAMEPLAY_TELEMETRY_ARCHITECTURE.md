@@ -45,6 +45,33 @@ event uretmez. Yeni run'da `run_started` once, ilk Day 1 `phase_changed` hemen s
 Exact Continue restore edilen mevcut `(RunId, Day, Phase)` kimligi prime edilir ve duplicate event
 uretilmez. Bu idempotency save state'e yazilmaz ve cycle/wave/spawn budget sahipligini kopyalamaz.
 
+## `resource_spent` v1
+
+`GameManager`, yalniz basarili player purchase transaction'i canonical runtime state'e commit
+edildikten sonra event uretir:
+
+- payload: `Resource`, `Amount`, `PurchaseType`, `ResultingLevel`, `ResultingCount`
+- resource identity: `wood/stone/iron/food/grave_essence/meta_currency`
+- birden fazla kaynak harcayan tek purchase, ayni purchase type ve sonuc snapshot'iyla kaynak
+  basina bir event uretir; sira Wood, Stone, Iron, Food olarak sabittir
+- level tabanli upgrade'ler post-commit level'i, quantity tabanli islemler post-commit count'u yazar
+- normal Wall repair `ResultingCount` alanina post-commit tam HP birimini yazar
+
+Aktif V1 owner baglantilari normal Wall repair, Arrow refill/capacity/efficiency, bed capacity,
+dort worker binasinin capacity/efficiency upgrade'leri, Basic/Rapid/Frost buy, Rapid/Frost retrain,
+Castle Heart node purchase ve olum sonrasi durable Meta upgrade transaction'laridir. Meta currency
+player-facing adi owner karari bekledigi icin machine identity `meta_currency` olarak sabittir.
+
+Event `SpendResources` yardimcisina genel olarak baglanmaz. Boylece Council negatif effect'leri,
+dawn arrival Food kesintisi, pasif/otomatik tuketim ve rollback edilen islemler purchase olarak
+sayilmaz. Player-facing olmayan legacy Fortify, Tech Tree, archer type upgrade/unlock ve Castle
+upgrade yollari da V1 event kapsamina dahil degildir. `freeEconomyTestMode` gercek debit yapmadigi
+icin resource event'i uretmez. Reddedilen veya rollback edilen purchase sifir event uretir.
+
+Castle Heart event'i wallet debit aninda degil, `HeartPurchaseService` graph/effect commit'i tamamen
+basarili dondukten sonra yazilir. Meta event'i de Souls, level ve disk save ayni atomik transaction'da
+basarili olduktan sonra yazilir. Subscriber hatasi gameplay transaction'ini geri almaz.
+
 ## Genisleme kurali
 
 Tracker'daki sonraki event'ler ayni `GameplayTelemetryRecord` cikisini kullanir. Yeni manager,

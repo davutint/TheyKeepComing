@@ -209,7 +209,21 @@ namespace DeadWalls
                 return false;
 
             MetaUpgradeSO canonical = metaUpgradeCatalog.GetUpgrade(upgrade.Id);
-            return canonical != null && MetaProgression.TryBuyUpgrade(canonical);
+            if (canonical == null)
+                return false;
+
+            int previousLevel = MetaProgression.GetUpgradeLevel(canonical.Id);
+            int cost = canonical.GetCost(previousLevel);
+            if (!MetaProgression.TryBuyUpgrade(canonical))
+                return false;
+
+            TryEmitResourceSpentTelemetry(
+                ResourceSpentTelemetryContract.MetaCurrency,
+                cost,
+                ResourceSpentTelemetryContract.MetaUpgrade,
+                previousLevel + 1,
+                0);
+            return true;
         }
 
         private void Awake()
@@ -590,12 +604,20 @@ namespace DeadWalls
             if (!CanRepairDefenseFull())
                 return false;
 
-            if (!SpendResources(GetRepairCost()))
+            ResourceCost cost = GetRepairCost();
+            if (!SpendResources(cost))
                 return false;
 
             bool repaired = RepairWallByMaxPercent(GetNormalRepairHealPercent());
             if (repaired)
+            {
+                TryEmitResourceSpentTelemetry(
+                    cost,
+                    ResourceSpentTelemetryContract.WallRepair,
+                    0,
+                    Mathf.Max(1, Mathf.CeilToInt(Mathf.Max(0f, Wall.CurrentHP))));
                 OnGameStateChanged?.Invoke();
+            }
 
             return repaired;
         }
@@ -1071,6 +1093,11 @@ namespace DeadWalls
 
             _entityManager.SetComponentData(entity, next);
             ArrowSupply = next;
+            TryEmitResourceSpentTelemetry(
+                new ResourceCost(quote.WoodCost, 0, 0, 0),
+                ResourceSpentTelemetryContract.ArrowRefill,
+                0,
+                next.Current);
             OnGameStateChanged?.Invoke();
             return true;
         }
@@ -1097,6 +1124,11 @@ namespace DeadWalls
 
             _entityManager.SetComponentData(entity, next);
             ArrowSupply = next;
+            TryEmitResourceSpentTelemetry(
+                new ResourceCost(quote.WoodCost, 0, 0, 0),
+                ResourceSpentTelemetryContract.ArrowRefill,
+                0,
+                next.Current);
             OnGameStateChanged?.Invoke();
             return true;
         }
@@ -1147,6 +1179,11 @@ namespace DeadWalls
 
             _entityManager.SetComponentData(entity, next);
             ArrowSupply = next;
+            TryEmitResourceSpentTelemetry(
+                cost,
+                ResourceSpentTelemetryContract.ToArrowUpgradePurchaseType(type),
+                ArrowEconomyUtility.GetUpgradeLevel(next, type),
+                0);
             OnGameStateChanged?.Invoke();
             return true;
         }
@@ -1685,6 +1722,11 @@ namespace DeadWalls
 
             _entityManager.SetComponentData(mobileConfigEntity, state);
             BedCapacity = state;
+            TryEmitResourceSpentTelemetry(
+                cost,
+                ResourceSpentTelemetryContract.BedCapacity,
+                0,
+                MobileBedCapacityUtility.GetTotalCapacity(state));
             OnGameStateChanged?.Invoke();
             return true;
         }
@@ -1760,6 +1802,16 @@ namespace DeadWalls
             _entityManager.SetComponentData(mobileConfigEntity, nextState);
             WorkerBuildingUpgrades = nextState;
             ApplyTechEconomyAggregates();
+            TryEmitResourceSpentTelemetry(
+                cost,
+                ResourceSpentTelemetryContract.ToWorkerUpgradePurchaseType(
+                    resource,
+                    upgradeType),
+                MobileWorkerBuildingUpgradeUtility.GetLevel(
+                    nextState,
+                    resource,
+                    upgradeType),
+                0);
             OnGameStateChanged?.Invoke();
             return true;
         }
@@ -2131,6 +2183,11 @@ namespace DeadWalls
 
             ConsumePopulationForNewArcher(definition.PopulationCost);
             ReadArcherTypeCounts();
+            TryEmitResourceSpentTelemetry(
+                cost,
+                ResourceSpentTelemetryContract.ToArcherBuyPurchaseType(definition.Type),
+                0,
+                GetArcherTypeCount(definition.Type));
             OnGameStateChanged?.Invoke();
             return true;
         }
@@ -2153,6 +2210,11 @@ namespace DeadWalls
 
             ConsumePopulationForNewArcher();
             ReadArcherTypeCounts();
+            TryEmitResourceSpentTelemetry(
+                cost,
+                ResourceSpentTelemetryContract.ToArcherBuyPurchaseType(type),
+                0,
+                GetArcherTypeCount(type));
             OnGameStateChanged?.Invoke();
             return true;
         }
@@ -2188,6 +2250,11 @@ namespace DeadWalls
 
             ApplyArcherTypeToEntity(entity, targetType);
             ReadArcherTypeCounts();
+            TryEmitResourceSpentTelemetry(
+                cost,
+                ResourceSpentTelemetryContract.ToArcherRetrainPurchaseType(targetType),
+                0,
+                GetArcherTypeCount(targetType));
             OnGameStateChanged?.Invoke();
             return true;
         }
