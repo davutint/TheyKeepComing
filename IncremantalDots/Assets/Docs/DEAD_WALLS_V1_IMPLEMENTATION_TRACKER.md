@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.3
 > **Son tam kapsam denetimi:** 2026-07-17
 > **Aktif paket:** Post-Package V1 Closure - Contracts, Performance ve Release DoD
-> **Aktif iş:** `DW-V1-DOD-WALL-ONLY-END` - Verify Wall-Only Run End Contract
-> **İlerleme:** `421 / 442` tracker checkbox'ı tamamlandı - `%95,25`
+> **Aktif iş:** `DW-V1-DOD-SINGLE-ENEMY-CATALOG` - Verify Single Enemy Launch Catalog
+> **İlerleme:** `422 / 442` tracker checkbox'ı tamamlandı - `%95,48`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -1173,7 +1173,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 
 ### Mevcut test envanteri
 
-- `[x]` EditMode: `375/375`; `run_started/phase_changed/resource_spent/archer_changed/heart_node_bought/council_resolved/ability_cast/wall_repaired/run_ended` payload/envelope/identity guard'ları, run peak/timeline accumulator ve v15 migration doğrulaması, archer transition/total-cap ile Heart node/level/depth/cost/reveal doğrulaması, multi-resource canonical order, ability-specific result shape, Meta diminishing reward/quoted receipt/exact 11-definition tuning, exact Council 3/6/9 cadence, staged launch catalog, 5.400-sample budget/token gate, source-retirement/curated-chain, role/content recipe kontratı, v10->v11 Council migration/discriminator, Heart graph, finite Arrow, pool, targeting, Formation V1, common archer cap, economy, worker, cycle, quantity-only, backlog, Moat isolation ve enemy pool kapsamı.
+- `[x]` EditMode: `376/376`; tek production `IsGameOver = true` writer'ı ve Wall-destroyed guard'ı, `run_started/phase_changed/resource_spent/archer_changed/heart_node_bought/council_resolved/ability_cast/wall_repaired/run_ended` payload/envelope/identity guard'ları, run peak/timeline accumulator ve v15 migration doğrulaması, archer transition/total-cap ile Heart node/level/depth/cost/reveal doğrulaması, multi-resource canonical order, ability-specific result shape, Meta diminishing reward/quoted receipt/exact 11-definition tuning, exact Council 3/6/9 cadence, staged launch catalog, 5.400-sample budget/token gate, source-retirement/curated-chain, role/content recipe kontratı, v10->v11 Council migration/discriminator, Heart graph, finite Arrow, pool, targeting, Formation V1, common archer cap, economy, worker, cycle, quantity-only, backlog, Moat isolation ve enemy pool kapsamı.
 - `[x]` PlayMode envanteri: `81 pass + 2 explicit profiler/soak skip`; telemetry class'i `9/9` ile `run_started` sırası, exact Continue duplicate guard'ı, canonical Day/Phase/alive/backlog snapshot'i, tek/iki kaynaklı purchase commit'i, player archer buy/retrain transition'ı, gerçek Castle Heart buy/reveal snapshot'i, regular Council secim/expire sonucu, Fireball/Rally/Emergency Repair commit/result snapshot'i, normal Wall repair'i ve exact Continue sonrası durable `run_ended` final summary'sini kilitler. Rejected transaction'lar event üretmez; Fireball asynchronous hit sayısı cast anında uydurulmaz. Final 83-test full suite temiz geçti. Telemetry, gerçek death quote/Continue/meta shop, `NewGameScene` Day 1-12 Council cadence, onaylı Council chain flag live yazımı, active-card exact payload/memory/handled-day Continue, çözülmüş seçim + temp effect duration Continue, bozuk Council karar/Continue payload preflight'ı, Heart Continue, Arrow/pool/targeting, 1K archer x 10K enemy, Formation V1, archer cap/retrain, economy/worker, Wall, cycle, backlog ve Fireball kapsamı envanterde kalır.
 - `[~]` Player/hardware frame pacing kabulü ilgili ürün kapısını bekliyor; Council launch content ownership tamamlandı.
 
@@ -1198,7 +1198,14 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 
 ## 18. Release Definition of Done
 
-- [ ] Run yalnız Wall `0 HP` ile bitiyor; final wave/boss/ikinci fail phase yok.
+- [x] Run yalnız Wall `0 HP` ile bitiyor; final wave/boss/ikinci fail phase yok.
+  Production runtime scriptlerinde `GameStateData.IsGameOver = true` yazan tek owner
+  `DamageApplySystem` ve tek guard `SingleWallDefenseRules.IsDestroyed(remainingWallHp)`. `GameManager`
+  yalnız authoritative `false -> true` geçişini gözleyip death transaction/sunumu bir kez başlatıyor.
+  Wave completion, cycle/day, horde pressure, enemy/boss ölümü veya başka fail phase terminal state
+  yazmıyor. Source-owner EditMode guard'ı ile injected Gate/Core gerçek PlayMode regresyonu bu sınırı
+  kilitliyor; targeted `12/12` EditMode, `1/1` PlayMode, full EditMode `376/376` ve full PlayMode
+  `81 pass + 2 explicit profiler/soak skip` geçti.
 - [ ] Çıkış catalog'unda tek enemy prefab var.
 - [ ] Difficulty enemy stats değil adet/akış büyütüyor.
 - [ ] 60 saniye cycle 30/5/20/5 ve kesintisiz.
@@ -1270,6 +1277,7 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | `RunPersistence.cs` | Exact schema v15; minimum v3, compact snapshot, Heart graph, regular Council state, üç active-ability cooldown'ı ve run telemetry accumulator'ları; açık v3->v15 migration zinciri |
 | `ContinuousSiegeCycleSystem.cs` | Phase/intensity ve Blood Moon application |
 | `WaveSpawnSystem.cs` + `EnemyPoolRuntimeUtility.cs` | Tek catalog prefab/stat, cap/backlog ve expandable pool rent |
+| `DamageApplySystem.cs` + `SingleWallDefenseRules.cs` | Production runtime'da tek `IsGameOver = true` writer'ı; yalnız `WallSegment` sıfır HP guard'ı terminal state üretir, final wave/boss/ikinci fail owner'ı yoktur |
 | `DamageCleanupSystem.cs` | Reward sonrası enemy pool return |
 | `ResourceTickSystem.cs` + `PopulationTickSystem.cs` | V1 castle loop'ta ana kaynak ve population için pasif consumption yok |
 | `MobileEconomyPriceTuning` + `MobileCastleTuningResolver.cs` + `DifficultyTunerWindow.cs` | Profile-owned bed base/interval ve worker CAP/EFF Wood/Iron base + ortak growth değerlerini sanitize edip Baker/live Apply ile tek runtime component'e taşır |
@@ -1420,3 +1428,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-17 | `DW-V1-TELEMETRY-COUNCIL-RESOLVED` canonical regular Council decision event | Provider-independent telemetry bus'i `council_resolved` v1 ile genisletildi. Regular Council Option A/B secimi effect apply, otomatik/curated flag ve active-clear commit'inden sonra; Dusk expire active-clear commit'inden sonra day/template/resolution/concrete effect/guardlanmis next-night delta snapshot'i yayiyor. Rejected secim, bos tekrar expire, UI sunumu ve cozulmus karar sonrasi exact Continue event disinda; Emergency Council yok | Contract EditMode `18/18`; gercek `NewGameScene` choice + expire + Continue PlayMode `6/6`; full EditMode `363/363`; full PlayMode `78 pass + 2 explicit profiler/soak skip`; `NewGameScene` validation `0` issue; tracker `418/442` |
 | 2026-07-17 | `DW-V1-TELEMETRY-ABILITY-CAST` canonical active ability result event | Provider-independent telemetry bus'i `ability_cast` v1 ile genisletildi. Fireball/Rally/Emergency Repair yalniz canonical transaction commit'inden sonra ability/phase/resolved cooldown/result snapshot'i yayiyor. Fireball asynchronous impact oncesi speculative hit saymiyor; Rally canonical archer totalini, Emergency Repair gercek Wall HP farkini yaziyor. Rejected cooldown/active/phase/Wall yollari ve exact Continue event disinda; Fireball damage job'una sync-point veya per-zombie telemetry eklenmedi | Contract EditMode `21/21`; gercek `NewGameScene` uc ability + rejected tekrar + Continue PlayMode `7/7`; full EditMode `366/366`; full PlayMode `79 pass + 2 explicit profiler/soak skip`; scene validation `0` issue; final Console `0 error / 0 warning`; tracker `419/442` |
 | 2026-07-17 | `DW-V1-TELEMETRY-RUN-ENDED` durable final run summary event | Provider-independent telemetry bus'i `run_ended` v1 ile genişletildi. Production spawn commit'leri peak enemy high-water mark'ını, modifier sonrası gerçek Wall hasarı day/phase bucket'larını besliyor; per-hit event ve development stress sayımı yok. Schema v15 exact Continue accumulator'ları koruyor. Event yalnız death receipt ve Meta persistence finalize edildikten sonra gerçek day/kills/peak enemy/peak population/Wall damage timeline/meta reward snapshot'ıyla bir kez çıkıyor | Targeted EditMode `53/53`; targeted PlayMode `9/9`; full EditMode `375/375`; full PlayMode `81 pass + 2 explicit profiler/soak skip`; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `421/442` |
+| 2026-07-17 | `DW-V1-DOD-WALL-ONLY-END` Wall-only terminal state contract | Runtime source audit'inde tek production `IsGameOver = true` writer'ının `DamageApplySystem` olduğu ve yalnız `SingleWallDefenseRules.IsDestroyed(remainingWallHp)` sonrasında yazdığı kilitlendi. `GameManager` terminal state üretmiyor; yalnız rising edge'i death transaction ve UI'ya taşıyor. Wave completion, cycle/day, horde pressure, enemy/boss ölümü, injected legacy Gate/Core ve ikinci fail phase koşuyu bitiremiyor | Targeted EditMode `12/12`; injected Gate/Core + lethal Wall PlayMode `1/1`; full EditMode `376/376`; full PlayMode `81 pass + 2 explicit profiler/soak skip`; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `422/442` |
