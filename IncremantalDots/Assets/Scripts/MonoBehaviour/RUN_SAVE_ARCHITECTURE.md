@@ -73,6 +73,18 @@ Combat rebuild seed ayrı kaydedilir; saved spawn RNG, cycle, kill ve count'tan 
 
 Receipt veya `.tmp` marker'ı var fakat payload okunamıyorsa Continue fail-closed reddedilir. Atomik write, orphan temp recovery ve çökme matrisi `DEATH_RECEIPT_ARCHITECTURE.md` içindedir.
 
+## Kapalı süre ve offline ilerleme sınırı
+
+Continue bir zaman atlama sistemi değildir. `RunSaveState`, `MetaProgressState` ve
+`RunDeathReceipt` wall-clock timestamp, last-login veya offline accrual alanı taşımaz.
+Yükleme yalnız diskteki exact cycle, kaynak, spawn RNG ve combat state'ini geri kurar;
+uygulamanın kapalı kaldığı süre kadar kaynak, düşman, hasar, ölüm veya meta ödülü üretmez.
+
+Production runtime kodu `DateTime.Now`, `DateTime.UtcNow`, `DateTimeOffset` veya Unix timestamp
+üzerinden ilerleme hesaplamaz. Bu sınır `NoSpeedOfflineProgressContractTests` ile source,
+save-schema ve player-facing scene düzeylerinde release guard olarak korunur. Editor-only
+profiling/simülasyon araçlarının tarih damgaları runtime sözleşmesinin parçası değildir.
+
 ## Değişiklik kuralı
 
 Yeni bir koşu state'i eklenirken üç sınır birlikte güncellenir:
@@ -106,6 +118,7 @@ Entity referansı doğrudan JSON'a yazılmaz. Referans gerekiyorsa compact stabl
 - `RunPersistenceTests.CorruptDeathReceiptMarker_FailsClosedAndInvalidatesSnapshot`
 - `RunPersistenceTests.PendingDeathReward_RecoversOnceAndSurvivesReload`
 - `RunPersistenceTests.PendingDeathReceipt_RecoversOrphanedDurableTemp`
+- `NoSpeedOfflineProgressContractTests.RunAndMetaSaveSchemas_HaveNoOfflineAccrualFields`
 - `ExactRunContinuePlayModeTests.SaveRunSnapshot_LethalEcsState_CannotRewriteContinueAfterDeath`
 - `ExactRunContinuePlayModeTests.Continue_RestoresSameCyclePhaseTimerResourcesAndSpawnRng` actual worker ve target ratio state'ini de doğrular.
 - `ExactRunContinuePlayModeTests.GraveEssence_UsesHeartTransactionPersistsOnContinueAndResetsWithRun`

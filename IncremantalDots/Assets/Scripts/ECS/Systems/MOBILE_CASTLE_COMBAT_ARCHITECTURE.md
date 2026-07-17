@@ -230,6 +230,18 @@ Sol ust economy HUD mevcut kaynaklari gosterir: Wood, Stone, Iron, Food, Populat
 
 Mobile castle mode'da XP level-up pause veya kart paneli tetiklemez. Oyun dongusu surekli devam eder: zombi oldur, kaynak biriktir, sol worker drawer'dan ekonomi buyut, sag recruitment drawer'dan okcu satin al.
 
+### Sabit oyun hızı
+
+Player-facing run hızı `1x` sabittir; `2x/4x`, fast-forward veya benzeri bir hızlandırma
+kontrolü yoktur. `SimulationPauseService` yalnız modal/pause lease'leri için `0` kullanır ve
+önceki değeri exact geri yükler. `UIManager` Game Over sunumunda kısa süreli `0.25x` yavaşlatma
+kullanabilir; bu oyuncu kontrollü hızlandırma değildir. Production runtime'da `1` üstü
+`Time.timeScale` ve `Time.fixedDeltaTime` yazıcısı yasaktır.
+
+`LongRunSimulatorWindow` içindeki `1-5x` yalnız Editor test aracıdır; player build/runtime
+sözleşmesine girmez. Production scene pause kontrolü taşıyabilir fakat speed control taşıyamaz.
+Bu sahiplik `NoSpeedOfflineProgressContractTests` ile kilitlidir.
+
 Legacy level-up kart API'si eski akis icin kodda durabilir, ama `MobileCastleCombatConfig` varken `DamageCleanupSystem` XP threshold'u `IsLevelUpPending` yapmaz.
 
 Mobile normal mode'da `DamageCleanupSystem`, death timer biten zombiler icin kill reward'i `ResourceAccumulator` uzerine yazar ve entity'yi pool rezervine dondurur. Worker economy aktifken kill reward `WorkerEconomyRewardMultiplier` ile azaltilir; ana gelir kaynagi worker allocation'dir. Continuous siege varsayilaninda wave clear bonus/player-facing clear akisi tetiklenmez, fakat cycle tamamlandikca population growth uygulanir. Stress mode'da reward verilmez.

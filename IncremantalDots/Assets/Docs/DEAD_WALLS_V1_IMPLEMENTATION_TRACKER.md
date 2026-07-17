@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.3
 > **Son tam kapsam denetimi:** 2026-07-17
 > **Aktif paket:** Post-Package V1 Closure - Contracts, Performance ve Release DoD
-> **Aktif iş:** `DW-V1-DOD-NO-SPEED-OFFLINE` - Verify No Speed-Up or Offline Progress
-> **İlerleme:** `425 / 442` tracker checkbox'ı tamamlandı - `%96,15`
+> **Aktif iş:** `DW-V1-DOD-PASSIVE-RESOURCE-DRAIN` - Verify Passive Resource Drain Boundary
+> **İlerleme:** `426 / 442` tracker checkbox'ı tamamlandı - `%96,38`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -123,7 +123,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 |---|---|---|
 | Aktif scene | `Assets/Scenes/NewGameScene.unity` Unity MCP'de loaded; bu paket scene kaydetmedi, dış değişiklik modali in-memory hali korumak için Ignore edildi | Disk/in-memory scene uzlaşması sonraki scene yazımından önce kontrol edilmeli |
 | Kamera | Ortografik, size `8`, gameplay pan/zoom controller yok; `CameraShaker` var | Temel sabit kamera uyumlu |
-| Oyun hızı | Oyuncu kontrollü x2/x4 veya offline progress owner'ı bulunmadı | Blueprint ile uyumlu; regression gerekli |
+| Oyun hızı | Player runtime `1x`; pause `0`, Game Over sunumu `0.25x`; x2/x4 kontrolü, wall-clock owner'ı veya offline save alanı yok. Editor `LongRunSimulatorWindow` ayrı test aracıdır | `[x]` Source/save-schema/scene release guard + exact Continue regresyonu |
 | Battlefield | Kale/duvar solda, spawn sağdaki `SpawnLineX` bandından geliyor | Temel kompozisyon uyumlu |
 | Build placement | Aktif scene'de `BuildingPlacementUI` ve `BuildingGridManager` bağlı değil | Hazır bina yönüyle uyumlu |
 | Cycle | Release guard ile exact `60 = 30/5/20/5`; dört fazda pozitif spawn temposu ve Day wrap'ında prep gap yok | Uyumlu |
@@ -1234,7 +1234,19 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
   dört-faz sözleşmesiyle değiştirildi. Targeted EditMode `1/1`, gerçek phase/wrap PlayMode `2/2`,
   full EditMode `379/379` ve full PlayMode `81 pass + 2 explicit profiler/soak skip` geçti;
   scene validation `0` issue ve final Console `0 error / 0 warning`.
-- [ ] Speed-up/offline progress yok.
+- [x] Speed-up/offline progress yok.
+  Production runtime source guard'ı player-facing `Time.timeScale > 1`, `Time.fixedDeltaTime`
+  yazıcısı, wall-clock API ve offline owner alanlarını yasaklıyor; yalnız normal `1x`, merkezi pause
+  `0` ve Game Over sunumu `0.25x` sahipleri onaylı. Editor-only `LongRunSimulatorWindow` player
+  runtime kapsamına girmiyor. `RunSaveState`, `MetaProgressState` ve `RunDeathReceipt` timestamp,
+  last-login veya offline accrual alanı taşımıyor. Gerçek `NewGameScene` tek bound pause kontrolü
+  taşıyor ve x2/x4/fast-forward kontrolü taşımıyor; exact Continue aynı cycle/phase/timer,
+  kaynak ve spawn RNG state'ini geri yüklüyor. Targeted EditMode `3/3`, exact Continue PlayMode
+  `1/1`, full EditMode `382/382` ve full PlayMode `81 pass + 2 explicit profiler/soak skip`
+  geçti. Tam PlayMode ilk turunda 10K/1K stres testi son-frame projectile fotoğrafına bağlı kaldı;
+  sample boyunca authoritative pool rent artışını ölçecek biçimde stabilize edildi ve hedefli
+  turda `2.000` yeni rent / `1.000` peak aktif projectile doğrulandı. Scene validation `0` issue,
+  final Console `0 error / 0 warning`.
 - [ ] Wood/Stone/Iron/Food pasif negatif akmıyor; Arrow tek sürekli tüketim.
 - [ ] Population, beds ve worker ratios exact save/load.
 - [ ] Worker world feedback representative ve doğru.
@@ -1457,3 +1469,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-17 | `DW-V1-DOD-SINGLE-ENEMY-CATALOG` single-enemy launch catalog contract | Production düşman klasörü tam bir `EnemyCatalogSO`, tam bir `EnemyDefinitionSO` ve tek `zombie_basic -> Zombie.prefab` kaydıyla sınırlandı. EditMode release guard'ı iki SubScene authoring sahibinin aynı production catalog'a, legacy compatibility alanının da aynı prefab'a bağlı olmasını kilitliyor. Runtime bake buffer'ı tek entry üretiyor; production spawn bu entry'nin prefab ve statlarını kullanıyor | Unity MCP asset audit `1 catalog / 1 definition`; targeted EditMode `4/4`; gerçek bake/spawn PlayMode `2/2`; full EditMode `377/377`; full PlayMode `81 pass + 2 explicit profiler/soak skip`; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `423/442` |
 | 2026-07-17 | `DW-V1-DOD-QUANTITY-ONLY-DIFFICULTY` quantity-only launch difficulty contract | Production difficulty klasörü tek `DefaultDifficulty.asset` profile'ıyla sınırlandı. EditMode release guard'ı active SubScene authoring/profile/catalog bağını, neutral HP/damage/speed growth değerlerini ve aktif count/batch/intensity/interval pressure kanallarını birlikte kilitliyor. Gerçek runtime Day 1 -> Day 50 geçişinde enemy statları sabit kalırken adet artıyor ve spawn interval daralıyor | Unity MCP asset audit `1 profile`; targeted EditMode `2/2`; gerçek profile/bake/advanced-cycle PlayMode `3/3`; full EditMode `378/378`; full PlayMode `81 pass + 2 explicit profiler/soak skip`; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `424/442` |
 | 2026-07-17 | `DW-V1-DOD-60S-CYCLE` exact continuous cycle launch contract | Production SubScene exact `ContinuousSiegeEnabled=true` ve `60 = Day 30 + Dusk 5 + Night 20 + Dawn 5` authoring sözleşmesiyle kilitlendi. Runtime wrap testi dört pozitif-intensity fazı, Day 1 -> Day 2 geçişini, cycle index/timer wrap'ını ve `WaveStateData` combat-active durumunun prep gap olmadan korunmasını doğruluyor. Eski üç-faz `25/10/25` mimari metni kaldırılarak güncel tek sözleşme bırakıldı | Targeted EditMode `1/1`; gerçek phase/wrap PlayMode `2/2`; full EditMode `379/379`; full PlayMode `81 pass + 2 explicit profiler/soak skip`; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `425/442` |
+| 2026-07-17 | `DW-V1-DOD-NO-SPEED-OFFLINE` fixed-speed online-only run contract | Production source release guard'ı player-facing `Time.timeScale > 1`, `Time.fixedDeltaTime`, wall-clock progression API ve offline owner alanlarını yasaklıyor; yalnız normal `1x`, merkezi pause `0` ve Game Over sunumu `0.25x` sahipleri onaylı. Run/meta/death save şemaları timestamp veya offline accrual alanı taşımıyor; gerçek scene pause sunuyor fakat x2/x4/fast-forward sunmuyor. Exact Continue kapalı süre uygulamadan aynı cycle/phase/timer, kaynak ve spawn RNG state'ini geri kuruyor. Tam regresyonda bulunan 10K/1K stres testi son-frame projectile flake'i, runtime değiştirilmeden sample içindeki authoritative pool rent artışını ölçerek stabilize edildi | Targeted EditMode `3/3`; exact Continue PlayMode `1/1`; stabilize 10K/1K PlayMode `1/1` (`2.000` sample rent, `1.000` peak projectile); full EditMode `382/382`; full PlayMode `81 pass + 2 explicit profiler/soak skip`; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `426/442` |

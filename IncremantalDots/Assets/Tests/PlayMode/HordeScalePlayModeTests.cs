@@ -357,6 +357,10 @@ namespace DeadWalls.Tests
             for (int frame = 0; frame < WarmupFrames; frame++)
                 yield return null;
 
+            ArrowPoolRuntimeData arrowPoolBeforeSample =
+                entityManager.GetComponentData<ArrowPoolRuntimeData>(arrowPoolEntity);
+            int peakProjectileCountDuringSample = 0;
+
             int activeChunkCount = activeQuery.CalculateChunkCount();
             double averageActiveEntitiesPerChunk = activeChunkCount > 0
                 ? (double)EnemyTarget / activeChunkCount
@@ -385,6 +389,9 @@ namespace DeadWalls.Tests
                 for (int frame = 0; frame < SampleFrames; frame++)
                 {
                     yield return null;
+                    peakProjectileCountDuringSample = Math.Max(
+                        peakProjectileCountDuringSample,
+                        projectileQuery.CalculateEntityCount());
                     double frameMs = Time.unscaledDeltaTime * 1000.0;
                     frameTimes[frame] = frameMs;
                     frameTotalMs += frameMs;
@@ -413,12 +420,14 @@ namespace DeadWalls.Tests
             Assert.That(archerQuery.CalculateEntityCount(), Is.EqualTo(ArcherTarget),
                 "Steady-state sample sirasinda archer sayisi degisti.");
             int projectileCountAfterSample = projectileQuery.CalculateEntityCount();
-            Assert.That(projectileCountAfterSample, Is.GreaterThan(0),
-                "1K archer hedefleme turu projectile uretmedi.");
             Assert.That(ArrowPoolRuntimeUtility.Maintain(
                 entityManager, arrowPoolEntity, arrowPrefab), Is.True);
             ArrowPoolRuntimeData arrowPoolAfterSample =
                 entityManager.GetComponentData<ArrowPoolRuntimeData>(arrowPoolEntity);
+            long sampleProjectileRents = arrowPoolAfterSample.TotalRentCount
+                - arrowPoolBeforeSample.TotalRentCount;
+            Assert.That(sampleProjectileRents, Is.GreaterThan(0),
+                "1K archer hedefleme turu sample boyunca projectile rent etmedi.");
             Assert.That(arrowPoolAfterSample.TotalCreated,
                 Is.GreaterThanOrEqualTo(arrowPoolAfterSample.PrewarmTarget));
             Assert.That(arrowPoolAfterSample.TotalRentCount, Is.GreaterThan(0));
@@ -555,6 +564,8 @@ namespace DeadWalls.Tests
                 "[DW-B-SCALE] " +
                 $"enemy={EnemyTarget}; archer={ArcherTarget}; " +
                 $"projectile_after_sample={projectileCountAfterSample}; " +
+                $"projectile_sample_peak={peakProjectileCountDuringSample}; " +
+                $"projectile_sample_rents={sampleProjectileRents}; " +
                 $"arrow_pool_total={arrowPoolAfterSample.TotalCreated}; " +
                 $"arrow_pool_available={arrowPoolAfterSample.AvailableCount}; " +
                 $"arrow_pool_active={arrowPoolAfterSample.ActiveCount}; " +
