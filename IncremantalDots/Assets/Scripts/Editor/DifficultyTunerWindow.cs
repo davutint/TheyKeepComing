@@ -31,6 +31,7 @@ namespace DeadWalls
         private bool _botAutoRestart = true;
         private int _spawnPreviewDay = 1;
         private float _wallPreviewMissingPercent = 0.50f;
+        private int _economyPreviewLevel;
         private double _nextSpawnTelemetryRepaint;
 
         private List<int> _deaths = new List<int>();
@@ -423,26 +424,71 @@ namespace DeadWalls
         private void DrawEconomyPriceSection()
         {
             _foldEconomyPrices = DrawSectionHeader(_foldEconomyPrices,
-                "Ekonomi Fiyat Egrileri", "bed + worker bina + finite ammo");
+                "Economy Runtime Contract", "base rates + CAP cost + EFF growth");
             if (!_foldEconomyPrices)
                 return;
 
             using (new EditorGUILayout.VerticalScope("box"))
             {
-                EditorGUILayout.LabelField("House Beds", EditorStyles.boldLabel);
-                DrawProp("BedBaseWoodCost");
-                DrawProp("BedCostGrowthCapacityInterval");
-                EditorGUILayout.Space(4);
-                EditorGUILayout.LabelField("Worker Building Capacity", EditorStyles.boldLabel);
+                EditorGUILayout.LabelField("Per-Worker Base Production / Min", EditorStyles.boldLabel);
+                DrawProp("WoodWorkerProductionPerMin");
+                DrawProp("StoneWorkerProductionPerMin");
+                DrawProp("IronWorkerProductionPerMin");
+                DrawProp("FoodWorkerProductionPerMin");
+
+                EditorGUILayout.Space(6);
+                EditorGUILayout.LabelField("Capacity Investment", EditorStyles.boldLabel);
                 DrawProp("WorkerCapacityBaseWoodCost");
                 DrawProp("WorkerCapacityBaseIronCost");
-                EditorGUILayout.Space(4);
-                EditorGUILayout.LabelField("Worker Building Efficiency", EditorStyles.boldLabel);
+                EditorGUILayout.LabelField("Effect per level",
+                    $"+{MobileWorkerBuildingUpgradeUtility.CapacityPerLevel} worker slots (V1 fixed)");
+
+                EditorGUILayout.Space(6);
+                EditorGUILayout.LabelField("Efficiency Investment", EditorStyles.boldLabel);
                 DrawProp("WorkerEfficiencyBaseWoodCost");
                 DrawProp("WorkerEfficiencyBaseIronCost");
+                DrawProp("WorkerEfficiencyPercentPerLevel");
                 DrawProp("WorkerBuildingCostGrowthMultiplier");
+
                 EditorGUILayout.Space(6);
-                EditorGUILayout.LabelField("Finite Arrow Supply", EditorStyles.boldLabel);
+                _economyPreviewLevel = EditorGUILayout.IntSlider(
+                    "Preview current level", _economyPreviewLevel, 0, 25);
+                MobileEconomyPriceTuning previewTuning =
+                    MobileCastleTuningResolver.ResolveEconomyPriceTuning(_profile);
+                MobileWorkerBuildingUpgradeUtility.TryGetCostForLevel(
+                    WorkerBuildingUpgradeType.Capacity,
+                    _economyPreviewLevel,
+                    previewTuning,
+                    out WorkerBuildingUpgradeCost capacityCost);
+                MobileWorkerBuildingUpgradeUtility.TryGetCostForLevel(
+                    WorkerBuildingUpgradeType.Efficiency,
+                    _economyPreviewLevel,
+                    previewTuning,
+                    out WorkerBuildingUpgradeCost efficiencyCost);
+                EditorGUILayout.LabelField("Next CAP / EFF cost",
+                    $"{capacityCost.Wood:N0}W + {capacityCost.Iron:N0}I  /  "
+                    + $"{efficiencyCost.Wood:N0}W + {efficiencyCost.Iron:N0}I");
+                EditorGUILayout.LabelField("Owned CAP / EFF effect",
+                    $"+{MobileWorkerBuildingUpgradeUtility.GetCapacityBonus(_economyPreviewLevel):N0} slots  /  "
+                    + $"+{MobileWorkerBuildingUpgradeUtility.GetEfficiencyBonusPercent(_economyPreviewLevel, previewTuning):P0}");
+                EditorGUILayout.HelpBox(
+                    "Base rates profile-owned'dir. CAP ve EFF her alisveriste Wood + Iron'i "
+                    + "tek transaction olarak harcar; iki fiyat da ilgili bina seviyesinde ortak "
+                    + "growth carpanini kullanir. EFF bonusu additive'dir, compound olmaz.",
+                    MessageType.None);
+
+                DrawLiveEconomyTelemetry();
+
+                EditorGUILayout.Space(8);
+                EditorGUILayout.LabelField("Adjacent Population / Arrow Inputs", EditorStyles.boldLabel);
+                EditorGUILayout.HelpBox(
+                    "Bu alanlar mevcut edit yetenegini korur; kendi tracker audit'lerinde ayrica "
+                    + "Population ve Archer runtime contract yuzeylerine alinacak.", MessageType.None);
+                EditorGUILayout.LabelField("House Beds", EditorStyles.miniBoldLabel);
+                DrawProp("BedBaseWoodCost");
+                DrawProp("BedCostGrowthCapacityInterval");
+                EditorGUILayout.Space(6);
+                EditorGUILayout.LabelField("Finite Arrow Supply", EditorStyles.miniBoldLabel);
                 DrawProp("ArrowBaseCapacity");
                 DrawProp("ArrowCapacityPerLevel");
                 DrawProp("ArrowRefillPackageSize");
@@ -453,12 +499,90 @@ namespace DeadWalls
                 DrawProp("ArrowEfficiencyBaseWoodCost");
                 DrawProp("ArrowEfficiencyBaseIronCost");
                 DrawProp("ArrowUpgradeCostGrowthMultiplier");
-                EditorGUILayout.HelpBox(
-                    "Butun degerler Apply sirasinda int-safe tuning'e sanitize edilir. "
-                    + "Bed quadratic, bina ve ammo yatirim fiyatlari exponential buyur; refill "
-                    + "birim fiyati satin alma sayisiyla artmaz. Temsil edilemeyen "
-                    + "transaction runtime tarafinda reddedilir.", MessageType.None);
             }
+        }
+
+        private void DrawLiveEconomyTelemetry()
+        {
+            if (!Application.isPlaying)
+                return;
+
+            var world = World.DefaultGameObjectInjectionWorld;
+            if (world == null || !world.IsCreated)
+                return;
+
+            EntityManager em = world.EntityManager;
+            using EntityQuery query = em.CreateEntityQuery(
+                typeof(MobileCastleCombatConfig),
+                typeof(MobileEconomyPriceTuning),
+                typeof(MobilePopulationAllocation),
+                typeof(MobileWorkerBuildingUpgradeState));
+            if (query.CalculateEntityCount() != 1)
+            {
+                EditorGUILayout.HelpBox("Live worker economy singleton henuz hazir degil.",
+                    MessageType.Info);
+                return;
+            }
+
+            Entity entity = query.GetSingletonEntity();
+            MobileCastleCombatConfig config = em.GetComponentData<MobileCastleCombatConfig>(entity);
+            MobileEconomyPriceTuning tuning = MobileEconomyPriceTuningUtility.Sanitize(
+                em.GetComponentData<MobileEconomyPriceTuning>(entity));
+            MobilePopulationAllocation allocation =
+                em.GetComponentData<MobilePopulationAllocation>(entity);
+            MobileWorkerBuildingUpgradeState upgrades =
+                em.GetComponentData<MobileWorkerBuildingUpgradeState>(entity);
+            GameManager gm = GameManager.Instance;
+
+            EditorGUILayout.Space(6);
+            EditorGUILayout.LabelField("Live Effective Economy", EditorStyles.boldLabel);
+            DrawEconomyResourceTelemetry("Wood", EconomyFocusType.Wood,
+                allocation.WoodWorkers, config.WoodWorkerCap,
+                _profile.WoodWorkerProductionPerMin, config.WoodWorkerProductionPerMin,
+                upgrades, tuning, gm);
+            DrawEconomyResourceTelemetry("Stone", EconomyFocusType.Stone,
+                allocation.StoneWorkers, config.StoneWorkerCap,
+                _profile.StoneWorkerProductionPerMin, config.StoneWorkerProductionPerMin,
+                upgrades, tuning, gm);
+            DrawEconomyResourceTelemetry("Iron", EconomyFocusType.Iron,
+                allocation.IronWorkers, config.IronWorkerCap,
+                _profile.IronWorkerProductionPerMin, config.IronWorkerProductionPerMin,
+                upgrades, tuning, gm);
+            DrawEconomyResourceTelemetry("Food", EconomyFocusType.Food,
+                allocation.FoodWorkers, config.FoodWorkerCap,
+                _profile.FoodWorkerProductionPerMin, config.FoodWorkerProductionPerMin,
+                upgrades, tuning, gm);
+        }
+
+        private static void DrawEconomyResourceTelemetry(string label,
+            EconomyFocusType resource, int workers, int effectiveCap, float profileBaseRate,
+            float effectiveRate, in MobileWorkerBuildingUpgradeState upgrades,
+            in MobileEconomyPriceTuning tuning, GameManager gameManager)
+        {
+            int capacityLevel = MobileWorkerBuildingUpgradeUtility.GetLevel(
+                upgrades, resource, WorkerBuildingUpgradeType.Capacity);
+            int efficiencyLevel = MobileWorkerBuildingUpgradeUtility.GetLevel(
+                upgrades, resource, WorkerBuildingUpgradeType.Efficiency);
+            MobileWorkerBuildingUpgradeUtility.TryGetNextCost(
+                upgrades, resource, WorkerBuildingUpgradeType.Capacity, tuning,
+                out WorkerBuildingUpgradeCost capacityCost);
+            MobileWorkerBuildingUpgradeUtility.TryGetNextCost(
+                upgrades, resource, WorkerBuildingUpgradeType.Efficiency, tuning,
+                out WorkerBuildingUpgradeCost efficiencyCost);
+            float totalPerMin = gameManager != null
+                ? gameManager.GetWorkerProductionRate(resource)
+                : Mathf.Max(0, workers) * Mathf.Max(0f, effectiveRate);
+
+            EditorGUILayout.LabelField(label, EditorStyles.miniBoldLabel);
+            EditorGUILayout.LabelField("Workers / effective cap",
+                $"{Mathf.Max(0, workers):N0} / {Mathf.Max(0, effectiveCap):N0}");
+            EditorGUILayout.LabelField("Profile base / effective / total",
+                $"{Mathf.Max(0f, profileBaseRate):0.###} / {Mathf.Max(0f, effectiveRate):0.###} / {Mathf.Max(0f, totalPerMin):0.##} per min");
+            EditorGUILayout.LabelField("CAP level / next",
+                $"L{capacityLevel} / {capacityCost.Wood:N0}W + {capacityCost.Iron:N0}I");
+            EditorGUILayout.LabelField("EFF level / bonus / next",
+                $"L{efficiencyLevel} / +{MobileWorkerBuildingUpgradeUtility.GetEfficiencyBonusPercent(efficiencyLevel, tuning):P0} / "
+                + $"{efficiencyCost.Wood:N0}W + {efficiencyCost.Iron:N0}I");
         }
 
         private void DrawFutureSection()
@@ -664,7 +788,13 @@ namespace DeadWalls
                 buffer.Add(MobileCastleTuningResolver.ResolveDaySample(p, day));
             }
 
-            GameManager.Instance?.ApplyWallBaseHpTuning(config.WallBaseHp);
+            GameManager gameManager = GameManager.Instance;
+            gameManager?.ApplyWallBaseHpTuning(config.WallBaseHp);
+            gameManager?.ApplyWorkerEconomyTuning(
+                config.WoodWorkerProductionPerMin,
+                config.StoneWorkerProductionPerMin,
+                config.IronWorkerProductionPerMin,
+                config.FoodWorkerProductionPerMin);
         }
 
         private void LoadLatestSummary()

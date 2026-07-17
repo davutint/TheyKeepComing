@@ -28,6 +28,10 @@ namespace DeadWalls.Tests
                 profile.RallyCooldown = 48f;
                 profile.EmergencyRepairHealPercent = 0.35f;
                 profile.EmergencyRepairCooldown = 95f;
+                profile.WoodWorkerProductionPerMin = 11f;
+                profile.StoneWorkerProductionPerMin = 12f;
+                profile.IronWorkerProductionPerMin = 13f;
+                profile.FoodWorkerProductionPerMin = 14f;
 
                 var config = new MobileCastleCombatConfig
                 {
@@ -42,7 +46,10 @@ namespace DeadWalls.Tests
                     SiegeCycleDuration = 91f,
                     SiegeDayDuration = 31f,
                     SpawnLineX = 27f,
-                    IronWorkerProductionPerMin = 4.9f
+                    WoodWorkerProductionPerMin = 8f,
+                    StoneWorkerProductionPerMin = 5.5f,
+                    IronWorkerProductionPerMin = 4.9f,
+                    FoodWorkerProductionPerMin = 7f
                 };
 
                 MobileCastleTuningResolver.ApplyDifficultyProfile(ref config, profile);
@@ -64,7 +71,10 @@ namespace DeadWalls.Tests
                 Assert.That(config.SiegeCycleDuration, Is.EqualTo(91f));
                 Assert.That(config.SiegeDayDuration, Is.EqualTo(31f));
                 Assert.That(config.SpawnLineX, Is.EqualTo(27f));
-                Assert.That(config.IronWorkerProductionPerMin, Is.EqualTo(4.9f));
+                Assert.That(config.WoodWorkerProductionPerMin, Is.EqualTo(11f));
+                Assert.That(config.StoneWorkerProductionPerMin, Is.EqualTo(12f));
+                Assert.That(config.IronWorkerProductionPerMin, Is.EqualTo(13f));
+                Assert.That(config.FoodWorkerProductionPerMin, Is.EqualTo(14f));
             }
             finally
             {
@@ -108,7 +118,11 @@ namespace DeadWalls.Tests
                     SiegeDuskDuration = authoring.SiegeDuskDuration,
                     SiegeNightDuration = authoring.SiegeNightDuration,
                     SiegeDawnDuration = authoring.SiegeDawnDuration,
-                    SpawnLineX = authoring.SpawnLineX
+                    SpawnLineX = authoring.SpawnLineX,
+                    WoodWorkerProductionPerMin = authoring.WoodWorkerProductionPerMin,
+                    StoneWorkerProductionPerMin = authoring.StoneWorkerProductionPerMin,
+                    IronWorkerProductionPerMin = authoring.IronWorkerProductionPerMin,
+                    FoodWorkerProductionPerMin = authoring.FoodWorkerProductionPerMin
                 };
 
                 MobileCastleTuningResolver.ApplyDifficultyProfile(ref config, profile);
@@ -122,6 +136,15 @@ namespace DeadWalls.Tests
                 Assert.That(config.SiegeNightDuration, Is.EqualTo(authoring.SiegeNightDuration));
                 Assert.That(config.SiegeDawnDuration, Is.EqualTo(authoring.SiegeDawnDuration));
                 Assert.That(config.SpawnLineX, Is.EqualTo(authoring.SpawnLineX));
+                Assert.That(profile.IronWorkerProductionPerMin, Is.EqualTo(4.9f));
+                Assert.That(config.WoodWorkerProductionPerMin,
+                    Is.EqualTo(profile.WoodWorkerProductionPerMin));
+                Assert.That(config.StoneWorkerProductionPerMin,
+                    Is.EqualTo(profile.StoneWorkerProductionPerMin));
+                Assert.That(config.IronWorkerProductionPerMin,
+                    Is.EqualTo(profile.IronWorkerProductionPerMin));
+                Assert.That(config.FoodWorkerProductionPerMin,
+                    Is.EqualTo(profile.FoodWorkerProductionPerMin));
             }
             finally
             {
@@ -221,6 +244,7 @@ namespace DeadWalls.Tests
                 MobileCastleTuningResolver.ResolveEconomyPriceTuning(null);
             Assert.That(fallback.BedBaseWoodCost, Is.EqualTo(100));
             Assert.That(fallback.WorkerBuildingCostGrowthMultiplier, Is.EqualTo(1.35d));
+            Assert.That(fallback.WorkerEfficiencyPercentPerLevel, Is.EqualTo(0.10f));
 
             var profile = ScriptableObject.CreateInstance<DifficultyProfileSO>();
             try
@@ -232,6 +256,7 @@ namespace DeadWalls.Tests
                 profile.WorkerEfficiencyBaseWoodCost = 500;
                 profile.WorkerEfficiencyBaseIronCost = 0;
                 profile.WorkerBuildingCostGrowthMultiplier = double.NaN;
+                profile.WorkerEfficiencyPercentPerLevel = float.NaN;
 
                 MobileEconomyPriceTuning tuning =
                     MobileCastleTuningResolver.ResolveEconomyPriceTuning(profile);
@@ -243,6 +268,7 @@ namespace DeadWalls.Tests
                 Assert.That(tuning.WorkerEfficiencyBaseWoodCost, Is.EqualTo(500));
                 Assert.That(tuning.WorkerEfficiencyBaseIronCost, Is.EqualTo(1));
                 Assert.That(tuning.WorkerBuildingCostGrowthMultiplier, Is.EqualTo(1.35d));
+                Assert.That(tuning.WorkerEfficiencyPercentPerLevel, Is.EqualTo(0.10f));
             }
             finally
             {

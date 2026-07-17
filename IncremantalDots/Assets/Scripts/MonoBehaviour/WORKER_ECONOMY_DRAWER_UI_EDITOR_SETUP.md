@@ -89,7 +89,8 @@ prefab instantiate edilmeden once ayni repair adimini otomatik calistirir.
 7. Hedef kontrolleri mevcut actual worker sayilarini aninda degistirmemelidir.
 8. Sonradan gelen yeni population, hedef acigi ve resource cap kuralina gore dagilmalidir.
 9. Her satirdaki `CAP` ve `EFF` butonlari level + sonraki Wood/Iron maliyetini gostermelidir.
-10. CAP alimi ilgili cap'i `10`, EFF alimi baz kisi uretimini additive `%10` artirmalidir.
+10. CAP alimi ilgili cap'i `10`, EFF alimi baz kisi uretimini aktif profile oraninda additive
+    artirmalidir (V1 default `%10`).
 11. Iki alimin da Wood ve Iron'i ayni transaction'da harcadigi dogrulanmalidir.
 12. Housing satiri population/total beds, free beds ve purchased beds degerlerini gostermelidir.
 13. `+1 / +10 / +100 Beds` butonlari exact bulk Wood maliyetini gostermeli ve tek transaction'la satin almalidir.

@@ -4,6 +4,11 @@ namespace DeadWalls
 {
     public static class MobileEconomyPriceTuningUtility
     {
+        public const float DefaultWoodWorkerProductionPerMin = 8f;
+        public const float DefaultStoneWorkerProductionPerMin = 5.5f;
+        public const float DefaultIronWorkerProductionPerMin = 4.9f;
+        public const float DefaultFoodWorkerProductionPerMin = 7f;
+        public const float DefaultWorkerEfficiencyPercentPerLevel = 0.10f;
         public const int DefaultBedBaseWoodCost = 100;
         public const int DefaultBedCostGrowthCapacityInterval = 25;
         public const int DefaultWorkerCapacityBaseWoodCost = 100;
@@ -31,6 +36,7 @@ namespace DeadWalls
             WorkerEfficiencyBaseWoodCost = DefaultWorkerEfficiencyBaseWoodCost,
             WorkerEfficiencyBaseIronCost = DefaultWorkerEfficiencyBaseIronCost,
             WorkerBuildingCostGrowthMultiplier = DefaultWorkerBuildingCostGrowthMultiplier,
+            WorkerEfficiencyPercentPerLevel = DefaultWorkerEfficiencyPercentPerLevel,
             ArrowBaseCapacity = DefaultArrowBaseCapacity,
             ArrowCapacityPerLevel = DefaultArrowCapacityPerLevel,
             ArrowRefillPackageSize = DefaultArrowRefillPackageSize,
@@ -51,6 +57,10 @@ namespace DeadWalls
             double arrowGrowth = math.isfinite(tuning.ArrowUpgradeCostGrowthMultiplier)
                 ? math.max(1d, tuning.ArrowUpgradeCostGrowthMultiplier)
                 : DefaultArrowUpgradeCostGrowthMultiplier;
+            float efficiencyPercent = math.isfinite(tuning.WorkerEfficiencyPercentPerLevel)
+                && tuning.WorkerEfficiencyPercentPerLevel > 0f
+                    ? math.max(0.001f, tuning.WorkerEfficiencyPercentPerLevel)
+                    : DefaultWorkerEfficiencyPercentPerLevel;
 
             return new MobileEconomyPriceTuning
             {
@@ -61,6 +71,7 @@ namespace DeadWalls
                 WorkerEfficiencyBaseWoodCost = math.max(1, tuning.WorkerEfficiencyBaseWoodCost),
                 WorkerEfficiencyBaseIronCost = math.max(1, tuning.WorkerEfficiencyBaseIronCost),
                 WorkerBuildingCostGrowthMultiplier = growth,
+                WorkerEfficiencyPercentPerLevel = efficiencyPercent,
                 ArrowBaseCapacity = math.max(1, tuning.ArrowBaseCapacity),
                 ArrowCapacityPerLevel = math.max(1, tuning.ArrowCapacityPerLevel),
                 ArrowRefillPackageSize = math.max(1, tuning.ArrowRefillPackageSize),

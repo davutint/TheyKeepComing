@@ -59,8 +59,8 @@ Tum component'lar unmanaged ECS struct olarak tutulur. Davranis sistemlerde, ver
 - `CastleYardPrepState`: `Fortify` ve `Rally` tek-gecelik prep buff state'ini tutar.
 - `MobilePopulationAllocation`: Wood/Stone/Iron/Food actual worker sayilarini, `10.000` basis-point target ratio'larini, etkin cap ve idle aynalarini, population auto-allocation/growth checkpoint'lerini ve son Dawn için requested/accepted/Food budget sonucunu tutar.
 - `MobileBedCapacityState`: Run başlangıç yatak kapasitesi ile satın alınmış ek yatak sayısını ayrı tutar; toplam sahiplik `60` tabanından sonra quadratic Wood maliyetini büyütür, gameplay hard max yoktur ve güncel exact save `v8` kapsamındadır.
-- `MobileWorkerBuildingUpgradeState`: Hazır Wood/Stone/Iron/Food worker binalarının bağımsız Capacity/Efficiency seviyelerini tutar. Capacity seviye başına `+10` slot, Efficiency baz kişi üretimine additive `+10%` verir; güncel exact save `v8` kapsamındadır.
-- `MobileEconomyPriceTuning`: `DifficultyProfileSO` kaynaklı House bed ve worker CAP/EFF başlangıç maliyetleriyle ortak worker bina büyüme çarpanını config entity'sinde taşır. Runtime içerik baseline'ıdır; satın alınmış state değildir ve save'e yazılmaz.
+- `MobileWorkerBuildingUpgradeState`: Hazır Wood/Stone/Iron/Food worker binalarının bağımsız Capacity/Efficiency seviyelerini tutar. Capacity seviye başına `+10` slot, Efficiency profile-owned oranla baz kişi üretimine additive bonus verir; V1 default `%10`, güncel exact save `v8` kapsamındadır.
+- `MobileEconomyPriceTuning`: `DifficultyProfileSO` kaynaklı House bed, worker CAP/EFF başlangıç maliyetleri, ortak worker bina büyüme çarpanı ve EFF seviye yüzdesini config entity'sinde taşır. Runtime içerik baseline'ıdır; satın alınmış state değildir ve save'e yazılmaz.
 - `ArcherSlotPosition`: legacy/manual pozisyon buffer'i. NewGameScene mobile tilemap spawn akisi bunu kullanmaz.
 
 ## CastleInteriorWorkerComponents.cs

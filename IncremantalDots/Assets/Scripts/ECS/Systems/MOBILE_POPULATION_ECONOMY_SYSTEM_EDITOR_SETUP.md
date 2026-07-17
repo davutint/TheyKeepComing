@@ -18,7 +18,8 @@
 - Initial archers: `4`
 - Worker caps: Wood `40`, Stone `30`, Iron `24`, Food `40`
 - Population growth: `+15` each completed continuous siege cycle; legacy flow'da completed wave DayPrep
-- Worker production: Wood `8/min`, Stone `5.5/min`, Iron `3.8/min`, Food `7/min`
+- Worker production: aktif `DefaultDifficulty.asset` kaynakli Wood `8/min`, Stone `5.5/min`,
+  Iron `4.9/min`, Food `7/min`; profile yoksa ayni authoring fallback'leri kullanilir
 - Kill/wave reward multiplier while worker economy is active: `0.25`
 - Economy event chance: `0.15`
 - Event cooldown: `2` waves

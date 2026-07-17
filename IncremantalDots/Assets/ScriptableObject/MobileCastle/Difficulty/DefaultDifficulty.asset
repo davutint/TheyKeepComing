@@ -136,6 +136,11 @@ MonoBehaviour:
   RallyCooldown: 60
   EmergencyRepairHealPercent: 0.2
   EmergencyRepairCooldown: 120
+  WoodWorkerProductionPerMin: 8
+  StoneWorkerProductionPerMin: 5.5
+  IronWorkerProductionPerMin: 4.9
+  FoodWorkerProductionPerMin: 7
+  WorkerEfficiencyPercentPerLevel: 0.1
   BedBaseWoodCost: 100
   BedCostGrowthCapacityInterval: 25
   WorkerCapacityBaseWoodCost: 100

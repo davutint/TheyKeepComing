@@ -56,7 +56,8 @@ SubScene:
 - `MobileCastleCombatAuthoring`: wave clear bonus base Wood/Food/Stone/Iron `20 / 15 / 10 / 6`, per wave `6 / 5 / 4 / 3`
 - `MobileCastleCombatAuthoring`: worker economy population growth `15`, initial workers Wood/Stone/Iron/Food `20 / 10 / 8 / 15`
 - `MobileCastleCombatAuthoring`: worker caps Wood/Stone/Iron/Food `40 / 30 / 24 / 40`
-- `MobileCastleCombatAuthoring`: worker production Wood/Stone/Iron/Food `8 / 5.5 / 3.8 / 7` per minute, reward multiplier `0.25`
+- `MobileCastleCombatAuthoring`: profile yoksa worker production fallback'i Wood/Stone/Iron/Food
+  `8 / 5.5 / 4.9 / 7` per minute; aktif profile bu degerlerin owner'idir, reward multiplier `0.25`
 - `MobileCastleCombatAuthoring`: economy event chance `0.15`, cooldown `2` waves
 - `MobileCastleCombatAuthoring`: continuous siege enabled, total cycle `60`, day/dusk/night/dawn `30 / 5 / 20 / 5`, intensity `0.55 / 1.00->1.35 / 1.65`
 - `MobileCastleCombatAuthoring`: legacy initial day prep `12`, day prep `15`, day/night overlay alpha `0 / 0.50`; unlimited Arrow alani yoktur

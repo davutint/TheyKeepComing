@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.3
 > **Son tam kapsam denetimi:** 2026-07-17
 > **Aktif paket:** Post-Package V1 Closure - Contracts, Performance ve Release DoD
-> **Aktif iş:** `DW-V1-TUNING-ECONOMY-SURFACE` - Audit Economy Base Rates, Capacity Cost and Efficiency Growth
-> **İlerleme:** `406 / 442` tracker checkbox'ı tamamlandı - `%91,86`
+> **Aktif iş:** `DW-V1-TUNING-POPULATION-SURFACE` - Audit Population Food per Arrival, Bed Curve and Dawn Count
+> **İlerleme:** `407 / 442` tracker checkbox'ı tamamlandı - `%92,08`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -956,7 +956,17 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 
 - [x] Spawn: day curve, phase multiplier, backlog, active cap. `DifficultyProfileSO` BaseSpawn/Night gün eğrileri, dört faz çarpanı, `MaxSpawnBatch` backlog drain tavanı ve `MaxAliveZombies` active cap owner'ları `Difficulty Tuner > Spawn Runtime Contract` panelinde preview + canlı ECS telemetry ile tek yüzeyde görünür. Backlog politikası V1 `PreserveDemand` olarak read-only kalır; exact `PendingEnemies` cap dolumu ve kapasite açılınca drain davranışı 1 EditMode + 2 PlayMode hedef testinde geçti.
 - [x] Wall: base HP, repair Stone cost, repair amount, Emergency %, day multiplier. `WallBaseHp`, normal repair paketi, `RepairStonePerMissingHp`, `RepairDayPriceMultiplier` ve Emergency heal/cooldown alanları `DifficultyProfileSO -> MobileCastleTuningResolver -> MobileCastleCombatConfig` owner zincirinde `Difficulty Tuner > Wall Runtime Contract` yüzeyine bağlandı; profile yoksa `CastleAuthoring.WallHP` fallback kalır. Baseline package preview ile gameplay aynı `SingleWallDefenseRules` Stone formülünü kullanır; live Apply HP oranını ve tech/meta/Heart aggregate'lerini korur. Default asset/resolver/formül/Emergency 5 EditMode, baked runtime/Stone transaction/live base HP 3 PlayMode testinde geçti.
-- [ ] Economy: base rates, capacity cost, efficiency growth.
+- [x] Economy: base rates, capacity cost, efficiency growth. Wood/Stone/Iron/Food kisi basi
+  production baseline'lari `8 / 5,5 / 4,9 / 7`, CAP `100W+25I`, EFF `150W+50I`, ortak fiyat
+  buyumesi `1,35` ve seviye basi additive EFF `%10` tek
+  `DifficultyProfileSO -> MobileCastleTuningResolver -> MobileCastleCombatConfig /
+  MobileEconomyPriceTuning` owner zincirine alindi. `Difficulty Tuner > Economy Runtime Contract`
+  ayni gameplay utility'leriyle level preview ve dort kaynak icin canli worker/cap,
+  base/effective/total production, seviye/bonus/next-cost telemetry'si gosterir. Play Mode Apply,
+  base rate degisiminde mevcut Tech/Meta/Heart ve bina aggregate'lerini yeniden fold eder. Owner,
+  sanitize, iki-kaynak maliyet/effect matematikleri EditMode `8/8`; baked runtime, live rebase,
+  satin alma+Continue ve runtime quote PlayMode `4/4` gecti; scene validation `0` issue,
+  final Console `0 error`.
 - [ ] Population: Food per arrival, bed curve, dawn count.
 - [ ] Archers: base stats, cost growth, retrain cost, Arrow drain.
 - [ ] Heart: Essence gain, node cost/growth, rarity/depth.

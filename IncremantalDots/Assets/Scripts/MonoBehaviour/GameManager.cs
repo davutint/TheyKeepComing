@@ -1508,6 +1508,36 @@ namespace DeadWalls
             }
         }
 
+        /// <summary>
+        /// Difficulty Profile worker production baseline'larini canli uygular. Tech, meta,
+        /// Heart ve bina Efficiency katmanlari yeni baseline uzerine yeniden fold edilir.
+        /// </summary>
+        public bool ApplyWorkerEconomyTuning(float woodPerMin, float stonePerMin,
+            float ironPerMin, float foodPerMin)
+        {
+            if (!_initialized
+                || !float.IsFinite(woodPerMin)
+                || !float.IsFinite(stonePerMin)
+                || !float.IsFinite(ironPerMin)
+                || !float.IsFinite(foodPerMin)
+                || !TryGetMobileConfigEntity(out Entity configEntity))
+            {
+                return false;
+            }
+
+            MobileCastleCombatConfig config =
+                _entityManager.GetComponentData<MobileCastleCombatConfig>(configEntity);
+            CaptureTechEconomyBaselineIfNeeded(config);
+            _baseWoodProductionPerMin = Mathf.Max(0f, woodPerMin);
+            _baseStoneProductionPerMin = Mathf.Max(0f, stonePerMin);
+            _baseIronProductionPerMin = Mathf.Max(0f, ironPerMin);
+            _baseFoodProductionPerMin = Mathf.Max(0f, foodPerMin);
+
+            ApplyTechEconomyAggregates();
+            OnGameStateChanged?.Invoke();
+            return true;
+        }
+
         public bool SetResourceWorkers(EconomyFocusType resource, int value)
         {
             if (!IsMobilePopulationEconomyEnabled() || !TryGetMobileConfigEntity(out var mobileConfigEntity))
@@ -2432,20 +2462,7 @@ namespace DeadWalls
                 return;
 
             var config = _entityManager.GetComponentData<MobileCastleCombatConfig>(configEntity);
-
-            if (!_techConfigBaselineCaptured)
-            {
-                _baseWoodWorkerCap = config.WoodWorkerCap;
-                _baseStoneWorkerCap = config.StoneWorkerCap;
-                _baseIronWorkerCap = config.IronWorkerCap;
-                _baseFoodWorkerCap = config.FoodWorkerCap;
-                _baseWoodProductionPerMin = config.WoodWorkerProductionPerMin;
-                _baseStoneProductionPerMin = config.StoneWorkerProductionPerMin;
-                _baseIronProductionPerMin = config.IronWorkerProductionPerMin;
-                _baseFoodProductionPerMin = config.FoodWorkerProductionPerMin;
-                _basePopulationGrowthPerCycle = config.PopulationGrowthPerDayPrep;
-                _techConfigBaselineCaptured = true;
-            }
+            CaptureTechEconomyBaselineIfNeeded(config);
 
             int woodCap = 0, stoneCap = 0, ironCap = 0, foodCap = 0;
             float woodProd = 0f, stoneProd = 0f, ironProd = 0f, foodProd = 0f;
@@ -2497,6 +2514,7 @@ namespace DeadWalls
             var buildings = _entityManager.HasComponent<MobileWorkerBuildingUpgradeState>(configEntity)
                 ? _entityManager.GetComponentData<MobileWorkerBuildingUpgradeState>(configEntity)
                 : default;
+            MobileEconomyPriceTuning economyTuning = GetEconomyPriceTuning();
             int woodBuildingCap = MobileWorkerBuildingUpgradeUtility.GetCapacityBonus(
                 buildings.WoodCapacityLevel);
             int stoneBuildingCap = MobileWorkerBuildingUpgradeUtility.GetCapacityBonus(
@@ -2506,13 +2524,13 @@ namespace DeadWalls
             int foodBuildingCap = MobileWorkerBuildingUpgradeUtility.GetCapacityBonus(
                 buildings.FoodCapacityLevel);
             float woodBuildingProd = MobileWorkerBuildingUpgradeUtility.GetEfficiencyBonusPercent(
-                buildings.WoodEfficiencyLevel);
+                buildings.WoodEfficiencyLevel, economyTuning);
             float stoneBuildingProd = MobileWorkerBuildingUpgradeUtility.GetEfficiencyBonusPercent(
-                buildings.StoneEfficiencyLevel);
+                buildings.StoneEfficiencyLevel, economyTuning);
             float ironBuildingProd = MobileWorkerBuildingUpgradeUtility.GetEfficiencyBonusPercent(
-                buildings.IronEfficiencyLevel);
+                buildings.IronEfficiencyLevel, economyTuning);
             float foodBuildingProd = MobileWorkerBuildingUpgradeUtility.GetEfficiencyBonusPercent(
-                buildings.FoodEfficiencyLevel);
+                buildings.FoodEfficiencyLevel, economyTuning);
 
             // Cap toplamlari = base + tech + council + bina yatirimi. Hepsi ayni aggregate'te
             // yasadigi icin bir katmandaki degisiklik diger katmanlarin kazanimini ezmez.
@@ -2537,6 +2555,23 @@ namespace DeadWalls
             MoatDormancyRules.ApplyV1(ref config);
             _entityManager.SetComponentData(configEntity, config);
             WorkerBuildingUpgrades = buildings;
+        }
+
+        private void CaptureTechEconomyBaselineIfNeeded(in MobileCastleCombatConfig config)
+        {
+            if (_techConfigBaselineCaptured)
+                return;
+
+            _baseWoodWorkerCap = config.WoodWorkerCap;
+            _baseStoneWorkerCap = config.StoneWorkerCap;
+            _baseIronWorkerCap = config.IronWorkerCap;
+            _baseFoodWorkerCap = config.FoodWorkerCap;
+            _baseWoodProductionPerMin = config.WoodWorkerProductionPerMin;
+            _baseStoneProductionPerMin = config.StoneWorkerProductionPerMin;
+            _baseIronProductionPerMin = config.IronWorkerProductionPerMin;
+            _baseFoodProductionPerMin = config.FoodWorkerProductionPerMin;
+            _basePopulationGrowthPerCycle = config.PopulationGrowthPerDayPrep;
+            _techConfigBaselineCaptured = true;
         }
 
         private static int SaturatingWorkerCap(int baseValue, int techBonus,

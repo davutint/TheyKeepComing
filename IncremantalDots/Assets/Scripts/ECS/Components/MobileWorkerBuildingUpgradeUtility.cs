@@ -24,7 +24,8 @@ namespace DeadWalls
     public static class MobileWorkerBuildingUpgradeUtility
     {
         public const int CapacityPerLevel = 10;
-        public const float EfficiencyPercentPerLevel = 0.10f;
+        public const float EfficiencyPercentPerLevel =
+            MobileEconomyPriceTuningUtility.DefaultWorkerEfficiencyPercentPerLevel;
         public const int CapacityBaseWoodCost =
             MobileEconomyPriceTuningUtility.DefaultWorkerCapacityBaseWoodCost;
         public const int CapacityBaseIronCost =
@@ -166,7 +167,17 @@ namespace DeadWalls
 
         public static float GetEfficiencyBonusPercent(int efficiencyLevel)
         {
-            return math.max(0, efficiencyLevel) * EfficiencyPercentPerLevel;
+            var tuning = MobileEconomyPriceTuningUtility.Default;
+            return GetEfficiencyBonusPercent(efficiencyLevel, tuning);
+        }
+
+        public static float GetEfficiencyBonusPercent(int efficiencyLevel,
+            in MobileEconomyPriceTuning tuning)
+        {
+            MobileEconomyPriceTuning safeTuning = MobileEconomyPriceTuningUtility.Sanitize(tuning);
+            double bonus = (double)math.max(0, efficiencyLevel)
+                * safeTuning.WorkerEfficiencyPercentPerLevel;
+            return bonus >= float.MaxValue ? float.MaxValue : (float)bonus;
         }
     }
 }

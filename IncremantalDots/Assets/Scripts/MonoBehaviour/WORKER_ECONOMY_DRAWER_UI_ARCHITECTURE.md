@@ -33,7 +33,8 @@ Wood/Stone/Iron/Food CAP veya EFF
 -> Wood + Iron tek transaction olarak harcanir
 -> MobileWorkerBuildingUpgradeState ilgili bagimsiz seviyeyi +1 yapar
 -> GameManager base + Heart + Council + Meta + bina aggregate'ini yeniden kurar
--> CAP seviye basina +10 slot, EFF baz kisi uretimine additive +10% verir
+-> CAP seviye basina +10 slot, EFF aktif profile oranini baz kisi uretimine additive verir
+   (V1 default +10%)
 ```
 
 `+1%` ve `+10%` secilen resource hedefini yuzde puan olarak artirir. `+100%`

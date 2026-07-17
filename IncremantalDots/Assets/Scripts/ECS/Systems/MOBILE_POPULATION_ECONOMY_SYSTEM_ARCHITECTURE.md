@@ -11,7 +11,10 @@
 - Pozitif target'larin cap'i doldugunda dagitilamayan kisileri Idle Population'da birakir.
 - `PopulationState.Workers` ve `PopulationState.Idle` degerlerini allocation + archer sayisina gore gunceller; idle sonucu `WorkerAllocationUtility.ResolveIdlePopulation` ile `GameManager` player API'siyle ayni owner'dan gelir.
 - `ResourceProductionRate` degerlerini worker sayisi x worker production tuning olarak yazar.
-- Etkin worker cap ve kisi basi production tuning'ini `GameManager`in base + Heart + Council + Meta + worker-building aggregate'i yazdigi `MobileCastleCombatConfig` uzerinden tuketir; bina seviyesini burada ikinci kez uygulamaz.
+- Etkin worker cap ve kisi basi production tuning'ini `GameManager`in profile base + Tech +
+  Heart + Meta + worker-building aggregate'i yazdigi `MobileCastleCombatConfig` uzerinden
+  tuketir; bina seviyesini burada ikinci kez uygulamaz. V1 base rate'leri
+  `DefaultDifficulty.asset` icinde `8 / 5.5 / 4.9 / 7`dir.
 - Continuous siege aciksa her tamamlanan 60 saniyelik cycle basina bir kez Dawn arrival bütçesi uygular.
 - Legacy DayPrep akisinda her completed wave sonrasi `DayPrep` basinda aynı arrival bütçesini uygular.
 - İstenen arrival'ı boş yatak ve mevcut Food / kişi maliyetiyle sınırlar; requested/accepted/required Food sonucunu allocation state'e yazar.

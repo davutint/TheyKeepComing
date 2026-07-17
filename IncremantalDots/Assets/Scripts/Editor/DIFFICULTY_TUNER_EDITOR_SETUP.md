@@ -16,8 +16,8 @@ DefaultDifficulty.asset` seed edilir (varsa DOKUNULMAZ) ve subscene'deki
    - Gec oyun baskisi: `SpawnBatchGrowthPerCycle`, `MaxSpawnBatch`, `MaxAliveZombies`.
    - Wall Runtime Contract: `WallBaseHp`, normal heal paketi, Stone/HP, Day fiyat carpani,
      Emergency heal yuzdesi ve cooldown.
-   - House/worker yatirim fiyatlari: `Ekonomi Fiyat Egrileri` foldout'unda bed base ve
-     interval, CAP/EFF Wood+Iron base ve ortak worker building growth multiplier.
+   - Worker economy: `Economy Runtime Contract` foldout'unda dort kisi basi production
+     baseline'i, CAP/EFF Wood+Iron base cost, ortak growth ve EFF seviye yuzdesi.
 4. **Apply** — edit modda subscene'e baglar+kaydeder (bake); play modda ayrica CANLI uygular.
 5. Olcum: Play'e gir -> **Run Bot** (profili uygular, temiz kosu baslatir) ->
    kosular bitince **Son Olcumu Ozetle** ile olum-gunu dagilimini oku.
@@ -27,7 +27,8 @@ DefaultDifficulty.asset` seed edilir (varsa DOKUNULMAZ) ve subscene'deki
 - Egriler x=GUN (1..SampleDays), y=CARPAN; 1 = etkisiz. Gun, SampleDays'i asarsa son deger kullanilir.
 - `SpawnTable` ve `SpecialNights` alanlari M-C hazirligidir — sistem henuz okumaz, veri girebilirsin.
 - `DefaultDifficulty.asset` ekonomi default'lari: bed `100W / 25 interval`, CAP
-  `100W+25I`, EFF `150W+50I`, ortak growth `1.35`. Apply, edit modda bunlari bake eder;
-  Play Mode'da mevcut config entity'sine de canli yazar.
+  `100W+25I`, EFF `150W+50I`, ortak growth `1.35`; worker base rate'leri
+  `8 / 5.5 / 4.9 / 7`, EFF etkisi seviye basina additive `%10`. Apply, edit modda bunlari
+  bake eder; Play Mode'da config ve aggregate katmanlarina canli yazar.
 - Wall base HP profile-owned'dir. Profile yoksa `CastleAuthoring.WallHP` fallback olur.
-  Iron uretimi gibi profil-disi baseline'lar setup tool/active SubScene Authoring'de kalir.
+  Worker base rate'leri de profile-owned'dir; profile yoksa SubScene Authoring fallback olur.

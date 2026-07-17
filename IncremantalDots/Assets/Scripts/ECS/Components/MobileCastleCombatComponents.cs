@@ -238,7 +238,7 @@ namespace DeadWalls
     }
 
     /// <summary>
-    /// DifficultyProfileSO'dan bake edilen ekonomi fiyat parametreleri.
+    /// DifficultyProfileSO'dan bake edilen ekonomi fiyat ve worker Efficiency parametreleri.
     /// Run state degildir; satin alinmis seviye/yatak state'i bu baseline'i kullanir.
     /// </summary>
     public struct MobileEconomyPriceTuning : IComponentData
@@ -250,6 +250,7 @@ namespace DeadWalls
         public int WorkerEfficiencyBaseWoodCost;
         public int WorkerEfficiencyBaseIronCost;
         public double WorkerBuildingCostGrowthMultiplier;
+        public float WorkerEfficiencyPercentPerLevel;
         public int ArrowBaseCapacity;
         public int ArrowCapacityPerLevel;
         public int ArrowRefillPackageSize;

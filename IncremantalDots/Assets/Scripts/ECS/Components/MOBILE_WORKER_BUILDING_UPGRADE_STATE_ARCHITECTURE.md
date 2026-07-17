@@ -5,7 +5,7 @@
 Wood, Stone, Iron ve Food worker binaları haritada hazır bulunur; oyuncu bina yerleştirmez. Her bina run içinde iki bağımsız ekonomik yatırıma sahiptir:
 
 - Capacity: seviye başına `+10` worker slotu.
-- Efficiency: seviye başına baz kişi üretimine additive `+10%`.
+- Efficiency: seviye başına profile-owned baz kişi üretim yüzdesi; V1 default additive `+10%`.
 
 Castle Heart teknoloji etkileri ayrı bir katmandır. Doğrudan bina yatırımı Heart seviyesini değiştirmez; Heart, Council, Meta ve bina etkileri aynı config aggregate hesabında birleşir.
 
@@ -34,6 +34,7 @@ Efficiency: ceil(150 Wood × 1.35^level) + ceil(50 Iron × 1.35^level)
 
 Yukarıdaki değerler onaylı `DefaultDifficulty.asset` baseline'ıdır; Difficulty Tuner'dan
 CAP ve EFF için ayrı Wood/Iron başlangıç maliyetleri ile ortak büyüme çarpanı değiştirilebilir.
+EFF effect yuzdesi de ayni asset'te `WorkerEfficiencyPercentPerLevel` ile tune edilir.
 Her alım hem Wood hem Iron harcar. `GameManager.TryBuyWorkerBuildingUpgrade()` iki kaynağı
 tek transaction olarak doğrular ve harcar; kaynak yetmezse seviye değişmez.
 
@@ -45,10 +46,12 @@ Gameplay hard max yoktur. `Math.Pow` sonucu veya herhangi bir maliyet `int` ile 
 
 ```text
 Worker Cap = base + Heart cap + Council cap + Building Capacity
-Per-worker production = base × (1 + Heart% + Meta% + Building Efficiency%)
+Per-worker production = profile base × (1 + Tech% + Meta% + Building Efficiency%) × Heart ratio
 ```
 
-Capacity toplamı `int.MaxValue` sınırında saturate edilir. Efficiency bonusu additive yüzdedir; önceki sonucu tekrar çarparak compound üretmez. `MobilePopulationEconomySystem` bu config'i tüketip etkin cap aynalarını ve `worker count × per-worker production` oranlarını yazar.
+Capacity toplamı `int.MaxValue` sınırında saturate edilir. Efficiency bonusu profile-driven
+additive yüzdedir; önceki sonucu tekrar çarparak compound üretmez. `MobilePopulationEconomySystem`
+bu config'i tüketip etkin cap aynalarını ve `worker count × per-worker production` oranlarını yazar.
 
 ## Save sözleşmesi
 

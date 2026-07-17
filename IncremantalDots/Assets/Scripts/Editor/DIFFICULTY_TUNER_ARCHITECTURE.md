@@ -15,8 +15,11 @@ tek profil iterasyonuyla, KOD YAZMADAN tasindi).
      (erken oyun rampi burada), `ZombieHpMultByDay`, `SpawnBatchMultByDay`; `SampleDays` (60).
    - SKALERLER (config'e yazilir): kutle eskalasyonu (BaseHP/HpGrowth/Damage/Batch/
      MaxSpawnBatch/MaxAlive/interval'lar), faz intensity'leri, repair maliyetleri.
-   - EKONOMI FIYAT EGRILERI: House bed base/interval, worker CAP ve EFF icin ayri
-     Wood/Iron base maliyetleri, iki bina yatirimi icin ortak growth multiplier.
+   - WORKER ECONOMY CONTRACT: Wood/Stone/Iron/Food kisi basi production baseline'lari,
+     worker CAP/EFF icin ayri Wood/Iron base maliyetleri, ortak growth multiplier ve
+     profile-driven additive EFF yuzdesi.
+   - KOMSU FIYAT VERILERI: House bed ve finite Arrow alanlari ayni asset'te kalir;
+     tracker'daki Population/Archer audit'leri bunlari kendi runtime yuzeylerinde kapatir.
    - M-C HAZIRLIK ISKELETI (sistem henuz okumuyor, veri hazir): `SpawnTable`
      (gun -> dusman tipi agirliklari) + `SpecialNights` (her N gunde ozel gece).
 2. **ECS tasima — `DifficultyDaySample` buffer'i:** AnimationCurve Burst'e giremez;
@@ -33,9 +36,13 @@ tek profil iterasyonuyla, KOD YAZMADAN tasindi).
    - `WaveSpawnSystem` (continuous): batch'e gunun `SpawnBatchMult`'u.
 5. **`DifficultyTunerWindow`** (Window > DeadWalls > Difficulty Tuner):
    - Profil sec/inline duzenle (CurveField'lar dahil), Default olustur/bul.
-   - Ekonomi Fiyat Egrileri foldout'u bed, worker bina ve finite Arrow refill/CAP/EFF
-     alanlarini duzenler; Play Mode Apply baked `MobileEconomyPriceTuning` component'ini
-     canli gunceller.
+   - **Economy Runtime Contract** foldout'u worker base rate, CAP cost, EFF cost/growth ve
+     EFF effect yuzdesini tek yuzeyde duzenler. Preview ayni runtime utility ile bir sonraki
+     maliyet ve birikmis etkiyi hesaplar; Play Mode telemetry dort kaynak icin worker/cap,
+     base/effective/total production, seviye ve sonraki fiyatlari canli gosterir.
+   - Play Mode Apply baked `MobileEconomyPriceTuning` component'ini gunceller ve
+     `GameManager.ApplyWorkerEconomyTuning` ile tech/meta/Heart/bina aggregate'lerini
+     yeni production baseline'i uzerine yeniden fold eder.
    - **Apply**: subscene authoring'e bagla (bake yolu) + play moddaysa CANLI uygula
      (config alanlari SetComponentData + buffer yeniden ornekleme).
    - **Run Bot**: profili canli uygular, RestartGame + Long Run Simulator'u baslatir
@@ -67,9 +74,11 @@ tek profil iterasyonuyla, KOD YAZMADAN tasindi).
 ## Tuzaklar
 
 - Profile yoksa setup tool'un `CastleAuthoring.WallHP` degeri fallback'tir. Aktif profile
-  varken Wall base HP Difficulty Tuner'dan gelir. IronWorkerProductionPerMin gibi profile
-  tasinmamis baseline degerler setup sabitinde kalir.
+  varken Wall base HP Difficulty Tuner'dan gelir. Worker production baseline'lari da profile
+  aittir; profile yoksa `MobileCastleCombatAuthoring` alanlari fallback'tir. Worker cap,
+  population ve cycle baseline'lari halen authoring sahibindedir.
 - Canli uygulama restart sonrasi config'i bake degerlerine dondurur; Tuner'in Run Bot'u
   bu yuzden restart'tan SONRA da ApplyProfileLive cagirir.
-- Fiyat alanlari sifir/negatif veya gecersiz girilirse resolver int-guvenli minimumlara
-  sanitize eder; runtime UI kendi ayri fiyat formulu tutmaz.
+- Fiyat alanlari sifir/negatif veya gecersiz girilirse resolver int-guvenli minimumlara,
+  gecersiz EFF yuzdesi onayli `%10` default'una sanitize edilir; runtime UI kendi ayri fiyat
+  veya effect formulu tutmaz.

@@ -132,10 +132,18 @@ namespace DeadWalls
         public int StoneWorkerCap = 30;
         public int IronWorkerCap = 24;
         public int FoodWorkerCap = 40;
-        public float WoodWorkerProductionPerMin = 8.0f;
-        public float StoneWorkerProductionPerMin = 5.5f;
-        public float IronWorkerProductionPerMin = 3.8f;
-        public float FoodWorkerProductionPerMin = 7.0f;
+        [Tooltip("Difficulty Profile yoksa kullanilan Wood worker/min fallback degeri.")]
+        public float WoodWorkerProductionPerMin =
+            MobileEconomyPriceTuningUtility.DefaultWoodWorkerProductionPerMin;
+        [Tooltip("Difficulty Profile yoksa kullanilan Stone worker/min fallback degeri.")]
+        public float StoneWorkerProductionPerMin =
+            MobileEconomyPriceTuningUtility.DefaultStoneWorkerProductionPerMin;
+        [Tooltip("Difficulty Profile yoksa kullanilan Iron worker/min fallback degeri.")]
+        public float IronWorkerProductionPerMin =
+            MobileEconomyPriceTuningUtility.DefaultIronWorkerProductionPerMin;
+        [Tooltip("Difficulty Profile yoksa kullanilan Food worker/min fallback degeri.")]
+        public float FoodWorkerProductionPerMin =
+            MobileEconomyPriceTuningUtility.DefaultFoodWorkerProductionPerMin;
         [Range(0f, 1f)] public float WorkerEconomyRewardMultiplier = 0.25f;
 
         [Header("Economy Events")]

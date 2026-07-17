@@ -59,6 +59,15 @@ namespace DeadWalls.Tests
             Assert.That(MobileWorkerBuildingUpgradeUtility.GetCapacityBonus(7), Is.EqualTo(70));
             Assert.That(MobileWorkerBuildingUpgradeUtility.GetEfficiencyBonusPercent(7),
                 Is.EqualTo(0.7f).Within(0.0001f));
+
+            var tuning = MobileEconomyPriceTuningUtility.Default;
+            tuning.WorkerEfficiencyPercentPerLevel = 0.15f;
+            Assert.That(MobileWorkerBuildingUpgradeUtility.GetEfficiencyBonusPercent(7, tuning),
+                Is.EqualTo(1.05f).Within(0.0001f));
+
+            tuning.WorkerEfficiencyPercentPerLevel = float.NaN;
+            Assert.That(MobileWorkerBuildingUpgradeUtility.GetEfficiencyBonusPercent(7, tuning),
+                Is.EqualTo(0.7f).Within(0.0001f));
             Assert.That(MobileWorkerBuildingUpgradeUtility.TryGetCostForLevel(
                 WorkerBuildingUpgradeType.Capacity, 1000, out _), Is.False);
         }

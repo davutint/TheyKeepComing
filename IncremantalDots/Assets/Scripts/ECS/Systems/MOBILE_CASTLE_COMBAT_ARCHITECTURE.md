@@ -223,7 +223,8 @@ Sol ust economy HUD mevcut kaynaklari gosterir: Wood, Stone, Iron, Food, Populat
 - Wood `280`, Stone `120`, Iron `70`, Food `220`, Population `60`, Arrows `200 / 200`
 - Initial workers: Wood `20`, Stone `10`, Iron `8`, Food `15`
 - Worker caps: Wood `40`, Stone `30`, Iron `24`, Food `40`
-- Worker income: Wood `8/min`, Stone `5.5/min`, Iron `3.8/min`, Food `7/min` per assigned worker
+- Worker income: active profile base Wood `8/min`, Stone `5.5/min`, Iron `4.9/min`,
+  Food `7/min` per assigned worker
 
 ## Continuous Recruitment Loop
 

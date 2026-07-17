@@ -20,6 +20,9 @@ Deger adi ezberleme — asagidaki tablodan hissini bul, hangi ayara dokunacagini
 | "Tamir cok pahali, kurtulamiyorum" | Wall Runtime Contract > **RepairStonePerMissingHp** veya **RepairDayPriceMultiplier** | DUSUR |
 | "Tamir cok ucuz, duvar onemsizlesti" | Ayni | ARTIR |
 | "Duvar cok cabuk yikiliyor / fazla dayanikli" | Wall Runtime Contract > **WallBaseHp** | ARTIR / DUSUR; tech/meta/Heart yuzdeleri bunun ustune biner |
+| "Isci ekonomisi cok yavas / fazla hizli" | Economy Runtime Contract > ilgili **WorkerProductionPerMin** | Kaynagin kisi basi baseline'ini ARTIR / DUSUR |
+| "Worker bina yatirimlari cok ucuz / pahali" | **CAP/EFF Wood+Iron base cost** ve **WorkerBuildingCostGrowthMultiplier** | Ilk maliyeti veya seviye buyumesini ayarla |
+| "Efficiency yatirimi hissedilmiyor / cok guclu" | **WorkerEfficiencyPercentPerLevel** | Her EFF seviyesinin additive uretim yuzdesini ayarla |
 | "Gunduz cok sakin / cok yogun" | Faz Yogunluklari > **DayIntensity** | 0.55 taban; artir/azalt |
 | "Gece yeterince korkutucu degil" | **NightIntensity** | ARTIR (1.65 taban) |
 | "Belirli bir GUN cok sert/yumusak" | Ilgili egriye o gune keyframe ekle | Egri = gun bazli ince ayar |
@@ -74,6 +77,15 @@ Normal repair maliyeti `ceil(actualHealHP x Stone/HP x DayPrice x discounts)` fo
 hesaplanir. Tech/Heart repair indirimi en son uygulanir. Eski `RepairBaseWoodCost` ve
 `RepairBaseStoneCost` alanlari yalniz serialized uyumluluk icin kalir; V1 fiyatini belirlemez.
 
+### Worker Ekonomisi
+
+Profile-owned kisi basi dakika baseline'lari Wood/Stone/Iron/Food icin `8 / 5.5 / 4.9 / 7`dir.
+Capacity yatirimi her seviyede sabit `+10` worker slotu verir; ilk fiyat `100 Wood + 25 Iron`dir.
+Efficiency yatirimi her seviyede baz kisi uretimine additive `+%10` verir; ilk fiyat
+`150 Wood + 50 Iron`dir. Iki yatirim da kendi seviyesinde ortak `1.35` fiyat carpaniyla buyur
+ve her alista Wood ile Iron'i birlikte harcar. Efficiency yuzdesi onceki effective sonucu tekrar
+carpmaz: base uretim uzerine tech/meta/bina yuzdeleri toplanir, Heart katmani sonradan uygulanir.
+
 ### Arrow Ekonomisi
 
 Default finite stok `200`, refill paketi `100`, verim `4 Arrow/Wood`dur. Capacity
@@ -108,6 +120,15 @@ ayni saf formulle gosterir. Play Mode'da profile baseline ile tech/meta/Heart uy
 MaxHP, mevcut HP, gercek Stone quote ve phase gate canli okunur. Apply, Wall MaxHP degisirken
 mevcut can oranini korur.
 
+### Economy Runtime Contract paneli
+
+Dort kaynagin profile-owned kisi basi baseline'i, CAP/EFF Wood+Iron ilk maliyetleri, ortak fiyat
+buyumesi ve EFF seviye yuzdesi ayni paneldedir. `Preview current level`, secilen seviyedeki bir
+sonraki CAP/EFF fiyatini ve birikmis slot/uretim etkisini gameplay utility'siyle hesaplar. Play
+Mode telemetry'si her kaynak icin worker/effective cap, profile base/effective/total rate, mevcut
+CAP/EFF seviyeleri, additive EFF bonusu ve iki sonraki fiyati canli gosterir. Apply, base rate'i
+degistirirken mevcut tech/meta/Heart ve bina katmanlarini yeni baseline uzerine yeniden fold eder.
+
 ## 5. Olcum botu nasil yorumlanir?
 
 1. Play'e gir -> RUN BOT (profili uygular, temiz kosu baslatir, 3x hizda oynar).
@@ -121,8 +142,8 @@ mevcut can oranini korur.
 
 ## 6. Bilinmesi gereken iki tuzak
 
-1. **Profil her seyi kapsamiyor:** Wall base HP artik profildedir; geometri, cycle sureleri ve
-   iron uretimi gibi baseline'lar aktif SubScene Authoring'de kalir. Profile yoksa
-   `CastleAuthoring.WallHP` bake degeri fallback olur.
+1. **Profil her seyi kapsamiyor:** Wall base HP ve dort worker production baseline'i profildedir;
+   geometri, cycle sureleri ve worker cap baseline'lari aktif SubScene Authoring'de kalir. Profile
+   yoksa Wall ve worker rate alanlari kendi authoring fallback degerlerini kullanir.
 2. **APPLY'siz degisiklik oyuna gitmez:** panelde degeri degistirmek yetmez; APPLY
    (edit modda sahneye kaydeder, play modda aninda uygular) sart.

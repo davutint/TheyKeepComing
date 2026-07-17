@@ -94,6 +94,23 @@ namespace DeadWalls
         [Range(0.01f, 1f)] public float EmergencyRepairHealPercent = 0.20f;
         [Min(0.1f)] public float EmergencyRepairCooldown = 120f;
 
+        [Header("Worker Economy (config/tuning'e yazilir)")]
+        [Tooltip("Bir Wood worker'in tech, meta, Heart ve bina bonuslarindan onceki dakikalik uretimi.")]
+        [Min(0f)] public float WoodWorkerProductionPerMin =
+            MobileEconomyPriceTuningUtility.DefaultWoodWorkerProductionPerMin;
+        [Tooltip("Bir Stone worker'in tech, meta, Heart ve bina bonuslarindan onceki dakikalik uretimi.")]
+        [Min(0f)] public float StoneWorkerProductionPerMin =
+            MobileEconomyPriceTuningUtility.DefaultStoneWorkerProductionPerMin;
+        [Tooltip("Bir Iron worker'in tech, meta, Heart ve bina bonuslarindan onceki dakikalik uretimi.")]
+        [Min(0f)] public float IronWorkerProductionPerMin =
+            MobileEconomyPriceTuningUtility.DefaultIronWorkerProductionPerMin;
+        [Tooltip("Bir Food worker'in tech, meta, Heart ve bina bonuslarindan onceki dakikalik uretimi.")]
+        [Min(0f)] public float FoodWorkerProductionPerMin =
+            MobileEconomyPriceTuningUtility.DefaultFoodWorkerProductionPerMin;
+        [Tooltip("Her Efficiency bina seviyesinin baz kisi uretimine additive ekledigi oran. 0.10 = +%10.")]
+        [Min(0.001f)] public float WorkerEfficiencyPercentPerLevel =
+            MobileEconomyPriceTuningUtility.DefaultWorkerEfficiencyPercentPerLevel;
+
         [Header("Ekonomi Fiyat Egrileri (runtime tuning'e bake edilir)")]
         [Min(1)] public int BedBaseWoodCost =
             MobileEconomyPriceTuningUtility.DefaultBedBaseWoodCost;

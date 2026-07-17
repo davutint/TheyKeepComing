@@ -724,10 +724,14 @@ namespace DeadWalls
             mobileAuthoring.StoneWorkerCap = 30;
             mobileAuthoring.IronWorkerCap = 24;
             mobileAuthoring.FoodWorkerCap = 40;
-            mobileAuthoring.WoodWorkerProductionPerMin = 8f;
-            mobileAuthoring.StoneWorkerProductionPerMin = 5.5f;
-            mobileAuthoring.IronWorkerProductionPerMin = 4.9f; // M-A balance: iron darbogazi (+%30)
-            mobileAuthoring.FoodWorkerProductionPerMin = 7f;
+            mobileAuthoring.WoodWorkerProductionPerMin =
+                MobileEconomyPriceTuningUtility.DefaultWoodWorkerProductionPerMin;
+            mobileAuthoring.StoneWorkerProductionPerMin =
+                MobileEconomyPriceTuningUtility.DefaultStoneWorkerProductionPerMin;
+            mobileAuthoring.IronWorkerProductionPerMin =
+                MobileEconomyPriceTuningUtility.DefaultIronWorkerProductionPerMin;
+            mobileAuthoring.FoodWorkerProductionPerMin =
+                MobileEconomyPriceTuningUtility.DefaultFoodWorkerProductionPerMin;
             mobileAuthoring.WorkerEconomyRewardMultiplier = 0.25f;
             mobileAuthoring.EconomyEventChance = 0.15f;
             mobileAuthoring.EconomyEventCooldownWaves = 2;
@@ -1987,6 +1991,16 @@ namespace DeadWalls
             profile.RallyCooldown = 60f;
             profile.EmergencyRepairHealPercent = 0.20f;
             profile.EmergencyRepairCooldown = 120f;
+            profile.WoodWorkerProductionPerMin =
+                MobileEconomyPriceTuningUtility.DefaultWoodWorkerProductionPerMin;
+            profile.StoneWorkerProductionPerMin =
+                MobileEconomyPriceTuningUtility.DefaultStoneWorkerProductionPerMin;
+            profile.IronWorkerProductionPerMin =
+                MobileEconomyPriceTuningUtility.DefaultIronWorkerProductionPerMin;
+            profile.FoodWorkerProductionPerMin =
+                MobileEconomyPriceTuningUtility.DefaultFoodWorkerProductionPerMin;
+            profile.WorkerEfficiencyPercentPerLevel =
+                MobileEconomyPriceTuningUtility.DefaultWorkerEfficiencyPercentPerLevel;
             profile.BedBaseWoodCost = MobileEconomyPriceTuningUtility.DefaultBedBaseWoodCost;
             profile.BedCostGrowthCapacityInterval =
                 MobileEconomyPriceTuningUtility.DefaultBedCostGrowthCapacityInterval;

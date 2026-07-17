@@ -9,7 +9,8 @@ Her tuning alanının tek bir baseline owner'ı olmalıdır. Inspector, Difficul
 1. V1 Blueprint ürün davranışının tasarım otoritesidir.
 2. Aktif `EnemyDefinitionSO`, enemy prefabı ile base HP/damage/speed/scale değerlerinin içerik owner'ıdır.
 3. `DifficultyProfileSO`, enemy base statları dışındaki quantity/difficulty baseline değerlerinin içerik owner'ıdır.
-4. Aktif SubScene'deki `MobileCastleCombatAuthoring`, profile taşınmamış geometri, mode, cycle süresi, ekonomi ve feedback baseline değerlerinin owner'ıdır.
+4. Aktif SubScene'deki `MobileCastleCombatAuthoring`, profile taşınmamış geometri, mode,
+   cycle süresi, worker cap/population ve feedback baseline değerlerinin owner'ıdır.
 5. `MobileCastleTuningResolver` Profile/Authoring değerlerini birleştirir; Baker aktif EnemyDefinition base statlarını son adımda runtime config'e uygular.
 6. `MobileCastleCombatConfig`, runtime çıktısıdır; editlenecek içerik kaynağı değildir.
 7. Tech, meta progression ve Council etkileri baseline config üzerine runtime aggregate uygular. Bu effective değerler yeni baseline sayılmaz.
@@ -32,6 +33,8 @@ Her tuning alanının tek bir baseline owner'ı olmalıdır. Inspector, Difficul
 - Repair base Wood/Stone legacy serialized uyumluluk degerleri (aktif fiyat owner'i degil)
 - House bed başlangıç Wood maliyeti ve owned-bed büyüme interval'i
 - Worker CAP/EFF ayrı Wood/Iron başlangıç maliyetleri ve ortak bina büyüme çarpanı
+- Wood/Stone/Iron/Food worker başına üretim baseline'ları
+- Worker Efficiency seviye başına additive üretim yüzdesi
 - Gün eğrileri; SpecialNights schema/content V1'de dormant ve multiplier her zaman 1
 
 Not: Normal V1 repair yalnız Stone kullanir. `RepairBaseWoodCost` ve
@@ -72,7 +75,8 @@ dışındadır. İçerik değerleri `DifficultyProfileSO`, politika/matematik
 - Continuous siege enable ve cycle süreleri
 - Zombie scale/speed ve stress-test alanları
 - Reward ve worker economy baseline değerleri
-- Population growth, worker cap ve production değerleri
+- Population growth ve worker cap değerleri
+- Worker production alanları yalnız profile yokken fallback'tir
 - Unlimited arrows gibi mode flag'leri
 - Overlay, wave director phase oranları, Fortify/Rally baseline
 
@@ -95,6 +99,12 @@ preview'u `SingleWallDefenseRules` ile runtime formulunu paylasir. Play Mode tel
 baseline/effective MaxHP, mevcut HP, gercek Stone quote ve phase gate'i gosterir; live Apply
 HP oranini koruyarak tech/meta/Heart aggregate'lerini yeniden fold eder.
 
+`Economy Runtime Contract` paneli profile-owned dort kisi basi production baseline'ini,
+CAP/EFF Wood+Iron ilk maliyetlerini, ortak fiyat buyumesini ve additive EFF yuzdesini tek
+yuzeyde toplar. Preview runtime utility'lerini kullanir. Play Mode Apply
+`GameManager.ApplyWorkerEconomyTuning` ile mevcut tech/meta/Heart ve bina katmanlarini yeni
+base rate'lere yeniden fold eder; effective config yeni baseline sayilmaz.
+
 `MobileCastleSceneSetupWindow` yalnız owner tarafından açıkça çalıştırılan initializer/repair aracıdır. Runtime owner değildir. Tool'un yazdığı değerler scene/profile asset'e kaydedildikten sonra yukarıdaki sahiplik kuralına girer.
 
 ## Aktif proje kanıtı (2026-07-12)
@@ -114,6 +124,8 @@ Aktif SubScene `DefaultDifficulty.asset` profilini kullanır. Bilinçli olarak f
 | Bed base / interval | Profile owner | 100 / 25 | `MobileEconomyPriceTuning`: 100 / 25 |
 | Worker CAP / EFF base | Profile owner | 100W+25I / 150W+50I | `MobileEconomyPriceTuning`: aynı |
 | Worker bina growth | Profile owner | 1.35 | `MobileEconomyPriceTuning`: 1.35 |
+| Worker production/min | Authoring fallback 8/5.5/4.9/7 | 8/5.5/4.9/7 | Profile baseline + aggregate |
+| Worker EFF effect/level | Legacy code default %10 | %10 | `MobileEconomyPriceTuning`: additive %10 |
 | Cycle Day/Dusk/Night/Dawn | 30/5/20/5 | Profile'da yok | 30/5/20/5 |
 
 Runtime production gibi bazı alanlar tech/meta aggregate sonrasında baseline'dan farklı görünebilir. Örneğin `IronWorkerProductionPerMin` meta production bonusuyla artabilir; bu owner çakışması değildir.

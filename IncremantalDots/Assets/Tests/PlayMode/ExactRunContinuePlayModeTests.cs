@@ -613,6 +613,10 @@ namespace DeadWalls.Tests
             Assert.That(config.RepairStonePerMissingHp, Is.EqualTo(0.10f));
             Assert.That(config.RepairDayPriceMultiplier, Is.EqualTo(1f));
             Assert.That(config.EmergencyRepairHealPercent, Is.EqualTo(0.20f));
+            Assert.That(config.WoodWorkerProductionPerMin, Is.EqualTo(8f));
+            Assert.That(config.StoneWorkerProductionPerMin, Is.EqualTo(5.5f));
+            Assert.That(config.IronWorkerProductionPerMin, Is.EqualTo(4.9f));
+            Assert.That(config.FoodWorkerProductionPerMin, Is.EqualTo(7f));
             Assert.That(config.SiegeDayDuration, Is.EqualTo(30f));
             Assert.That(config.SiegeDuskDuration, Is.EqualTo(5f));
             Assert.That(config.SiegeNightDuration, Is.EqualTo(20f));
@@ -632,6 +636,8 @@ namespace DeadWalls.Tests
             Assert.That(economyPriceTuning.WorkerEfficiencyBaseIronCost, Is.EqualTo(50));
             Assert.That(economyPriceTuning.WorkerBuildingCostGrowthMultiplier,
                 Is.EqualTo(1.35d));
+            Assert.That(economyPriceTuning.WorkerEfficiencyPercentPerLevel,
+                Is.EqualTo(0.10f));
             Assert.That(samples.Length, Is.EqualTo(60));
             Assert.That(samples[0].NightIntensityMult, Is.EqualTo(0.5f));
             Assert.That(samples[4].BloodMoonIntensityMult, Is.EqualTo(1f));
@@ -699,6 +705,56 @@ namespace DeadWalls.Tests
             Assert.That(restoredWall.MaxHP, Is.EqualTo(originalEffectiveMaxHp).Within(0.02f));
             restoredWall.CurrentHP = restoredWall.MaxHP;
             entityManager.SetComponentData(wallEntity, restoredWall);
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator WorkerEconomyBaseRateLiveTuning_PreservesEffectiveAggregateRatios()
+        {
+            var gameManager = GameManager.Instance;
+            bool runtimeReady = false;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                {
+                    runtimeReady = true;
+                    break;
+                }
+                yield return null;
+            }
+            Assert.That(runtimeReady, Is.True);
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            Entity configEntity = entityManager.CreateEntityQuery(typeof(MobileCastleCombatConfig))
+                .GetSingletonEntity();
+            MobileCastleCombatConfig original =
+                entityManager.GetComponentData<MobileCastleCombatConfig>(configEntity);
+
+            const float scale = 1.25f;
+            Assert.That(gameManager.ApplyWorkerEconomyTuning(
+                8f * scale, 5.5f * scale, 4.9f * scale, 7f * scale), Is.True);
+            MobileCastleCombatConfig tuned =
+                entityManager.GetComponentData<MobileCastleCombatConfig>(configEntity);
+            Assert.That(tuned.WoodWorkerProductionPerMin,
+                Is.EqualTo(original.WoodWorkerProductionPerMin * scale).Within(0.001f));
+            Assert.That(tuned.StoneWorkerProductionPerMin,
+                Is.EqualTo(original.StoneWorkerProductionPerMin * scale).Within(0.001f));
+            Assert.That(tuned.IronWorkerProductionPerMin,
+                Is.EqualTo(original.IronWorkerProductionPerMin * scale).Within(0.001f));
+            Assert.That(tuned.FoodWorkerProductionPerMin,
+                Is.EqualTo(original.FoodWorkerProductionPerMin * scale).Within(0.001f));
+
+            Assert.That(gameManager.ApplyWorkerEconomyTuning(8f, 5.5f, 4.9f, 7f), Is.True);
+            MobileCastleCombatConfig restored =
+                entityManager.GetComponentData<MobileCastleCombatConfig>(configEntity);
+            Assert.That(restored.WoodWorkerProductionPerMin,
+                Is.EqualTo(original.WoodWorkerProductionPerMin).Within(0.001f));
+            Assert.That(restored.StoneWorkerProductionPerMin,
+                Is.EqualTo(original.StoneWorkerProductionPerMin).Within(0.001f));
+            Assert.That(restored.IronWorkerProductionPerMin,
+                Is.EqualTo(original.IronWorkerProductionPerMin).Within(0.001f));
+            Assert.That(restored.FoodWorkerProductionPerMin,
+                Is.EqualTo(original.FoodWorkerProductionPerMin).Within(0.001f));
             yield return null;
         }
 
