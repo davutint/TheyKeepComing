@@ -93,6 +93,11 @@ otoritesi yalniz `GameManager` transaction'lari ve mevcut ECS effect owner'larin
 - `GameManager.GetCouncilRuntimeTuningTelemetry`, katalog validasyonu, memory/flag/one-shot sayilari,
   active kart butceleri ve production/next-night expiry'lerini aggregate verir; yeni gameplay state'i
   kurmaz veya gizli secenek icerigi uretmez.
+- Provider-bagimsiz `GameplayTelemetry`, yalniz secim effect/flag/active-clear transaction'i veya
+  Dusk expire active-clear transaction'i kesinlestikten sonra `council_resolved v1` yayar. Payload
+  day/template, `option_a/option_b/expired`, concrete effect snapshot'lari ve production guard'dan
+  gecmis next-night count delta'sini tasir. Rejected secim, bos tekrar expire ve cozulmus karar
+  sonrasi exact Continue duplicate event uretmez; Emergency Council yolu yoktur.
 
 ## Persistence
 
@@ -240,7 +245,9 @@ payload'in karar/on-state mutation yapamadigini;
 `ExactRunContinuePlayModeTests` ayni payload'in Continue preflight'ta restart oncesi
 reddedildigini; `CouncilRegularSchedulePlayModeTests` active payload/memory/handled-day ile
 cozulmus secim, sureli effect state'i ve ilk meeting oncesi committed run salt'in exact
-Continue davranisini dogrular.
+Continue davranisini; `GameplayTelemetryTests` ile `GameplayTelemetryPlayModeTests` ise
+`council_resolved` contract/envelope guard'larini ve gercek secim/expire/Continue emission'ini
+dogrular.
 
 ## Isim Sozlesmesi
 

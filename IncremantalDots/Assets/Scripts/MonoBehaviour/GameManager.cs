@@ -2970,6 +2970,13 @@ namespace DeadWalls
             }
 
             _activeCouncilEvent = null;
+            TryEmitCouncilResolvedTelemetry(
+                day,
+                active,
+                option,
+                optionA
+                    ? CouncilResolvedTelemetryContract.OptionA
+                    : CouncilResolvedTelemetryContract.OptionB);
             OnGameStateChanged?.Invoke();
             return true;
         }
@@ -2977,10 +2984,17 @@ namespace DeadWalls
         /// <summary>Karar penceresi kapandi (DUSK) — kart secilmeden dagilir; flag yazilmaz.</summary>
         public void ExpireCouncilEvent()
         {
-            if (_activeCouncilEvent == null)
+            ComposedCouncilEvent active = _activeCouncilEvent;
+            if (active == null)
                 return;
 
+            int day = Mathf.Max(1, ContinuousSiegeCycle.CycleIndex + 1);
             _activeCouncilEvent = null;
+            TryEmitCouncilResolvedTelemetry(
+                day,
+                active,
+                null,
+                CouncilResolvedTelemetryContract.Expired);
             OnGameStateChanged?.Invoke();
         }
 

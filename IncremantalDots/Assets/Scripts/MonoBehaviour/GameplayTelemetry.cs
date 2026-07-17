@@ -118,6 +118,92 @@ namespace DeadWalls
         public int RevealedChildren;
     }
 
+    [Serializable]
+    public sealed class CouncilResolvedTelemetryEffect
+    {
+        public string Kind;
+        public string Resource;
+        public int Amount;
+        public float Rate;
+        public int DurationDays;
+    }
+
+    [Serializable]
+    public sealed class CouncilResolvedTelemetryPayload
+    {
+        public int Day;
+        public string TemplateId;
+        public string Resolution;
+        public List<CouncilResolvedTelemetryEffect> Effects =
+            new List<CouncilResolvedTelemetryEffect>();
+        public float NextNightDelta;
+    }
+
+    internal static class CouncilResolvedTelemetryContract
+    {
+        internal const string OptionA = "option_a";
+        internal const string OptionB = "option_b";
+        internal const string Expired = "expired";
+
+        internal const string GainResource = "gain_resource";
+        internal const string PayResource = "pay_resource";
+        internal const string TempProductionBoost = "temp_production_boost";
+        internal const string TempProductionPenalty = "temp_production_penalty";
+        internal const string WorkerCapBonus = "worker_cap_bonus";
+        internal const string GainPopulation = "gain_population";
+        internal const string GainFreeArchers = "gain_free_archers";
+        internal const string HealDefensePercent = "heal_defense_percent";
+        internal const string NextNightSpawnDelta = "next_night_spawn_delta";
+
+        internal const string None = "none";
+        internal const string All = "all";
+        internal const string Wood = "wood";
+        internal const string Stone = "stone";
+        internal const string Iron = "iron";
+        internal const string Food = "food";
+
+        internal static bool IsResolution(string resolution)
+        {
+            return string.Equals(resolution, OptionA, StringComparison.Ordinal)
+                || string.Equals(resolution, OptionB, StringComparison.Ordinal)
+                || string.Equals(resolution, Expired, StringComparison.Ordinal);
+        }
+
+        internal static bool IsEffectKind(string kind)
+        {
+            switch (kind)
+            {
+                case GainResource:
+                case PayResource:
+                case TempProductionBoost:
+                case TempProductionPenalty:
+                case WorkerCapBonus:
+                case GainPopulation:
+                case GainFreeArchers:
+                case HealDefensePercent:
+                case NextNightSpawnDelta:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        internal static bool IsResource(string resource)
+        {
+            return string.Equals(resource, None, StringComparison.Ordinal)
+                || string.Equals(resource, All, StringComparison.Ordinal)
+                || IsSingleResource(resource);
+        }
+
+        internal static bool IsSingleResource(string resource)
+        {
+            return string.Equals(resource, Wood, StringComparison.Ordinal)
+                || string.Equals(resource, Stone, StringComparison.Ordinal)
+                || string.Equals(resource, Iron, StringComparison.Ordinal)
+                || string.Equals(resource, Food, StringComparison.Ordinal);
+        }
+    }
+
     internal static class ArcherChangedTelemetryContract
     {
         internal const string Buy = "buy";
@@ -302,6 +388,8 @@ namespace DeadWalls
         public const int ArcherChangedSchemaVersion = 1;
         public const string HeartNodeBoughtEventName = "heart_node_bought";
         public const int HeartNodeBoughtSchemaVersion = 1;
+        public const string CouncilResolvedEventName = "council_resolved";
+        public const int CouncilResolvedSchemaVersion = 1;
 
         public static event Action<GameplayTelemetryRecord> Emitted;
 
@@ -407,6 +495,30 @@ namespace DeadWalls
             return EmitValidated(
                 HeartNodeBoughtEventName,
                 HeartNodeBoughtSchemaVersion,
+                normalizedRunId,
+                payload,
+                out record,
+                out error);
+        }
+
+        public static bool TryEmitCouncilResolved(
+            string runId,
+            CouncilResolvedTelemetryPayload payload,
+            out GameplayTelemetryRecord record,
+            out string error)
+        {
+            record = default;
+            if (!TryNormalizeRunId(runId, CouncilResolvedEventName, out string normalizedRunId,
+                    out error))
+            {
+                return false;
+            }
+            if (!TryValidateCouncilResolved(payload, out error))
+                return false;
+
+            return EmitValidated(
+                CouncilResolvedEventName,
+                CouncilResolvedSchemaVersion,
                 normalizedRunId,
                 payload,
                 out record,
@@ -675,6 +787,155 @@ namespace DeadWalls
             error = string.Empty;
             return true;
         }
+
+        internal static bool TryValidateCouncilResolved(
+            CouncilResolvedTelemetryPayload payload,
+            out string error)
+        {
+            if (payload == null)
+            {
+                error = "council_resolved payload bos.";
+                return false;
+            }
+            if (payload.Day < 1 || string.IsNullOrWhiteSpace(payload.TemplateId))
+            {
+                error = "council_resolved day veya template kimligi gecersiz.";
+                return false;
+            }
+            if (!CouncilResolvedTelemetryContract.IsResolution(payload.Resolution))
+            {
+                error = "council_resolved resolution kimligi gecersiz.";
+                return false;
+            }
+            if (payload.Effects == null || float.IsNaN(payload.NextNightDelta)
+                || float.IsInfinity(payload.NextNightDelta))
+            {
+                error = "council_resolved effect listesi veya next-night delta gecersiz.";
+                return false;
+            }
+
+            bool expired = string.Equals(
+                payload.Resolution,
+                CouncilResolvedTelemetryContract.Expired,
+                StringComparison.Ordinal);
+            if (expired)
+            {
+                if (payload.Effects.Count != 0 || !Mathf.Approximately(payload.NextNightDelta, 0f))
+                {
+                    error = "council_resolved expired sonucu effect veya next-night delta tasiyamaz.";
+                    return false;
+                }
+
+                error = string.Empty;
+                return true;
+            }
+
+            if (payload.Effects.Count == 0)
+            {
+                error = "council_resolved option sonucu en az bir effect tasimali.";
+                return false;
+            }
+
+            float expectedNightDelta = 0f;
+            for (int i = 0; i < payload.Effects.Count; i++)
+            {
+                CouncilResolvedTelemetryEffect effect = payload.Effects[i];
+                if (!TryValidateCouncilEffect(effect, out error))
+                {
+                    error = $"council_resolved Effects[{i}] gecersiz: {error}";
+                    return false;
+                }
+
+                if (string.Equals(effect.Kind,
+                        CouncilResolvedTelemetryContract.NextNightSpawnDelta,
+                        StringComparison.Ordinal))
+                {
+                    expectedNightDelta =
+                        CouncilEffectGuardUtility.ResolveNightCountMultiplier(effect.Rate) - 1f;
+                }
+            }
+
+            if (!Mathf.Approximately(payload.NextNightDelta, expectedNightDelta))
+            {
+                error = "council_resolved next-night delta effect snapshot'iyla uyusmuyor.";
+                return false;
+            }
+
+            error = string.Empty;
+            return true;
+        }
+
+        private static bool TryValidateCouncilEffect(
+            CouncilResolvedTelemetryEffect effect,
+            out string error)
+        {
+            if (effect == null
+                || !CouncilResolvedTelemetryContract.IsEffectKind(effect.Kind)
+                || !CouncilResolvedTelemetryContract.IsResource(effect.Resource)
+                || effect.Amount < 0 || effect.DurationDays < 0
+                || float.IsNaN(effect.Rate) || float.IsInfinity(effect.Rate))
+            {
+                error = "kimlik veya magnitude alani gecersiz.";
+                return false;
+            }
+
+            bool noResource = string.Equals(
+                effect.Resource,
+                CouncilResolvedTelemetryContract.None,
+                StringComparison.Ordinal);
+            switch (effect.Kind)
+            {
+                case CouncilResolvedTelemetryContract.GainResource:
+                case CouncilResolvedTelemetryContract.PayResource:
+                    if (effect.Amount <= 0
+                        || !CouncilResolvedTelemetryContract.IsSingleResource(effect.Resource))
+                    {
+                        error = "resource effect amount/resource alani gecersiz.";
+                        return false;
+                    }
+                    break;
+                case CouncilResolvedTelemetryContract.WorkerCapBonus:
+                    if (effect.Amount <= 0 || noResource)
+                    {
+                        error = "worker cap effect amount/resource alani gecersiz.";
+                        return false;
+                    }
+                    break;
+                case CouncilResolvedTelemetryContract.GainPopulation:
+                case CouncilResolvedTelemetryContract.GainFreeArchers:
+                    if (effect.Amount <= 0 || !noResource)
+                    {
+                        error = "population/archer effect amount/resource alani gecersiz.";
+                        return false;
+                    }
+                    break;
+                case CouncilResolvedTelemetryContract.TempProductionBoost:
+                case CouncilResolvedTelemetryContract.TempProductionPenalty:
+                    if (effect.Rate <= 0f || effect.DurationDays <= 0 || noResource)
+                    {
+                        error = "production effect rate/duration/resource alani gecersiz.";
+                        return false;
+                    }
+                    break;
+                case CouncilResolvedTelemetryContract.HealDefensePercent:
+                    if (effect.Rate <= 0f || !noResource)
+                    {
+                        error = "heal effect rate/resource alani gecersiz.";
+                        return false;
+                    }
+                    break;
+                case CouncilResolvedTelemetryContract.NextNightSpawnDelta:
+                    if (Mathf.Approximately(effect.Rate, 0f) || !noResource)
+                    {
+                        error = "next-night effect rate/resource alani gecersiz.";
+                        return false;
+                    }
+                    break;
+            }
+
+            error = string.Empty;
+            return true;
+        }
     }
 
     internal static class ResourceSpentTelemetryFactory
@@ -775,6 +1036,115 @@ namespace DeadWalls
                 Cost = result?.Quote?.TotalGraveEssenceCost ?? 0L,
                 RevealedChildren = result?.NewlyRevealedNodeIds?.Count ?? -1
             };
+        }
+    }
+
+    internal static class CouncilResolvedTelemetryFactory
+    {
+        internal static CouncilResolvedTelemetryPayload Create(
+            int day,
+            ComposedCouncilEvent councilEvent,
+            ComposedCouncilOption option,
+            string resolution)
+        {
+            var payload = new CouncilResolvedTelemetryPayload
+            {
+                Day = Math.Max(1, day),
+                TemplateId = councilEvent?.TemplateId?.Trim(),
+                Resolution = resolution,
+                Effects = new List<CouncilResolvedTelemetryEffect>(),
+                NextNightDelta = 0f
+            };
+
+            if (option?.Effects == null)
+                return payload;
+
+            for (int i = 0; i < option.Effects.Count; i++)
+            {
+                ComposedCouncilEffect source = option.Effects[i];
+                payload.Effects.Add(new CouncilResolvedTelemetryEffect
+                {
+                    Kind = ToEffectKind(source.Kind),
+                    Resource = ToResource(source.Kind, source.Resource),
+                    Amount = Math.Max(0, source.Amount),
+                    Rate = source.Rate,
+                    DurationDays = Math.Max(0, source.DurationDays)
+                });
+
+                if (source.Kind == CouncilEffectKind.NextNightSpawnDelta)
+                {
+                    payload.NextNightDelta =
+                        CouncilEffectGuardUtility.ResolveNightCountMultiplier(source.Rate) - 1f;
+                }
+            }
+
+            return payload;
+        }
+
+        internal static CouncilResolvedTelemetryPayload CreateExpired(
+            int day,
+            ComposedCouncilEvent councilEvent)
+        {
+            return Create(
+                day,
+                councilEvent,
+                null,
+                CouncilResolvedTelemetryContract.Expired);
+        }
+
+        private static string ToEffectKind(CouncilEffectKind kind)
+        {
+            switch (kind)
+            {
+                case CouncilEffectKind.GainResource:
+                    return CouncilResolvedTelemetryContract.GainResource;
+                case CouncilEffectKind.PayResource:
+                    return CouncilResolvedTelemetryContract.PayResource;
+                case CouncilEffectKind.TempProductionBoost:
+                    return CouncilResolvedTelemetryContract.TempProductionBoost;
+                case CouncilEffectKind.TempProductionPenalty:
+                    return CouncilResolvedTelemetryContract.TempProductionPenalty;
+                case CouncilEffectKind.WorkerCapBonus:
+                    return CouncilResolvedTelemetryContract.WorkerCapBonus;
+                case CouncilEffectKind.GainPopulation:
+                    return CouncilResolvedTelemetryContract.GainPopulation;
+                case CouncilEffectKind.GainFreeArchers:
+                    return CouncilResolvedTelemetryContract.GainFreeArchers;
+                case CouncilEffectKind.HealDefensePercent:
+                    return CouncilResolvedTelemetryContract.HealDefensePercent;
+                case CouncilEffectKind.NextNightSpawnDelta:
+                    return CouncilResolvedTelemetryContract.NextNightSpawnDelta;
+                default:
+                    return string.Empty;
+            }
+        }
+
+        private static string ToResource(CouncilEffectKind kind, EconomyFocusType resource)
+        {
+            switch (kind)
+            {
+                case CouncilEffectKind.GainPopulation:
+                case CouncilEffectKind.GainFreeArchers:
+                case CouncilEffectKind.HealDefensePercent:
+                case CouncilEffectKind.NextNightSpawnDelta:
+                    return CouncilResolvedTelemetryContract.None;
+            }
+
+            switch (resource)
+            {
+                case EconomyFocusType.Wood:
+                    return CouncilResolvedTelemetryContract.Wood;
+                case EconomyFocusType.Stone:
+                    return CouncilResolvedTelemetryContract.Stone;
+                case EconomyFocusType.Iron:
+                    return CouncilResolvedTelemetryContract.Iron;
+                case EconomyFocusType.Food:
+                    return CouncilResolvedTelemetryContract.Food;
+                case EconomyFocusType.Balanced:
+                    return CouncilResolvedTelemetryContract.All;
+                default:
+                    return string.Empty;
+            }
         }
     }
 

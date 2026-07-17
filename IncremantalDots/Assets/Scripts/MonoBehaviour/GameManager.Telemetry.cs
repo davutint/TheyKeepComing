@@ -243,5 +243,31 @@ namespace DeadWalls
                     $"[GameManager] heart_node_bought telemetry reddedildi: {error}");
             }
         }
+
+        private void TryEmitCouncilResolvedTelemetry(
+            int day,
+            ComposedCouncilEvent councilEvent,
+            ComposedCouncilOption option,
+            string resolution)
+        {
+            if (!_initialized || string.IsNullOrWhiteSpace(_currentRunId)
+                || !IsRunIdentityReadyForPhaseTelemetry())
+            {
+                return;
+            }
+
+            CouncilResolvedTelemetryPayload payload = option == null
+                ? CouncilResolvedTelemetryFactory.CreateExpired(day, councilEvent)
+                : CouncilResolvedTelemetryFactory.Create(day, councilEvent, option, resolution);
+            if (!GameplayTelemetry.TryEmitCouncilResolved(
+                    _currentRunId,
+                    payload,
+                    out _,
+                    out string error))
+            {
+                UnityEngine.Debug.LogError(
+                    $"[GameManager] council_resolved telemetry reddedildi: {error}");
+            }
+        }
     }
 }

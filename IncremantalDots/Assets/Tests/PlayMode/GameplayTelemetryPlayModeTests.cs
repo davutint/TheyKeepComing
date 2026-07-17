@@ -23,6 +23,8 @@ namespace DeadWalls.Tests
             new List<GameplayTelemetryRecord>();
         private readonly List<GameplayTelemetryRecord> _heartNodeBoughtRecords =
             new List<GameplayTelemetryRecord>();
+        private readonly List<GameplayTelemetryRecord> _councilResolvedRecords =
+            new List<GameplayTelemetryRecord>();
         private readonly List<string> _purchaseEventOrder = new List<string>();
         private readonly List<UnityEngine.Object> _createdObjects =
             new List<UnityEngine.Object>();
@@ -30,6 +32,8 @@ namespace DeadWalls.Tests
         private string _runSavePath;
         private FieldInfo _heartCatalogField;
         private HeartNodeCatalogSO _originalHeartCatalog;
+        private FieldInfo _councilCatalogField;
+        private CouncilEventCatalogSO _originalCouncilCatalog;
 
         [UnitySetUp]
         public IEnumerator SetUp()
@@ -44,6 +48,7 @@ namespace DeadWalls.Tests
             _resourceSpentRecords.Clear();
             _archerChangedRecords.Clear();
             _heartNodeBoughtRecords.Clear();
+            _councilResolvedRecords.Clear();
             _purchaseEventOrder.Clear();
             GameplayTelemetry.Emitted += OnTelemetryEmitted;
             GameBootstrap.PendingAction = GameBootstrap.StartAction.None;
@@ -63,6 +68,12 @@ namespace DeadWalls.Tests
             Assert.That(_heartCatalogField, Is.Not.Null);
             _originalHeartCatalog =
                 _heartCatalogField.GetValue(GameManager.Instance) as HeartNodeCatalogSO;
+            _councilCatalogField = typeof(GameManager).GetField(
+                "councilCatalog",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.That(_councilCatalogField, Is.Not.Null);
+            _originalCouncilCatalog =
+                _councilCatalogField.GetValue(GameManager.Instance) as CouncilEventCatalogSO;
         }
 
         [UnityTearDown]
@@ -76,6 +87,12 @@ namespace DeadWalls.Tests
                     "ResetHeartRuntime",
                     BindingFlags.Instance | BindingFlags.NonPublic);
                 resetHeartRuntime?.Invoke(GameManager.Instance, null);
+
+                _councilCatalogField?.SetValue(GameManager.Instance, _originalCouncilCatalog);
+                MethodInfo resetCouncilState = typeof(GameManager).GetMethod(
+                    "ResetCouncilState",
+                    BindingFlags.Instance | BindingFlags.NonPublic);
+                resetCouncilState?.Invoke(GameManager.Instance, null);
             }
             RunPersistence.Delete();
             if (_originalRunSave != null)
@@ -444,6 +461,130 @@ namespace DeadWalls.Tests
             Assert.That(_purchaseEventOrder.Count, Is.EqualTo(2));
         }
 
+        [UnityTest]
+        public IEnumerator CouncilChoiceAndExpiry_EmitCommittedDecisionOnce_AndContinueDoesNotDuplicate()
+        {
+            GameManager gameManager = GameManager.Instance;
+            _councilCatalogField.SetValue(gameManager, CreateTelemetryCouncilCatalog());
+            MethodInfo resetCouncilState = typeof(GameManager).GetMethod(
+                "ResetCouncilState",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.That(resetCouncilState, Is.Not.Null);
+            resetCouncilState.Invoke(gameManager, null);
+
+            _records.Clear();
+            _councilResolvedRecords.Clear();
+            gameManager.RestartGame();
+            for (int frame = 0; frame < 180 && _records.Count == 0; frame++)
+                yield return null;
+            Assert.That(_records.Count, Is.EqualTo(1),
+                "Council telemetry oncesi run identity kurulmalidir.");
+
+            SetTelemetryCouncilCycle(gameManager, 3, SiegeCyclePhase.Dawn);
+            Assert.That(gameManager.TryOpenRegularCouncilEvent(), Is.True);
+            Assert.That(gameManager.ActiveCouncilEvent.TemplateId,
+                Is.EqualTo("telemetry_council"));
+            Assert.That(gameManager.ChooseCouncilOption(true), Is.True);
+            Assert.That(gameManager.ActiveCouncilEvent, Is.Null);
+            Assert.That(_councilResolvedRecords.Count, Is.EqualTo(1));
+
+            CouncilResolvedTelemetryPayload selected =
+                JsonUtility.FromJson<CouncilResolvedTelemetryPayload>(
+                    _councilResolvedRecords[0].PayloadJson);
+            Assert.That(selected.Day, Is.EqualTo(3));
+            Assert.That(selected.TemplateId, Is.EqualTo("telemetry_council"));
+            Assert.That(selected.Resolution, Is.EqualTo("option_a"));
+            Assert.That(selected.Effects, Has.Count.EqualTo(1));
+            Assert.That(selected.Effects[0].Kind, Is.EqualTo("gain_resource"));
+            Assert.That(selected.Effects[0].Amount, Is.GreaterThan(0));
+            Assert.That(selected.NextNightDelta, Is.Zero);
+
+            Assert.That(gameManager.SaveRunSnapshot(), Is.True);
+            Assert.That(gameManager.TryRestoreRunFromCheckpoint(), Is.True);
+            for (int frame = 0; frame < 5; frame++)
+                yield return null;
+            Assert.That(_councilResolvedRecords.Count, Is.EqualTo(1),
+                "Cozulmus Council exact Continue sonrasinda duplicate event uretmemeli.");
+
+            SetTelemetryCouncilCycle(gameManager, 6, SiegeCyclePhase.Dawn);
+            Assert.That(gameManager.TryOpenRegularCouncilEvent(), Is.True);
+            Assert.That(gameManager.ActiveCouncilEvent, Is.Not.Null);
+            gameManager.ExpireCouncilEvent();
+            Assert.That(_councilResolvedRecords.Count, Is.EqualTo(2));
+
+            CouncilResolvedTelemetryPayload expired =
+                JsonUtility.FromJson<CouncilResolvedTelemetryPayload>(
+                    _councilResolvedRecords[1].PayloadJson);
+            Assert.That(expired.Day, Is.EqualTo(6));
+            Assert.That(expired.TemplateId, Is.EqualTo("telemetry_council"));
+            Assert.That(expired.Resolution, Is.EqualTo("expired"));
+            Assert.That(expired.Effects, Is.Empty);
+            Assert.That(expired.NextNightDelta, Is.Zero);
+
+            gameManager.ExpireCouncilEvent();
+            Assert.That(_councilResolvedRecords.Count, Is.EqualTo(2),
+                "Bos active state uzerindeki tekrar Expire duplicate event uretmemeli.");
+        }
+
+        private CouncilEventCatalogSO CreateTelemetryCouncilCatalog()
+        {
+            CouncilEffectAtomSO gain =
+                ScriptableObject.CreateInstance<CouncilEffectAtomSO>();
+            gain.Id = "telemetry_gain";
+            gain.Kind = CouncilEffectKind.GainResource;
+            gain.MinutesOfProduction = 1f;
+            gain.BudgetMinutes = 1f;
+            _createdObjects.Add(gain);
+
+            CouncilEffectAtomSO boost =
+                ScriptableObject.CreateInstance<CouncilEffectAtomSO>();
+            boost.Id = "telemetry_boost";
+            boost.Kind = CouncilEffectKind.TempProductionBoost;
+            boost.Rate = 0.1f;
+            boost.DurationDays = 1;
+            boost.BudgetMinutes = 1f;
+            _createdObjects.Add(boost);
+
+            CouncilTemplateSO template =
+                ScriptableObject.CreateInstance<CouncilTemplateSO>();
+            template.Id = "telemetry_council";
+            template.Title = "TELEMETRY COUNCIL";
+            template.Body = "A regular Council on day {DAY}.";
+            template.OutcomeA = "+{GAIN_N} {GAIN_RES}.";
+            template.OutcomeB = "{BOOST_RES} +{BOOST_PCT}% for {BOOST_D} days.";
+            template.Contrast = CouncilContrastType.NowVsLater;
+            template.OptionAAtomIds = new[] { gain.Id };
+            template.OptionBAtomIds = new[] { boost.Id };
+            template.MinDay = 1;
+            _createdObjects.Add(template);
+
+            CouncilEventCatalogSO catalog =
+                ScriptableObject.CreateInstance<CouncilEventCatalogSO>();
+            catalog.Atoms = new[] { gain, boost };
+            catalog.Templates = new[] { template };
+            catalog.RecentTemplateMemory = 1;
+            _createdObjects.Add(catalog);
+            return catalog;
+        }
+
+        private static void SetTelemetryCouncilCycle(
+            GameManager gameManager,
+            int day,
+            SiegeCyclePhase phase)
+        {
+            PropertyInfo cycleProperty = typeof(GameManager).GetProperty(
+                "ContinuousSiegeCycle",
+                BindingFlags.Instance | BindingFlags.Public);
+            MethodInfo cycleSetter = cycleProperty?.GetSetMethod(true);
+            Assert.That(cycleSetter, Is.Not.Null);
+
+            ContinuousSiegeCycleData cycle = gameManager.ContinuousSiegeCycle;
+            cycle.Enabled = true;
+            cycle.CycleIndex = day - 1;
+            cycle.Phase = phase;
+            cycleSetter.Invoke(gameManager, new object[] { cycle });
+        }
+
         private HeartNodeCatalogSO CreateTelemetryHeartCatalog()
         {
             HeartNodeCatalogSO catalog = ScriptableObject.CreateInstance<HeartNodeCatalogSO>();
@@ -579,6 +720,8 @@ namespace DeadWalls.Tests
                 _heartNodeBoughtRecords.Add(record);
                 _purchaseEventOrder.Add(record.EventName);
             }
+            else if (record.EventName == GameplayTelemetry.CouncilResolvedEventName)
+                _councilResolvedRecords.Add(record);
         }
     }
 }

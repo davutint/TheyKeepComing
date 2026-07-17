@@ -33,16 +33,24 @@ sinifinin parcasidir; `GameplayTelemetry.cs` ayni `DeadWalls` runtime assembly's
     cost ile yeni reveal edilen child sayisini vermelidir.
 15. Ayni non-repeatable node tekrar alindiginda veya hidden/locked/yetersiz Essence node denendiginde
     yeni `heart_node_bought` kaydi gelmemelidir.
+16. Day `3/6/9...` regular Council'da Option A veya B secilir; Console'daki `council_resolved`
+    kaydi exact day/template, `option_a/option_b`, concrete effect listesi ve guardlanmis
+    `NextNightDelta` degerini vermelidir.
+17. Regular Council Dusk'a secilmeden tasinir; tek `expired` kaydi gelmeli, `Effects` bos ve
+    `NextNightDelta=0` olmalidir. Bos active state'te ikinci expire yeni kayit uretmemelidir.
+18. Cozulmus Council sonrasi save/Continue yapildiginda ayni karar tekrar yayilmamalidir;
+    affordability veya content gate'inde reddedilen secim de event uretmemelidir.
 
 Otomatik kapsam:
 
-- EditMode `GameplayTelemetryTests`: run/phase/resource/archer/Heart payload factory'leri,
+- EditMode `GameplayTelemetryTests`: run/phase/resource/archer/Heart/Council payload factory'leri,
   multi-resource canonical order, envelope serialization ve invalid identity/amount/result/
-  transition/cap/node/level/depth/cost/reveal guard'lari.
+  transition/cap/node/level/depth/cost/reveal/resolution/effect/night-delta guard'lari.
 - PlayMode `GameplayTelemetryPlayModeTests`: gercek NewGameScene yeni-run emission'i, canonical
   phase/horde snapshot'i, ayni-phase idempotency, exact Continue duplicate guard'i, tek/iki kaynakli
   purchase commit event'leri, player archer buy/retrain transition snapshot'lari, canonical Castle
-  Heart purchase/reveal snapshot'i ve rejected transaction sifir-event guard'i.
+  Heart purchase/reveal snapshot'i, regular Council secim/expire/Continue snapshot'i ve rejected
+  transaction sifir-event guard'i.
 
 Harici analytics target'i bu kurulumun parcasi degildir; tracker'daki owner-karari maddesi
 onaylanmadan SDK, servis veya endpoint eklenmez.

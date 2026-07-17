@@ -594,6 +594,165 @@ namespace DeadWalls.Tests
             Assert.That(revealError, Does.Contain("revealed children"));
         }
 
+        [Test]
+        public void CouncilResolvedFactory_CapturesCanonicalEffectsAndResolvedNightDelta()
+        {
+            var councilEvent = new ComposedCouncilEvent
+            {
+                TemplateId = " night_bargain "
+            };
+            var option = new ComposedCouncilOption
+            {
+                Effects = new List<ComposedCouncilEffect>
+                {
+                    new ComposedCouncilEffect
+                    {
+                        Kind = CouncilEffectKind.GainResource,
+                        Resource = EconomyFocusType.Wood,
+                        Amount = 240
+                    },
+                    new ComposedCouncilEffect
+                    {
+                        Kind = CouncilEffectKind.NextNightSpawnDelta,
+                        Resource = EconomyFocusType.Balanced,
+                        Rate = 100f
+                    }
+                }
+            };
+
+            CouncilResolvedTelemetryPayload selected =
+                CouncilResolvedTelemetryFactory.Create(
+                    9,
+                    councilEvent,
+                    option,
+                    CouncilResolvedTelemetryContract.OptionB);
+            Assert.That(selected.Day, Is.EqualTo(9));
+            Assert.That(selected.TemplateId, Is.EqualTo("night_bargain"));
+            Assert.That(selected.Resolution, Is.EqualTo("option_b"));
+            Assert.That(selected.Effects, Has.Count.EqualTo(2));
+            Assert.That(selected.Effects[0].Kind, Is.EqualTo("gain_resource"));
+            Assert.That(selected.Effects[0].Resource, Is.EqualTo("wood"));
+            Assert.That(selected.Effects[0].Amount, Is.EqualTo(240));
+            Assert.That(selected.Effects[1].Kind, Is.EqualTo("next_night_spawn_delta"));
+            Assert.That(selected.Effects[1].Resource, Is.EqualTo("none"));
+            Assert.That(selected.NextNightDelta,
+                Is.EqualTo(CouncilEffectGuardUtility.MaximumNightCountMultiplier - 1f)
+                    .Within(0.0001f));
+
+            CouncilResolvedTelemetryPayload expired =
+                CouncilResolvedTelemetryFactory.CreateExpired(12, councilEvent);
+            Assert.That(expired.Resolution, Is.EqualTo("expired"));
+            Assert.That(expired.Effects, Is.Empty);
+            Assert.That(expired.NextNightDelta, Is.Zero);
+        }
+
+        [Test]
+        public void TryEmitCouncilResolved_ProducesVersionedMachineReadableEnvelope()
+        {
+            GameplayTelemetryRecord observed = default;
+            bool received = false;
+            void OnEmitted(GameplayTelemetryRecord record)
+            {
+                observed = record;
+                received = true;
+            }
+
+            var payload = new CouncilResolvedTelemetryPayload
+            {
+                Day = 6,
+                TemplateId = "granary_request",
+                Resolution = CouncilResolvedTelemetryContract.OptionA,
+                Effects = new List<CouncilResolvedTelemetryEffect>
+                {
+                    new CouncilResolvedTelemetryEffect
+                    {
+                        Kind = CouncilResolvedTelemetryContract.GainPopulation,
+                        Resource = CouncilResolvedTelemetryContract.None,
+                        Amount = 4
+                    }
+                },
+                NextNightDelta = 0f
+            };
+            GameplayTelemetry.Emitted += OnEmitted;
+            try
+            {
+                Assert.That(GameplayTelemetry.TryEmitCouncilResolved(
+                    " run_council_06 ", payload, out GameplayTelemetryRecord emitted,
+                    out string error), Is.True, error);
+                Assert.That(received, Is.True);
+                Assert.That(observed.RunId, Is.EqualTo("run_council_06"));
+                Assert.That(emitted.EventName, Is.EqualTo("council_resolved"));
+                Assert.That(emitted.SchemaVersion, Is.EqualTo(1));
+
+                GameplayTelemetryEnvelope envelope =
+                    JsonUtility.FromJson<GameplayTelemetryEnvelope>(emitted.SerializedEnvelope);
+                CouncilResolvedTelemetryPayload decoded =
+                    JsonUtility.FromJson<CouncilResolvedTelemetryPayload>(envelope.PayloadJson);
+                Assert.That(envelope.EventName, Is.EqualTo("council_resolved"));
+                Assert.That(envelope.SchemaVersion, Is.EqualTo(1));
+                Assert.That(decoded.Day, Is.EqualTo(6));
+                Assert.That(decoded.TemplateId, Is.EqualTo("granary_request"));
+                Assert.That(decoded.Resolution, Is.EqualTo("option_a"));
+                Assert.That(decoded.Effects, Has.Count.EqualTo(1));
+                Assert.That(decoded.Effects[0].Kind, Is.EqualTo("gain_population"));
+                Assert.That(decoded.Effects[0].Amount, Is.EqualTo(4));
+                Assert.That(decoded.NextNightDelta, Is.Zero);
+            }
+            finally
+            {
+                GameplayTelemetry.Emitted -= OnEmitted;
+            }
+        }
+
+        [Test]
+        public void TryEmitCouncilResolved_RejectsInvalidIdentityExpiredEffectsAndNightDelta()
+        {
+            var payload = new CouncilResolvedTelemetryPayload
+            {
+                Day = 3,
+                TemplateId = "valid_template",
+                Resolution = CouncilResolvedTelemetryContract.Expired,
+                Effects = new List<CouncilResolvedTelemetryEffect>(),
+                NextNightDelta = 0f
+            };
+
+            payload.Day = 0;
+            Assert.That(GameplayTelemetry.TryEmitCouncilResolved(
+                "run_invalid_day", payload, out _, out string dayError), Is.False);
+            Assert.That(dayError, Does.Contain("day veya template"));
+
+            payload.Day = 3;
+            payload.Effects.Add(new CouncilResolvedTelemetryEffect
+            {
+                Kind = CouncilResolvedTelemetryContract.GainResource,
+                Resource = CouncilResolvedTelemetryContract.Wood,
+                Amount = 10
+            });
+            Assert.That(GameplayTelemetry.TryEmitCouncilResolved(
+                "run_expired_effect", payload, out _, out string expiredError), Is.False);
+            Assert.That(expiredError, Does.Contain("expired sonucu"));
+
+            payload.Resolution = CouncilResolvedTelemetryContract.OptionA;
+            payload.Effects.Clear();
+            payload.Effects.Add(new CouncilResolvedTelemetryEffect
+            {
+                Kind = CouncilResolvedTelemetryContract.NextNightSpawnDelta,
+                Resource = CouncilResolvedTelemetryContract.None,
+                Rate = 0.25f
+            });
+            payload.NextNightDelta = 0f;
+            Assert.That(GameplayTelemetry.TryEmitCouncilResolved(
+                "run_wrong_delta", payload, out _, out string deltaError), Is.False);
+            Assert.That(deltaError, Does.Contain("next-night delta"));
+
+            payload.NextNightDelta =
+                CouncilEffectGuardUtility.ResolveNightCountMultiplier(0.25f) - 1f;
+            payload.Effects[0].Kind = "boss_spawn";
+            Assert.That(GameplayTelemetry.TryEmitCouncilResolved(
+                "run_unknown_effect", payload, out _, out string effectError), Is.False);
+            Assert.That(effectError, Does.Contain("Effects[0]"));
+        }
+
         private MetaUpgradeSO CreateUpgrade(string id, int maxLevel)
         {
             MetaUpgradeSO upgrade = ScriptableObject.CreateInstance<MetaUpgradeSO>();

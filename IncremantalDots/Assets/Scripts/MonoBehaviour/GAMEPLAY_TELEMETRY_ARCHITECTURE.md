@@ -109,6 +109,29 @@ preflight veya spend rejection sifir Heart event'i uretir. Evaluate/quote, exact
 effect replay purchase degildir; event'e baglanmaz. Telemetry graph state'ini sahiplenmez ve hidden
 child kimliklerini aciga cikarmaz; yalniz reveal sayisini yayar.
 
+## `council_resolved` v1
+
+`GameManager`, regular Council karari canonical runtime transaction'inda kesinlestikten sonra tek
+event uretir:
+
+- payload: `Day`, `TemplateId`, `Resolution`, `Effects`, `NextNightDelta`
+- resolution identity: player secimi icin `option_a/option_b`, Dusk'ta secilmeden kapanis icin
+  `expired`
+- her effect machine-readable `Kind`, `Resource`, `Amount`, `Rate`, `DurationDays` snapshot'idir;
+  resource kullanmayan effect'ler `none`, tum uretim/cap hedefi `all` kimligini kullanir
+- `NextNightDelta`, authored raw rate'i degil production `CouncilEffectGuardUtility` clamp'i
+  uygulandiktan sonraki gercek count multiplier delta'sidir
+
+Secim eventi effect apply, otomatik/curated flag yazimi ve active kartin temizlenmesinden sonra;
+expire eventi active kart temizlendikten sonra cikar. Affordability/content gate'inde reddedilen
+secim, bos state'te tekrar expire ve UI'nin yalniz kart gostermesi sifir event uretir. Expired
+payload effect veya next-night delta tasimaz.
+
+Event yeni Council history/state owner'i kurmaz. Cozulmus kart save'de active olmadigi icin exact
+Continue ayni karari tekrar yaymaz; unresolved active kart ise mevcut exact payload'iyla restore
+olur ve oyuncu daha sonra karar verdiginde tek event uretir. Emergency Council iptal edilen V1
+kapsamina dahil degildir.
+
 ## Genisleme kurali
 
 Tracker'daki sonraki event'ler ayni `GameplayTelemetryRecord` cikisini kullanir. Yeni manager,

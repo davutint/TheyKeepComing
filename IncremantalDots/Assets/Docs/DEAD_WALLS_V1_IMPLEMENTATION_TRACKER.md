@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.3
 > **Son tam kapsam denetimi:** 2026-07-17
 > **Aktif paket:** Post-Package V1 Closure - Contracts, Performance ve Release DoD
-> **Aktif iş:** `DW-V1-TELEMETRY-COUNCIL-RESOLVED` - Emit council_resolved Decision State
-> **İlerleme:** `417 / 442` tracker checkbox'ı tamamlandı - `%94,34`
+> **Aktif iş:** `DW-V1-TELEMETRY-ABILITY-CAST` - Emit ability_cast Ability Result State
+> **İlerleme:** `418 / 442` tracker checkbox'ı tamamlandı - `%94,57`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -1102,7 +1102,14 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
   sıfır `heart_node_bought` üretir. Contract EditMode `15/15`, gerçek graph buy/reveal/rejected tekrar
   PlayMode `5/5`, full EditMode `360/360` ve temiz full PlayMode tekrarı `77 pass + 2 explicit
   profiler/soak skip` geçti.
-- [ ] `council_resolved`: day, template, option/expired, effects, next-night delta.
+- [x] `council_resolved`: day, template, option/expired, effects, next-night delta.
+  `GameplayTelemetry` v1 payload'i regular-only Council kararini `Day`, `TemplateId`,
+  `option_a/option_b/expired`, machine-readable effect listesi ve production guard'dan gecmis
+  `NextNightDelta` ile yayar. Basarili secim effect/flag/active-clear commit'inden, expire ise
+  active-clear commit'inden sonra tek event uretir. Rejected secim, bos tekrar expire ve cozulmus
+  karar sonrasi exact Continue sifir duplicate uretir. Contract EditMode `18/18`, gercek
+  `NewGameScene` secim/expire/Continue PlayMode `6/6`, full EditMode `363/363` ve full PlayMode
+  `78 pass + 2 explicit profiler/soak skip` gecti.
 - [ ] `ability_cast`: ability, phase, cooldown, targets/repair.
 - [ ] `wall_repaired`: phase, Stone cost, HP before/after.
 - [ ] `run_ended`: day, kills, peak enemies/pop, Wall damage timeline, meta reward.
@@ -1382,3 +1389,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-17 | `DW-V1-TELEMETRY-RESOURCE-SPENT` canonical committed purchase debit event | Provider-independent telemetry bus'i `resource_spent` v1 ile genişletildi. Aktif run kaynakları, Grave Essence ve owner adı bekleyen Meta currency sabit machine identity kullanır. Bütün aktif V1 player purchase owner'ları post-commit seviyeyi veya sayıyı yazar; çok kaynaklı işlem kaynak başına ayrı event, rejected/rollback/free-test/automatic/Council/legacy yolları sıfır event üretir. Heart graph/effect ve Meta disk transaction sınırları debit'ten sonra doğrulanır | Contract EditMode `9/9`; gerçek bed + dual-resource worker + rejected purchase PlayMode `3/3`; full EditMode `354/354`; full PlayMode `75 pass + 2 explicit skip`; `NewGameScene` validation `0`, final Console `0 error / 0 warning`; tracker `415/442` |
 | 2026-07-17 | `DW-V1-TELEMETRY-ARCHER-CHANGED` canonical player archer transaction event | Provider-independent telemetry bus'i `archer_changed` v1 ile genişletildi. Başarılı Basic/Rapid/Frost buy `none -> type`, başarılı Basic retrain ise `basic -> rapid/frost` transition'ı ve post-commit ortak 1000-cap kullanımını yazar. Event canonical type-count refresh'inden ve aynı transaction'ın kaynak kayıtlarından sonra çıkar; free economy state değişimini korurken rejected/rollback, Council/meta bonusu ve exact Continue restore yollarını dışarıda bırakır | Contract EditMode `12/12`; gerçek buy + retrain + rejected buy PlayMode `4/4`; full EditMode `357/357`; full PlayMode `76 pass + 2 explicit skip`; `NewGameScene` validation `0`, final Console `0 error / 0 warning`; tracker `416/442` |
 | 2026-07-17 | `DW-V1-TELEMETRY-HEART-NODE-BOUGHT` canonical Castle Heart purchase event | Provider-independent telemetry bus'i `heart_node_bought` v1 ile genişletildi. `HeartPurchaseService` başarı sonucuna canonical purchased-node depth eklendi; GameManager yalnız Grave Essence, level, effect, lock ve reveal commit'i tamamlandıktan sonra node Id/post-level/depth/total-cost/revealed-child-count snapshot'ı yayıyor. `resource_spent` önce kalır; hidden child Id'leri redacted, quote/Continue/rejected yolları event dışıdır | Contract EditMode `15/15`; gerçek graph buy + first reveal + rejected repeat PlayMode `5/5`; full EditMode `360/360`; ilk full PlayMode turundaki unrelated 1K Arrow timing dalgalanması targeted `30,09 ms` ile geçti, temiz full tekrar `77 pass + 2 explicit skip`; `NewGameScene` validation `0`, final Console `0 error / 0 warning`; tracker `417/442` |
+| 2026-07-17 | `DW-V1-TELEMETRY-COUNCIL-RESOLVED` canonical regular Council decision event | Provider-independent telemetry bus'i `council_resolved` v1 ile genisletildi. Regular Council Option A/B secimi effect apply, otomatik/curated flag ve active-clear commit'inden sonra; Dusk expire active-clear commit'inden sonra day/template/resolution/concrete effect/guardlanmis next-night delta snapshot'i yayiyor. Rejected secim, bos tekrar expire, UI sunumu ve cozulmus karar sonrasi exact Continue event disinda; Emergency Council yok | Contract EditMode `18/18`; gercek `NewGameScene` choice + expire + Continue PlayMode `6/6`; full EditMode `363/363`; full PlayMode `78 pass + 2 explicit profiler/soak skip`; `NewGameScene` validation `0` issue; tracker `418/442` |
