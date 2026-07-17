@@ -93,6 +93,6 @@ Doğrulama sahipleri:
 - `ArrowEconomyUtilityTests`: sabit birim fiyat, kısmi dolum, Buy Max, efficiency,
   exponential yatırım ve overflow sınırları.
 - `ArrowAmmoPlayModeTests`: stok `0` iken atışın durması, instant refill sonrası yeniden
-  başlaması, 1.000 Archer bulk-refill restart ölçümü, projectile başına `1` tüketim ve Rapid
-  tüketim farkı.
+  başlaması, 1.000 Archer bulk-refill restart ölçümü, projectile başına `1` tüketim, ana
+  kaynakların combat tick'inde azalmaması ve Rapid tüketim farkı.
 - `RunPersistenceTests`: şema `v8`, eski kayıt migration'ı ve yatırım seviyeleri.

@@ -6,7 +6,7 @@
 
 ## Dead Walls V1 sözleşmesi
 
-Aktif castle loop, `MobileCastleCombatConfig` singleton'ı ile tanınır. Bu modda Wood, Stone, Iron ve Food için pasif upkeep yoktur. Sistem `ResourceConsumptionRate` değerlerini V1 hesaplamasında sıfır kabul eder; ana kaynaklar yalnız oyuncunun yaptığı anlık transaction'larla azalabilir.
+Aktif castle loop, `MobileCastleCombatConfig` singleton'ı ile tanınır. Bu modda Wood, Stone, Iron ve Food için pasif upkeep yoktur. Sistem `ResourceConsumptionRate` değerlerini V1 hesaplamasında sıfır kabul eder; ana kaynaklar per-minute drain ile azalmaz. Player purchase/repair ve kabul edilen Dawn nüfusunun bir defalık Food maliyeti gibi committed transaction'lar bu sınırın dışındadır.
 
 Legacy sahnelerde eski `production - consumption` davranışı korunur.
 
@@ -20,6 +20,15 @@ Legacy sahnelerde eski `production - consumption` davranışı korunur.
 6. Accumulator `+1` veya `-1` eşiğini geçtiğinde integer stoka transfer et.
 
 V1'de negatif accumulator yalnız eski save/state kalıntısından gelebilir; yeni pasif tüketim üretilmez.
+
+## Release guard
+
+`ExactRunContinuePlayModeTests.V1CastleLoop_DoesNotApplyPassiveMainResourceConsumption`, aktif
+castle world'e yüksek legacy consumption rate enjekte edildiğinde Wood/Stone/Iron/Food stoklarının
+azalmadığını doğrular. `ArrowAmmoPlayModeTests.V1CastleCombat_OnlyArrowStockHasContinuousDrain`
+aynı sınırı gerçek combat tick'inde kontrol eder: production world'de `ArrowProducer` ve
+`ArcherTrainer` yoktur, dört ana stok azalmaz ve başarılı tek projectile rent'i yalnız
+`ArrowSupply.Current` değerini `1` düşürür.
 
 ## İlgili state
 

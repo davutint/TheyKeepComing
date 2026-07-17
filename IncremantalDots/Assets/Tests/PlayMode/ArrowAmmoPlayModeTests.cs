@@ -87,6 +87,76 @@ namespace DeadWalls.Tests
         }
 
         [UnityTest]
+        public IEnumerator V1CastleCombat_OnlyArrowStockHasContinuousDrain()
+        {
+            yield return WaitForRuntime();
+            EntityManager em = World.DefaultGameObjectInjectionWorld.EntityManager;
+
+            using (EntityQuery arrowProducerQuery = em.CreateEntityQuery(typeof(ArrowProducer)))
+            using (EntityQuery archerTrainerQuery = em.CreateEntityQuery(typeof(ArcherTrainer)))
+            {
+                Assert.That(arrowProducerQuery.CalculateEntityCount(), Is.Zero,
+                    "Production castle world Fletcher/ArrowProducer tasimamali.");
+                Assert.That(archerTrainerQuery.CalculateEntityCount(), Is.Zero,
+                    "Production castle world legacy Barracks trainer tasimamali.");
+            }
+
+            SetupIsolatedCombat(em, out Entity gameStateEntity, out Entity waveEntity,
+                out Entity enemyPoolEntity, out Entity arrowPoolEntity, out Entity target);
+            Entity archer = CreateArcher(em, ArcherType.Basic, 1f, 0f);
+
+            // Broadphase/target cache'ini kur; olcumden once olasi warm-up projectile'ini temizle.
+            yield return null;
+            yield return null;
+            ArrowPoolRuntimeUtility.ReturnAllActive(em, arrowPoolEntity);
+
+            var baseline = new ResourceData
+            {
+                Wood = 5000,
+                Stone = 5000,
+                Iron = 5000,
+                Food = 5000
+            };
+            em.SetComponentData(gameStateEntity, baseline);
+            em.SetComponentData(gameStateEntity, new ResourceConsumptionRate
+            {
+                WoodPerMin = 60000f,
+                StonePerMin = 60000f,
+                IronPerMin = 60000f,
+                FoodPerMin = 60000f
+            });
+            em.SetComponentData(gameStateEntity, new ResourceAccumulator());
+            SetSupply(em, gameStateEntity, 10);
+            SetReady(em, archer);
+
+            long rentsBefore = em.GetComponentData<ArrowPoolRuntimeData>(
+                arrowPoolEntity).TotalRentCount;
+            yield return null;
+
+            ResourceData after = em.GetComponentData<ResourceData>(gameStateEntity);
+            ResourceConsumptionRate consumption =
+                em.GetComponentData<ResourceConsumptionRate>(gameStateEntity);
+            ArrowSupply arrows = em.GetComponentData<ArrowSupply>(gameStateEntity);
+            long rentsAfter = em.GetComponentData<ArrowPoolRuntimeData>(
+                arrowPoolEntity).TotalRentCount;
+
+            Assert.That(rentsAfter - rentsBefore, Is.EqualTo(1),
+                "Hazir tek okcu gercek projectile rent etmelidir.");
+            Assert.That(arrows.Current, Is.EqualTo(9),
+                "Basarili tek projectile rent'i tam 1 Arrow tuketmelidir.");
+            Assert.That(after.Wood, Is.GreaterThanOrEqualTo(baseline.Wood));
+            Assert.That(after.Stone, Is.GreaterThanOrEqualTo(baseline.Stone));
+            Assert.That(after.Iron, Is.GreaterThanOrEqualTo(baseline.Iron));
+            Assert.That(after.Food, Is.GreaterThanOrEqualTo(baseline.Food));
+            Assert.That(consumption.WoodPerMin, Is.Zero);
+            Assert.That(consumption.StonePerMin, Is.Zero);
+            Assert.That(consumption.IronPerMin, Is.Zero);
+            Assert.That(consumption.FoodPerMin, Is.Zero);
+
+            Cleanup(em, waveEntity, enemyPoolEntity, arrowPoolEntity, target, archer);
+        }
+
+        [UnityTest]
         public IEnumerator ThousandArchers_ZeroSupplyThenBulkRefill_RestartsPooledSalvoNextTick()
         {
             const int archerCount = 1_000;

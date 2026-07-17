@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.3
 > **Son tam kapsam denetimi:** 2026-07-17
 > **Aktif paket:** Post-Package V1 Closure - Contracts, Performance ve Release DoD
-> **Aktif iş:** `DW-V1-DOD-PASSIVE-RESOURCE-DRAIN` - Verify Passive Resource Drain Boundary
-> **İlerleme:** `426 / 442` tracker checkbox'ı tamamlandı - `%96,38`
+> **Aktif iş:** `DW-V1-DOD-EXACT-POPULATION-WORKERS` - Verify Exact Population, Beds and Worker Ratios Save/Load
+> **İlerleme:** `427 / 442` tracker checkbox'ı tamamlandı - `%96,61`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -132,7 +132,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Defense | Damage/Game Over aktif ve testli olarak tek Wall'a çekildi | `[x]` |
 | Normal repair | Stone-only ve yalnız Day/Dusk | `[x]` |
 | Save | Exact same-moment Continue; schema v11, minimum v3; purchased bed, worker bina yatırımı, Archer Formation V1, finite Arrow yatırımı, Grave Essence, exact Heart graph replay ve regular Council handled-day/active-card discriminator | `[x]` |
-| Economy | Worker üretimi, bed alımı ve dört hazır binanın capacity/efficiency yatırımları var; bed ve bina fiyat eğrileri `DefaultDifficulty.asset`/Difficulty Tuner üzerinden baked runtime tuning'e bağlı; V1 ana kaynaklarında pasif consumption yok | `[x]` |
+| Economy | Worker üretimi, bed alımı ve dört hazır binanın capacity/efficiency yatırımları var; bed ve bina fiyat eğrileri `DefaultDifficulty.asset`/Difficulty Tuner üzerinden baked runtime tuning'e bağlı; V1 ana kaynaklarında pasif consumption yok, Arrow başarılı projectile rent başına sürekli tükenen tek stok | `[x]` Runtime release guard |
 | Population | House bed state + Wood purchase API + exact save var; Dawn isteği boş yatak ve Food/kişi bütçesiyle sınırlı, gerçek accepted count uygulanıyor, Food bir kez düşülüyor ve en fazla 15 temsili survivor sağdan Wall arkasına yürüyor | `[x]` |
 | Workers | Kalıcı target ratio + actual/cap/idle state, +1/+10/+100/direct input, bağımsız bina capacity/efficiency seviyeleri, yeni nüfus auto-allocation, exact save, Low/Medium/High density ve allocation-senkronlu animation/cargo/lantern/delivery feedback var | `[x]` |
 | Council | 9 launch template, 11 serialized atom (`cap_bonus` dormant), staged Day 3/6/9 havuzu, curated source-retirement/follow-up, exact kart ve fail-closed policy aktif | `[x]` 5.400-sample budget/token/content gate + exact save/guard doğrulandı |
@@ -1247,7 +1247,17 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
   sample boyunca authoritative pool rent artışını ölçecek biçimde stabilize edildi ve hedefli
   turda `2.000` yeni rent / `1.000` peak aktif projectile doğrulandı. Scene validation `0` issue,
   final Console `0 error / 0 warning`.
-- [ ] Wood/Stone/Iron/Food pasif negatif akmıyor; Arrow tek sürekli tüketim.
+- [x] Wood/Stone/Iron/Food pasif negatif akmıyor; Arrow tek sürekli tüketim.
+  `ResourceTickSystem`, active `MobileCastleCombatConfig` loop'unda legacy
+  `ResourceConsumptionRate` değerlerini hesap dışı bırakıyor; `ArrowProductionSystem` mobile
+  config varken Fletcher üretimi veya Wood tüketimi yapmıyor. Gerçek production world'de
+  `ArrowProducer = 0` ve legacy `ArcherTrainer = 0` doğrulandı. Yüksek negatif rate enjekte
+  edilen gerçek combat tick'inde Wood/Stone/Iron/Food başlangıç stoklarının hiçbiri azalmadı ve
+  dört consumption rate sıfırlandı; başarılı tek projectile rent'i yalnız Arrow stokunu
+  `10 -> 9` düşürdü. Player purchase/repair ve kabul edilen Dawn nüfusunun bir defalık Food
+  maliyeti committed transaction'dır; pasif/per-minute drain değildir. Targeted PlayMode `3/3`,
+  full EditMode `382/382` ve full PlayMode `82 pass + 2 explicit profiler/soak skip` geçti;
+  scene validation `0` issue ve final Console `0 error / 0 warning`.
 - [ ] Population, beds ve worker ratios exact save/load.
 - [ ] Worker world feedback representative ve doğru.
 - [x] Basic/Rapid/Frost toplam 1000 cap.
@@ -1470,3 +1480,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-17 | `DW-V1-DOD-QUANTITY-ONLY-DIFFICULTY` quantity-only launch difficulty contract | Production difficulty klasörü tek `DefaultDifficulty.asset` profile'ıyla sınırlandı. EditMode release guard'ı active SubScene authoring/profile/catalog bağını, neutral HP/damage/speed growth değerlerini ve aktif count/batch/intensity/interval pressure kanallarını birlikte kilitliyor. Gerçek runtime Day 1 -> Day 50 geçişinde enemy statları sabit kalırken adet artıyor ve spawn interval daralıyor | Unity MCP asset audit `1 profile`; targeted EditMode `2/2`; gerçek profile/bake/advanced-cycle PlayMode `3/3`; full EditMode `378/378`; full PlayMode `81 pass + 2 explicit profiler/soak skip`; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `424/442` |
 | 2026-07-17 | `DW-V1-DOD-60S-CYCLE` exact continuous cycle launch contract | Production SubScene exact `ContinuousSiegeEnabled=true` ve `60 = Day 30 + Dusk 5 + Night 20 + Dawn 5` authoring sözleşmesiyle kilitlendi. Runtime wrap testi dört pozitif-intensity fazı, Day 1 -> Day 2 geçişini, cycle index/timer wrap'ını ve `WaveStateData` combat-active durumunun prep gap olmadan korunmasını doğruluyor. Eski üç-faz `25/10/25` mimari metni kaldırılarak güncel tek sözleşme bırakıldı | Targeted EditMode `1/1`; gerçek phase/wrap PlayMode `2/2`; full EditMode `379/379`; full PlayMode `81 pass + 2 explicit profiler/soak skip`; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `425/442` |
 | 2026-07-17 | `DW-V1-DOD-NO-SPEED-OFFLINE` fixed-speed online-only run contract | Production source release guard'ı player-facing `Time.timeScale > 1`, `Time.fixedDeltaTime`, wall-clock progression API ve offline owner alanlarını yasaklıyor; yalnız normal `1x`, merkezi pause `0` ve Game Over sunumu `0.25x` sahipleri onaylı. Run/meta/death save şemaları timestamp veya offline accrual alanı taşımıyor; gerçek scene pause sunuyor fakat x2/x4/fast-forward sunmuyor. Exact Continue kapalı süre uygulamadan aynı cycle/phase/timer, kaynak ve spawn RNG state'ini geri kuruyor. Tam regresyonda bulunan 10K/1K stres testi son-frame projectile flake'i, runtime değiştirilmeden sample içindeki authoritative pool rent artışını ölçerek stabilize edildi | Targeted EditMode `3/3`; exact Continue PlayMode `1/1`; stabilize 10K/1K PlayMode `1/1` (`2.000` sample rent, `1.000` peak projectile); full EditMode `382/382`; full PlayMode `81 pass + 2 explicit profiler/soak skip`; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `426/442` |
+| 2026-07-17 | `DW-V1-DOD-PASSIVE-RESOURCE-DRAIN` main-resource upkeep exclusion + finite Arrow combat drain | Active castle loop legacy `ResourceConsumptionRate` değerlerini etkisizleştiriyor; Fletcher `ArrowProductionSystem` mobile config varken çıkıyor. Production world `ArrowProducer` veya legacy `ArcherTrainer` taşımıyor. Gerçek combat release guard'ında yüksek negatif rate enjeksiyonu Wood/Stone/Iron/Food stoklarını azaltmadı; başarılı tek projectile rent'i yalnız finite Arrow stokunu `10 -> 9` düşürdü. Player purchase/repair ve accepted Dawn population Food maliyeti tek seferlik transaction olarak açıkça ayrıldı | Targeted PlayMode `3/3`; full EditMode `382/382`; full PlayMode `82 pass + 2 explicit profiler/soak skip`; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `427/442` |
