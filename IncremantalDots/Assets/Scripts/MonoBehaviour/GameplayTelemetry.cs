@@ -99,6 +99,47 @@ namespace DeadWalls
         public int ResultingCount;
     }
 
+    [Serializable]
+    public sealed class ArcherChangedTelemetryPayload
+    {
+        public string ChangeType;
+        public string TypeFrom;
+        public string TypeTo;
+        public int TotalCapUsage;
+    }
+
+    internal static class ArcherChangedTelemetryContract
+    {
+        internal const string Buy = "buy";
+        internal const string Retrain = "retrain";
+        internal const string None = "none";
+        internal const string Basic = "basic";
+        internal const string Rapid = "rapid";
+        internal const string Frost = "frost";
+
+        internal static bool IsArcherType(string type)
+        {
+            return string.Equals(type, Basic, StringComparison.Ordinal)
+                || string.Equals(type, Rapid, StringComparison.Ordinal)
+                || string.Equals(type, Frost, StringComparison.Ordinal);
+        }
+
+        internal static string ToArcherType(ArcherType type)
+        {
+            switch (type)
+            {
+                case ArcherType.Basic:
+                    return Basic;
+                case ArcherType.Rapid:
+                    return Rapid;
+                case ArcherType.Frost:
+                    return Frost;
+                default:
+                    return string.Empty;
+            }
+        }
+    }
+
     internal static class ResourceSpentTelemetryContract
     {
         internal const string Wood = "wood";
@@ -247,6 +288,8 @@ namespace DeadWalls
         public const int PhaseChangedSchemaVersion = 1;
         public const string ResourceSpentEventName = "resource_spent";
         public const int ResourceSpentSchemaVersion = 1;
+        public const string ArcherChangedEventName = "archer_changed";
+        public const int ArcherChangedSchemaVersion = 1;
 
         public static event Action<GameplayTelemetryRecord> Emitted;
 
@@ -307,6 +350,27 @@ namespace DeadWalls
             return EmitValidated(
                 ResourceSpentEventName,
                 ResourceSpentSchemaVersion,
+                normalizedRunId,
+                payload,
+                out record,
+                out error);
+        }
+
+        public static bool TryEmitArcherChanged(
+            string runId,
+            ArcherChangedTelemetryPayload payload,
+            out GameplayTelemetryRecord record,
+            out string error)
+        {
+            record = default;
+            if (!TryNormalizeRunId(runId, ArcherChangedEventName, out string normalizedRunId, out error))
+                return false;
+            if (!TryValidateArcherChanged(payload, out error))
+                return false;
+
+            return EmitValidated(
+                ArcherChangedEventName,
+                ArcherChangedSchemaVersion,
                 normalizedRunId,
                 payload,
                 out record,
@@ -485,6 +549,57 @@ namespace DeadWalls
             error = string.Empty;
             return true;
         }
+
+        internal static bool TryValidateArcherChanged(
+            ArcherChangedTelemetryPayload payload,
+            out string error)
+        {
+            if (payload == null)
+            {
+                error = "archer_changed payload bos.";
+                return false;
+            }
+            if (payload.TotalCapUsage <= 0
+                || payload.TotalCapUsage > ArcherCapacityUtility.MaxTotalArchers)
+            {
+                error = "archer_changed total cap usage gecersiz.";
+                return false;
+            }
+
+            if (string.Equals(payload.ChangeType, ArcherChangedTelemetryContract.Buy,
+                    StringComparison.Ordinal))
+            {
+                if (!string.Equals(payload.TypeFrom, ArcherChangedTelemetryContract.None,
+                        StringComparison.Ordinal)
+                    || !ArcherChangedTelemetryContract.IsArcherType(payload.TypeTo))
+                {
+                    error = "archer_changed buy type transition'i gecersiz.";
+                    return false;
+                }
+            }
+            else if (string.Equals(payload.ChangeType, ArcherChangedTelemetryContract.Retrain,
+                         StringComparison.Ordinal))
+            {
+                if (!string.Equals(payload.TypeFrom, ArcherChangedTelemetryContract.Basic,
+                        StringComparison.Ordinal)
+                    || (!string.Equals(payload.TypeTo, ArcherChangedTelemetryContract.Rapid,
+                            StringComparison.Ordinal)
+                        && !string.Equals(payload.TypeTo, ArcherChangedTelemetryContract.Frost,
+                            StringComparison.Ordinal)))
+                {
+                    error = "archer_changed retrain type transition'i gecersiz.";
+                    return false;
+                }
+            }
+            else
+            {
+                error = "archer_changed change type kimligi gecersiz.";
+                return false;
+            }
+
+            error = string.Empty;
+            return true;
+        }
     }
 
     internal static class ResourceSpentTelemetryFactory
@@ -541,6 +656,35 @@ namespace DeadWalls
                 purchaseType,
                 resultingLevel,
                 resultingCount));
+        }
+    }
+
+    internal static class ArcherChangedTelemetryFactory
+    {
+        internal static ArcherChangedTelemetryPayload CreateBuy(
+            ArcherType type,
+            int totalCapUsage)
+        {
+            return new ArcherChangedTelemetryPayload
+            {
+                ChangeType = ArcherChangedTelemetryContract.Buy,
+                TypeFrom = ArcherChangedTelemetryContract.None,
+                TypeTo = ArcherChangedTelemetryContract.ToArcherType(type),
+                TotalCapUsage = totalCapUsage
+            };
+        }
+
+        internal static ArcherChangedTelemetryPayload CreateRetrain(
+            ArcherType targetType,
+            int totalCapUsage)
+        {
+            return new ArcherChangedTelemetryPayload
+            {
+                ChangeType = ArcherChangedTelemetryContract.Retrain,
+                TypeFrom = ArcherChangedTelemetryContract.Basic,
+                TypeTo = ArcherChangedTelemetryContract.ToArcherType(targetType),
+                TotalCapUsage = totalCapUsage
+            };
         }
     }
 

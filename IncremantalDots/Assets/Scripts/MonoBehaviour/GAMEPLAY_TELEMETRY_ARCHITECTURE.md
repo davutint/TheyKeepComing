@@ -72,6 +72,27 @@ Castle Heart event'i wallet debit aninda degil, `HeartPurchaseService` graph/eff
 basarili dondukten sonra yazilir. Meta event'i de Souls, level ve disk save ayni atomik transaction'da
 basarili olduktan sonra yazilir. Subscriber hatasi gameplay transaction'ini geri almaz.
 
+## `archer_changed` v1
+
+`GameManager`, yalniz basarili player buy veya Basic retrain transaction'i archer entity/state
+commit'ini tamamladiktan ve type count cache'ini canonical ECS sorgusundan yeniledikten sonra event
+uretir:
+
+- payload: `ChangeType`, `TypeFrom`, `TypeTo`, `TotalCapUsage`
+- buy transition'i: `buy`, `none -> basic/rapid/frost`
+- retrain transition'i: `retrain`, `basic -> rapid/frost`
+- cap snapshot'i: `GetTotalArcherCount()` post-commit sonucu, exact `1..1000`
+
+Buy event'i ayni transaction'in `resource_spent` kayitlarindan sonra gelir. Free economy test
+modunda debit olmadigi icin resource event'i cikmasa bile archer entity gercekten commit edildiyse
+`archer_changed` cikar. Spawn fail edip resource rollback yapan, locked/cap/population/resource
+guard'inda reddedilen veya entity kayboldugu icin retrain rollback eden islem sifir archer event'i
+uretir.
+
+Council/meta baslangic bonusu, exact Continue restore ve merkezi `SpawnArcher`/restore yollari
+oyuncu buy/retrain transaction'i degildir; bu event'e baglanmaz. Event yeni archer state owner'i,
+history listesi veya save alani kurmaz; yalniz mevcut entity ve canonical total snapshot'ini yayar.
+
 ## Genisleme kurali
 
 Tracker'daki sonraki event'ler ayni `GameplayTelemetryRecord` cikisini kullanir. Yeni manager,

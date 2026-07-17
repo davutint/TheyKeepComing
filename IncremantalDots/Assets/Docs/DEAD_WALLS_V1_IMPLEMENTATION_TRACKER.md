@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.3
 > **Son tam kapsam denetimi:** 2026-07-17
 > **Aktif paket:** Post-Package V1 Closure - Contracts, Performance ve Release DoD
-> **Aktif iş:** `DW-V1-TELEMETRY-ARCHER-CHANGED` - Emit archer_changed Buy/Retrain State
-> **İlerleme:** `415 / 442` tracker checkbox'ı tamamlandı - `%93,89`
+> **Aktif iş:** `DW-V1-TELEMETRY-HEART-NODE-BOUGHT` - Emit heart_node_bought Node Purchase State
+> **İlerleme:** `416 / 442` tracker checkbox'ı tamamlandı - `%94,12`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -1081,7 +1081,16 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
   commit'inden, Meta debit ise atomic disk save'den sonra yazılır. Contract EditMode `9/9`, gerçek
   bed + Wood/Iron worker purchase/rejection PlayMode `3/3`, full EditMode `354/354` ve full PlayMode
   `75 pass + 2 explicit profiler/soak skip` geçti.
-- [ ] `archer_changed`: buy/retrain, type from/to, total cap usage.
+- [x] `archer_changed`: buy/retrain, type from/to, total cap usage. Mevcut provider-independent
+  `GameplayTelemetry` bus'i v1 payload ile genişletildi. Yalnız başarılı player transaction'ı
+  canonical entity/state commit'i ve type-count sorgusu tamamlandıktan sonra `buy: none ->
+  basic/rapid/frost` veya `retrain: basic -> rapid/frost` transition'ı ile post-commit toplam
+  `1..1000` cap kullanımını yazar. Aynı buy/retrain transaction'ındaki `resource_spent` kayıtları
+  önce gelir; free economy test modunda debit olmasa bile gerçek archer state değişimi event üretir.
+  Locked/cap/population/resource guard'ında reddedilen, spawn/retrain rollback yapan işlemler ile
+  Council/meta başlangıç bonusu ve exact Continue restore sıfır `archer_changed` üretir. Contract
+  EditMode `12/12`, gerçek buy/retrain/rejected transaction PlayMode `4/4`, full EditMode `357/357`
+  ve full PlayMode `76 pass + 2 explicit profiler/soak skip` geçti.
 - [ ] `heart_node_bought`: node, level, depth, cost, revealed children.
 - [ ] `council_resolved`: day, template, option/expired, effects, next-night delta.
 - [ ] `ability_cast`: ability, phase, cooldown, targets/repair.
@@ -1119,8 +1128,8 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 
 ### Mevcut test envanteri
 
-- `[x]` EditMode: `354/354`; `run_started/phase_changed/resource_spent` payload/envelope/identity guard'ları, multi-resource canonical order, Meta diminishing reward/quoted receipt/exact 11-definition tuning, exact Council 3/6/9 cadence, staged launch catalog, 5.400-sample budget/token gate, source-retirement/curated-chain, role/content recipe kontratı, v10->v11 Council migration/discriminator, Heart graph, finite Arrow, pool, targeting, Formation V1, common archer cap, economy, worker, cycle, quantity-only, backlog, Moat isolation ve enemy pool kapsamı.
-- `[x]` PlayMode envanteri: `75 pass + 2 explicit profiler/soak skip`; telemetry class'i `3/3` ile `run_started` sırası, exact Continue duplicate guard'ı, canonical Day/Phase/alive/backlog snapshot'i, tek/iki kaynaklı purchase commit'i ve rejected purchase sıfır-event kuralını kilitler. Final 77-test full suite temiz geçti. Telemetry, gerçek death quote/Continue/meta shop, `NewGameScene` Day 1-12 Council cadence, onaylı Council chain flag live yazımı, active-card exact payload/memory/handled-day Continue, çözülmüş seçim + temp effect duration Continue, bozuk Council karar/Continue payload preflight'ı, Heart Continue, Arrow/pool/targeting, 1K archer x 10K enemy, Formation V1, archer cap/retrain, economy/worker, Wall, cycle, backlog ve Fireball kapsamı envanterde kalır.
+- `[x]` EditMode: `357/357`; `run_started/phase_changed/resource_spent/archer_changed` payload/envelope/identity guard'ları, buy/retrain transition ve total-cap doğrulaması, multi-resource canonical order, Meta diminishing reward/quoted receipt/exact 11-definition tuning, exact Council 3/6/9 cadence, staged launch catalog, 5.400-sample budget/token gate, source-retirement/curated-chain, role/content recipe kontratı, v10->v11 Council migration/discriminator, Heart graph, finite Arrow, pool, targeting, Formation V1, common archer cap, economy, worker, cycle, quantity-only, backlog, Moat isolation ve enemy pool kapsamı.
+- `[x]` PlayMode envanteri: `76 pass + 2 explicit profiler/soak skip`; telemetry class'i `4/4` ile `run_started` sırası, exact Continue duplicate guard'ı, canonical Day/Phase/alive/backlog snapshot'i, tek/iki kaynaklı purchase commit'i, player archer buy/retrain transition'ı ve rejected transaction sıfır-event kuralını kilitler. Final 78-test full suite temiz geçti. Telemetry, gerçek death quote/Continue/meta shop, `NewGameScene` Day 1-12 Council cadence, onaylı Council chain flag live yazımı, active-card exact payload/memory/handled-day Continue, çözülmüş seçim + temp effect duration Continue, bozuk Council karar/Continue payload preflight'ı, Heart Continue, Arrow/pool/targeting, 1K archer x 10K enemy, Formation V1, archer cap/retrain, economy/worker, Wall, cycle, backlog ve Fireball kapsamı envanterde kalır.
 - `[~]` Player/hardware frame pacing kabulü ilgili ürün kapısını bekliyor; Council launch content ownership tamamlandı.
 
 ---
@@ -1361,3 +1370,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-17 | `DW-V1-TELEMETRY-RUN-STARTED` provider-independent run identity event | Sonraki telemetry event'lerinin de kullanacagi tek `GameplayTelemetry` envelope/subscriber siniri kuruldu; external target owner karari bekler. Yeni run, 11 production Meta definition level'i, ECS baslangic kaynaklari/Arrow/population snapshot'i ve Heart catalog/graph kimligini v1 payload'a yazar. Unconfigured production Heart acik status olarak kalir; main-menu action uygulanmadan emit edilmez ve exact Continue ayni RunId'yi tekrar saymaz | Contract EditMode `3/3`; new-run/Continue PlayMode `1/1`; ilgili telemetry+Continue+Meta grubu `3/3`; full EditMode `348/348`; full PlayMode'da suite-order Dusk flake'i targeted `1/1` gecti; `NewGameScene` validation `0`, final Console `0 error / 0 warning`; tracker `413/442` |
 | 2026-07-17 | `DW-V1-TELEMETRY-PHASE-CHANGED` canonical cycle/horde transition event | Mevcut provider-independent telemetry bus'i genisletildi. Her yeni `RunId + Day + Phase` kimligi, `ContinuousSiegeCycleData`, `WaveStateData.ZombiesAlive` ve `ContinuousSpawnBudgetData.PendingEnemies` canonical owner'larindan tek immutable snapshot uretir. Ayni phase icindeki horde sayisi degisimleri duplicate sayilmaz; yeni run event sirasi `run_started -> phase_changed` olarak kilitlidir ve exact Continue mevcut phase'i tekrar emit etmez | Contract EditMode `6/6`; transition/Continue PlayMode `2/2`; full EditMode `351/351`; full PlayMode `74 pass + 2 explicit skip`; `NewGameScene` validation `0`, final Console `0 error / 0 warning`; tracker `414/442` |
 | 2026-07-17 | `DW-V1-TELEMETRY-RESOURCE-SPENT` canonical committed purchase debit event | Provider-independent telemetry bus'i `resource_spent` v1 ile genişletildi. Aktif run kaynakları, Grave Essence ve owner adı bekleyen Meta currency sabit machine identity kullanır. Bütün aktif V1 player purchase owner'ları post-commit seviyeyi veya sayıyı yazar; çok kaynaklı işlem kaynak başına ayrı event, rejected/rollback/free-test/automatic/Council/legacy yolları sıfır event üretir. Heart graph/effect ve Meta disk transaction sınırları debit'ten sonra doğrulanır | Contract EditMode `9/9`; gerçek bed + dual-resource worker + rejected purchase PlayMode `3/3`; full EditMode `354/354`; full PlayMode `75 pass + 2 explicit skip`; `NewGameScene` validation `0`, final Console `0 error / 0 warning`; tracker `415/442` |
+| 2026-07-17 | `DW-V1-TELEMETRY-ARCHER-CHANGED` canonical player archer transaction event | Provider-independent telemetry bus'i `archer_changed` v1 ile genişletildi. Başarılı Basic/Rapid/Frost buy `none -> type`, başarılı Basic retrain ise `basic -> rapid/frost` transition'ı ve post-commit ortak 1000-cap kullanımını yazar. Event canonical type-count refresh'inden ve aynı transaction'ın kaynak kayıtlarından sonra çıkar; free economy state değişimini korurken rejected/rollback, Council/meta bonusu ve exact Continue restore yollarını dışarıda bırakır | Contract EditMode `12/12`; gerçek buy + retrain + rejected buy PlayMode `4/4`; full EditMode `357/357`; full PlayMode `76 pass + 2 explicit skip`; `NewGameScene` validation `0`, final Console `0 error / 0 warning`; tracker `416/442` |

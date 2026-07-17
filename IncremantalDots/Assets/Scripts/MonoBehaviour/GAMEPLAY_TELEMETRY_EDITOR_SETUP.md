@@ -22,14 +22,21 @@ sinifinin parcasidir; `GameplayTelemetry.cs` ayni `DeadWalls` runtime assembly's
 9. Yetersiz kaynakla ayni purchase tekrar denenir; yeni `resource_spent` kaydi gelmemelidir.
 10. Heart catalog configured ortamda node alimi Grave Essence event'ini graph commit'inden sonra;
     Game Over Meta shop alimi ise `meta_currency` event'ini durable save'den sonra uretmelidir.
+11. Basic Archer satin alinir; `archer_changed` payload'i `buy`, `none -> basic` ve post-commit
+    toplam cap kullanimini vermelidir.
+12. Basic Archer, Rapid veya Frost'a retrain edilir; payload `retrain`, `basic -> target` olmali ve
+    toplam cap kullanimi degismemelidir.
+13. Locked type, yetersiz kaynak/population veya 1000 cap nedeniyle reddedilen buy ile gecersiz
+    retrain yeni `archer_changed` kaydi uretmemelidir.
 
 Otomatik kapsam:
 
-- EditMode `GameplayTelemetryTests`: run/phase/resource payload factory'leri, multi-resource
-  canonical order, envelope serialization ve invalid identity/amount/result guard'lari.
+- EditMode `GameplayTelemetryTests`: run/phase/resource/archer payload factory'leri, multi-resource
+  canonical order, envelope serialization ve invalid identity/amount/result/transition/cap guard'lari.
 - PlayMode `GameplayTelemetryPlayModeTests`: gercek NewGameScene yeni-run emission'i, canonical
   phase/horde snapshot'i, ayni-phase idempotency, exact Continue duplicate guard'i, tek/iki kaynakli
-  purchase commit event'leri ve rejected purchase sifir-event guard'i.
+  purchase commit event'leri, player buy/retrain transition snapshot'lari ve rejected transaction
+  sifir-event guard'i.
 
 Harici analytics target'i bu kurulumun parcasi degildir; tracker'daki owner-karari maddesi
 onaylanmadan SDK, servis veya endpoint eklenmez.

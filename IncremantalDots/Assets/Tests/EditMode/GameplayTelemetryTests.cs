@@ -380,6 +380,102 @@ namespace DeadWalls.Tests
             Assert.That(resultError, Does.Contain("resulting level/count"));
         }
 
+        [Test]
+        public void ArcherChangedFactory_CreatesCanonicalBuyAndRetrainTransitions()
+        {
+            ArcherChangedTelemetryPayload buy = ArcherChangedTelemetryFactory.CreateBuy(
+                ArcherType.Frost,
+                73);
+            Assert.That(buy.ChangeType, Is.EqualTo("buy"));
+            Assert.That(buy.TypeFrom, Is.EqualTo("none"));
+            Assert.That(buy.TypeTo, Is.EqualTo("frost"));
+            Assert.That(buy.TotalCapUsage, Is.EqualTo(73));
+
+            ArcherChangedTelemetryPayload retrain =
+                ArcherChangedTelemetryFactory.CreateRetrain(
+                    ArcherType.Rapid,
+                    ArcherCapacityUtility.MaxTotalArchers);
+            Assert.That(retrain.ChangeType, Is.EqualTo("retrain"));
+            Assert.That(retrain.TypeFrom, Is.EqualTo("basic"));
+            Assert.That(retrain.TypeTo, Is.EqualTo("rapid"));
+            Assert.That(retrain.TotalCapUsage,
+                Is.EqualTo(ArcherCapacityUtility.MaxTotalArchers));
+        }
+
+        [Test]
+        public void TryEmitArcherChanged_ProducesVersionedMachineReadableEnvelope()
+        {
+            GameplayTelemetryRecord observed = default;
+            bool received = false;
+            void OnEmitted(GameplayTelemetryRecord record)
+            {
+                observed = record;
+                received = true;
+            }
+
+            ArcherChangedTelemetryPayload payload =
+                ArcherChangedTelemetryFactory.CreateRetrain(ArcherType.Frost, 994);
+            GameplayTelemetry.Emitted += OnEmitted;
+            try
+            {
+                Assert.That(GameplayTelemetry.TryEmitArcherChanged(
+                    " run_archer_994 ", payload, out GameplayTelemetryRecord emitted,
+                    out string error), Is.True, error);
+                Assert.That(received, Is.True);
+                Assert.That(observed.RunId, Is.EqualTo("run_archer_994"));
+                Assert.That(emitted.EventName, Is.EqualTo("archer_changed"));
+                Assert.That(emitted.SchemaVersion, Is.EqualTo(1));
+
+                GameplayTelemetryEnvelope envelope =
+                    JsonUtility.FromJson<GameplayTelemetryEnvelope>(emitted.SerializedEnvelope);
+                ArcherChangedTelemetryPayload decoded =
+                    JsonUtility.FromJson<ArcherChangedTelemetryPayload>(envelope.PayloadJson);
+                Assert.That(envelope.EventName, Is.EqualTo("archer_changed"));
+                Assert.That(envelope.SchemaVersion, Is.EqualTo(1));
+                Assert.That(decoded.ChangeType, Is.EqualTo("retrain"));
+                Assert.That(decoded.TypeFrom, Is.EqualTo("basic"));
+                Assert.That(decoded.TypeTo, Is.EqualTo("frost"));
+                Assert.That(decoded.TotalCapUsage, Is.EqualTo(994));
+            }
+            finally
+            {
+                GameplayTelemetry.Emitted -= OnEmitted;
+            }
+        }
+
+        [Test]
+        public void TryEmitArcherChanged_RejectsInvalidTransitionsAndCapUsage()
+        {
+            var invalidBuy = new ArcherChangedTelemetryPayload
+            {
+                ChangeType = ArcherChangedTelemetryContract.Buy,
+                TypeFrom = ArcherChangedTelemetryContract.Basic,
+                TypeTo = ArcherChangedTelemetryContract.Rapid,
+                TotalCapUsage = 10
+            };
+            Assert.That(GameplayTelemetry.TryEmitArcherChanged(
+                "run_invalid_buy", invalidBuy, out _, out string buyError), Is.False);
+            Assert.That(buyError, Does.Contain("buy type transition"));
+
+            var invalidRetrain = new ArcherChangedTelemetryPayload
+            {
+                ChangeType = ArcherChangedTelemetryContract.Retrain,
+                TypeFrom = ArcherChangedTelemetryContract.Basic,
+                TypeTo = ArcherChangedTelemetryContract.Basic,
+                TotalCapUsage = 10
+            };
+            Assert.That(GameplayTelemetry.TryEmitArcherChanged(
+                "run_invalid_retrain", invalidRetrain, out _, out string retrainError), Is.False);
+            Assert.That(retrainError, Does.Contain("retrain type transition"));
+
+            ArcherChangedTelemetryPayload overCap = ArcherChangedTelemetryFactory.CreateBuy(
+                ArcherType.Basic,
+                ArcherCapacityUtility.MaxTotalArchers + 1);
+            Assert.That(GameplayTelemetry.TryEmitArcherChanged(
+                "run_over_cap", overCap, out _, out string capError), Is.False);
+            Assert.That(capError, Does.Contain("total cap usage"));
+        }
+
         private MetaUpgradeSO CreateUpgrade(string id, int maxLevel)
         {
             MetaUpgradeSO upgrade = ScriptableObject.CreateInstance<MetaUpgradeSO>();

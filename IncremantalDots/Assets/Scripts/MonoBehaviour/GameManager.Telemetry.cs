@@ -205,5 +205,24 @@ namespace DeadWalls
                     $"[GameManager] resource_spent telemetry reddedildi: {error}");
             }
         }
+
+        private void TryEmitArcherChangedTelemetry(ArcherChangedTelemetryPayload payload)
+        {
+            if (!_initialized || string.IsNullOrWhiteSpace(_currentRunId)
+                || !IsRunIdentityReadyForPhaseTelemetry())
+            {
+                return;
+            }
+
+            if (!GameplayTelemetry.TryEmitArcherChanged(
+                    _currentRunId,
+                    payload,
+                    out _,
+                    out string error))
+            {
+                UnityEngine.Debug.LogError(
+                    $"[GameManager] archer_changed telemetry reddedildi: {error}");
+            }
+        }
     }
 }

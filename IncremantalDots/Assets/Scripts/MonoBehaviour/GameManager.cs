@@ -2188,6 +2188,9 @@ namespace DeadWalls
                 ResourceSpentTelemetryContract.ToArcherBuyPurchaseType(definition.Type),
                 0,
                 GetArcherTypeCount(definition.Type));
+            TryEmitArcherChangedTelemetry(ArcherChangedTelemetryFactory.CreateBuy(
+                definition.Type,
+                GetTotalArcherCount()));
             OnGameStateChanged?.Invoke();
             return true;
         }
@@ -2215,6 +2218,9 @@ namespace DeadWalls
                 ResourceSpentTelemetryContract.ToArcherBuyPurchaseType(type),
                 0,
                 GetArcherTypeCount(type));
+            TryEmitArcherChangedTelemetry(ArcherChangedTelemetryFactory.CreateBuy(
+                type,
+                GetTotalArcherCount()));
             OnGameStateChanged?.Invoke();
             return true;
         }
@@ -2255,6 +2261,9 @@ namespace DeadWalls
                 ResourceSpentTelemetryContract.ToArcherRetrainPurchaseType(targetType),
                 0,
                 GetArcherTypeCount(targetType));
+            TryEmitArcherChangedTelemetry(ArcherChangedTelemetryFactory.CreateRetrain(
+                targetType,
+                GetTotalArcherCount()));
             OnGameStateChanged?.Invoke();
             return true;
         }

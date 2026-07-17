@@ -18,6 +18,8 @@ namespace DeadWalls.Tests
             new List<GameplayTelemetryRecord>();
         private readonly List<GameplayTelemetryRecord> _resourceSpentRecords =
             new List<GameplayTelemetryRecord>();
+        private readonly List<GameplayTelemetryRecord> _archerChangedRecords =
+            new List<GameplayTelemetryRecord>();
         private byte[] _originalRunSave;
         private string _runSavePath;
 
@@ -32,6 +34,7 @@ namespace DeadWalls.Tests
             _records.Clear();
             _phaseRecords.Clear();
             _resourceSpentRecords.Clear();
+            _archerChangedRecords.Clear();
             GameplayTelemetry.Emitted += OnTelemetryEmitted;
             GameBootstrap.PendingAction = GameBootstrap.StartAction.None;
 
@@ -273,6 +276,69 @@ namespace DeadWalls.Tests
                 "Reddedilen transaction resource_spent uretmemeli.");
         }
 
+        [UnityTest]
+        public IEnumerator ArcherBuyAndRetrain_EmitCanonicalTransitions_AndRejectedBuyEmitsNothing()
+        {
+            GameManager gameManager = GameManager.Instance;
+            _records.Clear();
+            _phaseRecords.Clear();
+            _resourceSpentRecords.Clear();
+            _archerChangedRecords.Clear();
+            gameManager.RestartGame();
+
+            for (int frame = 0; frame < 180 && _records.Count == 0; frame++)
+                yield return null;
+            Assert.That(_records.Count, Is.EqualTo(1),
+                "Archer telemetry oncesi run identity kurulmalidir.");
+
+            World world = World.DefaultGameObjectInjectionWorld;
+            Assert.That(world, Is.Not.Null);
+            EntityManager entityManager = world.EntityManager;
+            using EntityQuery resourceQuery = entityManager.CreateEntityQuery(typeof(ResourceData));
+            Entity resourceEntity = resourceQuery.GetSingletonEntity();
+            ResourceData funded = entityManager.GetComponentData<ResourceData>(resourceEntity);
+            funded.Wood = 1_000_000;
+            funded.Stone = 1_000_000;
+            funded.Iron = 1_000_000;
+            funded.Food = 1_000_000;
+            entityManager.SetComponentData(resourceEntity, funded);
+
+            Assert.That(gameManager.IsArcherTypeUnlocked(ArcherType.Rapid), Is.False);
+            Assert.That(gameManager.BuyArcher(ArcherType.Rapid), Is.False);
+            Assert.That(_archerChangedRecords, Is.Empty,
+                "Locked/rejected buy archer_changed uretmemeli.");
+
+            int totalBeforeBuy = gameManager.GetTotalArcherCount();
+            Assert.That(gameManager.BuyArcher(ArcherType.Basic), Is.True);
+            Assert.That(_archerChangedRecords.Count, Is.EqualTo(1));
+            ArcherChangedTelemetryPayload buy =
+                JsonUtility.FromJson<ArcherChangedTelemetryPayload>(
+                    _archerChangedRecords[0].PayloadJson);
+            Assert.That(buy.ChangeType, Is.EqualTo("buy"));
+            Assert.That(buy.TypeFrom, Is.EqualTo("none"));
+            Assert.That(buy.TypeTo, Is.EqualTo("basic"));
+            Assert.That(buy.TotalCapUsage, Is.EqualTo(totalBeforeBuy + 1));
+            Assert.That(buy.TotalCapUsage, Is.EqualTo(gameManager.GetTotalArcherCount()));
+
+            MethodInfo unlockFromTech = typeof(GameManager).GetMethod(
+                "UnlockArcherTypeFromTech",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.That(unlockFromTech, Is.Not.Null);
+            unlockFromTech.Invoke(gameManager, new object[] { ArcherType.Rapid });
+
+            int totalBeforeRetrain = gameManager.GetTotalArcherCount();
+            Assert.That(gameManager.RetrainBasicArcher(ArcherType.Rapid), Is.True);
+            Assert.That(_archerChangedRecords.Count, Is.EqualTo(2));
+            ArcherChangedTelemetryPayload retrain =
+                JsonUtility.FromJson<ArcherChangedTelemetryPayload>(
+                    _archerChangedRecords[1].PayloadJson);
+            Assert.That(retrain.ChangeType, Is.EqualTo("retrain"));
+            Assert.That(retrain.TypeFrom, Is.EqualTo("basic"));
+            Assert.That(retrain.TypeTo, Is.EqualTo("rapid"));
+            Assert.That(retrain.TotalCapUsage, Is.EqualTo(totalBeforeRetrain));
+            Assert.That(retrain.TotalCapUsage, Is.EqualTo(gameManager.GetTotalArcherCount()));
+        }
+
         private void OnTelemetryEmitted(GameplayTelemetryRecord record)
         {
             if (record.EventName == GameplayTelemetry.RunStartedEventName)
@@ -281,6 +347,8 @@ namespace DeadWalls.Tests
                 _phaseRecords.Add(record);
             else if (record.EventName == GameplayTelemetry.ResourceSpentEventName)
                 _resourceSpentRecords.Add(record);
+            else if (record.EventName == GameplayTelemetry.ArcherChangedEventName)
+                _archerChangedRecords.Add(record);
         }
     }
 }
