@@ -1,5 +1,8 @@
+using System.Linq;
 using NUnit.Framework;
 using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine.SceneManagement;
 
 namespace DeadWalls.Tests
 {
@@ -9,6 +12,10 @@ namespace DeadWalls.Tests
             "Assets/ScriptableObject/MobileCastle/Enemies/EnemyCatalog.asset";
         private const string DefinitionPath =
             "Assets/ScriptableObject/MobileCastle/Enemies/BasicZombie.asset";
+        private const string EnemyContentRoot =
+            "Assets/ScriptableObject/MobileCastle/Enemies";
+        private const string CombatSubScenePath =
+            "Assets/Scenes/NewGameScene/MobileCastleCombatSubScene.unity";
 
         [Test]
         public void ActiveV1Catalog_ContainsOnlyCurrentZombiePrefab()
@@ -38,6 +45,51 @@ namespace DeadWalls.Tests
             Assert.That(definition.Scale, Is.EqualTo(1.4f));
             Assert.That(definition.PoolPrewarm, Is.EqualTo(128));
             Assert.That(definition.PoolExpandBatch, Is.EqualTo(128));
+        }
+
+        [Test]
+        public void ProductionContentAndSubScene_UseExactlyOneEnemyCatalogDefinitionAndPrefab()
+        {
+            string[] catalogGuids = AssetDatabase.FindAssets(
+                "t:EnemyCatalogSO", new[] { EnemyContentRoot });
+            string[] definitionGuids = AssetDatabase.FindAssets(
+                "t:EnemyDefinitionSO", new[] { EnemyContentRoot });
+
+            Assert.That(catalogGuids, Has.Length.EqualTo(1));
+            Assert.That(AssetDatabase.GUIDToAssetPath(catalogGuids[0]), Is.EqualTo(CatalogPath));
+            Assert.That(definitionGuids, Has.Length.EqualTo(1));
+            Assert.That(AssetDatabase.GUIDToAssetPath(definitionGuids[0]), Is.EqualTo(DefinitionPath));
+
+            var catalog = AssetDatabase.LoadAssetAtPath<EnemyCatalogSO>(CatalogPath);
+            var definition = AssetDatabase.LoadAssetAtPath<EnemyDefinitionSO>(DefinitionPath);
+            Assert.That(catalog.Definitions, Is.EqualTo(new[] { definition }));
+
+            Scene scene = SceneManager.GetSceneByPath(CombatSubScenePath);
+            bool openedByTest = !scene.IsValid() || !scene.isLoaded;
+            if (openedByTest)
+                scene = EditorSceneManager.OpenScene(CombatSubScenePath, OpenSceneMode.Additive);
+
+            try
+            {
+                var roots = scene.GetRootGameObjects();
+                WaveConfigAuthoring[] waveOwners = roots
+                    .SelectMany(root => root.GetComponentsInChildren<WaveConfigAuthoring>(true))
+                    .ToArray();
+                MobileCastleCombatAuthoring[] combatOwners = roots
+                    .SelectMany(root => root.GetComponentsInChildren<MobileCastleCombatAuthoring>(true))
+                    .ToArray();
+
+                Assert.That(waveOwners, Has.Length.EqualTo(1));
+                Assert.That(combatOwners, Has.Length.EqualTo(1));
+                Assert.That(waveOwners[0].EnemyCatalog, Is.SameAs(catalog));
+                Assert.That(combatOwners[0].EnemyCatalog, Is.SameAs(catalog));
+                Assert.That(waveOwners[0].ZombiePrefab, Is.SameAs(definition.Prefab));
+            }
+            finally
+            {
+                if (openedByTest)
+                    EditorSceneManager.CloseScene(scene, true);
+            }
         }
 
         [Test]

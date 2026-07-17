@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.3
 > **Son tam kapsam denetimi:** 2026-07-17
 > **Aktif paket:** Post-Package V1 Closure - Contracts, Performance ve Release DoD
-> **Aktif iş:** `DW-V1-DOD-SINGLE-ENEMY-CATALOG` - Verify Single Enemy Launch Catalog
-> **İlerleme:** `422 / 442` tracker checkbox'ı tamamlandı - `%95,48`
+> **Aktif iş:** `DW-V1-DOD-QUANTITY-ONLY-DIFFICULTY` - Verify Quantity-Only Difficulty
+> **İlerleme:** `423 / 442` tracker checkbox'ı tamamlandı - `%95,70`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -127,7 +127,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Battlefield | Kale/duvar solda, spawn sağdaki `SpawnLineX` bandından geliyor | Temel kompozisyon uyumlu |
 | Build placement | Aktif scene'de `BuildingPlacementUI` ve `BuildingGridManager` bağlı değil | Hazır bina yönüyle uyumlu |
 | Cycle | `Day 30 / Dusk 5 / Night 20 / Dawn 5`; dört fazda pozitif spawn temposu | Uyumlu |
-| Horde | Tek catalog prefabı; sabit stats; saved backlog; expandable bulk rent/return pool; Blood Moon dormant | 10K gate ve optimizasyon ölçüldü |
+| Horde | Tek production catalog/tanım/prefab ve ortak SubScene binding'i release guard ile kilitli; sabit stats; saved backlog; expandable bulk rent/return pool; Blood Moon dormant | 10K gate ve optimizasyon ölçüldü |
 | Moat | Runtime flag kapalı; slow `1`, damage `0`; tech/meta catalog bağlantıları dormant | Uyumlu |
 | Defense | Damage/Game Over aktif ve testli olarak tek Wall'a çekildi | `[x]` |
 | Normal repair | Stone-only ve yalnız Day/Dusk | `[x]` |
@@ -1153,7 +1153,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 | Horde | Day 1 vs ileri gün stat | HP/damage/speed aynı | `[x]` |
 | Wall | Night normal repair | Kapalı; Stone harcanmaz | `[x]` |
 | Wall | HP 0 + same-frame repair | Game Over kazanır | `[x]` |
-| Enemy catalog | V1 runtime bake + gerçek spawn | Tek `zombie_basic`; prefab/stat/scale tanımla eşleşir | `[x]` |
+| Enemy catalog | Production asset/authoring guard + V1 runtime bake + gerçek spawn | Tek `zombie_basic`; iki SubScene owner'ı aynı catalog/prefab'a bağlı; prefab/stat/scale tanımla eşleşir | `[x]` |
 | Population | Food yetersiz dawn | Mevcut pop korunur; arrival sınırlı | `[x]` |
 | Ammo | Arrow 0 / refill | Ateş durur / stok aynı transaction'da artar / sonraki simulation tick'inde atış sürer | `[x]` |
 | Archers | 1.001. purchase | Reddedilir; harcama yok | `[x]` |
@@ -1206,7 +1206,15 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
   yazmıyor. Source-owner EditMode guard'ı ile injected Gate/Core gerçek PlayMode regresyonu bu sınırı
   kilitliyor; targeted `12/12` EditMode, `1/1` PlayMode, full EditMode `376/376` ve full PlayMode
   `81 pass + 2 explicit profiler/soak skip` geçti.
-- [ ] Çıkış catalog'unda tek enemy prefab var.
+- [x] Çıkış catalog'unda tek enemy prefab var.
+  Unity MCP production asset denetiminde enemy klasöründe `1 EnemyCatalogSO + 1 EnemyDefinitionSO`
+  bulundu; catalog tam bir `zombie_basic` kaydı ve `Zombie.prefab` içeriyor. Release guard,
+  `MobileCastleCombatSubScene` içindeki tek `WaveConfigAuthoring` ile tek
+  `MobileCastleCombatAuthoring` sahibinin aynı production catalog'a, legacy compatibility prefab
+  alanının da aynı `Zombie.prefab` referansına bağlı olmasını zorunlu kılıyor. Targeted EditMode
+  `4/4`, gerçek bake/spawn PlayMode `2/2`, full EditMode `377/377` ve full PlayMode
+  `81 pass + 2 explicit profiler/soak skip` geçti; scene validation `0` issue ve final Console
+  `0 error / 0 warning`.
 - [ ] Difficulty enemy stats değil adet/akış büyütüyor.
 - [ ] 60 saniye cycle 30/5/20/5 ve kesintisiz.
 - [ ] Speed-up/offline progress yok.
@@ -1429,3 +1437,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-17 | `DW-V1-TELEMETRY-ABILITY-CAST` canonical active ability result event | Provider-independent telemetry bus'i `ability_cast` v1 ile genisletildi. Fireball/Rally/Emergency Repair yalniz canonical transaction commit'inden sonra ability/phase/resolved cooldown/result snapshot'i yayiyor. Fireball asynchronous impact oncesi speculative hit saymiyor; Rally canonical archer totalini, Emergency Repair gercek Wall HP farkini yaziyor. Rejected cooldown/active/phase/Wall yollari ve exact Continue event disinda; Fireball damage job'una sync-point veya per-zombie telemetry eklenmedi | Contract EditMode `21/21`; gercek `NewGameScene` uc ability + rejected tekrar + Continue PlayMode `7/7`; full EditMode `366/366`; full PlayMode `79 pass + 2 explicit profiler/soak skip`; scene validation `0` issue; final Console `0 error / 0 warning`; tracker `419/442` |
 | 2026-07-17 | `DW-V1-TELEMETRY-RUN-ENDED` durable final run summary event | Provider-independent telemetry bus'i `run_ended` v1 ile genişletildi. Production spawn commit'leri peak enemy high-water mark'ını, modifier sonrası gerçek Wall hasarı day/phase bucket'larını besliyor; per-hit event ve development stress sayımı yok. Schema v15 exact Continue accumulator'ları koruyor. Event yalnız death receipt ve Meta persistence finalize edildikten sonra gerçek day/kills/peak enemy/peak population/Wall damage timeline/meta reward snapshot'ıyla bir kez çıkıyor | Targeted EditMode `53/53`; targeted PlayMode `9/9`; full EditMode `375/375`; full PlayMode `81 pass + 2 explicit profiler/soak skip`; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `421/442` |
 | 2026-07-17 | `DW-V1-DOD-WALL-ONLY-END` Wall-only terminal state contract | Runtime source audit'inde tek production `IsGameOver = true` writer'ının `DamageApplySystem` olduğu ve yalnız `SingleWallDefenseRules.IsDestroyed(remainingWallHp)` sonrasında yazdığı kilitlendi. `GameManager` terminal state üretmiyor; yalnız rising edge'i death transaction ve UI'ya taşıyor. Wave completion, cycle/day, horde pressure, enemy/boss ölümü, injected legacy Gate/Core ve ikinci fail phase koşuyu bitiremiyor | Targeted EditMode `12/12`; injected Gate/Core + lethal Wall PlayMode `1/1`; full EditMode `376/376`; full PlayMode `81 pass + 2 explicit profiler/soak skip`; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `422/442` |
+| 2026-07-17 | `DW-V1-DOD-SINGLE-ENEMY-CATALOG` single-enemy launch catalog contract | Production düşman klasörü tam bir `EnemyCatalogSO`, tam bir `EnemyDefinitionSO` ve tek `zombie_basic -> Zombie.prefab` kaydıyla sınırlandı. EditMode release guard'ı iki SubScene authoring sahibinin aynı production catalog'a, legacy compatibility alanının da aynı prefab'a bağlı olmasını kilitliyor. Runtime bake buffer'ı tek entry üretiyor; production spawn bu entry'nin prefab ve statlarını kullanıyor | Unity MCP asset audit `1 catalog / 1 definition`; targeted EditMode `4/4`; gerçek bake/spawn PlayMode `2/2`; full EditMode `377/377`; full PlayMode `81 pass + 2 explicit profiler/soak skip`; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `423/442` |

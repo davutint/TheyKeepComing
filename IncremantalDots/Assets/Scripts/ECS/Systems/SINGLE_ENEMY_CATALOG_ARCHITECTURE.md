@@ -39,8 +39,12 @@ Catalog atanmamış eski sahnelerde `WaveConfigAuthoring.ZombiePrefab`, `legacy_
 
 V1 ürün kararı değişmeden ikinci prefab catalog'a eklenmez. İleride kapsam onaylanırsa yeni içerik prefab adına göre kod dalı eklemek yerine yeni `EnemyDefinitionSO` ile catalog'a kaydedilir; catalog validation sözleşmesi de bilinçli olarak V1 tek-kayıt kuralından genişletilir.
 
+## Çıkış catalog guard'ı
+
+Production düşman içeriği `Assets/ScriptableObject/MobileCastle/Enemies` klasöründe tam bir `EnemyCatalogSO` ve tam bir `EnemyDefinitionSO` ile sınırlıdır. `MobileCastleCombatSubScene` içindeki tek `WaveConfigAuthoring` ve tek `MobileCastleCombatAuthoring` aynı production catalog'a bağlı olmak zorundadır; legacy `ZombiePrefab` compatibility alanı da catalog tanımındaki aynı `Zombie.prefab` referansını taşır. Bu sınırlar EditMode release guard'ında birlikte denetlenir. Böylece ikinci bir asset eklemek, iki authoring sahibini farklı catalog'lara bağlamak veya legacy prefab referansını catalog'dan ayırmak V1 çıkış testini doğrudan kırar.
+
 ## Doğrulama
 
-- `EnemyCatalogContractTests`: tek aktif kayıt, prefab/stat/pool metadata ve type branch gerektirmeyen index çözümü.
+- `EnemyCatalogContractTests`: production klasöründe tek catalog/tanım, iki SubScene authoring sahibinde aynı catalog/prefab bağlantısı, tek aktif kayıt, prefab/stat/pool metadata ve type branch gerektirmeyen index çözümü.
 - `ExactRunContinuePlayModeTests.RuntimeTuning_UsesProfileDifficulty_AndAuthoringCycleDurations`: bake edilmiş runtime catalog/config/prefab eşleşmesi.
 - `ExactRunContinuePlayModeTests.EnemyCatalog_SpawnsRegisteredPrefabWithDefinitionStats`: gerçek spawn edilen entity'nin catalog prefabı ve tanım statlarıyla oluşması.
