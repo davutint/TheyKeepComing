@@ -46,18 +46,29 @@ sinifinin parcasidir; `GameplayTelemetry.cs` ayni `DeadWalls` runtime assembly's
     `Targets=1` ve gercek Wall HP artisini vermelidir.
 20. Ayni ability cooldown/active-effect guard'inda tekrar denendiginde yeni event gelmemeli;
     save/Continue daha once kabul edilen cast'leri tekrar yaymamalidir.
+21. Day veya Dusk'ta hasarli Wall normal repair ile iyilestirilir; once
+    `resource_spent: stone/wall_repair`, sonra tek `wall_repaired` kaydi gelmelidir.
+22. `wall_repaired` payload'inda exact transaction phase'i, gercek Stone debit'i ve canonical
+    `WallSegment` HP before/after degerleri kontrol edilir.
+23. Full/dead Wall, Night/Dawn, yetersiz Stone ve free economy test modunda yeni
+    `wall_repaired` kaydi gelmemelidir. Emergency Repair ve Council heal de bu eventi uretmemelidir.
+24. Basarili normal repair sonrasi save/Continue yapildiginda ayni transaction tekrar
+    yayilmamalidir.
 
 Otomatik kapsam:
 
-- EditMode `GameplayTelemetryTests`: run/phase/resource/archer/Heart/Council/ability payload factory'leri,
+- EditMode `GameplayTelemetryTests`: run/phase/resource/archer/Heart/Council/ability/Wall repair
+  payload factory'leri,
   multi-resource canonical order, envelope serialization ve invalid identity/amount/result/
-  transition/cap/node/level/depth/cost/reveal/resolution/effect/night-delta/ability-result guard'lari.
+  transition/cap/node/level/depth/cost/reveal/resolution/effect/night-delta/ability-result/
+  repair-phase/cost/HP-transition guard'lari.
 - PlayMode `GameplayTelemetryPlayModeTests`: gercek NewGameScene yeni-run emission'i, canonical
   phase/horde snapshot'i, ayni-phase idempotency, exact Continue duplicate guard'i, tek/iki kaynakli
   purchase commit event'leri, player archer buy/retrain transition snapshot'lari, canonical Castle
   Heart purchase/reveal snapshot'i, regular Council secim/expire/Continue snapshot'i ve rejected
   transaction sifir-event guard'i; gercek Fireball/Rally/Emergency Repair commit/result snapshot'i
-  ile cooldown/rejected/Continue sifir-event davranisi.
+  ile cooldown/rejected/Continue sifir-event davranisi; gercek Day normal repair Stone debit +
+  HP transition snapshot'i, event sirasi ve full/Night/resource/Continue sifir-event davranisi.
 
 Harici analytics target'i bu kurulumun parcasi degildir; tracker'daki owner-karari maddesi
 onaylanmadan SDK, servis veya endpoint eklenmez.

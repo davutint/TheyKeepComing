@@ -149,6 +149,24 @@ namespace DeadWalls
         public float Repair;
     }
 
+    [Serializable]
+    public sealed class WallRepairedTelemetryPayload
+    {
+        public string Phase;
+        public int StoneCost;
+        public float HpBefore;
+        public float HpAfter;
+    }
+
+    internal static class WallRepairedTelemetryContract
+    {
+        internal static bool IsRepairPhase(string phase)
+        {
+            return string.Equals(phase, "day", StringComparison.Ordinal)
+                || string.Equals(phase, "dusk", StringComparison.Ordinal);
+        }
+    }
+
     internal static class AbilityCastTelemetryContract
     {
         internal const string Fireball = "fireball";
@@ -416,6 +434,8 @@ namespace DeadWalls
         public const int CouncilResolvedSchemaVersion = 1;
         public const string AbilityCastEventName = "ability_cast";
         public const int AbilityCastSchemaVersion = 1;
+        public const string WallRepairedEventName = "wall_repaired";
+        public const int WallRepairedSchemaVersion = 1;
 
         public static event Action<GameplayTelemetryRecord> Emitted;
 
@@ -569,6 +589,30 @@ namespace DeadWalls
             return EmitValidated(
                 AbilityCastEventName,
                 AbilityCastSchemaVersion,
+                normalizedRunId,
+                payload,
+                out record,
+                out error);
+        }
+
+        public static bool TryEmitWallRepaired(
+            string runId,
+            WallRepairedTelemetryPayload payload,
+            out GameplayTelemetryRecord record,
+            out string error)
+        {
+            record = default;
+            if (!TryNormalizeRunId(runId, WallRepairedEventName, out string normalizedRunId,
+                    out error))
+            {
+                return false;
+            }
+            if (!TryValidateWallRepaired(payload, out error))
+                return false;
+
+            return EmitValidated(
+                WallRepairedEventName,
+                WallRepairedSchemaVersion,
                 normalizedRunId,
                 payload,
                 out record,
@@ -972,6 +1016,37 @@ namespace DeadWalls
             return true;
         }
 
+        internal static bool TryValidateWallRepaired(
+            WallRepairedTelemetryPayload payload,
+            out string error)
+        {
+            if (payload == null)
+            {
+                error = "wall_repaired payload bos.";
+                return false;
+            }
+            if (!WallRepairedTelemetryContract.IsRepairPhase(payload.Phase))
+            {
+                error = "wall_repaired phase kimligi Day/Dusk olmali.";
+                return false;
+            }
+            if (payload.StoneCost <= 0)
+            {
+                error = "wall_repaired Stone cost sifirdan buyuk olmali.";
+                return false;
+            }
+            if (float.IsNaN(payload.HpBefore) || float.IsInfinity(payload.HpBefore)
+                || float.IsNaN(payload.HpAfter) || float.IsInfinity(payload.HpAfter)
+                || payload.HpBefore <= 0f || payload.HpAfter <= payload.HpBefore + 0.001f)
+            {
+                error = "wall_repaired HP before/after snapshot'i gecersiz.";
+                return false;
+            }
+
+            error = string.Empty;
+            return true;
+        }
+
         private static bool TryValidateCouncilEffect(
             CouncilResolvedTelemetryEffect effect,
             out string error)
@@ -1294,6 +1369,24 @@ namespace DeadWalls
                 Cooldown = cooldown,
                 Targets = targets,
                 Repair = repair
+            };
+        }
+    }
+
+    internal static class WallRepairedTelemetryFactory
+    {
+        internal static WallRepairedTelemetryPayload Create(
+            SiegeCyclePhase phase,
+            int stoneCost,
+            float hpBefore,
+            float hpAfter)
+        {
+            return new WallRepairedTelemetryPayload
+            {
+                Phase = PhaseChangedTelemetryFactory.ToContractPhase(phase),
+                StoneCost = stoneCost,
+                HpBefore = hpBefore,
+                HpAfter = hpAfter
             };
         }
     }

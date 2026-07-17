@@ -604,6 +604,8 @@ namespace DeadWalls
             if (!CanRepairDefenseFull())
                 return false;
 
+            WallSegment wallBefore = _entityManager.GetComponentData<WallSegment>(_castleEntity);
+            SiegeCyclePhase repairPhase = ResolveTelemetryPhase();
             ResourceCost cost = GetRepairCost();
             if (!SpendResources(cost))
                 return false;
@@ -616,6 +618,11 @@ namespace DeadWalls
                     ResourceSpentTelemetryContract.WallRepair,
                     0,
                     Mathf.Max(1, Mathf.CeilToInt(Mathf.Max(0f, Wall.CurrentHP))));
+                TryEmitWallRepairedTelemetry(
+                    repairPhase,
+                    cost.Stone,
+                    wallBefore.CurrentHP,
+                    Wall.CurrentHP);
                 OnGameStateChanged?.Invoke();
             }
 
@@ -836,7 +843,7 @@ namespace DeadWalls
             _entityManager.SetComponentData(prepEntity, prep);
             CastleYardPrep = prep;
             TryEmitAbilityCastTelemetry(AbilityCastTelemetryFactory.CreateRally(
-                ResolveAbilityTelemetryPhase(),
+                ResolveTelemetryPhase(),
                 _rallyCooldownRemaining,
                 GetTotalArcherCount()));
             OnGameStateChanged?.Invoke();
@@ -908,7 +915,7 @@ namespace DeadWalls
             Wall = wall;
             _emergencyRepairCooldownRemaining = EmergencyRepairCooldownDuration;
             TryEmitAbilityCastTelemetry(AbilityCastTelemetryFactory.CreateEmergencyRepair(
-                ResolveAbilityTelemetryPhase(),
+                ResolveTelemetryPhase(),
                 _emergencyRepairCooldownRemaining,
                 repairedHp));
             OnGameStateChanged?.Invoke();
@@ -4365,7 +4372,7 @@ namespace DeadWalls
             ActiveFireballProjectile = projectile;
 
             TryEmitAbilityCastTelemetry(AbilityCastTelemetryFactory.CreateFireball(
-                ResolveAbilityTelemetryPhase(),
+                ResolveTelemetryPhase(),
                 _fireballCooldownRemaining));
             OnGameStateChanged?.Invoke();
             return true;

@@ -270,7 +270,7 @@ namespace DeadWalls
             }
         }
 
-        private SiegeCyclePhase ResolveAbilityTelemetryPhase()
+        private SiegeCyclePhase ResolveTelemetryPhase()
         {
             return TryGetContinuousSiegeCycle(out ContinuousSiegeCycleData cycle)
                 ? cycle.Phase
@@ -293,6 +293,34 @@ namespace DeadWalls
             {
                 UnityEngine.Debug.LogError(
                     $"[GameManager] ability_cast telemetry reddedildi: {error}");
+            }
+        }
+
+        private void TryEmitWallRepairedTelemetry(
+            SiegeCyclePhase phase,
+            int stoneCost,
+            float hpBefore,
+            float hpAfter)
+        {
+            if (freeEconomyTestMode || !_initialized || string.IsNullOrWhiteSpace(_currentRunId)
+                || !IsRunIdentityReadyForPhaseTelemetry())
+            {
+                return;
+            }
+
+            WallRepairedTelemetryPayload payload = WallRepairedTelemetryFactory.Create(
+                phase,
+                stoneCost,
+                hpBefore,
+                hpAfter);
+            if (!GameplayTelemetry.TryEmitWallRepaired(
+                    _currentRunId,
+                    payload,
+                    out _,
+                    out string error))
+            {
+                UnityEngine.Debug.LogError(
+                    $"[GameManager] wall_repaired telemetry reddedildi: {error}");
             }
         }
     }

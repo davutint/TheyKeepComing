@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.3
 > **Son tam kapsam denetimi:** 2026-07-17
 > **Aktif paket:** Post-Package V1 Closure - Contracts, Performance ve Release DoD
-> **Aktif iş:** `DW-V1-TELEMETRY-WALL-REPAIRED` - Emit wall_repaired Repair Result State
-> **İlerleme:** `419 / 442` tracker checkbox'ı tamamlandı - `%94,80`
+> **Aktif iş:** `DW-V1-TELEMETRY-RUN-ENDED` - Emit run_ended Final Run Summary
+> **İlerleme:** `420 / 442` tracker checkbox'ı tamamlandı - `%95,02`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -1120,7 +1120,16 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
   sıfır duplicate üretir. Contract EditMode `21/21`, gerçek `NewGameScene` üç ability/rejected/
   Continue PlayMode `7/7`, full EditMode `366/366` ve full PlayMode
   `79 pass + 2 explicit profiler/soak skip` geçti.
-- [ ] `wall_repaired`: phase, Stone cost, HP before/after.
+- [x] `wall_repaired`: phase, Stone cost, HP before/after. Provider-independent
+  `GameplayTelemetry` bus'i normal Wall repair v1 payload'iyla genisletildi. Yalniz
+  `RepairDefenseFull` Day/Dusk transaction'i exact Stone debit'i ve canonical `WallSegment` HP
+  commit'ini tamamen basariyla tamamladiktan sonra `Phase`, `StoneCost`, `HpBefore`, `HpAfter`
+  snapshot'i yayilir. Ayni transaction'in `resource_spent: stone/wall_repair` kaydi once,
+  `wall_repaired` sonucu sonra gelir. Full/dead Wall, Game Over, Night/Dawn, yetersiz Stone ve
+  `freeEconomyTestMode` sifir event uretir; Emergency Repair ile Council heal ikinci kez normal
+  repair sayilmaz. Exact Continue tamamlanmis transaction'i tekrar yaymaz. Contract EditMode
+  `24/24`, gercek `NewGameScene` repair/rejected/Continue PlayMode `8/8`, full EditMode `369/369`,
+  full PlayMode `80 pass + 2 explicit profiler/soak skip` ve scene validation `0 issue` gecti.
 - [ ] `run_ended`: day, kills, peak enemies/pop, Wall damage timeline, meta reward.
 
 ---

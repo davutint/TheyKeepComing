@@ -880,6 +880,99 @@ namespace DeadWalls.Tests
             Assert.That(repairError, Does.Contain("emergency repair"));
         }
 
+        [Test]
+        public void WallRepairedFactory_CapturesCanonicalRepairResultSnapshot()
+        {
+            WallRepairedTelemetryPayload payload = WallRepairedTelemetryFactory.Create(
+                SiegeCyclePhase.Dusk,
+                37,
+                420f,
+                650f);
+
+            Assert.That(payload.Phase, Is.EqualTo("dusk"));
+            Assert.That(payload.StoneCost, Is.EqualTo(37));
+            Assert.That(payload.HpBefore, Is.EqualTo(420f));
+            Assert.That(payload.HpAfter, Is.EqualTo(650f));
+        }
+
+        [Test]
+        public void TryEmitWallRepaired_ProducesVersionedMachineReadableEnvelope()
+        {
+            GameplayTelemetryRecord observed = default;
+            bool received = false;
+            void OnEmitted(GameplayTelemetryRecord record)
+            {
+                observed = record;
+                received = true;
+            }
+
+            WallRepairedTelemetryPayload payload = WallRepairedTelemetryFactory.Create(
+                SiegeCyclePhase.Day,
+                25,
+                500f,
+                750f);
+            GameplayTelemetry.Emitted += OnEmitted;
+            try
+            {
+                Assert.That(GameplayTelemetry.TryEmitWallRepaired(
+                    " run_repair_25 ", payload, out GameplayTelemetryRecord emitted,
+                    out string error), Is.True, error);
+                Assert.That(received, Is.True);
+                Assert.That(observed.RunId, Is.EqualTo("run_repair_25"));
+                Assert.That(emitted.EventName, Is.EqualTo("wall_repaired"));
+                Assert.That(emitted.SchemaVersion, Is.EqualTo(1));
+
+                GameplayTelemetryEnvelope envelope =
+                    JsonUtility.FromJson<GameplayTelemetryEnvelope>(emitted.SerializedEnvelope);
+                WallRepairedTelemetryPayload decoded =
+                    JsonUtility.FromJson<WallRepairedTelemetryPayload>(envelope.PayloadJson);
+                Assert.That(envelope.EventName, Is.EqualTo("wall_repaired"));
+                Assert.That(envelope.SchemaVersion, Is.EqualTo(1));
+                Assert.That(decoded.Phase, Is.EqualTo("day"));
+                Assert.That(decoded.StoneCost, Is.EqualTo(25));
+                Assert.That(decoded.HpBefore, Is.EqualTo(500f));
+                Assert.That(decoded.HpAfter, Is.EqualTo(750f));
+            }
+            finally
+            {
+                GameplayTelemetry.Emitted -= OnEmitted;
+            }
+        }
+
+        [Test]
+        public void TryEmitWallRepaired_RejectsInvalidPhaseCostAndHpTransition()
+        {
+            var payload = new WallRepairedTelemetryPayload
+            {
+                Phase = "night",
+                StoneCost = 25,
+                HpBefore = 500f,
+                HpAfter = 750f
+            };
+
+            Assert.That(GameplayTelemetry.TryEmitWallRepaired(
+                "run_night_repair", payload, out _, out string phaseError), Is.False);
+            Assert.That(phaseError, Does.Contain("Day/Dusk"));
+
+            payload.Phase = "day";
+            payload.StoneCost = 0;
+            Assert.That(GameplayTelemetry.TryEmitWallRepaired(
+                "run_free_repair", payload, out _, out string costError), Is.False);
+            Assert.That(costError, Does.Contain("Stone cost"));
+
+            payload.StoneCost = 25;
+            payload.HpAfter = payload.HpBefore;
+            Assert.That(GameplayTelemetry.TryEmitWallRepaired(
+                "run_zero_heal", payload, out _, out string hpError), Is.False);
+            Assert.That(hpError, Does.Contain("HP before/after"));
+
+            payload.HpBefore = 0f;
+            payload.HpAfter = 250f;
+            Assert.That(GameplayTelemetry.TryEmitWallRepaired(
+                "run_dead_wall", payload, out _, out string deadError), Is.False);
+            Assert.That(deadError, Does.Contain("HP before/after"));
+        }
+
         private MetaUpgradeSO CreateUpgrade(string id, int maxLevel)
         {
             MetaUpgradeSO upgrade = ScriptableObject.CreateInstance<MetaUpgradeSO>();

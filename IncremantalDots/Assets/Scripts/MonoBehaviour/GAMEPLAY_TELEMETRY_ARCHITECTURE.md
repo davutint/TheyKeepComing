@@ -155,6 +155,27 @@ Emergency Repair de event disidir. Exact Continue, daha once kabul edilmis abili
 tekrar yaymaz. Event yeni ability state owner'i veya save alani kurmaz; mevcut
 `GameManager + CastleYardPrepState + FireballProjectile` zincirini snapshot'lar.
 
+## `wall_repaired` v1
+
+`GameManager.RepairDefenseFull`, yalniz normal Wall repair transaction'i Stone debit'i ve gercek
+Wall HP commit'ini tamamen basariyla tamamladiktan sonra tek event uretir:
+
+- payload: `Phase`, `StoneCost`, `HpBefore`, `HpAfter`
+- phase: normal repair'in izinli oldugu canonical `day/dusk`
+- Stone cost: `SingleWallDefenseRules.CalculateRepairStoneCost` ile quote edilen ve gercekten
+  harcanan exact tam sayi debit
+- HP before/after: ayni transaction'da canonical `WallSegment` owner'inda gozlenen pozitif HP
+  transition'i
+
+Ayni transaction'in `resource_spent: stone/wall_repair` kaydi once, `wall_repaired` sonucu sonra
+gelir. Full/dead Wall, Game Over, Night/Dawn veya yetersiz Stone guard'inda reddedilen deneme iki
+event'i de uretmez. `freeEconomyTestMode` gercek Stone debit'i yapmadigi icin bu production result
+event'ini de uretmez.
+
+Emergency Repair `ability_cast` ile, Council heal ise `council_resolved` effect snapshot'iyla
+izlenir; ikisi de normal repair olarak ikinci kez sayilmaz. Exact Continue daha once tamamlanmis
+transaction'i tekrar yaymaz. Event yeni Wall state/history owner'i veya save alani kurmaz.
+
 ## Genisleme kurali
 
 Tracker'daki sonraki event'ler ayni `GameplayTelemetryRecord` cikisini kullanir. Yeni manager,

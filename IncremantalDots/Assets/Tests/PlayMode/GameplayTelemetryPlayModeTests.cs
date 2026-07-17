@@ -27,6 +27,8 @@ namespace DeadWalls.Tests
             new List<GameplayTelemetryRecord>();
         private readonly List<GameplayTelemetryRecord> _abilityCastRecords =
             new List<GameplayTelemetryRecord>();
+        private readonly List<GameplayTelemetryRecord> _wallRepairedRecords =
+            new List<GameplayTelemetryRecord>();
         private readonly List<string> _purchaseEventOrder = new List<string>();
         private readonly List<UnityEngine.Object> _createdObjects =
             new List<UnityEngine.Object>();
@@ -52,6 +54,7 @@ namespace DeadWalls.Tests
             _heartNodeBoughtRecords.Clear();
             _councilResolvedRecords.Clear();
             _abilityCastRecords.Clear();
+            _wallRepairedRecords.Clear();
             _purchaseEventOrder.Clear();
             GameplayTelemetry.Emitted += OnTelemetryEmitted;
             GameBootstrap.PendingAction = GameBootstrap.StartAction.None;
@@ -622,6 +625,110 @@ namespace DeadWalls.Tests
                 "Exact Continue kabul edilmis ability transaction'larini tekrar yaymamali.");
         }
 
+        [UnityTest]
+        public IEnumerator WallRepair_EmitsExactCommittedResult_AndRejectedOrContinueEmitNothing()
+        {
+            GameManager gameManager = GameManager.Instance;
+            _records.Clear();
+            _resourceSpentRecords.Clear();
+            _wallRepairedRecords.Clear();
+            _purchaseEventOrder.Clear();
+            gameManager.RestartGame();
+            for (int frame = 0; frame < 180 && _records.Count == 0; frame++)
+                yield return null;
+            Assert.That(_records.Count, Is.EqualTo(1),
+                "Wall repair telemetry oncesi run identity kurulmalidir.");
+
+            World world = World.DefaultGameObjectInjectionWorld;
+            Assert.That(world, Is.Not.Null);
+            EntityManager entityManager = world.EntityManager;
+            using EntityQuery cycleQuery = entityManager.CreateEntityQuery(
+                typeof(ContinuousSiegeCycleData));
+            using EntityQuery wallQuery = entityManager.CreateEntityQuery(typeof(WallSegment));
+            using EntityQuery resourceQuery = entityManager.CreateEntityQuery(typeof(ResourceData));
+            Entity cycleEntity = cycleQuery.GetSingletonEntity();
+            Entity wallEntity = wallQuery.GetSingletonEntity();
+            Entity resourceEntity = resourceQuery.GetSingletonEntity();
+
+            ContinuousSiegeCycleData cycle =
+                entityManager.GetComponentData<ContinuousSiegeCycleData>(cycleEntity);
+            cycle.Enabled = true;
+            cycle.Phase = SiegeCyclePhase.Day;
+            entityManager.SetComponentData(cycleEntity, cycle);
+
+            WallSegment wall = entityManager.GetComponentData<WallSegment>(wallEntity);
+            wall.CurrentHP = wall.MaxHP * 0.5f;
+            entityManager.SetComponentData(wallEntity, wall);
+            ResourceData resources = entityManager.GetComponentData<ResourceData>(resourceEntity);
+            resources.Stone = 100_000;
+            entityManager.SetComponentData(resourceEntity, resources);
+
+            ResourceCost cost = gameManager.GetRepairCost();
+            Assert.That(cost.Stone, Is.GreaterThan(0));
+            float expectedHpAfter = SingleWallDefenseRules.HealByMaxPercent(
+                wall.CurrentHP,
+                wall.MaxHP,
+                gameManager.GetNormalRepairHealPercent());
+
+            _resourceSpentRecords.Clear();
+            _wallRepairedRecords.Clear();
+            _purchaseEventOrder.Clear();
+            Assert.That(gameManager.RepairDefenseFull(), Is.True);
+            Assert.That(_resourceSpentRecords.Count, Is.EqualTo(1));
+            Assert.That(_wallRepairedRecords.Count, Is.EqualTo(1));
+            CollectionAssert.AreEqual(
+                new[] { "resource_spent", "wall_repaired" },
+                _purchaseEventOrder,
+                "Stone debit eventi repair sonucundan once gelmelidir.");
+
+            ResourceSpentTelemetryPayload debit =
+                JsonUtility.FromJson<ResourceSpentTelemetryPayload>(
+                    _resourceSpentRecords[0].PayloadJson);
+            Assert.That(debit.Resource, Is.EqualTo("stone"));
+            Assert.That(debit.Amount, Is.EqualTo(cost.Stone));
+            Assert.That(debit.PurchaseType, Is.EqualTo("wall_repair"));
+
+            WallRepairedTelemetryPayload repaired =
+                JsonUtility.FromJson<WallRepairedTelemetryPayload>(
+                    _wallRepairedRecords[0].PayloadJson);
+            Assert.That(repaired.Phase, Is.EqualTo("day"));
+            Assert.That(repaired.StoneCost, Is.EqualTo(cost.Stone));
+            Assert.That(repaired.HpBefore, Is.EqualTo(wall.CurrentHP).Within(0.001f));
+            Assert.That(repaired.HpAfter, Is.EqualTo(expectedHpAfter).Within(0.001f));
+            ResourceData afterRepair = entityManager.GetComponentData<ResourceData>(resourceEntity);
+            Assert.That(afterRepair.Stone, Is.EqualTo(resources.Stone - cost.Stone));
+
+            wall = entityManager.GetComponentData<WallSegment>(wallEntity);
+            wall.CurrentHP = wall.MaxHP;
+            entityManager.SetComponentData(wallEntity, wall);
+            Assert.That(gameManager.RepairDefenseFull(), Is.False);
+            Assert.That(_wallRepairedRecords.Count, Is.EqualTo(1));
+
+            cycle = entityManager.GetComponentData<ContinuousSiegeCycleData>(cycleEntity);
+            cycle.Phase = SiegeCyclePhase.Night;
+            entityManager.SetComponentData(cycleEntity, cycle);
+            wall.CurrentHP = wall.MaxHP * 0.5f;
+            entityManager.SetComponentData(wallEntity, wall);
+            Assert.That(gameManager.RepairDefenseFull(), Is.False);
+            Assert.That(_wallRepairedRecords.Count, Is.EqualTo(1));
+
+            cycle.Phase = SiegeCyclePhase.Day;
+            entityManager.SetComponentData(cycleEntity, cycle);
+            resources = entityManager.GetComponentData<ResourceData>(resourceEntity);
+            resources.Stone = 0;
+            entityManager.SetComponentData(resourceEntity, resources);
+            Assert.That(gameManager.RepairDefenseFull(), Is.False);
+            Assert.That(_wallRepairedRecords.Count, Is.EqualTo(1));
+            Assert.That(_resourceSpentRecords.Count, Is.EqualTo(1));
+
+            Assert.That(gameManager.SaveRunSnapshot(), Is.True);
+            Assert.That(gameManager.TryRestoreRunFromCheckpoint(), Is.True);
+            for (int frame = 0; frame < 5; frame++)
+                yield return null;
+            Assert.That(_wallRepairedRecords.Count, Is.EqualTo(1),
+                "Exact Continue kabul edilmis Wall repair transaction'ini tekrar yaymamali.");
+        }
+
         private CouncilEventCatalogSO CreateTelemetryCouncilCatalog()
         {
             CouncilEffectAtomSO gain =
@@ -820,6 +927,11 @@ namespace DeadWalls.Tests
                 _councilResolvedRecords.Add(record);
             else if (record.EventName == GameplayTelemetry.AbilityCastEventName)
                 _abilityCastRecords.Add(record);
+            else if (record.EventName == GameplayTelemetry.WallRepairedEventName)
+            {
+                _wallRepairedRecords.Add(record);
+                _purchaseEventOrder.Add(record.EventName);
+            }
         }
     }
 }
