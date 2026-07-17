@@ -663,6 +663,41 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void TryLoad_Version11Snapshot_StartsNewAbilitiesReady()
+        {
+            string path = Path.Combine(Application.persistentDataPath, "run_save.json");
+            byte[] original = File.Exists(path) ? File.ReadAllBytes(path) : null;
+            var legacy = new RunSaveState
+            {
+                Version = 11,
+                RunId = "run_v11_ability_migration_" + Guid.NewGuid().ToString("N"),
+                FireballCooldownRemaining = 12.5f,
+                RallyCooldownRemaining = 31.5f,
+                EmergencyRepairCooldownRemaining = 74.25f
+            };
+
+            try
+            {
+                File.WriteAllText(path, JsonUtility.ToJson(legacy));
+
+                RunSaveState restored = RunPersistence.TryLoad();
+
+                Assert.That(restored, Is.Not.Null);
+                Assert.That(restored.Version, Is.EqualTo(RunSaveState.CurrentVersion));
+                Assert.That(restored.FireballCooldownRemaining, Is.EqualTo(12.5f));
+                Assert.That(restored.RallyCooldownRemaining, Is.Zero);
+                Assert.That(restored.EmergencyRepairCooldownRemaining, Is.Zero);
+            }
+            finally
+            {
+                if (original != null)
+                    File.WriteAllBytes(path, original);
+                else if (File.Exists(path))
+                    File.Delete(path);
+            }
+        }
+
+        [Test]
         public void TryLoad_Version12Snapshot_InitializesMetaEssenceRemainderToZero()
         {
             string path = Path.Combine(Application.persistentDataPath, "run_save.json");

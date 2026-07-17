@@ -1,9 +1,47 @@
+using System.Linq;
 using NUnit.Framework;
+using UnityEditor;
 
 namespace DeadWalls.Tests
 {
     public class ActiveAbilityRulesTests
     {
+        [Test]
+        public void AbilityContract_ContentAssetsOwnUnlockAndTuningInputs()
+        {
+            DifficultyProfileSO profile = AssetDatabase.LoadAssetAtPath<DifficultyProfileSO>(
+                "Assets/ScriptableObject/MobileCastle/Difficulty/DefaultDifficulty.asset");
+            TechNodeDefinitionSO unlock = AssetDatabase.LoadAssetAtPath<TechNodeDefinitionSO>(
+                "Assets/ScriptableObject/MobileCastle/TechTree/ArcaneTower.asset");
+            TechNodeDefinitionSO damage = AssetDatabase.LoadAssetAtPath<TechNodeDefinitionSO>(
+                "Assets/ScriptableObject/MobileCastle/TechTree/SearingFlames.asset");
+            TechNodeDefinitionSO radius = AssetDatabase.LoadAssetAtPath<TechNodeDefinitionSO>(
+                "Assets/ScriptableObject/MobileCastle/TechTree/GreaterBlast.asset");
+            TechNodeDefinitionSO cooldown = AssetDatabase.LoadAssetAtPath<TechNodeDefinitionSO>(
+                "Assets/ScriptableObject/MobileCastle/TechTree/ArcaneFocus.asset");
+
+            Assert.That(profile, Is.Not.Null);
+            Assert.That(unlock, Is.Not.Null);
+            Assert.That(damage, Is.Not.Null);
+            Assert.That(radius, Is.Not.Null);
+            Assert.That(cooldown, Is.Not.Null);
+            Assert.That(profile.RallyCooldown, Is.EqualTo(60f));
+            Assert.That(profile.EmergencyRepairHealPercent, Is.EqualTo(0.20f));
+            Assert.That(profile.EmergencyRepairCooldown, Is.EqualTo(120f));
+
+            Assert.That(unlock.Effects.Single().Type,
+                Is.EqualTo(TechNodeEffectType.UnlockSpellcasting));
+            Assert.That(damage.Effects.Single().Type,
+                Is.EqualTo(TechNodeEffectType.ModifySpellDamagePercent));
+            Assert.That(damage.Effects.Single().Value, Is.EqualTo(0.20f));
+            Assert.That(radius.Effects.Single().Type,
+                Is.EqualTo(TechNodeEffectType.AddSpellRadius));
+            Assert.That(radius.Effects.Single().Value, Is.EqualTo(0.40f));
+            Assert.That(cooldown.Effects.Single().Type,
+                Is.EqualTo(TechNodeEffectType.ReduceSpellCooldownPercent));
+            Assert.That(cooldown.Effects.Single().Value, Is.EqualTo(0.10f));
+        }
+
         [Test]
         public void Rally_IsGuardedOnlyByUnlockCooldownActiveStateAndGameState()
         {

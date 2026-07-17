@@ -158,7 +158,8 @@ namespace DeadWalls
         public bool HasActiveCouncilEvent;
         public ComposedCouncilEvent ActiveCouncilEvent;
 
-        // Run ability / prep state
+        // Run ability / prep state. Unlock ve resolved tuning multiplier'lari burada
+        // kopyalanmaz; TechNodeLevels + exact HeartGraph restore'u bunlari yeniden kurar.
         public float FireballCooldownRemaining;
         public bool FortifyActive;
         public float FortifyDamageMultiplier;

@@ -80,6 +80,32 @@ namespace DeadWalls.Tests
                 typeof(MobileCastleCombatConfig), typeof(MobilePopulationAllocation)).GetSingletonEntity();
             Entity wallEntity = entityManager.CreateEntityQuery(typeof(WallSegment)).GetSingletonEntity();
 
+            var abilityPurchaseResources = entityManager.GetComponentData<ResourceData>(resourceEntity);
+            abilityPurchaseResources.Wood = 10000;
+            abilityPurchaseResources.Stone = 10000;
+            abilityPurchaseResources.Iron = 10000;
+            abilityPurchaseResources.Food = 10000;
+            entityManager.SetComponentData(resourceEntity, abilityPurchaseResources);
+
+            float baseFireballDamage = gameManager.FireballDamage;
+            float baseFireballRadius = gameManager.FireballRadius;
+            float baseFireballCooldown = gameManager.FireballCooldownDuration;
+            Assert.That(gameManager.FireballUnlocked, Is.False);
+            Assert.That(gameManager.TryBuyTechNode("arcane_tower"), Is.True);
+            Assert.That(gameManager.TryBuyTechNode("fire_power"), Is.True);
+            Assert.That(gameManager.TryBuyTechNode("fire_radius"), Is.True);
+            Assert.That(gameManager.TryBuyTechNode("fire_cooldown"), Is.True);
+            Assert.That(gameManager.FireballUnlocked, Is.True);
+            Assert.That(gameManager.FireballDamage,
+                Is.EqualTo(baseFireballDamage * 1.20f).Within(0.001f));
+            Assert.That(gameManager.FireballRadius,
+                Is.EqualTo(baseFireballRadius + 0.40f).Within(0.001f));
+            Assert.That(gameManager.FireballCooldownDuration,
+                Is.EqualTo(baseFireballCooldown * 0.90f).Within(0.001f));
+            float savedFireballDamage = gameManager.FireballDamage;
+            float savedFireballRadius = gameManager.FireballRadius;
+            float savedFireballCooldownDuration = gameManager.FireballCooldownDuration;
+
             var cycle = entityManager.GetComponentData<ContinuousSiegeCycleData>(cycleEntity);
             cycle.CycleIndex = 9;
             cycle.Phase = SiegeCyclePhase.Night;
@@ -132,6 +158,8 @@ namespace DeadWalls.Tests
                 "Night normal repair kapali kalmali ve Stone harcamamali.");
             Assert.That(gameManager.TryUseRally(), Is.True);
             Assert.That(gameManager.TryUseEmergencyRepair(), Is.True);
+            Assert.That(gameManager.TryCastFireball(new Vector2(500f, 500f)), Is.True);
+            float savedFireballCooldown = gameManager.FireballCooldownRemaining;
             float savedRallyCooldown = gameManager.RallyCooldownRemaining;
             float savedEmergencyCooldown = gameManager.EmergencyRepairCooldownRemaining;
             float savedWallHp = entityManager.GetComponentData<WallSegment>(wallEntity).CurrentHP;
@@ -206,6 +234,15 @@ namespace DeadWalls.Tests
             Assert.That(restoredAllocation.LastObservedPopulation, Is.EqualTo(58));
             Assert.That(restoredAllocation.LastPopulationGrowthCycle, Is.EqualTo(10));
             Assert.That(restoredPrep.RallyTimer, Is.GreaterThan(0f));
+            Assert.That(gameManager.FireballUnlocked, Is.True);
+            Assert.That(gameManager.FireballDamage,
+                Is.EqualTo(savedFireballDamage).Within(0.001f));
+            Assert.That(gameManager.FireballRadius,
+                Is.EqualTo(savedFireballRadius).Within(0.001f));
+            Assert.That(gameManager.FireballCooldownDuration,
+                Is.EqualTo(savedFireballCooldownDuration).Within(0.001f));
+            Assert.That(gameManager.FireballCooldownRemaining,
+                Is.EqualTo(savedFireballCooldown).Within(0.05f));
             Assert.That(gameManager.RallyCooldownRemaining, Is.EqualTo(savedRallyCooldown).Within(0.05f));
             Assert.That(gameManager.EmergencyRepairCooldownRemaining,
                 Is.EqualTo(savedEmergencyCooldown).Within(0.05f));

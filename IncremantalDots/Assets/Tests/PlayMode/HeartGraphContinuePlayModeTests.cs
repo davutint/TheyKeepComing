@@ -90,6 +90,8 @@ namespace DeadWalls.Tests
             Assert.That(gameManager.IsHeartRuntimeReady, Is.True);
             Assert.That(gameManager.IsArcherTypeUnlocked(ArcherType.Rapid), Is.True,
                 "Saved Rapid unlock behavior effect replay edilmedi.");
+            Assert.That(gameManager.FireballUnlocked, Is.True,
+                "Saved Fireball unlock behavior effect replay edilmedi.");
             Assert.That(gameManager.TryBuildHeartPresentation(
                 out HeartGraphPresentation presentation,
                 out IReadOnlyList<string> errors), Is.True, string.Join(" | ", errors));
@@ -98,6 +100,9 @@ namespace DeadWalls.Tests
                 Is.EqualTo(1));
             Assert.That(
                 presentation.Nodes.Single(node => node.ExactNodeId == "wall_access").Level,
+                Is.EqualTo(1));
+            Assert.That(
+                presentation.Nodes.Single(node => node.ExactNodeId == "fireball_unlock").Level,
                 Is.EqualTo(1));
 
             Assert.That(gameManager.SaveRunSnapshot(), Is.True);
@@ -197,7 +202,7 @@ namespace DeadWalls.Tests
             AddNode(graph, "production_sink", HeartNodeBranch.Production, 1,
                 HeartNodeVisibility.Revealed, 0);
             AddNode(graph, "fireball_unlock", HeartNodeBranch.HeartMagic, 1,
-                HeartNodeVisibility.Revealed, 0);
+                HeartNodeVisibility.Revealed, 1);
             AddNode(graph, "heart_sink", HeartNodeBranch.HeartMagic, 2);
 
             AddEdge(graph, HeartGraphConstants.RootNodeId, "rapid_unlock");

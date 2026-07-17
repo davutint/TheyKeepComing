@@ -14,7 +14,7 @@ iyileştirir.
 - `SpellCastUI`: tek input/presentation sahibidir. `1/2/3` hotkey'leri, üç buton,
   cooldown fill/label ve Fireball world-selection burada birleşir. Pointer UI üstündeyse
   Fireball cast edilmez.
-- `GameManager`: ability transaction'larını, cooldown sayaçlarını, Fireball Heart
+- `GameManager`: ability transaction'larını, cooldown sayaçlarını, Fireball tech + Heart
   modifier'larını ve exact run save/restore'u yönetir.
 - `ActiveAbilityRules`: Rally ve Emergency Repair guard'larının saf otoritesidir;
   kaynak parametresi bilerek içermez.
@@ -22,8 +22,25 @@ iyileştirir.
 - `CastleYardPrepSystem`: Rally timer'ını bütün continuous-cycle fazlarında azaltır.
 - `MobileCastleCombatConfig`: normal repair, Rally ve Emergency Repair runtime tuning'ini
   taşır; `MobileCastleTuningResolver` değerleri `DifficultyProfileSO` kaynağından yazar.
-- `RunPersistence`: güncel v13 şemasında Rally ve Emergency Repair cooldown'larını exact saklar;
-  v11 kayıtları iki ability hazır başlayacak şekilde migrate edilir.
+- `RunPersistence`: güncel v14 şemasında üç ability cooldown'ını ve aktif ability etkilerini
+  exact saklar; v11 kayıtları Rally ve Emergency Repair hazır başlayacak şekilde migrate edilir.
+
+### `ActiveAbilityState` contract'i
+
+Bu isim ayrı bir ECS component veya ikinci runtime state anlamına gelmez. V1 contract'i
+mevcut tek owner zincirinin aşağıdaki birleşimidir:
+
+| Contract alanı | Tek otorite | Save/restore kuralı |
+|---|---|---|
+| Unlock state | `GameManager`: Fireball tech/Heart effect'lerinden türetilir; Rally ve Emergency Repair V1'de daima açıktır | Tech node level'ları ve exact Heart graph saklanır; unlock tekrar uygulanır |
+| Cooldown remaining | `GameManager._fireballCooldownRemaining`, `_rallyCooldownRemaining`, `_emergencyRepairCooldownRemaining` | Üç sayaç `RunSaveState` içinde exact saklanır |
+| Fireball tuning modifier'ları | Tech node level'ları + `HeartEffectPipeline`; `GameManager` resolved damage/radius/cooldown sunar | Ham türetilmiş multiplier saklanmaz; tech/Heart state'inden yeniden kurulur |
+| Rally/Emergency tuning | `DifficultyProfileSO` -> `MobileCastleTuningResolver` -> `MobileCastleCombatConfig` | Content/config tekrar bake/resolve edilir; cooldown remaining ayrı korunur |
+| Aktif Rally etkisi | `CastleYardPrepState.RallyTimer/Duration/FireRateMultiplier` | Aktif değerler exact saklanır |
+
+`SpellCastUI` bu state'in sahibi değildir; yalnız `GameManager` read API'sini görselleştirir
+ve kabul edilen input'u aynı transaction API'lerine yollar. Development test unlock'u
+production tech/Heart state'ini değiştirmeyen transient bir istisnadır.
 
 ## Ability kuralları
 
@@ -31,7 +48,8 @@ iyileştirir.
 
 - `[1]` veya buton targeting modunu açar; geçerli world click projectile yaratır.
 - UI üstündeki click cast sayılmaz.
-- Damage, radius ve cooldown değerleri Castle Heart effect'lerinden okunur.
+- Damage, radius ve cooldown değerleri tech aggregate'i ile Castle Heart effect'lerinin
+  çözülmüş birleşiminden okunur.
 - Aktif projectile ve cooldown exact Continue kapsamında korunur.
 
 ### Rally
@@ -80,9 +98,10 @@ barında bulunmaz; legacy prep etkisi ayrı kalır. Arrow Storm V1'e eklenmez.
 
 - `ActiveAbilityRulesTests`: cooldown, phase, Wall ölüm/full-health ve Game Over guard'ları.
 - `MobileCastleTuningResolverTests`: profile tuning'inin runtime config'e aktarımı.
-- `RunPersistenceTests`: v11->v12 cooldown ve v12->v13 Essence remainder migration sözleşmesi.
-- `ExactRunContinuePlayModeTests`: cost-free kullanım, Night normal repair reddi ve
-  Rally/Emergency cooldown + Wall HP exact Continue doğrulaması.
+- `RunPersistenceTests`: v11->v12 cooldown ve sonraki v14'e kadar sıralı migration sözleşmesi.
+- `ExactRunContinuePlayModeTests`: cost-free kullanım, Night normal repair reddi,
+  Fireball tech unlock/modifier rebuild'i, üç cooldown + Rally effect + Wall HP exact
+  Continue doğrulaması.
 - `HudAbilityBarPresentationTests`: tek bottom-center paneli, üç slot geometrisini,
   cooldown overlay contract'ını ve legacy panel yokluğunu kilitler.
 - `FirstRunOnboardingTests` + `WorkerAllocationPlayModeTests`: ilk Night gate'ini, ilk hazir
