@@ -30,6 +30,64 @@ namespace DeadWalls
                                            && _heartEffectPipeline != null
                                            && heartCatalog != null;
         public HeartNodeCatalogSO HeartCatalog => heartCatalog;
+        public HeartGraphRuntimeSettings GetHeartGraphSettingsSnapshot()
+        {
+            return (heartGraphSettings ?? new HeartGraphRuntimeSettings()).Clone();
+        }
+
+        public HeartRuntimeTuningTelemetry GetHeartRuntimeTuningTelemetry()
+        {
+            int revealedNodeCount = 0;
+            int purchasedNodeCount = 0;
+            int lockedNodeCount = 0;
+            List<GeneratedHeartNodeState> nodes = _generatedHeartGraph?.Nodes;
+            if (nodes != null)
+            {
+                for (int i = 0; i < nodes.Count; i++)
+                {
+                    GeneratedHeartNodeState node = nodes[i];
+                    if (node == null)
+                        continue;
+                    if (node.Visibility == HeartNodeVisibility.Revealed)
+                        revealedNodeCount++;
+                    if (node.Level > 0)
+                        purchasedNodeCount++;
+                    if (node.LockState != HeartNodeLockState.Available)
+                        lockedNodeCount++;
+                }
+            }
+
+            GraveEssence essence = TryGetGraveEssence(out _, out GraveEssence currentEssence)
+                ? currentEssence
+                : HeartEssence;
+            double gainPercent = double.IsFinite(_metaEssenceGainPercent)
+                ? Math.Max(0d, _metaEssenceGainPercent)
+                : 0d;
+            double gainAccumulator = double.IsFinite(essence.MetaGainAccumulator)
+                ? Math.Max(0d, essence.MetaGainAccumulator)
+                : 0d;
+            string runtimeError = _heartRuntimeError;
+            if (string.IsNullOrWhiteSpace(runtimeError) && heartCatalog == null)
+                runtimeError = "Production HeartNodeCatalogSO atanmamis.";
+
+            return new HeartRuntimeTuningTelemetry(
+                heartCatalog != null,
+                _heartRuntimeAttempted,
+                IsHeartRuntimeReady,
+                runtimeError,
+                Math.Max(0L, essence.Current),
+                gainPercent,
+                gainAccumulator,
+                _generatedHeartGraph?.GraphVersion ?? 0,
+                _generatedHeartGraph?.CatalogVersion ?? heartCatalog?.CatalogVersion ?? 0,
+                _generatedHeartGraph?.Seed ?? 0u,
+                nodes?.Count ?? 0,
+                _generatedHeartGraph?.Edges?.Count ?? 0,
+                revealedNodeCount,
+                purchasedNodeCount,
+                lockedNodeCount);
+        }
+
         public bool HeartSplitShotEnabled => IsHeartBehaviorEnabled(HeartNodeEffectType.EnableSplitShot);
         public bool HeartBurningGroundEnabled => IsHeartBehaviorEnabled(HeartNodeEffectType.EnableBurningGround);
         public bool HeartSecondBlastEnabled => IsHeartBehaviorEnabled(HeartNodeEffectType.EnableSecondBlast);

@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.3
 > **Son tam kapsam denetimi:** 2026-07-17
 > **Aktif paket:** Post-Package V1 Closure - Contracts, Performance ve Release DoD
-> **Aktif iş:** `DW-V1-TUNING-HEART-SURFACE` - Audit Heart Essence Gain, Node Cost/Growth and Rarity/Depth
-> **İlerleme:** `409 / 442` tracker checkbox'ı tamamlandı - `%92,53`
+> **Aktif iş:** `DW-V1-TUNING-COUNCIL-SURFACE` - Audit Council Fixed Cadence, Effect Bands, Repeat Memory and Decision Timer
+> **İlerleme:** `410 / 442` tracker checkbox'ı tamamlandı - `%92,76`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -995,7 +995,20 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
   asset/cost/drain EditMode `11/11`; live rebase + retrain + finite Arrow PlayMode `5/5` geçti;
   1K refill örneği `1000` rent, `1000` Arrow, `0` pool expansion ve `30,413 ms` main thread verdi;
   Difficulty Tuner açıldı, scene validation `0` issue ve final Console `0 error`.
-- [ ] Heart: Essence gain, node cost/growth, rarity/depth.
+- [x] Heart: Essence gain, node cost/growth, rarity/depth. `Difficulty Tuner > Heart Runtime
+  Contract`, canonical `GameManager`/`HeartNodeDefinitionSO` sahiplerini yeni bir runtime owner
+  kurmadan tek yüzeyde gösterir. Gelecek run graph ayarları doğrudan `heartGraphSettings` üzerinden;
+  catalog varsa rarity, minimum/maximum depth, base Grave Essence cost ve level growth doğrudan
+  gerçek definition asset'lerinde düzenlenir. `+1/+10/Buy Max` preview'u production
+  `HeartPurchasePricing`, seed graph preview'u production `HeartGraphGenerator` kullanır. Live
+  telemetry hidden node kimliği sızdırmadan wallet/meta remainder ile aggregate node/edge/reveal/
+  purchase/lock sayılarını verir. Bu tuning yalnız gelecekte üretilecek graph'ı etkiler; aktif veya
+  Continue ile restore edilen exact graph reroll edilmez. Blueprint Essence drop yönünü tanımlasa
+  da onaylı drop ihtimali/miktarı/cadence'i ve production node catalog'u yoktur; tuner bunları
+  uydurmaz, açık `UNCONFIGURED` owner gate'i olarak gösterir ve legacy tech catalog'a fallback
+  yapmaz. Contract guard EditMode `2/2`, Heart data/generator/purchase EditMode `36/36`, exact
+  Continue PlayMode `1/1` geçti; Difficulty Tuner açıldı, scene validation `0` issue ve final
+  Console `0 error / 0 warning`.
 - [ ] Council: fixed cadence, effect bands, repeat memory, decision timer.
 - [ ] Meta: reward weights, upgrade costs/effects.
 
@@ -1278,3 +1291,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-17 | `DW-V1-PERF-ARROW-REFILL-1K` measured pooled restart after finite-ammo refill | Mevcut `GameManager.TryBuyArrowRefill`, `ArrowSupply`, `ArcherShootSystem` ve projectile pool zinciri değiştirilmeden tek benchmarkta birleştirildi. 1.000 hazır Basic Archer stok `0` iken ateş etmiyor; 10 paketlik gerçek transaction `1.000 Arrow` için `250 Wood` harcıyor. Takip eden tek simulation tick'i tam `1.000` gameplay projectile rent ediyor, tam `1.000` Arrow tüketiyor ve prewarm pool'u genişletmiyor. Main-thread `<50 ms` ve wall-frame `<100 ms` Editor guard bütçeleri otomatik regresyona eklendi. Whole-frame GC sample test runner dahil olduğundan izole Player allocation kabulü sayılmıyor | Unity script validation `0 error / 0 warning`; targeted benchmark `1/1` ve full ArrowAmmo PlayMode `3/3`; iki temiz sample: refill `0,010-0,600 ms`, restart main `22,210-23,158 ms`, wall `24,327-50,327 ms`, whole-frame GC `29.622-30.094 B`, rent `1.000`, pool expansion `0`; bir ara koşu test başlamadan init timeout verdi, MCP recovery sonrası gerçek testler geçti; `NewGameScene` validation `0` issue; final Console `0 error`; tracker `401/442` |
 | 2026-07-17 | `DW-V1-PERF-CONTINUE-10K-1K` canonical 10K horde + 1K archer Continue rebuild | Önceki direct-ECS stress archer kurulumu save kanıtı olmadığı için benchmark, üretim `GameManager.RestoreArcherCountsWithinCapacity` owner'ıyla canonical 1.000 Basic Archer kuracak biçimde kapatıldı. Population/allocation/bed state'i coherent exact-run değerlerine eşitlendi; v14 save payload'ı 1.000 Basic Archer, formation version `1`, 10.000 aggregate enemy rebuild ve backlog `777` taşıdı. Bütün okçular her tur öncesi silinerek iki bağımsız Continue yapıldı; iki turda da 10K enemy + 1K canonical archer yeniden kuruldu ve enemy/archer fingerprint'leri aynı kaldı. Runtime gameplay kodu değiştirilmedi | Unity compile/Console `0 error`; targeted canonical Continue PlayMode `1/1`; `378` rebuild bucket, snapshot `369.097 B`, save `47,05 ms`, restore `417,11/436,89 ms`, enemy/archer deterministic `True/True`, frame average/P95 `30,49/52,06 ms`; ilk deneme test başlamadan init timeout verdi, MCP recovery sonrası gerçek test geçti; tracker `402/442` |
 | 2026-07-17 | `DW-V1-PERF-PLAYER-ALLOC-SPIKE` isolated combined-load Player ownership | Explicit profiler testi production pool ve canonical archer restore owner'ıyla 10.000 enemy + 1.000 Basic Archer kuracak, finite Arrow/projectile pipeline'ını çalıştıracak ve allocation callstack açık 120-frame raw yazacak biçimde genişletildi. Editor-only runner exact testi StandaloneWindows64 Development Player'a gönderiyor; analyzer insan-okur TXT ve makine-okur JSON üretiyor, bütün active DeadWalls marker biçimlerini ve ECS system/job marker'larını tanıyor. Test Framework build failure callback'i run metadata/status ile fail-closed bağlandı. Strict Player build'i bozan unused third-party prefab'daki tek missing legacy Pixel Perfect component temizlendi; corrupt Entities artifact SubScene reimport ile yeniden üretildi | Player-targeted test `1/1`; capture enemy/archer/projectile `10.000/1.000/6`, raw `73.765.057 B`, analyzer `121` frame; CPU average/P95/max `10,593/18,694/33,234 ms`; root GC average/max `10.437/12.020 B`; proje user-code GC `58.290 B / 481 B/frame`; ECS GC `0 B`, sync-point yok; `DamageApplySystem` avg/max `1,892/4,863 ms`, `ArcherShootSystem` max `17,444 ms`; script validation `0 error`, Unity compile `0 error`; tracker `403/442` |
+| 2026-07-17 | `DW-V1-TUNING-HEART-SURFACE` canonical Heart tuning contract | Yeni/paralel bir Heart owner kurulmadı. `Difficulty Tuner > Heart Runtime Contract`, `GameManager` graph settings/wallet runtime owner'ını ve catalog varsa gerçek `HeartNodeDefinitionSO` rarity/depth/cost/growth definition'larını doğrudan düzenlenen tek yüzeyde birleştirdi. Fiyat ve graph preview'ları production `HeartPurchasePricing` ile `HeartGraphGenerator` kullanır; live telemetry hidden node kimliklerini açmadan aggregate state sunar. Değişiklikler yalnız gelecekte üretilecek graph'a uygulanır, aktif veya Continue exact graph'i reroll edilmez. Onaylı Essence drop sayıları ve production catalog bulunmadığından değer uydurulmadı; açık `UNCONFIGURED` owner gate'i ve fail-closed catalog sınırı korundu | Heart contract guard EditMode `2/2`; Heart data/generator/purchase EditMode `36/36`; exact graph Continue PlayMode `1/1`; Difficulty Tuner gerçek editor window olarak açıldı; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `410/442` |

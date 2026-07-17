@@ -25,6 +25,11 @@ tek profil iterasyonuyla, KOD YAZMADAN tasindi).
      `ArcherShootSystem` basarili pool rent'inden sonra sabit `1 Arrow` harcar.
    - ARCHER DEFINITION CONTRACT: combat, buy/retrain base maliyeti, population cost ve
      target-type growth tuning'i profile'a kopyalanmaz; aktif `ArcherDefinitionSO` asset'lerinde kalir.
+   - HEART RUNTIME CONTRACT: graph depth/cross-link/Keystone/rarity agirliklari scene'deki canonical
+     `GameManager.heartGraphSettings` sahibinde; node cost/growth/rarity/depth ise production
+     `HeartNodeDefinitionSO` asset'lerinde kalir. DifficultyProfile'a kopyalanmaz. Essence drop
+     miktari/cadence'i Blueprint'te kesinlesmedigi ve production grant caller'i olmadigi icin panel
+     bunu acik owner gate olarak gosterir; sahte per-kill deger uretmez.
    - M-C HAZIRLIK ISKELETI (sistem henuz okumuyor, veri hazir): `SpawnTable`
      (gun -> dusman tipi agirliklari) + `SpecialNights` (her N gunde ozel gece).
 2. **ECS tasima — `DifficultyDaySample` buffer'i:** AnimationCurve Burst'e giremez;
@@ -59,6 +64,14 @@ tek profil iterasyonuyla, KOD YAZMADAN tasindi).
      Play Mode telemetry effective ECS stat/count/DPS, teorik shot ceiling, olculen pool-rent
      Arrow/s, stok/capacity/verim ve yatirim fiyatlarini gosterir. Live Apply mevcut archer state'ini
      koruyup combat statlarini ayni Heart/Tech/Meta aggregate'leriyle yeni baseline'a yeniden fold eder.
+   - **Heart Runtime Contract** foldout'u canonical `GameManager`/catalog owner'ini, run-only wallet
+     ve grant/spend kapilarini tek yerde gosterir. Graph settings dogrudan future-run generator
+     girdilerini; production catalog varsa definition cost/growth/rarity/depth alanlarini dogrudan
+     duzenler. +1/+10/Buy Max preview'u `HeartPurchasePricing`, seed preview'u ise gercek
+     `HeartGraphGenerator` + validator kullanir. Aktif exact graph reroll edilmez. Play Mode telemetry
+     hidden node Id'lerini acmadan bakiye/meta remainder, graph/catalog version, seed ve aggregate
+     node/edge/reveal/purchase/lock sayilarini gosterir. Catalog null veya Essence drop source yoksa
+     legacy fallback yerine acik owner gate verir.
    - **Apply**: subscene authoring'e bagla (bake yolu) + play moddaysa CANLI uygula
      (config alanlari SetComponentData + buffer yeniden ornekleme).
    - **Run Bot**: profili canli uygular, RestartGame + Long Run Simulator'u baslatir
@@ -96,6 +109,9 @@ tek profil iterasyonuyla, KOD YAZMADAN tasindi).
   sahibinde kalir.
 - Archer definition asset'leri DifficultyProfile'in alt kopyasi degildir. Aktif catalog owner'i
   belirler; Tuner bu asset'leri dogrudan duzenler. Apply cost state'i veya count'u sifirlamaz.
+- Heart graph settings ve definition asset'leri de DifficultyProfile alt kopyasi degildir. Settings
+  degisikligi yalniz sonraki yeni run generation'ina gider; aktif/Continue exact graph asla reroll
+  edilmez. Production Heart catalog ve Essence drop sayilari owner onayi olmadan olusturulmaz.
 - Canli uygulama restart sonrasi config'i bake degerlerine dondurur; Tuner'in Run Bot'u
   bu yuzden restart'tan SONRA da ApplyProfileLive cagirir.
 - Fiyat alanlari sifir/negatif veya gecersiz girilirse resolver int-guvenli minimumlara,

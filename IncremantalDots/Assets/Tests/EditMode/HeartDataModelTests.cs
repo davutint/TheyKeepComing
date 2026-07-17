@@ -159,6 +159,60 @@ namespace DeadWalls.Tests
             Assert.That(typeof(MetaProgressState).GetField("GraveEssence"), Is.Null);
         }
 
+        [Test]
+        public void GraphRuntimeSettings_CloneAndRequestPreserveEveryTuningField()
+        {
+            HeartNodeCatalogSO catalog = ScriptableObject.CreateInstance<HeartNodeCatalogSO>();
+            try
+            {
+                var settings = new HeartGraphRuntimeSettings
+                {
+                    MinimumBranchDepth = 3,
+                    MaximumBranchDepth = 7,
+                    MaximumCrossLinks = 4,
+                    KeystonePairCount = 2,
+                    MaximumAttempts = 11,
+                    StandardRarityWeight = 9,
+                    RareRarityWeight = 2
+                };
+
+                HeartGraphRuntimeSettings clone = settings.Clone();
+                HeartGraphGenerationRequest request = clone.CreateRequest(catalog, 12345u);
+                clone.MinimumBranchDepth = 99;
+
+                Assert.That(clone, Is.Not.SameAs(settings));
+                Assert.That(settings.MinimumBranchDepth, Is.EqualTo(3));
+                Assert.That(request.Catalog, Is.SameAs(catalog));
+                Assert.That(request.Seed, Is.EqualTo(12345u));
+                Assert.That(request.MinimumBranchDepth, Is.EqualTo(3));
+                Assert.That(request.MaximumBranchDepth, Is.EqualTo(7));
+                Assert.That(request.MaximumCrossLinks, Is.EqualTo(4));
+                Assert.That(request.KeystonePairCount, Is.EqualTo(2));
+                Assert.That(request.MaximumAttempts, Is.EqualTo(11));
+                Assert.That(request.StandardRarityWeight, Is.EqualTo(9));
+                Assert.That(request.RareRarityWeight, Is.EqualTo(2));
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(catalog);
+            }
+        }
+
+        [Test]
+        public void RuntimeTuningTelemetry_IsAggregateAndDoesNotExposeGeneratedGraphOrNodeIds()
+        {
+            Type type = typeof(HeartRuntimeTuningTelemetry);
+
+            Assert.That(type.GetField("Graph", BindingFlags.Instance | BindingFlags.Public), Is.Null);
+            Assert.That(type.GetField("Nodes", BindingFlags.Instance | BindingFlags.Public), Is.Null);
+            Assert.That(type.GetField("NodeIds", BindingFlags.Instance | BindingFlags.Public), Is.Null);
+            foreach (FieldInfo field in type.GetFields(BindingFlags.Instance | BindingFlags.Public))
+            {
+                Assert.That(field.FieldType, Is.Not.EqualTo(typeof(GeneratedRunGraph)));
+                Assert.That(field.FieldType, Is.Not.EqualTo(typeof(GeneratedHeartNodeState)));
+            }
+        }
+
         private static void AssertNoUnityObjectFields(Type type)
         {
             foreach (FieldInfo field in type.GetFields(BindingFlags.Instance | BindingFlags.Public))

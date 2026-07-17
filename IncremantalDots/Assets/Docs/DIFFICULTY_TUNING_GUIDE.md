@@ -33,6 +33,10 @@ Deger adi ezberleme — asagidaki tablodan hissini bul, hangi ayara dokunacagini
 | "Yeni okcu veya retrain cok ucuz / pahali" | Ilgili definition **BuyCost / RetrainCost / GrowthInterval / GrowthExponent** | Base maliyeti veya hedef-tur sayisiyla buyume egrisini ayarla |
 | "Ok cok cabuk bitiyor" | Archer Runtime Contract > **Arrow kapasite / Arrow per Wood** | Kapasiteyi, paket verimini veya efficiency kazancini ARTIR |
 | "Ok ekonomisi anlamsiz ucuz" | Archer Runtime Contract > **Arrow CAP/EFF Wood+Iron base cost** | Ilgili base maliyetleri ARTIR; refill unit price satin alma sayisiyla buyumez |
+| "Heart node'lari cok ucuz / pahali" | Heart Runtime Contract > ilgili definition **Base Grave Essence cost / growth** | Production catalog onaylandiktan sonra base veya linear level growth'u degistir |
+| "Heart graph cok kisa / uzun" | Heart Runtime Contract > **Minimum / Maximum branch depth** | Yalniz yeni run graph'larini etkiler; aktif run reroll edilmez |
+| "Rare node cok sik / seyrek" | Heart Runtime Contract > **Standard / Rare rarity weight** | Agirlik oranini degistir; generator preview'u valid graph'i ayni ekranda dogrular |
+| "Essence cok yavas / hizli geliyor" | Heart Runtime Contract > **Production drop source** | Su an owner gate acik; onayli drop miktari/cadence'i olmadan deger uydurma |
 
 ---
 
@@ -114,6 +118,20 @@ carpaninda buyur. Refill birim fiyati kac kez alindigina gore buyumez; Rapid gib
 hizli okcular talebi dogal olarak artirir. Her basarili projectile pool rent'i tam `1 Arrow`
 harcar; hedef/pool yoksa veya stok `0` ise harcama olmaz. Bu deger V1'de read-only'dir.
 
+### Castle Heart Runtime Contract
+
+Graph uzunlugu, cross-link/Keystone adedi ve Standard/Rare agirliklari canonical scene
+`GameManager.heartGraphSettings` alanindadir. Bunlar yalniz yeni bir run baslarken uretilen graph'i
+etkiler; aktif veya Continue ile geri gelen exact graph'i degistirmez. Production catalog atandiginda
+her `HeartNodeDefinitionSO` icin base Grave Essence maliyeti, linear level growth, rarity ve izinli
+depth araligi ayni panelde dogrudan asset owner'inda duzenlenir. Preview, oyunla ayni
+`HeartPurchasePricing` ve `HeartGraphGenerator` hesaplarini kullanir.
+
+Su an production Heart catalog ve kill/drop gain owner'i owner onayi bekliyor. `GrantGraveEssence`
+pozitif kazanc transaction kapisidir ama production kodunda onu cagiran kill/drop kaynagi yoktur.
+Panel bu durumu `UNCONFIGURED` olarak gosterir; legacy Tech Tree fiyatini veya rastgele `1 Essence / kill`
+varsayimini otomatik uretmez. Catalog ve drop sayilari onaylandiginda bu ayni yuzeyden tune edilir.
+
 ### M-C Hazirlik (SpawnTable / SpecialNights)
 SIMDILIK BOS BIRAK — zombi cesitliligi milestone'unda (M-C) sistem bunlari okumaya
 baslayacak ("kosucular gun 5'te acilsin", "her 5. gece kanli ay" buradan ayarlanacak).
@@ -169,6 +187,15 @@ Play Mode telemetry, ECS'deki effective okcu stat/count/DPS'ini, teorik max shot
 gercek pool rent'lerinden olculen Arrow/s drain'i, stok/capacity/verim/yatirim fiyatlarini canli
 gosterir. Apply, mevcut count/population/formation/fire timer state'ini koruyup aktif okcularin
 combat statlarini ayni Heart/Tech/Meta katmanlariyla yeni definition baseline'ina yeniden fold eder.
+
+### Heart Runtime Contract paneli
+
+Panel canonical `GameManager`, production Heart catalog ve run-only Grave Essence transaction
+sinirini birlikte gosterir. Future-run graph alanlari scene owner'inda; node cost/growth/rarity/depth
+alanlari definition asset'lerinde kalir. Cost preview +1/+10/Buy Max icin gercek arithmetic-series
+owner'ini, graph preview ise secilen seed ile production generator/validator'i kullanir. Play Mode
+telemetry hidden node kimliklerini gostermeden bakiye/meta remainder, version/seed ve aggregate
+node/edge/reveal/purchase/lock sayilarini verir. Catalog veya drop owner'i eksikse acik hata verir.
 
 ## 5. Olcum botu nasil yorumlanir?
 

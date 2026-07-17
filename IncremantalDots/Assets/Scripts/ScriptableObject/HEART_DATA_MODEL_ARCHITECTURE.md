@@ -53,10 +53,13 @@ Runtime transaction siniri `GameManager` uzerindedir:
 - `TrySpendGraveEssenceAtHeart(cost)`: Heart satin alimlarinin tek harcama kapisi.
 - `GraveEssenceAmount`: guncel bakiye.
 
-Bu paket Essence drop kaynagi veya oran uydurmaz. Yeni `HeartPurchaseService`,
-`IHeartGraveEssenceWallet` uzerinden yalniz Heart harcama kapisini kullanir. Production
-catalog/UI cutover'i yapilmadigi icin mevcut `TryBuyTechNode` halen yalniz legacy
-catalog'un ResourceCost owner'idir.
+Bu paket Essence drop kaynagi veya oran uydurmaz. Blueprint `Essence drop` ve ilk kill/Essence
+yonunu tanimlar ancak miktar/cadence kesinlestirmez; production kodunda `GrantGraveEssence`
+cagiran kill/drop owner'i halen yoktur. `Difficulty Tuner > Heart Runtime Contract` bunu
+`UNCONFIGURED` owner gate olarak gosterir. `HeartPurchaseService`,
+`IHeartGraveEssenceWallet` uzerinden yalniz Heart harcama kapisini kullanir. Production Heart
+catalog content'i henuz atanmadigi icin mevcut `TryBuyTechNode` yalniz dormant legacy catalog'un
+ResourceCost owner'idir; aktif Heart UI veya tuning yuzeyi bu yolu kullanmaz.
 
 ## Lifecycle ve persistence
 

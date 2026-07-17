@@ -20,6 +20,12 @@ Owner review olmadan su alanlari doldurmayin:
 
 Legacy Wood/Stone/Iron/Food fiyatini otomatik Grave Essence'a cevirmeyin.
 
+Production catalog onaylandiktan sonra node `BaseGraveEssenceCost`, `CostGrowthPerLevel`,
+`Rarity`, `MinimumDepth` ve `MaximumDepth` alanlari `Window > DeadWalls > Difficulty Tuner >
+Heart Runtime Contract` yuzeyinden ayni source asset'lerde duzenlenebilir. Preview production
+pricing/generator owner'larini kullanir; aktif exact run graph'ini reroll etmez. Catalog null ve
+Essence drop source yokken panel acik owner gate verir; fallback content olusturmaz.
+
 ## Effect authoring kurallari
 
 1. Numeric effect'te `Value > 0` ve finite olmali.

@@ -29,6 +29,7 @@ namespace DeadWalls
         private bool _foldEconomyPrices = true;
         private bool _foldPopulation = true;
         private bool _foldArchers = true;
+        private bool _foldHeart = true;
         private bool _foldFuture;
         private bool _foldBot = true;
 
@@ -47,6 +48,9 @@ namespace DeadWalls
         private int _arrowPreviewEfficiencyLevel;
         private int _arrowPreviewPackageCount = 1;
         private int _arrowPreviewAvailableWood = 100;
+        private int _heartPreviewSeed = 1;
+        private int _heartPreviewCurrentLevel;
+        private long _heartPreviewAvailableEssence = 1000L;
         private long _lastArrowRentCount = -1L;
         private double _lastArrowRentSampleTime;
         private float _observedArrowDrainPerSecond;
@@ -127,6 +131,7 @@ namespace DeadWalls
             DrawEconomyPriceSection();
             DrawPopulationSection();
             DrawArcherSection();
+            DrawHeartSection();
             DrawFutureSection();
 
             _profileSO.ApplyModifiedProperties();
@@ -633,15 +638,340 @@ namespace DeadWalls
             }
         }
 
+        private void DrawHeartSection()
+        {
+            _foldHeart = DrawSectionHeader(_foldHeart,
+                "Heart Runtime Contract", "Essence gate + node cost/growth + rarity/depth");
+            if (!_foldHeart)
+                return;
+
+            using (new EditorGUILayout.VerticalScope("box"))
+            {
+                GameManager gameManager = ResolveGameManagerOwner();
+                if (gameManager == null)
+                {
+                    EditorGUILayout.HelpBox(
+                        "Aktif scene'de canonical GameManager Heart owner'i bulunamadi.",
+                        MessageType.Error);
+                    return;
+                }
+
+                using (new EditorGUI.DisabledScope(true))
+                {
+                    EditorGUILayout.ObjectField("Runtime owner", gameManager,
+                        typeof(GameManager), true);
+                    EditorGUILayout.ObjectField("Production node catalog", gameManager.HeartCatalog,
+                        typeof(HeartNodeCatalogSO), false);
+                }
+
+                DrawHeartEssenceGainContract(gameManager);
+                DrawHeartGraphSettingsEditor(gameManager);
+
+                HeartNodeCatalogSO catalog = gameManager.HeartCatalog;
+                if (catalog == null)
+                {
+                    EditorGUILayout.HelpBox(
+                        "OWNER CONTENT GATE: Production HeartNodeCatalogSO atanmamis. Launch node listesi, "
+                        + "base cost/growth, rarity/depth, Keystone ve effect sayilari owner onayi olmadan "
+                        + "uretilmez. Tuner legacy TechTree catalog'una fallback yapmaz.",
+                        MessageType.Error);
+                    DrawLiveHeartTelemetry(gameManager);
+                    return;
+                }
+
+                DrawHeartCatalogTuning(catalog, gameManager.GetHeartGraphSettingsSnapshot());
+                DrawLiveHeartTelemetry(gameManager);
+            }
+        }
+
+        private static void DrawHeartEssenceGainContract(GameManager gameManager)
+        {
+            EditorGUILayout.LabelField("Grave Essence Gain", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Run wallet / spending owner",
+                "GraveEssence ECS + GameManager.TrySpendGraveEssenceAtHeart");
+            EditorGUILayout.LabelField("Positive grant gate",
+                "GameManager.GrantGraveEssence(long)");
+            EditorGUILayout.LabelField("Production drop source", "UNCONFIGURED");
+            EditorGUILayout.HelpBox(
+                "Blueprint Essence drop ve ilk kill/Essence yonunu tanimliyor; fakat drop ihtimali, "
+                + "miktari veya cadence sayisi onayli degil. Runtime'da GrantGraveEssence kullanan "
+                + "production kill/drop owner'i yoktur. Tuner burada sahte bir per-kill deger uretmez.",
+                MessageType.Warning);
+
+            if (!Application.isPlaying)
+                return;
+
+            HeartRuntimeTuningTelemetry telemetry = gameManager.GetHeartRuntimeTuningTelemetry();
+            EditorGUILayout.LabelField("Live Essence / meta gain",
+                $"{telemetry.GraveEssence:N0} / +{telemetry.MetaGainPercent:P2}");
+            EditorGUILayout.LabelField("Exact fractional accumulator",
+                telemetry.MetaGainAccumulator.ToString("0.######"));
+        }
+
+        private static void DrawHeartGraphSettingsEditor(GameManager gameManager)
+        {
+            EditorGUILayout.Space(6);
+            EditorGUILayout.LabelField("Future-Run Graph Generation", EditorStyles.boldLabel);
+            var owner = new SerializedObject(gameManager);
+            owner.Update();
+            SerializedProperty settings = owner.FindProperty("heartGraphSettings");
+            if (settings == null)
+            {
+                EditorGUILayout.HelpBox("heartGraphSettings serialized owner'i bulunamadi.",
+                    MessageType.Error);
+                return;
+            }
+
+            EditorGUI.BeginChangeCheck();
+            DrawRelativeProp(settings, "MinimumBranchDepth", "Minimum branch depth");
+            DrawRelativeProp(settings, "MaximumBranchDepth", "Maximum branch depth");
+            DrawRelativeProp(settings, "MaximumCrossLinks", "Maximum cross-links");
+            DrawRelativeProp(settings, "KeystonePairCount", "Keystone pair count");
+            DrawRelativeProp(settings, "MaximumAttempts", "Deterministic attempts");
+            DrawRelativeProp(settings, "StandardRarityWeight", "Standard rarity weight");
+            DrawRelativeProp(settings, "RareRarityWeight", "Rare rarity weight");
+            bool changed = EditorGUI.EndChangeCheck();
+            owner.ApplyModifiedProperties();
+            if (changed && !Application.isPlaying && gameManager.gameObject.scene.IsValid())
+            {
+                EditorUtility.SetDirty(gameManager);
+                UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(
+                    gameManager.gameObject.scene);
+            }
+
+            EditorGUILayout.HelpBox(
+                "Bu alanlar yalniz yeni bir run graph'i uretilirken okunur. Aktif veya Continue ile "
+                + "restore edilen exact graph reroll edilmez; mevcut node/level/reveal/lock state'i degismez.",
+                MessageType.None);
+        }
+
+        private void DrawHeartCatalogTuning(
+            HeartNodeCatalogSO catalog,
+            HeartGraphRuntimeSettings graphSettings)
+        {
+            EditorGUILayout.Space(6);
+            EditorGUILayout.LabelField("Authored Node Pool", EditorStyles.boldLabel);
+            HeartNodeDefinitionSO[] definitions = catalog.Nodes ?? System.Array.Empty<HeartNodeDefinitionSO>();
+            int standardCount = 0;
+            int rareCount = 0;
+            int repeatableCount = 0;
+            int minimumDepth = int.MaxValue;
+            int maximumDepth = 0;
+            for (int i = 0; i < definitions.Length; i++)
+            {
+                HeartNodeDefinitionSO definition = definitions[i];
+                if (definition == null)
+                    continue;
+                if (definition.Rarity == HeartNodeRarity.Rare)
+                    rareCount++;
+                else
+                    standardCount++;
+                if (definition.IsRepeatable)
+                    repeatableCount++;
+                minimumDepth = Mathf.Min(minimumDepth, definition.MinimumDepth);
+                maximumDepth = Mathf.Max(maximumDepth, definition.MaximumDepth);
+            }
+
+            EditorGUILayout.LabelField("Catalog version / nodes / repeatable",
+                $"v{catalog.CatalogVersion} / {definitions.Length:N0} / {repeatableCount:N0}");
+            EditorGUILayout.LabelField("Standard / Rare definitions",
+                $"{standardCount:N0} / {rareCount:N0}");
+            EditorGUILayout.LabelField("Authored depth envelope",
+                definitions.Length > 0 && minimumDepth != int.MaxValue
+                    ? $"{minimumDepth}..{maximumDepth}"
+                    : "EMPTY");
+
+            _heartPreviewCurrentLevel = Mathf.Max(0,
+                EditorGUILayout.IntField("Cost preview current level", _heartPreviewCurrentLevel));
+            _heartPreviewAvailableEssence = System.Math.Max(0L,
+                EditorGUILayout.LongField("Cost preview available Essence",
+                    _heartPreviewAvailableEssence));
+
+            for (int i = 0; i < definitions.Length; i++)
+            {
+                HeartNodeDefinitionSO definition = definitions[i];
+                if (definition == null)
+                {
+                    EditorGUILayout.HelpBox($"Catalog Nodes[{i}] bos.", MessageType.Error);
+                    continue;
+                }
+                DrawHeartDefinitionEditor(definition);
+            }
+
+            DrawHeartGeneratorPreview(catalog, graphSettings);
+        }
+
+        private void DrawHeartDefinitionEditor(HeartNodeDefinitionSO definition)
+        {
+            using (new EditorGUILayout.VerticalScope("helpbox"))
+            {
+                EditorGUILayout.LabelField(
+                    $"{definition.Title}  [{definition.Branch} / {definition.Type}]",
+                    EditorStyles.boldLabel);
+                using (new EditorGUI.DisabledScope(true))
+                {
+                    EditorGUILayout.ObjectField("Definition owner", definition,
+                        typeof(HeartNodeDefinitionSO), false);
+                    EditorGUILayout.TextField("Stable Id", definition.Id ?? string.Empty);
+                }
+
+                var definitionSO = new SerializedObject(definition);
+                definitionSO.Update();
+                DrawDefinitionProp(definitionSO, "Rarity", "Rarity");
+                DrawDefinitionProp(definitionSO, "MinimumDepth", "Minimum depth");
+                DrawDefinitionProp(definitionSO, "MaximumDepth", "Maximum depth");
+                DrawDefinitionProp(definitionSO, "BaseGraveEssenceCost", "Base Grave Essence cost");
+                DrawDefinitionProp(definitionSO, "CostGrowthPerLevel", "Linear growth per level");
+                definitionSO.ApplyModifiedProperties();
+
+                bool hasOne = HeartPurchasePricing.TryGetLevelCost(
+                    definition, _heartPreviewCurrentLevel, out long oneCost);
+                long tenCost = 0L;
+                bool hasTen = definition.IsRepeatable
+                              && HeartPurchasePricing.TryGetTotalCost(
+                                  definition, _heartPreviewCurrentLevel, 10, out tenCost);
+                int affordableLevels = 0;
+                long affordableCost = 0L;
+                bool hasMax = definition.IsRepeatable
+                              && HeartPurchasePricing.TryGetAffordableLevels(
+                                  definition,
+                                  _heartPreviewCurrentLevel,
+                                  _heartPreviewAvailableEssence,
+                                  out affordableLevels,
+                                  out affordableCost);
+                EditorGUILayout.LabelField("Preview +1 / +10",
+                    $"{FormatEssenceQuote(hasOne, oneCost)} / "
+                    + (definition.IsRepeatable
+                        ? FormatEssenceQuote(hasTen, tenCost)
+                        : "N/A (single purchase)"));
+                EditorGUILayout.LabelField("Preview Buy Max",
+                    definition.IsRepeatable
+                        ? hasMax
+                            ? $"+{affordableLevels:N0} / {affordableCost:N0} GE"
+                            : "NOT AFFORDABLE / INVALID"
+                        : "N/A (single purchase)");
+            }
+        }
+
+        private void DrawHeartGeneratorPreview(
+            HeartNodeCatalogSO catalog,
+            HeartGraphRuntimeSettings settings)
+        {
+            EditorGUILayout.Space(6);
+            EditorGUILayout.LabelField("Deterministic Generator Preview", EditorStyles.boldLabel);
+            _heartPreviewSeed = Mathf.Max(1,
+                EditorGUILayout.IntField("Preview seed", _heartPreviewSeed));
+
+            var catalogErrors = new List<string>();
+            catalog.CollectValidationErrors(catalogErrors);
+            if (catalogErrors.Count > 0)
+            {
+                DrawHeartErrors("Catalog validation failed", catalogErrors);
+                return;
+            }
+
+            bool generated = HeartGraphGenerator.TryGenerate(
+                settings.CreateRequest(catalog, (uint)_heartPreviewSeed),
+                out GeneratedRunGraph graph,
+                out HeartGraphGenerationReport report);
+            if (!generated)
+            {
+                DrawHeartErrors("Graph generation failed", report.Errors);
+                return;
+            }
+
+            int standardCount = 0;
+            int rareCount = 0;
+            int purchasedCount = 0;
+            List<GeneratedHeartNodeState> nodes = graph.Nodes ?? new List<GeneratedHeartNodeState>();
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                GeneratedHeartNodeState node = nodes[i];
+                HeartNodeDefinitionSO definition = node == null ? null : catalog.GetNode(node.NodeId);
+                if (definition == null)
+                    continue;
+                if (definition.Rarity == HeartNodeRarity.Rare)
+                    rareCount++;
+                else
+                    standardCount++;
+                if (node.Level > 0)
+                    purchasedCount++;
+            }
+
+            EditorGUILayout.LabelField("Graph / catalog version",
+                $"v{graph.GraphVersion} / v{graph.CatalogVersion}");
+            EditorGUILayout.LabelField("Nodes / edges / attempts",
+                $"{nodes.Count:N0} / {(graph.Edges?.Count ?? 0):N0} / {report.SuccessfulAttempt:N0}");
+            EditorGUILayout.LabelField("Placed Standard / Rare",
+                $"{standardCount:N0} / {rareCount:N0}");
+            EditorGUILayout.LabelField("Initial purchased nodes", purchasedCount.ToString("N0"));
+            EditorGUILayout.HelpBox(
+                "Preview production generator ve validator'i aynen kullanir; aktif run state'ine yazmaz.",
+                MessageType.Info);
+        }
+
+        private static void DrawLiveHeartTelemetry(GameManager gameManager)
+        {
+            if (!Application.isPlaying)
+                return;
+
+            HeartRuntimeTuningTelemetry telemetry = gameManager.GetHeartRuntimeTuningTelemetry();
+            EditorGUILayout.Space(6);
+            EditorGUILayout.LabelField("Live Heart Aggregate", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Catalog / attempted / ready",
+                $"{telemetry.HasCatalog} / {telemetry.RuntimeAttempted} / {telemetry.RuntimeReady}");
+            EditorGUILayout.LabelField("Graph v / catalog v / seed",
+                $"{telemetry.GraphVersion} / {telemetry.CatalogVersion} / {telemetry.Seed}");
+            EditorGUILayout.LabelField("Nodes / edges / revealed",
+                $"{telemetry.NodeCount:N0} / {telemetry.EdgeCount:N0} / {telemetry.RevealedNodeCount:N0}");
+            EditorGUILayout.LabelField("Purchased / locked",
+                $"{telemetry.PurchasedNodeCount:N0} / {telemetry.LockedNodeCount:N0}");
+            if (!string.IsNullOrWhiteSpace(telemetry.RuntimeError))
+                EditorGUILayout.HelpBox(telemetry.RuntimeError, MessageType.Error);
+        }
+
+        private static void DrawRelativeProp(
+            SerializedProperty owner,
+            string propertyName,
+            string label)
+        {
+            SerializedProperty property = owner.FindPropertyRelative(propertyName);
+            if (property != null)
+                EditorGUILayout.PropertyField(property, new GUIContent(label));
+        }
+
+        private static string FormatEssenceQuote(bool valid, long value)
+        {
+            return valid ? $"{System.Math.Max(0L, value):N0} GE" : "INVALID / OVERFLOW";
+        }
+
+        private static void DrawHeartErrors(string heading, IReadOnlyList<string> errors)
+        {
+            int count = errors?.Count ?? 0;
+            var message = heading + ".";
+            int visibleCount = Mathf.Min(count, 4);
+            for (int i = 0; i < visibleCount; i++)
+                message += "\n- " + errors[i];
+            if (count > visibleCount)
+                message += $"\n- ... {count - visibleCount} more";
+            EditorGUILayout.HelpBox(message, MessageType.Error);
+        }
+
         private ArcherRecruitmentCatalogSO ResolveArcherCatalog()
         {
-            GameManager gameManager = GameManager.Instance;
-            if (gameManager == null)
-                gameManager = FindFirstObjectByType<GameManager>(FindObjectsInactive.Include);
+            GameManager gameManager = ResolveGameManagerOwner();
 
             return gameManager != null && gameManager.ArcherCatalog != null
                 ? gameManager.ArcherCatalog
                 : _fallbackArcherCatalog;
+        }
+
+        private static GameManager ResolveGameManagerOwner()
+        {
+            GameManager gameManager = GameManager.Instance;
+            return gameManager != null
+                ? gameManager
+                : FindFirstObjectByType<GameManager>(FindObjectsInactive.Include);
         }
 
         private void DrawArcherDefinitionEditor(ArcherDefinitionSO definition)

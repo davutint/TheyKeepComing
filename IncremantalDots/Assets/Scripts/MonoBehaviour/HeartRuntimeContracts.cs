@@ -29,6 +29,77 @@ namespace DeadWalls
                 RareRarityWeight = RareRarityWeight
             };
         }
+
+        public HeartGraphRuntimeSettings Clone()
+        {
+            return new HeartGraphRuntimeSettings
+            {
+                MinimumBranchDepth = MinimumBranchDepth,
+                MaximumBranchDepth = MaximumBranchDepth,
+                MaximumCrossLinks = MaximumCrossLinks,
+                KeystonePairCount = KeystonePairCount,
+                MaximumAttempts = MaximumAttempts,
+                StandardRarityWeight = StandardRarityWeight,
+                RareRarityWeight = RareRarityWeight
+            };
+        }
+    }
+
+    /// <summary>
+    /// Difficulty Tuner'in internal/hidden graph kimliklerini acmadan okuyabildigi aggregate Heart state'i.
+    /// Bu veri presentation telemetrisidir; graph veya purchase state owner'i degildir.
+    /// </summary>
+    public readonly struct HeartRuntimeTuningTelemetry
+    {
+        public readonly bool HasCatalog;
+        public readonly bool RuntimeAttempted;
+        public readonly bool RuntimeReady;
+        public readonly string RuntimeError;
+        public readonly long GraveEssence;
+        public readonly double MetaGainPercent;
+        public readonly double MetaGainAccumulator;
+        public readonly int GraphVersion;
+        public readonly int CatalogVersion;
+        public readonly uint Seed;
+        public readonly int NodeCount;
+        public readonly int EdgeCount;
+        public readonly int RevealedNodeCount;
+        public readonly int PurchasedNodeCount;
+        public readonly int LockedNodeCount;
+
+        public HeartRuntimeTuningTelemetry(
+            bool hasCatalog,
+            bool runtimeAttempted,
+            bool runtimeReady,
+            string runtimeError,
+            long graveEssence,
+            double metaGainPercent,
+            double metaGainAccumulator,
+            int graphVersion,
+            int catalogVersion,
+            uint seed,
+            int nodeCount,
+            int edgeCount,
+            int revealedNodeCount,
+            int purchasedNodeCount,
+            int lockedNodeCount)
+        {
+            HasCatalog = hasCatalog;
+            RuntimeAttempted = runtimeAttempted;
+            RuntimeReady = runtimeReady;
+            RuntimeError = runtimeError ?? string.Empty;
+            GraveEssence = graveEssence;
+            MetaGainPercent = metaGainPercent;
+            MetaGainAccumulator = metaGainAccumulator;
+            GraphVersion = graphVersion;
+            CatalogVersion = catalogVersion;
+            Seed = seed;
+            NodeCount = nodeCount;
+            EdgeCount = edgeCount;
+            RevealedNodeCount = revealedNodeCount;
+            PurchasedNodeCount = purchasedNodeCount;
+            LockedNodeCount = lockedNodeCount;
+        }
     }
 
     public interface IHeartScreenRuntime

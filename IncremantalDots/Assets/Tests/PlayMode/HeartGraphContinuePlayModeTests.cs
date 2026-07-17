@@ -18,6 +18,8 @@ namespace DeadWalls.Tests
         private byte[] _originalRunSave;
         private FieldInfo _catalogField;
         private HeartNodeCatalogSO _originalCatalog;
+        private FieldInfo _graphSettingsField;
+        private HeartGraphRuntimeSettings _originalGraphSettings;
 
         [UnitySetUp]
         public IEnumerator SetUp()
@@ -35,6 +37,12 @@ namespace DeadWalls.Tests
                 BindingFlags.Instance | BindingFlags.NonPublic);
             Assert.That(_catalogField, Is.Not.Null);
             _originalCatalog = _catalogField.GetValue(GameManager.Instance) as HeartNodeCatalogSO;
+            _graphSettingsField = typeof(GameManager).GetField(
+                "heartGraphSettings",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.That(_graphSettingsField, Is.Not.Null);
+            _originalGraphSettings =
+                (_graphSettingsField.GetValue(GameManager.Instance) as HeartGraphRuntimeSettings)?.Clone();
             yield return null;
         }
 
@@ -44,6 +52,8 @@ namespace DeadWalls.Tests
             if (GameManager.Instance != null && _catalogField != null)
             {
                 _catalogField.SetValue(GameManager.Instance, _originalCatalog);
+                if (_graphSettingsField != null && _originalGraphSettings != null)
+                    _graphSettingsField.SetValue(GameManager.Instance, _originalGraphSettings.Clone());
                 MethodInfo resetMethod = typeof(GameManager).GetMethod(
                     "ResetHeartRuntime",
                     BindingFlags.Instance | BindingFlags.NonPublic);
@@ -105,13 +115,30 @@ namespace DeadWalls.Tests
                 presentation.Nodes.Single(node => node.ExactNodeId == "fireball_unlock").Level,
                 Is.EqualTo(1));
 
+            HeartRuntimeTuningTelemetry telemetryBefore =
+                gameManager.GetHeartRuntimeTuningTelemetry();
+            HeartGraphRuntimeSettings liveSettings =
+                (HeartGraphRuntimeSettings)_graphSettingsField.GetValue(gameManager);
+            liveSettings.MinimumBranchDepth = 1;
+            liveSettings.MaximumBranchDepth = 1;
+            liveSettings.StandardRarityWeight = 1;
+            liveSettings.RareRarityWeight = 99;
+            HeartRuntimeTuningTelemetry telemetryAfter =
+                gameManager.GetHeartRuntimeTuningTelemetry();
+
+            Assert.That(telemetryAfter.Seed, Is.EqualTo(telemetryBefore.Seed));
+            Assert.That(telemetryAfter.NodeCount, Is.EqualTo(telemetryBefore.NodeCount));
+            Assert.That(telemetryAfter.EdgeCount, Is.EqualTo(telemetryBefore.EdgeCount));
+            Assert.That(telemetryAfter.PurchasedNodeCount,
+                Is.EqualTo(telemetryBefore.PurchasedNodeCount));
+
             Assert.That(gameManager.SaveRunSnapshot(), Is.True);
             RunSaveState replayedSave = RunPersistence.TryLoad();
             Assert.That(replayedSave, Is.Not.Null);
             Assert.That(replayedSave.HasHeartGraph, Is.True);
             Assert.That(replayedSave.GraveEssence, Is.EqualTo(765));
             Assert.That(JsonUtility.ToJson(replayedSave.HeartGraph), Is.EqualTo(exactGraphJson),
-                "Continue sonrasi graph source catalog'dan yeniden zar atilmamali.");
+                "Continue sonrasi veya future-run tuning degisince aktif graph yeniden zar atilmamali.");
         }
 
         private HeartNodeCatalogSO CreateCatalog()
