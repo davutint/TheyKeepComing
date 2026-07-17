@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.3
 > **Son tam kapsam denetimi:** 2026-07-17
 > **Aktif paket:** Post-Package V1 Closure - Contracts, Performance ve Release DoD
-> **Aktif iş:** `DW-V1-DOD-WORKER-WORLD-FEEDBACK` - Verify Representative Worker World Feedback
-> **İlerleme:** `428 / 442` tracker checkbox'ı tamamlandı - `%96,83`
+> **Aktif iş:** `DW-V1-DOD-HEART-RUNTIME-CONTRACT` - Verify Castle Heart Generated, Validated, Exact-Saved and Grave-Essence-Only
+> **İlerleme:** `429 / 442` tracker checkbox'ı tamamlandı - `%97,06`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -1268,7 +1268,20 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
   PlayMode `3/3`, full EditMode `382/382` ve full PlayMode
   `83 pass + 2 explicit profiler/soak skip` geçti; scene validation `0` issue ve final Console
   `0 error / 0 warning`.
-- [ ] Worker world feedback representative ve doğru.
+- [x] Worker world feedback representative ve doğru.
+  Gerçek `NewGameScene` birleşik release guard'ı dört resource'u aynı anda Low/Medium/High
+  density örnekleriyle kurdu: actual `12 / 60 / 101 / 1000`, temsili
+  `12 / 24 / 27 / 32`. Toplam `95` visual entity'nin resource içi index'i unique,
+  temsil ağırlığı kendi actual grubuna exact eşit, logistics route'u geçerli, cargo rengi
+  resource'a doğru, production feedback şiddeti represented weight ile aynı ve Night
+  lantern sinyali aktif doğrulandı. Dünya feedback'i `MobilePopulationAllocation` actual
+  truth'unu değiştirmedi; mevcut pickup work/carry, hub delivery pulse ve Day lantern-off
+  regresyonları da korundu. İlk çoklu-filter Test Runner başlangıcı Unity Test Framework'ün
+  kendi `PlayModeRunTask.cs:52` domain-reload hatasıyla test gövdesinden önce düştü; MCP'nin
+  orphan job'u kendi `TestJobManager.ClearStuckJob()` recovery yolu ile temizlendi ve testler
+  tekil gerçek job'larda geçti. Targeted PlayMode `3/3`, full EditMode `382/382`, full
+  PlayMode `84 pass + 2 explicit profiler/soak skip`; scene validation `0` issue ve final
+  Console `0 error / 0 warning`.
 - [x] Basic/Rapid/Frost toplam 1000 cap.
 - [x] 40x25 stable formation.
 - [x] Arrow Wood ile anında alınır; Fletcher/queue yok.
@@ -1491,3 +1504,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-17 | `DW-V1-DOD-NO-SPEED-OFFLINE` fixed-speed online-only run contract | Production source release guard'ı player-facing `Time.timeScale > 1`, `Time.fixedDeltaTime`, wall-clock progression API ve offline owner alanlarını yasaklıyor; yalnız normal `1x`, merkezi pause `0` ve Game Over sunumu `0.25x` sahipleri onaylı. Run/meta/death save şemaları timestamp veya offline accrual alanı taşımıyor; gerçek scene pause sunuyor fakat x2/x4/fast-forward sunmuyor. Exact Continue kapalı süre uygulamadan aynı cycle/phase/timer, kaynak ve spawn RNG state'ini geri kuruyor. Tam regresyonda bulunan 10K/1K stres testi son-frame projectile flake'i, runtime değiştirilmeden sample içindeki authoritative pool rent artışını ölçerek stabilize edildi | Targeted EditMode `3/3`; exact Continue PlayMode `1/1`; stabilize 10K/1K PlayMode `1/1` (`2.000` sample rent, `1.000` peak projectile); full EditMode `382/382`; full PlayMode `81 pass + 2 explicit profiler/soak skip`; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `426/442` |
 | 2026-07-17 | `DW-V1-DOD-PASSIVE-RESOURCE-DRAIN` main-resource upkeep exclusion + finite Arrow combat drain | Active castle loop legacy `ResourceConsumptionRate` değerlerini etkisizleştiriyor; Fletcher `ArrowProductionSystem` mobile config varken çıkıyor. Production world `ArrowProducer` veya legacy `ArcherTrainer` taşımıyor. Gerçek combat release guard'ında yüksek negatif rate enjeksiyonu Wood/Stone/Iron/Food stoklarını azaltmadı; başarılı tek projectile rent'i yalnız finite Arrow stokunu `10 -> 9` düşürdü. Player purchase/repair ve accepted Dawn population Food maliyeti tek seferlik transaction olarak açıkça ayrıldı | Targeted PlayMode `3/3`; full EditMode `382/382`; full PlayMode `82 pass + 2 explicit profiler/soak skip`; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `427/442` |
 | 2026-07-17 | `DW-V1-DOD-EXACT-POPULATION-WORKERS` unified population/bed/worker exact Continue contract | Tek gerçek snapshot; Population total/workers/archers/idle ve base/capacity, bed base/purchased, dört actual worker count, worker idle/last-observed ve dört target ratio alanını birlikte yazdı. Runtime tuple tamamen değiştirildikten sonra Continue actual archer entity sayısını koruyarak bütün state'i exact geri yükledi; ratio `2700/1900/1600/3800`, worker `23/17/11/25`, idle `17`, purchased beds `15` kanıtı kullanıldı | Targeted PlayMode `3/3`; full EditMode `382/382`; full PlayMode `83 pass + 2 explicit profiler/soak skip`; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `428/442` |
+| 2026-07-17 | `DW-V1-DOD-WORKER-WORLD-FEEDBACK` representative worker world release contract | Mevcut allocation/representation owner zinciri değiştirilmedi. Birleşik gerçek-scene guard'ı Wood/Stone/Iron/Food için actual `12/60/101/1000` değerlerini temsili `12/24/27/32` entity'ye çevirdi; toplam `95` visual üzerinde unique index, exact represented weight, geçerli route, resource cargo rengi, weight-scaled feedback ve Night lantern doğrulandı. Presentation katmanı actual allocation truth'unu değiştirmedi | Targeted PlayMode `3/3`; full EditMode `382/382`; full PlayMode `84 pass + 2 explicit profiler/soak skip`; ilk çoklu-filter job test gövdesinden önce Unity Test Framework hatasıyla orphan kaldı, MCP internal recovery ile temizlenip tekil gerçek job'larda geçti; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `429/442` |

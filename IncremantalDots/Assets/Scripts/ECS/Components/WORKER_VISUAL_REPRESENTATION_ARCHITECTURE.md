@@ -53,6 +53,10 @@ teslimatlar kaynak eklemez ve save edilmez.
   `12 -> 60 -> 1000 -> 5000 -> 0` actual gecisinde
   `12 -> 24 -> 32 -> 32 -> 0` visual contract'i; ayni bucket icinde `101 -> 119`
   actual weight sync'i; pickup cargo/work, hub delivery pulse ve Night lantern state'i.
+  Birlesik release guard dort resource'u ayni anda `12 / 60 / 101 / 1000` actual ve
+  `12 / 24 / 27 / 32` temsili sayiyla kurar; exact weight, unique index, route,
+  cargo rengi, feedback siddeti, Night lantern ve allocation-truth korunmasini
+  butun `95` visual entity uzerinde dogrular.
 - Game View QA: baslangic state'inde `53` actual worker icin `45` okunabilir visual;
   Night'ta worker olceginde kucuk resource cargo ve sicak lantern noktasi.
 

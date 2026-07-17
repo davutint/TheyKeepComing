@@ -1743,6 +1743,119 @@ namespace DeadWalls.Tests
         }
 
         [UnityTest]
+        public IEnumerator WorkerWorldFeedback_AllResourcesPreserveRepresentativeTruth()
+        {
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            using EntityQuery allocationQuery = entityManager.CreateEntityQuery(
+                typeof(MobileCastleCombatConfig), typeof(MobilePopulationAllocation));
+            using EntityQuery populationQuery = entityManager.CreateEntityQuery(typeof(PopulationState));
+            using EntityQuery waveQuery = entityManager.CreateEntityQuery(typeof(WaveStateData));
+            using EntityQuery cycleQuery = entityManager.CreateEntityQuery(typeof(ContinuousSiegeCycleData));
+            Entity allocationEntity = allocationQuery.GetSingletonEntity();
+            Entity populationEntity = populationQuery.GetSingletonEntity();
+            Entity waveEntity = waveQuery.GetSingletonEntity();
+            Entity cycleEntity = cycleQuery.GetSingletonEntity();
+
+            WaveStateData wave = entityManager.GetComponentData<WaveStateData>(waveEntity);
+            wave.StressTestMode = true;
+            entityManager.SetComponentData(waveEntity, wave);
+
+            int4 actualCounts = new int4(12, 60, 101, 1000);
+            int4 expectedVisualCounts = new int4(12, 24, 27, 32);
+            EconomyFocusType[] resources =
+            {
+                EconomyFocusType.Wood,
+                EconomyFocusType.Stone,
+                EconomyFocusType.Iron,
+                EconomyFocusType.Food
+            };
+            SetWorkerCounts(entityManager, allocationEntity, populationEntity, actualCounts);
+
+            for (int resourceIndex = 0; resourceIndex < resources.Length; resourceIndex++)
+            {
+                yield return WaitForWorkerVisualCount(
+                    entityManager,
+                    resources[resourceIndex],
+                    expectedVisualCounts[resourceIndex]);
+            }
+
+            ContinuousSiegeCycleData cycle =
+                entityManager.GetComponentData<ContinuousSiegeCycleData>(cycleEntity);
+            cycle.Phase = SiegeCyclePhase.Night;
+            entityManager.SetComponentData(cycleEntity, cycle);
+            yield return null;
+
+            int4 representedTotals = int4.zero;
+            bool[][] seenIndices =
+            {
+                new bool[expectedVisualCounts.x],
+                new bool[expectedVisualCounts.y],
+                new bool[expectedVisualCounts.z],
+                new bool[expectedVisualCounts.w]
+            };
+            using EntityQuery visualQuery = entityManager.CreateEntityQuery(new EntityQueryDesc
+            {
+                All = new[] { ComponentType.ReadOnly<ResourceWorkerVisual>() },
+                None = new[] { ComponentType.ReadOnly<Prefab>() }
+            });
+            using NativeArray<Entity> visualEntities = visualQuery.ToEntityArray(Allocator.Temp);
+            using NativeArray<ResourceWorkerVisual> visuals =
+                visualQuery.ToComponentDataArray<ResourceWorkerVisual>(Allocator.Temp);
+
+            Assert.That(visualEntities.Length, Is.EqualTo(math.csum(expectedVisualCounts)));
+            for (int visualIndex = 0; visualIndex < visualEntities.Length; visualIndex++)
+            {
+                Entity entity = visualEntities[visualIndex];
+                ResourceWorkerVisual visual = visuals[visualIndex];
+                int resourceIndex = GetTestWorkerResourceIndex(visual.Resource);
+                Assert.That(visual.Index,
+                    Is.InRange(0, expectedVisualCounts[resourceIndex] - 1));
+                Assert.That(seenIndices[resourceIndex][visual.Index], Is.False,
+                    $"{visual.Resource} visual index {visual.Index} birden fazla kez kullanildi.");
+                seenIndices[resourceIndex][visual.Index] = true;
+                Assert.That(visual.RepresentedWorkerCount, Is.GreaterThan(0));
+                representedTotals[resourceIndex] += visual.RepresentedWorkerCount;
+
+                Assert.That(entityManager.HasComponent<WorkerLogisticsRoute>(entity), Is.True);
+                Assert.That(entityManager.HasComponent<WorkerLogisticsFeedbackState>(entity), Is.True);
+                Assert.That(entityManager.HasComponent<WorkerAnimationMaterialProperty>(entity), Is.True);
+                Assert.That(entityManager.HasComponent<WorkerFeedbackMaterialProperty>(entity), Is.True);
+                Assert.That(entityManager.HasComponent<WorkerCargoColorMaterialProperty>(entity), Is.True);
+
+                WorkerLogisticsRoute route = entityManager.GetComponentData<WorkerLogisticsRoute>(entity);
+                WorkerLogisticsFeedbackState feedback =
+                    entityManager.GetComponentData<WorkerLogisticsFeedbackState>(entity);
+                WorkerFeedbackMaterialProperty materialFeedback =
+                    entityManager.GetComponentData<WorkerFeedbackMaterialProperty>(entity);
+                WorkerCargoColorMaterialProperty cargoColor =
+                    entityManager.GetComponentData<WorkerCargoColorMaterialProperty>(entity);
+                Assert.That(route.Speed, Is.GreaterThan(0f));
+                Assert.That(math.distance(route.PickupPosition, route.DeliveryPosition),
+                    Is.GreaterThan(0.1f));
+                Assert.That(feedback.LanternActive, Is.EqualTo(1));
+                Assert.That(materialFeedback.Value.y, Is.EqualTo(1f).Within(0.001f));
+                Assert.That(materialFeedback.Value.w,
+                    Is.EqualTo(WorkerVisualRepresentationUtility.GetProductionFeedbackStrength(
+                        visual.RepresentedWorkerCount)).Within(0.001f));
+                Assert.That(math.distance(
+                        cargoColor.Value,
+                        ResourceWorkerVisualStyle.GetCargoTint(visual.Resource)),
+                    Is.LessThan(0.001f));
+            }
+
+            Assert.That(representedTotals, Is.EqualTo(actualCounts));
+            MobilePopulationAllocation allocation =
+                entityManager.GetComponentData<MobilePopulationAllocation>(allocationEntity);
+            Assert.That(new int4(
+                    allocation.WoodWorkers,
+                    allocation.StoneWorkers,
+                    allocation.IronWorkers,
+                    allocation.FoodWorkers),
+                Is.EqualTo(actualCounts),
+                "World feedback actual worker truth'ini degistirmemeli.");
+        }
+
+        [UnityTest]
         public IEnumerator DayPresentation_WarmLightKeepsProductionReadableAndWorkerAmbienceScalesWithWorkers()
         {
             GameManager gameManager = GameManager.Instance;
@@ -2630,6 +2743,46 @@ namespace DeadWalls.Tests
             allocation.LastObservedPopulation = population.Total;
             allocation.AutoAllocationInitialized = 1;
             entityManager.SetComponentData(allocationEntity, allocation);
+        }
+
+        private static void SetWorkerCounts(EntityManager entityManager, Entity allocationEntity,
+            Entity populationEntity, int4 workerCounts)
+        {
+            workerCounts = math.max(workerCounts, int4.zero);
+            int workerTotal = math.csum(workerCounts);
+            PopulationState population = entityManager.GetComponentData<PopulationState>(populationEntity);
+            population.Total = workerTotal + population.Archers;
+            population.Workers = workerTotal;
+            population.Idle = 0;
+            population.Capacity = Mathf.Max(population.Capacity, population.Total);
+            population.BaseCapacity = Mathf.Max(population.BaseCapacity, population.Capacity);
+            entityManager.SetComponentData(populationEntity, population);
+
+            MobilePopulationAllocation allocation =
+                entityManager.GetComponentData<MobilePopulationAllocation>(allocationEntity);
+            allocation.WoodWorkers = workerCounts.x;
+            allocation.StoneWorkers = workerCounts.y;
+            allocation.IronWorkers = workerCounts.z;
+            allocation.FoodWorkers = workerCounts.w;
+            allocation.WoodTargetRatioBps = 1000;
+            allocation.StoneTargetRatioBps = 2000;
+            allocation.IronTargetRatioBps = 3000;
+            allocation.FoodTargetRatioBps = 4000;
+            allocation.IdlePopulation = 0;
+            allocation.LastObservedPopulation = population.Total;
+            allocation.AutoAllocationInitialized = 1;
+            entityManager.SetComponentData(allocationEntity, allocation);
+        }
+
+        private static int GetTestWorkerResourceIndex(EconomyFocusType resource)
+        {
+            return EconomyFocusUtility.Normalize(resource) switch
+            {
+                EconomyFocusType.Stone => 1,
+                EconomyFocusType.Iron => 2,
+                EconomyFocusType.Food => 3,
+                _ => 0
+            };
         }
 
         private static int ReadWoodWorkerCount(EntityManager entityManager, Entity allocationEntity)
