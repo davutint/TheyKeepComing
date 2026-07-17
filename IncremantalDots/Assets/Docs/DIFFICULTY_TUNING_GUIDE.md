@@ -17,8 +17,9 @@ Deger adi ezberleme — asagidaki tablodan hissini bul, hangi ayara dokunacagini
 | "Gec oyunda tehdit hissetmiyorum, para birikiyor" | **SpawnBatchGrowthPerCycle** + **MaxSpawnBatch** | ARTIR (kalabalik buyur) |
 | "Zombiler sunger oldu, oldurmek zevksiz" | Enemy Definition base HP + **SpawnBatchGrowthPerCycle** | V1 HP gunle buyumez; base HP'yi dusur veya tehdidi kalabalikla artir |
 | "Ekran zombi doldu, PC hedefinde frame butcesi asildi" | **MaxAliveZombies** | Profil kaniti olmadan 900 ustune cikarma; once Player capture + soak al |
-| "Tamir cok pahali, kurtulamiyorum" | Tamir Maliyeti > **RepairBase*Cost** | DUSUR |
+| "Tamir cok pahali, kurtulamiyorum" | Wall Runtime Contract > **RepairStonePerMissingHp** veya **RepairDayPriceMultiplier** | DUSUR |
 | "Tamir cok ucuz, duvar onemsizlesti" | Ayni | ARTIR |
+| "Duvar cok cabuk yikiliyor / fazla dayanikli" | Wall Runtime Contract > **WallBaseHp** | ARTIR / DUSUR; tech/meta/Heart yuzdeleri bunun ustune biner |
 | "Gunduz cok sakin / cok yogun" | Faz Yogunluklari > **DayIntensity** | 0.55 taban; artir/azalt |
 | "Gece yeterince korkutucu degil" | **NightIntensity** | ARTIR (1.65 taban) |
 | "Belirli bir GUN cok sert/yumusak" | Ilgili egriye o gune keyframe ekle | Egri = gun bazli ince ayar |
@@ -58,9 +59,20 @@ Deger adi ezberleme — asagidaki tablodan hissini bul, hangi ayara dokunacagini
 DAY 0.55 -> DUSK 1.0->1.35 -> NIGHT 1.65 -> DAWN 0.15. Buyuk sayi = sik dogum.
 Gece Siddeti EGRISI bu degerlerin USTUNE gun carpani olarak biner (Night ve Dusk-sonu).
 
-### Tamir Maliyeti
-Tam yikimda odenen taban (120 odun / 50 tas); kismi hasarda oranla azalir.
-Tech'teki "Repair Efficiency" bunu ayrica dusurur.
+### Wall Defense
+
+| Alan | Ne demek? | Default |
+|---|---|---:|
+| WallBaseHp | Tech/meta/Heart carpanlarindan onceki Wall MaxHP baseline | 350 |
+| NormalRepairHealPercent | Day/Dusk normal repair paketinin MaxHP orani | %25 |
+| RepairStonePerMissingHp | Gercek iyilestirilen her HP icin Stone | 0.10 |
+| RepairDayPriceMultiplier | Day/Dusk repair fiyatina global carpan | 1.0 |
+| EmergencyRepairHealPercent | Night, cost-free ability heal orani | %20 |
+| EmergencyRepairCooldown | Emergency ability cooldown | 120s |
+
+Normal repair maliyeti `ceil(actualHealHP x Stone/HP x DayPrice x discounts)` formuluyle
+hesaplanir. Tech/Heart repair indirimi en son uygulanir. Eski `RepairBaseWoodCost` ve
+`RepairBaseStoneCost` alanlari yalniz serialized uyumluluk icin kalir; V1 fiyatini belirlemez.
 
 ### Arrow Ekonomisi
 
@@ -88,6 +100,14 @@ ve effective interval okunur. Backlog sayisini elle tune etmezsin: `PreserveDema
 cap doluyken talebi kayipsiz saklar. `MaxAliveZombies` sahadaki tavani, `MaxSpawnBatch` kapasite
 acildiginda backlog'un frame basina ne kadar hizli eriyecegini belirler.
 
+### Wall Runtime Contract paneli
+
+Base HP, normal repair paketi, Stone/HP, Day fiyat carpani ve Emergency yuzdesi ayni paneldedir.
+`Preview missing HP`, tech/Heart indirimi olmadan baseline paket HP/Stone sonucunu gameplay ile
+ayni saf formulle gosterir. Play Mode'da profile baseline ile tech/meta/Heart uygulanmis effective
+MaxHP, mevcut HP, gercek Stone quote ve phase gate canli okunur. Apply, Wall MaxHP degisirken
+mevcut can oranini korur.
+
 ## 5. Olcum botu nasil yorumlanir?
 
 1. Play'e gir -> RUN BOT (profili uygular, temiz kosu baslatir, 3x hizda oynar).
@@ -101,8 +121,8 @@ acildiginda backlog'un frame basina ne kadar hizli eriyecegini belirler.
 
 ## 6. Bilinmesi gereken iki tuzak
 
-1. **Profil her seyi kapsamiyor:** Duvar HP'si (350) ve iron uretimi gibi degerler setup
-   tool'un icinde yasar — onlari degistirmek istersen soyle, setup sabitinde guncelleriz
-   (elle Inspector'dan degistirirsen bir sonraki Setup kosusu geri ezer!).
+1. **Profil her seyi kapsamiyor:** Wall base HP artik profildedir; geometri, cycle sureleri ve
+   iron uretimi gibi baseline'lar aktif SubScene Authoring'de kalir. Profile yoksa
+   `CastleAuthoring.WallHP` bake degeri fallback olur.
 2. **APPLY'siz degisiklik oyuna gitmez:** panelde degeri degistirmek yetmez; APPLY
    (edit modda sahneye kaydeder, play modda aninda uygular) sart.

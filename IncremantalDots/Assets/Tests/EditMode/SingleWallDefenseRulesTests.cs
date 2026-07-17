@@ -59,5 +59,18 @@ namespace DeadWalls.Tests
             Assert.That(SingleWallDefenseRules.GetHealthRatio(750f, 500f), Is.EqualTo(1f));
             Assert.That(SingleWallDefenseRules.GetHealthRatio(0f, 0f), Is.EqualTo(1f));
         }
+
+        [Test]
+        public void RepairStoneCost_UsesActualHealPackage_UnitPriceAndDayMultiplier()
+        {
+            Assert.That(SingleWallDefenseRules.GetRepairHealAmount(175f, 350f, 0.25f),
+                Is.EqualTo(87.5f));
+            Assert.That(SingleWallDefenseRules.CalculateRepairStoneCost(
+                175f, 350f, 0.25f, 0.10f, 1f), Is.EqualTo(9));
+            Assert.That(SingleWallDefenseRules.CalculateRepairStoneCost(
+                315f, 350f, 0.25f, 0.10f, 1.5f), Is.EqualTo(6));
+            Assert.That(SingleWallDefenseRules.CalculateRepairStoneCost(
+                0f, 350f, 0.25f, 0.10f, 1f), Is.Zero);
+        }
     }
 }

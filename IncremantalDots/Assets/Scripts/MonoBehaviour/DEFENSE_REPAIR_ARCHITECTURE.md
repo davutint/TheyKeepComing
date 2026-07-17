@@ -6,7 +6,7 @@ Normal Wall repair:
 
 - Yalnız Day ve Dusk phase'lerinde kullanılabilir.
 - Tek harcama kaynağı Stone'dur.
-- Eksik HP oranına göre ölçeklenir ve `ReduceRepairCostPercent` tech çarpanını kullanır.
+- Gercek iyilestirilecek HP'ye gore fiyatlanir ve `ReduceRepairCostPercent` tech çarpanını kullanır.
 - Wall `0 HP` olduktan sonra uygulanamaz; aynı-frame lethal damage repair'den üstündür.
 
 ## Otorite
@@ -29,11 +29,23 @@ Afford edilemeyen tik, programmatic GameManager cagrisi veya Wall hasari event y
 
 ## Legacy/data notu
 
-`MobileCastleCombatConfig.RepairBaseWoodCost` ve Difficulty Profile'daki eş alan eski tuning uyumluluğu için serialize kalabilir fakat V1 normal repair hesabında okunmaz. Aktif maliyet owner'ı `RepairBaseStoneCost` alanıdır.
+Aktif baseline owner zinciri `DifficultyProfileSO -> MobileCastleTuningResolver ->
+MobileCastleCombatConfig`'tir. `WallBaseHp`, `NormalRepairHealPercent`,
+`RepairStonePerMissingHp`, `RepairDayPriceMultiplier` ve Emergency repair alanlari ayni
+profile surface'inde yasar. Profile yoksa yalniz Wall base HP icin
+`CastleAuthoring.WallHP` bake degeri fallback olur.
+
+`RepairBaseWoodCost` ve `RepairBaseStoneCost` eski tuning uyumluluğu için serialize kalır
+fakat V1 normal repair hesabında okunmaz. Aktif Stone owner'i
+`ceil(actualHealHP x RepairStonePerMissingHp x RepairDayPriceMultiplier x discounts)`
+formuludur; `SingleWallDefenseRules.CalculateRepairStoneCost` gameplay ve Editor preview
+tarafindan ortak kullanilir.
 
 ## Doğrulama
 
 - `SingleWallDefenseRulesTests.RepairPhase_AllowsOnlyDayAndDusk`
 - `SingleWallDefenseRulesTests.SameFrameLethalDamage_WinsAgainstRepair`
+- `SingleWallDefenseRulesTests.RepairStoneCost_UsesActualHealPackage_UnitPriceAndDayMultiplier`
 - `ExactRunContinuePlayModeTests.Repair_IsStoneOnly_AndAllowedOnlyDuringDayOrDusk`
+- `ExactRunContinuePlayModeTests.WallBaseHpLiveTuning_PreservesHealthRatioAndEffectiveModifiers`
 - `WorkerAllocationPlayModeTests.FirstDamagedWallDayRepairOnboarding_PulsesRealRepairAction_AndCompletesOnSuccessfulPlayerRepair`

@@ -102,9 +102,8 @@ namespace DeadWalls
         public float SiegeDawnIntensityMultiplier = 0.15f;
 
         [Header("Defense Repair")]
-        [Tooltip("Tam kayipta odenen tamir maliyeti; gercek maliyet kayip oraniyla olceklenir.")]
-        public int RepairBaseWoodCost = 120;
-        public int RepairBaseStoneCost = 80;
+        [HideInInspector] public int RepairBaseWoodCost = 120;
+        [HideInInspector] public int RepairBaseStoneCost = 80;
         [Range(0.01f, 1f)] public float NormalRepairHealPercent = 0.25f;
         [Min(0.001f)] public float RepairStonePerMissingHp = 0.10f;
         [Min(0.01f)] public float RepairDayPriceMultiplier = 1f;

@@ -47,6 +47,12 @@ tek profil iterasyonuyla, KOD YAZMADAN tasindi).
      last/total demand-spawn ve effective interval telemetrisini canli gosterir.
      Backlog policy ayarlanabilir enum degildir; `PreserveDemand` read-only contract olarak
      aciklanir, yalniz drain hizi `MaxSpawnBatch` ve saha tavani `MaxAliveZombies` tune edilir.
+   - **Wall Runtime Contract**: profile-owned base HP, normal repair heal paketi,
+     Stone/HP, Day fiyat carpani ve Emergency heal/cooldown alanlarini tek panelde duzenler.
+     Baseline package preview gameplay ile ayni `SingleWallDefenseRules` formulunu kullanir.
+     Play Mode'da config baseline/effective MaxHP, current HP, gercek Stone quote ve phase
+     gate gorunur; live Apply health ratio'yu koruyup tech/meta/Heart aggregate'lerini yeniden
+     fold eder. Legacy RepairBase Wood/Stone alanlari active panelde gosterilmez.
 
 ## Dogrulama (2026-07-07)
 
@@ -60,9 +66,9 @@ tek profil iterasyonuyla, KOD YAZMADAN tasindi).
 
 ## Tuzaklar
 
-- Setup tool'un normalize bolumu bazi authoring degerlerini hardcoded yazar (WallHP,
-  IronWorkerProductionPerMin...) — kalici deger degisikligi SETUP SABITINDE yapilmali,
-  yoksa sonraki SetupScene kosusu ezer (bir kez yasandi).
+- Profile yoksa setup tool'un `CastleAuthoring.WallHP` degeri fallback'tir. Aktif profile
+  varken Wall base HP Difficulty Tuner'dan gelir. IronWorkerProductionPerMin gibi profile
+  tasinmamis baseline degerler setup sabitinde kalir.
 - Canli uygulama restart sonrasi config'i bake degerlerine dondurur; Tuner'in Run Bot'u
   bu yuzden restart'tan SONRA da ApplyProfileLive cagirir.
 - Fiyat alanlari sifir/negatif veya gecersiz girilirse resolver int-guvenli minimumlara

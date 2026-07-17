@@ -161,7 +161,7 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 
 - CastleDefensePanel'deki player-facing REPAIR butonunun controller'i (HUD root'ta ayri component)
 - Tamir continuous siege sirasinda HER ZAMAN denenebilir (eski DayPrep sarti kaldirildi — continuous'ta olu yoldu)
-- Maliyet kayip-orantili: `GameManager.GetRepairCost()` = `ceil(RepairBase * kayipOrani * techCarpani)`; taban config'te (120W/80S tam kayipta)
+- Maliyet gercek heal paketine bagli: `ceil(actualHealHP x StonePerHP x DayPrice x discounts)`; yalniz Stone harcanir
 - `repair_efficiency` tech node'u (`ReduceRepairCostPercent`) maliyeti dusurur
 - Basarida punch, reddetmede shake (DOTween); 0.25s poll ile cost etiketi/interactable
 

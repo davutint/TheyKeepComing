@@ -13,8 +13,9 @@ DefaultDifficulty.asset` seed edilir (varsa DOKUNULMAZ) ve subscene'deki
 3. Egrileri/degerleri panelden duzenle:
    - Erken oyun sertligi: `NightIntensityByDay` egrisi (dusuk baslat, kac gunde 1.0'a
      cikacagini keyframe'lerle belirle).
-   - Gec oyun baskisi: `ZombieHpGrowthPerCycle`, `SpawnBatchGrowthPerCycle`, `MaxSpawnBatch`.
-   - Kurtulus ekonomisi: `RepairBase*Cost`.
+   - Gec oyun baskisi: `SpawnBatchGrowthPerCycle`, `MaxSpawnBatch`, `MaxAliveZombies`.
+   - Wall Runtime Contract: `WallBaseHp`, normal heal paketi, Stone/HP, Day fiyat carpani,
+     Emergency heal yuzdesi ve cooldown.
    - House/worker yatirim fiyatlari: `Ekonomi Fiyat Egrileri` foldout'unda bed base ve
      interval, CAP/EFF Wood+Iron base ve ortak worker building growth multiplier.
 4. **Apply** — edit modda subscene'e baglar+kaydeder (bake); play modda ayrica CANLI uygular.
@@ -28,6 +29,5 @@ DefaultDifficulty.asset` seed edilir (varsa DOKUNULMAZ) ve subscene'deki
 - `DefaultDifficulty.asset` ekonomi default'lari: bed `100W / 25 interval`, CAP
   `100W+25I`, EFF `150W+50I`, ortak growth `1.35`. Apply, edit modda bunlari bake eder;
   Play Mode'da mevcut config entity'sine de canli yazar.
-- WallHP / Iron uretimi gibi profil-DISI degerler setup tool sabitlerinde yasar
-  (setup her kosuda normalize eder) — kalici degisiklik icin MobileCastleSceneSetupWindow'daki
-  degeri guncelle.
+- Wall base HP profile-owned'dir. Profile yoksa `CastleAuthoring.WallHP` fallback olur.
+  Iron uretimi gibi profil-disi baseline'lar setup tool/active SubScene Authoring'de kalir.

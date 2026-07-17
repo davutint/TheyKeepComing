@@ -77,9 +77,11 @@ namespace DeadWalls
         public float NightIntensity = 1.65f;
         public float DawnIntensity = 0.15f;
 
-        [Header("Savunma Maliyeti (config'e yazilir)")]
-        public int RepairBaseWoodCost = 120;
-        public int RepairBaseStoneCost = 50;
+        [Header("Wall Defense (config'e yazilir)")]
+        [Tooltip("Tech, meta ve Heart yuzde carpanlarindan onceki Wall MaxHP baseline degeri.")]
+        [Min(1f)] public float WallBaseHp = 350f;
+        [HideInInspector] public int RepairBaseWoodCost = 120;
+        [HideInInspector] public int RepairBaseStoneCost = 50;
         [Tooltip("Normal repair tek kullanimda Wall MaxHP'nin bu orani kadar iyilestirir.")]
         [Range(0.01f, 1f)] public float NormalRepairHealPercent = 0.25f;
         [Tooltip("Normal repair'de gercek iyilestirilen her HP icin Stone fiyati.")]

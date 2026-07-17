@@ -25,6 +25,10 @@ namespace DeadWalls.Tests
             Assert.That(damage, Is.Not.Null);
             Assert.That(radius, Is.Not.Null);
             Assert.That(cooldown, Is.Not.Null);
+            Assert.That(profile.WallBaseHp, Is.EqualTo(350f));
+            Assert.That(profile.NormalRepairHealPercent, Is.EqualTo(0.25f));
+            Assert.That(profile.RepairStonePerMissingHp, Is.EqualTo(0.10f));
+            Assert.That(profile.RepairDayPriceMultiplier, Is.EqualTo(1f));
             Assert.That(profile.RallyCooldown, Is.EqualTo(60f));
             Assert.That(profile.EmergencyRepairHealPercent, Is.EqualTo(0.20f));
             Assert.That(profile.EmergencyRepairCooldown, Is.EqualTo(120f));

@@ -27,12 +27,18 @@ Her tuning alanının tek bir baseline owner'ı olmalıdır. Inspector, Difficul
 - Max spawn batch ve max alive zombie
 - Base/min spawn interval
 - Day, Dusk start/end, Night ve Dawn intensity
-- Repair base Wood/Stone serialized tuning değerleri
+- Wall base HP, normal repair heal paketi, Stone/HP, Day fiyat carpani
+- Emergency Repair heal yuzdesi ve cooldown
+- Repair base Wood/Stone legacy serialized uyumluluk degerleri (aktif fiyat owner'i degil)
 - House bed başlangıç Wood maliyeti ve owned-bed büyüme interval'i
 - Worker CAP/EFF ayrı Wood/Iron başlangıç maliyetleri ve ortak bina büyüme çarpanı
 - Gün eğrileri; SpecialNights schema/content V1'de dormant ve multiplier her zaman 1
 
-Not: Normal V1 repair artık yalnız Stone kullandığı için `RepairBaseWoodCost` serialize uyumluluğu dışında gameplay tarafından okunmaz.
+Not: Normal V1 repair yalnız Stone kullanir. `RepairBaseWoodCost` ve
+`RepairBaseStoneCost` serialize uyumlulugu disinda gameplay tarafindan okunmaz; aktif fiyat
+`RepairStonePerMissingHp x RepairDayPriceMultiplier x gercek heal x discounts` formuludur.
+Profile varsa `WallBaseHp` runtime baseline'i olur; profile yoksa `CastleAuthoring.WallHP`
+bake degeri fallback kalir.
 
 ## RunDifficultyProfile contract (V1)
 
@@ -83,6 +89,12 @@ yüzeyde toplar. `PendingEnemies` read-only gösterilir; backlog policy tune edi
 BaseSpawn curve/interval, phase multipliers, `MaxSpawnBatch` drain hızı ve `MaxAliveZombies`
 active cap değerlerini profile üzerinden değiştirir.
 
+`Wall Runtime Contract` paneli profile-owned `WallBaseHp`, normal repair heal paketi,
+Stone/HP, Day fiyat carpani ve Emergency yuzdesini tek yuzeyde duzenler. Baseline paket
+preview'u `SingleWallDefenseRules` ile runtime formulunu paylasir. Play Mode telemetry,
+baseline/effective MaxHP, mevcut HP, gercek Stone quote ve phase gate'i gosterir; live Apply
+HP oranini koruyarak tech/meta/Heart aggregate'lerini yeniden fold eder.
+
 `MobileCastleSceneSetupWindow` yalnız owner tarafından açıkça çalıştırılan initializer/repair aracıdır. Runtime owner değildir. Tool'un yazdığı değerler scene/profile asset'e kaydedildikten sonra yukarıdaki sahiplik kuralına girer.
 
 ## Aktif proje kanıtı (2026-07-12)
@@ -95,7 +107,10 @@ Aktif SubScene `DefaultDifficulty.asset` profilini kullanır. Bilinçli olarak f
 | Zombie HP growth/cycle | 0 | 0 | 0; utility ayrıca growth'ü okumaz |
 | Spawn batch growth/cycle | 0.10 | 0.15 | 0.15 |
 | Max spawn batch | 12 | 16 | 16 |
-| Repair base Stone | 80 | 50 | 50 |
+| Wall base HP | `CastleAuthoring` 350 fallback | 350 | 350 baseline + tech/meta/Heart aggregate |
+| Legacy repair base Stone | 80 | 50 | serialized only; V1 fiyatinda okunmaz |
+| Normal repair | Authoring fallback | %25, 0.10 Stone/HP, x1 Day | ayni profile baseline |
+| Emergency repair | Authoring fallback | %20, 120s | ayni profile baseline |
 | Bed base / interval | Profile owner | 100 / 25 | `MobileEconomyPriceTuning`: 100 / 25 |
 | Worker CAP / EFF base | Profile owner | 100W+25I / 150W+50I | `MobileEconomyPriceTuning`: aynı |
 | Worker bina growth | Profile owner | 1.35 | `MobileEconomyPriceTuning`: 1.35 |

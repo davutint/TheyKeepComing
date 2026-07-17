@@ -21,7 +21,7 @@ namespace DeadWalls
         private bool _foldEscalation = true;
         private bool _foldIntensity;
         private bool _foldSpawnContract = true;
-        private bool _foldRepair;
+        private bool _foldRepair = true;
         private bool _foldEconomyPrices = true;
         private bool _foldFuture;
         private bool _foldBot = true;
@@ -30,6 +30,7 @@ namespace DeadWalls
         private int _botTargetDay = 20;
         private bool _botAutoRestart = true;
         private int _spawnPreviewDay = 1;
+        private float _wallPreviewMissingPercent = 0.50f;
         private double _nextSpawnTelemetryRepaint;
 
         private List<int> _deaths = new List<int>();
@@ -328,15 +329,95 @@ namespace DeadWalls
 
         private void DrawRepairSection()
         {
-            _foldRepair = DrawSectionHeader(_foldRepair, "Tamir Maliyeti", "tam kayipta odenen taban");
+            _foldRepair = DrawSectionHeader(_foldRepair,
+                "Wall Runtime Contract", "base HP / Stone / normal / emergency");
             if (!_foldRepair)
                 return;
 
             using (new EditorGUILayout.VerticalScope("box"))
             {
-                DrawProp("RepairBaseWoodCost");
-                DrawProp("RepairBaseStoneCost");
+                EditorGUILayout.LabelField("Baseline Defense", EditorStyles.boldLabel);
+                DrawProp("WallBaseHp");
+                EditorGUILayout.Space(4f);
+                EditorGUILayout.LabelField("Normal Repair — Day / Dusk", EditorStyles.boldLabel);
+                DrawProp("NormalRepairHealPercent");
+                DrawProp("RepairStonePerMissingHp");
+                DrawProp("RepairDayPriceMultiplier");
+                EditorGUILayout.Space(4f);
+                EditorGUILayout.LabelField("Emergency Repair — Night", EditorStyles.boldLabel);
+                DrawProp("EmergencyRepairHealPercent");
+                DrawProp("EmergencyRepairCooldown");
+
+                EditorGUILayout.Space(6f);
+                _wallPreviewMissingPercent = EditorGUILayout.Slider(
+                    "Preview missing HP", _wallPreviewMissingPercent, 0.05f, 1f);
+                float baseHp = Mathf.Max(1f, _profile.WallBaseHp);
+                float previewCurrentHp = baseHp * (1f - _wallPreviewMissingPercent);
+                float previewHealHp = SingleWallDefenseRules.GetRepairHealAmount(
+                    previewCurrentHp, baseHp, _profile.NormalRepairHealPercent);
+                int previewStone = SingleWallDefenseRules.CalculateRepairStoneCost(
+                    previewCurrentHp,
+                    baseHp,
+                    _profile.NormalRepairHealPercent,
+                    _profile.RepairStonePerMissingHp,
+                    _profile.RepairDayPriceMultiplier);
+                EditorGUILayout.LabelField("Baseline package preview",
+                    $"+{previewHealHp:0.##} HP / {previewStone:N0} Stone");
+                EditorGUILayout.HelpBox(
+                    "V1 aktif fiyat = ceil(actual healed HP x Stone/HP x Day price x discounts). "
+                    + "RepairBaseWoodCost ve RepairBaseStoneCost yalniz eski serialized content "
+                    + "uyumlulugu icin kalir; aktif fiyat owner'i degildir.", MessageType.Info);
+
+                DrawWallRuntimeTelemetry();
             }
+        }
+
+        private static void DrawWallRuntimeTelemetry()
+        {
+            EditorGUILayout.Space(4f);
+            EditorGUILayout.LabelField("Live Runtime", EditorStyles.boldLabel);
+            if (!Application.isPlaying)
+            {
+                EditorGUILayout.LabelField(
+                    "Play Mode'da baseline/effective HP ve gercek repair quote burada gorunur.",
+                    EditorStyles.miniLabel);
+                return;
+            }
+
+            World world = World.DefaultGameObjectInjectionWorld;
+            if (world == null || !world.IsCreated)
+            {
+                EditorGUILayout.LabelField("ECS world henuz hazir degil.", EditorStyles.miniLabel);
+                return;
+            }
+
+            EntityManager em = world.EntityManager;
+            using EntityQuery configQuery = em.CreateEntityQuery(typeof(MobileCastleCombatConfig));
+            using EntityQuery wallQuery = em.CreateEntityQuery(typeof(WallSegment));
+            if (configQuery.CalculateEntityCount() != 1 || wallQuery.CalculateEntityCount() != 1)
+            {
+                EditorGUILayout.LabelField("Wall/config singleton'lari henuz hazir degil.", EditorStyles.miniLabel);
+                return;
+            }
+
+            MobileCastleCombatConfig config = em.GetComponentData<MobileCastleCombatConfig>(
+                configQuery.GetSingletonEntity());
+            WallSegment wall = em.GetComponentData<WallSegment>(wallQuery.GetSingletonEntity());
+            GameManager gm = GameManager.Instance;
+            ResourceCost quote = gm != null ? gm.GetRepairCost() : ResourceCost.Zero;
+
+            EditorGUILayout.LabelField("Baseline / effective MaxHP",
+                $"{Mathf.Max(0f, config.WallBaseHp):N0} / {Mathf.Max(0f, wall.MaxHP):N0}");
+            EditorGUILayout.LabelField("Current HP",
+                $"{Mathf.Max(0f, wall.CurrentHP):N0} / {Mathf.Max(0f, wall.MaxHP):N0} ({SingleWallDefenseRules.GetHealthRatio(wall.CurrentHP, wall.MaxHP):P0})");
+            EditorGUILayout.LabelField("Normal package / Stone quote",
+                $"{Mathf.Clamp01(config.NormalRepairHealPercent):P0} / {Mathf.Max(0, quote.Stone):N0}");
+            EditorGUILayout.LabelField("Stone per HP / Day price",
+                $"{Mathf.Max(0f, config.RepairStonePerMissingHp):0.###} / x{Mathf.Max(0f, config.RepairDayPriceMultiplier):0.###}");
+            EditorGUILayout.LabelField("Normal phase gate",
+                gm != null && gm.IsRepairPhaseAvailable() ? "AVAILABLE" : "LOCKED");
+            EditorGUILayout.LabelField("Emergency heal / cooldown",
+                $"{Mathf.Clamp01(config.EmergencyRepairHealPercent):P0} / {Mathf.Max(0f, config.EmergencyRepairCooldown):0.##}s");
         }
 
         private void DrawEconomyPriceSection()
@@ -582,6 +663,8 @@ namespace DeadWalls
             {
                 buffer.Add(MobileCastleTuningResolver.ResolveDaySample(p, day));
             }
+
+            GameManager.Instance?.ApplyWallBaseHpTuning(config.WallBaseHp);
         }
 
         private void LoadLatestSummary()

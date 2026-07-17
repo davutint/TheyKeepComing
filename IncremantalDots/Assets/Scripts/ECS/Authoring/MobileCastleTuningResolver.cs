@@ -29,6 +29,7 @@ namespace DeadWalls
             config.SiegeDuskEndIntensityMultiplier = math.max(0.01f, profile.DuskEndIntensity);
             config.SiegeNightIntensityMultiplier = math.max(0.01f, profile.NightIntensity);
             config.SiegeDawnIntensityMultiplier = math.max(0.01f, profile.DawnIntensity);
+            config.WallBaseHp = math.max(1f, profile.WallBaseHp);
             config.RepairBaseWoodCost = math.max(0, profile.RepairBaseWoodCost);
             config.RepairBaseStoneCost = math.max(0, profile.RepairBaseStoneCost);
             config.NormalRepairHealPercent = math.clamp(profile.NormalRepairHealPercent, 0.01f, 1f);

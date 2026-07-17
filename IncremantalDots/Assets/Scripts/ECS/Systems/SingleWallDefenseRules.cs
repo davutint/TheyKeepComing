@@ -47,5 +47,39 @@ namespace DeadWalls
             float healAmount = safeMaxHp * math.max(0f, percent);
             return math.min(safeMaxHp, math.max(0f, currentHp) + healAmount);
         }
+
+        public static float GetRepairHealAmount(float currentHp, float maxHp, float healPercent)
+        {
+            if (IsDestroyed(currentHp) || maxHp <= 0f)
+                return 0f;
+
+            float safeCurrentHp = math.clamp(currentHp, 0f, maxHp);
+            float missingHp = math.max(0f, maxHp - safeCurrentHp);
+            return math.min(missingHp, maxHp * math.max(0f, healPercent));
+        }
+
+        public static int CalculateRepairStoneCost(
+            float currentHp,
+            float maxHp,
+            float healPercent,
+            float stonePerHealedHp,
+            float dayPriceMultiplier,
+            float discountMultiplier = 1f)
+        {
+            float healHp = GetRepairHealAmount(currentHp, maxHp, healPercent);
+            if (healHp <= 0f)
+                return 0;
+
+            double rawCost = healHp
+                * math.max(0f, stonePerHealedHp)
+                * math.max(0f, dayPriceMultiplier)
+                * math.max(0f, discountMultiplier);
+            if (double.IsNaN(rawCost) || rawCost <= 0d)
+                return 1;
+            if (double.IsInfinity(rawCost) || rawCost >= int.MaxValue)
+                return int.MaxValue;
+
+            return math.max(1, (int)math.ceil(rawCost));
+        }
     }
 }

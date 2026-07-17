@@ -607,7 +607,12 @@ namespace DeadWalls.Tests
             Assert.That(config.ZombieHpGrowthPerCycle, Is.Zero);
             Assert.That(config.SpawnBatchGrowthPerCycle, Is.EqualTo(0.15f));
             Assert.That(config.MaxSpawnBatch, Is.EqualTo(16));
+            Assert.That(config.WallBaseHp, Is.EqualTo(350f));
             Assert.That(config.RepairBaseStoneCost, Is.EqualTo(50));
+            Assert.That(config.NormalRepairHealPercent, Is.EqualTo(0.25f));
+            Assert.That(config.RepairStonePerMissingHp, Is.EqualTo(0.10f));
+            Assert.That(config.RepairDayPriceMultiplier, Is.EqualTo(1f));
+            Assert.That(config.EmergencyRepairHealPercent, Is.EqualTo(0.20f));
             Assert.That(config.SiegeDayDuration, Is.EqualTo(30f));
             Assert.That(config.SiegeDuskDuration, Is.EqualTo(5f));
             Assert.That(config.SiegeNightDuration, Is.EqualTo(20f));
@@ -645,6 +650,56 @@ namespace DeadWalls.Tests
             Assert.That(config.ZombieScale, Is.EqualTo(enemyEntries[0].Scale));
             Assert.That(entityManager.GetComponentData<ZombiePrefabData>(enemyCatalogEntity).ZombiePrefab,
                 Is.EqualTo(enemyEntries[0].Prefab));
+        }
+
+        [UnityTest]
+        public IEnumerator WallBaseHpLiveTuning_PreservesHealthRatioAndEffectiveModifiers()
+        {
+            var gameManager = GameManager.Instance;
+            bool runtimeReady = false;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                {
+                    runtimeReady = true;
+                    break;
+                }
+                yield return null;
+            }
+            Assert.That(runtimeReady, Is.True);
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            Entity configEntity = entityManager.CreateEntityQuery(typeof(MobileCastleCombatConfig))
+                .GetSingletonEntity();
+            Entity wallEntity = entityManager.CreateEntityQuery(typeof(WallSegment)).GetSingletonEntity();
+            MobileCastleCombatConfig config =
+                entityManager.GetComponentData<MobileCastleCombatConfig>(configEntity);
+            WallSegment wall = entityManager.GetComponentData<WallSegment>(wallEntity);
+            float originalBaseHp = config.WallBaseHp;
+            float originalEffectiveMaxHp = wall.MaxHP;
+            Assert.That(originalBaseHp, Is.GreaterThan(0f));
+            Assert.That(originalEffectiveMaxHp, Is.GreaterThan(0f));
+
+            wall.CurrentHP = wall.MaxHP * 0.40f;
+            entityManager.SetComponentData(wallEntity, wall);
+            float tunedBaseHp = originalBaseHp * 1.20f;
+            Assert.That(gameManager.ApplyWallBaseHpTuning(tunedBaseHp), Is.True);
+
+            WallSegment tunedWall = entityManager.GetComponentData<WallSegment>(wallEntity);
+            MobileCastleCombatConfig tunedConfig =
+                entityManager.GetComponentData<MobileCastleCombatConfig>(configEntity);
+            Assert.That(tunedConfig.WallBaseHp, Is.EqualTo(tunedBaseHp).Within(0.01f));
+            Assert.That(tunedWall.MaxHP,
+                Is.EqualTo(originalEffectiveMaxHp * 1.20f).Within(0.02f));
+            Assert.That(SingleWallDefenseRules.GetHealthRatio(tunedWall.CurrentHP, tunedWall.MaxHP),
+                Is.EqualTo(0.40f).Within(0.001f));
+
+            Assert.That(gameManager.ApplyWallBaseHpTuning(originalBaseHp), Is.True);
+            WallSegment restoredWall = entityManager.GetComponentData<WallSegment>(wallEntity);
+            Assert.That(restoredWall.MaxHP, Is.EqualTo(originalEffectiveMaxHp).Within(0.02f));
+            restoredWall.CurrentHP = restoredWall.MaxHP;
+            entityManager.SetComponentData(wallEntity, restoredWall);
+            yield return null;
         }
 
         [UnityTest]

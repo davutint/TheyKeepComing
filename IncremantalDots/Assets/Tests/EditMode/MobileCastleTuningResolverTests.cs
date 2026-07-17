@@ -20,6 +20,7 @@ namespace DeadWalls.Tests
                 profile.MaxSpawnBatch = 23;
                 profile.DayIntensity = 0.4f;
                 profile.NightIntensity = 2.2f;
+                profile.WallBaseHp = 555f;
                 profile.RepairBaseStoneCost = 77;
                 profile.NormalRepairHealPercent = 0.30f;
                 profile.RepairStonePerMissingHp = 0.42f;
@@ -36,6 +37,7 @@ namespace DeadWalls.Tests
                     MaxSpawnBatch = 12,
                     SiegeDayIntensityMultiplier = 0.55f,
                     SiegeNightIntensityMultiplier = 1.65f,
+                    WallBaseHp = 222f,
                     RepairBaseStoneCost = 80,
                     SiegeCycleDuration = 91f,
                     SiegeDayDuration = 31f,
@@ -51,6 +53,7 @@ namespace DeadWalls.Tests
                 Assert.That(config.MaxSpawnBatch, Is.EqualTo(23));
                 Assert.That(config.SiegeDayIntensityMultiplier, Is.EqualTo(0.4f));
                 Assert.That(config.SiegeNightIntensityMultiplier, Is.EqualTo(2.2f));
+                Assert.That(config.WallBaseHp, Is.EqualTo(555f));
                 Assert.That(config.RepairBaseStoneCost, Is.EqualTo(77));
                 Assert.That(config.NormalRepairHealPercent, Is.EqualTo(0.30f));
                 Assert.That(config.RepairStonePerMissingHp, Is.EqualTo(0.42f));
@@ -99,6 +102,7 @@ namespace DeadWalls.Tests
                 {
                     ZombieHpGrowthPerCycle = authoring.ZombieHpGrowthPerCycle,
                     MaxSpawnBatch = authoring.MaxSpawnBatch,
+                    WallBaseHp = 0f,
                     RepairBaseStoneCost = authoring.RepairBaseStoneCost,
                     SiegeDayDuration = authoring.SiegeDayDuration,
                     SiegeDuskDuration = authoring.SiegeDuskDuration,
@@ -110,6 +114,8 @@ namespace DeadWalls.Tests
                 MobileCastleTuningResolver.ApplyDifficultyProfile(ref config, profile);
                 Assert.That(config.ZombieHpGrowthPerCycle, Is.Zero);
                 Assert.That(config.MaxSpawnBatch, Is.EqualTo(profile.MaxSpawnBatch));
+                Assert.That(profile.WallBaseHp, Is.EqualTo(350f));
+                Assert.That(config.WallBaseHp, Is.EqualTo(profile.WallBaseHp));
                 Assert.That(config.RepairBaseStoneCost, Is.EqualTo(profile.RepairBaseStoneCost));
                 Assert.That(config.SiegeDayDuration, Is.EqualTo(authoring.SiegeDayDuration));
                 Assert.That(config.SiegeDuskDuration, Is.EqualTo(authoring.SiegeDuskDuration));

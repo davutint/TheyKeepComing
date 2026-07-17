@@ -305,6 +305,8 @@ namespace DeadWalls
             if (castleQuery.IsEmpty) return false;
 
             _castleEntity = castleQuery.GetSingletonEntity();
+            if (!_techDefenseBaselineCaptured)
+                CaptureConfiguredWallBaseline();
             _initialized = true;
             ApplyMobileInitialPrepIfNeeded();
             EnsureCurrentRunId();
@@ -646,29 +648,34 @@ namespace DeadWalls
                 return ResourceCost.Zero;
 
             var wall = _entityManager.GetComponentData<WallSegment>(_castleEntity);
-            float missingHp = Mathf.Max(0f, wall.MaxHP - wall.CurrentHP);
-            if (missingHp <= 0.005f || wall.MaxHP <= 0f)
-                return ResourceCost.Zero;
-
-            float healHp = Mathf.Min(missingHp, wall.MaxHP * GetNormalRepairHealPercent());
             float stonePerHp = 0.10f;
             float dayPriceMultiplier = 1f;
             if (TryGetMobileCombatConfig(out var config))
             {
                 stonePerHp = config.RepairStonePerMissingHp > 0f
                     ? config.RepairStonePerMissingHp
-                    : config.RepairBaseStoneCost / Mathf.Max(1f, wall.MaxHP);
+                    : 0.10f;
                 dayPriceMultiplier = config.RepairDayPriceMultiplier > 0f
                     ? config.RepairDayPriceMultiplier
                     : 1f;
             }
 
-            float multiplier = dayPriceMultiplier * Mathf.Max(
+            float discountMultiplier = Mathf.Max(
                 0.05f,
                 _techRepairCostMultiplier * GetHeartRepairCostMultiplier());
+            int stoneCost = SingleWallDefenseRules.CalculateRepairStoneCost(
+                wall.CurrentHP,
+                wall.MaxHP,
+                GetNormalRepairHealPercent(),
+                stonePerHp,
+                dayPriceMultiplier,
+                discountMultiplier);
+            if (stoneCost <= 0)
+                return ResourceCost.Zero;
+
             return new ResourceCost(
                 0,
-                Mathf.Max(1, Mathf.CeilToInt(healHp * stonePerHp * multiplier)),
+                stoneCost,
                 0, 0);
         }
 
@@ -678,6 +685,35 @@ namespace DeadWalls
                 return Mathf.Clamp01(config.NormalRepairHealPercent);
 
             return 0.25f;
+        }
+
+        /// <summary>
+        /// Difficulty Profile Wall baseline'ini live uygular. Tech/meta/Heart effective carpanlari
+        /// yeniden fold edilir ve mevcut HP orani korunur.
+        /// </summary>
+        public bool ApplyWallBaseHpTuning(float baseMaxHp)
+        {
+            if (!_initialized
+                || !CanAccessEntityManager()
+                || !_entityManager.Exists(_castleEntity)
+                || float.IsNaN(baseMaxHp)
+                || float.IsInfinity(baseMaxHp))
+            {
+                return false;
+            }
+
+            _baseWallMaxHp = Mathf.Max(1f, baseMaxHp);
+            _techDefenseBaselineCaptured = true;
+            if (TryGetMobileConfigEntity(out Entity configEntity))
+            {
+                var config = _entityManager.GetComponentData<MobileCastleCombatConfig>(configEntity);
+                config.WallBaseHp = _baseWallMaxHp;
+                _entityManager.SetComponentData(configEntity, config);
+            }
+
+            ApplyTechDefenseAggregates();
+            OnGameStateChanged?.Invoke();
+            return true;
         }
 
         public ResourceCost GetFortifyCost()
@@ -2510,6 +2546,35 @@ namespace DeadWalls
             if (total <= 0L)
                 return 0;
             return total >= int.MaxValue ? int.MaxValue : (int)total;
+        }
+
+        private void CaptureConfiguredWallBaseline()
+        {
+            if (!_entityManager.Exists(_castleEntity))
+                return;
+
+            var wall = _entityManager.GetComponentData<WallSegment>(_castleEntity);
+            float healthRatio = SingleWallDefenseRules.GetHealthRatio(wall.CurrentHP, wall.MaxHP);
+            float configuredBaseHp = wall.MaxHP;
+            if (_mobileConfigEntity != Entity.Null
+                && _entityManager.Exists(_mobileConfigEntity)
+                && _entityManager.HasComponent<MobileCastleCombatConfig>(_mobileConfigEntity))
+            {
+                var config = _entityManager.GetComponentData<MobileCastleCombatConfig>(_mobileConfigEntity);
+                if (config.WallBaseHp > 0f
+                    && !float.IsNaN(config.WallBaseHp)
+                    && !float.IsInfinity(config.WallBaseHp))
+                {
+                    configuredBaseHp = config.WallBaseHp;
+                }
+            }
+
+            _baseWallMaxHp = Mathf.Max(1f, configuredBaseHp);
+            _techDefenseBaselineCaptured = true;
+            wall.MaxHP = _baseWallMaxHp;
+            wall.CurrentHP = wall.MaxHP * healthRatio;
+            _entityManager.SetComponentData(_castleEntity, wall);
+            Wall = wall;
         }
 
         /// <summary>

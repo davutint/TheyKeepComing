@@ -1979,6 +1979,7 @@ namespace DeadWalls
             profile.SpawnBatchGrowthPerCycle = 0.15f;
             profile.MaxSpawnBatch = 16;
             // Erken kurtulus yolu: repair'in stone bagimliligi dusuruldu
+            profile.WallBaseHp = 350f;
             profile.RepairBaseStoneCost = 50;
             profile.NormalRepairHealPercent = 0.25f;
             profile.RepairStonePerMissingHp = 0.10f;

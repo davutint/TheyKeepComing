@@ -21,7 +21,8 @@ iyileştirir.
 - `CastleYardPrepState`: Rally aktif süre ve fire-rate multiplier verisini taşır.
 - `CastleYardPrepSystem`: Rally timer'ını bütün continuous-cycle fazlarında azaltır.
 - `MobileCastleCombatConfig`: normal repair, Rally ve Emergency Repair runtime tuning'ini
-  taşır; `MobileCastleTuningResolver` değerleri `DifficultyProfileSO` kaynağından yazar.
+  taşır; Wall base HP dahil `MobileCastleTuningResolver` değerleri `DifficultyProfileSO`
+  kaynağından yazar. Profile yoksa baked `CastleAuthoring.WallHP` fallback kalir.
 - `RunPersistence`: güncel v14 şemasında üç ability cooldown'ını ve aktif ability etkilerini
   exact saklar; v11 kayıtları Rally ve Emergency Repair hazır başlayacak şekilde migrate edilir.
 
@@ -84,6 +85,8 @@ Normal repair ability değildir. Yalnız Day/Dusk sırasında görünür ve çal
 gerçek iyileşecek miktar fiyatlanır. Stone maliyeti
 `ceil(actualHealHP × RepairStonePerMissingHp × RepairDayPriceMultiplier × discounts)`
 formülüdür. Night guard transaction'dan önce çalıştığı için Stone harcanmaz.
+Gameplay quote'u ve Difficulty Tuner baseline preview'u ayni
+`SingleWallDefenseRules.CalculateRepairStoneCost` metodunu kullanir.
 
 ## UI ve legacy sınırı
 

@@ -82,7 +82,9 @@ namespace DeadWalls
         public float SiegeDuskEndIntensityMultiplier;
         public float SiegeNightIntensityMultiplier;
         public float SiegeDawnIntensityMultiplier;
-        // Repair maliyeti: tam kayipta odenen taban (kayip oranıyla olceklenir)
+        // Profile varsa effective Wall baseline; 0 ise CastleAuthoring bake degeri fallback'tir.
+        public float WallBaseHp;
+        // Legacy serialized repair tabanlari; V1 aktif fiyat owner'i Stone/HP formulu.
         public int RepairBaseWoodCost;
         public int RepairBaseStoneCost;
         // V1 normal repair: Day/Dusk'ta MaxHP yuzdesi kadar paket heal; Stone maliyeti
