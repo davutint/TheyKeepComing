@@ -139,7 +139,8 @@ namespace DeadWalls
         public float GlobalArrowDamageBonus;
         public float GlobalFireRateMultiplier;
 
-        // Council state
+        // Council run state: regular handled day, karar hafizasi ve deterministic salt.
+        // Cozulmus sureli production/next-night etkileri asagidaki economy state alanlarindadir.
         public List<CouncilFlagEntry> CouncilFlags = new List<CouncilFlagEntry>();
         public List<string> RecentCouncilTemplates = new List<string>();
         public List<string> UsedOneShotCouncils = new List<string>();

@@ -43,11 +43,30 @@ recetesi tarafindan kabul edilmez. Diger 10 atom authored tariflerde kullanilir.
    ister. Tek bir branch'i isaretlemez; karti acmaz, secim yapmaz, timer/pause/resource state'ine
    dokunmaz. `CouncilChoiceCommittedByPlayer` yalniz basarili gercek UI seciminden sonra yayilir.
 
+## `CouncilRunState` Contract'i
+
+Bu contract ayri bir ikinci state nesnesi degildir. Regular-only Council akisinin mevcut
+owner'lari asagidaki tek zinciri olusturur:
+
+| Contract alani | Tek otorite | Exact save davranisi |
+|---|---|---|
+| Regular handled day | `CouncilRegularSchedule` cadence + `GameManager._lastRegularCouncilDay` | `LastRegularCouncilDay` aynen saklanir; ayni gun ikinci kart acilmaz |
+| Flag ve chain hafizasi | `GameManager._councilFlags` (`flag -> set day`) | `CouncilFlags` listesi aynen saklanir |
+| Recent/one-shot hafiza | `_recentCouncilTemplates` + `_usedOneShotCouncils` | Sirali recent liste ve one-shot set girdileri saklanir |
+| Deterministik run salt | `GameManager._councilRunSalt` | Ilk regular meeting beklenmeden ilk exact save'de non-zero commit edilir |
+| Cozulmemis aktif kart | `GameManager._activeCouncilEvent` + discriminator | Payload yeniden compose edilmez; production catalog preflight'i fail-closed'dur |
+| Cozulmus sureli etkiler | `MobileEconomyEventState` production/next-night multiplier + expiry alanlari | Kart yeniden acilmaz; multiplier ve expiry aynen restore edilir |
+
+Council V1 regular-only'dir. Emergency meeting type, trigger, rarity veya ayri run-state
+dali yoktur. UI, onboarding ve presentation katmanlari bu state'i okuyabilir fakat yazma
+otoritesi yalniz `GameManager` transaction'lari ve mevcut ECS effect owner'larindadir.
+
 ## Regular Schedule
 
 - Tek takvim owner'i `CouncilRegularSchedule`'dir: ilk regular gun `3`, interval `3`.
 - Day `1/2/4/5...` hicbir chance roll yapmaz; pity ve cooldown regular akisa dahil degildir.
-- `_lastRegularCouncilDay` ayni Dawn'da ikinci karti engeller ve exact save v11'de korunur.
+- `_lastRegularCouncilDay` ayni Dawn'da ikinci karti engeller; alan v11'de eklenmistir ve
+  guncel exact save v14'te korunur.
 - Compose gecersiz catalog nedeniyle null donerse scheduled gun fail-closed islenir; ayni gun
   hot-reload veya tekrar cagri ile farkli kart reroll edilmez.
 - V1 Council regular-only'dir; Day `3/6/9...` disinda ikinci bir meeting type veya trigger
@@ -58,8 +77,10 @@ recetesi tarafindan kabul edilmez. Diger 10 atom authored tariflerde kullanilir.
 
 ## Persistence
 
-- v11 `LastRegularCouncilDay`, `HasActiveCouncilEvent`, active composed payload, flags, recent
-  template memory, one-shot list ve run salt'i saklar.
+- Guncel v14 save; v11'de eklenen `LastRegularCouncilDay`, `HasActiveCouncilEvent`, active
+  composed payload, flags, recent template memory, one-shot list ve run salt'i saklar.
+- Yeni run salt'i ilk meeting'e kadar ertelenmez; ilk exact snapshot'tan once uretilir.
+  Boylece Day 1/2 Main Menu -> Continue gelecekteki regular kart dizisini degistirmez.
 - `HasActiveCouncilEvent` otoritedir; `JsonUtility` null nested class'i bos nesne yaptigi icin
   discriminator false ise payload ignore edilip null'a normalize edilir.
 - v10 chance/pity state'i migrate edilirken yalniz mevcut regular gunde aktif/gecerli kart veya
@@ -197,7 +218,8 @@ exact metin, affordability, cycle countdown ve generated HUD prefab timer'ini ki
 `CouncilRegularSchedulePlayModeTests` bozuk payload'in karar/on-state mutation yapamadigini;
 `ExactRunContinuePlayModeTests` ayni payload'in Continue preflight'ta restart oncesi
 reddedildigini; `CouncilRegularSchedulePlayModeTests` active payload/memory/handled-day ile
-cozulmus secim ve sureli effect state'inin exact Continue davranisini dogrular.
+cozulmus secim, sureli effect state'i ve ilk meeting oncesi committed run salt'in exact
+Continue davranisini dogrular.
 
 ## Isim Sozlesmesi
 

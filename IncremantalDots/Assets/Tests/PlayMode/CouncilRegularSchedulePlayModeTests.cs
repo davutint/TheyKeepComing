@@ -111,6 +111,35 @@ namespace DeadWalls.Tests
         }
 
         [UnityTest]
+        public IEnumerator FreshRun_SaveCommitsCouncilSaltBeforeFirstRegularMeeting()
+        {
+            GameManager gameManager = GameManager.Instance;
+            FieldInfo saltField = typeof(GameManager).GetField(
+                "_councilRunSalt",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.That(saltField, Is.Not.Null);
+            saltField.SetValue(gameManager, 0u);
+            Assert.That(GetPrivateField<int>(gameManager, "_lastRegularCouncilDay"),
+                Is.EqualTo(-1));
+            Assert.That(gameManager.ActiveCouncilEvent, Is.Null);
+
+            yield return WaitForSnapshotReady(gameManager);
+
+            uint committedSalt = GetPrivateField<uint>(gameManager, "_councilRunSalt");
+            RunSaveState save = RunPersistence.TryLoad();
+            Assert.That(committedSalt, Is.Not.Zero);
+            Assert.That(save, Is.Not.Null);
+            Assert.That(save.CouncilRunSalt, Is.EqualTo(committedSalt));
+
+            Assert.That(gameManager.TryRestoreRunFromCheckpoint(), Is.True);
+            Assert.That(GetPrivateField<uint>(gameManager, "_councilRunSalt"),
+                Is.EqualTo(committedSalt));
+            Assert.That(GetPrivateField<int>(gameManager, "_lastRegularCouncilDay"),
+                Is.EqualTo(-1));
+            Assert.That(gameManager.ActiveCouncilEvent, Is.Null);
+        }
+
+        [UnityTest]
         public IEnumerator RegularCouncil_OpensExactlyOnThreeSixNineCadence_OncePerDay()
         {
             GameManager gameManager = GameManager.Instance;

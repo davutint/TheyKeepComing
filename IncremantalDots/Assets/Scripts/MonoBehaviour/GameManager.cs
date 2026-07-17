@@ -3034,10 +3034,15 @@ namespace DeadWalls
                     baseSeed = stored;
             }
 
-            if (_councilRunSalt == 0u)
-                _councilRunSalt = (uint)UnityEngine.Random.Range(1, int.MaxValue);
+            EnsureCouncilRunSalt();
 
             return math.hash(new uint3(baseSeed, _councilRunSalt, (uint)day));
+        }
+
+        private void EnsureCouncilRunSalt()
+        {
+            if (_councilRunSalt == 0u)
+                _councilRunSalt = (uint)UnityEngine.Random.Range(1, int.MaxValue);
         }
 
         private CouncilContext BuildCouncilContext(int day)
@@ -3067,7 +3072,8 @@ namespace DeadWalls
             _usedOneShotCouncils.Clear();
             _activeCouncilEvent = null;
             _lastRegularCouncilDay = -1;
-            _councilRunSalt = (uint)UnityEngine.Random.Range(1, int.MaxValue); // her kosuya taze zar
+            _councilRunSalt = 0u;
+            EnsureCouncilRunSalt(); // her kosuya taze ve ilk save'den once kalici zar
             _councilWoodCapBonus = 0;
             _councilStoneCapBonus = 0;
             _councilIronCapBonus = 0;
@@ -3083,6 +3089,7 @@ namespace DeadWalls
         /// <summary>Kosunun safak fotografini diske yazar (yalniz recompute-EDILEMEYEN durum).</summary>
         private void SaveRunCheckpointLegacy()
         {
+            EnsureCouncilRunSalt();
             var save = new RunSaveState
             {
                 CycleIndex = ContinuousSiegeCycle.CycleIndex,
@@ -3177,6 +3184,7 @@ namespace DeadWalls
             foreach (var id in save.UsedOneShotCouncils)
                 _usedOneShotCouncils.Add(id);
             _councilRunSalt = save.CouncilRunSalt;
+            EnsureCouncilRunSalt();
             _councilWoodCapBonus = save.CouncilWoodCapBonus;
             _councilStoneCapBonus = save.CouncilStoneCapBonus;
             _councilIronCapBonus = save.CouncilIronCapBonus;
@@ -3310,6 +3318,7 @@ namespace DeadWalls
             }
 
             EnsureCurrentRunId();
+            EnsureCouncilRunSalt();
             if (!TryCaptureHeartGraphForSave(
                     out GeneratedRunGraph heartGraphSnapshot,
                     out string heartSaveError))
@@ -3659,6 +3668,7 @@ namespace DeadWalls
                 _usedOneShotCouncils.Add(id);
             _lastRegularCouncilDay = save.LastRegularCouncilDay;
             _councilRunSalt = save.CouncilRunSalt;
+            EnsureCouncilRunSalt();
             _councilWoodCapBonus = save.CouncilWoodCapBonus;
             _councilStoneCapBonus = save.CouncilStoneCapBonus;
             _councilIronCapBonus = save.CouncilIronCapBonus;

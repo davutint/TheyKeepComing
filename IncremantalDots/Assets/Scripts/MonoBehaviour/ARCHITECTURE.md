@@ -154,7 +154,7 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - Director: kit kaynak/dusuk savunma/bolluk baglamina gore atom-sablon agirliklari; hafiza: flag'ler + zincir sablonlari (RequiredFlags/ChainDelayDays/OneShot); butce: A/B secenekleri "dakika-degeri" cinsinden dengelenir
 - Regular schedule tek owner'i `CouncilRegularSchedule`: Day `3,6,9,12...`; chance/pity/cooldown regular akis disinda. V1 regular-only'dir ve ikinci emergency meeting yolu yoktur. GameManager API: `TryOpenRegularCouncilEvent`, `ChooseCouncilOption`, `ExpireCouncilEvent`, `CanAffordCouncilOption`
 - `CouncilOptionPresentationUtility` iki secenegi canli state'ten exact quote eder; `CouncilDecisionWindowUtility` kalan Dawn + Day suresini `DECIDE Ns` ve azalan Filled/Horizontal seride verir
-- Exact save v13 `LastRegularCouncilDay`, `HasActiveCouncilEvent` ve Essence meta remainder'ını korur; v10 chance fail'i migration'da scheduled gunu tuketmez
+- Exact save v14 `LastRegularCouncilDay`, non-zero Council run salt, `HasActiveCouncilEvent` ve resolved effect state'ini korur; v10 chance fail'i migration'da scheduled gunu tuketmez
 - Otoriter dok: `COUNCIL_EVENTS_ARCHITECTURE.md`
 
 ### DefenseRepairUI.cs
