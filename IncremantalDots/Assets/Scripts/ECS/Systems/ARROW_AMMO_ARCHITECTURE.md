@@ -68,10 +68,21 @@ Refill bir UI/ECS singleton transaction'ıdır; archer başına üretim entity's
 oluşturmaz. `Rapid` yüksek fire rate nedeniyle aynı sürede Basic'ten daha fazla Arrow
 tüketir. 1.000 archer refill sonrası mevcut pooled projectile yolunu kullanmaya devam eder.
 
+1.000 hazır Basic Archer + stok `0` kabul koşusunda gerçek
+`GameManager.TryBuyArrowRefill(10)` transaction'ı `1.000 Arrow / 250 Wood` yazar. Takip eden
+tek simulation tick'i tam `1.000` gameplay projectile rent eder, stoku tekrar `0` yapar ve
+prewarm pool'u genişletmez. İki temiz Editor örneklemi refill transaction için
+`0,010-0,600 ms`, restart frame'i için `22,210-23,158 ms` main thread /
+`24,327-50,327 ms` wall-frame ve bütün Editor test frame'i için `29.622-30.094 B` GC gösterdi.
+Guard bütçesi main thread `< 50 ms`, wall-frame `< 100 ms`'dir. GC
+örneklemi test runner dahil tüm Editor frame'ine aittir; izole Player system-allocation kabulü
+yerine geçmez.
+
 Doğrulama sahipleri:
 
 - `ArrowEconomyUtilityTests`: sabit birim fiyat, kısmi dolum, Buy Max, efficiency,
   exponential yatırım ve overflow sınırları.
 - `ArrowAmmoPlayModeTests`: stok `0` iken atışın durması, instant refill sonrası yeniden
-  başlaması, projectile başına `1` tüketim ve Rapid tüketim farkı.
+  başlaması, 1.000 Archer bulk-refill restart ölçümü, projectile başına `1` tüketim ve Rapid
+  tüketim farkı.
 - `RunPersistenceTests`: şema `v8`, eski kayıt migration'ı ve yatırım seviyeleri.

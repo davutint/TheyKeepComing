@@ -54,6 +54,9 @@ profile bulunmayan eski sahneler içindir.
 - Capacity/Efficiency al: ikisi de Wood + Iron harcamalı ve fiyatları ayrı seviyeleriyle
   büyümeli.
 - Save/Continue: current stok ve iki yatırım seviyesi aynı kalmalı.
+- 1.000 hazır okçu + stok `0`: `+10` paketlik gerçek transaction sonrası takip eden simulation
+  tick'inde tam `1.000` pooled projectile rent edilmeli, stok tam `0` olmalı ve pool expansion
+  oluşmamalı. Editor guard bütçeleri restart main thread `< 50 ms`, wall-frame `< 100 ms`.
 - Onboarding flag incomplete iken stoku `%25` esigine indir: `ArrowChip` pulse olmali,
   `AmmoPurchasePanel` kendiliginden acilmamali; basarisiz refill flag yazmamali, basarili refill
   `tutorial.v1.low_ammo` flag'ini yazmalidir.

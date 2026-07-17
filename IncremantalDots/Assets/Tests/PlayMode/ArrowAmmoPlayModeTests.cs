@@ -1,8 +1,10 @@
 using System.Collections;
 using System.IO;
 using NUnit.Framework;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Profiling;
 using Unity.Transforms;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -82,6 +84,147 @@ namespace DeadWalls.Tests
                 "Gercek pooled projectile basina tam 1 Arrow dusmeli.");
 
             Cleanup(em, waveEntity, enemyPoolEntity, arrowPoolEntity, target, archer);
+        }
+
+        [UnityTest]
+        public IEnumerator ThousandArchers_ZeroSupplyThenBulkRefill_RestartsPooledSalvoNextTick()
+        {
+            const int archerCount = 1_000;
+            const int refillPackageCount = 10;
+
+            yield return WaitForRuntime();
+            EntityManager em = World.DefaultGameObjectInjectionWorld.EntityManager;
+            SetupIsolatedCombat(em, out Entity gameStateEntity, out Entity waveEntity,
+                out Entity enemyPoolEntity, out Entity arrowPoolEntity, out Entity target);
+
+            Entity archerPrefab = em.GetComponentData<ArcherPrefabData>(
+                em.CreateEntityQuery(typeof(ArcherPrefabData)).GetSingletonEntity()).ArcherPrefab;
+            using (NativeArray<Entity> archers =
+                   em.Instantiate(archerPrefab, archerCount, Allocator.Temp))
+            {
+                for (int i = 0; i < archers.Length; i++)
+                {
+                    em.SetComponentData(archers[i], new ArcherUnit
+                    {
+                        FireRate = 1.5f,
+                        FireTimer = 0f,
+                        ArrowDamage = 10f,
+                        Range = 15f,
+                        Type = ArcherType.Basic,
+                        SlowDuration = 0f,
+                        SlowMultiplier = 1f,
+                        FacingDirection = new float2(1f, 0f),
+                        AttackAnimTimer = 0f
+                    });
+                    em.SetComponentData(archers[i], LocalTransform.FromPositionRotationScale(
+                        new float3(0f, 0f, MobileCastleRenderDepth.UnitZ),
+                        quaternion.identity,
+                        1f));
+                }
+            }
+
+            Entity arrowPrefab = em.GetComponentData<ArrowPrefabData>(
+                em.CreateEntityQuery(typeof(ArrowPrefabData)).GetSingletonEntity()).ArrowPrefab;
+            Assert.That(ArrowPoolRuntimeUtility.Maintain(em, arrowPoolEntity, arrowPrefab), Is.True);
+            ArrowPoolRuntimeData poolBefore = em.GetComponentData<ArrowPoolRuntimeData>(arrowPoolEntity);
+            Assert.That(poolBefore.AvailableCount, Is.GreaterThanOrEqualTo(archerCount),
+                "1K restart olcumunden once projectile pool prewarm tamamlanmis olmali.");
+
+            ArrowSupply supply = em.GetComponentData<ArrowSupply>(gameStateEntity);
+            supply.CapacityLevel = 50;
+            supply.Current = 0;
+            em.SetComponentData(gameStateEntity, supply);
+
+            ResourceData resources = em.GetComponentData<ResourceData>(gameStateEntity);
+            resources.Wood = 100_000;
+            em.SetComponentData(gameStateEntity, resources);
+            yield return null;
+
+            Time.timeScale = 0f;
+            long stoppedRentCount = em.GetComponentData<ArrowPoolRuntimeData>(
+                arrowPoolEntity).TotalRentCount;
+            yield return null;
+            Assert.That(em.GetComponentData<ArrowPoolRuntimeData>(arrowPoolEntity).TotalRentCount,
+                Is.EqualTo(stoppedRentCount),
+                "1K hazir okcu Arrow stoku sifirken projectile rent etmemeli.");
+
+            ArrowRefillQuote quote = GameManager.Instance.GetArrowRefillQuote(refillPackageCount);
+            Assert.That(quote.IsValid, Is.True);
+            Assert.That(quote.ArrowAmount, Is.EqualTo(archerCount));
+            int woodBefore = em.GetComponentData<ResourceData>(gameStateEntity).Wood;
+
+            double refillTransactionMs;
+            double restartMainThreadMs;
+            double restartWallFrameMs;
+            long restartGcBytes;
+            using (var mainThread = ProfilerRecorder.StartNew(
+                       ProfilerCategory.Internal, "Main Thread", 1))
+            using (var gcAllocated = ProfilerRecorder.StartNew(
+                       ProfilerCategory.Memory, "GC Allocated In Frame", 1))
+            {
+                Assert.That(mainThread.Valid, Is.True);
+                Assert.That(gcAllocated.Valid, Is.True);
+
+                // Recorder'in ilk sample'ini sifir stoklu frame ile isit; refill ve 1K salvo
+                // takip eden tek kayitli frame'de birlikte olculur.
+                yield return null;
+                Assert.That(em.GetComponentData<ArrowPoolRuntimeData>(
+                    arrowPoolEntity).TotalRentCount, Is.EqualTo(stoppedRentCount));
+
+                double refillStarted = Time.realtimeSinceStartupAsDouble;
+                Assert.That(GameManager.Instance.TryBuyArrowRefill(refillPackageCount), Is.True);
+                refillTransactionMs =
+                    (Time.realtimeSinceStartupAsDouble - refillStarted) * 1000.0;
+                Assert.That(em.GetComponentData<ArrowSupply>(gameStateEntity).Current,
+                    Is.EqualTo(archerCount));
+                Assert.That(em.GetComponentData<ResourceData>(gameStateEntity).Wood,
+                    Is.EqualTo(woodBefore - quote.WoodCost));
+
+                double restartFrameStarted = Time.realtimeSinceStartupAsDouble;
+                yield return null;
+                restartWallFrameMs =
+                    (Time.realtimeSinceStartupAsDouble - restartFrameStarted) * 1000.0;
+                restartMainThreadMs = mainThread.LastValue / 1_000_000.0;
+                restartGcBytes = gcAllocated.LastValue;
+            }
+
+            ArrowPoolRuntimeData poolAfter = em.GetComponentData<ArrowPoolRuntimeData>(arrowPoolEntity);
+            using EntityQuery projectileQuery = em.CreateEntityQuery(
+                typeof(ArrowTag), typeof(ArrowProjectile), typeof(LocalTransform));
+            Assert.That(poolAfter.TotalRentCount - stoppedRentCount, Is.EqualTo(archerCount),
+                "Refill sonrasi ilk simulation tick'i 1K pooled gameplay projectile uretmeli.");
+            Assert.That(poolAfter.ActiveCount, Is.EqualTo(archerCount));
+            Assert.That(projectileQuery.CalculateEntityCount(), Is.EqualTo(archerCount));
+            Assert.That(poolAfter.TotalCreated, Is.EqualTo(poolBefore.TotalCreated),
+                "1K refill restart frame'i prewarm pool'u genisletmemeli.");
+            Assert.That(poolAfter.ExpansionCount, Is.EqualTo(poolBefore.ExpansionCount));
+            Assert.That(em.GetComponentData<ArrowSupply>(gameStateEntity).Current, Is.Zero,
+                "1K gercek projectile tam 1K Arrow tuketmeli.");
+            Assert.That(restartMainThreadMs, Is.GreaterThan(0.0),
+                "Main Thread profiler sample'i olculebilir olmali.");
+            Assert.That(restartMainThreadMs, Is.LessThan(50.0),
+                $"1K refill restart Editor main-thread safety budget'ini asti: {restartMainThreadMs:F2} ms.");
+            Assert.That(restartWallFrameMs, Is.LessThan(100.0),
+                $"1K refill restart wall-frame safety budget'ini asti: {restartWallFrameMs:F2} ms.");
+
+            Debug.Log(
+                $"[DW-V1-ARROW-REFILL-1K] archers={archerCount}; refill_arrows={quote.ArrowAmount}; " +
+                $"wood_cost={quote.WoodCost}; refill_transaction_ms={refillTransactionMs:F3}; " +
+                $"restart_main_ms={restartMainThreadMs:F3}; " +
+                $"restart_wall_frame_ms={restartWallFrameMs:F3}; restart_gc_bytes={restartGcBytes}; " +
+                $"rents={poolAfter.TotalRentCount - stoppedRentCount}; " +
+                $"pool_expansions={poolAfter.ExpansionCount - poolBefore.ExpansionCount}");
+
+            Time.timeScale = 1f;
+            ArrowPoolRuntimeUtility.ReturnAllActive(em, arrowPoolEntity);
+            using (EntityQuery archerQuery = em.CreateEntityQuery(typeof(ArcherUnit)))
+                em.DestroyEntity(archerQuery);
+            if (em.Exists(target))
+                EnemyPoolRuntimeUtility.Return(em, enemyPoolEntity, target);
+            WaveStateData wave = em.GetComponentData<WaveStateData>(waveEntity);
+            wave.StressTestMode = false;
+            wave.ZombiesAlive = 0;
+            em.SetComponentData(waveEntity, wave);
         }
 
         [UnityTest]
