@@ -66,6 +66,8 @@ namespace DeadWalls
                     IsGameOver = false,
                     IsLevelUpPending = false
                 });
+                AddComponent(entity, new RunTelemetryData { PeakEnemies = 0 });
+                AddBuffer<RunWallDamageTelemetryElement>(entity);
 
                 AddComponent(entity, new WaveStateData
                 {

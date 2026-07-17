@@ -158,6 +158,26 @@ namespace DeadWalls
         public float HpAfter;
     }
 
+    [Serializable]
+    public sealed class RunEndedWallDamageTelemetryEntry
+    {
+        public int Day;
+        public string Phase;
+        public float Damage;
+    }
+
+    [Serializable]
+    public sealed class RunEndedTelemetryPayload
+    {
+        public int Day;
+        public int Kills;
+        public int PeakEnemies;
+        public int PeakPopulation;
+        public List<RunEndedWallDamageTelemetryEntry> WallDamageTimeline =
+            new List<RunEndedWallDamageTelemetryEntry>();
+        public int MetaReward;
+    }
+
     internal static class WallRepairedTelemetryContract
     {
         internal static bool IsRepairPhase(string phase)
@@ -436,6 +456,8 @@ namespace DeadWalls
         public const int AbilityCastSchemaVersion = 1;
         public const string WallRepairedEventName = "wall_repaired";
         public const int WallRepairedSchemaVersion = 1;
+        public const string RunEndedEventName = "run_ended";
+        public const int RunEndedSchemaVersion = 1;
 
         public static event Action<GameplayTelemetryRecord> Emitted;
 
@@ -613,6 +635,30 @@ namespace DeadWalls
             return EmitValidated(
                 WallRepairedEventName,
                 WallRepairedSchemaVersion,
+                normalizedRunId,
+                payload,
+                out record,
+                out error);
+        }
+
+        public static bool TryEmitRunEnded(
+            string runId,
+            RunEndedTelemetryPayload payload,
+            out GameplayTelemetryRecord record,
+            out string error)
+        {
+            record = default;
+            if (!TryNormalizeRunId(runId, RunEndedEventName, out string normalizedRunId,
+                    out error))
+            {
+                return false;
+            }
+            if (!TryValidateRunEnded(payload, out error))
+                return false;
+
+            return EmitValidated(
+                RunEndedEventName,
+                RunEndedSchemaVersion,
                 normalizedRunId,
                 payload,
                 out record,
@@ -1047,6 +1093,57 @@ namespace DeadWalls
             return true;
         }
 
+        internal static bool TryValidateRunEnded(
+            RunEndedTelemetryPayload payload,
+            out string error)
+        {
+            if (payload == null)
+            {
+                error = "run_ended payload bos.";
+                return false;
+            }
+            if (payload.Day < 1 || payload.Kills < 0 || payload.PeakEnemies < 0
+                || payload.PeakPopulation < 0 || payload.MetaReward < 0)
+            {
+                error = "run_ended summary degerleri gecersiz.";
+                return false;
+            }
+            if (payload.WallDamageTimeline == null)
+            {
+                error = "run_ended Wall damage timeline bos referans.";
+                return false;
+            }
+
+            int previousDay = 0;
+            int previousPhaseOrder = -1;
+            for (int i = 0; i < payload.WallDamageTimeline.Count; i++)
+            {
+                RunEndedWallDamageTelemetryEntry entry = payload.WallDamageTimeline[i];
+                if (entry == null || entry.Day < 1 || entry.Day > payload.Day
+                    || !PhaseChangedTelemetryFactory.TryGetContractPhaseOrder(
+                        entry.Phase, out int phaseOrder)
+                    || entry.Damage <= 0f || float.IsNaN(entry.Damage)
+                    || float.IsInfinity(entry.Damage))
+                {
+                    error = $"run_ended WallDamageTimeline[{i}] gecersiz.";
+                    return false;
+                }
+
+                if (entry.Day < previousDay
+                    || (entry.Day == previousDay && phaseOrder <= previousPhaseOrder))
+                {
+                    error = $"run_ended WallDamageTimeline[{i}] kronolojik veya unique degil.";
+                    return false;
+                }
+
+                previousDay = entry.Day;
+                previousPhaseOrder = phaseOrder;
+            }
+
+            error = string.Empty;
+            return true;
+        }
+
         private static bool TryValidateCouncilEffect(
             CouncilResolvedTelemetryEffect effect,
             out string error)
@@ -1391,6 +1488,46 @@ namespace DeadWalls
         }
     }
 
+    internal static class RunEndedTelemetryFactory
+    {
+        internal static RunEndedTelemetryPayload Create(
+            int day,
+            int kills,
+            int peakEnemies,
+            int peakPopulation,
+            IReadOnlyList<RunEndedWallDamageTelemetryEntry> wallDamageTimeline,
+            int metaReward)
+        {
+            var timeline = new List<RunEndedWallDamageTelemetryEntry>();
+            if (wallDamageTimeline != null)
+            {
+                for (int i = 0; i < wallDamageTimeline.Count; i++)
+                {
+                    RunEndedWallDamageTelemetryEntry entry = wallDamageTimeline[i];
+                    if (entry == null)
+                        continue;
+
+                    timeline.Add(new RunEndedWallDamageTelemetryEntry
+                    {
+                        Day = entry.Day,
+                        Phase = entry.Phase,
+                        Damage = entry.Damage
+                    });
+                }
+            }
+
+            return new RunEndedTelemetryPayload
+            {
+                Day = Math.Max(1, day),
+                Kills = Math.Max(0, kills),
+                PeakEnemies = Math.Max(0, peakEnemies),
+                PeakPopulation = Math.Max(0, peakPopulation),
+                WallDamageTimeline = timeline,
+                MetaReward = Math.Max(0, metaReward)
+            };
+        }
+    }
+
     internal static class RunStartedTelemetryFactory
     {
         internal static RunStartedTelemetryPayload Create(
@@ -1499,6 +1636,33 @@ namespace DeadWalls
                 || string.Equals(phase, "dusk", StringComparison.Ordinal)
                 || string.Equals(phase, "night", StringComparison.Ordinal)
                 || string.Equals(phase, "dawn", StringComparison.Ordinal);
+        }
+
+        internal static bool TryGetContractPhaseOrder(string phase, out int order)
+        {
+            if (string.Equals(phase, "day", StringComparison.Ordinal))
+            {
+                order = 0;
+                return true;
+            }
+            if (string.Equals(phase, "dusk", StringComparison.Ordinal))
+            {
+                order = 1;
+                return true;
+            }
+            if (string.Equals(phase, "night", StringComparison.Ordinal))
+            {
+                order = 2;
+                return true;
+            }
+            if (string.Equals(phase, "dawn", StringComparison.Ordinal))
+            {
+                order = 3;
+                return true;
+            }
+
+            order = -1;
+            return false;
         }
 
         internal static string ToContractPhase(SiegeCyclePhase phase)

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace DeadWalls
 {
@@ -11,6 +12,7 @@ namespace DeadWalls
         private string _phaseChangedTelemetryHandledRunId;
         private int _phaseChangedTelemetryHandledDay;
         private SiegeCyclePhase _phaseChangedTelemetryHandledPhase;
+        private string _runEndedTelemetryHandledRunId;
 
         private void TryEmitRunStartedTelemetry()
         {
@@ -321,6 +323,162 @@ namespace DeadWalls
             {
                 UnityEngine.Debug.LogError(
                     $"[GameManager] wall_repaired telemetry reddedildi: {error}");
+            }
+        }
+
+        private void CaptureRunTelemetryForSave(RunSaveState save)
+        {
+            if (save == null)
+                return;
+
+            save.TelemetryPeakEnemies = Math.Max(0, WaveState.ZombiesAlive);
+            if (_entityManager.HasComponent<RunTelemetryData>(_gameStateEntity))
+            {
+                RunTelemetryData telemetry =
+                    _entityManager.GetComponentData<RunTelemetryData>(_gameStateEntity);
+                save.TelemetryPeakEnemies = Math.Max(
+                    save.TelemetryPeakEnemies,
+                    telemetry.PeakEnemies);
+            }
+
+            if (save.WallDamageTimeline == null)
+                save.WallDamageTimeline = new List<RunWallDamageTelemetrySaveState>();
+            else
+                save.WallDamageTimeline.Clear();
+
+            if (!_entityManager.HasBuffer<RunWallDamageTelemetryElement>(_gameStateEntity))
+                return;
+
+            var timeline =
+                _entityManager.GetBuffer<RunWallDamageTelemetryElement>(_gameStateEntity, true);
+            for (int i = 0; i < timeline.Length; i++)
+            {
+                RunWallDamageTelemetryElement entry = timeline[i];
+                save.WallDamageTimeline.Add(new RunWallDamageTelemetrySaveState
+                {
+                    Day = entry.Day,
+                    Phase = (int)entry.Phase,
+                    Damage = entry.Damage
+                });
+            }
+        }
+
+        private void RestoreRunTelemetryFromSave(RunSaveState save)
+        {
+            if (save == null || !_entityManager.Exists(_gameStateEntity))
+                return;
+
+            int currentAlive = _entityManager.HasComponent<WaveStateData>(_gameStateEntity)
+                ? Math.Max(0,
+                    _entityManager.GetComponentData<WaveStateData>(_gameStateEntity).ZombiesAlive)
+                : 0;
+            if (_entityManager.HasComponent<RunTelemetryData>(_gameStateEntity))
+            {
+                _entityManager.SetComponentData(_gameStateEntity, new RunTelemetryData
+                {
+                    PeakEnemies = Math.Max(currentAlive, save.TelemetryPeakEnemies)
+                });
+            }
+
+            if (!_entityManager.HasBuffer<RunWallDamageTelemetryElement>(_gameStateEntity))
+                return;
+
+            var timeline =
+                _entityManager.GetBuffer<RunWallDamageTelemetryElement>(_gameStateEntity);
+            timeline.Clear();
+            if (save.WallDamageTimeline == null)
+                return;
+
+            for (int i = 0; i < save.WallDamageTimeline.Count; i++)
+            {
+                RunWallDamageTelemetrySaveState entry = save.WallDamageTimeline[i];
+                if (entry == null)
+                    continue;
+
+                timeline.Add(new RunWallDamageTelemetryElement
+                {
+                    Day = entry.Day,
+                    Phase = (SiegeCyclePhase)entry.Phase,
+                    Damage = entry.Damage
+                });
+            }
+        }
+
+        private void ResetRunTelemetryState()
+        {
+            if (!_entityManager.Exists(_gameStateEntity))
+                return;
+
+            if (_entityManager.HasComponent<RunTelemetryData>(_gameStateEntity))
+            {
+                _entityManager.SetComponentData(
+                    _gameStateEntity,
+                    new RunTelemetryData { PeakEnemies = 0 });
+            }
+            if (_entityManager.HasBuffer<RunWallDamageTelemetryElement>(_gameStateEntity))
+            {
+                _entityManager.GetBuffer<RunWallDamageTelemetryElement>(_gameStateEntity).Clear();
+            }
+        }
+
+        private void TryEmitRunEndedTelemetry(
+            int day,
+            int kills,
+            int peakPopulation,
+            MetaRunResult result)
+        {
+            if (!result.Persisted || string.IsNullOrWhiteSpace(_currentRunId)
+                || string.Equals(_runEndedTelemetryHandledRunId, _currentRunId,
+                    StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            int peakEnemies = Math.Max(0, WaveState.ZombiesAlive);
+            var wallDamage = new List<RunEndedWallDamageTelemetryEntry>();
+            if (_entityManager.Exists(_gameStateEntity))
+            {
+                if (_entityManager.HasComponent<RunTelemetryData>(_gameStateEntity))
+                {
+                    RunTelemetryData telemetry =
+                        _entityManager.GetComponentData<RunTelemetryData>(_gameStateEntity);
+                    peakEnemies = Math.Max(peakEnemies, telemetry.PeakEnemies);
+                }
+
+                if (_entityManager.HasBuffer<RunWallDamageTelemetryElement>(_gameStateEntity))
+                {
+                    var timeline = _entityManager.GetBuffer<RunWallDamageTelemetryElement>(
+                        _gameStateEntity,
+                        true);
+                    for (int i = 0; i < timeline.Length; i++)
+                    {
+                        RunWallDamageTelemetryElement entry = timeline[i];
+                        wallDamage.Add(new RunEndedWallDamageTelemetryEntry
+                        {
+                            Day = entry.Day,
+                            Phase = PhaseChangedTelemetryFactory.ToContractPhase(entry.Phase),
+                            Damage = entry.Damage
+                        });
+                    }
+                }
+            }
+
+            RunEndedTelemetryPayload payload = RunEndedTelemetryFactory.Create(
+                day,
+                kills,
+                peakEnemies,
+                peakPopulation,
+                wallDamage,
+                result.Reward.TotalSouls);
+            _runEndedTelemetryHandledRunId = _currentRunId;
+            if (!GameplayTelemetry.TryEmitRunEnded(
+                    _currentRunId,
+                    payload,
+                    out _,
+                    out string error))
+            {
+                UnityEngine.Debug.LogError(
+                    $"[GameManager] run_ended telemetry reddedildi: {error}");
             }
         }
     }

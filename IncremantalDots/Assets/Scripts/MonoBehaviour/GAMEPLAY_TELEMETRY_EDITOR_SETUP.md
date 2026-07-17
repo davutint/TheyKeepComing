@@ -54,14 +54,24 @@ sinifinin parcasidir; `GameplayTelemetry.cs` ayni `DeadWalls` runtime assembly's
     `wall_repaired` kaydi gelmemelidir. Emergency Repair ve Council heal de bu eventi uretmemelidir.
 24. Basarili normal repair sonrasi save/Continue yapildiginda ayni transaction tekrar
     yayilmamalidir.
+25. Normal bir run'da enemy sayisi yuksek su isaretine cikarilir; daha sonra alive sayisi dusse de
+    `run_ended.PeakEnemies` onceki en yuksek production count'u korumalidir.
+26. Wall farkli day/phase'lerde hasar aldiginda `WallDamageTimeline` kronolojik olmalidir; ayni
+    day/phase icindeki cok sayida hit tek aggregate bucket'ta toplanmalidir.
+27. Save/Continue sonrasi peak enemy ve Wall damage bucket'lari aynen korunmali; death aninda
+    `Day/Kills/PeakPopulation` ile durable `MetaReward` tek `run_ended` payload'ina girmelidir.
+28. Ayni lethal state/death transaction'i yeniden islenmeye calisildiginda ikinci `run_ended`
+    cikmamali; Meta save durable degilse event hic cikmamalidir.
 
 Otomatik kapsam:
 
-- EditMode `GameplayTelemetryTests`: run/phase/resource/archer/Heart/Council/ability/Wall repair
+- EditMode `GameplayTelemetryTests`: run/phase/resource/archer/Heart/Council/ability/Wall repair/
+  run-ended
   payload factory'leri,
   multi-resource canonical order, envelope serialization ve invalid identity/amount/result/
   transition/cap/node/level/depth/cost/reveal/resolution/effect/night-delta/ability-result/
-  repair-phase/cost/HP-transition guard'lari.
+  repair-phase/cost/HP-transition, final-summary/timeline/order guard'lari ve ECS accumulator
+  high-water/bucket aggregation davranisi.
 - PlayMode `GameplayTelemetryPlayModeTests`: gercek NewGameScene yeni-run emission'i, canonical
   phase/horde snapshot'i, ayni-phase idempotency, exact Continue duplicate guard'i, tek/iki kaynakli
   purchase commit event'leri, player archer buy/retrain transition snapshot'lari, canonical Castle
@@ -69,6 +79,8 @@ Otomatik kapsam:
   transaction sifir-event guard'i; gercek Fireball/Rally/Emergency Repair commit/result snapshot'i
   ile cooldown/rejected/Continue sifir-event davranisi; gercek Day normal repair Stone debit +
   HP transition snapshot'i, event sirasi ve full/Night/resource/Continue sifir-event davranisi.
+  Ayni class ayrica run telemetry accumulator'larini save/Continue boyunca koruyup durable death
+  sonrasinda tek `run_ended` final summary'ye baglar.
 
 Harici analytics target'i bu kurulumun parcasi degildir; tracker'daki owner-karari maddesi
 onaylanmadan SDK, servis veya endpoint eklenmez.

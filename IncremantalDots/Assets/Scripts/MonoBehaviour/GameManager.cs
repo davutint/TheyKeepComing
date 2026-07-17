@@ -3701,6 +3701,7 @@ namespace DeadWalls
             save.RecentCouncilTemplates.AddRange(_recentCouncilTemplates);
             save.UsedOneShotCouncils.AddRange(_usedOneShotCouncils);
 
+            CaptureRunTelemetryForSave(save);
             CaptureCombatSnapshot(save);
             return RunPersistence.Save(save);
         }
@@ -4085,6 +4086,7 @@ namespace DeadWalls
 
             if (!RestoreCombatSnapshot(save))
                 return false;
+            RestoreRunTelemetryFromSave(save);
             ReadECSData();
             SuppressSessionStartTelemetryForRestoredRun();
             OnGameStateChanged?.Invoke();
@@ -4615,9 +4617,12 @@ namespace DeadWalls
 
             // Meta Save basarisizsa receipt korunur; bir sonraki acilis ayni RunId'yi
             // idempotent tamamlar. UI mevcut sonucu yine gosterebilir.
-            RunPersistence.TryFinalizePendingDeathReward(out MetaRunResult result);
+            bool rewardFinalized =
+                RunPersistence.TryFinalizePendingDeathReward(out MetaRunResult result);
             LastRunResult = result;
             _metaRunCollected = true;
+            if (rewardFinalized)
+                TryEmitRunEndedTelemetry(day, kills, peakPopulation, result);
         }
 
         private void ConfigureWaveForCurrentNumber(ref WaveStateData wave)
@@ -6158,6 +6163,7 @@ namespace DeadWalls
                 IsGameOver = false,
                 IsLevelUpPending = false
             });
+            ResetRunTelemetryState();
 
             _entityManager.SetComponentData(_gameStateEntity, new WaveStateData
             {

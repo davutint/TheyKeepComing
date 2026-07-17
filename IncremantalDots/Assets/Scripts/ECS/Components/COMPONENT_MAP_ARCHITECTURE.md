@@ -46,7 +46,11 @@ Tum component'lar unmanaged ECS struct olarak tutulur. Davranis sistemlerde, ver
 
 ## GameStateComponents.cs
 
-- `GameStateData`: XP, level, level-up pending ve game-over state.
+- `GameStateData`: XP, level, level-up pending, run total kill ve game-over state.
+- `RunTelemetryData`: ayni GameState entity'sinde production run peak enemy sayisini tutar;
+  ayri simulation owner veya ikinci singleton kurmaz.
+- `RunWallDamageTelemetryElement`: `DamageApplySystem` tarafindan gercek applied Wall hasarini
+  day/phase bucket'larinda biriktiren bounded-cadence buffer'dir; per-hit/per-zombie history tutmaz.
 - `RunPhaseType`: legacy mobile run phase enum'u. Continuous siege aktifken uyumluluk icin `NightCombat` tutulur.
 - `WaveStateData`: dalga/spawn durumu, spawn timer, zombi sayilari ve wave stat'leri. Continuous siege aktifken `WaveActive` true kalir; `StressTestMode` normal mobile akislarini atlar.
 
@@ -119,13 +123,15 @@ MobilePopulationEconomySystem -> bed kapasitesini aynalar; Dawn arrival'ını bo
 GameManager + SurvivorArrivalVisualSystem -> committed accepted count'u yalnız sunum için geçici villager entity'lerine çevirir; population/resource state yazmaz
 PopulationTickSystem -> PopulationState.Idle aggregate'ini hesaplar; V1'de pasif Food consumption yazmaz
 ResourceTickSystem -> EconomyFocusState varsa effective production hesaplar, ResourceAccumulator + ResourceData gunceller
-WaveSpawnSystem -> ZombieStats/ZombieState/PhysicsBody/CollisionRadius olusturur
+WaveSpawnSystem -> ZombieStats/ZombieState/PhysicsBody/CollisionRadius olusturur; normal run
+  spawn commit'i sonrasi RunTelemetryData.PeakEnemies degerini yuksek su isareti olarak gunceller
 ApplyMovementForceSystem -> PhysicsBody.Force yazar
 PhysicsCollisionSystem -> PhysicsBody.Velocity + LocalTransform yazar
 IntegrateSystem -> PhysicsBody.Force -> Velocity -> LocalTransform.Position
 BoundarySystem -> ZombieState gecirir
 ZombieAttackSystem -> hasar queue yazar
-DamageApplySystem -> yalniz WallSegment HP yazar; Wall 0 ise GameStateData.IsGameOver
+DamageApplySystem -> yalniz WallSegment HP yazar; modifier sonrasi gercek applied hasari
+  RunWallDamageTelemetryElement day/phase bucket'ina ekler; Wall 0 ise GameStateData.IsGameOver
 ZombieDeathSystem -> ZombieState.Dead isaretler
 DamageCleanupSystem -> Dead entity'leri pool'a dondurur, GameStateData.XP ve mobile kill reward gunceller
 ```

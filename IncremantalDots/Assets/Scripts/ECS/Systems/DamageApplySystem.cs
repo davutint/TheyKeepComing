@@ -69,6 +69,8 @@ namespace DeadWalls
 
             if (totalAppliedDamage > 0f)
             {
+                RecordRunWallDamage(ref state, totalAppliedDamage);
+
                 float2 feedbackCenter = float2.zero;
                 if (SystemAPI.HasSingleton<MobileCastleCombatConfig>())
                 {
@@ -88,6 +90,36 @@ namespace DeadWalls
                 if (!gameState.ValueRO.IsGameOver)
                     gameState.ValueRW.IsGameOver = true;
             }
+        }
+
+        private void RecordRunWallDamage(ref SystemState state, float damage)
+        {
+            if (!SystemAPI.HasSingleton<RunTelemetryData>())
+                return;
+
+            Entity telemetryEntity = SystemAPI.GetSingletonEntity<RunTelemetryData>();
+            if (!state.EntityManager.HasBuffer<RunWallDamageTelemetryElement>(telemetryEntity))
+                return;
+
+            int day = 1;
+            SiegeCyclePhase phase = SiegeCyclePhase.Night;
+            if (SystemAPI.HasSingleton<ContinuousSiegeCycleData>())
+            {
+                ContinuousSiegeCycleData cycle = SystemAPI.GetSingleton<ContinuousSiegeCycleData>();
+                day = cycle.CycleIndex >= int.MaxValue
+                    ? int.MaxValue
+                    : math.max(1, cycle.CycleIndex + 1);
+                phase = cycle.Phase;
+            }
+            else if (SystemAPI.HasSingleton<WaveStateData>()
+                     && SystemAPI.GetSingleton<WaveStateData>().Phase == RunPhaseType.DayPrep)
+            {
+                phase = SiegeCyclePhase.Day;
+            }
+
+            DynamicBuffer<RunWallDamageTelemetryElement> timeline =
+                state.EntityManager.GetBuffer<RunWallDamageTelemetryElement>(telemetryEntity);
+            RunTelemetryAccumulator.RecordWallDamage(timeline, day, phase, damage);
         }
 
         private static void EmitCastleHitFeedback(ref SystemState state, float2 center)

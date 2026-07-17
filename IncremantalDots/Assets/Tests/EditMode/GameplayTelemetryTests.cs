@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using NUnit.Framework;
+using Unity.Entities;
 using UnityEngine;
 
 namespace DeadWalls.Tests
@@ -893,6 +894,166 @@ namespace DeadWalls.Tests
             Assert.That(payload.StoneCost, Is.EqualTo(37));
             Assert.That(payload.HpBefore, Is.EqualTo(420f));
             Assert.That(payload.HpAfter, Is.EqualTo(650f));
+        }
+
+        [Test]
+        public void RunTelemetryAccumulator_TracksPeakAndAggregatesChronologicalWallBuckets()
+        {
+            using var world = new World("RunTelemetryAccumulatorTests");
+            EntityManager entityManager = world.EntityManager;
+            Entity entity = entityManager.CreateEntity(typeof(RunTelemetryData));
+            DynamicBuffer<RunWallDamageTelemetryElement> timeline =
+                entityManager.AddBuffer<RunWallDamageTelemetryElement>(entity);
+
+            RunTelemetryData telemetry = default;
+            RunTelemetryAccumulator.ObserveEnemyCount(ref telemetry, 1_500);
+            RunTelemetryAccumulator.ObserveEnemyCount(ref telemetry, 700);
+            RunTelemetryAccumulator.RecordWallDamage(
+                timeline, 1, SiegeCyclePhase.Night, 45.5f);
+            RunTelemetryAccumulator.RecordWallDamage(
+                timeline, 1, SiegeCyclePhase.Night, 4.5f);
+            RunTelemetryAccumulator.RecordWallDamage(
+                timeline, 2, SiegeCyclePhase.Dusk, 12f);
+
+            Assert.That(telemetry.PeakEnemies, Is.EqualTo(1_500));
+            Assert.That(timeline.Length, Is.EqualTo(2));
+            Assert.That(timeline[0].Day, Is.EqualTo(1));
+            Assert.That(timeline[0].Phase, Is.EqualTo(SiegeCyclePhase.Night));
+            Assert.That(timeline[0].Damage, Is.EqualTo(50f).Within(0.001f));
+            Assert.That(timeline[1].Day, Is.EqualTo(2));
+            Assert.That(timeline[1].Phase, Is.EqualTo(SiegeCyclePhase.Dusk));
+            Assert.That(timeline[1].Damage, Is.EqualTo(12f).Within(0.001f));
+        }
+
+        [Test]
+        public void RunEndedFactory_CapturesFinalSummaryAndClonesWallDamageTimeline()
+        {
+            var source = new List<RunEndedWallDamageTelemetryEntry>
+            {
+                new RunEndedWallDamageTelemetryEntry
+                {
+                    Day = 1,
+                    Phase = "night",
+                    Damage = 150f
+                },
+                new RunEndedWallDamageTelemetryEntry
+                {
+                    Day = 2,
+                    Phase = "dusk",
+                    Damage = 25f
+                }
+            };
+
+            RunEndedTelemetryPayload payload = RunEndedTelemetryFactory.Create(
+                3, 4_200, 2_048, 88, source, 640);
+            source[0].Damage = 999f;
+
+            Assert.That(payload.Day, Is.EqualTo(3));
+            Assert.That(payload.Kills, Is.EqualTo(4_200));
+            Assert.That(payload.PeakEnemies, Is.EqualTo(2_048));
+            Assert.That(payload.PeakPopulation, Is.EqualTo(88));
+            Assert.That(payload.MetaReward, Is.EqualTo(640));
+            Assert.That(payload.WallDamageTimeline.Count, Is.EqualTo(2));
+            Assert.That(payload.WallDamageTimeline[0].Damage, Is.EqualTo(150f));
+        }
+
+        [Test]
+        public void TryEmitRunEnded_ProducesVersionedMachineReadableEnvelope()
+        {
+            GameplayTelemetryRecord observed = default;
+            bool received = false;
+            void OnEmitted(GameplayTelemetryRecord record)
+            {
+                observed = record;
+                received = true;
+            }
+
+            RunEndedTelemetryPayload payload = RunEndedTelemetryFactory.Create(
+                4,
+                8_000,
+                3_100,
+                120,
+                new List<RunEndedWallDamageTelemetryEntry>
+                {
+                    new RunEndedWallDamageTelemetryEntry
+                    {
+                        Day = 3,
+                        Phase = "night",
+                        Damage = 325.25f
+                    }
+                },
+                1_250);
+
+            GameplayTelemetry.Emitted += OnEmitted;
+            try
+            {
+                Assert.That(GameplayTelemetry.TryEmitRunEnded(
+                    " run_ended_contract_04 ", payload,
+                    out GameplayTelemetryRecord emitted, out string error), Is.True, error);
+                Assert.That(received, Is.True);
+                Assert.That(observed.RunId, Is.EqualTo("run_ended_contract_04"));
+                Assert.That(emitted.EventName, Is.EqualTo("run_ended"));
+                Assert.That(emitted.SchemaVersion, Is.EqualTo(1));
+
+                GameplayTelemetryEnvelope envelope =
+                    JsonUtility.FromJson<GameplayTelemetryEnvelope>(emitted.SerializedEnvelope);
+                RunEndedTelemetryPayload decoded =
+                    JsonUtility.FromJson<RunEndedTelemetryPayload>(envelope.PayloadJson);
+                Assert.That(envelope.EventName, Is.EqualTo("run_ended"));
+                Assert.That(envelope.SchemaVersion, Is.EqualTo(1));
+                Assert.That(decoded.Kills, Is.EqualTo(8_000));
+                Assert.That(decoded.PeakEnemies, Is.EqualTo(3_100));
+                Assert.That(decoded.WallDamageTimeline[0].Phase, Is.EqualTo("night"));
+                Assert.That(decoded.MetaReward, Is.EqualTo(1_250));
+            }
+            finally
+            {
+                GameplayTelemetry.Emitted -= OnEmitted;
+            }
+        }
+
+        [Test]
+        public void TryEmitRunEnded_RejectsInvalidSummaryAndWallDamageTimeline()
+        {
+            var payload = new RunEndedTelemetryPayload
+            {
+                Day = 2,
+                Kills = 10,
+                PeakEnemies = 20,
+                PeakPopulation = 30,
+                MetaReward = 40,
+                WallDamageTimeline = new List<RunEndedWallDamageTelemetryEntry>
+                {
+                    new RunEndedWallDamageTelemetryEntry
+                    {
+                        Day = 2,
+                        Phase = "night",
+                        Damage = 15f
+                    }
+                }
+            };
+
+            payload.PeakEnemies = -1;
+            Assert.That(GameplayTelemetry.TryEmitRunEnded(
+                "run_invalid_summary", payload, out _, out string summaryError), Is.False);
+            Assert.That(summaryError, Does.Contain("summary"));
+
+            payload.PeakEnemies = 20;
+            payload.WallDamageTimeline[0].Phase = "storm";
+            Assert.That(GameplayTelemetry.TryEmitRunEnded(
+                "run_invalid_phase", payload, out _, out string phaseError), Is.False);
+            Assert.That(phaseError, Does.Contain("WallDamageTimeline"));
+
+            payload.WallDamageTimeline[0].Phase = "night";
+            payload.WallDamageTimeline.Add(new RunEndedWallDamageTelemetryEntry
+            {
+                Day = 1,
+                Phase = "day",
+                Damage = 1f
+            });
+            Assert.That(GameplayTelemetry.TryEmitRunEnded(
+                "run_invalid_order", payload, out _, out string orderError), Is.False);
+            Assert.That(orderError, Does.Contain("kronolojik"));
         }
 
         [Test]

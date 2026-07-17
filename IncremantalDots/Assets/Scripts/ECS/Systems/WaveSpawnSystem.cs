@@ -232,6 +232,15 @@ namespace DeadWalls
 
             wave.SpawnRandomState = random.state;
 
+            if (spawned > 0 && !wave.StressTestMode
+                && SystemAPI.HasSingleton<RunTelemetryData>())
+            {
+                var telemetry = SystemAPI.GetSingletonRW<RunTelemetryData>();
+                RunTelemetryData value = telemetry.ValueRO;
+                RunTelemetryAccumulator.ObserveEnemyCount(ref value, wave.ZombiesAlive);
+                telemetry.ValueRW = value;
+            }
+
             return spawned;
         }
 

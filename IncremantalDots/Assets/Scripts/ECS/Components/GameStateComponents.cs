@@ -14,6 +14,69 @@ namespace DeadWalls
         public int TotalKills;
     }
 
+    /// <summary>
+    /// Run sonu telemetry'sinin scalar ECS accumulator'i. Ayri bir singleton owner kurmaz;
+    /// mevcut GameState entity'sinde WaveStateData ile birlikte yasar.
+    /// </summary>
+    public struct RunTelemetryData : IComponentData
+    {
+        public int PeakEnemies;
+    }
+
+    /// <summary>
+    /// Wall'a gercekten uygulanmis hasari day/phase bucket'larinda biriktirir.
+    /// Per-hit event tutmadigi icin buyuk hordelerde allocation ve payload patlamasi yaratmaz.
+    /// </summary>
+    [InternalBufferCapacity(8)]
+    public struct RunWallDamageTelemetryElement : IBufferElementData
+    {
+        public int Day;
+        public SiegeCyclePhase Phase;
+        public float Damage;
+    }
+
+    public static class RunTelemetryAccumulator
+    {
+        public static void ObserveEnemyCount(ref RunTelemetryData telemetry, int aliveEnemies)
+        {
+            if (aliveEnemies > telemetry.PeakEnemies)
+                telemetry.PeakEnemies = aliveEnemies;
+        }
+
+        public static void RecordWallDamage(
+            DynamicBuffer<RunWallDamageTelemetryElement> timeline,
+            int day,
+            SiegeCyclePhase phase,
+            float damage)
+        {
+            if (!timeline.IsCreated || day < 1 || damage <= 0f
+                || float.IsNaN(damage) || float.IsInfinity(damage))
+            {
+                return;
+            }
+
+            if (timeline.Length > 0)
+            {
+                int lastIndex = timeline.Length - 1;
+                RunWallDamageTelemetryElement last = timeline[lastIndex];
+                if (last.Day == day && last.Phase == phase)
+                {
+                    double total = (double)last.Damage + damage;
+                    last.Damage = total >= float.MaxValue ? float.MaxValue : (float)total;
+                    timeline[lastIndex] = last;
+                    return;
+                }
+            }
+
+            timeline.Add(new RunWallDamageTelemetryElement
+            {
+                Day = day,
+                Phase = phase,
+                Damage = damage
+            });
+        }
+    }
+
     public enum RunPhaseType : byte
     {
         DayPrep,

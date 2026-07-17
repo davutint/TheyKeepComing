@@ -29,11 +29,17 @@ namespace DeadWalls.Tests
             new List<GameplayTelemetryRecord>();
         private readonly List<GameplayTelemetryRecord> _wallRepairedRecords =
             new List<GameplayTelemetryRecord>();
+        private readonly List<GameplayTelemetryRecord> _runEndedRecords =
+            new List<GameplayTelemetryRecord>();
         private readonly List<string> _purchaseEventOrder = new List<string>();
         private readonly List<UnityEngine.Object> _createdObjects =
             new List<UnityEngine.Object>();
         private byte[] _originalRunSave;
         private string _runSavePath;
+        private byte[] _originalDeathReceipt;
+        private string _deathReceiptPath;
+        private byte[] _originalMetaSave;
+        private string _metaSavePath;
         private FieldInfo _heartCatalogField;
         private HeartNodeCatalogSO _originalHeartCatalog;
         private FieldInfo _councilCatalogField;
@@ -46,7 +52,19 @@ namespace DeadWalls.Tests
             _originalRunSave = File.Exists(_runSavePath)
                 ? File.ReadAllBytes(_runSavePath)
                 : null;
-            RunPersistence.Delete();
+            _deathReceiptPath = Path.Combine(
+                Application.persistentDataPath, "run_death_receipt.json");
+            _originalDeathReceipt = File.Exists(_deathReceiptPath)
+                ? File.ReadAllBytes(_deathReceiptPath)
+                : null;
+            _metaSavePath = Path.Combine(Application.persistentDataPath, "meta_progress.json");
+            _originalMetaSave = File.Exists(_metaSavePath)
+                ? File.ReadAllBytes(_metaSavePath)
+                : null;
+            DeleteFileAndTemp(_runSavePath);
+            DeleteFileAndTemp(_deathReceiptPath);
+            DeleteFileAndTemp(_metaSavePath);
+            MetaProgression.Load();
             _records.Clear();
             _phaseRecords.Clear();
             _resourceSpentRecords.Clear();
@@ -55,6 +73,7 @@ namespace DeadWalls.Tests
             _councilResolvedRecords.Clear();
             _abilityCastRecords.Clear();
             _wallRepairedRecords.Clear();
+            _runEndedRecords.Clear();
             _purchaseEventOrder.Clear();
             GameplayTelemetry.Emitted += OnTelemetryEmitted;
             GameBootstrap.PendingAction = GameBootstrap.StartAction.None;
@@ -100,9 +119,10 @@ namespace DeadWalls.Tests
                     BindingFlags.Instance | BindingFlags.NonPublic);
                 resetCouncilState?.Invoke(GameManager.Instance, null);
             }
-            RunPersistence.Delete();
-            if (_originalRunSave != null)
-                File.WriteAllBytes(_runSavePath, _originalRunSave);
+            RestoreFile(_runSavePath, _originalRunSave);
+            RestoreFile(_deathReceiptPath, _originalDeathReceipt);
+            RestoreFile(_metaSavePath, _originalMetaSave);
+            MetaProgression.Load();
             GameBootstrap.PendingAction = GameBootstrap.StartAction.None;
             for (int i = _createdObjects.Count - 1; i >= 0; i--)
                 UnityEngine.Object.Destroy(_createdObjects[i]);
@@ -729,6 +749,122 @@ namespace DeadWalls.Tests
                 "Exact Continue kabul edilmis Wall repair transaction'ini tekrar yaymamali.");
         }
 
+        [UnityTest]
+        public IEnumerator RunEnded_PreservesAccumulatorsAcrossContinue_AndEmitsDurableSummaryOnce()
+        {
+            GameManager gameManager = GameManager.Instance;
+            _records.Clear();
+            _runEndedRecords.Clear();
+            gameManager.RestartGame();
+            for (int frame = 0; frame < 180 && _records.Count == 0; frame++)
+                yield return null;
+            Assert.That(_records.Count, Is.EqualTo(1));
+
+            bool runtimeReady = false;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                {
+                    runtimeReady = true;
+                    break;
+                }
+                yield return null;
+            }
+            Assert.That(runtimeReady, Is.True);
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            using EntityQuery gameStateQuery = entityManager.CreateEntityQuery(
+                typeof(GameStateData),
+                typeof(WaveStateData),
+                typeof(PopulationState),
+                typeof(RunTelemetryData),
+                typeof(RunWallDamageTelemetryElement));
+            using EntityQuery cycleQuery = entityManager.CreateEntityQuery(
+                typeof(ContinuousSiegeCycleData));
+            Entity gameStateEntity = gameStateQuery.GetSingletonEntity();
+            Entity cycleEntity = cycleQuery.GetSingletonEntity();
+
+            entityManager.SetComponentData(gameStateEntity, new RunTelemetryData
+            {
+                PeakEnemies = 2_345
+            });
+            DynamicBuffer<RunWallDamageTelemetryElement> timeline =
+                entityManager.GetBuffer<RunWallDamageTelemetryElement>(gameStateEntity);
+            timeline.Clear();
+            timeline.Add(new RunWallDamageTelemetryElement
+            {
+                Day = 1,
+                Phase = SiegeCyclePhase.Night,
+                Damage = 150.5f
+            });
+            timeline.Add(new RunWallDamageTelemetryElement
+            {
+                Day = 2,
+                Phase = SiegeCyclePhase.Dusk,
+                Damage = 25f
+            });
+
+            ContinuousSiegeCycleData cycle =
+                entityManager.GetComponentData<ContinuousSiegeCycleData>(cycleEntity);
+            cycle.CycleIndex = 2;
+            cycle.Phase = SiegeCyclePhase.Night;
+            entityManager.SetComponentData(cycleEntity, cycle);
+
+            GameStateData gameState =
+                entityManager.GetComponentData<GameStateData>(gameStateEntity);
+            gameState.TotalKills = 4_321;
+            entityManager.SetComponentData(gameStateEntity, gameState);
+            PopulationState population =
+                entityManager.GetComponentData<PopulationState>(gameStateEntity);
+            population.Total = 91;
+            population.Capacity = 100;
+            population.BaseCapacity = 100;
+            population.Idle = Math.Max(0, population.Total - population.Workers - population.Archers);
+            entityManager.SetComponentData(gameStateEntity, population);
+
+            Assert.That(gameManager.SaveRunSnapshot(), Is.True);
+            RunSaveState saved = RunPersistence.TryLoad();
+            Assert.That(saved, Is.Not.Null);
+            Assert.That(saved.Version, Is.EqualTo(RunSaveState.CurrentVersion));
+            Assert.That(saved.TelemetryPeakEnemies, Is.EqualTo(2_345));
+            Assert.That(saved.WallDamageTimeline.Count, Is.EqualTo(2));
+
+            Assert.That(gameManager.TryRestoreRunFromCheckpoint(), Is.True);
+            RunTelemetryData restoredTelemetry =
+                entityManager.GetComponentData<RunTelemetryData>(gameStateEntity);
+            DynamicBuffer<RunWallDamageTelemetryElement> restoredTimeline =
+                entityManager.GetBuffer<RunWallDamageTelemetryElement>(gameStateEntity);
+            Assert.That(restoredTelemetry.PeakEnemies, Is.EqualTo(2_345));
+            Assert.That(restoredTimeline.Length, Is.EqualTo(2));
+            Assert.That(restoredTimeline[0].Damage, Is.EqualTo(150.5f).Within(0.001f));
+
+            _runEndedRecords.Clear();
+            gameState = entityManager.GetComponentData<GameStateData>(gameStateEntity);
+            gameState.IsGameOver = true;
+            entityManager.SetComponentData(gameStateEntity, gameState);
+
+            Assert.That(gameManager.SaveRunSnapshot(), Is.False);
+            Assert.That(_runEndedRecords.Count, Is.EqualTo(1));
+            RunEndedTelemetryPayload payload =
+                JsonUtility.FromJson<RunEndedTelemetryPayload>(
+                    _runEndedRecords[0].PayloadJson);
+            Assert.That(payload.Day, Is.EqualTo(3));
+            Assert.That(payload.Kills, Is.EqualTo(4_321));
+            Assert.That(payload.PeakEnemies, Is.EqualTo(2_345));
+            Assert.That(payload.PeakPopulation, Is.EqualTo(91));
+            Assert.That(payload.WallDamageTimeline.Count, Is.EqualTo(2));
+            Assert.That(payload.WallDamageTimeline[0].Phase, Is.EqualTo("night"));
+            Assert.That(payload.WallDamageTimeline[1].Phase, Is.EqualTo("dusk"));
+            Assert.That(payload.MetaReward,
+                Is.EqualTo(gameManager.LastRunResult.Reward.TotalSouls));
+            Assert.That(gameManager.LastRunResult.Persisted, Is.True);
+
+            Assert.That(gameManager.SaveRunSnapshot(), Is.False);
+            Assert.That(_runEndedRecords.Count, Is.EqualTo(1),
+                "Ayni durable death transaction'i ikinci run_ended uretmemeli.");
+            yield return null;
+        }
+
         private CouncilEventCatalogSO CreateTelemetryCouncilCatalog()
         {
             CouncilEffectAtomSO gain =
@@ -932,6 +1068,23 @@ namespace DeadWalls.Tests
                 _wallRepairedRecords.Add(record);
                 _purchaseEventOrder.Add(record.EventName);
             }
+            else if (record.EventName == GameplayTelemetry.RunEndedEventName)
+                _runEndedRecords.Add(record);
+        }
+
+        private static void DeleteFileAndTemp(string path)
+        {
+            if (File.Exists(path))
+                File.Delete(path);
+            if (File.Exists(path + ".tmp"))
+                File.Delete(path + ".tmp");
+        }
+
+        private static void RestoreFile(string path, byte[] content)
+        {
+            DeleteFileAndTemp(path);
+            if (content != null)
+                File.WriteAllBytes(path, content);
         }
     }
 }

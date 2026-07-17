@@ -112,6 +112,7 @@ namespace DeadWalls.Tests
                 DayBaseSpawnInterval = 0.42f,
                 PhaseIntensityMultiplier = 1.65f,
                 EffectiveSpawnInterval = 0.2545f,
+                TelemetryPeakEnemies = 2_048,
                 Wood = 321,
                 Stone = 222,
                 Iron = 111,
@@ -178,6 +179,18 @@ namespace DeadWalls.Tests
                 NextNightSpawnMultiplier = 0.72f,
                 NightSpawnExpiresAfterWave = 9
             };
+            state.WallDamageTimeline.Add(new RunWallDamageTelemetrySaveState
+            {
+                Day = 7,
+                Phase = (int)SiegeCyclePhase.Night,
+                Damage = 125.5f
+            });
+            state.WallDamageTimeline.Add(new RunWallDamageTelemetrySaveState
+            {
+                Day = 8,
+                Phase = (int)SiegeCyclePhase.Day,
+                Damage = 20f
+            });
             state.CouncilFlags.Add(new CouncilFlagEntry { Flag = "council_prior_choice_b", Day = 3 });
             state.RecentCouncilTemplates.Add("prior_choice");
             state.RecentCouncilTemplates.Add("council_test");
@@ -247,6 +260,13 @@ namespace DeadWalls.Tests
             Assert.That(restored.TotalDemandedEnemies, Is.EqualTo(1234));
             Assert.That(restored.TotalBudgetSpawnedEnemies, Is.EqualTo(1157));
             Assert.That(restored.DayBaseSpawnInterval, Is.EqualTo(0.42f));
+            Assert.That(restored.TelemetryPeakEnemies, Is.EqualTo(2_048));
+            Assert.That(restored.WallDamageTimeline.Count, Is.EqualTo(2));
+            Assert.That(restored.WallDamageTimeline[0].Day, Is.EqualTo(7));
+            Assert.That(restored.WallDamageTimeline[0].Phase,
+                Is.EqualTo((int)SiegeCyclePhase.Night));
+            Assert.That(restored.WallDamageTimeline[0].Damage, Is.EqualTo(125.5f));
+            Assert.That(restored.WallDamageTimeline[1].Day, Is.EqualTo(8));
             Assert.That(restored.ArrowCurrent, Is.EqualTo(456));
             Assert.That(restored.ArrowCapacityLevel, Is.EqualTo(3));
             Assert.That(restored.ArrowEfficiencyLevel, Is.EqualTo(4));
@@ -404,14 +424,44 @@ namespace DeadWalls.Tests
         }
 
         [Test]
-        public void TryLoad_Version14InvalidCombatRebuild_FailsClosed()
+        public void TryLoad_Version14Snapshot_MigratesWithoutInventingHistoricalRunTelemetry()
+        {
+            string path = Path.Combine(Application.persistentDataPath, "run_save.json");
+            byte[] original = File.Exists(path) ? File.ReadAllBytes(path) : null;
+            string runId = "run_v14_telemetry_migration_" + Guid.NewGuid().ToString("N");
+
+            try
+            {
+                File.WriteAllText(path,
+                    $"{{\"Version\":14,\"RunId\":\"{runId}\",\"IsDead\":false}}");
+
+                RunSaveState restored = RunPersistence.TryLoad();
+
+                Assert.That(restored, Is.Not.Null);
+                Assert.That(restored.Version, Is.EqualTo(RunSaveState.CurrentVersion));
+                Assert.That(restored.TelemetryPeakEnemies, Is.Zero);
+                Assert.That(restored.WallDamageTimeline, Is.Not.Null);
+                Assert.That(restored.WallDamageTimeline, Is.Empty,
+                    "v14 historical peak/damage timeline tahminle uydurulmamali.");
+            }
+            finally
+            {
+                if (original != null)
+                    File.WriteAllBytes(path, original);
+                else if (File.Exists(path))
+                    File.Delete(path);
+            }
+        }
+
+        [Test]
+        public void TryLoad_Version15InvalidCombatRebuild_FailsClosed()
         {
             string path = Path.Combine(Application.persistentDataPath, "run_save.json");
             byte[] original = File.Exists(path) ? File.ReadAllBytes(path) : null;
             var corrupt = new RunSaveState
             {
                 Version = RunSaveState.CurrentVersion,
-                RunId = "run_v14_corrupt_rebuild_" + Guid.NewGuid().ToString("N"),
+                RunId = "run_v15_corrupt_rebuild_" + Guid.NewGuid().ToString("N"),
                 HasCombatRebuild = true,
                 CombatRebuild = new CombatRebuildRunSaveState
                 {
@@ -434,6 +484,46 @@ namespace DeadWalls.Tests
 
                 Assert.That(RunPersistence.TryLoad(), Is.Null,
                     "Discriminator true iken eksik bucket payload'i sifir horde gibi acilmamali.");
+            }
+            finally
+            {
+                if (original != null)
+                    File.WriteAllBytes(path, original);
+                else if (File.Exists(path))
+                    File.Delete(path);
+            }
+        }
+
+        [Test]
+        public void TryLoad_Version15OutOfOrderRunTelemetry_FailsClosed()
+        {
+            string path = Path.Combine(Application.persistentDataPath, "run_save.json");
+            byte[] original = File.Exists(path) ? File.ReadAllBytes(path) : null;
+            var corrupt = new RunSaveState
+            {
+                Version = RunSaveState.CurrentVersion,
+                RunId = "run_v15_corrupt_telemetry_" + Guid.NewGuid().ToString("N"),
+                TelemetryPeakEnemies = 100
+            };
+            corrupt.WallDamageTimeline.Add(new RunWallDamageTelemetrySaveState
+            {
+                Day = 2,
+                Phase = (int)SiegeCyclePhase.Night,
+                Damage = 10f
+            });
+            corrupt.WallDamageTimeline.Add(new RunWallDamageTelemetrySaveState
+            {
+                Day = 1,
+                Phase = (int)SiegeCyclePhase.Day,
+                Damage = 5f
+            });
+
+            try
+            {
+                File.WriteAllText(path, JsonUtility.ToJson(corrupt));
+
+                Assert.That(RunPersistence.TryLoad(), Is.Null,
+                    "v15 out-of-order Wall timeline sessizce restore edilmemeli.");
             }
             finally
             {

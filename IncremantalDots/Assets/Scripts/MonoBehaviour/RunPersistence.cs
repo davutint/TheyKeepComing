@@ -13,7 +13,7 @@ namespace DeadWalls
     [Serializable]
     public class RunSaveState
     {
-        public const int CurrentVersion = 14;
+        public const int CurrentVersion = 15;
         public const int MinimumSupportedVersion = 3;
 
         public int Version = CurrentVersion;
@@ -35,6 +35,12 @@ namespace DeadWalls
         public int Level;
         public int XPToNextLevel;
         public int TotalKills;
+
+        // v15 run_ended telemetry: scalar peak ve day/phase bazli applied Wall damage.
+        // Eski v14 snapshot historical telemetry uydurmadan 0/bos state ile migrate edilir.
+        public int TelemetryPeakEnemies;
+        public List<RunWallDamageTelemetrySaveState> WallDamageTimeline =
+            new List<RunWallDamageTelemetrySaveState>();
 
         // Wave + deterministic spawn stream
         public int CurrentWave;
@@ -199,6 +205,13 @@ namespace DeadWalls
     [Serializable] public class ArcherLevelEntry { public int Type; public int Level; }
     [Serializable] public class UpgradeTierEntry { public int Type; public int Tier; }
     [Serializable] public class CouncilFlagEntry { public string Flag; public int Day; }
+    [Serializable]
+    public class RunWallDamageTelemetrySaveState
+    {
+        public int Day;
+        public int Phase;
+        public float Damage;
+    }
 
     [Serializable]
     public class CombatRebuildRunSaveState
@@ -357,6 +370,11 @@ namespace DeadWalls
                     Debug.LogWarning($"[RunPersistence] Combat rebuild snapshot gecersiz: {combatError}");
                     return null;
                 }
+                if (!NormalizeRunTelemetry(state, out string telemetryError))
+                {
+                    Debug.LogWarning($"[RunPersistence] Run telemetry snapshot gecersiz: {telemetryError}");
+                    return null;
+                }
                 return state;
             }
             catch (Exception e)
@@ -378,6 +396,11 @@ namespace DeadWalls
             if (!NormalizeCombatRebuild(state, out string combatError))
             {
                 Debug.LogWarning($"[RunPersistence] Combat rebuild snapshot yazilmadi: {combatError}");
+                return false;
+            }
+            if (!NormalizeRunTelemetry(state, out string telemetryError))
+            {
+                Debug.LogWarning($"[RunPersistence] Run telemetry snapshot yazilmadi: {telemetryError}");
                 return false;
             }
             return WriteJson(FilePath, state, "Run save");
@@ -519,6 +542,15 @@ namespace DeadWalls
                 state.CombatRebuild = null;
                 state.Version = 14;
             }
+
+            if (state.Version == 14)
+            {
+                // v14 peak enemy veya Wall damage history tasimiyordu. Historical deger
+                // uydurulmaz; Continue sonrasi runtime mevcut alive count'tan itibaren izler.
+                state.TelemetryPeakEnemies = 0;
+                state.WallDamageTimeline = new List<RunWallDamageTelemetrySaveState>();
+                state.Version = 15;
+            }
         }
 
         private static bool NormalizeCombatRebuild(RunSaveState state, out string error)
@@ -537,6 +569,52 @@ namespace DeadWalls
             }
 
             return CombatRebuildUtility.IsValid(state.CombatRebuild, out error);
+        }
+
+        private static bool NormalizeRunTelemetry(RunSaveState state, out string error)
+        {
+            error = string.Empty;
+            if (state == null)
+            {
+                error = "Run state null.";
+                return false;
+            }
+            if (state.TelemetryPeakEnemies < 0)
+            {
+                error = "Peak enemy count negatif olamaz.";
+                return false;
+            }
+
+            if (state.WallDamageTimeline == null)
+                state.WallDamageTimeline = new List<RunWallDamageTelemetrySaveState>();
+
+            int previousDay = 0;
+            int previousPhase = -1;
+            for (int i = 0; i < state.WallDamageTimeline.Count; i++)
+            {
+                RunWallDamageTelemetrySaveState entry = state.WallDamageTimeline[i];
+                if (entry == null || entry.Day < 1
+                    || entry.Phase < (int)SiegeCyclePhase.Day
+                    || entry.Phase > (int)SiegeCyclePhase.Dawn
+                    || entry.Damage <= 0f || float.IsNaN(entry.Damage)
+                    || float.IsInfinity(entry.Damage))
+                {
+                    error = $"Wall damage timeline[{i}] gecersiz.";
+                    return false;
+                }
+
+                if (entry.Day < previousDay
+                    || (entry.Day == previousDay && entry.Phase <= previousPhase))
+                {
+                    error = $"Wall damage timeline[{i}] kronolojik veya unique degil.";
+                    return false;
+                }
+
+                previousDay = entry.Day;
+                previousPhase = entry.Phase;
+            }
+
+            return true;
         }
 
         private static void NormalizeActiveCouncilEvent(RunSaveState state)
