@@ -1357,6 +1357,53 @@ namespace DeadWalls.Tests
         }
 
         [UnityTest]
+        public IEnumerator ActiveV1Runtime_HasSingleSceneAndEcsOwnerPerDomain()
+        {
+            GameManager gameManager = GameManager.Instance;
+            bool runtimeReady = false;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                {
+                    runtimeReady = true;
+                    break;
+                }
+                yield return null;
+            }
+            Assert.That(runtimeReady, Is.True);
+
+            AssertSingleSceneOwner<GameManager>();
+            AssertSingleSceneOwner<HUDController>();
+            AssertSingleSceneOwner<SpellCastUI>();
+            AssertSingleSceneOwner<CouncilEventUI>();
+            AssertSingleSceneOwner<HeartScreenUI>();
+            AssertSingleSceneOwner<DayNightOverlayController>();
+            AssertSingleSceneOwner<AmbientAudioController>();
+            AssertSingleSceneOwner<CombatFeedbackBridge>();
+            AssertSingleSceneOwner<MobileCastleArcherTilePlacement>();
+            AssertSingleSceneOwner<FirstRunOnboardingUI>();
+            AssertSingleSceneOwner<ArrowSupplyUI>();
+            AssertSingleSceneOwner<DefenseRepairUI>();
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            AssertSingleEcsOwner(entityManager, ComponentType.ReadOnly<GameStateData>());
+            AssertSingleEcsOwner(entityManager, ComponentType.ReadOnly<MobileCastleCombatConfig>());
+            AssertSingleEcsOwner(entityManager, ComponentType.ReadOnly<ContinuousSiegeCycleData>());
+            AssertSingleEcsOwner(entityManager, ComponentType.ReadOnly<ContinuousSpawnBudgetData>());
+            AssertSingleEcsOwner(entityManager, ComponentType.ReadOnly<ResourceData>());
+            AssertSingleEcsOwner(entityManager, ComponentType.ReadOnly<PopulationState>());
+            AssertSingleEcsOwner(entityManager, ComponentType.ReadOnly<MobilePopulationAllocation>());
+            AssertSingleEcsOwner(entityManager, ComponentType.ReadOnly<MobileBedCapacityState>());
+            AssertSingleEcsOwner(entityManager,
+                ComponentType.ReadOnly<MobileWorkerBuildingUpgradeState>());
+            AssertSingleEcsOwner(entityManager, ComponentType.ReadOnly<ArrowSupply>());
+            AssertSingleEcsOwner(entityManager, ComponentType.ReadOnly<GraveEssence>());
+            AssertSingleEcsOwner(entityManager, ComponentType.ReadOnly<MobileEconomyEventState>());
+            AssertSingleEcsOwner(entityManager, ComponentType.ReadOnly<CastleYardPrepState>());
+            AssertSingleEcsOwner(entityManager, ComponentType.ReadOnly<WallSegment>());
+        }
+
+        [UnityTest]
         public IEnumerator SaveRunSnapshot_LethalEcsState_CannotRewriteContinueAfterDeath()
         {
             var gameManager = GameManager.Instance;
@@ -1405,6 +1452,24 @@ namespace DeadWalls.Tests
                 File.Delete(path);
             if (File.Exists(path + ".tmp"))
                 File.Delete(path + ".tmp");
+        }
+
+        private static void AssertSingleSceneOwner<T>() where T : Component
+        {
+            T[] owners = Object.FindObjectsByType<T>(
+                FindObjectsInactive.Include,
+                FindObjectsSortMode.None);
+            Assert.That(owners.Length, Is.EqualTo(1),
+                $"{typeof(T).Name} aktif V1 scene domain'inde tek owner olmali.");
+        }
+
+        private static void AssertSingleEcsOwner(
+            EntityManager entityManager,
+            ComponentType componentType)
+        {
+            using EntityQuery query = entityManager.CreateEntityQuery(componentType);
+            Assert.That(query.CalculateEntityCount(), Is.EqualTo(1),
+                $"{componentType} aktif V1 world'unde singleton olmali.");
         }
 
         private static void RestoreFile(string path, byte[] contents)
