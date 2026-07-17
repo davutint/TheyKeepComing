@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.3
 > **Son tam kapsam denetimi:** 2026-07-17
 > **Aktif paket:** Post-Package V1 Closure - Contracts, Performance ve Release DoD
-> **Aktif iş:** `DW-V1-DOD-60S-CYCLE` - Verify 60-Second Continuous Cycle
-> **İlerleme:** `424 / 442` tracker checkbox'ı tamamlandı - `%95,93`
+> **Aktif iş:** `DW-V1-DOD-NO-SPEED-OFFLINE` - Verify No Speed-Up or Offline Progress
+> **İlerleme:** `425 / 442` tracker checkbox'ı tamamlandı - `%96,15`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -126,7 +126,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Oyun hızı | Oyuncu kontrollü x2/x4 veya offline progress owner'ı bulunmadı | Blueprint ile uyumlu; regression gerekli |
 | Battlefield | Kale/duvar solda, spawn sağdaki `SpawnLineX` bandından geliyor | Temel kompozisyon uyumlu |
 | Build placement | Aktif scene'de `BuildingPlacementUI` ve `BuildingGridManager` bağlı değil | Hazır bina yönüyle uyumlu |
-| Cycle | `Day 30 / Dusk 5 / Night 20 / Dawn 5`; dört fazda pozitif spawn temposu | Uyumlu |
+| Cycle | Release guard ile exact `60 = 30/5/20/5`; dört fazda pozitif spawn temposu ve Day wrap'ında prep gap yok | Uyumlu |
 | Horde | Tek production catalog/tanım/prefab ve ortak SubScene binding'i release guard ile kilitli; sabit stats; saved backlog; expandable bulk rent/return pool; Blood Moon dormant | 10K gate ve optimizasyon ölçüldü |
 | Moat | Runtime flag kapalı; slow `1`, damage `0`; tech/meta catalog bağlantıları dormant | Uyumlu |
 | Defense | Damage/Game Over aktif ve testli olarak tek Wall'a çekildi | `[x]` |
@@ -1148,7 +1148,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 
 | Alan | Test | Beklenen | Durum |
 |---|---|---|---|
-| Cycle | 60 sn full loop | 30/5/20/5; kesintisiz spawn | `[x]` |
+| Cycle | Production authoring + 60 sn full loop/wrap | 30/5/20/5; dört pozitif phase; yeni Day'e prep gap olmadan kesintisiz combat | `[x]` |
 | Horde | Active cap dolu | Talep backlog'a gider | `[x]` |
 | Horde | Production profile guard + Day 1 vs ileri gün runtime stat/quantity | HP/damage/speed aynı; count artar, interval daralır | `[x]` |
 | Wall | Night normal repair | Kapalı; Stone harcanmaz | `[x]` |
@@ -1225,7 +1225,15 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
   PlayMode `3/3`, full EditMode `378/378` ve full PlayMode
   `81 pass + 2 explicit profiler/soak skip` geçti; scene validation `0` issue ve final Console
   `0 error / 0 warning`.
-- [ ] 60 saniye cycle 30/5/20/5 ve kesintisiz.
+- [x] 60 saniye cycle 30/5/20/5 ve kesintisiz.
+  Production SubScene release guard'ı `ContinuousSiegeEnabled=true` ve exact
+  `60 = Day 30 + Dusk 5 + Night 20 + Dawn 5` authoring sözleşmesini kilitliyor. Gerçek runtime
+  testinde dört fazın tamamı pozitif spawn intensity üretti; cycle `60s` sınırını geçtiğinde
+  `CycleIndex` bir arttı, timer yeni Day içine döndü ve `WaveStateData` araya DayPrep/wave-start
+  beklemesi girmeden active combat halinde kaldı. Stale üç-faz `25/10/25` mimari metni güncel
+  dört-faz sözleşmesiyle değiştirildi. Targeted EditMode `1/1`, gerçek phase/wrap PlayMode `2/2`,
+  full EditMode `379/379` ve full PlayMode `81 pass + 2 explicit profiler/soak skip` geçti;
+  scene validation `0` issue ve final Console `0 error / 0 warning`.
 - [ ] Speed-up/offline progress yok.
 - [ ] Wood/Stone/Iron/Food pasif negatif akmıyor; Arrow tek sürekli tüketim.
 - [ ] Population, beds ve worker ratios exact save/load.
@@ -1448,3 +1456,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-17 | `DW-V1-DOD-WALL-ONLY-END` Wall-only terminal state contract | Runtime source audit'inde tek production `IsGameOver = true` writer'ının `DamageApplySystem` olduğu ve yalnız `SingleWallDefenseRules.IsDestroyed(remainingWallHp)` sonrasında yazdığı kilitlendi. `GameManager` terminal state üretmiyor; yalnız rising edge'i death transaction ve UI'ya taşıyor. Wave completion, cycle/day, horde pressure, enemy/boss ölümü, injected legacy Gate/Core ve ikinci fail phase koşuyu bitiremiyor | Targeted EditMode `12/12`; injected Gate/Core + lethal Wall PlayMode `1/1`; full EditMode `376/376`; full PlayMode `81 pass + 2 explicit profiler/soak skip`; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `422/442` |
 | 2026-07-17 | `DW-V1-DOD-SINGLE-ENEMY-CATALOG` single-enemy launch catalog contract | Production düşman klasörü tam bir `EnemyCatalogSO`, tam bir `EnemyDefinitionSO` ve tek `zombie_basic -> Zombie.prefab` kaydıyla sınırlandı. EditMode release guard'ı iki SubScene authoring sahibinin aynı production catalog'a, legacy compatibility alanının da aynı prefab'a bağlı olmasını kilitliyor. Runtime bake buffer'ı tek entry üretiyor; production spawn bu entry'nin prefab ve statlarını kullanıyor | Unity MCP asset audit `1 catalog / 1 definition`; targeted EditMode `4/4`; gerçek bake/spawn PlayMode `2/2`; full EditMode `377/377`; full PlayMode `81 pass + 2 explicit profiler/soak skip`; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `423/442` |
 | 2026-07-17 | `DW-V1-DOD-QUANTITY-ONLY-DIFFICULTY` quantity-only launch difficulty contract | Production difficulty klasörü tek `DefaultDifficulty.asset` profile'ıyla sınırlandı. EditMode release guard'ı active SubScene authoring/profile/catalog bağını, neutral HP/damage/speed growth değerlerini ve aktif count/batch/intensity/interval pressure kanallarını birlikte kilitliyor. Gerçek runtime Day 1 -> Day 50 geçişinde enemy statları sabit kalırken adet artıyor ve spawn interval daralıyor | Unity MCP asset audit `1 profile`; targeted EditMode `2/2`; gerçek profile/bake/advanced-cycle PlayMode `3/3`; full EditMode `378/378`; full PlayMode `81 pass + 2 explicit profiler/soak skip`; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `424/442` |
+| 2026-07-17 | `DW-V1-DOD-60S-CYCLE` exact continuous cycle launch contract | Production SubScene exact `ContinuousSiegeEnabled=true` ve `60 = Day 30 + Dusk 5 + Night 20 + Dawn 5` authoring sözleşmesiyle kilitlendi. Runtime wrap testi dört pozitif-intensity fazı, Day 1 -> Day 2 geçişini, cycle index/timer wrap'ını ve `WaveStateData` combat-active durumunun prep gap olmadan korunmasını doğruluyor. Eski üç-faz `25/10/25` mimari metni kaldırılarak güncel tek sözleşme bırakıldı | Targeted EditMode `1/1`; gerçek phase/wrap PlayMode `2/2`; full EditMode `379/379`; full PlayMode `81 pass + 2 explicit profiler/soak skip`; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `425/442` |

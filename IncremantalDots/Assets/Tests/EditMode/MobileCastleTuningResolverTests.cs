@@ -173,6 +173,38 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void ActiveSubScene_UsesExactContinuousSixtySecondCycleContract()
+        {
+            const string subScenePath = "Assets/Scenes/NewGameScene/MobileCastleCombatSubScene.unity";
+            Scene scene = EditorSceneManager.OpenScene(subScenePath, OpenSceneMode.Additive);
+            try
+            {
+                MobileCastleCombatAuthoring authoring = null;
+                foreach (var root in scene.GetRootGameObjects())
+                {
+                    authoring = root.GetComponentInChildren<MobileCastleCombatAuthoring>(true);
+                    if (authoring != null)
+                        break;
+                }
+
+                Assert.That(authoring, Is.Not.Null);
+                Assert.That(authoring.ContinuousSiegeEnabled, Is.True);
+                Assert.That(authoring.SiegeCycleDuration, Is.EqualTo(60f));
+                Assert.That(authoring.SiegeDayDuration, Is.EqualTo(30f));
+                Assert.That(authoring.SiegeDuskDuration, Is.EqualTo(5f));
+                Assert.That(authoring.SiegeNightDuration, Is.EqualTo(20f));
+                Assert.That(authoring.SiegeDawnDuration, Is.EqualTo(5f));
+                Assert.That(authoring.SiegeDayDuration + authoring.SiegeDuskDuration
+                    + authoring.SiegeNightDuration + authoring.SiegeDawnDuration,
+                    Is.EqualTo(authoring.SiegeCycleDuration));
+            }
+            finally
+            {
+                EditorSceneManager.CloseScene(scene, true);
+            }
+        }
+
+        [Test]
         public void DaySample_UsesSameCurves_ButKeepsSpecialNightsDormantInV1()
         {
             var profile = ScriptableObject.CreateInstance<DifficultyProfileSO>();

@@ -890,7 +890,7 @@ namespace DeadWalls.Tests
         }
 
         [UnityTest]
-        public IEnumerator ContinuousCycle_UsesThirtyFiveTwentyFive_AndNeverZeroIntensity()
+        public IEnumerator ContinuousCycle_UsesExactFourPhaseSixtySecondContract_AndWrapsWithoutPrepGap()
         {
             var gameManager = GameManager.Instance;
             bool runtimeReady = false;
@@ -908,6 +908,7 @@ namespace DeadWalls.Tests
             EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             Entity configEntity = entityManager.CreateEntityQuery(
                 typeof(MobileCastleCombatConfig), typeof(ContinuousSiegeCycleData)).GetSingletonEntity();
+            Entity waveEntity = entityManager.CreateEntityQuery(typeof(WaveStateData)).GetSingletonEntity();
             var config = entityManager.GetComponentData<MobileCastleCombatConfig>(configEntity);
 
             Assert.That(config.SiegeCycleDuration, Is.EqualTo(60f));
@@ -938,6 +939,35 @@ namespace DeadWalls.Tests
                 Assert.That(cycle.Phase, Is.EqualTo(phases[i]));
                 Assert.That(cycle.SpawnIntensityMultiplier, Is.GreaterThan(0f));
             }
+
+            var wrappingCycle = entityManager.GetComponentData<ContinuousSiegeCycleData>(configEntity);
+            int previousCycleIndex = wrappingCycle.CycleIndex;
+            wrappingCycle.CycleTimer = config.SiegeCycleDuration + 0.25f;
+            entityManager.SetComponentData(configEntity, wrappingCycle);
+
+            var wrappingWave = entityManager.GetComponentData<WaveStateData>(waveEntity);
+            wrappingWave.WaveActive = false;
+            wrappingWave.Phase = RunPhaseType.DayPrep;
+            wrappingWave.PrepTimer = 99f;
+            wrappingWave.PrepDuration = 99f;
+            wrappingWave.WaveStartTimer = 99f;
+            entityManager.SetComponentData(waveEntity, wrappingWave);
+
+            yield return null;
+
+            wrappingCycle = entityManager.GetComponentData<ContinuousSiegeCycleData>(configEntity);
+            wrappingWave = entityManager.GetComponentData<WaveStateData>(waveEntity);
+            Assert.That(wrappingCycle.CycleIndex, Is.EqualTo(previousCycleIndex + 1));
+            Assert.That(wrappingCycle.CycleTimer, Is.GreaterThanOrEqualTo(0f));
+            Assert.That(wrappingCycle.CycleTimer, Is.LessThan(1f));
+            Assert.That(wrappingCycle.Phase, Is.EqualTo(SiegeCyclePhase.Day));
+            Assert.That(wrappingCycle.SpawnIntensityMultiplier, Is.GreaterThan(0f));
+            Assert.That(wrappingWave.CurrentWave, Is.EqualTo(wrappingCycle.CycleIndex + 1));
+            Assert.That(wrappingWave.WaveActive, Is.True);
+            Assert.That(wrappingWave.Phase, Is.EqualTo(RunPhaseType.NightCombat));
+            Assert.That(wrappingWave.PrepTimer, Is.Zero);
+            Assert.That(wrappingWave.PrepDuration, Is.Zero);
+            Assert.That(wrappingWave.WaveStartTimer, Is.Zero);
         }
 
         [UnityTest]

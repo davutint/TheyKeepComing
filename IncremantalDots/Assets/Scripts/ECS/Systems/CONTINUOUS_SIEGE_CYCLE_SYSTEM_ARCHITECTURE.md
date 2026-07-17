@@ -6,11 +6,12 @@
 
 - Sistem sadece `MobileCastleCombatConfig` ve `ContinuousSiegeCycleData` varsa calisir.
 - Stress mode, game over ve level-up pending durumlarinda update yapmaz.
-- Varsayilan cycle:
-  - Day: 25 saniye
-  - Dusk: 10 saniye
-  - Night: 25 saniye
-- `CyclePhaseText` icin faz sadece `DAY`, `DUSK`, `NIGHT` olarak tutulur; wave numarasi UI'a yazilmaz.
+- Varsayilan cycle tam 60 saniyedir:
+  - Day: 30 saniye
+  - Dusk: 5 saniye
+  - Night: 20 saniye
+  - Dawn: 5 saniye
+- `CyclePhaseText` fazi `DAY`, `DUSK`, `NIGHT`, `DAWN` olarak sunar; wave numarasi UI'a yazilmaz.
 - `WaveStateData` uyumluluk icin aktif combat halinde tutulur:
   - `WaveActive = true`
   - `Phase = NightCombat`
@@ -25,12 +26,13 @@ Varsayilan yogunluklar:
 - Day: `0.55`
 - Dusk: `1.00 -> 1.35`
 - Night: `1.65`
+- Dawn: `0.15`
 
 ## Eski Akisle Iliski
 
 `DayNightPrepSystem`, `ContinuousSiegeCycleData.Enabled` true oldugunda erken cikar. Boylece eski day prep sistemi dosyada kalir ama mobile continuous siege varsayilaninda oyunu durdurmaz.
 
-## v5.1: DAWN Fazi + Kutle Eskalasyonu (2026-07-06)
+## Dawn fazi + kutle eskalasyonu
 
 Dongu 4 FAZ: DAY 30s -> DUSK 5s -> NIGHT 20s -> DAWN 5s (60s toplam;
 sureler `SiegeCycleDuration`'a oranla olceklenir). Dawn intensity 0.15 —
@@ -47,6 +49,10 @@ odul/nefes fazi. `SiegeDawnDuration=0` bake'lerde legacy 3-faz davranis korunur.
 - `KillRewardWaveScale=0` default: kill odulu cycle ile buyumez (gelir/zorluk ayrisik).
 - DayNightOverlayController Dawn'da night->day alpha lerp'i yapar;
   HUDController `DAWN` yazar ve `CycleDayCounterText` ("DAY n" = CycleIndex+1) gunceller.
+
+## V1 çıkış guard'ı
+
+Active `MobileCastleCombatSubScene`, `ContinuousSiegeEnabled=true` ve exact `60 = 30 + 5 + 20 + 5` süre sözleşmesini taşır. EditMode release guard'ı production authoring değerlerini doğrudan denetler. Gerçek PlayMode testi dört fazın pozitif intensity ürettiğini ve cycle wrap anında `CycleIndex` artarken timer'ın yeni Day içine döndüğünü doğrular. Aynı frame'de `WaveStateData` combat-active kalır, prep timer'ları sıfırlanır ve `DayNightPrepSystem` continuous cycle açık olduğu için araya duraklama sokmaz.
 
 ## V1: SpecialNights dormant
 
