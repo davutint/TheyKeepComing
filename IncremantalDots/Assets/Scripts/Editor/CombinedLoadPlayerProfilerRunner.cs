@@ -19,6 +19,7 @@ namespace DeadWalls.Editor
             "DeadWalls.Tests.HordeScaleProfilerCapturePlayModeTests." +
             "HordeScale_10K_1K_CombinedProfilerCapture_ProducesLoadableRaw";
         private const string CapturePrefix = "DW_V1_PLAYER_COMBINED_";
+        private const string FramePacingPrefix = "DW_V1_TARGET_HARDWARE_FRAME_PACING_";
         private const string MenuRoot = "Tools/DeadWalls/";
 
         private static TestRunnerApi _testRunnerApi;
@@ -36,6 +37,7 @@ namespace DeadWalls.Editor
             public int failed;
             public int skipped;
             public string rawPath;
+            public string framePacingPath;
             public string reportPath;
             public string summaryPath;
             public string error;
@@ -117,7 +119,16 @@ namespace DeadWalls.Editor
             }
 
             DateTime analyzedUtc = DateTime.UtcNow;
-            AnalyzeAndWriteStatus(rawPath, null, analyzedUtc, analyzedUtc, null, 1, 0, 0);
+            AnalyzeAndWriteStatus(
+                rawPath,
+                FindLatestFramePacing(0L),
+                null,
+                analyzedUtc,
+                analyzedUtc,
+                null,
+                1,
+                0,
+                0);
         }
 
         private sealed class PlayerCallbacks : IErrorCallbacks
@@ -143,6 +154,7 @@ namespace DeadWalls.Editor
             {
                 DateTime finishedUtc = DateTime.UtcNow;
                 string rawPath = FindLatestRaw(_startedUtcTicks);
+                string framePacingPath = FindLatestFramePacing(_startedUtcTicks);
                 string resultError = result.TestStatus == TestStatus.Passed
                     ? null
                     : $"Player test status={result.TestStatus}; message={result.Message}; " +
@@ -150,11 +162,14 @@ namespace DeadWalls.Editor
 
                 if (string.IsNullOrEmpty(resultError) && string.IsNullOrEmpty(rawPath))
                     resultError = "Player testi bitti fakat yeni combined raw capture bulunamadi.";
+                if (string.IsNullOrEmpty(resultError) && string.IsNullOrEmpty(framePacingPath))
+                    resultError = "Player testi bitti fakat target-hardware frame pacing raporu bulunamadi.";
 
                 if (string.IsNullOrEmpty(resultError))
                 {
                     AnalyzeAndWriteStatus(
                         rawPath,
+                        framePacingPath,
                         result,
                         new DateTime(_startedUtcTicks, DateTimeKind.Utc),
                         finishedUtc,
@@ -175,6 +190,7 @@ namespace DeadWalls.Editor
                         failed = result.FailCount,
                         skipped = result.SkipCount,
                         rawPath = rawPath,
+                        framePacingPath = framePacingPath,
                         error = resultError
                     });
                     Debug.LogError($"[DW-V1-PLAYER-PROFILE] status=failed; error={resultError}");
@@ -209,6 +225,7 @@ namespace DeadWalls.Editor
 
         private static void AnalyzeAndWriteStatus(
             string rawPath,
+            string framePacingPath,
             ITestResultAdaptor result,
             DateTime startedUtc,
             DateTime finishedUtc,
@@ -236,6 +253,7 @@ namespace DeadWalls.Editor
                 failed = failed,
                 skipped = skipped,
                 rawPath = rawPath,
+                framePacingPath = framePacingPath,
                 reportPath = analyzed ? reportPath : null,
                 summaryPath = analyzed ? summaryPath : null,
                 error = analysisError
@@ -245,7 +263,7 @@ namespace DeadWalls.Editor
             {
                 Debug.Log(
                     $"[DW-V1-PLAYER-PROFILE] status=passed; raw={rawPath}; " +
-                    $"report={reportPath}; summary={summaryPath}");
+                    $"frame_pacing={framePacingPath}; report={reportPath}; summary={summaryPath}");
             }
             else
             {
@@ -262,6 +280,19 @@ namespace DeadWalls.Editor
                 return null;
 
             return Directory.GetFiles(directory, CapturePrefix + "*.raw")
+                .Where(path => minimumUtcTicks <= 0L
+                    || File.GetLastWriteTimeUtc(path).Ticks >= minimumUtcTicks)
+                .OrderByDescending(File.GetLastWriteTimeUtc)
+                .FirstOrDefault();
+        }
+
+        private static string FindLatestFramePacing(long minimumUtcTicks)
+        {
+            string directory = GetCaptureDirectory();
+            if (!Directory.Exists(directory))
+                return null;
+
+            return Directory.GetFiles(directory, FramePacingPrefix + "*.json")
                 .Where(path => minimumUtcTicks <= 0L
                     || File.GetLastWriteTimeUtc(path).Ticks >= minimumUtcTicks)
                 .OrderByDescending(File.GetLastWriteTimeUtc)

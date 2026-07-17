@@ -334,3 +334,58 @@ GC ve Total Used Memory satırları Unity Editor + Test Runner root sayaçlarıd
 allocation/leak sertifikası olarak yorumlanmaz. Bir önceki isolated Standalone Player capture'ı proje
 kodu allocation'ını `481 B/frame`, named ECS system GC'sini `0 B` ölçmüştü. Bu soak'ın bellek kabulü
 managed sayaçtan ziyade sabit enemy/projectile pool residency'si ve exact rent/return muhasebesidir.
+
+---
+
+## DW-V1-DOD-10K-1K-FRAME-PACING kabul ölçümü - 2026-07-18
+
+Hedef donanım kapısı `StandaloneWindows64` Development Player'da, binary Profiler ve allocation
+callstack kapalı ayrı bir pencereyle ölçüldü. Test assembly'si yalnız exact fixture/orchestration
+içindir; örnekleme sırasında Profiler instrumentation'ı yoktur. Production `NewGameScene`, enemy
+pool, canonical `GameManager.RestoreArcherCountsWithinCapacity` yoluyla 1.000 Basic Archer,
+targeting/collision/projectile sistemleri ve Ultra quality render hattı birlikte açıktır. Fixture
+Arrow stoku normal run kapasitesi tarafından kesilmez; release economy/tuning asset'i değişmez.
+
+### Hedef makine ve senaryo
+
+| Alan | Değer |
+|---|---:|
+| CPU / GPU | Intel Core i5-14400F / Intel Arc B580 12 GB |
+| Sistem belleği | 32.581 MB |
+| Player / çözünürlük | WindowsPlayer / 1920 x 1080 |
+| Quality / VSync / target FPS | Ultra / 1 / -1 |
+| Warmup / sample | 180 / 600 frame |
+| Enemy / canonical Basic Archer | 10.000 / 1.000 |
+| Projectile peak | 670 |
+| Projectile-positive örnek | 4 / 21 |
+
+### Instrumentation kapalı frame-pacing sonucu
+
+| Metrik | Sonuç | Kabul bütçesi |
+|---|---:|---:|
+| Frame average | 7,665 ms | <= 16,667 ms |
+| Frame P95 | 13,890 ms | <= 16,667 ms |
+| Frame P99 | 14,058 ms | <= 33,333 ms |
+| Frame maximum | 27,722 ms | Bilgi |
+| 16,667 ms üstü | 4 / 600 | Bilgi |
+| 33,333 ms üstü | 0 / 600 | 0 |
+| En uzun 16,667 ms üstü seri | 1 frame | Bilgi |
+| Exact entity + combat kanıtı | Geçti | 10K / 1K / projectile |
+| **Kabul** | **Geçti** | Bütün kapılar true |
+
+600-frame pencerede average ve P95 60 FPS bütçesinin altında, P99 ise 30 FPS pacing floor'unun
+altında kaldı. 16,667 ms üstündeki dört frame ardışık birikmedi; 33,333 ms üstü frame yoktur.
+Bu nedenle tracker'daki `1k archer + 10k enemy target hardware frame pacing` V1 DoD kapısı kabul
+edildi. Bu karar release `MaxAliveZombies = 900` değerini yükseltmez; long-run saturation kararı ve
+backlog policy'si aynen korunur.
+
+### Ayrı instrumented raw owner kanıtı
+
+Aynı geçen test, kabul penceresinden sonra allocation callstack açık 120-frame raw üretti
+(`74.879.570 B`). Analyzer sonucu average/P95/max `9,108 / 12,132 / 44,013 ms`'dir. ECS named
+system'lerde GC veya sync-point yoktur; PhysicsCollisionSystem `0,352 ms`, DamageApplySystem
+`1,190 ms`, BuildSpatialHashSystem `0,033 ms` ortalamadadır. Raw'daki profiler metadata,
+callstack/file-write ve test/render allocation'ları target-hardware pacing sonucu değildir.
+
+Doğrulama: Player-targeted explicit test `1/1 passed`; frame JSON `accepted=true`; raw `120/120`
+frame analiz edildi; orchestration status `passed` ve iki capture yolunu birlikte kaydetti.
