@@ -45,3 +45,24 @@ temel ECS state component'lerinin her birinden tam bir singleton bulunduğunu do
 
 Bu test legacy sınıf dosyasının varlığını yasaklamaz. Legacy/dormant kod ancak aktif scene,
 prefab, authoring veya runtime transaction zincirine bağlanırsa bu sınırı ihlal eder.
+
+## `MobileCastle*` isim stabilitesi
+
+`MobileCastle*` öneki mobil platform hedefi değildir; projenin eski teknik isimlendirmesinden
+kalan ve aktif V1 kaynak, scene, prefab ve asset referanslarına yayılmış bir serialized
+sözleşmedir. Dead Walls V1 PC/Steam ürün hedefini korurken mevcut `MobileCastleCombatConfig`,
+`MobileCastleCombatAuthoring`, `MobileCastleTuningResolver`,
+`MobileCastleArcherTilePlacement` ve ilişkili tipler yalnız daha estetik görünmeleri için toplu
+rename edilmez.
+
+Mevcut bir `MobileCastle*` tipi ancak işlevsel bir ihtiyaç varsa ve owner açıkça onaylarsa rename
+edilebilir. Böyle bir değişiklikten önce bütün kod/scene/prefab/asset referansları envantere
+alınır; script GUID, type name ve serialized field migration planı hazırlanır; gerektiğinde
+`MovedFrom` / `FormerlySerializedAs` gibi compatibility katmanları eklenir; aktif scene, prefab,
+save ve regresyon testleri birlikte doğrulanır. Yalnız dosya ve sınıf adını değiştirmek kabul
+edilmez.
+
+Yeni V1 tiplerinin `MobileCastle` önekini sürdürme zorunluluğu yoktur; yeni isimler domain'i
+anlatmalıdır. Player-facing metinler ise teknik öneki göstermez ve `Dead Walls`, kale, sur veya
+ilgili gameplay terimini kullanır. Bu kural mevcut serialized yüzeyi korur; tarihsel öneki yeni
+tasarıma yayma zorunluluğu doğurmaz.
