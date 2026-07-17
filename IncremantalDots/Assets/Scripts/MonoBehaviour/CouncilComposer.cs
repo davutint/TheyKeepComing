@@ -59,10 +59,6 @@ namespace DeadWalls
     /// </summary>
     public static class CouncilComposer
     {
-        private const float SmallBand = 0.7f;
-        private const float FairBand = 1.0f;
-        private const float GenerousBand = 1.4f;
-        private const float BudgetTolerance = 1.25f; // A/B butce orani bu katsayiyi asarsa dusuk taraf yukseltilir
         private static readonly string[] SafeVsRiskyLootAtomIds = { "gain_resource" };
 
         // ---------------------------------------------------------------
@@ -91,7 +87,7 @@ namespace DeadWalls
                 SetsFlagOnB = template.SetsFlagOnB,
             };
 
-            float band = PickBand(ref rng);
+            float band = PickBand(catalog.EffectBands, ref rng);
             // Govde varyanti secimi (rng tuketimi BuildOptions'tan ONCE — deterministik sira)
             string bodyRaw = template.Body;
             if (template.BodyVariants != null && template.BodyVariants.Length > 0)
@@ -101,7 +97,7 @@ namespace DeadWalls
             if (composed.OptionA == null || composed.OptionB == null)
                 return null;
 
-            BalanceBudgets(composed, context);
+            BalanceBudgets(composed, catalog.EffectBands.BudgetTolerance);
             composed.OptionA.Label = template.OptionAVerb + "  —  " + DescribeEffects(composed.OptionA.Effects);
             composed.OptionB.Label = template.OptionBVerb + "  —  " + DescribeEffects(composed.OptionB.Effects);
             // Token doldurma: govde her iki secenegin sayilarini kullanabilir (once A, sonra B
@@ -468,11 +464,11 @@ namespace DeadWalls
         }
 
         /// <summary>A/B butcelerini kaba dengele: oran toleransi asarsa dusuk tarafin ilk kaynak etkisi buyutulur.</summary>
-        private static void BalanceBudgets(ComposedCouncilEvent composed, in CouncilContext context)
+        private static void BalanceBudgets(ComposedCouncilEvent composed, float budgetTolerance)
         {
             float a = Mathf.Max(0.1f, composed.OptionA.BudgetMinutes);
             float b = Mathf.Max(0.1f, composed.OptionB.BudgetMinutes);
-            if (a / b <= BudgetTolerance && b / a <= BudgetTolerance)
+            if (a / b <= budgetTolerance && b / a <= budgetTolerance)
                 return;
 
             var weak = a < b ? composed.OptionA : composed.OptionB;
@@ -494,12 +490,29 @@ namespace DeadWalls
         // ---------------------------------------------------------------
         // Yardimcilar
         // ---------------------------------------------------------------
-        private static float PickBand(ref Unity.Mathematics.Random rng)
+        private static float PickBand(CouncilEffectBandSettings settings,
+            ref Unity.Mathematics.Random rng)
         {
-            float roll = rng.NextFloat();
-            if (roll < 0.35f) return SmallBand;
-            if (roll < 0.85f) return FairBand;
-            return GenerousBand;
+            return ResolveEffectBand(settings, rng.NextFloat());
+        }
+
+        /// <summary>
+        /// Normalize edilmis tek roll'u authored Small/Fair/Generous agirliklarina cozer.
+        /// Composer RNG sirasi degismez; varsayilan degerler eski 35/50/15 dagilimini korur.
+        /// </summary>
+        public static float ResolveEffectBand(CouncilEffectBandSettings settings,
+            float normalizedRoll)
+        {
+            if (settings == null || !settings.TryValidate(out _))
+                return 0f;
+
+            float totalWeight = settings.GetTotalWeight();
+            float roll = Mathf.Clamp01(normalizedRoll) * totalWeight;
+            if (roll < settings.SmallWeight)
+                return settings.SmallMultiplier;
+            if (roll < settings.SmallWeight + settings.FairWeight)
+                return settings.FairMultiplier;
+            return settings.GenerousMultiplier;
         }
 
         private static EconomyFocusType ResolveResource(CouncilEffectAtomSO atom,

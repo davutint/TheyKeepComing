@@ -182,6 +182,34 @@ namespace DeadWalls.Tests
         }
 
         [UnityTest]
+        public IEnumerator ReducedRecentMemory_IsAppliedBeforeAndAfterNextScheduledComposition()
+        {
+            GameManager gameManager = GameManager.Instance;
+            CouncilEventCatalogSO catalog = _catalogField.GetValue(gameManager) as CouncilEventCatalogSO;
+            Assert.That(catalog, Is.Not.Null);
+            catalog.RecentTemplateMemory = 1;
+
+            List<string> recent = GetPrivateField<List<string>>(
+                gameManager, "_recentCouncilTemplates");
+            recent.AddRange(new[] { "stale_a", "stale_b", "schedule_template" });
+
+            SetCycle(gameManager, 3, SiegeCyclePhase.Dawn, 1f);
+            Assert.That(gameManager.TryOpenRegularCouncilEvent(), Is.True);
+            Assert.That(recent, Has.Count.EqualTo(1));
+            Assert.That(recent[0], Is.EqualTo(gameManager.ActiveCouncilEvent.TemplateId));
+
+            CouncilRuntimeTuningTelemetry telemetry =
+                gameManager.GetCouncilRuntimeTuningTelemetry();
+            Assert.That(telemetry.RecentTemplateMemory, Is.EqualTo(1));
+            Assert.That(telemetry.RecentTemplateCount, Is.EqualTo(1));
+            Assert.That(telemetry.HasActiveEvent, Is.True);
+            Assert.That(telemetry.TotalDecisionSeconds,
+                Is.EqualTo(CouncilDecisionWindowUtility.GetTotalWindowSeconds(
+                    gameManager.ContinuousSiegeCycle)).Within(0.001f));
+            yield return null;
+        }
+
+        [UnityTest]
         public IEnumerator ApprovedCouncilChoice_WritesCuratedChainFlagInLiveGameManager()
         {
             GameManager gameManager = GameManager.Instance;

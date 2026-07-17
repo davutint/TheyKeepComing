@@ -322,6 +322,16 @@ namespace DeadWalls
     /// <summary>Karar kartinin Dawn + Day penceresini cycle state'inden sayisal olarak uretir.</summary>
     public static class CouncilDecisionWindowUtility
     {
+        public static float GetTotalWindowSeconds(float dawnDuration, float dayDuration)
+        {
+            return Mathf.Max(0f, dawnDuration) + Mathf.Max(0f, dayDuration);
+        }
+
+        public static float GetTotalWindowSeconds(in ContinuousSiegeCycleData cycle)
+        {
+            return GetTotalWindowSeconds(cycle.DawnDuration, cycle.DayDuration);
+        }
+
         public static float GetRemainingSeconds(in ContinuousSiegeCycleData cycle)
         {
             float phaseRemaining = 1f - Mathf.Clamp01(cycle.PhaseProgress01);

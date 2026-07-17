@@ -116,6 +116,58 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void EffectBands_DefaultsPreserveLegacyThirtyFiveFiftyFifteenDistribution()
+        {
+            CouncilEffectBandSettings settings = _catalog.EffectBands;
+
+            Assert.That(settings.TryValidate(out string problem), Is.True, problem);
+            Assert.That(CouncilComposer.ResolveEffectBand(settings, 0f), Is.EqualTo(0.7f));
+            Assert.That(CouncilComposer.ResolveEffectBand(settings, 0.34999f), Is.EqualTo(0.7f));
+            Assert.That(CouncilComposer.ResolveEffectBand(settings, 0.35f), Is.EqualTo(1f));
+            Assert.That(CouncilComposer.ResolveEffectBand(settings, 0.84999f), Is.EqualTo(1f));
+            Assert.That(CouncilComposer.ResolveEffectBand(settings, 0.85f), Is.EqualTo(1.4f));
+            Assert.That(CouncilComposer.ResolveEffectBand(settings, 1f), Is.EqualTo(1.4f));
+        }
+
+        [Test]
+        public void EffectBands_CustomWeightsAndMultipliersDriveCanonicalResolver()
+        {
+            CouncilEffectBandSettings settings = _catalog.EffectBands;
+            settings.SmallMultiplier = 0.5f;
+            settings.FairMultiplier = 1.1f;
+            settings.GenerousMultiplier = 2f;
+            settings.SmallWeight = 1f;
+            settings.FairWeight = 2f;
+            settings.GenerousWeight = 1f;
+
+            Assert.That(CouncilComposer.ResolveEffectBand(settings, 0.24999f), Is.EqualTo(0.5f));
+            Assert.That(CouncilComposer.ResolveEffectBand(settings, 0.25f), Is.EqualTo(1.1f));
+            Assert.That(CouncilComposer.ResolveEffectBand(settings, 0.74999f), Is.EqualTo(1.1f));
+            Assert.That(CouncilComposer.ResolveEffectBand(settings, 0.75f), Is.EqualTo(2f));
+        }
+
+        [Test]
+        public void EffectBands_InvalidOrderFailsCatalogAndComposeClosed()
+        {
+            _catalog.EffectBands.FairMultiplier = 0.1f;
+
+            Assert.That(_catalog.ValidateCatalog(), Has.Some.Contains("Small <= Fair <= Generous"));
+            Assert.That(CouncilComposer.Compose(_catalog, 17u, MakeContext(6)), Is.Null);
+        }
+
+        [Test]
+        public void RecentMemory_TrimKeepsNewestEntriesAndEnforcesMinimumOne()
+        {
+            var recent = new List<string> { "a", "b", "c", "d" };
+
+            CouncilRecentTemplateMemory.TrimInPlace(recent, 2);
+            Assert.That(recent, Is.EqualTo(new[] { "c", "d" }));
+
+            CouncilRecentTemplateMemory.TrimInPlace(recent, 0);
+            Assert.That(recent, Is.EqualTo(new[] { "d" }));
+        }
+
+        [Test]
         public void Compose_AyniSeed_AyniSonucuVerir()
         {
             var context = MakeContext(day: 5);

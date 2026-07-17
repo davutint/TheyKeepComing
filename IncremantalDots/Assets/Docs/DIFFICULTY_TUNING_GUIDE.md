@@ -37,6 +37,8 @@ Deger adi ezberleme — asagidaki tablodan hissini bul, hangi ayara dokunacagini
 | "Heart graph cok kisa / uzun" | Heart Runtime Contract > **Minimum / Maximum branch depth** | Yalniz yeni run graph'larini etkiler; aktif run reroll edilmez |
 | "Rare node cok sik / seyrek" | Heart Runtime Contract > **Standard / Rare rarity weight** | Agirlik oranini degistir; generator preview'u valid graph'i ayni ekranda dogrular |
 | "Essence cok yavas / hizli geliyor" | Heart Runtime Contract > **Production drop source** | Su an owner gate acik; onayli drop miktari/cadence'i olmadan deger uydurma |
+| "Council sonuclari cok kucuk / buyuk" | Council Runtime Contract > **Small/Fair/Generous multiplier + weight** | Production katalogdaki etki olcegini veya cikma agirligini ayarla |
+| "Ayni Council kartlari cok sik tekrar ediyor" | Council Runtime Contract > **Recent template memory** | Hafizayi artir; alternatif varsa son N template tamamen dislanir |
 
 ---
 
@@ -132,6 +134,20 @@ pozitif kazanc transaction kapisidir ama production kodunda onu cagiran kill/dro
 Panel bu durumu `UNCONFIGURED` olarak gosterir; legacy Tech Tree fiyatini veya rastgele `1 Essence / kill`
 varsayimini otomatik uretmez. Catalog ve drop sayilari onaylandiginda bu ayni yuzeyden tune edilir.
 
+### Council Runtime Contract
+
+Council takvimi tune edilmez: regular kart yalniz Dawn'da Day `3/6/9...` gunlerinde bir kez
+acilir; Emergency Council yoktur. Production `CouncilEventCatalogSO` icindeki Small/Fair/Generous
+multiplier ve weight alanlari sonuclarin olcegini/dagilimini, Budget Tolerance A/B dengeleme esigini,
+`RecentTemplateMemory` ise hard anti-tekrar penceresini belirler. Varsayilanlar mevcut davranisi
+aynen korur: `0.7/1.0/1.4`, `%35/%50/%15`, tolerans `1.25`, memory `3`.
+
+Karar suresi ayri bir Council ayari degildir. Scene cycle owner'indaki Dawn + Day surelerinden
+turetilir (production baseline `5 + 30 = 35s`) ve Dusk girisinde kart expire olur. Play Mode
+telemetry active card/butce, kalan/toplam sure, recent/flag/one-shot sayilari ile sureli production
+ve next-night count etkilerini aggregate gosterir. Katalog alanlari `DifficultyProfileSO` icine
+kopyalanmaz; katalogdaki degisiklikler bir sonraki scheduled compose'da okunur.
+
 ### M-C Hazirlik (SpawnTable / SpecialNights)
 SIMDILIK BOS BIRAK — zombi cesitliligi milestone'unda (M-C) sistem bunlari okumaya
 baslayacak ("kosucular gun 5'te acilsin", "her 5. gece kanli ay" buradan ayarlanacak).
@@ -196,6 +212,14 @@ alanlari definition asset'lerinde kalir. Cost preview +1/+10/Buy Max icin gercek
 owner'ini, graph preview ise secilen seed ile production generator/validator'i kullanir. Play Mode
 telemetry hidden node kimliklerini gostermeden bakiye/meta remainder, version/seed ve aggregate
 node/edge/reveal/purchase/lock sayilarini verir. Catalog veya drop owner'i eksikse acik hata verir.
+
+### Council Runtime Contract paneli
+
+Panel canonical `GameManager` ve production Council catalog owner'ini gosterir. Effect band
+multiplier/weight, A/B budget tolerance ve recent memory dogrudan katalog asset'inde duzenlenir;
+takvim ve karar penceresi read-only contract olarak gorunur. Memory dusurulurse eski uzun recent
+liste bir sonraki kart adaylari hesaplanmadan once yeni sinira indirilir. Play Mode telemetry
+Council state'ini yeni bir owner yaratmadan aggregate olarak okur.
 
 ## 5. Olcum botu nasil yorumlanir?
 

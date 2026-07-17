@@ -15,10 +15,15 @@ namespace DeadWalls
     {
         private const string DefaultArcherCatalogPath =
             "Assets/ScriptableObject/MobileCastle/Archers/ArcherRecruitmentCatalog.asset";
+        private const string DefaultCouncilCatalogPath =
+            "Assets/ScriptableObject/MobileCastle/Council/CouncilEventCatalog.asset";
+        private const string MobileCastleCombatSubScenePath =
+            "Assets/Scenes/NewGameScene/MobileCastleCombatSubScene.unity";
 
         private DifficultyProfileSO _profile;
         private SerializedObject _profileSO;
         private ArcherRecruitmentCatalogSO _fallbackArcherCatalog;
+        private CouncilEventCatalogSO _fallbackCouncilCatalog;
         private Vector2 _scroll;
 
         private bool _foldCurves = true;
@@ -30,6 +35,7 @@ namespace DeadWalls
         private bool _foldPopulation = true;
         private bool _foldArchers = true;
         private bool _foldHeart = true;
+        private bool _foldCouncil = true;
         private bool _foldFuture;
         private bool _foldBot = true;
 
@@ -55,6 +61,10 @@ namespace DeadWalls
         private double _lastArrowRentSampleTime;
         private float _observedArrowDrainPerSecond;
         private bool _hasObservedArrowDrainSample;
+        private bool _hasCouncilDecisionOwnerSnapshot;
+        private float _councilDecisionDawnDuration;
+        private float _councilDecisionDayDuration;
+        private string _councilDecisionOwnerProblem = string.Empty;
         private double _nextSpawnTelemetryRepaint;
 
         private List<int> _deaths = new List<int>();
@@ -81,11 +91,15 @@ namespace DeadWalls
             if (_fallbackArcherCatalog == null)
                 _fallbackArcherCatalog = AssetDatabase.LoadAssetAtPath<ArcherRecruitmentCatalogSO>(
                     DefaultArcherCatalogPath);
+            if (_fallbackCouncilCatalog == null)
+                _fallbackCouncilCatalog = AssetDatabase.LoadAssetAtPath<CouncilEventCatalogSO>(
+                    DefaultCouncilCatalogPath);
 
             _lastArrowRentCount = -1L;
             _lastArrowRentSampleTime = 0d;
             _observedArrowDrainPerSecond = 0f;
             _hasObservedArrowDrainSample = false;
+            RefreshCouncilDecisionOwnerSnapshot();
 
             EditorApplication.update -= RepaintLiveTelemetry;
             EditorApplication.update += RepaintLiveTelemetry;
@@ -132,6 +146,7 @@ namespace DeadWalls
             DrawPopulationSection();
             DrawArcherSection();
             DrawHeartSection();
+            DrawCouncilSection();
             DrawFutureSection();
 
             _profileSO.ApplyModifiedProperties();
@@ -682,6 +697,257 @@ namespace DeadWalls
                 DrawHeartCatalogTuning(catalog, gameManager.GetHeartGraphSettingsSnapshot());
                 DrawLiveHeartTelemetry(gameManager);
             }
+        }
+
+        private void DrawCouncilSection()
+        {
+            _foldCouncil = DrawSectionHeader(_foldCouncil,
+                "Council Runtime Contract", "fixed cadence + effect bands + repeat memory + derived timer");
+            if (!_foldCouncil)
+                return;
+
+            using (new EditorGUILayout.VerticalScope("box"))
+            {
+                GameManager gameManager = ResolveGameManagerOwner();
+                CouncilEventCatalogSO catalog = gameManager != null && gameManager.CouncilCatalog != null
+                    ? gameManager.CouncilCatalog
+                    : _fallbackCouncilCatalog;
+
+                using (new EditorGUI.DisabledScope(true))
+                {
+                    EditorGUILayout.ObjectField("Runtime owner", gameManager,
+                        typeof(GameManager), true);
+                    EditorGUILayout.ObjectField("Production event catalog", catalog,
+                        typeof(CouncilEventCatalogSO), false);
+                    EditorGUILayout.IntField("First regular day", CouncilRegularSchedule.FirstRegularDay);
+                    EditorGUILayout.IntField("Regular interval (days)", CouncilRegularSchedule.IntervalDays);
+                }
+
+                EditorGUILayout.HelpBox(
+                    "V1 takvimi sabittir: regular Council yalniz Dawn'da Day 3/6/9... gunlerinde bir kez acilir. "
+                    + "Emergency Council yoktur; legacy chance, pity ve cooldown alanlari runtime'da dormantdadir.",
+                    MessageType.None);
+
+                if (catalog == null)
+                {
+                    EditorGUILayout.HelpBox(
+                        "Production CouncilEventCatalogSO bulunamadi. Mobile Castle Scene Setup ile binding'i onar.",
+                        MessageType.Error);
+                    DrawCouncilDecisionWindow(gameManager);
+                    return;
+                }
+
+                DrawCouncilCatalogSettings(catalog);
+                DrawCouncilDecisionWindow(gameManager);
+                DrawLiveCouncilTelemetry(gameManager);
+            }
+        }
+
+        private static void DrawCouncilCatalogSettings(CouncilEventCatalogSO catalog)
+        {
+            EditorGUILayout.Space(6);
+            EditorGUILayout.LabelField("Authored Effect + Memory Contract", EditorStyles.boldLabel);
+            var catalogSO = new SerializedObject(catalog);
+            catalogSO.Update();
+            SerializedProperty bands = catalogSO.FindProperty("EffectBands");
+            SerializedProperty recentMemory = catalogSO.FindProperty("RecentTemplateMemory");
+            if (bands == null || recentMemory == null)
+            {
+                EditorGUILayout.HelpBox("Council catalog tuning alanlari bulunamadi.", MessageType.Error);
+                return;
+            }
+
+            EditorGUI.BeginChangeCheck();
+            DrawRelativeProp(bands, "SmallMultiplier", "Small multiplier");
+            DrawRelativeProp(bands, "FairMultiplier", "Fair multiplier");
+            DrawRelativeProp(bands, "GenerousMultiplier", "Generous multiplier");
+            DrawRelativeProp(bands, "SmallWeight", "Small weight");
+            DrawRelativeProp(bands, "FairWeight", "Fair weight");
+            DrawRelativeProp(bands, "GenerousWeight", "Generous weight");
+            DrawRelativeProp(bands, "BudgetTolerance", "A/B budget tolerance");
+            EditorGUILayout.PropertyField(recentMemory, new GUIContent("Recent template memory"));
+            bool changed = EditorGUI.EndChangeCheck();
+            catalogSO.ApplyModifiedProperties();
+            if (changed)
+                EditorUtility.SetDirty(catalog);
+
+            CouncilEffectBandSettings settings = catalog.EffectBands;
+            float totalWeight = settings?.GetTotalWeight() ?? 0f;
+            string distribution = totalWeight > 0f
+                ? $"{settings.SmallWeight / totalWeight:P1} / {settings.FairWeight / totalWeight:P1} / "
+                  + $"{settings.GenerousWeight / totalWeight:P1}"
+                : "INVALID";
+            EditorGUILayout.LabelField("Normalized Small / Fair / Generous", distribution);
+            EditorGUILayout.LabelField("Templates / atoms / curated chains",
+                $"{(catalog.Templates?.Length ?? 0):N0} / {(catalog.Atoms?.Length ?? 0):N0} / "
+                + $"{(catalog.CuratedChains?.Length ?? 0):N0}");
+
+            List<string> problems = catalog.ValidateCatalog();
+            if (problems.Count > 0)
+                DrawHeartErrors("Council catalog validation failed", problems);
+            else
+                EditorGUILayout.HelpBox("Production Council catalog valid.", MessageType.Info);
+
+            EditorGUILayout.HelpBox(
+                "Bu alanlar dogrudan production CouncilEventCatalogSO asset'ini duzenler; DifficultyProfileSO "
+                + "icine kopyalanmaz. Memory azaltilirsa yeni sinir bir sonraki scheduled kart compose edilmeden "
+                + "once mevcut recent listeye uygulanir.", MessageType.None);
+        }
+
+        private void DrawCouncilDecisionWindow(GameManager gameManager)
+        {
+            EditorGUILayout.Space(6);
+            EditorGUILayout.LabelField("Decision Window Owner", EditorStyles.boldLabel);
+            MobileCastleCombatAuthoring authoring = FindFirstObjectByType<MobileCastleCombatAuthoring>(
+                FindObjectsInactive.Include);
+            float dawn = authoring != null
+                ? authoring.SiegeDawnDuration
+                : _councilDecisionDawnDuration;
+            float day = authoring != null
+                ? authoring.SiegeDayDuration
+                : _councilDecisionDayDuration;
+            bool hasOwner = authoring != null || _hasCouncilDecisionOwnerSnapshot;
+            float total = CouncilDecisionWindowUtility.GetTotalWindowSeconds(dawn, day);
+            if (Application.isPlaying && gameManager != null)
+            {
+                CouncilRuntimeTuningTelemetry telemetry = gameManager.GetCouncilRuntimeTuningTelemetry();
+                dawn = gameManager.ContinuousSiegeCycle.DawnDuration;
+                day = gameManager.ContinuousSiegeCycle.DayDuration;
+                total = telemetry.TotalDecisionSeconds;
+                hasOwner = true;
+            }
+
+            using (new EditorGUI.DisabledScope(true))
+            {
+                EditorGUILayout.TextField("Cycle owner",
+                    Application.isPlaying
+                        ? "Live ContinuousSiegeCycleData"
+                        : authoring != null
+                            ? "Loaded MobileCastleCombatAuthoring"
+                            : _hasCouncilDecisionOwnerSnapshot
+                                ? MobileCastleCombatSubScenePath
+                                : "UNAVAILABLE");
+                EditorGUILayout.TextField("Dawn duration", hasOwner ? $"{dawn:0.###}s" : "UNAVAILABLE");
+                EditorGUILayout.TextField("Day duration", hasOwner ? $"{day:0.###}s" : "UNAVAILABLE");
+                EditorGUILayout.TextField("Total decision seconds", hasOwner ? $"{total:0.###}s" : "UNAVAILABLE");
+            }
+            if (!Application.isPlaying && GUILayout.Button("Refresh cycle owner snapshot"))
+                RefreshCouncilDecisionOwnerSnapshot();
+            if (!hasOwner)
+                EditorGUILayout.HelpBox(_councilDecisionOwnerProblem, MessageType.Error);
+            EditorGUILayout.HelpBox(
+                "Karar suresi ayri bir Council timer ayari degildir. Production cycle owner'indaki Dawn + Day "
+                + "surelerinden turetilir; Dusk girisinde kart expire olur.", MessageType.None);
+        }
+
+        private void RefreshCouncilDecisionOwnerSnapshot()
+        {
+            _hasCouncilDecisionOwnerSnapshot = false;
+            _councilDecisionDawnDuration = 0f;
+            _councilDecisionDayDuration = 0f;
+            _councilDecisionOwnerProblem = string.Empty;
+
+            MobileCastleCombatAuthoring loaded = FindFirstObjectByType<MobileCastleCombatAuthoring>(
+                FindObjectsInactive.Include);
+            if (loaded != null)
+            {
+                _councilDecisionDawnDuration = loaded.SiegeDawnDuration;
+                _councilDecisionDayDuration = loaded.SiegeDayDuration;
+                _hasCouncilDecisionOwnerSnapshot = true;
+                return;
+            }
+
+            try
+            {
+                string projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
+                string scenePath = Path.Combine(projectRoot,
+                    MobileCastleCombatSubScenePath.Replace('/', Path.DirectorySeparatorChar));
+                if (!File.Exists(scenePath))
+                {
+                    _councilDecisionOwnerProblem = "Mobile Castle combat SubScene asset'i bulunamadi.";
+                    return;
+                }
+
+                bool hasDawn = false;
+                bool hasDay = false;
+                foreach (string line in File.ReadLines(scenePath))
+                {
+                    string trimmed = line.Trim();
+                    if (!hasDawn && TryReadSerializedFloat(
+                            trimmed, "SiegeDawnDuration:", out float dawn))
+                    {
+                        _councilDecisionDawnDuration = dawn;
+                        hasDawn = true;
+                    }
+                    else if (!hasDay && TryReadSerializedFloat(
+                                 trimmed, "SiegeDayDuration:", out float day))
+                    {
+                        _councilDecisionDayDuration = day;
+                        hasDay = true;
+                    }
+
+                    if (hasDawn && hasDay)
+                        break;
+                }
+
+                _hasCouncilDecisionOwnerSnapshot = hasDawn && hasDay;
+                if (!_hasCouncilDecisionOwnerSnapshot)
+                    _councilDecisionOwnerProblem =
+                        "MobileCastleCombatSubScene serialized Dawn/Day owner alanlari okunamadi.";
+            }
+            catch (System.Exception exception)
+            {
+                _councilDecisionOwnerProblem =
+                    "Cycle owner snapshot okunamadi: " + exception.Message;
+            }
+        }
+
+        private static bool TryReadSerializedFloat(
+            string line,
+            string fieldPrefix,
+            out float value)
+        {
+            value = 0f;
+            if (!line.StartsWith(fieldPrefix, System.StringComparison.Ordinal))
+                return false;
+
+            string raw = line.Substring(fieldPrefix.Length).Trim();
+            return float.TryParse(
+                raw,
+                System.Globalization.NumberStyles.Float,
+                System.Globalization.CultureInfo.InvariantCulture,
+                out value);
+        }
+
+        private static void DrawLiveCouncilTelemetry(GameManager gameManager)
+        {
+            if (!Application.isPlaying || gameManager == null)
+                return;
+
+            CouncilRuntimeTuningTelemetry telemetry = gameManager.GetCouncilRuntimeTuningTelemetry();
+            EditorGUILayout.Space(6);
+            EditorGUILayout.LabelField("Live Council Aggregate", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Catalog present / valid",
+                $"{telemetry.HasCatalog} / {telemetry.CatalogValid}");
+            EditorGUILayout.LabelField("Day / phase / last handled",
+                $"{telemetry.CurrentDay} / {telemetry.Phase} / {telemetry.LastHandledRegularDay}");
+            EditorGUILayout.LabelField("Recent / limit / flags / one-shots",
+                $"{telemetry.RecentTemplateCount} / {telemetry.RecentTemplateMemory} / "
+                + $"{telemetry.FlagCount} / {telemetry.UsedOneShotCount}");
+            EditorGUILayout.LabelField("Active card / A-B budgets",
+                telemetry.HasActiveEvent
+                    ? $"{telemetry.ActiveTemplateId} / {telemetry.OptionABudgetMinutes:0.###} - "
+                      + $"{telemetry.OptionBBudgetMinutes:0.###} min"
+                    : "NONE");
+            EditorGUILayout.LabelField("Decision remaining / total",
+                $"{telemetry.RemainingDecisionSeconds:0.0}s / {telemetry.TotalDecisionSeconds:0.0}s");
+            EditorGUILayout.LabelField("Production modifier / expiry",
+                $"{telemetry.ProductionModifierResource} x{telemetry.ProductionModifierMultiplier:0.###} / "
+                + $"wave {telemetry.ProductionModifierExpiresAfterWave}");
+            EditorGUILayout.LabelField("Next-night count / expiry",
+                $"x{telemetry.NextNightSpawnMultiplier:0.###} / wave {telemetry.NightSpawnExpiresAfterWave}");
+            if (!telemetry.CatalogValid)
+                EditorGUILayout.HelpBox(telemetry.CatalogProblem, MessageType.Error);
         }
 
         private static void DrawHeartEssenceGainContract(GameManager gameManager)

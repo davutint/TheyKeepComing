@@ -113,6 +113,15 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void DecisionWindow_TotalIsDerivedFromDawnPlusDayWithoutSeparateTimer()
+        {
+            Assert.That(CouncilDecisionWindowUtility.GetTotalWindowSeconds(5f, 30f),
+                Is.EqualTo(35f).Within(0.001f));
+            Assert.That(CouncilDecisionWindowUtility.GetTotalWindowSeconds(-5f, 30f),
+                Is.EqualTo(30f).Within(0.001f));
+        }
+
+        [Test]
         public void GeneratedHudPrefab_ContainsNumericalDecisionTimerText()
         {
             GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(

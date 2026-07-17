@@ -72,6 +72,13 @@ tek profil iterasyonuyla, KOD YAZMADAN tasindi).
      hidden node Id'lerini acmadan bakiye/meta remainder, graph/catalog version, seed ve aggregate
      node/edge/reveal/purchase/lock sayilarini gosterir. Catalog null veya Essence drop source yoksa
      legacy fallback yerine acik owner gate verir.
+   - **Council Runtime Contract** foldout'u canonical `GameManager` ile production
+     `CouncilEventCatalogSO` owner'ini birlestirir. Small/Fair/Generous multiplier ve weight'leri,
+     A/B budget tolerance ile `RecentTemplateMemory` dogrudan katalog asset'inde duzenlenir;
+     `DifficultyProfileSO` kopyasi yaratmaz. Day `3/6/9...` regular cadence read-only ve sabittir;
+     Emergency Council yoktur. Decision timer ayri bir alan degil, active cycle'in Dawn+Day
+     surelerinden turetilen read-only kontrattir. Play Mode aggregate telemetry handled day,
+     recent/flag/one-shot sayilari, active card butceleri ve sureli effect/expiry state'ini gosterir.
    - **Apply**: subscene authoring'e bagla (bake yolu) + play moddaysa CANLI uygula
      (config alanlari SetComponentData + buffer yeniden ornekleme).
    - **Run Bot**: profili canli uygular, RestartGame + Long Run Simulator'u baslatir
@@ -112,6 +119,8 @@ tek profil iterasyonuyla, KOD YAZMADAN tasindi).
 - Heart graph settings ve definition asset'leri de DifficultyProfile alt kopyasi degildir. Settings
   degisikligi yalniz sonraki yeni run generation'ina gider; aktif/Continue exact graph asla reroll
   edilmez. Production Heart catalog ve Essence drop sayilari owner onayi olmadan olusturulmaz.
+- Council effect band/memory ayarlari production Council catalog'a aittir. Takvim veya timer icin
+  profile/scene icinde ikinci alan acilmaz; karar suresi mevcut cycle Dawn+Day owner'indan turetilir.
 - Canli uygulama restart sonrasi config'i bake degerlerine dondurur; Tuner'in Run Bot'u
   bu yuzden restart'tan SONRA da ApplyProfileLive cagirir.
 - Fiyat alanlari sifir/negatif veya gecersiz girilirse resolver int-guvenli minimumlara,

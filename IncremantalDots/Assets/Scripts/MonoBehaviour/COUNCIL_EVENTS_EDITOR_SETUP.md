@@ -31,6 +31,12 @@
   ekle. `ValidateCatalog()` onaysiz veya kopuk zinciri reddeder.
 - `RecentTemplateMemory` katalog asset'inde hard anti-tekrar hafizasidir. Alternatif uygun
   template varken recent template secilemez; tum adaylar recent ise scheduled fallback acilir.
+  Memory canli azaltildiginda eski recent liste bir sonraki scheduled compose'dan once yeni sinira
+  iner.
+- `Window > DeadWalls > Difficulty Tuner > Council Runtime Contract`, production katalogdaki
+  Small/Fair/Generous multiplier ve weight'leri, A/B budget tolerance ile recent memory'yi dogrudan
+  duzenler. Varsayilan `0.7/1.0/1.4`, `%35/%50/%15`, `1.25`, memory `3` mevcut davranisi korur.
+  Weight toplam sifir, multiplier sirasi gecersiz veya tolerance `<1` olursa catalog fail-closed'dur.
   Regular takvim asset-tunable degildir: `CouncilRegularSchedule` sabit Day `3,6,9,12...`
   owner'idir.
 - Launch staging sabittir: Day 3 temel ekonomi; Day 6 population/savunma; Day 9 gece riski.
@@ -47,6 +53,8 @@
    acildigini kontrol et. Ayni duzen Day 6/9/12'de devam eder.
 2. Kart sol-alt bolgede belirir (odul toast'undan ~1.2s sonra); sure seridi ve `DECIDE Ns`
    sayaci kalan Dawn+Day penceresini gosterir; DUSK girisinde secilmediyse kaybolur.
+   Tuner'da decision window read-only olarak `SiegeDawnDuration + SiegeDayDuration` gorunmelidir;
+   production baseline `5 + 30 = 35s`'dir ve ayri Council timer alani yoktur.
 3. Iki butonun ikinci satirinda exact sonuc gorunur: population `+N PEOPLE -M FOOD`, free
    archer `+N BASIC ARCHERS -N IDLE PEOPLE`, Wall heal gercek uygulanacak HP ve gece etkisi
    exact count yuzdesi. Karsilanamayan exact sonuc butonu pasif yapar ve eksigi yazar.
@@ -57,7 +65,7 @@
    flag bulunsa bile target fail-closed acilmaz. A secildikten sonra source event kosu icin
    emekli olur; B secimi source'u yakmaz ve ileride tekrar teklif edilebilir.
 5. EditMode: `CouncilComposerTests`, `CouncilContentPolicyTests`, `CouncilRegularScheduleTests`,
-   `RunPersistenceTests`.
+   `CouncilOptionPresentationUtilityTests`, `CouncilTuningContractTests`, `RunPersistenceTests`.
 6. PlayMode: `CouncilRegularSchedulePlayModeTests` gercek sahnede Day 1-12 cadence,
    onayli flag yazimi ve bozuk role payload'inin fail-closed karar kilidini;
    `ExactRunContinuePlayModeTests` bozuk active Council payload'inin restart oncesi Continue

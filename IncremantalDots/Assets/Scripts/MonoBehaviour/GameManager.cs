@@ -2755,6 +2755,9 @@ namespace DeadWalls
                 return false;
             }
 
+            // Tuner'da memory azaltildiysa eski uzun liste bir sonraki kartin aday havuzuna
+            // sizmadan once yeni authored sinira indirilir.
+            TrimCouncilRecentTemplatesToCatalogMemory();
             uint seed = GetCouncilSeed(day);
             var context = BuildCouncilContext(day);
             var composed = CouncilComposer.Compose(councilCatalog, seed, context);
@@ -2768,9 +2771,7 @@ namespace DeadWalls
             _activeCouncilEvent = composed;
 
             _recentCouncilTemplates.Add(composed.TemplateId);
-            int memory = Mathf.Max(1, councilCatalog.RecentTemplateMemory);
-            while (_recentCouncilTemplates.Count > memory)
-                _recentCouncilTemplates.RemoveAt(0);
+            TrimCouncilRecentTemplatesToCatalogMemory();
 
             foreach (var template in councilCatalog.Templates)
             {

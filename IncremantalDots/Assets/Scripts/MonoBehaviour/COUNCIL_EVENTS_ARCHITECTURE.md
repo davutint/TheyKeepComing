@@ -14,7 +14,8 @@ recetesi tarafindan kabul edilmez. Diger 10 atom authored tariflerde kullanilir.
 1. **Veri (ScriptableObject/):** `CouncilEffectAtomSO` (etki parcacigi: tur + uretim-oranli
    buyukluk + director agirlik kurallari + butce degeri), `CouncilTemplateSO` (tema/metin +
    karsitlik tipi + flag kosullari + zincir alanlari), `CouncilEventCatalogSO` (havuz +
-   RecentTemplateMemory 3 + explicit `CuratedChains` allowlist'i). `ValidateCatalog`,
+   `CouncilEffectBandSettings` + RecentTemplateMemory 3 + explicit `CuratedChains` allowlist'i).
+   `ValidateCatalog`,
    `CouncilContentPolicy` role/recipe kontratini da zorunlu tutar. Legacy
    DailyEventChance/PityDays/CooldownDays alanlari serialized asset uyumlulugu icin saklidir
    fakat regular schedule tarafindan kullanilmaz.
@@ -22,8 +23,9 @@ recetesi tarafindan kabul edilmez. Diger 10 atom authored tariflerde kullanilir.
    katalogla seed + `CouncilContext` -> sablon sec
    (curated flag/gun filtreleri + hard anti-tekrar + iki secenekli director on-skoru) ->
    karsitlik recetesine gore A/B
-   atomlari -> uretim-oranli miktarlar (`perMin * MinutesOfProduction * band`; band 0.7/1.0/1.4)
-   -> butce dengeleme (A/B "dakika-degeri" toleransi asarsa dusuk taraf olceklenir).
+   atomlari -> uretim-oranli miktarlar (`perMin * MinutesOfProduction * band`; production
+   varsayilani 0.7/1.0/1.4 ve %35/%50/%15) -> authored `BudgetTolerance` asilirsa A/B
+   "dakika-degeri" dengelemesi. Composer bu degerleri sabit koddan degil katalogdan okur.
    DETERMINISTIK: ayni seed + ayni context = ayni event (EditMode testli). Rng warm-up
    ardisik-seed korelasyonunu kirar.
 3. **Runtime state (GameManager):** `TryOpenRegularCouncilEvent` (yalniz Day 3/6/9...;
@@ -74,6 +76,23 @@ otoritesi yalniz `GameManager` transaction'lari ve mevcut ECS effect owner'larin
 - Launch staging: Day 3 yalniz temel ekonomi (`abandoned_cache`, `merchant_caravan`,
   `quarry_crew`); Day 6 population/savunma (`refugees_at_gate`, `wandering_veterans`,
   `cold_snap`); Day 9 gece riski (`strange_bonfires`). Follow-up'lar flag + gecikme ile acilir.
+
+## Tuning ve Telemetry Contract'i
+
+- `Difficulty Tuner > Council Runtime Contract`, production `CouncilEventCatalogSO` asset'ini
+  dogrudan duzenler. Small/Fair/Generous multiplier ve weight'leri, A/B budget tolerance ile
+  `RecentTemplateMemory` `DifficultyProfileSO` icine kopyalanmaz.
+- Varsayilan `0.7/1.0/1.4`, `%35/%50/%15`, `1.25` ve memory `3` degerleri paket oncesi composer
+  davranisini aynen korur. Gecersiz/sirasiz multiplier, negatif/bos weight veya `<1` tolerance
+  katalog validation'i ve runtime compose'u fail-closed durdurur.
+- Memory degeri canli azaltildiginda `GameManager`, eski recent listeyi bir sonraki scheduled
+  compose'dan once yeni limite indirir ve secilen kart eklendikten sonra ayni limiti tekrar uygular.
+- Karar timer'inin ayri tuning/state owner'i yoktur. `CouncilDecisionWindowUtility`, toplam pencereyi
+  active `ContinuousSiegeCycleData.DawnDuration + DayDuration` olarak turetir; kalan sure faz
+  progress'inden gelir ve Dusk'ta sifirlanir.
+- `GameManager.GetCouncilRuntimeTuningTelemetry`, katalog validasyonu, memory/flag/one-shot sayilari,
+  active kart butceleri ve production/next-night expiry'lerini aggregate verir; yeni gameplay state'i
+  kurmaz veya gizli secenek icerigi uretmez.
 
 ## Persistence
 
@@ -215,7 +234,9 @@ provenance'ini ve production asset gate'ini;
 `CouncilEffectGuardPlayModeTests` gercek ECS population/Food/archer/Wall/count-only
 transaction'larini ve scene timer binding'ini dogrular. `CouncilOptionPresentationUtilityTests`
 exact metin, affordability, cycle countdown ve generated HUD prefab timer'ini kilitler.
-`CouncilRegularSchedulePlayModeTests` bozuk payload'in karar/on-state mutation yapamadigini;
+`CouncilTuningContractTests` production band degerlerini ve Tuner owner baglarini;
+`CouncilRegularSchedulePlayModeTests` canli memory sinirini, aggregate timer telemetry'sini ve bozuk
+payload'in karar/on-state mutation yapamadigini;
 `ExactRunContinuePlayModeTests` ayni payload'in Continue preflight'ta restart oncesi
 reddedildigini; `CouncilRegularSchedulePlayModeTests` active payload/memory/handled-day ile
 cozulmus secim, sureli effect state'i ve ilk meeting oncesi committed run salt'in exact

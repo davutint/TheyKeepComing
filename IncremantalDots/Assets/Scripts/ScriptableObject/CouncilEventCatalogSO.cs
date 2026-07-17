@@ -3,6 +3,78 @@ using UnityEngine;
 
 namespace DeadWalls
 {
+    [System.Serializable]
+    public sealed class CouncilEffectBandSettings
+    {
+        public const float DefaultSmallMultiplier = 0.7f;
+        public const float DefaultFairMultiplier = 1f;
+        public const float DefaultGenerousMultiplier = 1.4f;
+        public const float DefaultSmallWeight = 0.35f;
+        public const float DefaultFairWeight = 0.50f;
+        public const float DefaultGenerousWeight = 0.15f;
+        public const float DefaultBudgetTolerance = 1.25f;
+
+        [Min(0.01f)] public float SmallMultiplier = DefaultSmallMultiplier;
+        [Min(0.01f)] public float FairMultiplier = DefaultFairMultiplier;
+        [Min(0.01f)] public float GenerousMultiplier = DefaultGenerousMultiplier;
+        [Min(0f)] public float SmallWeight = DefaultSmallWeight;
+        [Min(0f)] public float FairWeight = DefaultFairWeight;
+        [Min(0f)] public float GenerousWeight = DefaultGenerousWeight;
+        [Min(1f)] public float BudgetTolerance = DefaultBudgetTolerance;
+
+        public bool TryValidate(out string problem)
+        {
+            if (!IsFinitePositive(SmallMultiplier)
+                || !IsFinitePositive(FairMultiplier)
+                || !IsFinitePositive(GenerousMultiplier))
+            {
+                problem = "Council effect band multiplier degerleri sonlu ve sifirdan buyuk olmali.";
+                return false;
+            }
+
+            if (SmallMultiplier > FairMultiplier || FairMultiplier > GenerousMultiplier)
+            {
+                problem = "Council effect band sirasi Small <= Fair <= Generous olmali.";
+                return false;
+            }
+
+            if (!IsFiniteNonNegative(SmallWeight)
+                || !IsFiniteNonNegative(FairWeight)
+                || !IsFiniteNonNegative(GenerousWeight)
+                || SmallWeight + FairWeight + GenerousWeight <= 0f)
+            {
+                problem = "Council effect band agirliklari sonlu, negatif olmayan ve toplamda sifirdan buyuk olmali.";
+                return false;
+            }
+
+            if (!IsFinitePositive(BudgetTolerance) || BudgetTolerance < 1f)
+            {
+                problem = "Council budget tolerance sonlu ve en az 1 olmali.";
+                return false;
+            }
+
+            problem = string.Empty;
+            return true;
+        }
+
+        public float GetTotalWeight()
+        {
+            return Mathf.Max(0f, SmallWeight)
+                   + Mathf.Max(0f, FairWeight)
+                   + Mathf.Max(0f, GenerousWeight);
+        }
+
+        private static bool IsFinitePositive(float value)
+        {
+            return value > 0f && !float.IsNaN(value) && !float.IsInfinity(value);
+        }
+
+        private static bool IsFiniteNonNegative(float value)
+        {
+            return value >= 0f && !float.IsNaN(value) && !float.IsInfinity(value);
+        }
+    }
+
     public enum CouncilChoiceBranch
     {
         OptionA = 0,
@@ -33,6 +105,10 @@ namespace DeadWalls
         public CouncilTemplateSO[] Templates = new CouncilTemplateSO[0];
         public CouncilEffectAtomSO[] Atoms = new CouncilEffectAtomSO[0];
 
+        [Header("Effect Bands")]
+        [Tooltip("Composer'in Small/Fair/Generous olcekleri, secim agirliklari ve A/B butce toleransi.")]
+        public CouncilEffectBandSettings EffectBands = new CouncilEffectBandSettings();
+
         // v10 ve daha eski authored asset uyumlulugu icin serialized tutulur. V1 Council
         // schedule'i bunlari kullanmaz; exact 3/6/9 takviminin tek owner'i
         // CouncilRegularSchedule'dir.
@@ -45,6 +121,7 @@ namespace DeadWalls
 
         [Header("Presentation Memory")]
         [Tooltip("Son N sablon, alternatif uygun template varsa havuzdan tamamen cikarilir.")]
+        [Min(1)]
         public int RecentTemplateMemory = 3;
 
         [Header("Curated Memory Chains")]
@@ -180,6 +257,11 @@ namespace DeadWalls
 
             CouncilContentPolicy.ValidateCatalog(this, problems);
             ValidateCuratedChains(templatesById, problems);
+
+            if (EffectBands == null)
+                problems.Add("Council EffectBands ayarlari bos olamaz.");
+            else if (!EffectBands.TryValidate(out string bandProblem))
+                problems.Add(bandProblem);
 
             if (atomIds.Count == 0) problems.Add("Katalogda hic atom yok.");
             if (templateIds.Count == 0) problems.Add("Katalogda hic sablon yok.");

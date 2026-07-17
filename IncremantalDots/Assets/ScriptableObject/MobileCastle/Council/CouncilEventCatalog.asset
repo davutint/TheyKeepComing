@@ -34,6 +34,14 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 4cf9ab88112f6f040a904804fe66e1a9, type: 2}
   - {fileID: 11400000, guid: f8a0291574b65e247afdb0b51cb8dff9, type: 2}
   - {fileID: 11400000, guid: 9c66821a4842b3e4c8e35459c2aecf40, type: 2}
+  EffectBands:
+    SmallMultiplier: 0.7
+    FairMultiplier: 1
+    GenerousMultiplier: 1.4
+    SmallWeight: 0.35
+    FairWeight: 0.5
+    GenerousWeight: 0.15
+    BudgetTolerance: 1.25
   DailyEventChance: 0.3
   PityDays: 3
   CooldownDays: 1
