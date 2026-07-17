@@ -289,3 +289,48 @@ callstack instrumentation'ı taşır. Buna rağmen Editor gürültüsünden ayr�
 average 60 FPS bütçesinin altında, P95 ise `16,67 ms` bütçesinin `2,024 ms` üzerindedir. Bu nedenle
 release cap artırılmadı; aktif cap/backlog saturation ve süreklilik kararı sıradaki long-run soak
 ölçümünde verilecektir.
+
+---
+
+## DW-V1-PERF-LONG-RUN-SOAK takip ölçümü - 2026-07-17
+
+Release `MaxAliveZombies = 900` değeri test için yükseltilmedi. Ölçüm, bekleme süresini yapay
+olarak uzatmadan doygunluğu deterministik kurmak için `ContinuousSpawnBudgetData` içine exact
+telemetry ile birlikte `10.000` pending demand seed etti; bu backlog'u yalnız üretim
+`WaveSpawnSystem` ve `EnemyPoolRuntimeUtility` tüketti. Cap dolduktan sonra 1.000 canonical Basic
+Archer, yüksek test ArrowSupply stoku ve gerçek projectile rent/return pipeline'ı devreye girdi.
+Warmup sonrasındaki steady-state pencere `3.600` frame'dir; bu, 60 FPS karşılığında bir dakikalık
+oyun frame'i örneğidir. Ardından yeni demand `SpawnTimer` üzerinden donduruldu, active kapasite
+128'lik kontrollü pool return turlarıyla açıldı ve mevcut backlog tamamen eritildi.
+
+| Metrik | Koşu 1 | Koşu 2 |
+|---|---:|---:|
+| Targeted PlayMode | 1/1 passed | 1/1 passed |
+| Release active cap / gözlenen max | 900 / 900 | 900 / 900 |
+| Cap dolum frame'i | 57 | 57 |
+| Warmup / steady-state | 360 / 3.600 frame | 360 / 3.600 frame |
+| Soak başlangıç / bitiş backlog | 9.228 / 9.989 | 9.228 / 10.002 |
+| Drain frame / max drain | 625 / 16 | 626 / 16 |
+| Final demanded / spawned / pending | 10.889 / 10.889 / 0 | 10.902 / 10.902 / 0 |
+| Final active enemy | 777 | 790 |
+| Enemy pool created / expansion | 1.024 / 7 | 1.024 / 7 |
+| Enemy pool rent / return | 10.889 / 10.112 | 10.902 / 10.112 |
+| Arrow pool created / expansion | 1.024 / 0 | 1.024 / 0 |
+| Arrow pool rent / return | 42.000 / 42.000 | 41.000 / 41.000 |
+| Frame average / P95 / max | 5,992 / 7,732 / 37,620 ms | 5,833 / 7,400 / 30,497 ms |
+| Main thread average / max | 5,981 / 37,580 ms | 5,821 / 30,508 ms |
+| Editor root GC average / max | 28.460 / 305.947 B | 29.079 / 305.025 B |
+| Total Used Memory başlangıç / bitiş | 4.001.181.282 / 4.063.759.106 B | 4.030.732.442 / 4.094.979.214 B |
+
+İki koşuda da `TotalDemanded - TotalSpawned = Pending` eşitliği her frame korundu. Cap doluyken
+enemy active/rent sayısı değişmedi ve backlog yeni continuous demand ile monoton büyüdü. Demand
+dondurulduğunda drain hiçbir frame release `MaxSpawnBatch = 16` sınırını aşmadı; pending sıfıra
+indiğinde demanded ile spawned tam eşitlendi. Enemy ve Arrow pool için
+`available + active = totalCreated` bütün örneklerde korundu; warmup sonrası yeni entity veya pool
+expansion oluşmadı. Bu nedenle saturation davranışı bounded ve backlog kayıpsızdır; release cap
+`900` olarak kalır.
+
+GC ve Total Used Memory satırları Unity Editor + Test Runner root sayaçlarıdır; proje koduna ait
+allocation/leak sertifikası olarak yorumlanmaz. Bir önceki isolated Standalone Player capture'ı proje
+kodu allocation'ını `481 B/frame`, named ECS system GC'sini `0 B` ölçmüştü. Bu soak'ın bellek kabulü
+managed sayaçtan ziyade sabit enemy/projectile pool residency'si ve exact rent/return muhasebesidir.

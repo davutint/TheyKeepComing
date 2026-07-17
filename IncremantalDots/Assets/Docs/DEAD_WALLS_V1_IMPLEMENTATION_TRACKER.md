@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.3
 > **Son tam kapsam denetimi:** 2026-07-17
 > **Aktif paket:** Post-Package V1 Closure - Contracts, Performance ve Release DoD
-> **Aktif iş:** `DW-V1-PERF-LONG-RUN-SOAK` - Measure Long-Run Soak and Active-Cap/Backlog Saturation
-> **İlerleme:** `403 / 442` tracker checkbox'ı tamamlandı - `%91,18`
+> **Aktif iş:** `DW-V1-TUNING-SPAWN-SURFACE` - Audit Spawn Day Curve, Phase Multiplier, Backlog and Active Cap
+> **İlerleme:** `404 / 442` tracker checkbox'ı tamamlandı - `%91,40`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -950,7 +950,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 - [x] 10K enemy + canonical 1K Basic Archer v14 Continue doğrulandı. Önceki üç temiz enemy rebuild koşusuna ek olarak üretim restore/spawn owner'ıyla kurulan 1K okçu snapshot'a `Basic/Rapid/Frost = 1000/0/0` ve formation version `1` olarak girdi. Canonical koşuda `378` bucket, `369.097 B`, save `47,05 ms`; bütün okçular her restore öncesi silindikten sonra iki Continue `417,11/436,89 ms` içinde 10K enemy + 1K okçuyu yeniden kurdu. Enemy position ve archer type/formation fingerprint'leri iki turda da deterministik kaldı; backlog `777` korundu.
 - [x] Düşük/orta/yüksek worker visual density geçişi; actual `12/60/1000/5000/0`, visual `12/24/32/32/0`.
 - [x] Projectile pool sonrası birleşik 10K enemy + canonical 1K Basic Archer yükü isolated StandaloneWindows64 Development Player'da ölçüldü. Targeted Player test `1/1`; 120-frame capture `73.765.057 B` raw üretti ve analyzer `121` frame okudu. Frame average/P95/max `10,593/18,694/33,234 ms`; root GC average/max `10.437/12.020 B`, proje kodu GC `58.290 B toplam / 481 B/frame`. Named ECS system GC `0 B`, sync-point yok. `DamageApplySystem` `1,892 ms` ortalama ve `4,863 ms` max ile sürekli owner; tek en yüksek system sample'ı `ArcherShootSystem 17,444 ms`. Release cap artırılmadı; saturation kararı long-run soak'a bırakıldı.
-- [ ] Long-run soak ve active cap/backlog saturation ölçümü.
+- [x] Long-run soak ve active cap/backlog saturation ölçümü. Release `MaxAliveZombies = 900` değiştirilmeden, üretim `WaveSpawnSystem`/`ContinuousSpawnBudgetData`/enemy pool owner'larıyla 10.000 seed backlog + 1.000 canonical Basic Archer + gerçek projectile pipeline koşuldu. İki temiz explicit PlayMode turunun her birinde `360` warmup + `3.600` steady-state frame geçti; alive hiçbir frame `900` üstüne çıkmadı, cap doluyken backlog `9.228 -> 9.989/10.002` büyüdü ve enemy rent sabit kaldı. Yeni demand dondurulunca backlog `625/626` frame'de, tam `16/frame MaxSpawnBatch` sınırıyla sıfırlandı; demanded/spawned `10.889/10.889` ve `10.902/10.902` oldu. Enemy pool `1.024` created / `7` expansion, arrow pool `1.024` created / `0` expansion olarak warmup sonrası drift etmedi. Soak frame average/P95 `5,992/7,732 ms` ve `5,833/7,400 ms`; targeted test iki turda da `1/1` geçti. Release cap artırılmadı.
 
 ### Tuning yüzeyleri
 
