@@ -29,7 +29,7 @@ V1 castle loop'taki satın alınabilir yatak gerçeği `MobileBedCapacityState` 
 
 Toplam yatak `BaseCapacity + PurchasedCapacity` olarak `MobileBedCapacityUtility` tarafından overflow-safe hesaplanır. Gameplay hard max yoktur; yalnız `int.MaxValue` teknik taşma sınırı uygulanır.
 
-`GameManager.TryBuyBedCapacity` bu state'i anlık satın alım transaction'ıyla büyütür. Sonraki yatağın Wood maliyeti owner onaylı `ceil(100 × (1 + max(0, ToplamYatak - 60) / 25)^2)` eğrisidir. Varsayılan `60` yatakta fiyat `100`, `160` yatakta `2.500`, `360` yatakta `16.900`, `810` yatakta `96.100` Wood olur. Toplu alım mevcut birim fiyatı adetle çarpmaz; her ek yatağın ardışık fiyatını toplar. Gameplay hard max yoktur; temsil edilemeyen `int` transaction taşırılmadan reddedilir. Eğri katsayılarının Inspector/SO tuning yüzeyine taşınması ayrı tracker işidir.
+`GameManager.TryBuyBedCapacity` bu state'i anlık satın alım transaction'ıyla büyütür. Sonraki yatağın Wood maliyeti owner onaylı `ceil(100 × (1 + max(0, ToplamYatak - 60) / 25)^2)` eğrisidir. Varsayılan `60` yatakta fiyat `100`, `160` yatakta `2.500`, `360` yatakta `16.900`, `810` yatakta `96.100` Wood olur. Toplu alım mevcut birim fiyatı adetle çarpmaz; her ek yatağın ardışık fiyatını toplar. Gameplay hard max yoktur; temsil edilemeyen `int` transaction taşırılmadan reddedilir. Eğri katsayıları `DifficultyProfileSO` ve `Difficulty Tuner > Population Runtime Contract` yüzeyindedir; runtime owner `MobileEconomyPriceTuning` component'idir.
 
 Bed state güncel exact save `v8` içinde `BedBaseCapacity` ve `PurchasedBedCapacity` olarak saklanır. `v3/v4` kayıtları mevcut nüfusu geçersiz kılmayacak bir base bed değeriyle migrate edilir; v5 kayıtları sıfır worker-building yatırımıyla v6'ya, ardından formation alanıyla v7'ye ve finite Arrow alanlarıyla v8'e yükseltilir.
 
@@ -45,6 +45,8 @@ accepted = min(requestedDawnCount, totalBeds - currentPopulation, Food / FoodCos
 
 - Varsayılan `requestedDawnCount = 15`.
 - Owner onaylı V1 değeri `FoodCostPerArrival = 1`.
+- İki değer de `DifficultyProfileSO -> MobileCastleTuningResolver -> MobileCastleCombatConfig`
+  zincirinde profile-owned'dir; authoring alanları profile yoksa fallback olur.
 - Food yetersizse mevcut nüfus azalmaz; yalnız yeni arrival sayısı düşer.
 - `MobilePopulationAllocation`, son istenen/kabul edilen sayıyı ve kabul edilenler için gereken Food tutarını saklar.
 - Kabul edilen population artışıyla aynı transaction içinde `RequiredFood`, `ResourceData.Food` stokundan yalnız bir kez düşülür.

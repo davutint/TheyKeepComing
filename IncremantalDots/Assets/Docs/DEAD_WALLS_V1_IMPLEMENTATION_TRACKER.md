@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.3
 > **Son tam kapsam denetimi:** 2026-07-17
 > **Aktif paket:** Post-Package V1 Closure - Contracts, Performance ve Release DoD
-> **Aktif iş:** `DW-V1-TUNING-POPULATION-SURFACE` - Audit Population Food per Arrival, Bed Curve and Dawn Count
-> **İlerleme:** `407 / 442` tracker checkbox'ı tamamlandı - `%92,08`
+> **Aktif iş:** `DW-V1-TUNING-ARCHER-SURFACE` - Audit Archer Base Stats, Cost Growth, Retrain Cost and Arrow Drain
+> **İlerleme:** `408 / 442` tracker checkbox'ı tamamlandı - `%92,31`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -967,7 +967,17 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
   sanitize, iki-kaynak maliyet/effect matematikleri EditMode `8/8`; baked runtime, live rebase,
   satin alma+Continue ve runtime quote PlayMode `4/4` gecti; scene validation `0` issue,
   final Console `0 error`.
-- [ ] Population: Food per arrival, bed curve, dawn count.
+- [x] Population: Food per arrival, bed curve, dawn count. Dawn request `15` ve kabul edilen
+  survivor başına tek seferlik `1 Food`, `DifficultyProfileSO -> MobileCastleTuningResolver ->
+  MobileCastleCombatConfig` owner zincirine alındı; aynı isimli SubScene alanları profile yoksa
+  fallback kalır. Initial bed `60` authoring-owned run baseline'ıdır. House bed `100W / 25 owned`
+  quadratic eğrisi profile-owned `MobileEconomyPriceTuning` üzerinden devam eder. `Difficulty
+  Tuner > Population Runtime Contract`, gerçek arrival/bed utility'leriyle current population,
+  purchased beds ve Food preview'u; accepted/required Food, +1/+10 bed quote ve canlı next-Dawn/
+  last-Dawn telemetry'si gösterir. Live Apply mevcut run bed state'ini sıfırlamadan request/Food
+  config'ini ve bed curve tuning'ini günceller. Profile/fallback/sanitize, Dawn budget ve int-safe
+  bed curve EditMode `18/18`; baked runtime, gerçek Dawn tek transaction, bed purchase+Continue ve
+  runtime quote PlayMode `4/4` geçti; scene validation `0` issue, final Console `0 error`.
 - [ ] Archers: base stats, cost growth, retrain cost, Arrow drain.
 - [ ] Heart: Essence gain, node cost/growth, rarity/depth.
 - [ ] Council: fixed cadence, effect bands, repeat memory, decision timer.

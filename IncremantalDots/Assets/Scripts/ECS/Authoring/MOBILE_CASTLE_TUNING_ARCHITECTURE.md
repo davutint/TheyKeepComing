@@ -10,7 +10,7 @@ Her tuning alanının tek bir baseline owner'ı olmalıdır. Inspector, Difficul
 2. Aktif `EnemyDefinitionSO`, enemy prefabı ile base HP/damage/speed/scale değerlerinin içerik owner'ıdır.
 3. `DifficultyProfileSO`, enemy base statları dışındaki quantity/difficulty baseline değerlerinin içerik owner'ıdır.
 4. Aktif SubScene'deki `MobileCastleCombatAuthoring`, profile taşınmamış geometri, mode,
-   cycle süresi, worker cap/population ve feedback baseline değerlerinin owner'ıdır.
+   cycle süresi, initial bed, worker cap ve feedback baseline değerlerinin owner'ıdır.
 5. `MobileCastleTuningResolver` Profile/Authoring değerlerini birleştirir; Baker aktif EnemyDefinition base statlarını son adımda runtime config'e uygular.
 6. `MobileCastleCombatConfig`, runtime çıktısıdır; editlenecek içerik kaynağı değildir.
 7. Tech, meta progression ve Council etkileri baseline config üzerine runtime aggregate uygular. Bu effective değerler yeni baseline sayılmaz.
@@ -31,6 +31,7 @@ Her tuning alanının tek bir baseline owner'ı olmalıdır. Inspector, Difficul
 - Wall base HP, normal repair heal paketi, Stone/HP, Day fiyat carpani
 - Emergency Repair heal yuzdesi ve cooldown
 - Repair base Wood/Stone legacy serialized uyumluluk degerleri (aktif fiyat owner'i degil)
+- Dawn/cycle basina istenen survivor sayisi ve kabul edilen kisi basi tek seferlik Food
 - House bed başlangıç Wood maliyeti ve owned-bed büyüme interval'i
 - Worker CAP/EFF ayrı Wood/Iron başlangıç maliyetleri ve ortak bina büyüme çarpanı
 - Wood/Stone/Iron/Food worker başına üretim baseline'ları
@@ -75,7 +76,8 @@ dışındadır. İçerik değerleri `DifficultyProfileSO`, politika/matematik
 - Continuous siege enable ve cycle süreleri
 - Zombie scale/speed ve stress-test alanları
 - Reward ve worker economy baseline değerleri
-- Population growth ve worker cap değerleri
+- Initial bed ve worker cap değerleri
+- Population growth/Food alanlari yalniz profile yokken fallback'tir
 - Worker production alanları yalnız profile yokken fallback'tir
 - Unlimited arrows gibi mode flag'leri
 - Overlay, wave director phase oranları, Fortify/Rally baseline
@@ -105,6 +107,12 @@ yuzeyde toplar. Preview runtime utility'lerini kullanir. Play Mode Apply
 `GameManager.ApplyWorkerEconomyTuning` ile mevcut tech/meta/Heart ve bina katmanlarini yeni
 base rate'lere yeniden fold eder; effective config yeni baseline sayilmaz.
 
+`Population Runtime Contract` paneli profile-owned Dawn request ile Food/arrival degerini ve
+profile-owned House bed fiyat egrisini tek yuzeyde toplar. Preview/live telemetry ayni
+`MobilePopulationArrivalUtility` ve `MobileBedCapacityUtility` owner'larini kullanir. Baslangic
+yatagi SubScene Authoring state'idir; live Apply mevcut `MobileBedCapacityState` degerini
+sifirlamadan yalniz config ve fiyat tuning baseline'larini gunceller.
+
 `MobileCastleSceneSetupWindow` yalnız owner tarafından açıkça çalıştırılan initializer/repair aracıdır. Runtime owner değildir. Tool'un yazdığı değerler scene/profile asset'e kaydedildikten sonra yukarıdaki sahiplik kuralına girer.
 
 ## Aktif proje kanıtı (2026-07-12)
@@ -121,6 +129,8 @@ Aktif SubScene `DefaultDifficulty.asset` profilini kullanır. Bilinçli olarak f
 | Legacy repair base Stone | 80 | 50 | serialized only; V1 fiyatinda okunmaz |
 | Normal repair | Authoring fallback | %25, 0.10 Stone/HP, x1 Day | ayni profile baseline |
 | Emergency repair | Authoring fallback | %20, 120s | ayni profile baseline |
+| Dawn request / Food each | Authoring fallback 15 / 1 | 15 / 1 | Profile baseline: 15 / 1 |
+| Initial bed capacity | 60 | Profile'da yok | `MobileBedCapacityState.BaseCapacity`: 60 |
 | Bed base / interval | Profile owner | 100 / 25 | `MobileEconomyPriceTuning`: 100 / 25 |
 | Worker CAP / EFF base | Profile owner | 100W+25I / 150W+50I | `MobileEconomyPriceTuning`: aynı |
 | Worker bina growth | Profile owner | 1.35 | `MobileEconomyPriceTuning`: 1.35 |
@@ -137,6 +147,8 @@ Runtime production gibi bazı alanlar tech/meta aggregate sonrasında baseline'd
 - `MobileCastleTuningResolverTests.DaySample_UsesSameCurveAndSpecialNightRulesForBakeAndLiveApply`
 - `MobileCastleTuningResolverTests.RunDifficultyProfile_ClosesSpawnCurvePhaseCapAndPreservedBacklogContract`
 - `MobileCastleTuningResolverTests.EconomyPriceTuning_UsesProfileValuesAndSanitizesInvalidInputs`
+- `MobileCastleTuningResolverTests.PopulationRuntimeTuning_UsesProfileValuesAndSanitizesInvalidInputs`
+- `MobilePopulationArrivalUtilityTests.DefaultsAndSanitizers_ClosePopulationRuntimeContract`
 - `ExactRunContinuePlayModeTests.RuntimeTuning_UsesProfileDifficulty_AndAuthoringCycleDurations`
 - `EnemyCatalogContractTests.Definition_OwnsBaseStatsAndFuturePoolMetadata`
 - `ExactRunContinuePlayModeTests.EnemyCatalog_SpawnsRegisteredPrefabWithDefinitionStats`

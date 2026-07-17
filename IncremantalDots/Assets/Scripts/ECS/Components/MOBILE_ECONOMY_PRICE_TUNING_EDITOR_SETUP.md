@@ -3,14 +3,15 @@
 1. `Window > DeadWalls > Difficulty Tuner` penceresini aç.
 2. `DefaultDifficulty` profilini seç.
 3. `Economy Runtime Contract` bölümünden worker base rate, CAP/EFF maliyeti, ortak growth
-   ve EFF seviye yüzdesini düzenle. Bed/Arrow komşu alanları panelin altında korunur.
+   ve EFF seviye yüzdesini düzenle. House bed alanlari `Population Runtime Contract`a,
+   Arrow alanlari Economy panelinin komsu Archer girdilerine ayrilmistir.
 4. `APPLY` ile asset'i kaydet ve aktif authoring'e bağla.
 5. Play Mode'da Apply, bake edilmiş `MobileEconomyPriceTuning` component'ini canlı yeniler
    ve worker rate aggregate'lerini yeni baseline'a yeniden uygular.
 
 Inspector üzerinden doğrudan düzenlemek istersen:
 `Assets/ScriptableObject/MobileCastle/Difficulty/DefaultDifficulty.asset` asset'ini seç ve
-`Worker Economy` ve `Ekonomi Fiyat Egrileri` alanlarını kullan.
+`Worker Economy`, `Population Runtime Contract` ve `Ekonomi Fiyat Egrileri` alanlarını kullan.
 
 V1 default:
 

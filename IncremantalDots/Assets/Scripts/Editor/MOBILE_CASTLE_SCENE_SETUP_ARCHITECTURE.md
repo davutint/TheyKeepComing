@@ -103,7 +103,8 @@ Mobile HUD economy varsayilanlari NewGameScene setup tarafindan GameStateAuthori
 - Worker caps: Wood `40`, Stone `30`, Iron `24`, Food `40`
 - Worker production authoring fallback: Wood `8/min`, Stone `5.5/min`, Iron `4.9/min`,
   Food `7/min`; aktif `DefaultDifficulty.asset` ayni degerlerin content owner'idir
-- Continuous siege cycle tamamlandikca population growth `+15` uygulanir.
+- Continuous siege cycle tamamlandikca aktif `DefaultDifficulty.asset` kaynakli Dawn request
+  `+15` ve Food/arrival `1` uygulanir; initial bed `60` authoring state'idir.
 
 Economy focus UI mobile worker economy ile kullanilmaz. Tool eski `EconomyFocusPanel`, `EconomyFocusText` ve `EconomyBalanced/Wood/Stone/Iron/FoodButton` objelerini root'tan soker; bunlar re-run ile geri uretilmez. Yeni player-facing worker kontrolu `WorkerEconomyDrawerUI` uzerinden sol ust resource bar altindaki drawer ile yapilir; target ratio ile hazir binalarin Capacity/Efficiency yatirimlari ayni panelde sunulur. Prefab yalniz gorsel kontrolleri tasir, runtime controller sahne instance'inda tek owner olarak kalir. `CastleEconomyUI` legacy full-screen panel olarak bagli kalabilir ama `PlayerFacingPanelEnabled = false` ile kapali tutulur. Runtime davranis UI JSON icine gomulmez.
 

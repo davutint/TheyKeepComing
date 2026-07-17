@@ -5,6 +5,19 @@ namespace DeadWalls.Tests
     public class MobilePopulationArrivalUtilityTests
     {
         [Test]
+        public void DefaultsAndSanitizers_ClosePopulationRuntimeContract()
+        {
+            Assert.That(MobilePopulationArrivalUtility.DefaultRequestedArrivalsPerDawn,
+                Is.EqualTo(15));
+            Assert.That(MobilePopulationArrivalUtility.DefaultFoodCostPerArrival,
+                Is.EqualTo(1));
+            Assert.That(MobilePopulationArrivalUtility.SanitizeRequestedArrivals(-1), Is.Zero);
+            Assert.That(MobilePopulationArrivalUtility.SanitizeRequestedArrivals(8), Is.EqualTo(8));
+            Assert.That(MobilePopulationArrivalUtility.SanitizeFoodCostPerArrival(0), Is.EqualTo(1));
+            Assert.That(MobilePopulationArrivalUtility.SanitizeFoodCostPerArrival(4), Is.EqualTo(4));
+        }
+
+        [Test]
         public void CalculateBudget_AcceptsFullRequestedCountWhenBedsAndFoodAllow()
         {
             MobilePopulationArrivalBudget budget = MobilePopulationArrivalUtility.CalculateBudget(

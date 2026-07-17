@@ -54,7 +54,9 @@ SubScene:
 - `MobileCastleCombatAuthoring`: zombie scale `1.4`, base speed `0.85`, speed per wave `0.04`, stress batch `25`, stress interval `0.1`, stress max alive `1500`
 - `MobileCastleCombatAuthoring`: kill reward Wood/Food/Stone/Iron `1 / 0.6 / 0.25 / 0.15`, wave scale `0.05`
 - `MobileCastleCombatAuthoring`: wave clear bonus base Wood/Food/Stone/Iron `20 / 15 / 10 / 6`, per wave `6 / 5 / 4 / 3`
-- `MobileCastleCombatAuthoring`: worker economy population growth `15`, initial workers Wood/Stone/Iron/Food `20 / 10 / 8 / 15`
+- `MobileCastleCombatAuthoring`: profile yoksa Dawn request/Food fallback `15 / 1`, initial bed
+  `60`, initial workers Wood/Stone/Iron/Food `20 / 10 / 8 / 15`
+- `DefaultDifficulty.asset`: profile-owned Dawn request/Food `15 / 1`, bed curve `100W / 25 interval`
 - `MobileCastleCombatAuthoring`: worker caps Wood/Stone/Iron/Food `40 / 30 / 24 / 40`
 - `MobileCastleCombatAuthoring`: profile yoksa worker production fallback'i Wood/Stone/Iron/Food
   `8 / 5.5 / 4.9 / 7` per minute; aktif profile bu degerlerin owner'idir, reward multiplier `0.25`

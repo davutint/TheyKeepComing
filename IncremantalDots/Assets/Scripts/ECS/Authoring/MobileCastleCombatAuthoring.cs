@@ -120,7 +120,10 @@ namespace DeadWalls
         public int FinalBatchDelta = 1;
 
         [Header("Population Economy")]
-        public int PopulationGrowthPerDayPrep = 15;
+        [Tooltip("Difficulty Profile yoksa kullanilan Dawn survivor request fallback degeri.")]
+        public int PopulationGrowthPerDayPrep =
+            MobilePopulationArrivalUtility.DefaultRequestedArrivalsPerDawn;
+        [Tooltip("Difficulty Profile yoksa kullanilan tek seferlik Food/arrival fallback degeri.")]
         [Min(1)] public int FoodCostPerArrival = MobilePopulationArrivalUtility.DefaultFoodCostPerArrival;
         [Tooltip("Run baslangicindaki House yatak kapasitesi. Satin alinmis yataklar ayri run state'inde birikir.")]
         public int InitialBedCapacity = MobileBedCapacityUtility.DefaultInitialCapacity;

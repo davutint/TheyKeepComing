@@ -23,6 +23,7 @@ namespace DeadWalls
         private bool _foldSpawnContract = true;
         private bool _foldRepair = true;
         private bool _foldEconomyPrices = true;
+        private bool _foldPopulation = true;
         private bool _foldFuture;
         private bool _foldBot = true;
 
@@ -32,6 +33,9 @@ namespace DeadWalls
         private int _spawnPreviewDay = 1;
         private float _wallPreviewMissingPercent = 0.50f;
         private int _economyPreviewLevel;
+        private int _populationPreviewCurrentPopulation = 60;
+        private int _populationPreviewPurchasedBeds = 15;
+        private int _populationPreviewFood = 30;
         private double _nextSpawnTelemetryRepaint;
 
         private List<int> _deaths = new List<int>();
@@ -98,6 +102,7 @@ namespace DeadWalls
             DrawSpawnContractSection();
             DrawRepairSection();
             DrawEconomyPriceSection();
+            DrawPopulationSection();
             DrawFutureSection();
 
             _profileSO.ApplyModifiedProperties();
@@ -480,14 +485,10 @@ namespace DeadWalls
                 DrawLiveEconomyTelemetry();
 
                 EditorGUILayout.Space(8);
-                EditorGUILayout.LabelField("Adjacent Population / Arrow Inputs", EditorStyles.boldLabel);
+                EditorGUILayout.LabelField("Adjacent Archer Inputs", EditorStyles.boldLabel);
                 EditorGUILayout.HelpBox(
-                    "Bu alanlar mevcut edit yetenegini korur; kendi tracker audit'lerinde ayrica "
-                    + "Population ve Archer runtime contract yuzeylerine alinacak.", MessageType.None);
-                EditorGUILayout.LabelField("House Beds", EditorStyles.miniBoldLabel);
-                DrawProp("BedBaseWoodCost");
-                DrawProp("BedCostGrowthCapacityInterval");
-                EditorGUILayout.Space(6);
+                    "Finite Arrow alanlari mevcut edit yetenegini korur; Archer tracker audit'inde "
+                    + "kendi runtime contract yuzeyine alinacak.", MessageType.None);
                 EditorGUILayout.LabelField("Finite Arrow Supply", EditorStyles.miniBoldLabel);
                 DrawProp("ArrowBaseCapacity");
                 DrawProp("ArrowCapacityPerLevel");
@@ -500,6 +501,152 @@ namespace DeadWalls
                 DrawProp("ArrowEfficiencyBaseIronCost");
                 DrawProp("ArrowUpgradeCostGrowthMultiplier");
             }
+        }
+
+        private void DrawPopulationSection()
+        {
+            _foldPopulation = DrawSectionHeader(_foldPopulation,
+                "Population Runtime Contract", "Dawn request + Food + bed curve");
+            if (!_foldPopulation)
+                return;
+
+            using (new EditorGUILayout.VerticalScope("box"))
+            {
+                EditorGUILayout.LabelField("Dawn Arrival", EditorStyles.boldLabel);
+                DrawProp("PopulationGrowthPerDayPrep");
+                DrawProp("FoodCostPerArrival");
+
+                EditorGUILayout.Space(6);
+                EditorGUILayout.LabelField("House Bed Curve", EditorStyles.boldLabel);
+                DrawProp("BedBaseWoodCost");
+                DrawProp("BedCostGrowthCapacityInterval");
+                EditorGUILayout.LabelField("Initial bed capacity",
+                    $"{MobileBedCapacityUtility.DefaultInitialCapacity:N0} (SubScene Authoring baseline)");
+
+                EditorGUILayout.Space(6);
+                EditorGUILayout.LabelField("Contract Preview", EditorStyles.boldLabel);
+                _populationPreviewCurrentPopulation = Mathf.Max(0,
+                    EditorGUILayout.IntField("Current population",
+                        _populationPreviewCurrentPopulation));
+                _populationPreviewPurchasedBeds = Mathf.Max(0,
+                    EditorGUILayout.IntField("Purchased beds",
+                        _populationPreviewPurchasedBeds));
+                _populationPreviewFood = Mathf.Max(0,
+                    EditorGUILayout.IntField("Available Food", _populationPreviewFood));
+
+                var previewBeds = new MobileBedCapacityState
+                {
+                    BaseCapacity = MobileBedCapacityUtility.DefaultInitialCapacity,
+                    PurchasedCapacity = _populationPreviewPurchasedBeds
+                };
+                int totalBeds = MobileBedCapacityUtility.GetTotalCapacity(previewBeds);
+                MobilePopulationArrivalBudget budget = MobilePopulationArrivalUtility.CalculateBudget(
+                    _profile.PopulationGrowthPerDayPrep,
+                    _populationPreviewCurrentPopulation,
+                    totalBeds,
+                    _populationPreviewFood,
+                    _profile.FoodCostPerArrival);
+                MobileEconomyPriceTuning previewTuning =
+                    MobileCastleTuningResolver.ResolveEconomyPriceTuning(_profile);
+                bool hasOneBedQuote = MobileBedCapacityUtility.TryGetPurchaseWoodCost(
+                    previewBeds, 1, previewTuning, out int oneBedCost);
+                bool hasTenBedQuote = MobileBedCapacityUtility.TryGetPurchaseWoodCost(
+                    previewBeds, 10, previewTuning, out int tenBedCost);
+
+                EditorGUILayout.LabelField("Beds / free space",
+                    $"{totalBeds:N0} / {budget.AvailableBedSpace:N0}");
+                EditorGUILayout.LabelField("Requested / affordable / accepted",
+                    $"{budget.RequestedArrivals:N0} / {budget.AffordableArrivals:N0} / {budget.AcceptedArrivals:N0}");
+                EditorGUILayout.LabelField("One-time Food spend",
+                    $"{budget.AcceptedArrivals:N0} x {budget.FoodCostPerArrival:N0} = {budget.RequiredFood:N0}");
+                EditorGUILayout.LabelField("Next +1 / +10 bed quote",
+                    $"{FormatWoodQuote(hasOneBedQuote, oneBedCost)} / "
+                    + FormatWoodQuote(hasTenBedQuote, tenBedCost));
+                EditorGUILayout.HelpBox(
+                    "Dawn kabul formulu min(requested, bos yatak, Food / kisi maliyeti)'dir. "
+                    + "Food yalniz kabul edilen survivor icin ayni transaction'da bir kez harcanir. "
+                    + "Yatakta hard max yoktur; Wood fiyati toplam sahip olunan yatak sayisiyla "
+                    + "quadratic buyur ve bulk alim her yatagin sirali fiyatini toplar.",
+                    MessageType.None);
+
+                DrawLivePopulationTelemetry();
+            }
+        }
+
+        private static string FormatWoodQuote(bool valid, int woodCost)
+        {
+            return valid ? $"{Mathf.Max(0, woodCost):N0}W" : "INT LIMIT";
+        }
+
+        private static void DrawLivePopulationTelemetry()
+        {
+            if (!Application.isPlaying)
+                return;
+
+            var world = World.DefaultGameObjectInjectionWorld;
+            if (world == null || !world.IsCreated)
+                return;
+
+            EntityManager em = world.EntityManager;
+            using EntityQuery configQuery = em.CreateEntityQuery(
+                typeof(MobileCastleCombatConfig),
+                typeof(MobileEconomyPriceTuning),
+                typeof(MobileBedCapacityState),
+                typeof(MobilePopulationAllocation));
+            using EntityQuery stateQuery = em.CreateEntityQuery(
+                typeof(PopulationState), typeof(ResourceData));
+            if (configQuery.CalculateEntityCount() != 1 || stateQuery.CalculateEntityCount() != 1)
+            {
+                EditorGUILayout.HelpBox("Live population singleton'lari henuz hazir degil.",
+                    MessageType.Info);
+                return;
+            }
+
+            Entity configEntity = configQuery.GetSingletonEntity();
+            Entity stateEntity = stateQuery.GetSingletonEntity();
+            MobileCastleCombatConfig config =
+                em.GetComponentData<MobileCastleCombatConfig>(configEntity);
+            MobileEconomyPriceTuning tuning = MobileEconomyPriceTuningUtility.Sanitize(
+                em.GetComponentData<MobileEconomyPriceTuning>(configEntity));
+            MobileBedCapacityState beds =
+                em.GetComponentData<MobileBedCapacityState>(configEntity);
+            MobilePopulationAllocation allocation =
+                em.GetComponentData<MobilePopulationAllocation>(configEntity);
+            PopulationState population = em.GetComponentData<PopulationState>(stateEntity);
+            ResourceData resources = em.GetComponentData<ResourceData>(stateEntity);
+            int totalBeds = MobileBedCapacityUtility.GetTotalCapacity(beds);
+            MobilePopulationArrivalBudget budget = MobilePopulationArrivalUtility.CalculateBudget(
+                config.PopulationGrowthPerDayPrep,
+                population.Total,
+                totalBeds,
+                resources.Food,
+                config.FoodCostPerArrival);
+            bool hasOneBedQuote = MobileBedCapacityUtility.TryGetPurchaseWoodCost(
+                beds, 1, tuning, out int oneBedCost);
+            bool hasTenBedQuote = MobileBedCapacityUtility.TryGetPurchaseWoodCost(
+                beds, 10, tuning, out int tenBedCost);
+
+            EditorGUILayout.Space(6);
+            EditorGUILayout.LabelField("Live Next-Dawn Budget", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Requested / Food each",
+                $"{budget.RequestedArrivals:N0} / {budget.FoodCostPerArrival:N0}");
+            EditorGUILayout.LabelField("Population / beds / free",
+                $"{Mathf.Max(0, population.Total):N0} / {totalBeds:N0} / {budget.AvailableBedSpace:N0}");
+            EditorGUILayout.LabelField("Food / affordable / accepted",
+                $"{Mathf.Max(0, resources.Food):N0} / {budget.AffordableArrivals:N0} / {budget.AcceptedArrivals:N0}");
+            EditorGUILayout.LabelField("Predicted one-time Food spend",
+                $"{budget.RequiredFood:N0}");
+            EditorGUILayout.LabelField("Last Dawn requested / accepted / spent",
+                $"{Mathf.Max(0, allocation.LastArrivalRequestedCount):N0} / "
+                + $"{Mathf.Max(0, allocation.LastArrivalAcceptedCount):N0} / "
+                + $"{Mathf.Max(0, allocation.LastArrivalFoodCost):N0}");
+            EditorGUILayout.LabelField("Base / purchased beds",
+                $"{Mathf.Max(0, beds.BaseCapacity):N0} / {Mathf.Max(0, beds.PurchasedCapacity):N0}");
+            EditorGUILayout.LabelField("Next +1 / +10 bed quote",
+                $"{FormatWoodQuote(hasOneBedQuote, oneBedCost)} / "
+                + FormatWoodQuote(hasTenBedQuote, tenBedCost));
+            EditorGUILayout.LabelField("Bed curve base / interval",
+                $"{tuning.BedBaseWoodCost:N0}W / {tuning.BedCostGrowthCapacityInterval:N0} owned beds");
         }
 
         private void DrawLiveEconomyTelemetry()

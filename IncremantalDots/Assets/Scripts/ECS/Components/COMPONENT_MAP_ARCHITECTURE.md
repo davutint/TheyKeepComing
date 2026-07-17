@@ -97,6 +97,8 @@ GameManager.BuyArcher(type) -> ArcherCapacityUtility ortak 1000 cap -> MobileCas
 MobilePopulationAllocation actual count -> WorkerVisualRepresentationUtility -> GameManager temsili DOTS villager count + exact weight sync -> WorkerLogisticsMovementSystem animation/cargo/fener/teslimat feedback
 GameManager.TryBuyBedCapacity -> MobileEconomyPriceTuning + MobileBedCapacityUtility owned-capacity sıralı fiyatı -> Wood transaction -> MobileBedCapacityState.PurchasedCapacity
 GameManager.TryBuyWorkerBuildingUpgrade -> MobileEconomyPriceTuning fiyatı -> Wood + Iron transaction -> bağımsız bina seviyesi -> base + Heart + Council + Meta + bina config aggregate'i
+DifficultyProfileSO -> MobileCastleTuningResolver -> MobileCastleCombatConfig Dawn request + Food/arrival
+DifficultyProfileSO -> MobileCastleTuningResolver -> MobileEconomyPriceTuning House bed quadratic egrisi
 MobilePopulationEconomySystem -> MobileBedCapacityState kapasite aynası -> MobilePopulationArrivalUtility bed + Food kabul bütçesi -> accepted population growth + tek seferlik ResourceData.Food transaction
 MobilePopulationAllocation yeni growth marker + accepted count -> GameManager VillagerWorker arrival spawn -> SurvivorArrivalVisualSystem sağdan Wall arkasına yürüyüş + varışta destroy
 GameManager.BuyFortify()/BuyRally() -> CastleYardPrepState uzerine tek-gecelik buff yazar

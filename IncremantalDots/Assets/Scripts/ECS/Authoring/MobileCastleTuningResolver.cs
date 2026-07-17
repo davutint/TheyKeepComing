@@ -3,8 +3,9 @@ using Unity.Mathematics;
 namespace DeadWalls
 {
     /// <summary>
-    /// Baseline tuning precedence owner'i. DifficultyProfile difficulty, Wall ve worker economy
-    /// tuning'ini; MobileCastleCombatAuthoring geometri/mode/cycle ve kalan fallback alanlarini sahiplenir.
+    /// Baseline tuning precedence owner'i. DifficultyProfile difficulty, Wall, population ve worker
+    /// economy tuning'ini; MobileCastleCombatAuthoring geometri/mode/cycle ve kalan fallback alanlarini
+    /// sahiplenir.
     /// Runtime tech, meta ve Council carpanlari bu baseline'in ustune ayri aggregate katmani kurar.
     /// </summary>
     public static class MobileCastleTuningResolver
@@ -38,6 +39,12 @@ namespace DeadWalls
             config.RallyCooldown = math.max(0.1f, profile.RallyCooldown);
             config.EmergencyRepairHealPercent = math.clamp(profile.EmergencyRepairHealPercent, 0.01f, 1f);
             config.EmergencyRepairCooldown = math.max(0.1f, profile.EmergencyRepairCooldown);
+            config.PopulationGrowthPerDayPrep =
+                MobilePopulationArrivalUtility.SanitizeRequestedArrivals(
+                    profile.PopulationGrowthPerDayPrep);
+            config.FoodCostPerArrival =
+                MobilePopulationArrivalUtility.SanitizeFoodCostPerArrival(
+                    profile.FoodCostPerArrival);
             config.WoodWorkerProductionPerMin = math.max(0f, profile.WoodWorkerProductionPerMin);
             config.StoneWorkerProductionPerMin = math.max(0f, profile.StoneWorkerProductionPerMin);
             config.IronWorkerProductionPerMin = math.max(0f, profile.IronWorkerProductionPerMin);

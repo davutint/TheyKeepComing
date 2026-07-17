@@ -94,6 +94,14 @@ namespace DeadWalls
         [Range(0.01f, 1f)] public float EmergencyRepairHealPercent = 0.20f;
         [Min(0.1f)] public float EmergencyRepairCooldown = 120f;
 
+        [Header("Population Runtime Contract (config/tuning'e yazilir)")]
+        [Tooltip("Her tamamlanan Dawn/cycle icin yatak ve Food butcesinden once istenen survivor sayisi.")]
+        [Min(0)] public int PopulationGrowthPerDayPrep =
+            MobilePopulationArrivalUtility.DefaultRequestedArrivalsPerDawn;
+        [Tooltip("Kabul edilen her yeni survivor icin ayni Dawn transaction'inda bir kez harcanan Food.")]
+        [Min(1)] public int FoodCostPerArrival =
+            MobilePopulationArrivalUtility.DefaultFoodCostPerArrival;
+
         [Header("Worker Economy (config/tuning'e yazilir)")]
         [Tooltip("Bir Wood worker'in tech, meta, Heart ve bina bonuslarindan onceki dakikalik uretimi.")]
         [Min(0f)] public float WoodWorkerProductionPerMin =

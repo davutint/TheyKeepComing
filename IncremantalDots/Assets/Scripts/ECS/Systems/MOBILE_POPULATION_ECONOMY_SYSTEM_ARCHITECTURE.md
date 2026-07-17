@@ -17,6 +17,8 @@
   `DefaultDifficulty.asset` icinde `8 / 5.5 / 4.9 / 7`dir.
 - Continuous siege aciksa her tamamlanan 60 saniyelik cycle basina bir kez Dawn arrival bütçesi uygular.
 - Legacy DayPrep akisinda her completed wave sonrasi `DayPrep` basinda aynı arrival bütçesini uygular.
+- Dawn request ve Food/arrival baseline'ini profile-resolved `MobileCastleCombatConfig`'ten;
+  bed fiyat egrisini `MobileEconomyPriceTuning` owner'indan tuketir.
 - İstenen arrival'ı boş yatak ve mevcut Food / kişi maliyetiyle sınırlar; requested/accepted/required Food sonucunu allocation state'e yazar.
 - Kabul edilen survivor'ların toplam Food maliyetini population artışıyla aynı transaction içinde stoktan bir kez düşer.
 - `MobileEconomyEventState` icin nadir event roll eder ve aktif production bonusunu rate'lere uygular.
@@ -31,6 +33,8 @@ Stress mode'da calismaz. Legacy/non-mobile sahnelerde `MobileCastleCombatConfig`
 
 - Dawn kabul formülü `min(requested, totalBeds - currentPopulation, Food / FoodCostPerArrival)` şeklindedir.
 - Aktif V1 tuning'i requested `15`, kişi başı Food `1` değeridir.
+- Iki deger `DifficultyProfileSO -> MobileCastleTuningResolver -> MobileCastleCombatConfig`
+  zincirindedir; profile yoksa authoring fallback'leri kullanilir.
 - Food yetersizliğinde mevcut population düşmez; yalnız yeni arrival sınırlanır.
 - `RequiredFood = accepted × FoodCostPerArrival` aynı işlemde `ResourceData.Food` stokundan düşülür.
 - Persistent `LastPopulationGrowthCycle/LastPopulationGrowthWave` marker'ları aynı Dawn'da ve exact Continue sonrasında çift population/harcama yapılmasını engeller.
@@ -66,6 +70,8 @@ V1 eventleri geneldir: resource stash, quarry crew, refugee cart. UI metinleri `
 
 - Saf allocation matematiği ve migration: EditMode.
 - `MobilePopulationArrivalUtilityTests`: istek, yatak, Food ve int sınırları için saf EditMode bütçe sözleşmesi.
+- `MobileCastleTuningResolverTests.PopulationRuntimeTuning_UsesProfileValuesAndSanitizesInvalidInputs`: profile/fallback precedence ve invalid clamp.
+- `MobileBedCapacityUtilityTests`: quadratic unit/bulk fiyat, hard-max yoklugu ve int guvenligi.
 - Yeni population, cap ve idle overflow: gerçek `NewGameScene` PlayMode.
 - `WorkerAllocationPlayModeTests.DawnArrivalTransaction_SpendsFoodOnceForAcceptedSurvivors`: Food-limitli kabul, gerçek capacity aynası, iki frame boyunca tek transaction, arrival entity izolasyonu ve varış cleanup doğrulaması.
 - `WorkerAllocationPlayModeTests.WorkerDrawer_TargetControlsAndBuildingUpgradesUseBoundRuntimeState`: building cap/efficiency aggregate'inin bu sistemin tukettigi config'e dogru yansimasi.

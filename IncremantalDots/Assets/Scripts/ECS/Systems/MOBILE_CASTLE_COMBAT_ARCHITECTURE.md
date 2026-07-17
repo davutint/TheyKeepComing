@@ -85,7 +85,7 @@ Varsayilan mobile degerleri:
 - Stress max alive zombies: `1500`
 - Kill reward: Wood `1.0`, Food `0.6`, Stone `0.25`, Iron `0.15`, wave scale `0`
 - Wave clear bonus: Wood `20 + 6 per wave`, Food `15 + 5 per wave`, Stone `10 + 4 per wave`, Iron `6 + 3 per wave`
-- Worker economy: population growth continuous siege cycle basina `15`, initial workers Wood/Stone/Iron/Food `20 / 10 / 8 / 15`
+- Worker economy: profile-owned Dawn request/Food `15 / 1`; authoring initial beds `60`, initial workers Wood/Stone/Iron/Food `20 / 10 / 8 / 15`
 - Worker caps: Wood/Stone/Iron/Food `40 / 30 / 24 / 40`
 - Worker production baseline: Wood/Stone/Iron/Food `8 / 5.5 / 4.9 / 7` per minute
 - Worker economy reward multiplier: `0.25`
@@ -249,7 +249,9 @@ Mobile normal mode'da `DamageCleanupSystem`, death timer biten zombiler icin kil
 - Villager worker pickup pozisyonlari main scene `CastleInteriorEconomyArea/*Site/WorkerSpawnPoints` marker'larindan gelir.
 - Delivery pozisyonlari `CastleInteriorEconomyArea/CastleWorkerHub/DeliveryPoints` marker'larindan gelir.
 - `WorkerLogisticsMovementSystem`, villagerlari pickup ile hub arasinda yuruturek kaynak tasima feedback'i verir.
-- `PopulationGrowthPerDayPrep` legacy DayPrep akisi icin isimlendirilmis eski alan olarak kalir; continuous siege varsayilaninda her cycle tamamlandiginda population growth miktari olarak kullanilir.
+- `PopulationGrowthPerDayPrep` legacy DayPrep akisi icin isimlendirilmis eski config alanidir;
+  continuous siege varsayilaninda her Dawn request miktari olarak kullanilir. Aktif baseline
+  `DifficultyProfileSO`dan resolver ile gelir; authoring alani profile yoksa fallback'tir.
 - Okcu satin almak `1` idle population kullanir; idle yoksa buy disabled olur ve drawer `NEED POP` yazar.
 - Editor testleri icin `GameManager.Free Economy Test Mode` acilirsa okcu satin alma population harcamaz ve resource/population eksigi aksiyonlari bloklamaz.
 - Nadir eventler `MobileEconomyEventState` ile tutulur; secilmezse gece baslarken expire eder.

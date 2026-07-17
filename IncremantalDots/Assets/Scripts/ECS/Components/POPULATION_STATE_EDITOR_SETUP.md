@@ -19,23 +19,26 @@
 |------|-----------|----------|
 | Food Per Assigned Per Min | 2.0 | Her atanmis bireyin dakika basina yemek tuketimi |
 
-## MobileCastleCombatAuthoring Inspector
+## Population Runtime Tuning
 
 ### Population Economy
 
 | Alan | Varsayilan | Aciklama |
 |---|---:|---|
-| Initial Bed Capacity | 60 | Run başlangıcındaki House yatak kapasitesi; satın alınmış yataklar runtime state'te ayrı tutulur |
-| Population Growth Per Day Prep | 15 | Her tamamlanan Dawn/cycle için istenen survivor sayısı |
-| Food Cost Per Arrival | 1 | Kabul edilen her yeni survivor için bütçelenen tek seferlik Food |
+| Initial Bed Capacity | 60 | `MobileCastleCombatAuthoring` sahibi; run başlangıcındaki House yatak kapasitesi |
+| Population Growth Per Day Prep | 15 | `DifficultyProfileSO` sahibi; her tamamlanan Dawn/cycle için istenen survivor sayısı |
+| Food Cost Per Arrival | 1 | `DifficultyProfileSO` sahibi; kabul edilen her yeni survivor için tek seferlik Food |
 
-`NewGameScene/MobileCastleCombatSubScene` içindeki `MobileCastleConfig` objesi bu değerleri `60 / 15 / 1` olarak serialize eder. Aynı subscene'deki `GameStateAuthoring.InitialCapacity = 60` değeridir; eski `999999` mobile kapasite aynası kaldırılmıştır.
+`NewGameScene/MobileCastleCombatSubScene` içindeki `MobileCastleConfig` authoring fallback'lerini
+`60 / 15 / 1` olarak serialize eder. Aktif profile varken request/Food profile'dan gelir;
+profile yoksa authoring fallback olur. Aynı subscene'deki `GameStateAuthoring.InitialCapacity = 60`
+değeridir; eski `999999` mobile kapasite aynası kaldırılmıştır.
 
 Bed fiyatı `DefaultDifficulty.asset` içindeki `BedBaseWoodCost` ve
 `BedCostGrowthCapacityInterval` alanlarından gelir. Onaylı default `100 Wood` ve
 `25 owned bed interval` değeridir; quadratic eğri korunur. Bu alanlar
-`Window > DeadWalls > Difficulty Tuner > Ekonomi Fiyat Eğrileri` bölümünden ayarlanır
-ve Play Mode'da canlı uygulanabilir.
+`Window > DeadWalls > Difficulty Tuner > Population Runtime Contract` bölümünden Dawn request
+ve Food/arrival ile birlikte ayarlanır ve Play Mode'da canlı uygulanabilir.
 
 ## Test Senaryolari
 
@@ -80,4 +83,5 @@ Mobile V1 castle loop'ta bu pasif nüfus tüketimi uygulanmaz.
 3. HUDController Inspector'ina PopulationText referansini ata
 4. Play mode'da Entity Debugger'dan PopulationState degerlerini dogrula
 5. Mobile testte `MobileBedCapacityState` için `BaseCapacity=60`, `PurchasedCapacity=0` başlangıcını doğrula
-6. `MobileCastleConfig.FoodCostPerArrival=1` ve `GameStateAuthoring.InitialCapacity=60` değerlerini doğrula
+6. `DefaultDifficulty.asset` içinde request=`15`, Food/arrival=`1`; authoring initial bed=`60` doğrula
+7. `Population Runtime Contract` preview ve Play Mode telemetry'sinde aynı next-Dawn bütçesini doğrula

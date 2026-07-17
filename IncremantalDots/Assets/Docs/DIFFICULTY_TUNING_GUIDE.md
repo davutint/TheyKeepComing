@@ -23,6 +23,9 @@ Deger adi ezberleme — asagidaki tablodan hissini bul, hangi ayara dokunacagini
 | "Isci ekonomisi cok yavas / fazla hizli" | Economy Runtime Contract > ilgili **WorkerProductionPerMin** | Kaynagin kisi basi baseline'ini ARTIR / DUSUR |
 | "Worker bina yatirimlari cok ucuz / pahali" | **CAP/EFF Wood+Iron base cost** ve **WorkerBuildingCostGrowthMultiplier** | Ilk maliyeti veya seviye buyumesini ayarla |
 | "Efficiency yatirimi hissedilmiyor / cok guclu" | **WorkerEfficiencyPercentPerLevel** | Her EFF seviyesinin additive uretim yuzdesini ayarla |
+| "Her Dawn cok az / cok fazla insan geliyor" | Population Runtime Contract > **PopulationGrowthPerDayPrep** | Istenen survivor sayisini ARTIR / DUSUR; gercek kabul yatak ve Food ile sinirlanir |
+| "Yeni nufus Food'u cok hizli / cok yavas eritiyor" | **FoodCostPerArrival** | Yalniz kabul edilen her survivor icin tek seferlik maliyeti ayarla |
+| "Yataklar cok ucuz / cok cabuk ulasilmaz oluyor" | **BedBaseWoodCost** ve **BedCostGrowthCapacityInterval** | Ilk fiyati veya quadratic egrinin buyume hizini ayarla |
 | "Gunduz cok sakin / cok yogun" | Faz Yogunluklari > **DayIntensity** | 0.55 taban; artir/azalt |
 | "Gece yeterince korkutucu degil" | **NightIntensity** | ARTIR (1.65 taban) |
 | "Belirli bir GUN cok sert/yumusak" | Ilgili egriye o gune keyframe ekle | Egri = gun bazli ince ayar |
@@ -86,6 +89,14 @@ Efficiency yatirimi her seviyede baz kisi uretimine additive `+%10` verir; ilk f
 ve her alista Wood ile Iron'i birlikte harcar. Efficiency yuzdesi onceki effective sonucu tekrar
 carpmaz: base uretim uzerine tech/meta/bina yuzdeleri toplanir, Heart katmani sonradan uygulanir.
 
+### Population ve House Beds
+
+Her tamamlanan Dawn/cycle icin profile-owned istek `15` survivor, kabul edilen kisi basina
+tek seferlik maliyet `1 Food`dur. Gercek kabul `min(istenen, bos yatak, Food / kisi maliyeti)`
+formuludur; mevcut nufus pasif Food tuketmez. Run `60` authoring-owned yatakla baslar.
+Sonraki yatak `ceil(100 x (1 + ownedGrowth / 25)^2)` Wood egrisini kullanir; hard max yoktur
+ve bulk alim her ek yatagin sirali fiyatini toplar.
+
 ### Arrow Ekonomisi
 
 Default finite stok `200`, refill paketi `100`, verim `4 Arrow/Wood`dur. Capacity
@@ -129,6 +140,15 @@ Mode telemetry'si her kaynak icin worker/effective cap, profile base/effective/t
 CAP/EFF seviyeleri, additive EFF bonusu ve iki sonraki fiyati canli gosterir. Apply, base rate'i
 degistirirken mevcut tech/meta/Heart ve bina katmanlarini yeni baseline uzerine yeniden fold eder.
 
+### Population Runtime Contract paneli
+
+Dawn request, Food/arrival ve House bed quadratic egrisi ayni paneldedir. Contract Preview,
+girilen current population, purchased beds ve Food ile bir sonraki Dawn'in requested/affordable/
+accepted sayilarini, tek seferlik Food harcamasini ve +1/+10 yatak fiyatini gameplay utility'leriyle
+hesaplar. Play Mode telemetry ayni degerleri canli ECS state'inden, son Dawn receipt'i ve mevcut
+base/purchased bed state'iyle birlikte gosterir. Apply request/Food degerlerini config'e, yatak
+egrisini `MobileEconomyPriceTuning` component'ine canli yazar; mevcut run yatak state'ini sifirlamaz.
+
 ## 5. Olcum botu nasil yorumlanir?
 
 1. Play'e gir -> RUN BOT (profili uygular, temiz kosu baslatir, 3x hizda oynar).
@@ -142,8 +162,9 @@ degistirirken mevcut tech/meta/Heart ve bina katmanlarini yeni baseline uzerine 
 
 ## 6. Bilinmesi gereken iki tuzak
 
-1. **Profil her seyi kapsamiyor:** Wall base HP ve dort worker production baseline'i profildedir;
-   geometri, cycle sureleri ve worker cap baseline'lari aktif SubScene Authoring'de kalir. Profile
-   yoksa Wall ve worker rate alanlari kendi authoring fallback degerlerini kullanir.
+1. **Profil her seyi kapsamiyor:** Wall, dort worker production baseline'i, Dawn request ve
+   Food/arrival profildedir; geometri, cycle sureleri, run baslangic yatagi ve worker cap
+   baseline'lari aktif SubScene Authoring'de kalir. Profile yoksa ayni isimli authoring alanlari
+   fallback olarak kullanilir.
 2. **APPLY'siz degisiklik oyuna gitmez:** panelde degeri degistirmek yetmez; APPLY
    (edit modda sahneye kaydeder, play modda aninda uygular) sart.

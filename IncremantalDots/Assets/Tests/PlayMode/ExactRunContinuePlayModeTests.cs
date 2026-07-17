@@ -613,6 +613,10 @@ namespace DeadWalls.Tests
             Assert.That(config.RepairStonePerMissingHp, Is.EqualTo(0.10f));
             Assert.That(config.RepairDayPriceMultiplier, Is.EqualTo(1f));
             Assert.That(config.EmergencyRepairHealPercent, Is.EqualTo(0.20f));
+            Assert.That(config.PopulationGrowthPerDayPrep,
+                Is.EqualTo(MobilePopulationArrivalUtility.DefaultRequestedArrivalsPerDawn));
+            Assert.That(config.FoodCostPerArrival,
+                Is.EqualTo(MobilePopulationArrivalUtility.DefaultFoodCostPerArrival));
             Assert.That(config.WoodWorkerProductionPerMin, Is.EqualTo(8f));
             Assert.That(config.StoneWorkerProductionPerMin, Is.EqualTo(5.5f));
             Assert.That(config.IronWorkerProductionPerMin, Is.EqualTo(4.9f));
@@ -630,6 +634,12 @@ namespace DeadWalls.Tests
                 entityManager.GetComponentData<MobileEconomyPriceTuning>(configEntity);
             Assert.That(economyPriceTuning.BedBaseWoodCost, Is.EqualTo(100));
             Assert.That(economyPriceTuning.BedCostGrowthCapacityInterval, Is.EqualTo(25));
+            Assert.That(entityManager.HasComponent<MobileBedCapacityState>(configEntity), Is.True);
+            MobileBedCapacityState bedCapacity =
+                entityManager.GetComponentData<MobileBedCapacityState>(configEntity);
+            Assert.That(bedCapacity.BaseCapacity,
+                Is.EqualTo(MobileBedCapacityUtility.DefaultInitialCapacity));
+            Assert.That(bedCapacity.PurchasedCapacity, Is.Zero);
             Assert.That(economyPriceTuning.WorkerCapacityBaseWoodCost, Is.EqualTo(100));
             Assert.That(economyPriceTuning.WorkerCapacityBaseIronCost, Is.EqualTo(25));
             Assert.That(economyPriceTuning.WorkerEfficiencyBaseWoodCost, Is.EqualTo(150));

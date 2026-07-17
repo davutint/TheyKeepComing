@@ -18,8 +18,10 @@ tek profil iterasyonuyla, KOD YAZMADAN tasindi).
    - WORKER ECONOMY CONTRACT: Wood/Stone/Iron/Food kisi basi production baseline'lari,
      worker CAP/EFF icin ayri Wood/Iron base maliyetleri, ortak growth multiplier ve
      profile-driven additive EFF yuzdesi.
-   - KOMSU FIYAT VERILERI: House bed ve finite Arrow alanlari ayni asset'te kalir;
-     tracker'daki Population/Archer audit'leri bunlari kendi runtime yuzeylerinde kapatir.
+   - POPULATION CONTRACT: Dawn basina istenen survivor, kabul edilen kisi basi tek seferlik
+     Food ve House bed quadratic fiyat egrisi.
+   - KOMSU FIYAT VERILERI: finite Arrow alanlari ayni asset'te kalir; Archer audit'i bunlari
+     kendi runtime yuzeyinde kapatir.
    - M-C HAZIRLIK ISKELETI (sistem henuz okumuyor, veri hazir): `SpawnTable`
      (gun -> dusman tipi agirliklari) + `SpecialNights` (her N gunde ozel gece).
 2. **ECS tasima — `DifficultyDaySample` buffer'i:** AnimationCurve Burst'e giremez;
@@ -43,6 +45,10 @@ tek profil iterasyonuyla, KOD YAZMADAN tasindi).
    - Play Mode Apply baked `MobileEconomyPriceTuning` component'ini gunceller ve
      `GameManager.ApplyWorkerEconomyTuning` ile tech/meta/Heart/bina aggregate'lerini
      yeni production baseline'i uzerine yeniden fold eder.
+   - **Population Runtime Contract** foldout'u Dawn request, Food/arrival ve House bed egrisini
+     tek yerde duzenler. Preview ve Play Mode telemetry gameplay ile ayni
+     `MobilePopulationArrivalUtility` ve `MobileBedCapacityUtility` hesaplarini kullanir;
+     live Apply config/tuning baseline'larini degistirir ama run bed state'ini sifirlamaz.
    - **Apply**: subscene authoring'e bagla (bake yolu) + play moddaysa CANLI uygula
      (config alanlari SetComponentData + buffer yeniden ornekleme).
    - **Run Bot**: profili canli uygular, RestartGame + Long Run Simulator'u baslatir
@@ -75,8 +81,9 @@ tek profil iterasyonuyla, KOD YAZMADAN tasindi).
 
 - Profile yoksa setup tool'un `CastleAuthoring.WallHP` degeri fallback'tir. Aktif profile
   varken Wall base HP Difficulty Tuner'dan gelir. Worker production baseline'lari da profile
-  aittir; profile yoksa `MobileCastleCombatAuthoring` alanlari fallback'tir. Worker cap,
-  population ve cycle baseline'lari halen authoring sahibindedir.
+  aittir. Dawn request ve Food/arrival da profile-owned'dir; ayni isimli authoring alanlari
+  yalniz profile yokken fallback'tir. Initial bed, worker cap ve cycle baseline'lari authoring
+  sahibinde kalir.
 - Canli uygulama restart sonrasi config'i bake degerlerine dondurur; Tuner'in Run Bot'u
   bu yuzden restart'tan SONRA da ApplyProfileLive cagirir.
 - Fiyat alanlari sifir/negatif veya gecersiz girilirse resolver int-guvenli minimumlara,

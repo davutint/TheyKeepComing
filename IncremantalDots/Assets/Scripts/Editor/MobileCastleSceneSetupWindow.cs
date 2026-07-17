@@ -713,7 +713,8 @@ namespace DeadWalls
             mobileAuthoring.FinalIntervalMultiplier = 0.65f;
             mobileAuthoring.OpeningBatchDelta = -1;
             mobileAuthoring.FinalBatchDelta = 1;
-            mobileAuthoring.PopulationGrowthPerDayPrep = 15;
+            mobileAuthoring.PopulationGrowthPerDayPrep =
+                MobilePopulationArrivalUtility.DefaultRequestedArrivalsPerDawn;
             mobileAuthoring.FoodCostPerArrival = MobilePopulationArrivalUtility.DefaultFoodCostPerArrival;
             mobileAuthoring.InitialBedCapacity = MobileBedCapacityUtility.DefaultInitialCapacity;
             mobileAuthoring.InitialWoodWorkers = 20;
@@ -1991,6 +1992,10 @@ namespace DeadWalls
             profile.RallyCooldown = 60f;
             profile.EmergencyRepairHealPercent = 0.20f;
             profile.EmergencyRepairCooldown = 120f;
+            profile.PopulationGrowthPerDayPrep =
+                MobilePopulationArrivalUtility.DefaultRequestedArrivalsPerDawn;
+            profile.FoodCostPerArrival =
+                MobilePopulationArrivalUtility.DefaultFoodCostPerArrival;
             profile.WoodWorkerProductionPerMin =
                 MobileEconomyPriceTuningUtility.DefaultWoodWorkerProductionPerMin;
             profile.StoneWorkerProductionPerMin =

@@ -28,6 +28,8 @@ namespace DeadWalls.Tests
                 profile.RallyCooldown = 48f;
                 profile.EmergencyRepairHealPercent = 0.35f;
                 profile.EmergencyRepairCooldown = 95f;
+                profile.PopulationGrowthPerDayPrep = 23;
+                profile.FoodCostPerArrival = 4;
                 profile.WoodWorkerProductionPerMin = 11f;
                 profile.StoneWorkerProductionPerMin = 12f;
                 profile.IronWorkerProductionPerMin = 13f;
@@ -46,6 +48,9 @@ namespace DeadWalls.Tests
                     SiegeCycleDuration = 91f,
                     SiegeDayDuration = 31f,
                     SpawnLineX = 27f,
+                    PopulationGrowthPerDayPrep = 15,
+                    FoodCostPerArrival = 1,
+                    InitialBedCapacity = 71,
                     WoodWorkerProductionPerMin = 8f,
                     StoneWorkerProductionPerMin = 5.5f,
                     IronWorkerProductionPerMin = 4.9f,
@@ -68,6 +73,9 @@ namespace DeadWalls.Tests
                 Assert.That(config.RallyCooldown, Is.EqualTo(48f));
                 Assert.That(config.EmergencyRepairHealPercent, Is.EqualTo(0.35f));
                 Assert.That(config.EmergencyRepairCooldown, Is.EqualTo(95f));
+                Assert.That(config.PopulationGrowthPerDayPrep, Is.EqualTo(23));
+                Assert.That(config.FoodCostPerArrival, Is.EqualTo(4));
+                Assert.That(config.InitialBedCapacity, Is.EqualTo(71));
                 Assert.That(config.SiegeCycleDuration, Is.EqualTo(91f));
                 Assert.That(config.SiegeDayDuration, Is.EqualTo(31f));
                 Assert.That(config.SpawnLineX, Is.EqualTo(27f));
@@ -119,6 +127,9 @@ namespace DeadWalls.Tests
                     SiegeNightDuration = authoring.SiegeNightDuration,
                     SiegeDawnDuration = authoring.SiegeDawnDuration,
                     SpawnLineX = authoring.SpawnLineX,
+                    PopulationGrowthPerDayPrep = authoring.PopulationGrowthPerDayPrep,
+                    FoodCostPerArrival = authoring.FoodCostPerArrival,
+                    InitialBedCapacity = authoring.InitialBedCapacity,
                     WoodWorkerProductionPerMin = authoring.WoodWorkerProductionPerMin,
                     StoneWorkerProductionPerMin = authoring.StoneWorkerProductionPerMin,
                     IronWorkerProductionPerMin = authoring.IronWorkerProductionPerMin,
@@ -136,6 +147,15 @@ namespace DeadWalls.Tests
                 Assert.That(config.SiegeNightDuration, Is.EqualTo(authoring.SiegeNightDuration));
                 Assert.That(config.SiegeDawnDuration, Is.EqualTo(authoring.SiegeDawnDuration));
                 Assert.That(config.SpawnLineX, Is.EqualTo(authoring.SpawnLineX));
+                Assert.That(profile.PopulationGrowthPerDayPrep,
+                    Is.EqualTo(MobilePopulationArrivalUtility.DefaultRequestedArrivalsPerDawn));
+                Assert.That(profile.FoodCostPerArrival,
+                    Is.EqualTo(MobilePopulationArrivalUtility.DefaultFoodCostPerArrival));
+                Assert.That(config.PopulationGrowthPerDayPrep,
+                    Is.EqualTo(profile.PopulationGrowthPerDayPrep));
+                Assert.That(config.FoodCostPerArrival,
+                    Is.EqualTo(profile.FoodCostPerArrival));
+                Assert.That(config.InitialBedCapacity, Is.EqualTo(authoring.InitialBedCapacity));
                 Assert.That(profile.IronWorkerProductionPerMin, Is.EqualTo(4.9f));
                 Assert.That(config.WoodWorkerProductionPerMin,
                     Is.EqualTo(profile.WoodWorkerProductionPerMin));
@@ -269,6 +289,38 @@ namespace DeadWalls.Tests
                 Assert.That(tuning.WorkerEfficiencyBaseIronCost, Is.EqualTo(1));
                 Assert.That(tuning.WorkerBuildingCostGrowthMultiplier, Is.EqualTo(1.35d));
                 Assert.That(tuning.WorkerEfficiencyPercentPerLevel, Is.EqualTo(0.10f));
+            }
+            finally
+            {
+                Object.DestroyImmediate(profile);
+            }
+        }
+
+        [Test]
+        public void PopulationRuntimeTuning_UsesProfileValuesAndSanitizesInvalidInputs()
+        {
+            var fallback = new MobileCastleCombatConfig
+            {
+                PopulationGrowthPerDayPrep = 19,
+                FoodCostPerArrival = 3,
+                InitialBedCapacity = 72
+            };
+            MobileCastleTuningResolver.ApplyDifficultyProfile(ref fallback, null);
+            Assert.That(fallback.PopulationGrowthPerDayPrep, Is.EqualTo(19));
+            Assert.That(fallback.FoodCostPerArrival, Is.EqualTo(3));
+            Assert.That(fallback.InitialBedCapacity, Is.EqualTo(72));
+
+            var profile = ScriptableObject.CreateInstance<DifficultyProfileSO>();
+            try
+            {
+                profile.PopulationGrowthPerDayPrep = -5;
+                profile.FoodCostPerArrival = 0;
+
+                MobileCastleTuningResolver.ApplyDifficultyProfile(ref fallback, profile);
+
+                Assert.That(fallback.PopulationGrowthPerDayPrep, Is.Zero);
+                Assert.That(fallback.FoodCostPerArrival, Is.EqualTo(1));
+                Assert.That(fallback.InitialBedCapacity, Is.EqualTo(72));
             }
             finally
             {

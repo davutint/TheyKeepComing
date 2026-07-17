@@ -9,6 +9,9 @@ Worker economy tuning ve komsu bed/Arrow fiyatlarinin içerik kaynağı `Difficu
 production alanlari olarak config entity'sine yazar. Runtime utility'leri hardcoded maliyet veya
 EFF effect yuzdesi kullanmaz. Serialized teknik component adi compatibility icin korunur.
 
+House bed alanlari editor'da `Population Runtime Contract` yuzeyinde gosterilir. Bu yalniz
+sunum ayrimidir; runtime owner yine ayni `MobileEconomyPriceTuning` component'idir.
+
 ## Alanlar
 
 - Worker production baseline: `Wood/Stone/Iron/FoodWorkerProductionPerMin`
@@ -56,6 +59,8 @@ sanitize eder. Bed ve worker bina cost API'leri aynı snapshot'ı ilgili utility
 `ApplyTechEconomyAggregates`, ayni snapshot'taki EFF yuzdesini bina seviyeleriyle birlestirir.
 Difficulty Tuner live Apply, `ApplyWorkerEconomyTuning` ile dort base rate'i yeniden kurar;
 tech/meta/Heart/bina aggregate'i yeni baseline uzerine tekrar uygulanir.
+Population live Apply ayni component'teki bed curve alanlarini gunceller; mevcut
+`MobileBedCapacityState` base/purchased degerlerini degistirmez.
 Tuning içerik verisidir, run-save state'i değildir. Güncel exact save v8 satın alınmış yatak,
 sekiz bina seviyesi ve iki Arrow yatırım seviyesini taşır; Continue sonrası maliyet mevcut
 profile baseline'ından yeniden hesaplanır.
