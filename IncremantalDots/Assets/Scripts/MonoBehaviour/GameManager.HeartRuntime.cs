@@ -158,6 +158,8 @@ namespace DeadWalls
             errors = buildErrors;
             if (!succeeded)
                 _heartRuntimeError = string.Join(" | ", buildErrors);
+            else
+                _heartRuntimeError = string.Empty;
             return succeeded;
         }
 

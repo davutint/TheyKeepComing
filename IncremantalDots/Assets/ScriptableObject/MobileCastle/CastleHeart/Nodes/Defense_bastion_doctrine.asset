@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80871521fe4dcdc4685cc73049b43fb8, type: 3}
+  m_Name: Defense_bastion_doctrine
+  m_EditorClassIdentifier: DeadWalls::DeadWalls.HeartNodeDefinitionSO
+  Id: bastion_doctrine
+  Title: Bastion Doctrine
+  Description: Choose permanent mass over recovery speed. This seals Salvage Doctrine.
+  Icon: {fileID: 21300000, guid: e1d8e47cca9198b448683f1db8543638, type: 3}
+  Tags: []
+  Type: 3
+  Branch: 1
+  Rarity: 1
+  MinimumDepth: 3
+  MaximumDepth: 5
+  BaseGraveEssenceCost: 50
+  CostGrowthPerLevel: 0
+  ConflictNodeIds:
+  - salvage_doctrine
+  Effects:
+  - Type: 5
+    Value: 0.35
+    ArcherType: 0
+    Resource: 0
+    SoftCap: 0

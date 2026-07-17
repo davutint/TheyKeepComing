@@ -67,10 +67,10 @@ namespace DeadWalls
         public AudioClip PanelOpenClip;
 
         [Header("Layout")]
-        public Vector2 NodeSize = new Vector2(268f, 172f);
-        public float HorizontalSpacing = 350f;
-        public float VerticalSpacing = 250f;
-        public Vector2 ContentPadding = new Vector2(170f, 140f);
+        public Vector2 NodeSize = new Vector2(292f, 188f);
+        public float HorizontalSpacing = 386f;
+        public float VerticalSpacing = 278f;
+        public Vector2 ContentPadding = new Vector2(190f, 160f);
 
         private const float RefreshInterval = 0.15f;
         private const float BadgeInterval = 0.5f;
@@ -89,6 +89,8 @@ namespace DeadWalls
             new Dictionary<string, ConnectionView>(StringComparer.Ordinal);
         private readonly Dictionary<string, HeartGraphNodePresentation> _presentationsBySlot =
             new Dictionary<string, HeartGraphNodePresentation>(StringComparer.Ordinal);
+        private readonly Dictionary<HeartNodeBranch, Image> _branchAxes =
+            new Dictionary<HeartNodeBranch, Image>();
 
         private HeartPurchaseQuantity _selectedQuantity = HeartPurchaseQuantity.One;
         private IDisposable _pauseLease;
@@ -111,6 +113,9 @@ namespace DeadWalls
             public GameObject Root;
             public RectTransform Rect;
             public Image Background;
+            public Image Accent;
+            public Image RarityMarker;
+            public Outline Outline;
             public Image Icon;
             public TMP_Text IconFallback;
             public TMP_Text Title;
@@ -133,6 +138,7 @@ namespace DeadWalls
 
         private void OnEnable()
         {
+            ApplyScreenPolish();
             BindButtons();
             if (HeartPanel != null)
                 HeartPanel.SetActive(false);
@@ -248,10 +254,10 @@ namespace DeadWalls
                 GraveEssenceText.text = $"GRAVE ESSENCE  {FormatLong(runtime?.GraveEssenceAmount ?? 0L)}";
             if (BranchCompassText != null)
                 BranchCompassText.text =
-                    "<color=#D95C54>ARMY  ></color>    "
-                    + "<color=#6EA8D9><  DEFENSE</color>    "
-                    + "<color=#D5A548>^  PRODUCTION</color>    "
-                    + "<color=#A477CF>HEART / MAGIC  v</color>";
+                    "<color=#E76058>ARMY  /  EAST</color>     "
+                    + "<color=#68A9F2>DEFENSE  /  WEST</color>     "
+                    + "<color=#E0B44E>PRODUCTION  /  NORTH</color>     "
+                    + "<color=#B479F2>HEART MAGIC  /  SOUTH</color>";
 
             HeartGraphPresentation presentation = null;
             IReadOnlyList<string> errors = null;
@@ -288,6 +294,7 @@ namespace DeadWalls
             float height = ContentPadding.y * 2f + maxDepth * VerticalSpacing * 2f + NodeSize.y;
             HeartContent.anchorMin = HeartContent.anchorMax = HeartContent.pivot = new Vector2(0.5f, 0.5f);
             HeartContent.sizeDelta = new Vector2(width, height);
+            UpdateBranchAxes(maxDepth);
 
             for (int i = 0; i < presentation.Nodes.Count; i++)
             {
@@ -355,6 +362,11 @@ namespace DeadWalls
                 BuyButtonText = FindDeep<TMP_Text>(root.transform, "TechNodeBuyButtonText", "HeartNodeBuyButtonText"),
                 SlotId = slotId
             };
+            view.Accent = EnsureDecorationImage(root.transform, "HeartNodeAccent");
+            view.RarityMarker = EnsureDecorationImage(root.transform, "HeartNodeRarityMarker");
+            if (view.Background != null)
+                view.Outline = view.Background.GetComponent<Outline>()
+                               ?? view.Background.gameObject.AddComponent<Outline>();
             ConfigureNodeLayout(view);
             if (view.BuyButton != null)
             {
@@ -380,12 +392,14 @@ namespace DeadWalls
             {
                 SetText(view.Title, "CASTLE HEART");
                 SetText(view.Level, "ROOT");
-                SetText(view.Description, "The run's living progression core.");
-                SetText(view.Cost, $"{FormatLong(runtime.GraveEssenceAmount)} GE AVAILABLE");
-                SetText(view.Status, "FOUR PATHS • ONE RUN");
-                SetIcon(view, null, "♥", RootColor);
+                SetText(view.Description, "A living run core. Every purchase survives Continue and dies with the Wall.");
+                SetText(view.Cost, $"{FormatLong(runtime.GraveEssenceAmount)} GRAVE ESSENCE");
+                SetText(view.Status, "FOUR PATHS  /  ONE RUN");
+                SetIcon(view, null, "DW", RootColor);
                 SetButton(view, false, false, string.Empty);
                 SetBackground(view, RootColor);
+                SetNodeChrome(view, RootColor, false,
+                    new Color(1f, 0.72f, 0.30f, 0.95f), true);
                 return;
             }
 
@@ -399,6 +413,7 @@ namespace DeadWalls
                 SetIcon(view, null, "?", branchColor);
                 SetButton(view, false, false, string.Empty);
                 SetBackground(view, HiddenColor);
+                SetNodeChrome(view, branchColor, false, branchColor, false, true);
                 return;
             }
 
@@ -415,32 +430,39 @@ namespace DeadWalls
                 SetText(view.Status, "PATH SEALED");
                 SetButton(view, true, false, "LOCKED");
                 SetBackground(view, LockedColor);
+                SetNodeChrome(view, branchColor, node.Rarity == HeartNodeRarity.Rare,
+                    new Color(0.72f, 0.18f, 0.20f, 0.90f), false);
                 return;
             }
 
             HeartPurchaseQuantity quantity = node.Type == HeartNodeType.Repeatable
                 ? _selectedQuantity
                 : HeartPurchaseQuantity.One;
-            HeartPurchaseEvaluation evaluation = runtime.EvaluateHeartPurchase(
-                node.ExactNodeId,
-                quantity);
+            bool alreadyOwned = node.Type != HeartNodeType.Repeatable && node.Level > 0;
+            HeartPurchaseEvaluation evaluation = alreadyOwned
+                ? null
+                : runtime.EvaluateHeartPurchase(node.ExactNodeId, quantity);
             bool canPurchase = evaluation != null
                                && evaluation.CanPurchase
                                && node.EffectInformationComplete;
             HeartPurchaseQuote quote = evaluation?.Quote;
-            if (quote != null)
+            if (alreadyOwned)
+            {
+                SetText(view.Cost, "PURCHASED FOR THIS RUN");
+            }
+            else if (quote != null)
             {
                 SetText(view.Cost,
-                    $"{FormatLong(quote.TotalGraveEssenceCost)} GE  •  +{quote.LevelsToBuy}");
+                    $"{FormatLong(quote.TotalGraveEssenceCost)} GE  /  +{quote.LevelsToBuy}");
             }
             else
             {
                 SetText(view.Cost, evaluation?.Message ?? string.Empty);
             }
 
-            string status = node.Type == HeartNodeType.Repeatable
-                ? GetBranchName(node.Branch)
-                : node.Level > 0 ? "OWNED" : GetBranchName(node.Branch);
+            string status = node.Level > 0 && node.Type != HeartNodeType.Repeatable
+                ? "OWNED"
+                : $"{(node.Rarity == HeartNodeRarity.Rare ? "RARE " : string.Empty)}{node.Type}".ToUpperInvariant();
             if (node.KeystoneConflict != null)
             {
                 status = node.KeystoneConflict.WillLockOnPurchase
@@ -449,13 +471,16 @@ namespace DeadWalls
             }
             SetText(view.Status, status);
 
-            bool alreadyOwned = node.Type != HeartNodeType.Repeatable && node.Level > 0;
             SetButton(
                 view,
                 true,
                 canPurchase,
                 alreadyOwned ? "OWNED" : canPurchase ? "PURCHASE" : "UNAVAILABLE");
             SetBackground(view, Color.Lerp(HiddenColor, branchColor, node.Level > 0 ? 0.48f : 0.28f));
+            SetNodeChrome(view, branchColor, node.Rarity == HeartNodeRarity.Rare,
+                node.Level > 0 ? new Color(1f, 0.75f, 0.32f, 0.95f) : branchColor,
+                node.Level > 0);
+            StylePurchaseButton(view, branchColor, canPurchase, alreadyOwned);
         }
 
         private void Purchase(string slotId)
@@ -576,7 +601,7 @@ namespace DeadWalls
                 {
                     builder.Append(": ")
                         .Append(effect.CurrentValueText)
-                        .Append(" → ")
+                        .Append(" > ")
                         .Append(effect.AfterPurchaseValueText);
                     if (!string.IsNullOrWhiteSpace(effect.DeltaText))
                         builder.Append("  (").Append(effect.DeltaText).Append(')');
@@ -595,6 +620,203 @@ namespace DeadWalls
             return builder.ToString();
         }
 
+        private void ApplyScreenPolish()
+        {
+            if (HeartPanel == null)
+                return;
+
+            Image panelImage = HeartPanel.GetComponent<Image>();
+            if (panelImage != null)
+                panelImage.color = new Color(0.018f, 0.014f, 0.026f, 0.985f);
+
+            TMP_Text title = FindDeep<TMP_Text>(HeartPanel.transform,
+                "CastleHeartTitleText", "TechTreeTitleText");
+            if (title != null)
+            {
+                title.text = "CASTLE HEART";
+                title.fontStyle = FontStyles.Bold;
+                title.characterSpacing = 4f;
+                title.color = new Color(0.96f, 0.88f, 0.72f, 1f);
+            }
+
+            if (GraveEssenceText != null)
+            {
+                GraveEssenceText.fontStyle = FontStyles.Bold;
+                GraveEssenceText.characterSpacing = 1.5f;
+                GraveEssenceText.color = new Color(0.91f, 0.75f, 0.35f, 1f);
+            }
+            if (ScreenStatusText != null)
+            {
+                ScreenStatusText.fontStyle = FontStyles.UpperCase;
+                ScreenStatusText.characterSpacing = 1.2f;
+            }
+            if (BranchCompassText != null)
+            {
+                BranchCompassText.fontStyle = FontStyles.Bold;
+                BranchCompassText.characterSpacing = 0.8f;
+            }
+
+            if (HeartViewport != null)
+            {
+                Image viewportImage = HeartViewport.GetComponent<Image>();
+                if (viewportImage != null)
+                    viewportImage.color = new Color(0.035f, 0.028f, 0.050f, 0.72f);
+            }
+
+            Image topRule = EnsureDecorationImage(HeartPanel.transform, "HeartTopRule");
+            RectTransform topRect = topRule.rectTransform;
+            topRect.anchorMin = new Vector2(0f, 1f);
+            topRect.anchorMax = new Vector2(1f, 1f);
+            topRect.offsetMin = new Vector2(24f, -72f);
+            topRect.offsetMax = new Vector2(-24f, -68f);
+            topRule.color = new Color(0.78f, 0.43f, 0.22f, 0.82f);
+            topRule.transform.SetAsFirstSibling();
+
+            Image bottomRule = EnsureDecorationImage(HeartPanel.transform, "HeartBottomRule");
+            RectTransform bottomRect = bottomRule.rectTransform;
+            bottomRect.anchorMin = new Vector2(0f, 0f);
+            bottomRect.anchorMax = new Vector2(1f, 0f);
+            bottomRect.offsetMin = new Vector2(24f, 58f);
+            bottomRect.offsetMax = new Vector2(-24f, 61f);
+            bottomRule.color = new Color(0.42f, 0.27f, 0.48f, 0.70f);
+            bottomRule.transform.SetAsFirstSibling();
+        }
+
+        private void UpdateBranchAxes(int maxDepth)
+        {
+            if (HeartContent == null)
+                return;
+
+            HeartNodeBranch[] branches =
+            {
+                HeartNodeBranch.Army,
+                HeartNodeBranch.Defense,
+                HeartNodeBranch.Production,
+                HeartNodeBranch.HeartMagic
+            };
+
+            for (int i = 0; i < branches.Length; i++)
+            {
+                HeartNodeBranch branch = branches[i];
+                if (!_branchAxes.TryGetValue(branch, out Image axis) || axis == null)
+                {
+                    axis = EnsureDecorationImage(HeartContent, "HeartAxis_" + branch);
+                    _branchAxes[branch] = axis;
+                }
+
+                bool horizontal = branch == HeartNodeBranch.Army
+                                  || branch == HeartNodeBranch.Defense;
+                float spacing = horizontal ? HorizontalSpacing : VerticalSpacing;
+                float length = Mathf.Max(spacing, maxDepth * spacing);
+                float sign = branch == HeartNodeBranch.Army
+                             || branch == HeartNodeBranch.Production ? 1f : -1f;
+                RectTransform rect = axis.rectTransform;
+                rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0.5f, 0.5f);
+                rect.anchoredPosition = horizontal
+                    ? new Vector2(sign * length * 0.5f, 0f)
+                    : new Vector2(0f, sign * length * 0.5f);
+                rect.sizeDelta = horizontal
+                    ? new Vector2(length, 4f)
+                    : new Vector2(4f, length);
+                Color color = GetBranchColor(branch);
+                color.a = 0.13f;
+                axis.color = color;
+                axis.transform.SetAsFirstSibling();
+            }
+        }
+
+        private static Image EnsureDecorationImage(Transform parent, string name)
+        {
+            Transform existing = FindTransform(parent, name);
+            if (existing != null && existing.TryGetComponent(out Image existingImage))
+            {
+                existingImage.raycastTarget = false;
+                return existingImage;
+            }
+
+            var root = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+            root.transform.SetParent(parent, false);
+            var image = root.GetComponent<Image>();
+            image.raycastTarget = false;
+            return image;
+        }
+
+        private void SetNodeChrome(
+            NodeView view,
+            Color accentColor,
+            bool rare,
+            Color outlineColor,
+            bool emphasized,
+            bool hidden = false)
+        {
+            if (view.Accent != null)
+            {
+                RectTransform rect = view.Accent.rectTransform;
+                rect.anchorMin = new Vector2(0f, 0f);
+                rect.anchorMax = new Vector2(0f, 1f);
+                rect.offsetMin = Vector2.zero;
+                rect.offsetMax = new Vector2(6f, 0f);
+                accentColor.a = hidden ? 0.28f : 0.94f;
+                view.Accent.color = accentColor;
+                view.Accent.transform.SetAsFirstSibling();
+            }
+
+            if (view.RarityMarker != null)
+            {
+                RectTransform rect = view.RarityMarker.rectTransform;
+                rect.anchorMin = rect.anchorMax = new Vector2(1f, 1f);
+                rect.pivot = new Vector2(1f, 1f);
+                rect.anchoredPosition = new Vector2(-8f, -8f);
+                rect.sizeDelta = new Vector2(10f, 10f);
+                view.RarityMarker.color = new Color(1f, 0.76f, 0.28f, 0.98f);
+                view.RarityMarker.gameObject.SetActive(rare && !hidden);
+                view.RarityMarker.transform.SetAsLastSibling();
+            }
+
+            if (view.Outline != null)
+            {
+                outlineColor.a = hidden ? 0.22f : outlineColor.a;
+                view.Outline.effectColor = outlineColor;
+                view.Outline.effectDistance = emphasized
+                    ? new Vector2(2.2f, -2.2f)
+                    : new Vector2(1.2f, -1.2f);
+                view.Outline.useGraphicAlpha = true;
+            }
+
+            view.Rect.sizeDelta = string.Equals(
+                view.SlotId, HeartGraphSlotUtility.RootSlotId, StringComparison.Ordinal)
+                    ? NodeSize * 1.08f
+                    : NodeSize;
+        }
+
+        private static void StylePurchaseButton(
+            NodeView view,
+            Color branchColor,
+            bool canPurchase,
+            bool alreadyOwned)
+        {
+            if (view.BuyButton == null)
+                return;
+
+            Color baseColor = alreadyOwned
+                ? new Color(0.30f, 0.24f, 0.15f, 0.96f)
+                : canPurchase
+                    ? Color.Lerp(new Color(0.12f, 0.10f, 0.16f, 1f), branchColor, 0.72f)
+                    : new Color(0.12f, 0.13f, 0.16f, 0.90f);
+            if (view.BuyButton.targetGraphic is Image image)
+                image.color = baseColor;
+
+            ColorBlock colors = view.BuyButton.colors;
+            colors.normalColor = baseColor;
+            colors.highlightedColor = Color.Lerp(baseColor, Color.white, 0.16f);
+            colors.pressedColor = Color.Lerp(baseColor, Color.black, 0.18f);
+            colors.selectedColor = colors.highlightedColor;
+            colors.disabledColor = new Color(0.11f, 0.12f, 0.14f, 0.72f);
+            colors.colorMultiplier = 1f;
+            colors.fadeDuration = 0.08f;
+            view.BuyButton.colors = colors;
+        }
+
         private static void ConfigureNodeLayout(NodeView view)
         {
             SetRect(view.Title, new Vector2(0f, 1f), new Vector2(1f, 1f),
@@ -607,12 +829,50 @@ namespace DeadWalls
                 new Vector2(12f, 38f), new Vector2(-12f, 58f));
             SetRect(view.Cost, new Vector2(0f, 0f), new Vector2(1f, 0f),
                 new Vector2(12f, 12f), new Vector2(-100f, 36f));
+            if (view.Title != null)
+            {
+                view.Title.fontSize = 15f;
+                view.Title.fontStyle = FontStyles.Bold;
+                view.Title.characterSpacing = 0.6f;
+                view.Title.color = new Color(0.98f, 0.96f, 0.91f, 1f);
+            }
+            if (view.Level != null)
+            {
+                view.Level.fontSize = 9.5f;
+                view.Level.fontStyle = FontStyles.Bold;
+                view.Level.color = new Color(0.80f, 0.82f, 0.86f, 1f);
+            }
+            if (view.Description != null)
+            {
+                view.Description.fontSize = 9.6f;
+                view.Description.lineSpacing = -5f;
+                view.Description.color = new Color(0.85f, 0.86f, 0.88f, 1f);
+            }
+            if (view.Cost != null)
+            {
+                view.Cost.fontSize = 10f;
+                view.Cost.fontStyle = FontStyles.Bold;
+                view.Cost.color = new Color(0.96f, 0.78f, 0.36f, 1f);
+            }
+            if (view.Status != null)
+            {
+                view.Status.fontSize = 9f;
+                view.Status.fontStyle = FontStyles.Bold;
+                view.Status.characterSpacing = 0.8f;
+                view.Status.color = new Color(0.72f, 0.75f, 0.80f, 1f);
+            }
             if (view.BuyButton != null)
             {
                 RectTransform rect = (RectTransform)view.BuyButton.transform;
                 rect.anchorMin = rect.anchorMax = new Vector2(1f, 0f);
                 rect.anchoredPosition = new Vector2(-49f, 23f);
                 rect.sizeDelta = new Vector2(86f, 34f);
+                if (view.BuyButtonText != null)
+                {
+                    view.BuyButtonText.fontSize = 10f;
+                    view.BuyButtonText.fontStyle = FontStyles.Bold;
+                    view.BuyButtonText.characterSpacing = 0.7f;
+                }
             }
         }
 

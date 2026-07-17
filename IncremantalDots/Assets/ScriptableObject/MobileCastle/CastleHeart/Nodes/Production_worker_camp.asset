@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80871521fe4dcdc4685cc73049b43fb8, type: 3}
+  m_Name: Production_worker_camp
+  m_EditorClassIdentifier: DeadWalls::DeadWalls.HeartNodeDefinitionSO
+  Id: worker_camp
+  Title: Worker Quarters
+  Description: Permanent stations expand every building's worker capacity for this
+    run.
+  Icon: {fileID: 21300000, guid: 5f2a63bfc612d6c409f508b9db58bc10, type: 3}
+  Tags: []
+  Type: 2
+  Branch: 2
+  Rarity: 1
+  MinimumDepth: 2
+  MaximumDepth: 5
+  BaseGraveEssenceCost: 34
+  CostGrowthPerLevel: 0
+  ConflictNodeIds: []
+  Effects:
+  - Type: 7
+    Value: 3
+    ArcherType: 0
+    Resource: 1
+    SoftCap: 0
+  - Type: 7
+    Value: 3
+    ArcherType: 0
+    Resource: 2
+    SoftCap: 0
+  - Type: 7
+    Value: 3
+    ArcherType: 0
+    Resource: 3
+    SoftCap: 0
+  - Type: 7
+    Value: 3
+    ArcherType: 0
+    Resource: 4
+    SoftCap: 0

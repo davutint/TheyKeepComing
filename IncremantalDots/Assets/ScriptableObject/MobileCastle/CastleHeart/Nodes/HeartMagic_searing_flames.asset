@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80871521fe4dcdc4685cc73049b43fb8, type: 3}
+  m_Name: HeartMagic_searing_flames
+  m_EditorClassIdentifier: DeadWalls::DeadWalls.HeartNodeDefinitionSO
+  Id: searing_flames
+  Title: Searing Flames
+  Description: Feed the spell an endless reserve of raw damage.
+  Icon: {fileID: -6607481912129624618, guid: 79e73aa61548fcb48b90eff46912e31d, type: 3}
+  Tags:
+  - sink:repeatable
+  Type: 1
+  Branch: 3
+  Rarity: 0
+  MinimumDepth: 2
+  MaximumDepth: 5
+  BaseGraveEssenceCost: 18
+  CostGrowthPerLevel: 0.5
+  ConflictNodeIds: []
+  Effects:
+  - Type: 10
+    Value: 0.1
+    ArcherType: 0
+    Resource: 0
+    SoftCap: 0

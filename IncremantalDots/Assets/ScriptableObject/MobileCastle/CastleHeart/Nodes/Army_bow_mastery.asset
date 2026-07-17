@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80871521fe4dcdc4685cc73049b43fb8, type: 3}
+  m_Name: Army_bow_mastery
+  m_EditorClassIdentifier: DeadWalls::DeadWalls.HeartNodeDefinitionSO
+  Id: bow_mastery
+  Title: Bow Mastery
+  Description: Endless drills keep Basic Archers relevant deep into the siege.
+  Icon: {fileID: 21300000, guid: 13fb0a3c745be144caecf6b3a5464f47, type: 3}
+  Tags:
+  - sink:repeatable
+  Type: 1
+  Branch: 0
+  Rarity: 0
+  MinimumDepth: 2
+  MaximumDepth: 5
+  BaseGraveEssenceCost: 15
+  CostGrowthPerLevel: 0.4
+  ConflictNodeIds: []
+  Effects:
+  - Type: 3
+    Value: 0.06
+    ArcherType: 0
+    Resource: 0
+    SoftCap: 0

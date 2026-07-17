@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.3
 > **Son tam kapsam denetimi:** 2026-07-17
 > **Aktif paket:** Post-Package V1 Closure - Contracts, Performance ve Release DoD
-> **Aktif iş:** `DW-V1-DOD-HEART-RUNTIME-CONTRACT` - Verify Castle Heart Generated, Validated, Exact-Saved and Grave-Essence-Only
-> **İlerleme:** `429 / 442` tracker checkbox'ı tamamlandı - `%97,06`
+> **Aktif iş:** `DW-V1-DOD-10K-1K-FRAME-PACING` - Accept 1K Archer + 10K Enemy Target-Hardware Frame Pacing
+> **İlerleme:** `430 / 442` tracker checkbox'ı tamamlandı - `%97,29`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -1285,7 +1285,17 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 - [x] Basic/Rapid/Frost toplam 1000 cap.
 - [x] 40x25 stable formation.
 - [x] Arrow Wood ile anında alınır; Fletcher/queue yok.
-- [ ] Castle Heart generated, validated, saved ve yalnız Grave Essence kullanıyor.
+- [x] Castle Heart generated, validated, saved ve yalnız Grave Essence kullanıyor.
+  Canonical production v1 katalog, eski `TechTreeCatalogSO` asset'lerini değiştirmeyen idempotent
+  migration builder'ı ile `35` node olarak üretildi ve `NewGameScene` `GameManager` sahibine bağlandı.
+  Dört branch, dört Keystone trade-off çifti, dört repeatable sink ve `15` Evolution node içeriyor;
+  `64` deterministic seed sweep'inde generator validation temiz. Player-facing graph branch damarları,
+  rarity/owned/locked chrome'u, okunabilir gerçek numeric sonuçlar ve run-scope metinleriyle polish edildi.
+  Purchase transaction'ı yalnız canonical `GraveEssence` wallet'ını kullanıyor; mevcut exact graph save/
+  Continue ve Grave Essence reset sözleşmeleri tam PlayMode regresyonunda korundu. Targeted production
+  EditMode `3/3`, targeted production PlayMode `1/1`, full EditMode `385/385`, full PlayMode
+  `85 pass + 2 explicit profiler/soak skip`; scene validation `0` issue, final Console
+  `0 error / 0 warning`.
 - [x] Council 3/6/9 regular schedule'ı koruyor ve aynı gün yalnız bir kart açıyor.
 - [x] Council yalnız approved template/effect pool kullanıyor.
 - [x] Council ana guardrail'leri bypass etmiyor.
@@ -1505,3 +1515,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-17 | `DW-V1-DOD-PASSIVE-RESOURCE-DRAIN` main-resource upkeep exclusion + finite Arrow combat drain | Active castle loop legacy `ResourceConsumptionRate` değerlerini etkisizleştiriyor; Fletcher `ArrowProductionSystem` mobile config varken çıkıyor. Production world `ArrowProducer` veya legacy `ArcherTrainer` taşımıyor. Gerçek combat release guard'ında yüksek negatif rate enjeksiyonu Wood/Stone/Iron/Food stoklarını azaltmadı; başarılı tek projectile rent'i yalnız finite Arrow stokunu `10 -> 9` düşürdü. Player purchase/repair ve accepted Dawn population Food maliyeti tek seferlik transaction olarak açıkça ayrıldı | Targeted PlayMode `3/3`; full EditMode `382/382`; full PlayMode `82 pass + 2 explicit profiler/soak skip`; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `427/442` |
 | 2026-07-17 | `DW-V1-DOD-EXACT-POPULATION-WORKERS` unified population/bed/worker exact Continue contract | Tek gerçek snapshot; Population total/workers/archers/idle ve base/capacity, bed base/purchased, dört actual worker count, worker idle/last-observed ve dört target ratio alanını birlikte yazdı. Runtime tuple tamamen değiştirildikten sonra Continue actual archer entity sayısını koruyarak bütün state'i exact geri yükledi; ratio `2700/1900/1600/3800`, worker `23/17/11/25`, idle `17`, purchased beds `15` kanıtı kullanıldı | Targeted PlayMode `3/3`; full EditMode `382/382`; full PlayMode `83 pass + 2 explicit profiler/soak skip`; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `428/442` |
 | 2026-07-17 | `DW-V1-DOD-WORKER-WORLD-FEEDBACK` representative worker world release contract | Mevcut allocation/representation owner zinciri değiştirilmedi. Birleşik gerçek-scene guard'ı Wood/Stone/Iron/Food için actual `12/60/101/1000` değerlerini temsili `12/24/27/32` entity'ye çevirdi; toplam `95` visual üzerinde unique index, exact represented weight, geçerli route, resource cargo rengi, weight-scaled feedback ve Night lantern doğrulandı. Presentation katmanı actual allocation truth'unu değiştirmedi | Targeted PlayMode `3/3`; full EditMode `382/382`; full PlayMode `84 pass + 2 explicit profiler/soak skip`; ilk çoklu-filter job test gövdesinden önce Unity Test Framework hatasıyla orphan kaldı, MCP internal recovery ile temizlenip tekil gerçek job'larda geçti; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `429/442` |
+| 2026-07-18 | `DW-V1-DOD-HEART-RUNTIME-CONTRACT` production Castle Heart catalog + polished generated graph | Eski `TechTreeCatalogSO` scope'u yerinde bırakıldı; canonical idempotent migration builder'ı production v1 `HeartNodeCatalogSO` ile `35` definition üretti ve `NewGameScene` `GameManager` sahibine bağladı. Dört branch, dört Keystone pair, dört repeatable sink, `15` Evolution node ve mevcut gerçek runtime adapter'larına bağlı effect'ler generator validation'dan geçti. Heart graph branch damarları, rarity/state chrome'u, player-facing exact value/cost/owned copy'si ve geniş node layout'uyla polish edildi. Purchase yalnız `GraveEssence` wallet'ından commit oluyor; graph save/Continue sözleşmesi değişmeden korundu | Production asset audit `35` node / `4` Keystone pair / `4` sink / `15` Evolution; deterministic seed sweep EditMode `3/3`; production scene PlayMode `1/1`; full EditMode `385/385`; full PlayMode `85 pass + 2 explicit profiler/soak skip`; ilk retry Unity Test Framework `PlayModeRunTask.cs:52` orphan job'u MCP internal recovery ile temizlendi; FullHD Game View visual QA; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `430/442` |

@@ -70463,10 +70463,10 @@ MonoBehaviour:
   RevealClip: {fileID: 8300000, guid: 29b56f80cda21401f89a9ee4b159ff92, type: 3}
   DeniedClip: {fileID: 8300000, guid: 925ed7778ac2f43dcbc21c28843a0163, type: 3}
   PanelOpenClip: {fileID: 8300000, guid: 9f2f8e892180d4b18a7aaf8b689712d5, type: 3}
-  NodeSize: {x: 268, y: 172}
-  HorizontalSpacing: 350
-  VerticalSpacing: 250
-  ContentPadding: {x: 170, y: 140}
+  NodeSize: {x: 292, y: 188}
+  HorizontalSpacing: 386
+  VerticalSpacing: 278
+  ContentPadding: {x: 190, y: 160}
 --- !u!114 &1065689873
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -74711,7 +74711,7 @@ MonoBehaviour:
   techTreeCatalog: {fileID: 11400000, guid: 58610c7ef50a5d74cbf7e1d97d39fa2c, type: 2}
   councilCatalog: {fileID: 11400000, guid: 9603e30ca26cba7499e4373d2806638a, type: 2}
   metaUpgradeCatalog: {fileID: 11400000, guid: 62da96a7c9c2d2d4d904c2148a6605d0, type: 2}
-  heartCatalog: {fileID: 0}
+  heartCatalog: {fileID: 11400000, guid: c2bd36eb660380c4cba63e70ef8bbd11, type: 2}
   heartGraphSettings:
     MinimumBranchDepth: 4
     MaximumBranchDepth: 5

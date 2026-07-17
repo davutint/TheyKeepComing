@@ -1385,6 +1385,8 @@ namespace DeadWalls
             ArcherRecruitmentCatalogSO archerCatalog = EnsureDefaultArcherRecruitmentCatalog();
             ArcherFormationDefinitionSO archerFormation = EnsureDefaultArcherFormationDefinition();
             TechTreeCatalogSO techCatalog = EnsureDefaultTechTreeCatalog();
+            HeartNodeCatalogSO heartCatalog =
+                CastleHeartProductionCatalogBuilder.EnsureProductionCatalog();
             CouncilEventCatalogSO councilEventCatalog = EnsureDefaultCouncilCatalog();
             AssignDifficultyProfileToAuthoring(EnsureDefaultDifficultyProfile());
             GameObject gameManagerObject = FindRoot(scene, "GameManager");
@@ -1398,6 +1400,7 @@ namespace DeadWalls
             EnsureComponent<RunBootstrap>(gameManagerObject); // menuden gelen Continue/NewRun'i uygular
             AssignObjectReference(gameManager, "archerCatalog", archerCatalog);
             AssignObjectReference(gameManager, "techTreeCatalog", techCatalog);
+            AssignObjectReference(gameManager, "heartCatalog", heartCatalog);
             AssignObjectReference(gameManager, "councilCatalog", councilEventCatalog);
             AssignObjectReference(gameManager, "metaUpgradeCatalog", EnsureDefaultMetaUpgradeCatalog());
 
