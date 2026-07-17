@@ -476,6 +476,124 @@ namespace DeadWalls.Tests
             Assert.That(capError, Does.Contain("total cap usage"));
         }
 
+        [Test]
+        public void HeartNodeBoughtFactory_CreatesCanonicalCommittedPurchaseSnapshot()
+        {
+            var result = new HeartPurchaseResult
+            {
+                Quote = new HeartPurchaseQuote
+                {
+                    NodeId = "army_repeatable",
+                    PreviousLevel = 2,
+                    LevelsToBuy = 10,
+                    NewLevel = 12,
+                    TotalGraveEssenceCost = 875L
+                },
+                NodeDepth = 4,
+                FailureReason = HeartPurchaseFailureReason.None
+            };
+            result.NewlyRevealedNodeIds.Add("army_child_a");
+            result.NewlyRevealedNodeIds.Add("army_child_b");
+
+            HeartNodeBoughtTelemetryPayload payload =
+                HeartNodeBoughtTelemetryFactory.Create(result);
+            Assert.That(payload.NodeId, Is.EqualTo("army_repeatable"));
+            Assert.That(payload.Level, Is.EqualTo(12));
+            Assert.That(payload.Depth, Is.EqualTo(4));
+            Assert.That(payload.Cost, Is.EqualTo(875L));
+            Assert.That(payload.RevealedChildren, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void TryEmitHeartNodeBought_ProducesVersionedMachineReadableEnvelope()
+        {
+            GameplayTelemetryRecord observed = default;
+            bool received = false;
+            void OnEmitted(GameplayTelemetryRecord record)
+            {
+                observed = record;
+                received = true;
+            }
+
+            var payload = new HeartNodeBoughtTelemetryPayload
+            {
+                NodeId = "defense_wall_core",
+                Level = 3,
+                Depth = 2,
+                Cost = 240L,
+                RevealedChildren = 1
+            };
+            GameplayTelemetry.Emitted += OnEmitted;
+            try
+            {
+                Assert.That(GameplayTelemetry.TryEmitHeartNodeBought(
+                    " run_heart_240 ", payload, out GameplayTelemetryRecord emitted,
+                    out string error), Is.True, error);
+                Assert.That(received, Is.True);
+                Assert.That(observed.RunId, Is.EqualTo("run_heart_240"));
+                Assert.That(emitted.EventName, Is.EqualTo("heart_node_bought"));
+                Assert.That(emitted.SchemaVersion, Is.EqualTo(1));
+
+                GameplayTelemetryEnvelope envelope =
+                    JsonUtility.FromJson<GameplayTelemetryEnvelope>(emitted.SerializedEnvelope);
+                HeartNodeBoughtTelemetryPayload decoded =
+                    JsonUtility.FromJson<HeartNodeBoughtTelemetryPayload>(envelope.PayloadJson);
+                Assert.That(envelope.EventName, Is.EqualTo("heart_node_bought"));
+                Assert.That(envelope.SchemaVersion, Is.EqualTo(1));
+                Assert.That(decoded.NodeId, Is.EqualTo("defense_wall_core"));
+                Assert.That(decoded.Level, Is.EqualTo(3));
+                Assert.That(decoded.Depth, Is.EqualTo(2));
+                Assert.That(decoded.Cost, Is.EqualTo(240L));
+                Assert.That(decoded.RevealedChildren, Is.EqualTo(1));
+            }
+            finally
+            {
+                GameplayTelemetry.Emitted -= OnEmitted;
+            }
+        }
+
+        [Test]
+        public void TryEmitHeartNodeBought_RejectsInvalidNodeLevelDepthCostAndRevealCount()
+        {
+            var payload = new HeartNodeBoughtTelemetryPayload
+            {
+                NodeId = "heart_valid",
+                Level = 1,
+                Depth = 1,
+                Cost = 10L,
+                RevealedChildren = 0
+            };
+
+            payload.NodeId = " ";
+            Assert.That(GameplayTelemetry.TryEmitHeartNodeBought(
+                "run_invalid_node", payload, out _, out string nodeError), Is.False);
+            Assert.That(nodeError, Does.Contain("node kimligi"));
+
+            payload.NodeId = "heart_valid";
+            payload.Level = 0;
+            Assert.That(GameplayTelemetry.TryEmitHeartNodeBought(
+                "run_invalid_level", payload, out _, out string levelError), Is.False);
+            Assert.That(levelError, Does.Contain("level"));
+
+            payload.Level = 1;
+            payload.Depth = 0;
+            Assert.That(GameplayTelemetry.TryEmitHeartNodeBought(
+                "run_invalid_depth", payload, out _, out string depthError), Is.False);
+            Assert.That(depthError, Does.Contain("depth"));
+
+            payload.Depth = 1;
+            payload.Cost = 0L;
+            Assert.That(GameplayTelemetry.TryEmitHeartNodeBought(
+                "run_invalid_cost", payload, out _, out string costError), Is.False);
+            Assert.That(costError, Does.Contain("cost"));
+
+            payload.Cost = 10L;
+            payload.RevealedChildren = -1;
+            Assert.That(GameplayTelemetry.TryEmitHeartNodeBought(
+                "run_invalid_reveal", payload, out _, out string revealError), Is.False);
+            Assert.That(revealError, Does.Contain("revealed children"));
+        }
+
         private MetaUpgradeSO CreateUpgrade(string id, int maxLevel)
         {
             MetaUpgradeSO upgrade = ScriptableObject.CreateInstance<MetaUpgradeSO>();

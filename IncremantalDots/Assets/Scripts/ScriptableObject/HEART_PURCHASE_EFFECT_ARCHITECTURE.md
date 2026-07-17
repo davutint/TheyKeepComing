@@ -30,6 +30,10 @@ Harcama oncesindeki herhangi bir hata graph level'ini, visibility'yi, lock state
 effect runtime'ini degistirmez. Harcamadan sonraki adimlar preflight edilmis ve fail etmeyen
 commit adimlaridir.
 
+Basarili `HeartPurchaseResult`, quote ve reveal Id'lerine ek olarak satin alinan canonical node'un
+`Depth` degerini tasir. Bu alan ikinci graph lookup/state owner'i kurmadan telemetry ve presentation
+sinirlarinin exact purchase snapshot'i uretmesi icindir; failure sonucunda `0` kalir.
+
 `GameManager`, mevcut `GraveEssenceAmount` ve `TrySpendGraveEssenceAtHeart` metotlariyla
 `IHeartGraveEssenceWallet` uygular. Heart pipeline ana `ResourceCost`/Wood/Stone/Iron/Food
 harcama yolunu kabul etmez.

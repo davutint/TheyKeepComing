@@ -224,5 +224,24 @@ namespace DeadWalls
                     $"[GameManager] archer_changed telemetry reddedildi: {error}");
             }
         }
+
+        private void TryEmitHeartNodeBoughtTelemetry(HeartNodeBoughtTelemetryPayload payload)
+        {
+            if (!_initialized || string.IsNullOrWhiteSpace(_currentRunId)
+                || !IsRunIdentityReadyForPhaseTelemetry())
+            {
+                return;
+            }
+
+            if (!GameplayTelemetry.TryEmitHeartNodeBought(
+                    _currentRunId,
+                    payload,
+                    out _,
+                    out string error))
+            {
+                UnityEngine.Debug.LogError(
+                    $"[GameManager] heart_node_bought telemetry reddedildi: {error}");
+            }
+        }
     }
 }

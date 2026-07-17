@@ -210,6 +210,8 @@ namespace DeadWalls
                     ResourceSpentTelemetryContract.HeartNode,
                     result.Quote.NewLevel,
                     0);
+                TryEmitHeartNodeBoughtTelemetry(
+                    HeartNodeBoughtTelemetryFactory.Create(result));
                 OnGameStateChanged?.Invoke();
             }
             return result;

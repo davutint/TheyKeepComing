@@ -55,6 +55,7 @@ namespace DeadWalls
     public sealed class HeartPurchaseResult
     {
         public HeartPurchaseQuote Quote;
+        public int NodeDepth;
         public HeartPurchaseFailureReason FailureReason;
         public string Message = string.Empty;
         public bool KeystoneConflictApplied;
@@ -273,6 +274,7 @@ namespace DeadWalls
             var result = new HeartPurchaseResult
             {
                 Quote = plan.Quote,
+                NodeDepth = plan.Node.Depth,
                 FailureReason = HeartPurchaseFailureReason.None,
                 KeystoneConflictApplied = plan.KeystonePartner != null
             };

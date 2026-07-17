@@ -108,6 +108,16 @@ namespace DeadWalls
         public int TotalCapUsage;
     }
 
+    [Serializable]
+    public sealed class HeartNodeBoughtTelemetryPayload
+    {
+        public string NodeId;
+        public int Level;
+        public int Depth;
+        public long Cost;
+        public int RevealedChildren;
+    }
+
     internal static class ArcherChangedTelemetryContract
     {
         internal const string Buy = "buy";
@@ -290,6 +300,8 @@ namespace DeadWalls
         public const int ResourceSpentSchemaVersion = 1;
         public const string ArcherChangedEventName = "archer_changed";
         public const int ArcherChangedSchemaVersion = 1;
+        public const string HeartNodeBoughtEventName = "heart_node_bought";
+        public const int HeartNodeBoughtSchemaVersion = 1;
 
         public static event Action<GameplayTelemetryRecord> Emitted;
 
@@ -371,6 +383,30 @@ namespace DeadWalls
             return EmitValidated(
                 ArcherChangedEventName,
                 ArcherChangedSchemaVersion,
+                normalizedRunId,
+                payload,
+                out record,
+                out error);
+        }
+
+        public static bool TryEmitHeartNodeBought(
+            string runId,
+            HeartNodeBoughtTelemetryPayload payload,
+            out GameplayTelemetryRecord record,
+            out string error)
+        {
+            record = default;
+            if (!TryNormalizeRunId(runId, HeartNodeBoughtEventName, out string normalizedRunId,
+                    out error))
+            {
+                return false;
+            }
+            if (!TryValidateHeartNodeBought(payload, out error))
+                return false;
+
+            return EmitValidated(
+                HeartNodeBoughtEventName,
+                HeartNodeBoughtSchemaVersion,
                 normalizedRunId,
                 payload,
                 out record,
@@ -600,6 +636,45 @@ namespace DeadWalls
             error = string.Empty;
             return true;
         }
+
+        internal static bool TryValidateHeartNodeBought(
+            HeartNodeBoughtTelemetryPayload payload,
+            out string error)
+        {
+            if (payload == null)
+            {
+                error = "heart_node_bought payload bos.";
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(payload.NodeId))
+            {
+                error = "heart_node_bought node kimligi gecersiz.";
+                return false;
+            }
+            if (payload.Level <= 0)
+            {
+                error = "heart_node_bought level sifirdan buyuk olmali.";
+                return false;
+            }
+            if (payload.Depth <= 0)
+            {
+                error = "heart_node_bought depth sifirdan buyuk olmali.";
+                return false;
+            }
+            if (payload.Cost <= 0L)
+            {
+                error = "heart_node_bought cost sifirdan buyuk olmali.";
+                return false;
+            }
+            if (payload.RevealedChildren < 0)
+            {
+                error = "heart_node_bought revealed children negatif olamaz.";
+                return false;
+            }
+
+            error = string.Empty;
+            return true;
+        }
     }
 
     internal static class ResourceSpentTelemetryFactory
@@ -684,6 +759,21 @@ namespace DeadWalls
                 TypeFrom = ArcherChangedTelemetryContract.Basic,
                 TypeTo = ArcherChangedTelemetryContract.ToArcherType(targetType),
                 TotalCapUsage = totalCapUsage
+            };
+        }
+    }
+
+    internal static class HeartNodeBoughtTelemetryFactory
+    {
+        internal static HeartNodeBoughtTelemetryPayload Create(HeartPurchaseResult result)
+        {
+            return new HeartNodeBoughtTelemetryPayload
+            {
+                NodeId = result?.Quote?.NodeId,
+                Level = result?.Quote?.NewLevel ?? 0,
+                Depth = result?.NodeDepth ?? 0,
+                Cost = result?.Quote?.TotalGraveEssenceCost ?? 0L,
+                RevealedChildren = result?.NewlyRevealedNodeIds?.Count ?? -1
             };
         }
     }

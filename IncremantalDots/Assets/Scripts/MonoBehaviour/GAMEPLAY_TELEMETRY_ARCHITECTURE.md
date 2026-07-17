@@ -93,6 +93,22 @@ Council/meta baslangic bonusu, exact Continue restore ve merkezi `SpawnArcher`/r
 oyuncu buy/retrain transaction'i degildir; bu event'e baglanmaz. Event yeni archer state owner'i,
 history listesi veya save alani kurmaz; yalniz mevcut entity ve canonical total snapshot'ini yayar.
 
+## `heart_node_bought` v1
+
+`GameManager.TryPurchaseHeartNode`, yalniz `HeartPurchaseService` Grave Essence spend, graph level,
+effect, Keystone lock ve reveal commit'lerini tamamen basarili tamamladiktan sonra event uretir:
+
+- payload: `NodeId`, `Level`, `Depth`, `Cost`, `RevealedChildren`
+- level ve cost: `HeartPurchaseQuote.NewLevel` ile bulk-safe `TotalGraveEssenceCost`
+- depth: service purchase plan'indaki canonical `GeneratedHeartNodeState.Depth`
+- revealed children: ilk purchase'ta gercekten `Hidden -> Revealed` olan outgoing child sayisi
+
+Ayni transaction'in `resource_spent: grave_essence/heart_node` kaydi once, `heart_node_bought`
+sonra gelir. Insufficient Essence, hidden/locked/root/unknown node, invalid catalog/graph, effect
+preflight veya spend rejection sifir Heart event'i uretir. Evaluate/quote, exact Continue restore ve
+effect replay purchase degildir; event'e baglanmaz. Telemetry graph state'ini sahiplenmez ve hidden
+child kimliklerini aciga cikarmaz; yalniz reveal sayisini yayar.
+
 ## Genisleme kurali
 
 Tracker'daki sonraki event'ler ayni `GameplayTelemetryRecord` cikisini kullanir. Yeni manager,

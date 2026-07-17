@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -20,8 +21,15 @@ namespace DeadWalls.Tests
             new List<GameplayTelemetryRecord>();
         private readonly List<GameplayTelemetryRecord> _archerChangedRecords =
             new List<GameplayTelemetryRecord>();
+        private readonly List<GameplayTelemetryRecord> _heartNodeBoughtRecords =
+            new List<GameplayTelemetryRecord>();
+        private readonly List<string> _purchaseEventOrder = new List<string>();
+        private readonly List<UnityEngine.Object> _createdObjects =
+            new List<UnityEngine.Object>();
         private byte[] _originalRunSave;
         private string _runSavePath;
+        private FieldInfo _heartCatalogField;
+        private HeartNodeCatalogSO _originalHeartCatalog;
 
         [UnitySetUp]
         public IEnumerator SetUp()
@@ -35,6 +43,8 @@ namespace DeadWalls.Tests
             _phaseRecords.Clear();
             _resourceSpentRecords.Clear();
             _archerChangedRecords.Clear();
+            _heartNodeBoughtRecords.Clear();
+            _purchaseEventOrder.Clear();
             GameplayTelemetry.Emitted += OnTelemetryEmitted;
             GameBootstrap.PendingAction = GameBootstrap.StartAction.None;
 
@@ -47,16 +57,33 @@ namespace DeadWalls.Tests
             }
             Assert.That(GameManager.Instance, Is.Not.Null);
             Assert.That(GameManager.Instance.ContinuousSiegeCycle.Enabled, Is.True);
+            _heartCatalogField = typeof(GameManager).GetField(
+                "heartCatalog",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.That(_heartCatalogField, Is.Not.Null);
+            _originalHeartCatalog =
+                _heartCatalogField.GetValue(GameManager.Instance) as HeartNodeCatalogSO;
         }
 
         [UnityTearDown]
         public IEnumerator TearDown()
         {
             GameplayTelemetry.Emitted -= OnTelemetryEmitted;
+            if (GameManager.Instance != null && _heartCatalogField != null)
+            {
+                _heartCatalogField.SetValue(GameManager.Instance, _originalHeartCatalog);
+                MethodInfo resetHeartRuntime = typeof(GameManager).GetMethod(
+                    "ResetHeartRuntime",
+                    BindingFlags.Instance | BindingFlags.NonPublic);
+                resetHeartRuntime?.Invoke(GameManager.Instance, null);
+            }
             RunPersistence.Delete();
             if (_originalRunSave != null)
                 File.WriteAllBytes(_runSavePath, _originalRunSave);
             GameBootstrap.PendingAction = GameBootstrap.StartAction.None;
+            for (int i = _createdObjects.Count - 1; i >= 0; i--)
+                UnityEngine.Object.Destroy(_createdObjects[i]);
+            _createdObjects.Clear();
             yield return null;
         }
 
@@ -339,6 +366,201 @@ namespace DeadWalls.Tests
             Assert.That(retrain.TotalCapUsage, Is.EqualTo(gameManager.GetTotalArcherCount()));
         }
 
+        [UnityTest]
+        public IEnumerator HeartNodePurchase_EmitsCommittedGraphSnapshot_AndRejectedPurchaseEmitsNothing()
+        {
+            GameManager gameManager = GameManager.Instance;
+            _records.Clear();
+            gameManager.RestartGame();
+            for (int frame = 0; frame < 180 && _records.Count == 0; frame++)
+                yield return null;
+            Assert.That(_records.Count, Is.EqualTo(1),
+                "Heart telemetry oncesi run identity kurulmalidir.");
+
+            bool snapshotReady = false;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                {
+                    snapshotReady = true;
+                    break;
+                }
+                yield return null;
+            }
+            Assert.That(snapshotReady, Is.True, "Heart telemetry snapshot'i hazirlanamadi.");
+
+            RunSaveState save = RunPersistence.TryLoad();
+            Assert.That(save, Is.Not.Null);
+            HeartNodeCatalogSO catalog = CreateTelemetryHeartCatalog();
+            save.HasHeartGraph = true;
+            save.HeartGraph = CreateTelemetryHeartGraph(catalog.CatalogVersion);
+            save.GraveEssence = 500L;
+            Assert.That(RunPersistence.Save(save), Is.True);
+            _heartCatalogField.SetValue(gameManager, catalog);
+            Assert.That(gameManager.TryRestoreRunFromCheckpoint(), Is.True);
+            Assert.That(gameManager.IsHeartRuntimeReady, Is.True);
+
+            _resourceSpentRecords.Clear();
+            _heartNodeBoughtRecords.Clear();
+            _purchaseEventOrder.Clear();
+            HeartPurchaseResult result = gameManager.TryPurchaseHeartNode(
+                "rapid_unlock",
+                HeartPurchaseQuantity.One);
+            Assert.That(result.Succeeded, Is.True, result.Message);
+            Assert.That(result.NodeDepth, Is.EqualTo(1));
+            Assert.That(result.NewlyRevealedNodeIds, Is.EqualTo(new[] { "frost_unlock" }));
+            Assert.That(_resourceSpentRecords.Count, Is.EqualTo(1));
+            Assert.That(_heartNodeBoughtRecords.Count, Is.EqualTo(1));
+            Assert.That(_purchaseEventOrder,
+                Is.EqualTo(new[] { "resource_spent", "heart_node_bought" }));
+
+            ResourceSpentTelemetryPayload resource =
+                JsonUtility.FromJson<ResourceSpentTelemetryPayload>(
+                    _resourceSpentRecords[0].PayloadJson);
+            Assert.That(resource.Resource, Is.EqualTo("grave_essence"));
+            Assert.That(resource.Amount, Is.EqualTo(10L));
+            Assert.That(resource.PurchaseType, Is.EqualTo("heart_node"));
+            Assert.That(resource.ResultingLevel, Is.EqualTo(1));
+
+            GameplayTelemetryRecord record = _heartNodeBoughtRecords[0];
+            Assert.That(record.SchemaVersion, Is.EqualTo(1));
+            HeartNodeBoughtTelemetryPayload payload =
+                JsonUtility.FromJson<HeartNodeBoughtTelemetryPayload>(record.PayloadJson);
+            Assert.That(payload.NodeId, Is.EqualTo("rapid_unlock"));
+            Assert.That(payload.Level, Is.EqualTo(1));
+            Assert.That(payload.Depth, Is.EqualTo(1));
+            Assert.That(payload.Cost, Is.EqualTo(10L));
+            Assert.That(payload.RevealedChildren, Is.EqualTo(1));
+            Assert.That(gameManager.GraveEssenceAmount, Is.EqualTo(490L));
+
+            HeartPurchaseResult rejected = gameManager.TryPurchaseHeartNode(
+                "rapid_unlock",
+                HeartPurchaseQuantity.One);
+            Assert.That(rejected.Succeeded, Is.False);
+            Assert.That(rejected.FailureReason,
+                Is.EqualTo(HeartPurchaseFailureReason.AlreadyPurchased));
+            Assert.That(_resourceSpentRecords.Count, Is.EqualTo(1));
+            Assert.That(_heartNodeBoughtRecords.Count, Is.EqualTo(1));
+            Assert.That(_purchaseEventOrder.Count, Is.EqualTo(2));
+        }
+
+        private HeartNodeCatalogSO CreateTelemetryHeartCatalog()
+        {
+            HeartNodeCatalogSO catalog = ScriptableObject.CreateInstance<HeartNodeCatalogSO>();
+            _createdObjects.Add(catalog);
+            catalog.CatalogVersion = 77;
+            catalog.Nodes = new[]
+            {
+                CreateTelemetryHeartDefinition("rapid_unlock", HeartNodeBranch.Army,
+                    HeartNodeType.Unlock, HeartGraphConstants.RapidGuaranteeTag),
+                CreateTelemetryHeartDefinition("frost_unlock", HeartNodeBranch.Army,
+                    HeartNodeType.Unlock, HeartGraphConstants.FrostGuaranteeTag),
+                CreateTelemetryHeartDefinition("army_sink", HeartNodeBranch.Army,
+                    HeartNodeType.Repeatable, HeartGraphConstants.RepeatableSinkTag),
+                CreateTelemetryHeartDefinition("wall_access", HeartNodeBranch.Defense,
+                    HeartNodeType.Unlock, HeartGraphConstants.WallGuaranteeTag),
+                CreateTelemetryHeartDefinition("defense_sink", HeartNodeBranch.Defense,
+                    HeartNodeType.Repeatable, HeartGraphConstants.RepeatableSinkTag),
+                CreateTelemetryHeartDefinition("production_sink", HeartNodeBranch.Production,
+                    HeartNodeType.Repeatable, HeartGraphConstants.RepeatableSinkTag),
+                CreateTelemetryHeartDefinition("fireball_unlock", HeartNodeBranch.HeartMagic,
+                    HeartNodeType.Unlock, HeartGraphConstants.FireballGuaranteeTag),
+                CreateTelemetryHeartDefinition("heart_sink", HeartNodeBranch.HeartMagic,
+                    HeartNodeType.Repeatable, HeartGraphConstants.RepeatableSinkTag)
+            };
+            return catalog;
+        }
+
+        private HeartNodeDefinitionSO CreateTelemetryHeartDefinition(
+            string id,
+            HeartNodeBranch branch,
+            HeartNodeType type,
+            string tag)
+        {
+            HeartNodeDefinitionSO definition =
+                ScriptableObject.CreateInstance<HeartNodeDefinitionSO>();
+            _createdObjects.Add(definition);
+            definition.Id = id;
+            definition.Title = id;
+            definition.Description = id + " telemetry test";
+            definition.Branch = branch;
+            definition.Type = type;
+            definition.MinimumDepth = 1;
+            definition.MaximumDepth = 3;
+            definition.BaseGraveEssenceCost = 10L;
+            definition.CostGrowthPerLevel = 0d;
+            definition.Tags = new[] { tag };
+            definition.Effects = Array.Empty<HeartNodeEffect>();
+            definition.ConflictNodeIds = Array.Empty<string>();
+            return definition;
+        }
+
+        private static GeneratedRunGraph CreateTelemetryHeartGraph(int catalogVersion)
+        {
+            var graph = new GeneratedRunGraph
+            {
+                CatalogVersion = catalogVersion,
+                Seed = 0xB017u,
+                RootNodeId = HeartGraphConstants.RootNodeId
+            };
+            AddTelemetryHeartNode(graph, HeartGraphConstants.RootNodeId,
+                HeartNodeBranch.HeartMagic, 0, HeartNodeVisibility.Revealed, 1);
+            AddTelemetryHeartNode(graph, "rapid_unlock", HeartNodeBranch.Army, 1,
+                HeartNodeVisibility.Revealed);
+            AddTelemetryHeartNode(graph, "frost_unlock", HeartNodeBranch.Army, 2);
+            AddTelemetryHeartNode(graph, "army_sink", HeartNodeBranch.Army, 3);
+            AddTelemetryHeartNode(graph, "wall_access", HeartNodeBranch.Defense, 1,
+                HeartNodeVisibility.Revealed);
+            AddTelemetryHeartNode(graph, "defense_sink", HeartNodeBranch.Defense, 2);
+            AddTelemetryHeartNode(graph, "production_sink", HeartNodeBranch.Production, 1,
+                HeartNodeVisibility.Revealed);
+            AddTelemetryHeartNode(graph, "fireball_unlock", HeartNodeBranch.HeartMagic, 1,
+                HeartNodeVisibility.Revealed);
+            AddTelemetryHeartNode(graph, "heart_sink", HeartNodeBranch.HeartMagic, 2);
+
+            AddTelemetryHeartEdge(graph, HeartGraphConstants.RootNodeId, "rapid_unlock");
+            AddTelemetryHeartEdge(graph, "rapid_unlock", "frost_unlock");
+            AddTelemetryHeartEdge(graph, "frost_unlock", "army_sink");
+            AddTelemetryHeartEdge(graph, HeartGraphConstants.RootNodeId, "wall_access");
+            AddTelemetryHeartEdge(graph, "wall_access", "defense_sink");
+            AddTelemetryHeartEdge(graph, HeartGraphConstants.RootNodeId, "production_sink");
+            AddTelemetryHeartEdge(graph, HeartGraphConstants.RootNodeId, "fireball_unlock");
+            AddTelemetryHeartEdge(graph, "fireball_unlock", "heart_sink");
+            return graph;
+        }
+
+        private static void AddTelemetryHeartNode(
+            GeneratedRunGraph graph,
+            string nodeId,
+            HeartNodeBranch branch,
+            int depth,
+            HeartNodeVisibility visibility = HeartNodeVisibility.Hidden,
+            int level = 0)
+        {
+            graph.Nodes.Add(new GeneratedHeartNodeState
+            {
+                NodeId = nodeId,
+                Branch = branch,
+                Depth = depth,
+                Visibility = visibility,
+                Level = level,
+                LockState = HeartNodeLockState.Available,
+                LockedByNodeId = string.Empty
+            });
+        }
+
+        private static void AddTelemetryHeartEdge(
+            GeneratedRunGraph graph,
+            string fromNodeId,
+            string toNodeId)
+        {
+            graph.Edges.Add(new GeneratedHeartEdge
+            {
+                FromNodeId = fromNodeId,
+                ToNodeId = toNodeId
+            });
+        }
+
         private void OnTelemetryEmitted(GameplayTelemetryRecord record)
         {
             if (record.EventName == GameplayTelemetry.RunStartedEventName)
@@ -346,9 +568,17 @@ namespace DeadWalls.Tests
             else if (record.EventName == GameplayTelemetry.PhaseChangedEventName)
                 _phaseRecords.Add(record);
             else if (record.EventName == GameplayTelemetry.ResourceSpentEventName)
+            {
                 _resourceSpentRecords.Add(record);
+                _purchaseEventOrder.Add(record.EventName);
+            }
             else if (record.EventName == GameplayTelemetry.ArcherChangedEventName)
                 _archerChangedRecords.Add(record);
+            else if (record.EventName == GameplayTelemetry.HeartNodeBoughtEventName)
+            {
+                _heartNodeBoughtRecords.Add(record);
+                _purchaseEventOrder.Add(record.EventName);
+            }
         }
     }
 }

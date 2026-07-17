@@ -28,15 +28,21 @@ sinifinin parcasidir; `GameplayTelemetry.cs` ayni `DeadWalls` runtime assembly's
     toplam cap kullanimi degismemelidir.
 13. Locked type, yetersiz kaynak/population veya 1000 cap nedeniyle reddedilen buy ile gecersiz
     retrain yeni `archer_changed` kaydi uretmemelidir.
+14. Revealed bir Castle Heart node'u Grave Essence ile alinir; once `resource_spent`, sonra
+    `heart_node_bought` gelmeli ve payload exact node Id, post-commit level, graph depth, toplam bulk
+    cost ile yeni reveal edilen child sayisini vermelidir.
+15. Ayni non-repeatable node tekrar alindiginda veya hidden/locked/yetersiz Essence node denendiginde
+    yeni `heart_node_bought` kaydi gelmemelidir.
 
 Otomatik kapsam:
 
-- EditMode `GameplayTelemetryTests`: run/phase/resource/archer payload factory'leri, multi-resource
-  canonical order, envelope serialization ve invalid identity/amount/result/transition/cap guard'lari.
+- EditMode `GameplayTelemetryTests`: run/phase/resource/archer/Heart payload factory'leri,
+  multi-resource canonical order, envelope serialization ve invalid identity/amount/result/
+  transition/cap/node/level/depth/cost/reveal guard'lari.
 - PlayMode `GameplayTelemetryPlayModeTests`: gercek NewGameScene yeni-run emission'i, canonical
   phase/horde snapshot'i, ayni-phase idempotency, exact Continue duplicate guard'i, tek/iki kaynakli
-  purchase commit event'leri, player buy/retrain transition snapshot'lari ve rejected transaction
-  sifir-event guard'i.
+  purchase commit event'leri, player archer buy/retrain transition snapshot'lari, canonical Castle
+  Heart purchase/reveal snapshot'i ve rejected transaction sifir-event guard'i.
 
 Harici analytics target'i bu kurulumun parcasi degildir; tracker'daki owner-karari maddesi
 onaylanmadan SDK, servis veya endpoint eklenmez.
