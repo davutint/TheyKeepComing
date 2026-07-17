@@ -10,13 +10,18 @@ sinifinin parcasidir; `GameplayTelemetry.cs` ayni `DeadWalls` runtime assembly's
 3. Payload'da production Meta definition seviyeleri, gercek baslangic kaynaklari ve Heart
    graph identity kontrol edilir.
 4. Save/Continue yapildiginda ayni RunId icin ikinci `run_started` olmamalidir.
+5. Console'da Day 1 `day` ile baslayan tek `phase_changed` aranir; Dusk/Night/Dawn
+   transition'larinda yeni event gelmeli, ayni phase icindeki enemy/backlog degisimi duplicate
+   uretmemelidir.
+6. `phase_changed` payload'indaki `AliveEnemies` ve `SpawnBacklog`, transition sonrasi
+   `WaveStateData` ve `ContinuousSpawnBudgetData` snapshot'lariyla ayni olmalidir.
 
 Otomatik kapsam:
 
-- EditMode `GameplayTelemetryTests`: payload factory, envelope serialization ve invalid identity
-  guard'lari.
-- PlayMode `GameplayTelemetryPlayModeTests`: gercek NewGameScene yeni-run emission'i ve exact
-  Continue duplicate guard'i.
+- EditMode `GameplayTelemetryTests`: run/phase payload factory'leri, envelope serialization ve
+  invalid identity guard'lari.
+- PlayMode `GameplayTelemetryPlayModeTests`: gercek NewGameScene yeni-run emission'i, canonical
+  phase/horde snapshot'i, ayni-phase idempotency ve exact Continue duplicate guard'i.
 
 Harici analytics target'i bu kurulumun parcasi degildir; tracker'daki owner-karari maddesi
 onaylanmadan SDK, servis veya endpoint eklenmez.

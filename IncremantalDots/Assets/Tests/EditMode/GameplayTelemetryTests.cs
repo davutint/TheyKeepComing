@@ -166,6 +166,104 @@ namespace DeadWalls.Tests
             Assert.That(heartError, Does.Contain("Heart graph"));
         }
 
+        [Test]
+        public void PhaseChangedFactory_CapturesCanonicalDayPhaseAndHordeSnapshot()
+        {
+            PhaseChangedTelemetryPayload payload = PhaseChangedTelemetryFactory.Create(
+                new ContinuousSiegeCycleData
+                {
+                    Enabled = true,
+                    CycleIndex = 4,
+                    Phase = SiegeCyclePhase.Night
+                },
+                new WaveStateData { ZombiesAlive = 237 },
+                new ContinuousSpawnBudgetData { PendingEnemies = 9_123L });
+
+            Assert.That(payload.Day, Is.EqualTo(5));
+            Assert.That(payload.Phase, Is.EqualTo("night"));
+            Assert.That(payload.AliveEnemies, Is.EqualTo(237));
+            Assert.That(payload.SpawnBacklog, Is.EqualTo(9_123L));
+        }
+
+        [Test]
+        public void TryEmitPhaseChanged_ProducesVersionedMachineReadableEnvelope()
+        {
+            GameplayTelemetryRecord observed = default;
+            bool received = false;
+            void OnEmitted(GameplayTelemetryRecord record)
+            {
+                observed = record;
+                received = true;
+            }
+
+            var payload = new PhaseChangedTelemetryPayload
+            {
+                Day = 8,
+                Phase = "dusk",
+                AliveEnemies = 640,
+                SpawnBacklog = 2_048L
+            };
+
+            GameplayTelemetry.Emitted += OnEmitted;
+            try
+            {
+                Assert.That(GameplayTelemetry.TryEmitPhaseChanged(
+                    " run_phase_08 ", payload, out GameplayTelemetryRecord emitted,
+                    out string error), Is.True, error);
+                Assert.That(received, Is.True);
+                Assert.That(observed.RunId, Is.EqualTo("run_phase_08"));
+                Assert.That(emitted.EventName, Is.EqualTo("phase_changed"));
+                Assert.That(emitted.SchemaVersion, Is.EqualTo(1));
+
+                GameplayTelemetryEnvelope envelope =
+                    JsonUtility.FromJson<GameplayTelemetryEnvelope>(emitted.SerializedEnvelope);
+                Assert.That(envelope.EventName, Is.EqualTo("phase_changed"));
+                Assert.That(envelope.SchemaVersion, Is.EqualTo(1));
+                PhaseChangedTelemetryPayload decoded =
+                    JsonUtility.FromJson<PhaseChangedTelemetryPayload>(envelope.PayloadJson);
+                Assert.That(decoded.Day, Is.EqualTo(8));
+                Assert.That(decoded.Phase, Is.EqualTo("dusk"));
+                Assert.That(decoded.AliveEnemies, Is.EqualTo(640));
+                Assert.That(decoded.SpawnBacklog, Is.EqualTo(2_048L));
+            }
+            finally
+            {
+                GameplayTelemetry.Emitted -= OnEmitted;
+            }
+        }
+
+        [Test]
+        public void TryEmitPhaseChanged_RejectsInvalidDayPhaseAndHordeState()
+        {
+            var invalidDay = new PhaseChangedTelemetryPayload
+            {
+                Day = 0,
+                Phase = "day"
+            };
+            Assert.That(GameplayTelemetry.TryEmitPhaseChanged(
+                "run_invalid_day", invalidDay, out _, out string dayError), Is.False);
+            Assert.That(dayError, Does.Contain("horde snapshot"));
+
+            var invalidPhase = new PhaseChangedTelemetryPayload
+            {
+                Day = 1,
+                Phase = "storm"
+            };
+            Assert.That(GameplayTelemetry.TryEmitPhaseChanged(
+                "run_invalid_phase", invalidPhase, out _, out string phaseError), Is.False);
+            Assert.That(phaseError, Does.Contain("phase kimligi"));
+
+            var invalidBacklog = new PhaseChangedTelemetryPayload
+            {
+                Day = 1,
+                Phase = "night",
+                SpawnBacklog = -1L
+            };
+            Assert.That(GameplayTelemetry.TryEmitPhaseChanged(
+                "run_invalid_backlog", invalidBacklog, out _, out string backlogError), Is.False);
+            Assert.That(backlogError, Does.Contain("horde snapshot"));
+        }
+
         private MetaUpgradeSO CreateUpgrade(string id, int maxLevel)
         {
             MetaUpgradeSO upgrade = ScriptableObject.CreateInstance<MetaUpgradeSO>();

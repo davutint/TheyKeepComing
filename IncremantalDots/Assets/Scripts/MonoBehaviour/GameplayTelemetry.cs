@@ -80,6 +80,15 @@ namespace DeadWalls
         public TelemetryHeartGraphIdentity Heart;
     }
 
+    [Serializable]
+    public sealed class PhaseChangedTelemetryPayload
+    {
+        public int Day;
+        public string Phase;
+        public int AliveEnemies;
+        public long SpawnBacklog;
+    }
+
     /// <summary>
     /// Gameplay event'lerinin provider-bagimsiz cikis siniri. Runtime state sahiplenmez ve
     /// dis analytics SDK'si secmez; subscriber'lara immutable JSON snapshot yollar.
@@ -89,6 +98,8 @@ namespace DeadWalls
         public const string LogPrefix = "[DW-TELEMETRY]";
         public const string RunStartedEventName = "run_started";
         public const int RunStartedSchemaVersion = 1;
+        public const string PhaseChangedEventName = "phase_changed";
+        public const int PhaseChangedSchemaVersion = 1;
 
         public static event Action<GameplayTelemetryRecord> Emitted;
 
@@ -99,21 +110,72 @@ namespace DeadWalls
             out string error)
         {
             record = default;
-            string normalizedRunId = runId?.Trim();
-            if (string.IsNullOrEmpty(normalizedRunId))
-            {
-                error = "run_started RunId bos olamaz.";
+            if (!TryNormalizeRunId(runId, RunStartedEventName, out string normalizedRunId, out error))
                 return false;
-            }
             if (!TryValidateRunStarted(payload, out error))
                 return false;
 
+            return EmitValidated(
+                RunStartedEventName,
+                RunStartedSchemaVersion,
+                normalizedRunId,
+                payload,
+                out record,
+                out error);
+        }
+
+        public static bool TryEmitPhaseChanged(
+            string runId,
+            PhaseChangedTelemetryPayload payload,
+            out GameplayTelemetryRecord record,
+            out string error)
+        {
+            record = default;
+            if (!TryNormalizeRunId(runId, PhaseChangedEventName, out string normalizedRunId, out error))
+                return false;
+            if (!TryValidatePhaseChanged(payload, out error))
+                return false;
+
+            return EmitValidated(
+                PhaseChangedEventName,
+                PhaseChangedSchemaVersion,
+                normalizedRunId,
+                payload,
+                out record,
+                out error);
+        }
+
+        private static bool TryNormalizeRunId(
+            string runId,
+            string eventName,
+            out string normalizedRunId,
+            out string error)
+        {
+            normalizedRunId = runId?.Trim();
+            if (!string.IsNullOrEmpty(normalizedRunId))
+            {
+                error = string.Empty;
+                return true;
+            }
+
+            error = $"{eventName} RunId bos olamaz.";
+            return false;
+        }
+
+        private static bool EmitValidated(
+            string eventName,
+            int schemaVersion,
+            string runId,
+            object payload,
+            out GameplayTelemetryRecord record,
+            out string error)
+        {
             string payloadJson = JsonUtility.ToJson(payload, false);
             var envelope = new GameplayTelemetryEnvelope
             {
-                EventName = RunStartedEventName,
-                SchemaVersion = RunStartedSchemaVersion,
-                RunId = normalizedRunId,
+                EventName = eventName,
+                SchemaVersion = schemaVersion,
+                RunId = runId,
                 PayloadJson = payloadJson
             };
             string serializedEnvelope = JsonUtility.ToJson(envelope, false);
@@ -190,6 +252,30 @@ namespace DeadWalls
                     || heart.GraphVersion <= 0 || heart.CatalogVersion <= 0 || heart.Seed == 0u))
             {
                 error = "run_started hazir Heart graph identity'si eksik.";
+                return false;
+            }
+
+            error = string.Empty;
+            return true;
+        }
+
+        internal static bool TryValidatePhaseChanged(
+            PhaseChangedTelemetryPayload payload,
+            out string error)
+        {
+            if (payload == null)
+            {
+                error = "phase_changed payload bos.";
+                return false;
+            }
+            if (payload.Day < 1 || payload.AliveEnemies < 0 || payload.SpawnBacklog < 0L)
+            {
+                error = "phase_changed day veya horde snapshot'i gecersiz.";
+                return false;
+            }
+            if (!PhaseChangedTelemetryFactory.IsContractPhase(payload.Phase))
+            {
+                error = "phase_changed phase kimligi gecersiz.";
                 return false;
             }
 
@@ -278,6 +364,51 @@ namespace DeadWalls
                     return Math.Max(0, entry.Level);
             }
             return 0;
+        }
+    }
+
+    internal static class PhaseChangedTelemetryFactory
+    {
+        internal static PhaseChangedTelemetryPayload Create(
+            ContinuousSiegeCycleData cycle,
+            WaveStateData wave,
+            ContinuousSpawnBudgetData spawnBudget)
+        {
+            int day = cycle.CycleIndex >= int.MaxValue
+                ? int.MaxValue
+                : Math.Max(1, cycle.CycleIndex + 1);
+            return new PhaseChangedTelemetryPayload
+            {
+                Day = day,
+                Phase = ToContractPhase(cycle.Phase),
+                AliveEnemies = Math.Max(0, wave.ZombiesAlive),
+                SpawnBacklog = Math.Max(0L, spawnBudget.PendingEnemies)
+            };
+        }
+
+        internal static bool IsContractPhase(string phase)
+        {
+            return string.Equals(phase, "day", StringComparison.Ordinal)
+                || string.Equals(phase, "dusk", StringComparison.Ordinal)
+                || string.Equals(phase, "night", StringComparison.Ordinal)
+                || string.Equals(phase, "dawn", StringComparison.Ordinal);
+        }
+
+        private static string ToContractPhase(SiegeCyclePhase phase)
+        {
+            switch (phase)
+            {
+                case SiegeCyclePhase.Day:
+                    return "day";
+                case SiegeCyclePhase.Dusk:
+                    return "dusk";
+                case SiegeCyclePhase.Night:
+                    return "night";
+                case SiegeCyclePhase.Dawn:
+                    return "dawn";
+                default:
+                    return string.Empty;
+            }
         }
     }
 }

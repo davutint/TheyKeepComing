@@ -30,6 +30,21 @@ event uretir; exact Continue restore edilen mevcut RunId'yi `run_started` olarak
 Telemetry guard alanlari yalnız emission idempotency'sidir; run/save state owner'i degildir ve
 save schema'ya yazilmaz.
 
+## `phase_changed` v1
+
+`GameManager`, her yeni `(RunId, Day, Phase)` kimligini canonical ECS snapshot'larindan bir kez
+yayinlar:
+
+- Day/Phase: `ContinuousSiegeCycleData.CycleIndex + 1` ve `SiegeCyclePhase`
+- alive enemies: `WaveStateData.ZombiesAlive`
+- spawn backlog: `ContinuousSpawnBudgetData.PendingEnemies`
+
+Phase kimligi machine-readable `day/dusk/night/dawn` degerlerinden biridir. Alive/backlog degerleri
+yalniz transition sonrasi ilk gozlem aninin snapshot'idir; ayni phase icindeki sayi degisimleri yeni
+event uretmez. Yeni run'da `run_started` once, ilk Day 1 `phase_changed` hemen sonra gelir.
+Exact Continue restore edilen mevcut `(RunId, Day, Phase)` kimligi prime edilir ve duplicate event
+uretilmez. Bu idempotency save state'e yazilmaz ve cycle/wave/spawn budget sahipligini kopyalamaz.
+
 ## Genisleme kurali
 
 Tracker'daki sonraki event'ler ayni `GameplayTelemetryRecord` cikisini kullanir. Yeni manager,
