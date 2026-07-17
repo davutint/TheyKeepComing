@@ -15,8 +15,8 @@ Deger adi ezberleme — asagidaki tablodan hissini bul, hangi ayara dokunacagini
 | "Ilk gunler cok zor, ogrenemeden oluyorum" | Gun Egrileri > **Gece Siddeti** egrisinin ILK gunleri | Ilk keyframe'leri DUSUR (orn. gun1'i 0.5 -> 0.4) veya rampi UZAT (1.0'a gun 7 yerine gun 10'da cikar) |
 | "Ilk gunler cok kolay, sikiliyorum" | Ayni egri | Ilk degerleri YUKSELT veya rampi KISALT |
 | "Gec oyunda tehdit hissetmiyorum, para birikiyor" | **SpawnBatchGrowthPerCycle** + **MaxSpawnBatch** | ARTIR (kalabalik buyur) |
-| "Zombiler sunger oldu, oldurmek zevksiz" | **ZombieHpGrowthPerCycle** DUSUR + **SpawnBatchGrowthPerCycle** ARTIR | Zorluk HP'den degil KALABALIKTAN gelsin (tasarim ilkemiz) |
-| "Ekran zombi doldu, telefon kaldirmaz" | **MaxAliveZombies** | DUSUR (performans tavani) |
+| "Zombiler sunger oldu, oldurmek zevksiz" | Enemy Definition base HP + **SpawnBatchGrowthPerCycle** | V1 HP gunle buyumez; base HP'yi dusur veya tehdidi kalabalikla artir |
+| "Ekran zombi doldu, PC hedefinde frame butcesi asildi" | **MaxAliveZombies** | Profil kaniti olmadan 900 ustune cikarma; once Player capture + soak al |
 | "Tamir cok pahali, kurtulamiyorum" | Tamir Maliyeti > **RepairBase*Cost** | DUSUR |
 | "Tamir cok ucuz, duvar onemsizlesti" | Ayni | ARTIR |
 | "Gunduz cok sakin / cok yogun" | Faz Yogunluklari > **DayIntensity** | 0.55 taban; artir/azalt |
@@ -36,8 +36,9 @@ Deger adi ezberleme — asagidaki tablodan hissini bul, hangi ayara dokunacagini
 - Ornek (su anki default Gece Siddeti): `(gun1, 0.5) (gun3, 0.7) (gun5, 0.85) (gun7, 1.0)`
   -> ilk hafta kademeli isinma, sonra tam siddet. "Olum bandini" DAY 2-3'ten DAY 6+'ya
   tasiyan degisiklik BUYDU (kod degil, bu dort nokta).
-- Uc egri var: **Gece Siddeti** (spawn temposunu buker — en cok kullanacagin),
-  **Zombi HP** (o gunun zombilerini sisirir/inceltilir), **Spawn Batch** (dalga kalabaligi).
+- Iki aktif spawn egrisi var: **Gece Siddeti** (Night/Dusk-end temposu) ve
+  **Spawn Batch** (gunun quantity carpani). **Zombi HP** egrisi V1 quantity-only runtime'da
+  dormant legacy alandir; oyunu degistirmez.
 
 ## 3. Deger sozlugu (sade dille)
 
@@ -45,12 +46,12 @@ Deger adi ezberleme — asagidaki tablodan hissini bul, hangi ayara dokunacagini
 | Alan | Ne demek? | Default | Guvenli aralik |
 |---|---|---|---|
 | ZombieBaseHP | Gun 1 zombisinin cani | 20 | 10-40 |
-| ZombieHpGrowthPerCycle | Her gun cana eklenen oran (0.40 = gun basi +%40 taban) | 0.40 | 0.2-0.6 |
-| ZombieBaseDamage / DamagePerCycle | Duvara vurus hasari (taban + gunluk artis) | 5 / 0.5 | - |
+| ZombieHpGrowthPerCycle | V1 quantity-only runtime'da dormant legacy alan | 0 | Degistirme |
+| ZombieBaseDamage / DamagePerCycle | Base damage Enemy Definition owner'indadir; gunluk artis dormant | 5 / 0 | Definition uzerinden tune et |
 | SpawnBatchSize | Tek seferde dogan zombi (taban) | 2 | 1-4 |
 | SpawnBatchGrowthPerCycle | Kalabaligin gunluk buyumesi (0.15 = gun basi +%15) | 0.15 | 0.05-0.25 |
 | MaxSpawnBatch | Tek dogumda ust sinir | 16 | 8-24 |
-| MaxAliveZombies | Ekrandaki toplam zombi tavani (PERFORMANS sigortasi) | 900 | telefon testine gore |
+| MaxAliveZombies | Sahadaki toplam zombi tavani (PC performans sigortasi) | 900 | Player capture + soak kanitina gore |
 | BaseSpawnInterval / MinSpawnInterval | Dogumlar arasi sure (taban / taban asagi kirpma) | 0.95 / 0.35 | - |
 
 ### Faz Yogunluklari (gunun ritmi)
@@ -75,10 +76,17 @@ baslayacak ("kosucular gun 5'te acilsin", "her 5. gece kanli ay" buradan ayarlan
 
 ## 4. Meraklisina: formullerin sade hali
 
-- Zombi cani (gun G) = BaseHP x (1 + (G-1) x HpGrowth) x HP-egrisi(G)
-  - Ornek: gun 5 = 20 x (1 + 4 x 0.4) = 52 can
+- Zombi cani (gun G) = aktif Enemy Definition base HP; V1'de gun/cycle ile buyumez.
 - Dogum kalabaligi = BatchSize x faz-yogunlugu x (1 + (G-1) x BatchGrowth) x Batch-egrisi(G), tavan MaxSpawnBatch
 - Dogum sikligi = BaseInterval / faz-yogunlugu (asagisi MinSpawnInterval'da kirpilir)
+
+### Spawn Runtime Contract paneli
+
+Difficulty Tuner'daki bu panel, `Preview Day` ile BaseSpawn ve Night day-curve carpanlarini
+tek yerde gosterir. Play Mode'da live phase, alive/cap, Pending backlog, last/total demand-spawn
+ve effective interval okunur. Backlog sayisini elle tune etmezsin: `PreserveDemand` politikasi
+cap doluyken talebi kayipsiz saklar. `MaxAliveZombies` sahadaki tavani, `MaxSpawnBatch` kapasite
+acildiginda backlog'un frame basina ne kadar hizli eriyecegini belirler.
 
 ## 5. Olcum botu nasil yorumlanir?
 

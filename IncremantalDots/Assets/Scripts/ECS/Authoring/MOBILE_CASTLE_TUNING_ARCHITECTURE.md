@@ -78,6 +78,10 @@ Profile atanmışken aynı isimli shadow Inspector difficulty alanları fallback
 difficulty config için aynı `MobileCastleTuningResolver.ApplyDifficultyProfile` metodunu,
 ekonomi fiyatları için aynı `ResolveEconomyPriceTuning` metodunu kullanır. Gün eğrisi/
 SpecialNight sample üretimi de aynı `ResolveDaySample` metodundadır; iki ayrı formül tutulmaz.
+`Spawn Runtime Contract` paneli bu owner zincirini day preview + live ECS telemetry olarak tek
+yüzeyde toplar. `PendingEnemies` read-only gösterilir; backlog policy tune edilmez. Designer yalnız
+BaseSpawn curve/interval, phase multipliers, `MaxSpawnBatch` drain hızı ve `MaxAliveZombies`
+active cap değerlerini profile üzerinden değiştirir.
 
 `MobileCastleSceneSetupWindow` yalnız owner tarafından açıkça çalıştırılan initializer/repair aracıdır. Runtime owner değildir. Tool'un yazdığı değerler scene/profile asset'e kaydedildikten sonra yukarıdaki sahiplik kuralına girer.
 

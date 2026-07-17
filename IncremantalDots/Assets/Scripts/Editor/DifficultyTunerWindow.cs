@@ -20,6 +20,7 @@ namespace DeadWalls
         private bool _foldCurves = true;
         private bool _foldEscalation = true;
         private bool _foldIntensity;
+        private bool _foldSpawnContract = true;
         private bool _foldRepair;
         private bool _foldEconomyPrices = true;
         private bool _foldFuture;
@@ -28,6 +29,8 @@ namespace DeadWalls
         private float _botTimeScale = 3f;
         private int _botTargetDay = 20;
         private bool _botAutoRestart = true;
+        private int _spawnPreviewDay = 1;
+        private double _nextSpawnTelemetryRepaint;
 
         private List<int> _deaths = new List<int>();
         private int _maxDayReached;
@@ -50,6 +53,23 @@ namespace DeadWalls
             if (_profile == null)
                 _profile = AssetDatabase.LoadAssetAtPath<DifficultyProfileSO>(
                     MobileCastleSceneSetupWindow.DifficultyProfilePath);
+
+            EditorApplication.update -= RepaintLiveTelemetry;
+            EditorApplication.update += RepaintLiveTelemetry;
+        }
+
+        private void OnDisable()
+        {
+            EditorApplication.update -= RepaintLiveTelemetry;
+        }
+
+        private void RepaintLiveTelemetry()
+        {
+            if (!Application.isPlaying || EditorApplication.timeSinceStartup < _nextSpawnTelemetryRepaint)
+                return;
+
+            _nextSpawnTelemetryRepaint = EditorApplication.timeSinceStartup + 0.25d;
+            Repaint();
         }
 
         private void OnGUI()
@@ -73,6 +93,7 @@ namespace DeadWalls
             DrawCurvesSection();
             DrawEscalationSection();
             DrawIntensitySection();
+            DrawSpawnContractSection();
             DrawRepairSection();
             DrawEconomyPriceSection();
             DrawFutureSection();
@@ -157,7 +178,7 @@ namespace DeadWalls
                 DrawBigCurve("NightIntensityByDay", "Gece Siddeti",
                     "Erken oyun rampi: dusuk basla, kacinci gunde 1.0'a cikacagini belirle.");
                 DrawBigCurve("ZombieHpMultByDay", "Zombi HP",
-                    "Lineer HP buyumesine EK gun carpani.");
+                    "V1 quantity-only: dormant legacy egri, runtime zombi HP'sini degistirmez.");
                 DrawBigCurve("SpawnBatchMultByDay", "Spawn Batch",
                     "Kalabalik carpani (intensity ve cycle buyumesine EK).");
                 EditorGUILayout.PropertyField(_profileSO.FindProperty("SampleDays"));
@@ -196,6 +217,10 @@ namespace DeadWalls
                 EditorGUILayout.Space(4);
                 DrawProp("BaseSpawnInterval");
                 DrawProp("MinSpawnInterval");
+                EditorGUILayout.HelpBox(
+                    "V1 quantity-only: Zombie HP/Damage growth alanlari dormanttir; aktif enemy "
+                    + "base stat owner'i EnemyDefinitionSO'dur. Zorluk Spawn Batch/interval ve "
+                    + "faz yogunluklariyla ayarlanir.", MessageType.None);
             }
         }
 
@@ -213,6 +238,92 @@ namespace DeadWalls
                 DrawProp("NightIntensity");
                 DrawProp("DawnIntensity");
             }
+        }
+
+        private void DrawSpawnContractSection()
+        {
+            _foldSpawnContract = DrawSectionHeader(_foldSpawnContract,
+                "Spawn Runtime Contract", "day curve / phase / backlog / active cap");
+            if (!_foldSpawnContract)
+                return;
+
+            using (new EditorGUILayout.VerticalScope("box"))
+            {
+                int sampleDays = Mathf.Clamp(_profile.SampleDays, 1, 200);
+                _spawnPreviewDay = EditorGUILayout.IntSlider(
+                    "Preview Day", Mathf.Clamp(_spawnPreviewDay, 1, sampleDays), 1, sampleDays);
+
+                DifficultyDaySample sample = MobileCastleTuningResolver.ResolveDaySample(
+                    _profile, _spawnPreviewDay);
+                EditorGUILayout.LabelField("BaseSpawn day curve",
+                    $"x{sample.SpawnBatchMult:0.###} quantity");
+                EditorGUILayout.LabelField("Night/Dusk-end day curve",
+                    $"x{sample.NightIntensityMult:0.###} intensity");
+                EditorGUILayout.LabelField("Phase multipliers",
+                    $"DAY x{_profile.DayIntensity:0.###}  |  DUSK x{_profile.DuskStartIntensity:0.###}->x{_profile.DuskEndIntensity:0.###}  |  NIGHT x{_profile.NightIntensity:0.###}  |  DAWN x{_profile.DawnIntensity:0.###}");
+                EditorGUILayout.LabelField("Demand / drain",
+                    $"batch {_profile.SpawnBatchSize}, cycle +{_profile.SpawnBatchGrowthPerCycle:P0}, max {_profile.MaxSpawnBatch}/frame");
+                EditorGUILayout.LabelField("Active cap", _profile.MaxAliveZombies.ToString("N0"));
+
+                EditorGUILayout.HelpBox(
+                    "Backlog bir designer secenegi degildir: V1 PreserveDemand politikasi cap "
+                    + "doluyken talebi PendingEnemies icinde exact korur. MaxAliveZombies sahadaki "
+                    + "active tavani, MaxSpawnBatch ise kapasite acilinca frame basina drain tavanidir.",
+                    MessageType.Info);
+
+                DrawSpawnRuntimeTelemetry();
+            }
+        }
+
+        private static void DrawSpawnRuntimeTelemetry()
+        {
+            EditorGUILayout.Space(4f);
+            EditorGUILayout.LabelField("Live Runtime", EditorStyles.boldLabel);
+            if (!Application.isPlaying)
+            {
+                EditorGUILayout.LabelField(
+                    "Play Mode'da phase, alive, backlog ve demand/drain telemetrisi burada gorunur.",
+                    EditorStyles.miniLabel);
+                return;
+            }
+
+            World world = World.DefaultGameObjectInjectionWorld;
+            if (world == null || !world.IsCreated)
+            {
+                EditorGUILayout.LabelField("ECS world henuz hazir degil.", EditorStyles.miniLabel);
+                return;
+            }
+
+            EntityManager em = world.EntityManager;
+            using EntityQuery configQuery = em.CreateEntityQuery(
+                typeof(MobileCastleCombatConfig),
+                typeof(ContinuousSiegeCycleData),
+                typeof(ContinuousSpawnBudgetData));
+            using EntityQuery waveQuery = em.CreateEntityQuery(typeof(WaveStateData));
+            if (configQuery.CalculateEntityCount() != 1 || waveQuery.CalculateEntityCount() != 1)
+            {
+                EditorGUILayout.LabelField("Spawn singleton'lari henuz hazir degil.", EditorStyles.miniLabel);
+                return;
+            }
+
+            Entity configEntity = configQuery.GetSingletonEntity();
+            MobileCastleCombatConfig config = em.GetComponentData<MobileCastleCombatConfig>(configEntity);
+            ContinuousSiegeCycleData cycle = em.GetComponentData<ContinuousSiegeCycleData>(configEntity);
+            ContinuousSpawnBudgetData budget = em.GetComponentData<ContinuousSpawnBudgetData>(configEntity);
+            WaveStateData wave = em.GetComponentData<WaveStateData>(waveQuery.GetSingletonEntity());
+
+            EditorGUILayout.LabelField("Phase / day", $"{cycle.Phase} / {Mathf.Max(1, wave.CurrentWave)}");
+            EditorGUILayout.LabelField("Alive / active cap",
+                $"{Mathf.Max(0, wave.ZombiesAlive):N0} / {Mathf.Max(0, config.MaxAliveZombies):N0}");
+            EditorGUILayout.LabelField("Pending backlog", System.Math.Max(0L, budget.PendingEnemies).ToString("N0"));
+            EditorGUILayout.LabelField("Last demand / spawn",
+                $"{Mathf.Max(0, budget.LastDemandedEnemies):N0} / {Mathf.Max(0, budget.LastSpawnedEnemies):N0}");
+            EditorGUILayout.LabelField("Total demand / spawn",
+                $"{System.Math.Max(0L, budget.TotalDemandedEnemies):N0} / {System.Math.Max(0L, budget.TotalSpawnedEnemies):N0}");
+            EditorGUILayout.LabelField("Live multipliers",
+                $"day x{budget.DayQuantityMultiplier:0.###}  |  phase x{budget.PhaseIntensityMultiplier:0.###}");
+            EditorGUILayout.LabelField("Demand / interval / drain cap",
+                $"{Mathf.Max(0, budget.DemandPerInterval):N0} / {Mathf.Max(0f, budget.EffectiveSpawnInterval):0.###}s / {Mathf.Max(0, config.MaxSpawnBatch):N0}");
         }
 
         private void DrawRepairSection()

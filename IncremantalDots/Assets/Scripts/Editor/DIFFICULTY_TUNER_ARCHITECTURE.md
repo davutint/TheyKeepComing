@@ -28,7 +28,8 @@ tek profil iterasyonuyla, KOD YAZMADAN tasindi).
 4. **Sistem tuketicileri:**
    - `ContinuousSiegeCycleSystem`: Night (ve Dusk-END lerp hedefi) intensity'sine gunun
      `NightIntensityMult`'u; `ConfigureMobileWave`'e gunun `ZombieHpMult`'u gecirilir.
-   - `MobileWaveUtility.ConfigureMobileWave(ref wave, config, dayHpMult=1)`: HP'ye ek carpan.
+   - `MobileWaveUtility.ConfigureMobileWave(ref wave, config)`: V1 quantity-only; enemy HP day
+     curve/growth okumaz, base stat aktif `EnemyDefinitionSO`/catalog'dan gelir.
    - `WaveSpawnSystem` (continuous): batch'e gunun `SpawnBatchMult`'u.
 5. **`DifficultyTunerWindow`** (Window > DeadWalls > Difficulty Tuner):
    - Profil sec/inline duzenle (CurveField'lar dahil), Default olustur/bul.
@@ -40,6 +41,12 @@ tek profil iterasyonuyla, KOD YAZMADAN tasindi).
    - **Run Bot**: profili canli uygular, RestartGame + Long Run Simulator'u baslatir
      (OpenAndStart koprusu). **Son Olcumu Ozetle**: en yeni CSV'den olum gunleri +
      ortalama + ulasilan en yuksek gun.
+   - **Spawn Runtime Contract**: secilen gun icin BaseSpawn quantity ve Night/Dusk-end
+     day-curve carpanlarini; profile-owned phase, MaxSpawnBatch ve MaxAlive baseline'larini
+     tek panelde ozetler. Play Mode'da phase/day, alive/cap, exact Pending backlog,
+     last/total demand-spawn ve effective interval telemetrisini canli gosterir.
+     Backlog policy ayarlanabilir enum degildir; `PreserveDemand` read-only contract olarak
+     aciklanir, yalniz drain hizi `MaxSpawnBatch` ve saha tavani `MaxAliveZombies` tune edilir.
 
 ## Dogrulama (2026-07-07)
 

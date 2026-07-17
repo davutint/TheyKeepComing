@@ -49,7 +49,7 @@ namespace DeadWalls
         [Header("Gun Egrileri (x = gun, y = carpan; 1 = etkisiz)")]
         [Tooltip("Gece (ve dusk-sonu) intensity'sine gun carpani. Erken oyun rampi burada: orn. (1, 0.6) (2, 0.8) (3, 1).")]
         public AnimationCurve NightIntensityByDay = AnimationCurve.Constant(1f, 60f, 1f);
-        [Tooltip("Zombi HP'sine gun carpani (lineer buyumeye EK).")]
+        [Tooltip("V1 quantity-only runtime'da dormant legacy alan; zombi HP'sini degistirmez.")]
         public AnimationCurve ZombieHpMultByDay = AnimationCurve.Constant(1f, 60f, 1f);
         [Tooltip("RunDifficultyProfile BaseSpawn gun egrisi: spawn batch'ine intensity ve cycle buyumesinden sonra uygulanan carpan.")]
         public AnimationCurve SpawnBatchMultByDay = AnimationCurve.Constant(1f, 60f, 1f);
