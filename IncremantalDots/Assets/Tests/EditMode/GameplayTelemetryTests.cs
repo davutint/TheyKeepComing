@@ -753,6 +753,133 @@ namespace DeadWalls.Tests
             Assert.That(effectError, Does.Contain("Effects[0]"));
         }
 
+        [Test]
+        public void AbilityCastFactory_CapturesCanonicalAbilityResultSnapshots()
+        {
+            AbilityCastTelemetryPayload fireball = AbilityCastTelemetryFactory.CreateFireball(
+                SiegeCyclePhase.Dusk,
+                45f);
+            Assert.That(fireball.Ability, Is.EqualTo("fireball"));
+            Assert.That(fireball.Phase, Is.EqualTo("dusk"));
+            Assert.That(fireball.Cooldown, Is.EqualTo(45f));
+            Assert.That(fireball.Targets, Is.Zero);
+            Assert.That(fireball.Repair, Is.Zero);
+
+            AbilityCastTelemetryPayload rally = AbilityCastTelemetryFactory.CreateRally(
+                SiegeCyclePhase.Day,
+                60f,
+                173);
+            Assert.That(rally.Ability, Is.EqualTo("rally"));
+            Assert.That(rally.Phase, Is.EqualTo("day"));
+            Assert.That(rally.Cooldown, Is.EqualTo(60f));
+            Assert.That(rally.Targets, Is.EqualTo(173));
+            Assert.That(rally.Repair, Is.Zero);
+
+            AbilityCastTelemetryPayload repair =
+                AbilityCastTelemetryFactory.CreateEmergencyRepair(
+                    SiegeCyclePhase.Night,
+                    120f,
+                    240f);
+            Assert.That(repair.Ability, Is.EqualTo("emergency_repair"));
+            Assert.That(repair.Phase, Is.EqualTo("night"));
+            Assert.That(repair.Cooldown, Is.EqualTo(120f));
+            Assert.That(repair.Targets, Is.EqualTo(1));
+            Assert.That(repair.Repair, Is.EqualTo(240f));
+        }
+
+        [Test]
+        public void TryEmitAbilityCast_ProducesVersionedMachineReadableEnvelope()
+        {
+            GameplayTelemetryRecord observed = default;
+            bool received = false;
+            void OnEmitted(GameplayTelemetryRecord record)
+            {
+                observed = record;
+                received = true;
+            }
+
+            AbilityCastTelemetryPayload payload = AbilityCastTelemetryFactory.CreateRally(
+                SiegeCyclePhase.Dawn,
+                60f,
+                1000);
+            GameplayTelemetry.Emitted += OnEmitted;
+            try
+            {
+                Assert.That(GameplayTelemetry.TryEmitAbilityCast(
+                    " run_ability_1000 ", payload, out GameplayTelemetryRecord emitted,
+                    out string error), Is.True, error);
+                Assert.That(received, Is.True);
+                Assert.That(observed.RunId, Is.EqualTo("run_ability_1000"));
+                Assert.That(emitted.EventName, Is.EqualTo("ability_cast"));
+                Assert.That(emitted.SchemaVersion, Is.EqualTo(1));
+
+                GameplayTelemetryEnvelope envelope =
+                    JsonUtility.FromJson<GameplayTelemetryEnvelope>(emitted.SerializedEnvelope);
+                AbilityCastTelemetryPayload decoded =
+                    JsonUtility.FromJson<AbilityCastTelemetryPayload>(envelope.PayloadJson);
+                Assert.That(envelope.EventName, Is.EqualTo("ability_cast"));
+                Assert.That(envelope.SchemaVersion, Is.EqualTo(1));
+                Assert.That(decoded.Ability, Is.EqualTo("rally"));
+                Assert.That(decoded.Phase, Is.EqualTo("dawn"));
+                Assert.That(decoded.Cooldown, Is.EqualTo(60f));
+                Assert.That(decoded.Targets, Is.EqualTo(1000));
+                Assert.That(decoded.Repair, Is.Zero);
+            }
+            finally
+            {
+                GameplayTelemetry.Emitted -= OnEmitted;
+            }
+        }
+
+        [Test]
+        public void TryEmitAbilityCast_RejectsInvalidIdentityPhaseCooldownAndResultShape()
+        {
+            var payload = new AbilityCastTelemetryPayload
+            {
+                Ability = AbilityCastTelemetryContract.Fireball,
+                Phase = "day",
+                Cooldown = 45f,
+                Targets = 0,
+                Repair = 0f
+            };
+
+            payload.Ability = "arrow_storm";
+            Assert.That(GameplayTelemetry.TryEmitAbilityCast(
+                "run_invalid_ability", payload, out _, out string abilityError), Is.False);
+            Assert.That(abilityError, Does.Contain("ability kimligi"));
+
+            payload.Ability = AbilityCastTelemetryContract.Fireball;
+            payload.Phase = "blood_moon";
+            Assert.That(GameplayTelemetry.TryEmitAbilityCast(
+                "run_invalid_phase", payload, out _, out string phaseError), Is.False);
+            Assert.That(phaseError, Does.Contain("phase kimligi"));
+
+            payload.Phase = "night";
+            payload.Cooldown = 0f;
+            Assert.That(GameplayTelemetry.TryEmitAbilityCast(
+                "run_invalid_cooldown", payload, out _, out string cooldownError), Is.False);
+            Assert.That(cooldownError, Does.Contain("cooldown"));
+
+            payload.Cooldown = 45f;
+            payload.Targets = 1;
+            Assert.That(GameplayTelemetry.TryEmitAbilityCast(
+                "run_speculative_fireball", payload, out _, out string fireballError), Is.False);
+            Assert.That(fireballError, Does.Contain("speculative"));
+
+            payload.Ability = AbilityCastTelemetryContract.Rally;
+            payload.Targets = ArcherCapacityUtility.MaxTotalArchers + 1;
+            Assert.That(GameplayTelemetry.TryEmitAbilityCast(
+                "run_invalid_rally", payload, out _, out string rallyError), Is.False);
+            Assert.That(rallyError, Does.Contain("rally"));
+
+            payload.Ability = AbilityCastTelemetryContract.EmergencyRepair;
+            payload.Targets = 1;
+            payload.Repair = 0f;
+            Assert.That(GameplayTelemetry.TryEmitAbilityCast(
+                "run_invalid_repair", payload, out _, out string repairError), Is.False);
+            Assert.That(repairError, Does.Contain("emergency repair"));
+        }
+
         private MetaUpgradeSO CreateUpgrade(string id, int maxLevel)
         {
             MetaUpgradeSO upgrade = ScriptableObject.CreateInstance<MetaUpgradeSO>();

@@ -53,6 +53,8 @@ Fireball damage/radius/cooldown ise Castle Heart node effect'leriyle değişir.
 - Save/Continue sonrası üç ability cooldown gösterimi runtime state ile aynıdır.
 - Ilk Night'ta ilk hazir gercek slot pulse olur; kabul edilmis `1/2/3` hotkey durable key-hint
   flag'ini yazar, ayni slotun mouse button'i bu ogretim flag'ini yazmaz.
+- Kabul edilen Fireball/Rally/Emergency Repair kullanimi tek `ability_cast` telemetry kaydi
+  uretir; rejected tekrarlar ve exact Continue duplicate kayit uretmez.
 
 Otomatik regresyon için `HudAbilityBarPresentationTests`, `ActiveAbilityRulesTests`,
 `MobileCastleTuningResolverTests`, `RunPersistenceTests` ve hedefli

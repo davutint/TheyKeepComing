@@ -139,6 +139,30 @@ namespace DeadWalls
         public float NextNightDelta;
     }
 
+    [Serializable]
+    public sealed class AbilityCastTelemetryPayload
+    {
+        public string Ability;
+        public string Phase;
+        public float Cooldown;
+        public int Targets;
+        public float Repair;
+    }
+
+    internal static class AbilityCastTelemetryContract
+    {
+        internal const string Fireball = "fireball";
+        internal const string Rally = "rally";
+        internal const string EmergencyRepair = "emergency_repair";
+
+        internal static bool IsAbility(string ability)
+        {
+            return string.Equals(ability, Fireball, StringComparison.Ordinal)
+                || string.Equals(ability, Rally, StringComparison.Ordinal)
+                || string.Equals(ability, EmergencyRepair, StringComparison.Ordinal);
+        }
+    }
+
     internal static class CouncilResolvedTelemetryContract
     {
         internal const string OptionA = "option_a";
@@ -390,6 +414,8 @@ namespace DeadWalls
         public const int HeartNodeBoughtSchemaVersion = 1;
         public const string CouncilResolvedEventName = "council_resolved";
         public const int CouncilResolvedSchemaVersion = 1;
+        public const string AbilityCastEventName = "ability_cast";
+        public const int AbilityCastSchemaVersion = 1;
 
         public static event Action<GameplayTelemetryRecord> Emitted;
 
@@ -519,6 +545,30 @@ namespace DeadWalls
             return EmitValidated(
                 CouncilResolvedEventName,
                 CouncilResolvedSchemaVersion,
+                normalizedRunId,
+                payload,
+                out record,
+                out error);
+        }
+
+        public static bool TryEmitAbilityCast(
+            string runId,
+            AbilityCastTelemetryPayload payload,
+            out GameplayTelemetryRecord record,
+            out string error)
+        {
+            record = default;
+            if (!TryNormalizeRunId(runId, AbilityCastEventName, out string normalizedRunId,
+                    out error))
+            {
+                return false;
+            }
+            if (!TryValidateAbilityCast(payload, out error))
+                return false;
+
+            return EmitValidated(
+                AbilityCastEventName,
+                AbilityCastSchemaVersion,
                 normalizedRunId,
                 payload,
                 out record,
@@ -865,6 +915,63 @@ namespace DeadWalls
             return true;
         }
 
+        internal static bool TryValidateAbilityCast(
+            AbilityCastTelemetryPayload payload,
+            out string error)
+        {
+            if (payload == null)
+            {
+                error = "ability_cast payload bos.";
+                return false;
+            }
+            if (!AbilityCastTelemetryContract.IsAbility(payload.Ability))
+            {
+                error = "ability_cast ability kimligi gecersiz.";
+                return false;
+            }
+            if (!PhaseChangedTelemetryFactory.IsContractPhase(payload.Phase))
+            {
+                error = "ability_cast phase kimligi gecersiz.";
+                return false;
+            }
+            if (payload.Cooldown <= 0f || float.IsNaN(payload.Cooldown)
+                || float.IsInfinity(payload.Cooldown) || payload.Targets < 0
+                || float.IsNaN(payload.Repair) || float.IsInfinity(payload.Repair)
+                || payload.Repair < 0f)
+            {
+                error = "ability_cast cooldown veya sonuc snapshot'i gecersiz.";
+                return false;
+            }
+
+            if (string.Equals(payload.Ability, AbilityCastTelemetryContract.Fireball,
+                    StringComparison.Ordinal))
+            {
+                if (payload.Targets != 0 || !Mathf.Approximately(payload.Repair, 0f))
+                {
+                    error = "ability_cast fireball kabul eventi speculative sonuc tasiyamaz.";
+                    return false;
+                }
+            }
+            else if (string.Equals(payload.Ability, AbilityCastTelemetryContract.Rally,
+                         StringComparison.Ordinal))
+            {
+                if (payload.Targets > ArcherCapacityUtility.MaxTotalArchers
+                    || !Mathf.Approximately(payload.Repair, 0f))
+                {
+                    error = "ability_cast rally hedef/repair snapshot'i gecersiz.";
+                    return false;
+                }
+            }
+            else if (payload.Targets != 1 || payload.Repair <= 0f)
+            {
+                error = "ability_cast emergency repair sonuc snapshot'i gecersiz.";
+                return false;
+            }
+
+            error = string.Empty;
+            return true;
+        }
+
         private static bool TryValidateCouncilEffect(
             CouncilResolvedTelemetryEffect effect,
             out string error)
@@ -1148,6 +1255,49 @@ namespace DeadWalls
         }
     }
 
+    internal static class AbilityCastTelemetryFactory
+    {
+        internal static AbilityCastTelemetryPayload CreateFireball(
+            SiegeCyclePhase phase,
+            float cooldown)
+        {
+            return Create(AbilityCastTelemetryContract.Fireball, phase, cooldown, 0, 0f);
+        }
+
+        internal static AbilityCastTelemetryPayload CreateRally(
+            SiegeCyclePhase phase,
+            float cooldown,
+            int targets)
+        {
+            return Create(AbilityCastTelemetryContract.Rally, phase, cooldown, targets, 0f);
+        }
+
+        internal static AbilityCastTelemetryPayload CreateEmergencyRepair(
+            SiegeCyclePhase phase,
+            float cooldown,
+            float repair)
+        {
+            return Create(AbilityCastTelemetryContract.EmergencyRepair, phase, cooldown, 1, repair);
+        }
+
+        private static AbilityCastTelemetryPayload Create(
+            string ability,
+            SiegeCyclePhase phase,
+            float cooldown,
+            int targets,
+            float repair)
+        {
+            return new AbilityCastTelemetryPayload
+            {
+                Ability = ability,
+                Phase = PhaseChangedTelemetryFactory.ToContractPhase(phase),
+                Cooldown = cooldown,
+                Targets = targets,
+                Repair = repair
+            };
+        }
+    }
+
     internal static class RunStartedTelemetryFactory
     {
         internal static RunStartedTelemetryPayload Create(
@@ -1258,7 +1408,7 @@ namespace DeadWalls
                 || string.Equals(phase, "dawn", StringComparison.Ordinal);
         }
 
-        private static string ToContractPhase(SiegeCyclePhase phase)
+        internal static string ToContractPhase(SiegeCyclePhase phase)
         {
             switch (phase)
             {

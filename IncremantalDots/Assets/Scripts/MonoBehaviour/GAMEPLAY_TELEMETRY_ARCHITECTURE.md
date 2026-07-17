@@ -132,6 +132,29 @@ Continue ayni karari tekrar yaymaz; unresolved active kart ise mevcut exact payl
 olur ve oyuncu daha sonra karar verdiginde tek event uretir. Emergency Council iptal edilen V1
 kapsamina dahil degildir.
 
+## `ability_cast` v1
+
+`GameManager`, yalniz Fireball, Rally veya Emergency Repair canonical transaction'i tamamen kabul
+edildikten sonra tek event uretir:
+
+- payload: `Ability`, `Phase`, `Cooldown`, `Targets`, `Repair`
+- ability identity: `fireball/rally/emergency_repair`
+- phase: transaction anindaki canonical `day/dusk/night/dawn`
+- cooldown: commit sonrasinda baslatilan resolved cooldown remaining degeri
+- Rally `Targets`: commit aninda buff'i alan canonical toplam archer sayisi (`0..1000`)
+- Emergency Repair: `Targets=1`, `Repair` ise Wall'a gercekten eklenen HP farkidir
+
+Fireball world-point projectile'i kabul aninda yaratilir; isabet ve hasar daha sonra
+`FireballStrikeSystem` tarafindan cozulur. Bu nedenle `ability_cast` Fireball icin speculative hit
+sayisi uydurmaz ve `Targets=0 / Repair=0` yazar. Isabet sonucuna ileride ihtiyac duyulursa ayri,
+impact-owner'li bir event tanimlanir; cast eventi ECS damage job'ini senkronize etmez.
+
+Locked/cooldown/pause/Game Over/phase/Wall guard'inda reddedilen kullanim sifir event uretir.
+Rally'nin aktifken tekrar kullanimi, Fireball cooldown tekrar cast'i ve full/dead/off-phase
+Emergency Repair de event disidir. Exact Continue, daha once kabul edilmis ability transaction'ini
+tekrar yaymaz. Event yeni ability state owner'i veya save alani kurmaz; mevcut
+`GameManager + CastleYardPrepState + FireballProjectile` zincirini snapshot'lar.
+
 ## Genisleme kurali
 
 Tracker'daki sonraki event'ler ayni `GameplayTelemetryRecord` cikisini kullanir. Yeni manager,

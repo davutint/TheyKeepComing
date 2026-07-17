@@ -269,5 +269,31 @@ namespace DeadWalls
                     $"[GameManager] council_resolved telemetry reddedildi: {error}");
             }
         }
+
+        private SiegeCyclePhase ResolveAbilityTelemetryPhase()
+        {
+            return TryGetContinuousSiegeCycle(out ContinuousSiegeCycleData cycle)
+                ? cycle.Phase
+                : ContinuousSiegeCycle.Phase;
+        }
+
+        private void TryEmitAbilityCastTelemetry(AbilityCastTelemetryPayload payload)
+        {
+            if (!_initialized || string.IsNullOrWhiteSpace(_currentRunId)
+                || !IsRunIdentityReadyForPhaseTelemetry())
+            {
+                return;
+            }
+
+            if (!GameplayTelemetry.TryEmitAbilityCast(
+                    _currentRunId,
+                    payload,
+                    out _,
+                    out string error))
+            {
+                UnityEngine.Debug.LogError(
+                    $"[GameManager] ability_cast telemetry reddedildi: {error}");
+            }
+        }
     }
 }

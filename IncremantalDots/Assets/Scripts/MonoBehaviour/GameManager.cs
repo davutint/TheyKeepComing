@@ -835,6 +835,10 @@ namespace DeadWalls
             _rallyCooldownRemaining = RallyCooldownDuration;
             _entityManager.SetComponentData(prepEntity, prep);
             CastleYardPrep = prep;
+            TryEmitAbilityCastTelemetry(AbilityCastTelemetryFactory.CreateRally(
+                ResolveAbilityTelemetryPhase(),
+                _rallyCooldownRemaining,
+                GetTotalArcherCount()));
             OnGameStateChanged?.Invoke();
             return true;
         }
@@ -898,10 +902,15 @@ namespace DeadWalls
             if (healedHp <= wall.CurrentHP + 0.001f)
                 return false;
 
+            float repairedHp = healedHp - wall.CurrentHP;
             wall.CurrentHP = healedHp;
             _entityManager.SetComponentData(_castleEntity, wall);
             Wall = wall;
             _emergencyRepairCooldownRemaining = EmergencyRepairCooldownDuration;
+            TryEmitAbilityCastTelemetry(AbilityCastTelemetryFactory.CreateEmergencyRepair(
+                ResolveAbilityTelemetryPhase(),
+                _emergencyRepairCooldownRemaining,
+                repairedHp));
             OnGameStateChanged?.Invoke();
             return true;
         }
@@ -4355,6 +4364,9 @@ namespace DeadWalls
             _entityManager.SetComponentData(projectile, LocalTransform.FromPosition(start));
             ActiveFireballProjectile = projectile;
 
+            TryEmitAbilityCastTelemetry(AbilityCastTelemetryFactory.CreateFireball(
+                ResolveAbilityTelemetryPhase(),
+                _fireballCooldownRemaining));
             OnGameStateChanged?.Invoke();
             return true;
         }

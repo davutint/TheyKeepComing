@@ -40,17 +40,24 @@ sinifinin parcasidir; `GameplayTelemetry.cs` ayni `DeadWalls` runtime assembly's
     `NextNightDelta=0` olmalidir. Bos active state'te ikinci expire yeni kayit uretmemelidir.
 18. Cozulmus Council sonrasi save/Continue yapildiginda ayni karar tekrar yayilmamalidir;
     affordability veya content gate'inde reddedilen secim de event uretmemelidir.
+19. Development combat acikken Fireball, Rally ve Night Emergency Repair sirayla kullanilir;
+    `ability_cast` kayitlari `fireball/rally/emergency_repair`, exact phase ve resolved cooldown
+    tasimalidir. Fireball `Targets=0/Repair=0`, Rally canonical archer totalini, Emergency Repair ise
+    `Targets=1` ve gercek Wall HP artisini vermelidir.
+20. Ayni ability cooldown/active-effect guard'inda tekrar denendiginde yeni event gelmemeli;
+    save/Continue daha once kabul edilen cast'leri tekrar yaymamalidir.
 
 Otomatik kapsam:
 
-- EditMode `GameplayTelemetryTests`: run/phase/resource/archer/Heart/Council payload factory'leri,
+- EditMode `GameplayTelemetryTests`: run/phase/resource/archer/Heart/Council/ability payload factory'leri,
   multi-resource canonical order, envelope serialization ve invalid identity/amount/result/
-  transition/cap/node/level/depth/cost/reveal/resolution/effect/night-delta guard'lari.
+  transition/cap/node/level/depth/cost/reveal/resolution/effect/night-delta/ability-result guard'lari.
 - PlayMode `GameplayTelemetryPlayModeTests`: gercek NewGameScene yeni-run emission'i, canonical
   phase/horde snapshot'i, ayni-phase idempotency, exact Continue duplicate guard'i, tek/iki kaynakli
   purchase commit event'leri, player archer buy/retrain transition snapshot'lari, canonical Castle
   Heart purchase/reveal snapshot'i, regular Council secim/expire/Continue snapshot'i ve rejected
-  transaction sifir-event guard'i.
+  transaction sifir-event guard'i; gercek Fireball/Rally/Emergency Repair commit/result snapshot'i
+  ile cooldown/rejected/Continue sifir-event davranisi.
 
 Harici analytics target'i bu kurulumun parcasi degildir; tracker'daki owner-karari maddesi
 onaylanmadan SDK, servis veya endpoint eklenmez.

@@ -25,6 +25,9 @@ iyileştirir.
   kaynağından yazar. Profile yoksa baked `CastleAuthoring.WallHP` fallback kalir.
 - `RunPersistence`: güncel v14 şemasında üç ability cooldown'ını ve aktif ability etkilerini
   exact saklar; v11 kayıtları Rally ve Emergency Repair hazır başlayacak şekilde migrate edilir.
+- `GameplayTelemetry`: yeni ability state sahiplenmeden, yalniz kabul edilmis canonical
+  transaction sonu `ability_cast` snapshot'ini yayinlar. Fireball kabul aninda speculative isabet
+  saymaz; Rally gerçek archer totalini, Emergency Repair gerçek HP farkini taşır.
 
 ### `ActiveAbilityState` contract'i
 

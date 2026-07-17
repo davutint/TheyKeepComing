@@ -25,6 +25,8 @@ namespace DeadWalls.Tests
             new List<GameplayTelemetryRecord>();
         private readonly List<GameplayTelemetryRecord> _councilResolvedRecords =
             new List<GameplayTelemetryRecord>();
+        private readonly List<GameplayTelemetryRecord> _abilityCastRecords =
+            new List<GameplayTelemetryRecord>();
         private readonly List<string> _purchaseEventOrder = new List<string>();
         private readonly List<UnityEngine.Object> _createdObjects =
             new List<UnityEngine.Object>();
@@ -49,6 +51,7 @@ namespace DeadWalls.Tests
             _archerChangedRecords.Clear();
             _heartNodeBoughtRecords.Clear();
             _councilResolvedRecords.Clear();
+            _abilityCastRecords.Clear();
             _purchaseEventOrder.Clear();
             GameplayTelemetry.Emitted += OnTelemetryEmitted;
             GameBootstrap.PendingAction = GameBootstrap.StartAction.None;
@@ -526,6 +529,99 @@ namespace DeadWalls.Tests
                 "Bos active state uzerindeki tekrar Expire duplicate event uretmemeli.");
         }
 
+        [UnityTest]
+        public IEnumerator AbilityTransactions_EmitCommittedResults_AndRejectedOrContinueEmitNothing()
+        {
+            GameManager gameManager = GameManager.Instance;
+            _records.Clear();
+            _abilityCastRecords.Clear();
+            gameManager.RestartGame();
+            for (int frame = 0; frame < 180 && _records.Count == 0; frame++)
+                yield return null;
+            Assert.That(_records.Count, Is.EqualTo(1),
+                "Ability telemetry oncesi run identity kurulmalidir.");
+            Assert.That(gameManager.TryEnableDevelopmentCombat(out string unlockMessage), Is.True,
+                unlockMessage);
+
+            World world = World.DefaultGameObjectInjectionWorld;
+            Assert.That(world, Is.Not.Null);
+            EntityManager entityManager = world.EntityManager;
+            using EntityQuery cycleQuery = entityManager.CreateEntityQuery(
+                typeof(ContinuousSiegeCycleData));
+            using EntityQuery wallQuery = entityManager.CreateEntityQuery(typeof(WallSegment));
+            Entity cycleEntity = cycleQuery.GetSingletonEntity();
+            Entity wallEntity = wallQuery.GetSingletonEntity();
+
+            ContinuousSiegeCycleData cycle =
+                entityManager.GetComponentData<ContinuousSiegeCycleData>(cycleEntity);
+            cycle.Phase = SiegeCyclePhase.Day;
+            entityManager.SetComponentData(cycleEntity, cycle);
+
+            _abilityCastRecords.Clear();
+            Assert.That(gameManager.TryCastFireball(Vector2.zero), Is.True);
+            Assert.That(_abilityCastRecords.Count, Is.EqualTo(1));
+            AbilityCastTelemetryPayload fireball =
+                JsonUtility.FromJson<AbilityCastTelemetryPayload>(
+                    _abilityCastRecords[0].PayloadJson);
+            Assert.That(fireball.Ability, Is.EqualTo("fireball"));
+            Assert.That(fireball.Phase, Is.EqualTo("day"));
+            Assert.That(fireball.Cooldown,
+                Is.EqualTo(gameManager.FireballCooldownDuration).Within(0.001f));
+            Assert.That(fireball.Targets, Is.Zero,
+                "Projectile kabul aninda speculative Fireball isabeti yazilmamali.");
+            Assert.That(fireball.Repair, Is.Zero);
+            Assert.That(gameManager.TryCastFireball(Vector2.one), Is.False);
+            Assert.That(_abilityCastRecords.Count, Is.EqualTo(1));
+
+            int rallyTargets = gameManager.GetTotalArcherCount();
+            Assert.That(gameManager.TryUseRally(), Is.True);
+            Assert.That(_abilityCastRecords.Count, Is.EqualTo(2));
+            AbilityCastTelemetryPayload rally =
+                JsonUtility.FromJson<AbilityCastTelemetryPayload>(
+                    _abilityCastRecords[1].PayloadJson);
+            Assert.That(rally.Ability, Is.EqualTo("rally"));
+            Assert.That(rally.Phase, Is.EqualTo("day"));
+            Assert.That(rally.Cooldown,
+                Is.EqualTo(gameManager.RallyCooldownDuration).Within(0.001f));
+            Assert.That(rally.Targets, Is.EqualTo(rallyTargets));
+            Assert.That(rally.Repair, Is.Zero);
+            Assert.That(gameManager.TryUseRally(), Is.False);
+            Assert.That(_abilityCastRecords.Count, Is.EqualTo(2));
+
+            cycle = entityManager.GetComponentData<ContinuousSiegeCycleData>(cycleEntity);
+            cycle.Phase = SiegeCyclePhase.Night;
+            entityManager.SetComponentData(cycleEntity, cycle);
+            WallSegment wall = entityManager.GetComponentData<WallSegment>(wallEntity);
+            wall.CurrentHP = wall.MaxHP * 0.5f;
+            entityManager.SetComponentData(wallEntity, wall);
+            float expectedRepair = SingleWallDefenseRules.HealByMaxPercent(
+                wall.CurrentHP,
+                wall.MaxHP,
+                gameManager.EmergencyRepairHealPercent) - wall.CurrentHP;
+
+            Assert.That(gameManager.TryUseEmergencyRepair(), Is.True);
+            Assert.That(_abilityCastRecords.Count, Is.EqualTo(3));
+            AbilityCastTelemetryPayload repair =
+                JsonUtility.FromJson<AbilityCastTelemetryPayload>(
+                    _abilityCastRecords[2].PayloadJson);
+            Assert.That(repair.Ability, Is.EqualTo("emergency_repair"));
+            Assert.That(repair.Phase, Is.EqualTo("night"));
+            Assert.That(repair.Cooldown,
+                Is.EqualTo(gameManager.EmergencyRepairCooldownDuration).Within(0.001f));
+            Assert.That(repair.Targets, Is.EqualTo(1));
+            Assert.That(repair.Repair, Is.EqualTo(expectedRepair).Within(0.001f));
+            Assert.That(gameManager.TryUseEmergencyRepair(), Is.False);
+            Assert.That(_abilityCastRecords.Count, Is.EqualTo(3));
+
+            Assert.That(gameManager.CompleteDevelopmentTestSession(), Is.True);
+            Assert.That(gameManager.SaveRunSnapshot(), Is.True);
+            Assert.That(gameManager.TryRestoreRunFromCheckpoint(), Is.True);
+            for (int frame = 0; frame < 5; frame++)
+                yield return null;
+            Assert.That(_abilityCastRecords.Count, Is.EqualTo(3),
+                "Exact Continue kabul edilmis ability transaction'larini tekrar yaymamali.");
+        }
+
         private CouncilEventCatalogSO CreateTelemetryCouncilCatalog()
         {
             CouncilEffectAtomSO gain =
@@ -722,6 +818,8 @@ namespace DeadWalls.Tests
             }
             else if (record.EventName == GameplayTelemetry.CouncilResolvedEventName)
                 _councilResolvedRecords.Add(record);
+            else if (record.EventName == GameplayTelemetry.AbilityCastEventName)
+                _abilityCastRecords.Add(record);
         }
     }
 }
