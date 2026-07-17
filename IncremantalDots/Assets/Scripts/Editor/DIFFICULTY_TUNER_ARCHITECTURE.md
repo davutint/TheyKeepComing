@@ -20,8 +20,11 @@ tek profil iterasyonuyla, KOD YAZMADAN tasindi).
      profile-driven additive EFF yuzdesi.
    - POPULATION CONTRACT: Dawn basina istenen survivor, kabul edilen kisi basi tek seferlik
      Food ve House bed quadratic fiyat egrisi.
-   - KOMSU FIYAT VERILERI: finite Arrow alanlari ayni asset'te kalir; Archer audit'i bunlari
-     kendi runtime yuzeyinde kapatir.
+   - FINITE ARROW CONTRACT: capacity/refill/verim ve CAP/EFF yatirim fiyatlari profile-owned
+     `MobileEconomyPriceTuning` baseline'ina bake edilir. Projectile basina tuketim tune edilmez;
+     `ArcherShootSystem` basarili pool rent'inden sonra sabit `1 Arrow` harcar.
+   - ARCHER DEFINITION CONTRACT: combat, buy/retrain base maliyeti, population cost ve
+     target-type growth tuning'i profile'a kopyalanmaz; aktif `ArcherDefinitionSO` asset'lerinde kalir.
    - M-C HAZIRLIK ISKELETI (sistem henuz okumuyor, veri hazir): `SpawnTable`
      (gun -> dusman tipi agirliklari) + `SpecialNights` (her N gunde ozel gece).
 2. **ECS tasima — `DifficultyDaySample` buffer'i:** AnimationCurve Burst'e giremez;
@@ -49,6 +52,13 @@ tek profil iterasyonuyla, KOD YAZMADAN tasindi).
      tek yerde duzenler. Preview ve Play Mode telemetry gameplay ile ayni
      `MobilePopulationArrivalUtility` ve `MobileBedCapacityUtility` hesaplarini kullanir;
      live Apply config/tuning baseline'larini degistirir ama run bed state'ini sifirlamaz.
+   - **Archer Runtime Contract** foldout'u aktif `GameManager.ArcherCatalog` definition'larinin
+     base combat, buy/retrain ve type-count growth alanlarini dogrudan duzenler. Preview ayni
+     `ArcherRecruitmentCostUtility` ile quote uretir. Finite Arrow profile alanlari, paket/Buy Max,
+     yatirim quote'lari ve read-only `1 Arrow / successful rent` kuralinin ayni yuzeyindedir.
+     Play Mode telemetry effective ECS stat/count/DPS, teorik shot ceiling, olculen pool-rent
+     Arrow/s, stok/capacity/verim ve yatirim fiyatlarini gosterir. Live Apply mevcut archer state'ini
+     koruyup combat statlarini ayni Heart/Tech/Meta aggregate'leriyle yeni baseline'a yeniden fold eder.
    - **Apply**: subscene authoring'e bagla (bake yolu) + play moddaysa CANLI uygula
      (config alanlari SetComponentData + buffer yeniden ornekleme).
    - **Run Bot**: profili canli uygular, RestartGame + Long Run Simulator'u baslatir
@@ -84,6 +94,8 @@ tek profil iterasyonuyla, KOD YAZMADAN tasindi).
   aittir. Dawn request ve Food/arrival da profile-owned'dir; ayni isimli authoring alanlari
   yalniz profile yokken fallback'tir. Initial bed, worker cap ve cycle baseline'lari authoring
   sahibinde kalir.
+- Archer definition asset'leri DifficultyProfile'in alt kopyasi degildir. Aktif catalog owner'i
+  belirler; Tuner bu asset'leri dogrudan duzenler. Apply cost state'i veya count'u sifirlamaz.
 - Canli uygulama restart sonrasi config'i bake degerlerine dondurur; Tuner'in Run Bot'u
   bu yuzden restart'tan SONRA da ApplyProfileLive cagirir.
 - Fiyat alanlari sifir/negatif veya gecersiz girilirse resolver int-guvenli minimumlara,

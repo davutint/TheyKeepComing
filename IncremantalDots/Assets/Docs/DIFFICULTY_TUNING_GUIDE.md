@@ -29,8 +29,10 @@ Deger adi ezberleme — asagidaki tablodan hissini bul, hangi ayara dokunacagini
 | "Gunduz cok sakin / cok yogun" | Faz Yogunluklari > **DayIntensity** | 0.55 taban; artir/azalt |
 | "Gece yeterince korkutucu degil" | **NightIntensity** | ARTIR (1.65 taban) |
 | "Belirli bir GUN cok sert/yumusak" | Ilgili egriye o gune keyframe ekle | Egri = gun bazli ince ayar |
-| "Ok cok cabuk bitiyor" | Ekonomi Fiyat Egrileri > **Arrow kapasite / Arrow per Wood** | Kapasiteyi, paket verimini veya efficiency kazancini ARTIR |
-| "Ok ekonomisi anlamsiz ucuz" | **Arrow CAP/EFF Wood+Iron base cost** | Ilgili base maliyetleri ARTIR; refill unit price satin alma sayisiyla buyumez |
+| "Okcular zayif / fazla guclu" | Archer Runtime Contract > ilgili definition **Damage / FireRate / Range** | Base combat'i ayarla; Heart/Tech/Meta katmanlari bunun ustune biner |
+| "Yeni okcu veya retrain cok ucuz / pahali" | Ilgili definition **BuyCost / RetrainCost / GrowthInterval / GrowthExponent** | Base maliyeti veya hedef-tur sayisiyla buyume egrisini ayarla |
+| "Ok cok cabuk bitiyor" | Archer Runtime Contract > **Arrow kapasite / Arrow per Wood** | Kapasiteyi, paket verimini veya efficiency kazancini ARTIR |
+| "Ok ekonomisi anlamsiz ucuz" | Archer Runtime Contract > **Arrow CAP/EFF Wood+Iron base cost** | Ilgili base maliyetleri ARTIR; refill unit price satin alma sayisiyla buyumez |
 
 ---
 
@@ -97,13 +99,20 @@ formuludur; mevcut nufus pasif Food tuketmez. Run `60` authoring-owned yatakla b
 Sonraki yatak `ceil(100 x (1 + ownedGrowth / 25)^2)` Wood egrisini kullanir; hard max yoktur
 ve bulk alim her ek yatagin sirali fiyatini toplar.
 
-### Arrow Ekonomisi
+### Archer Recruitment ve Arrow Ekonomisi
+
+Basic/Rapid/Frost base combat, buy/retrain base maliyeti ve type-count growth degerleri
+dogrudan aktif `ArcherDefinitionSO` asset'lerindedir. Default combat `10 x 1.5 / 15 range`,
+`6 x 3 / 14 range`, `5 x 1.2 / 14 range`; growth `interval 25`, `exponent 2`dir.
+Buy ve retrain ayni hedef-tur sayisini kullanir: `ceil(base x (1 + count / 25)^2)`.
+Retrain yeni okcu/population uretmez; var olan Basic'i yerinde Rapid/Frost'a cevirir.
 
 Default finite stok `200`, refill paketi `100`, verim `4 Arrow/Wood`dur. Capacity
 yatirimi seviye basina `+200`, Efficiency yatirimi seviye basina `+1 Arrow/Wood`
 verir. CAP ve EFF alimlari Wood+Iron ister ve fiyatlari kendi seviyeleriyle `1.35`
 carpaninda buyur. Refill birim fiyati kac kez alindigina gore buyumez; Rapid gibi daha
-hizli okcular talebi dogal olarak artirir.
+hizli okcular talebi dogal olarak artirir. Her basarili projectile pool rent'i tam `1 Arrow`
+harcar; hedef/pool yoksa veya stok `0` ise harcama olmaz. Bu deger V1'de read-only'dir.
 
 ### M-C Hazirlik (SpawnTable / SpecialNights)
 SIMDILIK BOS BIRAK — zombi cesitliligi milestone'unda (M-C) sistem bunlari okumaya
@@ -149,6 +158,18 @@ hesaplar. Play Mode telemetry ayni degerleri canli ECS state'inden, son Dawn rec
 base/purchased bed state'iyle birlikte gosterir. Apply request/Food degerlerini config'e, yatak
 egrisini `MobileEconomyPriceTuning` component'ine canli yazar; mevcut run yatak state'ini sifirlamaz.
 
+### Archer Runtime Contract paneli
+
+Panel aktif `GameManager.ArcherCatalog` icindeki definition asset'lerini dogrudan duzenler;
+combat/maliyet verisini `DifficultyProfileSO` icine kopyalamaz. Ortak `Preview target-type count`,
+her turun base DPS'ini ve gameplay `ArcherRecruitmentCostUtility` ile ayni buy/retrain quote'unu
+gosterir. Finite Arrow bolumu profile-owned capacity/refill/verim/CAP-EFF fiyatlarini, paket ve
+Buy Max quote'larini ve sabit `1 Arrow / successful projectile rent` kuralini ayni yerde tutar.
+Play Mode telemetry, ECS'deki effective okcu stat/count/DPS'ini, teorik max shot demand'i,
+gercek pool rent'lerinden olculen Arrow/s drain'i, stok/capacity/verim/yatirim fiyatlarini canli
+gosterir. Apply, mevcut count/population/formation/fire timer state'ini koruyup aktif okcularin
+combat statlarini ayni Heart/Tech/Meta katmanlariyla yeni definition baseline'ina yeniden fold eder.
+
 ## 5. Olcum botu nasil yorumlanir?
 
 1. Play'e gir -> RUN BOT (profili uygular, temiz kosu baslatir, 3x hizda oynar).
@@ -162,8 +183,9 @@ egrisini `MobileEconomyPriceTuning` component'ine canli yazar; mevcut run yatak 
 
 ## 6. Bilinmesi gereken iki tuzak
 
-1. **Profil her seyi kapsamiyor:** Wall, dort worker production baseline'i, Dawn request ve
-   Food/arrival profildedir; geometri, cycle sureleri, run baslangic yatagi ve worker cap
+1. **Profil her seyi kapsamiyor:** Wall, dort worker production baseline'i, Dawn request,
+   Food/arrival ve finite Arrow ekonomi tuning'i profildedir. Archer combat/buy/retrain tuning'i
+   aktif definition asset'lerinde; geometri, cycle sureleri, run baslangic yatagi ve worker cap
    baseline'lari aktif SubScene Authoring'de kalir. Profile yoksa ayni isimli authoring alanlari
    fallback olarak kullanilir.
 2. **APPLY'siz degisiklik oyuna gitmez:** panelde degeri degistirmek yetmez; APPLY

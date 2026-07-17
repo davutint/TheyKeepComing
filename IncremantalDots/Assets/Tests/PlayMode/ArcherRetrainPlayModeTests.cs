@@ -2,6 +2,7 @@ using System.Collections;
 using System.IO;
 using System.Reflection;
 using NUnit.Framework;
+using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -136,6 +137,78 @@ namespace DeadWalls.Tests
             AssertPopulationUnchanged(
                 populationBeforeFrost,
                 entityManager.GetComponentData<PopulationState>(gameStateEntity));
+        }
+
+        [UnityTest]
+        public IEnumerator ApplyArcherDefinitionTuning_RebasesExistingArchersWithoutStateLoss()
+        {
+            GameManager gameManager = GameManager.Instance;
+            bool runtimeReady = false;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                {
+                    runtimeReady = true;
+                    break;
+                }
+                yield return null;
+            }
+            Assert.That(runtimeReady, Is.True,
+                "GameManager/SubScene 300 frame icinde hazir olmadi.");
+
+            ArcherDefinitionSO definition = gameManager.GetArcherDefinition(ArcherType.Basic);
+            Assert.That(definition, Is.Not.Null);
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            using EntityQuery query = entityManager.CreateEntityQuery(new EntityQueryDesc
+            {
+                All = new[] { ComponentType.ReadOnly<ArcherUnit>() },
+                None = new[] { ComponentType.ReadOnly<Prefab>() }
+            });
+            Entity basicEntity = Entity.Null;
+            using (NativeArray<Entity> entities = query.ToEntityArray(Allocator.Temp))
+            {
+                for (int i = 0; i < entities.Length; i++)
+                {
+                    if (entityManager.GetComponentData<ArcherUnit>(entities[i]).Type
+                        != ArcherType.Basic)
+                        continue;
+
+                    basicEntity = entities[i];
+                    break;
+                }
+            }
+            Assert.That(basicEntity, Is.Not.EqualTo(Entity.Null));
+
+            ArcherUnit before = entityManager.GetComponentData<ArcherUnit>(basicEntity);
+            int totalBefore = gameManager.GetTotalArcherCount();
+            float originalDamage = definition.Damage;
+            float originalFireRate = definition.FireRate;
+            float originalRange = definition.Range;
+            try
+            {
+                definition.Damage = originalDamage + 4f;
+                definition.FireRate = originalFireRate + 0.5f;
+                definition.Range = originalRange + 1f;
+
+                Assert.That(gameManager.ApplyArcherDefinitionTuning(), Is.True);
+                ArcherUnit after = entityManager.GetComponentData<ArcherUnit>(basicEntity);
+
+                Assert.That(after.ArrowDamage, Is.GreaterThan(before.ArrowDamage));
+                Assert.That(after.FireRate, Is.GreaterThan(before.FireRate));
+                Assert.That(after.Range, Is.GreaterThan(before.Range));
+                Assert.That(after.FireTimer, Is.EqualTo(before.FireTimer));
+                Assert.That(after.Type, Is.EqualTo(before.Type));
+                Assert.That(gameManager.GetTotalArcherCount(), Is.EqualTo(totalBefore));
+            }
+            finally
+            {
+                definition.Damage = originalDamage;
+                definition.FireRate = originalFireRate;
+                definition.Range = originalRange;
+                gameManager.ApplyArcherDefinitionTuning();
+            }
+
+            yield return null;
         }
 
         private static Button FindButton(GameObject root, string rowName, string buttonName)

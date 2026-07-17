@@ -23,7 +23,8 @@ tick'inde atış yeniden başlar. Fletcher, üretim kuyruğu, worker veya beklem
 - `ArrowSupplyUI`: yalniz basarili player-facing refill sonrasinda
   `ArrowRefillPurchasedByPlayer` event'ini yayar; onboarding transaction'i tekrar etmeden dinler.
 - `ArcherShootSystem`: yalnız gerçek projectile pool rent'i başarılı olduktan sonra
-  `Current` değerini bir azaltır. Pool boşsa Arrow harcanmaz.
+  `Current` değerini `ArrowCostPerSuccessfulProjectileRent = 1` azaltır. Pool boşsa Arrow
+  harcanmaz; bu V1 sabit kuralidir, balance alani degildir.
 
 ## Varsayılan ekonomi
 
@@ -56,11 +57,20 @@ yalniz ust HUD `ArrowChip` satirini pulse eder. Paneli otomatik acmaz. Basarili 
 
 ## Save ve migration
 
-Run save güncel şema `v8`'dir. `ArrowCurrent`, `ArrowCapacityLevel` ve
-`ArrowEfficiencyLevel` exact Continue kapsamında tutulur. `v3-v7` kayıtları in-memory
-`v8`'e yükseltilir; eski kayıtlarda iki yatırım seviyesi `0` başlar. Restore edilen
+Run save güncel şema `v14`'tür. `ArrowCurrent`, `ArrowCapacityLevel` ve
+`ArrowEfficiencyLevel` exact Continue kapsamında tutulur. `v3-v13` kayıtları sıralı
+migration ile güncel şemaya yükseltilir; eski kayıtlarda iki yatırım seviyesi `0` başlar. Restore edilen
 stok, data-driven kapasiteye clamp edilir. Restart seviyeleri sıfırlar ve base
 kapasiteyi doldurur.
+
+## Difficulty Tuner yuzeyi
+
+`Archer Runtime Contract`, finite Arrow profile alanlarini recruitment/combat owner'lariyla
+ayni tuning panelinde gosterir. Preview, `ArrowEconomyUtility` ile capacity, Arrow/Wood,
+paket, Buy Max ve CAP/EFF sonraki maliyetini hesaplar. Play Mode telemetry, stok/capacity,
+seviyeler, pool active/available/total rent ve rent delta'sindan gercek Arrow/s drain'i okur.
+Tuner ayrica teorik effective fire-rate toplamini gosterir; gercek tuketim hedef, cooldown ve
+pool gating nedeniyle bu tavandan dusuk olabilir.
 
 ## Performans ve test sınırı
 

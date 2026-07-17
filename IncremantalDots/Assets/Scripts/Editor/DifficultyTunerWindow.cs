@@ -13,8 +13,12 @@ namespace DeadWalls
     /// </summary>
     public class DifficultyTunerWindow : EditorWindow
     {
+        private const string DefaultArcherCatalogPath =
+            "Assets/ScriptableObject/MobileCastle/Archers/ArcherRecruitmentCatalog.asset";
+
         private DifficultyProfileSO _profile;
         private SerializedObject _profileSO;
+        private ArcherRecruitmentCatalogSO _fallbackArcherCatalog;
         private Vector2 _scroll;
 
         private bool _foldCurves = true;
@@ -24,6 +28,7 @@ namespace DeadWalls
         private bool _foldRepair = true;
         private bool _foldEconomyPrices = true;
         private bool _foldPopulation = true;
+        private bool _foldArchers = true;
         private bool _foldFuture;
         private bool _foldBot = true;
 
@@ -36,6 +41,16 @@ namespace DeadWalls
         private int _populationPreviewCurrentPopulation = 60;
         private int _populationPreviewPurchasedBeds = 15;
         private int _populationPreviewFood = 30;
+        private int _archerPreviewTargetTypeCount = 25;
+        private int _arrowPreviewCurrent;
+        private int _arrowPreviewCapacityLevel;
+        private int _arrowPreviewEfficiencyLevel;
+        private int _arrowPreviewPackageCount = 1;
+        private int _arrowPreviewAvailableWood = 100;
+        private long _lastArrowRentCount = -1L;
+        private double _lastArrowRentSampleTime;
+        private float _observedArrowDrainPerSecond;
+        private bool _hasObservedArrowDrainSample;
         private double _nextSpawnTelemetryRepaint;
 
         private List<int> _deaths = new List<int>();
@@ -59,6 +74,14 @@ namespace DeadWalls
             if (_profile == null)
                 _profile = AssetDatabase.LoadAssetAtPath<DifficultyProfileSO>(
                     MobileCastleSceneSetupWindow.DifficultyProfilePath);
+            if (_fallbackArcherCatalog == null)
+                _fallbackArcherCatalog = AssetDatabase.LoadAssetAtPath<ArcherRecruitmentCatalogSO>(
+                    DefaultArcherCatalogPath);
+
+            _lastArrowRentCount = -1L;
+            _lastArrowRentSampleTime = 0d;
+            _observedArrowDrainPerSecond = 0f;
+            _hasObservedArrowDrainSample = false;
 
             EditorApplication.update -= RepaintLiveTelemetry;
             EditorApplication.update += RepaintLiveTelemetry;
@@ -103,6 +126,7 @@ namespace DeadWalls
             DrawRepairSection();
             DrawEconomyPriceSection();
             DrawPopulationSection();
+            DrawArcherSection();
             DrawFutureSection();
 
             _profileSO.ApplyModifiedProperties();
@@ -483,23 +507,6 @@ namespace DeadWalls
                     MessageType.None);
 
                 DrawLiveEconomyTelemetry();
-
-                EditorGUILayout.Space(8);
-                EditorGUILayout.LabelField("Adjacent Archer Inputs", EditorStyles.boldLabel);
-                EditorGUILayout.HelpBox(
-                    "Finite Arrow alanlari mevcut edit yetenegini korur; Archer tracker audit'inde "
-                    + "kendi runtime contract yuzeyine alinacak.", MessageType.None);
-                EditorGUILayout.LabelField("Finite Arrow Supply", EditorStyles.miniBoldLabel);
-                DrawProp("ArrowBaseCapacity");
-                DrawProp("ArrowCapacityPerLevel");
-                DrawProp("ArrowRefillPackageSize");
-                DrawProp("ArrowBaseArrowsPerWood");
-                DrawProp("ArrowArrowsPerWoodPerEfficiencyLevel");
-                DrawProp("ArrowCapacityBaseWoodCost");
-                DrawProp("ArrowCapacityBaseIronCost");
-                DrawProp("ArrowEfficiencyBaseWoodCost");
-                DrawProp("ArrowEfficiencyBaseIronCost");
-                DrawProp("ArrowUpgradeCostGrowthMultiplier");
             }
         }
 
@@ -570,6 +577,330 @@ namespace DeadWalls
                     MessageType.None);
 
                 DrawLivePopulationTelemetry();
+            }
+        }
+
+        private void DrawArcherSection()
+        {
+            _foldArchers = DrawSectionHeader(_foldArchers,
+                "Archer Runtime Contract", "base stats + buy/retrain + finite Arrow drain");
+            if (!_foldArchers)
+                return;
+
+            using (new EditorGUILayout.VerticalScope("box"))
+            {
+                ArcherRecruitmentCatalogSO catalog = ResolveArcherCatalog();
+                using (new EditorGUI.DisabledScope(true))
+                {
+                    EditorGUILayout.ObjectField("Active definition catalog", catalog,
+                        typeof(ArcherRecruitmentCatalogSO), false);
+                }
+
+                if (catalog == null)
+                {
+                    EditorGUILayout.HelpBox(
+                        "Active GameManager/default ArcherRecruitmentCatalog bulunamadi. "
+                        + "Mobile Castle Scene Setup ile catalog binding'ini onar.",
+                        MessageType.Error);
+                    return;
+                }
+
+                ArcherDefinitionSO[] definitions = catalog.GetOrderedDefinitions();
+                if (definitions.Length == 0)
+                {
+                    EditorGUILayout.HelpBox("Catalog definition icermiyor.", MessageType.Error);
+                    return;
+                }
+
+                EditorGUILayout.HelpBox(
+                    "Combat ve buy/retrain alanlari dogrudan aktif ArcherDefinitionSO asset'lerini "
+                    + "duzenler; DifficultyProfileSO icine kopyalanmaz. Cost preview gameplay ile "
+                    + "ayni target-type count egrisini kullanir.", MessageType.None);
+                _archerPreviewTargetTypeCount = EditorGUILayout.IntSlider(
+                    "Preview target-type count", _archerPreviewTargetTypeCount,
+                    0, ArcherCapacityUtility.MaxTotalArchers);
+
+                for (int i = 0; i < definitions.Length; i++)
+                {
+                    ArcherDefinitionSO definition = definitions[i];
+                    if (definition != null)
+                        DrawArcherDefinitionEditor(definition);
+                }
+
+                EditorGUILayout.Space(8);
+                DrawFiniteArrowContract();
+                DrawLiveArcherTelemetry();
+            }
+        }
+
+        private ArcherRecruitmentCatalogSO ResolveArcherCatalog()
+        {
+            GameManager gameManager = GameManager.Instance;
+            if (gameManager == null)
+                gameManager = FindFirstObjectByType<GameManager>(FindObjectsInactive.Include);
+
+            return gameManager != null && gameManager.ArcherCatalog != null
+                ? gameManager.ArcherCatalog
+                : _fallbackArcherCatalog;
+        }
+
+        private void DrawArcherDefinitionEditor(ArcherDefinitionSO definition)
+        {
+            using (new EditorGUILayout.VerticalScope("helpbox"))
+            {
+                EditorGUILayout.LabelField(
+                    $"{definition.DisplayName}  [{definition.Type}]",
+                    EditorStyles.boldLabel);
+                using (new EditorGUI.DisabledScope(true))
+                {
+                    EditorGUILayout.ObjectField("Definition owner", definition,
+                        typeof(ArcherDefinitionSO), false);
+                    EditorGUILayout.TextField("Required Heart tech", string.IsNullOrWhiteSpace(
+                        definition.RequiredTechId) ? "None" : definition.RequiredTechId);
+                }
+
+                var definitionSO = new SerializedObject(definition);
+                definitionSO.Update();
+                EditorGUILayout.LabelField("Base Combat", EditorStyles.miniBoldLabel);
+                DrawDefinitionProp(definitionSO, "Damage", "Damage / projectile");
+                DrawDefinitionProp(definitionSO, "FireRate", "Fire rate / second");
+                DrawDefinitionProp(definitionSO, "Range", "Range");
+                DrawDefinitionProp(definitionSO, "SlowDuration", "Slow duration");
+                DrawDefinitionProp(definitionSO, "SlowMultiplier", "Slow multiplier");
+
+                EditorGUILayout.Space(3);
+                EditorGUILayout.LabelField("Recruitment + Retrain", EditorStyles.miniBoldLabel);
+                DrawDefinitionProp(definitionSO, "BuyCost", "Buy base cost", true);
+                DrawDefinitionProp(definitionSO, "RetrainCost", "Retrain base cost", true);
+                DrawDefinitionProp(definitionSO, "PopulationCost", "Population cost");
+                DrawDefinitionProp(definitionSO, "CostGrowthInterval", "Growth interval");
+                DrawDefinitionProp(definitionSO, "CostGrowthExponent", "Growth exponent");
+                definitionSO.ApplyModifiedProperties();
+
+                ResourceCost buyQuote = ArcherRecruitmentCostUtility.GetScaledCost(
+                    definition.BuyCost,
+                    _archerPreviewTargetTypeCount,
+                    definition.CostGrowthInterval,
+                    definition.CostGrowthExponent);
+                ResourceCost retrainQuote = ArcherRecruitmentCostUtility.GetScaledCost(
+                    definition.RetrainCost,
+                    _archerPreviewTargetTypeCount,
+                    definition.CostGrowthInterval,
+                    definition.CostGrowthExponent);
+                EditorGUILayout.LabelField("Base DPS",
+                    $"{Mathf.Max(0f, definition.Damage) * Mathf.Max(0f, definition.FireRate):0.###}");
+                EditorGUILayout.LabelField("Preview buy / retrain",
+                    $"{buyQuote.ToDisplayString()} / "
+                    + (definition.Type == ArcherType.Basic
+                        ? "N/A (retrain target degil)"
+                        : retrainQuote.ToDisplayString()));
+            }
+        }
+
+        private static void DrawDefinitionProp(SerializedObject owner, string propertyName,
+            string label, bool includeChildren = false)
+        {
+            SerializedProperty property = owner.FindProperty(propertyName);
+            if (property != null)
+                EditorGUILayout.PropertyField(property, new GUIContent(label), includeChildren);
+        }
+
+        private void DrawFiniteArrowContract()
+        {
+            EditorGUILayout.LabelField("Finite Arrow Supply", EditorStyles.boldLabel);
+            DrawProp("ArrowBaseCapacity");
+            DrawProp("ArrowCapacityPerLevel");
+            DrawProp("ArrowRefillPackageSize");
+            DrawProp("ArrowBaseArrowsPerWood");
+            DrawProp("ArrowArrowsPerWoodPerEfficiencyLevel");
+            DrawProp("ArrowCapacityBaseWoodCost");
+            DrawProp("ArrowCapacityBaseIronCost");
+            DrawProp("ArrowEfficiencyBaseWoodCost");
+            DrawProp("ArrowEfficiencyBaseIronCost");
+            DrawProp("ArrowUpgradeCostGrowthMultiplier");
+
+            EditorGUILayout.Space(4);
+            EditorGUILayout.LabelField("Arrow Contract Preview", EditorStyles.miniBoldLabel);
+            _arrowPreviewCapacityLevel = Mathf.Max(0,
+                EditorGUILayout.IntField("Capacity level", _arrowPreviewCapacityLevel));
+            _arrowPreviewEfficiencyLevel = Mathf.Max(0,
+                EditorGUILayout.IntField("Efficiency level", _arrowPreviewEfficiencyLevel));
+            _arrowPreviewCurrent = Mathf.Max(0,
+                EditorGUILayout.IntField("Current Arrow", _arrowPreviewCurrent));
+            _arrowPreviewPackageCount = EditorGUILayout.IntSlider(
+                "Refill package count", _arrowPreviewPackageCount, 1, 10);
+            _arrowPreviewAvailableWood = Mathf.Max(0,
+                EditorGUILayout.IntField("Available Wood", _arrowPreviewAvailableWood));
+
+            MobileEconomyPriceTuning tuning =
+                MobileCastleTuningResolver.ResolveEconomyPriceTuning(_profile);
+            var supply = new ArrowSupply
+            {
+                Current = _arrowPreviewCurrent,
+                CapacityLevel = _arrowPreviewCapacityLevel,
+                EfficiencyLevel = _arrowPreviewEfficiencyLevel
+            };
+            int capacity = ArrowEconomyUtility.GetCapacity(supply, tuning);
+            supply.Current = Mathf.Clamp(supply.Current, 0, capacity);
+            bool hasPackage = ArrowEconomyUtility.TryGetPackageQuote(
+                supply, tuning, _arrowPreviewPackageCount, out ArrowRefillQuote packageQuote);
+            bool hasBuyMax = ArrowEconomyUtility.TryGetBuyMaxQuote(
+                supply, tuning, _arrowPreviewAvailableWood, out ArrowRefillQuote buyMaxQuote);
+            bool hasCapacityCost = ArrowEconomyUtility.TryGetUpgradeCost(
+                supply, ArrowUpgradeType.Capacity, tuning, out ArrowUpgradeCost capacityCost);
+            bool hasEfficiencyCost = ArrowEconomyUtility.TryGetUpgradeCost(
+                supply, ArrowUpgradeType.Efficiency, tuning, out ArrowUpgradeCost efficiencyCost);
+
+            EditorGUILayout.LabelField("Current / capacity / Arrow per Wood",
+                $"{supply.Current:N0} / {capacity:N0} / "
+                + $"{ArrowEconomyUtility.GetArrowsPerWood(supply, tuning):N0}");
+            EditorGUILayout.LabelField($"+{_arrowPreviewPackageCount} package quote",
+                hasPackage
+                    ? $"{packageQuote.ArrowAmount:N0} Arrow / {packageQuote.WoodCost:N0}W"
+                    : "FULL");
+            EditorGUILayout.LabelField("Buy Max quote",
+                hasBuyMax
+                    ? $"{buyMaxQuote.ArrowAmount:N0} Arrow / {buyMaxQuote.WoodCost:N0}W"
+                    : "FULL / NEED WOOD");
+            EditorGUILayout.LabelField("Next CAP / EFF investment",
+                $"{FormatArrowUpgradeCost(hasCapacityCost, capacityCost)} / "
+                + FormatArrowUpgradeCost(hasEfficiencyCost, efficiencyCost));
+            EditorGUILayout.LabelField("Arrow per successful projectile rent",
+                $"{ArcherShootSystem.ArrowCostPerSuccessfulProjectileRent} (V1 fixed, read-only)");
+            EditorGUILayout.HelpBox(
+                "Arrow yalniz projectile pool rent'i basarili olduktan sonra harcanir. "
+                + "Pool bos, hedef yok veya stok 0 ise tuketim olmaz. Refill beklemesizdir; "
+                + "hizli okcular ayni surede daha fazla Arrow talep eder.", MessageType.None);
+        }
+
+        private void DrawLiveArcherTelemetry()
+        {
+            if (!Application.isPlaying)
+                return;
+
+            var world = World.DefaultGameObjectInjectionWorld;
+            if (world == null || !world.IsCreated)
+                return;
+
+            EntityManager em = world.EntityManager;
+            using EntityQuery tuningQuery = em.CreateEntityQuery(typeof(MobileEconomyPriceTuning));
+            using EntityQuery supplyQuery = em.CreateEntityQuery(typeof(ArrowSupply));
+            using EntityQuery poolQuery = em.CreateEntityQuery(typeof(ArrowPoolRuntimeData));
+            using EntityQuery archerQuery = em.CreateEntityQuery(new EntityQueryDesc
+            {
+                All = new[] { ComponentType.ReadOnly<ArcherUnit>() },
+                None = new[] { ComponentType.ReadOnly<Prefab>() }
+            });
+            if (tuningQuery.CalculateEntityCount() != 1
+                || supplyQuery.CalculateEntityCount() != 1
+                || poolQuery.CalculateEntityCount() != 1)
+            {
+                EditorGUILayout.HelpBox("Live Archer/Arrow singleton'lari henuz hazir degil.",
+                    MessageType.Info);
+                return;
+            }
+
+            MobileEconomyPriceTuning tuning = MobileEconomyPriceTuningUtility.Sanitize(
+                em.GetComponentData<MobileEconomyPriceTuning>(tuningQuery.GetSingletonEntity()));
+            ArrowSupply supply = em.GetComponentData<ArrowSupply>(supplyQuery.GetSingletonEntity());
+            ArrowPoolRuntimeData pool = em.GetComponentData<ArrowPoolRuntimeData>(
+                poolQuery.GetSingletonEntity());
+            var aggregates = new ArcherLiveAggregate[3];
+            using (Unity.Collections.NativeArray<ArcherUnit> archers =
+                   archerQuery.ToComponentDataArray<ArcherUnit>(Unity.Collections.Allocator.Temp))
+            {
+                for (int i = 0; i < archers.Length; i++)
+                {
+                    int typeIndex = Mathf.Clamp((int)archers[i].Type, 0, aggregates.Length - 1);
+                    aggregates[typeIndex].Add(archers[i]);
+                }
+            }
+
+            UpdateObservedArrowDrain(pool.TotalRentCount);
+            int capacity = ArrowEconomyUtility.GetCapacity(supply, tuning);
+            bool hasCapacityCost = ArrowEconomyUtility.TryGetUpgradeCost(
+                supply, ArrowUpgradeType.Capacity, tuning, out ArrowUpgradeCost capacityCost);
+            bool hasEfficiencyCost = ArrowEconomyUtility.TryGetUpgradeCost(
+                supply, ArrowUpgradeType.Efficiency, tuning, out ArrowUpgradeCost efficiencyCost);
+
+            EditorGUILayout.Space(6);
+            EditorGUILayout.LabelField("Live Effective Archer + Arrow", EditorStyles.boldLabel);
+            DrawLiveArcherType("Basic", aggregates[(int)ArcherType.Basic]);
+            DrawLiveArcherType("Rapid", aggregates[(int)ArcherType.Rapid]);
+            DrawLiveArcherType("Frost", aggregates[(int)ArcherType.Frost]);
+            float maximumShotDemand = aggregates[0].FireRateSum
+                + aggregates[1].FireRateSum
+                + aggregates[2].FireRateSum;
+            EditorGUILayout.LabelField("Effective max shot demand",
+                $"{maximumShotDemand:0.##} Arrow/s before target/pool gating");
+            EditorGUILayout.LabelField("Observed successful rent drain",
+                _hasObservedArrowDrainSample
+                    ? $"{_observedArrowDrainPerSecond:0.##} Arrow/s"
+                    : "sampling...");
+            EditorGUILayout.LabelField("Arrow current / capacity / per Wood",
+                $"{Mathf.Max(0, supply.Current):N0} / {capacity:N0} / "
+                + $"{ArrowEconomyUtility.GetArrowsPerWood(supply, tuning):N0}");
+            EditorGUILayout.LabelField("CAP / EFF level",
+                $"L{Mathf.Max(0, supply.CapacityLevel)} / L{Mathf.Max(0, supply.EfficiencyLevel)}");
+            EditorGUILayout.LabelField("Next CAP / EFF investment",
+                $"{FormatArrowUpgradeCost(hasCapacityCost, capacityCost)} / "
+                + FormatArrowUpgradeCost(hasEfficiencyCost, efficiencyCost));
+            EditorGUILayout.LabelField("Projectile pool active / available / total rents",
+                $"{Mathf.Max(0, pool.ActiveCount):N0} / {Mathf.Max(0, pool.AvailableCount):N0} / "
+                + $"{System.Math.Max(0L, pool.TotalRentCount):N0}");
+        }
+
+        private void UpdateObservedArrowDrain(long totalRentCount)
+        {
+            double now = EditorApplication.timeSinceStartup;
+            if (_lastArrowRentCount < 0L || totalRentCount < _lastArrowRentCount)
+            {
+                _lastArrowRentCount = totalRentCount;
+                _lastArrowRentSampleTime = now;
+                _hasObservedArrowDrainSample = false;
+                return;
+            }
+
+            double elapsed = now - _lastArrowRentSampleTime;
+            if (elapsed < 0.20d)
+                return;
+
+            long rentDelta = totalRentCount - _lastArrowRentCount;
+            _observedArrowDrainPerSecond = elapsed > 0d
+                ? (float)(rentDelta * ArcherShootSystem.ArrowCostPerSuccessfulProjectileRent / elapsed)
+                : 0f;
+            _hasObservedArrowDrainSample = true;
+            _lastArrowRentCount = totalRentCount;
+            _lastArrowRentSampleTime = now;
+        }
+
+        private static void DrawLiveArcherType(string label, in ArcherLiveAggregate aggregate)
+        {
+            float averageDamage = aggregate.Count > 0 ? aggregate.DamageSum / aggregate.Count : 0f;
+            float averageFireRate = aggregate.Count > 0 ? aggregate.FireRateSum / aggregate.Count : 0f;
+            EditorGUILayout.LabelField(label,
+                $"x{aggregate.Count:N0} | avg {averageDamage:0.###} dmg x "
+                + $"{averageFireRate:0.###}/s | {aggregate.DpsSum:0.##} DPS");
+        }
+
+        private static string FormatArrowUpgradeCost(bool valid, in ArrowUpgradeCost cost)
+        {
+            return valid ? $"{cost.Wood:N0}W + {cost.Iron:N0}I" : "INT LIMIT";
+        }
+
+        private struct ArcherLiveAggregate
+        {
+            public int Count;
+            public float DamageSum;
+            public float FireRateSum;
+            public float DpsSum;
+
+            public void Add(in ArcherUnit archer)
+            {
+                Count++;
+                DamageSum += Mathf.Max(0f, archer.ArrowDamage);
+                FireRateSum += Mathf.Max(0f, archer.FireRate);
+                DpsSum += Mathf.Max(0f, archer.ArrowDamage) * Mathf.Max(0f, archer.FireRate);
             }
         }
 
@@ -942,6 +1273,7 @@ namespace DeadWalls
                 config.StoneWorkerProductionPerMin,
                 config.IronWorkerProductionPerMin,
                 config.FoodWorkerProductionPerMin);
+            gameManager?.ApplyArcherDefinitionTuning();
         }
 
         private void LoadLatestSummary()

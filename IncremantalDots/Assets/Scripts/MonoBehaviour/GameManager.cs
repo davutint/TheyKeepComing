@@ -1938,6 +1938,22 @@ namespace DeadWalls
             return stats.Damage * stats.FireRate * GetArcherTypeCount(type);
         }
 
+        /// <summary>
+        /// Difficulty Tuner'da definition asset'leri degistiginde mevcut garnizonu ayni
+        /// Heart/Tech/Meta katmanlariyla yeni baseline uzerine yeniden fold eder.
+        /// Count, population, fire timer ve formation state'i degismez.
+        /// </summary>
+        public bool ApplyArcherDefinitionTuning()
+        {
+            if (!_initialized || !CanAccessEntityManager())
+                return false;
+
+            ApplyScaledStatsToArchers(ArcherType.Basic, false);
+            ReadArcherTypeCounts();
+            OnGameStateChanged?.Invoke();
+            return true;
+        }
+
         public ArcherDefinitionSO[] GetArcherDefinitions()
         {
             var catalogDefinitions = archerCatalog != null ? archerCatalog.GetOrderedDefinitions() : null;

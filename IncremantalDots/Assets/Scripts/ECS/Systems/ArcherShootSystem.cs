@@ -13,6 +13,7 @@ namespace DeadWalls
     [UpdateBefore(typeof(ApplyMovementForceSystem))]
     public partial struct ArcherShootSystem : ISystem
     {
+        public const int ArrowCostPerSuccessfulProjectileRent = 1;
         private const int InitialReservationCapacity = 16384;
 
         private NativeParallelMultiHashMap<int, Entity> _targetMap;
@@ -283,7 +284,7 @@ namespace DeadWalls
                 if (!TryRentArrow(out Entity arrow, out long shotSequence))
                     return;
 
-                supply.Current--;
+                supply.Current -= ArrowCostPerSuccessfulProjectileRent;
                 ArrowSupplyLookup[ArrowSupplyEntity] = supply;
 
                 AddReservation(target, math.max(0f, archer.ArrowDamage));

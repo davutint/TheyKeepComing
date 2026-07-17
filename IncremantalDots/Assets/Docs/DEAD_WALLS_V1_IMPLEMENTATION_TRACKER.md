@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.3
 > **Son tam kapsam denetimi:** 2026-07-17
 > **Aktif paket:** Post-Package V1 Closure - Contracts, Performance ve Release DoD
-> **Aktif iş:** `DW-V1-TUNING-ARCHER-SURFACE` - Audit Archer Base Stats, Cost Growth, Retrain Cost and Arrow Drain
-> **İlerleme:** `408 / 442` tracker checkbox'ı tamamlandı - `%92,31`
+> **Aktif iş:** `DW-V1-TUNING-HEART-SURFACE` - Audit Heart Essence Gain, Node Cost/Growth and Rarity/Depth
+> **İlerleme:** `409 / 442` tracker checkbox'ı tamamlandı - `%92,53`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -978,7 +978,23 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
   config'ini ve bed curve tuning'ini günceller. Profile/fallback/sanitize, Dawn budget ve int-safe
   bed curve EditMode `18/18`; baked runtime, gerçek Dawn tek transaction, bed purchase+Continue ve
   runtime quote PlayMode `4/4` geçti; scene validation `0` issue, final Console `0 error`.
-- [ ] Archers: base stats, cost growth, retrain cost, Arrow drain.
+- [x] Archers: base stats, cost growth, retrain cost, Arrow drain. Basic/Rapid/Frost base
+  combat ve recruitment tuning'i aktif catalog'daki üç `ArcherDefinitionSO` asset'inin tek
+  definition owner'ı olarak korundu: `10 x 1,5 / R15`, `6 x 3 / R14`, `5 x 1,2 / R14`;
+  buy/retrain base cost'lari ve ortak target-type count eğrisi `interval 25 / exponent 2`.
+  `Difficulty Tuner > Archer Runtime Contract`, bu asset'leri profile'a kopyalamadan doğrudan
+  düzenler ve `ArcherRecruitmentCostUtility` ile buy/retrain preview üretir. Finite Arrow
+  capacity/refill/verim/CAP-EFF alanları aynı yüzeye taşındı fakat mevcut
+  `DifficultyProfileSO -> MobileCastleTuningResolver -> MobileEconomyPriceTuning` owner zinciri
+  değişmedi; paket/Buy Max/yatırım preview'ları gerçek `ArrowEconomyUtility` kullanır. Tüketim
+  `ArcherShootSystem.ArrowCostPerSuccessfulProjectileRent = 1` read-only V1 kuralıdır ve yalnız
+  başarılı pool rent'inden sonra uygulanır. Live telemetry effective type stat/count/DPS,
+  teorik shot demand, ölçülen pool-rent Arrow/s, stok/capacity/verim ve yatırım fiyatlarını
+  gösterir. Live Apply count/population/formation/type/fire timer state'ini koruyup mevcut
+  okçuları aynı Heart/Tech/Meta katmanlarıyla yeni definition baseline'ına rebase eder. Canonical
+  asset/cost/drain EditMode `11/11`; live rebase + retrain + finite Arrow PlayMode `5/5` geçti;
+  1K refill örneği `1000` rent, `1000` Arrow, `0` pool expansion ve `30,413 ms` main thread verdi;
+  Difficulty Tuner açıldı, scene validation `0` issue ve final Console `0 error`.
 - [ ] Heart: Essence gain, node cost/growth, rarity/depth.
 - [ ] Council: fixed cadence, effect bands, repeat memory, decision timer.
 - [ ] Meta: reward weights, upgrade costs/effects.

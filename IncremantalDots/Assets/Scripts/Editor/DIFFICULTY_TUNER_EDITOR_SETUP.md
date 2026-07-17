@@ -21,6 +21,10 @@ DefaultDifficulty.asset` seed edilir (varsa DOKUNULMAZ) ve subscene'deki
    - Population: `Population Runtime Contract` foldout'unda Dawn request, Food/arrival,
      House bed base Wood ve owned-bed growth interval'i. Preview alanina population,
      purchased beds ve Food girerek bir sonraki kabul/harcama/+1/+10 bed fiyatini gor.
+   - Archers: `Archer Runtime Contract` foldout'unda aktif catalog definition'larinin base
+     combat, buy/retrain ve count-growth alanlari; finite Arrow capacity/refill/verim/CAP-EFF
+     tuning'i. Preview count ile buy/retrain quote'unu, Play Mode'da effective stat/DPS ve
+     gercek pool-rent Arrow/s drain'ini gor.
 4. **Apply** — edit modda subscene'e baglar+kaydeder (bake); play modda ayrica CANLI uygular.
 5. Olcum: Play'e gir -> **Run Bot** (profili uygular, temiz kosu baslatir) ->
    kosular bitince **Son Olcumu Ozetle** ile olum-gunu dagilimini oku.
@@ -36,5 +40,10 @@ DefaultDifficulty.asset` seed edilir (varsa DOKUNULMAZ) ve subscene'deki
 - Population default'lari Dawn request `15`, Food/arrival `1` ve SubScene initial bed `60`tir.
   Request/Food profile-owned, initial bed authoring-owned'dir. Play Mode Apply mevcut purchased
   bed state'ini silmeden bir sonraki Dawn butcesini ve yatak fiyat egrisini canli degistirir.
+- Archer definition default'lari Basic `10 damage / 1.5 fire rate / 15 range`, Rapid
+  `6 / 3 / 14`, Frost `5 / 1.2 / 14`; type-count growth `25 / exponent 2`dir. Bunlar profile'a
+  kopyalanmaz. Finite Arrow default'u `200` capacity, `100` package, `4 Arrow/Wood` ve her
+  basarili projectile rent'i icin read-only `1 Arrow`dur. Play Mode Apply count, population,
+  formation ve fire timer'i koruyarak mevcut okculari yeni definition baseline'ina rebase eder.
 - Wall base HP profile-owned'dir. Profile yoksa `CastleAuthoring.WallHP` fallback olur.
   Worker base rate'leri de profile-owned'dir; profile yoksa SubScene Authoring fallback olur.

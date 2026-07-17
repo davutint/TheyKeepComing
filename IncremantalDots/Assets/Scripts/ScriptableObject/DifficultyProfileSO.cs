@@ -135,7 +135,7 @@ namespace DeadWalls
         [Min(1f)] public double WorkerBuildingCostGrowthMultiplier =
             MobileEconomyPriceTuningUtility.DefaultWorkerBuildingCostGrowthMultiplier;
 
-        [Header("Arrow Economy (runtime tuning'e bake edilir)")]
+        [Header("Archer Runtime Contract - Finite Arrow (runtime tuning'e bake edilir)")]
         [Min(1)] public int ArrowBaseCapacity =
             MobileEconomyPriceTuningUtility.DefaultArrowBaseCapacity;
         [Min(1)] public int ArrowCapacityPerLevel =

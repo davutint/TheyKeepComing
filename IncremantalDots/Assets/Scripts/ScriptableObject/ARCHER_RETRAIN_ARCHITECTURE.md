@@ -58,6 +58,10 @@ Aktif truth `MobileCastleHudRoot.prefab` içindeki inactive
 satırlarında unlock, Basic varlığı ve kaynak durumuna göre açılır. Cap dolması buy'ı
 `MAX` yapar fakat retrain'i engellemez.
 
+`Difficulty Tuner > Archer Runtime Contract`, her definition'in buy ve retrain base
+maliyetini, ortak interval/exponent'ini ve secilen target-type count icin iki quote'u ayni
+gameplay utility'siyle gosterir. Live Apply mevcut retrain/count state'ini sifirlamaz.
+
 ## Doğrulama
 
 - `ArcherRecruitmentCostUtilityTests`: eğri, input sanitization ve int saturation.

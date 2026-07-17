@@ -32,7 +32,7 @@ ayrıca chip üzerindeki ana değeri `Current / Capacity` biçiminde günceller.
 
 ## Tuning
 
-`Window > DeadWalls > Difficulty Tuner` içindeki Arrow Economy alanları
+`Window > DeadWalls > Difficulty Tuner > Archer Runtime Contract` içindeki finite Arrow alanları
 `DifficultyProfileSO` üzerinden şu runtime değerlerini besler:
 
 - base capacity ve level başına capacity,
@@ -44,6 +44,10 @@ ayrıca chip üzerindeki ana değeri `Current / Capacity` biçiminde günceller.
 `APPLY` sonrasında `MobileCastleTuningResolver` değerleri sanitize eder ve aktif
 `MobileEconomyPriceTuning` singleton'ına yazar. Scene authoring fallback'leri yalnız
 profile bulunmayan eski sahneler içindir.
+
+Ayni panelde `Arrow per successful projectile rent = 1` read-only gorunur. Play Mode'da
+effective Archer fire-rate/DPS, teorik shot demand, gercek pool rent Arrow/s, stok/capacity,
+CAP/EFF seviyeleri ve sonraki yatirim fiyatlari canli okunur.
 
 ## Play Mode kabulü
 
