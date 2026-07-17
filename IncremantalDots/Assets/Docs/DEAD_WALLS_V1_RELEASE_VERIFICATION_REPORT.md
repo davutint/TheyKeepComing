@@ -1,0 +1,106 @@
+# Dead Walls V1 - Release Verification Report
+
+## Ölçüm kimliği
+
+- Tarih: `2026-07-18`
+- Unity: `6000.3.10f1`
+- Aktif scene: `Assets/Scenes/NewGameScene.unity`
+- Run save şeması: desteklenen `v3-v15`, canonical `v15`
+- Meta save şeması: desteklenen `v1-v3`, canonical `v3`
+- Release active enemy cap: `900`
+
+Bu rapor V1 Definition of Done içindeki full regression, save migration ve explicit long-run
+soak kapılarını tek audit kaydında birleştirir. Target-hardware 10K + 1K pacing kanıtı
+`DEAD_WALLS_10K_RUNTIME_REPORT.md` içindedir; burada aynı sonucu yeniden uydurmak yerine referans
+olarak korunur.
+
+## Sonuç özeti
+
+| Kapı | Sonuç | Kanıt |
+|---|---:|---|
+| Full EditMode | Geçti | `386/386` |
+| Full PlayMode | Geçti | `85 pass + 2 expected explicit skip` |
+| Save migration grubu | Geçti | `55/55` |
+| Explicit long-run soak | Geçti | `1/1`, `3.600` sample frame |
+| 10K + 1K target hardware | Geçti | Average/P95/P99 `7,665/13,890/14,058 ms` |
+| Scene validation | Geçti | `0 issue` |
+| Final Console | Geçti | `0 error / 0 warning` |
+
+## Save migration matrisi
+
+`RunPersistence.UpgradeToCurrent` her desteklenen legacy sürümü bir sonraki açık sözleşmeye
+taşır. Test matrisi yalnız son sürüm round-trip'ini değil, her şema sınırını ayrı doğrular.
+
+| Kaynak | Canonical sonuç | Guard |
+|---|---|---|
+| v3 | Worker target ratio, idle mirror ve observation state | Mevcut population/worker sayısı korunur |
+| v4 | Gerçek bed base + purchased bed `0` | Legacy `999999` sentinel taşınmaz |
+| v5 | Dört worker binası CAP/EFF `L0` | Olmayan yatırım uydurulmaz |
+| v6 | Archer formation version `1` | Archer type sayıları korunur |
+| v7 | Arrow capacity/efficiency `L0` | Mevcut Arrow stoku korunur; olmayan upgrade uydurulmaz |
+| v8 | Grave Essence `0` | Meta'dan run currency icat edilmez |
+| v9 | Heart graph açıkça absent | Production catalog'dan sessiz reroll yapılmaz |
+| v10 | Regular Council handled-day state | Chance failure scheduled günü tüketmez; kanıtlı kart korunur |
+| v11 | Rally/Emergency cooldown hazır | Mevcut Fireball cooldown korunur |
+| v12 | Essence meta remainder `0` | Kesirli geçmiş değer uydurulmaz |
+| v13 | Legacy exact combat fallback | Aggregate payload tahminle üretilmez |
+| v14 | Telemetry peak/timeline temiz başlangıç | Historical telemetry uydurulmaz |
+| v15 | Canonical payload | Bozuk combat rebuild ve sırasız Wall timeline fail-closed |
+
+Ek durable state kanıtı:
+
+- Meta v1/v2 save'leri canonical v3'e currency, upgrade, receipt, pool unlock ve tutorial
+  state'ini uydurmadan taşır; future-version ve corrupt JSON overwrite edilemez.
+- Death receipt run identity/reward snapshot'ını round-trip eder; matching pending death run
+  snapshot'ını geçersiz kılar ve aynı RunId Meta reward'ını yalnız bir kez uygular.
+- Targeted `RunPersistenceTests + MetaProgressionSchemaTests + CouncilRegularScheduleTests`
+  birleşik sonucu `55/55`'tir.
+
+## Long-run soak kapanış koşusu
+
+Explicit test release `MaxAliveZombies = 900` değerini yükseltmeden `10.000` pending demand seed
+etti. Production `WaveSpawnSystem`, enemy pool ve Arrow pool 360 warmup + 3.600 steady-state frame
+boyunca çalıştı; ardından demand dondurulup backlog yalnız `MaxSpawnBatch = 16` ile eritildi.
+
+| Metrik | Sonuç |
+|---|---:|
+| Targeted test | `1/1 passed` |
+| Active cap / observed max | `900 / 900` |
+| Cap fill | `57 frame` |
+| Warmup / soak | `360 / 3.600 frame` |
+| Backlog before / after soak | `9.244 / 9.989` |
+| Drain frame / max per frame | `625 / 16` |
+| Demanded / spawned / pending | `10.889 / 10.889 / 0` |
+| Final active enemy | `777` |
+| Enemy pool created / expansion | `1.024 / 7` |
+| Enemy rent / return | `10.889 / 10.112` |
+| Arrow pool created / expansion | `1.024 / 0` |
+| Arrow rent / return | `45.000 / 45.000` |
+| Frame average / P95 / max | `6,227 / 8,227 / 34,610 ms` |
+| Main thread average / max | `6,215 / 34,367 ms` |
+| Editor root GC average / max | `29.759 / 398.875 B` |
+| Used memory start / end | `4.273.004.896 / 4.341.456.264 B` |
+
+`TotalDemanded - TotalSpawned = Pending`, pool `available + active = totalCreated`, cap saturation
+ve batch-bounded drain invariant'ları test boyunca korundu. Editor root GC ve used-memory sayaçları
+runtime allocation/leak sertifikası değildir; bounded pool residency ve exact rent/return
+muhasebesi release kabul sahibidir.
+
+## Test kararlılığı
+
+İlk full PlayMode closure turunda `Exact2KHorde_FireballGapRefillsUnderQueuedPressure`, ağır suite
+frame'i sabit `4,5s` realtime penceresini çok az simulation update'iyle tükettiği için strike
+sonucunu erken okuyup `killed=0` verdi. Test tek başına geçti; fixture daha sonra realtime deadline
+yanında minimum queue/refill frame sayısını da bekleyecek şekilde dar kapsamlı stabilize edildi.
+Gameplay, Fireball, queue veya horde davranışı değiştirilmedi.
+
+Stabilizasyon sonrası targeted test `1/1`, clean full PlayMode tekrar `85 pass + 2 expected explicit
+skip` geçti. Bu nedenle ilk dalgalanma gizlenmedi; kökü ve test-only düzeltmesi bu raporda durable
+kanıt olarak tutuldu.
+
+## Release kararı
+
+Full regression, bütün desteklenen save migration sınırları, regular-Council legacy geçişi,
+durable Meta/death state'i, target-hardware combined load ve release-cap long-run soak temizdir.
+V1 DoD test-report kapısı kapatılabilir. Bu karar enemy cap'i artırmaz ve yeni content kararı
+vermez; açık owner-content maddeleri tracker'da ayrı kalır.

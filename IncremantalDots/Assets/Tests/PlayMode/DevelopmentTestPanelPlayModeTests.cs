@@ -302,7 +302,16 @@ namespace DeadWalls.Tests
                 }
             }
 
-            yield return new WaitForSecondsRealtime(15f);
+            // Realtime tek basina suite-order stall'inda cok az simulation frame'i
+            // birakabilir. Hem hordenin duvara ulasma suresini hem minimum update
+            // sayisini bekleyerek fixture'i Editor yukunden bagimsiz tut.
+            float queueDeadline = Time.realtimeSinceStartup + 15f;
+            int queueFrames = 0;
+            while (Time.realtimeSinceStartup < queueDeadline || queueFrames < 300)
+            {
+                queueFrames++;
+                yield return null;
+            }
 
             entityManager.CompleteAllTrackedJobs();
             float2 strikeCenter = float2.zero;
@@ -337,7 +346,16 @@ namespace DeadWalls.Tests
                 Damage = 10_000_000_000f
             });
 
-            yield return new WaitForSecondsRealtime(4.5f);
+            // Ayni nedenle Fireball damage/return/refill zincirine en az 270
+            // simulation update'i ver; agir full-suite frame'i 4,5 saniyeyi tek
+            // basina tuketse bile strike sonucunu erken okumayalim.
+            float refillDeadline = Time.realtimeSinceStartup + 4.5f;
+            int refillFrames = 0;
+            while (Time.realtimeSinceStartup < refillDeadline || refillFrames < 270)
+            {
+                refillFrames++;
+                yield return null;
+            }
 
             entityManager.CompleteAllTrackedJobs();
             int activeAfter;

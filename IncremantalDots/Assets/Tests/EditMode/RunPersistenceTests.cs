@@ -697,6 +697,43 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void TryLoad_Version7Snapshot_MigratesToCleanFiniteArrowUpgradeLevels()
+        {
+            string path = Path.Combine(Application.persistentDataPath, "run_save.json");
+            byte[] original = File.Exists(path) ? File.ReadAllBytes(path) : null;
+            var legacy = new RunSaveState
+            {
+                Version = 7,
+                RunId = "run_v7_arrow_migration_" + Guid.NewGuid().ToString("N"),
+                ArrowCurrent = 173,
+                ArrowCapacityLevel = 99,
+                ArrowEfficiencyLevel = 88
+            };
+
+            try
+            {
+                File.WriteAllText(path, JsonUtility.ToJson(legacy));
+
+                RunSaveState restored = RunPersistence.TryLoad();
+
+                Assert.That(restored, Is.Not.Null);
+                Assert.That(restored.Version, Is.EqualTo(RunSaveState.CurrentVersion));
+                Assert.That(restored.ArrowCurrent, Is.EqualTo(173));
+                Assert.That(restored.ArrowCapacityLevel, Is.Zero,
+                    "v7 finite Arrow capacity level'i tasimiyordu; migration temiz L0 olmali.");
+                Assert.That(restored.ArrowEfficiencyLevel, Is.Zero,
+                    "v7 finite Arrow efficiency level'i tasimiyordu; migration temiz L0 olmali.");
+            }
+            finally
+            {
+                if (original != null)
+                    File.WriteAllBytes(path, original);
+                else if (File.Exists(path))
+                    File.Delete(path);
+            }
+        }
+
+        [Test]
         public void TryLoad_Version8Snapshot_MigratesToZeroGraveEssence()
         {
             string path = Path.Combine(Application.persistentDataPath, "run_save.json");

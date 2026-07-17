@@ -389,3 +389,33 @@ callstack/file-write ve test/render allocation'ları target-hardware pacing sonu
 
 Doğrulama: Player-targeted explicit test `1/1 passed`; frame JSON `accepted=true`; raw `120/120`
 frame analiz edildi; orchestration status `passed` ve iki capture yolunu birlikte kaydetti.
+
+---
+
+## DW-V1-DOD-RELEASE-TEST-REPORTS soak kapanış koşusu - 2026-07-18
+
+V1 release doğrulamasında explicit long-run soak güncel kod üzerinde yeniden çalıştırıldı. Release
+`MaxAliveZombies = 900`, `MaxSpawnBatch = 16`, production enemy/Arrow pool ve backlog policy
+değiştirilmedi.
+
+| Metrik | Kapanış koşusu |
+|---|---:|
+| Targeted PlayMode | `1/1 passed` |
+| Release cap / observed max | `900 / 900` |
+| Warmup / soak | `360 / 3.600 frame` |
+| Backlog before / after soak | `9.244 / 9.989` |
+| Drain frame / max drain | `625 / 16` |
+| Demanded / spawned / pending | `10.889 / 10.889 / 0` |
+| Enemy pool created / expansion | `1.024 / 7` |
+| Enemy rent / return | `10.889 / 10.112` |
+| Arrow pool created / expansion | `1.024 / 0` |
+| Arrow rent / return | `45.000 / 45.000` |
+| Frame average / P95 / max | `6,227 / 8,227 / 34,610 ms` |
+| Main thread average / max | `6,215 / 34,367 ms` |
+| Editor root GC average / max | `29.759 / 398.875 B` |
+| Used memory start / end | `4.273.004.896 / 4.341.456.264 B` |
+
+Pending sıfıra indiğinde demanded ve spawned exact eşitlendi; enemy/Arrow pool muhasebesi ve cap
+saturation invariant'ları korundu. Fresh sonuç önceki iki koşunun P95 `7,400-7,732 ms` bandına
+yakın `8,227 ms` verdi ve 60 FPS bütçesinin belirgin biçimde altında kaldı. Editor GC/memory root
+sayaçları yine allocation/leak sertifikası sayılmaz; bounded pool residency kabul sahibidir.
