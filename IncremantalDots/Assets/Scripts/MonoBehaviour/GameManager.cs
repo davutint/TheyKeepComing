@@ -230,6 +230,7 @@ namespace DeadWalls
 
             EnsureHeartRuntime();
             ReadECSData();
+            TryEmitRunStartedTelemetry();
             TickAbilityCooldowns();
         }
 
@@ -3978,6 +3979,7 @@ namespace DeadWalls
             if (!RestoreCombatSnapshot(save))
                 return false;
             ReadECSData();
+            SuppressRunStartedTelemetryForRestoredRun();
             OnGameStateChanged?.Invoke();
             return true;
         }

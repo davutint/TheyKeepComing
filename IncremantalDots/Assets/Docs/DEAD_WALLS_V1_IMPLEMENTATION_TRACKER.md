@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.3
 > **Son tam kapsam denetimi:** 2026-07-17
 > **Aktif paket:** Post-Package V1 Closure - Contracts, Performance ve Release DoD
-> **Aktif iş:** `DW-V1-TELEMETRY-RUN-STARTED` - Emit run_started Meta/Resource/Heart Identity
-> **İlerleme:** `412 / 442` tracker checkbox'ı tamamlandı - `%93,21`
+> **Aktif iş:** `DW-V1-TELEMETRY-PHASE-CHANGED` - Emit phase_changed Day/Phase/Horde State
+> **İlerleme:** `413 / 442` tracker checkbox'ı tamamlandı - `%93,44`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -1044,7 +1044,20 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 
 ### Telemetry event'leri
 
-- [ ] `run_started`: meta levels, starting resources, graph seed/version.
+- [x] `run_started`: meta levels, starting resources, graph seed/version. Provider-bagimsiz tek
+  `GameplayTelemetry` cikisi kuruldu; event v1 envelope'u `EventName/SchemaVersion/RunId/PayloadJson`
+  tasir ve external analytics target'i owner karari gelmeden secilmez. `GameManager`, canonical
+  `MetaProgression` + production 11-definition Meta catalog, ECS `ResourceData/ArrowSupply/
+  PopulationState` ve Heart runtime identity'sini yeni run tamamen kurulduktan sonra immutable
+  snapshot'a cevirir. Production default emission `160/80/50/120`, `200/200 Arrow`, `60/60`
+  population ve 11 exact Meta level verir. Launch Heart catalog henuz owner karari bekledigi icin
+  event kaybolmaz; `configured=false/ready=false/version=0/seed=0` explicit unconfigured kimligi
+  tasir ve catalog geldiginde ayni contract generated graph seed/version'ini otomatik okur.
+  Main-menu pending action uygulanmadan emission yapilmaz; yeni `RestartGame` RunId basina bir kez
+  emit eder, exact Continue restore edilen ayni RunId'yi ikinci `run_started` saymaz. Editor/
+  Development log'u `[DW-TELEMETRY]` machine-readable envelope verir; Release log kapali fakat
+  subscriber cikisi aktiftir. Contract EditMode `3/3`, yeni-run + Continue duplicate PlayMode
+  `1/1`, ilgili Meta/Continue grubu `3/3` gecti.
 - [ ] `phase_changed`: day, phase, alive enemies, spawn backlog.
 - [ ] `resource_spent`: resource, amount, purchase type, resulting level/count.
 - [ ] `archer_changed`: buy/retrain, type from/to, total cap usage.
@@ -1085,8 +1098,8 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 
 ### Mevcut test envanteri
 
-- `[x]` EditMode: `345/345`; Meta diminishing reward/quoted receipt/exact 11-definition tuning, exact Council 3/6/9 cadence, staged launch catalog, 5.400-sample budget/token gate, source-retirement/curated-chain, role/content recipe kontratı, v10->v11 Council migration/discriminator, Heart graph, finite Arrow, pool, targeting, Formation V1, common archer cap, economy, worker, cycle, quantity-only, backlog, Moat isolation ve enemy pool kapsamı.
-- `[x]` PlayMode: `72 pass + 2 explicit profiler/soak skip`; gerçek death quote/Continue/meta shop, `NewGameScene` Day 1-12 Council cadence, onaylı Council chain flag live yazımı, active-card exact payload/memory/handled-day Continue, çözülmüş seçim + temp effect duration Continue, bozuk Council karar/Continue payload preflight'ı, Heart Continue, Arrow/pool/targeting, 1K archer x 10K enemy, Formation V1, archer cap/retrain, economy/worker, Wall, cycle, backlog ve Fireball kapsamı.
+- `[x]` EditMode: `348/348`; `run_started` payload/envelope/identity guard'lari, Meta diminishing reward/quoted receipt/exact 11-definition tuning, exact Council 3/6/9 cadence, staged launch catalog, 5.400-sample budget/token gate, source-retirement/curated-chain, role/content recipe kontratı, v10->v11 Council migration/discriminator, Heart graph, finite Arrow, pool, targeting, Formation V1, common archer cap, economy, worker, cycle, quantity-only, backlog, Moat isolation ve enemy pool kapsamı.
+- `[x]` PlayMode envanteri: `73 pass + 2 explicit profiler/soak skip`; yeni `run_started` new-run/Continue testi `1/1`, ilgili telemetry + exact Continue + Meta start grubu `3/3`. Tam 75-test suite iki kez kosuldu: ilkinde SpellFeedback ve Dusk presentation, ikincisinde yalniz Dusk presentation suite-order flake verdi; iki eski test ayri tekrar kosusunda `2/2`, Dusk tekrarinda `1/1` gecti. Telemetry, gerçek death quote/Continue/meta shop, `NewGameScene` Day 1-12 Council cadence, onaylı Council chain flag live yazımı, active-card exact payload/memory/handled-day Continue, çözülmüş seçim + temp effect duration Continue, bozuk Council karar/Continue payload preflight'ı, Heart Continue, Arrow/pool/targeting, 1K archer x 10K enemy, Formation V1, archer cap/retrain, economy/worker, Wall, cycle, backlog ve Fireball kapsamı envanterde kalır.
 - `[~]` Player/hardware frame pacing kabulü ilgili ürün kapısını bekliyor; Council launch content ownership tamamlandı.
 
 ---
@@ -1324,3 +1337,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-17 | `DW-V1-TUNING-HEART-SURFACE` canonical Heart tuning contract | Yeni/paralel bir Heart owner kurulmadı. `Difficulty Tuner > Heart Runtime Contract`, `GameManager` graph settings/wallet runtime owner'ını ve catalog varsa gerçek `HeartNodeDefinitionSO` rarity/depth/cost/growth definition'larını doğrudan düzenlenen tek yüzeyde birleştirdi. Fiyat ve graph preview'ları production `HeartPurchasePricing` ile `HeartGraphGenerator` kullanır; live telemetry hidden node kimliklerini açmadan aggregate state sunar. Değişiklikler yalnız gelecekte üretilecek graph'a uygulanır, aktif veya Continue exact graph'i reroll edilmez. Onaylı Essence drop sayıları ve production catalog bulunmadığından değer uydurulmadı; açık `UNCONFIGURED` owner gate'i ve fail-closed catalog sınırı korundu | Heart contract guard EditMode `2/2`; Heart data/generator/purchase EditMode `36/36`; exact graph Continue PlayMode `1/1`; Difficulty Tuner gerçek editor window olarak açıldı; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `410/442` |
 | 2026-07-17 | `DW-V1-TUNING-COUNCIL-SURFACE` canonical regular Council tuning contract | Yeni Council type, timer veya parallel state kurulmadı. Production catalog Small/Fair/Generous multiplier/weight, A/B budget tolerance ve recent memory'nin tek tuning owner'i oldu; eski composer dagilimi aynen korundu. Memory azaltimi scheduled compose oncesi ve secim sonrasi uygulanir. Tuner fixed Day `3/6/9...` cadence'i, regular-only/Emergency-absent siniri, SubScene'den okunan Dawn+Day karar penceresini ve aggregate runtime state'i tek yuzeyde gosterir | Council EditMode `56/56`; regular runtime/Continue/memory PlayMode `8/8`; Tuner snapshot `5s + 30s = 35s`; editor window acildi; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `411/442` |
 | 2026-07-17 | `DW-V1-TUNING-META-SURFACE` diminishing death reward + audited permanent economy | Production Meta catalog, uc azalan kill bandi ile day/night/peak-pop/record agirliklarinin tek owner'i oldu. Exact quote `RunDeathReceipt v2` icinde durable sabitlenir; recovery tuning drift'i yaratmaz, v1 legacy explicit kalir. Mevcut 11 definition'in exponential maliyet ve hafif-guc rolleri degistirilmeden exact testle kilitlendi. Tuner ayni catalog/definition assetlerini dogrudan duzenler, runtime preview ve aggregate telemetry sunar | Targeted EditMode `44/44`; targeted PlayMode `3/3`; full EditMode `345/345`; full PlayMode `72 pass + 2 explicit skip`; 10K quote `1.640`; catalog `11/0 problem`; editor window acildi; scene validation `0`; final Console `0 error / 0 warning`; tracker `412/442` |
+| 2026-07-17 | `DW-V1-TELEMETRY-RUN-STARTED` provider-independent run identity event | Sonraki telemetry event'lerinin de kullanacagi tek `GameplayTelemetry` envelope/subscriber siniri kuruldu; external target owner karari bekler. Yeni run, 11 production Meta definition level'i, ECS baslangic kaynaklari/Arrow/population snapshot'i ve Heart catalog/graph kimligini v1 payload'a yazar. Unconfigured production Heart acik status olarak kalir; main-menu action uygulanmadan emit edilmez ve exact Continue ayni RunId'yi tekrar saymaz | Contract EditMode `3/3`; new-run/Continue PlayMode `1/1`; ilgili telemetry+Continue+Meta grubu `3/3`; full EditMode `348/348`; full PlayMode'da suite-order Dusk flake'i targeted `1/1` gecti; `NewGameScene` validation `0`, final Console `0 error / 0 warning`; tracker `413/442` |
