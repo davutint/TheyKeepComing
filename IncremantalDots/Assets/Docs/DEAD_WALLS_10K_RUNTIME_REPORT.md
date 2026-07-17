@@ -253,3 +253,39 @@ Bu koşudaki snapshot, ölçüm anında `879` aktif projectile içerdiği için 
 pool aktivasyonu ile canonical 1K archer spawn/formasyon kurulumunun birlikte maliyetidir; Continue
 yükleme ekranında çalışır ve aktif combat frame bütçesi değildir. Bu ölçüm Player allocation/spike
 kabulü sayılmaz; birleşik yükte isolated Player Profiler kanıtı ayrı tracker maddesinde açıktır.
+
+---
+
+## DW-V1-PERF-PLAYER-ALLOC-SPIKE takip ölçümü - 2026-07-17
+
+Birleşik yük, Test Framework'ün `StandaloneWindows64` Development Player'ında allocation
+callstack açık şekilde yeniden kuruldu. Test doğrudan stress archer entity'si üretmedi; production
+`GameManager.RestoreArcherCountsWithinCapacity` owner'ı ile 1.000 Basic Archer, production enemy
+pool ile 10.000 aktif enemy ve gerçek finite Arrow/projectile pipeline'ı kullanıldı. Capture 30
+warmup frame sonrasında 120 frame topladı; raw profil `73.765.057 B` olarak yazıldı ve analyzer
+tarafından 121 okunabilir frame'e dönüştürüldü.
+
+| Metrik | Standalone Player ölçümü |
+|---|---:|
+| Test sonucu | 1 passed / 0 failed / 0 skipped |
+| Enemy / canonical archer | 10.000 / 1.000 |
+| Capture sonu aktif projectile | 6 |
+| Frame average / P95 / max | 10,593 / 18,694 / 33,234 ms |
+| Root GC average / max | 10.437 / 12.020 B/frame |
+| Proje kodu GC toplam / ortalama | 58.290 B / 481 B/frame |
+| ECS system GC / sync-point | 0 B / yok |
+| En ağır ortalama sistem | DamageApplySystem - 1,892 ms ortalama, 4,863 ms max |
+| En yüksek tek sistem sample'ı | ArcherShootSystem - 17,444 ms max |
+| En yavaş whole-frame sahibi | Frame 2 - 33,234 ms; en büyük named ECS katkısı DamageApplySystem 2,219 ms |
+
+Proje kodu allocation owner'ları `GameManager.Update` 22.848 B, `SpellCastUI.Update` 22.372 B,
+`ArrowSupplyUI.Update` 10.080 B, `MarketUI.Update` 1.344 B, `HUDController.Update` 940 B,
+`HeartScreenUI.Update` 456 B ve `AmbientAudioController.Update` 250 B olarak ayrıldı. Toplam root
+allocation'ın büyük bölümü Player render/test altyapısında; proje kodu payı capture boyunca yaklaşık
+`482 B/frame` kaldı. Named ECS sistemlerinin hiçbirinde GC veya sync-point marker'ı bulunmadı.
+
+Bu Development Player koşusu release FPS sertifikası değildir; test assembly, profiler ve allocation
+callstack instrumentation'ı taşır. Buna rağmen Editor gürültüsünden ayrılmış birleşik owner kanıtıdır:
+average 60 FPS bütçesinin altında, P95 ise `16,67 ms` bütçesinin `2,024 ms` üzerindedir. Bu nedenle
+release cap artırılmadı; aktif cap/backlog saturation ve süreklilik kararı sıradaki long-run soak
+ölçümünde verilecektir.

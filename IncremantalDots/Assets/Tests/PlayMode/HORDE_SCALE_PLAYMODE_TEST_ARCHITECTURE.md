@@ -9,3 +9,5 @@ Save kabulü `BasicArchers = 1000`, diğer iki type count `0`, güncel `ArcherFo
 Performans değerleri assert threshold değildir; donanım/Editor bağımlı telemetry olarak `[DW-B-SCALE]` satırına yazılır. `saved_archers`, `rebuild_deterministic`, `archer_rebuild_deterministic`, `save_ms`, `save_bytes`, `restore_ms` ve `second_restore_ms` canonical Continue kanıtının parçasıdır. Contract correctness değerleri assert edilir; test runtime gameplay davranışını değiştirmez.
 
 Otoriter ölçüm çıktısı: `Assets/Docs/DEAD_WALLS_10K_RUNTIME_REPORT.md`.
+
+Normal regression setindeki testten ayrı explicit `HordeScaleProfilerCapturePlayModeTests`, aynı production pool ve canonical archer owner'larıyla 10K enemy + 1K Basic Archer birleşik yükünü Development Player raw capture'ına çevirir. Bu test release cap/tuning yazmaz; allocation callstack yalnız 120-frame hedefli profil penceresinde açıktır. Player build/run ve otomatik analiz owner'ı `Assets/Scripts/Editor/CombinedLoadPlayerProfilerRunner.cs` dosyasıdır.

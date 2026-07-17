@@ -11,3 +11,5 @@ Test başlamadan `NewGameScene` build settings içinde olmalı ve Unity Console 
 Başarılı koşuda Test Runner output'undaki `[DW-B-SCALE]` satırı en az `enemy=10000`, `archer=1000`, `saved_archers=1000`, `rebuild_deterministic=True`, `archer_rebuild_deterministic=True` ve `backlog=777` taşımalıdır. `save_ms`, `save_bytes`, `restore_ms` ve `second_restore_ms` aynı satırdan rapora aktarılır.
 
 Editor ölçümünü standalone build sonucu olarak kullanma. Karşılaştırma yaparken aynı Unity sürümü, aynı makine ve aynı test senaryosunu kullan.
+
+Isolated Standalone Player allocation/spike ölçümü için normal Test Runner listesindeki explicit profiler testini Editor içinde çalıştırma. `Tools > DeadWalls > Run Combined 10K + 1K Player Profile` komutunu kullan; bu yol exact testi `StandaloneWindows64` Player'a gönderir ve raw capture'ı mevcut analyzer ile otomatik raporlar.

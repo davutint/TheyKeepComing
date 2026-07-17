@@ -34,6 +34,12 @@ public class ProfilerDataAnalyzer : EditorWindow
 
     private const string REPORT_OUTPUT_PATH = @"C:\Users\PC\Desktop\PERFORMANS ANALIZI\profiler_report.txt";
     private const string USER_CODE_PREFIX = "Assembly-CSharp.dll!";
+    private static readonly string[] USER_CODE_PREFIXES =
+    {
+        USER_CODE_PREFIX,
+        "DeadWalls.dll!",
+        "DeadWalls."
+    };
 
     private const int MAX_HIERARCHY_DEPTH = 8;
     private const int TOP_SPIKE_COUNT = 20;
@@ -253,6 +259,47 @@ public class ProfilerDataAnalyzer : EditorWindow
         public float maxPhysicsPipelineMs;
     }
 
+    [Serializable]
+    private sealed class AutomationSystemSummary
+    {
+        public string system;
+        public float averageMs;
+        public float maxMs;
+        public long gcBytes;
+        public bool syncPoint;
+    }
+
+    [Serializable]
+    private sealed class AutomationAllocatorSummary
+    {
+        public string marker;
+        public long totalBytes;
+        public long calls;
+    }
+
+    [Serializable]
+    private sealed class AutomationProfileSummary
+    {
+        public string profilePath;
+        public string reportPath;
+        public int frames;
+        public int skippedFrames;
+        public float averageCpuMs;
+        public float p95CpuMs;
+        public float maxCpuMs;
+        public long totalFrameGcBytes;
+        public long averageFrameGcBytes;
+        public long maxFrameGcBytes;
+        public int framesWithGc;
+        public long totalUserGcBytes;
+        public long averageUserGcBytes;
+        public int maxSpikeFrame;
+        public string maxSpikeSystem;
+        public float maxSpikeSystemMs;
+        public List<AutomationSystemSummary> systems;
+        public List<AutomationAllocatorSummary> userAllocators;
+    }
+
     // ═══════════════════════════════════════════════════════════
     // WINDOW STATE
     // ═══════════════════════════════════════════════════════════
@@ -272,6 +319,7 @@ public class ProfilerDataAnalyzer : EditorWindow
     private enum SnapshotDisplayMode { A, B, Both }
     private SnapshotDisplayMode _snapshotDisplayMode = SnapshotDisplayMode.A;
     private AnalysisSnapshot _displaySnapshot;
+    private bool _automationMode;
 
     // ═══════════════════════════════════════════════════════════
     // COMPATIBILITY PROPERTIES (Tab 0-7 use these → delegates to _displaySnapshot ?? _snapshotA)
@@ -315,6 +363,137 @@ public class ProfilerDataAnalyzer : EditorWindow
     {
         var window = GetWindow<ProfilerDataAnalyzer>("Profiler Analyzer");
         window.minSize = new Vector2(900, 600);
+    }
+
+    public static bool TryAnalyzeProfileToArtifacts(
+        string profilePath,
+        string reportPath,
+        string summaryPath,
+        out string error)
+    {
+        error = null;
+        ProfilerDataAnalyzer analyzer = CreateInstance<ProfilerDataAnalyzer>();
+        analyzer._automationMode = true;
+
+        try
+        {
+            AnalysisSnapshot snapshot = analyzer.AnalyzeFile(profilePath, "PLAYER");
+            if (snapshot == null)
+            {
+                error = "Profiler raw analizi sonuc uretmedi.";
+                return false;
+            }
+
+            analyzer._snapshotA = snapshot;
+            analyzer._snapshotB = null;
+            analyzer._displaySnapshot = null;
+
+            Directory.CreateDirectory(Path.GetDirectoryName(reportPath));
+            File.WriteAllText(
+                reportPath,
+                analyzer.GenerateTextReport(),
+                new UTF8Encoding(false));
+
+            AutomationProfileSummary summary = BuildAutomationSummary(snapshot, reportPath);
+            Directory.CreateDirectory(Path.GetDirectoryName(summaryPath));
+            File.WriteAllText(
+                summaryPath,
+                JsonUtility.ToJson(summary, true),
+                new UTF8Encoding(false));
+
+            Debug.Log(
+                $"[DW-V1-PLAYER-PROFILE-ANALYSIS] frames={summary.frames}; " +
+                $"cpu_avg_ms={summary.averageCpuMs:F3}; cpu_p95_ms={summary.p95CpuMs:F3}; " +
+                $"cpu_max_ms={summary.maxCpuMs:F3}; gc_avg_bytes={summary.averageFrameGcBytes}; " +
+                $"gc_max_bytes={summary.maxFrameGcBytes}; user_gc_avg_bytes={summary.averageUserGcBytes}; " +
+                $"spike_system={summary.maxSpikeSystem}; " +
+                $"report={reportPath}; summary={summaryPath}");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            error = ex.ToString();
+            Debug.LogError($"[DW-V1-PLAYER-PROFILE-ANALYSIS] {error}");
+            return false;
+        }
+        finally
+        {
+            DestroyImmediate(analyzer);
+            EditorUtility.ClearProgressBar();
+        }
+    }
+
+    private static AutomationProfileSummary BuildAutomationSummary(
+        AnalysisSnapshot snapshot,
+        string reportPath)
+    {
+        float[] cpu = snapshot.frameTimings.Select(frame => frame.cpuMs).OrderBy(value => value).ToArray();
+        int p95Index = cpu.Length > 0
+            ? Mathf.Clamp(Mathf.CeilToInt(cpu.Length * 0.95f) - 1, 0, cpu.Length - 1)
+            : 0;
+        FrameTimingData maxSpike = snapshot.frameTimings.Count > 0
+            ? snapshot.frameTimings.OrderByDescending(frame => frame.cpuMs).First()
+            : default;
+        EcsFrameData spikePipeline = snapshot.ecsFrameTimeline.FirstOrDefault(
+            frame => frame.frameIndex == maxSpike.frameIndex);
+        KeyValuePair<string, float> spikeSystem = spikePipeline?.systemTimesMs != null
+            && spikePipeline.systemTimesMs.Count > 0
+            ? spikePipeline.systemTimesMs.OrderByDescending(pair => pair.Value).First()
+            : default;
+
+        double totalFrameGc = snapshot.frameTimings.Sum(frame => frame.gcBytes);
+        double maxFrameGc = snapshot.frameTimings.Count > 0
+            ? snapshot.frameTimings.Max(frame => frame.gcBytes)
+            : 0d;
+        double totalUserGc = snapshot.functionMap.Values
+            .Where(entry => IsUserCode(entry.name))
+            .Sum(entry => entry.totalGcBytes);
+
+        return new AutomationProfileSummary
+        {
+            profilePath = snapshot.filePath,
+            reportPath = reportPath,
+            frames = snapshot.frameTimings.Count,
+            skippedFrames = snapshot.skippedFrames,
+            averageCpuMs = snapshot.avgCpu,
+            p95CpuMs = cpu.Length > 0 ? cpu[p95Index] : 0f,
+            maxCpuMs = snapshot.maxCpu,
+            totalFrameGcBytes = (long)totalFrameGc,
+            averageFrameGcBytes = snapshot.frameTimings.Count > 0
+                ? (long)(totalFrameGc / snapshot.frameTimings.Count)
+                : 0L,
+            maxFrameGcBytes = (long)maxFrameGc,
+            framesWithGc = snapshot.frameTimings.Count(frame => frame.gcBytes > 0),
+            totalUserGcBytes = (long)totalUserGc,
+            averageUserGcBytes = snapshot.frameTimings.Count > 0
+                ? (long)(totalUserGc / snapshot.frameTimings.Count)
+                : 0L,
+            maxSpikeFrame = maxSpike.frameIndex,
+            maxSpikeSystem = string.IsNullOrEmpty(spikeSystem.Key) ? "none" : spikeSystem.Key,
+            maxSpikeSystemMs = spikeSystem.Value,
+            systems = snapshot.ecsSystemsSorted
+                .Take(20)
+                .Select(system => new AutomationSystemSummary
+                {
+                    system = system.systemName,
+                    averageMs = system.AvgTimeMs,
+                    maxMs = system.maxTimeMs,
+                    gcBytes = (long)system.totalGcBytes,
+                    syncPoint = system.hasSyncPoint
+                })
+                .ToList(),
+            userAllocators = snapshot.functionMap.Values
+                .Where(entry => IsUserCode(entry.name) && entry.totalGcBytes > 0)
+                .OrderByDescending(entry => entry.totalGcBytes)
+                .Take(10)
+                .Select(entry => new AutomationAllocatorSummary
+                {
+                    marker = StripUserCodePrefix(entry.name),
+                    totalBytes = (long)entry.totalGcBytes,
+                    calls = entry.totalCalls
+                })
+                .ToList()
+        };
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -530,8 +709,9 @@ public class ProfilerDataAnalyzer : EditorWindow
 
             if (firstFrame < 0 || lastFrame < 0 || lastFrame < firstFrame)
             {
-                EditorUtility.DisplayDialog("Profiler Analyzer",
-                    $"[{label}] Frame aralığı geçersiz: {firstFrame} - {lastFrame}", "OK");
+                if (!_automationMode)
+                    EditorUtility.DisplayDialog("Profiler Analyzer",
+                        $"[{label}] Frame aralığı geçersiz: {firstFrame} - {lastFrame}", "OK");
                 return null;
             }
 
@@ -580,10 +760,18 @@ public class ProfilerDataAnalyzer : EditorWindow
                 if (frameIdx % PROGRESS_UPDATE_INTERVAL == 0)
                 {
                     float progress = (float)(frameIdx - firstFrame) / snapshot.totalFrames;
-                    if (EditorUtility.DisplayCancelableProgressBar(
-                        $"Profiler Analizi [{label}]",
-                        $"Frame {frameIdx - firstFrame + 1} / {snapshot.totalFrames} işleniyor...",
-                        progress))
+                    bool cancelled = _automationMode
+                        ? false
+                        : EditorUtility.DisplayCancelableProgressBar(
+                            $"Profiler Analizi [{label}]",
+                            $"Frame {frameIdx - firstFrame + 1} / {snapshot.totalFrames} işleniyor...",
+                            progress);
+                    if (_automationMode)
+                        EditorUtility.DisplayProgressBar(
+                            $"Profiler Analizi [{label}]",
+                            $"Frame {frameIdx - firstFrame + 1} / {snapshot.totalFrames} işleniyor...",
+                            progress);
+                    if (cancelled)
                     {
                         Debug.LogWarning($"[ProfilerAnalyzer][{label}] Kullanıcı tarafından iptal edildi.");
                         EditorUtility.ClearProgressBar();
@@ -636,8 +824,9 @@ public class ProfilerDataAnalyzer : EditorWindow
         catch (Exception ex)
         {
             Debug.LogError($"[ProfilerAnalyzer][{label}] Kritik hata: {ex}");
-            EditorUtility.DisplayDialog("Profiler Analyzer",
-                $"[{label}] Beklenmeyen hata oluştu:\n{ex.Message}", "OK");
+            if (!_automationMode)
+                EditorUtility.DisplayDialog("Profiler Analyzer",
+                    $"[{label}] Beklenmeyen hata oluştu:\n{ex.Message}", "OK");
             return null;
         }
         finally
@@ -654,9 +843,10 @@ public class ProfilerDataAnalyzer : EditorWindow
     {
         if (!File.Exists(path))
         {
-            EditorUtility.DisplayDialog("Profiler Analyzer",
-                $"Profiler dosyası bulunamadı:\n{path}\n\n" +
-                "Unity Profiler'dan File > Save as .raw ile dışa aktarın.", "OK");
+            if (!_automationMode)
+                EditorUtility.DisplayDialog("Profiler Analyzer",
+                    $"Profiler dosyası bulunamadı:\n{path}\n\n" +
+                    "Unity Profiler'dan File > Save as .raw ile dışa aktarın.", "OK");
             return false;
         }
 
@@ -667,9 +857,10 @@ public class ProfilerDataAnalyzer : EditorWindow
         if (!loaded)
         {
             EditorUtility.ClearProgressBar();
-            EditorUtility.DisplayDialog("Profiler Analyzer",
-                $"Profil yüklenemedi:\n{path}\n\n" +
-                "Dosyanın geçerli bir Unity Profiler .raw dosyası olduğundan emin olun.", "OK");
+            if (!_automationMode)
+                EditorUtility.DisplayDialog("Profiler Analyzer",
+                    $"Profil yüklenemedi:\n{path}\n\n" +
+                    "Dosyanın geçerli bir Unity Profiler .raw dosyası olduğundan emin olun.", "OK");
             return false;
         }
 
@@ -765,7 +956,7 @@ public class ProfilerDataAnalyzer : EditorWindow
 
             // Update nearestUserAncestor for children
             string ancestorForChildren = nearestUserAncestor;
-            if (!string.IsNullOrEmpty(name) && name.StartsWith(USER_CODE_PREFIX, StringComparison.Ordinal))
+            if (IsUserCode(name))
             {
                 ancestorForChildren = name;
             }
@@ -838,7 +1029,7 @@ public class ProfilerDataAnalyzer : EditorWindow
 
             // GC Call Chain tracking
             if (gcBytes > 0 && !string.IsNullOrEmpty(name)
-                && !name.StartsWith(USER_CODE_PREFIX, StringComparison.Ordinal)
+                && !IsUserCode(name)
                 && nearestUserAncestor != null)
             {
                 string chainKey = $"{nearestUserAncestor}||{name}";
@@ -1038,14 +1229,13 @@ public class ProfilerDataAnalyzer : EditorWindow
     private static string ExtractJobName(string markerName)
     {
         if (string.IsNullOrEmpty(markerName)) return null;
-        string name = markerName;
-        // Namespace temizle: "DeadWalls.CollisionJob" → "CollisionJob"
-        int dotIdx = name.LastIndexOf('.');
-        if (dotIdx >= 0) name = name.Substring(dotIdx + 1);
-        // Suffix temizle: "CollisionJob.Execute()" → "CollisionJob"
-        int parenIdx = name.IndexOf('(');
-        if (parenIdx > 0) name = name.Substring(0, parenIdx);
-        return KNOWN_ECS_JOBS.ContainsKey(name) ? name : null;
+        foreach (string jobName in KNOWN_ECS_JOBS.Keys)
+        {
+            if (markerName.IndexOf(jobName, StringComparison.Ordinal) >= 0)
+                return jobName;
+        }
+
+        return null;
     }
 
     private void RecordEcsJobFrameData(AnalysisSnapshot snapshot, int frameIndex, string systemName, float timeMs)
@@ -1224,19 +1414,25 @@ public class ProfilerDataAnalyzer : EditorWindow
         if (string.IsNullOrEmpty(functionName))
             return false;
 
-        return functionName.StartsWith(USER_CODE_PREFIX, StringComparison.Ordinal);
+        for (int i = 0; i < USER_CODE_PREFIXES.Length; i++)
+        {
+            if (functionName.StartsWith(USER_CODE_PREFIXES[i], StringComparison.Ordinal))
+                return true;
+        }
+
+        return false;
     }
 
     private static string ExtractSystemName(string markerName)
     {
         if (string.IsNullOrEmpty(markerName)) return null;
-        string name = markerName;
-        int nsIdx = name.LastIndexOf('.');
-        if (nsIdx >= 0) name = name.Substring(nsIdx + 1);
-        // "System.OnUpdate()" gibi suffix'leri temizle
-        int parenIdx = name.IndexOf('(');
-        if (parenIdx > 0) name = name.Substring(0, parenIdx);
-        return KNOWN_ECS_SYSTEMS.ContainsKey(name) ? name : null;
+        foreach (string systemName in KNOWN_ECS_SYSTEMS.Keys)
+        {
+            if (markerName.IndexOf(systemName, StringComparison.Ordinal) >= 0)
+                return systemName;
+        }
+
+        return null;
     }
 
     private const float SYNC_POINT_THRESHOLD_MS = 0.5f;
@@ -3866,8 +4062,11 @@ public class ProfilerDataAnalyzer : EditorWindow
     private static string StripUserCodePrefix(string name)
     {
         if (string.IsNullOrEmpty(name)) return name;
-        if (name.StartsWith(USER_CODE_PREFIX, StringComparison.Ordinal))
-            return name.Substring(USER_CODE_PREFIX.Length);
+        for (int i = 0; i < USER_CODE_PREFIXES.Length; i++)
+        {
+            if (name.StartsWith(USER_CODE_PREFIXES[i], StringComparison.Ordinal))
+                return name.Substring(USER_CODE_PREFIXES[i].Length);
+        }
         return name;
     }
 

@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.IO;
+using System.Reflection;
 using NUnit.Framework;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -19,6 +21,7 @@ namespace DeadWalls.Tests
     public class HordeScaleProfilerCapturePlayModeTests
     {
         private const int EnemyTarget = 10_000;
+        private const int ArcherTarget = 1_000;
         private const int WarmupFrames = 30;
         private const int CaptureFrames = 120;
 
@@ -44,6 +47,7 @@ namespace DeadWalls.Tests
         [UnityTearDown]
         public IEnumerator TearDown()
         {
+            Time.timeScale = 1f;
             Profiler.enableBinaryLog = false;
             Profiler.enableAllocationCallstacks = false;
             Profiler.enabled = false;
@@ -55,8 +59,8 @@ namespace DeadWalls.Tests
         }
 
         [UnityTest]
-        [Explicit("Targeted 10K allocation capture only; normal regression setinde calismaz.")]
-        public IEnumerator HordeScale_10K_SteadyStateProfilerCapture_ProducesLoadableRaw()
+        [Explicit("Targeted 10K + canonical 1K Player allocation capture only; normal regression setinde calismaz.")]
+        public IEnumerator HordeScale_10K_1K_CombinedProfilerCapture_ProducesLoadableRaw()
         {
             GameManager gameManager = GameManager.Instance;
             bool runtimeReady = false;
@@ -151,13 +155,66 @@ namespace DeadWalls.Tests
             entityManager.SetComponentData(waveEntity, wave);
             Assert.That(activeQuery.CalculateEntityCount(), Is.EqualTo(EnemyTarget));
 
+            MethodInfo restoreArcherCounts = typeof(GameManager).GetMethod(
+                "RestoreArcherCountsWithinCapacity",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.That(restoreArcherCounts, Is.Not.Null);
+            restoreArcherCounts.Invoke(gameManager, new object[] { ArcherTarget, 0, 0 });
+
+            using EntityQuery archerQuery = entityManager.CreateEntityQuery(new EntityQueryDesc
+            {
+                All = new[]
+                {
+                    ComponentType.ReadOnly<ArcherUnit>(),
+                    ComponentType.ReadOnly<LocalTransform>()
+                },
+                None = new[] { ComponentType.ReadOnly<Prefab>() }
+            });
+            Assert.That(archerQuery.CalculateEntityCount(), Is.EqualTo(ArcherTarget));
+            Assert.That(gameManager.BasicArcherCount, Is.EqualTo(ArcherTarget));
+
+            using (NativeArray<Entity> archers = archerQuery.ToEntityArray(Allocator.Temp))
+            {
+                for (int i = 0; i < archers.Length; i++)
+                {
+                    ArcherUnit archer = entityManager.GetComponentData<ArcherUnit>(archers[i]);
+                    archer.FireTimer = 0f;
+                    entityManager.SetComponentData(archers[i], archer);
+                }
+            }
+
+            using (EntityQuery arrowSupplyQuery = entityManager.CreateEntityQuery(typeof(ArrowSupply)))
+            {
+                Entity arrowSupplyEntity = arrowSupplyQuery.GetSingletonEntity();
+                ArrowSupply stressSupply = entityManager.GetComponentData<ArrowSupply>(arrowSupplyEntity);
+                stressSupply.CapacityLevel = 50;
+                stressSupply.Current = ArrowEconomyUtility.GetCapacity(
+                    stressSupply, gameManager.GetEconomyPriceTuning());
+                entityManager.SetComponentData(arrowSupplyEntity, stressSupply);
+            }
+
+            using EntityQuery projectileQuery = entityManager.CreateEntityQuery(new EntityQueryDesc
+            {
+                All = new[]
+                {
+                    ComponentType.ReadOnly<ArrowTag>(),
+                    ComponentType.ReadOnly<ArrowProjectile>(),
+                    ComponentType.ReadOnly<LocalTransform>()
+                },
+                None = new[] { ComponentType.ReadOnly<Prefab>() }
+            });
+
             for (int frame = 0; frame < WarmupFrames; frame++)
                 yield return null;
 
-            string logsDirectory = Path.Combine(Directory.GetParent(Application.dataPath).FullName, "Logs");
-            Directory.CreateDirectory(logsDirectory);
-            string captureBasePath = Path.Combine(logsDirectory,
-                "DW_B_SCALE_OPT_STEADY_" + DateTime.UtcNow.ToString("yyyyMMdd_HHmmss_fff"));
+            Assert.That(projectileQuery.CalculateEntityCount(), Is.GreaterThan(0),
+                "Canonical 1K archer warmup sirasinda aktif projectile uretmedi.");
+
+            string capturesDirectory = Path.Combine(
+                Application.persistentDataPath, "DeadWallsProfilerCaptures");
+            Directory.CreateDirectory(capturesDirectory);
+            string captureBasePath = Path.Combine(capturesDirectory,
+                "DW_V1_PLAYER_COMBINED_" + DateTime.UtcNow.ToString("yyyyMMdd_HHmmss_fff"));
 
             bool previousEnabled = Profiler.enabled;
             bool previousBinaryLog = Profiler.enableBinaryLog;
@@ -189,12 +246,19 @@ namespace DeadWalls.Tests
             yield return null;
             Assert.That(activeQuery.CalculateEntityCount(), Is.EqualTo(EnemyTarget),
                 "Profiler capture sirasinda aktif enemy sayisi degisti.");
+            Assert.That(archerQuery.CalculateEntityCount(), Is.EqualTo(ArcherTarget),
+                "Profiler capture sirasinda canonical archer sayisi degisti.");
+            Assert.That(projectileQuery.CalculateEntityCount(), Is.GreaterThan(0),
+                "Profiler capture sonunda aktif projectile kalmadi.");
             Assert.That(File.Exists(rawPath), Is.True, "Profiler RAW dosyasi olusmadi.");
             Assert.That(new FileInfo(rawPath).Length, Is.GreaterThan(0),
                 "Profiler RAW dosyasi bos olustu.");
 
-            Debug.Log($"[DW-B-SCALE-PROFILE] path={rawPath}; frames={CaptureFrames}; " +
-                      $"enemy={EnemyTarget}; bytes={new FileInfo(rawPath).Length}");
+            Debug.Log($"[DW-V1-PLAYER-PROFILE-CAPTURE] path={rawPath}; " +
+                      $"platform={Application.platform}; frames={CaptureFrames}; " +
+                      $"enemy={EnemyTarget}; archer={ArcherTarget}; " +
+                      $"projectile={projectileQuery.CalculateEntityCount()}; " +
+                      $"bytes={new FileInfo(rawPath).Length}");
 
             EnemyPoolRuntimeUtility.ReturnAllActive(entityManager, poolEntity);
             wave = entityManager.GetComponentData<WaveStateData>(waveEntity);
