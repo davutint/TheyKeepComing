@@ -4269,7 +4269,8 @@ namespace DeadWalls
         // ---------------------------------------------------------------------------------
         // Meta Progression (roguelite, K2 karari — otoriter dok: META_PROGRESSION_ARCHITECTURE.md)
         // Kalici katman MetaProgression static sinifinda (JSON); burada kosu-basi uygulama +
-        // kosu-sonu kazanim yasar. Para birimi: RUH (1 kill = 1 Ruh + yeni rekorda gun x 50).
+        // kosu-sonu kazanim yasar. Para birimi: SOULS; exact reward production meta catalog
+        // tuning'inden bir kez quote edilir ve death receipt'e sabitlenir.
         // ---------------------------------------------------------------------------------
 
         /// <summary>Kosu basinda kalici meta seviyelerini oyuna uygular (idempotent — kosu basina bir kez).</summary>
@@ -4305,7 +4306,7 @@ namespace DeadWalls
                 if (level <= 0)
                     continue;
 
-                double total = (double)upgrade.ValuePerLevel * level;
+                double total = upgrade.GetTotalEffect(level);
                 switch (upgrade.EffectType)
                 {
                     case MetaUpgradeEffectType.StartingResource:
@@ -4468,11 +4469,32 @@ namespace DeadWalls
                 return;
 
             EnsureCurrentRunId();
+            int day = Mathf.Max(1, ContinuousSiegeCycle.CycleIndex + 1);
+            int kills = Mathf.Max(0, GameState.TotalKills);
+            // V1 population kaybetmez; death anindaki toplam population bu nedenle run peak'idir.
+            int peakPopulation = Mathf.Max(0, Population.Total);
+            if (metaUpgradeCatalog == null
+                || !MetaRewardCalculator.TryCalculate(
+                    metaUpgradeCatalog.RewardSettings,
+                    day,
+                    kills,
+                    peakPopulation,
+                    MetaProgression.State.BestDay,
+                    out MetaRewardQuote reward))
+            {
+                Debug.LogError(
+                    "[GameManager] Meta reward tuning bulunamadi veya gecersiz; death transaction fail-closed.");
+                return;
+            }
+
             var receipt = new RunDeathReceipt
             {
+                Version = RunDeathReceipt.CurrentVersion,
                 RunId = _currentRunId,
-                Day = Mathf.Max(1, ContinuousSiegeCycle.CycleIndex + 1),
-                Kills = GameState.TotalKills
+                Day = day,
+                Kills = kills,
+                PeakPopulation = peakPopulation,
+                Reward = reward
             };
 
             // Journal diske durable yazilmadan run snapshot silinmez ve meta uygulanmaz.

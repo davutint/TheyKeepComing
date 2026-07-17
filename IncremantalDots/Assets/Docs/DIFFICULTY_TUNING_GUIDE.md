@@ -34,6 +34,8 @@ Deger adi ezberleme — asagidaki tablodan hissini bul, hangi ayara dokunacagini
 | "Ok cok cabuk bitiyor" | Archer Runtime Contract > **Arrow kapasite / Arrow per Wood** | Kapasiteyi, paket verimini veya efficiency kazancini ARTIR |
 | "Ok ekonomisi anlamsiz ucuz" | Archer Runtime Contract > **Arrow CAP/EFF Wood+Iron base cost** | Ilgili base maliyetleri ARTIR; refill unit price satin alma sayisiyla buyumez |
 | "Heart node'lari cok ucuz / pahali" | Heart Runtime Contract > ilgili definition **Base Grave Essence cost / growth** | Production catalog onaylandiktan sonra base veya linear level growth'u degistir |
+| "Olum odulu 10K surude ekonomiyi patlatiyor" | Meta Runtime Contract > **kill band weights** | Ilk bandi okunur tut; ikinci/overflow agirligini dusur, preview'da 2K ve 10K quote'u karsilastir |
+| "Meta ilerleme cok yavas / hizli" | Meta Runtime Contract > **day/night/peak population/record weights** ve definition cost/growth | Reward ile fiyatlari ayni panelde karsilastir; pending death receipt'in eski quote'unu degistirmeyecegini unutma |
 | "Heart graph cok kisa / uzun" | Heart Runtime Contract > **Minimum / Maximum branch depth** | Yalniz yeni run graph'larini etkiler; aktif run reroll edilmez |
 | "Rare node cok sik / seyrek" | Heart Runtime Contract > **Standard / Rare rarity weight** | Agirlik oranini degistir; generator preview'u valid graph'i ayni ekranda dogrular |
 | "Essence cok yavas / hizli geliyor" | Heart Runtime Contract > **Production drop source** | Su an owner gate acik; onayli drop miktari/cadence'i olmadan deger uydurma |

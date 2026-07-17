@@ -307,11 +307,17 @@ namespace DeadWalls.Tests
         [Test]
         public void DeathReceipt_RoundTrip_PreservesRunIdentityAndRewardInputs()
         {
+            Assert.That(MetaRewardCalculator.TryCalculate(
+                new MetaRewardSettings(), 12, 9876, 240, 10,
+                out MetaRewardQuote reward), Is.True);
             var receipt = new RunDeathReceipt
             {
+                Version = RunDeathReceipt.CurrentVersion,
                 RunId = "run_dead_01",
                 Day = 12,
-                Kills = 9876
+                Kills = 9876,
+                PeakPopulation = 240,
+                Reward = reward
             };
 
             string json = JsonUtility.ToJson(receipt);
@@ -320,6 +326,9 @@ namespace DeadWalls.Tests
             Assert.That(restored.RunId, Is.EqualTo("run_dead_01"));
             Assert.That(restored.Day, Is.EqualTo(12));
             Assert.That(restored.Kills, Is.EqualTo(9876));
+            Assert.That(restored.PeakPopulation, Is.EqualTo(240));
+            Assert.That(restored.Reward.TotalSouls, Is.EqualTo(reward.TotalSouls));
+            Assert.That(MetaRewardCalculator.IsStructurallyValid(restored.Reward), Is.True);
         }
 
         [Test]
@@ -905,12 +914,19 @@ namespace DeadWalls.Tests
                 DeleteFileAndTemp(metaPath);
                 MetaProgression.Load();
 
+                Assert.That(MetaRewardCalculator.TryCalculate(
+                    new MetaRewardSettings(), 4, 100, 60, 0,
+                    out MetaRewardQuote reward), Is.True);
+
                 Assert.That(RunPersistence.Save(new RunSaveState { RunId = runId }), Is.True);
                 Assert.That(RunPersistence.CommitDeath(new RunDeathReceipt
                 {
+                    Version = RunDeathReceipt.CurrentVersion,
                     RunId = runId,
                     Day = 4,
-                    Kills = 100
+                    Kills = 100,
+                    PeakPopulation = 60,
+                    Reward = reward
                 }), Is.True);
                 Assert.That(File.Exists(runPath), Is.False);
                 Assert.That(File.Exists(receiptPath), Is.True);
@@ -918,7 +934,7 @@ namespace DeadWalls.Tests
                 Assert.That(RunPersistence.RecoverPendingDeathReward(), Is.True);
                 Assert.That(File.Exists(receiptPath), Is.False);
                 Assert.That(MetaProgression.HasRewardedRun(runId), Is.True);
-                Assert.That(MetaProgression.State.Souls, Is.EqualTo(300));
+                Assert.That(MetaProgression.State.Souls, Is.EqualTo(427));
                 Assert.That(MetaProgression.State.TotalRuns, Is.EqualTo(1));
 
                 MetaProgression.Load(); // process restart simulation

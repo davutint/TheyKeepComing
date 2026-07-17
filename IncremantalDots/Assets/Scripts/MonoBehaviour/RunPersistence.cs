@@ -284,10 +284,17 @@ namespace DeadWalls
     [Serializable]
     public class RunDeathReceipt
     {
+        public const int CurrentVersion = 2;
+        public const int MinimumSupportedVersion = 1;
+
+        // Field initializer v1 kalir: test/legacy code yalniz Day+Kills verdiginde eski
+        // yayinlanmis formul acik migration yoluyla uygulanir. Production GameManager v2 yazar.
         public int Version = 1;
         public string RunId;
         public int Day;
         public int Kills;
+        public int PeakPopulation;
+        public MetaRewardQuote Reward;
     }
 
     public static class RunPersistence
@@ -601,7 +608,31 @@ namespace DeadWalls
             if (receipt == null || string.IsNullOrEmpty(receipt.RunId))
                 return false;
 
-            result = MetaProgression.AddRunResult(receipt.RunId, receipt.Day, receipt.Kills);
+            if (receipt.Version < RunDeathReceipt.MinimumSupportedVersion
+                || receipt.Version > RunDeathReceipt.CurrentVersion)
+            {
+                Debug.LogError(
+                    $"[RunPersistence] Desteklenmeyen death receipt schema v{receipt.Version}.");
+                return false;
+            }
+
+            if (receipt.Version >= 2)
+            {
+                if (receipt.Reward.Day != Math.Max(0, receipt.Day)
+                    || receipt.Reward.Kills != Math.Max(0, receipt.Kills)
+                    || receipt.Reward.PeakPopulation != Math.Max(0, receipt.PeakPopulation)
+                    || !MetaRewardCalculator.IsStructurallyValid(receipt.Reward))
+                {
+                    Debug.LogError("[RunPersistence] Death receipt v2 reward payload'i gecersiz.");
+                    return false;
+                }
+
+                result = MetaProgression.AddRunResult(receipt.RunId, receipt.Reward);
+            }
+            else
+            {
+                result = MetaProgression.AddRunResult(receipt.RunId, receipt.Day, receipt.Kills);
+            }
             if (!result.Persisted || !MetaProgression.HasRewardedRun(receipt.RunId))
                 return false;
 

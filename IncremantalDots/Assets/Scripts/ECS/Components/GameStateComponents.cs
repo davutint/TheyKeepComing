@@ -10,7 +10,7 @@ namespace DeadWalls
         public bool IsGameOver;
         public bool IsLevelUpPending;
         // Kosu boyunca oldurulen toplam zombi — meta-progression kazanim kaynagi
-        // (1 kill = 1 Ruh; DamageCleanupSystem sayar, GameOver'da MetaProgression toplar)
+        // Meta reward input'i; DamageCleanupSystem sayar, GameOver'da MetaRewardCalculator agirliklandirir.
         public int TotalKills;
     }
 

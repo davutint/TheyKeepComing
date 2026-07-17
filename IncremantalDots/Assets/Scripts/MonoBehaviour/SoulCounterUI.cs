@@ -4,9 +4,9 @@ using UnityEngine;
 namespace DeadWalls
 {
     /// <summary>
-    /// Kosu ici SOUL sayaci (Polish 2, bilgi cilasi): oyuncu oldurdukce biriken kill'i
-    /// (= olumde kazanacagi Soul) HUD'da gorur — roguelite dongusunun motoru kosu SIRASINDA
-    /// hissedilir. Kaynak: GameStateData.TotalKills (1 kill = 1 Soul). Polling 0.25s.
+    /// Kosu ici projected death reward sayaci: oyuncu su anda olurse receipt'e yazilacak exact
+    /// MetaRewardQuote toplam Soul miktarini gorur. Ayri formul tutmaz; GameManager aggregate
+    /// telemetry'sini 0.25 saniyede bir okur.
     /// </summary>
     public class SoulCounterUI : MonoBehaviour
     {
@@ -25,17 +25,21 @@ namespace DeadWalls
             _checkTimer = CheckInterval;
 
             var gm = GameManager.Instance;
-            bool visible = gm != null && gm.ContinuousSiegeCycle.Enabled && !gm.GameState.IsGameOver;
+            MetaRuntimeTelemetry telemetry = gm != null ? gm.GetMetaRuntimeTelemetry() : default;
+            bool visible = gm != null
+                           && gm.ContinuousSiegeCycle.Enabled
+                           && !gm.GameState.IsGameOver
+                           && telemetry.HasCurrentRewardQuote;
             if (CounterPanel != null && CounterPanel.activeSelf != visible)
                 CounterPanel.SetActive(visible);
             if (!visible)
                 return;
 
-            int kills = gm.GameState.TotalKills;
-            if (kills != _lastShown && CounterText != null)
+            int projectedSouls = telemetry.CurrentRewardQuote.TotalSouls;
+            if (projectedSouls != _lastShown && CounterText != null)
             {
-                _lastShown = kills;
-                CounterText.text = $"<color=#B085F5>SOULS</color>  {kills}";
+                _lastShown = projectedSouls;
+                CounterText.text = $"<color=#B085F5>DEATH</color>  +{projectedSouls} SOULS";
             }
         }
     }

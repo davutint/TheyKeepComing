@@ -23,7 +23,7 @@ namespace DeadWalls
         public const int MinimumSupportedVersion = 1;
 
         public int Version = CurrentVersion;
-        public int Souls;                 // harcanabilir bakiye (1 kill = 1 Ruh)
+        public int Souls;                 // harcanabilir kalici bakiye (weighted death reward)
         public int TotalSoulsEarned;
         public int BestDay;
         public int TotalRuns;
@@ -52,6 +52,7 @@ namespace DeadWalls
         public int SoulsEarned;
         public bool NewRecord;
         public bool AlreadyRewarded;
+        public MetaRewardQuote Reward;
         /// <summary>RewardedRunIds dahil meta state diske durable yazildi.</summary>
         public bool Persisted;
     }
@@ -68,7 +69,7 @@ namespace DeadWalls
 
     /// <summary>
     /// Roguelite meta-progression'in kalici katmani (K2 karari). Kosular ARASI yasar:
-    /// olumde kill'ler Ruh'a cevrilir (1 kill = 1 Ruh + yeni rekorda gun x RecordBonusPerDay),
+    /// olumde run sonucu production MetaRewardSettings ile Souls'a cevrilir,
     /// Ruh olum ekrani magazasinda kalici yukseltmelere harcanir. Depo: persistentDataPath/
     /// meta_progress.json (JsonUtility) — M-E save sisteminin ilk tugla'si.
     /// Kosu-ICI hicbir sey burada tutulmaz (o M-E'nin isi).
@@ -77,7 +78,8 @@ namespace DeadWalls
     {
         // Owner karari (2026-07-08): kavram RUH, oyun dili INGILIZCE -> ekranda "SOULS"
         public const string CurrencyName = "SOULS";
-        public const int RecordBonusPerDay = 50;  // yeni rekor: bonus = yeniBestDay * bu
+        // Yalniz v1 death receipt migration'i icin yayinlanmis eski sabit.
+        public const int RecordBonusPerDay = MetaRewardCalculator.LegacyRecordBonusPerDay;
         private const int MaxRewardReceipts = 128;
 
         private static MetaProgressState _state;
@@ -349,9 +351,26 @@ namespace DeadWalls
         public static MetaRunResult AddRunResult(string runId, int day, int kills)
         {
             var s = State;
-            var result = ApplyRunResult(s, runId, day, kills);
+            MetaRewardQuote legacyQuote = MetaRewardCalculator.CalculateLegacy(
+                day, kills, s.BestDay);
+            var result = ApplyRunResult(s, runId, legacyQuote);
             // Duplicate in-memory receipt, onceki Save basarisiz oldugu icin olusmus olabilir.
             // Bu nedenle AlreadyRewarded olsa bile state tekrar durable yazilir.
+            result.Persisted = Save();
+            return result;
+        }
+
+        public static MetaRunResult AddRunResult(string runId, MetaRewardQuote reward)
+        {
+            var s = State;
+            if (!TryApplyRunResult(s, runId, reward, out MetaRunResult result, out string error))
+            {
+                Debug.LogError($"[MetaProgression] Quoted death reward reddedildi: {error}");
+                return result;
+            }
+
+            // Quote death receipt icinde durable oldugu icin Save basarisizsa ayni exact
+            // sonuc sonraki process acilisinda yeniden denenebilir.
             result.Persisted = Save();
             return result;
         }
@@ -361,47 +380,103 @@ namespace DeadWalls
             if (s == null)
                 throw new ArgumentNullException(nameof(s));
 
+            MetaRewardQuote legacyQuote = MetaRewardCalculator.CalculateLegacy(
+                day, kills, s.BestDay);
+            return ApplyRunResult(s, runId, legacyQuote);
+        }
+
+        internal static MetaRunResult ApplyRunResult(
+            MetaProgressState s,
+            string runId,
+            MetaRewardQuote reward)
+        {
+            if (!TryApplyRunResult(s, runId, reward, out MetaRunResult result, out string error))
+                throw new ArgumentException(error, nameof(reward));
+            return result;
+        }
+
+        private static bool TryApplyRunResult(
+            MetaProgressState s,
+            string runId,
+            MetaRewardQuote reward,
+            out MetaRunResult result,
+            out string error)
+        {
+            result = default;
+            error = null;
+            if (s == null)
+                throw new ArgumentNullException(nameof(s));
+
             s.RewardedRunIds ??= new List<string>();
             if (string.IsNullOrEmpty(runId) || s.RewardedRunIds.Contains(runId))
             {
-                return new MetaRunResult
+                result = new MetaRunResult
                 {
-                    Day = day,
-                    Kills = kills,
+                    Day = reward.Day,
+                    Kills = reward.Kills,
                     SoulsEarned = 0,
                     NewRecord = false,
-                    AlreadyRewarded = true
+                    AlreadyRewarded = true,
+                    Reward = reward
                 };
+                return true;
             }
 
-            int safeDay = Mathf.Max(0, day);
-            int safeKills = Mathf.Max(0, kills);
-            bool newRecord = safeDay > s.BestDay;
-            long rawEarned = (long)safeKills
-                             + (newRecord ? (long)safeDay * RecordBonusPerDay : 0L);
-            int earned = rawEarned >= int.MaxValue ? int.MaxValue : (int)rawEarned;
+            if (!MetaRewardCalculator.IsStructurallyValid(reward))
+            {
+                error = "Reward quote yapisal olarak gecersiz.";
+                result = BuildRejectedRunResult(reward);
+                return false;
+            }
 
+            int currentBestDay = Mathf.Max(0, s.BestDay);
+            if (reward.PreviousBestDay != currentBestDay
+                || reward.NewRecord != (reward.Day > currentBestDay))
+            {
+                error = $"Reward quote record snapshot'i meta state ile uyusmuyor "
+                        + $"(quote best={reward.PreviousBestDay}, state best={currentBestDay}).";
+                result = BuildRejectedRunResult(reward);
+                return false;
+            }
+
+            int earned = reward.TotalSouls;
             s.Souls = SaturatingAddNonNegative(s.Souls, earned);
             s.TotalSoulsEarned = SaturatingAddNonNegative(s.TotalSoulsEarned, earned);
-            s.TotalKillsAllTime = s.TotalKillsAllTime > long.MaxValue - safeKills
+            s.TotalKillsAllTime = s.TotalKillsAllTime > long.MaxValue - reward.Kills
                 ? long.MaxValue
-                : s.TotalKillsAllTime + safeKills;
+                : s.TotalKillsAllTime + reward.Kills;
             s.TotalRuns = SaturatingAddNonNegative(s.TotalRuns, 1);
-            if (newRecord)
-                s.BestDay = safeDay;
+            if (reward.NewRecord)
+                s.BestDay = reward.Day;
 
             s.RewardedRunIds.Add(runId);
             const int MaxRewardReceipts = 128;
             if (s.RewardedRunIds.Count > MaxRewardReceipts)
                 s.RewardedRunIds.RemoveRange(0, s.RewardedRunIds.Count - MaxRewardReceipts);
 
+            result = new MetaRunResult
+            {
+                Day = reward.Day,
+                Kills = reward.Kills,
+                SoulsEarned = earned,
+                NewRecord = reward.NewRecord,
+                AlreadyRewarded = false,
+                Reward = reward
+            };
+            return true;
+        }
+
+        private static MetaRunResult BuildRejectedRunResult(MetaRewardQuote reward)
+        {
             return new MetaRunResult
             {
-                Day = day,
-                Kills = kills,
-                SoulsEarned = earned,
-                NewRecord = newRecord,
-                AlreadyRewarded = false
+                Day = reward.Day,
+                Kills = reward.Kills,
+                SoulsEarned = 0,
+                NewRecord = false,
+                AlreadyRewarded = false,
+                Reward = reward,
+                Persisted = false
             };
         }
 

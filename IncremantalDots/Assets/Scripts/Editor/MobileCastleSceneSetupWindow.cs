@@ -1916,7 +1916,16 @@ namespace DeadWalls
                 AssetDatabase.CreateAsset(catalog, MetaCatalogPath);
             }
 
-            bool changed = catalog.Upgrades == null || catalog.Upgrades.Length != upgrades.Count;
+            bool changed = false;
+            if (catalog.RewardSettings == null)
+            {
+                Undo.RecordObject(catalog, "Configure Meta Reward Settings");
+                catalog.RewardSettings = new MetaRewardSettings();
+                EditorUtility.SetDirty(catalog);
+                changed = true;
+            }
+
+            changed |= catalog.Upgrades == null || catalog.Upgrades.Length != upgrades.Count;
             if (!changed)
             {
                 for (int i = 0; i < upgrades.Count; i++)

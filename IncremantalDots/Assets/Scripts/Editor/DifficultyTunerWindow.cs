@@ -17,6 +17,8 @@ namespace DeadWalls
             "Assets/ScriptableObject/MobileCastle/Archers/ArcherRecruitmentCatalog.asset";
         private const string DefaultCouncilCatalogPath =
             "Assets/ScriptableObject/MobileCastle/Council/CouncilEventCatalog.asset";
+        private const string DefaultMetaCatalogPath =
+            "Assets/ScriptableObject/MobileCastle/Meta/MetaUpgradeCatalog.asset";
         private const string MobileCastleCombatSubScenePath =
             "Assets/Scenes/NewGameScene/MobileCastleCombatSubScene.unity";
 
@@ -24,6 +26,7 @@ namespace DeadWalls
         private SerializedObject _profileSO;
         private ArcherRecruitmentCatalogSO _fallbackArcherCatalog;
         private CouncilEventCatalogSO _fallbackCouncilCatalog;
+        private MetaUpgradeCatalogSO _fallbackMetaCatalog;
         private Vector2 _scroll;
 
         private bool _foldCurves = true;
@@ -36,6 +39,7 @@ namespace DeadWalls
         private bool _foldArchers = true;
         private bool _foldHeart = true;
         private bool _foldCouncil = true;
+        private bool _foldMeta = true;
         private bool _foldFuture;
         private bool _foldBot = true;
 
@@ -57,6 +61,11 @@ namespace DeadWalls
         private int _heartPreviewSeed = 1;
         private int _heartPreviewCurrentLevel;
         private long _heartPreviewAvailableEssence = 1000L;
+        private int _metaPreviewDay = 4;
+        private int _metaPreviewKills = 1000;
+        private int _metaPreviewPeakPopulation = 100;
+        private int _metaPreviewPreviousBestDay = 3;
+        private int _metaPreviewUpgradeLevel;
         private long _lastArrowRentCount = -1L;
         private double _lastArrowRentSampleTime;
         private float _observedArrowDrainPerSecond;
@@ -94,6 +103,9 @@ namespace DeadWalls
             if (_fallbackCouncilCatalog == null)
                 _fallbackCouncilCatalog = AssetDatabase.LoadAssetAtPath<CouncilEventCatalogSO>(
                     DefaultCouncilCatalogPath);
+            if (_fallbackMetaCatalog == null)
+                _fallbackMetaCatalog = AssetDatabase.LoadAssetAtPath<MetaUpgradeCatalogSO>(
+                    DefaultMetaCatalogPath);
 
             _lastArrowRentCount = -1L;
             _lastArrowRentSampleTime = 0d;
@@ -147,6 +159,7 @@ namespace DeadWalls
             DrawArcherSection();
             DrawHeartSection();
             DrawCouncilSection();
+            DrawMetaSection();
             DrawFutureSection();
 
             _profileSO.ApplyModifiedProperties();
@@ -948,6 +961,227 @@ namespace DeadWalls
                 $"x{telemetry.NextNightSpawnMultiplier:0.###} / wave {telemetry.NightSpawnExpiresAfterWave}");
             if (!telemetry.CatalogValid)
                 EditorGUILayout.HelpBox(telemetry.CatalogProblem, MessageType.Error);
+        }
+
+        private void DrawMetaSection()
+        {
+            _foldMeta = DrawSectionHeader(_foldMeta,
+                "Meta Runtime Contract", "diminishing death reward + permanent costs/effects");
+            if (!_foldMeta)
+                return;
+
+            using (new EditorGUILayout.VerticalScope("box"))
+            {
+                GameManager gameManager = ResolveGameManagerOwner();
+                MetaUpgradeCatalogSO catalog = gameManager != null && gameManager.MetaCatalog != null
+                    ? gameManager.MetaCatalog
+                    : _fallbackMetaCatalog;
+
+                using (new EditorGUI.DisabledScope(true))
+                {
+                    EditorGUILayout.ObjectField("Runtime owner", gameManager,
+                        typeof(GameManager), true);
+                    EditorGUILayout.ObjectField("Production meta catalog", catalog,
+                        typeof(MetaUpgradeCatalogSO), false);
+                }
+
+                EditorGUILayout.HelpBox(
+                    "Death reward ve 11 permanent definition dogrudan production MetaUpgradeCatalogSO "
+                    + "owner'indan okunur; DifficultyProfileSO icine kopyalanmaz. Reward quote death "
+                    + "receipt'e bir kez yazilir ve recovery sirasinda yeniden tune edilmez.",
+                    MessageType.None);
+
+                if (catalog == null)
+                {
+                    EditorGUILayout.HelpBox(
+                        "Production MetaUpgradeCatalogSO bulunamadi. Death reward fail-closed kalir.",
+                        MessageType.Error);
+                    return;
+                }
+
+                DrawMetaRewardSettings(catalog);
+                DrawMetaRewardPreview(catalog);
+                DrawMetaUpgradeTuning(catalog);
+                DrawLiveMetaTelemetry(gameManager);
+
+                List<string> problems = catalog.ValidateCatalog();
+                if (problems.Count > 0)
+                    DrawHeartErrors("Meta catalog validation failed", problems);
+                else
+                    EditorGUILayout.HelpBox(
+                        "Meta reward + permanent upgrade catalog validation: OK",
+                        MessageType.Info);
+            }
+        }
+
+        private static void DrawMetaRewardSettings(MetaUpgradeCatalogSO catalog)
+        {
+            EditorGUILayout.Space(6);
+            EditorGUILayout.LabelField("Death Reward Weights", EditorStyles.boldLabel);
+            var catalogSO = new SerializedObject(catalog);
+            catalogSO.Update();
+            SerializedProperty settings = catalogSO.FindProperty("RewardSettings");
+            if (settings == null)
+            {
+                EditorGUILayout.HelpBox("Meta RewardSettings alani bulunamadi.", MessageType.Error);
+                return;
+            }
+
+            EditorGUI.BeginChangeCheck();
+            DrawRelativeProp(settings, "FirstKillBandLimit", "First kill band limit");
+            DrawRelativeProp(settings, "SecondKillBandLimit", "Second kill band limit");
+            DrawRelativeProp(settings, "FirstBandSoulsPerKill", "First band Souls / kill");
+            DrawRelativeProp(settings, "SecondBandSoulsPerKill", "Second band Souls / kill");
+            DrawRelativeProp(settings, "OverflowSoulsPerKill", "Overflow Souls / kill");
+            DrawRelativeProp(settings, "SoulsPerDayReached", "Souls / day reached");
+            DrawRelativeProp(settings, "SoulsPerNightSurvived", "Souls / night survived");
+            DrawRelativeProp(settings, "SoulsPerPeakPopulation", "Souls / peak population");
+            DrawRelativeProp(settings, "NewRecordSoulsPerDay", "New-record Souls / day");
+            bool changed = EditorGUI.EndChangeCheck();
+            catalogSO.ApplyModifiedProperties();
+            if (changed)
+                EditorUtility.SetDirty(catalog);
+
+            EditorGUILayout.LabelField("Rounding / overflow",
+                "component floor / int saturating sum");
+        }
+
+        private void DrawMetaRewardPreview(MetaUpgradeCatalogSO catalog)
+        {
+            EditorGUILayout.Space(6);
+            EditorGUILayout.LabelField("Reward Preview", EditorStyles.boldLabel);
+            _metaPreviewDay = Mathf.Max(0,
+                EditorGUILayout.IntField("Day reached", _metaPreviewDay));
+            _metaPreviewKills = Mathf.Max(0,
+                EditorGUILayout.IntField("Kills", _metaPreviewKills));
+            _metaPreviewPeakPopulation = Mathf.Max(0,
+                EditorGUILayout.IntField("Peak population", _metaPreviewPeakPopulation));
+            _metaPreviewPreviousBestDay = Mathf.Max(0,
+                EditorGUILayout.IntField("Previous best day", _metaPreviewPreviousBestDay));
+
+            if (!MetaRewardCalculator.TryCalculate(
+                    catalog.RewardSettings,
+                    _metaPreviewDay,
+                    _metaPreviewKills,
+                    _metaPreviewPeakPopulation,
+                    _metaPreviewPreviousBestDay,
+                    out MetaRewardQuote quote))
+            {
+                EditorGUILayout.HelpBox("Reward preview: INVALID SETTINGS", MessageType.Error);
+                return;
+            }
+
+            DrawMetaRewardQuote("Preview", quote);
+        }
+
+        private void DrawMetaUpgradeTuning(MetaUpgradeCatalogSO catalog)
+        {
+            EditorGUILayout.Space(8);
+            EditorGUILayout.LabelField("Permanent Upgrade Cost + Effect Audit", EditorStyles.boldLabel);
+            _metaPreviewUpgradeLevel = Mathf.Max(0,
+                EditorGUILayout.IntField("Shared preview level", _metaPreviewUpgradeLevel));
+
+            MetaUpgradeSO[] upgrades = catalog.Upgrades ?? new MetaUpgradeSO[0];
+            for (int i = 0; i < upgrades.Length; i++)
+            {
+                MetaUpgradeSO upgrade = upgrades[i];
+                if (upgrade == null)
+                {
+                    EditorGUILayout.HelpBox($"Catalog Upgrades[{i}] bos.", MessageType.Error);
+                    continue;
+                }
+
+                using (new EditorGUILayout.VerticalScope("helpbox"))
+                {
+                    EditorGUILayout.LabelField(
+                        $"{upgrade.Title}  [{upgrade.EffectType}]", EditorStyles.boldLabel);
+                    using (new EditorGUI.DisabledScope(true))
+                    {
+                        EditorGUILayout.ObjectField("Definition owner", upgrade,
+                            typeof(MetaUpgradeSO), false);
+                        EditorGUILayout.TextField("Stable Id", upgrade.Id ?? string.Empty);
+                        if (MetaUpgradePolicy.IsContentUnlockEffect(upgrade.EffectType))
+                            EditorGUILayout.TextField("Pool content Id", upgrade.PoolContentId ?? string.Empty);
+                    }
+
+                    var upgradeSO = new SerializedObject(upgrade);
+                    upgradeSO.Update();
+                    EditorGUI.BeginChangeCheck();
+                    DrawDefinitionProp(upgradeSO, "BaseCost", "Base Souls cost");
+                    DrawDefinitionProp(upgradeSO, "CostGrowthPerLevel", "Exponential growth / level");
+                    DrawDefinitionProp(upgradeSO, "MaxLevel", "Max level (0 = unlimited)");
+                    if (!MetaUpgradePolicy.IsContentUnlockEffect(upgrade.EffectType))
+                        DrawDefinitionProp(upgradeSO, "ValuePerLevel", "Effect / level");
+                    bool changed = EditorGUI.EndChangeCheck();
+                    upgradeSO.ApplyModifiedProperties();
+                    if (changed)
+                        EditorUtility.SetDirty(upgrade);
+
+                    int previewLevel = upgrade.MaxLevel > 0
+                        ? Mathf.Min(_metaPreviewUpgradeLevel, upgrade.MaxLevel)
+                        : _metaPreviewUpgradeLevel;
+                    string nextCost = upgrade.IsMaxLevel(previewLevel)
+                        ? "MAX"
+                        : $"{upgrade.GetCost(previewLevel):N0} SOULS";
+                    EditorGUILayout.LabelField("Preview level / next cost",
+                        $"{previewLevel:N0} / {nextCost}");
+                    EditorGUILayout.LabelField("Cumulative effect",
+                        FormatMetaEffect(upgrade, upgrade.GetTotalEffect(previewLevel)));
+                }
+            }
+        }
+
+        private static void DrawLiveMetaTelemetry(GameManager gameManager)
+        {
+            if (!Application.isPlaying || gameManager == null)
+                return;
+
+            MetaRuntimeTelemetry telemetry = gameManager.GetMetaRuntimeTelemetry();
+            EditorGUILayout.Space(8);
+            EditorGUILayout.LabelField("Live Meta Aggregate", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Souls / lifetime earned",
+                $"{telemetry.Souls:N0} / {telemetry.TotalSoulsEarned:N0}");
+            EditorGUILayout.LabelField("Best day / runs / lifetime kills",
+                $"{telemetry.BestDay:N0} / {telemetry.TotalRuns:N0} / {telemetry.TotalKillsAllTime:N0}");
+            EditorGUILayout.LabelField("Current day / kills / peak population",
+                $"{telemetry.CurrentRunDay:N0} / {telemetry.CurrentRunKills:N0} / "
+                + $"{telemetry.CurrentRunPeakPopulation:N0}");
+            EditorGUILayout.LabelField("Applied Wall / production",
+                $"+{telemetry.AppliedWallHpPercent:P1} / +{telemetry.AppliedProductionPercent:P1}");
+            EditorGUILayout.LabelField("Applied Arrow / Essence",
+                $"+{telemetry.AppliedArrowEfficiencyBonus:N0} / +{telemetry.AppliedEssenceGainPercent:P1}");
+            if (telemetry.HasCurrentRewardQuote)
+                DrawMetaRewardQuote("Live death quote", telemetry.CurrentRewardQuote);
+            else
+                EditorGUILayout.HelpBox("Live death quote gecersiz veya catalog eksik.", MessageType.Error);
+        }
+
+        private static void DrawMetaRewardQuote(string label, MetaRewardQuote quote)
+        {
+            EditorGUILayout.LabelField($"{label} total", $"{quote.TotalSouls:N0} SOULS");
+            EditorGUILayout.LabelField("Kill / day / night / population / record",
+                $"{quote.KillSouls:N0} / {quote.DaySouls:N0} / {quote.NightSouls:N0} / "
+                + $"{quote.PopulationSouls:N0} / {quote.RecordSouls:N0}");
+            EditorGUILayout.LabelField("Nights survived / new record",
+                $"{quote.NightsSurvived:N0} / {quote.NewRecord}");
+        }
+
+        private static string FormatMetaEffect(MetaUpgradeSO upgrade, double total)
+        {
+            if (upgrade == null)
+                return "INVALID";
+
+            switch (upgrade.EffectType)
+            {
+                case MetaUpgradeEffectType.WallHpPercent:
+                case MetaUpgradeEffectType.ProductionPercent:
+                case MetaUpgradeEffectType.EssenceGainPercent:
+                    return $"+{System.Math.Max(0d, total):P1}";
+                case MetaUpgradeEffectType.NodePoolUnlock:
+                    return total > 0d ? "UNLOCKED" : "LOCKED";
+                default:
+                    return $"+{System.Math.Max(0d, total):N0}";
+            }
         }
 
         private static void DrawHeartEssenceGainContract(GameManager gameManager)

@@ -20,6 +20,12 @@ Kaynak/yatak definition'larında `MaxLevel=0` repeatable anlamına gelir. UI bun
 gösterir; `MAX` yalnız pozitif hard cap'e ulaşıldığında görünür. Bütün fiyatlar assetteki
 `BaseCost` ve `CostGrowthPerLevel` üzerinden üstel hesaplanır.
 
+`MetaUpgradeCatalog.asset > Reward Settings` production ölüm ödülünün tek tuning sahibidir.
+Varsayılan kill bandları `100 / 1000`, ağırlıklar `1 / 0.25 / 0.05`; day/night/population/record
+ağırlıkları `10 / 25 / 0.2 / 50`dir. Bu alanları ve 11 definition'ın fiyat/etkilerini
+`Window > DeadWalls > Difficulty Tuner > Meta Runtime Contract` üzerinden birlikte denetle.
+Panel değerleri `DifficultyProfileSO`'ya kopyalamaz.
+
 Game Over `MetaProgressionUI`, satın alma için doğrudan `MetaProgression` çağırmaz;
 `GameManager.CanBuyMetaUpgrade/TryBuyMetaUpgrade` binding'ini kullanır. Yeni bir meta UI/prefab
 eklerken aynı API'yi kullan; yalnız paneli Game Over altında tutmak yeterli güvenlik değildir.
@@ -51,6 +57,8 @@ EditMode'da `MetaProgressionSchemaTests` çalıştır:
 - Bilinmeyen future version ile corrupt JSON yazmayı kilitler ve orijinal dosyayı korur.
 - Duplicate/negatif alanlar deterministic normalize edilir; bilinmeyen upgrade Id'si korunur.
 - Pool unlock ve tutorial flag atomik save/reload round-trip yapar.
+- V2 death receipt exact reward quote ve peak population değerini round-trip taşır; recovery
+  tuning'i yeniden okumadan aynı amount'u uygular.
 - Tutorial reset exact sekiz onboarding flag'ini tek save'de temizler; future tutorial flag,
   pool unlock, Souls ve diger meta state reload sonrasinda korunur.
 - First Day worker ratio PlayMode testi gerçek UI action'ının flag yazdığını ve test öncesi
@@ -68,6 +76,8 @@ Boundary kabulü için ayrıca:
 
 - EditMode `MetaProgressionBoundaryTests`: death-only kural matrisi, exact 11 definition sırası,
   legacy numeric `3/5` reddi, üstel repeatable maliyet ve tek-seferlik pool contract denetimi.
+- EditMode `MetaTuningContractTests`: diminishing 10K quote, non-record breakdown, invalid band
+  reddi, quoted idempotency ve production 11-definition maliyet/etki tablosunu denetler.
 - PlayMode `ExactRunContinuePlayModeTests.MetaPurchase_ActiveRunRejectedAndDurableDeathAllowsCanonicalUpgrade`:
   aktif koşuda red, durable ölümden sonra canonical satın alma, atomik pool unlock ve aynı Id'li
   spoof asset reddi.

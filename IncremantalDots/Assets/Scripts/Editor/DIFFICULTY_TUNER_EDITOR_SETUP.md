@@ -25,6 +25,9 @@ DefaultDifficulty.asset` seed edilir (varsa DOKUNULMAZ) ve subscene'deki
      combat, buy/retrain ve count-growth alanlari; finite Arrow capacity/refill/verim/CAP-EFF
      tuning'i. Preview count ile buy/retrain quote'unu, Play Mode'da effective stat/DPS ve
      gercek pool-rent Arrow/s drain'ini gor.
+   - Meta: `Meta Runtime Contract` foldout'unda diminishing kill bandlari, day/night/peak-pop/
+     record agirliklari ve exact 11 permanent upgrade'in base cost, exponential growth, cap ve
+     effect degerleri. Reward/level preview ile live aggregate ayni runtime formulunu kullanir.
 4. **Apply** — edit modda subscene'e baglar+kaydeder (bake); play modda ayrica CANLI uygular.
 5. Olcum: Play'e gir -> **Run Bot** (profili uygular, temiz kosu baslatir) ->
    kosular bitince **Son Olcumu Ozetle** ile olum-gunu dagilimini oku.

@@ -11,7 +11,7 @@ Bu sözleşme üç ayrı disk sahibine bölünür:
 | Dosya | Sahip | İçerik |
 |---|---|---|
 | `run_save.json` | `RunPersistence` | Yalnız yaşayan koşunun exact-critical + deterministic-combat v14 snapshot'ı |
-| `run_death_receipt.json` | `RunPersistence` | Kapanmakta olan koşunun `{ RunId, Day, Kills }` transaction journal'ı |
+| `run_death_receipt.json` | `RunPersistence` | Kapanmakta olan koşunun v2 `{ RunId, Day, Kills, PeakPopulation, Reward }` transaction journal'ı |
 | `meta_progress.json` | `MetaProgression` | v3 Souls/istatistik, upgrade seviyeleri, pool unlocks, tutorial flags ve son 128 `RewardedRunIds` |
 
 Run save ile meta save birbirinin alanlarını taşımaz. Death receipt gameplay state değildir;
@@ -21,17 +21,23 @@ iki ayrı save otoritesi arasındaki işlemi tamamlayan küçük ve geçici bir 
 
 Otoriter ölüm yolu `GameManager.ProcessRunDeath()` metodudur:
 
-1. `GameManager`, güncel `RunId`, day ve kill değerleriyle receipt üretir.
+1. `GameManager`, production Meta catalog tuning'iyle day/kill/completed-night/peak-pop/record
+   breakdown'ını bir kez quote eder ve güncel `RunId` ile v2 receipt üretir.
 2. `RunPersistence.CommitDeath()` receipt'i durable ve atomik biçimde diske yazar.
 3. Receipt authoritative olduktan sonra run snapshot fiziksel olarak silinir. Silme başarısız
    olsa bile matching receipt bulunan snapshot `TryLoad()` tarafından reddedilir.
-4. `MetaProgression.AddRunResult()` aynı `RunId` için ödülü idempotent uygular.
+4. `MetaProgression.AddRunResult()` receipt'teki exact quote'u aynı `RunId` için idempotent uygular.
 5. `meta_progress.json`, `RewardedRunIds` dahil durable ve atomik biçimde yazılır.
 6. Yalnız meta write başarılıysa ve `HasRewardedRun(runId)` doğrulanıyorsa run snapshot ile
    death receipt temizlenir.
 
 Meta write başarısız olursa receipt korunur. `GameManager.Awake` ve `MainMenuSceneUI`
 başlangıcı `RecoverPendingDeathReward()` çağırarak aynı transaction'ı tamamlar.
+
+V2 quote'un component toplamı, day/kills/peak-pop eşleşmesi ve previous-best record snapshot'i
+uygulanmadan önce doğrulanır. Pending transaction sırasında tuning asset'i değişse bile reward
+yeniden hesaplanmaz. V1 receipt yalnız yayınlanmış eski day+kills formülüyle explicit legacy
+tamamlama yolundan geçer; future receipt version fail-closed kalır.
 
 ## Atomik dosya sözleşmesi
 
@@ -72,8 +78,9 @@ snapshot restore veya generated Heart graph seçimi için kullanılmaz.
 
 ## Test sahipleri
 
-- `RunPersistenceTests`: atomik receipt round-trip, matching snapshot invalidation, corrupt
+- `RunPersistenceTests`: v2 exact quote round-trip/recovery, matching snapshot invalidation, corrupt
   marker fail-closed, orphan temp recovery ve process-reload idempotency.
+- `MetaTuningContractTests`: quote structure, diminishing kill bandlari ve exact idempotent apply.
 - `ExactRunContinuePlayModeTests.SaveRunSnapshot_LethalEcsState_CannotRewriteContinueAfterDeath`:
   stale Mono cache'e rağmen lethal ECS state'in yaşayan snapshot yazmasını engeller.
 - `ExactRunContinuePlayModeTests.Continue_RestoresSameCyclePhaseTimerResourcesAndSpawnRng`:

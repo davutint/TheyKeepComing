@@ -24,8 +24,9 @@ elle değiştirerek yapılan corrupt-marker testi bittikten sonra gerçek oyuncu
 
 ## Otomatik doğrulama
 
-EditMode'da `RunPersistenceTests` çalıştır. Package H death-receipt kabulü için beklenen hedefli
-sonuç `18/18` pass'tir.
+EditMode'da `RunPersistenceTests` ile `MetaTuningContractTests` çalıştır. V2 receipt'in
+`PeakPopulation` ve exact `MetaRewardQuote` alanlarını round-trip/recovery boyunca koruması,
+component toplamı bozuk quote'u reddetmesi ve aynı RunId'yi ikinci kez ödememesi gerekir.
 
 PlayMode'da şu üç testi birlikte çalıştır:
 

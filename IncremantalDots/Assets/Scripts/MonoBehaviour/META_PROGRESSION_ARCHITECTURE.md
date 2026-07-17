@@ -2,7 +2,9 @@
 
 ## Amaç
 
-Wall `0 HP` olduğunda koşu tamamen biter; koşu içi state Continue edilemez. O koşunun kill ve day sonucu kalıcı Souls ilerlemesine bir kez aktarılır. Meta state yeni koşularda başlangıç ivmesi ve hafif kalıcı güç sağlar.
+Wall `0 HP` olduğunda koşu tamamen biter; koşu içi state Continue edilemez. O koşunun kill,
+ulaşılan day, tamamlanan gece ve peak population sonucu kalıcı Souls ilerlemesine bir kez
+aktarılır. Meta state yeni koşularda başlangıç ivmesi ve hafif kalıcı güç sağlar.
 
 Player-facing bütün metinler İngilizcedir. Kod tarafındaki para birimi otoritesi `MetaProgression.CurrencyName` sabitidir.
 
@@ -58,15 +60,24 @@ sınırı aşağıdaki runtime sözleşmesiyle tamamlanmıştır.
 
 ## Koşu sonucu transaction'ı
 
-Otoriter API `AddRunResult(string runId, int day, int kills)` metodudur. Boş RunId kabul edilmez. Daha önce ödüllendirilen RunId yeniden gelirse sonuç `AlreadyRewarded` olarak döner ve Souls/istatistik değişmez.
+Yeni ölüm transaction'ının otoriter API'si `AddRunResult(string runId, MetaRewardQuote reward)`
+metodudur. `AddRunResult(string runId, int day, int kills)` yalnız v1 death receipt migration
+yoludur ve yayınlanmış eski `1 kill + new-record day x 50` sonucunu tamamlar. Boş veya daha önce
+ödüllendirilen RunId yeniden gelirse sonuç `AlreadyRewarded` olarak döner ve Souls/istatistik
+değişmez.
 
 Game Over akışı journal-first ilerler:
 
-1. `GameManager.ProcessRunDeath()`, run identity ile `RunDeathReceipt` üretir.
+1. `GameManager.ProcessRunDeath()`, production `MetaUpgradeCatalogSO.RewardSettings` ile exact
+   `MetaRewardQuote` hesaplar ve run identity ile `RunDeathReceipt v2` üretir.
 2. Receipt atomik ve durable yazılır; bundan sonra matching run save Continue edilemez.
 3. Canlı run save fiziksel olarak temizlenir.
 4. `AddRunResult()` ödülü idempotent uygular ve `RewardedRunIds` dahil meta state'i atomik yazar.
 5. Yalnız meta write başarılı ve RunId ödüllendirilmiş olarak doğrulanmışsa receipt temizlenir.
+
+Reward quote receipt içinde day/kills/peak population, önceki best day ve beş bileşenin exact
+toplamını taşır. Structural validation ile receipt dışarıdan bozulmuşsa meta state'e uygulanmaz.
+Tuning asset'i ölüm ile recovery arasında değişse bile pending ölümün miktarı yeniden hesaplanmaz.
 
 Uygulama bu adımların arasında kapanırsa `GameManager.Awake` ve ana menü başlangıcı
 `RunPersistence.RecoverPendingDeathReward()` çağırır. Receipt'teki aynı RunId meta state'te
@@ -76,9 +87,23 @@ başarısızsa receipt silinmez ve sonraki açılış yeniden dener. Ayrıntıl�
 
 ## Ödül hesabı
 
-- Her kill: `1 Soul`.
-- Yeni day rekoru: `day x 50` ek Soul.
-- Sonuç `MetaRunResult` üzerinden Game Over UI tarafından okunur.
+`MetaRewardCalculator`, production katalogdaki `MetaRewardSettings` alanlarını tek saf formülde
+uygular. Varsayılan V1 tuning'i:
+
+- İlk `100` kill: `1 Soul/kill`.
+- `101..1000`: `0.25 Soul/kill`.
+- `1000` üstü: `0.05 Soul/kill`.
+- Ulaşılan her day: `10 Soul`.
+- Tamamlanan her gece (`max(0, day - 1)`): `25 Soul`.
+- Peak population: kişi başı `0.2 Soul`.
+- Yeni day rekoru: `day x 50 Soul`.
+
+Her bileşen ayrı ayrı aşağı yuvarlanır, toplam `int.MaxValue` değerinde saturate olur. Kill
+bandlarının ağırlığı ilerleyen bantta artamaz; bütün eşikler ve ağırlıklar production catalog
+validation'ından geçer. Böylece erken kill'ler anlaşılır kalırken 2K/10K stres sürüleri meta
+ekonomisini doğrusal olarak patlatmaz. Sonuç ve breakdown `MetaRunResult.Reward` üzerinden okunur.
+Aktif sahnedeki mevcut `SoulCounterUI`, kill sayisini Souls diye yeniden etiketlemez; ayni
+`GameManager.GetMetaRuntimeTelemetry()` quote'undan `DEATH +N SOULS` projected reward'unu gosterir.
 
 ## Upgrade kataloğu ve koşu başı uygulama
 
@@ -115,6 +140,13 @@ Katalogdaki kaynak ve yatak sink'lerinde `MaxLevel=0` limitsiz anlamına gelir. 
 değil, `ceil(BaseCost * (1 + growth)^currentLevel)` formülüyle üstel büyür ve temsil sınırında
 `int.MaxValue` değerine saturate olur. Basic Archer `1000` hard cap'ine kadar tanımlıdır; güç
 yüzdeleri sınırlı level taşır; node-pool unlock tam bir kez alınabilir.
+
+`Window > DeadWalls > Difficulty Tuner > Meta Runtime Contract`, reward ağırlıklarını katalogdan
+ve her definition'ın `BaseCost`, exponential growth, `MaxLevel` ve `ValuePerLevel` alanlarını
+doğrudan gerçek asset sahibinden düzenler. Ortak level preview'u next cost ve cumulative effect'i
+aynı `GetCost/GetTotalEffect` runtime formülleriyle gösterir. Play Mode aggregate telemetry Souls,
+lifetime istatistikler, current death quote breakdown ve uygulanan Wall/production/Arrow/Essence
+meta katkılarını read-only sunar; `DifficultyProfileSO` içinde ikinci meta state oluşturulmaz.
 
 `GameManager.ApplyMetaProgressionAtRunStart()` her yeni koşuda state'i mevcut gameplay
 kanallarından uygular. `_metaAppliedThisRun` aynı runtime başlangıcında çift uygulamayı önler.

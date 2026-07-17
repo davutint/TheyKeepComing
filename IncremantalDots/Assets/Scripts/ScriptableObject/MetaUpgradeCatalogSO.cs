@@ -7,6 +7,10 @@ namespace DeadWalls
     [CreateAssetMenu(fileName = "MetaUpgradeCatalog", menuName = "DeadWalls/Mobile Castle/Meta Upgrade Catalog")]
     public class MetaUpgradeCatalogSO : ScriptableObject
     {
+        [Header("Death Reward")]
+        public MetaRewardSettings RewardSettings = new MetaRewardSettings();
+
+        [Header("Permanent Upgrade Definitions")]
         public MetaUpgradeSO[] Upgrades = new MetaUpgradeSO[0];
 
         public MetaUpgradeSO GetUpgrade(string id)
@@ -27,6 +31,11 @@ namespace DeadWalls
         {
             var problems = new List<string>();
             var ids = new HashSet<string>();
+            if (RewardSettings == null)
+                problems.Add("Meta reward settings bos.");
+            else
+                RewardSettings.CollectValidationErrors(problems);
+
             if (Upgrades != null)
             {
                 foreach (var upgrade in Upgrades)

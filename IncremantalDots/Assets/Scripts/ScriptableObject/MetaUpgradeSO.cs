@@ -120,6 +120,18 @@ namespace DeadWalls
             return Math.Max(1, (int)Math.Ceiling(raw));
         }
 
+        public double GetTotalEffect(int currentLevel)
+        {
+            int level = Math.Max(0, currentLevel);
+            if (MetaUpgradePolicy.IsContentUnlockEffect(EffectType))
+                return level > 0 ? 1d : 0d;
+
+            double total = (double)ValuePerLevel * level;
+            if (double.IsNaN(total) || total <= 0d)
+                return 0d;
+            return double.IsInfinity(total) ? double.MaxValue : total;
+        }
+
         public bool IsConfigurationValid()
         {
             if (string.IsNullOrWhiteSpace(Id)

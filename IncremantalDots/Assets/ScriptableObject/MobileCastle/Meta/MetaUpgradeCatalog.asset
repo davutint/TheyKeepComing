@@ -12,6 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7450186637e704428f1064bf439cbae, type: 3}
   m_Name: MetaUpgradeCatalog
   m_EditorClassIdentifier: DeadWalls::DeadWalls.MetaUpgradeCatalogSO
+  RewardSettings:
+    FirstKillBandLimit: 100
+    SecondKillBandLimit: 1000
+    FirstBandSoulsPerKill: 1
+    SecondBandSoulsPerKill: 0.25
+    OverflowSoulsPerKill: 0.05
+    SoulsPerDayReached: 10
+    SoulsPerNightSurvived: 25
+    SoulsPerPeakPopulation: 0.2
+    NewRecordSoulsPerDay: 50
   Upgrades:
   - {fileID: 11400000, guid: ea8d95539c414c74ab5af466b2e464a3, type: 2}
   - {fileID: 11400000, guid: b98ede52dda356e4497358a5e6e75d63, type: 2}

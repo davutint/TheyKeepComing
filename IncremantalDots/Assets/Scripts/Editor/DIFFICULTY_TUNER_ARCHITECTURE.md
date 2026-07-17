@@ -79,6 +79,13 @@ tek profil iterasyonuyla, KOD YAZMADAN tasindi).
      Emergency Council yoktur. Decision timer ayri bir alan degil, active cycle'in Dawn+Day
      surelerinden turetilen read-only kontrattir. Play Mode aggregate telemetry handled day,
      recent/flag/one-shot sayilari, active card butceleri ve sureli effect/expiry state'ini gosterir.
+   - **Meta Runtime Contract** foldout'u production `MetaUpgradeCatalogSO` icindeki diminishing
+     kill bandlari, day/night/peak-pop/record agirliklari ve 11 permanent definition'in exact
+     cost/growth/cap/effect alanlarini dogrudan duzenler. Reward preview ayni
+     `MetaRewardCalculator`, upgrade preview ayni `GetCost/GetTotalEffect` formulunu kullanir.
+     Play Mode aggregate telemetry current death quote breakdown, Souls/lifetime state ve
+     applied Wall/production/Arrow/Essence katkilarini gosterir. Death receipt v2 quote'u
+     sabitledigi icin pending recovery sonradan degisen tuning'i yeniden okumaz.
    - **Apply**: subscene authoring'e bagla (bake yolu) + play moddaysa CANLI uygula
      (config alanlari SetComponentData + buffer yeniden ornekleme).
    - **Run Bot**: profili canli uygular, RestartGame + Long Run Simulator'u baslatir
@@ -121,6 +128,9 @@ tek profil iterasyonuyla, KOD YAZMADAN tasindi).
   edilmez. Production Heart catalog ve Essence drop sayilari owner onayi olmadan olusturulmaz.
 - Council effect band/memory ayarlari production Council catalog'a aittir. Takvim veya timer icin
   profile/scene icinde ikinci alan acilmaz; karar suresi mevcut cycle Dawn+Day owner'indan turetilir.
+- Meta reward ve permanent upgrade ayarlari production Meta catalog'a aittir. Bunlari
+  DifficultyProfile'a kopyalama; current/pending death sonucunu asset degisikligiyle geriye donuk
+  yeniden hesaplama.
 - Canli uygulama restart sonrasi config'i bake degerlerine dondurur; Tuner'in Run Bot'u
   bu yuzden restart'tan SONRA da ApplyProfileLive cagirir.
 - Fiyat alanlari sifir/negatif veya gecersiz girilirse resolver int-guvenli minimumlara,

@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.3
 > **Son tam kapsam denetimi:** 2026-07-17
 > **Aktif paket:** Post-Package V1 Closure - Contracts, Performance ve Release DoD
-> **Aktif iş:** `DW-V1-TUNING-META-SURFACE` - Audit Meta Reward Weights and Upgrade Costs/Effects
-> **İlerleme:** `411 / 442` tracker checkbox'ı tamamlandı - `%92,99`
+> **Aktif iş:** `DW-V1-TELEMETRY-RUN-STARTED` - Emit run_started Meta/Resource/Heart Identity
+> **İlerleme:** `412 / 442` tracker checkbox'ı tamamlandı - `%93,21`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -732,7 +732,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 |---|---|---|
 | Meta ayrı save | `MetaProgression` canonical v3 JSON kullanıyor | `[x]` Currency/upgrade/pool/tutorial/receipt sahipleri ayrık |
 | Death-only shop | UI ve transaction `GameManager` durable-death kapısından geçiyor; aktif run/Pause/Main Menu reset bypass'ı yok | `[x]` |
-| Reward inputs | Day+kills+record bonus | Nights/peak pop/record weighting eksik/tuning |
+| Reward inputs | Production catalog-owned diminishing kill bands + day/night/peak-pop/record weights; exact quote death receipt v2'ye sabitlenir | `[x]` |
 | Idempotent reward | Durable death receipt, `RewardedRunIds`, atomic write ve fail-closed Continue guard aktif | `[x]` |
 | Fixed upgrade list | Exact 11-definition katalog Blueprint sırasını taşır; legacy Archer Damage kaldırıldı | `[x]` |
 | StartingTechLevel yok | Enum, `TechNodeId`, runtime case ve dormant `Meta_start_moat.asset` kaldırıldı | `[x]` |
@@ -1023,7 +1023,24 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
   telemetry'sini gosterir. Production snapshot `5s Dawn + 30s Day = 35s`; Council EditMode `56/56`,
   regular runtime/Continue/memory PlayMode `8/8` gecti; Tuner gercek editor window olarak acildi,
   `NewGameScene` validation `0` issue ve final Console `0 error / 0 warning`.
-- [ ] Meta: reward weights, upgrade costs/effects.
+- [x] Meta: reward weights, upgrade costs/effects. Production `MetaUpgradeCatalogSO`, diminishing
+  kill bandlari `100/1000` ve agirliklari `1/0,25/0,05` ile day/night/peak-pop/record
+  agirliklarinin `10/25/0,2/50` tek owner'idir. Quote component-floor + saturating toplamla
+  hesaplanir; 10K/Day10/peak200/new-record ornegi `1.640 Souls` (`775/100/225/40/500`) verir.
+  `RunDeathReceipt v2`, exact quote ve peak population'i journal'a sabitleyerek recovery'nin
+  sonradan degisen tuning'i yeniden okumasini engeller; v1 receipt eski formuluyla explicit
+  migration yolundadir. 11 permanent definition'in mevcut incremental cost/effect tablosu
+  korunup exact testle kilitlendi: resource/yatak limitsiz exponential sink, Basic Archer `1000`
+  cap, Wall `+%25`, production `+%15`, Arrow `+10`, Essence `+%50`, pool unlock tek sefer.
+  `Difficulty Tuner > Meta Runtime Contract`, reward alanlari ile definition cost/growth/cap/effect
+  degerlerini gercek catalog/asset sahibinden duzenler; ayni runtime utility'leriyle reward/level
+  preview ve aggregate live Souls/lifetime/current quote/applied-effect telemetry'si gosterir.
+  Aktif HUD `SoulCounterUI`, kill sayisini yanlis bicimde Souls diye gostermek yerine ayni exact
+  quote'u `DEATH +N SOULS` olarak sunar.
+  Targeted Meta+persistence EditMode `44/44`, targeted death/Continue/shop PlayMode `3/3`, full
+  EditMode `345/345`, full PlayMode `72 pass + 2 explicit soak/profiler skip` gecti; production
+  catalog `11 definition / 0 problem`, Tuner gercek editor window olarak acildi,
+  `NewGameScene` validation `0` issue.
 
 ### Telemetry event'leri
 
@@ -1068,8 +1085,8 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 
 ### Mevcut test envanteri
 
-- `[x]` EditMode: `209/209`; exact Council 3/6/9 cadence, staged launch catalog, 5.400-sample budget/token gate, source-retirement/curated-chain, role/content recipe kontratı, v10->v11 Council migration/discriminator, Heart graph, finite Arrow, pool, targeting, Formation V1, common archer cap, economy, worker, cycle, quantity-only, backlog, Moat isolation ve enemy pool kapsamı.
-- `[x]` PlayMode: `37 pass + 1 explicit profiler skip`; gerçek `NewGameScene` Day 1-12 Council cadence, onaylı Council chain flag live yazımı, active-card exact payload/memory/handled-day Continue, çözülmüş seçim + temp effect duration Continue, bozuk Council karar/Continue payload preflight'ı, Heart Continue, Arrow/pool/targeting, 1K archer x 10K enemy, Formation V1, archer cap/retrain, economy/worker, Wall, cycle, backlog ve Fireball kapsamı.
+- `[x]` EditMode: `345/345`; Meta diminishing reward/quoted receipt/exact 11-definition tuning, exact Council 3/6/9 cadence, staged launch catalog, 5.400-sample budget/token gate, source-retirement/curated-chain, role/content recipe kontratı, v10->v11 Council migration/discriminator, Heart graph, finite Arrow, pool, targeting, Formation V1, common archer cap, economy, worker, cycle, quantity-only, backlog, Moat isolation ve enemy pool kapsamı.
+- `[x]` PlayMode: `72 pass + 2 explicit profiler/soak skip`; gerçek death quote/Continue/meta shop, `NewGameScene` Day 1-12 Council cadence, onaylı Council chain flag live yazımı, active-card exact payload/memory/handled-day Continue, çözülmüş seçim + temp effect duration Continue, bozuk Council karar/Continue payload preflight'ı, Heart Continue, Arrow/pool/targeting, 1K archer x 10K enemy, Formation V1, archer cap/retrain, economy/worker, Wall, cycle, backlog ve Fireball kapsamı.
 - `[~]` Player/hardware frame pacing kabulü ilgili ürün kapısını bekliyor; Council launch content ownership tamamlandı.
 
 ---
@@ -1081,7 +1098,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 | 1k x 10k targeting collapse | Pooled-arrow Editor birleşik P95 `12,50 ms`; Player/hardware kabulü açık | Coarse spatial query + target load + arrow pool tamam; Player kabulüyle doğrula |
 | Projectile/VFX flood | Projectile churn kapandı; hit event yoğunluğu açık | Pool tamam; VFX/SFX budget + aggregation |
 | Graph unreachable | Generator henüz yok | Validation + deterministic fallback |
-| Meta runaway | Current reward kills/day ağırlıklı | Diminishing values + telemetry |
+| Meta runaway | 10K quote artık `1.640`; kill katkısı üç azalan band kullanıyor | Tuner reward/cost preview + live aggregate; telemetry event'leriyle saha dağılımını izle |
 | Ammo click angaryası | +1/+5/Buy Max, capacity ve efficiency aktif | Telemetry ile paket/verim tune et; Blueprint dışı auto-spend ekleme |
 | HUD tekrar büyür | Forecast kaldırıldı; üç management yüzeyi ortak exclusive owner altında ve aynı anda yalnız biri açık | Fixed layout + mockup gate + presentation guard testleri |
 | Legacy leakage | Gate/Core binding, Fletcher, Barracks training, direct upgrades | Source-owner audit + guard tests |
@@ -1180,7 +1197,7 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | `HeartScreenUI.cs` + `SimulationPauseService.cs` + `TechTreeViewController.cs` | Hidden-safe fullscreen generated graph, compass layout, GE quote/effect/Keystone UI, pan/zoom ve nested exact full-simulation pause |
 | `TechTreeUI.cs` | Legacy sabit catalog UI; aktif NewGameScene owner'ı değil |
 | `CouncilRegularSchedule.cs` + `CouncilComposer.cs` + `CouncilContentPolicy.cs` + `CouncilEventUI.cs` | Exact Day 3/6/9 cadence + curated deterministic card infrastructure + fail-closed Heart/Meta role/content boundary |
-| `MetaProgression.cs` + `MetaUpgradeSO.cs` | Separate meta save, current reward/effects |
+| `MetaRewardTuning.cs` + `MetaProgression.cs` + `MetaUpgradeSO.cs` | Catalog-owned diminishing death reward, receipt-fixed exact quote, separate meta save ve audited permanent costs/effects |
 | `CombatFeedbackBridge.cs` | VFX/audio pools ve rate limiting altyapısı |
 | `Assets/Tests/EditMode` + `Assets/Tests/PlayMode` | V1 contract ve gerçek scene/runtime regression testleri |
 
@@ -1306,3 +1323,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-17 | `DW-V1-PERF-PLAYER-ALLOC-SPIKE` isolated combined-load Player ownership | Explicit profiler testi production pool ve canonical archer restore owner'ıyla 10.000 enemy + 1.000 Basic Archer kuracak, finite Arrow/projectile pipeline'ını çalıştıracak ve allocation callstack açık 120-frame raw yazacak biçimde genişletildi. Editor-only runner exact testi StandaloneWindows64 Development Player'a gönderiyor; analyzer insan-okur TXT ve makine-okur JSON üretiyor, bütün active DeadWalls marker biçimlerini ve ECS system/job marker'larını tanıyor. Test Framework build failure callback'i run metadata/status ile fail-closed bağlandı. Strict Player build'i bozan unused third-party prefab'daki tek missing legacy Pixel Perfect component temizlendi; corrupt Entities artifact SubScene reimport ile yeniden üretildi | Player-targeted test `1/1`; capture enemy/archer/projectile `10.000/1.000/6`, raw `73.765.057 B`, analyzer `121` frame; CPU average/P95/max `10,593/18,694/33,234 ms`; root GC average/max `10.437/12.020 B`; proje user-code GC `58.290 B / 481 B/frame`; ECS GC `0 B`, sync-point yok; `DamageApplySystem` avg/max `1,892/4,863 ms`, `ArcherShootSystem` max `17,444 ms`; script validation `0 error`, Unity compile `0 error`; tracker `403/442` |
 | 2026-07-17 | `DW-V1-TUNING-HEART-SURFACE` canonical Heart tuning contract | Yeni/paralel bir Heart owner kurulmadı. `Difficulty Tuner > Heart Runtime Contract`, `GameManager` graph settings/wallet runtime owner'ını ve catalog varsa gerçek `HeartNodeDefinitionSO` rarity/depth/cost/growth definition'larını doğrudan düzenlenen tek yüzeyde birleştirdi. Fiyat ve graph preview'ları production `HeartPurchasePricing` ile `HeartGraphGenerator` kullanır; live telemetry hidden node kimliklerini açmadan aggregate state sunar. Değişiklikler yalnız gelecekte üretilecek graph'a uygulanır, aktif veya Continue exact graph'i reroll edilmez. Onaylı Essence drop sayıları ve production catalog bulunmadığından değer uydurulmadı; açık `UNCONFIGURED` owner gate'i ve fail-closed catalog sınırı korundu | Heart contract guard EditMode `2/2`; Heart data/generator/purchase EditMode `36/36`; exact graph Continue PlayMode `1/1`; Difficulty Tuner gerçek editor window olarak açıldı; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `410/442` |
 | 2026-07-17 | `DW-V1-TUNING-COUNCIL-SURFACE` canonical regular Council tuning contract | Yeni Council type, timer veya parallel state kurulmadı. Production catalog Small/Fair/Generous multiplier/weight, A/B budget tolerance ve recent memory'nin tek tuning owner'i oldu; eski composer dagilimi aynen korundu. Memory azaltimi scheduled compose oncesi ve secim sonrasi uygulanir. Tuner fixed Day `3/6/9...` cadence'i, regular-only/Emergency-absent siniri, SubScene'den okunan Dawn+Day karar penceresini ve aggregate runtime state'i tek yuzeyde gosterir | Council EditMode `56/56`; regular runtime/Continue/memory PlayMode `8/8`; Tuner snapshot `5s + 30s = 35s`; editor window acildi; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `411/442` |
+| 2026-07-17 | `DW-V1-TUNING-META-SURFACE` diminishing death reward + audited permanent economy | Production Meta catalog, uc azalan kill bandi ile day/night/peak-pop/record agirliklarinin tek owner'i oldu. Exact quote `RunDeathReceipt v2` icinde durable sabitlenir; recovery tuning drift'i yaratmaz, v1 legacy explicit kalir. Mevcut 11 definition'in exponential maliyet ve hafif-guc rolleri degistirilmeden exact testle kilitlendi. Tuner ayni catalog/definition assetlerini dogrudan duzenler, runtime preview ve aggregate telemetry sunar | Targeted EditMode `44/44`; targeted PlayMode `3/3`; full EditMode `345/345`; full PlayMode `72 pass + 2 explicit skip`; 10K quote `1.640`; catalog `11/0 problem`; editor window acildi; scene validation `0`; final Console `0 error / 0 warning`; tracker `412/442` |
