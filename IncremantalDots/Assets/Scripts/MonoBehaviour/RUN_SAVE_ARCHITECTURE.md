@@ -121,6 +121,7 @@ Entity referansı doğrudan JSON'a yazılmaz. Referans gerekiyorsa compact stabl
 - `NoSpeedOfflineProgressContractTests.RunAndMetaSaveSchemas_HaveNoOfflineAccrualFields`
 - `ExactRunContinuePlayModeTests.SaveRunSnapshot_LethalEcsState_CannotRewriteContinueAfterDeath`
 - `ExactRunContinuePlayModeTests.Continue_RestoresSameCyclePhaseTimerResourcesAndSpawnRng` actual worker ve target ratio state'ini de doğrular.
+- `ExactRunContinuePlayModeTests.PopulationBedsAndWorkerRatios_RestoreExactSnapshot`
 - `ExactRunContinuePlayModeTests.GraveEssence_UsesHeartTransactionPersistsOnContinueAndResetsWithRun`
 - `HeartGraphContinuePlayModeTests.Continue_ReplaysExactSavedHeartGraphWithoutReroll`
 - `CouncilRegularSchedulePlayModeTests.RegularCouncil_OpensExactlyOnThreeSixNineCadence_OncePerDay`

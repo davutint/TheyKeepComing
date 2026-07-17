@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.3
 > **Son tam kapsam denetimi:** 2026-07-17
 > **Aktif paket:** Post-Package V1 Closure - Contracts, Performance ve Release DoD
-> **Aktif iş:** `DW-V1-DOD-EXACT-POPULATION-WORKERS` - Verify Exact Population, Beds and Worker Ratios Save/Load
-> **İlerleme:** `427 / 442` tracker checkbox'ı tamamlandı - `%96,61`
+> **Aktif iş:** `DW-V1-DOD-WORKER-WORLD-FEEDBACK` - Verify Representative Worker World Feedback
+> **İlerleme:** `428 / 442` tracker checkbox'ı tamamlandı - `%96,83`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -133,8 +133,8 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Normal repair | Stone-only ve yalnız Day/Dusk | `[x]` |
 | Save | Exact same-moment Continue; schema v11, minimum v3; purchased bed, worker bina yatırımı, Archer Formation V1, finite Arrow yatırımı, Grave Essence, exact Heart graph replay ve regular Council handled-day/active-card discriminator | `[x]` |
 | Economy | Worker üretimi, bed alımı ve dört hazır binanın capacity/efficiency yatırımları var; bed ve bina fiyat eğrileri `DefaultDifficulty.asset`/Difficulty Tuner üzerinden baked runtime tuning'e bağlı; V1 ana kaynaklarında pasif consumption yok, Arrow başarılı projectile rent başına sürekli tükenen tek stok | `[x]` Runtime release guard |
-| Population | House bed state + Wood purchase API + exact save var; Dawn isteği boş yatak ve Food/kişi bütçesiyle sınırlı, gerçek accepted count uygulanıyor, Food bir kez düşülüyor ve en fazla 15 temsili survivor sağdan Wall arkasına yürüyor | `[x]` |
-| Workers | Kalıcı target ratio + actual/cap/idle state, +1/+10/+100/direct input, bağımsız bina capacity/efficiency seviyeleri, yeni nüfus auto-allocation, exact save, Low/Medium/High density ve allocation-senkronlu animation/cargo/lantern/delivery feedback var | `[x]` |
+| Population | House bed state + Wood purchase API + exact save var; Dawn isteği boş yatak ve Food/kişi bütçesiyle sınırlı, gerçek accepted count uygulanıyor, Food bir kez düşülüyor ve en fazla 15 temsili survivor sağdan Wall arkasına yürüyor; total/workers/archers/idle + base/purchased beds tek snapshot guard'ında exact | `[x]` |
+| Workers | Kalıcı target ratio + actual/cap/idle state, +1/+10/+100/direct input, bağımsız bina capacity/efficiency seviyeleri, yeni nüfus auto-allocation, exact save, Low/Medium/High density ve allocation-senkronlu animation/cargo/lantern/delivery feedback var; dört actual count + dört ratio birleşik Continue guard'ında exact | `[x]` |
 | Council | 9 launch template, 11 serialized atom (`cap_bonus` dormant), staged Day 3/6/9 havuzu, curated source-retirement/follow-up, exact kart ve fail-closed policy aktif | `[x]` 5.400-sample budget/token/content gate + exact save/guard doğrulandı |
 | Archers | Basic/Rapid/Frost, instant buy, incremental type maliyeti, yerinde retrain, version'lı 40x25 formation, scalable target load ve pooled projectile lifetime var | `[x]` Combat temeli; upgrade owner'ı Package E |
 | Archer cap | `ArcherCapacityUtility` Basic/Rapid/Frost toplamını `1000` ile sınırlar; buy, merkezi spawn, Council, meta, restore ve legacy Barracks aynı guard'ı kullanır | `[x]` |
@@ -1258,7 +1258,16 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
   maliyeti committed transaction'dır; pasif/per-minute drain değildir. Targeted PlayMode `3/3`,
   full EditMode `382/382` ve full PlayMode `82 pass + 2 explicit profiler/soak skip` geçti;
   scene validation `0` issue ve final Console `0 error / 0 warning`.
-- [ ] Population, beds ve worker ratios exact save/load.
+- [x] Population, beds ve worker ratios exact save/load.
+  Birleşik release guard aynı disk snapshot'ında `PopulationState` total/workers/archers/idle,
+  population base/capacity, `MobileBedCapacityState` base/purchased, Wood/Stone/Iron/Food actual
+  worker count, worker idle/last-observed ve dört target ratio'yu birlikte yazıyor. Runtime state
+  farklı coherent değerlere mutate edildikten sonra Continue; actual archer entity sayısını koruyarak
+  bütün alanları bire bir geri yükledi. Target ratio kontratı exact `2700/1900/1600/3800`, actual
+  worker kontratı `23/17/11/25`, idle `17` ve purchased beds `15` ile doğrulandı. Targeted
+  PlayMode `3/3`, full EditMode `382/382` ve full PlayMode
+  `83 pass + 2 explicit profiler/soak skip` geçti; scene validation `0` issue ve final Console
+  `0 error / 0 warning`.
 - [ ] Worker world feedback representative ve doğru.
 - [x] Basic/Rapid/Frost toplam 1000 cap.
 - [x] 40x25 stable formation.
@@ -1481,3 +1490,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-17 | `DW-V1-DOD-60S-CYCLE` exact continuous cycle launch contract | Production SubScene exact `ContinuousSiegeEnabled=true` ve `60 = Day 30 + Dusk 5 + Night 20 + Dawn 5` authoring sözleşmesiyle kilitlendi. Runtime wrap testi dört pozitif-intensity fazı, Day 1 -> Day 2 geçişini, cycle index/timer wrap'ını ve `WaveStateData` combat-active durumunun prep gap olmadan korunmasını doğruluyor. Eski üç-faz `25/10/25` mimari metni kaldırılarak güncel tek sözleşme bırakıldı | Targeted EditMode `1/1`; gerçek phase/wrap PlayMode `2/2`; full EditMode `379/379`; full PlayMode `81 pass + 2 explicit profiler/soak skip`; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `425/442` |
 | 2026-07-17 | `DW-V1-DOD-NO-SPEED-OFFLINE` fixed-speed online-only run contract | Production source release guard'ı player-facing `Time.timeScale > 1`, `Time.fixedDeltaTime`, wall-clock progression API ve offline owner alanlarını yasaklıyor; yalnız normal `1x`, merkezi pause `0` ve Game Over sunumu `0.25x` sahipleri onaylı. Run/meta/death save şemaları timestamp veya offline accrual alanı taşımıyor; gerçek scene pause sunuyor fakat x2/x4/fast-forward sunmuyor. Exact Continue kapalı süre uygulamadan aynı cycle/phase/timer, kaynak ve spawn RNG state'ini geri kuruyor. Tam regresyonda bulunan 10K/1K stres testi son-frame projectile flake'i, runtime değiştirilmeden sample içindeki authoritative pool rent artışını ölçerek stabilize edildi | Targeted EditMode `3/3`; exact Continue PlayMode `1/1`; stabilize 10K/1K PlayMode `1/1` (`2.000` sample rent, `1.000` peak projectile); full EditMode `382/382`; full PlayMode `81 pass + 2 explicit profiler/soak skip`; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `426/442` |
 | 2026-07-17 | `DW-V1-DOD-PASSIVE-RESOURCE-DRAIN` main-resource upkeep exclusion + finite Arrow combat drain | Active castle loop legacy `ResourceConsumptionRate` değerlerini etkisizleştiriyor; Fletcher `ArrowProductionSystem` mobile config varken çıkıyor. Production world `ArrowProducer` veya legacy `ArcherTrainer` taşımıyor. Gerçek combat release guard'ında yüksek negatif rate enjeksiyonu Wood/Stone/Iron/Food stoklarını azaltmadı; başarılı tek projectile rent'i yalnız finite Arrow stokunu `10 -> 9` düşürdü. Player purchase/repair ve accepted Dawn population Food maliyeti tek seferlik transaction olarak açıkça ayrıldı | Targeted PlayMode `3/3`; full EditMode `382/382`; full PlayMode `82 pass + 2 explicit profiler/soak skip`; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `427/442` |
+| 2026-07-17 | `DW-V1-DOD-EXACT-POPULATION-WORKERS` unified population/bed/worker exact Continue contract | Tek gerçek snapshot; Population total/workers/archers/idle ve base/capacity, bed base/purchased, dört actual worker count, worker idle/last-observed ve dört target ratio alanını birlikte yazdı. Runtime tuple tamamen değiştirildikten sonra Continue actual archer entity sayısını koruyarak bütün state'i exact geri yükledi; ratio `2700/1900/1600/3800`, worker `23/17/11/25`, idle `17`, purchased beds `15` kanıtı kullanıldı | Targeted PlayMode `3/3`; full EditMode `382/382`; full PlayMode `83 pass + 2 explicit profiler/soak skip`; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `428/442` |

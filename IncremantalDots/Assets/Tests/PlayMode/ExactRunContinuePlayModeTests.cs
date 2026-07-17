@@ -256,6 +256,161 @@ namespace DeadWalls.Tests
         }
 
         [UnityTest]
+        public IEnumerator PopulationBedsAndWorkerRatios_RestoreExactSnapshot()
+        {
+            var gameManager = GameManager.Instance;
+            bool runtimeReady = false;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                {
+                    runtimeReady = true;
+                    break;
+                }
+                yield return null;
+            }
+            Assert.That(runtimeReady, Is.True,
+                "Population/bed/worker exact snapshot runtime'i hazir olmadi.");
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            Entity gameStateEntity = entityManager.CreateEntityQuery(
+                typeof(PopulationState), typeof(ResourceData)).GetSingletonEntity();
+            Entity mobileEntity = entityManager.CreateEntityQuery(
+                typeof(MobileCastleCombatConfig),
+                typeof(MobilePopulationAllocation),
+                typeof(MobileBedCapacityState)).GetSingletonEntity();
+
+            using EntityQuery archerQuery = entityManager.CreateEntityQuery(new EntityQueryDesc
+            {
+                All = new[] { ComponentType.ReadOnly<ArcherUnit>() },
+                None = new[] { ComponentType.ReadOnly<Prefab>() }
+            });
+            int savedArchers = archerQuery.CalculateEntityCount();
+
+            const int woodWorkers = 23;
+            const int stoneWorkers = 17;
+            const int ironWorkers = 11;
+            const int foodWorkers = 25;
+            const int savedIdle = 17;
+            int savedWorkers = woodWorkers + stoneWorkers + ironWorkers + foodWorkers;
+            int savedTotal = savedWorkers + savedArchers + savedIdle;
+            int savedBedBase = savedTotal;
+            const int savedPurchasedBeds = 15;
+            int savedCapacity = savedBedBase + savedPurchasedBeds;
+
+            MobilePopulationAllocation allocation =
+                entityManager.GetComponentData<MobilePopulationAllocation>(mobileEntity);
+            Assert.That(allocation.WoodWorkerCapacity, Is.GreaterThanOrEqualTo(woodWorkers));
+            Assert.That(allocation.StoneWorkerCapacity, Is.GreaterThanOrEqualTo(stoneWorkers));
+            Assert.That(allocation.IronWorkerCapacity, Is.GreaterThanOrEqualTo(ironWorkers));
+            Assert.That(allocation.FoodWorkerCapacity, Is.GreaterThanOrEqualTo(foodWorkers));
+            allocation.WoodWorkers = woodWorkers;
+            allocation.StoneWorkers = stoneWorkers;
+            allocation.IronWorkers = ironWorkers;
+            allocation.FoodWorkers = foodWorkers;
+            allocation.WoodTargetRatioBps = 2700;
+            allocation.StoneTargetRatioBps = 1900;
+            allocation.IronTargetRatioBps = 1600;
+            allocation.FoodTargetRatioBps = 3800;
+            allocation.IdlePopulation = savedIdle;
+            allocation.LastObservedPopulation = savedTotal;
+            allocation.AutoAllocationInitialized = 1;
+            entityManager.SetComponentData(mobileEntity, allocation);
+
+            var beds = new MobileBedCapacityState
+            {
+                BaseCapacity = savedBedBase,
+                PurchasedCapacity = savedPurchasedBeds
+            };
+            entityManager.SetComponentData(mobileEntity, beds);
+
+            PopulationState population = entityManager.GetComponentData<PopulationState>(gameStateEntity);
+            population.Total = savedTotal;
+            population.Workers = savedWorkers;
+            population.Archers = savedArchers;
+            population.Idle = savedIdle;
+            population.BaseCapacity = savedBedBase;
+            population.Capacity = savedCapacity;
+            entityManager.SetComponentData(gameStateEntity, population);
+
+            Assert.That(gameManager.SaveRunSnapshot(), Is.True);
+            RunSaveState saved = RunPersistence.TryLoad();
+            Assert.That(saved, Is.Not.Null);
+            Assert.That(saved.PopulationTotal, Is.EqualTo(savedTotal));
+            Assert.That(saved.PopulationCapacity, Is.EqualTo(savedCapacity));
+            Assert.That(saved.PopulationBaseCapacity, Is.EqualTo(savedBedBase));
+            Assert.That(saved.BedBaseCapacity, Is.EqualTo(savedBedBase));
+            Assert.That(saved.PurchasedBedCapacity, Is.EqualTo(savedPurchasedBeds));
+            Assert.That(saved.WoodWorkers, Is.EqualTo(woodWorkers));
+            Assert.That(saved.StoneWorkers, Is.EqualTo(stoneWorkers));
+            Assert.That(saved.IronWorkers, Is.EqualTo(ironWorkers));
+            Assert.That(saved.FoodWorkers, Is.EqualTo(foodWorkers));
+            Assert.That(saved.WoodWorkerTargetRatioBps, Is.EqualTo(2700));
+            Assert.That(saved.StoneWorkerTargetRatioBps, Is.EqualTo(1900));
+            Assert.That(saved.IronWorkerTargetRatioBps, Is.EqualTo(1600));
+            Assert.That(saved.FoodWorkerTargetRatioBps, Is.EqualTo(3800));
+            Assert.That(saved.WorkerIdlePopulation, Is.EqualTo(savedIdle));
+            Assert.That(saved.LastObservedPopulation, Is.EqualTo(savedTotal));
+
+            int mutatedTotal = savedArchers + 5;
+            population.Total = mutatedTotal;
+            population.Workers = 0;
+            population.Archers = savedArchers;
+            population.Idle = 5;
+            population.BaseCapacity = mutatedTotal;
+            population.Capacity = mutatedTotal;
+            entityManager.SetComponentData(gameStateEntity, population);
+            beds.BaseCapacity = mutatedTotal;
+            beds.PurchasedCapacity = 0;
+            entityManager.SetComponentData(mobileEntity, beds);
+            allocation.WoodWorkers = 0;
+            allocation.StoneWorkers = 0;
+            allocation.IronWorkers = 0;
+            allocation.FoodWorkers = 0;
+            allocation.WoodTargetRatioBps = 2500;
+            allocation.StoneTargetRatioBps = 2500;
+            allocation.IronTargetRatioBps = 2500;
+            allocation.FoodTargetRatioBps = 2500;
+            allocation.IdlePopulation = 5;
+            allocation.LastObservedPopulation = mutatedTotal;
+            entityManager.SetComponentData(mobileEntity, allocation);
+
+            Assert.That(gameManager.TryRestoreRunFromCheckpoint(), Is.True);
+
+            gameStateEntity = entityManager.CreateEntityQuery(typeof(PopulationState)).GetSingletonEntity();
+            mobileEntity = entityManager.CreateEntityQuery(
+                typeof(MobileCastleCombatConfig),
+                typeof(MobilePopulationAllocation),
+                typeof(MobileBedCapacityState)).GetSingletonEntity();
+            PopulationState restoredPopulation =
+                entityManager.GetComponentData<PopulationState>(gameStateEntity);
+            MobileBedCapacityState restoredBeds =
+                entityManager.GetComponentData<MobileBedCapacityState>(mobileEntity);
+            MobilePopulationAllocation restoredAllocation =
+                entityManager.GetComponentData<MobilePopulationAllocation>(mobileEntity);
+
+            Assert.That(restoredPopulation.Total, Is.EqualTo(savedTotal));
+            Assert.That(restoredPopulation.Workers, Is.EqualTo(savedWorkers));
+            Assert.That(restoredPopulation.Archers, Is.EqualTo(savedArchers));
+            Assert.That(restoredPopulation.Idle, Is.EqualTo(savedIdle));
+            Assert.That(restoredPopulation.BaseCapacity, Is.EqualTo(savedBedBase));
+            Assert.That(restoredPopulation.Capacity, Is.EqualTo(savedCapacity));
+            Assert.That(restoredBeds.BaseCapacity, Is.EqualTo(savedBedBase));
+            Assert.That(restoredBeds.PurchasedCapacity, Is.EqualTo(savedPurchasedBeds));
+            Assert.That(restoredAllocation.WoodWorkers, Is.EqualTo(woodWorkers));
+            Assert.That(restoredAllocation.StoneWorkers, Is.EqualTo(stoneWorkers));
+            Assert.That(restoredAllocation.IronWorkers, Is.EqualTo(ironWorkers));
+            Assert.That(restoredAllocation.FoodWorkers, Is.EqualTo(foodWorkers));
+            Assert.That(restoredAllocation.WoodTargetRatioBps, Is.EqualTo(2700));
+            Assert.That(restoredAllocation.StoneTargetRatioBps, Is.EqualTo(1900));
+            Assert.That(restoredAllocation.IronTargetRatioBps, Is.EqualTo(1600));
+            Assert.That(restoredAllocation.FoodTargetRatioBps, Is.EqualTo(3800));
+            Assert.That(restoredAllocation.IdlePopulation, Is.EqualTo(savedIdle));
+            Assert.That(restoredAllocation.LastObservedPopulation, Is.EqualTo(savedTotal));
+            yield return null;
+        }
+
+        [UnityTest]
         public IEnumerator GraveEssence_UsesHeartTransactionPersistsOnContinueAndResetsWithRun()
         {
             var gameManager = GameManager.Instance;
