@@ -31,9 +31,14 @@ Bu ayrım, ilerleyen günlerde düşmanı süngerleştirmeden kalabalık hissini
 
 Utility stat growth alanlarını tamamen görmezden gelir. Böylece eski bir scene/profile değeri yanlışlıkla sıfırdan büyük kalsa bile HP/damage/speed progression geri dönmez.
 
+## Çıkış profile guard'ı
+
+Production difficulty içeriği `Assets/ScriptableObject/MobileCastle/Difficulty/DefaultDifficulty.asset` dosyasındaki tek `DifficultyProfileSO` ile sınırlıdır. `MobileCastleCombatSubScene` içindeki tek `MobileCastleCombatAuthoring` bu profile ve geçerli production enemy catalog'una bağlı olmak zorundadır. Production profile ve authoring üzerindeki HP/damage/speed growth alanları neutral kalır; buna karşılık extra enemy count, cycle batch growth, day/night intensity ve daralan spawn interval kanalları aktif tutulur. EditMode release guard'ı gerçek profile + SubScene authoring + enemy definition bileşimini `MobileWaveUtility` üzerinden Day 1 ve ileri cycle karşılaştırmasına sokar.
+
 ## Doğrulama
 
 - `MobileWaveUtilityTests.ConfigureMobileWave_IgnoresStatGrowthFields_ButIncreasesQuantityPressure`
+- `MobileWaveUtilityTests.ProductionProfileAndSubScene_KeepStatsFixedAndQuantityPressureActive`
 - `ExactRunContinuePlayModeTests.AdvancedCycle_IncreasesQuantityButKeepsEnemyStatsFixed`
 - `ExactRunContinuePlayModeTests.EnemyCatalog_SpawnsRegisteredPrefabWithDefinitionStats`
 
