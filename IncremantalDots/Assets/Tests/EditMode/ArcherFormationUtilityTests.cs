@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using NUnit.Framework;
+using UnityEditor;
 using UnityEngine;
 
 namespace DeadWalls.Tests
@@ -8,6 +9,32 @@ namespace DeadWalls.Tests
     {
         private static readonly Vector2 RightVertex = new Vector2(0.5f, 0f);
         private static readonly Vector2 TopVertex = new Vector2(0f, 0.25f);
+
+        [Test]
+        public void FormationContract_AssetOwnsFortyCellsAndUtilityOwnsVersionedTwentyFiveSlots()
+        {
+            const string assetPath =
+                "Assets/ScriptableObject/MobileCastle/Archers/ArcherFormationV1.asset";
+            ArcherFormationDefinitionSO definition =
+                AssetDatabase.LoadAssetAtPath<ArcherFormationDefinitionSO>(assetPath);
+
+            Assert.That(definition, Is.Not.Null,
+                "Canonical ArcherFormationV1 asset bulunamadi.");
+            Assert.That(definition.ValidateV1(out string problem), Is.True, problem);
+            Assert.That(definition.Version,
+                Is.EqualTo(ArcherFormationUtility.CurrentVersion));
+            Assert.That(definition.TileCoordinates.Length,
+                Is.EqualTo(ArcherFormationUtility.RequiredTileCount));
+            Assert.That(ArcherFormationUtility.MatchesCanonicalV1(
+                definition.TileCoordinates), Is.True);
+            Assert.That(ArcherFormationUtility.SlotsPerTile, Is.EqualTo(25));
+            Assert.That(ArcherFormationUtility.TotalCapacity,
+                Is.EqualTo(definition.TileCoordinates.Length
+                    * ArcherFormationUtility.SlotsPerTile));
+            Assert.That(ArcherFormationUtility.TotalCapacity, Is.EqualTo(1000));
+            Assert.That(ArcherFormationUtility.NormalizeVersion(0),
+                Is.EqualTo(ArcherFormationUtility.CurrentVersion));
+        }
 
         [Test]
         public void CanonicalV1Layout_ContainsExactOrderedFortyOutsideTiles()

@@ -19,6 +19,20 @@ Formation V1 tam `40` canonical `outside` hücresi kullanır. Hücreler merkezde
 bu koordinatları ve örnekleme tuning'ini version ile birlikte taşır; sahnedeki tilemap bu
 contract'i karşılamıyorsa placement geçersizdir.
 
+### Contract sahipliği
+
+| Contract alanı | Tek otorite | Runtime tüketicisi |
+|---|---|---|
+| 40 sıralı hücre | `ArcherFormationV1.asset` (`ArcherFormationDefinitionSO.TileCoordinates`) | `MobileCastleArcherTilePlacement` |
+| Hücre başına 25 local nokta | `ArcherFormationUtility.SlotsPerTile` ve deterministic üretim algoritması | `MobileCastleArcherTilePlacement` |
+| Algoritma sürümü | `ArcherFormationUtility.CurrentVersion` + asset `Version` | Placement cache, `GameManager`, `RunPersistence` |
+| 1000 toplam kapasite | `RequiredTileCount * SlotsPerTile` türevi | Okçu cap'i, placement cache ve gizmo |
+
+`ArcherFormationDefinitionSO` runtime state tutmaz. `MobileCastleArcherTilePlacement` yeni
+bir formasyon tanımlamaz; asset ve utility contract'ini aktif `outside` tilemap üzerinde
+world-space cache'e dönüştürür. Böylece 40, 25 ve sürüm değerleri farklı scene veya prefab
+alanlarında tekrar author edilmez.
+
 ## 40 x 25 yerleşim
 
 Her tile için `25` local slot üretilir. Seed; formation version, tile coordinate, local
@@ -44,14 +58,17 @@ local noktayı tile merkezine bu iki eksenle taşır. Runtime Z değeri
 
 ## Save ve Continue
 
-Exact save `v8`, archer type count'ları yanında `ArcherFormationVersion` değerini tutar;
+Exact save güncel `v14` şemasında archer type count'ları yanında
+`ArcherFormationVersion` değerini tutar;
 1000 world position JSON'a yazılmaz. Restore önce kaydın version'ıyla aynı deterministik
 cache'i kurar, mevcut başlangıç okçularını bu sıraya taşır ve sonra eksik type count'larını
 tamamlar. Böylece Main Menu -> Continue aynı formation noktalarını yeniden üretir.
 
 `v6 -> v7` migration, eski deterministic placement kayıtlarını Formation V1'e bağlar;
-ardından `v7 -> v8` finite Arrow yatırım alanlarını ekler.
-Bilinmeyen bir formation version sessizce farklı bir düzene çevrilmez.
+sonraki şema migration'ları Formation V1 sürümünü koruyarak güncel `v14` state'ine taşır.
+V1 yalnız algoritma sürümü `1`i destekler. Save normalization eski veya boş formation
+sürümünü current V1'e bağlar; placement API'si cache sürümüyle eşleşmeyen doğrudan
+istekleri reddeder.
 
 ## Sınırlar
 
@@ -62,7 +79,8 @@ Bilinmeyen bir formation version sessizce farklı bir düzene çevrilmez.
 
 ## Doğrulama
 
-- `ArcherFormationUtilityTests`: tam 40 koordinat, deterministik diamond/inset/minimum
+- `ArcherFormationUtilityTests`: canonical asset'in 40 hücre + algoritma sürümü
+  sahipliği, utility'nin 25 slot/1000 kapasitesi, deterministik diamond/inset/minimum
   mesafe ve layer-fill mapping.
 - `ArcherFormationPlayModeTests`: gerçek `NewGameScene` üzerinde 40/1000 contract'i,
   benzersiz noktalar, cache rebuild ve exact Continue sonrası aynı formasyon.
