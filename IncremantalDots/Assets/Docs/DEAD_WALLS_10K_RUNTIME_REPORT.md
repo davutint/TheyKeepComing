@@ -216,3 +216,40 @@ tamamlandı. Küçük contact patch zemine temas verdi; muted-cold tek-texel edg
 silhouette'leri ayırdı; deterministic phase dağılımı senkron frame-0 titreşimini kaldırdı.
 Hedefli doğrulama: `HordeReadabilityTests 3/3`, enemy pool testi `1/1`, gerçek 10K + 1K
 benchmark `1/1`, scene validation `0` issue ve Console `0` error.
+
+---
+
+## DW-V1-PERF-CONTINUE-10K-1K takip ölçümü - 2026-07-17
+
+Önceki birleşik benchmark, 1.000 okçuyu doğrudan ECS stress entity'si olarak kurduğu için
+`run_save.json` içindeki archer type count ve canonical formation replay'ini kanıtlamıyordu. Bu
+koşuda 1.000 Basic Archer üretim `GameManager.RestoreArcherCountsWithinCapacity` owner'ı ile
+kuruldu; population/allocation/bed state'i aynı exact run state'ine eşitlendi. Snapshot alındıktan
+sonra bütün okçular silindi ve aynı v14 snapshot iki kez Continue edildi.
+
+| Metrik | Canonical Continue koşusu |
+|---|---:|
+| Enemy / canonical archer | 10.000 / 1.000 Basic |
+| Saved archer type count | 1.000 / 0 Rapid / 0 Frost |
+| Archer formation version | 1 |
+| Combat rebuild bucket | 378 |
+| Snapshot save / size | 47,05 ms / 369.097 B |
+| İlk / ikinci Continue restore | 417,11 / 436,89 ms |
+| Enemy / archer rebuild deterministic | True / True |
+| Restore edilen backlog | 777 |
+| Frame average / P95 / max | 30,49 / 52,06 / 66,23 ms |
+| Main thread average / max | 30,36 / 76,10 ms |
+| Sample sonu aktif projectile | 879 |
+| Arrow pool total / active / rents | 1.280 / 879 / 8.000 |
+| 10K activation / Fireball death peak | 152,37 / 65,83 ms |
+
+Canonical Continue correctness kapısı geçti: save payload'ı gerçekten 1.000 Basic Archer ve
+formation version `1` taşıdı; her restore öncesinde sahnede archer sayısı `0` iken her iki Continue
+turunda da 1.000 archer yeniden kuruldu. Enemy position multiset'i ile archer type/formation
+fingerprint'i iki restore arasında birebir aynı kaldı; 10.000 enemy ve backlog `777` de korundu.
+
+Bu koşudaki snapshot, ölçüm anında `879` aktif projectile içerdiği için önceki düşük-projectile
+örneklerinden daha büyüktür. `417,11-436,89 ms` restore değerleri Unity Editor içinde 10K enemy
+pool aktivasyonu ile canonical 1K archer spawn/formasyon kurulumunun birlikte maliyetidir; Continue
+yükleme ekranında çalışır ve aktif combat frame bütçesi değildir. Bu ölçüm Player allocation/spike
+kabulü sayılmaz; birleşik yükte isolated Player Profiler kanıtı ayrı tracker maddesinde açıktır.

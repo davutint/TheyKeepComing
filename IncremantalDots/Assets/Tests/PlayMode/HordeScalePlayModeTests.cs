@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using NUnit.Framework;
 using Unity.Collections;
@@ -215,44 +216,66 @@ namespace DeadWalls.Tests
                 Debug.Log($"[DW-I-HORDE-READ] frame_bands={frameBands}; timer_bands={timerBands}");
             }
 
-            using (EntityQuery existingArcherQuery =
-                   entityManager.CreateEntityQuery(typeof(ArcherUnit)))
-                entityManager.DestroyEntity(existingArcherQuery);
-
-            Entity archerPrefab = entityManager.GetComponentData<ArcherPrefabData>(
-                entityManager.CreateEntityQuery(typeof(ArcherPrefabData))
-                    .GetSingletonEntity()).ArcherPrefab;
             MobileCastleArcherTilePlacement placement =
                 UnityEngine.Object.FindFirstObjectByType<MobileCastleArcherTilePlacement>();
             Assert.That(placement, Is.Not.Null);
             Assert.That(placement.FormationCapacity, Is.EqualTo(ArcherTarget));
 
+            MethodInfo restoreArcherCounts = typeof(GameManager).GetMethod(
+                "RestoreArcherCountsWithinCapacity",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.That(restoreArcherCounts, Is.Not.Null);
+            restoreArcherCounts.Invoke(gameManager, new object[] { ArcherTarget, 0, 0 });
+
+            using EntityQuery archerQuery = entityManager.CreateEntityQuery(new EntityQueryDesc
+            {
+                All = new[]
+                {
+                    ComponentType.ReadOnly<ArcherUnit>(),
+                    ComponentType.ReadOnly<LocalTransform>()
+                },
+                None = new[] { ComponentType.ReadOnly<Prefab>() }
+            });
+            Assert.That(archerQuery.CalculateEntityCount(), Is.EqualTo(ArcherTarget));
+            Assert.That(gameManager.BasicArcherCount, Is.EqualTo(ArcherTarget));
+            Assert.That(gameManager.RapidArcherCount, Is.Zero);
+            Assert.That(gameManager.FrostArcherCount, Is.Zero);
+
             using (NativeArray<Entity> stressArchers =
-                   entityManager.Instantiate(archerPrefab, ArcherTarget, Allocator.Temp))
+                   archerQuery.ToEntityArray(Allocator.Temp))
             {
                 for (int i = 0; i < stressArchers.Length; i++)
                 {
-                    Assert.That(placement.TryGetSpawnPosition(i, out float3 archerPosition), Is.True);
-                    entityManager.SetComponentData(stressArchers[i], new ArcherUnit
-                    {
-                        FireRate = 1.5f,
-                        FireTimer = 0f,
-                        ArrowDamage = 10f,
-                        Range = 15f,
-                        Type = ArcherType.Basic,
-                        SlowDuration = 0f,
-                        SlowMultiplier = 1f,
-                        FacingDirection = new float2(1f, 0f),
-                        AttackAnimTimer = 0f
-                    });
-                    entityManager.SetComponentData(
-                        stressArchers[i],
-                        LocalTransform.FromPositionRotationScale(
-                            archerPosition, quaternion.identity, 1f));
+                    ArcherUnit archer = entityManager.GetComponentData<ArcherUnit>(stressArchers[i]);
+                    archer.FireTimer = 0f;
+                    entityManager.SetComponentData(stressArchers[i], archer);
                 }
             }
 
-            using EntityQuery archerQuery = entityManager.CreateEntityQuery(typeof(ArcherUnit));
+            MobilePopulationAllocation allocation =
+                entityManager.GetComponentData<MobilePopulationAllocation>(configEntity);
+            int canonicalWorkerCount = allocation.WoodWorkers + allocation.StoneWorkers
+                + allocation.IronWorkers + allocation.FoodWorkers;
+            int canonicalPopulationTotal = canonicalWorkerCount + ArcherTarget;
+            allocation.IdlePopulation = 0;
+            allocation.LastObservedPopulation = canonicalPopulationTotal;
+            entityManager.SetComponentData(configEntity, allocation);
+
+            MobileBedCapacityState beds =
+                entityManager.GetComponentData<MobileBedCapacityState>(configEntity);
+            beds.BaseCapacity = canonicalPopulationTotal;
+            beds.PurchasedCapacity = 0;
+            entityManager.SetComponentData(configEntity, beds);
+
+            PopulationState population = entityManager.GetComponentData<PopulationState>(gameStateEntity);
+            population.Total = canonicalPopulationTotal;
+            population.Workers = canonicalWorkerCount;
+            population.Archers = ArcherTarget;
+            population.Idle = 0;
+            population.BaseCapacity = beds.BaseCapacity;
+            population.Capacity = MobileBedCapacityUtility.GetTotalCapacity(beds);
+            entityManager.SetComponentData(gameStateEntity, population);
+
             using EntityQuery projectileQuery = entityManager.CreateEntityQuery(
                 typeof(ArrowTag), typeof(ArrowProjectile), typeof(LocalTransform));
             Entity arrowPrefab = entityManager.GetComponentData<ArrowPrefabData>(
@@ -417,6 +440,12 @@ namespace DeadWalls.Tests
             Assert.That(compactCombatSave.HasCombatRebuild, Is.True);
             Assert.That(compactCombatSave.CombatRebuild, Is.Not.Null);
             Assert.That(compactCombatSave.CombatRebuild.TotalZombies, Is.EqualTo(EnemyTarget));
+            Assert.That(compactCombatSave.BasicArchers, Is.EqualTo(ArcherTarget));
+            Assert.That(compactCombatSave.RapidArchers, Is.Zero);
+            Assert.That(compactCombatSave.FrostArchers, Is.Zero);
+            Assert.That(compactCombatSave.ArcherFormationVersion,
+                Is.EqualTo(ArcherFormationUtility.CurrentVersion));
+            Assert.That(compactCombatSave.PopulationTotal, Is.EqualTo(canonicalPopulationTotal));
             Assert.That(compactCombatSave.ActiveZombies, Is.Empty,
                 "v14 10K zombie pozisyonlarini entity basina legacy listede yazmamali.");
             Assert.That(compactCombatSave.CombatRebuild.Buckets.Count, Is.LessThan(EnemyTarget));
@@ -487,6 +516,10 @@ namespace DeadWalls.Tests
             Assert.That(poolAfterFireball.TotalCreated, Is.EqualTo(poolAtTenK.TotalCreated),
                 "Death return sirasinda pool gereksiz genisledi.");
 
+            entityManager.DestroyEntity(archerQuery);
+            Assert.That(archerQuery.CalculateEntityCount(), Is.Zero,
+                "Continue kabulunden once 1K okcu gercekten kaldirilmali.");
+
             double restoreStarted = Time.realtimeSinceStartupAsDouble;
             Assert.That(gameManager.TryRestoreRunFromCheckpoint(), Is.True);
             double restoreMs = (Time.realtimeSinceStartupAsDouble - restoreStarted) * 1000.0;
@@ -497,12 +530,26 @@ namespace DeadWalls.Tests
             Assert.That(restoredPool.ActiveCount, Is.EqualTo(EnemyTarget));
             Assert.That(restoredPool.TotalCreated, Is.EqualTo(poolAtTenK.TotalCreated));
             Assert.That(restoredBudget.PendingEnemies, Is.EqualTo(777));
+            Assert.That(archerQuery.CalculateEntityCount(), Is.EqualTo(ArcherTarget));
+            Assert.That(gameManager.GetTotalArcherCount(), Is.EqualTo(ArcherTarget));
+            Assert.That(gameManager.BasicArcherCount, Is.EqualTo(ArcherTarget));
+            Assert.That(entityManager.GetComponentData<PopulationState>(gameStateEntity).Archers,
+                Is.EqualTo(ArcherTarget));
             ulong firstRestoreFingerprint = BuildActivePositionFingerprint(entityManager);
+            ulong firstArcherFingerprint = BuildArcherFormationFingerprint(entityManager);
 
+            entityManager.DestroyEntity(archerQuery);
+            double secondRestoreStarted = Time.realtimeSinceStartupAsDouble;
             Assert.That(gameManager.TryRestoreRunFromCheckpoint(), Is.True);
+            double secondRestoreMs =
+                (Time.realtimeSinceStartupAsDouble - secondRestoreStarted) * 1000.0;
             ulong secondRestoreFingerprint = BuildActivePositionFingerprint(entityManager);
+            ulong secondArcherFingerprint = BuildArcherFormationFingerprint(entityManager);
             Assert.That(secondRestoreFingerprint, Is.EqualTo(firstRestoreFingerprint),
                 "Ayni v14 snapshot iki Continue'da ayni rebuilt position multiset'ini uretmeli.");
+            Assert.That(archerQuery.CalculateEntityCount(), Is.EqualTo(ArcherTarget));
+            Assert.That(secondArcherFingerprint, Is.EqualTo(firstArcherFingerprint),
+                "Ayni v14 snapshot iki Continue'da ayni 1K canonical Archer formasyonunu uretmeli.");
 
             Debug.Log(
                 "[DW-B-SCALE] " +
@@ -523,12 +570,15 @@ namespace DeadWalls.Tests
                 $"gc_avg_bytes={averageGcBytes}; gc_max_bytes={gcMaxBytes}; " +
                 $"draw_calls_avg={averageDrawCalls}; used_memory_bytes={usedMemoryBytes}; " +
                 $"save_ms={saveMs:F2}; save_bytes={saveBytes}; " +
+                $"saved_archers={compactCombatSave.BasicArchers}; " +
                 $"rebuild_policy={compactCombatSave.CombatRebuild.PolicyVersion}; " +
                 $"rebuild_buckets={compactCombatSave.CombatRebuild.Buckets.Count}; " +
                 $"rebuild_deterministic={firstRestoreFingerprint == secondRestoreFingerprint}; " +
+                $"archer_rebuild_deterministic={firstArcherFingerprint == secondArcherFingerprint}; " +
                 $"fireball_return_frames={deathFrames + 1}; death_peak_ms={deathPeakFrameMs:F2}; " +
                 $"death_peak_frame={deathPeakFrameIndex}; death_peak_active={deathPeakActiveCount}; " +
-                $"restore_ms={restoreMs:F2}; backlog={restoredBudget.PendingEnemies}");
+                $"restore_ms={restoreMs:F2}; second_restore_ms={secondRestoreMs:F2}; " +
+                $"backlog={restoredBudget.PendingEnemies}");
 
             EnemyPoolRuntimeUtility.ReturnAllActive(entityManager, poolEntity);
             ArrowPoolRuntimeUtility.ReturnAllActive(entityManager, arrowPoolEntity);
@@ -580,6 +630,40 @@ namespace DeadWalls.Tests
             for (int i = 0; i < packedPositions.Length; i++)
             {
                 fingerprint ^= packedPositions[i];
+                fingerprint *= 1099511628211UL;
+            }
+            return fingerprint;
+        }
+
+        private static ulong BuildArcherFormationFingerprint(EntityManager entityManager)
+        {
+            using EntityQuery query = entityManager.CreateEntityQuery(new EntityQueryDesc
+            {
+                All = new[]
+                {
+                    ComponentType.ReadOnly<ArcherUnit>(),
+                    ComponentType.ReadOnly<LocalTransform>()
+                },
+                None = new[] { ComponentType.ReadOnly<Prefab>() }
+            });
+            using NativeArray<ArcherUnit> units =
+                query.ToComponentDataArray<ArcherUnit>(Allocator.Temp);
+            using NativeArray<LocalTransform> transforms =
+                query.ToComponentDataArray<LocalTransform>(Allocator.Temp);
+            var packed = new ulong[transforms.Length];
+            for (int i = 0; i < transforms.Length; i++)
+            {
+                int x = Mathf.RoundToInt(transforms[i].Position.x * 10_000f);
+                int y = Mathf.RoundToInt(transforms[i].Position.y * 10_000f);
+                ulong position = ((ulong)unchecked((uint)x) << 32) | unchecked((uint)y);
+                packed[i] = position ^ ((ulong)(byte)units[i].Type << 56);
+            }
+
+            Array.Sort(packed);
+            ulong fingerprint = 1469598103934665603UL;
+            for (int i = 0; i < packed.Length; i++)
+            {
+                fingerprint ^= packed[i];
                 fingerprint *= 1099511628211UL;
             }
             return fingerprint;
