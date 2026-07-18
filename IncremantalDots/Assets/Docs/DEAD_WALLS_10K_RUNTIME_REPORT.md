@@ -419,3 +419,32 @@ Pending sıfıra indiğinde demanded ve spawned exact eşitlendi; enemy/Arrow po
 saturation invariant'ları korundu. Fresh sonuç önceki iki koşunun P95 `7,400-7,732 ms` bandına
 yakın `8,227 ms` verdi ve 60 FPS bütçesinin belirgin biçimde altında kaldı. Editor GC/memory root
 sayaçları yine allocation/leak sertifikası sayılmaz; bounded pool residency kabul sahibidir.
+
+---
+
+## DW-V1-CLOSURE-10K-1K-NIGHT-VISUAL kabul koşusu - 2026-07-18
+
+Mevcut canonical `HordeScalePlayModeTests` fixture'ı production `NewGameScene`, enemy pool,
+`GameManager.RestoreArcherCountsWithinCapacity`, gerçek finite Arrow/projectile pipeline ve
+bounded salvo presentation'ı birlikte kullanır. Yeni stress harness veya production runtime yolu
+eklenmedi. Yalnız screenshot penceresinde `WaveStateData.StressTestMode` presentation suppression'ı
+geçici kaldırıldı; authoritative `ContinuousSiegeCycleData` Night ortasına sabitlendi ve gerçek
+overlay/global-light transition'ı settle olduktan sonra capture alındı. Capture sonrasında stress
+state'i geri yüklenip mevcut performance, Fireball ve exact Continue benchmark'ı tamamlandı.
+
+| Aynı capture karesi | Sonuç |
+|---|---:|
+| Çözünürlük / phase | `1920 x 1080 / Night` |
+| Enemy / canonical Basic Archer | `10.000 / 1.000` |
+| Aktif gameplay projectile | `1.000` |
+| Görünür bounded projectile | `48` |
+| Salvo presentation stride | `21` |
+| Night overlay alpha | `0,500` |
+| Night global light intensity | `0,680` |
+| PNG | `DW_V1_10K_1K_NIGHT_VISUAL_ACCEPTANCE.png` |
+| Targeted PlayMode | `1/1 passed` |
+
+PNG audit'inde soğuk Night palette'i, Night tarafındaki celestial dial, sur hattındaki canonical
+Archer formasyonu, 10K horde alanı ve savaş alanındaki bounded ok temsilcileri aynı karede okunur
+kaldı. Test log'u exact sayaçları, phase'i, overlay/light değerlerini, çözünürlüğü ve capture yolunu
+`[DW-V1-10K-1K-NIGHT-VISUAL]` kaydıyla birlikte üretir.

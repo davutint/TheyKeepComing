@@ -21,6 +21,7 @@ namespace DeadWalls.Tests
         private const int ArcherTarget = 1_000;
         private const int WarmupFrames = 30;
         private const int SampleFrames = 120;
+        private const int NightPresentationSettleFrames = 45;
 
         private string _runSavePath;
         private byte[] _originalRunSave;
@@ -241,6 +242,50 @@ namespace DeadWalls.Tests
             Assert.That(gameManager.RapidArcherCount, Is.Zero);
             Assert.That(gameManager.FrostArcherCount, Is.Zero);
 
+            Entity cycleEntity = entityManager.CreateEntityQuery(
+                typeof(ContinuousSiegeCycleData)).GetSingletonEntity();
+            ContinuousSiegeCycleData nightCycle =
+                entityManager.GetComponentData<ContinuousSiegeCycleData>(cycleEntity);
+            Assert.That(nightCycle.DayDuration, Is.GreaterThan(0f));
+            Assert.That(nightCycle.DuskDuration, Is.GreaterThan(0f));
+            Assert.That(nightCycle.NightDuration, Is.GreaterThan(0f));
+            float nightStart = nightCycle.DayDuration + nightCycle.DuskDuration;
+            nightCycle.Enabled = true;
+            nightCycle.CycleTimer = nightStart + nightCycle.NightDuration * 0.5f;
+            nightCycle.CycleProgress01 = math.saturate(
+                nightCycle.CycleTimer / math.max(1f, nightCycle.CycleDuration));
+            nightCycle.PhaseProgress01 = 0.5f;
+            nightCycle.SpawnIntensityMultiplier =
+                math.max(0.01f, config.SiegeNightIntensityMultiplier);
+            nightCycle.HordePressure01 = 1f;
+            nightCycle.Phase = SiegeCyclePhase.Night;
+            nightCycle.IsBloodMoonNight = false;
+            entityManager.SetComponentData(cycleEntity, nightCycle);
+
+            wave = entityManager.GetComponentData<WaveStateData>(waveEntity);
+            wave.StressTestMode = false;
+            entityManager.SetComponentData(waveEntity, wave);
+
+            DayNightOverlayController nightPresentation =
+                UnityEngine.Object.FindFirstObjectByType<DayNightOverlayController>();
+            Assert.That(nightPresentation, Is.Not.Null);
+            Assert.That(nightPresentation.OverlayImage, Is.Not.Null);
+            Assert.That(nightPresentation.GlobalLight, Is.Not.Null);
+
+            Time.timeScale = 0f;
+            for (int frame = 0; frame < NightPresentationSettleFrames; frame++)
+                yield return null;
+
+            Assert.That(gameManager.TryGetContinuousSiegeCycle(out ContinuousSiegeCycleData settledNight),
+                Is.True);
+            Assert.That(settledNight.Phase, Is.EqualTo(SiegeCyclePhase.Night));
+            Assert.That(nightPresentation.OverlayImage.color.a,
+                Is.EqualTo(config.NightOverlayAlpha).Within(0.02f),
+                "Combined visual capture gercek Night overlay alpha'sina ulasmali.");
+            Assert.That(nightPresentation.GlobalLight.intensity,
+                Is.EqualTo(nightPresentation.NightLightIntensity).Within(0.05f),
+                "Combined visual capture gercek Night global light intensity'sine ulasmali.");
+
             using (NativeArray<Entity> stressArchers =
                    archerQuery.ToEntityArray(Allocator.Temp))
             {
@@ -337,9 +382,23 @@ namespace DeadWalls.Tests
                 yield return null;
             Time.timeScale = 0f;
 
+            int captureEnemyCount = activeQuery.CalculateEntityCount();
+            int captureArcherCount = archerQuery.CalculateEntityCount();
+            int captureProjectileCount = projectileQuery.CalculateEntityCount();
+            int captureVisibleProjectileCount = CountVisibleProjectiles(projectileQuery);
+            Assert.That(gameManager.TryGetContinuousSiegeCycle(out ContinuousSiegeCycleData captureCycle),
+                Is.True);
+            Assert.That(captureCycle.Phase, Is.EqualTo(SiegeCyclePhase.Night));
+            Assert.That(captureEnemyCount, Is.EqualTo(EnemyTarget));
+            Assert.That(captureArcherCount, Is.EqualTo(ArcherTarget));
+            Assert.That(captureProjectileCount, Is.GreaterThan(0),
+                "Combined Night karesinde aktif gameplay projectile bulunmali.");
+            Assert.That(captureVisibleProjectileCount, Is.GreaterThan(0),
+                "Combined Night karesinde bounded temsilci projectile gorunmeli.");
+
             string salvoCapturePath = Path.Combine(
                 Application.temporaryCachePath,
-                "DW_I_SALVO_RHYTHM_10K.png");
+                "DW_V1_10K_1K_NIGHT_VISUAL_ACCEPTANCE.png");
             if (File.Exists(salvoCapturePath))
                 File.Delete(salvoCapturePath);
             ScreenCapture.CaptureScreenshot(salvoCapturePath);
@@ -352,6 +411,17 @@ namespace DeadWalls.Tests
                 $"[DW-I-SALVO-RHYTHM] gameplay_projectiles={firstSalvoProjectileCount}; " +
                 $"visual_representatives={firstSalvoVisibleCount}; stride={salvoStride}; " +
                 $"capture={salvoCapturePath}");
+            Debug.Log(
+                $"[DW-V1-10K-1K-NIGHT-VISUAL] enemy={captureEnemyCount}; " +
+                $"archer={captureArcherCount}; projectile={captureProjectileCount}; " +
+                $"visual_projectile={captureVisibleProjectileCount}; phase={captureCycle.Phase}; " +
+                $"overlay_alpha={nightPresentation.OverlayImage.color.a:F3}; " +
+                $"global_light={nightPresentation.GlobalLight.intensity:F3}; " +
+                $"resolution={Screen.width}x{Screen.height}; capture={salvoCapturePath}");
+
+            wave = entityManager.GetComponentData<WaveStateData>(waveEntity);
+            wave.StressTestMode = true;
+            entityManager.SetComponentData(waveEntity, wave);
             Time.timeScale = 1f;
 
             for (int frame = 0; frame < WarmupFrames; frame++)

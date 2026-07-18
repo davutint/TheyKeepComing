@@ -23,6 +23,7 @@ olarak korunur.
 | Save migration grubu | Geçti | `57/57` |
 | Explicit long-run soak | Geçti | `1/1`, `3.600` sample frame |
 | 10K + 1K target hardware | Geçti | Average/P95/P99 `7,665/13,890/14,058 ms` |
+| 10K + 1K combined Night visual | Geçti | `10.000 / 1.000 / 1.000 projectile`, 1920x1080 PNG |
 | Scene validation | Geçti | `0 issue` |
 | Final Console | Geçti | `0 error / 0 warning` |
 
@@ -130,6 +131,16 @@ ve batch-bounded drain invariant'ları test boyunca korundu. Editor root GC ve u
 runtime allocation/leak sertifikası değildir; bounded pool residency ve exact rent/return
 muhasebesi release kabul sahibidir.
 
+## Combined Night görsel kabulü
+
+Canonical `HordeScalePlayModeTests`, production `NewGameScene` içinde screenshot penceresinde
+authoritative cycle'ı Night ortasına sabitledi ve stress presentation suppression'ını yalnız bu
+pencere boyunca kaldırdı. Gerçek Night overlay/global-light transition'ı settle olduktan sonra aynı
+1920x1080 karede `10.000 enemy`, `1.000 canonical Basic Archer`, `1.000 aktif gameplay
+projectile` ve stride `21` ile `48` görünür representative doğrulandı. Overlay alpha `0,500`,
+global light `0,680`; targeted PlayMode `1/1` geçti. Reproducible PNG adı
+`DW_V1_10K_1K_NIGHT_VISUAL_ACCEPTANCE.png`'dir.
+
 ## Test kararlılığı
 
 İlk full PlayMode closure turunda `Exact2KHorde_FireballGapRefillsUnderQueuedPressure`, ağır suite
@@ -145,6 +156,6 @@ kanıt olarak tutuldu.
 ## Release kararı
 
 Full regression, bütün desteklenen save migration sınırları, regular-Council legacy geçişi,
-durable Meta/death state'i, target-hardware combined load ve release-cap long-run soak temizdir.
-V1 DoD test-report kapısı kapatılabilir. Bu karar enemy cap'i artırmaz ve yeni content kararı
-vermez; açık owner-content maddeleri tracker'da ayrı kalır.
+durable Meta/death state'i, target-hardware combined load, combined Night görseli ve release-cap
+long-run soak temizdir. V1 DoD test-report kapısı kapatıldı; implementation tracker `442/442`
+tamamlandı. Bu karar enemy cap'i artırmaz ve yeni content kararı vermez.
