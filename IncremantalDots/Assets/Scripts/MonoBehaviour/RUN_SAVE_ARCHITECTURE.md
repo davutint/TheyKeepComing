@@ -4,7 +4,7 @@
 
 V1 Blueprint kararı: koşu yalnız Wall `0 HP` olduğunda biter. Oyuncu ana menüye dönebilir veya uygulamayı kapatabilir; Continue aynı koşunun exact kritik state'ini ve perceptually faithful combat alanını geri yükler. Aktif koşu varken gönüllü New Run/Restart yolu sunulmaz.
 
-`RunPersistence.cs` içindeki `RunSaveState` bu sözleşmenin disk şemasıdır. Güncel sürüm `v15`, desteklenen en eski sürüm `v3` tür. Eski v2 Dawn-checkpoint kayıtları exact state içermediği için Continue olarak gösterilmez. v3-v8 zinciri worker, bed, bina, formation, Arrow ve Grave Essence state'ini açık migration'larla v9'a taşır. v9 snapshot'larda generated Heart graph bulunmadığı için v10 migration bu alanı `null` bırakır; source catalog'dan graph uydurmaz veya reroll etmez. v10 chance/pity Council state'i v11 exact `LastRegularCouncilDay` takvimine kanıt-temelli migrate edilir. v11 kayıtları Rally ve Emergency Repair cooldown'ları hazır başlayacak biçimde açıkça v12'ye; v12 kayıtları meta Essence gain kesirli remainder'ı `0` olacak biçimde v13'e taşınır. v13 exact zombie listesi v14'e tahminle çevrilmez; legacy fallback olarak aynen korunur. İlk yeni v14 save, 10K alanı deterministic aggregate rebuild payload'ına geçirir. v14 -> v15 migration'i historical peak enemy veya Wall damage timeline uydurmaz; iki alan temiz başlar ve Continue sonrasındaki mevcut alive count yeni peak için alt sınır olur.
+`RunPersistence.cs` içindeki `RunSaveState` bu sözleşmenin disk şemasıdır. Güncel sürüm `v16`, desteklenen en eski sürüm `v3` tür. Eski v2 Dawn-checkpoint kayıtları exact state içermediği için Continue olarak gösterilmez. v3-v8 zinciri worker, bed, bina, formation, Arrow ve Grave Essence state'ini açık migration'larla v9'a taşır. v9 snapshot'larda generated Heart graph bulunmadığı için v10 migration bu alanı `null` bırakır; source catalog'dan graph uydurmaz veya reroll etmez. v10 chance/pity Council state'i v11 exact `LastRegularCouncilDay` takvimine kanıt-temelli migrate edilir. v11 kayıtları Rally ve Emergency Repair cooldown'ları hazır başlayacak biçimde açıkça v12'ye; v12 kayıtları meta Essence gain kesirli remainder'ı `0` olacak biçimde v13'e taşınır. v13 exact zombie listesi v14'e tahminle çevrilmez; legacy fallback olarak aynen korunur. İlk yeni v14 save, 10K alanı deterministic aggregate rebuild payload'ına geçirir. v14 -> v15 migration'i historical peak enemy veya Wall damage timeline uydurmaz; iki alan temiz başlar ve Continue sonrasındaki mevcut alive count yeni peak için alt sınır olur. v15 -> v16 migration'i geçmişte bulunmayan Fireball evolution runtime state'ini boş listelerle başlatır; secondary blast veya burning ground uydurmaz.
 
 Eski `v5` snapshot'larda bed state yazılmış olsa bile legacy bedelsiz growth nedeniyle population kayıtlı yataktan büyük olabilir. Restore bu durumda mevcut nüfusu silmez; `BedBaseCapacity` değerini population-safe minimuma yükseltir. Runtime'da `MobilePopulationEconomySystem`, `PopulationState.Capacity` aynasını restore edilen toplam yataktan yeniden kurar. v5'te bulunmayan Wood/Stone/Iron/Food ve v7'de bulunmayan Arrow Capacity/Efficiency seviyeleri açık migration ile sıfır başlar.
 
@@ -28,7 +28,7 @@ Kaydedilen state, oyuncunun aynı ana dönmesini etkileyen runtime verisidir:
 - Population/legacy capacity; `BedBaseCapacity` ve `PurchasedBedCapacity`; actual worker dağılımı; target ratio, etkin worker cap ve idle aynaları; sekiz worker bina Capacity/Efficiency seviyesi; arrival checkpoint'i ve Dawn/event tekrarını önleyen last-marker alanları.
 - Wall current HP, archer sayıları/level state'i, `ArcherFormationVersion`, tech node level'ları ve legacy upgrade tier'ları.
 - Council regular handled day, hafıza, salt, cap bonusları, `HasActiveCouncilEvent` discriminator'ı, aktif kart ve seçenek/effect içeriği. v10 cooldown/pity alanları yalnız migration girdisidir.
-- Fireball, Rally ve Emergency Repair cooldown'ları; aktif Fireball projectile; Fortify/Rally ve süreli economy/horde effect state'i.
+- Fireball, Rally ve Emergency Repair cooldown'ları; aktif Fireball projectile ve cast anındaki evolution flag'leri; bekleyen Fireball strike/secondary blast ile kalan burning-ground duration/next-tick/exact remaining-tick state'i; Fortify/Rally ve süreli economy/horde effect state'i.
 - Aktif zombie toplamı, spatial yoğunluğu, state/HP/slow/death dağılımı ve combat ortalamaları aggregate rebuild payload'ında tutulur; tekil zombie pozisyonları tutulmaz.
 - Aktif Arrow projectile state'i exact kalır; hedefi exact entity index'i yerine canonical zombie bucket index'iyle saklanır ve restore'da aynı seed ile bucket içindeki deterministik hedefe bağlanır.
 
@@ -48,13 +48,13 @@ Combat rebuild seed ayrı kaydedilir; saved spawn RNG, cycle, kill ve count'tan 
 
 `GameManager.TryRestoreRunFromCheckpoint()` şu sırayı korur:
 
-1. Geçerli `v3`-`v15` snapshot yüklenir; legacy state açık migration zinciriyle in-memory v15'e yükseltilir. Saved Heart graph, v14 combat rebuild payload'ı ve v15 run telemetry sırası temiz runtime kurulmadan önce validate edilir.
+1. Geçerli `v3`-`v16` snapshot yüklenir; legacy state açık migration zinciriyle in-memory v16'ya yükseltilir. Saved Heart graph, v14 combat rebuild payload'ı ve v15 run telemetry sırası temiz runtime kurulmadan önce validate edilir.
 2. Aynı `RunId` ve worker bina yatırım state'i geri alınır; tech seviyeleri maliyetsiz uygulanıp base + Heart + Council + Meta + bina aggregate'leri kurulur.
 3. Council hafızası, `LastRegularCouncilDay` ve discriminator ile doğrulanmış aktif Council kartı aynen yüklenir; regular kart yalnız restore edilen gün scheduled ve henüz handled değilse açılır.
 4. `ArcherFormationVersion` yüklenir; mevcut başlangıç okçuları aynı formation cache'ine taşınır, ardından archer level/count state'i, kaynaklar, finite Arrow paid state'i ve Grave Essence bakiyesi geri yazılır. Exact Heart graph effect'leri deferred pipeline ile replay edilir; Arrow effective capacity son aggregate sonrasında bir kez clamp edilir.
 5. Exact cycle phase/timer, wave state ve spawn RNG state'i geri yazılır. `CycleIndex + 1`, zorunlu Day veya timer `0` uygulanmaz.
 6. Wall current HP, ability cooldown ve süreli effect state'i geri yüklenir.
-7. v14 aggregate varsa zombie'ler canonical bucket/seed policy ile; legacy v13 fallback varsa exact listeden kurulur. Arrow hedefleri bucket'a veya legacy index'e bağlanır ve aktif Fireball exact kurulur.
+7. v14 aggregate varsa zombie'ler canonical bucket/seed policy ile; legacy v13 fallback varsa exact listeden kurulur. Arrow hedefleri bucket'a veya legacy index'e bağlanır; aktif Fireball projectile, pending strike/secondary blast ve burning-ground state'i exact kurulur.
 8. v15 `TelemetryPeakEnemies` ile day/phase `WallDamageTimeline`, combat rebuild tamamlandıktan sonra
    GameState entity'sindeki accumulator component/buffer'ına geri yazılır. Legacy v14 için restored
    current alive count yalnız ileriye dönük lower-bound peak'tir; geçmiş damage tahmin edilmez.
@@ -104,8 +104,9 @@ Entity referansı doğrudan JSON'a yazılmaz. Referans gerekiyorsa compact stabl
 - `RunPersistenceTests.CombatRebuildPolicy_10KField_IsCompactValidAndDeterministic`
 - `RunPersistenceTests.TryLoad_Version13ExactCombat_MigratesWithoutInventingAggregatePayload`
 - `RunPersistenceTests.TryLoad_Version14Snapshot_MigratesWithoutInventingHistoricalRunTelemetry`
-- `RunPersistenceTests.TryLoad_Version15InvalidCombatRebuild_FailsClosed`
-- `RunPersistenceTests.TryLoad_Version15OutOfOrderRunTelemetry_FailsClosed`
+- `RunPersistenceTests.TryLoad_Version15Snapshot_MigratesToEmptyFireballEvolutionRuntimeState`
+- `RunPersistenceTests.TryLoad_Version16InvalidCombatRebuild_FailsClosed`
+- `RunPersistenceTests.TryLoad_Version16OutOfOrderRunTelemetry_FailsClosed`
 - `RunPersistenceTests.TryLoad_Version3Snapshot_MigratesWorkerAllocationBedBuildingFormationAndAmmoStateToCurrent`
 - `RunPersistenceTests.TryLoad_Version4UnlimitedCapacity_MigratesToPopulationSafeBedBase`
 - `RunPersistenceTests.TryLoad_Version5Snapshot_MigratesToCleanWorkerBuildingLevels`

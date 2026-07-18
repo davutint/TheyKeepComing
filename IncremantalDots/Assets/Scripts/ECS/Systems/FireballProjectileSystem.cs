@@ -51,7 +51,9 @@ namespace DeadWalls
                     {
                         Position = projectile.ValueRO.Target,
                         Radius = projectile.ValueRO.Radius,
-                        Damage = projectile.ValueRO.Damage
+                        Damage = projectile.ValueRO.Damage,
+                        Kind = FireballStrikeKind.Primary,
+                        Evolutions = projectile.ValueRO.Evolutions
                     });
                     ecb.DestroyEntity(entity);
                     continue;

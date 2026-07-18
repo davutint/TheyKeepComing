@@ -81,6 +81,44 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void PersistedProductionV1Graph_MigratesCatalogIdentityWithoutInjectingV2Evolutions()
+        {
+            HeartNodeCatalogSO catalog = CreateValidCatalog();
+            catalog.CatalogVersion = 1;
+            GeneratedRunGraph graph = HeartGraphGenerator.GenerateOrThrow(
+                CreateRequest(catalog, 1781u));
+            GeneratedRunGraph expected = HeartGraphPersistenceUtility.CloneExact(graph);
+            expected.CatalogVersion = 2;
+
+            var definitions = catalog.Nodes.ToList();
+            definitions.Add(CreateDefinition(
+                "scorched_earth",
+                HeartNodeBranch.HeartMagic,
+                HeartNodeType.Evolution,
+                null,
+                new HeartNodeEffect { Type = HeartNodeEffectType.EnableBurningGround }));
+            definitions.Add(CreateDefinition(
+                "echoing_detonation",
+                HeartNodeBranch.HeartMagic,
+                HeartNodeType.Evolution,
+                null,
+                new HeartNodeEffect { Type = HeartNodeEffectType.EnableSecondBlast }));
+            catalog.Nodes = definitions.ToArray();
+            catalog.CatalogVersion = 2;
+
+            bool valid = HeartGraphPersistenceUtility.TryValidateForRestore(
+                graph,
+                catalog,
+                out List<string> errors);
+
+            Assert.That(valid, Is.True, string.Join(" | ", errors));
+            Assert.That(graph.CatalogVersion, Is.EqualTo(2));
+            Assert.That(graph.Nodes, Has.None.Matches<GeneratedHeartNodeState>(node =>
+                node.NodeId == "scorched_earth" || node.NodeId == "echoing_detonation"));
+            Assert.That(JsonUtility.ToJson(graph), Is.EqualTo(JsonUtility.ToJson(expected)));
+        }
+
+        [Test]
         public void PersistedGraph_ReplaysPurchasedNumericAndBehaviorEffectsBeforeActivation()
         {
             HeartNodeCatalogSO catalog = CreateValidCatalog();

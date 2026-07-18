@@ -3850,9 +3850,69 @@ namespace DeadWalls
                     TargetY = projectile.Target.y,
                     Speed = projectile.Speed,
                     Radius = projectile.Radius,
-                    Damage = projectile.Damage
+                    Damage = projectile.Damage,
+                    Evolutions = (int)projectile.Evolutions
                 };
             }
+
+            EntityQuery fireballStrikeQuery = _entityManager.CreateEntityQuery(typeof(FireballStrike));
+            using (NativeArray<Entity> strikes = fireballStrikeQuery.ToEntityArray(Allocator.Temp))
+            {
+                for (int i = 0; i < strikes.Length; i++)
+                {
+                    FireballStrike strike = _entityManager.GetComponentData<FireballStrike>(strikes[i]);
+                    save.ActiveFireballStrikes.Add(new FireballStrikeRunSaveState
+                    {
+                        X = strike.Position.x,
+                        Y = strike.Position.y,
+                        Radius = strike.Radius,
+                        Damage = strike.Damage,
+                        Kind = (int)strike.Kind,
+                        Evolutions = (int)strike.Evolutions
+                    });
+                }
+            }
+            fireballStrikeQuery.Dispose();
+
+            EntityQuery delayedBlastQuery = _entityManager.CreateEntityQuery(typeof(FireballDelayedBlast));
+            using (NativeArray<Entity> delayedBlasts = delayedBlastQuery.ToEntityArray(Allocator.Temp))
+            {
+                for (int i = 0; i < delayedBlasts.Length; i++)
+                {
+                    FireballDelayedBlast blast =
+                        _entityManager.GetComponentData<FireballDelayedBlast>(delayedBlasts[i]);
+                    save.ActiveFireballDelayedBlasts.Add(new FireballDelayedBlastRunSaveState
+                    {
+                        X = blast.Position.x,
+                        Y = blast.Position.y,
+                        Radius = blast.Radius,
+                        Damage = blast.Damage,
+                        RemainingDelay = blast.RemainingDelay
+                    });
+                }
+            }
+            delayedBlastQuery.Dispose();
+
+            EntityQuery burningGroundQuery = _entityManager.CreateEntityQuery(typeof(FireballBurningGround));
+            using (NativeArray<Entity> burningGrounds = burningGroundQuery.ToEntityArray(Allocator.Temp))
+            {
+                for (int i = 0; i < burningGrounds.Length; i++)
+                {
+                    FireballBurningGround ground =
+                        _entityManager.GetComponentData<FireballBurningGround>(burningGrounds[i]);
+                    save.ActiveFireballBurningGrounds.Add(new FireballBurningGroundRunSaveState
+                    {
+                        X = ground.Position.x,
+                        Y = ground.Position.y,
+                        Radius = ground.Radius,
+                        DamagePerTick = ground.DamagePerTick,
+                        RemainingDuration = ground.RemainingDuration,
+                        TimeUntilNextTick = ground.TimeUntilNextTick,
+                        RemainingTicks = ground.RemainingTicks
+                    });
+                }
+            }
+            burningGroundQuery.Dispose();
         }
 
         public bool TryRestoreRunFromCheckpoint()
@@ -4279,11 +4339,73 @@ namespace DeadWalls
                     Target = new float2(item.TargetX, item.TargetY),
                     Speed = item.Speed,
                     Radius = item.Radius,
-                    Damage = item.Damage
+                    Damage = item.Damage,
+                    Evolutions = (FireballEvolutionFlags)(item.Evolutions
+                        & (int)(FireballEvolutionFlags.BurningGround
+                                | FireballEvolutionFlags.SecondBlast))
                 });
                 _entityManager.SetComponentData(entity, LocalTransform.FromPositionRotationScale(
                     new float3(item.X, item.Y, item.Z), quaternion.identity, Mathf.Max(0.01f, item.Scale)));
                 ActiveFireballProjectile = entity;
+            }
+
+            foreach (FireballStrikeRunSaveState item in
+                     save.ActiveFireballStrikes ?? new List<FireballStrikeRunSaveState>())
+            {
+                if (item == null)
+                    continue;
+                Entity entity = _entityManager.CreateEntity(typeof(FireballStrike));
+                _entityManager.SetComponentData(entity, new FireballStrike
+                {
+                    Position = new float2(item.X, item.Y),
+                    Radius = item.Radius,
+                    Damage = item.Damage,
+                    Kind = item.Kind == (int)FireballStrikeKind.SecondBlast
+                        ? FireballStrikeKind.SecondBlast
+                        : item.Kind == (int)FireballStrikeKind.BurningGroundPulse
+                            ? FireballStrikeKind.BurningGroundPulse
+                            : FireballStrikeKind.Primary,
+                    Evolutions = (FireballEvolutionFlags)(item.Evolutions
+                        & (int)(FireballEvolutionFlags.BurningGround
+                                | FireballEvolutionFlags.SecondBlast))
+                });
+            }
+
+            foreach (FireballDelayedBlastRunSaveState item in
+                     save.ActiveFireballDelayedBlasts
+                     ?? new List<FireballDelayedBlastRunSaveState>())
+            {
+                if (item == null)
+                    continue;
+                Entity entity = _entityManager.CreateEntity(typeof(FireballDelayedBlast));
+                _entityManager.SetComponentData(entity, new FireballDelayedBlast
+                {
+                    Position = new float2(item.X, item.Y),
+                    Radius = item.Radius,
+                    Damage = item.Damage,
+                    RemainingDelay = Mathf.Max(0f, item.RemainingDelay)
+                });
+            }
+
+            foreach (FireballBurningGroundRunSaveState item in
+                     save.ActiveFireballBurningGrounds
+                     ?? new List<FireballBurningGroundRunSaveState>())
+            {
+                if (item == null)
+                    continue;
+                Entity entity = _entityManager.CreateEntity(typeof(FireballBurningGround));
+                _entityManager.SetComponentData(entity, new FireballBurningGround
+                {
+                    Position = new float2(item.X, item.Y),
+                    Radius = item.Radius,
+                    DamagePerTick = item.DamagePerTick,
+                    RemainingDuration = Mathf.Max(0f, item.RemainingDuration),
+                    TimeUntilNextTick = Mathf.Max(0f, item.TimeUntilNextTick),
+                    RemainingTicks = Mathf.Clamp(
+                        item.RemainingTicks,
+                        0,
+                        FireballEvolutionRules.BurningGroundTickCount)
+                });
             }
 
             var wave = _entityManager.GetComponentData<WaveStateData>(_gameStateEntity);
@@ -4331,6 +4453,18 @@ namespace DeadWalls
             FireballBaseCooldown * _spellCooldownMultiplier);
         public float FireballCooldownRemaining => _fireballCooldownRemaining;
         public bool FireballReady => _fireballUnlocked && _fireballCooldownRemaining <= 0f;
+        public FireballEvolutionFlags FireballEvolutions
+        {
+            get
+            {
+                FireballEvolutionFlags flags = FireballEvolutionFlags.None;
+                if (HeartBurningGroundEnabled)
+                    flags |= FireballEvolutionFlags.BurningGround;
+                if (HeartSecondBlastEnabled)
+                    flags |= FireballEvolutionFlags.SecondBlast;
+                return flags;
+            }
+        }
 
         private const float FireballProjectileSpeed = 18f;
         // Meteor dususu (owner istegi): mermi hedefin USTUNDEN, hafif capraz iner
@@ -4368,7 +4502,8 @@ namespace DeadWalls
                 Target = new float2(worldPosition.x, worldPosition.y),
                 Speed = FireballProjectileSpeed,
                 Radius = FireballRadius,
-                Damage = FireballDamage
+                Damage = FireballDamage,
+                Evolutions = FireballEvolutions
             });
             _entityManager.SetComponentData(projectile, LocalTransform.FromPosition(start));
             ActiveFireballProjectile = projectile;
@@ -5979,6 +6114,16 @@ namespace DeadWalls
 
             var fireballQuery = _entityManager.CreateEntityQuery(typeof(FireballProjectile));
             _entityManager.DestroyEntity(fireballQuery);
+            fireballQuery.Dispose();
+            var fireballStrikeQuery = _entityManager.CreateEntityQuery(typeof(FireballStrike));
+            _entityManager.DestroyEntity(fireballStrikeQuery);
+            fireballStrikeQuery.Dispose();
+            var delayedBlastQuery = _entityManager.CreateEntityQuery(typeof(FireballDelayedBlast));
+            _entityManager.DestroyEntity(delayedBlastQuery);
+            delayedBlastQuery.Dispose();
+            var burningGroundQuery = _entityManager.CreateEntityQuery(typeof(FireballBurningGround));
+            _entityManager.DestroyEntity(burningGroundQuery);
+            burningGroundQuery.Dispose();
             ActiveFireballProjectile = Entity.Null;
 
             if (mobileMode)

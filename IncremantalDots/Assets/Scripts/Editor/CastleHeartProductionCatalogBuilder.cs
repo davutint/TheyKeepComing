@@ -22,7 +22,7 @@ namespace DeadWalls
         private const string HudPrefabPath =
             "Assets/Prefabs/UI/Generated/MobileCastleHudRoot.prefab";
 
-        private const int CatalogVersion = 1;
+        private const int CatalogVersion = 2;
         private const string ArmyIconPath =
             "Assets/Sprites/UI/Generated/mobile_castle_hud/arrow_basic.png";
         private const string RapidIconPath =
@@ -497,6 +497,16 @@ namespace DeadWalls
                     HeartNodeType.Evolution, HeartNodeBranch.HeartMagic, 1, 5, 31, 0,
                     null, null,
                     Fx(HeartNodeEffectType.AddSpellRadius, 0.65, softCap: 3.5)),
+                Node("scorched_earth", "Scorched Earth",
+                    "Leave a 70% radius ember field for 5s; five pulses deal 12% impact damage each.",
+                    HeartNodeType.Evolution, HeartNodeBranch.HeartMagic, 3, 5, 44, 0,
+                    null, null,
+                    Fx(HeartNodeEffectType.EnableBurningGround)),
+                Node("echoing_detonation", "Echoing Detonation",
+                    "After 0.85s, detonate again for 60% damage across 85% of the impact radius.",
+                    HeartNodeType.Evolution, HeartNodeBranch.HeartMagic, 3, 5, 46, 0,
+                    null, null,
+                    Fx(HeartNodeEffectType.EnableSecondBlast)),
                 Node("inferno_heart", "Inferno Heart",
                     "Shape Fireball around the largest possible first impact.",
                     HeartNodeType.Keystone, HeartNodeBranch.HeartMagic, 3, 5, 55, 0,

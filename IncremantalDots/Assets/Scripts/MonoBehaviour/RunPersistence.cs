@@ -13,7 +13,7 @@ namespace DeadWalls
     [Serializable]
     public class RunSaveState
     {
-        public const int CurrentVersion = 15;
+        public const int CurrentVersion = 16;
         public const int MinimumSupportedVersion = 3;
 
         public int Version = CurrentVersion;
@@ -199,6 +199,12 @@ namespace DeadWalls
         public List<ZombieRunSaveState> ActiveZombies = new List<ZombieRunSaveState>();
         public List<ArrowRunSaveState> ActiveArrows = new List<ArrowRunSaveState>();
         public FireballRunSaveState ActiveFireball;
+        public List<FireballStrikeRunSaveState> ActiveFireballStrikes =
+            new List<FireballStrikeRunSaveState>();
+        public List<FireballDelayedBlastRunSaveState> ActiveFireballDelayedBlasts =
+            new List<FireballDelayedBlastRunSaveState>();
+        public List<FireballBurningGroundRunSaveState> ActiveFireballBurningGrounds =
+            new List<FireballBurningGroundRunSaveState>();
     }
 
     [Serializable] public class TechLevelEntry { public string Id; public int Level; }
@@ -288,6 +294,33 @@ namespace DeadWalls
         public float X, Y, Z, Scale;
         public float TargetX, TargetY;
         public float Speed, Radius, Damage;
+        public int Evolutions;
+    }
+
+    [Serializable]
+    public class FireballStrikeRunSaveState
+    {
+        public float X, Y;
+        public float Radius, Damage;
+        public int Kind;
+        public int Evolutions;
+    }
+
+    [Serializable]
+    public class FireballDelayedBlastRunSaveState
+    {
+        public float X, Y;
+        public float Radius, Damage;
+        public float RemainingDelay;
+    }
+
+    [Serializable]
+    public class FireballBurningGroundRunSaveState
+    {
+        public float X, Y;
+        public float Radius, DamagePerTick;
+        public float RemainingDuration, TimeUntilNextTick;
+        public int RemainingTicks;
     }
 
     /// <summary>
@@ -364,6 +397,7 @@ namespace DeadWalls
                 }
 
                 UpgradeToCurrent(state);
+                NormalizeFireballEvolutionState(state);
                 NormalizeActiveCouncilEvent(state);
                 if (!NormalizeCombatRebuild(state, out string combatError))
                 {
@@ -392,6 +426,7 @@ namespace DeadWalls
             state.Version = RunSaveState.CurrentVersion;
             state.ArcherFormationVersion = ArcherFormationUtility.NormalizeVersion(
                 state.ArcherFormationVersion);
+            NormalizeFireballEvolutionState(state);
             NormalizeActiveCouncilEvent(state);
             if (!NormalizeCombatRebuild(state, out string combatError))
             {
@@ -551,6 +586,27 @@ namespace DeadWalls
                 state.WallDamageTimeline = new List<RunWallDamageTelemetrySaveState>();
                 state.Version = 15;
             }
+
+            if (state.Version == 15)
+            {
+                // v15 Fireball projectile'ini tasiyordu fakat behavior evolution flag'leri,
+                // pending second blast ve active Burning Ground state'leri yoktu. Bu content
+                // v15 catalog'unda bulunmadigi icin temiz bos state exact migration'dir.
+                state.ActiveFireballStrikes = new List<FireballStrikeRunSaveState>();
+                state.ActiveFireballDelayedBlasts = new List<FireballDelayedBlastRunSaveState>();
+                state.ActiveFireballBurningGrounds = new List<FireballBurningGroundRunSaveState>();
+                state.Version = 16;
+            }
+        }
+
+        private static void NormalizeFireballEvolutionState(RunSaveState state)
+        {
+            if (state == null)
+                return;
+
+            state.ActiveFireballStrikes ??= new List<FireballStrikeRunSaveState>();
+            state.ActiveFireballDelayedBlasts ??= new List<FireballDelayedBlastRunSaveState>();
+            state.ActiveFireballBurningGrounds ??= new List<FireballBurningGroundRunSaveState>();
         }
 
         private static bool NormalizeCombatRebuild(RunSaveState state, out string error)

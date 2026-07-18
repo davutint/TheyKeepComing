@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using Unity.Collections;
 using TMPro;
 using Unity.Entities;
 using Unity.Transforms;
@@ -106,6 +108,27 @@ namespace DeadWalls
         private float _blastRingBaseDiameter;
         private float _blastFrameTimer;
         private int _blastFrame = -1; // -1 = oynamiyor
+        private Color _activeBlastCoreColor;
+        private Color _activeBlastRingColor;
+
+        private sealed class BurningGroundVisual
+        {
+            public GameObject Root;
+            public SpriteRenderer Fill;
+            public SpriteRenderer Ring;
+        }
+
+        private readonly Dictionary<Entity, BurningGroundVisual> _burningGroundVisuals =
+            new Dictionary<Entity, BurningGroundVisual>();
+        private readonly HashSet<Entity> _liveBurningGrounds = new HashSet<Entity>();
+        private readonly HashSet<Entity> _presentedEvolutionStrikes = new HashSet<Entity>();
+        private readonly List<Entity> _staleEvolutionEntities = new List<Entity>();
+        private World _evolutionQueryWorld;
+        private EntityQuery _burningGroundQuery;
+        private EntityQuery _fireballStrikeQuery;
+        private bool _evolutionQueriesCreated;
+
+        public int ActiveBurningGroundVisualCount => _burningGroundVisuals.Count;
 
         private void OnEnable()
         {
@@ -133,6 +156,7 @@ namespace DeadWalls
                 SpellPanel.SetActive(visible);
 
             UpdateProjectileVisual(gm);
+            UpdateEvolutionVisuals();
             UpdateBlastVisual();
 
             if (!visible)
@@ -331,7 +355,10 @@ namespace DeadWalls
                 _trackedProjectile = Entity.Null;
                 if (_projectileVisual != null)
                     _projectileVisual.gameObject.SetActive(false);
-                StartBlast(_pendingBlastPosition, _pendingBlastRadius);
+                StartBlast(
+                    _pendingBlastPosition,
+                    _pendingBlastRadius,
+                    FireballStrikeKind.Primary);
             }
         }
 
@@ -371,7 +398,10 @@ namespace DeadWalls
             _projectileAuraVisual.color = FireballProjectileAuraColor;
         }
 
-        private void StartBlast(Vector2 position, float radius)
+        private void StartBlast(
+            Vector2 position,
+            float radius,
+            FireballStrikeKind kind)
         {
             if (BlastFrames == null || BlastFrames.Length == 0)
                 return;
@@ -415,14 +445,24 @@ namespace DeadWalls
             _blastVisual.transform.localScale = Vector3.one * scale;
             _blastVisual.transform.rotation = Quaternion.identity;
             _blastVisual.sprite = BlastFrames[0];
+            _blastVisual.color = kind == FireballStrikeKind.SecondBlast
+                ? new Color(1f, 0.72f, 0.28f, 0.96f)
+                : Color.white;
             _blastVisual.gameObject.SetActive(true);
+
+            _activeBlastCoreColor = kind == FireballStrikeKind.SecondBlast
+                ? SpellFeedbackHierarchy.SecondBlastCoreColor
+                : FireballBlastCoreColor;
+            _activeBlastRingColor = kind == FireballStrikeKind.SecondBlast
+                ? SpellFeedbackHierarchy.SecondBlastRingColor
+                : FireballBlastRingColor;
 
             _blastCoreVisual.transform.position = presentationPosition;
             _blastCoreVisual.transform.rotation = Quaternion.identity;
             _blastCoreVisual.transform.localScale = Vector3.one
                 * Mathf.Max(0.1f, radius)
                 * Mathf.Max(1f, FireballBlastCoreDiameterMultiplier);
-            _blastCoreVisual.color = FireballBlastCoreColor;
+            _blastCoreVisual.color = _activeBlastCoreColor;
             _blastCoreVisual.gameObject.SetActive(true);
 
             _blastRingBaseDiameter = SpellFeedbackHierarchy.ResolveFireballBlastRingDiameter(
@@ -436,7 +476,7 @@ namespace DeadWalls
                     0f,
                     FireballBlastRingStartScale,
                     FireballBlastRingEndScale);
-            _blastRingVisual.color = FireballBlastRingColor;
+            _blastRingVisual.color = _activeBlastRingColor;
             _blastRingVisual.gameObject.SetActive(true);
             _blastFrame = 0;
             _blastFrameTimer = 0f;
@@ -484,15 +524,208 @@ namespace DeadWalls
                 FireballBlastRingEndScale);
             _blastRingVisual.transform.localScale = Vector3.one * scale;
             _blastRingVisual.color = SpellFeedbackHierarchy.ResolveFadingColor(
-                FireballBlastRingColor,
+                _activeBlastRingColor,
                 progress01);
             if (_blastCoreVisual != null)
             {
                 float coreProgress = Mathf.Clamp01(progress01 * 0.72f);
                 _blastCoreVisual.color = SpellFeedbackHierarchy.ResolveFadingColor(
-                    FireballBlastCoreColor,
+                    _activeBlastCoreColor,
                     coreProgress);
             }
+        }
+
+        private void UpdateEvolutionVisuals()
+        {
+            World world = World.DefaultGameObjectInjectionWorld;
+            if (world == null || !world.IsCreated)
+            {
+                ClearBurningGroundVisuals();
+                DisposeEvolutionQueries();
+                return;
+            }
+
+            EnsureEvolutionQueries(world);
+            EntityManager entityManager = world.EntityManager;
+            SyncBurningGroundVisuals(entityManager);
+            PresentSecondBlasts(entityManager);
+        }
+
+        private void EnsureEvolutionQueries(World world)
+        {
+            if (_evolutionQueriesCreated && ReferenceEquals(_evolutionQueryWorld, world))
+                return;
+
+            DisposeEvolutionQueries();
+            _evolutionQueryWorld = world;
+            EntityManager entityManager = world.EntityManager;
+            _burningGroundQuery = entityManager.CreateEntityQuery(
+                ComponentType.ReadOnly<FireballBurningGround>());
+            _fireballStrikeQuery = entityManager.CreateEntityQuery(
+                ComponentType.ReadOnly<FireballStrike>());
+            _evolutionQueriesCreated = true;
+        }
+
+        private void SyncBurningGroundVisuals(EntityManager entityManager)
+        {
+            _liveBurningGrounds.Clear();
+            using (NativeArray<Entity> entities = _burningGroundQuery.ToEntityArray(Allocator.Temp))
+            {
+                for (int i = 0; i < entities.Length; i++)
+                {
+                    Entity entity = entities[i];
+                    if (!entityManager.Exists(entity)
+                        || !entityManager.HasComponent<FireballBurningGround>(entity))
+                    {
+                        continue;
+                    }
+
+                    _liveBurningGrounds.Add(entity);
+                    FireballBurningGround ground =
+                        entityManager.GetComponentData<FireballBurningGround>(entity);
+                    if (!_burningGroundVisuals.TryGetValue(entity, out BurningGroundVisual visual))
+                    {
+                        visual = CreateBurningGroundVisual();
+                        _burningGroundVisuals.Add(entity, visual);
+                    }
+                    UpdateBurningGroundVisual(visual, ground);
+                }
+            }
+
+            _staleEvolutionEntities.Clear();
+            foreach (KeyValuePair<Entity, BurningGroundVisual> pair in _burningGroundVisuals)
+            {
+                if (!_liveBurningGrounds.Contains(pair.Key))
+                    _staleEvolutionEntities.Add(pair.Key);
+            }
+            for (int i = 0; i < _staleEvolutionEntities.Count; i++)
+            {
+                Entity stale = _staleEvolutionEntities[i];
+                if (_burningGroundVisuals.TryGetValue(stale, out BurningGroundVisual visual)
+                    && visual?.Root != null)
+                {
+                    Destroy(visual.Root);
+                }
+                _burningGroundVisuals.Remove(stale);
+            }
+        }
+
+        private void PresentSecondBlasts(EntityManager entityManager)
+        {
+            using (NativeArray<Entity> entities = _fireballStrikeQuery.ToEntityArray(Allocator.Temp))
+            {
+                for (int i = 0; i < entities.Length; i++)
+                {
+                    Entity entity = entities[i];
+                    if (!entityManager.Exists(entity)
+                        || !entityManager.HasComponent<FireballStrike>(entity))
+                    {
+                        continue;
+                    }
+
+                    FireballStrike strike = entityManager.GetComponentData<FireballStrike>(entity);
+                    if (strike.Kind != FireballStrikeKind.SecondBlast
+                        || !_presentedEvolutionStrikes.Add(entity))
+                    {
+                        continue;
+                    }
+
+                    StartBlast(
+                        new Vector2(strike.Position.x, strike.Position.y),
+                        strike.Radius,
+                        FireballStrikeKind.SecondBlast);
+                }
+            }
+
+            _staleEvolutionEntities.Clear();
+            foreach (Entity entity in _presentedEvolutionStrikes)
+            {
+                if (!entityManager.Exists(entity)
+                    || !entityManager.HasComponent<FireballStrike>(entity))
+                {
+                    _staleEvolutionEntities.Add(entity);
+                }
+            }
+            for (int i = 0; i < _staleEvolutionEntities.Count; i++)
+                _presentedEvolutionStrikes.Remove(_staleEvolutionEntities[i]);
+        }
+
+        private BurningGroundVisual CreateBurningGroundVisual()
+        {
+            var root = new GameObject("FireballScorchedEarthVisual");
+            var fillObject = new GameObject("ScorchedEarthFill");
+            fillObject.transform.SetParent(root.transform, false);
+            SpriteRenderer fill = fillObject.AddComponent<SpriteRenderer>();
+            fill.sprite = GetCircleSprite();
+            fill.sortingLayerName = SpellSortingLayer;
+            fill.sortingOrder = SpellFeedbackHierarchy.BurningGroundFillSortingOrder;
+
+            var ringObject = new GameObject("ScorchedEarthRing");
+            ringObject.transform.SetParent(root.transform, false);
+            SpriteRenderer ring = ringObject.AddComponent<SpriteRenderer>();
+            ring.sprite = GetHierarchyRingSprite();
+            ring.sortingLayerName = SpellSortingLayer;
+            ring.sortingOrder = SpellFeedbackHierarchy.BurningGroundRingSortingOrder;
+
+            return new BurningGroundVisual
+            {
+                Root = root,
+                Fill = fill,
+                Ring = ring
+            };
+        }
+
+        private static void UpdateBurningGroundVisual(
+            BurningGroundVisual visual,
+            FireballBurningGround ground)
+        {
+            if (visual?.Root == null)
+                return;
+
+            visual.Root.transform.position = new Vector3(
+                ground.Position.x,
+                ground.Position.y,
+                MobileCastleRenderDepth.ProjectileZ);
+            float diameter = SpellFeedbackHierarchy.ResolveBurningGroundDiameter(
+                ground.Radius,
+                Time.time);
+            visual.Fill.transform.localScale = Vector3.one * diameter;
+            visual.Ring.transform.localScale = Vector3.one * diameter * 1.08f;
+            visual.Ring.transform.localRotation = Quaternion.Euler(0f, 0f, Time.time * 10f);
+            visual.Fill.color = SpellFeedbackHierarchy.ResolveBurningGroundColor(
+                SpellFeedbackHierarchy.BurningGroundFillColor,
+                ground.RemainingDuration,
+                FireballEvolutionRules.BurningGroundDurationSeconds);
+            visual.Ring.color = SpellFeedbackHierarchy.ResolveBurningGroundColor(
+                SpellFeedbackHierarchy.BurningGroundRingColor,
+                ground.RemainingDuration,
+                FireballEvolutionRules.BurningGroundDurationSeconds);
+        }
+
+        private void ClearBurningGroundVisuals()
+        {
+            foreach (BurningGroundVisual visual in _burningGroundVisuals.Values)
+            {
+                if (visual?.Root != null)
+                    Destroy(visual.Root);
+            }
+            _burningGroundVisuals.Clear();
+            _liveBurningGrounds.Clear();
+        }
+
+        private void DisposeEvolutionQueries()
+        {
+            if (_evolutionQueriesCreated
+                && _evolutionQueryWorld != null
+                && _evolutionQueryWorld.IsCreated)
+            {
+                _burningGroundQuery.Dispose();
+                _fireballStrikeQuery.Dispose();
+            }
+
+            _evolutionQueriesCreated = false;
+            _evolutionQueryWorld = null;
+            _presentedEvolutionStrikes.Clear();
         }
 
         // ---------------------------------------------------------------------------
@@ -726,6 +959,8 @@ namespace DeadWalls
         {
             _trackedProjectile = Entity.Null;
             _blastFrame = -1;
+            ClearBurningGroundVisuals();
+            DisposeEvolutionQueries();
             if (_projectileVisual != null)
                 _projectileVisual.gameObject.SetActive(false);
             if (_blastVisual != null)

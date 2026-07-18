@@ -18,7 +18,7 @@ namespace DeadWalls.Tests
         private const string LaunchSpecPath =
             "Assets/Docs/DEAD_WALLS_V1_CASTLE_HEART_LAUNCH_CATALOG.md";
         private const string ExpectedLaunchFingerprint =
-            "e360c3312da560ae5ce4a2b2bb10aeb71555ad7b19f7a028b193a1f9139e00eb";
+            "b6e4dd5666bf65f0e321d45c946b0c4493fa664b3704c50ed53fbc6eb5fb313a";
         private HeartNodeCatalogSO _catalog;
 
         [SetUp]
@@ -32,9 +32,9 @@ namespace DeadWalls.Tests
         public void ProductionCatalog_IsCanonicalValidAndExcludesLegacyScope()
         {
             Assert.That(_catalog, Is.Not.Null);
-            Assert.That(_catalog.CatalogVersion, Is.EqualTo(1));
+            Assert.That(_catalog.CatalogVersion, Is.EqualTo(2));
             Assert.That(_catalog.RootNodeId, Is.EqualTo(HeartGraphConstants.RootNodeId));
-            Assert.That(_catalog.Nodes, Has.Length.EqualTo(35));
+            Assert.That(_catalog.Nodes, Has.Length.EqualTo(37));
 
             var errors = new List<string>();
             _catalog.CollectValidationErrors(errors);
@@ -74,14 +74,24 @@ namespace DeadWalls.Tests
                 && partner.ConflictNodeIds[0] == node.Id);
             Assert.That(symmetricPairs, Is.EqualTo(4));
 
-            int realFireballEvolutions = _catalog.Nodes.Count(node =>
+            HeartNodeDefinitionSO[] behaviorFireballEvolutions = _catalog.Nodes.Where(node =>
                 node.Branch == HeartNodeBranch.HeartMagic
                 && node.Type == HeartNodeType.Evolution
                 && node.Effects.Any(effect =>
-                    effect.Type == HeartNodeEffectType.ModifySpellDamagePercent
-                    || effect.Type == HeartNodeEffectType.AddSpellRadius
-                    || effect.Type == HeartNodeEffectType.ReduceSpellCooldownPercent));
-            Assert.That(realFireballEvolutions, Is.GreaterThanOrEqualTo(3));
+                    effect.Type == HeartNodeEffectType.EnableBurningGround
+                    || effect.Type == HeartNodeEffectType.EnableSecondBlast)).ToArray();
+            Assert.That(behaviorFireballEvolutions, Has.Length.EqualTo(2));
+
+            AssertFireballEvolution(
+                "scorched_earth",
+                44L,
+                HeartNodeEffectType.EnableBurningGround,
+                "5s");
+            AssertFireballEvolution(
+                "echoing_detonation",
+                46L,
+                HeartNodeEffectType.EnableSecondBlast,
+                "0.85s");
         }
 
         [Test]
@@ -128,13 +138,13 @@ namespace DeadWalls.Tests
         {
             Assert.That(_catalog.Nodes.Count(node => node.Type == HeartNodeType.Unlock), Is.EqualTo(4));
             Assert.That(_catalog.Nodes.Count(node => node.Type == HeartNodeType.Repeatable), Is.EqualTo(8));
-            Assert.That(_catalog.Nodes.Count(node => node.Type == HeartNodeType.Evolution), Is.EqualTo(15));
+            Assert.That(_catalog.Nodes.Count(node => node.Type == HeartNodeType.Evolution), Is.EqualTo(17));
             Assert.That(_catalog.Nodes.Count(node => node.Type == HeartNodeType.Keystone), Is.EqualTo(8));
 
             Assert.That(_catalog.Nodes.Count(node => node.Branch == HeartNodeBranch.Army), Is.EqualTo(9));
             Assert.That(_catalog.Nodes.Count(node => node.Branch == HeartNodeBranch.Defense), Is.EqualTo(8));
             Assert.That(_catalog.Nodes.Count(node => node.Branch == HeartNodeBranch.Production), Is.EqualTo(10));
-            Assert.That(_catalog.Nodes.Count(node => node.Branch == HeartNodeBranch.HeartMagic), Is.EqualTo(8));
+            Assert.That(_catalog.Nodes.Count(node => node.Branch == HeartNodeBranch.HeartMagic), Is.EqualTo(10));
 
             Assert.That(CreateLaunchFingerprint(_catalog), Is.EqualTo(ExpectedLaunchFingerprint));
         }
@@ -257,6 +267,25 @@ namespace DeadWalls.Tests
                 Assert.That(first.Effects.Select(effect => effect.Resource), Is.Unique);
             if (secondEffectCount == 4)
                 Assert.That(second.Effects.Select(effect => effect.Resource), Is.Unique);
+        }
+
+        private void AssertFireballEvolution(
+            string nodeId,
+            long cost,
+            HeartNodeEffectType effectType,
+            string requiredCopy)
+        {
+            HeartNodeDefinitionSO node = _catalog.GetNode(nodeId);
+            Assert.That(node, Is.Not.Null, nodeId);
+            Assert.That(node.Type, Is.EqualTo(HeartNodeType.Evolution));
+            Assert.That(node.Branch, Is.EqualTo(HeartNodeBranch.HeartMagic));
+            Assert.That(node.Rarity, Is.EqualTo(HeartNodeRarity.Rare));
+            Assert.That(node.MinimumDepth, Is.EqualTo(3));
+            Assert.That(node.MaximumDepth, Is.EqualTo(5));
+            Assert.That(node.BaseGraveEssenceCost, Is.EqualTo(cost));
+            Assert.That(node.Effects, Has.Length.EqualTo(1));
+            Assert.That(node.Effects[0].Type, Is.EqualTo(effectType));
+            Assert.That(node.Description, Does.Contain(requiredCopy));
         }
     }
 }

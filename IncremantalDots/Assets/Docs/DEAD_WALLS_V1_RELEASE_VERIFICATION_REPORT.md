@@ -5,7 +5,7 @@
 - Tarih: `2026-07-18`
 - Unity: `6000.3.10f1`
 - Aktif scene: `Assets/Scenes/NewGameScene.unity`
-- Run save şeması: desteklenen `v3-v15`, canonical `v15`
+- Run save şeması: desteklenen `v3-v16`, canonical `v16`
 - Meta save şeması: desteklenen `v1-v3`, canonical `v3`
 - Release active enemy cap: `900`
 
@@ -18,9 +18,9 @@ olarak korunur.
 
 | Kapı | Sonuç | Kanıt |
 |---|---:|---|
-| Full EditMode | Geçti | `386/386` |
-| Full PlayMode | Geçti | `85 pass + 2 expected explicit skip` |
-| Save migration grubu | Geçti | `55/55` |
+| Full EditMode | Geçti | `400/400` |
+| Full PlayMode | Geçti | `88 pass + 2 expected explicit skip` |
+| Save migration grubu | Geçti | `56/56` |
 | Explicit long-run soak | Geçti | `1/1`, `3.600` sample frame |
 | 10K + 1K target hardware | Geçti | Average/P95/P99 `7,665/13,890/14,058 ms` |
 | Scene validation | Geçti | `0 issue` |
@@ -45,7 +45,8 @@ taşır. Test matrisi yalnız son sürüm round-trip'ini değil, her şema sın�
 | v12 | Essence meta remainder `0` | Kesirli geçmiş değer uydurulmaz |
 | v13 | Legacy exact combat fallback | Aggregate payload tahminle üretilmez |
 | v14 | Telemetry peak/timeline temiz başlangıç | Historical telemetry uydurulmaz |
-| v15 | Canonical payload | Bozuk combat rebuild ve sırasız Wall timeline fail-closed |
+| v15 | Fireball evolution runtime listeleri boş | Legacy save'de olmayan pending strike, delayed blast veya burning ground state'i uydurulmaz |
+| v16 | Canonical payload | Bozuk combat rebuild ve sırasız Wall timeline fail-closed; aktif evolution timer ve kalan tick sayısı exact korunur |
 
 Ek durable state kanıtı:
 
@@ -54,7 +55,19 @@ Ek durable state kanıtı:
 - Death receipt run identity/reward snapshot'ını round-trip eder; matching pending death run
   snapshot'ını geçersiz kılar ve aynı RunId Meta reward'ını yalnız bir kez uygular.
 - Targeted `RunPersistenceTests + MetaProgressionSchemaTests + CouncilRegularScheduleTests`
-  birleşik sonucu `55/55`'tir.
+  birleşik sonucu `56/56`'tir.
+
+## Fireball evolution kapanışı
+
+Production Heart catalog v2, Scorched Earth ve Echoing Detonation behavior node'larıyla `37`
+canonical definition taşır. İlk evolution beş aggregate burning-ground tick'ini, ikincisi tek delayed
+aggregate blast'i üretir; iki yol da per-enemy telemetry/VFX veya yeni enemy entity'si oluşturmaz.
+
+Targeted EditMode `51/51`, exact aggregate hasar/VFX lifecycle ve gerçek GameManager save/Continue
+PlayMode `2/2` geçti. İlk PlayMode turu beşinci Burning Ground tick'inin float expiry sınırında
+atlanabildiğini yakaladı; runtime yalnız süreye bakmak yerine canonical `RemainingTicks` sayısını
+koruyacak şekilde düzeltildi. Ardından full EditMode `400/400` ve clean full PlayMode
+`88 pass + 2 expected explicit skip` geçti.
 
 ## Long-run soak kapanış koşusu
 
@@ -94,8 +107,8 @@ sonucunu erken okuyup `killed=0` verdi. Test tek başına geçti; fixture daha s
 yanında minimum queue/refill frame sayısını da bekleyecek şekilde dar kapsamlı stabilize edildi.
 Gameplay, Fireball, queue veya horde davranışı değiştirilmedi.
 
-Stabilizasyon sonrası targeted test `1/1`, clean full PlayMode tekrar `85 pass + 2 expected explicit
-skip` geçti. Bu nedenle ilk dalgalanma gizlenmedi; kökü ve test-only düzeltmesi bu raporda durable
+Stabilizasyon sonrası targeted test `1/1`, güncel clean full PlayMode tekrar `88 pass + 2 expected
+explicit skip` geçti. Bu nedenle ilk dalgalanma gizlenmedi; kökü ve test-only düzeltmesi bu raporda durable
 kanıt olarak tutuldu.
 
 ## Release kararı

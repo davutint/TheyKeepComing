@@ -40,6 +40,15 @@ namespace DeadWalls.Tests
         public IEnumerator TearDown()
         {
             Time.timeScale = 1f;
+            World world = World.DefaultGameObjectInjectionWorld;
+            if (world != null && world.IsCreated)
+            {
+                EntityManager entityManager = world.EntityManager;
+                DestroyEntitiesWith<FireballProjectile>(entityManager);
+                DestroyEntitiesWith<FireballStrike>(entityManager);
+                DestroyEntitiesWith<FireballDelayedBlast>(entityManager);
+                DestroyEntitiesWith<FireballBurningGround>(entityManager);
+            }
             RunPersistence.Delete();
             if (_originalRunSave != null)
                 File.WriteAllBytes(_runSavePath, _originalRunSave);
@@ -269,6 +278,204 @@ namespace DeadWalls.Tests
             Time.timeScale = 1f;
         }
 
+        [UnityTest]
+        public IEnumerator FireballEvolutions_ApplyExactAggregateDamageAndFixedGroundPresentation()
+        {
+            GameManager gameManager = GameManager.Instance;
+            bool runtimeReady = false;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                {
+                    runtimeReady = true;
+                    break;
+                }
+                yield return null;
+            }
+            Assert.That(runtimeReady, Is.True);
+            Assert.That(gameManager.TryEnableDevelopmentCombat(out string unlockMessage),
+                Is.True,
+                unlockMessage);
+
+            gameManager.EnableBehaviorEffect(new HeartNodeEffect
+            {
+                Type = HeartNodeEffectType.EnableBurningGround
+            });
+            gameManager.EnableBehaviorEffect(new HeartNodeEffect
+            {
+                Type = HeartNodeEffectType.EnableSecondBlast
+            });
+            Assert.That(gameManager.FireballEvolutions,
+                Is.EqualTo(FireballEvolutionFlags.BurningGround
+                           | FireballEvolutionFlags.SecondBlast));
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            var target = new Vector2(8f, -2f);
+            const float initialHp = 10_000f;
+            Entity victim = entityManager.CreateEntity(
+                typeof(ZombieTag),
+                typeof(ZombieStats),
+                typeof(LocalTransform));
+            entityManager.SetComponentData(victim, new ZombieStats
+            {
+                MaxHP = initialHp,
+                CurrentHP = initialHp,
+                MoveSpeed = 0f,
+                AttackDamage = 0f,
+                AttackCooldown = 1f,
+                XPReward = 0
+            });
+            entityManager.SetComponentData(victim,
+                LocalTransform.FromPosition(new float3(target.x, target.y, 0f)));
+
+            Assert.That(gameManager.TryCastFireball(target), Is.True);
+            Entity projectileEntity = gameManager.ActiveFireballProjectile;
+            Assert.That(entityManager.Exists(projectileEntity), Is.True);
+            FireballProjectile projectile =
+                entityManager.GetComponentData<FireballProjectile>(projectileEntity);
+            Assert.That(projectile.Evolutions,
+                Is.EqualTo(FireballEvolutionFlags.BurningGround
+                           | FireballEvolutionFlags.SecondBlast));
+            entityManager.SetComponentData(projectileEntity,
+                LocalTransform.FromPosition(new float3(target.x, target.y, 0f)));
+
+            using EntityQuery delayedQuery = entityManager.CreateEntityQuery(
+                typeof(FireballDelayedBlast));
+            using EntityQuery groundQuery = entityManager.CreateEntityQuery(
+                typeof(FireballBurningGround));
+            for (int frame = 0;
+                 frame < 60 && (delayedQuery.IsEmptyIgnoreFilter || groundQuery.IsEmptyIgnoreFilter);
+                 frame++)
+            {
+                yield return null;
+            }
+
+            Assert.That(delayedQuery.CalculateEntityCount(), Is.EqualTo(1));
+            Assert.That(groundQuery.CalculateEntityCount(), Is.EqualTo(1));
+            FireballDelayedBlast delayed = delayedQuery.GetSingleton<FireballDelayedBlast>();
+            FireballBurningGround ground = groundQuery.GetSingleton<FireballBurningGround>();
+            Assert.That(delayed.Damage,
+                Is.EqualTo(projectile.Damage
+                           * FireballEvolutionRules.SecondBlastDamageMultiplier).Within(0.001f));
+            Assert.That(delayed.Radius,
+                Is.EqualTo(projectile.Radius
+                           * FireballEvolutionRules.SecondBlastRadiusMultiplier).Within(0.001f));
+            Assert.That(ground.DamagePerTick,
+                Is.EqualTo(projectile.Damage
+                           * FireballEvolutionRules.BurningGroundDamageMultiplierPerTick)
+                    .Within(0.001f));
+            Assert.That(ground.Radius,
+                Is.EqualTo(projectile.Radius
+                           * FireballEvolutionRules.BurningGroundRadiusMultiplier).Within(0.001f));
+            Assert.That(ground.RemainingTicks,
+                Is.EqualTo(FireballEvolutionRules.BurningGroundTickCount));
+
+            SpellCastUI spell = Object.FindFirstObjectByType<SpellCastUI>();
+            Assert.That(spell, Is.Not.Null);
+            for (int frame = 0;
+                 frame < 30 && spell.ActiveBurningGroundVisualCount == 0;
+                 frame++)
+            {
+                yield return null;
+            }
+            Assert.That(spell.ActiveBurningGroundVisualCount, Is.EqualTo(1));
+            Assert.That(entityManager.GetComponentData<ZombieStats>(victim).CurrentHP,
+                Is.EqualTo(initialHp - projectile.Damage).Within(0.05f));
+
+            Time.timeScale = 20f;
+            for (int frame = 0;
+                 frame < 180 && (!delayedQuery.IsEmptyIgnoreFilter || !groundQuery.IsEmptyIgnoreFilter);
+                 frame++)
+            {
+                yield return null;
+            }
+            yield return null;
+            yield return null;
+            Time.timeScale = 1f;
+
+            Assert.That(delayedQuery.IsEmptyIgnoreFilter, Is.True);
+            Assert.That(groundQuery.IsEmptyIgnoreFilter, Is.True);
+            float totalDamageMultiplier = 1f
+                                          + FireballEvolutionRules.SecondBlastDamageMultiplier
+                                          + FireballEvolutionRules.BurningGroundTickCount
+                                          * FireballEvolutionRules.BurningGroundDamageMultiplierPerTick;
+            Assert.That(entityManager.GetComponentData<ZombieStats>(victim).CurrentHP,
+                Is.EqualTo(initialHp - projectile.Damage * totalDamageMultiplier).Within(0.1f));
+            Assert.That(spell.ActiveBurningGroundVisualCount, Is.Zero);
+
+            if (entityManager.Exists(victim))
+                entityManager.DestroyEntity(victim);
+        }
+
+        [UnityTest]
+        public IEnumerator FireballEvolutionRuntimeState_SaveAndContinueRestoresExactTimersAndTicks()
+        {
+            GameManager gameManager = GameManager.Instance;
+            bool runtimeReady = false;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                {
+                    runtimeReady = true;
+                    break;
+                }
+                yield return null;
+            }
+            Assert.That(runtimeReady, Is.True);
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            Entity delayedEntity = entityManager.CreateEntity(typeof(FireballDelayedBlast));
+            entityManager.SetComponentData(delayedEntity, new FireballDelayedBlast
+            {
+                Position = new float2(7f, -1f),
+                Radius = 1.87f,
+                Damage = 36f,
+                RemainingDelay = 0.42f
+            });
+            Entity groundEntity = entityManager.CreateEntity(typeof(FireballBurningGround));
+            entityManager.SetComponentData(groundEntity, new FireballBurningGround
+            {
+                Position = new float2(7f, -1f),
+                Radius = 1.54f,
+                DamagePerTick = 7.2f,
+                RemainingDuration = 3.6f,
+                TimeUntilNextTick = 0.6f,
+                RemainingTicks = 4
+            });
+
+            Assert.That(gameManager.SaveRunSnapshot(), Is.True);
+            RunSaveState saved = RunPersistence.TryLoad();
+            Assert.That(saved, Is.Not.Null);
+            Assert.That(saved.ActiveFireballDelayedBlasts, Has.Count.EqualTo(1));
+            Assert.That(saved.ActiveFireballBurningGrounds, Has.Count.EqualTo(1));
+            Assert.That(saved.ActiveFireballDelayedBlasts[0].RemainingDelay,
+                Is.EqualTo(0.42f).Within(0.001f));
+            Assert.That(saved.ActiveFireballBurningGrounds[0].RemainingDuration,
+                Is.EqualTo(3.6f).Within(0.001f));
+            Assert.That(saved.ActiveFireballBurningGrounds[0].TimeUntilNextTick,
+                Is.EqualTo(0.6f).Within(0.001f));
+            Assert.That(saved.ActiveFireballBurningGrounds[0].RemainingTicks, Is.EqualTo(4));
+
+            entityManager.DestroyEntity(delayedEntity);
+            entityManager.DestroyEntity(groundEntity);
+            Assert.That(gameManager.TryRestoreRunFromCheckpoint(), Is.True);
+
+            using EntityQuery delayedQuery = entityManager.CreateEntityQuery(
+                typeof(FireballDelayedBlast));
+            using EntityQuery groundQuery = entityManager.CreateEntityQuery(
+                typeof(FireballBurningGround));
+            Assert.That(delayedQuery.CalculateEntityCount(), Is.EqualTo(1));
+            Assert.That(groundQuery.CalculateEntityCount(), Is.EqualTo(1));
+            FireballDelayedBlast restoredDelayed =
+                delayedQuery.GetSingleton<FireballDelayedBlast>();
+            FireballBurningGround restoredGround =
+                groundQuery.GetSingleton<FireballBurningGround>();
+            Assert.That(restoredDelayed.RemainingDelay, Is.EqualTo(0.42f).Within(0.001f));
+            Assert.That(restoredGround.RemainingDuration, Is.EqualTo(3.6f).Within(0.001f));
+            Assert.That(restoredGround.TimeUntilNextTick, Is.EqualTo(0.6f).Within(0.001f));
+            Assert.That(restoredGround.RemainingTicks, Is.EqualTo(4));
+        }
+
         private static void AssertFrostHierarchy(
             CombatFeedbackBridge bridge,
             int expectedFrostCount,
@@ -318,6 +525,15 @@ namespace DeadWalls.Tests
             Assert.That(frostRingCount, Is.EqualTo(expectedFrostCount));
             Assert.That(ordinaryMainCount, Is.EqualTo(expectedOrdinaryCount));
             Assert.That(largestFrostScale, Is.GreaterThan(largestOrdinaryScale * 3f));
+        }
+
+        private static void DestroyEntitiesWith<T>(EntityManager entityManager)
+            where T : unmanaged, IComponentData
+        {
+            using EntityQuery query = entityManager.CreateEntityQuery(
+                ComponentType.ReadOnly<T>());
+            if (!query.IsEmptyIgnoreFilter)
+                entityManager.DestroyEntity(query);
         }
     }
 }

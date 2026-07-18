@@ -10,6 +10,8 @@ namespace DeadWalls
         public const int FrostHitSortingOrder = 48;
         public const int FireballProjectileAuraSortingOrder = 219;
         public const int FireballProjectileSortingOrder = 220;
+        public const int BurningGroundFillSortingOrder = 227;
+        public const int BurningGroundRingSortingOrder = 228;
         public const int FireballBlastSortingOrder = 230;
         public const int FireballBlastCoreSortingOrder = 231;
         public const int FireballBlastRingSortingOrder = 232;
@@ -30,6 +32,10 @@ namespace DeadWalls
         public static Color FireballProjectileAuraColor => new Color(1f, 0.38f, 0.06f, 0.32f);
         public static Color FireballBlastCoreColor => new Color(1f, 0.12f, 0.01f, 0.72f);
         public static Color FireballBlastRingColor => new Color(1f, 0.42f, 0.05f, 1f);
+        public static Color SecondBlastCoreColor => new Color(1f, 0.72f, 0.24f, 0.82f);
+        public static Color SecondBlastRingColor => new Color(1f, 0.82f, 0.32f, 1f);
+        public static Color BurningGroundFillColor => new Color(0.48f, 0.07f, 0.015f, 0.26f);
+        public static Color BurningGroundRingColor => new Color(1f, 0.28f, 0.025f, 0.72f);
 
         public static float ResolveFrostHitScale(float baseScale, float multiplier)
         {
@@ -91,6 +97,24 @@ namespace DeadWalls
         public static Color ResolveFadingColor(Color baseColor, float progress01)
         {
             baseColor.a *= 1f - Mathf.Clamp01(progress01);
+            return baseColor;
+        }
+
+        public static float ResolveBurningGroundDiameter(float radius, float time)
+        {
+            float pulse = 1f + Mathf.Sin(time * 4.5f) * 0.035f;
+            return Mathf.Max(0.1f, radius) * 2f * pulse;
+        }
+
+        public static Color ResolveBurningGroundColor(
+            Color baseColor,
+            float remainingDuration,
+            float totalDuration)
+        {
+            float normalized = Mathf.Clamp01(
+                remainingDuration / Mathf.Max(0.01f, totalDuration));
+            float fade = Mathf.Clamp01(normalized / 0.22f);
+            baseColor.a *= fade;
             return baseColor;
         }
     }

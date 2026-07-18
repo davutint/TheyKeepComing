@@ -167,7 +167,9 @@ namespace DeadWalls.Tests
                     TargetX = 8f,
                     TargetY = 2f,
                     Damage = 90f,
-                    Radius = 3.5f
+                    Radius = 3.5f,
+                    Evolutions = (int)(FireballEvolutionFlags.BurningGround
+                                       | FireballEvolutionFlags.SecondBlast)
                 },
                 PendingEconomyEvent = 2,
                 EconomyEventWave = 8,
@@ -220,6 +222,34 @@ namespace DeadWalls.Tests
                 Damage = 9f,
                 ArcherType = (int)ArcherType.Frost,
                 RemainingLifetime = 2.75f
+            });
+            state.ActiveFireballStrikes.Add(new FireballStrikeRunSaveState
+            {
+                X = 8f,
+                Y = 2f,
+                Radius = 3.5f,
+                Damage = 90f,
+                Kind = (int)FireballStrikeKind.Primary,
+                Evolutions = (int)(FireballEvolutionFlags.BurningGround
+                                   | FireballEvolutionFlags.SecondBlast)
+            });
+            state.ActiveFireballDelayedBlasts.Add(new FireballDelayedBlastRunSaveState
+            {
+                X = 8f,
+                Y = 2f,
+                Radius = 2.975f,
+                Damage = 54f,
+                RemainingDelay = 0.42f
+            });
+            state.ActiveFireballBurningGrounds.Add(new FireballBurningGroundRunSaveState
+            {
+                X = 8f,
+                Y = 2f,
+                Radius = 2.45f,
+                DamagePerTick = 10.8f,
+                RemainingDuration = 3.6f,
+                TimeUntilNextTick = 0.6f,
+                RemainingTicks = 4
             });
             state.HeartGraph.Nodes.Add(new GeneratedHeartNodeState
             {
@@ -310,6 +340,20 @@ namespace DeadWalls.Tests
             Assert.That(restored.ActiveArrows[0].TargetZombieIndex, Is.EqualTo(0));
             Assert.That(restored.ActiveArrows[0].RemainingLifetime, Is.EqualTo(2.75f));
             Assert.That(restored.ActiveFireball.Active, Is.True);
+            Assert.That(restored.ActiveFireball.Evolutions,
+                Is.EqualTo((int)(FireballEvolutionFlags.BurningGround
+                                 | FireballEvolutionFlags.SecondBlast)));
+            Assert.That(restored.ActiveFireballStrikes, Has.Count.EqualTo(1));
+            Assert.That(restored.ActiveFireballStrikes[0].Kind,
+                Is.EqualTo((int)FireballStrikeKind.Primary));
+            Assert.That(restored.ActiveFireballDelayedBlasts, Has.Count.EqualTo(1));
+            Assert.That(restored.ActiveFireballDelayedBlasts[0].RemainingDelay,
+                Is.EqualTo(0.42f).Within(0.001f));
+            Assert.That(restored.ActiveFireballBurningGrounds, Has.Count.EqualTo(1));
+            Assert.That(restored.ActiveFireballBurningGrounds[0].RemainingDuration,
+                Is.EqualTo(3.6f).Within(0.001f));
+            Assert.That(restored.ActiveFireballBurningGrounds[0].RemainingTicks,
+                Is.EqualTo(4));
             Assert.That(restored.FireballCooldownRemaining, Is.EqualTo(12.5f));
             Assert.That(restored.RallyCooldownRemaining, Is.EqualTo(31.5f));
             Assert.That(restored.EmergencyRepairCooldownRemaining, Is.EqualTo(74.25f));
@@ -454,14 +498,43 @@ namespace DeadWalls.Tests
         }
 
         [Test]
-        public void TryLoad_Version15InvalidCombatRebuild_FailsClosed()
+        public void TryLoad_Version15Snapshot_MigratesToEmptyFireballEvolutionRuntimeState()
+        {
+            string path = Path.Combine(Application.persistentDataPath, "run_save.json");
+            byte[] original = File.Exists(path) ? File.ReadAllBytes(path) : null;
+            string runId = "run_v15_fireball_evolution_migration_" + Guid.NewGuid().ToString("N");
+
+            try
+            {
+                File.WriteAllText(path,
+                    $"{{\"Version\":15,\"RunId\":\"{runId}\",\"IsDead\":false}}");
+
+                RunSaveState restored = RunPersistence.TryLoad();
+
+                Assert.That(restored, Is.Not.Null);
+                Assert.That(restored.Version, Is.EqualTo(RunSaveState.CurrentVersion));
+                Assert.That(restored.ActiveFireballStrikes, Is.Not.Null.And.Empty);
+                Assert.That(restored.ActiveFireballDelayedBlasts, Is.Not.Null.And.Empty);
+                Assert.That(restored.ActiveFireballBurningGrounds, Is.Not.Null.And.Empty);
+            }
+            finally
+            {
+                if (original != null)
+                    File.WriteAllBytes(path, original);
+                else if (File.Exists(path))
+                    File.Delete(path);
+            }
+        }
+
+        [Test]
+        public void TryLoad_Version16InvalidCombatRebuild_FailsClosed()
         {
             string path = Path.Combine(Application.persistentDataPath, "run_save.json");
             byte[] original = File.Exists(path) ? File.ReadAllBytes(path) : null;
             var corrupt = new RunSaveState
             {
                 Version = RunSaveState.CurrentVersion,
-                RunId = "run_v15_corrupt_rebuild_" + Guid.NewGuid().ToString("N"),
+                RunId = "run_v16_corrupt_rebuild_" + Guid.NewGuid().ToString("N"),
                 HasCombatRebuild = true,
                 CombatRebuild = new CombatRebuildRunSaveState
                 {
@@ -495,14 +568,14 @@ namespace DeadWalls.Tests
         }
 
         [Test]
-        public void TryLoad_Version15OutOfOrderRunTelemetry_FailsClosed()
+        public void TryLoad_Version16OutOfOrderRunTelemetry_FailsClosed()
         {
             string path = Path.Combine(Application.persistentDataPath, "run_save.json");
             byte[] original = File.Exists(path) ? File.ReadAllBytes(path) : null;
             var corrupt = new RunSaveState
             {
                 Version = RunSaveState.CurrentVersion,
-                RunId = "run_v15_corrupt_telemetry_" + Guid.NewGuid().ToString("N"),
+                RunId = "run_v16_corrupt_telemetry_" + Guid.NewGuid().ToString("N"),
                 TelemetryPeakEnemies = 100
             };
             corrupt.WallDamageTimeline.Add(new RunWallDamageTelemetrySaveState
@@ -523,7 +596,7 @@ namespace DeadWalls.Tests
                 File.WriteAllText(path, JsonUtility.ToJson(corrupt));
 
                 Assert.That(RunPersistence.TryLoad(), Is.Null,
-                    "v15 out-of-order Wall timeline sessizce restore edilmemeli.");
+                    "v16 out-of-order Wall timeline sessizce restore edilmemeli.");
             }
             finally
             {

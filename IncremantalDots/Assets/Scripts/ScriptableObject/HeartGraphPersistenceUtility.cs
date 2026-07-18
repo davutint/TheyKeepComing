@@ -85,10 +85,20 @@ namespace DeadWalls
             }
             if (graph.GraphVersion != GeneratedRunGraph.CurrentGraphVersion)
                 errors.Add($"Desteklenmeyen saved Heart graph version: {graph.GraphVersion}.");
+            int originalCatalogVersion = graph.CatalogVersion;
+            bool migratedCatalog = false;
             if (graph.CatalogVersion != catalog.CatalogVersion)
             {
-                errors.Add($"Saved Heart catalog version {graph.CatalogVersion}, aktif catalog version "
-                           + $"{catalog.CatalogVersion} ile uyusmuyor; graph yeniden uretilmedi.");
+                migratedCatalog = TryMigrateProductionCatalogV1ToV2(
+                    graph,
+                    catalog,
+                    out string migrationError);
+                if (!migratedCatalog)
+                {
+                    errors.Add($"Saved Heart catalog version {graph.CatalogVersion}, aktif catalog version "
+                               + $"{catalog.CatalogVersion} ile uyusmuyor; graph yeniden uretilmedi. "
+                               + migrationError);
+                }
             }
 
             ValidateRuntimeState(graph, catalog, errors);
@@ -99,7 +109,47 @@ namespace DeadWalls
                 initialState,
                 catalog);
             HeartGraphValidator.Validate(initialState, catalog, validationRequest, errors);
+            if (errors.Count > 0 && migratedCatalog)
+                graph.CatalogVersion = originalCatalogVersion;
             return errors.Count == 0;
+        }
+
+        private static bool TryMigrateProductionCatalogV1ToV2(
+            GeneratedRunGraph graph,
+            HeartNodeCatalogSO catalog,
+            out string error)
+        {
+            error = string.Empty;
+            if (graph == null
+                || catalog == null
+                || graph.CatalogVersion != 1
+                || catalog.CatalogVersion != 2
+                || catalog.GetNode("scorched_earth") == null
+                || catalog.GetNode("echoing_detonation") == null)
+            {
+                error = "Desteklenen production catalog v1 -> v2 migration kosullari saglanmadi.";
+                return false;
+            }
+
+            foreach (GeneratedHeartNodeState node in graph.Nodes ?? new List<GeneratedHeartNodeState>())
+            {
+                if (node == null || string.IsNullOrWhiteSpace(node.NodeId))
+                    continue;
+                if (string.Equals(node.NodeId, graph.RootNodeId, StringComparison.Ordinal))
+                    continue;
+                if (string.Equals(node.NodeId, "scorched_earth", StringComparison.Ordinal)
+                    || string.Equals(node.NodeId, "echoing_detonation", StringComparison.Ordinal)
+                    || catalog.GetNode(node.NodeId) == null)
+                {
+                    error = $"Saved v1 graph node '{node.NodeId}' production v2 migration'ina uygun degil.";
+                    return false;
+                }
+            }
+
+            // Yeni evolution'lar devam eden run'a enjekte edilmez. Yalniz catalog kimligi
+            // yukseltilir; seed, node/edge listesi, reveal, level ve lock state exact kalir.
+            graph.CatalogVersion = catalog.CatalogVersion;
+            return true;
         }
 
         public static bool TryCreateRestoredPipeline(

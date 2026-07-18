@@ -301,10 +301,13 @@ namespace DeadWalls
                     summary = "Enable Split Shot";
                     break;
                 case HeartNodeEffectType.EnableBurningGround:
-                    summary = "Enable Burning Ground";
+                    summary = $"Burning Ground · {FireballEvolutionRules.BurningGroundDurationSeconds:0}s · "
+                              + $"{FireballEvolutionRules.BurningGroundTickCount} × "
+                              + $"{FireballEvolutionRules.BurningGroundDamageMultiplierPerTick * 100f:0}% damage";
                     break;
                 case HeartNodeEffectType.EnableSecondBlast:
-                    summary = "Enable Second Blast";
+                    summary = $"Second Blast · {FireballEvolutionRules.SecondBlastDelaySeconds:0.00}s · "
+                              + $"{FireballEvolutionRules.SecondBlastDamageMultiplier * 100f:0}% damage";
                     break;
                 default:
                     presentation = null;

@@ -39,18 +39,57 @@ namespace DeadWalls
                 .CreateCommandBuffer(state.WorldUnmanaged);
             foreach (var (strike, entity) in SystemAPI.Query<RefRO<FireballStrike>>().WithEntityAccess())
             {
-                strikes.Add(strike.ValueRO);
+                FireballStrike value = strike.ValueRO;
+                strikes.Add(value);
                 ecb.DestroyEntity(entity);
 
-                // Patlama SFX'i (M-D): gorsel SpellCastUI'da, ses feedback kanalindan
-                var sfxEvent = ecb.CreateEntity();
-                ecb.AddComponent(sfxEvent, new CombatSfxEvent
+                if (value.Kind == FireballStrikeKind.Primary)
                 {
-                    Position = new float3(strike.ValueRO.Position.x, strike.ValueRO.Position.y, 0f),
-                    Type = CombatSfxType.FireballBlast,
-                    Volume = 0.9f,
-                    Pitch = 1f
-                });
+                    if (FireballEvolutionRules.Has(
+                            value.Evolutions,
+                            FireballEvolutionFlags.SecondBlast))
+                    {
+                        Entity delayedBlast = ecb.CreateEntity();
+                        ecb.AddComponent(delayedBlast, new FireballDelayedBlast
+                        {
+                            Position = value.Position,
+                            Radius = value.Radius * FireballEvolutionRules.SecondBlastRadiusMultiplier,
+                            Damage = value.Damage * FireballEvolutionRules.SecondBlastDamageMultiplier,
+                            RemainingDelay = FireballEvolutionRules.SecondBlastDelaySeconds
+                        });
+                    }
+
+                    if (FireballEvolutionRules.Has(
+                            value.Evolutions,
+                            FireballEvolutionFlags.BurningGround))
+                    {
+                        Entity burningGround = ecb.CreateEntity();
+                        ecb.AddComponent(burningGround, new FireballBurningGround
+                        {
+                            Position = value.Position,
+                            Radius = value.Radius * FireballEvolutionRules.BurningGroundRadiusMultiplier,
+                            DamagePerTick = value.Damage
+                                            * FireballEvolutionRules.BurningGroundDamageMultiplierPerTick,
+                            RemainingDuration = FireballEvolutionRules.BurningGroundDurationSeconds,
+                            TimeUntilNextTick = FireballEvolutionRules.BurningGroundTickIntervalSeconds,
+                            RemainingTicks = FireballEvolutionRules.BurningGroundTickCount
+                        });
+                    }
+                }
+
+                // Burning Ground pulse'lari per-enemy veya per-tick ses uretmez. Primary ve
+                // Echoing Detonation ayni rate-limited patlama kanalini farkli pitch ile kullanir.
+                if (value.Kind != FireballStrikeKind.BurningGroundPulse)
+                {
+                    Entity sfxEvent = ecb.CreateEntity();
+                    ecb.AddComponent(sfxEvent, new CombatSfxEvent
+                    {
+                        Position = new float3(value.Position.x, value.Position.y, 0f),
+                        Type = CombatSfxType.FireballBlast,
+                        Volume = value.Kind == FireballStrikeKind.SecondBlast ? 0.68f : 0.9f,
+                        Pitch = value.Kind == FireballStrikeKind.SecondBlast ? 1.16f : 1f
+                    });
+                }
             }
 
             state.Dependency = new FireballDamageJob

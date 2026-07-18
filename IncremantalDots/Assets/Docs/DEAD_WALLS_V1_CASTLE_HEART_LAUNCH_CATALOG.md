@@ -1,8 +1,8 @@
 # Dead Walls V1 — Castle Heart Launch Catalog
 
 > **Durum:** Launch content authority
-> **Catalog:** `HeartNodeCatalog.asset` — version `1`
-> **Runtime kapsamı:** `35` node, `4` branch, `4` Keystone çifti, `4` guaranteed route, `4` repeatable sink
+> **Catalog:** `HeartNodeCatalog.asset` — version `2`
+> **Runtime kapsamı:** `37` node, `4` branch, `4` Keystone çifti, `4` guaranteed route, `4` repeatable sink
 > **Para birimi:** Yalnız `Grave Essence`
 
 Bu belge, Castle Heart ekranında oyuncuya sunulan launch node havuzunun içerik ve effect
@@ -81,7 +81,7 @@ node/edge topolojisi compatibility için değişmez; reveal/purchase katmanı ar
 | `deep_stores` | Deep Stores | Keystone | 3–5 | 52 | Dört resource worker capacity'si ayrı ayrı `+6`; `relentless_shifts` kapanır | Yeni |
 | `relentless_shifts` | Relentless Shifts | Keystone | 3–5 | 52 | Dört resource production'ı ayrı ayrı `+20%`; `deep_stores` kapanır | Yeni |
 
-## Heart / Magic — 8 node
+## Heart / Magic — 10 node
 
 | ID | Oyuncu adı | Tür | Depth | Base / Growth | Exact effect | Legacy kaynak |
 |---|---|---:|---:|---:|---|---|
@@ -91,8 +91,26 @@ node/edge topolojisi compatibility için değişmez; reveal/purchase katmanı ar
 | `arcane_focus` | Arcane Focus | Evolution | 2–5 | 36 | Fireball cooldown raw `-18%`; soft-cap `-60%` | `fire_cooldown` |
 | `blazing_core` | Blazing Core | Evolution | 2–5 | 38 | Fireball damage `+35%` | Yeni |
 | `ember_reservoir` | Ember Reservoir | Evolution | 1–5 | 31 | Fireball radius `+0.65`; soft-cap `+3.5` | Yeni |
+| `scorched_earth` | Scorched Earth | Evolution | 3–5 | 44 | Vuruş alanının `%70` yarıçapında `5s`; saniyede bir `5 × %12` base impact damage | Yeni |
+| `echoing_detonation` | Echoing Detonation | Evolution | 3–5 | 46 | `0.85s` sonra `%85` yarıçapta `%60` base impact damage ile ikinci patlama | Yeni |
 | `inferno_heart` | Inferno Heart | Keystone | 3–5 | 55 | Fireball damage `+45%`; `chronomancer_heart` kapanır | Yeni |
 | `chronomancer_heart` | Chronomancer Heart | Keystone | 3–5 | 55 | Fireball cooldown raw `-26%`; soft-cap `-60%`; `inferno_heart` kapanır | Yeni |
+
+### Fireball behavior evolution sözleşmesi
+
+- İki evolution aynı koşuda birlikte bulunabilir; Keystone değildir ve birbirini kilitlemez.
+- Yüzdeler, cast anındaki gerçek primary Fireball damage/radius snapshot'ından hesaplanır.
+- `Scorched Earth` beş tick'i tek tek aggregate AoE strike olarak işler; düşman başına event,
+  particle veya GameObject üretmez. Alan yalnız iki sabit sprite renderer ile gösterilir.
+- `Echoing Detonation` tek timer entity ve tek aggregate secondary strike üretir. Mevcut blast
+  renderer'larını sıcak-altın palette yeniden kullanır; yeni per-enemy feedback oluşturmaz.
+- Exact Continue aktif projectile'ın evolution flag'lerini, bekleyen secondary blast'ı ve kalan
+  burning-ground süre/tick state'ini `RunSaveState v16` içinde korur.
+
+Catalog `v1 -> v2` migration yalnız mevcut generated graph'ın catalog kimliğini yükseltir. Yeni
+evolution node'ları devam eden koşuya eklenmez, graph yeniden üretilmez ve seed/node/edge,
+visibility, level veya Keystone lock state'i değiştirilmez. Yeni koşular catalog `v2` havuzundan
+üretilir.
 
 ## Guaranteed route ve sink sözleşmesi
 
@@ -143,7 +161,8 @@ catalog tarafından sahiplenilir.
   node türüne özel `UNLOCK / DEEPEN / EVOLVE / COMMIT` eylemini gösterir.
 - Keystone lore metni partner lock bilgisini tekrar etmez; iki kart, fork damarı ve exact
   `CHOOSE ONE · RUN COMMITMENT` satırı kararı birlikte anlatır.
-- Catalog version `1` korunur çünkü bu lock turu node Id/effect/cost/graph semantiğini değiştirmez;
-  serialized topology değişmeden coupled reveal, ortak branch devamı ve presentation fork'u ekler.
+- Catalog version `2`, iki behavior Fireball evolution'ını launch havuzuna ekler. Generated graph
+  schema version `1` kalır; catalog v1 graph'ları yalnız catalog identity migration ile açılır ve
+  yeni node'lar devam eden koşuya enjekte edilmez.
 - Gelecekte node Id, effect, cost, conflict veya generator uygunluğu değişirse `CatalogVersion`
   artırılır. Eski exact graph sessizce remap edilmez.

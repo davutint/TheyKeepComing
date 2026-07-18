@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60553c82078aa8949bdea9d34f9d0f18, type: 3}
   m_Name: HeartNodeCatalog
   m_EditorClassIdentifier: DeadWalls::DeadWalls.HeartNodeCatalogSO
-  CatalogVersion: 1
+  CatalogVersion: 2
   RootNodeId: castle_heart
   Nodes:
   - {fileID: 11400000, guid: be6c9b78ffacfd944bcf9d9257e4ab8f, type: 2}
@@ -48,5 +48,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 672b8056e05e9c647a343e60b5c977c4, type: 2}
   - {fileID: 11400000, guid: f9dc3801a0f13014fb05d61ce1710fc5, type: 2}
   - {fileID: 11400000, guid: 34ddf7dc8c4bc7145b38461edc341fa9, type: 2}
+  - {fileID: 11400000, guid: 7425d2567a0056241a3f082b01c8d854, type: 2}
+  - {fileID: 11400000, guid: a380220029d8c3d468acf6e9320b5f33, type: 2}
   - {fileID: 11400000, guid: e4820d8fe711194428b09b20bc027709, type: 2}
   - {fileID: 11400000, guid: fc345efca57b19b4896a31a7a4c18535, type: 2}

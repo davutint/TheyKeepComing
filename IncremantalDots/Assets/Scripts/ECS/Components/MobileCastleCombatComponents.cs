@@ -312,15 +312,74 @@ namespace DeadWalls
         public float BloodMoonIntensityMult;
     }
 
+    [System.Flags]
+    public enum FireballEvolutionFlags : byte
+    {
+        None = 0,
+        BurningGround = 1 << 0,
+        SecondBlast = 1 << 1
+    }
+
+    public enum FireballStrikeKind : byte
+    {
+        Primary = 0,
+        SecondBlast = 1,
+        BurningGroundPulse = 2
+    }
+
     /// <summary>
-    /// Oyuncunun attigi Ates Topu istegi (Mono -> ECS). GameManager.TryCastFireball yaratir;
-    /// FireballStrikeSystem ayni/ertesi frame yaricap ici zombilere hasari uygular ve siler.
+    /// Fireball evolution degerlerinin tek runtime tuning sahibi. Evolution'lar cooldown,
+    /// ana kaynak veya per-enemy feedback uretmez; ayni cast transaction'ini genisletir.
+    /// </summary>
+    public static class FireballEvolutionRules
+    {
+        public const float SecondBlastDelaySeconds = 0.85f;
+        public const float SecondBlastDamageMultiplier = 0.60f;
+        public const float SecondBlastRadiusMultiplier = 0.85f;
+
+        public const float BurningGroundDurationSeconds = 5f;
+        public const float BurningGroundTickIntervalSeconds = 1f;
+        public const float BurningGroundDamageMultiplierPerTick = 0.12f;
+        public const float BurningGroundRadiusMultiplier = 0.70f;
+        public const int BurningGroundTickCount = 5;
+
+        public static bool Has(FireballEvolutionFlags flags, FireballEvolutionFlags value)
+        {
+            return (flags & value) == value;
+        }
+    }
+
+    /// <summary>
+    /// Oyuncunun attigi Ates Topu vurusu. Primary strike evolution child entity'lerini
+    /// schedule eder; her strike yaricap icindeki zombilere tek hasar uygular.
     /// </summary>
     public struct FireballStrike : IComponentData
     {
         public float2 Position;
         public float Radius;
         public float Damage;
+        public FireballStrikeKind Kind;
+        public FireballEvolutionFlags Evolutions;
+    }
+
+    /// <summary>Echoing Detonation icin tek, gecikmeli ikinci patlama state'i.</summary>
+    public struct FireballDelayedBlast : IComponentData
+    {
+        public float2 Position;
+        public float Radius;
+        public float Damage;
+        public float RemainingDelay;
+    }
+
+    /// <summary>Scorched Earth icin sabit sureli, rate-limited alan hasari state'i.</summary>
+    public struct FireballBurningGround : IComponentData
+    {
+        public float2 Position;
+        public float Radius;
+        public float DamagePerTick;
+        public float RemainingDuration;
+        public float TimeUntilNextTick;
+        public int RemainingTicks;
     }
 
     /// <summary>
@@ -335,5 +394,6 @@ namespace DeadWalls
         public float Speed;
         public float Radius;
         public float Damage;
+        public FireballEvolutionFlags Evolutions;
     }
 }

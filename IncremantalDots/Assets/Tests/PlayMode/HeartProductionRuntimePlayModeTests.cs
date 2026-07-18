@@ -23,8 +23,8 @@ namespace DeadWalls.Tests
 
             Assert.That(manager, Is.Not.Null);
             Assert.That(manager.HeartCatalog, Is.Not.Null);
-            Assert.That(manager.HeartCatalog.CatalogVersion, Is.EqualTo(1));
-            Assert.That(manager.HeartCatalog.Nodes, Has.Length.EqualTo(35));
+            Assert.That(manager.HeartCatalog.CatalogVersion, Is.EqualTo(2));
+            Assert.That(manager.HeartCatalog.Nodes, Has.Length.EqualTo(37));
 
             HeartGraphPresentation presentation = null;
             System.Collections.Generic.IReadOnlyList<string> errors = null;
@@ -44,7 +44,7 @@ namespace DeadWalls.Tests
             Assert.That(telemetry.HasCatalog, Is.True);
             Assert.That(telemetry.RuntimeReady, Is.True, telemetry.RuntimeError);
             Assert.That(telemetry.RuntimeError, Is.Empty);
-            Assert.That(telemetry.CatalogVersion, Is.EqualTo(1));
+            Assert.That(telemetry.CatalogVersion, Is.EqualTo(2));
             Assert.That(telemetry.NodeCount, Is.EqualTo(presentation.Nodes.Count));
 
             HeartScreenUI screen = Object.FindFirstObjectByType<HeartScreenUI>();

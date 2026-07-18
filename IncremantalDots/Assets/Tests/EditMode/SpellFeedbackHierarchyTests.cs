@@ -14,8 +14,12 @@ namespace DeadWalls.Tests
                 Is.GreaterThan(SpellFeedbackHierarchy.FrostHitSortingOrder));
             Assert.That(SpellFeedbackHierarchy.FireballProjectileSortingOrder,
                 Is.GreaterThan(SpellFeedbackHierarchy.FireballProjectileAuraSortingOrder));
-            Assert.That(SpellFeedbackHierarchy.FireballBlastSortingOrder,
+            Assert.That(SpellFeedbackHierarchy.BurningGroundFillSortingOrder,
                 Is.GreaterThan(SpellFeedbackHierarchy.FireballProjectileSortingOrder));
+            Assert.That(SpellFeedbackHierarchy.BurningGroundRingSortingOrder,
+                Is.GreaterThan(SpellFeedbackHierarchy.BurningGroundFillSortingOrder));
+            Assert.That(SpellFeedbackHierarchy.FireballBlastSortingOrder,
+                Is.GreaterThan(SpellFeedbackHierarchy.BurningGroundRingSortingOrder));
             Assert.That(SpellFeedbackHierarchy.FireballBlastCoreSortingOrder,
                 Is.GreaterThan(SpellFeedbackHierarchy.FireballBlastSortingOrder));
             Assert.That(SpellFeedbackHierarchy.FireballBlastRingSortingOrder,
@@ -74,6 +78,41 @@ namespace DeadWalls.Tests
             Assert.That(SpellFeedbackHierarchy.FireballBlastRingColor.r,
                 Is.GreaterThan(SpellFeedbackHierarchy.FireballBlastRingColor.b * 10f));
             Assert.That(faded.a, Is.Zero.Within(0.001f));
+        }
+
+        [Test]
+        public void FireballEvolutions_LockExactCombatAndFixedRendererVfxDirection()
+        {
+            Assert.That(FireballEvolutionRules.SecondBlastDelaySeconds,
+                Is.EqualTo(0.85f).Within(0.001f));
+            Assert.That(FireballEvolutionRules.SecondBlastDamageMultiplier,
+                Is.EqualTo(0.60f).Within(0.001f));
+            Assert.That(FireballEvolutionRules.SecondBlastRadiusMultiplier,
+                Is.EqualTo(0.85f).Within(0.001f));
+            Assert.That(FireballEvolutionRules.BurningGroundDurationSeconds,
+                Is.EqualTo(5f).Within(0.001f));
+            Assert.That(FireballEvolutionRules.BurningGroundTickIntervalSeconds,
+                Is.EqualTo(1f).Within(0.001f));
+            Assert.That(FireballEvolutionRules.BurningGroundTickCount, Is.EqualTo(5));
+            Assert.That(FireballEvolutionRules.BurningGroundDamageMultiplierPerTick,
+                Is.EqualTo(0.12f).Within(0.001f));
+            Assert.That(FireballEvolutionRules.BurningGroundRadiusMultiplier,
+                Is.EqualTo(0.70f).Within(0.001f));
+
+            float diameter = SpellFeedbackHierarchy.ResolveBurningGroundDiameter(2f, 0f);
+            Color active = SpellFeedbackHierarchy.ResolveBurningGroundColor(
+                SpellFeedbackHierarchy.BurningGroundRingColor,
+                5f,
+                5f);
+            Color expired = SpellFeedbackHierarchy.ResolveBurningGroundColor(
+                SpellFeedbackHierarchy.BurningGroundRingColor,
+                0f,
+                5f);
+            Assert.That(diameter, Is.EqualTo(4f).Within(0.001f));
+            Assert.That(active.a, Is.GreaterThan(0.5f));
+            Assert.That(expired.a, Is.Zero.Within(0.001f));
+            Assert.That(SpellFeedbackHierarchy.SecondBlastCoreColor.r,
+                Is.GreaterThan(SpellFeedbackHierarchy.SecondBlastCoreColor.b));
         }
     }
 }
