@@ -25,10 +25,26 @@ namespace DeadWalls
         private const int CatalogVersion = 1;
         private const string ArmyIconPath =
             "Assets/Sprites/UI/Generated/mobile_castle_hud/arrow_basic.png";
+        private const string RapidIconPath =
+            "Assets/Sprites/UI/Generated/mobile_castle_hud/archer_rapid_portrait_v4.png";
+        private const string FrostIconPath =
+            "Assets/Sprites/UI/Generated/mobile_castle_hud/archer_frost_portrait_v4.png";
         private const string DefenseIconPath =
             "Assets/Sprites/UI/Generated/mobile_castle_hud/defense_shield_icon_v1.png";
+        private const string RepairIconPath =
+            "Assets/Sprites/UI/Generated/mobile_castle_hud/castle_yard_repair_icon_v1.png";
+        private const string ArrowStockIconPath =
+            "Assets/Sprites/UI/Generated/mobile_castle_hud/arrow_stock_v4.png";
         private const string ProductionIconPath =
             "Assets/Sprites/UI/Generated/mobile_castle_hud/wood_icon.png";
+        private const string StoneIconPath =
+            "Assets/Sprites/UI/Generated/mobile_castle_hud/stone_icon.png";
+        private const string IronIconPath =
+            "Assets/Sprites/UI/Generated/mobile_castle_hud/iron_icon.png";
+        private const string FoodIconPath =
+            "Assets/Sprites/UI/Generated/mobile_castle_hud/food_icon.png";
+        private const string PopulationIconPath =
+            "Assets/Sprites/UI/Generated/mobile_castle_hud/population_people_v4.png";
         private const string MagicIconPath = "Assets/3x/EXTRAS/Projectiles/Fireball.png";
 
         private sealed class NodeSeed
@@ -188,8 +204,9 @@ namespace DeadWalls
             node.Id = seed.Id;
             node.Title = seed.Title;
             node.Description = seed.Description;
-            node.Icon = LoadSprite(GetIconPath(seed.Branch));
+            node.Icon = LoadSprite(GetIconPath(seed));
             node.Tags = seed.Tags ?? Array.Empty<string>();
+            node.LegacySourceNodeIds = GetLegacySourceNodeIds(seed.Id);
             node.Type = seed.Type;
             node.Branch = seed.Branch;
             node.Rarity = seed.Rarity;
@@ -220,9 +237,39 @@ namespace DeadWalls
             return null;
         }
 
-        private static string GetIconPath(HeartNodeBranch branch)
+        private static string GetIconPath(NodeSeed seed)
         {
-            return branch switch
+            switch (seed.Id)
+            {
+                case "rapid_archer_unlock":
+                case "rapid_drill":
+                case "storm_cadence":
+                    return RapidIconPath;
+                case "frost_archer_unlock":
+                case "frostbite_tips":
+                    return FrostIconPath;
+                case "repair_efficiency":
+                case "salvage_doctrine":
+                    return RepairIconPath;
+                case "arrow_vault":
+                case "fletchers_measure":
+                case "arrow_workshop":
+                case "reserve_stacks":
+                    return ArrowStockIconPath;
+                case "stone_guild":
+                    return StoneIconPath;
+                case "iron_foundry":
+                    return IronIconPath;
+                case "harvest_ledger":
+                    return FoodIconPath;
+                case "worker_camp":
+                case "dawn_housing":
+                case "deep_stores":
+                case "relentless_shifts":
+                    return PopulationIconPath;
+            }
+
+            return seed.Branch switch
             {
                 HeartNodeBranch.Army => ArmyIconPath,
                 HeartNodeBranch.Defense => DefenseIconPath,
@@ -298,12 +345,12 @@ namespace DeadWalls
                     null, null,
                     Fx(HeartNodeEffectType.AddArcherRange, 0.55, ArcherType.Basic, softCap: 3.0)),
                 Node("heavy_draw", "Heavy Draw",
-                    "Commit to crushing single volleys. Choosing this seals Storm Cadence.",
+                    "Turn every Basic Archer volley into a crushing, deliberate strike.",
                     HeartNodeType.Keystone, HeartNodeBranch.Army, 3, 5, 48, 0,
                     null, "storm_cadence",
                     Fx(HeartNodeEffectType.ModifyArcherDamagePercent, 0.30, ArcherType.Basic)),
                 Node("storm_cadence", "Storm Cadence",
-                    "Commit to relentless release speed. Choosing this seals Heavy Draw.",
+                    "Drive Basic Archers toward relentless release speed.",
                     HeartNodeType.Keystone, HeartNodeBranch.Army, 3, 5, 48, 0,
                     null, "heavy_draw",
                     Fx(HeartNodeEffectType.ModifyArcherFireRatePercent, 0.28, ArcherType.Basic, softCap: 0.75)),
@@ -340,12 +387,12 @@ namespace DeadWalls
                     null, null,
                     Fx(HeartNodeEffectType.IncreaseArrowEfficiency, 4)),
                 Node("bastion_doctrine", "Bastion Doctrine",
-                    "Choose permanent mass over recovery speed. This seals Salvage Doctrine.",
+                    "Raise a fortress of sheer mass and maximum integrity.",
                     HeartNodeType.Keystone, HeartNodeBranch.Defense, 3, 5, 50, 0,
                     null, "salvage_doctrine",
                     Fx(HeartNodeEffectType.ModifyWallMaxHpPercent, 0.35)),
                 Node("salvage_doctrine", "Salvage Doctrine",
-                    "Choose ruthless repair economy over raw mass. This seals Bastion Doctrine.",
+                    "Standardize recovery around ruthless Stone efficiency.",
                     HeartNodeType.Keystone, HeartNodeBranch.Defense, 3, 5, 50, 0,
                     null, "bastion_doctrine",
                     Fx(HeartNodeEffectType.ReduceWallRepairCostPercent, 0.30)),
@@ -399,7 +446,7 @@ namespace DeadWalls
                     null, null,
                     Fx(HeartNodeEffectType.IncreaseArrowCapacity, 100)),
                 Node("deep_stores", "Deep Stores",
-                    "Choose broad worker capacity. This seals Relentless Shifts.",
+                    "Build broad reserves that expand every workshop's staffing limit.",
                     HeartNodeType.Keystone, HeartNodeBranch.Production, 3, 5, 52, 0,
                     null, "relentless_shifts",
                     Fx(HeartNodeEffectType.IncreaseWorkerCapacity, 6, resource: EconomyFocusType.Wood),
@@ -407,7 +454,7 @@ namespace DeadWalls
                     Fx(HeartNodeEffectType.IncreaseWorkerCapacity, 6, resource: EconomyFocusType.Iron),
                     Fx(HeartNodeEffectType.IncreaseWorkerCapacity, 6, resource: EconomyFocusType.Food)),
                 Node("relentless_shifts", "Relentless Shifts",
-                    "Choose concentrated output. This seals Deep Stores.",
+                    "Drive every staffed building toward concentrated output.",
                     HeartNodeType.Keystone, HeartNodeBranch.Production, 3, 5, 52, 0,
                     null, "deep_stores",
                     Fx(HeartNodeEffectType.IncreaseResourceProductionPercent, 0.20,
@@ -451,15 +498,41 @@ namespace DeadWalls
                     null, null,
                     Fx(HeartNodeEffectType.AddSpellRadius, 0.65, softCap: 3.5)),
                 Node("inferno_heart", "Inferno Heart",
-                    "Choose maximum impact. This seals Chronomancer Heart.",
+                    "Shape Fireball around the largest possible first impact.",
                     HeartNodeType.Keystone, HeartNodeBranch.HeartMagic, 3, 5, 55, 0,
                     null, "chronomancer_heart",
                     Fx(HeartNodeEffectType.ModifySpellDamagePercent, 0.45)),
                 Node("chronomancer_heart", "Chronomancer Heart",
-                    "Choose faster cycles. This seals Inferno Heart.",
+                    "Shorten the ritual until Fireball cycles become relentless.",
                     HeartNodeType.Keystone, HeartNodeBranch.HeartMagic, 3, 5, 55, 0,
                     null, "inferno_heart",
                     Fx(HeartNodeEffectType.ReduceSpellCooldownPercent, 0.26, softCap: 0.60))
+            };
+        }
+
+        private static string[] GetLegacySourceNodeIds(string heartNodeId)
+        {
+            return heartNodeId switch
+            {
+                "rapid_archer_unlock" => Legacy("rapid_archer"),
+                "frost_archer_unlock" => Legacy("frost_archer"),
+                "bow_mastery" => Legacy("bow_mastery"),
+                "volley_mastery" => Legacy("volley_mastery"),
+                "rapid_drill" => Legacy("rapid_volley"),
+                "frostbite_tips" => Legacy("frost_arrows"),
+                "heavy_draw" => Legacy("bow_training"),
+                "living_ramparts" => Legacy("wall_reinforcement"),
+                "repair_efficiency" => Legacy("repair_efficiency"),
+                "layered_masonry" => Legacy("repair_crew"),
+                "lumber_covenant" => Legacy("wood_camp"),
+                "harvest_ledger" => Legacy("food_stores"),
+                "worker_camp" => Legacy("worker_camp"),
+                "dawn_housing" => Legacy("population_growth"),
+                "fireball_unlock" => Legacy("arcane_tower"),
+                "searing_flames" => Legacy("fire_power"),
+                "greater_blast" => Legacy("fire_radius"),
+                "arcane_focus" => Legacy("fire_cooldown"),
+                _ => Array.Empty<string>()
             };
         }
 
@@ -515,6 +588,11 @@ namespace DeadWalls
         }
 
         private static string[] Tags(params string[] values)
+        {
+            return values ?? Array.Empty<string>();
+        }
+
+        private static string[] Legacy(params string[] values)
         {
             return values ?? Array.Empty<string>();
         }

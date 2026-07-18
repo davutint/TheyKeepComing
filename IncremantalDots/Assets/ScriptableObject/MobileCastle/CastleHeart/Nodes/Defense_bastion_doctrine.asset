@@ -14,9 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: DeadWalls::DeadWalls.HeartNodeDefinitionSO
   Id: bastion_doctrine
   Title: Bastion Doctrine
-  Description: Choose permanent mass over recovery speed. This seals Salvage Doctrine.
+  Description: Raise a fortress of sheer mass and maximum integrity.
   Icon: {fileID: 21300000, guid: e1d8e47cca9198b448683f1db8543638, type: 3}
   Tags: []
+  LegacySourceNodeIds: []
   Type: 3
   Branch: 1
   Rarity: 1

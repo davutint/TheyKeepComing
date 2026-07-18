@@ -17,6 +17,8 @@ MonoBehaviour:
   Description: Interlocked courses absorb impacts before cracks can spread.
   Icon: {fileID: 21300000, guid: e1d8e47cca9198b448683f1db8543638, type: 3}
   Tags: []
+  LegacySourceNodeIds:
+  - repair_crew
   Type: 2
   Branch: 1
   Rarity: 1

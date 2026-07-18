@@ -14,9 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: DeadWalls::DeadWalls.HeartNodeDefinitionSO
   Id: storm_cadence
   Title: Storm Cadence
-  Description: Commit to relentless release speed. Choosing this seals Heavy Draw.
-  Icon: {fileID: 21300000, guid: 13fb0a3c745be144caecf6b3a5464f47, type: 3}
+  Description: Drive Basic Archers toward relentless release speed.
+  Icon: {fileID: 21300000, guid: e3bf4c0b3daae9c4895b211f89231be9, type: 3}
   Tags: []
+  LegacySourceNodeIds: []
   Type: 3
   Branch: 0
   Rarity: 1

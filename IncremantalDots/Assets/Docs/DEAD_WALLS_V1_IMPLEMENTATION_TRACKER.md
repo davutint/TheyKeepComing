@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.3
 > **Son tam kapsam denetimi:** 2026-07-17
 > **Aktif paket:** Post-Package V1 Closure - Owner Content, Narrative ve Tuning
-> **Aktif iş:** `DW-V1-CONTENT-HEART-NODE-CATALOG` - Lock Launch Castle Heart Node Catalog and Effect Specs
-> **İlerleme:** `434 / 442` tracker checkbox'ı tamamlandı - `%98,19`
+> **Aktif iş:** `DW-V1-CONTENT-KEYSTONE-TRADEOFFS` - Lock Launch Keystone Trade-off Pairs
+> **İlerleme:** `435 / 442` tracker checkbox'ı tamamlandı - `%98,42`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -594,7 +594,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [x] Yeni Heart purchase service yalnız `IHeartGraveEssenceWallet` kullanıyor; aktif UI legacy kaynak satın alımına fallback yapmıyor.
 - [x] Unlock node tek satın alma ile level 1 olur ve outgoing devam yolunu reveal eder.
 - [x] Repeatable node için exact `+1 / +10 / Buy Max` quote ve commit ekle.
-- [~] Evolution tek seferlik authored behavior effect'i uygular; production behavior pool'u owner onayı/E5 binding'i bekliyor.
+- [~] Evolution tek seferlik authored effect'i uygular ve launch numeric/role effect pool'u kilitlidir; Split Shot/Burning Ground/Second Blast gibi behavior evolution'larının canlı gameplay binding'i sonraki Fireball evolution paketini bekliyor.
 - [x] Keystone seçimi yalnız exact ve simetrik eş Keystone'u kapatır.
 - [x] Maliyette `long`, effect value/raw/actual hesabında `double` ve açık overflow fail'i kullan.
 - [x] Fire rate, cooldown, Frost slow, archer range ve spell radius için authored soft-cap/diminishing return uygula.
@@ -602,7 +602,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [x] Archer damage/fire rate/range/Frost slow target/policy contract'ı `GameManager.HeartRuntime` baseline/sink adapter'ına bağlı.
 - [x] Wall HP/repair, worker capacity/production/population ve Arrow capacity/efficiency target'ları live owner'lara bağlı; Arrow Heart bonusları paid level'lardan ayrı.
 - [x] Fireball unlock/damage/radius/cooldown contract'ı live ability state'e bağlı.
-- [~] Split Shot/Burning Ground/Second Blast behavior contract'ı yalnız authored effect'i kabul ediyor; launch pool içeriği owner onayı bekliyor.
+- [~] Split Shot/Burning Ground/Second Blast behavior contract'ı authored effect'i kabul ediyor; launch v1 katalog bu üç behavior flag'ini henüz author etmez ve canlı gameplay binding'i sonraki Fireball evolution paketini bekler.
 
 ### E5 - Heart ekranı ve pause
 
@@ -908,7 +908,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 | Workers | `MobilePopulationEconomySystem`, GameManager worker visuals | Target ratios + caps + representative density |
 | Archers | `GameManager`, `ArcherShootSystem` | Common 1000 cap + scalable target load |
 | Placement | `MobileCastleArcherTilePlacement` | 40x25 stable local points + version |
-| Heart | `GameManager.HeartRuntime` + `HeartScreenUI` generated graph/reveal/purchase/effect/pause ve exact v11 Continue replay owner'ı; legacy `TechTreeUI` aktif scene'den kaldırıldı, production catalog owner onayı bekliyor | Yalnız onaylı production node/balance content'i |
+| Heart | `GameManager.HeartRuntime` + `HeartScreenUI` generated graph/reveal/purchase/effect/pause ve exact v11 Continue replay owner'ı; legacy `TechTreeUI` aktif scene'den kaldırıldı; production v1 launch catalog/effect spec kilitli | Yalnız launch spec'te kayıtlı node/effect/cost içeriği; yeni behavior evolution ayrı versioned review ister |
 | Council | `CouncilRegularSchedule`, `CouncilComposer`, `CouncilContentPolicy`, `CouncilOptionPresentationUtility`, `CouncilEventUI`, catalog | Exact 3/6/9, guarded effects, exact option/timer, curated context/memory ve Heart/Meta role boundary hazır; regular-only scope |
 | Meta | `MetaProgression` | Death-only fixed list + idempotent receipt |
 | HUD | `MobileCastleHudRoot`, `HUDController` | Single Wall + minimal cycle + bottom abilities |
@@ -1298,6 +1298,12 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
   Dört branch, dört Keystone trade-off çifti, dört repeatable sink ve `15` Evolution node içeriyor;
   `64` deterministic seed sweep'inde generator validation temiz. Player-facing graph branch damarları,
   rarity/owned/locked chrome'u, okunabilir gerçek numeric sonuçlar ve run-scope metinleriyle polish edildi.
+  Launch içerik otoritesi `DEAD_WALLS_V1_CASTLE_HEART_LAUNCH_CATALOG.md` içinde bütün `35` node'un
+  effect/cost/depth/legacy provenance değerlerini kilitliyor. `18` yararlı legacy fikir tekil provenance
+  mapping'i taşırken root/Basic/Moat kapsamı migrate edilmiyor; node kimliği/effect/cost değişmediği için
+  exact graph uyumluluğu korunarak catalog version `1` bırakıldı. Node kartları branch/type hiyerarşisi,
+  node-specific production/archer/repair ikonları, açık `ESSENCE` dili ve türe özel satın alma fiilleriyle
+  ikinci FullHD polish turundan geçti.
   Purchase transaction'ı yalnız canonical `GraveEssence` wallet'ını kullanıyor; mevcut exact graph save/
   Continue ve Grave Essence reset sözleşmeleri tam PlayMode regresyonunda korundu. Targeted production
   EditMode `3/3`, targeted production PlayMode `1/1`, full EditMode `385/385`, full PlayMode
@@ -1343,7 +1349,7 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 - [x] Faz göstergesi: Owner `B - Celestial Dial` yönünü seçti; uygulandı, görsel eşleşme turundan geçti ve `A - Horizon Ribbon` geri dönüş alternatifi karar dokümanında arşivlendi.
 - [x] Meta currency adı, ikon ve death-screen copy: `LAST EMBERS / EMBERS`, `last_embers` stable presentation Id, amber cracked-ember icon ve polished `THE WALL HAS FALLEN` screen seti.
 - [x] Narrative premise/world pitch/opening copy: Steward rolü, stand/Heart rekindle/Last Embers canon'u, deliberate unknown guardrail'leri ve modal eklemeyen `THE WORLD ENDED. THE SIEGE DID NOT.` main-menu açılışı kilitlendi.
-- [ ] Launch Heart node catalog ve effect specs.
+- [x] Launch Heart node catalog ve effect specs: production v1 `35` node / `4` branch / `4` Keystone pair / `4` repeatable sink exact effect-cost-depth tablolarıyla kilitlendi; `18` legacy fikir provenance-only migrate edildi, root/Basic/Moat dışarıda bırakıldı ve player-facing graph ikinci FullHD polish turundan geçti.
 - [x] Council launch template/atom listesi + tekrar/bütçe testi.
 - [ ] En az 3 Keystone trade-off çifti.
 - [ ] Fireball için 2-3 evolution spec ve VFX yönü.
@@ -1527,3 +1533,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-18 | `DW-V1-DOD-RELEASE-TEST-REPORTS` full regression + migration matrix + fresh soak closure | Run save destek sınırı `v3-v15` kaynak/test matrisiyle denetlendi; eksik v7 finite-Arrow CAP/EFF `L0` migration regresyonu eklendi. RunPersistence + Meta v1/v2->v3 + legacy regular-Council grubu birlikte çalıştırıldı. Explicit release-cap soak güncel kodla yeniden alındı. İlk full PlayMode turundaki 2K Fireball test-order dalgalanmasının realtime bekleme sırasında yetersiz simulation update'inden geldiği kanıtlandı; fixture minimum queue/refill frame guard'ıyla stabilize edildi, gameplay değişmedi. Yeni `DEAD_WALLS_V1_RELEASE_VERIFICATION_REPORT.md` bütün kanıtı tek yerde toplar | Migration group `55/55`; fresh soak `1/1`, cap `900`, 3.600 frame average/P95/max `6,227/8,227/34,610 ms`, backlog `9.989 -> 0`, demanded/spawned `10.889/10.889`, Arrow rent/return `45.000/45.000`; stabilized 2K targeted `1/1`; full EditMode `386/386`; clean full PlayMode `85 pass + 2 explicit profiler/soak skip`; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `432/442` |
 | 2026-07-18 | `DW-V1-CONTENT-META-CURRENCY-IDENTITY` Last Embers catalog migration + death-screen polish | Generic player-facing `SOULS` kimliği `MetaUpgradeCatalogSO.Presentation v2` altında `LAST EMBERS / EMBERS` ve stable `last_embers` Id'sine taşındı. Generated transparent cracked-ember icon Sprite/Point/256 olarak production kataloga bağlandı. Migration reward settings, 11 stable upgrade asset'i, legacy `Souls` save alanı, bakiye, upgrade level/pool/receipt state'ini koruyor. Scene-owned Game Over ekranı `1120x880` dark rounded frame, run summary, reward bandı, iconlu bakiye, açıklamalı 68px satırlar, maskeli vertical ScrollRect ve ayrı next-run CTA ile yeniden kuruldu | Imagegen chroma-key + local alpha validation temiz; targeted EditMode `15/15` + final identity regression `2/2`; full EditMode `388/388`; full PlayMode `85 pass + 2 explicit profiler/soak skip`; FullHD Game View visual QA; scene validation `0` issue; final Console `0 error / 0 warning`; tracker `433/442` |
 | 2026-07-18 | `DW-V1-CONTENT-NARRATIVE-PREMISE` canon premise + opening copy | Player role `Steward`, run'ın anlatı adı `stand`, Castle Heart'ın Wall düşüşünde stand'i yeniden tutuşturması ve yalnız `Last Embers` hafızasının kalması tek canon spec'te kilitlendi. Heart/dead origin, named kingdom/faction, chosen hero, boss/elite ve Council loop awareness deliberate unknown/kapsam dışı kaldı. Açılış uzun prologue modal'i yerine `DEAD WALLS` / `THE WORLD ENDED. THE SIEGE DID NOT.` / `BEGIN THE STAND` üçlüsüyle gerçek MainMenuScene'e bağlandı | Blueprint PDF page `4/5/39` visual audit; targeted narrative EditMode `2/2`; full EditMode `390/390`; full PlayMode `85 pass + 2 explicit profiler/soak skip`; FullHD MainMenu Play Mode visual QA; MainMenu repair menu + runtime/doc/scene drift guard; `MainMenuScene` ve `NewGameScene` validation `0` issue; `NewGameScene` aktif/clean; final Console `0 error / 0 warning`; tracker `434/442` |
+| 2026-07-18 | `DW-V1-CONTENT-HEART-NODE-CATALOG` launch catalog lock + clean legacy provenance + graph polish | Production v1 catalog'un `35` stable node Id'si, branch/type dağılımı, effect/cost/depth/soft-cap değerleri ve garanti/sink sözleşmesi yeni launch authority dokümanında kilitlendi. Builder, yararlı `18` legacy TechTree fikrini yalnız provenance olarak yeni asset'lere yazar; eski kaynak maliyeti, prerequisite/reveal edge'i ve level state'i taşınmaz, system root/Basic/Moat bilinçli dışarıda kalır. Runtime effect/cost/Id semantiği değişmediği için catalog v1 ve exact graph save uyumluluğu korundu. Heart kartları doğru node-specific ikonlar, kesilmeyen branch eyebrow, açık `ESSENCE` maliyeti, `UNLOCK/DEEPEN/EVOLVE/COMMIT` fiilleri ve tekrarsız Keystone lock copy'siyle polish edildi | Production rebuild `35` canonical node / scene binding true; catalog fingerprint + classification + provenance + spec-sync targeted EditMode `6/6`; full EditMode `393/393`; full PlayMode `85 pass + 2 explicit profiler/soak skip`; FullHD root/initial, fully revealed graph ve Keystone card visual QA; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `435/442` |

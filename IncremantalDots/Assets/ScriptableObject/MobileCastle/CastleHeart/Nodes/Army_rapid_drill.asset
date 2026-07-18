@@ -15,8 +15,10 @@ MonoBehaviour:
   Id: rapid_drill
   Title: Clockwork Volley
   Description: Rapid Archers hold a faster, steadier cadence.
-  Icon: {fileID: 21300000, guid: 13fb0a3c745be144caecf6b3a5464f47, type: 3}
+  Icon: {fileID: 21300000, guid: e3bf4c0b3daae9c4895b211f89231be9, type: 3}
   Tags: []
+  LegacySourceNodeIds:
+  - rapid_volley
   Type: 2
   Branch: 0
   Rarity: 1

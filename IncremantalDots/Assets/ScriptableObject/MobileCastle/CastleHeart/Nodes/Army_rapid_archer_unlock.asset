@@ -15,9 +15,11 @@ MonoBehaviour:
   Id: rapid_archer_unlock
   Title: Rapid Doctrine
   Description: Unlock Rapid Archer recruitment for this run.
-  Icon: {fileID: 21300000, guid: 13fb0a3c745be144caecf6b3a5464f47, type: 3}
+  Icon: {fileID: 21300000, guid: e3bf4c0b3daae9c4895b211f89231be9, type: 3}
   Tags:
   - guarantee:rapid
+  LegacySourceNodeIds:
+  - rapid_archer
   Type: 0
   Branch: 0
   Rarity: 0

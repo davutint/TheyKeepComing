@@ -78,6 +78,10 @@ namespace DeadWalls
         public Sprite Icon;
         public string[] Tags = Array.Empty<string>();
 
+        [Header("Legacy Migration Provenance")]
+        [Tooltip("Bu launch node'una fikir/effect kaynagi olan dormant TechTree node Id'leri. Runtime progression icin kullanilmaz.")]
+        public string[] LegacySourceNodeIds = Array.Empty<string>();
+
         [Header("Classification")]
         public HeartNodeType Type = HeartNodeType.Unlock;
         public HeartNodeBranch Branch = HeartNodeBranch.Army;
@@ -145,6 +149,21 @@ namespace DeadWalls
             HeartNodeEffect[] effects = Effects ?? Array.Empty<HeartNodeEffect>();
             for (int i = 0; i < effects.Length; i++)
                 CollectEffectValidationErrors(effects[i], i, errors);
+
+            string[] legacySourceIds = LegacySourceNodeIds ?? Array.Empty<string>();
+            var seenLegacySourceIds = new HashSet<string>(StringComparer.Ordinal);
+            for (int i = 0; i < legacySourceIds.Length; i++)
+            {
+                string sourceId = legacySourceIds[i];
+                if (string.IsNullOrWhiteSpace(sourceId))
+                {
+                    errors.Add($"LegacySourceNodeIds[{i}] bos olamaz.");
+                    continue;
+                }
+
+                if (!seenLegacySourceIds.Add(sourceId))
+                    errors.Add($"Tekrarlanan legacy source Id: {sourceId}");
+            }
         }
 
         private static void CollectEffectValidationErrors(

@@ -15,8 +15,10 @@ MonoBehaviour:
   Id: frostbite_tips
   Title: Frostbite Tips
   Description: Frost arrows drive enemy movement closer to a frozen crawl.
-  Icon: {fileID: 21300000, guid: 13fb0a3c745be144caecf6b3a5464f47, type: 3}
+  Icon: {fileID: 21300000, guid: 9bd98158bb639e0428f30e48fbd4d495, type: 3}
   Tags: []
+  LegacySourceNodeIds:
+  - frost_arrows
   Type: 2
   Branch: 0
   Rarity: 1

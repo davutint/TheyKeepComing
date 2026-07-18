@@ -16,8 +16,10 @@ MonoBehaviour:
   Title: Worker Quarters
   Description: Permanent stations expand every building's worker capacity for this
     run.
-  Icon: {fileID: 21300000, guid: 5f2a63bfc612d6c409f508b9db58bc10, type: 3}
+  Icon: {fileID: 21300000, guid: e0fc0358082a74643b2739d6e5776576, type: 3}
   Tags: []
+  LegacySourceNodeIds:
+  - worker_camp
   Type: 2
   Branch: 2
   Rarity: 1

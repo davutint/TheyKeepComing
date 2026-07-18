@@ -14,9 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: DeadWalls::DeadWalls.HeartNodeDefinitionSO
   Id: salvage_doctrine
   Title: Salvage Doctrine
-  Description: Choose ruthless repair economy over raw mass. This seals Bastion Doctrine.
-  Icon: {fileID: 21300000, guid: e1d8e47cca9198b448683f1db8543638, type: 3}
+  Description: Standardize recovery around ruthless Stone efficiency.
+  Icon: {fileID: 21300000, guid: ef99280ec5252b6469fd8372b8c42f95, type: 3}
   Tags: []
+  LegacySourceNodeIds: []
   Type: 3
   Branch: 1
   Rarity: 1

@@ -392,9 +392,10 @@ namespace DeadWalls
             {
                 SetText(view.Title, "CASTLE HEART");
                 SetText(view.Level, "ROOT");
-                SetText(view.Description, "A living run core. Every purchase survives Continue and dies with the Wall.");
+                SetText(view.Description,
+                    "Shape this stand with Grave Essence. Every awakened path endures until the Wall falls.");
                 SetText(view.Cost, $"{FormatLong(runtime.GraveEssenceAmount)} GRAVE ESSENCE");
-                SetText(view.Status, "FOUR PATHS  /  ONE RUN");
+                SetText(view.Status, "FOUR PATHS  /  ONE STAND");
                 SetIcon(view, null, "DW", RootColor);
                 SetButton(view, false, false, string.Empty);
                 SetBackground(view, RootColor);
@@ -407,7 +408,7 @@ namespace DeadWalls
             {
                 SetText(view.Title, "VEILED");
                 SetText(view.Level, $"DEPTH {node.Depth}");
-                SetText(view.Description, "Purchase the connected node to reveal this choice.");
+                SetText(view.Description, "Awaken a connected node to uncover this choice.");
                 SetText(view.Cost, string.Empty);
                 SetText(view.Status, GetBranchName(node.Branch));
                 SetIcon(view, null, "?", branchColor);
@@ -418,9 +419,7 @@ namespace DeadWalls
             }
 
             SetText(view.Title, string.IsNullOrWhiteSpace(node.Title) ? "UNNAMED" : node.Title.ToUpperInvariant());
-            SetText(view.Level, node.Type == HeartNodeType.Repeatable
-                ? $"LEVEL {node.Level}"
-                : node.Type?.ToString().ToUpperInvariant() ?? string.Empty);
+            SetText(view.Level, BuildNodeEyebrow(node));
             SetText(view.Description, BuildDescription(node));
             SetIcon(view, node.Icon, BuildFallback(node.Title), branchColor);
 
@@ -453,20 +452,18 @@ namespace DeadWalls
             else if (quote != null)
             {
                 SetText(view.Cost,
-                    $"{FormatLong(quote.TotalGraveEssenceCost)} GE  /  +{quote.LevelsToBuy}");
+                    $"{FormatLong(quote.TotalGraveEssenceCost)} ESSENCE  /  +{quote.LevelsToBuy}");
             }
             else
             {
                 SetText(view.Cost, evaluation?.Message ?? string.Empty);
             }
 
-            string status = node.Level > 0 && node.Type != HeartNodeType.Repeatable
-                ? "OWNED"
-                : $"{(node.Rarity == HeartNodeRarity.Rare ? "RARE " : string.Empty)}{node.Type}".ToUpperInvariant();
+            string status = BuildNodeStatus(node);
             if (node.KeystoneConflict != null)
             {
                 status = node.KeystoneConflict.WillLockOnPurchase
-                    ? $"LOCKS {node.KeystoneConflict.ConflictingChoiceTitle}"
+                    ? $"LOCKS {node.KeystoneConflict.ConflictingChoiceTitle.ToUpperInvariant()}"
                     : status;
             }
             SetText(view.Status, status);
@@ -475,7 +472,7 @@ namespace DeadWalls
                 view,
                 true,
                 canPurchase,
-                alreadyOwned ? "OWNED" : canPurchase ? "PURCHASE" : "UNAVAILABLE");
+                alreadyOwned ? "AWAKENED" : canPurchase ? GetPurchaseAction(node.Type) : "UNAVAILABLE");
             SetBackground(view, Color.Lerp(HiddenColor, branchColor, node.Level > 0 ? 0.48f : 0.28f));
             SetNodeChrome(view, branchColor, node.Rarity == HeartNodeRarity.Rare,
                 node.Level > 0 ? new Color(1f, 0.75f, 0.32f, 0.95f) : branchColor,
@@ -508,7 +505,9 @@ namespace DeadWalls
             if (result.NewlyRevealedNodeIds.Count > 0)
                 PlaySfx(RevealClip, 0.75f);
             ShowToast(
-                $"{node.Title.ToUpperInvariant()}  +{result.Quote.LevelsToBuy}",
+                node.Type == HeartNodeType.Repeatable
+                    ? $"{node.Title.ToUpperInvariant()}  /  LEVEL {result.Quote.NewLevel}"
+                    : $"{node.Title.ToUpperInvariant()} AWAKENED",
                 true);
             RefreshScreen();
         }
@@ -596,7 +595,7 @@ namespace DeadWalls
                 HeartEffectPresentation effect = node.Effects[i];
                 if (builder.Length > 0)
                     builder.AppendLine();
-                builder.Append(effect.Label);
+                builder.Append("EFFECT  /  ").Append(effect.Label);
                 if (!string.IsNullOrWhiteSpace(effect.CurrentValueText))
                 {
                     builder.Append(": ")
@@ -608,16 +607,39 @@ namespace DeadWalls
                 }
             }
 
-            if (node.KeystoneConflict != null
-                && !string.IsNullOrWhiteSpace(node.KeystoneConflict.ConflictingChoiceTitle))
-            {
-                if (builder.Length > 0)
-                    builder.AppendLine();
-                builder.Append("Choosing this seals ")
-                    .Append(node.KeystoneConflict.ConflictingChoiceTitle)
-                    .Append('.');
-            }
             return builder.ToString();
+        }
+
+        private static string BuildNodeEyebrow(HeartGraphNodePresentation node)
+        {
+            return node.Branch == HeartNodeBranch.HeartMagic
+                ? "HEART MAGIC"
+                : GetBranchName(node.Branch);
+        }
+
+        private static string BuildNodeStatus(HeartGraphNodePresentation node)
+        {
+            if (node.Level > 0 && node.Type != HeartNodeType.Repeatable)
+                return "AWAKENED";
+            if (node.Type == HeartNodeType.Repeatable)
+                return node.Level > 0
+                    ? $"REPEATABLE  /  LEVEL {node.Level}"
+                    : "REPEATABLE SINK";
+            if (node.Type == HeartNodeType.Evolution)
+                return "RARE  /  EVOLUTION";
+            return node.Type?.ToString().ToUpperInvariant() ?? "AVAILABLE";
+        }
+
+        private static string GetPurchaseAction(HeartNodeType? type)
+        {
+            return type switch
+            {
+                HeartNodeType.Unlock => "UNLOCK",
+                HeartNodeType.Repeatable => "DEEPEN",
+                HeartNodeType.Evolution => "EVOLVE",
+                HeartNodeType.Keystone => "COMMIT",
+                _ => "AWAKEN"
+            };
         }
 
         private void ApplyScreenPolish()

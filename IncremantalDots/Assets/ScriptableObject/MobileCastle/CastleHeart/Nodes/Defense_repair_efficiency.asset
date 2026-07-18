@@ -15,8 +15,10 @@ MonoBehaviour:
   Id: repair_efficiency
   Title: Measured Repairs
   Description: Salvage exact cuts and reduce every future Wall repair cost.
-  Icon: {fileID: 21300000, guid: e1d8e47cca9198b448683f1db8543638, type: 3}
+  Icon: {fileID: 21300000, guid: ef99280ec5252b6469fd8372b8c42f95, type: 3}
   Tags: []
+  LegacySourceNodeIds:
+  - repair_efficiency
   Type: 2
   Branch: 1
   Rarity: 1

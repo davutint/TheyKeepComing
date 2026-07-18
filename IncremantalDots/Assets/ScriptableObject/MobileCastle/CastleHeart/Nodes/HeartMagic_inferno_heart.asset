@@ -14,9 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: DeadWalls::DeadWalls.HeartNodeDefinitionSO
   Id: inferno_heart
   Title: Inferno Heart
-  Description: Choose maximum impact. This seals Chronomancer Heart.
+  Description: Shape Fireball around the largest possible first impact.
   Icon: {fileID: -6607481912129624618, guid: 79e73aa61548fcb48b90eff46912e31d, type: 3}
   Tags: []
+  LegacySourceNodeIds: []
   Type: 3
   Branch: 3
   Rarity: 1
