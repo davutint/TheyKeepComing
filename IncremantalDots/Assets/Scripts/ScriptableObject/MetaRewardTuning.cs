@@ -5,19 +5,19 @@ using UnityEngine;
 namespace DeadWalls
 {
     /// <summary>
-    /// Olumde verilen Souls miktarinin production tuning sahibi. Kill katkisi yuksek
-    /// surulerde meta ekonomiyi patlatmamak icin uc azalan banda ayrilir; ilerleme,
-    /// tamamlanan geceler, peak population ve yeni day rekoruyla da odullendirilir.
+    /// Olumde verilen Souls miktarinin production tuning sahibi. Her Skeleton tam olarak
+    /// 1 Soul kazandirir; ilerleme, tamamlanan geceler, peak population ve yeni day
+    /// rekoru ayri ek odul katmanlari olarak korunur.
     /// </summary>
     [Serializable]
     public sealed class MetaRewardSettings
     {
-        [Header("Diminishing Kill Bands")]
+        [Header("One Soul Per Skeleton")]
         [Min(1)] public int FirstKillBandLimit = 100;
         [Min(2)] public int SecondKillBandLimit = 1000;
         [Min(0f)] public float FirstBandSoulsPerKill = 1f;
-        [Min(0f)] public float SecondBandSoulsPerKill = 0.25f;
-        [Min(0f)] public float OverflowSoulsPerKill = 0.05f;
+        [Min(0f)] public float SecondBandSoulsPerKill = 1f;
+        [Min(0f)] public float OverflowSoulsPerKill = 1f;
 
         [Header("Run Progress Weights")]
         [Min(0f)] public float SoulsPerDayReached = 10f;

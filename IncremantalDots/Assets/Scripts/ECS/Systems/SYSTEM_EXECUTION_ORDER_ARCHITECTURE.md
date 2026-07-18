@@ -168,6 +168,10 @@ Presentation tarafinda `SpriteAnimationSystem` UV rect hesaplarini yapar.
 ### ArrowHitSystem
 
 - Mesafe `< 0.5` ise hasar uygular ve pooled oku rezerve dondurur.
+- Ayni hedefe ayni frame'de ulasan birden fazla okun HP yazimi ve gosterilen gercek hasari
+  kaybetmemesi icin hit job'u tek sirali calisir; projectile move/targeting parallel kalir.
+- Her gercek Basic/Rapid/Frost hasari, overkill'i mevcut HP'ye clamp edilmis
+  `CombatDamageNumberEvent` olarak ayrica yayimlanir.
 - Timeout, disabled hedef ve generation mismatch ayni pool return yolunu kullanir.
 - Frost ok isabetinde hedefteki `ZombieSlow` duration'ini refresh eder.
 - Hit feedback, raw isabet basina entity uretmez. Parallel hit job'u ayni `0.75` world-unit
@@ -184,6 +188,8 @@ Presentation tarafinda `SpriteAnimationSystem` UV rect hesaplarini yapar.
   ECB ile siler; tek `IJobEntity` yaricap ici TUM zombilerin `CurrentHP`'sini dusurur.
 - `RequireForUpdate<FireballStrike>` — cast yokken hic kosmaz (cooldown'lu oyuncu aksiyonu).
 - Olum akisina karismaz (HP<=0 -> ZombieDeathSystem); pause guard ArrowHit ile ayni.
+- Primary, SecondBlast ve BurningGroundPulse hasari mevcut HP'ye clamp edilir ve her gercek
+  uygulama kendi `CombatDamageNumberEvent` kaydini uretir.
 
 ### DamageApplySystem
 
@@ -194,12 +200,16 @@ Presentation tarafinda `SpriteAnimationSystem` UV rect hesaplarini yapar.
 
 ### ZombieDeathSystem / ZombieAnimationStateSystem
 
-- Ayni frame olen zombiler arasindan atomik claim ile tek temsilci death SFX konumu secilir; 10K gecici event entity'si uretilmez.
-- Death animasyonuna geciste enableable `DeathTimer` job icinde dogrudan yazilip acilir; entity basina ECB komutu yoktur.
+- `CurrentHP <= 0` ile ilk kez Dead'e gecen her Skeleton ayni frame `GameStateData.TotalKills`
+  degerini tam bir artirir ve `Amount=1` `SoulPickupEvent` uretir.
+- Ayni frame olenlerin SFX'i tek aggregate event'te `Multiplicity` ile tasinir; ayri ses yigilmaz.
+- Death animasyonuna geciste enableable `DeathTimer` job icinde dogrudan yazilip acilir;
+  ECB yalniz Soul presentation event'lerini Simulation sonunda yayimlamak icin kullanilir.
 
 ### DamageCleanupSystem
 
 - Death timer biterse XP ekler; pool uyelerini toplu olarak Burst job'da resetler ve tek buffer/state commit ile pool rezervine dondurur.
+- `TotalKills` veya Soul eklemez; bu odul olum aninda `ZombieDeathSystem` tarafindan tek kez verilir.
 - Mobile normal mode'da kill reward'i `ResourceAccumulator` uzerine ekler.
 - Return entity'yi scale `0` ve disabled `ZombieTag` ile inactive yapar; ayni entity sonraki rent'te yeni generation alir.
 - Worker economy aktifse kill reward `WorkerEconomyRewardMultiplier` ile azaltilir.

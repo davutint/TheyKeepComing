@@ -9,19 +9,19 @@ namespace DeadWalls.Tests
             "Assets/ScriptableObject/MobileCastle/Meta/MetaUpgradeCatalog.asset";
 
         [Test]
-        public void DefaultReward_UsesDiminishingKillBandsAndAllApprovedRunInputs()
+        public void DefaultReward_GivesExactlyOneSoulPerKillAndKeepsRunBonuses()
         {
             var settings = new MetaRewardSettings();
 
             Assert.That(MetaRewardCalculator.TryCalculate(
                 settings, 10, 10_000, 200, 9, out MetaRewardQuote quote), Is.True);
 
-            Assert.That(quote.KillSouls, Is.EqualTo(775));
+            Assert.That(quote.KillSouls, Is.EqualTo(10_000));
             Assert.That(quote.DaySouls, Is.EqualTo(100));
             Assert.That(quote.NightSouls, Is.EqualTo(225));
             Assert.That(quote.PopulationSouls, Is.EqualTo(40));
             Assert.That(quote.RecordSouls, Is.EqualTo(500));
-            Assert.That(quote.TotalSouls, Is.EqualTo(1640));
+            Assert.That(quote.TotalSouls, Is.EqualTo(10_865));
             Assert.That(quote.NightsSurvived, Is.EqualTo(9));
             Assert.That(quote.NewRecord, Is.True);
             Assert.That(MetaRewardCalculator.IsStructurallyValid(quote), Is.True);
@@ -35,12 +35,12 @@ namespace DeadWalls.Tests
             Assert.That(MetaRewardCalculator.TryCalculate(
                 settings, 4, 1000, 100, 4, out MetaRewardQuote quote), Is.True);
 
-            Assert.That(quote.KillSouls, Is.EqualTo(325));
+            Assert.That(quote.KillSouls, Is.EqualTo(1000));
             Assert.That(quote.DaySouls, Is.EqualTo(40));
             Assert.That(quote.NightSouls, Is.EqualTo(75));
             Assert.That(quote.PopulationSouls, Is.EqualTo(20));
             Assert.That(quote.RecordSouls, Is.Zero);
-            Assert.That(quote.TotalSouls, Is.EqualTo(460));
+            Assert.That(quote.TotalSouls, Is.EqualTo(1135));
             Assert.That(quote.NewRecord, Is.False);
         }
 
@@ -71,13 +71,13 @@ namespace DeadWalls.Tests
             MetaRunResult first = MetaProgression.ApplyRunResult(state, "quoted-run", quote);
             MetaRunResult duplicate = MetaProgression.ApplyRunResult(state, "quoted-run", quote);
 
-            Assert.That(first.SoulsEarned, Is.EqualTo(660));
-            Assert.That(state.Souls, Is.EqualTo(660));
+            Assert.That(first.SoulsEarned, Is.EqualTo(1335));
+            Assert.That(state.Souls, Is.EqualTo(1335));
             Assert.That(state.BestDay, Is.EqualTo(4));
             Assert.That(state.TotalKillsAllTime, Is.EqualTo(1000));
             Assert.That(duplicate.AlreadyRewarded, Is.True);
             Assert.That(duplicate.SoulsEarned, Is.Zero);
-            Assert.That(state.Souls, Is.EqualTo(660));
+            Assert.That(state.Souls, Is.EqualTo(1335));
         }
 
         [Test]
@@ -99,6 +99,9 @@ namespace DeadWalls.Tests
 
             Assert.That(catalog, Is.Not.Null);
             Assert.That(catalog.ValidateCatalog(), Is.Empty);
+            Assert.That(catalog.RewardSettings.FirstBandSoulsPerKill, Is.EqualTo(1f));
+            Assert.That(catalog.RewardSettings.SecondBandSoulsPerKill, Is.EqualTo(1f));
+            Assert.That(catalog.RewardSettings.OverflowSoulsPerKill, Is.EqualTo(1f));
             Assert.That(catalog.Upgrades, Has.Length.EqualTo(11));
             AssertUpgrade(catalog, "start_wood", 150, 0.60f, 0, 75f);
             AssertUpgrade(catalog, "start_stone", 175, 0.65f, 0, 50f);
@@ -115,6 +118,28 @@ namespace DeadWalls.Tests
             Assert.That(catalog.GetUpgrade("wall_hp").GetTotalEffect(5), Is.EqualTo(0.25d).Within(0.0001d));
             Assert.That(catalog.GetUpgrade("production").GetTotalEffect(5), Is.EqualTo(0.15d).Within(0.0001d));
             Assert.That(catalog.GetUpgrade("essence_gain").GetTotalEffect(10), Is.EqualTo(0.50d).Within(0.0001d));
+        }
+
+        [TestCase(0)]
+        [TestCase(99)]
+        [TestCase(100)]
+        [TestCase(101)]
+        [TestCase(1000)]
+        [TestCase(1001)]
+        [TestCase(10_000)]
+        public void ProductionReward_EverySkeletonContributesExactlyOneSoul(int kills)
+        {
+            MetaUpgradeCatalogSO catalog = AssetDatabase.LoadAssetAtPath<MetaUpgradeCatalogSO>(CatalogPath);
+
+            Assert.That(catalog, Is.Not.Null);
+            Assert.That(MetaRewardCalculator.TryCalculate(
+                catalog.RewardSettings,
+                1,
+                kills,
+                0,
+                1,
+                out MetaRewardQuote quote), Is.True);
+            Assert.That(quote.KillSouls, Is.EqualTo(kills));
         }
 
         private static void AssertUpgrade(

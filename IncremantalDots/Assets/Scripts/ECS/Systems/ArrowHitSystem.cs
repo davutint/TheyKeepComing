@@ -63,7 +63,10 @@ namespace DeadWalls
                 ArrowPoolEntity = SystemAPI.GetSingletonEntity<ArrowPoolRuntimeData>(),
                 HitCandidates = _hitCandidates.AsParallelWriter(),
                 ECB = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter()
-            }.ScheduleParallel(clearHandle);
+            // Birden fazla ok ayni hedefe ayni frame'de ulasabilir. Hasar ve player-facing
+            // sayinin birebir eslesmesi icin hedef HP yazimlari tek sirali job'da yapilir;
+            // onceki parallel ComponentLookup yazimi ayni hedefte lost-update riski tasiyordu.
+            }.Schedule(clearHandle);
 
             CombatFeedbackBudgetTelemetryData previousTelemetry =
                 state.EntityManager.GetComponentData<CombatFeedbackBudgetTelemetryData>(
@@ -124,11 +127,17 @@ namespace DeadWalls
 
                 if (dist < 0.5f)
                 {
+                    float appliedDamage = 0f;
                     if (StatsLookup.HasComponent(target))
                     {
                         var zombieStats = StatsLookup[target];
-                        zombieStats.CurrentHP -= arrow.Damage;
-                        StatsLookup[target] = zombieStats;
+                        float previousHp = math.max(0f, zombieStats.CurrentHP);
+                        appliedDamage = math.min(previousHp, math.max(0f, arrow.Damage));
+                        if (appliedDamage > 0f)
+                        {
+                            zombieStats.CurrentHP = previousHp - appliedDamage;
+                            StatsLookup[target] = zombieStats;
+                        }
                     }
 
                     if (arrow.ArcherType == ArcherType.Frost &&
@@ -163,8 +172,29 @@ namespace DeadWalls
                         Scale = frostHit ? 0.11f : 0.08f
                     });
 
+                    if (appliedDamage > 0f)
+                    {
+                        Entity damageNumberEvent = ECB.CreateEntity(sortKey);
+                        ECB.AddComponent(sortKey, damageNumberEvent, new CombatDamageNumberEvent
+                        {
+                            Position = hitPosition,
+                            AppliedDamage = appliedDamage,
+                            Source = ResolveDamageSource(arrow.ArcherType)
+                        });
+                    }
+
                     ReturnToPool(entity, sortKey);
                 }
+            }
+
+            private static PlayerDamageSourceType ResolveDamageSource(ArcherType archerType)
+            {
+                return archerType switch
+                {
+                    ArcherType.Rapid => PlayerDamageSourceType.RapidArrow,
+                    ArcherType.Frost => PlayerDamageSourceType.FrostArrow,
+                    _ => PlayerDamageSourceType.BasicArrow
+                };
             }
 
             private void ReturnToPool(Entity entity, int sortKey)

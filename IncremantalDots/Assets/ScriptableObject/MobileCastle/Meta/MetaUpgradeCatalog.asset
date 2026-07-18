@@ -29,8 +29,8 @@ MonoBehaviour:
     FirstKillBandLimit: 100
     SecondKillBandLimit: 1000
     FirstBandSoulsPerKill: 1
-    SecondBandSoulsPerKill: 0.25
-    OverflowSoulsPerKill: 0.05
+    SecondBandSoulsPerKill: 1
+    OverflowSoulsPerKill: 1
     SoulsPerDayReached: 10
     SoulsPerNightSurvived: 25
     SoulsPerPeakPopulation: 0.2

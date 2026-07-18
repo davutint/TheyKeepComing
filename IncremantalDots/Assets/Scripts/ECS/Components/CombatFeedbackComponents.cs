@@ -72,6 +72,16 @@ namespace DeadWalls
         FireballBlast
     }
 
+    public enum PlayerDamageSourceType : byte
+    {
+        BasicArrow,
+        RapidArrow,
+        FrostArrow,
+        Fireball,
+        FireballSecondBlast,
+        FireballBurningGround
+    }
+
     public struct CombatVfxEvent : IComponentData
     {
         public float3 Position;
@@ -90,6 +100,27 @@ namespace DeadWalls
         public float Volume;
         public float Pitch;
         public int Multiplicity;
+    }
+
+    /// <summary>
+    /// Oyuncu kaynakli tek bir gercek hasar uygulamasinin player-facing kaydi.
+    /// Event budget ile elenmez; Mono presentation bridge tarafindan tuketilir.
+    /// </summary>
+    public struct CombatDamageNumberEvent : IComponentData
+    {
+        public float3 Position;
+        public float AppliedDamage;
+        public PlayerDamageSourceType Source;
+    }
+
+    /// <summary>
+    /// Bir Skeleton'in olum aninda kazandirdigi Soul ve animasyon baslangic konumu.
+    /// Amount production contract'inda her olum icin tam olarak 1'dir.
+    /// </summary>
+    public struct SoulPickupEvent : IComponentData
+    {
+        public float3 Position;
+        public int Amount;
     }
 
     public struct CombatHitFeedbackCandidate

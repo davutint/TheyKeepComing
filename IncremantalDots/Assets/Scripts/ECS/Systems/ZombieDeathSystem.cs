@@ -1,7 +1,5 @@
-using System.Threading;
 using Unity.Burst;
 using Unity.Collections;
-using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
@@ -14,76 +12,99 @@ namespace DeadWalls
     [UpdateAfter(typeof(ArrowHitSystem))]
     public partial struct ZombieDeathSystem : ISystem
     {
+        public void OnCreate(ref SystemState state)
+        {
+            state.RequireForUpdate<GameStateData>();
+        }
+
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            var feedbackClaim = new NativeArray<int>(
-                1, Allocator.TempJob, NativeArrayOptions.ClearMemory);
-            var feedbackPosition = new NativeArray<float3>(
-                1, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            GameStateData currentGameState = SystemAPI.GetSingleton<GameStateData>();
+            if (currentGameState.IsGameOver || currentGameState.IsLevelUpPending)
+                return;
+
+            var deathPositions = new NativeQueue<float3>(Allocator.TempJob);
             var ecb = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>()
                 .CreateCommandBuffer(state.WorldUnmanaged);
 
             JobHandle deathHandle = new DeathCheckJob
             {
-                FeedbackClaim = feedbackClaim,
-                FeedbackPosition = feedbackPosition
+                DeathPositions = deathPositions.AsParallelWriter()
             }.ScheduleParallel(state.Dependency);
 
-            JobHandle feedbackHandle = new EmitDeathSfxJob
+            JobHandle rewardHandle = new ApplyDeathRewardsJob
             {
-                FeedbackClaim = feedbackClaim,
-                FeedbackPosition = feedbackPosition,
+                DeathPositions = deathPositions,
+                GameStateEntity = SystemAPI.GetSingletonEntity<GameStateData>(),
+                GameStateLookup = SystemAPI.GetComponentLookup<GameStateData>(false),
                 ECB = ecb
             }.Schedule(deathHandle);
 
-            JobHandle claimDisposeHandle = feedbackClaim.Dispose(feedbackHandle);
-            state.Dependency = feedbackPosition.Dispose(claimDisposeHandle);
+            state.Dependency = deathPositions.Dispose(rewardHandle);
         }
 
         [BurstCompile]
         [WithAll(typeof(ZombieTag))]
         partial struct DeathCheckJob : IJobEntity
         {
-            [NativeDisableParallelForRestriction] public NativeArray<int> FeedbackClaim;
-            [NativeDisableParallelForRestriction] public NativeArray<float3> FeedbackPosition;
+            public NativeQueue<float3>.ParallelWriter DeathPositions;
 
-            unsafe void Execute(in ZombieStats stats,
+            void Execute(in ZombieStats stats,
                 ref ZombieState zombieState, in LocalTransform transform)
             {
                 if (zombieState.Value != ZombieStateType.Dead && stats.CurrentHP <= 0f)
                 {
                     zombieState.Value = ZombieStateType.Dead;
-
-                    // Bridge frame icinde zaten tek olum sesini duyurabilir. Atomik claim,
-                    // ayni frame olen binlerce zombi icin binlerce gecici SFX entity'si
-                    // olusturmak yerine temsilci bir konum secer.
-                    int* feedbackClaim = (int*)NativeArrayUnsafeUtility.GetUnsafePtr(FeedbackClaim);
-                    if (Interlocked.CompareExchange(ref feedbackClaim[0], 1, 0) == 0)
-                        FeedbackPosition[0] = transform.Position;
+                    DeathPositions.Enqueue(transform.Position);
                 }
             }
         }
 
         [BurstCompile]
-        private struct EmitDeathSfxJob : IJob
+        private struct ApplyDeathRewardsJob : IJob
         {
-            [ReadOnly] public NativeArray<int> FeedbackClaim;
-            [ReadOnly] public NativeArray<float3> FeedbackPosition;
+            public NativeQueue<float3> DeathPositions;
+            public Entity GameStateEntity;
+            public ComponentLookup<GameStateData> GameStateLookup;
             public EntityCommandBuffer ECB;
 
             public void Execute()
             {
-                if (FeedbackClaim[0] == 0)
+                int deathCount = 0;
+                float3 representativePosition = float3.zero;
+                while (DeathPositions.TryDequeue(out float3 position))
+                {
+                    if (deathCount == 0)
+                        representativePosition = position;
+                    deathCount++;
+
+                    Entity soulEvent = ECB.CreateEntity();
+                    ECB.AddComponent(soulEvent, new SoulPickupEvent
+                    {
+                        Position = position,
+                        Amount = 1
+                    });
+                }
+
+                if (deathCount <= 0)
                     return;
+
+                GameStateData gameState = GameStateLookup[GameStateEntity];
+                long totalKills = (long)math.max(0, gameState.TotalKills) + deathCount;
+                gameState.TotalKills = totalKills >= int.MaxValue
+                    ? int.MaxValue
+                    : (int)totalKills;
+                GameStateLookup[GameStateEntity] = gameState;
 
                 Entity sfxEvent = ECB.CreateEntity();
                 ECB.AddComponent(sfxEvent, new CombatSfxEvent
                 {
-                    Position = FeedbackPosition[0],
+                    Position = representativePosition,
                     Type = CombatSfxType.ZombieDeath,
                     Volume = 0.35f,
-                    Pitch = 1f
+                    Pitch = 1f,
+                    Multiplicity = deathCount
                 });
             }
         }

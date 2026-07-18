@@ -92,20 +92,18 @@ başarısızsa receipt silinmez ve sonraki açılış yeniden dener. Ayrıntıl�
 `MetaRewardCalculator`, production katalogdaki `MetaRewardSettings` alanlarını tek saf formülde
 uygular. Varsayılan V1 tuning'i:
 
-- İlk `100` kill: `1 Ember/kill`.
-- `101..1000`: `0.25 Ember/kill`.
-- `1000` üstü: `0.05 Ember/kill`.
+- Her Skeleton kill'i, toplam kill sayisindan bagimsiz olarak tam `1 Soul/Ember`.
 - Ulaşılan her day: `10 Ember`.
 - Tamamlanan her gece (`max(0, day - 1)`): `25 Ember`.
 - Peak population: kişi başı `0.2 Ember`.
 - Yeni day rekoru: `day x 50 Ember`.
 
 Her bileşen ayrı ayrı aşağı yuvarlanır, toplam `int.MaxValue` değerinde saturate olur. Kill
-bandlarının ağırlığı ilerleyen bantta artamaz; bütün eşikler ve ağırlıklar production catalog
-validation'ından geçer. Böylece erken kill'ler anlaşılır kalırken 2K/10K stres sürüleri meta
-ekonomisini doğrusal olarak patlatmaz. Sonuç ve breakdown `MetaRunResult.Reward` üzerinden okunur.
-Aktif sahnedeki mevcut `SoulCounterUI`, kill sayisini Souls diye yeniden etiketlemez; ayni
-`GameManager.GetMetaRuntimeTelemetry()` quote'undan `ON DEATH +N EMBERS` projected reward'unu gösterir.
+katkisi butun production bantlarinda `1` olarak validation ve test ile kilitlidir; bu nedenle
+her Skeleton projected death reward'u tam bir artirir. Sonuç ve breakdown
+`MetaRunResult.Reward` üzerinden okunur. Aktif sahnedeki `SoulCounterUI`, ayni
+`GameManager.GetMetaRuntimeTelemetry()` quote'undan `ON DEATH +N EMBERS` projected reward'unu
+gosterir; `SoulPickupEvent` olum konumundan bu sayaca gider ve varista pulse uretir.
 
 ## Presentation v2 ve temiz katalog migration'ı
 

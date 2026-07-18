@@ -108,8 +108,8 @@ namespace DeadWalls.Tests
             Assert.That(meta.RewardSettings.FirstKillBandLimit, Is.EqualTo(100));
             Assert.That(meta.RewardSettings.SecondKillBandLimit, Is.EqualTo(1000));
             Assert.That(meta.RewardSettings.FirstBandSoulsPerKill, Is.EqualTo(1f));
-            Assert.That(meta.RewardSettings.SecondBandSoulsPerKill, Is.EqualTo(0.25f));
-            Assert.That(meta.RewardSettings.OverflowSoulsPerKill, Is.EqualTo(0.05f));
+            Assert.That(meta.RewardSettings.SecondBandSoulsPerKill, Is.EqualTo(1f));
+            Assert.That(meta.RewardSettings.OverflowSoulsPerKill, Is.EqualTo(1f));
             Assert.That(meta.RewardSettings.SoulsPerDayReached, Is.EqualTo(10f));
             Assert.That(meta.RewardSettings.SoulsPerNightSurvived, Is.EqualTo(25f));
             Assert.That(meta.RewardSettings.SoulsPerPeakPopulation, Is.EqualTo(0.2f));

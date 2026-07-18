@@ -1,29 +1,130 @@
+using System;
+using System.Collections.Generic;
 using TMPro;
+using Unity.Collections;
+using Unity.Entities;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace DeadWalls
 {
     /// <summary>
-    /// Kosu ici projected death reward sayaci: oyuncu su anda olurse receipt'e yazilacak exact
-    /// MetaRewardQuote toplam Soul miktarini gorur. Ayri formul tutmaz; GameManager aggregate
-    /// telemetry'sini 0.25 saniyede bir okur.
+    /// Kosu ici projected death reward sayaci ve Skeleton olumunden HUD'a giden Soul
+    /// presentation owner'i. Gameplay odulu ZombieDeathSystem'de olum aninda yazilir;
+    /// bu sinif yalniz event'i gorunur animasyona cevirir.
     /// </summary>
     public class SoulCounterUI : MonoBehaviour
     {
         public GameObject CounterPanel;
         public TMP_Text CounterText;
 
+        [Header("Soul Pickup Animation")]
+        public int InitialSoulVisualPoolSize = 64;
+        public float SoulTravelDuration = 0.82f;
+        public float SoulArcHeight = 115f;
+        public float SoulStartWorldOffset = 0.45f;
+        public float CounterPulseDuration = 0.24f;
+        public float CounterPulseScale = 1.14f;
+        public Color SoulColor = new Color32(118, 224, 255, 255);
+
+        public int ActiveSoulVisualCount => _activeSoulVisuals.Count;
+        public long TotalSoulVisualsPlayedCount { get; private set; }
+
         private const float CheckInterval = 0.25f;
         private float _checkTimer;
         private int _lastShown = -1;
+        private World _world;
+        private EntityManager _entityManager;
+        private EntityQuery _soulPickupQuery;
+        private bool _queryReady;
+        private Canvas _canvas;
+        private RectTransform _canvasRect;
+        private Camera _uiCamera;
+        private Sprite _soulSprite;
+        private Vector3 _counterBaseScale = Vector3.one;
+        private float _counterPulseRemaining;
+        private readonly Queue<SoulVisual> _soulVisualPool = new Queue<SoulVisual>();
+        private readonly List<ActiveSoulVisual> _activeSoulVisuals =
+            new List<ActiveSoulVisual>();
+
+        private struct SoulVisual
+        {
+            public GameObject Instance;
+            public RectTransform Rect;
+            public CanvasGroup Group;
+            public Image Icon;
+            public TMP_Text AmountText;
+        }
+
+        private struct ActiveSoulVisual
+        {
+            public SoulVisual Visual;
+            public Vector2 Start;
+            public Vector2 Control;
+            public Vector2 Target;
+            public float Elapsed;
+            public float Duration;
+        }
+
+        private void Awake()
+        {
+            CacheCanvas();
+            if (CounterPanel != null)
+                _counterBaseScale = CounterPanel.transform.localScale;
+            EnsureSoulVisualPool();
+        }
+
+        private void OnDisable()
+        {
+            ReleaseAllSoulVisuals();
+            ResetQueryState();
+            _counterPulseRemaining = 0f;
+            if (CounterPanel != null)
+                CounterPanel.transform.localScale = _counterBaseScale;
+        }
+
+        private void OnDestroy()
+        {
+            if (_soulSprite == null)
+                return;
+
+            Texture texture = _soulSprite.texture;
+            Destroy(_soulSprite);
+            if (texture != null)
+                Destroy(texture);
+            _soulSprite = null;
+        }
 
         private void Update()
         {
-            _checkTimer -= Time.unscaledDeltaTime;
-            if (_checkTimer > 0f)
-                return;
-            _checkTimer = CheckInterval;
+            float unscaledDeltaTime = Time.unscaledDeltaTime;
+            UpdateSoulVisuals(unscaledDeltaTime);
+            UpdateCounterPulse(unscaledDeltaTime);
 
+            try
+            {
+                if (TryEnsureSoulQuery())
+                    ProcessSoulPickupEvents();
+            }
+            catch (ObjectDisposedException)
+            {
+                ResetQueryState();
+            }
+            catch (InvalidOperationException)
+            {
+                ResetQueryState();
+            }
+
+            _checkTimer -= unscaledDeltaTime;
+            if (_checkTimer <= 0f)
+            {
+                _checkTimer = CheckInterval;
+                RefreshCounter(false);
+            }
+        }
+
+        private void RefreshCounter(bool force)
+        {
             var gm = GameManager.Instance;
             MetaRuntimeTelemetry telemetry = gm != null ? gm.GetMetaRuntimeTelemetry() : default;
             bool visible = gm != null
@@ -36,7 +137,7 @@ namespace DeadWalls
                 return;
 
             int projectedSouls = telemetry.CurrentRewardQuote.TotalSouls;
-            if (projectedSouls != _lastShown && CounterText != null)
+            if ((force || projectedSouls != _lastShown) && CounterText != null)
             {
                 _lastShown = projectedSouls;
                 MetaPresentationSettings presentation = gm.MetaCatalog != null
@@ -48,6 +149,336 @@ namespace DeadWalls
                 CounterText.text =
                     $"<color=#FFB33F>ON DEATH</color>  +{projectedSouls:N0} {currency}";
             }
+        }
+
+        private bool TryEnsureSoulQuery()
+        {
+            World world = World.DefaultGameObjectInjectionWorld;
+            if (world == null || !world.IsCreated)
+            {
+                ResetQueryState();
+                return false;
+            }
+
+            if (_queryReady && _world == world)
+                return true;
+
+            _world = world;
+            _entityManager = world.EntityManager;
+            _soulPickupQuery = _entityManager.CreateEntityQuery(
+                ComponentType.ReadOnly<SoulPickupEvent>());
+            _queryReady = true;
+            return true;
+        }
+
+        private void ResetQueryState()
+        {
+            _world = null;
+            _queryReady = false;
+        }
+
+        private void ProcessSoulPickupEvents()
+        {
+            using NativeArray<Entity> entities = _soulPickupQuery.ToEntityArray(Allocator.Temp);
+            if (entities.Length == 0)
+                return;
+
+            using NativeArray<SoulPickupEvent> events =
+                _soulPickupQuery.ToComponentDataArray<SoulPickupEvent>(Allocator.Temp);
+            for (int i = 0; i < events.Length; i++)
+                PlaySoulPickup(events[i]);
+
+            _entityManager.DestroyEntity(entities);
+        }
+
+        private void PlaySoulPickup(SoulPickupEvent soulEvent)
+        {
+            if (soulEvent.Amount <= 0 || CounterPanel == null)
+                return;
+
+            CacheCanvas();
+            if (_canvasRect == null)
+                return;
+
+            SoulVisual visual = GetSoulVisual();
+            if (visual.Instance == null)
+                return;
+
+            Vector3 worldPosition = new Vector3(
+                soulEvent.Position.x,
+                soulEvent.Position.y + Mathf.Max(0f, SoulStartWorldOffset),
+                soulEvent.Position.z);
+            Camera gameplayCamera = Camera.main;
+            Vector2 startScreen = gameplayCamera != null
+                ? (Vector2)gameplayCamera.WorldToScreenPoint(worldPosition)
+                : new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
+            Vector2 start = ScreenToCanvasLocal(startScreen);
+            Vector2 targetScreen = RectTransformUtility.WorldToScreenPoint(
+                _uiCamera,
+                CounterPanel.transform.position);
+            Vector2 target = ScreenToCanvasLocal(targetScreen);
+            float lateral = ((TotalSoulVisualsPlayedCount % 5L) - 2L) * 13f;
+            Vector2 control = (start + target) * 0.5f
+                + Vector2.up * Mathf.Max(0f, SoulArcHeight)
+                + Vector2.right * lateral;
+
+            visual.Rect.anchoredPosition = start;
+            visual.Rect.localScale = Vector3.one * 0.72f;
+            visual.Group.alpha = 0f;
+            visual.Icon.color = SoulColor;
+            if (visual.AmountText != null)
+                visual.AmountText.text = "+" + soulEvent.Amount;
+            visual.Instance.SetActive(true);
+
+            _activeSoulVisuals.Add(new ActiveSoulVisual
+            {
+                Visual = visual,
+                Start = start,
+                Control = control,
+                Target = target,
+                Elapsed = 0f,
+                Duration = Mathf.Max(0.2f, SoulTravelDuration)
+            });
+            TotalSoulVisualsPlayedCount++;
+        }
+
+        private void UpdateSoulVisuals(float dt)
+        {
+            for (int i = _activeSoulVisuals.Count - 1; i >= 0; i--)
+            {
+                ActiveSoulVisual active = _activeSoulVisuals[i];
+                if (active.Visual.Instance == null)
+                {
+                    _activeSoulVisuals.RemoveAt(i);
+                    continue;
+                }
+
+                active.Elapsed += Mathf.Max(0f, dt);
+                float progress01 = Mathf.Clamp01(active.Elapsed / active.Duration);
+                float eased = progress01 * progress01 * (3f - 2f * progress01);
+                active.Visual.Rect.anchoredPosition = QuadraticBezier(
+                    active.Start,
+                    active.Control,
+                    active.Target,
+                    eased);
+
+                float scale = progress01 < 0.2f
+                    ? Mathf.Lerp(0.72f, 1.12f, progress01 / 0.2f)
+                    : Mathf.Lerp(1.12f, 0.64f, (progress01 - 0.2f) / 0.8f);
+                active.Visual.Rect.localScale = Vector3.one * scale;
+                active.Visual.Group.alpha = progress01 < 0.12f
+                    ? progress01 / 0.12f
+                    : 1f;
+
+                if (progress01 >= 1f)
+                {
+                    ReleaseSoulVisual(active.Visual);
+                    _activeSoulVisuals.RemoveAt(i);
+                    RefreshCounter(true);
+                    StartCounterPulse();
+                    continue;
+                }
+
+                _activeSoulVisuals[i] = active;
+            }
+        }
+
+        private void StartCounterPulse()
+        {
+            _counterPulseRemaining = Mathf.Max(0.01f, CounterPulseDuration);
+        }
+
+        private void UpdateCounterPulse(float dt)
+        {
+            if (CounterPanel == null)
+                return;
+
+            if (_counterPulseRemaining <= 0f)
+            {
+                CounterPanel.transform.localScale = _counterBaseScale;
+                return;
+            }
+
+            float duration = Mathf.Max(0.01f, CounterPulseDuration);
+            _counterPulseRemaining = Mathf.Max(0f, _counterPulseRemaining - Mathf.Max(0f, dt));
+            float progress01 = 1f - _counterPulseRemaining / duration;
+            float pulse = Mathf.Sin(progress01 * Mathf.PI);
+            float scale = Mathf.Lerp(1f, Mathf.Max(1f, CounterPulseScale), pulse);
+            CounterPanel.transform.localScale = _counterBaseScale * scale;
+        }
+
+        private void CacheCanvas()
+        {
+            if (_canvasRect != null)
+                return;
+
+            _canvas = CounterPanel != null
+                ? CounterPanel.GetComponentInParent<Canvas>()
+                : GetComponentInParent<Canvas>();
+            if (_canvas == null)
+                return;
+
+            _canvasRect = _canvas.transform as RectTransform;
+            _uiCamera = _canvas.renderMode == RenderMode.ScreenSpaceOverlay
+                ? null
+                : _canvas.worldCamera;
+        }
+
+        private Vector2 ScreenToCanvasLocal(Vector2 screenPosition)
+        {
+            if (_canvasRect != null && RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                    _canvasRect,
+                    screenPosition,
+                    _uiCamera,
+                    out Vector2 localPoint))
+                return localPoint;
+
+            return Vector2.zero;
+        }
+
+        private void EnsureSoulVisualPool()
+        {
+            CacheCanvas();
+            if (_canvasRect == null)
+                return;
+
+            int targetSize = Mathf.Max(0, InitialSoulVisualPoolSize);
+            while (_soulVisualPool.Count + _activeSoulVisuals.Count < targetSize)
+                _soulVisualPool.Enqueue(CreateSoulVisual(
+                    _soulVisualPool.Count + _activeSoulVisuals.Count));
+        }
+
+        private SoulVisual GetSoulVisual()
+        {
+            EnsureSoulVisualPool();
+            if (_soulVisualPool.Count > 0)
+                return _soulVisualPool.Dequeue();
+
+            return CreateSoulVisual(_activeSoulVisuals.Count);
+        }
+
+        private SoulVisual CreateSoulVisual(int index)
+        {
+            if (_canvasRect == null)
+                return default;
+
+            var instance = new GameObject(
+                "SoulPickup_" + index,
+                typeof(RectTransform),
+                typeof(CanvasGroup),
+                typeof(Image));
+            var rect = instance.GetComponent<RectTransform>();
+            rect.SetParent(_canvasRect, false);
+            rect.sizeDelta = new Vector2(30f, 30f);
+            rect.SetAsLastSibling();
+
+            var group = instance.GetComponent<CanvasGroup>();
+            group.blocksRaycasts = false;
+            group.interactable = false;
+
+            var icon = instance.GetComponent<Image>();
+            icon.sprite = GetSoulSprite();
+            icon.preserveAspect = true;
+            icon.raycastTarget = false;
+            icon.color = SoulColor;
+
+            var amountObject = new GameObject("Amount", typeof(RectTransform), typeof(TextMeshProUGUI));
+            var amountRect = amountObject.GetComponent<RectTransform>();
+            amountRect.SetParent(rect, false);
+            amountRect.anchorMin = new Vector2(0.5f, 0.5f);
+            amountRect.anchorMax = new Vector2(0.5f, 0.5f);
+            amountRect.anchoredPosition = new Vector2(24f, 0f);
+            amountRect.sizeDelta = new Vector2(38f, 24f);
+            var amountText = amountObject.GetComponent<TextMeshProUGUI>();
+            amountText.alignment = TextAlignmentOptions.Center;
+            amountText.fontSize = 15f;
+            amountText.fontStyle = FontStyles.Bold;
+            amountText.color = Color.white;
+            amountText.raycastTarget = false;
+
+            instance.SetActive(false);
+            return new SoulVisual
+            {
+                Instance = instance,
+                Rect = rect,
+                Group = group,
+                Icon = icon,
+                AmountText = amountText
+            };
+        }
+
+        private Sprite GetSoulSprite()
+        {
+            if (_soulSprite != null)
+                return _soulSprite;
+
+            const int size = 32;
+            var texture = new Texture2D(size, size, TextureFormat.RGBA32, false)
+            {
+                name = "RuntimeSoulPickupTexture",
+                filterMode = FilterMode.Bilinear,
+                wrapMode = TextureWrapMode.Clamp
+            };
+            var pixels = new Color32[size * size];
+            float center = (size - 1) * 0.5f;
+            float radius = size * 0.5f;
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    float nx = (x - center) / radius;
+                    float ny = (y - center) / radius;
+                    float distance = Mathf.Sqrt(nx * nx + ny * ny);
+                    float core = Mathf.Clamp01(1f - distance);
+                    float glow = Mathf.Clamp01(1f - distance * 0.86f);
+                    byte alpha = (byte)(Mathf.Pow(glow, 1.6f) * 255f);
+                    byte brightness = (byte)Mathf.Lerp(170f, 255f, core);
+                    pixels[y * size + x] = new Color32(
+                        brightness,
+                        255,
+                        255,
+                        alpha);
+                }
+            }
+            texture.SetPixels32(pixels);
+            texture.Apply();
+
+            _soulSprite = Sprite.Create(
+                texture,
+                new Rect(0f, 0f, size, size),
+                new Vector2(0.5f, 0.5f),
+                size);
+            _soulSprite.name = "RuntimeSoulPickupSprite";
+            return _soulSprite;
+        }
+
+        private void ReleaseAllSoulVisuals()
+        {
+            for (int i = _activeSoulVisuals.Count - 1; i >= 0; i--)
+                ReleaseSoulVisual(_activeSoulVisuals[i].Visual);
+
+            _activeSoulVisuals.Clear();
+        }
+
+        private void ReleaseSoulVisual(SoulVisual visual)
+        {
+            if (visual.Instance == null)
+                return;
+
+            visual.Instance.SetActive(false);
+            _soulVisualPool.Enqueue(visual);
+        }
+
+        private static Vector2 QuadraticBezier(
+            Vector2 start,
+            Vector2 control,
+            Vector2 end,
+            float progress01)
+        {
+            float inverse = 1f - progress01;
+            return inverse * inverse * start
+                   + 2f * inverse * progress01 * control
+                   + progress01 * progress01 * end;
         }
     }
 }

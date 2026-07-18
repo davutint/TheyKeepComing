@@ -2,11 +2,11 @@
 
 ## Amac
 
-`CombatFeedbackBridge`, DOTS combat sistemlerinden gelen kisa omurlu feedback event'lerini GameObject tarafinda pooled VFX/SFX olarak oynatir. Gameplay projectile, damage ve hedefleme ECS tarafinda kalir; bu bridge sadece gorsel/ses juice katmanidir.
+`CombatFeedbackBridge`, DOTS combat sistemlerinden gelen kisa omurlu feedback event'lerini GameObject tarafinda pooled VFX/SFX ve world-space hasar sayilari olarak oynatir. Gameplay projectile, damage ve hedefleme ECS tarafinda kalir; bu bridge sadece gorsel/ses juice katmanidir.
 
 ## Akis
 
-- ECS sistemleri `CombatVfxEvent` ve `CombatSfxEvent` entity'leri uretir. Arrow hit akisi
+- ECS sistemleri `CombatVfxEvent`, `CombatSfxEvent` ve `CombatDamageNumberEvent` entity'leri uretir. Arrow hit akisi
   ham isabet basina event uretmez; `ArrowHitSystem` once `0.75` world-unit hucrelerde
   tur bazli spatial sample toplar.
 - `CombatFeedbackBridge`, `CombatFeedbackRoot` altinda bu event entity'lerini okur.
@@ -17,6 +17,12 @@
   kullanir ve event entity'sini siler.
 - SFX icin sabit AudioSource pool kullanir; bir frame'deki event'leri type bazinda aggregate eder,
   oncelik + frame budget + type rate-limit uygular ve event entity'lerini siler.
+- Hasar sayisi icin `TextMeshPro` world-space pool kullanir. Basic, Rapid, Frost, Fireball,
+  Echoing Detonation ve Burning Ground gercek uygulanan hasari ortak event sozlesmesine yazar.
+  Sayilar dusman basinin uzerinde punch + yukselme + fade ile oynar; VFX sampling budget'i
+  bu event'leri dusuremez.
+- Skeleton Soul yolculugu ayri `SoulCounterUI` sahibindedir. `SoulPickupEvent` olum
+  konumundan HUD sayacina gider ve varista sayaci pulse eder.
 
 ## V1 Event Kaynaklari
 
@@ -25,9 +31,13 @@
   candidate'i toplar. Bir frame'de en fazla `24` hit VFX event'i ve mevcut her hit
   turu icin tek `CombatSfxEvent` uretir; `Multiplicity` o cue'nun temsil ettigi
   spatial candidate sayisini tasir.
+- `ArrowHitSystem`: her gercek Basic/Rapid/Frost isabeti icin ayrica tam uygulanan hasari
+  tasiyan bir `CombatDamageNumberEvent` uretir.
 - `DamageApplySystem`: savunma hasari alindiginda `CastleHit`.
-- `ZombieDeathSystem` (M-D): olum aninda `ZombieDeath` SFX (rate-limit 0.09s — kalabalik yigilmaz).
-- `FireballStrikeSystem` (M-D): patlama aninda `FireballBlast` SFX (gorsel SpellCastUI'da).
+- `ZombieDeathSystem` (M-D): olum aninda `ZombieDeath` aggregate SFX ve Skeleton basina
+  tam bir `SoulPickupEvent` uretir.
+- `FireballStrikeSystem` (M-D): patlama aninda `FireballBlast` SFX (gorsel SpellCastUI'da)
+  ve Primary/SecondBlast/BurningGroundPulse basina gercek uygulanan hasar event'i uretir.
 
 ## M-D His Katmani (2026-07-08)
 
@@ -59,7 +69,10 @@ castle impact prefab'i atayabilir (yalniz-bossa kurali onu korur).
 
 ## Performans Notlari
 
-- Stress mode'da `DisableInStressMode = true` ise event'ler temizlenir ama oynatilmaz.
+- Stress mode'da `DisableInStressMode = true` ise VFX/SFX event'leri temizlenir ama oynatilmaz.
+  Gercek hasar sayilari player-facing dogruluk sozlesmesi oldugu icin bu guard tarafindan dusurulmez.
+- Hasar sayisi pool'u varsayilan `256` slotla baslar; eszamanli gercek hasar sayisi bunu
+  asarsa yeni slot buyur ve tamamlanan sayilar pool'a geri doner. Event atlama yoktur.
 - Hit flipbook pool varsayilan `128`; pool bosalirsa en eski aktif flipbook recycle edilir.
 - `ArrowHitSystem`, sabit `512` candidate map'i icinde ayni `0.75` world-unit hucredeki
   ayni hit turunu tek ornege indirir. Basic/Rapid ve Frost birlikteyse `24` VFX slotunun

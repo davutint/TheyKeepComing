@@ -9,10 +9,11 @@ using Unity.Transforms;
 namespace DeadWalls
 {
     /// <summary>
-    /// Olen zombileri odullendirir ve pool rezervine dondurur.
+    /// Olen zombilerin olum animasyonunu tamamlar ve pool rezervine dondurur.
     ///
     /// Eski akis: Dead → aninda sil
-    /// Yeni akis: Dead + DeathTimer → timer say → 0'a dusunce pool return + odul ver
+    /// Yeni akis: Dead aninda Soul/kill odulu ZombieDeathSystem'de verilir;
+    /// Dead + DeathTimer → timer say → 0'a dusunce XP/resource cleanup + pool return yapilir.
     ///
     /// DeathTimer, ZombieAnimationStateSystem tarafindan eklenir.
     /// Bu system sadece DeathTimer olan entity'leri isle.
@@ -68,9 +69,9 @@ namespace DeadWalls
                 if (deathTimer.ValueRO.Value > 0f)
                     continue;
 
-                // Timer bitti → odul ver + pool return
+                // Timer bitti → cleanup odulleri + pool return. TotalKills/Soul olum aninda
+                // ZombieDeathSystem tarafindan tam bir kez yazilmistir.
                 gameState.ValueRW.XP += stats.ValueRO.XPReward;
-                gameState.ValueRW.TotalKills++;
                 waveState.ValueRW.ZombiesAlive--;
                 if (canApplyMobileReward)
                     AddKillReward(ref resourceAccumulator.ValueRW, mobileConfig, economyFocus,

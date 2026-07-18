@@ -94,7 +94,8 @@ namespace DeadWalls
 
             state.Dependency = new FireballDamageJob
             {
-                Strikes = strikes.AsArray()
+                Strikes = strikes.AsArray(),
+                ECB = ecb.AsParallelWriter()
             }.ScheduleParallel(state.Dependency);
             strikes.Dispose(state.Dependency);
         }
@@ -104,15 +105,48 @@ namespace DeadWalls
         partial struct FireballDamageJob : IJobEntity
         {
             [ReadOnly] public NativeArray<FireballStrike> Strikes;
+            public EntityCommandBuffer.ParallelWriter ECB;
 
-            void Execute(ref ZombieStats stats, in LocalTransform transform)
+            void Execute([ChunkIndexInQuery] int sortKey,
+                ref ZombieStats stats, in LocalTransform transform)
             {
                 for (int i = 0; i < Strikes.Length; i++)
                 {
                     float radiusSq = Strikes[i].Radius * Strikes[i].Radius;
                     if (math.distancesq(transform.Position.xy, Strikes[i].Position) <= radiusSq)
-                        stats.CurrentHP -= Strikes[i].Damage;
+                    {
+                        float previousHp = math.max(0f, stats.CurrentHP);
+                        float appliedDamage = math.min(
+                            previousHp,
+                            math.max(0f, Strikes[i].Damage));
+                        if (appliedDamage <= 0f)
+                            continue;
+
+                        stats.CurrentHP = previousHp - appliedDamage;
+                        Entity damageNumberEvent = ECB.CreateEntity(sortKey);
+                        ECB.AddComponent(sortKey, damageNumberEvent, new CombatDamageNumberEvent
+                        {
+                            Position = new float3(
+                                transform.Position.x,
+                                transform.Position.y,
+                                MobileCastleRenderDepth.ProjectileZ),
+                            AppliedDamage = appliedDamage,
+                            Source = ResolveDamageSource(Strikes[i].Kind)
+                        });
+                    }
                 }
+            }
+
+            private static PlayerDamageSourceType ResolveDamageSource(FireballStrikeKind kind)
+            {
+                return kind switch
+                {
+                    FireballStrikeKind.SecondBlast =>
+                        PlayerDamageSourceType.FireballSecondBlast,
+                    FireballStrikeKind.BurningGroundPulse =>
+                        PlayerDamageSourceType.FireballBurningGround,
+                    _ => PlayerDamageSourceType.Fireball
+                };
             }
         }
     }

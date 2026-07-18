@@ -5,6 +5,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
+using TMPro;
 
 namespace DeadWalls
 {
@@ -45,6 +46,15 @@ namespace DeadWalls
         [Header("Hit VFX Budget")]
         public int MaxHitVfxPlayedPerFrame = CombatHitFeedbackBudget.MaxVfxEventsPerFrame;
         public float HitVfxMinInterval = 0.04f;
+
+        [Header("Damage Numbers")]
+        public int DamageNumberInitialPoolSize = 256;
+        public float DamageNumberDuration = 0.72f;
+        public float DamageNumberRiseDistance = 0.62f;
+        public float DamageNumberHeadOffset = 0.56f;
+        public float DamageNumberWorldScale = 0.13f;
+        public string DamageNumberSortingLayer = "Wall";
+        public int DamageNumberSortingOrder = 80;
 
         [Header("Pool")]
         public int VfxPoolSizePerType = 24;
@@ -93,6 +103,10 @@ namespace DeadWalls
         private readonly Queue<FlipbookVfx> _hitFlipbookPool = new Queue<FlipbookVfx>();
         private readonly List<FlipbookVfx> _activeHitFlipbooks = new List<FlipbookVfx>();
         private readonly List<AudioSource> _audioSources = new List<AudioSource>();
+        private readonly Queue<DamageNumberVisual> _damageNumberPool =
+            new Queue<DamageNumberVisual>();
+        private readonly List<ActiveDamageNumber> _activeDamageNumbers =
+            new List<ActiveDamageNumber>();
         private Sprite _hitHierarchyRingSprite;
         // Boyut enum uzunlugundan buyuk tutulur (yeni SFX tipi eklerken tasma olmasin)
         private readonly float[] _lastSfxTimes = { -999f, -999f, -999f, -999f, -999f, -999f, -999f, -999f };
@@ -123,11 +137,14 @@ namespace DeadWalls
         public long TotalHitVfxPlayedCount { get; private set; }
         public long TotalHitVfxDroppedCount { get; private set; }
         public int ActiveHitFlipbookCount => _activeHitFlipbooks.Count;
+        public int ActiveDamageNumberCount => _activeDamageNumbers.Count;
+        public long TotalDamageNumbersPlayedCount { get; private set; }
 
         private World _world;
         private EntityManager _entityManager;
         private EntityQuery _vfxQuery;
         private EntityQuery _sfxQuery;
+        private EntityQuery _damageNumberQuery;
         private EntityQuery _waveQuery;
         private bool _queriesReady;
         private int _audioCursor;
@@ -152,9 +169,27 @@ namespace DeadWalls
             public float Elapsed;
         }
 
+        private struct DamageNumberVisual
+        {
+            public GameObject Instance;
+            public TextMeshPro Text;
+        }
+
+        private struct ActiveDamageNumber
+        {
+            public DamageNumberVisual Visual;
+            public Vector3 StartPosition;
+            public float Elapsed;
+            public float Duration;
+            public float RiseDistance;
+            public float BaseScale;
+            public Color BaseColor;
+        }
+
         private void Awake()
         {
             EnsureHitFlipbookPool();
+            EnsureDamageNumberPool();
             EnsureAudioPool();
         }
 
@@ -162,6 +197,7 @@ namespace DeadWalls
         {
             ReleaseAllActiveHitFlipbooks();
             ReleaseAllActiveVfx();
+            ReleaseAllActiveDamageNumbers();
             ResetQueryState();
         }
 
@@ -184,10 +220,12 @@ namespace DeadWalls
                 bool queriesReady = TryEnsureQueries();
                 UpdateActiveHitFlipbooks(Time.deltaTime);
                 ReleaseExpiredVfx(Time.deltaTime, queriesReady);
+                UpdateActiveDamageNumbers(Time.deltaTime);
                 if (!queriesReady)
                     return;
 
                 bool stressMode = DisableInStressMode && IsStressMode();
+                ProcessDamageNumberEvents();
                 ProcessVfxEvents(stressMode);
                 ProcessSfxEvents(stressMode);
             }
@@ -217,6 +255,8 @@ namespace DeadWalls
             _entityManager = world.EntityManager;
             _vfxQuery = _entityManager.CreateEntityQuery(ComponentType.ReadOnly<CombatVfxEvent>());
             _sfxQuery = _entityManager.CreateEntityQuery(ComponentType.ReadOnly<CombatSfxEvent>());
+            _damageNumberQuery = _entityManager.CreateEntityQuery(
+                ComponentType.ReadOnly<CombatDamageNumberEvent>());
             _waveQuery = _entityManager.CreateEntityQuery(ComponentType.ReadOnly<WaveStateData>());
             _queriesReady = true;
             return true;
@@ -357,6 +397,184 @@ namespace DeadWalls
             }
 
             _entityManager.DestroyEntity(entities);
+        }
+
+        private void ProcessDamageNumberEvents()
+        {
+            using NativeArray<Entity> entities = _damageNumberQuery.ToEntityArray(Allocator.Temp);
+            if (entities.Length == 0)
+                return;
+
+            using NativeArray<CombatDamageNumberEvent> events =
+                _damageNumberQuery.ToComponentDataArray<CombatDamageNumberEvent>(Allocator.Temp);
+            for (int i = 0; i < events.Length; i++)
+                PlayDamageNumber(events[i]);
+
+            _entityManager.DestroyEntity(entities);
+        }
+
+        private void PlayDamageNumber(CombatDamageNumberEvent damageEvent)
+        {
+            if (damageEvent.AppliedDamage <= 0f)
+                return;
+
+            DamageNumberVisual visual = GetDamageNumberVisual();
+            if (visual.Instance == null || visual.Text == null)
+                return;
+
+            float baseScale = Mathf.Max(0.01f, DamageNumberWorldScale);
+            int lane = (int)(TotalDamageNumbersPlayedCount % 5L) - 2;
+            Vector3 startPosition = new Vector3(
+                damageEvent.Position.x + lane * 0.035f,
+                damageEvent.Position.y + Mathf.Max(0f, DamageNumberHeadOffset),
+                MobileCastleRenderDepth.ProjectileZ);
+            Color color = ResolveDamageNumberColor(damageEvent.Source);
+
+            visual.Text.text = FormatDamageNumber(damageEvent.AppliedDamage);
+            visual.Text.color = color;
+            visual.Instance.transform.position = startPosition;
+            visual.Instance.transform.localScale = Vector3.one * (baseScale * 0.72f);
+            visual.Instance.SetActive(true);
+
+            _activeDamageNumbers.Add(new ActiveDamageNumber
+            {
+                Visual = visual,
+                StartPosition = startPosition,
+                Elapsed = 0f,
+                Duration = Mathf.Max(0.1f, DamageNumberDuration),
+                RiseDistance = Mathf.Max(0.05f, DamageNumberRiseDistance),
+                BaseScale = baseScale,
+                BaseColor = color
+            });
+            TotalDamageNumbersPlayedCount++;
+        }
+
+        private void UpdateActiveDamageNumbers(float dt)
+        {
+            for (int i = _activeDamageNumbers.Count - 1; i >= 0; i--)
+            {
+                ActiveDamageNumber active = _activeDamageNumbers[i];
+                if (active.Visual.Instance == null || active.Visual.Text == null)
+                {
+                    _activeDamageNumbers.RemoveAt(i);
+                    continue;
+                }
+
+                active.Elapsed += Mathf.Max(0f, dt);
+                float progress01 = Mathf.Clamp01(active.Elapsed / active.Duration);
+                float easedRise = 1f - (1f - progress01) * (1f - progress01);
+                active.Visual.Instance.transform.position = active.StartPosition
+                    + Vector3.up * (active.RiseDistance * easedRise);
+
+                float scaleMultiplier = progress01 < 0.18f
+                    ? Mathf.Lerp(0.72f, 1.12f, progress01 / 0.18f)
+                    : Mathf.Lerp(1.12f, 1f, (progress01 - 0.18f) / 0.82f);
+                active.Visual.Instance.transform.localScale =
+                    Vector3.one * (active.BaseScale * scaleMultiplier);
+
+                float alpha = progress01 < 0.58f
+                    ? 1f
+                    : 1f - (progress01 - 0.58f) / 0.42f;
+                Color color = active.BaseColor;
+                color.a *= Mathf.Clamp01(alpha);
+                active.Visual.Text.color = color;
+
+                if (progress01 >= 1f)
+                {
+                    ReleaseDamageNumberVisual(active.Visual);
+                    _activeDamageNumbers.RemoveAt(i);
+                    continue;
+                }
+
+                _activeDamageNumbers[i] = active;
+            }
+        }
+
+        private void EnsureDamageNumberPool()
+        {
+            int targetSize = Mathf.Max(0, DamageNumberInitialPoolSize);
+            while (_damageNumberPool.Count + _activeDamageNumbers.Count < targetSize)
+                _damageNumberPool.Enqueue(CreateDamageNumberVisual(
+                    _damageNumberPool.Count + _activeDamageNumbers.Count));
+        }
+
+        private DamageNumberVisual GetDamageNumberVisual()
+        {
+            if (_damageNumberPool.Count > 0)
+                return _damageNumberPool.Dequeue();
+
+            return CreateDamageNumberVisual(
+                _damageNumberPool.Count + _activeDamageNumbers.Count);
+        }
+
+        private DamageNumberVisual CreateDamageNumberVisual(int index)
+        {
+            var instance = new GameObject("DamageNumber_" + index);
+            instance.transform.SetParent(transform, false);
+            var text = instance.AddComponent<TextMeshPro>();
+            text.alignment = TextAlignmentOptions.Center;
+            text.fontSize = 5f;
+            text.fontStyle = FontStyles.Bold;
+            text.enableWordWrapping = false;
+            text.raycastTarget = false;
+            text.rectTransform.sizeDelta = new Vector2(4f, 1.4f);
+            text.outlineWidth = 0.16f;
+            text.outlineColor = new Color32(16, 10, 8, 225);
+            MeshRenderer meshRenderer = text.GetComponent<MeshRenderer>();
+            if (meshRenderer != null)
+            {
+                meshRenderer.sortingLayerName = DamageNumberSortingLayer;
+                meshRenderer.sortingOrder = DamageNumberSortingOrder;
+            }
+
+            instance.SetActive(false);
+            return new DamageNumberVisual
+            {
+                Instance = instance,
+                Text = text
+            };
+        }
+
+        private void ReleaseAllActiveDamageNumbers()
+        {
+            for (int i = _activeDamageNumbers.Count - 1; i >= 0; i--)
+                ReleaseDamageNumberVisual(_activeDamageNumbers[i].Visual);
+
+            _activeDamageNumbers.Clear();
+        }
+
+        private void ReleaseDamageNumberVisual(DamageNumberVisual visual)
+        {
+            if (visual.Instance == null)
+                return;
+
+            visual.Instance.SetActive(false);
+            _damageNumberPool.Enqueue(visual);
+        }
+
+        public static string FormatDamageNumber(float appliedDamage)
+        {
+            float safeDamage = float.IsNaN(appliedDamage) || float.IsInfinity(appliedDamage)
+                ? 0f
+                : Mathf.Max(0f, appliedDamage);
+            float rounded = Mathf.Round(safeDamage);
+            if (Mathf.Abs(safeDamage - rounded) <= 0.01f)
+                return Mathf.RoundToInt(rounded).ToString();
+
+            return safeDamage.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture);
+        }
+
+        public static Color ResolveDamageNumberColor(PlayerDamageSourceType source)
+        {
+            return source switch
+            {
+                PlayerDamageSourceType.FrostArrow => new Color32(112, 226, 255, 255),
+                PlayerDamageSourceType.Fireball => new Color32(255, 155, 64, 255),
+                PlayerDamageSourceType.FireballSecondBlast => new Color32(255, 196, 90, 255),
+                PlayerDamageSourceType.FireballBurningGround => new Color32(255, 112, 54, 255),
+                PlayerDamageSourceType.RapidArrow => new Color32(255, 224, 142, 255),
+                _ => new Color32(255, 244, 216, 255)
+            };
         }
 
         private void ResetSfxAggregates()
