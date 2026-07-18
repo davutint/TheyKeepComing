@@ -5,8 +5,8 @@
 > **Tracker sürümü:** 2.3
 > **Son tam kapsam denetimi:** 2026-07-17
 > **Aktif paket:** Post-Package V1 Closure - Owner Content, Narrative ve Tuning
-> **Aktif iş:** `DW-V1-CLOSURE-ARCHER-HEART-EFFECTS` - Route Archer Damage/Fire Rate/Range/Frost Slow Upgrades Through the Heart Effect Pipeline
-> **İlerleme:** `440 / 442` tracker checkbox'ı tamamlandı - `%99,55`
+> **Aktif iş:** `DW-V1-CLOSURE-10K-1K-NIGHT-VISUAL` - Combined 1K Archer + 10K Enemy + Active Projectile Night Visual Acceptance
+> **İlerleme:** `441 / 442` tracker checkbox'ı tamamlandı - `%99,77`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -137,17 +137,17 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 | Moat | Runtime flag kapalı; slow `1`, damage `0`; tech/meta catalog bağlantıları dormant | Uyumlu |
 | Defense | Damage/Game Over aktif ve testli olarak tek Wall'a çekildi | `[x]` |
 | Normal repair | Stone-only ve yalnız Day/Dusk | `[x]` |
-| Save | Exact same-moment Continue; schema v11, minimum v3; purchased bed, worker bina yatırımı, Archer Formation V1, finite Arrow yatırımı, Grave Essence, exact Heart graph replay ve regular Council handled-day/active-card discriminator | `[x]` |
+| Save | Exact same-moment Continue; schema v17, minimum v3; purchased bed, worker bina yatırımı, Archer Formation V1, finite Arrow yatırımı, Grave Essence, exact Heart graph replay ve regular Council handled-day/active-card discriminator | `[x]` |
 | Economy | Worker üretimi, bed alımı ve dört hazır binanın capacity/efficiency yatırımları var; bed ve bina fiyat eğrileri `DefaultDifficulty.asset`/Difficulty Tuner üzerinden baked runtime tuning'e bağlı; V1 ana kaynaklarında pasif consumption yok, Arrow başarılı projectile rent başına sürekli tükenen tek stok | `[x]` Runtime release guard |
 | Population | House bed state + Wood purchase API + exact save var; Dawn isteği boş yatak ve Food/kişi bütçesiyle sınırlı, gerçek accepted count uygulanıyor, Food bir kez düşülüyor ve en fazla 15 temsili survivor sağdan Wall arkasına yürüyor; total/workers/archers/idle + base/purchased beds tek snapshot guard'ında exact | `[x]` |
 | Workers | Kalıcı target ratio + actual/cap/idle state, +1/+10/+100/direct input, bağımsız bina capacity/efficiency seviyeleri, yeni nüfus auto-allocation, exact save, Low/Medium/High density ve allocation-senkronlu animation/cargo/lantern/delivery feedback var; dört actual count + dört ratio birleşik Continue guard'ında exact | `[x]` |
 | Council | 9 launch template, 11 serialized atom (`cap_bonus` dormant), staged Day 3/6/9 havuzu, curated source-retirement/follow-up, exact kart ve fail-closed policy aktif | `[x]` 5.400-sample budget/token/content gate + exact save/guard doğrulandı |
-| Archers | Basic/Rapid/Frost, instant buy, incremental type maliyeti, yerinde retrain, version'lı 40x25 formation, scalable target load ve pooled projectile lifetime var | `[x]` Combat temeli; upgrade owner'ı Package E |
+| Archers | Basic/Rapid/Frost, instant buy, incremental type maliyeti, yerinde retrain, version'lı 40x25 formation, scalable target load ve pooled projectile lifetime var; damage/fire-rate/range/Frost slow progression'i yalnız Castle Heart effect pipeline'ında | `[x]` Combat + Heart progression owner'ı |
 | Archer cap | `ArcherCapacityUtility` Basic/Rapid/Frost toplamını `1000` ile sınırlar; buy, merkezi spawn, Council, meta, restore ve legacy Barracks aynı guard'ı kullanır | `[x]` |
 | Placement | Formation V1 asset'iyle sabit 40 `outside` tile x 25 seeded diamond nokta; layer-fill sıra, 1000 gizmo ve v9 Continue testli | `[x]` |
 | Targeting | Persistent coarse spatial query + incoming damage reservation Burst job'ları aktif | `[x]` |
 | Ammo | Finite stok; gerçek projectile başına `-1`; Wood ile anlık +1/+5/Buy Max refill; Wood+Iron CAP/EFF yatırımı; Current/Capacity HUD ve exact save v13 | `[x]` |
-| Tech/Heart | Generated graph/reveal, Grave Essence-only purchase, actual effect adapter'i, hidden-safe fullscreen `HeartScreenUI`, full simulation pause ve schema v11 exact graph/effect replay aktif; legacy `TechTreeUI` aktif owner değil. Production node catalog'u owner içerik onayı bekliyor ve null durumda açık hata veriliyor | E1-E6 runtime kabulü tamamlandı; launch content owner gate |
+| Tech/Heart | Production v2 `37` node generated graph/reveal, Grave Essence-only purchase, actual effect adapter'i, hidden-safe fullscreen `HeartScreenUI`, full simulation pause ve schema v17 exact graph/effect replay aktif; legacy `TechTreeUI` ve direct archer level API'si aktif owner değil | `[x]` E1-E6 + launch content + archer progression cutover |
 | Fireball | Dünya hedefli projectile/AoE ve cooldown çalışması mevcut | Korunacak temel |
 | Rally | Wood/Food maliyetli prep purchase | Cooldown-only ability olmalı |
 | Emergency Repair | Ayrı ability yok | Eksik |
@@ -186,7 +186,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 |---|---|---|
 | Tek Wall truth | Damage, Game Over, authoring, repair ve save defense alanı Wall'a çekildi | `[x]` 19/19 EditMode |
 | Run/meta ayrımı | Exact run `run_save.json`; kalıcı progression `meta_progress.json`; ölüm transaction'ı ayrı receipt | `[x]` |
-| Exact Continue | Schema v14 aynı cycle/phase/timer, kaynak, spawn RNG, worker target/checkpoint, purchased bed, worker bina yatırımı, Archer Formation V1, finite Arrow ve sonraki run state'lerini restore ediyor; v3-v13 sıralı migrate ediliyor | `[x]` EditMode + PlayMode |
+| Exact Continue | Schema v17 aynı cycle/phase/timer, kaynak, spawn RNG, worker target/checkpoint, purchased bed, worker bina yatırımı, Archer Formation V1, finite Arrow ve sonraki run state'lerini restore ediyor; v3-v16 sıralı migrate ediliyor | `[x]` EditMode + PlayMode |
 | Otomatik save | Ana menüye dönmeden önce ve application quit sırasında exact snapshot alınıyor | `[x]` |
 | Gönüllü reset yok | Aktif run sırasında Main Menu New Run ve Pause Restart kapalı; Game Over Restart yeni koşu başlatır | `[x]` |
 | Upkeep yok | V1 ResourceTick consumption'ı yok sayıyor; population Food ve Fletcher Wood yolları castle loop'ta kapalı | `[x]` |
@@ -196,11 +196,11 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 ### `DW-A-SAVE` - Tamamlandı: Exact Run Snapshot & Continue
 
-- [x] Run save schema güncel `v14`, minimum `v3`; v2 Dawn checkpoint reddediliyor, v3-v13 state'leri sıralı migrate ediliyor; zincir v3 worker target, v3/v4 bed, v3/v4/v5 worker bina yatırımı, v3-v6 Archer Formation V1 ve v3-v7 finite Arrow state'ini koruyor.
+- [x] Run save schema güncel `v17`, minimum `v3`; v2 Dawn checkpoint reddediliyor, v3-v16 state'leri sıralı migrate ediliyor; zincir worker/bed/bina/formation/Arrow/Heart/Council/ability/meta/combat/telemetry/Fireball state'ini açık migration'larla koruyor ve v16 direct archer level listesini Heart state'i uydurmadan retired ediyor.
 - [x] Gün/cycle index, aktif phase, exact cycle timer/progress ve spawn RNG state'i kaydediliyor.
 - [x] Wood, Stone, Iron, Food, Arrow current ve kesirli accumulator state'i kaydediliyor; data-driven capacity tech/config'ten yeniden hesaplanıyor.
 - [x] Population, bed/capacity, actual worker count, target ratio/cap/idle/checkpoint ve growth/event tekrar gate'leri capture/restore zincirinde kaydediliyor.
-- [x] Basic/Rapid/Frost count, archer level, `ArcherFormationVersion` ve ilgili run bonus state'i kaydediliyor; individual world position kaydedilmiyor.
+- [x] Basic/Rapid/Frost count, `ArcherFormationVersion`, exact Heart graph level'ları ve ilgili run bonus state'i kaydediliyor; individual world position kaydedilmiyor. `ArcherTypeLevels` yalnız v3-v16 JSON girdisi olarak okunup v17'de boş normalize ediliyor.
 - [x] Wall current HP, Fireball cooldown/projectile, Rally ve Fortify state'i kaydediliyor.
 - [x] Tech node level state'i kaydediliyor; generated graph reveal/effect aggregate'leri level state'inden yeniden kuruluyor.
 - [x] Council flags, recent/one-shot memory, salt, cooldown, active event/options/effects ve süreli economy/horde effect state'i kaydediliyor.
@@ -485,7 +485,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [x] Retrain toplam archer ve population sayısını değiştirmesin.
 - [x] Type maliyetini aynı türün mevcut sayısına göre büyüt.
 - [x] Market'teki ayrı Basic/Rapid/Frost level ve upgrade akışını kaldır/disable et.
-- [~] Hasar, fire rate, range, Frost slow upgrade'lerini Heart effect pipeline'ına taşı. Package E / E4 owner'ında.
+- [x] Hasar, fire rate, range ve Frost slow progression'i Heart effect pipeline'ına taşındı. Direct type-level cost/upgrade API'si ve type-level stat çarpanları retired; mevcut/yeni okçu rebase'i ile non-compounding exact Continue testli.
 - [x] Archer death/individual HP yolunun eklenmesini 1K × 10K runtime archer-count regression'ıyla engelle.
 
 ### 40x25 formation işleri
@@ -583,7 +583,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 
 - [x] Başlangıçta Heart ve bağlı ilk seçenekleri tamamen gösteren idempotent reveal state geçişini kur.
 - [x] Uzak node'larda yalnız yön rengi/damarını göster; exact node'u hidden-safe presentation contract'ında gizle ve gerçek prefabda VEILED slot olarak çiz.
-- [x] Gizli node içeriği run başında kesinleşiyor; exact graph güncel schema v11'e clone edilip Continue'da reroll olmadan restore ediliyor.
+- [x] Gizli node içeriği run başında kesinleşiyor; exact graph güncel schema v17'ye clone edilip Continue'da reroll olmadan restore ediliyor.
 - [x] İlk satın alımda, `0 -> N` bulk geçişi dahil, yalnız outgoing bağlı komşuları reveal et.
 - [x] Reveal anında RNG yok; save-scum karşıtı exact graph restore PlayMode round-trip ile doğrulandı.
 - [x] Görünür node effect bilgisini production baseline/sink resolver'ından gerçek numeric current/after/delta olarak prefabda göster.
@@ -947,7 +947,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 | Projectiles | Enableable `ArrowTag`, 1024 prewarm + 256 batch expand, rent/return ve 5s Burst lifetime | `[x]` |
 | VFX/SFX | CombatFeedbackBridge pool ve bazı min interval'lar var | 10k budget/aggregation audit |
 | Worker visuals | Low/Medium/High representative density; resource başına 32 visual cap | `[x]` |
-| Save | v14 exact-critical + deterministic combat rebuild; inactive pool catalog'dan yeniden kurulur | `[x]` 10K aggregate Continue ölçümü |
+| Save | v17 exact-critical + deterministic combat rebuild; inactive pool catalog'dan yeniden kurulur | `[x]` 10K aggregate Continue ölçümü |
 
 ### Ölçüm senaryoları
 
@@ -1146,7 +1146,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
   Basic/Rapid/Frost count ve unspent Grave Essence snapshot'ını canonical death state'inden ekler;
   launch target asset'i bu event'leri yalnız designer review için kullanır ve automatic retuning yapmaz.
   `DamageApplySystem`, modifier sonrası gerçekten uygulanan Wall hasarını kronolojik day/phase
-  bucket'larında toplar; per-hit telemetry/event üretmez. RunSave v16 exact Continue peak ve timeline'ı
+  bucket'larında toplar; per-hit telemetry/event üretmez. RunSave v17 exact Continue peak ve timeline'ı
   korur; v14->v15 migration eski save'lere geçmiş veri uydurmaz. Eksik Meta finalize, rejected payload ve aynı lethal
   transaction'ın tekrar işlenmesi sıfır duplicate üretir. Targeted EditMode `53/53`, gerçek Continue +
   durable death PlayMode `9/9`, full EditMode `375/375` ve full PlayMode
@@ -1183,8 +1183,8 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 
 ### Mevcut test envanteri
 
-- `[x]` EditMode: `404/404`; tek production `IsGameOver = true` writer'ı ve Wall-destroyed guard'ı, `run_started/phase_changed/resource_spent/archer_changed/heart_node_bought/council_resolved/ability_cast/wall_repaired/run_ended` payload/envelope/identity guard'ları, run peak/timeline accumulator, eksiksiz v3-v16 migration matrisi ve v16 doğrulaması, archer transition/total-cap ile Heart node/level/depth/cost/reveal doğrulaması, multi-resource canonical order, ability-specific result shape, Meta diminishing reward/quoted receipt/exact 11-definition tuning, Last Embers identity/icon/copy + scrollable death-screen presentation contract'ı, narrative canon/opening copy/no-prologue drift guard'ı, exact Council 3/6/9 cadence, production Heart catalog/evolution'ları, 19 launch telemetry target/fingerprint'i, exact launch Difficulty/Archer/Meta drift guard'ı, finite Arrow, pool, targeting, Formation V1, common archer cap, economy, worker, cycle, quantity-only, backlog, Moat isolation ve enemy pool kapsamı.
-- `[x]` PlayMode envanteri: `88 pass + 2 explicit profiler/soak skip`; telemetry class'i `9/9` ile `run_started` sırası, exact Continue duplicate guard'ı, canonical Day/Phase/alive/backlog snapshot'i, tek/iki kaynaklı purchase commit'i, player archer buy/retrain transition'ı, gerçek Castle Heart buy/reveal snapshot'i, regular Council secim/expire sonucu, Fireball/Rally/Emergency Repair commit/result snapshot'i, normal Wall repair'i ve exact Continue sonrası durable `run_ended v2` final economy/combat summary'sini kilitler. Rejected transaction'lar event üretmez; Fireball asynchronous hit sayısı cast anında uydurulmaz. Telemetry, gerçek death quote/Continue/meta shop, `NewGameScene` Day 1-12 Council cadence, onaylı Council chain flag live yazımı, active-card exact payload/memory/handled-day Continue, çözülmüş seçim + temp effect duration Continue, bozuk Council karar/Continue payload preflight'ı, production Heart graph/Continue, Fireball evolution exact Continue, Arrow/pool/targeting, 1K archer x 10K enemy, Formation V1, archer cap/retrain, economy/worker, Wall, cycle ve backlog kapsamı envanterde kalır.
+- `[x]` EditMode: `408/408`; tek production `IsGameOver = true` writer'ı ve Wall-destroyed guard'ı, telemetry payload/envelope/identity guard'ları, run peak/timeline accumulator, eksiksiz v3-v17 migration matrisi, retired direct archer owner guard'ı, production Heart'ın dört archer stat progression kategorisi, archer transition/total-cap, Heart node/level/depth/cost/reveal, Meta/Last Embers/narrative/Council/launch tuning, finite Arrow, pool, targeting, Formation V1, economy, worker, cycle, quantity-only, backlog, Moat isolation ve enemy catalog kapsamı.
+- `[x]` PlayMode envanteri: `89 pass + 2 explicit profiler/soak skip`; telemetry, death quote/Continue/meta shop, Council, production Heart graph/Continue, Fireball evolution, Arrow/pool/targeting, 1K archer x 10K enemy, Formation V1, archer cap/retrain, economy/worker, Wall, cycle ve backlog kapsamına ek olarak Heart damage/fire-rate/range/Frost slow satın alımının existing entity rebase, future spawn inheritance ve non-compounding exact Continue davranışını kilitler.
 - `[x]` Player/hardware frame pacing: exact 10K enemy + canonical 1K Basic Archer explicit StandaloneWindows64 test `1/1`; instrumentation kapalı 600-frame JSON `accepted=true`, average/P95/P99 `7,665/13,890/14,058 ms`; ayrı `74.879.570 B` raw `120/120` frame analiz edildi.
 
 ---
@@ -1373,8 +1373,8 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | `NewGameScene.unity` + `MobileCastleCombatSubScene.unity` | Kamera, HUD, active authoring, cycle ve combat values |
 | `MobileCastleHudRoot` live components | Celestial Dial CyclePanel, compact resource strip, Wall-only defense, bottom-center ability bar ve management drawers; Horde forecast ile Gate/Core yüzeyleri yok |
 | `MobileCastleCombatAuthoring.cs` + `DefaultDifficulty.asset` + `BasicZombie.asset` | 30/5/20/5, quantity curves, 900 cap ve ekonomi fiyat baseline'ları; enemy base statları catalog-owned |
-| `GameManager.cs` | Save/restore, repair, worker bina CAP/EFF alımı ve economy aggregate'i, ortak archer spawn/cap guard'ı, archer buy/upgrade, Council, Fireball, meta bridge |
-| `RunPersistence.cs` | Exact schema v16; minimum v3, compact snapshot, Heart graph, regular Council state, üç active-ability cooldown'ı, run telemetry accumulator'ları ve Fireball evolution pending/timer/tick state'i; açık v3->v16 migration zinciri |
+| `GameManager.cs` | Save/restore, repair, worker bina CAP/EFF alımı ve economy aggregate'i, ortak archer spawn/cap guard'ı, archer buy/retrain, Heart archer stat rebase'i, Council, Fireball ve meta bridge; direct archer type-level upgrade owner'ı yok |
+| `RunPersistence.cs` | Exact schema v17; minimum v3, compact snapshot, Heart graph, regular Council state, üç active-ability cooldown'ı, run telemetry accumulator'ları ve Fireball evolution pending/timer/tick state'i; açık v3->v17 migration zinciri ve retired archer level normalization'ı |
 | `ContinuousSiegeCycleSystem.cs` | Phase/intensity ve Blood Moon application |
 | `WaveSpawnSystem.cs` + `EnemyPoolRuntimeUtility.cs` | Tek catalog prefab/stat, cap/backlog ve expandable pool rent |
 | `DamageApplySystem.cs` + `SingleWallDefenseRules.cs` | Production runtime'da tek `IsGameOver = true` writer'ı; yalnız `WallSegment` sıfır HP guard'ı terminal state üretir, final wave/boss/ikinci fail owner'ı yoktur |
@@ -1546,3 +1546,4 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-18 | `DW-V1-CONTENT-KEYSTONE-TRADEOFFS` true-choice forks + four launch trade-offs | Dört branch'in owner-approved Keystone çiftleri gerçek paralel commitment fork'larına dönüştürüldü. Symmetric reveal, exact partner lock, ortak continuation reveal ve legacy exact-save görünürlük normalization sözleşmeleri catalog-aware runtime sahiplerine taşındı. Castle Heart grafiği fractional depth, branch yönüne göre iki-kart yerleşimi, altın pair/fork edge'i, dinamik chosen/locked copy'si ve tween lifecycle cleanup'ıyla polish edildi | Targeted EditMode `32/32`; Keystone + Dusk order PlayMode `2/2`; full EditMode `397/397`; full PlayMode `86 pass + 2 explicit profiler/soak skip`; FullHD true-choice overlay QA; `NewGameScene` validation `0` issue; targeted Keystone PlayMode sonrası DOTween `0` warning; tracker `436/442` |
 | 2026-07-18 | `DW-V1-CONTENT-FIREBALL-EVOLUTIONS` behavior evolutions + aggregate VFX direction | Launch Fireball içeriği iki gerçek davranış evolution'ıyla kilitlendi. Scorched Earth ilk patlamadan sonra `5` saniye boyunca `1` saniye aralıklı, her biri base impact'in `%12`si olan `5` aggregate tick'i `%70` radius'ta uygular; Echoing Detonation `0,85` saniye sonra `%60` damage ve `%85` radius ile ikinci aggregate blast üretir. Production Heart catalog v2 `37` canonical node'a taşındı; v1 graph migration kimliği güncellerken node/reroll uydurmaz. Run save v16 projectile flag, pending strike, delayed blast ve burning-ground next tick/remaining tick state'ini exact korur. Scorched Earth zemin izi ile Echoing Detonation sıcak-altın blast ayrımı per-enemy VFX/event üretmeden uygulanır | Targeted EditMode `51/51`; evolution exactness + gerçek GameManager save/Continue PlayMode `2/2`; migration group `56/56`; full EditMode `400/400`; full PlayMode `88 pass + 2 explicit profiler/soak skip`; production catalog rebuild `37` node / scene binding true; `NewGameScene` validation `0` issue; final Console `0 error / 0 warning`; tracker `439/442` |
 | 2026-07-18 | `DW-V1-CONTENT-EXACT-TUNING-CURVES` exact launch curves + telemetry targets | Mevcut production Difficulty/Archer/Meta değerleri spekülatif rebalance yapılmadan launch authority olarak kilitlendi. Yeni provider-independent target profile Spawn/Economy/Combat/Council/Meta için 19 measurable band, cohort, minimum sample ve canonical source event tanımlar; Difficulty Tuner bunları read-only polished panelde gösterir. `run_ended v2`, durable death sonrasında upgrade-applied Wall MaxHP, final resources, Arrow, population, archer mix ve unspent Essence snapshot'ını ekler. Band dışı ölçüm yalnız designer review tetikler; provider ve automatic retuning yoktur | Target contract EditMode `4/4`; telemetry EditMode `28/28`; gerçek `NewGameScene` telemetry PlayMode `9/9`; full EditMode `404/404`; full PlayMode `88 pass + 2 explicit profiler/soak skip`; target validation `19/19`, fingerprint `58fc60a0...f8059dd3`; scene validation `0` issue; final Console `0 error / 0 warning`; tracker `440/442` |
+| 2026-07-18 | `DW-V1-CLOSURE-ARCHER-HEART-EFFECTS` Heart-owned archer stat progression | Mevcut production Heart effect adapter'ı yeni bir paralel sistem kurulmadan tek V1 owner olarak kapatıldı. Direct Basic/Rapid/Frost level cost/upgrade API'si, type-level damage/fire-rate ve Frost duration/slow çarpanları kaldırıldı; Market row'u sayısal `LV` yerine `HEART/TECH` sahipliğini gösteriyor. Production v2 katalog damage, fire rate, range ve Frost slow kategorilerini exact node/target contract'ıyla kilitliyor. Run save v17, v16 direct archer level listesini graph/node/Essence uydurmadan retired eder; exact Heart graph korunur. Heart satın alımı existing entity'leri rebase eder, future spawn aynı effective state'i alır ve Continue bonusu compound etmez | Targeted EditMode `14/14`; Heart/archer PlayMode `6/6`; full EditMode `408/408`; full PlayMode `89 pass + 2 explicit profiler/soak skip`; live production catalog `7` archer effect row / `0` validation error; `NewGameScene` binding true, scene validation `0` issue; final Console `0 error / 0 warning`; tracker `441/442` |

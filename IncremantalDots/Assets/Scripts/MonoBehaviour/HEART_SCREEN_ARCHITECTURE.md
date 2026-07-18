@@ -45,14 +45,18 @@ Graph seed'i mevcut run id'sinin stable FNV hash'inden gelir. Generator settings
 serialize edilir; graph reveal baslangici idempotenttir. Production catalog yoksa veya graph
 validation fail ederse runtime fail-closed kalir.
 
-Heart effect'leri diger progression sahiplerini ezmez. Archer, Wall, worker economy ve Fireball
-degerleri Heart'siz baseline uzerine oran/additive bonus olarak birlesir. Arrow capacity ve
+Heart effect'leri diger domain sahiplerini ezmez. Archer damage/fire-rate/range/Frost slow icin
+Castle Heart tek V1 player-facing progression owner'idir; direct Basic/Rapid/Frost level API'si
+ve type-level stat carpanlari yoktur. Satin alim mevcut `ArcherUnit` entity'lerini ayni frame'de
+rebase eder, yeni spawn/retrain ayni effective state'i okur ve Continue exact graph replay'iyle
+compound etmez. Wall, worker economy ve Fireball degerleri Heart'siz baseline uzerine
+oran/additive bonus olarak birlesir. Arrow capacity ve
 efficiency bonuslari `ArrowSupply.HeartCapacityBonus` ve `HeartEfficiencyBonus` alanlarinda,
 odenen Arrow upgrade level'larindan ayri tutulur.
 
 Rapid/Frost ve spellcasting unlock'lari canli state'e baglidir. Split Shot, Burning Ground ve
-Second Blast flag'leri pipeline'da saklanir; owner-onayli production behavior sistemi gelmeden
-ek gameplay davranisi uydurulmaz.
+Second Blast flag'leri pipeline'da saklanir; Burning Ground ve Second Blast production behavior
+sistemleri bu resolved flag'leri tuketir.
 
 ## Pause sahipligi
 
@@ -110,8 +114,10 @@ bu cutover'i idempotent uygular ve eski isimleri yalniz migration fallback'i ola
 ## Persistence siniri
 
 E5 runtime graph'i canli kosu icinde deterministic uretir. E6 `DW-E-SAVE`, exact graph DTO,
-reveal, level ve Keystone lock state'ini v10'da save'e ekledi; guncel schema v11 bunu korur. Continue saved graph'i clone ve
-validate eder; catalog'dan yeniden graph uretmez ve purchased effect'leri replay eder.
+reveal, level ve Keystone lock state'ini v10'da save'e ekledi; guncel schema v17 bunu korur.
+v16 -> v17 migration retired `ArcherTypeLevels` listesini graph/node level'i veya Essence
+uydurmadan temizler. Continue saved graph'i clone ve validate eder; catalog'dan yeniden graph
+uretmez ve purchased effect'leri replay eder.
 
 ## Performans
 

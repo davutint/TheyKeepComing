@@ -60,6 +60,59 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void ProductionCatalog_OwnsEveryLaunchArcherStatProgressionCategory()
+        {
+            var effects = _catalog.Nodes
+                .SelectMany(node => (node.Effects ?? Array.Empty<HeartNodeEffect>())
+                    .Select(effect => new { Node = node.Id, Effect = effect }))
+                .Where(row => row.Effect.Type == HeartNodeEffectType.ModifyArcherDamagePercent
+                    || row.Effect.Type == HeartNodeEffectType.ModifyArcherFireRatePercent
+                    || row.Effect.Type == HeartNodeEffectType.AddArcherRange
+                    || row.Effect.Type == HeartNodeEffectType.ReduceFrostSlowMultiplier)
+                .ToArray();
+
+            Assert.That(effects.Where(row =>
+                    row.Effect.Type == HeartNodeEffectType.ModifyArcherDamagePercent)
+                .Select(row => row.Node),
+                Is.EquivalentTo(new[] { "bow_mastery", "heavy_draw" }));
+            Assert.That(effects.Where(row =>
+                    row.Effect.Type == HeartNodeEffectType.ModifyArcherFireRatePercent)
+                .Select(row => row.Node),
+                Is.EquivalentTo(new[] { "volley_mastery", "rapid_drill", "storm_cadence" }));
+            Assert.That(effects.Where(row => row.Effect.Type == HeartNodeEffectType.AddArcherRange)
+                .Select(row => row.Node), Is.EqualTo(new[] { "longbow_geometry" }));
+            Assert.That(effects.Where(row =>
+                    row.Effect.Type == HeartNodeEffectType.ReduceFrostSlowMultiplier)
+                .Select(row => row.Node), Is.EqualTo(new[] { "frostbite_tips" }));
+
+            Assert.That(effects.Single(row => row.Node == "longbow_geometry").Effect.ArcherType,
+                Is.EqualTo(ArcherType.Basic));
+            Assert.That(effects.Single(row => row.Node == "rapid_drill").Effect.ArcherType,
+                Is.EqualTo(ArcherType.Rapid));
+            Assert.That(effects.Single(row => row.Node == "frostbite_tips").Effect.ArcherType,
+                Is.EqualTo(ArcherType.Frost));
+        }
+
+        [Test]
+        public void GameManager_ExposesNoDirectArcherLevelUpgradeOwner()
+        {
+            const System.Reflection.BindingFlags flags =
+                System.Reflection.BindingFlags.Instance
+                | System.Reflection.BindingFlags.Public
+                | System.Reflection.BindingFlags.NonPublic;
+            string[] retiredMethods =
+            {
+                "GetArcherTypeLevel",
+                "GetArcherUpgradeCost",
+                "CanUpgradeArcherType",
+                "UpgradeArcherType"
+            };
+
+            foreach (string method in retiredMethods)
+                Assert.That(typeof(GameManager).GetMethod(method, flags), Is.Null, method);
+        }
+
+        [Test]
         public void ProductionCatalog_HasFourKeystonePairsAndRealFireballEvolutions()
         {
             HeartNodeDefinitionSO[] keystones = _catalog.Nodes

@@ -5,7 +5,7 @@
 - Tarih: `2026-07-18`
 - Unity: `6000.3.10f1`
 - Aktif scene: `Assets/Scenes/NewGameScene.unity`
-- Run save şeması: desteklenen `v3-v16`, canonical `v16`
+- Run save şeması: desteklenen `v3-v17`, canonical `v17`
 - Meta save şeması: desteklenen `v1-v3`, canonical `v3`
 - Release active enemy cap: `900`
 
@@ -18,9 +18,9 @@ olarak korunur.
 
 | Kapı | Sonuç | Kanıt |
 |---|---:|---|
-| Full EditMode | Geçti | `404/404` |
-| Full PlayMode | Geçti | `88 pass + 2 expected explicit skip` |
-| Save migration grubu | Geçti | `56/56` |
+| Full EditMode | Geçti | `408/408` |
+| Full PlayMode | Geçti | `89 pass + 2 expected explicit skip` |
+| Save migration grubu | Geçti | `57/57` |
 | Explicit long-run soak | Geçti | `1/1`, `3.600` sample frame |
 | 10K + 1K target hardware | Geçti | Average/P95/P99 `7,665/13,890/14,058 ms` |
 | Scene validation | Geçti | `0 issue` |
@@ -46,7 +46,8 @@ taşır. Test matrisi yalnız son sürüm round-trip'ini değil, her şema sın�
 | v13 | Legacy exact combat fallback | Aggregate payload tahminle üretilmez |
 | v14 | Telemetry peak/timeline temiz başlangıç | Historical telemetry uydurulmaz |
 | v15 | Fireball evolution runtime listeleri boş | Legacy save'de olmayan pending strike, delayed blast veya burning ground state'i uydurulmaz |
-| v16 | Canonical payload | Bozuk combat rebuild ve sırasız Wall timeline fail-closed; aktif evolution timer ve kalan tick sayısı exact korunur |
+| v16 | Direct Archer type level listesi retired | Heart graph/node/Essence state'i uydurulmaz; legacy liste canonical v17'de boş normalize edilir |
+| v17 | Canonical payload | Bozuk combat rebuild ve sırasız Wall timeline fail-closed; aktif evolution timer, kalan tick sayısı ve exact Heart graph korunur |
 
 Ek durable state kanıtı:
 
@@ -55,7 +56,7 @@ Ek durable state kanıtı:
 - Death receipt run identity/reward snapshot'ını round-trip eder; matching pending death run
   snapshot'ını geçersiz kılar ve aynı RunId Meta reward'ını yalnız bir kez uygular.
 - Targeted `RunPersistenceTests + MetaProgressionSchemaTests + CouncilRegularScheduleTests`
-  birleşik sonucu `56/56`'tir.
+  birleşik kapsamı güncel full EditMode koşusunda `57/57` geçmiştir.
 
 ## Fireball evolution kapanışı
 
@@ -86,6 +87,18 @@ population/capacity/idle, Basic/Rapid/Frost count ve unspent Grave Essence snaps
 Target contract EditMode `4/4`, telemetry EditMode `28/28`, gerçek `NewGameScene` telemetry
 PlayMode `9/9`, full EditMode `404/404` ve full PlayMode `88 pass + 2 expected explicit skip`
 geçti. Scene validation `0 issue`; final Console `0 error / 0 warning` kaldı.
+
+## Heart-owned archer progression kapanışı
+
+Production Heart catalog v2; Archer damage, fire rate, range ve Frost slow progression'ının tek aktif
+V1 sahibidir. Direct Basic/Rapid/Frost type-level cost/upgrade API'si ve bu level'ların stat çarpanları
+kaldırıldı; Market satırları sayısal `LV` yerine `HEART/TECH` sahipliğini gösterir.
+
+Run save v17, v16 direct Archer level listesini Heart graph/node/Essence state'i uydurmadan retired
+eder. Heart satın alımı existing entity'leri rebase eder, future spawn aynı effective stat state'ini
+alır ve Continue replay bonusu compound etmez. Targeted EditMode `14/14`, Heart/archer PlayMode
+`6/6`, güncel full EditMode `408/408` ve full PlayMode `89 pass + 2 expected explicit skip` geçti.
+Scene validation `0 issue`; final Console `0 error / 0 warning` kaldı.
 
 ## Long-run soak kapanış koşusu
 

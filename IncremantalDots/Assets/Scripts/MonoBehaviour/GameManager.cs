@@ -42,16 +42,10 @@ namespace DeadWalls
         private bool _workerVisualSyncInitialized;
         private int _lastSurvivorArrivalVisualMarker;
         private readonly Dictionary<UpgradeType, int> _upgradeTiers = new Dictionary<UpgradeType, int>();
-        private readonly Dictionary<ArcherType, int> _archerTypeLevels = new Dictionary<ArcherType, int>();
         private readonly HashSet<ArcherType> _unlockedArcherTypes = new HashSet<ArcherType> { ArcherType.Basic };
         private int4 _lastSyncedWorkerVisualCounts;
         private int4 _lastSyncedWorkerVisualActualCounts;
         private UpgradeCard[] _currentUpgradeCards;
-        private const float TypeDamageMultiplierPerLevel = 1.12f;
-        private const float TypeFireRateMultiplierPerLevel = 1.08f;
-        private const float FrostSlowDurationPerLevel = 0.15f;
-        private const float FrostSlowMultiplierStep = 0.02f;
-        private const float FrostMinSlowMultiplier = 0.40f;
         private const float GlobalFireRateCardMultiplier = 1.15f;
         private const float GlobalDamageCardBonus = 5f;
         private static readonly ResourceCost FortifyCost = new ResourceCost(0, 50, 25, 0);
@@ -1960,11 +1954,6 @@ namespace DeadWalls
             return type == ArcherType.Basic || _unlockedArcherTypes.Contains(type);
         }
 
-        public int GetArcherTypeLevel(ArcherType type)
-        {
-            return _archerTypeLevels.TryGetValue(type, out int level) ? math.max(1, level) : 1;
-        }
-
         public int GetArcherTypeCount(ArcherType type)
         {
             switch (type)
@@ -2119,20 +2108,6 @@ namespace DeadWalls
                 definition.CostGrowthExponent);
         }
 
-        public ResourceCost GetArcherUpgradeCost(ArcherType type)
-        {
-            int completedUpgrades = GetArcherTypeLevel(type) - 1;
-            switch (type)
-            {
-                case ArcherType.Rapid:
-                    return ScaleCost(new ResourceCost(85, 0, 55, 0), 1.40f, completedUpgrades);
-                case ArcherType.Frost:
-                    return ScaleCost(new ResourceCost(0, 70, 45, 0), 1.40f, completedUpgrades);
-                default:
-                    return ScaleCost(new ResourceCost(70, 0, 0, 30), 1.35f, completedUpgrades);
-            }
-        }
-
         public ResourceCost GetArcherUnlockCost(ArcherType type)
         {
             switch (type)
@@ -2280,25 +2255,6 @@ namespace DeadWalls
             TryEmitArcherChangedTelemetry(ArcherChangedTelemetryFactory.CreateRetrain(
                 targetType,
                 GetTotalArcherCount()));
-            OnGameStateChanged?.Invoke();
-            return true;
-        }
-
-        public bool CanUpgradeArcherType(ArcherType type)
-        {
-            return _initialized && IsArcherTypeUnlocked(type) && CanAfford(GetArcherUpgradeCost(type));
-        }
-
-        public bool UpgradeArcherType(ArcherType type)
-        {
-            if (!CanUpgradeArcherType(type))
-                return false;
-
-            if (!SpendResources(GetArcherUpgradeCost(type)))
-                return false;
-
-            _archerTypeLevels[type] = GetArcherTypeLevel(type) + 1;
-            ApplyScaledStatsToArchers(type, true);
             OnGameStateChanged?.Invoke();
             return true;
         }
@@ -3366,8 +3322,6 @@ namespace DeadWalls
 
             foreach (var pair in _techNodeLevels)
                 save.TechNodeLevels.Add(new TechLevelEntry { Id = pair.Key, Level = pair.Value });
-            foreach (var pair in _archerTypeLevels)
-                save.ArcherTypeLevels.Add(new ArcherLevelEntry { Type = (int)pair.Key, Level = pair.Value });
             foreach (var pair in _upgradeTiers)
                 save.UpgradeTiers.Add(new UpgradeTierEntry { Type = (int)pair.Key, Tier = pair.Value });
             foreach (var pair in _councilFlags)
@@ -3417,16 +3371,13 @@ namespace DeadWalls
             _lastRegularCouncilDay = -1;
             ApplyTechEconomyAggregates(); // council cap bonuslari fold'lanir
 
-            // 3) Level-up kartlari + okcu yukseltme seviyeleri (canli okculara stats yansir)
+            // 3) Dormant legacy level-up kartlari. V1 okcu stat progression'i yalniz
+            //    exact Heart graph effect replay'inden gelir.
             _upgradeTiers.Clear();
             foreach (var tier in save.UpgradeTiers)
                 _upgradeTiers[(UpgradeType)tier.Type] = tier.Tier;
             _globalArrowDamageBonus = save.GlobalArrowDamageBonus;
             _globalFireRateMultiplier = save.GlobalFireRateMultiplier;
-            _archerTypeLevels.Clear();
-            foreach (var entry in save.ArcherTypeLevels)
-                _archerTypeLevels[(ArcherType)entry.Type] = entry.Level;
-
             _archerFormationVersion = ArcherFormationUtility.NormalizeVersion(
                 save.ArcherFormationVersion);
             RepositionExistingMobileArchersToOutside();
@@ -3692,8 +3643,6 @@ namespace DeadWalls
 
             foreach (var pair in _techNodeLevels)
                 save.TechNodeLevels.Add(new TechLevelEntry { Id = pair.Key, Level = pair.Value });
-            foreach (var pair in _archerTypeLevels)
-                save.ArcherTypeLevels.Add(new ArcherLevelEntry { Type = (int)pair.Key, Level = pair.Value });
             foreach (var pair in _upgradeTiers)
                 save.UpgradeTiers.Add(new UpgradeTierEntry { Type = (int)pair.Key, Tier = pair.Value });
             foreach (var pair in _councilFlags)
@@ -3967,10 +3916,6 @@ namespace DeadWalls
                 _upgradeTiers[(UpgradeType)tier.Type] = tier.Tier;
             _globalArrowDamageBonus = save.GlobalArrowDamageBonus;
             _globalFireRateMultiplier = save.GlobalFireRateMultiplier;
-            _archerTypeLevels.Clear();
-            foreach (var entry in save.ArcherTypeLevels)
-                _archerTypeLevels[(ArcherType)entry.Type] = entry.Level;
-
             _archerFormationVersion = ArcherFormationUtility.NormalizeVersion(
                 save.ArcherFormationVersion);
             RepositionExistingMobileArchersToOutside();
@@ -4936,20 +4881,12 @@ namespace DeadWalls
         private ArcherStats GetHeartFreeScaledArcherStats(ArcherType type)
         {
             var stats = GetBaseArcherStats(type);
-            int extraLevels = GetArcherTypeLevel(type) - 1;
-            float damageScale = math.pow(TypeDamageMultiplierPerLevel, extraLevels);
-            float fireRateScale = math.pow(TypeFireRateMultiplierPerLevel, extraLevels) * _globalFireRateMultiplier;
 
-            // Tech tree carpanlari son degere uygulanir (flat bonus dahil) — bkz. TECH_TREE_SO_ARCHITECTURE.md
-            stats.Damage = (stats.Damage * damageScale + _globalArrowDamageBonus) * _techDamageMultiplier;
-            stats.FireRate *= fireRateScale * _techFireRateMultiplier;
-
-            if (type == ArcherType.Frost)
-            {
-                stats.SlowDuration += FrostSlowDurationPerLevel * extraLevels;
-                stats.SlowMultiplier = math.max(FrostMinSlowMultiplier,
-                    stats.SlowMultiplier - FrostSlowMultiplierStep * extraLevels);
-            }
+            // Mobile V1'da archer stat progression'in tek player-facing sahibi Heart'tir.
+            // Bu iki legacy katman yalniz dormant non-mobile level-up/Tech save uyumlulugu
+            // icin baseline'da kalir; V1 loop bunlara yeni yatirim yolu acmaz.
+            stats.Damage = (stats.Damage + _globalArrowDamageBonus) * _techDamageMultiplier;
+            stats.FireRate *= _globalFireRateMultiplier * _techFireRateMultiplier;
 
             return stats;
         }
@@ -6437,7 +6374,6 @@ namespace DeadWalls
 
         private void ResetArcherEconomyState()
         {
-            _archerTypeLevels.Clear();
             _unlockedArcherTypes.Clear();
             _unlockedArcherTypes.Add(ArcherType.Basic);
             _globalArrowDamageBonus = 0f;

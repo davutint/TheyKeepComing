@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
+using Unity.Collections;
+using Unity.Entities;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
@@ -141,6 +143,108 @@ namespace DeadWalls.Tests
                 "Continue sonrasi veya future-run tuning degisince aktif graph yeniden zar atilmamali.");
         }
 
+        [UnityTest]
+        public IEnumerator HeartArcherEffects_RebaseExistingAndFutureUnits_AndContinueDoesNotCompound()
+        {
+            GameManager gameManager = GameManager.Instance;
+            bool snapshotReady = false;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                {
+                    snapshotReady = true;
+                    break;
+                }
+                yield return null;
+            }
+            Assert.That(snapshotReady, Is.True, "GameManager snapshot icin hazir olmadi.");
+
+            RunSaveState save = RunPersistence.TryLoad();
+            Assert.That(save, Is.Not.Null);
+            HeartNodeCatalogSO catalog = CreateCatalog();
+            GeneratedRunGraph graph = CreateSavedGraph(catalog.CatalogVersion);
+            GeneratedHeartNodeState frostUnlock = graph.Nodes.Single(node =>
+                node.NodeId == "frost_unlock");
+            frostUnlock.Visibility = HeartNodeVisibility.Revealed;
+            frostUnlock.Level = 1;
+            GeneratedHeartNodeState armySink = graph.Nodes.Single(node =>
+                node.NodeId == "army_sink");
+            armySink.Visibility = HeartNodeVisibility.Revealed;
+            armySink.Level = 0;
+
+            save.HasHeartGraph = true;
+            save.HeartGraph = HeartGraphPersistenceUtility.CloneExact(graph);
+            save.GraveEssence = 1_000;
+            save.BasicArchers = Math.Max(1, save.BasicArchers);
+            save.FrostArchers = Math.Max(1, save.FrostArchers);
+            Assert.That(RunPersistence.Save(save), Is.True);
+
+            _catalogField.SetValue(gameManager, catalog);
+            Assert.That(gameManager.TryRestoreRunFromCheckpoint(), Is.True);
+            Assert.That(gameManager.IsHeartRuntimeReady, Is.True);
+
+            EntityManager entityManager =
+                World.DefaultGameObjectInjectionWorld.EntityManager;
+            Entity basicEntity = FindArcher(entityManager, ArcherType.Basic);
+            Entity frostEntity = FindArcher(entityManager, ArcherType.Frost);
+            Assert.That(basicEntity, Is.Not.EqualTo(Entity.Null));
+            Assert.That(frostEntity, Is.Not.EqualTo(Entity.Null));
+            ArcherUnit basicBefore = entityManager.GetComponentData<ArcherUnit>(basicEntity);
+            ArcherUnit frostBefore = entityManager.GetComponentData<ArcherUnit>(frostEntity);
+
+            HeartPurchaseResult purchase = gameManager.TryPurchaseHeartNode(
+                "army_sink", HeartPurchaseQuantity.One);
+            Assert.That(purchase, Is.Not.Null);
+            Assert.That(purchase.Succeeded, Is.True, purchase.Message);
+            yield return null;
+
+            ArcherUnit basicAfter = entityManager.GetComponentData<ArcherUnit>(basicEntity);
+            ArcherUnit frostAfter = entityManager.GetComponentData<ArcherUnit>(frostEntity);
+            Assert.That(basicAfter.ArrowDamage, Is.GreaterThan(basicBefore.ArrowDamage));
+            Assert.That(basicAfter.FireRate, Is.GreaterThan(basicBefore.FireRate));
+            Assert.That(basicAfter.Range, Is.GreaterThan(basicBefore.Range));
+            Assert.That(frostAfter.SlowMultiplier, Is.LessThan(frostBefore.SlowMultiplier));
+            Assert.That(frostAfter.SlowDuration, Is.EqualTo(frostBefore.SlowDuration).Within(0.0001f),
+                "Heart Frost progression slow multiplier'i sahiplenir; duration uydurmaz.");
+
+            HashSet<Entity> basicEntitiesBeforeBuy = GetArchers(entityManager, ArcherType.Basic);
+            FieldInfo freeEconomyField = typeof(GameManager).GetField(
+                "freeEconomyTestMode", BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.That(freeEconomyField, Is.Not.Null);
+            freeEconomyField.SetValue(gameManager, true);
+            try
+            {
+                Assert.That(gameManager.BuyArcher(ArcherType.Basic), Is.True);
+            }
+            finally
+            {
+                freeEconomyField.SetValue(gameManager, false);
+            }
+
+            Entity newBasicEntity = GetArchers(entityManager, ArcherType.Basic)
+                .Single(entity => !basicEntitiesBeforeBuy.Contains(entity));
+            ArcherUnit newBasic = entityManager.GetComponentData<ArcherUnit>(newBasicEntity);
+            AssertArcherStatsEqual(basicAfter, newBasic,
+                "Heart satin alimindan sonra uretilen okcu effective stat'leri miras almali.");
+
+            Assert.That(gameManager.SaveRunSnapshot(), Is.True);
+            RunSaveState heartSave = RunPersistence.TryLoad();
+            Assert.That(heartSave, Is.Not.Null);
+            Assert.That(heartSave.ArcherTypeLevels, Is.Not.Null.And.Empty);
+            Assert.That(heartSave.HeartGraph.Nodes.Single(node => node.NodeId == "army_sink").Level,
+                Is.EqualTo(1));
+
+            Assert.That(gameManager.TryRestoreRunFromCheckpoint(), Is.True);
+            ArcherUnit basicAfterContinue = entityManager.GetComponentData<ArcherUnit>(
+                FindArcher(entityManager, ArcherType.Basic));
+            ArcherUnit frostAfterContinue = entityManager.GetComponentData<ArcherUnit>(
+                FindArcher(entityManager, ArcherType.Frost));
+            AssertArcherStatsEqual(basicAfter, basicAfterContinue,
+                "Continue Heart damage/fire-rate/range effect'ini compound etmemeli.");
+            AssertArcherStatsEqual(frostAfter, frostAfterContinue,
+                "Continue Frost slow effect'ini compound etmemeli.");
+        }
+
         private HeartNodeCatalogSO CreateCatalog()
         {
             HeartNodeCatalogSO catalog = ScriptableObject.CreateInstance<HeartNodeCatalogSO>();
@@ -163,7 +267,34 @@ namespace DeadWalls.Tests
                         ArcherType = ArcherType.Frost
                     }),
                 CreateDefinition("army_sink", HeartNodeBranch.Army, HeartNodeType.Repeatable,
-                    new[] { HeartGraphConstants.RepeatableSinkTag }),
+                    new[] { HeartGraphConstants.RepeatableSinkTag },
+                    new HeartNodeEffect
+                    {
+                        Type = HeartNodeEffectType.ModifyArcherDamagePercent,
+                        ArcherType = ArcherType.Basic,
+                        Value = 0.25d
+                    },
+                    new HeartNodeEffect
+                    {
+                        Type = HeartNodeEffectType.ModifyArcherFireRatePercent,
+                        ArcherType = ArcherType.Basic,
+                        Value = 0.20d,
+                        SoftCap = 0.75d
+                    },
+                    new HeartNodeEffect
+                    {
+                        Type = HeartNodeEffectType.AddArcherRange,
+                        ArcherType = ArcherType.Basic,
+                        Value = 0.80d,
+                        SoftCap = 3d
+                    },
+                    new HeartNodeEffect
+                    {
+                        Type = HeartNodeEffectType.ReduceFrostSlowMultiplier,
+                        ArcherType = ArcherType.Frost,
+                        Value = 0.10d,
+                        SoftCap = 0.35d
+                    }),
                 CreateDefinition("wall_access", HeartNodeBranch.Defense, HeartNodeType.Unlock,
                     new[] { HeartGraphConstants.WallGuaranteeTag },
                     new HeartNodeEffect
@@ -266,6 +397,41 @@ namespace DeadWalls.Tests
         private static void AddEdge(GeneratedRunGraph graph, string from, string to)
         {
             graph.Edges.Add(new GeneratedHeartEdge { FromNodeId = from, ToNodeId = to });
+        }
+
+        private static Entity FindArcher(EntityManager entityManager, ArcherType type)
+        {
+            HashSet<Entity> entities = GetArchers(entityManager, type);
+            return entities.Count > 0 ? entities.First() : Entity.Null;
+        }
+
+        private static HashSet<Entity> GetArchers(EntityManager entityManager, ArcherType type)
+        {
+            using EntityQuery query = entityManager.CreateEntityQuery(new EntityQueryDesc
+            {
+                All = new[] { ComponentType.ReadOnly<ArcherUnit>() },
+                None = new[] { ComponentType.ReadOnly<Prefab>() }
+            });
+            var result = new HashSet<Entity>();
+            using NativeArray<Entity> entities = query.ToEntityArray(Allocator.Temp);
+            for (int i = 0; i < entities.Length; i++)
+            {
+                Entity entity = entities[i];
+                if (entityManager.GetComponentData<ArcherUnit>(entity).Type == type)
+                    result.Add(entity);
+            }
+            return result;
+        }
+
+        private static void AssertArcherStatsEqual(
+            ArcherUnit expected, ArcherUnit actual, string message)
+        {
+            Assert.That(actual.Type, Is.EqualTo(expected.Type), message);
+            Assert.That(actual.ArrowDamage, Is.EqualTo(expected.ArrowDamage).Within(0.0001f), message);
+            Assert.That(actual.FireRate, Is.EqualTo(expected.FireRate).Within(0.0001f), message);
+            Assert.That(actual.Range, Is.EqualTo(expected.Range).Within(0.0001f), message);
+            Assert.That(actual.SlowDuration, Is.EqualTo(expected.SlowDuration).Within(0.0001f), message);
+            Assert.That(actual.SlowMultiplier, Is.EqualTo(expected.SlowMultiplier).Within(0.0001f), message);
         }
     }
 }

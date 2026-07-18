@@ -200,7 +200,7 @@ state owner'i kurmadan olculebilir yapar. Alanlar non-negative ve kendi capacity
 tutarli olmak zorundadir; incoherent payload yayinlanmaz.
 
 Accumulator component/buffer'i yeni bir manager veya parallel singleton degildir; mevcut GameState
-entity'sinde canonical spawn/damage owner'larinin output'udur. `RunSaveState v16` peak ve kronolojik
+entity'sinde canonical spawn/damage owner'larinin output'udur. `RunSaveState v17` peak ve kronolojik
 timeline'i exact Continue icin saklar. v14->v15 migration historical deger uydurmaz; timeline bos
 baslar, peak restored current alive count'tan ileriye dogru izlenir.
 

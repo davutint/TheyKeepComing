@@ -527,14 +527,54 @@ namespace DeadWalls.Tests
         }
 
         [Test]
-        public void TryLoad_Version16InvalidCombatRebuild_FailsClosed()
+        public void TryLoad_Version16Snapshot_RetiresDirectArcherLevelsWithoutInventingHeartState()
+        {
+            string path = Path.Combine(Application.persistentDataPath, "run_save.json");
+            byte[] original = File.Exists(path) ? File.ReadAllBytes(path) : null;
+            var legacy = new RunSaveState
+            {
+                Version = 16,
+                RunId = "run_v16_archer_heart_migration_" + Guid.NewGuid().ToString("N"),
+                HasHeartGraph = false,
+                HeartGraph = null
+            };
+            legacy.ArcherTypeLevels.Add(new ArcherLevelEntry
+                { Type = (int)ArcherType.Basic, Level = 9 });
+            legacy.ArcherTypeLevels.Add(new ArcherLevelEntry
+                { Type = (int)ArcherType.Frost, Level = 4 });
+
+            try
+            {
+                File.WriteAllText(path, JsonUtility.ToJson(legacy));
+
+                RunSaveState restored = RunPersistence.TryLoad();
+
+                Assert.That(restored, Is.Not.Null);
+                Assert.That(restored.Version, Is.EqualTo(RunSaveState.CurrentVersion));
+                Assert.That(restored.ArcherTypeLevels, Is.Not.Null.And.Empty,
+                    "Retired Market seviyeleri ikinci bir V1 stat owner'i olarak yasamamali.");
+                Assert.That(restored.HasHeartGraph, Is.False);
+                Assert.That(restored.HeartGraph == null || restored.HeartGraph.Nodes.Count == 0,
+                    Is.True, "Migration eksik Heart graph veya node level'i uydurmamali.");
+            }
+            finally
+            {
+                if (original != null)
+                    File.WriteAllBytes(path, original);
+                else if (File.Exists(path))
+                    File.Delete(path);
+            }
+        }
+
+        [Test]
+        public void TryLoad_Version17InvalidCombatRebuild_FailsClosed()
         {
             string path = Path.Combine(Application.persistentDataPath, "run_save.json");
             byte[] original = File.Exists(path) ? File.ReadAllBytes(path) : null;
             var corrupt = new RunSaveState
             {
                 Version = RunSaveState.CurrentVersion,
-                RunId = "run_v16_corrupt_rebuild_" + Guid.NewGuid().ToString("N"),
+                RunId = "run_v17_corrupt_rebuild_" + Guid.NewGuid().ToString("N"),
                 HasCombatRebuild = true,
                 CombatRebuild = new CombatRebuildRunSaveState
                 {
@@ -568,14 +608,14 @@ namespace DeadWalls.Tests
         }
 
         [Test]
-        public void TryLoad_Version16OutOfOrderRunTelemetry_FailsClosed()
+        public void TryLoad_Version17OutOfOrderRunTelemetry_FailsClosed()
         {
             string path = Path.Combine(Application.persistentDataPath, "run_save.json");
             byte[] original = File.Exists(path) ? File.ReadAllBytes(path) : null;
             var corrupt = new RunSaveState
             {
                 Version = RunSaveState.CurrentVersion,
-                RunId = "run_v16_corrupt_telemetry_" + Guid.NewGuid().ToString("N"),
+                RunId = "run_v17_corrupt_telemetry_" + Guid.NewGuid().ToString("N"),
                 TelemetryPeakEnemies = 100
             };
             corrupt.WallDamageTimeline.Add(new RunWallDamageTelemetrySaveState
@@ -596,7 +636,7 @@ namespace DeadWalls.Tests
                 File.WriteAllText(path, JsonUtility.ToJson(corrupt));
 
                 Assert.That(RunPersistence.TryLoad(), Is.Null,
-                    "v16 out-of-order Wall timeline sessizce restore edilmemeli.");
+                    "v17 out-of-order Wall timeline sessizce restore edilmemeli.");
             }
             finally
             {

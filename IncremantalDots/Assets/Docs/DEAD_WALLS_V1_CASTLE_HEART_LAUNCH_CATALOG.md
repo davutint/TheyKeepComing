@@ -20,6 +20,15 @@ satın alma veya reveal sahibi değildir.
   asimptotik yaklaşır; node yapay bir max level'a kilitlenmez.
 - Keystone seçimi yalnız tabloda adı geçen karşı Keystone'u kapatır.
 
+## Archer progression owner sözleşmesi
+
+V1'da damage, fire rate, range ve Frost slow progression'inin tek player-facing sahibi Castle
+Heart'tır. Market yalnız buy ve Basic -> Rapid/Frost retrain sunar; direct type level, resource
+cost veya upgrade transaction API'si yoktur. Heart satın alımı mevcut okçuları anında rebase
+eder, daha sonra spawn/retrain edilen okçu aynı effective state'i alır ve exact Continue saved
+graph level'larını compound etmeden replay eder. HUD row level alanı bu nedenle sayısal `LV`
+yerine unlocked türde `HEART`, kilitli türde `TECH` gösterir.
+
 ## Owner-onaylı Keystone trade-off sözleşmesi — 2026-07-18
 
 Keystone, normal bir güç artışından farklı olarak koşu boyunca karakter belirleyen iki eşit
@@ -105,7 +114,7 @@ node/edge topolojisi compatibility için değişmez; reveal/purchase katmanı ar
 - `Echoing Detonation` tek timer entity ve tek aggregate secondary strike üretir. Mevcut blast
   renderer'larını sıcak-altın palette yeniden kullanır; yeni per-enemy feedback oluşturmaz.
 - Exact Continue aktif projectile'ın evolution flag'lerini, bekleyen secondary blast'ı ve kalan
-  burning-ground süre/tick state'ini `RunSaveState v16` içinde korur.
+  burning-ground süre/tick state'ini `RunSaveState v17` içinde korur.
 
 Catalog `v1 -> v2` migration yalnız mevcut generated graph'ın catalog kimliğini yükseltir. Yeni
 evolution node'ları devam eden koşuya eklenmez, graph yeniden üretilmez ve seed/node/edge,
@@ -154,6 +163,8 @@ catalog tarafından sahiplenilir.
 - `basic_archer`: koşu başlangıç baseline'ıdır; Heart unlock'u değildir.
 - `moat_flame` ve `moat_dig`: Moat V1 guardrail'i gereği dormant kalır.
 - Legacy resource cost, prerequisite/reveal edge ve runtime level state'i yeni catalog'a kopyalanmaz.
+- `RunSaveState v17`, v3-v16 JSON uyumluluğu için serialized alanı okuyabilir fakat retired
+  `ArcherTypeLevels` listesini boş normalize eder; bunu Heart node level'i veya Essence'e çevirmez.
 
 ## Sunum ve versioning kilidi
 

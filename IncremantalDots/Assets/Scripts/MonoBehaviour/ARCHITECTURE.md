@@ -17,10 +17,10 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - `RepairDefenseFull()`, `BuyFortify()` ve `BuyRally()` legacy/debug API olarak kalir
 - Finite Arrow API'leri: +1/+5/Buy Max Wood refill quote/transaction'ı, Wood+Iron Capacity/Efficiency quote/transaction'ı ve data-driven capacity/verim okuması
 - `GetDefensePercent()` wall/gate/castle toplam HP yuzdesini HUD'a verir
-- Mobile archer economy API'leri: `ArcherDefinitionSO` catalog'undan type-count scaled buy/retrain cost ve base stat okuma, buy, Basic -> Rapid/Frost in-place retrain, type count/DPS okuma; `GetTotalArcherCount`, `GetRemainingArcherCapacity` ve `CanAddArchers` Basic/Rapid/Frost ortak `1000` cap'ini sunar. Legacy unlock/upgrade API'leri kodda kalir ama sag drawer player-facing kullanmaz
+- Mobile archer economy API'leri: `ArcherDefinitionSO` catalog'undan type-count scaled buy/retrain cost ve base stat okuma, buy, Basic -> Rapid/Frost in-place retrain, type count/DPS okuma; `GetTotalArcherCount`, `GetRemainingArcherCapacity` ve `CanAddArchers` Basic/Rapid/Frost ortak `1000` cap'ini sunar. Direct type-level cost/upgrade API'si yoktur; stat progression exact Heart effect pipeline'ina aittir
 - Legacy Tech Tree state/API (`_techNodeLevels`, `_revealedTechNodes`, `TryBuyTechNode`) migration/debug uyumlulugu icin kodda kalir; aktif `NewGameScene` HUD'inda `TechTreeUI` yoktur ve legacy catalog player-facing progression owner'i degildir
 - Castle Heart runtime'i `GameManager.HeartRuntime.cs` partial'inda generated graph/reveal/presentation, Grave Essence-only quote/purchase ve actual effect adapter'larini birlestirir. Production `heartCatalog` null ise acik hata verir; legacy `TechTreeCatalogSO`'ya fallback yapmaz
-- Run-only `GraveEssence` bakiyesi `GrantGraveEssence` ile artar ve yalniz `TrySpendGraveEssenceAtHeart` kapisindan azalir; exact save v11'de generated Heart graph ile birlikte korunur, Restart/Game Over'da silinir
+- Run-only `GraveEssence` bakiyesi `GrantGraveEssence` ile artar ve yalniz `TrySpendGraveEssenceAtHeart` kapisindan azalir; exact save v17'de generated Heart graph ile birlikte korunur, Restart/Game Over'da silinir
 - Continue saved Heart graph'i `CatalogVersion`/structural/runtime-state preflight'inden gecirir ve purchased level'lari deferred `HeartEffectPipeline` replay'iyle canli owner'lara uygular; v9 null-graph migration'i yeni graph uretmez
 - Heart effect'leri Heart'siz baseline uzerine uygulanir: Basic/Rapid/Frost damage/fire-rate/range/Frost slow, tek Wall HP/repair, resource-specific worker capacity/production, population growth, Arrow capacity/efficiency ve Fireball damage/radius/cooldown. Arrow Heart bonuslari paid Arrow level'larindan ayri ECS alanlarinda tutulur
 - `GetHeartGraphSettingsSnapshot()` gelecekte uretilecek graph ayarlarini kopya olarak verir; `GetHeartRuntimeTuningTelemetry()` ise hidden node kimliklerini acmadan wallet, meta remainder ve aggregate graph sayaclarini Difficulty Tuner'a sunar. Bu yuzey aktif veya Continue ile restore edilen exact graph'i reroll etmez
@@ -36,7 +36,7 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - Bütün aktif spawn yollarini `SpawnArcher` merkezinde `ArcherCapacityUtility` ile sınırlar; 1001. entity oluşmaz
 - Spawn edilen okcuya type-specific `SpriteTint` yazar
 - Spawn edilen okculari varsayilan East facing idle state'iyle baslatir
-- Type upgrade'leri mevcut ve gelecekte spawn olacak ayni tip okculara damage/fire-rate scaling uygular; bu akisin player-facing sahibi sag drawer degil, ileride full-screen Tech Tree olacaktir
+- Heart damage/fire-rate/range/Frost slow effect'leri mevcut okculari aninda rebase eder; daha sonra spawn/retrain edilen okcular ayni effective state'i alir. Continue saved Heart level'larini replay eder ve bonusu compound etmez
 - `RestartGame()` ile oyunu sifirlar
 
 ### HUDController.cs
@@ -80,7 +80,7 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 ### LevelUpUI.cs
 
 - Legacy kart panelidir.
-- Mobile castle loop'ta kullanilmaz; okcu alma sag drawer recruitment uzerinden ilerler, upgrade/unlock ileride Tech Tree'ye tasinacaktir.
+- Mobile castle loop'ta kullanilmaz; okcu alma sag drawer recruitment uzerinden, unlock ve stat progression Castle Heart uzerinden ilerler.
 
 ### MarketUI.cs
 
@@ -90,12 +90,12 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - `ArcherRecruitmentListRoot` + inactive `ArcherRecruitmentRowTemplate` varsa satirlari `ArcherRecruitmentCatalogSO` definition listesinden runtime'da uretir
 - Template yoksa legacy Basic/Rapid/Frost row'larinda yalnizca `Buy` aksiyonunu `GameManager.BuyArcher()` API'sine baglar
 - Upgrade butonlari, Rapid/Frost tech unlock butonlari ve `ArrowTechPanel` player-facing olarak gizlenir
-- Basic baslangicta aciktir; Rapid/Frost ileride Tech Tree tarafindan unlock edilecek kilitli satirlar olarak kalir
+- Basic baslangicta aciktir; Rapid/Frost Castle Heart unlock node'larina kadar kilitli satirlar olarak kalir
 - Row `CostText` alanlarinda mevcut cost ile beraber eksik kaynak varsa `NEED ...`, idle population yoksa `NEED POP` yazar
 - `GameManager.Free Economy Test Mode` acikken cost satirlari `FREE` gosterir; kaynak ve population yetersizligi player-facing aksiyonlari bloklamaz
 - Free Economy Test Mode ortak `1000` cap'i bypass etmez; cap'te row `ARMY CAP 1000/1000` ve `MAX` gosterir
 - Rapid/Frost unlock olduktan sonra `RETRAIN`, bir Basic entity'yi yerinde dönüştürür; toplam garnizon/population değişmez ve cap doluyken de çalışır
-- Buy ve retrain maliyetleri hedef tür sayısına göre definition tuning'inden büyür; ayrı archer upgrade/level UI açılmaz
+- Buy ve retrain maliyetleri hedef tür sayısına göre definition tuning'inden büyür; ayrı archer upgrade/level UI açılmaz. Row level alanı unlocked türde `HEART`, kilitli türde `TECH` yazar
 - Basarili player-facing buy action'i `ArcherPurchasedByPlayer` event'ini yayar; onboarding gibi presentation consumer'lari transaction'i tekrar etmeden bu event'i dinler
 - Worker economy aktifken `Repair`, `Fortify` ve `Rally` player-facing drawer'da gizlenir; drawer archer recruitment paneli olarak kalir
 - Legacy `Arrow Refill` kontrolü gizlenir; Arrow chip'i scene-owned `ArrowSupplyUI` tek satır panelini açar
@@ -156,7 +156,7 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - Director: kit kaynak/dusuk savunma/bolluk baglamina gore atom-sablon agirliklari; hafiza: flag'ler + zincir sablonlari (RequiredFlags/ChainDelayDays/OneShot); butce: A/B secenekleri "dakika-degeri" cinsinden dengelenir
 - Regular schedule tek owner'i `CouncilRegularSchedule`: Day `3,6,9,12...`; chance/pity/cooldown regular akis disinda. V1 regular-only'dir ve ikinci emergency meeting yolu yoktur. GameManager API: `TryOpenRegularCouncilEvent`, `ChooseCouncilOption`, `ExpireCouncilEvent`, `CanAffordCouncilOption`
 - `CouncilOptionPresentationUtility` iki secenegi canli state'ten exact quote eder; `CouncilDecisionWindowUtility` kalan Dawn + Day suresini `DECIDE Ns` ve azalan Filled/Horizontal seride verir
-- Exact save v14 `LastRegularCouncilDay`, non-zero Council run salt, `HasActiveCouncilEvent` ve resolved effect state'ini korur; v10 chance fail'i migration'da scheduled gunu tuketmez
+- Exact save v17 `LastRegularCouncilDay`, non-zero Council run salt, `HasActiveCouncilEvent` ve resolved effect state'ini korur; v10 chance fail'i migration'da scheduled gunu tuketmez
 - Otoriter dok: `COUNCIL_EVENTS_ARCHITECTURE.md`
 
 ### DefenseRepairUI.cs

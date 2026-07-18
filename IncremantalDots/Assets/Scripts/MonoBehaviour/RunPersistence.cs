@@ -13,7 +13,7 @@ namespace DeadWalls
     [Serializable]
     public class RunSaveState
     {
-        public const int CurrentVersion = 16;
+        public const int CurrentVersion = 17;
         public const int MinimumSupportedVersion = 3;
 
         public int Version = CurrentVersion;
@@ -135,6 +135,8 @@ namespace DeadWalls
         public int BasicArchers;
         public int RapidArchers;
         public int FrostArchers;
+        // v3-v16 JSON uyumlulugu icin alan korunur. v17 migration listeyi temizler;
+        // aktif okcu stat progression'i exact HeartGraph level state'idir.
         public List<ArcherLevelEntry> ArcherTypeLevels = new List<ArcherLevelEntry>();
 
         // Tech: level state otoritedir; reveal/effect aggregate level'lardan yeniden kurulur.
@@ -397,6 +399,7 @@ namespace DeadWalls
                 }
 
                 UpgradeToCurrent(state);
+                NormalizeRetiredArcherProgressionState(state);
                 NormalizeFireballEvolutionState(state);
                 NormalizeActiveCouncilEvent(state);
                 if (!NormalizeCombatRebuild(state, out string combatError))
@@ -426,6 +429,7 @@ namespace DeadWalls
             state.Version = RunSaveState.CurrentVersion;
             state.ArcherFormationVersion = ArcherFormationUtility.NormalizeVersion(
                 state.ArcherFormationVersion);
+            NormalizeRetiredArcherProgressionState(state);
             NormalizeFireballEvolutionState(state);
             NormalizeActiveCouncilEvent(state);
             if (!NormalizeCombatRebuild(state, out string combatError))
@@ -597,6 +601,24 @@ namespace DeadWalls
                 state.ActiveFireballBurningGrounds = new List<FireballBurningGroundRunSaveState>();
                 state.Version = 16;
             }
+
+            if (state.Version == 16)
+            {
+                // v16 ve oncesindeki player-facing Basic/Rapid/Frost level state'i Heart
+                // graph disinda ikinci bir stat owner'iydi. Graph node/level veya Essence
+                // uydurmadan retired liste temizlenir; mevcut exact Heart graph korunur.
+                state.ArcherTypeLevels = new List<ArcherLevelEntry>();
+                state.Version = 17;
+            }
+        }
+
+        private static void NormalizeRetiredArcherProgressionState(RunSaveState state)
+        {
+            if (state == null)
+                return;
+
+            state.ArcherTypeLevels ??= new List<ArcherLevelEntry>();
+            state.ArcherTypeLevels.Clear();
         }
 
         private static void NormalizeFireballEvolutionState(RunSaveState state)

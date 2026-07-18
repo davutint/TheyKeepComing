@@ -12,6 +12,8 @@ Prefab stage'de su objeleri dogrula:
 
 - `CastleHeartOpenButton`: alt-sag anchor/pivot, `156 x 56`, `(-24,28)`, label `CASTLE HEART`.
 - `DrawerToggleButton`: ayni dock'ta `156 x 56`, `(-190,28)`, label `ARCHERS`; `ArcherDrawerPanel` child'i degil, ortak HUD parent'inin child'idir.
+- Archer row `ArcherLevelText`/legacy type level alanlari prefab default'unda `HEART` yazar;
+  runtime kilitli Rapid/Frost satirlarini `TECH` olarak gunceller.
 - `CastleHeartPanel` default inactive, fullscreen; `CanvasGroup`, `overrideSorting = true`,
   `sortingOrder = 200` nested `Canvas` ve `GraphicRaycaster` sahibi.
 - `CastleHeartTitleText` label: `CASTLE HEART`.
@@ -67,7 +69,7 @@ partneri, numeric value/soft-cap ve Evolution pool'u ayri owner onayi gerektirir
 7. Repeatable node'da `+1/+10/MAX`; Unlock/Evolution/Keystone'da yalniz tek alim kontrolunu
    dogrula.
 8. Rapid/Frost direct unlock ve archer stat upgrade yuzeylerinin drawer'da gorunmedigini
-   dogrula.
+   ve unlocked satirin level alaninda `HEART` yazdigini dogrula.
 9. Bir Keystone çiftine ilerle; iki kartın birlikte ve üst üste binmeden görünmesini,
    `CHOOSE ONE · RUN COMMITMENT` etiketini ve altın fork/merge damarlarını kontrol et.
 10. Her iki seçimi ayrı koşularda dene; yalnız partner kilitlenmeli ve branch'in sonraki node'u

@@ -64,6 +64,39 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void ArcherDrawer_PresentsHeartOwnershipAndKeepsLegacyUpgradeButtonsHidden()
+        {
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(HudPrefabPath);
+            Assert.That(prefab, Is.Not.Null);
+
+            RectTransform[] rects = prefab.GetComponentsInChildren<RectTransform>(true);
+            string[] heartLabels =
+            {
+                "ArcherLevelText",
+                "BasicLevelText",
+                "RapidLevelText",
+                "FrostLevelText"
+            };
+            foreach (string labelName in heartLabels)
+            {
+                RectTransform label = rects.Single(rect => rect.name == labelName);
+                Assert.That(GetLabel(label), Is.EqualTo("HEART"), labelName);
+            }
+
+            string[] retiredUpgradeButtons =
+            {
+                "BasicUpgradeButton",
+                "RapidUpgradeButton",
+                "FrostUpgradeButton"
+            };
+            foreach (string buttonName in retiredUpgradeButtons)
+            {
+                RectTransform button = rects.Single(rect => rect.name == buttonName);
+                Assert.That(button.gameObject.activeSelf, Is.False, buttonName);
+            }
+        }
+
+        [Test]
         public void MarketUi_OnEnableStartsDrawerClosed()
         {
             GameObject owner = new GameObject("MarketUiDefaultsTest", typeof(RectTransform));

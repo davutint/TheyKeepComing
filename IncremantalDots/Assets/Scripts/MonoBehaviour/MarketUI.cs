@@ -291,7 +291,6 @@ namespace DeadWalls
         private static void AddArcherFingerprint(ref int hash, GameManager gm, ArcherType type)
         {
             AddFingerprintValue(ref hash, gm.GetArcherTypeCount(type));
-            AddFingerprintValue(ref hash, gm.GetArcherTypeLevel(type));
             AddFingerprintValue(ref hash, gm.IsArcherTypeUnlocked(type));
             AddFingerprintValue(ref hash, gm.CanBuyArcher(type));
             if (type != ArcherType.Basic)
@@ -331,7 +330,7 @@ namespace DeadWalls
             if (dpsText != null)
                 dpsText.text = unlocked ? $"DPS {gm.GetArcherTypeDps(type):0.#}" : "LOCKED";
             if (levelText != null)
-                levelText.text = unlocked ? $"LV {gm.GetArcherTypeLevel(type)}" : "TECH";
+                levelText.text = unlocked ? "HEART" : "TECH";
 
             if (costText != null)
             {
@@ -690,7 +689,7 @@ namespace DeadWalls
             SetText(row.NameText, row.Definition.DisplayName);
             SetText(row.CountText, $"x{gm.GetArcherTypeCount(type)}");
             SetText(row.DpsText, unlocked ? $"DPS {gm.GetArcherTypeDps(type):0.#}" : "LOCKED");
-            SetText(row.LevelText, unlocked ? $"LV {gm.GetArcherTypeLevel(type)}" : "TECH");
+            SetText(row.LevelText, unlocked ? "HEART" : "TECH");
             SetText(row.CostText, BuildArcherCostLabel(
                 gm, row.Definition, unlocked, capReached, retrainTarget));
             if (row.StatusText != null)
