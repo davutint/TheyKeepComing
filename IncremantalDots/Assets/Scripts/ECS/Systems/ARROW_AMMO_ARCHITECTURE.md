@@ -45,15 +45,17 @@ ve her satın alım hem Wood hem Iron harcar.
 
 ## UI sözleşmesi
 
-Üst HUD Arrow chip'i `Current / Capacity` gösterir; `INF` modu yoktur. Chip'e basmak
-tek satırlık `AmmoPurchasePanel` açar. Panel mevcut stok/verim, `+1 paket`, `+5 paket`,
+Üst HUD Arrow chip'i `Current / Capacity` gösterir; `INF` modu yoktur ve diğer resource
+chip'leri gibi pasif bilgi yüzeyidir. Alt-sağ management dock'taki ayrı `ARROW SUPPLY`
+butonu tek satırlık `AmmoPurchasePanel` yüzeyini açar. Panel mevcut stok/verim, `+1 paket`, `+5 paket`,
 `Buy Max`, Capacity ve Efficiency yatırımlarını görünür fiyatlarıyla gösterir.
 Kaynak yetersizliği butonu kapatır fakat fiyatı gizlemez; yalnız dolu stok `FULL`,
 Wood ile hiçbir Arrow alınamayan Buy Max durumu `NEED WOOD` yazar.
 
 Ilk-kosu onboarding'i finite stok effective kapasitenin inclusive `%25` veya altina indiginde
-yalniz ust HUD `ArrowChip` satirini pulse eder. Paneli otomatik acmaz. Basarili `+1`, `+5` veya
-`Buy Max` refill ammo tutorial flag'ini tamamlar; CAP/EFF yatirimi tamamlamaz.
+panel kapaliyken `ARROW SUPPLY` dock butonunu pulse eder. Paneli otomatik acmaz; oyuncu paneli
+actiginda pulse gercek `+1 paket` butonuna tasinir. Basarili `+1`, `+5` veya `Buy Max` refill
+ammo tutorial flag'ini tamamlar; CAP/EFF yatirimi tamamlamaz.
 
 ## Save ve migration
 

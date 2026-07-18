@@ -16,8 +16,8 @@ scene setup tool tarafindan scene owner'ina eklenir ve isimle baglanir.
   `WoodWorkerTargetPlus10Button`.
 - Basic Archer target: `DrawerToggleButton` veya Archer drawer acikken runtime-generated
   `ArcherRecruitmentRow_basic_archer/ArcherBuyButton`.
-- Low Ammo target: her durumda ust resource strip'teki `ArrowChip`; threshold effective
-  `Current / Capacity <= %25`, panel otomatik acilmaz.
+- Low Ammo target: panel kapaliyken alt-sag `ArrowSupplyToggleButton`, panel oyuncu tarafindan
+  acikken `AmmoPackageButton`; threshold effective `Current / Capacity <= %25`, panel otomatik acilmaz.
 - Heart entry target: alt-sag dock'taki `CastleHeartOpenButton`; authoritative trigger
   `GraveEssenceAmount > 0`, panel otomatik acilmaz.
 - Heart pause hint: panel gercek oyuncu aksiyonuyla acikken top-center gorunur; pulse kapali,
@@ -65,9 +65,10 @@ Idempotent iki-sahne onarimi icin `NewGameScene` aktifken
   state'ini kendi basina degistirmedigini dogrular.
 - Basic Archer PlayMode testi, yetersiz kaynaktan ilk affordability'ye gecisi, kapali/acik drawer
   hedeflerini ve yalniz basarili satin almanin `tutorial.v1.basic_archer` flag'ini yazdigini dogrular.
-- Low Ammo PlayMode testi `%25` inclusive esigi, gercek Arrow chip hedefi, panelin kapali kalmasi,
-  basarisiz refill'in flag yazmamasi ve yalniz basarili refill'in `tutorial.v1.low_ammo` flag'ini
-  durable yazmasini dogrular.
+- Low Ammo PlayMode testi `%25` inclusive esigi, kapali panelde gercek `ARROW SUPPLY` dock hedefi,
+  panelin oyuncu tiklamasina kadar kapali kalmasi, acilis sonrasi gercek `AmmoPackageButton`
+  hedefi, basarisiz refill'in flag yazmamasi ve yalniz basarili refill'in
+  `tutorial.v1.low_ammo` flag'ini durable yazmasini dogrular.
 - Heart PlayMode testi sifir bakiyede sessiz kalmayi, ilk pozitif Grave Essence bakiyesinde gercek
   Heart butonunu pulse etmeyi, panelin oyuncu aksiyonuyla acilmasini, full-pause hint'inin
   `Time.timeScale = 0` iken gorunmesini ve flag'in yalniz player close sonrasinda yazilmasini

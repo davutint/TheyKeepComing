@@ -23,7 +23,7 @@
 Beklenen referanslar:
 
 - Economy: `WoodText`, `StoneText`, `IronText`, `FoodText`, `PopulationText`, `ArrowText`
-- Compact top strip: `ResourceBar` (`560 x 48`) içinde `WoodChip`, `StoneChip`, `IronChip`, `FoodChip`, `PopulationChip`, `ArrowChip`; value/rate metni tek satırdır
+- Compact top strip: `ResourceBar` (`560 x 48`) içinde `WoodChip`, `StoneChip`, `IronChip`, `FoodChip`, `PopulationChip`, `ArrowChip`; value/rate metni tek satırdır ve bütün chip'ler pasif bilgi yüzeyidir
 - Worker drawer: `WorkerEconomyDrawerPanel`, `WorkerDrawerToggleButton`, `WorkerIdlePopulationText`, `WorkerTotalText`, `WorkerArcherPopulationText`
 - Worker rows: `WoodWorkerCountText`, `WoodWorkerRateText`, `WoodWorkerAddButton`, `WoodWorkerStatusText`; ayni pattern `Stone`, `Iron` ve `Food` icin
 - Top center: `WaveText`, `KillsText`, `WaveRewardText`
@@ -69,7 +69,8 @@ generated prefab runtime owner tasimaz. Kurulum ve QA:
 Economy focus butonlari mobile continuous HUD'dan tamamen kaldirildi. Kaynak yonlendirme player-facing olarak sol worker drawer uzerinden yapilir; `EconomyFocusState` ve `EconomyFocusUI` sadece legacy/debug akislar icin kodda kalabilir.
 
 HUD `ArrowText` finite stoku `Current / Capacity` gösterir. Refill player-facing olarak
-Arrow chip'inden açılan `ArrowSupplyUI` panelindedir; legacy `RefillArrowsButton` ve
+alt-sağdaki `ArrowSupplyToggleButton` / `ARROW SUPPLY` girişinden açılan `ArrowSupplyUI`
+panelindedir; legacy `RefillArrowsButton` ve
 Fletcher/queue akışı kullanılmaz.
 
 ## Onemli

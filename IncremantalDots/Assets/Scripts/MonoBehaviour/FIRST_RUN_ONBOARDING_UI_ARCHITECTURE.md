@@ -37,8 +37,9 @@ owner'larinin player-action event'lerini dinler; yalniz non-modal hint ve pulse 
   kapasitenin inclusive `%25` veya altinda.
 - Worker ratio ve Basic Archer adimlari ayni anda uygunsa onceki adimlar sunum onceligini korur;
   prompt gorunmeden yapilan basarili refill yine ammo adimini tamamlar.
-- Tek hedef, ust resource strip'teki gercek `ArrowSupplyUI.ToggleButton` / `ArrowChip` satiridir.
-  `AmmoPurchasePanel` oyuncu adina acilmaz.
+- Panel kapaliyken hedef alt-sag dock'taki gercek `ArrowSupplyUI.ToggleButton` /
+  `ArrowSupplyToggleButton`; panel oyuncu tarafindan acilinca hedef gercek
+  `AmmoPackageButton` kontroludur. `AmmoPurchasePanel` oyuncu adina acilmaz.
 - Tek player-facing metin English'tir: `RESTOCK YOUR ARROWS.`
 - Yalniz `ArrowSupplyUI` uzerinden basarili `+1`, `+5` veya `Buy Max` refill satin alimi
   `ArrowRefillPurchasedByPlayer` event'ini yayar. Basarisiz refill ve CAP/EFF yatirimi flag yazmaz.

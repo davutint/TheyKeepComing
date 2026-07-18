@@ -9,6 +9,9 @@ management yuzeyinin acik kalmasini saglar. Koordine edilen uc yuzey:
 - `MarketUI`: Archer Recruitment;
 - `ArrowSupplyUI`: Arrow stok/refill ve CAP/EFF yatirimi.
 
+Arrow Supply girisi resource strip'teki pasif `ArrowChip` degil, alt-sag dock'taki ayri
+`ArrowSupplyToggleButton` / `ARROW SUPPLY` kontroludur.
+
 Castle Heart fullscreen modal, Council karti, Pause ve Game Over bu drawer grubuna dahil
 degildir. Kendi modal/pause sahipliklerini korurlar.
 

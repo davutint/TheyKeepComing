@@ -98,7 +98,8 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - Buy ve retrain maliyetleri hedef tür sayısına göre definition tuning'inden büyür; ayrı archer upgrade/level UI açılmaz. Row level alanı unlocked türde `HEART`, kilitli türde `TECH` yazar
 - Basarili player-facing buy action'i `ArcherPurchasedByPlayer` event'ini yayar; onboarding gibi presentation consumer'lari transaction'i tekrar etmeden bu event'i dinler
 - Worker economy aktifken `Repair`, `Fortify` ve `Rally` player-facing drawer'da gizlenir; drawer archer recruitment paneli olarak kalir
-- Legacy `Arrow Refill` kontrolü gizlenir; Arrow chip'i scene-owned `ArrowSupplyUI` tek satır panelini açar
+- Legacy `Arrow Refill` kontrolü gizlenir; resource chip'leri pasif kalır ve ayrı alt-sağ
+  `ARROW SUPPLY` butonu scene-owned `ArrowSupplyUI` tek satır panelini açar
 - Basarili player-facing `+1`, `+5` veya `Buy Max` refill
   `ArrowRefillPurchasedByPlayer` event'ini yayar; CAP/EFF yatirimi bu event'i yaymaz
 - Mobile continuous siege loop'ta `Start Next Wave` player-facing UI'da gizlenir; oyun durmadan `DAY / DUSK / NIGHT` cycle'i akar
@@ -129,7 +130,9 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - Package I ilk-kosu ogretiminin scene-owned, non-modal presentation sahibidir
 - Ilk Day worker ratio adiminda drawer kapaliyken Workers/Housing toggle'ini, acikken ilk ratio kontrolunu pulse eder; tek satir English hint gosterir
 - Basic Archer ilk kez gercekten satin alinabilir oldugunda drawer kapaliyken ARCHERS toggle'ini, acikken runtime Basic BUY kontrolunu pulse eder
-- Finite Arrow stoku effective kapasitenin `%25` veya altina ilk kez indiginde ust HUD'daki gercek `ArrowChip` satirini pulse eder; ammo panelini otomatik acmaz
+- Finite Arrow stoku effective kapasitenin `%25` veya altina ilk kez indiginde panel kapaliyken
+  gercek `ARROW SUPPLY` dock butonunu, panel oyuncu tarafindan acilinca gercek paket butonunu
+  pulse eder; ammo panelini otomatik acmaz
 - Ilk pozitif Grave Essence bakiyesinde gercek `CASTLE HEART` butonunu pulse eder; oyuncu paneli acinca mevcut full pause'u English hint ile ogretir ve flag'i player close sonrasinda yazar
 - Gameplay transaction'i, otomatik drawer acma, resource harcama veya worker dagitma yapmaz
 - Basarili gercek player ratio action'ini `WorkerEconomyDrawerUI` event'inden alir ve `tutorial.v1.worker_ratio` stable flag'ini canonical `MetaProgression` API'siyle durable yazar

@@ -67,22 +67,27 @@ namespace DeadWalls
         public AudioClip PanelOpenClip;
 
         [Header("Layout")]
-        public Vector2 NodeSize = new Vector2(292f, 188f);
-        public float HorizontalSpacing = 386f;
-        public float VerticalSpacing = 278f;
-        public Vector2 ContentPadding = new Vector2(190f, 160f);
+        public Vector2 NodeSize = new Vector2(264f, 156f);
+        public float HorizontalSpacing = 340f;
+        public float VerticalSpacing = 236f;
+        public Vector2 ContentPadding = new Vector2(160f, 140f);
+
+        [Header("Icon Slots")]
+        [Tooltip("Gercek owner onayli node ikonlari hazir oldugunda acilir. Bos slot hicbir fallback harf/glyph uretmez.")]
+        public bool ShowAuthoredNodeIcons;
+        public Vector2 IconSlotSize = new Vector2(52f, 52f);
 
         private const float RefreshInterval = 0.15f;
         private const float BadgeInterval = 0.5f;
 
-        private static readonly Color ArmyColor = new Color(0.86f, 0.25f, 0.22f, 1f);
-        private static readonly Color DefenseColor = new Color(0.25f, 0.55f, 0.92f, 1f);
-        private static readonly Color ProductionColor = new Color(0.27f, 0.76f, 0.44f, 1f);
-        private static readonly Color MagicColor = new Color(0.68f, 0.34f, 0.94f, 1f);
-        private static readonly Color HiddenColor = new Color(0.075f, 0.09f, 0.12f, 0.94f);
-        private static readonly Color RootColor = new Color(0.76f, 0.18f, 0.22f, 0.98f);
-        private static readonly Color LockedColor = new Color(0.25f, 0.27f, 0.31f, 0.96f);
-        private static readonly Color KeystoneColor = new Color(0.96f, 0.67f, 0.22f, 1f);
+        private static readonly Color ArmyColor = new Color(0.60f, 0.22f, 0.18f, 1f);
+        private static readonly Color DefenseColor = new Color(0.27f, 0.39f, 0.52f, 1f);
+        private static readonly Color ProductionColor = new Color(0.38f, 0.50f, 0.30f, 1f);
+        private static readonly Color MagicColor = new Color(0.46f, 0.30f, 0.52f, 1f);
+        private static readonly Color HiddenColor = new Color(0.055f, 0.048f, 0.060f, 0.96f);
+        private static readonly Color RootColor = new Color(0.40f, 0.12f, 0.14f, 0.98f);
+        private static readonly Color LockedColor = new Color(0.14f, 0.14f, 0.15f, 0.97f);
+        private static readonly Color KeystoneColor = new Color(0.72f, 0.50f, 0.24f, 1f);
 
         private readonly Dictionary<string, NodeView> _nodeViews =
             new Dictionary<string, NodeView>(StringComparer.Ordinal);
@@ -118,6 +123,7 @@ namespace DeadWalls
             public RectTransform Rect;
             public Image Background;
             public Image Accent;
+            public Image IconSocket;
             public Image RarityMarker;
             public Outline Outline;
             public Image Icon;
@@ -142,6 +148,7 @@ namespace DeadWalls
 
         private void OnEnable()
         {
+            ApplyPresentationLayoutContract();
             ApplyScreenPolish();
             BindButtons();
             if (HeartPanel != null)
@@ -260,10 +267,10 @@ namespace DeadWalls
                 GraveEssenceText.text = $"GRAVE ESSENCE  {FormatLong(runtime?.GraveEssenceAmount ?? 0L)}";
             if (BranchCompassText != null)
                 BranchCompassText.text =
-                    "<color=#E76058>ARMY  /  EAST</color>     "
-                    + "<color=#68A9F2>DEFENSE  /  WEST</color>     "
-                    + "<color=#E0B44E>PRODUCTION  /  NORTH</color>     "
-                    + "<color=#B479F2>HEART MAGIC  /  SOUTH</color>";
+                    "<color=#72895E>N  PRODUCTION</color>   ·   "
+                    + "<color=#536D8B>W  DEFENSE</color>   ·   "
+                    + "<color=#9A5147>E  ARMY</color>   ·   "
+                    + "<color=#765482>S  HEART MAGIC</color>";
 
             HeartGraphPresentation presentation = null;
             IReadOnlyList<string> errors = null;
@@ -351,7 +358,7 @@ namespace DeadWalls
             if (!TryGetVisibleKeystonePartner(node, out HeartGraphNodePresentation partner)
                 || partner.Branch != node.Branch)
             {
-                return defaultPosition;
+                return defaultPosition + GetOrganicOffset(node.Branch, node.SlotId, node.Depth);
             }
 
             float sharedDepth = (node.Depth + partner.Depth) * 0.5f;
@@ -370,6 +377,31 @@ namespace DeadWalls
                 ? Vector2.up * (NodeSize.y * 0.66f * direction)
                 : Vector2.right * (NodeSize.x * 0.62f * direction);
             return sharedPosition + choiceOffset;
+        }
+
+        private static Vector2 GetOrganicOffset(
+            HeartNodeBranch branch,
+            string slotId,
+            float depth)
+        {
+            if (depth <= 0f || string.IsNullOrEmpty(slotId))
+                return Vector2.zero;
+
+            uint hash = 2166136261u;
+            for (int i = 0; i < slotId.Length; i++)
+            {
+                hash ^= slotId[i];
+                hash *= 16777619u;
+            }
+
+            float normalized = (hash & 0xffffu) / 32767.5f - 1f;
+            float amplitude = 14f + Mathf.Min(42f, depth * 8f);
+            float lateral = normalized * amplitude;
+            bool horizontalBranch = branch == HeartNodeBranch.Army
+                                    || branch == HeartNodeBranch.Defense;
+            return horizontalBranch
+                ? Vector2.up * lateral
+                : Vector2.right * lateral;
         }
 
         private void AddKeystoneForkConnections(
@@ -509,6 +541,7 @@ namespace DeadWalls
                 SlotId = slotId
             };
             view.Accent = EnsureDecorationImage(root.transform, "HeartNodeAccent");
+            view.IconSocket = EnsureDecorationImage(root.transform, "HeartNodeIconSocket");
             view.RarityMarker = EnsureDecorationImage(root.transform, "HeartNodeRarityMarker");
             if (view.Background != null)
                 view.Outline = view.Background.GetComponent<Outline>()
@@ -545,11 +578,11 @@ namespace DeadWalls
                     "Shape this stand with Grave Essence. Every awakened path endures until the Wall falls.");
                 SetText(view.Cost, $"{FormatLong(runtime.GraveEssenceAmount)} GRAVE ESSENCE");
                 SetText(view.Status, "FOUR PATHS  /  ONE STAND");
-                SetIcon(view, null, "DW", RootColor);
+                SetIcon(view, null);
                 SetButton(view, false, false, string.Empty);
                 SetBackground(view, RootColor);
                 SetNodeChrome(view, RootColor, false,
-                    new Color(1f, 0.72f, 0.30f, 0.95f), true);
+                    new Color(0.70f, 0.52f, 0.30f, 0.72f), true);
                 return;
             }
 
@@ -560,7 +593,7 @@ namespace DeadWalls
                 SetText(view.Description, "Awaken a connected node to uncover this choice.");
                 SetText(view.Cost, string.Empty);
                 SetText(view.Status, GetBranchName(node.Branch));
-                SetIcon(view, null, "?", branchColor);
+                SetIcon(view, null);
                 SetButton(view, false, false, string.Empty);
                 SetBackground(view, HiddenColor);
                 SetNodeChrome(view, branchColor, false, branchColor, false, true);
@@ -570,7 +603,7 @@ namespace DeadWalls
             SetText(view.Title, string.IsNullOrWhiteSpace(node.Title) ? "UNNAMED" : node.Title.ToUpperInvariant());
             SetText(view.Level, BuildNodeEyebrow(node));
             SetText(view.Description, BuildDescription(node));
-            SetIcon(view, node.Icon, BuildFallback(node.Title), branchColor);
+            SetIcon(view, node.Icon);
 
             if (node.LockState == HeartNodeLockState.KeystoneConflict)
             {
@@ -581,7 +614,7 @@ namespace DeadWalls
                 SetButton(view, true, false, "LOCKED");
                 SetBackground(view, LockedColor);
                 SetNodeChrome(view, branchColor, node.Rarity == HeartNodeRarity.Rare,
-                    new Color(0.72f, 0.18f, 0.20f, 0.90f), false);
+                    new Color(0.48f, 0.15f, 0.16f, 0.72f), false);
                 return;
             }
 
@@ -630,9 +663,9 @@ namespace DeadWalls
                 alreadyOwned
                     ? node.Type == HeartNodeType.Keystone ? "COMMITTED" : "AWAKENED"
                     : canPurchase ? GetPurchaseAction(node.Type) : "UNAVAILABLE");
-            SetBackground(view, Color.Lerp(HiddenColor, branchColor, node.Level > 0 ? 0.48f : 0.28f));
+            SetBackground(view, Color.Lerp(HiddenColor, branchColor, node.Level > 0 ? 0.24f : 0.10f));
             SetNodeChrome(view, branchColor, node.Rarity == HeartNodeRarity.Rare,
-                node.Level > 0 ? new Color(1f, 0.75f, 0.32f, 0.95f) : branchColor,
+                node.Level > 0 ? new Color(0.70f, 0.54f, 0.31f, 0.78f) : branchColor,
                 node.Level > 0);
             StylePurchaseButton(view, branchColor, canPurchase, alreadyOwned);
         }
@@ -731,12 +764,12 @@ namespace DeadWalls
             float length = delta.magnitude;
             view.Rect.anchorMin = view.Rect.anchorMax = view.Rect.pivot = new Vector2(0.5f, 0.5f);
             view.Rect.anchoredPosition = (start + end) * 0.5f;
-            view.Rect.sizeDelta = new Vector2(length, hidden ? 3f : emphasized ? 8f : 5f);
+            view.Rect.sizeDelta = new Vector2(length, hidden ? 2f : emphasized ? 5f : 3f);
             view.Rect.localRotation = Quaternion.Euler(0f, 0f,
                 Mathf.Atan2(delta.y, delta.x) * Mathf.Rad2Deg);
             if (view.Image != null)
             {
-                color.a = hidden ? 0.24f : emphasized ? 0.92f : 0.72f;
+                color.a = hidden ? 0.16f : emphasized ? 0.78f : 0.48f;
                 view.Image.color = color;
                 view.Image.raycastTarget = false;
             }
@@ -745,7 +778,7 @@ namespace DeadWalls
         private static string BuildDescription(HeartGraphNodePresentation node)
         {
             var builder = new StringBuilder();
-            if (!string.IsNullOrWhiteSpace(node.Description))
+            if (node.Effects.Count == 0 && !string.IsNullOrWhiteSpace(node.Description))
                 builder.Append(node.Description.Trim());
 
             for (int i = 0; i < node.Effects.Count; i++)
@@ -753,7 +786,7 @@ namespace DeadWalls
                 HeartEffectPresentation effect = node.Effects[i];
                 if (builder.Length > 0)
                     builder.AppendLine();
-                builder.Append("EFFECT  /  ").Append(effect.Label);
+                builder.Append(effect.Label);
                 if (!string.IsNullOrWhiteSpace(effect.CurrentValueText))
                 {
                     builder.Append(": ")
@@ -800,6 +833,16 @@ namespace DeadWalls
             };
         }
 
+        private void ApplyPresentationLayoutContract()
+        {
+            // Eski scene serialize degerleri player-facing graph'i tekrar buyutmesin.
+            NodeSize = new Vector2(264f, 156f);
+            HorizontalSpacing = 340f;
+            VerticalSpacing = 236f;
+            ContentPadding = new Vector2(160f, 140f);
+            IconSlotSize = new Vector2(52f, 52f);
+        }
+
         private void ApplyScreenPolish()
         {
             if (HeartPanel == null)
@@ -807,7 +850,7 @@ namespace DeadWalls
 
             Image panelImage = HeartPanel.GetComponent<Image>();
             if (panelImage != null)
-                panelImage.color = new Color(0.018f, 0.014f, 0.026f, 0.985f);
+                panelImage.color = new Color(0.016f, 0.013f, 0.015f, 0.992f);
 
             TMP_Text title = FindDeep<TMP_Text>(HeartPanel.transform,
                 "CastleHeartTitleText", "TechTreeTitleText");
@@ -815,15 +858,15 @@ namespace DeadWalls
             {
                 title.text = "CASTLE HEART";
                 title.fontStyle = FontStyles.Bold;
-                title.characterSpacing = 4f;
-                title.color = new Color(0.96f, 0.88f, 0.72f, 1f);
+                title.characterSpacing = 2.2f;
+                title.color = new Color(0.86f, 0.80f, 0.68f, 1f);
             }
 
             if (GraveEssenceText != null)
             {
                 GraveEssenceText.fontStyle = FontStyles.Bold;
                 GraveEssenceText.characterSpacing = 1.5f;
-                GraveEssenceText.color = new Color(0.91f, 0.75f, 0.35f, 1f);
+                GraveEssenceText.color = new Color(0.78f, 0.66f, 0.40f, 1f);
             }
             if (ScreenStatusText != null)
             {
@@ -833,23 +876,23 @@ namespace DeadWalls
             if (BranchCompassText != null)
             {
                 BranchCompassText.fontStyle = FontStyles.Bold;
-                BranchCompassText.characterSpacing = 0.8f;
+                BranchCompassText.characterSpacing = 0.35f;
             }
 
             if (HeartViewport != null)
             {
                 Image viewportImage = HeartViewport.GetComponent<Image>();
                 if (viewportImage != null)
-                    viewportImage.color = new Color(0.035f, 0.028f, 0.050f, 0.72f);
+                    viewportImage.color = new Color(0.025f, 0.021f, 0.024f, 0.42f);
             }
 
             Image topRule = EnsureDecorationImage(HeartPanel.transform, "HeartTopRule");
             RectTransform topRect = topRule.rectTransform;
             topRect.anchorMin = new Vector2(0f, 1f);
             topRect.anchorMax = new Vector2(1f, 1f);
-            topRect.offsetMin = new Vector2(24f, -72f);
-            topRect.offsetMax = new Vector2(-24f, -68f);
-            topRule.color = new Color(0.78f, 0.43f, 0.22f, 0.82f);
+            topRect.offsetMin = new Vector2(32f, -73f);
+            topRect.offsetMax = new Vector2(-32f, -71f);
+            topRule.color = new Color(0.46f, 0.30f, 0.22f, 0.44f);
             topRule.transform.SetAsFirstSibling();
 
             Image bottomRule = EnsureDecorationImage(HeartPanel.transform, "HeartBottomRule");
@@ -858,50 +901,17 @@ namespace DeadWalls
             bottomRect.anchorMax = new Vector2(1f, 0f);
             bottomRect.offsetMin = new Vector2(24f, 58f);
             bottomRect.offsetMax = new Vector2(-24f, 61f);
-            bottomRule.color = new Color(0.42f, 0.27f, 0.48f, 0.70f);
+            bottomRule.color = new Color(0.26f, 0.20f, 0.23f, 0.26f);
             bottomRule.transform.SetAsFirstSibling();
         }
 
         private void UpdateBranchAxes(int maxDepth)
         {
-            if (HeartContent == null)
-                return;
-
-            HeartNodeBranch[] branches =
+            // Sert pusula arti-isareti yerine yalniz gercek graph edge'leri damar olarak cizilir.
+            foreach (Image axis in _branchAxes.Values)
             {
-                HeartNodeBranch.Army,
-                HeartNodeBranch.Defense,
-                HeartNodeBranch.Production,
-                HeartNodeBranch.HeartMagic
-            };
-
-            for (int i = 0; i < branches.Length; i++)
-            {
-                HeartNodeBranch branch = branches[i];
-                if (!_branchAxes.TryGetValue(branch, out Image axis) || axis == null)
-                {
-                    axis = EnsureDecorationImage(HeartContent, "HeartAxis_" + branch);
-                    _branchAxes[branch] = axis;
-                }
-
-                bool horizontal = branch == HeartNodeBranch.Army
-                                  || branch == HeartNodeBranch.Defense;
-                float spacing = horizontal ? HorizontalSpacing : VerticalSpacing;
-                float length = Mathf.Max(spacing, maxDepth * spacing);
-                float sign = branch == HeartNodeBranch.Army
-                             || branch == HeartNodeBranch.Production ? 1f : -1f;
-                RectTransform rect = axis.rectTransform;
-                rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0.5f, 0.5f);
-                rect.anchoredPosition = horizontal
-                    ? new Vector2(sign * length * 0.5f, 0f)
-                    : new Vector2(0f, sign * length * 0.5f);
-                rect.sizeDelta = horizontal
-                    ? new Vector2(length, 4f)
-                    : new Vector2(4f, length);
-                Color color = GetBranchColor(branch);
-                color.a = 0.13f;
-                axis.color = color;
-                axis.transform.SetAsFirstSibling();
+                if (axis != null)
+                    axis.gameObject.SetActive(false);
             }
         }
 
@@ -932,13 +942,29 @@ namespace DeadWalls
             if (view.Accent != null)
             {
                 RectTransform rect = view.Accent.rectTransform;
-                rect.anchorMin = new Vector2(0f, 0f);
-                rect.anchorMax = new Vector2(0f, 1f);
-                rect.offsetMin = Vector2.zero;
-                rect.offsetMax = new Vector2(6f, 0f);
-                accentColor.a = hidden ? 0.28f : 0.94f;
+                rect.anchorMin = new Vector2(0f, 1f);
+                rect.anchorMax = new Vector2(1f, 1f);
+                rect.offsetMin = new Vector2(10f, -4f);
+                rect.offsetMax = new Vector2(-10f, 0f);
+                accentColor.a = hidden ? 0.18f : 0.68f;
                 view.Accent.color = accentColor;
                 view.Accent.transform.SetAsFirstSibling();
+            }
+
+            if (view.IconSocket != null)
+            {
+                RectTransform rect = view.IconSocket.rectTransform;
+                rect.anchorMin = rect.anchorMax = new Vector2(0f, 1f);
+                rect.pivot = new Vector2(0f, 1f);
+                rect.anchoredPosition = new Vector2(14f, -12f);
+                rect.sizeDelta = IconSlotSize;
+                Color socketColor = Color.Lerp(
+                    new Color(0.025f, 0.022f, 0.024f, 0.96f),
+                    accentColor,
+                    hidden ? 0.08f : 0.18f);
+                socketColor.a = hidden ? 0.45f : 0.72f;
+                view.IconSocket.color = socketColor;
+                view.IconSocket.transform.SetAsFirstSibling();
             }
 
             if (view.RarityMarker != null)
@@ -946,9 +972,9 @@ namespace DeadWalls
                 RectTransform rect = view.RarityMarker.rectTransform;
                 rect.anchorMin = rect.anchorMax = new Vector2(1f, 1f);
                 rect.pivot = new Vector2(1f, 1f);
-                rect.anchoredPosition = new Vector2(-8f, -8f);
-                rect.sizeDelta = new Vector2(10f, 10f);
-                view.RarityMarker.color = new Color(1f, 0.76f, 0.28f, 0.98f);
+                rect.anchoredPosition = new Vector2(-10f, -10f);
+                rect.sizeDelta = new Vector2(8f, 8f);
+                view.RarityMarker.color = new Color(0.76f, 0.57f, 0.30f, 0.92f);
                 view.RarityMarker.gameObject.SetActive(rare && !hidden);
                 view.RarityMarker.transform.SetAsLastSibling();
             }
@@ -958,14 +984,14 @@ namespace DeadWalls
                 outlineColor.a = hidden ? 0.22f : outlineColor.a;
                 view.Outline.effectColor = outlineColor;
                 view.Outline.effectDistance = emphasized
-                    ? new Vector2(2.2f, -2.2f)
-                    : new Vector2(1.2f, -1.2f);
+                    ? new Vector2(1.4f, -1.4f)
+                    : new Vector2(0.7f, -0.7f);
                 view.Outline.useGraphicAlpha = true;
             }
 
             view.Rect.sizeDelta = string.Equals(
                 view.SlotId, HeartGraphSlotUtility.RootSlotId, StringComparison.Ordinal)
-                    ? NodeSize * 1.08f
+                    ? NodeSize * 1.04f
                     : NodeSize;
         }
 
@@ -979,10 +1005,10 @@ namespace DeadWalls
                 return;
 
             Color baseColor = alreadyOwned
-                ? new Color(0.30f, 0.24f, 0.15f, 0.96f)
+                ? new Color(0.22f, 0.19f, 0.14f, 0.96f)
                 : canPurchase
-                    ? Color.Lerp(new Color(0.12f, 0.10f, 0.16f, 1f), branchColor, 0.72f)
-                    : new Color(0.12f, 0.13f, 0.16f, 0.90f);
+                    ? Color.Lerp(new Color(0.09f, 0.075f, 0.08f, 1f), branchColor, 0.52f)
+                    : new Color(0.085f, 0.08f, 0.085f, 0.92f);
             if (view.BuyButton.targetGraphic is Image image)
                 image.color = baseColor;
 
@@ -991,7 +1017,7 @@ namespace DeadWalls
             colors.highlightedColor = Color.Lerp(baseColor, Color.white, 0.16f);
             colors.pressedColor = Color.Lerp(baseColor, Color.black, 0.18f);
             colors.selectedColor = colors.highlightedColor;
-            colors.disabledColor = new Color(0.11f, 0.12f, 0.14f, 0.72f);
+            colors.disabledColor = new Color(0.075f, 0.072f, 0.078f, 0.68f);
             colors.colorMultiplier = 1f;
             colors.fadeDuration = 0.08f;
             view.BuyButton.colors = colors;
@@ -1000,58 +1026,74 @@ namespace DeadWalls
         private static void ConfigureNodeLayout(NodeView view)
         {
             SetRect(view.Title, new Vector2(0f, 1f), new Vector2(1f, 1f),
-                new Vector2(54f, -38f), new Vector2(-10f, -8f));
-            SetRect(view.Level, new Vector2(1f, 1f), new Vector2(1f, 1f),
-                new Vector2(-92f, -58f), new Vector2(-10f, -40f));
+                new Vector2(76f, -32f), new Vector2(-12f, -10f));
+            SetRect(view.Level, new Vector2(0f, 1f), new Vector2(1f, 1f),
+                new Vector2(76f, -50f), new Vector2(-12f, -34f));
             SetRect(view.Description, new Vector2(0f, 1f), new Vector2(1f, 1f),
-                new Vector2(12f, -111f), new Vector2(-12f, -59f));
+                new Vector2(12f, -108f), new Vector2(-12f, -66f));
             SetRect(view.Status, new Vector2(0f, 0f), new Vector2(1f, 0f),
-                new Vector2(12f, 38f), new Vector2(-12f, 58f));
+                new Vector2(12f, 34f), new Vector2(-12f, 50f));
             SetRect(view.Cost, new Vector2(0f, 0f), new Vector2(1f, 0f),
-                new Vector2(12f, 12f), new Vector2(-100f, 36f));
+                new Vector2(12f, 8f), new Vector2(-88f, 31f));
             if (view.Title != null)
             {
                 view.Title.fontSize = 15f;
                 view.Title.fontStyle = FontStyles.Bold;
-                view.Title.characterSpacing = 0.6f;
-                view.Title.color = new Color(0.98f, 0.96f, 0.91f, 1f);
+                view.Title.characterSpacing = 0.35f;
+                view.Title.color = new Color(0.90f, 0.87f, 0.80f, 1f);
             }
             if (view.Level != null)
             {
-                view.Level.fontSize = 9.5f;
+                view.Level.fontSize = 9f;
                 view.Level.fontStyle = FontStyles.Bold;
-                view.Level.color = new Color(0.80f, 0.82f, 0.86f, 1f);
+                view.Level.characterSpacing = 0.5f;
+                view.Level.color = new Color(0.63f, 0.64f, 0.62f, 1f);
             }
             if (view.Description != null)
             {
-                view.Description.fontSize = 9.6f;
-                view.Description.lineSpacing = -5f;
-                view.Description.color = new Color(0.85f, 0.86f, 0.88f, 1f);
+                view.Description.fontSize = 10.2f;
+                view.Description.lineSpacing = -3f;
+                view.Description.color = new Color(0.74f, 0.73f, 0.70f, 1f);
             }
             if (view.Cost != null)
             {
                 view.Cost.fontSize = 10f;
                 view.Cost.fontStyle = FontStyles.Bold;
-                view.Cost.color = new Color(0.96f, 0.78f, 0.36f, 1f);
+                view.Cost.color = new Color(0.78f, 0.66f, 0.40f, 1f);
             }
             if (view.Status != null)
             {
-                view.Status.fontSize = 9f;
+                view.Status.fontSize = 8.5f;
                 view.Status.fontStyle = FontStyles.Bold;
-                view.Status.characterSpacing = 0.8f;
-                view.Status.color = new Color(0.72f, 0.75f, 0.80f, 1f);
+                view.Status.characterSpacing = 0.55f;
+                view.Status.color = new Color(0.56f, 0.58f, 0.58f, 1f);
+            }
+            if (view.Icon != null)
+            {
+                RectTransform rect = view.Icon.rectTransform;
+                rect.anchorMin = rect.anchorMax = new Vector2(0f, 1f);
+                rect.pivot = new Vector2(0f, 1f);
+                rect.anchoredPosition = new Vector2(21f, -19f);
+                rect.sizeDelta = new Vector2(38f, 38f);
+                view.Icon.preserveAspect = true;
+                view.Icon.raycastTarget = false;
+            }
+            if (view.IconFallback != null)
+            {
+                view.IconFallback.text = string.Empty;
+                view.IconFallback.gameObject.SetActive(false);
             }
             if (view.BuyButton != null)
             {
                 RectTransform rect = (RectTransform)view.BuyButton.transform;
                 rect.anchorMin = rect.anchorMax = new Vector2(1f, 0f);
-                rect.anchoredPosition = new Vector2(-49f, 23f);
-                rect.sizeDelta = new Vector2(86f, 34f);
+                rect.anchoredPosition = new Vector2(-43f, 20f);
+                rect.sizeDelta = new Vector2(76f, 28f);
                 if (view.BuyButtonText != null)
                 {
-                    view.BuyButtonText.fontSize = 10f;
+                    view.BuyButtonText.fontSize = 9f;
                     view.BuyButtonText.fontStyle = FontStyles.Bold;
-                    view.BuyButtonText.characterSpacing = 0.7f;
+                    view.BuyButtonText.characterSpacing = 0.45f;
                 }
             }
         }
@@ -1104,8 +1146,8 @@ namespace DeadWalls
             if (image != null)
             {
                 image.color = _selectedQuantity == quantity
-                    ? new Color(0.72f, 0.18f, 0.22f, 1f)
-                    : new Color(0.12f, 0.15f, 0.19f, 0.96f);
+                    ? new Color(0.46f, 0.17f, 0.18f, 1f)
+                    : new Color(0.085f, 0.08f, 0.085f, 0.96f);
             }
         }
 
@@ -1291,13 +1333,13 @@ namespace DeadWalls
             root.transform.SetParent(HeartContent, false);
             RectTransform rect = (RectTransform)root.transform;
             rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0.5f, 0.5f);
-            rect.sizeDelta = new Vector2(410f, 42f);
+            rect.sizeDelta = new Vector2(300f, 30f);
             Image background = root.GetComponent<Image>();
-            background.color = new Color(0.055f, 0.035f, 0.07f, 0.96f);
+            background.color = new Color(0.040f, 0.030f, 0.035f, 0.94f);
             background.raycastTarget = false;
             Outline backgroundOutline = root.AddComponent<Outline>();
-            backgroundOutline.effectColor = new Color(0.96f, 0.58f, 0.14f, 0.82f);
-            backgroundOutline.effectDistance = new Vector2(2f, -2f);
+            backgroundOutline.effectColor = new Color(0.72f, 0.50f, 0.24f, 0.68f);
+            backgroundOutline.effectDistance = new Vector2(1.2f, -1.2f);
 
             var textRoot = new GameObject(
                 "KeystoneChoiceText",
@@ -1312,12 +1354,12 @@ namespace DeadWalls
             textRect.offsetMin = new Vector2(12f, 4f);
             textRect.offsetMax = new Vector2(-12f, -4f);
             label.alignment = TextAlignmentOptions.Center;
-            label.fontSize = 17f;
+            label.fontSize = 13f;
             label.fontStyle = FontStyles.Bold;
             label.characterSpacing = 1.2f;
             label.color = KeystoneColor;
             label.outlineColor = new Color(0.05f, 0.03f, 0.02f, 0.95f);
-            label.outlineWidth = 0.22f;
+            label.outlineWidth = 0.12f;
             label.raycastTarget = false;
             _keystoneChoiceLabels.Add(pairKey, label);
             return label;
@@ -1416,17 +1458,19 @@ namespace DeadWalls
             return null;
         }
 
-        private static void SetIcon(NodeView view, Sprite sprite, string fallback, Color color)
+        private void SetIcon(NodeView view, Sprite sprite)
         {
+            bool showSprite = ShowAuthoredNodeIcons && sprite != null;
             if (view.Icon != null)
             {
-                view.Icon.sprite = sprite;
-                view.Icon.color = sprite != null ? Color.white : color;
+                view.Icon.sprite = showSprite ? sprite : null;
+                view.Icon.color = Color.white;
+                view.Icon.gameObject.SetActive(showSprite);
             }
             if (view.IconFallback != null)
             {
-                view.IconFallback.gameObject.SetActive(sprite == null);
-                view.IconFallback.text = fallback;
+                view.IconFallback.text = string.Empty;
+                view.IconFallback.gameObject.SetActive(false);
             }
         }
 
@@ -1493,16 +1537,6 @@ namespace DeadWalls
             return branch == HeartNodeBranch.HeartMagic
                 ? "HEART / MAGIC"
                 : branch.ToString().ToUpperInvariant();
-        }
-
-        private static string BuildFallback(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                return "?";
-            string[] words = value.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            if (words.Length == 1)
-                return words[0].Substring(0, 1).ToUpperInvariant();
-            return (words[0].Substring(0, 1) + words[1].Substring(0, 1)).ToUpperInvariant();
         }
 
         private static string SanitizeSlot(string value)

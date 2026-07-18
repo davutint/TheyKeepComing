@@ -18,7 +18,14 @@ ekran acik bir hata gosterir ve legacy `TechTreeCatalogSO`'ya geri dusmez.
 - `IHeartScreenRuntime` uzerinden presentation, quote ve purchase ister.
 - Yalniz `HeartGraphPresentation` okur; hidden node id, baslik ve effect bilgisine erismez.
 - Army sag, Defense sol, Production yukari, Heart/Magic asagi olacak sekilde deterministic
-  compass layout kurar.
+  compass layout kurar. Depth 2 ve sonrasinda stable slot hash'inden yalniz branch'e dik kucuk
+  sapma eklenir; sert arti ekseni cizilmez, gercek edge'ler dusuk-kontrast damar olarak kalir.
+- Node kartlari `264 x 156` compact yuzeydir. Branch rengi karti doldurmak yerine ince ust damar,
+  icon socket ve state chrome'unda kullanilir; doygun debug-panel gorunumu uretilmez.
+- Her node `52 x 52` sabit `HeartNodeIconSocket` ayirir. `ShowAuthoredNodeIcons` owner onayli
+  icon seti hazirlanana kadar default `false` kalir; bu durumda sprite, bas harf, `?` veya baska
+  gecici glyph cizilmez. Daha sonra ayni `HeartNodeDefinitionSO.Icon` binding'i yeni asset'leri
+  gostermek icin kullanilir; graph/purchase contract'i degismez.
 - Gorunur numeric effect'lerde actual `current -> after` ve delta degerini gosterir.
 - Repeatable node'larda global `+1`, `+10`, `MAX`; tek seferlik node'larda yalniz `+1`
   kullanir.
@@ -96,7 +103,9 @@ Aktif prefab isim sozlesmesi:
 - `GraveEssenceText`, `HeartScreenStatusText`, `HeartBranchCompassText`;
 - `HeartQuantityOneButton`, `HeartQuantityTenButton`, `HeartQuantityMaxButton`;
 - `CastleHeartBadge`, `CastleHeartToastText`;
-- `HeartNode...` template alt alanlari.
+- `HeartNode...` template alt alanlari. Runtime her kartta ayrica `HeartNodeIconSocket` uretir;
+  prefab `HeartNodeIconImage`/`HeartNodeIconFallbackText` binding'lerini gelecekteki icon seti icin
+  korur.
 
 `CastleHeartOpenButton`, alt-sag dock'ta `CASTLE HEART` label'iyle `156 x 56` sabit
 butondur (`anchoredPosition = (-24,28)`). Yanindaki `ARCHERS` butonu ayni dock'ta

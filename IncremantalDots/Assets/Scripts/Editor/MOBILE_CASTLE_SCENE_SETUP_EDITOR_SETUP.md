@@ -72,7 +72,7 @@ SubScene:
 - `MobileCastleHudRoot`: generated prefab varsa `Assets/Prefabs/UI/Generated/MobileCastleHudRoot.prefab` instancelanir; yoksa fallback HUD/drawer kurulur
 - Generated prefab dis root'unun dogrudan altindaki ayni isimli gorsel `MobileCastleHudRoot`: anchor min `(0,0)`, anchor max `(1,1)`, anchored position ve size delta `(0,0)`, scale `(1,1,1)`; sabit `1920 x 1080` boyut tasimaz
 - `HUDController`: `WoodText`, `StoneText`, `IronText`, `FoodText`, `PopulationText`, `ArrowText`, `WaveRewardText`, `DamageFlashImage` ve varsa cycle/defense module alanlari bagli
-- `ResourceBar`: üst solda `560 x 48`; altı resource/population/Arrow chip'i `84 x 42`, value/rate tek satır ve `ArrowChip` finite ammo toggle olmaya devam eder
+- `ResourceBar`: üst solda `560 x 48`; altı resource/population/Arrow chip'i `84 x 42`, value/rate tek satır ve bütün chip'ler pasif bilgi yüzeyidir
 - `HUDController` cycle module: `CyclePanel`, `CycleDayCounterText`, `CycleProgressMarker`, `CycleCelestialArc`, `CycleCelestialGlow`; legacy `CyclePhaseText`, label ve fill binding'leri uyumluluk icin kalabilir
 - `CyclePanel`: owner-secili Celestial Dial, top-center anchor ve `290 x 68` gercek pill; `CycleProgressTrack` `178 x 44`, 44 segmentli sig yaydir. Dikey ayirici ile legacy phase/label/linear fill player-facing kapali kalir
 - `CastleDefensePanel`: top-center anchor, anchored position `(6,-205)` ve `340 x 140`; 16:9 ile ultrawide'da Celestial Dial'a binmez
@@ -80,6 +80,7 @@ SubScene:
 - `HUDController` defense module: `DefensePercentText`, `DefenseWallFill`, `DefenseWallText`, opsiyonel `DefenseDamageGlow`; legacy Gate/Core alanlari prefabda ve controller binding'inde bulunmaz
 - `MarketUI`: alt-sag `ArcherDrawerPanel` (`540 x 350`, `(-24,160)`), sabit `DrawerToggleButton` (`156 x 56`, `(-190,28)`), Basic/Rapid/Frost row text, buy ve dynamic `ArcherRetrainButton` alanlari bagli; HUD acilisinda drawer kapali
 - `ManagementDrawerCoordinatorUI`: scene HUD root'ta tek component; Workers/Housing, Archer Recruitment ve Arrow Supply yuzeylerini mutual-exclusive tutar
+- `ArrowSupplyToggleButton`: alt-sağ `156 x 56`, `(-356,28)`, label `ARROW SUPPLY`; `AmmoPurchasePanel` aynı dock root'unda `732 x 78`, `(-24,160)` ve HUD açılışında kapalı
 - `CouncilEventUI`: tek `CouncilEventPanel`; iki option text exact live quote'u, `CouncilTimerText` kalan Dawn + Day saniyesini ve `CouncilTimerFill` Filled/Horizontal/Left azalan seridi gosterir
 - `MarketUI`: Upgrade butonlari, `ArrowTechPanel`, tech unlock butonlari ve repair/prep butonlari prefabda varsa gizli
 - `HeartScreenUI`: alt-sag sabit `CastleHeartOpenButton` (`156 x 56`, `(-24,28)`, `CASTLE HEART`), `CastleHeartPanel`, close, viewport/content, node/connection template,
@@ -147,7 +148,7 @@ Runtime davranisi prefab icinde degildir; `MarketUI` ve scene setup tool baglar.
 - `DeadWalls.Tests.HudAspectRatioPresentationTests`, responsive prefab root'unu, kritik UI rect'lerini ve battlefield/spawn framing'ini EditMode'da dogrular.
 
 Mobile continuous siege loop'ta player-facing `StartNextWaveButton` yoktur. Legacy
-`RefillArrowsButton` gizli kalır; finite refill, Arrow chip'inden açılan
+`RefillArrowsButton` gizli kalır; finite refill, ayrı alt-sağ `ARROW SUPPLY` butonundan açılan
 `AmmoPurchasePanel` + scene-owned `ArrowSupplyUI` üzerinden çalışır.
 
 `CastleRepairButton` legacy Castle Interior akisi icindir. Continuous siege varsayilaninda Castle Interior panel player-facing kapali kalir; sag drawer'in archer buy ve Basic -> Rapid/Frost retrain aksiyonlari combat sirasinda kullanilmaya devam eder. Stat upgrade ve tech unlock aktif full-screen Castle Heart owner'indadir. Production Heart catalog owner onayi bekler; setup tool icerik uydurmaz. Castle Interior paneli yoksa setup tool polish fallback uretmez; panel gerekirse dogrudan prefabda kurulur.

@@ -3,6 +3,7 @@ using System.Linq;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace DeadWalls.Tests
 {
@@ -59,7 +60,39 @@ namespace DeadWalls.Tests
             }
 
             Assert.That(labelColors.Count, Is.EqualTo(prefixes.Length));
-            Assert.That(transforms.First(t => t.name == "ArrowChip").GetComponent("Button"), Is.Not.Null);
+
+            Transform arrowChip = transforms.First(t => t.name == "ArrowChip");
+            Assert.That(arrowChip.GetComponent<Button>(), Is.Null,
+                "Resource chip'leri bilgi yuzeyi olarak pasif kalmalidir.");
+            Assert.That(arrowChip.GetComponent<Image>().raycastTarget, Is.False);
+
+            RectTransform arrowSupplyToggle =
+                transforms.First(t => t.name == "ArrowSupplyToggleButton") as RectTransform;
+            Assert.That(arrowSupplyToggle, Is.Not.Null);
+            Assert.That(arrowSupplyToggle.parent,
+                Is.SameAs(transforms.First(t => t.name == "DrawerToggleButton").parent));
+            Assert.That(arrowSupplyToggle.anchorMin, Is.EqualTo(new Vector2(1f, 0f)));
+            Assert.That(arrowSupplyToggle.anchorMax, Is.EqualTo(new Vector2(1f, 0f)));
+            Assert.That(arrowSupplyToggle.pivot, Is.EqualTo(new Vector2(1f, 0f)));
+            Assert.That(arrowSupplyToggle.anchoredPosition, Is.EqualTo(new Vector2(-356f, 28f)));
+            Assert.That(arrowSupplyToggle.sizeDelta, Is.EqualTo(new Vector2(156f, 56f)));
+            Button arrowSupplyButton = arrowSupplyToggle.GetComponent<Button>();
+            Assert.That(arrowSupplyButton, Is.Not.Null);
+            Assert.That(arrowSupplyButton.targetGraphic, Is.SameAs(arrowSupplyToggle.GetComponent<Image>()));
+            Assert.That(arrowSupplyToggle.GetComponent<Image>().raycastTarget, Is.True);
+            Component arrowSupplyLabel = arrowSupplyToggle.GetComponentsInChildren<Component>(true)
+                .First(component => component.GetType().Name == "TextMeshProUGUI");
+            Assert.That((string)arrowSupplyLabel.GetType().GetProperty("text").GetValue(arrowSupplyLabel),
+                Is.EqualTo("ARROW SUPPLY"));
+
+            RectTransform ammoPanel =
+                transforms.First(t => t.name == "AmmoPurchasePanel") as RectTransform;
+            Assert.That(ammoPanel.parent, Is.SameAs(arrowSupplyToggle.parent));
+            Assert.That(ammoPanel.anchorMin, Is.EqualTo(new Vector2(1f, 0f)));
+            Assert.That(ammoPanel.anchorMax, Is.EqualTo(new Vector2(1f, 0f)));
+            Assert.That(ammoPanel.pivot, Is.EqualTo(new Vector2(1f, 0f)));
+            Assert.That(ammoPanel.anchoredPosition, Is.EqualTo(new Vector2(-24f, 160f)));
+            Assert.That(ammoPanel.sizeDelta, Is.EqualTo(new Vector2(732f, 78f)));
         }
     }
 }

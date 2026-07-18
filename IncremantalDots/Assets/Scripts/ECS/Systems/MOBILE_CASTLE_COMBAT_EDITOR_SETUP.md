@@ -91,7 +91,9 @@ Script eklendikten sonra disaridan manuel compile komutu calistirma. Unity refre
   - Defense module: `DefensePercentText`, `DefenseWallFill`, `DefenseWallText`. Legacy Gate/Core referanslari serialize uyumlulugu icin kalabilir ama runtime'da gizlenir.
   - `MarketUI`: `ArcherDrawerPanel`, `DrawerToggleButton`, Basic/Rapid/Frost row buy alanlari ve dynamic template `ArcherRetrainButton` bagli olmali.
   - `MarketUI`: `Basic/Rapid/FrostUpgradeButton`, `ArrowTechPanel`, `RapidTechUnlockButton`, `FrostTechUnlockButton` prefabda varsa player-facing olarak gizlenmelidir.
-  - `ArrowSupplyUI`: ArrowChip toggle, Current/Capacity, paket, Buy Max ve Capacity/Efficiency binding'leri dolu olmalıdır. Repair akışı için `ARROW_AMMO_EDITOR_SETUP.md` izlenir.
+  - `ArrowSupplyUI`: ayrı `ArrowSupplyToggleButton`, pasif ArrowChip Current/Capacity aynası,
+    paket, Buy Max ve Capacity/Efficiency binding'leri dolu olmalıdır. Repair akışı için
+    `ARROW_AMMO_EDITOR_SETUP.md` izlenir.
   - Castle Yard: `RepairButton`; polish prefabda varsa `FortifyButton`, `RallyButton` ve cost/status text'leri.
 - `Canvas/DayNightOverlay`
   - Full-screen black `Image`, raycast target kapali.

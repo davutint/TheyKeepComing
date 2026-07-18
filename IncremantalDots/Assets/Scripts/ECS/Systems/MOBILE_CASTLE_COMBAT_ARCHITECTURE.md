@@ -295,7 +295,8 @@ Continuous siege varsayilaninda wave bittiginde oyun durmaz, `GameManager.OnWave
 
 - `Repair`: legacy DayPrep sirasinda aktiftir ve `GameManager.RepairDefenseFull()` ile wall/gate/castle HP full olur.
 - `Fortify` ve `Rally`: runtime API olarak kalir, fakat Castle Interior economy ekrani geldikten sonra player-facing drawer'da gizlenir.
-- `Arrow Refill`: Arrow chip'inden açılan tek satırlık panelde +1/+5 paket, Buy Max ve Capacity/Efficiency yatırımları gösterilir.
+- `Arrow Refill`: pasif Arrow chip'inden ayrı alt-sağ `ARROW SUPPLY` butonuyla açılan tek
+  satırlık panelde +1/+5 paket, Buy Max ve Capacity/Efficiency yatırımları gösterilir.
 - `Start Next Wave`: debug/public API olarak kalir, player-facing UI'da gizlidir.
 
 ## Okcu Yerlesimi

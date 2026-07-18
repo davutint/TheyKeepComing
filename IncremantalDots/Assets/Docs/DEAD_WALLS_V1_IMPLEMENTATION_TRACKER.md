@@ -6,7 +6,7 @@
 > **Son tam kapsam denetimi:** 2026-07-18
 > **Aktif paket:** V1 Tracker Complete - Release Evidence Locked
 > **Aktif iş:** Yok - bütün V1 tracker maddeleri tamamlandı
-> **İlerleme:** `442 / 442` tracker checkbox'ı tamamlandı - `%100`
+> **İlerleme:** `444 / 444` tracker checkbox'ı tamamlandı - `%100`
 > İlerleme hesabı bütün iş, kabul, DoD ve owner-kararı checkbox'larını kapsar; `[~]` tamamlanmış sayılmaz.
 > **Council kapsam kararı:** Owner, 2026-07-15 tarihinde Emergency Council yolunu iptal etti. V1 Council yalnız Day `3/6/9...` regular toplantılarından oluşur.
 
@@ -615,6 +615,7 @@ Bu tablo Blueprint'in hiçbir ana bölümünün tracker dışında kalmaması i�
 - [x] UI interaction, tooltip, buy/reveal ve focus davranışları unscaled UI zamanında çalışsın.
 - [x] Graph kapanınca önceki time scale ve SimulationSystemGroup state'i deterministik devam etsin; nested pause owner'ları erken resume etmesin.
 - [x] Market/Barracks archer upgrade ve direct unlock yüzeylerini kaldır/disable et.
+- [x] Castle Heart graph sunumunu compact organik damar düzenine taşı; sert pusula eksenini kaldır, her node için `52 x 52` boş icon socket sözleşmesini kur ve owner icon seti hazır olana kadar sprite/fallback glyph göstermeyi kapalı tut.
 
 ### E6 - Save, migration ve test
 
@@ -794,7 +795,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 | Forecast yok | Aktif prefab, canlı HUD, `HUDController` ve setup binding sözleşmesi forecast/pressure yüzeyi taşımıyor; gameplay `HordePressure01` sinyali korunuyor | `[x]` |
 | Abilities alt orta | Tek `496 x 90` bottom-center panelde Fireball/Rally/Emergency Repair; üç vertical cooldown overlay, tek `SpellCastUI`, legacy panel yok ve prefab guard testi aktif | `[x]` |
 | Workers/Housing alt sol | Tek bottom-left `Workers + Housing` toggle/drawer yüzeyi; worker ratio ve bina CAP/EFF yanında limitsiz `+1/+10/+100 Beds` Wood alımı, canlı population/bed/free/purchased aynaları ve prefab guard testi var | `[x]` |
-| Archers/Heart alt sağ | Sabit `ARCHERS` + `CASTLE HEART` bottom-right dock; drawer `540 x 350` olarak dock üstünde açılır, HUD başlangıcında kapalıdır ve Heart modal pause davranışını korur | `[x]` |
+| Archers/Arrow/Heart alt sağ | Pasif resource chip'lerinden ayrı sabit `ARROW SUPPLY` + `ARCHERS` + `CASTLE HEART` bottom-right dock; ilgili drawer'lar dock üstünde açılır, HUD başlangıcında kapalıdır ve Heart modal pause davranışını korur | `[x]` |
 | Tek drawer | Scene-owned `ManagementDrawerCoordinatorUI`, Workers/Housing, Archers ve Arrow Supply yüzeylerinde mutual exclusion kuruyor; Castle Heart bağımsız modal kalıyor | `[x]` |
 | Council geçici kart | Tek compact regular Council kartı; iki seçenek `CouncilOptionPresentationUtility` üzerinden live exact effect/bedel quote'u gösteriyor, karar penceresi Dawn + Day cycle süresine bağlı sayısal sayaç ve gerçekten azalan Filled bar taşıyor | `[x]` |
 | Fixed camera/ratio | Kamera sabit; responsive HUD visual root, top-anchored defense panel ve 1920x1080 / 3440x1440 critical rect + battlefield framing guard'ları aktif | `[x]` |
@@ -803,6 +804,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 
 - [x] Gate/Core serialized binding ve görsel kalıntılarını active prefabdan temizle veya açık dormant guard koy.
 - [x] Üst kaynak HUD'ını kompakt tut.
+- [x] Resource chip'lerini pasif tut; finite ok ikmalini ayrı `ARROW SUPPLY` management dock girişine taşı.
 - [x] Üst ortada minimal phase alanı ayır.
 - [x] Büyük CyclePanel ve ham DAY/DUSK/NIGHT sunumunu owner-approved mockup ile değiştir.
 - [x] Horde forecast/pressure panelini kaldır.
@@ -817,7 +819,7 @@ PlayMode koşularında `2/2` geçti. MCP scene/prefab denetiminde tek scene
 
 - [x] İlk Day: worker ratio düğmesini pulse + tek satır metinle öğret.
 - [x] İlk kaynak yeterliliği: Basic Archer drawer highlight göster.
-- [x] İlk düşük ammo: ammo satırını highlight et; zorunlu popup açma.
+- [x] İlk düşük ammo: panel kapalıyken `ARROW SUPPLY`, açılınca gerçek refill butonunu highlight et; zorunlu popup açma.
 - [x] İlk kill/Essence: Heart butonunu pulse et; açılınca full pause öğret.
 - [x] İlk regular Council/Day 3: bedel ve iki exact sonucu öğret.
 - [x] İlk Wall hasarı sonrası Day: normal repair action'ı highlight et.
@@ -1548,3 +1550,5 @@ Bu maddeler kod içinde varsayımla kapatılmaz. Önce mockup/spec, sonra owner 
 | 2026-07-18 | `DW-V1-CONTENT-EXACT-TUNING-CURVES` exact launch curves + telemetry targets | Mevcut production Difficulty/Archer/Meta değerleri spekülatif rebalance yapılmadan launch authority olarak kilitlendi. Yeni provider-independent target profile Spawn/Economy/Combat/Council/Meta için 19 measurable band, cohort, minimum sample ve canonical source event tanımlar; Difficulty Tuner bunları read-only polished panelde gösterir. `run_ended v2`, durable death sonrasında upgrade-applied Wall MaxHP, final resources, Arrow, population, archer mix ve unspent Essence snapshot'ını ekler. Band dışı ölçüm yalnız designer review tetikler; provider ve automatic retuning yoktur | Target contract EditMode `4/4`; telemetry EditMode `28/28`; gerçek `NewGameScene` telemetry PlayMode `9/9`; full EditMode `404/404`; full PlayMode `88 pass + 2 explicit profiler/soak skip`; target validation `19/19`, fingerprint `58fc60a0...f8059dd3`; scene validation `0` issue; final Console `0 error / 0 warning`; tracker `440/442` |
 | 2026-07-18 | `DW-V1-CLOSURE-ARCHER-HEART-EFFECTS` Heart-owned archer stat progression | Mevcut production Heart effect adapter'ı yeni bir paralel sistem kurulmadan tek V1 owner olarak kapatıldı. Direct Basic/Rapid/Frost level cost/upgrade API'si, type-level damage/fire-rate ve Frost duration/slow çarpanları kaldırıldı; Market row'u sayısal `LV` yerine `HEART/TECH` sahipliğini gösteriyor. Production v2 katalog damage, fire rate, range ve Frost slow kategorilerini exact node/target contract'ıyla kilitliyor. Run save v17, v16 direct archer level listesini graph/node/Essence uydurmadan retired eder; exact Heart graph korunur. Heart satın alımı existing entity'leri rebase eder, future spawn aynı effective state'i alır ve Continue bonusu compound etmez | Targeted EditMode `14/14`; Heart/archer PlayMode `6/6`; full EditMode `408/408`; full PlayMode `89 pass + 2 explicit profiler/soak skip`; live production catalog `7` archer effect row / `0` validation error; `NewGameScene` binding true, scene validation `0` issue; final Console `0 error / 0 warning`; tracker `441/442` |
 | 2026-07-18 | `DW-V1-CLOSURE-10K-1K-NIGHT-VISUAL` combined Night visual acceptance | Yeni/paralel stress harness kurulmadı ve production gameplay kodu değiştirilmedi. Mevcut canonical `HordeScalePlayModeTests`, screenshot penceresinde stress presentation suppression'ı geçici kaldırıp authoritative cycle'ı Night ortasına sabitliyor; gerçek overlay/global-light transition'ı settle olduktan sonra exact enemy/archer/projectile sayaçlarını aynı karede kilitliyor. Capture sonrası stress state'i geri yükleniyor ve mevcut performance/Fireball/Continue benchmark'ı aynen sürüyor | Targeted PlayMode `1/1`; aynı 1920x1080 karede `10.000 enemy / 1.000 canonical Basic Archer / 1.000 active projectile / 48 visible representative`; Night overlay `0,500`, global light `0,680`, phase `Night`; PNG görsel audit temiz; tracker `442/442` |
+| 2026-07-18 | `DW-V1-PRESENTATION-HEART-ORGANIC-GRAPH` compact organic Castle Heart graph + deferred icon slots | Mevcut `HeartScreenUI`, generated graph, purchase/effect ve save owner zinciri korunarak kartlar `264 x 156` compact düzene, muted branch chrome'una ve stable node kimliğinden türetilen küçük lateral sapmalarla organik damar sunumuna taşındı. Sert `HeartAxis_*` pusula artısı kaldırıldı; yalnız gerçek graph edge'leri kaldı. Her node `52 x 52` icon socket ayırıyor; `ShowAuthoredNodeIcons=false` iken hiçbir sprite, baş harf veya fallback glyph üretilmiyor. Gelecekte owner onaylı sprite'lar mevcut `HeartNodeDefinitionSO.Icon` bağı üzerinden açılacak; bu pakette icon asset'i üretilmedi veya atanmadı | Unity compile `0 error`; targeted Heart EditMode `8/8`; targeted production Heart PlayMode `2/2`; `1920 x 1080` canlı graph görsel QA; icon socket/sprite/fallback/no-axis regresyonu geçti; targeted diff check temiz; Console `0 error`, görev dışı mevcut ECS ordering warning `1`; tracker kapsamı `443 -> 444`, tracker `444/444` |
+| 2026-07-18 | `DW-V1-CLOSURE-ARROW-SUPPLY-ENTRY` explicit Arrow Supply dock entry | Üst resource strip'in tamamı pasif bilgi yüzeyi olarak birleştirildi; `ArrowChip` üzerindeki tekil Button kaldırıldı. Finite ok ikmali alt-sağ dock'ta `ARROW SUPPLY` isimli ayrı `156 x 56` yönetim girişine taşındı; `732 x 78` panel aynı dock üstünde açılıyor ve mevcut drawer coordinator mutual-exclusion sözleşmesini koruyor. Low-ammo onboarding paneli otomatik açmadan önce dock girişini, oyuncu paneli açınca gerçek `AmmoPackageButton` kontrolünü pulse ediyor | Unity compile `0 error`; targeted HUD/aspect EditMode `3/3`; low-ammo click/refill PlayMode `1/1`; MCP live audit: `ArrowChip Button 0`, toggle/panel/controller binding tekil, exact dock geometri ve raycast doğru; final Console `0 error`; tracker kapsamı `442 -> 443`, ilerleme `443/443` |

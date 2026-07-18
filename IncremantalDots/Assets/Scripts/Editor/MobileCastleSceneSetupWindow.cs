@@ -4697,16 +4697,71 @@ namespace DeadWalls
             if (arrowChip == null)
                 throw new InvalidOperationException("ArrowChip bulunamadi; finite ammo paneli baglanamadi.");
 
-            Button toggle = EnsureComponent<Button>(arrowChip);
-            toggle.targetGraphic = arrowChip.GetComponent<Image>();
-            toggle.transition = Selectable.Transition.ColorTint;
+            // Resource strip yalniz bilgi yuzeyidir; Arrow icin tek tiklanabilir kaynak chip'i
+            // yaratmak yerine ayri management dock girisi kullanilir.
+            DestroyComponentIfExists<Button>(arrowChip);
+            Image arrowChipImage = arrowChip.GetComponent<Image>();
+            if (arrowChipImage != null)
+                arrowChipImage.raycastTarget = false;
+
+            Transform visualRoot = hudRoot.transform.Find("MobileCastleHudRoot") ?? hudRoot.transform;
+            Button toggle = FindComponentInChildrenByName<Button>(hudRoot, "ArrowSupplyToggleButton");
+            if (toggle == null)
+            {
+                toggle = EnsureButton(visualRoot, "ArrowSupplyToggleButton",
+                    new Vector2(1f, 0f), new Vector2(-512f, 28f), new Vector2(-356f, 84f), out _);
+            }
+
+            RectTransform toggleRect = toggle.GetComponent<RectTransform>();
+            if (toggleRect.parent != visualRoot)
+                toggleRect.SetParent(visualRoot, false);
+            toggleRect.anchorMin = new Vector2(1f, 0f);
+            toggleRect.anchorMax = new Vector2(1f, 0f);
+            toggleRect.pivot = new Vector2(1f, 0f);
+            toggleRect.anchoredPosition = new Vector2(-356f, 28f);
+            toggleRect.sizeDelta = new Vector2(156f, 56f);
+            toggleRect.localScale = Vector3.one;
+            toggle.gameObject.SetActive(true);
+            SetButtonLabel(toggle, "ARROW SUPPLY");
+            NormalizeDockButtonLabel(toggle);
+
+            Image toggleImage = toggle.GetComponent<Image>();
+            Button dockStyleSource = FindComponentInChildrenByName<Button>(hudRoot, "DrawerToggleButton");
+            if (toggleImage != null)
+            {
+                toggleImage.raycastTarget = true;
+                if (dockStyleSource != null)
+                {
+                    Image sourceImage = dockStyleSource.GetComponent<Image>();
+                    if (sourceImage != null)
+                    {
+                        toggleImage.sprite = sourceImage.sprite;
+                        toggleImage.type = sourceImage.type;
+                        toggleImage.pixelsPerUnitMultiplier = sourceImage.pixelsPerUnitMultiplier;
+                        toggleImage.color = sourceImage.color;
+                    }
+                }
+            }
+            toggle.targetGraphic = toggleImage;
+            toggle.transition = dockStyleSource != null
+                ? dockStyleSource.transition
+                : Selectable.Transition.ColorTint;
+            if (dockStyleSource != null)
+                toggle.colors = dockStyleSource.colors;
+            toggle.navigation = Navigation.defaultNavigation;
 
             GameObject panel = FindChildByName(hudRoot, "AmmoPurchasePanel")
-                ?? EnsurePanel(hudRoot.transform, "AmmoPurchasePanel", true,
+                ?? EnsurePanel(visualRoot, "AmmoPurchasePanel", true,
                     new Color(0.055f, 0.045f, 0.035f, 0.97f));
-            SetRect(panel.GetComponent<RectTransform>(),
-                new Vector2(0f, 1f), new Vector2(0f, 1f),
-                new Vector2(28f, -236f), new Vector2(760f, -158f));
+            RectTransform panelRect = panel.GetComponent<RectTransform>();
+            if (panelRect.parent != visualRoot)
+                panelRect.SetParent(visualRoot, false);
+            panelRect.anchorMin = new Vector2(1f, 0f);
+            panelRect.anchorMax = new Vector2(1f, 0f);
+            panelRect.pivot = new Vector2(1f, 0f);
+            panelRect.anchoredPosition = new Vector2(-24f, 160f);
+            panelRect.sizeDelta = new Vector2(732f, 78f);
+            panelRect.localScale = Vector3.one;
 
             var stock = FindOrCreateText(panel.transform, "AmmoStockText", "ARROWS 200 / 200", 16,
                 TextAlignmentOptions.MidlineLeft, new Vector2(0f, 0f), new Vector2(0f, 1f),
@@ -5314,8 +5369,8 @@ namespace DeadWalls
         {
             EnsureArrowAmmoPanel(hudRoot);
             var controller = EnsureComponent<ArrowSupplyUI>(hudRoot);
-            GameObject arrowChip = FindChildByName(hudRoot, "ArrowChip");
-            controller.ToggleButton = arrowChip != null ? arrowChip.GetComponent<Button>() : null;
+            controller.ToggleButton =
+                FindComponentInChildrenByName<Button>(hudRoot, "ArrowSupplyToggleButton");
             controller.AmmoPanel = FindChildByName(hudRoot, "AmmoPurchasePanel");
             controller.StockText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "AmmoStockText");
             controller.EfficiencyText = FindComponentInChildrenByName<TextMeshProUGUI>(hudRoot, "AmmoEfficiencyText");

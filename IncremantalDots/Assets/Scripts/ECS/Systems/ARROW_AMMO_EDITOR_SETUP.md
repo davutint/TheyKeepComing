@@ -9,8 +9,9 @@
 4. Scene'i açıp `GameManager` üzerindeki `ArrowSupplyUI` binding'lerini kontrol et.
 
 Araç, UI gerçeği olan
-`Assets/Prefabs/UI/Generated/MobileCastleHudRoot.prefab` içindeki Arrow chip'ine Button
-ekler ve tek satırlık `AmmoPurchasePanel` üretir. Listener sahibi prefab değil,
+`Assets/Prefabs/UI/Generated/MobileCastleHudRoot.prefab` içindeki bütün resource chip'lerini
+pasif tutar; alt-sağ dock'a `ArrowSupplyToggleButton` ve üstüne tek satırlık
+`AmmoPurchasePanel` üretir. Listener sahibi prefab değil,
 `NewGameScene` üzerindeki tek `ArrowSupplyUI` component'idir; böylece duplicate listener
 oluşmaz.
 
@@ -19,7 +20,7 @@ oluşmaz.
 `ArrowSupplyUI` alanlarının tamamı dolu olmalıdır:
 
 - `AmmoPanel`
-- `ToggleButton` (`ArrowChip`)
+- `ToggleButton` (`ArrowSupplyToggleButton` / `ARROW SUPPLY`)
 - `StockText`, `EfficiencyText`
 - `PackageButton`, `LargePackageButton`, `BuyMaxButton`
 - `CapacityUpgradeButton`, `EfficiencyUpgradeButton`
@@ -27,8 +28,10 @@ oluşmaz.
 Scene-owned `FirstRunOnboardingUI.AmmoSupply`, ayni `ArrowSupplyUI` component'ine bagli
 olmalidir. Prefab asseti runtime onboarding controller tasimaz.
 
-Panel varsayılan olarak kapalıdır ve Arrow chip'iyle açılıp kapanır. `HUDController`
-ayrıca chip üzerindeki ana değeri `Current / Capacity` biçiminde günceller.
+Panel varsayılan olarak kapalıdır ve `ARROW SUPPLY` dock butonuyla açılıp kapanır.
+`ArrowSupplyToggleButton`, alt-sağ `(-356,28)` konumunda `156 x 56`; panel ise
+`(-24,160)` konumunda `732 x 78` boyutundadır. `HUDController` ayrıca pasif Arrow chip'i
+üzerindeki ana değeri `Current / Capacity` biçiminde günceller.
 
 ## Tuning
 
@@ -61,8 +64,9 @@ CAP/EFF seviyeleri ve sonraki yatirim fiyatlari canli okunur.
 - 1.000 hazır okçu + stok `0`: `+10` paketlik gerçek transaction sonrası takip eden simulation
   tick'inde tam `1.000` pooled projectile rent edilmeli, stok tam `0` olmalı ve pool expansion
   oluşmamalı. Editor guard bütçeleri restart main thread `< 50 ms`, wall-frame `< 100 ms`.
-- Onboarding flag incomplete iken stoku `%25` esigine indir: `ArrowChip` pulse olmali,
-  `AmmoPurchasePanel` kendiliginden acilmamali; basarisiz refill flag yazmamali, basarili refill
+- Onboarding flag incomplete iken stoku `%25` esigine indir: panel kapaliyken
+  `ArrowSupplyToggleButton`, panel oyuncu tarafindan acilinca `AmmoPackageButton` pulse olmali;
+  `AmmoPurchasePanel` kendiliginden acilmamali. Basarisiz refill flag yazmamali, basarili refill
   `tutorial.v1.low_ammo` flag'ini yazmalidir.
 
 Otomatik regresyon için `ArrowEconomyUtilityTests`, `RunPersistenceTests` ve

@@ -18,7 +18,7 @@ root'a idempotent eklenir.
 
 1. HUD acilisinda Workers, Archers ve Ammo panellerinin kapali oldugunu dogrula.
 2. `WORKERS + HOUSING` acikken `ARCHERS`a bas; Worker paneli ayni frame kapanmali.
-3. Archer paneli acikken Arrow chip'ine bas; Archer paneli aninda off-screen kapanmali.
+3. Archer paneli acikken `ARROW SUPPLY` butonuna bas; Archer paneli aninda off-screen kapanmali.
 4. Ammo acikken Worker butonuna bas; Ammo kapanip Worker acilmali.
 5. Her adimda `ManagementDrawerCoordinatorUI.ActiveDrawer` yalniz gorunen yuzeyi gostermeli.
 6. Castle Heart acilis/pause davranisinin coordinator'dan bagimsiz kaldigini dogrula.

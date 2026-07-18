@@ -445,9 +445,11 @@ namespace DeadWalls
             else if (shouldShowLowAmmo && AmmoSupply != null)
             {
                 step = FirstRunOnboardingStep.LowAmmo;
-                target = AmmoSupply.ToggleButton != null
-                    ? AmmoSupply.ToggleButton.GetComponent<RectTransform>()
-                    : null;
+                target = AmmoSupply.IsOpen && AmmoSupply.PackageButton != null
+                    ? AmmoSupply.PackageButton.GetComponent<RectTransform>()
+                    : AmmoSupply.ToggleButton != null
+                        ? AmmoSupply.ToggleButton.GetComponent<RectTransform>()
+                        : null;
             }
             else if (shouldShowHeartEntry && CastleHeart != null)
             {
@@ -857,21 +859,22 @@ namespace DeadWalls
                 bool councilExactStep = step == FirstRunOnboardingStep.CouncilExact;
                 bool daytimeRepairStep = step == FirstRunOnboardingStep.DaytimeRepair;
                 bool nightAbilityKeyStep = step == FirstRunOnboardingStep.NightAbilityKey;
+                bool rightDockStep = archerStep || ammoStep || heartEntryStep;
                 hintRect.anchorMin = heartPauseStep || daytimeRepairStep
                     ? new Vector2(0.5f, 1f)
                     : nightAbilityKeyStep
                         ? new Vector2(0.5f, 0f)
-                    : archerStep || heartEntryStep
+                    : rightDockStep
                     ? new Vector2(1f, 0f)
-                    : ammoStep ? new Vector2(0f, 1f) : Vector2.zero;
+                    : Vector2.zero;
                 hintRect.anchorMax = hintRect.anchorMin;
                 hintRect.pivot = heartPauseStep || daytimeRepairStep
                     ? new Vector2(0.5f, 1f)
                     : nightAbilityKeyStep
                         ? new Vector2(0.5f, 0f)
-                    : archerStep || heartEntryStep
+                    : rightDockStep
                     ? new Vector2(1f, 0f)
-                    : ammoStep ? new Vector2(0f, 1f) : Vector2.zero;
+                    : Vector2.zero;
                 hintRect.anchoredPosition = heartPauseStep
                     ? new Vector2(0f, -88f)
                     : daytimeRepairStep
@@ -883,7 +886,7 @@ namespace DeadWalls
                     : heartEntryStep
                         ? new Vector2(-24f, 96f)
                     : ammoStep
-                        ? new Vector2(24f, -96f)
+                        ? new Vector2(-24f, AmmoSupply != null && AmmoSupply.IsOpen ? 250f : 96f)
                     : councilExactStep
                         ? new Vector2(24f, 226f)
                     : new Vector2(24f, WorkerDrawer != null && WorkerDrawer.IsOpen ? 554f : 96f);

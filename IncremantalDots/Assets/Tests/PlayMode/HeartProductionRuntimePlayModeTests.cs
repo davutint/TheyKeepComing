@@ -49,8 +49,10 @@ namespace DeadWalls.Tests
 
             HeartScreenUI screen = Object.FindFirstObjectByType<HeartScreenUI>();
             Assert.That(screen, Is.Not.Null);
-            Assert.That(screen.NodeSize.x, Is.GreaterThanOrEqualTo(292f));
-            Assert.That(screen.NodeSize.y, Is.GreaterThanOrEqualTo(188f));
+            Assert.That(screen.NodeSize, Is.EqualTo(new Vector2(264f, 156f)));
+            Assert.That(screen.IconSlotSize, Is.EqualTo(new Vector2(52f, 52f)));
+            Assert.That(screen.ShowAuthoredNodeIcons, Is.False,
+                "Owner ikonlari hazir olmadan Castle Heart gecici sprite veya glyph gostermemeli.");
         }
 
         [UnityTest]
@@ -143,6 +145,21 @@ namespace DeadWalls.Tests
                 "HeartNode_" + second.SlotId.Replace(':', '_')) as RectTransform;
             Assert.That(firstCard, Is.Not.Null);
             Assert.That(secondCard, Is.Not.Null);
+            RectTransform iconSocket = firstCard.Find("HeartNodeIconSocket") as RectTransform;
+            Assert.That(iconSocket, Is.Not.Null);
+            Assert.That(iconSocket.sizeDelta, Is.EqualTo(screen.IconSlotSize));
+            Transform iconImage = firstCard.Find("HeartNodeIconImage");
+            Assert.That(iconImage, Is.Not.Null);
+            Assert.That(iconImage.gameObject.activeSelf, Is.False,
+                "Authored icon surface owner onayina kadar bos kalmali.");
+            TMPro.TMP_Text iconFallback = firstCard
+                .GetComponentsInChildren<TMPro.TMP_Text>(true)
+                .Single(text => text.name == "HeartNodeIconFallbackText");
+            Assert.That(iconFallback.gameObject.activeSelf, Is.False);
+            Assert.That(iconFallback.text, Is.Empty);
+            Assert.That(screen.HeartContent.Cast<Transform>().Any(child =>
+                child.name.StartsWith("HeartAxis_", System.StringComparison.Ordinal)), Is.False,
+                "Sert pusula ekseni yerine yalniz gercek graph damarlarinin cizilmesi gerekiyor.");
             bool horizontalBranch = first.Branch == HeartNodeBranch.Army
                                     || first.Branch == HeartNodeBranch.Defense;
             if (horizontalBranch)

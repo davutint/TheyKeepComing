@@ -239,7 +239,7 @@ namespace DeadWalls.Tests
         }
 
         [UnityTest]
-        public IEnumerator FirstLowAmmoOnboarding_PulsesArrowChipWithoutOpeningPanel_AndCompletesOnRefill()
+        public IEnumerator FirstLowAmmoOnboarding_PulsesArrowSupplyDockThenBuyButton_AndCompletesOnRefill()
         {
             GameManager gameManager = GameManager.Instance;
             FirstRunOnboardingUI onboarding =
@@ -296,6 +296,13 @@ namespace DeadWalls.Tests
             Assert.That(ammoSupply.IsOpen, Is.False,
                 "Low-ammo onboarding ammo panelini oyuncu adina acmamalidir.");
 
+            ammoSupply.ToggleButton.onClick.Invoke();
+            yield return null;
+
+            Assert.That(ammoSupply.IsOpen, Is.True);
+            Assert.That(onboarding.ActivePulseTarget,
+                Is.SameAs(ammoSupply.PackageButton.GetComponent<RectTransform>()));
+
             ResourceData resources = entityManager.GetComponentData<ResourceData>(gameStateEntity);
             resources.Wood = 0;
             entityManager.SetComponentData(gameStateEntity, resources);
@@ -330,7 +337,7 @@ namespace DeadWalls.Tests
             Assert.That(onboarding.IsLowAmmoStepVisible, Is.False);
             Assert.That(onboarding.HintPanel.activeSelf, Is.False);
             Assert.That(onboarding.PulseFrame.gameObject.activeSelf, Is.False);
-            Assert.That(ammoSupply.IsOpen, Is.False);
+            Assert.That(ammoSupply.IsOpen, Is.True);
         }
 
         [UnityTest]

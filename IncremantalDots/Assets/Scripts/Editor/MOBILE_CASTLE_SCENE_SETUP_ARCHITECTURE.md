@@ -61,7 +61,7 @@ Readability polish icin `MobileCastleArcherTilePlacement` Scene view'da 40 tile 
 
 Wave/run loop icin drawer oyun akisi controller'i degil, yalnizca gorsel ve referans root'udur. Davranis `MarketUI`, `UIManager`, `GameManager` ve ECS `DayNightPrepSystem` tarafindan uygulanir. Prefab runtime event barindirmaz. Yeni UI yuzeyi dogrudan `MobileCastleHudRoot.prefab` uzerinde kurulur (eski UIImporter/export pipeline'i 2026-07-06'da kaldirildi).
 
-Castle Yard prep aksiyonlari sag drawer'da player-facing degildir. Tool `RepairButton`, `FortifyButton`, `RallyButton`, legacy `RefillArrowsButton` ve `StartNextWaveButton` bulursa gizler. Finite refill için Arrow chip'ine bağlı tek satırlık `AmmoPurchasePanel` ve scene-owned `ArrowSupplyUI` kurar. Tool ayrica `Basic/Rapid/FrostUpgradeButton`, `ArrowTechPanel`, `RapidTechUnlockButton` ve `FrostTechUnlockButton` bulursa gizler; sag drawer yalnizca archer recruitment icin kullanilir. `CastleRepairButton` legacy Castle Interior akisi icin bagli kalabilir, fakat continuous siege varsayilaninda Castle Interior player-facing kapali tutulur.
+Castle Yard prep aksiyonlari sag drawer'da player-facing degildir. Tool `RepairButton`, `FortifyButton`, `RallyButton`, legacy `RefillArrowsButton` ve `StartNextWaveButton` bulursa gizler. Finite refill için resource chip'lerini pasif tutar; alt-sag dock'ta ayrı `ArrowSupplyToggleButton`, onun üstünde tek satırlık `AmmoPurchasePanel` ve scene-owned `ArrowSupplyUI` kurar. Tool ayrica `Basic/Rapid/FrostUpgradeButton`, `ArrowTechPanel`, `RapidTechUnlockButton` ve `FrostTechUnlockButton` bulursa gizler; sag drawer yalnizca archer recruitment icin kullanilir. `CastleRepairButton` legacy Castle Interior akisi icin bagli kalabilir, fakat continuous siege varsayilaninda Castle Interior player-facing kapali tutulur.
 
 `ConfigureHudRoot`, scene root'a tek `ManagementDrawerCoordinatorUI` ekler. Bu owner
 Workers/Housing, Archer Recruitment ve Arrow Supply acilislarini exclusive tutar; prefab
@@ -78,8 +78,9 @@ gomulmez; setup tool scene HUD root'una tek `FirstRunOnboardingUI` ekler ve mevc
 `DefenseRepairUI` player-action event'lerine; `SpellCastUI` accepted-hotkey event'ine baglar.
 Worker ratio, ilk affordable Basic Archer,
 ilk `%25` low-ammo, ilk pozitif Grave Essence Heart girisi, ilk regular Council ve ilk Daytime
-Wall repair ile ilk Night ability-key cue'su ayni presentation'i paylasir. Low-ammo hedefi gercek
-ust HUD `ArrowChip`, Heart hedefi gercek alt-sag `CastleHeartOpenButton`, repair hedefi gercek
+Wall repair ile ilk Night ability-key cue'su ayni presentation'i paylasir. Low-ammo hedefi panel
+kapaliyken gercek alt-sag `ArrowSupplyToggleButton`, panel acikken gercek `AmmoPackageButton`;
+Heart hedefi gercek alt-sag `CastleHeartOpenButton`, repair hedefi gercek
 `DefenseRepairButton`, ability hedefi ilk hazir gercek `AbilityBarPanel` slotudur.
 Controller drawer/paneli
 otomatik acmaz, ekonomi state'i yazmaz veya yeni pause lease'i uretmez; Heart acikken yalniz

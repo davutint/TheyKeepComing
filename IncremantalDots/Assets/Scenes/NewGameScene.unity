@@ -61757,6 +61757,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 101364735}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &914835398 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1793663069711798308, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
+  m_PrefabInstance: {fileID: 1065689827}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
 --- !u!1 &916179801
 GameObject:
   m_ObjectHideFlags: 0
@@ -71420,7 +71431,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: DeadWalls::DeadWalls.ArrowSupplyUI
   AmmoPanel: {fileID: 1669116443}
-  ToggleButton: {fileID: 1669116442}
+  ToggleButton: {fileID: 914835398}
   StockText: {fileID: 1669116441}
   EfficiencyText: {fileID: 1669116440}
   PackageButton: {fileID: 1669116439}
@@ -71464,6 +71475,8 @@ MonoBehaviour:
   HorizontalSpacing: 386
   VerticalSpacing: 278
   ContentPadding: {x: 190, y: 160}
+  ShowAuthoredNodeIcons: 0
+  IconSlotSize: {x: 52, y: 52}
 --- !u!114 &1065689873
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -79219,17 +79232,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
---- !u!114 &1669116442 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4124249147512143760, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}
-  m_PrefabInstance: {fileID: 1065689827}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
 --- !u!1 &1669116443 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6405550753688911921, guid: 3155b8a633c3cdc418267b8238875bde, type: 3}

@@ -21,6 +21,8 @@ Prefab stage'de su objeleri dogrula:
 - `HeartViewport`: `ScrollRect`, `RectMask2D`, `TechTreeViewController`.
 - `HeartContent`: node/connection runtime parent'i.
 - Inactive `HeartNodeTemplate` ve `HeartConnectionTemplate`.
+- Runtime node layout `264 x 156`, branch spacing `340 / 236`, icon socket `52 x 52` olmalidir.
+- `HeartScreenUI.ShowAuthoredNodeIcons` owner icon seti hazirlanana kadar kapali kalmalidir.
 - `GraveEssenceText`, `HeartScreenStatusText`, `HeartBranchCompassText`.
 - `HeartQuantityOneButton`, `HeartQuantityTenButton`, `HeartQuantityMaxButton`.
 - `CastleHeartBadge` default inactive.
@@ -30,6 +32,11 @@ Prefab stage'de su objeleri dogrula:
 `HeartNodeTitleText`, `HeartNodeLevelText`, `HeartNodeDescriptionText`,
 `HeartNodeCostText`, `HeartNodeStatusText`, `HeartNodeBuyButton`,
 `HeartNodeBuyButtonText` ve `HeartNodePipsRoot` bulunur.
+
+Runtime `HeartNodeIconSocket` dekorasyonunu template clone'una ekler. Icon kapaliyken
+`HeartNodeIconImage` ve `HeartNodeIconFallbackText` inactive/empty kalir; gecici harf veya soru
+isareti kullanilmaz. Owner iconlari hazirlandiginda definition asset'lerine sprite atanir ve ancak
+son ortak QA turunda `ShowAuthoredNodeIcons` acilir.
 
 ## Scene binding
 
@@ -66,16 +73,18 @@ partneri, numeric value/soft-cap ve Evolution pool'u ayri owner onayi gerektirir
 4. Heart'i kapat; onceki time scale ve DOTS group enabled state exact donmeli.
 5. Onayli catalog bagliysa hidden node'larda exact baslik/effect sizintisi olmadigini kontrol et.
 6. Gorunur numeric node'da current, after, delta ve exact GE maliyetini kontrol et.
-7. Repeatable node'da `+1/+10/MAX`; Unlock/Evolution/Keystone'da yalniz tek alim kontrolunu
+7. Icon seti owner onayi almadiysa her node'da bos socket ayrildigini, sprite/fallback glyph
+   gorunmedigini ve sert `HeartAxis_*` arti ekseni uretilmedigini kontrol et.
+8. Repeatable node'da `+1/+10/MAX`; Unlock/Evolution/Keystone'da yalniz tek alim kontrolunu
    dogrula.
-8. Rapid/Frost direct unlock ve archer stat upgrade yuzeylerinin drawer'da gorunmedigini
+9. Rapid/Frost direct unlock ve archer stat upgrade yuzeylerinin drawer'da gorunmedigini
    ve unlocked satirin level alaninda `HEART` yazdigini dogrula.
-9. Bir Keystone çiftine ilerle; iki kartın birlikte ve üst üste binmeden görünmesini,
+10. Bir Keystone çiftine ilerle; iki kartın birlikte ve üst üste binmeden görünmesini,
    `CHOOSE ONE · RUN COMMITMENT` etiketini ve altın fork/merge damarlarını kontrol et.
-10. Her iki seçimi ayrı koşularda dene; yalnız partner kilitlenmeli ve branch'in sonraki node'u
+11. Her iki seçimi ayrı koşularda dene; yalnız partner kilitlenmeli ve branch'in sonraki node'u
     hangi taraf seçilirse seçilsin reveal olmalıdır.
 
-11. Heart acikken sahneyi yeniden yukle veya Play Mode'dan cik; Console'da yok edilmis
+12. Heart acikken sahneyi yeniden yukle veya Play Mode'dan cik; Console'da yok edilmis
     `RectTransform`/`CanvasGroup` hedefli DOTween safe-mode uyarisi kalmamalidir.
 
 ## Otomatik dogrulama

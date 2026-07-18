@@ -38,6 +38,7 @@ namespace DeadWalls.Tests
             "CastleHeartPanel",
             "CouncilEventPanel",
             "AmmoPurchasePanel",
+            "ArrowSupplyToggleButton",
             "ArrowChip"
         };
 

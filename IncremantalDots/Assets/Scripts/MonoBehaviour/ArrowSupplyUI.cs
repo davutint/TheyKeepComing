@@ -5,7 +5,7 @@ using UnityEngine.UI;
 namespace DeadWalls
 {
     /// <summary>
-    /// Ust HUD ArrowChip'inden acilan tek satirlik finite ammo paneli.
+    /// Alt-sag ARROW SUPPLY management dock girisinden acilan finite ammo paneli.
     /// Refill anliktir; production queue veya Fletcher baglantisi yoktur.
     /// </summary>
     public sealed class ArrowSupplyUI : MonoBehaviour
