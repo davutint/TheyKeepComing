@@ -13,7 +13,7 @@ namespace DeadWalls
     {
         public static Vector2 GetPosition(
             HeartNodeBranch branch,
-            int depth,
+            float depth,
             float horizontalSpacing,
             float verticalSpacing)
         {
@@ -82,6 +82,7 @@ namespace DeadWalls
         private static readonly Color HiddenColor = new Color(0.075f, 0.09f, 0.12f, 0.94f);
         private static readonly Color RootColor = new Color(0.76f, 0.18f, 0.22f, 0.98f);
         private static readonly Color LockedColor = new Color(0.25f, 0.27f, 0.31f, 0.96f);
+        private static readonly Color KeystoneColor = new Color(0.96f, 0.67f, 0.22f, 1f);
 
         private readonly Dictionary<string, NodeView> _nodeViews =
             new Dictionary<string, NodeView>(StringComparer.Ordinal);
@@ -89,6 +90,8 @@ namespace DeadWalls
             new Dictionary<string, ConnectionView>(StringComparer.Ordinal);
         private readonly Dictionary<string, HeartGraphNodePresentation> _presentationsBySlot =
             new Dictionary<string, HeartGraphNodePresentation>(StringComparer.Ordinal);
+        private readonly Dictionary<string, TMP_Text> _keystoneChoiceLabels =
+            new Dictionary<string, TMP_Text>(StringComparer.Ordinal);
         private readonly Dictionary<HeartNodeBranch, Image> _branchAxes =
             new Dictionary<HeartNodeBranch, Image>();
 
@@ -101,6 +104,7 @@ namespace DeadWalls
         private bool _buttonsBound;
 
         public bool IsOpen => HeartPanel != null && HeartPanel.activeSelf;
+        public bool HasActiveOwnedTweens => HasOwnedTweenActivity();
         public HeartPurchaseQuantity SelectedQuantity => _selectedQuantity;
 
         public event Action HeartOpenedByPlayer;
@@ -153,8 +157,7 @@ namespace DeadWalls
         {
             UnbindButtons();
             ReleasePause();
-            _toastSequence?.Kill();
-            _toastSequence = null;
+            KillOwnedTweens();
         }
 
         private void Update()
@@ -199,12 +202,15 @@ namespace DeadWalls
             {
                 group.DOKill();
                 group.alpha = 0f;
-                group.DOFade(1f, 0.14f).SetUpdate(true);
+                group.DOFade(1f, 0.14f)
+                    .SetUpdate(true)
+                    .SetLink(HeartPanel, LinkBehaviour.KillOnDestroy);
             }
         }
 
         public void ClosePanel()
         {
+            KillOwnedTweens();
             if (HeartPanel != null)
                 HeartPanel.SetActive(false);
             ReleasePause();
@@ -300,13 +306,7 @@ namespace DeadWalls
             {
                 HeartGraphNodePresentation node = presentation.Nodes[i];
                 NodeView view = GetOrCreateNode(node.SlotId);
-                Vector2 position = node.IsRoot
-                    ? Vector2.zero
-                    : HeartGraphLayoutUtility.GetPosition(
-                        node.Branch,
-                        node.Depth,
-                        HorizontalSpacing,
-                        VerticalSpacing);
+                Vector2 position = GetDisplayPosition(node);
                 view.Rect.anchoredPosition = position;
                 RefreshNode(view, node, runtime);
             }
@@ -324,14 +324,160 @@ namespace DeadWalls
                 string key = edge.FromSlotId + ">" + edge.ToSlotId;
                 liveConnections.Add(key);
                 ConnectionView connection = GetOrCreateConnection(key);
+                bool keystoneChoice = IsKeystonePair(edge.FromSlotId, edge.ToSlotId);
                 UpdateConnection(
                     connection,
                     from.Rect.anchoredPosition,
                     to.Rect.anchoredPosition,
-                    GetBranchColor(edge.ToBranch),
-                    IsHiddenSlot(edge.ToSlotId));
+                    keystoneChoice ? KeystoneColor : GetBranchColor(edge.ToBranch),
+                    IsHiddenSlot(edge.ToSlotId),
+                    keystoneChoice);
             }
+            AddKeystoneForkConnections(presentation, liveConnections);
             RemoveStaleConnections(liveConnections);
+            SyncKeystoneChoiceLabels();
+        }
+
+        private Vector2 GetDisplayPosition(HeartGraphNodePresentation node)
+        {
+            if (node.IsRoot)
+                return Vector2.zero;
+
+            Vector2 defaultPosition = HeartGraphLayoutUtility.GetPosition(
+                node.Branch,
+                node.Depth,
+                HorizontalSpacing,
+                VerticalSpacing);
+            if (!TryGetVisibleKeystonePartner(node, out HeartGraphNodePresentation partner)
+                || partner.Branch != node.Branch)
+            {
+                return defaultPosition;
+            }
+
+            float sharedDepth = (node.Depth + partner.Depth) * 0.5f;
+            Vector2 sharedPosition = HeartGraphLayoutUtility.GetPosition(
+                node.Branch,
+                sharedDepth,
+                HorizontalSpacing,
+                VerticalSpacing);
+            bool nodeComesFirst = node.Depth < partner.Depth
+                                  || (node.Depth == partner.Depth
+                                      && string.CompareOrdinal(node.SlotId, partner.SlotId) < 0);
+            float direction = nodeComesFirst ? -1f : 1f;
+            bool horizontalBranch = node.Branch == HeartNodeBranch.Army
+                                    || node.Branch == HeartNodeBranch.Defense;
+            Vector2 choiceOffset = horizontalBranch
+                ? Vector2.up * (NodeSize.y * 0.66f * direction)
+                : Vector2.right * (NodeSize.x * 0.62f * direction);
+            return sharedPosition + choiceOffset;
+        }
+
+        private void AddKeystoneForkConnections(
+            HeartGraphPresentation presentation,
+            HashSet<string> liveConnections)
+        {
+            for (int nodeIndex = 0; nodeIndex < presentation.Nodes.Count; nodeIndex++)
+            {
+                HeartGraphNodePresentation first = presentation.Nodes[nodeIndex];
+                if (!TryGetCanonicalVisibleKeystonePair(
+                        first,
+                        out HeartGraphNodePresentation second,
+                        out string pairKey))
+                {
+                    continue;
+                }
+
+                HeartGraphEdgePresentation closestIncoming = null;
+                HeartGraphNodePresentation closestIncomingSource = null;
+                bool incomingTargetsFirst = false;
+                HeartGraphEdgePresentation closestOutgoing = null;
+                HeartGraphNodePresentation closestOutgoingTarget = null;
+                bool outgoingStartsAtFirst = false;
+                int minimumPairDepth = Mathf.Min(first.Depth, second.Depth);
+                int maximumPairDepth = Mathf.Max(first.Depth, second.Depth);
+                for (int edgeIndex = 0; edgeIndex < presentation.Edges.Count; edgeIndex++)
+                {
+                    HeartGraphEdgePresentation edge = presentation.Edges[edgeIndex];
+                    bool incomingToFirst = string.Equals(edge.ToSlotId, first.SlotId, StringComparison.Ordinal)
+                                           && !string.Equals(edge.FromSlotId, second.SlotId, StringComparison.Ordinal);
+                    bool incomingToSecond = string.Equals(edge.ToSlotId, second.SlotId, StringComparison.Ordinal)
+                                            && !string.Equals(edge.FromSlotId, first.SlotId, StringComparison.Ordinal);
+                    if ((incomingToFirst || incomingToSecond)
+                        && _presentationsBySlot.TryGetValue(
+                            edge.FromSlotId,
+                            out HeartGraphNodePresentation incomingSource)
+                        && incomingSource.Branch == first.Branch
+                        && incomingSource.Depth < minimumPairDepth
+                        && (closestIncomingSource == null
+                            || incomingSource.Depth > closestIncomingSource.Depth))
+                    {
+                        closestIncoming = edge;
+                        closestIncomingSource = incomingSource;
+                        incomingTargetsFirst = incomingToFirst;
+                    }
+
+                    bool outgoingFromFirst = string.Equals(edge.FromSlotId, first.SlotId, StringComparison.Ordinal)
+                                             && !string.Equals(edge.ToSlotId, second.SlotId, StringComparison.Ordinal);
+                    bool outgoingFromSecond = string.Equals(edge.FromSlotId, second.SlotId, StringComparison.Ordinal)
+                                              && !string.Equals(edge.ToSlotId, first.SlotId, StringComparison.Ordinal);
+                    if ((outgoingFromFirst || outgoingFromSecond)
+                        && _presentationsBySlot.TryGetValue(
+                            edge.ToSlotId,
+                            out HeartGraphNodePresentation outgoingTarget)
+                        && outgoingTarget.Branch == first.Branch
+                        && outgoingTarget.Depth > maximumPairDepth
+                        && (closestOutgoingTarget == null
+                            || outgoingTarget.Depth < closestOutgoingTarget.Depth))
+                    {
+                        closestOutgoing = edge;
+                        closestOutgoingTarget = outgoingTarget;
+                        outgoingStartsAtFirst = outgoingFromFirst;
+                    }
+                }
+
+                if (closestIncoming != null)
+                {
+                    string otherTarget = incomingTargetsFirst ? second.SlotId : first.SlotId;
+                    AddDerivedChoiceConnection(
+                        $"choice-in:{pairKey}:{closestIncoming.FromSlotId}>{otherTarget}",
+                        closestIncoming.FromSlotId,
+                        otherTarget,
+                        liveConnections);
+                }
+
+                if (closestOutgoing != null)
+                {
+                    string otherSource = outgoingStartsAtFirst ? second.SlotId : first.SlotId;
+                    AddDerivedChoiceConnection(
+                        $"choice-out:{pairKey}:{otherSource}>{closestOutgoing.ToSlotId}",
+                        otherSource,
+                        closestOutgoing.ToSlotId,
+                        liveConnections);
+                }
+            }
+        }
+
+        private void AddDerivedChoiceConnection(
+            string key,
+            string fromSlotId,
+            string toSlotId,
+            HashSet<string> liveConnections)
+        {
+            if (!_nodeViews.TryGetValue(fromSlotId, out NodeView from)
+                || !_nodeViews.TryGetValue(toSlotId, out NodeView to)
+                || !liveConnections.Add(key))
+            {
+                return;
+            }
+
+            ConnectionView connection = GetOrCreateConnection(key);
+            UpdateConnection(
+                connection,
+                from.Rect.anchoredPosition,
+                to.Rect.anchoredPosition,
+                KeystoneColor,
+                IsHiddenSlot(toSlotId),
+                true);
         }
 
         private NodeView GetOrCreateNode(string slotId)
@@ -378,7 +524,10 @@ namespace DeadWalls
             _nodeViews.Add(slotId, view);
 
             rect.localScale = Vector3.one * 0.82f;
-            rect.DOScale(1f, 0.18f).SetEase(Ease.OutBack).SetUpdate(true);
+            rect.DOScale(1f, 0.18f)
+                .SetEase(Ease.OutBack)
+                .SetUpdate(true)
+                .SetLink(root, LinkBehaviour.KillOnDestroy);
             return view;
         }
 
@@ -425,8 +574,10 @@ namespace DeadWalls
 
             if (node.LockState == HeartNodeLockState.KeystoneConflict)
             {
-                SetText(view.Cost, "LOCKED BY KEYSTONE");
-                SetText(view.Status, "PATH SEALED");
+                SetText(view.Cost, "LOCKED FOR THIS RUN");
+                SetText(view.Status, node.KeystoneConflict != null
+                    ? $"SEALED BY {node.KeystoneConflict.ConflictingChoiceTitle.ToUpperInvariant()}"
+                    : "OPPOSING DOCTRINE COMMITTED");
                 SetButton(view, true, false, "LOCKED");
                 SetBackground(view, LockedColor);
                 SetNodeChrome(view, branchColor, node.Rarity == HeartNodeRarity.Rare,
@@ -447,12 +598,15 @@ namespace DeadWalls
             HeartPurchaseQuote quote = evaluation?.Quote;
             if (alreadyOwned)
             {
-                SetText(view.Cost, "PURCHASED FOR THIS RUN");
+                SetText(view.Cost, node.Type == HeartNodeType.Keystone
+                    ? "ACTIVE UNTIL THE WALL FALLS"
+                    : "PURCHASED FOR THIS RUN");
             }
             else if (quote != null)
             {
-                SetText(view.Cost,
-                    $"{FormatLong(quote.TotalGraveEssenceCost)} ESSENCE  /  +{quote.LevelsToBuy}");
+                SetText(view.Cost, node.Type == HeartNodeType.Keystone
+                    ? $"{FormatLong(quote.TotalGraveEssenceCost)} ESSENCE  ·  RUN COMMITMENT"
+                    : $"{FormatLong(quote.TotalGraveEssenceCost)} ESSENCE  /  +{quote.LevelsToBuy}");
             }
             else
             {
@@ -462,9 +616,10 @@ namespace DeadWalls
             string status = BuildNodeStatus(node);
             if (node.KeystoneConflict != null)
             {
-                status = node.KeystoneConflict.WillLockOnPurchase
-                    ? $"LOCKS {node.KeystoneConflict.ConflictingChoiceTitle.ToUpperInvariant()}"
-                    : status;
+                if (alreadyOwned)
+                    status = "DOCTRINE COMMITTED";
+                else if (node.KeystoneConflict.WillLockOnPurchase)
+                    status = $"CHOOSE ONE  ·  LOCKS {node.KeystoneConflict.ConflictingChoiceTitle.ToUpperInvariant()}";
             }
             SetText(view.Status, status);
 
@@ -472,7 +627,9 @@ namespace DeadWalls
                 view,
                 true,
                 canPurchase,
-                alreadyOwned ? "AWAKENED" : canPurchase ? GetPurchaseAction(node.Type) : "UNAVAILABLE");
+                alreadyOwned
+                    ? node.Type == HeartNodeType.Keystone ? "COMMITTED" : "AWAKENED"
+                    : canPurchase ? GetPurchaseAction(node.Type) : "UNAVAILABLE");
             SetBackground(view, Color.Lerp(HiddenColor, branchColor, node.Level > 0 ? 0.48f : 0.28f));
             SetNodeChrome(view, branchColor, node.Rarity == HeartNodeRarity.Rare,
                 node.Level > 0 ? new Color(1f, 0.75f, 0.32f, 0.95f) : branchColor,
@@ -567,18 +724,19 @@ namespace DeadWalls
             Vector2 start,
             Vector2 end,
             Color color,
-            bool hidden)
+            bool hidden,
+            bool emphasized = false)
         {
             Vector2 delta = end - start;
             float length = delta.magnitude;
             view.Rect.anchorMin = view.Rect.anchorMax = view.Rect.pivot = new Vector2(0.5f, 0.5f);
             view.Rect.anchoredPosition = (start + end) * 0.5f;
-            view.Rect.sizeDelta = new Vector2(length, hidden ? 3f : 5f);
+            view.Rect.sizeDelta = new Vector2(length, hidden ? 3f : emphasized ? 8f : 5f);
             view.Rect.localRotation = Quaternion.Euler(0f, 0f,
                 Mathf.Atan2(delta.y, delta.x) * Mathf.Rad2Deg);
             if (view.Image != null)
             {
-                color.a = hidden ? 0.24f : 0.72f;
+                color.a = hidden ? 0.24f : emphasized ? 0.92f : 0.72f;
                 view.Image.color = color;
                 view.Image.raycastTarget = false;
             }
@@ -992,7 +1150,8 @@ namespace DeadWalls
             _toastSequence = DOTween.Sequence().SetUpdate(true)
                 .Append(ToastText.DOFade(1f, 0.12f))
                 .AppendInterval(1.15f)
-                .Append(ToastText.DOFade(0f, 0.24f));
+                .Append(ToastText.DOFade(0f, 0.24f))
+                .SetLink(gameObject, LinkBehaviour.KillOnDestroy);
         }
 
         private void PlaySfx(AudioClip clip, float volume)
@@ -1022,12 +1181,186 @@ namespace DeadWalls
         private void ClearGraph()
         {
             foreach (NodeView view in _nodeViews.Values)
+            {
+                view.Rect?.DOKill();
                 Destroy(view.Root);
+            }
             foreach (ConnectionView view in _connectionViews.Values)
                 Destroy(view.Root);
+            foreach (TMP_Text label in _keystoneChoiceLabels.Values)
+                Destroy(label.transform.parent.gameObject);
             _nodeViews.Clear();
             _connectionViews.Clear();
+            _keystoneChoiceLabels.Clear();
             _presentationsBySlot.Clear();
+        }
+
+        private void KillOwnedTweens()
+        {
+            _toastSequence?.Kill();
+            _toastSequence = null;
+            ToastText?.DOKill();
+
+            if (HeartPanel != null)
+            {
+                CanvasGroup group = HeartPanel.GetComponent<CanvasGroup>();
+                group?.DOKill();
+            }
+
+            foreach (NodeView view in _nodeViews.Values)
+            {
+                if (view?.Rect == null)
+                    continue;
+
+                view.Rect.DOKill();
+                view.Rect.localScale = Vector3.one;
+            }
+        }
+
+        private bool HasOwnedTweenActivity()
+        {
+            if (_toastSequence != null && _toastSequence.IsActive())
+                return true;
+
+            if (HeartPanel != null)
+            {
+                CanvasGroup group = HeartPanel.GetComponent<CanvasGroup>();
+                if (group != null && DOTween.IsTweening(group))
+                    return true;
+            }
+
+            foreach (NodeView view in _nodeViews.Values)
+            {
+                if (view?.Rect != null && DOTween.IsTweening(view.Rect))
+                    return true;
+            }
+
+            return false;
+        }
+
+        private void SyncKeystoneChoiceLabels()
+        {
+            var livePairs = new HashSet<string>(StringComparer.Ordinal);
+            foreach (HeartGraphNodePresentation node in _presentationsBySlot.Values)
+            {
+                if (!TryGetCanonicalVisibleKeystonePair(
+                        node,
+                        out HeartGraphNodePresentation partner,
+                        out string pairKey))
+                {
+                    continue;
+                }
+
+                livePairs.Add(pairKey);
+                TMP_Text label = GetOrCreateKeystoneChoiceLabel(pairKey);
+                Vector2 firstPosition = _nodeViews[node.SlotId].Rect.anchoredPosition;
+                Vector2 secondPosition = _nodeViews[partner.SlotId].Rect.anchoredPosition;
+                bool horizontalBranch = node.Branch == HeartNodeBranch.Army
+                                        || node.Branch == HeartNodeBranch.Defense;
+                RectTransform labelRoot = (RectTransform)label.transform.parent;
+                labelRoot.anchoredPosition = (firstPosition + secondPosition) * 0.5f
+                                             + (horizontalBranch
+                                                 ? Vector2.zero
+                                                 : Vector2.up * (NodeSize.y * 0.66f));
+                label.text = "CHOOSE ONE  ·  RUN COMMITMENT";
+            }
+
+            var stale = new List<string>();
+            foreach (KeyValuePair<string, TMP_Text> pair in _keystoneChoiceLabels)
+            {
+                if (!livePairs.Contains(pair.Key))
+                    stale.Add(pair.Key);
+            }
+            for (int i = 0; i < stale.Count; i++)
+            {
+                Destroy(_keystoneChoiceLabels[stale[i]].transform.parent.gameObject);
+                _keystoneChoiceLabels.Remove(stale[i]);
+            }
+        }
+
+        private TMP_Text GetOrCreateKeystoneChoiceLabel(string pairKey)
+        {
+            if (_keystoneChoiceLabels.TryGetValue(pairKey, out TMP_Text existing))
+                return existing;
+
+            var root = new GameObject(
+                "HeartKeystoneChoice_" + SanitizeSlot(pairKey),
+                typeof(RectTransform),
+                typeof(CanvasRenderer),
+                typeof(Image));
+            root.transform.SetParent(HeartContent, false);
+            RectTransform rect = (RectTransform)root.transform;
+            rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.sizeDelta = new Vector2(410f, 42f);
+            Image background = root.GetComponent<Image>();
+            background.color = new Color(0.055f, 0.035f, 0.07f, 0.96f);
+            background.raycastTarget = false;
+            Outline backgroundOutline = root.AddComponent<Outline>();
+            backgroundOutline.effectColor = new Color(0.96f, 0.58f, 0.14f, 0.82f);
+            backgroundOutline.effectDistance = new Vector2(2f, -2f);
+
+            var textRoot = new GameObject(
+                "KeystoneChoiceText",
+                typeof(RectTransform),
+                typeof(CanvasRenderer),
+                typeof(TextMeshProUGUI));
+            textRoot.transform.SetParent(root.transform, false);
+            var label = textRoot.GetComponent<TextMeshProUGUI>();
+            RectTransform textRect = label.rectTransform;
+            textRect.anchorMin = Vector2.zero;
+            textRect.anchorMax = Vector2.one;
+            textRect.offsetMin = new Vector2(12f, 4f);
+            textRect.offsetMax = new Vector2(-12f, -4f);
+            label.alignment = TextAlignmentOptions.Center;
+            label.fontSize = 17f;
+            label.fontStyle = FontStyles.Bold;
+            label.characterSpacing = 1.2f;
+            label.color = KeystoneColor;
+            label.outlineColor = new Color(0.05f, 0.03f, 0.02f, 0.95f);
+            label.outlineWidth = 0.22f;
+            label.raycastTarget = false;
+            _keystoneChoiceLabels.Add(pairKey, label);
+            return label;
+        }
+
+        private bool TryGetCanonicalVisibleKeystonePair(
+            HeartGraphNodePresentation node,
+            out HeartGraphNodePresentation partner,
+            out string pairKey)
+        {
+            pairKey = string.Empty;
+            if (!TryGetVisibleKeystonePartner(node, out partner)
+                || string.CompareOrdinal(node.SlotId, partner.SlotId) >= 0)
+            {
+                return false;
+            }
+
+            pairKey = node.SlotId + "|" + partner.SlotId;
+            return true;
+        }
+
+        private bool TryGetVisibleKeystonePartner(
+            HeartGraphNodePresentation node,
+            out HeartGraphNodePresentation partner)
+        {
+            partner = null;
+            return node != null
+                   && node.IsExactContentVisible
+                   && node.Type == HeartNodeType.Keystone
+                   && node.KeystoneConflict != null
+                   && !string.IsNullOrWhiteSpace(node.KeystoneConflict.ConflictingChoiceSlotId)
+                   && _presentationsBySlot.TryGetValue(
+                       node.KeystoneConflict.ConflictingChoiceSlotId,
+                       out partner)
+                   && partner.IsExactContentVisible
+                   && partner.Type == HeartNodeType.Keystone;
+        }
+
+        private bool IsKeystonePair(string fromSlotId, string toSlotId)
+        {
+            return _presentationsBySlot.TryGetValue(fromSlotId, out HeartGraphNodePresentation from)
+                   && TryGetVisibleKeystonePartner(from, out HeartGraphNodePresentation partner)
+                   && string.Equals(partner.SlotId, toSlotId, StringComparison.Ordinal);
         }
 
         private void RemoveStaleNodes(
@@ -1041,7 +1374,9 @@ namespace DeadWalls
             }
             for (int i = 0; i < stale.Count; i++)
             {
-                Destroy(_nodeViews[stale[i]].Root);
+                NodeView view = _nodeViews[stale[i]];
+                view.Rect?.DOKill();
+                Destroy(view.Root);
                 _nodeViews.Remove(stale[i]);
             }
         }

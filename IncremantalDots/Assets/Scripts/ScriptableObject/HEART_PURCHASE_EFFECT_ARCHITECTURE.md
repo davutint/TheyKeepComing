@@ -9,7 +9,8 @@ contract'ini kurar. Blueprint'teki su kurallari uygular:
 - Unlock, Evolution ve Keystone tek sefer satin alinir.
 - Repeatable node `+1`, `+10` ve `Buy Max` destekler.
 - Ilk satin alim, `0 -> 10` gibi bulk gecis dahil, outgoing komsulari reveal eder.
-- Keystone yalniz exact es Keystone'u kilitler.
+- Keystone yalnız exact eş Keystone'u kilitler; hangi taraf seçilirse seçilsin çiftin birleşik
+  outgoing hedefleri aynı branch devamını reveal eder.
 - Numeric effect'in player-facing degeri ile runtime'a uygulanacak deger ayni hesap owner'indan gelir.
 
 Bu paket production node katalogu, Grave Essence drop orani veya denge sayisi uretmez.
@@ -71,9 +72,11 @@ icerigidir.
 | Unlock | `0 -> 1` | Authored sistemi acar, outgoing komsular reveal olur |
 | Repeatable | `0 -> N`, sonra `N -> N+M` | Her level stat raw investment'ini buyutur; yalniz ilk transaction reveal eder |
 | Evolution | `0 -> 1` | Split Shot, Burning Ground veya Second Blast gibi authored behavior flag'i acar |
-| Keystone | `0 -> 1` | Yalniz simetrik catalog partner'ini `KeystoneConflict` ile kilitler |
+| Keystone | `0 -> 1` | Yalnız simetrik catalog partner'ini `KeystoneConflict` ile kilitler; iki tarafın outgoing birleşimi branch devamını açar |
 
-Partner disindaki normal node veya baska Keystone mutate edilmez. Hidden, kilitli veya
+Partner dışındaki başka Keystone mutate edilmez. Çiftin authored outgoing hedeflerindeki normal
+node'lar reveal edilebilir; bu birleşim serialized v1 topolojiyi değiştirmeden iki seçeneği aynı
+devam noktasına bağlar. Hidden, kilitli veya
 tek seferlik sahipli node satin alinamaz.
 
 ## Effect pipeline
@@ -164,7 +167,7 @@ E6 runtime:
 - Yetersiz bakiye/missing baseline/overflow durumunda sifir mutation.
 - Tek seferlik node quantity ve tekrar satin alma guard'i.
 - Evolution behavior.
-- Exact Keystone pair exclusion.
+- Exact Keystone pair exclusion ve iki seçimden de aynı branch continuation reveal'i.
 - Soft-cap actual delta'nin pozitif fakat azalan olmasi.
 - Range, Frost slow, cooldown ve Arrow numeric hedefleri.
 

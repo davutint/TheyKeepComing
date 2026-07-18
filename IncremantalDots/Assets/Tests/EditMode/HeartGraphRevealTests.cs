@@ -64,6 +64,85 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void FirstPurchase_WithCatalog_RevealsSequentialKeystonePairTogether()
+        {
+            var graph = new GeneratedRunGraph
+            {
+                Seed = 112233u,
+                RootNodeId = HeartGraphConstants.RootNodeId
+            };
+            AddNode(graph, HeartGraphConstants.RootNodeId, HeartNodeBranch.HeartMagic, 0,
+                HeartNodeVisibility.Revealed, 1);
+            AddNode(graph, "army_entry", HeartNodeBranch.Army, 1,
+                HeartNodeVisibility.Revealed, 1);
+            AddNode(graph, "heavy_draw", HeartNodeBranch.Army, 2);
+            AddNode(graph, "storm_cadence", HeartNodeBranch.Army, 3);
+            AddNode(graph, "army_after", HeartNodeBranch.Army, 4);
+            AddEdge(graph, HeartGraphConstants.RootNodeId, "army_entry");
+            AddEdge(graph, "army_entry", "heavy_draw");
+            AddEdge(graph, "heavy_draw", "storm_cadence");
+            AddEdge(graph, "storm_cadence", "army_after");
+
+            HeartNodeDefinitionSO first = CreateDefinition(
+                "heavy_draw", "Heavy Draw", HeartNodeBranch.Army, HeartNodeType.Keystone);
+            HeartNodeDefinitionSO second = CreateDefinition(
+                "storm_cadence", "Storm Cadence", HeartNodeBranch.Army, HeartNodeType.Keystone);
+            first.ConflictNodeIds = new[] { second.Id };
+            second.ConflictNodeIds = new[] { first.Id };
+            HeartNodeCatalogSO catalog = ScriptableObject.CreateInstance<HeartNodeCatalogSO>();
+            _createdObjects.Add(catalog);
+            catalog.Nodes = new[]
+            {
+                CreateDefinition("army_entry", "Army Entry", HeartNodeBranch.Army, HeartNodeType.Unlock),
+                first,
+                second,
+                CreateDefinition("army_after", "Army After", HeartNodeBranch.Army, HeartNodeType.Evolution)
+            };
+
+            HeartGraphRevealResult result = HeartGraphRevealService.RevealAfterFirstPurchase(
+                graph,
+                catalog,
+                "army_entry",
+                0);
+
+            Assert.That(result.Succeeded, Is.True, string.Join(" | ", result.Errors));
+            Assert.That(result.NewlyRevealedNodeIds,
+                Is.EquivalentTo(new[] { "heavy_draw", "storm_cadence" }));
+            Assert.That(FindNode(graph, "heavy_draw").Visibility,
+                Is.EqualTo(HeartNodeVisibility.Revealed));
+            Assert.That(FindNode(graph, "storm_cadence").Visibility,
+                Is.EqualTo(HeartNodeVisibility.Revealed));
+            Assert.That(FindNode(graph, "army_after").Visibility,
+                Is.EqualTo(HeartNodeVisibility.Hidden));
+        }
+
+        [Test]
+        public void NormalizeKeystonePairVisibility_RepairsOldExactSaveWithoutMutatingRunState()
+        {
+            GeneratedRunGraph graph = CreateGraph();
+            HeartNodeCatalogSO catalog = CreateCatalog();
+            GeneratedHeartNodeState source = FindNode(graph, "keystone_army");
+            GeneratedHeartNodeState partner = FindNode(graph, "keystone_defense");
+            source.Visibility = HeartNodeVisibility.Revealed;
+            source.Level = 0;
+            partner.Visibility = HeartNodeVisibility.Hidden;
+            int edgeCount = graph.Edges.Count;
+            uint seed = graph.Seed;
+
+            HeartGraphRevealResult result =
+                HeartGraphRevealService.NormalizeKeystonePairVisibility(graph, catalog);
+
+            Assert.That(result.Succeeded, Is.True, string.Join(" | ", result.Errors));
+            Assert.That(result.NewlyRevealedNodeIds, Is.EqualTo(new[] { partner.NodeId }));
+            Assert.That(partner.Visibility, Is.EqualTo(HeartNodeVisibility.Revealed));
+            Assert.That(source.Level, Is.Zero);
+            Assert.That(source.LockState, Is.EqualTo(HeartNodeLockState.Available));
+            Assert.That(partner.LockState, Is.EqualTo(HeartNodeLockState.Available));
+            Assert.That(graph.Edges, Has.Count.EqualTo(edgeCount));
+            Assert.That(graph.Seed, Is.EqualTo(seed));
+        }
+
+        [Test]
         public void RepeatableLaterLevel_DoesNotRevealAgain()
         {
             GeneratedRunGraph graph = CreateGraph();

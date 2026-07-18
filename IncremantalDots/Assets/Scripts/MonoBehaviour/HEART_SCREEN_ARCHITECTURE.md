@@ -22,7 +22,10 @@ ekran acik bir hata gosterir ve legacy `TechTreeCatalogSO`'ya geri dusmez.
 - Gorunur numeric effect'lerde actual `current -> after` ve delta degerini gosterir.
 - Repeatable node'larda global `+1`, `+10`, `MAX`; tek seferlik node'larda yalniz `+1`
   kullanir.
-- Keystone conflict bilgisini presentation contract'indaki safe baslik/slot ile cizer.
+- Keystone conflict bilgisini presentation contract'indaki safe baslik/slot ile cizer. Exact çift
+  birlikte görünürken aynı depth orta noktasında orthogonal olarak ayrılır: Army/Defense dikey,
+  Production/Heart Magic yatay iki kart olur. Altın fork/merge damarları iki seçeneğin aynı branch
+  devamına sahip olduğunu, `CHOOSE ONE · RUN COMMITMENT` etiketi ise kalıcı koşu kararını anlatır.
 - Panel, toast ve node animasyonlari unscaled DOTween zamaninda calisir.
 - Gercek open-button aksiyonu basarili panel gecisinden sonra `HeartOpenedByPlayer`, gercek
   close-button veya Escape aksiyonu ise `HeartClosedByPlayer` event'ini yayar. Programmatic
@@ -74,6 +77,12 @@ Bu iki katman birlikte su alanlari durdurur:
 UI event'i, tooltip, graph refresh, purchase feedback ve panel animasyonu unscaled zamanda
 calismaya devam eder.
 
+Panel fade, toast ve runtime node scale tween'leri `HeartScreenUI` sahipligindedir. Panel
+kapanirken veya component disable olurken bu tween'ler explicit kill edilir; runtime node
+silinmeden once hedef tween'i de durdurulur. `KillOnDestroy` link'i ikinci emniyet katmanidir.
+Boylece scene reload/test sirasi yok edilmis `RectTransform` veya `CanvasGroup` hedeflerine
+unscaled tween tasimaz.
+
 ## Prefab ve sahne cutover'i
 
 Aktif prefab isim sozlesmesi:
@@ -111,6 +120,8 @@ validate eder; catalog'dan yeniden graph uretmez ve purchased effect'leri replay
 - Acikken presentation node sayisi kadar view ve connection senkronize edilir; hidden data
   redaction'i UI katmaninda tekrar hesaplanmaz.
 - Purchase quote icin Buy Max binary-search contract'i korunur.
+- Keystone fork bağlantıları yalnız panel refresh'inde, görünür çift başına sabit sayıda üretilir;
+  per-frame gameplay sistemi eklenmez.
 
 ## Test
 
@@ -120,3 +131,6 @@ ayrilmasini kapsar. Exact save/load ve gercek Continue pause testi E6'ya aittir.
 `WorkerAllocationPlayModeTests.FirstEssenceHeartOnboarding...` gercek button event'ini,
 pozitif Essence giris kapisini, panel acikken full pause bilgisini ve player close sonrasi
 durable onboarding flag'ini birlikte dogrular.
+`HeartProductionRuntimePlayModeTests.NewGameScene_PresentsKeystoneAsARealTwoCardCommitment`
+production graph'ta çift reveal'i, ayrı kart konumlarını, commitment etiketi ve exact partner
+kilidini gerçek prefab üzerinden doğrular.

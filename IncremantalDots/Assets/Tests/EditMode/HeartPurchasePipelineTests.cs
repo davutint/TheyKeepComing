@@ -256,18 +256,18 @@ namespace DeadWalls.Tests
             HeartNodeDefinitionSO first = CreateDefinition(
                 "keystone_arrow", HeartNodeBranch.Army, HeartNodeType.Keystone);
             HeartNodeDefinitionSO second = CreateDefinition(
-                "keystone_stone", HeartNodeBranch.Defense, HeartNodeType.Keystone);
+                "keystone_cadence", HeartNodeBranch.Army, HeartNodeType.Keystone);
             HeartNodeDefinitionSO normal = CreateDefinition(
-                "normal_defense", HeartNodeBranch.Defense, HeartNodeType.Unlock);
+                "normal_army", HeartNodeBranch.Army, HeartNodeType.Unlock);
             first.ConflictNodeIds = new[] { second.Id };
             second.ConflictNodeIds = new[] { first.Id };
             HeartNodeCatalogSO catalog = CreateCatalog(first, second, normal);
             GeneratedRunGraph graph = CreateGraph();
             AddNode(graph, first.Id, first.Branch, 2, HeartNodeVisibility.Revealed);
-            AddNode(graph, second.Id, second.Branch, 2, HeartNodeVisibility.Revealed);
-            AddNode(graph, normal.Id, normal.Branch, 3, HeartNodeVisibility.Revealed);
+            AddNode(graph, second.Id, second.Branch, 3, HeartNodeVisibility.Revealed);
+            AddNode(graph, normal.Id, normal.Branch, 4, HeartNodeVisibility.Hidden);
             AddEdge(graph, HeartGraphConstants.RootNodeId, first.Id);
-            AddEdge(graph, HeartGraphConstants.RootNodeId, second.Id);
+            AddEdge(graph, first.Id, second.Id);
             AddEdge(graph, second.Id, normal.Id);
             var wallet = new FakeWallet(100L);
 
@@ -283,8 +283,48 @@ namespace DeadWalls.Tests
                 Is.EqualTo(HeartNodeLockState.KeystoneConflict));
             Assert.That(FindNode(graph, second.Id).LockedByNodeId, Is.EqualTo(first.Id));
             Assert.That(FindNode(graph, normal.Id).LockState, Is.EqualTo(HeartNodeLockState.Available));
+            Assert.That(FindNode(graph, normal.Id).Visibility, Is.EqualTo(HeartNodeVisibility.Revealed));
+            Assert.That(firstResult.NewlyRevealedNodeIds, Does.Contain(normal.Id));
             Assert.That(partnerResult.FailureReason, Is.EqualTo(HeartPurchaseFailureReason.KeystoneLocked));
             Assert.That(wallet.GraveEssenceAmount, Is.EqualTo(afterFirstPurchase));
+        }
+
+        [Test]
+        public void KeystonePurchase_EitherChoiceRevealsTheSameBranchContinuation()
+        {
+            HeartNodeDefinitionSO first = CreateDefinition(
+                "keystone_arrow", HeartNodeBranch.Army, HeartNodeType.Keystone);
+            HeartNodeDefinitionSO second = CreateDefinition(
+                "keystone_cadence", HeartNodeBranch.Army, HeartNodeType.Keystone);
+            HeartNodeDefinitionSO continuation = CreateDefinition(
+                "army_continuation", HeartNodeBranch.Army, HeartNodeType.Unlock);
+            first.ConflictNodeIds = new[] { second.Id };
+            second.ConflictNodeIds = new[] { first.Id };
+            HeartNodeCatalogSO catalog = CreateCatalog(first, second, continuation);
+            GeneratedRunGraph graph = CreateGraph();
+            AddNode(graph, first.Id, first.Branch, 2, HeartNodeVisibility.Revealed);
+            AddNode(graph, second.Id, second.Branch, 3, HeartNodeVisibility.Revealed);
+            AddNode(graph, continuation.Id, continuation.Branch, 4, HeartNodeVisibility.Hidden);
+            AddEdge(graph, HeartGraphConstants.RootNodeId, first.Id);
+            AddEdge(graph, first.Id, second.Id);
+            AddEdge(graph, second.Id, continuation.Id);
+
+            HeartPurchaseResult result = HeartPurchaseService.TryPurchase(
+                graph,
+                catalog,
+                second.Id,
+                HeartPurchaseQuantity.One,
+                new FakeWallet(100L),
+                null);
+
+            Assert.That(result.Succeeded, Is.True, result.Message);
+            Assert.That(result.KeystoneConflictApplied, Is.True);
+            Assert.That(FindNode(graph, first.Id).LockState,
+                Is.EqualTo(HeartNodeLockState.KeystoneConflict));
+            Assert.That(FindNode(graph, first.Id).LockedByNodeId, Is.EqualTo(second.Id));
+            Assert.That(FindNode(graph, continuation.Id).Visibility,
+                Is.EqualTo(HeartNodeVisibility.Revealed));
+            Assert.That(result.NewlyRevealedNodeIds, Does.Contain(continuation.Id));
         }
 
         [Test]

@@ -30,6 +30,8 @@ olarak unavailable kalir. Onaysiz test catalog'u scene/prefab asset'ine yazilmaz
 ## Dogrulama
 
 - EditMode: `HeartGraphGeneratorTests` persistence/version/replay testleri.
+- EditMode: `HeartGraphRevealTests.NormalizeKeystonePairVisibility...` eski exact save'in yalnız
+  partner görünürlüğünü tamamladığını ve seed/edge/level/lock state'ini koruduğunu kanıtlar.
 - EditMode: `RunPersistenceTests` guncel v11 JSON ve v9/v10 migration testleri.
 - PlayMode: `HeartGraphContinuePlayModeTests.Continue_ReplaysExactSavedHeartGraphWithoutReroll`.
 - Full EditMode ve PlayMode regression.

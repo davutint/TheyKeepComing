@@ -68,6 +68,13 @@ partneri, numeric value/soft-cap ve Evolution pool'u ayri owner onayi gerektirir
    dogrula.
 8. Rapid/Frost direct unlock ve archer stat upgrade yuzeylerinin drawer'da gorunmedigini
    dogrula.
+9. Bir Keystone çiftine ilerle; iki kartın birlikte ve üst üste binmeden görünmesini,
+   `CHOOSE ONE · RUN COMMITMENT` etiketini ve altın fork/merge damarlarını kontrol et.
+10. Her iki seçimi ayrı koşularda dene; yalnız partner kilitlenmeli ve branch'in sonraki node'u
+    hangi taraf seçilirse seçilsin reveal olmalıdır.
+
+11. Heart acikken sahneyi yeniden yukle veya Play Mode'dan cik; Console'da yok edilmis
+    `RectTransform`/`CanvasGroup` hedefli DOTween safe-mode uyarisi kalmamalidir.
 
 ## Otomatik dogrulama
 

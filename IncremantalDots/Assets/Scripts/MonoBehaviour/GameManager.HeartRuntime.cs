@@ -121,7 +121,8 @@ namespace DeadWalls
             }
 
             HeartGraphRevealResult reveal = HeartGraphRevealService.InitializeRunVisibility(
-                _generatedHeartGraph);
+                _generatedHeartGraph,
+                heartCatalog);
             if (!reveal.Succeeded)
             {
                 _heartRuntimeError = string.Join(" | ", reveal.Errors);
@@ -565,6 +566,16 @@ namespace DeadWalls
             }
 
             GeneratedRunGraph restoredGraph = HeartGraphPersistenceUtility.CloneExact(savedGraph);
+            HeartGraphRevealResult keystoneReveal =
+                HeartGraphRevealService.NormalizeKeystonePairVisibility(restoredGraph, heartCatalog);
+            if (!keystoneReveal.Succeeded)
+            {
+                ResetHeartRuntime();
+                _heartRuntimeAttempted = true;
+                error = string.Join(" | ", keystoneReveal.Errors);
+                _heartRuntimeError = error;
+                return false;
+            }
             _generatedHeartGraph = restoredGraph;
             _heartRuntimeRestoreInProgress = true;
             bool restored;

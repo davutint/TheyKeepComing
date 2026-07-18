@@ -2023,12 +2023,18 @@ namespace DeadWalls.Tests
             cycle.CycleTimer = cycle.DayDuration
                 + cycle.DuskDuration * DayNightOverlayController.DuskAmberPeakProgress;
             entityManager.SetComponentData(cycleEntity, cycle);
-            for (int frame = 0; frame < 20; frame++)
+            float duskDeadline = Time.realtimeSinceStartup + 2f;
+            while ((gameManager.ContinuousSiegeCycle.Phase != SiegeCyclePhase.Dusk
+                    || ambient.DuskRiserPlayCount == baselineRiserCount)
+                   && Time.realtimeSinceStartup < duskDeadline)
+            {
                 yield return null;
+            }
 
             Assert.That(gameManager.ContinuousSiegeCycle.Phase, Is.EqualTo(SiegeCyclePhase.Dusk),
                 "Amber checkpoint Dusk fazi icinde kalmali.");
-            Assert.That(ambient.DuskRiserPlayCount, Is.EqualTo(baselineRiserCount + 1));
+            Assert.That(ambient.DuskRiserPlayCount, Is.EqualTo(baselineRiserCount + 1),
+                "Dusk faz girisi canonical riser'i tam bir kez oynatmali.");
             Assert.That(ambient.DuskRiserSource.pitch,
                 Is.EqualTo(ambient.DuskRiserPitch).Within(0.001f));
 
@@ -2037,7 +2043,8 @@ namespace DeadWalls.Tests
                 entityManager.GetComponentData<WorkerLogisticsFeedbackState>(worker);
             WorkerFeedbackMaterialProperty materialFeedback =
                 entityManager.GetComponentData<WorkerFeedbackMaterialProperty>(worker);
-            Assert.That(feedback.LanternActive, Is.EqualTo(1));
+            Assert.That(feedback.LanternActive, Is.EqualTo(1),
+                "Dusk worker temsilinde lantern state aktif olmali.");
             Assert.That(materialFeedback.Value.y, Is.EqualTo(1f).Within(0.001f));
 
             cycle = entityManager.GetComponentData<ContinuousSiegeCycleData>(cycleEntity);

@@ -85,6 +85,27 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void ProductionCatalog_LocksApprovedKeystoneTradeOffValues()
+        {
+            AssertKeystonePair(
+                "heavy_draw", "storm_cadence", HeartNodeBranch.Army, 48L,
+                HeartNodeEffectType.ModifyArcherDamagePercent, 0.30d, 1,
+                HeartNodeEffectType.ModifyArcherFireRatePercent, 0.28d, 1);
+            AssertKeystonePair(
+                "bastion_doctrine", "salvage_doctrine", HeartNodeBranch.Defense, 50L,
+                HeartNodeEffectType.ModifyWallMaxHpPercent, 0.35d, 1,
+                HeartNodeEffectType.ReduceWallRepairCostPercent, 0.30d, 1);
+            AssertKeystonePair(
+                "deep_stores", "relentless_shifts", HeartNodeBranch.Production, 52L,
+                HeartNodeEffectType.IncreaseWorkerCapacity, 6d, 4,
+                HeartNodeEffectType.IncreaseResourceProductionPercent, 0.20d, 4);
+            AssertKeystonePair(
+                "inferno_heart", "chronomancer_heart", HeartNodeBranch.HeartMagic, 55L,
+                HeartNodeEffectType.ModifySpellDamagePercent, 0.45d, 1,
+                HeartNodeEffectType.ReduceSpellCooldownPercent, 0.26d, 1);
+        }
+
+        [Test]
         public void ProductionCatalog_GeneratesValidatedGraphsAcrossSeedSweep()
         {
             var settings = new HeartGraphRuntimeSettings();
@@ -200,6 +221,42 @@ namespace DeadWalls.Tests
             using SHA256 sha = SHA256.Create();
             byte[] hash = sha.ComputeHash(Encoding.UTF8.GetBytes(payload.ToString()));
             return BitConverter.ToString(hash).Replace("-", string.Empty).ToLowerInvariant();
+        }
+
+        private void AssertKeystonePair(
+            string firstId,
+            string secondId,
+            HeartNodeBranch branch,
+            long cost,
+            HeartNodeEffectType firstEffectType,
+            double firstValue,
+            int firstEffectCount,
+            HeartNodeEffectType secondEffectType,
+            double secondValue,
+            int secondEffectCount)
+        {
+            HeartNodeDefinitionSO first = _catalog.GetNode(firstId);
+            HeartNodeDefinitionSO second = _catalog.GetNode(secondId);
+            Assert.That(first, Is.Not.Null, firstId);
+            Assert.That(second, Is.Not.Null, secondId);
+            Assert.That(first.Type, Is.EqualTo(HeartNodeType.Keystone));
+            Assert.That(second.Type, Is.EqualTo(HeartNodeType.Keystone));
+            Assert.That(first.Branch, Is.EqualTo(branch));
+            Assert.That(second.Branch, Is.EqualTo(branch));
+            Assert.That(first.BaseGraveEssenceCost, Is.EqualTo(cost));
+            Assert.That(second.BaseGraveEssenceCost, Is.EqualTo(cost));
+            Assert.That(first.ConflictNodeIds, Is.EqualTo(new[] { secondId }));
+            Assert.That(second.ConflictNodeIds, Is.EqualTo(new[] { firstId }));
+            Assert.That(first.Effects, Has.Length.EqualTo(firstEffectCount));
+            Assert.That(second.Effects, Has.Length.EqualTo(secondEffectCount));
+            Assert.That(first.Effects, Has.All.Matches<HeartNodeEffect>(effect =>
+                effect.Type == firstEffectType && Math.Abs(effect.Value - firstValue) < 0.000001d));
+            Assert.That(second.Effects, Has.All.Matches<HeartNodeEffect>(effect =>
+                effect.Type == secondEffectType && Math.Abs(effect.Value - secondValue) < 0.000001d));
+            if (firstEffectCount == 4)
+                Assert.That(first.Effects.Select(effect => effect.Resource), Is.Unique);
+            if (secondEffectCount == 4)
+                Assert.That(second.Effects.Select(effect => effect.Resource), Is.Unique);
         }
     }
 }

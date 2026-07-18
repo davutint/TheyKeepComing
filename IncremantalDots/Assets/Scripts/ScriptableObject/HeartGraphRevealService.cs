@@ -19,6 +19,13 @@ namespace DeadWalls
     {
         public static HeartGraphRevealResult InitializeRunVisibility(GeneratedRunGraph graph)
         {
+            return InitializeRunVisibility(graph, null);
+        }
+
+        public static HeartGraphRevealResult InitializeRunVisibility(
+            GeneratedRunGraph graph,
+            HeartNodeCatalogSO catalog)
+        {
             var result = new HeartGraphRevealResult();
             if (!TryBuildLookup(graph, result.Errors, out Dictionary<string, GeneratedHeartNodeState> nodesById))
                 return result;
@@ -36,12 +43,21 @@ namespace DeadWalls
             }
 
             RevealNode(root, result.NewlyRevealedNodeIds);
-            RevealOutgoingTargets(graph, root.NodeId, nodesById, result);
+            RevealOutgoingTargets(graph, root.NodeId, nodesById, catalog, result);
             return result;
         }
 
         public static HeartGraphRevealResult RevealAfterFirstPurchase(
             GeneratedRunGraph graph,
+            string purchasedNodeId,
+            int previousLevel)
+        {
+            return RevealAfterFirstPurchase(graph, null, purchasedNodeId, previousLevel);
+        }
+
+        public static HeartGraphRevealResult RevealAfterFirstPurchase(
+            GeneratedRunGraph graph,
+            HeartNodeCatalogSO catalog,
             string purchasedNodeId,
             int previousLevel)
         {
@@ -81,7 +97,41 @@ namespace DeadWalls
             if (previousLevel > 0)
                 return result;
 
-            RevealOutgoingTargets(graph, purchasedNodeId, nodesById, result);
+            RevealOutgoingTargets(graph, purchasedNodeId, nodesById, catalog, result);
+            return result;
+        }
+
+        /// <summary>
+        /// Eski exact save'lerde tek tarafi acilmis bir Keystone secimini deterministic olarak
+        /// cift gorunurlugune tasir. Node/edge/level/lock state'ini veya RNG sonucunu degistirmez.
+        /// </summary>
+        public static HeartGraphRevealResult NormalizeKeystonePairVisibility(
+            GeneratedRunGraph graph,
+            HeartNodeCatalogSO catalog)
+        {
+            var result = new HeartGraphRevealResult();
+            if (!TryBuildLookup(graph, result.Errors, out Dictionary<string, GeneratedHeartNodeState> nodesById))
+                return result;
+            if (catalog == null)
+            {
+                result.Errors.Add("Keystone reveal normalization icin Heart catalog gerekli.");
+                return result;
+            }
+
+            var revealedNodeIds = new List<string>();
+            foreach (KeyValuePair<string, GeneratedHeartNodeState> pair in nodesById)
+            {
+                if (pair.Value.Visibility == HeartNodeVisibility.Revealed)
+                    revealedNodeIds.Add(pair.Key);
+            }
+
+            for (int i = 0; i < revealedNodeIds.Count; i++)
+            {
+                if (!nodesById.TryGetValue(revealedNodeIds[i], out GeneratedHeartNodeState revealed))
+                    continue;
+                RevealKeystonePartner(revealed, nodesById, catalog, result);
+            }
+
             return result;
         }
 
@@ -133,6 +183,7 @@ namespace DeadWalls
             GeneratedRunGraph graph,
             string sourceNodeId,
             Dictionary<string, GeneratedHeartNodeState> nodesById,
+            HeartNodeCatalogSO catalog,
             HeartGraphRevealResult result)
         {
             List<GeneratedHeartEdge> edges = graph.Edges ?? new List<GeneratedHeartEdge>();
@@ -149,7 +200,40 @@ namespace DeadWalls
                 }
 
                 RevealNode(target, result.NewlyRevealedNodeIds);
+                RevealKeystonePartner(target, nodesById, catalog, result);
             }
+        }
+
+        private static void RevealKeystonePartner(
+            GeneratedHeartNodeState source,
+            Dictionary<string, GeneratedHeartNodeState> nodesById,
+            HeartNodeCatalogSO catalog,
+            HeartGraphRevealResult result)
+        {
+            if (source == null || catalog == null)
+                return;
+
+            HeartNodeDefinitionSO definition = catalog.GetNode(source.NodeId);
+            if (definition == null || definition.Type != HeartNodeType.Keystone)
+                return;
+
+            string[] conflictIds = definition.ConflictNodeIds ?? Array.Empty<string>();
+            if (conflictIds.Length != 1
+                || !nodesById.TryGetValue(conflictIds[0], out GeneratedHeartNodeState partner)
+                || catalog.GetNode(partner.NodeId) is not HeartNodeDefinitionSO partnerDefinition
+                || partnerDefinition.Type != HeartNodeType.Keystone
+                || partnerDefinition.ConflictNodeIds == null
+                || partnerDefinition.ConflictNodeIds.Length != 1
+                || !string.Equals(
+                    partnerDefinition.ConflictNodeIds[0],
+                    source.NodeId,
+                    StringComparison.Ordinal))
+            {
+                result.Errors.Add($"Keystone '{source.NodeId}' exact ve simetrik reveal partneri tasimiyor.");
+                return;
+            }
+
+            RevealNode(partner, result.NewlyRevealedNodeIds);
         }
 
         private static void RevealNode(

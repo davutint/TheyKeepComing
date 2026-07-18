@@ -494,23 +494,74 @@ namespace DeadWalls
             if (node.Level == 0)
             {
                 var seenTargets = new HashSet<string>(StringComparer.Ordinal);
-                List<GeneratedHeartEdge> edges = graph.Edges ?? new List<GeneratedHeartEdge>();
-                for (int i = 0; i < edges.Count; i++)
-                {
-                    GeneratedHeartEdge edge = edges[i];
-                    if (!string.Equals(edge.FromNodeId, nodeId, StringComparison.Ordinal)
-                        || !seenTargets.Add(edge.ToNodeId))
-                    {
-                        continue;
-                    }
+                AddCoupledRevealTargets(
+                    graph,
+                    catalog,
+                    nodesById,
+                    nodeId,
+                    revealTargets,
+                    seenTargets);
 
-                    revealTargets.Add(nodesById[edge.ToNodeId]);
+                // Generated v1 graph pairleri compatibility icin branch spine'inda ardisik
+                // tutulur. Keystone secimi iki tarafin da outgoing hedeflerini acar; boylece
+                // hangi doctrine secilirse secilsin partner disinda ayni dal devam eder.
+                if (keystonePartner != null)
+                {
+                    AddCoupledRevealTargets(
+                        graph,
+                        catalog,
+                        nodesById,
+                        keystonePartner.NodeId,
+                        revealTargets,
+                        seenTargets);
                 }
             }
 
             plan = new PurchasePlan(definition, node, quote, keystonePartner, revealTargets);
             evaluation.FailureReason = HeartPurchaseFailureReason.None;
             return true;
+        }
+
+        private static void AddCoupledRevealTargets(
+            GeneratedRunGraph graph,
+            HeartNodeCatalogSO catalog,
+            Dictionary<string, GeneratedHeartNodeState> nodesById,
+            string sourceNodeId,
+            List<GeneratedHeartNodeState> revealTargets,
+            HashSet<string> seenTargets)
+        {
+            List<GeneratedHeartEdge> edges = graph.Edges ?? new List<GeneratedHeartEdge>();
+            for (int i = 0; i < edges.Count; i++)
+            {
+                GeneratedHeartEdge edge = edges[i];
+                if (!string.Equals(edge.FromNodeId, sourceNodeId, StringComparison.Ordinal)
+                    || !nodesById.TryGetValue(edge.ToNodeId, out GeneratedHeartNodeState target))
+                {
+                    continue;
+                }
+
+                AddRevealTarget(target, revealTargets, seenTargets);
+
+                HeartNodeDefinitionSO targetDefinition = catalog.GetNode(target.NodeId);
+                if (targetDefinition == null || targetDefinition.Type != HeartNodeType.Keystone)
+                    continue;
+
+                string[] conflictIds = targetDefinition.ConflictNodeIds ?? Array.Empty<string>();
+                if (conflictIds.Length == 1
+                    && nodesById.TryGetValue(conflictIds[0], out GeneratedHeartNodeState partner))
+                {
+                    AddRevealTarget(partner, revealTargets, seenTargets);
+                }
+            }
+        }
+
+        private static void AddRevealTarget(
+            GeneratedHeartNodeState target,
+            List<GeneratedHeartNodeState> revealTargets,
+            HashSet<string> seenTargets)
+        {
+            if (target != null && seenTargets.Add(target.NodeId))
+                revealTargets.Add(target);
         }
 
         private static bool TryBuildGraphLookup(

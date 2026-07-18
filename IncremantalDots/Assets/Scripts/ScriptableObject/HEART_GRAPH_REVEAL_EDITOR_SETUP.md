@@ -14,7 +14,7 @@ Yeni Heart purchase owner'i eklendiginde transaction sirasi su olmali:
 2. Grave Essence'i tek transaction kapisindan harca.
 3. Node level'ini arttir ve effect'i uygula.
 4. Transaction oncesi level'i `previousLevel` olarak sakla ve basarili alimdan sonra
-   `HeartGraphRevealService.RevealAfterFirstPurchase(graph, nodeId, previousLevel)` cagir.
+   `HeartGraphRevealService.RevealAfterFirstPurchase(graph, catalog, nodeId, previousLevel)` cagir.
 5. Reveal sonucunda yalniz `NewlyRevealedNodeIds` icin UI notification uret.
 
 Repeatable `+10` veya Buy Max transaction'i `0 -> N` gecisi yapiyorsa servis bunu ilk
@@ -38,6 +38,8 @@ Heart UI yalniz `HeartGraphPresentationBuilder` ciktisini tuketmelidir:
 - `WillLockOnPurchase`, `IsAlreadyLockedByThisChoice` ve
   `SourceIsLockedByConflictingChoice` durumlarini ayni warning stiliyle karistirma;
   secim oncesi, secilmis ve kilitlenmis state'ler ayri okunmalidir.
+- Reveal edilmiş exact Keystone partnerlerini aynı karar fork'unda iki ayrı kart olarak göster;
+  `CHOOSE ONE · RUN COMMITMENT` etiketi, iki giriş/çıkış damarı ve partner adı birlikte okunmalıdır.
 - Hidden Keystone partnerinin internal Id'sini veya diger authored bilgisini UI cache'ine
   kopyalama.
 
@@ -54,7 +56,8 @@ Exact snapshot `GeneratedRunGraph` icindeki node Id, edge, visibility, level, lo
 locked-by state'ini oldugu gibi kaydeder. Continue:
 
 - Generator'i tekrar cagirmaz.
-- `InitializeRunVisibility` ile eski reveal state'ini yeniden genisletmez.
+- Node/edge/seed/level/lock state'ini yeniden üretmez; yalnız eski tek-taraf-visible Keystone
+  snapshot'ında `NormalizeKeystonePairVisibility` ile exact partneri görünür yapar.
 - Saved graph version/catalog uyumsuzlugunda sessiz reroll yapmaz.
 - Presentation'i restore edilen exact graph'tan yeniden kurar.
 

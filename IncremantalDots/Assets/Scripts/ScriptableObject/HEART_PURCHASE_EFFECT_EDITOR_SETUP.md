@@ -74,7 +74,8 @@ Heart node UI:
 - Quote: exact total Grave Essence maliyeti ve kalan bakiye.
 - Numeric row: `IHeartEffectValueResolver` current/after/delta.
 - `EffectInformationComplete == false`: buy control kapali, authored raw degeri actual diye yazma.
-- Keystone: `HeartGraphPresentation` partner basligi/safe slot marker'i.
+- Keystone: iki reveal kartı, `HeartGraphPresentation` partner başlığı/safe slot marker'ı,
+  `COMMIT` eylemi ve ortak continuation damarı.
 - Failure reason: hidden/locked/need Essence/max/invalid content ayrimini koru.
 
 Aktif isim sozlesmesi ve Play Mode QA icin
@@ -98,5 +99,6 @@ Source catalog'tan yeni fiyat veya yeni graph zar atarak eski save'i degistirme.
 
 - Hedefli EditMode: `DeadWalls.Tests.HeartPurchasePipelineTests`.
 - Full EditMode regression.
-- Gercek prefab uzerinde +1/+10/Buy Max ve Keystone UI QA.
+- Gerçek prefab üzerinde +1/+10/Buy Max ve Keystone UI QA: çift birlikte görünmeli, kartlar
+  üst üste binmemeli, iki seçimden biri partneri kilitlemeli ve aynı branch devamını açmalıdır.
 - `HeartGraphContinuePlayModeTests` exact Continue replay ve level/lock JSON testi.

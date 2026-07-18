@@ -71,6 +71,9 @@ Restore gate su durumlari reddeder:
 
 Validation saved graph'i mutate etmez. Structural kontrol icin exact clone initial state'e
 normalize edilir; gercek reveal/level/lock degerleri ayri runtime-state kontrolunde kalir.
+Runtime restore doğrulamasından sonra yalnız eski tek-taraf-visible Keystone snapshot'ında exact
+partner visibility'si tamamlanır. Bu compatibility normalizasyonu seed, node/edge listesi, level,
+lock veya `LockedByNodeId` alanını değiştirmez.
 
 ## Migration
 

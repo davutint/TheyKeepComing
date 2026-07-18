@@ -20,6 +20,25 @@ satın alma veya reveal sahibi değildir.
   asimptotik yaklaşır; node yapay bir max level'a kilitlenmez.
 - Keystone seçimi yalnız tabloda adı geçen karşı Keystone'u kapatır.
 
+## Owner-onaylı Keystone trade-off sözleşmesi — 2026-07-18
+
+Keystone, normal bir güç artışından farklı olarak koşu boyunca karakter belirleyen iki eşit
+değerli doktrinden biridir. Çift aynı anda görünür, aynı fork üzerinde yan yana sunulur ve
+oyuncu **yalnız birini** `COMMIT` edebilir. Seçilen taraf koşu bitene kadar aktif kalır; sadece
+exact partner `KeystoneConflict` ile kilitlenir. Her iki seçim de aynı branch devamını açar.
+
+| Branch | Seçenek A | Seçenek B | Kararın oyuncu anlamı |
+|---|---|---|---|
+| Army | `heavy_draw`: Basic damage `+30%` | `storm_cadence`: Basic fire rate raw `+28%` | Ağır tek atışlar veya daha sık ok yağmuru |
+| Defense | `bastion_doctrine`: Wall max HP `+35%` | `salvage_doctrine`: repair Stone cost `-30%` | Daha büyük hata payı veya daha ucuz toparlanma |
+| Production | `deep_stores`: her resource worker capacity `+6` | `relentless_shifts`: her resource production `+20%` | Daha geniş iş gücü tavanı veya mevcut işçide daha yüksek verim |
+| Heart / Magic | `inferno_heart`: Fireball damage `+45%` | `chronomancer_heart`: cooldown raw `-26%` | Daha yıkıcı tek patlama veya daha sık büyü kullanımı |
+
+UI exact olarak `CHOOSE ONE · RUN COMMITMENT`, partner adı ve seçim sonrası
+`DOCTRINE COMMITTED / LOCKED FOR THIS RUN` durumlarını gösterir. Generated graph'ın version `1`
+node/edge topolojisi compatibility için değişmez; reveal/purchase katmanı ardışık serialized
+çifti oyuncuya gerçek fork olarak bağlar.
+
 ## Army — 9 node
 
 | ID | Oyuncu adı | Tür | Depth | Base / Growth | Exact effect | Legacy kaynak |
@@ -122,8 +141,9 @@ catalog tarafından sahiplenilir.
 
 - Node kartı branch/type eyebrow, exact effect current → after → delta, açık `ESSENCE` maliyeti ve
   node türüne özel `UNLOCK / DEEPEN / EVOLVE / COMMIT` eylemini gösterir.
-- Keystone lore metni partner lock bilgisini tekrar etmez; exact trade-off tek standart satırda çizilir.
+- Keystone lore metni partner lock bilgisini tekrar etmez; iki kart, fork damarı ve exact
+  `CHOOSE ONE · RUN COMMITMENT` satırı kararı birlikte anlatır.
 - Catalog version `1` korunur çünkü bu lock turu node Id/effect/cost/graph semantiğini değiştirmez;
-  yalnız presentation copy ve legacy provenance ekler.
+  serialized topology değişmeden coupled reveal, ortak branch devamı ve presentation fork'u ekler.
 - Gelecekte node Id, effect, cost, conflict veya generator uygunluğu değişirse `CatalogVersion`
   artırılır. Eski exact graph sessizce remap edilmez.
