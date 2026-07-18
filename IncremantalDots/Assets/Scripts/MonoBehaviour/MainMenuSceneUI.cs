@@ -15,6 +15,10 @@ namespace DeadWalls
     /// </summary>
     public class MainMenuSceneUI : MonoBehaviour
     {
+        public const string ProductTitle = "DEAD WALLS";
+        public const string OpeningTagline = "THE WORLD ENDED. THE SIEGE DID NOT.";
+        public const string NewStandLabel = "BEGIN THE STAND";
+
         [Header("Bindings (setup tool baglar)")]
         public Image BackgroundImage;
         public Image MoonGlowImage;
@@ -41,6 +45,7 @@ namespace DeadWalls
         private void Start()
         {
             RunPersistence.RecoverPendingDeathReward();
+            ApplyNarrativeCopy();
             ApplyGeneratedVisuals();
             ConfigureButtons();
             PlayIntroAnimation();
@@ -111,6 +116,22 @@ namespace DeadWalls
             colors.disabledColor = new Color(baseColor.r, baseColor.g, baseColor.b, 0.35f);
             colors.fadeDuration = 0.08f;
             button.colors = colors;
+        }
+
+        // ---------------------------------------------------------------------------
+
+        private void ApplyNarrativeCopy()
+        {
+            if (TitleText != null)
+                TitleText.text = ProductTitle;
+            if (TaglineText != null)
+                TaglineText.text = OpeningTagline;
+
+            TMP_Text newStandLabel = NewRunButton != null
+                ? NewRunButton.GetComponentInChildren<TMP_Text>(true)
+                : null;
+            if (newStandLabel != null)
+                newStandLabel.text = NewStandLabel;
         }
 
         // ---------------------------------------------------------------------------

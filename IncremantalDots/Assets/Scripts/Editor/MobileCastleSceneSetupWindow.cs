@@ -194,6 +194,45 @@ namespace DeadWalls
                 catalog);
         }
 
+        [MenuItem("Window/DeadWalls/Repair Narrative Opening Copy")]
+        public static void RepairNarrativeOpeningCopy()
+        {
+            Scene menuScene = SceneManager.GetSceneByPath(MainMenuScenePath);
+            bool closeAfterRepair = !menuScene.IsValid() || !menuScene.isLoaded;
+            if (closeAfterRepair)
+                menuScene = EditorSceneManager.OpenScene(MainMenuScenePath, OpenSceneMode.Additive);
+
+            GameObject canvas = FindRoot(menuScene, "Canvas");
+            MainMenuSceneUI menuUi = canvas != null
+                ? canvas.GetComponent<MainMenuSceneUI>()
+                : null;
+            if (menuUi == null)
+                throw new InvalidOperationException("MainMenuScene narrative presentation owner'i bulunamadi.");
+            if (menuUi.TitleText == null || menuUi.TaglineText == null)
+                throw new InvalidOperationException("MainMenuScene title/tagline binding'i bulunamadi.");
+
+            menuUi.TitleText.text = MainMenuSceneUI.ProductTitle;
+            menuUi.TaglineText.text = MainMenuSceneUI.OpeningTagline;
+            TMP_Text newStandLabel = menuUi.NewRunButton != null
+                ? menuUi.NewRunButton.GetComponentInChildren<TMP_Text>(true)
+                : null;
+            if (newStandLabel == null)
+                throw new InvalidOperationException("MainMenuScene NewRun label binding'i bulunamadi.");
+
+            newStandLabel.text = MainMenuSceneUI.NewStandLabel;
+            EditorUtility.SetDirty(menuUi.TitleText);
+            EditorUtility.SetDirty(menuUi.TaglineText);
+            EditorUtility.SetDirty(newStandLabel);
+            EditorUtility.SetDirty(menuUi);
+            EditorSceneManager.MarkSceneDirty(menuScene);
+            EditorSceneManager.SaveScene(menuScene, MainMenuScenePath);
+            if (closeAfterRepair)
+                EditorSceneManager.CloseScene(menuScene, true);
+
+            Debug.Log(
+                "[MobileCastleSceneSetup] V1 narrative opening copy MainMenuScene'e uygulandi.");
+        }
+
         [MenuItem("Window/DeadWalls/Repair Tutorial Reset Setting")]
         public static void RepairTutorialResetSetting()
         {
@@ -3113,14 +3152,14 @@ namespace DeadWalls
             menuUi.MoonImage = moonImage;
 
             // baslik + tagline
-            var title = EnsureText(ct, "TitleText", "DEAD WALLS", 84, TextAlignmentOptions.Center,
+            var title = EnsureText(ct, "TitleText", MainMenuSceneUI.ProductTitle, 84, TextAlignmentOptions.Center,
                 new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(-460f, -300f), new Vector2(460f, -170f));
             title.fontStyle = FontStyles.Bold;
             title.color = new Color(0.93f, 0.88f, 0.84f, 1f);
             title.characterSpacing = 8f;
             menuUi.TitleText = title;
 
-            var tagline = EnsureText(ct, "TaglineText", "THE HORDE COMES AT NIGHT", 21, TextAlignmentOptions.Center,
+            var tagline = EnsureText(ct, "TaglineText", MainMenuSceneUI.OpeningTagline, 21, TextAlignmentOptions.Center,
                 new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(-380f, -348f), new Vector2(380f, -300f));
             tagline.color = new Color(0.62f, 0.56f, 0.55f, 1f);
             tagline.characterSpacing = 14f;
@@ -3150,7 +3189,7 @@ namespace DeadWalls
 
             var newRunButton = EnsureButton(buttonsRoot.transform, "NewRunButton",
                 new Vector2(0.5f, 0.5f), new Vector2(-210f, -33f), new Vector2(210f, 33f), out var newRunLabel);
-            newRunLabel.text = "NEW RUN";
+            newRunLabel.text = MainMenuSceneUI.NewStandLabel;
             newRunLabel.fontSize = 25;
             EnsureComponent<UnityEngine.UI.LayoutElement>(newRunButton.gameObject).preferredHeight = 66f;
             menuUi.NewRunButton = newRunButton;
