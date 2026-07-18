@@ -176,12 +176,15 @@ Emergency Repair `ability_cast` ile, Council heal ise `council_resolved` effect 
 izlenir; ikisi de normal repair olarak ikinci kez sayilmaz. Exact Continue daha once tamamlanmis
 transaction'i tekrar yaymaz. Event yeni Wall state/history owner'i veya save alani kurmaz.
 
-## `run_ended` v1
+## `run_ended` v2
 
 `GameManager.ProcessRunDeath`, Wall kaynakli Game Over transaction'i death receipt ve Meta reward
 diske durable yazildiktan sonra ayni `RunId` icin tek final summary yayinlar:
 
 - payload: `Day`, `Kills`, `PeakEnemies`, `PeakPopulation`, `WallDamageTimeline`, `MetaReward`
+- final defense/economy: upgrade-applied Wall MaxHP, Wood/Stone/Iron/Food, Arrow stock/capacity,
+  population/capacity/idle
+- final combat/run currency: Basic/Rapid/Frost archer count ve unspent Grave Essence
 - day/kills/population: canonical cycle, `GameStateData.TotalKills` ve V1'de azalmayan
   `PopulationState.Total`
 - peak enemies: normal production spawn commit'inde `WaveSpawnSystem` tarafindan mevcut GameState
@@ -190,15 +193,25 @@ diske durable yazildiktan sonra ayni `RunId` icin tek final summary yayinlar:
   `day + phase` bucket'inda biriktirir; per-hit veya per-zombie event uretilmez
 - meta reward: durable `MetaRunResult.Reward.TotalSouls`; yeniden tuning hesaplamasi yapilmaz
 
+V2 final snapshot'i death anindaki canonical ECS/component ve `GameManager` cache state'inden
+alir. Final Wall MaxHP, timeline damage'ini run'da kazanilan upgrade'leri de hesaba katan orana
+cevirir. Economy, housing, Archer mix ve run-currency target'larini per-frame event veya ikinci
+state owner'i kurmadan olculebilir yapar. Alanlar non-negative ve kendi capacity/total sinirlariyla
+tutarli olmak zorundadir; incoherent payload yayinlanmaz.
+
 Accumulator component/buffer'i yeni bir manager veya parallel singleton degildir; mevcut GameState
-entity'sinde canonical spawn/damage owner'larinin output'udur. `RunSaveState v15` peak ve kronolojik
-timeline'i exact Continue icin saklar. v14 migration historical deger uydurmaz; timeline bos baslar,
-peak restored current alive count'tan ileriye dogru izlenir.
+entity'sinde canonical spawn/damage owner'larinin output'udur. `RunSaveState v16` peak ve kronolojik
+timeline'i exact Continue icin saklar. v14->v15 migration historical deger uydurmaz; timeline bos
+baslar, peak restored current alive count'tan ileriye dogru izlenir.
 
 Death receipt commit veya Meta persistence tamamlanamazsa `run_ended` cikmaz; receipt recovery icin
 korunur. Basarili durable sonuc sonrasinda local idempotency guard ve death transaction guard'i ayni
 run icin duplicate event'i engeller. Event external analytics target'i secmez ve gameplay sonucunu
 geri alamaz.
+
+Launch review bantlarinin production sahibi
+`V1LaunchTelemetryTargetsSO`/`V1LaunchTelemetryTargets.asset`tir. Bu asset event bus'a subscriber
+degildir ve runtime tuning'i otomatik degistirmez.
 
 ## Genisleme kurali
 

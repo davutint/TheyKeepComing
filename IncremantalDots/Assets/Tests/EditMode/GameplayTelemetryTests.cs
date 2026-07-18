@@ -945,7 +945,21 @@ namespace DeadWalls.Tests
             };
 
             RunEndedTelemetryPayload payload = RunEndedTelemetryFactory.Create(
-                3, 4_200, 2_048, 88, source, 640);
+                3,
+                4_200,
+                2_048,
+                88,
+                source,
+                640,
+                475f,
+                new ResourceData { Wood = 120, Stone = 80, Iron = 40, Food = 60 },
+                new ArrowSupply { Current = 75 },
+                200,
+                new PopulationState { Total = 88, Capacity = 100, Idle = 9 },
+                40,
+                20,
+                10,
+                35L);
             source[0].Damage = 999f;
 
             Assert.That(payload.Day, Is.EqualTo(3));
@@ -953,6 +967,17 @@ namespace DeadWalls.Tests
             Assert.That(payload.PeakEnemies, Is.EqualTo(2_048));
             Assert.That(payload.PeakPopulation, Is.EqualTo(88));
             Assert.That(payload.MetaReward, Is.EqualTo(640));
+            Assert.That(payload.FinalWallMaxHp, Is.EqualTo(475f));
+            Assert.That(payload.FinalResources.Wood, Is.EqualTo(120));
+            Assert.That(payload.FinalArrows, Is.EqualTo(75));
+            Assert.That(payload.FinalArrowCapacity, Is.EqualTo(200));
+            Assert.That(payload.FinalPopulation, Is.EqualTo(88));
+            Assert.That(payload.FinalPopulationCapacity, Is.EqualTo(100));
+            Assert.That(payload.FinalIdlePopulation, Is.EqualTo(9));
+            Assert.That(payload.FinalBasicArchers, Is.EqualTo(40));
+            Assert.That(payload.FinalRapidArchers, Is.EqualTo(20));
+            Assert.That(payload.FinalFrostArchers, Is.EqualTo(10));
+            Assert.That(payload.UnspentGraveEssence, Is.EqualTo(35L));
             Assert.That(payload.WallDamageTimeline.Count, Is.EqualTo(2));
             Assert.That(payload.WallDamageTimeline[0].Damage, Is.EqualTo(150f));
         }
@@ -982,7 +1007,16 @@ namespace DeadWalls.Tests
                         Damage = 325.25f
                     }
                 },
-                1_250);
+                1_250,
+                550f,
+                new ResourceData { Wood = 300, Stone = 200, Iron = 100, Food = 50 },
+                new ArrowSupply { Current = 25 },
+                400,
+                new PopulationState { Total = 120, Capacity = 140, Idle = 15 },
+                60,
+                25,
+                20,
+                125L);
 
             GameplayTelemetry.Emitted += OnEmitted;
             try
@@ -993,18 +1027,24 @@ namespace DeadWalls.Tests
                 Assert.That(received, Is.True);
                 Assert.That(observed.RunId, Is.EqualTo("run_ended_contract_04"));
                 Assert.That(emitted.EventName, Is.EqualTo("run_ended"));
-                Assert.That(emitted.SchemaVersion, Is.EqualTo(1));
+                Assert.That(emitted.SchemaVersion, Is.EqualTo(2));
 
                 GameplayTelemetryEnvelope envelope =
                     JsonUtility.FromJson<GameplayTelemetryEnvelope>(emitted.SerializedEnvelope);
                 RunEndedTelemetryPayload decoded =
                     JsonUtility.FromJson<RunEndedTelemetryPayload>(envelope.PayloadJson);
                 Assert.That(envelope.EventName, Is.EqualTo("run_ended"));
-                Assert.That(envelope.SchemaVersion, Is.EqualTo(1));
+                Assert.That(envelope.SchemaVersion, Is.EqualTo(2));
                 Assert.That(decoded.Kills, Is.EqualTo(8_000));
                 Assert.That(decoded.PeakEnemies, Is.EqualTo(3_100));
                 Assert.That(decoded.WallDamageTimeline[0].Phase, Is.EqualTo("night"));
                 Assert.That(decoded.MetaReward, Is.EqualTo(1_250));
+                Assert.That(decoded.FinalWallMaxHp, Is.EqualTo(550f));
+                Assert.That(decoded.FinalResources.Iron, Is.EqualTo(100));
+                Assert.That(decoded.FinalArrowCapacity, Is.EqualTo(400));
+                Assert.That(decoded.FinalPopulationCapacity, Is.EqualTo(140));
+                Assert.That(decoded.FinalRapidArchers, Is.EqualTo(25));
+                Assert.That(decoded.UnspentGraveEssence, Is.EqualTo(125L));
             }
             finally
             {
@@ -1039,6 +1079,22 @@ namespace DeadWalls.Tests
             Assert.That(summaryError, Does.Contain("summary"));
 
             payload.PeakEnemies = 20;
+            payload.FinalWallMaxHp = 0f;
+            Assert.That(GameplayTelemetry.TryEmitRunEnded(
+                "run_invalid_wall_max", payload, out _, out string wallMaxError),
+                Is.False);
+            Assert.That(wallMaxError, Does.Contain("final economy/combat"));
+
+            payload.FinalWallMaxHp = 550f;
+            payload.FinalArrows = 2;
+            payload.FinalArrowCapacity = 1;
+            Assert.That(GameplayTelemetry.TryEmitRunEnded(
+                "run_invalid_final_snapshot", payload, out _, out string finalSnapshotError),
+                Is.False);
+            Assert.That(finalSnapshotError, Does.Contain("final economy/combat"));
+
+            payload.FinalArrows = 0;
+            payload.FinalArrowCapacity = 0;
             payload.WallDamageTimeline[0].Phase = "storm";
             Assert.That(GameplayTelemetry.TryEmitRunEnded(
                 "run_invalid_phase", payload, out _, out string phaseError), Is.False);

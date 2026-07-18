@@ -27,6 +27,7 @@ namespace DeadWalls
         private ArcherRecruitmentCatalogSO _fallbackArcherCatalog;
         private CouncilEventCatalogSO _fallbackCouncilCatalog;
         private MetaUpgradeCatalogSO _fallbackMetaCatalog;
+        private V1LaunchTelemetryTargetsSO _fallbackLaunchTelemetryTargets;
         private Vector2 _scroll;
 
         private bool _foldCurves = true;
@@ -40,6 +41,7 @@ namespace DeadWalls
         private bool _foldHeart = true;
         private bool _foldCouncil = true;
         private bool _foldMeta = true;
+        private bool _foldLaunchTelemetryTargets = true;
         private bool _foldFuture;
         private bool _foldBot = true;
 
@@ -106,6 +108,12 @@ namespace DeadWalls
             if (_fallbackMetaCatalog == null)
                 _fallbackMetaCatalog = AssetDatabase.LoadAssetAtPath<MetaUpgradeCatalogSO>(
                     DefaultMetaCatalogPath);
+            if (_fallbackLaunchTelemetryTargets == null)
+            {
+                _fallbackLaunchTelemetryTargets =
+                    AssetDatabase.LoadAssetAtPath<V1LaunchTelemetryTargetsSO>(
+                        V1LaunchTelemetryTargetsSO.ProductionAssetPath);
+            }
 
             _lastArrowRentCount = -1L;
             _lastArrowRentSampleTime = 0d;
@@ -160,6 +168,7 @@ namespace DeadWalls
             DrawHeartSection();
             DrawCouncilSection();
             DrawMetaSection();
+            DrawLaunchTelemetryTargetsSection();
             DrawFutureSection();
 
             _profileSO.ApplyModifiedProperties();
@@ -1011,6 +1020,120 @@ namespace DeadWalls
                     EditorGUILayout.HelpBox(
                         "Meta reward + permanent upgrade catalog validation: OK",
                         MessageType.Info);
+            }
+        }
+
+        private void DrawLaunchTelemetryTargetsSection()
+        {
+            _foldLaunchTelemetryTargets = DrawSectionHeader(
+                _foldLaunchTelemetryTargets,
+                "V1 Launch Telemetry Targets",
+                "provider-independent review bands; no automatic retuning");
+            if (!_foldLaunchTelemetryTargets)
+                return;
+
+            using (new EditorGUILayout.VerticalScope("box"))
+            {
+                using (new EditorGUI.DisabledScope(true))
+                {
+                    EditorGUILayout.ObjectField(
+                        "Production target profile",
+                        _fallbackLaunchTelemetryTargets,
+                        typeof(V1LaunchTelemetryTargetsSO),
+                        false);
+                }
+
+                EditorGUILayout.HelpBox(
+                    "Bu bantlar gameplay degerlerini otomatik degistirmez. Minimum sample "
+                    + "saglandiktan sonra run_started/phase_changed/purchase/combat/run_ended "
+                    + "event'lerinden provider-bagimsiz balance review'u uretir.",
+                    MessageType.None);
+
+                if (_fallbackLaunchTelemetryTargets == null)
+                {
+                    EditorGUILayout.HelpBox(
+                        $"Production target asset bulunamadi: "
+                        + V1LaunchTelemetryTargetsSO.ProductionAssetPath,
+                        MessageType.Error);
+                    return;
+                }
+
+                EditorGUILayout.LabelField(
+                    "Profile / version",
+                    $"{_fallbackLaunchTelemetryTargets.ProfileId} / "
+                    + $"v{_fallbackLaunchTelemetryTargets.Version}");
+                EditorGUILayout.LabelField(
+                    "Default completed-run sample",
+                    _fallbackLaunchTelemetryTargets.MinimumCompletedRuns.ToString("N0"));
+                EditorGUILayout.LabelField(
+                    "Contract fingerprint",
+                    _fallbackLaunchTelemetryTargets.ComputeFingerprint(),
+                    EditorStyles.miniLabel);
+
+                V1TelemetryTargetDefinition[] targets =
+                    _fallbackLaunchTelemetryTargets.Targets
+                    ?? System.Array.Empty<V1TelemetryTargetDefinition>();
+                for (int i = 0; i < targets.Length; i++)
+                {
+                    V1TelemetryTargetDefinition target = targets[i];
+                    if (target == null)
+                        continue;
+
+                    using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+                    {
+                        using (new EditorGUILayout.HorizontalScope())
+                        {
+                            EditorGUILayout.LabelField(
+                                $"{target.Category} / {target.Label}",
+                                EditorStyles.boldLabel);
+                            GUILayout.FlexibleSpace();
+                            EditorGUILayout.LabelField(
+                                FormatTelemetryTargetBand(target),
+                                EditorStyles.boldLabel,
+                                GUILayout.Width(132f));
+                        }
+
+                        EditorGUILayout.LabelField(target.Id, EditorStyles.miniLabel);
+                        EditorGUILayout.LabelField(
+                            $"Cohort: {target.Cohort} | N >= {target.MinimumSamples:N0}",
+                            EditorStyles.miniLabel);
+                        EditorGUILayout.LabelField(
+                            $"Events: {target.SourceEvents}",
+                            EditorStyles.miniLabel);
+                        EditorGUILayout.LabelField(
+                            target.Interpretation,
+                            EditorStyles.wordWrappedMiniLabel);
+                    }
+                }
+
+                List<string> problems = _fallbackLaunchTelemetryTargets.ValidateProfile();
+                if (problems.Count > 0)
+                    DrawHeartErrors("Launch telemetry target validation failed", problems);
+                else
+                    EditorGUILayout.HelpBox("Launch telemetry targets: VALID", MessageType.Info);
+
+                if (GUILayout.Button("SELECT TARGET ASSET", GUILayout.Height(24f)))
+                {
+                    Selection.activeObject = _fallbackLaunchTelemetryTargets;
+                    EditorGUIUtility.PingObject(_fallbackLaunchTelemetryTargets);
+                }
+            }
+        }
+
+        private static string FormatTelemetryTargetBand(V1TelemetryTargetDefinition target)
+        {
+            switch (target.Unit)
+            {
+                case V1TelemetryTargetUnit.Ratio:
+                    return $"{target.MinInclusive:P0} - {target.MaxInclusive:P0}";
+                case V1TelemetryTargetUnit.LastEmbers:
+                    return $"{target.MinInclusive:N0} - {target.MaxInclusive:N0} EMBERS";
+                case V1TelemetryTargetUnit.Day:
+                    return $"DAY {target.MinInclusive:0.#} - {target.MaxInclusive:0.#}";
+                case V1TelemetryTargetUnit.DayDelta:
+                    return $"+{target.MinInclusive:0.#} - +{target.MaxInclusive:0.#} DAY";
+                default:
+                    return $"{target.MinInclusive:0.##} - {target.MaxInclusive:0.##}";
             }
         }
 

@@ -28,6 +28,9 @@ DefaultDifficulty.asset` seed edilir (varsa DOKUNULMAZ) ve subscene'deki
    - Meta: `Meta Runtime Contract` foldout'unda diminishing kill bandlari, day/night/peak-pop/
      record agirliklari ve exact 11 permanent upgrade'in base cost, exponential growth, cap ve
      effect degerleri. Reward/level preview ile live aggregate ayni runtime formulunu kullanir.
+   - Launch telemetry: `V1 Launch Telemetry Targets` foldout'unda production profil kimligi,
+     fingerprint, 19 target band/cohort/source event ve validation sonucu read-only gorulur.
+     Asset'i secmek icin `SELECT TARGET ASSET` kullan; panel automatic retuning yapmaz.
 4. **Apply** — edit modda subscene'e baglar+kaydeder (bake); play modda ayrica CANLI uygular.
 5. Olcum: Play'e gir -> **Run Bot** (profili uygular, temiz kosu baslatir) ->
    kosular bitince **Son Olcumu Ozetle** ile olum-gunu dagilimini oku.

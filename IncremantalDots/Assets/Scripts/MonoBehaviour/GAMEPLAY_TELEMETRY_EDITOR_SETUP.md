@@ -62,6 +62,11 @@ sinifinin parcasidir; `GameplayTelemetry.cs` ayni `DeadWalls` runtime assembly's
     `Day/Kills/PeakPopulation` ile durable `MetaReward` tek `run_ended` payload'ina girmelidir.
 28. Ayni lethal state/death transaction'i yeniden islenmeye calisildiginda ikinci `run_ended`
     cikmamali; Meta save durable degilse event hic cikmamalidir.
+29. `run_ended v2` final snapshot'inda upgrade-applied Wall MaxHP, Wood/Stone/Iron/Food, Arrow stock/capacity,
+    population/capacity/idle, Basic/Rapid/Frost count ve unspent Grave Essence canonical death
+    state'iyle ayni olmalidir.
+30. `Window > DeadWalls > Difficulty Tuner` icindeki launch target paneli 19 band, sifir validation
+    problemi ve authority dokumanindaki fingerprint'i gostermelidir.
 
 Otomatik kapsam:
 
@@ -82,5 +87,5 @@ Otomatik kapsam:
   Ayni class ayrica run telemetry accumulator'larini save/Continue boyunca koruyup durable death
   sonrasinda tek `run_ended` final summary'ye baglar.
 
-Harici analytics target'i bu kurulumun parcasi degildir; tracker'daki owner-karari maddesi
-onaylanmadan SDK, servis veya endpoint eklenmez.
+Harici analytics provider bu kurulumun parcasi degildir. Production launch target asset'i yalniz
+provider-independent designer review bantlarini tutar; SDK, servis veya endpoint eklemez.

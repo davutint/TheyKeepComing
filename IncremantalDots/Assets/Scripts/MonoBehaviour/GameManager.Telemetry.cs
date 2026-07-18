@@ -435,6 +435,7 @@ namespace DeadWalls
             }
 
             int peakEnemies = Math.Max(0, WaveState.ZombiesAlive);
+            float finalWallMaxHp = Math.Max(1f, Wall.MaxHP);
             var wallDamage = new List<RunEndedWallDamageTelemetryEntry>();
             if (_entityManager.Exists(_gameStateEntity))
             {
@@ -463,13 +464,32 @@ namespace DeadWalls
                 }
             }
 
+            if (_entityManager.Exists(_castleEntity)
+                && _entityManager.HasComponent<WallSegment>(_castleEntity))
+            {
+                finalWallMaxHp = Math.Max(
+                    1f,
+                    _entityManager.GetComponentData<WallSegment>(_castleEntity).MaxHP);
+            }
+
             RunEndedTelemetryPayload payload = RunEndedTelemetryFactory.Create(
                 day,
                 kills,
                 peakEnemies,
                 peakPopulation,
                 wallDamage,
-                result.Reward.TotalSouls);
+                result.Reward.TotalSouls,
+                finalWallMaxHp,
+                Resources,
+                ArrowSupply,
+                ArrowEconomyUtility.GetCapacity(
+                    ArrowSupply,
+                    GetEconomyPriceTuning()),
+                Population,
+                BasicArcherCount,
+                RapidArcherCount,
+                FrostArcherCount,
+                GraveEssenceAmount);
             _runEndedTelemetryHandledRunId = _currentRunId;
             if (!GameplayTelemetry.TryEmitRunEnded(
                     _currentRunId,

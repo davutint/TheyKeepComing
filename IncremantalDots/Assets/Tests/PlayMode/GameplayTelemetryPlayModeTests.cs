@@ -848,6 +848,7 @@ namespace DeadWalls.Tests
             RunEndedTelemetryPayload payload =
                 JsonUtility.FromJson<RunEndedTelemetryPayload>(
                     _runEndedRecords[0].PayloadJson);
+            Assert.That(_runEndedRecords[0].SchemaVersion, Is.EqualTo(2));
             Assert.That(payload.Day, Is.EqualTo(3));
             Assert.That(payload.Kills, Is.EqualTo(4_321));
             Assert.That(payload.PeakEnemies, Is.EqualTo(2_345));
@@ -857,6 +858,20 @@ namespace DeadWalls.Tests
             Assert.That(payload.WallDamageTimeline[1].Phase, Is.EqualTo("dusk"));
             Assert.That(payload.MetaReward,
                 Is.EqualTo(gameManager.LastRunResult.Reward.TotalSouls));
+            Assert.That(payload.FinalWallMaxHp, Is.GreaterThan(0f));
+            Assert.That(payload.FinalResources, Is.Not.Null);
+            Assert.That(payload.FinalResources.Wood, Is.GreaterThanOrEqualTo(0));
+            Assert.That(payload.FinalResources.Stone, Is.GreaterThanOrEqualTo(0));
+            Assert.That(payload.FinalResources.Iron, Is.GreaterThanOrEqualTo(0));
+            Assert.That(payload.FinalResources.Food, Is.GreaterThanOrEqualTo(0));
+            Assert.That(payload.FinalArrowCapacity, Is.GreaterThanOrEqualTo(payload.FinalArrows));
+            Assert.That(payload.FinalPopulation, Is.EqualTo(91));
+            Assert.That(payload.FinalPopulationCapacity, Is.EqualTo(100));
+            Assert.That(payload.FinalIdlePopulation, Is.LessThanOrEqualTo(payload.FinalPopulation));
+            Assert.That(payload.FinalBasicArchers + payload.FinalRapidArchers
+                        + payload.FinalFrostArchers,
+                Is.LessThanOrEqualTo(payload.FinalPopulation));
+            Assert.That(payload.UnspentGraveEssence, Is.GreaterThanOrEqualTo(0L));
             Assert.That(gameManager.LastRunResult.Persisted, Is.True);
 
             Assert.That(gameManager.SaveRunSnapshot(), Is.False);

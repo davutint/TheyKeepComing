@@ -18,7 +18,7 @@ olarak korunur.
 
 | Kapı | Sonuç | Kanıt |
 |---|---:|---|
-| Full EditMode | Geçti | `400/400` |
+| Full EditMode | Geçti | `404/404` |
 | Full PlayMode | Geçti | `88 pass + 2 expected explicit skip` |
 | Save migration grubu | Geçti | `56/56` |
 | Explicit long-run soak | Geçti | `1/1`, `3.600` sample frame |
@@ -68,6 +68,24 @@ PlayMode `2/2` geçti. İlk PlayMode turu beşinci Burning Ground tick'inin floa
 atlanabildiğini yakaladı; runtime yalnız süreye bakmak yerine canonical `RemainingTicks` sayısını
 koruyacak şekilde düzeltildi. Ardından full EditMode `400/400` ve clean full PlayMode
 `88 pass + 2 expected explicit skip` geçti.
+
+## Exact launch tuning ve telemetry target kapanışı
+
+Production `DefaultDifficulty.asset`, üç `ArcherDefinitionSO` ve `MetaUpgradeCatalog.asset`
+değerleri spekülatif rebalance yapılmadan exact launch authority olarak kilitlendi. Tek okunabilir
+değer/ölçüm tablosu `DEAD_WALLS_V1_LAUNCH_TUNING_AND_TELEMETRY_TARGETS.md` içindedir.
+
+Yeni `V1LaunchTelemetryTargets.asset`, Spawn/Economy/Combat/Council/Meta için `19` inclusive band,
+cohort, minimum sample ve canonical source event tanımı taşır. Validation `19/19` tanımı kabul eder;
+contract fingerprint'i
+`58fc60a01a2442fdeaf544f59560159c21ca0e5dff48c0e54f27d817f8059dd3` olarak kilitlidir.
+Bu profil harici analytics provider seçmez ve automatic retuning yapmaz.
+
+`run_ended v2`, mevcut final summary'ye upgrade-applied Wall MaxHP, Wood/Stone/Iron/Food, Arrow current/capacity,
+population/capacity/idle, Basic/Rapid/Frost count ve unspent Grave Essence snapshot'ını ekler.
+Target contract EditMode `4/4`, telemetry EditMode `28/28`, gerçek `NewGameScene` telemetry
+PlayMode `9/9`, full EditMode `404/404` ve full PlayMode `88 pass + 2 expected explicit skip`
+geçti. Scene validation `0 issue`; final Console `0 error / 0 warning` kaldı.
 
 ## Long-run soak kapanış koşusu
 

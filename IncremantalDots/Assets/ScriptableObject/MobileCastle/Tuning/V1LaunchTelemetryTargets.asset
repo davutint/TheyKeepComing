@@ -1,0 +1,223 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb069abcbfa0fd64391a157c7b4c15d1, type: 3}
+  m_Name: V1LaunchTelemetryTargets
+  m_EditorClassIdentifier: DeadWalls::DeadWalls.V1LaunchTelemetryTargetsSO
+  Version: 1
+  ProfileId: dead_walls_v1_launch_targets
+  MinimumCompletedRuns: 100
+  Targets:
+  - Id: fresh_median_run_end_day
+    Label: Fresh median run end day
+    Category: 0
+    Unit: 0
+    MinInclusive: 6
+    MaxInclusive: 12
+    MinimumSamples: 100
+    Cohort: fresh_account_completed_runs
+    SourceEvents: run_started,run_ended
+    Interpretation: Median survival should expose the second Council cycle without
+      flattening endless pressure.
+  - Id: fresh_reach_day_3_rate
+    Label: Fresh runs reaching Day 3
+    Category: 0
+    Unit: 1
+    MinInclusive: 0.85
+    MaxInclusive: 0.98
+    MinimumSamples: 100
+    Cohort: fresh_account_completed_runs
+    SourceEvents: run_started,run_ended
+    Interpretation: The first Council decision should be seen by most fresh runs.
+  - Id: fresh_reach_day_6_rate
+    Label: Fresh runs reaching Day 6
+    Category: 0
+    Unit: 1
+    MinInclusive: 0.5
+    MaxInclusive: 0.8
+    MinimumSamples: 100
+    Cohort: fresh_account_completed_runs
+    SourceEvents: run_started,run_ended
+    Interpretation: The second Council cycle remains attainable but not guaranteed.
+  - Id: fresh_reach_day_12_rate
+    Label: Fresh runs reaching Day 12
+    Category: 0
+    Unit: 1
+    MinInclusive: 0.15
+    MaxInclusive: 0.4
+    MinimumSamples: 100
+    Cohort: fresh_account_completed_runs
+    SourceEvents: run_started,run_ended
+    Interpretation: Long fresh runs exist while the wall-loss endpoint remains credible.
+  - Id: spawn_cap_saturation_run_rate
+    Label: Runs touching active-enemy cap
+    Category: 0
+    Unit: 1
+    MinInclusive: 0.05
+    MaxInclusive: 0.25
+    MinimumSamples: 100
+    Cohort: completed_runs
+    SourceEvents: phase_changed,run_ended
+    Interpretation: The cap protects performance without becoming the normal difficulty
+      governor.
+  - Id: positive_backlog_phase_rate
+    Label: Phases carrying spawn backlog
+    Category: 0
+    Unit: 1
+    MinInclusive: 0.05
+    MaxInclusive: 0.3
+    MinimumSamples: 400
+    Cohort: completed_run_phase_samples
+    SourceEvents: phase_changed
+    Interpretation: Backlog should preserve pressure occasionally without dominating
+      every phase.
+  - Id: zero_player_spend_run_rate
+    Label: Runs with no player spend
+    Category: 1
+    Unit: 1
+    MinInclusive: 0
+    MaxInclusive: 0.1
+    MinimumSamples: 100
+    Cohort: completed_runs
+    SourceEvents: resource_spent,run_ended
+    Interpretation: The incremental economy should produce a meaningful purchase
+      in nearly every run.
+  - Id: median_distinct_main_resources_spent
+    Label: Distinct main resources spent
+    Category: 1
+    Unit: 2
+    MinInclusive: 2
+    MaxInclusive: 4
+    MinimumSamples: 100
+    Cohort: completed_runs
+    SourceEvents: resource_spent,run_ended
+    Interpretation: Healthy runs should engage more than one resource lane without
+      requiring all four.
+  - Id: normal_repair_run_rate
+    Label: Runs using normal wall repair
+    Category: 1
+    Unit: 1
+    MinInclusive: 0.35
+    MaxInclusive: 0.7
+    MinimumSamples: 100
+    Cohort: completed_runs_with_wall_damage
+    SourceEvents: wall_repaired,run_ended
+    Interpretation: Stone repair remains a frequent decision rather than a mandatory
+      every-run tax.
+  - Id: arrow_refill_run_rate
+    Label: Runs buying arrow refill
+    Category: 1
+    Unit: 1
+    MinInclusive: 0.3
+    MaxInclusive: 0.75
+    MinimumSamples: 100
+    Cohort: completed_runs_with_archers
+    SourceEvents: resource_spent,archer_changed,run_ended
+    Interpretation: Arrow restocking should matter without turning Wood into a passive
+      upkeep drain.
+  - Id: median_unused_bed_ratio_at_death
+    Label: Unused bed ratio at death
+    Category: 1
+    Unit: 1
+    MinInclusive: 0
+    MaxInclusive: 0.2
+    MinimumSamples: 100
+    Cohort: wall_loss_runs
+    SourceEvents: run_ended
+    Interpretation: Housing capacity should usually be used before the run ends.
+  - Id: median_night_wall_damage_ratio
+    Label: Night wall damage ratio
+    Category: 2
+    Unit: 1
+    MinInclusive: 0.15
+    MaxInclusive: 0.35
+    MinimumSamples: 400
+    Cohort: completed_night_samples
+    SourceEvents: phase_changed,run_ended
+    Interpretation: A typical Night threatens the wall while preserving room for
+      repair and recovery.
+  - Id: archer_retrain_share
+    Label: Retrain share of archer changes
+    Category: 2
+    Unit: 1
+    MinInclusive: 0.15
+    MaxInclusive: 0.45
+    MinimumSamples: 100
+    Cohort: archer_change_samples
+    SourceEvents: archer_changed
+    Interpretation: Deaths create a real recovery sink without making all recruitment
+      replacement-only.
+  - Id: fireball_use_after_unlock_rate
+    Label: Fireball use after unlock
+    Category: 2
+    Unit: 1
+    MinInclusive: 0.6
+    MaxInclusive: 0.95
+    MinimumSamples: 50
+    Cohort: completed_runs_with_fireball_unlocked
+    SourceEvents: heart_node_bought,ability_cast,run_ended
+    Interpretation: Most players should discover the first spell while non-use remains
+      possible.
+  - Id: council_expiry_rate
+    Label: Council expiry rate
+    Category: 3
+    Unit: 1
+    MinInclusive: 0.05
+    MaxInclusive: 0.2
+    MinimumSamples: 100
+    Cohort: council_resolution_samples
+    SourceEvents: council_resolved
+    Interpretation: Timed pressure is visible without making non-decisions the dominant
+      outcome.
+  - Id: council_option_a_share
+    Label: Council option A share
+    Category: 3
+    Unit: 1
+    MinInclusive: 0.35
+    MaxInclusive: 0.65
+    MinimumSamples: 100
+    Cohort: non_expired_council_resolutions
+    SourceEvents: council_resolved
+    Interpretation: Neither branch should become an obvious always-pick across the
+      launch cohort.
+  - Id: median_meta_reward
+    Label: Median run meta reward
+    Category: 4
+    Unit: 3
+    MinInclusive: 250
+    MaxInclusive: 900
+    MinimumSamples: 100
+    Cohort: fresh_account_completed_runs
+    SourceEvents: run_started,run_ended
+    Interpretation: A normal fresh run should visibly advance Last Embers without
+      collapsing the meta curve.
+  - Id: first_death_affords_any_upgrade_rate
+    Label: First death affords an upgrade
+    Category: 4
+    Unit: 1
+    MinInclusive: 0.85
+    MaxInclusive: 1
+    MinimumSamples: 100
+    Cohort: first_completed_run_per_account
+    SourceEvents: run_ended
+    Interpretation: The first full reset should usually unlock at least one permanent
+      purchase.
+  - Id: post_meta_purchase_median_day_gain
+    Label: Median survival gain after meta purchase
+    Category: 4
+    Unit: 4
+    MinInclusive: 1
+    MaxInclusive: 4
+    MinimumSamples: 100
+    Cohort: paired_runs_after_first_meta_purchase
+    SourceEvents: resource_spent,run_started,run_ended
+    Interpretation: Permanent progress should be felt without erasing the early survival
+      arc.

@@ -167,6 +167,15 @@ namespace DeadWalls
     }
 
     [Serializable]
+    public sealed class RunEndedResourceTelemetrySnapshot
+    {
+        public int Wood;
+        public int Stone;
+        public int Iron;
+        public int Food;
+    }
+
+    [Serializable]
     public sealed class RunEndedTelemetryPayload
     {
         public int Day;
@@ -176,6 +185,18 @@ namespace DeadWalls
         public List<RunEndedWallDamageTelemetryEntry> WallDamageTimeline =
             new List<RunEndedWallDamageTelemetryEntry>();
         public int MetaReward;
+        public float FinalWallMaxHp;
+        public RunEndedResourceTelemetrySnapshot FinalResources =
+            new RunEndedResourceTelemetrySnapshot();
+        public int FinalArrows;
+        public int FinalArrowCapacity;
+        public int FinalPopulation;
+        public int FinalPopulationCapacity;
+        public int FinalIdlePopulation;
+        public int FinalBasicArchers;
+        public int FinalRapidArchers;
+        public int FinalFrostArchers;
+        public long UnspentGraveEssence;
     }
 
     internal static class WallRepairedTelemetryContract
@@ -457,7 +478,7 @@ namespace DeadWalls
         public const string WallRepairedEventName = "wall_repaired";
         public const int WallRepairedSchemaVersion = 1;
         public const string RunEndedEventName = "run_ended";
-        public const int RunEndedSchemaVersion = 1;
+        public const int RunEndedSchemaVersion = 2;
 
         public static event Action<GameplayTelemetryRecord> Emitted;
 
@@ -1108,6 +1129,31 @@ namespace DeadWalls
                 error = "run_ended summary degerleri gecersiz.";
                 return false;
             }
+            if (payload.FinalResources == null
+                || float.IsNaN(payload.FinalWallMaxHp)
+                || float.IsInfinity(payload.FinalWallMaxHp)
+                || payload.FinalWallMaxHp <= 0f
+                || payload.FinalResources.Wood < 0
+                || payload.FinalResources.Stone < 0
+                || payload.FinalResources.Iron < 0
+                || payload.FinalResources.Food < 0
+                || payload.FinalArrows < 0
+                || payload.FinalArrowCapacity < payload.FinalArrows
+                || payload.FinalPopulation < 0
+                || payload.FinalPopulationCapacity < payload.FinalPopulation
+                || payload.FinalIdlePopulation < 0
+                || payload.FinalIdlePopulation > payload.FinalPopulation
+                || payload.FinalBasicArchers < 0
+                || payload.FinalRapidArchers < 0
+                || payload.FinalFrostArchers < 0
+                || (long)payload.FinalBasicArchers
+                    + payload.FinalRapidArchers
+                    + payload.FinalFrostArchers > payload.FinalPopulation
+                || payload.UnspentGraveEssence < 0L)
+            {
+                error = "run_ended final economy/combat snapshot'i gecersiz.";
+                return false;
+            }
             if (payload.WallDamageTimeline == null)
             {
                 error = "run_ended Wall damage timeline bos referans.";
@@ -1496,7 +1542,16 @@ namespace DeadWalls
             int peakEnemies,
             int peakPopulation,
             IReadOnlyList<RunEndedWallDamageTelemetryEntry> wallDamageTimeline,
-            int metaReward)
+            int metaReward,
+            float finalWallMaxHp,
+            ResourceData resources,
+            ArrowSupply arrowSupply,
+            int arrowCapacity,
+            PopulationState population,
+            int basicArchers,
+            int rapidArchers,
+            int frostArchers,
+            long unspentGraveEssence)
         {
             var timeline = new List<RunEndedWallDamageTelemetryEntry>();
             if (wallDamageTimeline != null)
@@ -1516,6 +1571,11 @@ namespace DeadWalls
                 }
             }
 
+            float safeFinalWallMaxHp = float.IsNaN(finalWallMaxHp)
+                                       || float.IsInfinity(finalWallMaxHp)
+                ? 1f
+                : Math.Max(1f, finalWallMaxHp);
+
             return new RunEndedTelemetryPayload
             {
                 Day = Math.Max(1, day),
@@ -1523,7 +1583,28 @@ namespace DeadWalls
                 PeakEnemies = Math.Max(0, peakEnemies),
                 PeakPopulation = Math.Max(0, peakPopulation),
                 WallDamageTimeline = timeline,
-                MetaReward = Math.Max(0, metaReward)
+                MetaReward = Math.Max(0, metaReward),
+                FinalWallMaxHp = safeFinalWallMaxHp,
+                FinalResources = new RunEndedResourceTelemetrySnapshot
+                {
+                    Wood = Math.Max(0, resources.Wood),
+                    Stone = Math.Max(0, resources.Stone),
+                    Iron = Math.Max(0, resources.Iron),
+                    Food = Math.Max(0, resources.Food)
+                },
+                FinalArrows = Math.Max(0, arrowSupply.Current),
+                FinalArrowCapacity = Math.Max(Math.Max(0, arrowSupply.Current), arrowCapacity),
+                FinalPopulation = Math.Max(0, population.Total),
+                FinalPopulationCapacity = Math.Max(
+                    Math.Max(0, population.Total),
+                    population.Capacity),
+                FinalIdlePopulation = Math.Min(
+                    Math.Max(0, population.Total),
+                    Math.Max(0, population.Idle)),
+                FinalBasicArchers = Math.Max(0, basicArchers),
+                FinalRapidArchers = Math.Max(0, rapidArchers),
+                FinalFrostArchers = Math.Max(0, frostArchers),
+                UnspentGraveEssence = Math.Max(0L, unspentGraveEssence)
             };
         }
     }

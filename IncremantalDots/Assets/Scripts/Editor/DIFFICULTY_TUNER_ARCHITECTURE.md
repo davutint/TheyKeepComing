@@ -86,6 +86,11 @@ tek profil iterasyonuyla, KOD YAZMADAN tasindi).
      Play Mode aggregate telemetry current death quote breakdown, Souls/lifetime state ve
      applied Wall/production/Arrow/Essence katkilarini gosterir. Death receipt v2 quote'u
      sabitledigi icin pending recovery sonradan degisen tuning'i yeniden okumaz.
+   - **V1 Launch Telemetry Targets** foldout'u production `V1LaunchTelemetryTargetsSO` asset'ini
+     read-only bir review panelinde gosterir. Profil/version, default sample, contract fingerprint,
+     19 target band/cohort/source event ve validation sonucu ayni yuzeydedir. Panel analytics
+     provider secmez ve runtime tuning'i otomatik degistirmez; bilincli degisiklik Inspector,
+     authority dokumani ve contract testleriyle birlikte yapilir.
    - **Apply**: subscene authoring'e bagla (bake yolu) + play moddaysa CANLI uygula
      (config alanlari SetComponentData + buffer yeniden ornekleme).
    - **Run Bot**: profili canli uygular, RestartGame + Long Run Simulator'u baslatir
@@ -131,6 +136,9 @@ tek profil iterasyonuyla, KOD YAZMADAN tasindi).
 - Meta reward ve permanent upgrade ayarlari production Meta catalog'a aittir. Bunlari
   DifficultyProfile'a kopyalama; current/pending death sonucunu asset degisikligiyle geriye donuk
   yeniden hesaplama.
+- Launch telemetry target asset'i tuning sonucu degil review kontratidir. Band disi olcumde
+  DifficultyProfile/Archer/Meta asset'ini otomatik mutate etme; minimum cohort ve designer karari
+  beklenir.
 - Canli uygulama restart sonrasi config'i bake degerlerine dondurur; Tuner'in Run Bot'u
   bu yuzden restart'tan SONRA da ApplyProfileLive cagirir.
 - Fiyat alanlari sifir/negatif veya gecersiz girilirse resolver int-guvenli minimumlara,
