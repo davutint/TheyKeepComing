@@ -46,6 +46,8 @@ namespace DeadWalls
         private const string TechTreeCatalogPath = TechTreeFolder + "/TechTreeCatalog.asset";
         private const string MetaFolder = "Assets/ScriptableObject/MobileCastle/Meta";
         private const string MetaCatalogPath = MetaFolder + "/MetaUpgradeCatalog.asset";
+        private const string MetaCurrencyIconPath =
+            "Assets/Art/Generated/Meta/last_embers_icon.png";
         private const string DifficultyFolder = "Assets/ScriptableObject/MobileCastle/Difficulty";
         public const string DifficultyProfilePath = DifficultyFolder + "/DefaultDifficulty.asset";
         private const string CouncilFolder = "Assets/ScriptableObject/MobileCastle/Council";
@@ -149,6 +151,47 @@ namespace DeadWalls
             Debug.Log(sceneRepaired
                 ? "[MobileCastleSceneSetup] First-run onboarding prefab ve sahnede onarildi."
                 : "[MobileCastleSceneSetup] First-run onboarding prefabda onarildi; NewGameScene aktif degildi.");
+        }
+
+        [MenuItem("Window/DeadWalls/Repair Meta Identity Presentation")]
+        public static void RepairMetaIdentityPresentation()
+        {
+            MetaUpgradeCatalogSO catalog = EnsureDefaultMetaUpgradeCatalog();
+            Scene activeScene = SceneManager.GetActiveScene();
+            if (!activeScene.IsValid() || activeScene.path != TargetScenePath)
+                throw new InvalidOperationException(
+                    "Meta identity repair icin NewGameScene aktif olmali.");
+
+            GameOverUI gameOver = null;
+            SoulCounterUI soulCounter = null;
+            foreach (GameObject root in activeScene.GetRootGameObjects())
+            {
+                gameOver ??= root.GetComponentInChildren<GameOverUI>(true);
+                soulCounter ??= root.GetComponentInChildren<SoulCounterUI>(true);
+                if (gameOver != null && soulCounter != null)
+                    break;
+            }
+
+            if (gameOver == null)
+                throw new InvalidOperationException("NewGameScene GameOverUI owner'i bulunamadi.");
+
+            ConfigureMetaProgressionUI(gameOver.gameObject);
+            EditorUtility.SetDirty(gameOver);
+            if (soulCounter != null && soulCounter.CounterText != null)
+            {
+                soulCounter.CounterText.text =
+                    $"ON DEATH  +0 {catalog.Presentation.ShortName}";
+                EditorUtility.SetDirty(soulCounter.CounterText);
+                EditorUtility.SetDirty(soulCounter);
+            }
+            EditorSceneManager.MarkSceneDirty(activeScene);
+            EditorSceneManager.SaveScene(activeScene);
+            AssetDatabase.SaveAssets();
+
+            Debug.Log(
+                $"[MobileCastleSceneSetup] Meta identity v{catalog.Presentation.Version} " +
+                $"'{catalog.Presentation.DisplayName}' ve polished death-screen presentation uygulandi.",
+                catalog);
         }
 
         [MenuItem("Window/DeadWalls/Repair Tutorial Reset Setting")]
@@ -1920,6 +1963,27 @@ namespace DeadWalls
             }
 
             bool changed = false;
+            Sprite currencyIcon = EnsureMetaCurrencyIcon();
+            bool needsPresentationMigration = catalog.Presentation == null
+                                              || catalog.Presentation.Version
+                                              != MetaPresentationSettings.CurrentVersion
+                                              || string.Equals(
+                                                  catalog.Presentation.CurrencyName,
+                                                  MetaProgression.LegacyCurrencyName,
+                                                  StringComparison.OrdinalIgnoreCase)
+                                              || string.IsNullOrWhiteSpace(
+                                                  catalog.Presentation.CurrencyId)
+                                              || catalog.Presentation.CurrencyIcon == null;
+            if (needsPresentationMigration)
+            {
+                Undo.RecordObject(catalog, "Migrate Meta Identity Presentation");
+                // RewardSettings, upgrade referanslari ve save'deki stable Id/level/bakiye
+                // aynen korunur; yalniz player-facing presentation v2'ye gecilir.
+                catalog.Presentation = MetaPresentationSettings.CreateLastEmbers(currencyIcon);
+                EditorUtility.SetDirty(catalog);
+                changed = true;
+            }
+
             if (catalog.RewardSettings == null)
             {
                 Undo.RecordObject(catalog, "Configure Meta Reward Settings");
@@ -1951,6 +2015,70 @@ namespace DeadWalls
                 Debug.LogWarning($"[MobileCastleSceneSetup] MetaCatalog: {problem}", catalog);
 
             return catalog;
+        }
+
+        private static Sprite EnsureMetaCurrencyIcon()
+        {
+            if (!File.Exists(MetaCurrencyIconPath))
+                throw new FileNotFoundException(
+                    "Last Embers currency icon bulunamadi.", MetaCurrencyIconPath);
+
+            AssetDatabase.ImportAsset(
+                MetaCurrencyIconPath,
+                ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ForceUpdate);
+            var importer = AssetImporter.GetAtPath(MetaCurrencyIconPath) as TextureImporter;
+            if (importer != null)
+            {
+                bool dirty = false;
+                if (importer.textureType != TextureImporterType.Sprite)
+                {
+                    importer.textureType = TextureImporterType.Sprite;
+                    dirty = true;
+                }
+                if (importer.spriteImportMode != SpriteImportMode.Single)
+                {
+                    importer.spriteImportMode = SpriteImportMode.Single;
+                    dirty = true;
+                }
+                if (!importer.alphaIsTransparency)
+                {
+                    importer.alphaIsTransparency = true;
+                    dirty = true;
+                }
+                if (importer.mipmapEnabled)
+                {
+                    importer.mipmapEnabled = false;
+                    dirty = true;
+                }
+                if (importer.filterMode != FilterMode.Point)
+                {
+                    importer.filterMode = FilterMode.Point;
+                    dirty = true;
+                }
+                if (importer.wrapMode != TextureWrapMode.Clamp)
+                {
+                    importer.wrapMode = TextureWrapMode.Clamp;
+                    dirty = true;
+                }
+                if (importer.maxTextureSize != 256)
+                {
+                    importer.maxTextureSize = 256;
+                    dirty = true;
+                }
+                if (importer.textureCompression != TextureImporterCompression.Uncompressed)
+                {
+                    importer.textureCompression = TextureImporterCompression.Uncompressed;
+                    dirty = true;
+                }
+                if (dirty)
+                    importer.SaveAndReimport();
+            }
+
+            Sprite icon = AssetDatabase.LoadAssetAtPath<Sprite>(MetaCurrencyIconPath);
+            if (icon == null)
+                throw new InvalidOperationException(
+                    "Last Embers currency icon Sprite olarak import edilemedi.");
+            return icon;
         }
 
         private static MetaUpgradeSO EnsureMetaUpgrade(string id, Action<MetaUpgradeSO> configure)
@@ -2812,7 +2940,7 @@ namespace DeadWalls
             pauseLabel.fontSize = 20;
             pauseMenu.PauseButton = pauseButton;
 
-            // --- SOUL sayaci (Polish 2): pause butonunun altinda kucuk kosu-birikimi kutusu ---
+            // --- Last Embers sayaci: pause butonunun altinda kucuk kosu-birikimi kutusu ---
             var soulCounter = EnsureComponent<SoulCounterUI>(root);
             GameObject soulPanel = EnsurePanel(root.transform, "SoulCounterPanel", false, new Color(0.10f, 0.07f, 0.16f, 0.85f));
             var soulRect = (RectTransform)soulPanel.transform;
@@ -2820,7 +2948,7 @@ namespace DeadWalls
             soulRect.anchorMax = new Vector2(1f, 1f);
             soulRect.offsetMin = new Vector2(-150f, -112f);
             soulRect.offsetMax = new Vector2(-16f, -72f);
-            var soulText = EnsureText(soulPanel.transform, "SoulCounterText", "SOULS  0", 17,
+            var soulText = EnsureText(soulPanel.transform, "SoulCounterText", "ON DEATH  +0 EMBERS", 17,
                 TextAlignmentOptions.Center, new Vector2(0f, 0f), new Vector2(1f, 1f),
                 new Vector2(4f, 2f), new Vector2(-4f, -2f));
             soulCounter.CounterPanel = soulPanel;
@@ -3858,18 +3986,19 @@ namespace DeadWalls
                 levelUp.RepairGateText
             };
 
-            GameObject gameOverPanel = EnsurePanel(canvasTransform, "GameOverPanel", false, new Color(0.03f, 0.03f, 0.04f, 0.94f));
-            Center(gameOverPanel.GetComponent<RectTransform>(), new Vector2(680f, 640f));
+            GameObject gameOverPanel = EnsurePanel(canvasTransform, "GameOverPanel", false, Color.clear);
+            Center(gameOverPanel.GetComponent<RectTransform>(), new Vector2(1120f, 880f));
             var gameOver = EnsureComponent<GameOverUI>(gameOverPanel);
-            gameOver.GameOverText = EnsureText(gameOverPanel.transform, "GameOverText", "GAME OVER", 48,
+            gameOver.GameOverText = EnsureText(gameOverPanel.transform, "GameOverText", "THE WALL HAS FALLEN", 48,
                 TextAlignmentOptions.Center, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
-                new Vector2(-260f, -86f), new Vector2(260f, -20f));
-            gameOver.StatsText = EnsureText(gameOverPanel.transform, "StatsText", "Wave: 1\nLevel: 1", 22,
-                TextAlignmentOptions.Center, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                new Vector2(-240f, 190f), new Vector2(240f, 252f));
+                new Vector2(-470f, -100f), new Vector2(470f, -34f));
+            gameOver.StatsText = EnsureText(gameOverPanel.transform, "StatsText",
+                "THE RUN ENDS HERE. WHAT REMAINS WILL STRENGTHEN THE NEXT STAND.", 16,
+                TextAlignmentOptions.Center, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
+                new Vector2(-470f, -142f), new Vector2(470f, -104f));
             gameOver.RestartButton = EnsureButton(gameOverPanel.transform, "RestartButton",
-                new Vector2(0.5f, 0f), new Vector2(-120f, 24f), new Vector2(120f, 84f), out var restartText);
-            restartText.text = "Restart";
+                new Vector2(0.5f, 0f), new Vector2(-180f, 28f), new Vector2(180f, 88f), out var restartText);
+            restartText.text = "BEGIN NEXT RUN";
 
             ConfigureMetaProgressionUI(gameOverPanel);
             ConfigureUiSounds(canvasTransform.gameObject); // Polish 3: tik/basari/fail/sting
@@ -3889,7 +4018,7 @@ namespace DeadWalls
         }
 
         /// <summary>
-        /// Olum ekrani meta katmani (roguelite): kosu ozeti + RUH bakiyesi + kalici yukseltme
+        /// Olum ekrani meta katmani (roguelite): kosu ozeti + Last Embers bakiyesi + kalici yukseltme
         /// magazasi. GameOverPanel kod-uretimli oldugundan objeler burada kurulur (prefab degil);
         /// isim sozlesmesi: MetaSummaryText / MetaSoulsText / MetaShopListRoot / MetaShopRowTemplate
         /// (Row cocuklari: RowTitleText / RowLevelText / RowCostText / RowBuyButton).
@@ -3897,6 +4026,20 @@ namespace DeadWalls
         private static void ConfigureMetaProgressionUI(GameObject gameOverPanel)
         {
             var meta = EnsureComponent<MetaProgressionUI>(gameOverPanel);
+            var gameOver = EnsureComponent<GameOverUI>(gameOverPanel);
+            var panelRect = gameOverPanel.GetComponent<RectTransform>();
+            Center(panelRect, new Vector2(1120f, 880f));
+
+            MetaUpgradeCatalogSO catalog = AssetDatabase.LoadAssetAtPath<MetaUpgradeCatalogSO>(
+                MetaCatalogPath);
+            MetaPresentationSettings presentation = catalog != null && catalog.Presentation != null
+                ? catalog.Presentation
+                : MetaPresentationSettings.CreateLastEmbers(EnsureMetaCurrencyIcon());
+            Sprite rounded = EnsureRoundedRectAsset();
+
+            Image rootImage = EnsureComponent<Image>(gameOverPanel);
+            rootImage.color = Color.clear;
+            rootImage.raycastTarget = false;
 
             // Tam-ekran dim: arka plandaki HUD'u karartir + yanlis tiklamayi bloklar
             GameObject dim = FindDirectChild(gameOverPanel.transform, "GameOverDim");
@@ -3913,78 +4056,268 @@ namespace DeadWalls
             dimRect.offsetMin = new Vector2(-2400f, -1400f); // panel sinirlarini asip ekrani kaplar
             dimRect.offsetMax = new Vector2(2400f, 1400f);
             var dimImage = EnsureComponent<UnityEngine.UI.Image>(dim);
-            dimImage.color = new Color(0.01f, 0.01f, 0.02f, 0.86f);
+            dimImage.color = new Color(0.008f, 0.006f, 0.012f, 0.90f);
             dimImage.raycastTarget = true;
             dim.transform.SetAsFirstSibling(); // icerik ustte kalir
 
+            GameObject frame = EnsurePanel(gameOverPanel.transform, "GameOverFrame", true,
+                new Color(0.008f, 0.006f, 0.011f, 0.99f));
+            Stretch(frame.GetComponent<RectTransform>());
+            Image frameImage = frame.GetComponent<Image>();
+            frameImage.raycastTarget = false;
+            ApplyRoundedSkin(frameImage, rounded, null, 1.35f);
+            Outline frameOutline = EnsureComponent<Outline>(frame);
+            frameOutline.effectColor = new Color(0.95f, 0.58f, 0.18f, 0.42f);
+            frameOutline.effectDistance = new Vector2(2f, -2f);
+            frameOutline.useGraphicAlpha = true;
+            frame.transform.SetSiblingIndex(1);
+
+            gameOver.GameOverText = EnsureText(gameOverPanel.transform, "GameOverText",
+                presentation.DeathTitle, 46, TextAlignmentOptions.Center,
+                new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
+                new Vector2(-500f, -86f), new Vector2(500f, -28f));
+            gameOver.GameOverText.fontStyle = FontStyles.Bold;
+            gameOver.GameOverText.characterSpacing = 3f;
+            gameOver.GameOverText.color = new Color(1f, 0.91f, 0.73f, 1f);
+            gameOver.GameOverText.textWrappingMode = TextWrappingModes.NoWrap;
+
+            gameOver.StatsText = EnsureText(gameOverPanel.transform, "StatsText",
+                presentation.DeathSubtitle, 15, TextAlignmentOptions.Center,
+                new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
+                new Vector2(-490f, -128f), new Vector2(490f, -92f));
+            gameOver.StatsText.color = new Color(0.68f, 0.70f, 0.75f, 1f);
+            gameOver.StatsText.textWrappingMode = TextWrappingModes.NoWrap;
+
+            GameObject headerRule = EnsurePanel(gameOverPanel.transform, "GameOverHeaderRule", true,
+                new Color(0.95f, 0.58f, 0.18f, 0.42f));
+            SetRect(headerRule.GetComponent<RectTransform>(),
+                new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
+                new Vector2(-470f, -148f), new Vector2(470f, -146f));
+            headerRule.GetComponent<Image>().raycastTarget = false;
+
             meta.MetaSummaryText = EnsureText(gameOverPanel.transform, "MetaSummaryText",
-                "DAY 1 — 0 kills\n+0 SOULS", 22, TextAlignmentOptions.Center,
-                new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                new Vector2(-300f, 116f), new Vector2(300f, 184f));
+                "DAY 1 HELD  •  0 ENEMIES SLAIN", 24, TextAlignmentOptions.MidlineLeft,
+                new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
+                new Vector2(-470f, -213f), new Vector2(250f, -166f));
+            meta.MetaSummaryText.fontStyle = FontStyles.Bold;
+            meta.MetaSummaryText.textWrappingMode = TextWrappingModes.NoWrap;
+
+            meta.MetaRecordText = EnsureText(gameOverPanel.transform, "MetaRecordText",
+                presentation.NewRecordLabel, 14, TextAlignmentOptions.MidlineRight,
+                new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
+                new Vector2(240f, -211f), new Vector2(470f, -168f));
+            meta.MetaRecordText.fontStyle = FontStyles.Bold;
+            meta.MetaRecordText.color = new Color(1f, 0.73f, 0.24f, 1f);
+            meta.MetaRecordText.textWrappingMode = TextWrappingModes.NoWrap;
+
+            GameObject rewardPanel = EnsurePanel(gameOverPanel.transform, "MetaRewardPanel", true,
+                new Color(0.035f, 0.012f, 0.003f, 0.97f));
+            SetRect(rewardPanel.GetComponent<RectTransform>(),
+                new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
+                new Vector2(-470f, -307f), new Vector2(470f, -226f));
+            ApplyRoundedSkin(rewardPanel.GetComponent<Image>(), rounded, null, 1.7f);
+            rewardPanel.GetComponent<Image>().raycastTarget = false;
+
+            GameObject rewardIconObject = EnsureChild(rewardPanel.transform, "MetaRewardIcon", true);
+            SetRect(rewardIconObject.GetComponent<RectTransform>(),
+                new Vector2(0f, 0.5f), new Vector2(0f, 0.5f),
+                new Vector2(22f, -29f), new Vector2(80f, 29f));
+            meta.MetaRewardIcon = EnsureComponent<Image>(rewardIconObject);
+            meta.MetaRewardIcon.sprite = presentation.CurrencyIcon;
+            meta.MetaRewardIcon.preserveAspect = true;
+            meta.MetaRewardIcon.color = Color.white;
+            meta.MetaRewardIcon.raycastTarget = false;
+
+            meta.MetaEarnedText = EnsureText(rewardPanel.transform, "MetaEarnedText",
+                "+0 " + presentation.DisplayName, 28, TextAlignmentOptions.MidlineLeft,
+                new Vector2(0f, 0f), new Vector2(1f, 1f),
+                new Vector2(98f, 8f), new Vector2(-250f, -8f));
+            meta.MetaEarnedText.fontStyle = FontStyles.Bold;
+            meta.MetaEarnedText.color = presentation.CurrencyColor;
+            meta.MetaEarnedText.textWrappingMode = TextWrappingModes.NoWrap;
+
+            TMP_Text rewardCaption = EnsureText(rewardPanel.transform, "MetaRewardCaptionText",
+                "RECOVERED FROM THIS FALL", 11, TextAlignmentOptions.MidlineRight,
+                new Vector2(0f, 0f), new Vector2(1f, 1f),
+                new Vector2(650f, 8f), new Vector2(-22f, -8f));
+            rewardCaption.color = new Color(0.76f, 0.69f, 0.61f, 1f);
+            rewardCaption.characterSpacing = 1.5f;
+            rewardCaption.textWrappingMode = TextWrappingModes.NoWrap;
+
+            meta.MetaShopTitleText = EnsureText(gameOverPanel.transform, "MetaShopTitleText",
+                presentation.ShopTitle, 21, TextAlignmentOptions.MidlineLeft,
+                new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
+                new Vector2(-470f, -356f), new Vector2(250f, -316f));
+            meta.MetaShopTitleText.fontStyle = FontStyles.Bold;
+            meta.MetaShopTitleText.textWrappingMode = TextWrappingModes.NoWrap;
+
+            GameObject balanceIconObject = EnsureChild(gameOverPanel.transform, "MetaCurrencyIcon", true);
+            SetRect(balanceIconObject.GetComponent<RectTransform>(),
+                new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
+                new Vector2(246f, -352f), new Vector2(280f, -318f));
+            meta.MetaCurrencyIcon = EnsureComponent<Image>(balanceIconObject);
+            meta.MetaCurrencyIcon.sprite = presentation.CurrencyIcon;
+            meta.MetaCurrencyIcon.preserveAspect = true;
+            meta.MetaCurrencyIcon.color = Color.white;
+            meta.MetaCurrencyIcon.raycastTarget = false;
 
             meta.MetaSoulsText = EnsureText(gameOverPanel.transform, "MetaSoulsText",
-                "0 SOULS", 18, TextAlignmentOptions.Center,
-                new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                new Vector2(-300f, 84f), new Vector2(300f, 112f));
-            meta.MetaSoulsText.color = new Color(0.69f, 0.52f, 0.96f, 1f);
+                "0 " + presentation.ShortName, 17, TextAlignmentOptions.MidlineRight,
+                new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
+                new Vector2(286f, -354f), new Vector2(470f, -316f));
+            meta.MetaSoulsText.color = presentation.CurrencyColor;
+            meta.MetaSoulsText.fontStyle = FontStyles.Bold;
+            meta.MetaSoulsText.textWrappingMode = TextWrappingModes.NoWrap;
 
-            // Magaza listesi: dikey layout'lu konteyner
-            GameObject listRoot = FindDirectChild(gameOverPanel.transform, "MetaShopListRoot");
+            meta.MetaShopHintText = EnsureText(gameOverPanel.transform, "MetaShopHintText",
+                presentation.ShopHint, 11, TextAlignmentOptions.MidlineLeft,
+                new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
+                new Vector2(-470f, -381f), new Vector2(470f, -356f));
+            meta.MetaShopHintText.color = new Color(0.57f, 0.60f, 0.67f, 1f);
+            meta.MetaShopHintText.characterSpacing = 1f;
+            meta.MetaShopHintText.textWrappingMode = TextWrappingModes.NoWrap;
+
+            // 11 kalici upgrade tek ekrana sikistirilmaz; maskeli, wheel/drag destekli liste.
+            GameObject viewport = EnsurePanel(gameOverPanel.transform, "MetaShopViewport", true,
+                new Color(0.004f, 0.004f, 0.008f, 0.97f));
+            SetRect(viewport.GetComponent<RectTransform>(),
+                new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
+                new Vector2(-470f, -760f), new Vector2(470f, -390f));
+            ApplyRoundedSkin(viewport.GetComponent<Image>(), rounded, null, 1.4f);
+            Mask viewportMask = EnsureComponent<Mask>(viewport);
+            viewportMask.showMaskGraphic = true;
+            ScrollRect scrollRect = EnsureComponent<ScrollRect>(viewport);
+            scrollRect.horizontal = false;
+            scrollRect.vertical = true;
+            scrollRect.inertia = true;
+            scrollRect.decelerationRate = 0.12f;
+            scrollRect.scrollSensitivity = 32f;
+            scrollRect.movementType = ScrollRect.MovementType.Clamped;
+            scrollRect.viewport = viewport.GetComponent<RectTransform>();
+
+            GameObject listRoot = FindChildByName(gameOverPanel, "MetaShopListRoot");
             if (listRoot == null)
             {
                 listRoot = new GameObject("MetaShopListRoot", typeof(RectTransform));
                 Undo.RegisterCreatedObjectUndo(listRoot, "Create Meta Shop List");
                 listRoot.layer = gameOverPanel.layer;
-                listRoot.transform.SetParent(gameOverPanel.transform, false);
+                listRoot.transform.SetParent(viewport.transform, false);
+            }
+            else if (listRoot.transform.parent != viewport.transform)
+            {
+                Undo.SetTransformParent(listRoot.transform, viewport.transform,
+                    "Migrate Meta Shop Into Scroll Viewport");
             }
             var listRect = (RectTransform)listRoot.transform;
-            listRect.anchorMin = new Vector2(0.5f, 0.5f);
-            listRect.anchorMax = new Vector2(0.5f, 0.5f);
-            listRect.offsetMin = new Vector2(-320f, -250f);
-            listRect.offsetMax = new Vector2(320f, 78f);
+            listRect.anchorMin = new Vector2(0f, 1f);
+            listRect.anchorMax = new Vector2(1f, 1f);
+            listRect.pivot = new Vector2(0.5f, 1f);
+            listRect.anchoredPosition = Vector2.zero;
+            listRect.sizeDelta = Vector2.zero;
             var layout = EnsureComponent<UnityEngine.UI.VerticalLayoutGroup>(listRoot);
-            layout.spacing = 6f;
-            layout.childForceExpandWidth = true;
+            layout.padding = new RectOffset(10, 18, 10, 10);
+            layout.spacing = 8f;
+            layout.childForceExpandWidth = false;
             layout.childForceExpandHeight = false;
             layout.childControlWidth = true;
-            layout.childControlHeight = false;
+            layout.childControlHeight = true;
             layout.childAlignment = TextAnchor.UpperCenter;
+            ContentSizeFitter fitter = EnsureComponent<ContentSizeFitter>(listRoot);
+            fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            scrollRect.content = listRect;
             meta.MetaShopListRoot = listRect;
+
+            GameObject scrollbarObject = EnsurePanel(viewport.transform, "MetaShopScrollbar", true,
+                new Color(0.12f, 0.10f, 0.13f, 0.82f));
+            SetRect(scrollbarObject.GetComponent<RectTransform>(),
+                new Vector2(1f, 0f), new Vector2(1f, 1f),
+                new Vector2(-10f, 12f), new Vector2(-4f, -12f));
+            GameObject handleObject = EnsurePanel(scrollbarObject.transform, "Handle", true,
+                presentation.CurrencyColor);
+            RectTransform handleRect = handleObject.GetComponent<RectTransform>();
+            SetRect(handleRect, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            Scrollbar scrollbar = EnsureComponent<Scrollbar>(scrollbarObject);
+            scrollbar.handleRect = handleRect;
+            scrollbar.targetGraphic = handleObject.GetComponent<Image>();
+            scrollbar.direction = Scrollbar.Direction.BottomToTop;
+            scrollRect.verticalScrollbar = scrollbar;
+            scrollRect.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHide;
+            scrollRect.verticalScrollbarSpacing = -6f;
 
             // Satir sablonu (inactive; MetaProgressionUI klonlar)
             GameObject template = FindDirectChild(listRoot.transform, "MetaShopRowTemplate");
             if (template == null)
-            {
                 template = EnsurePanel(listRoot.transform, "MetaShopRowTemplate", false,
-                    new Color(0.10f, 0.12f, 0.15f, 0.95f));
-                var rowRect = (RectTransform)template.transform;
-                rowRect.sizeDelta = new Vector2(640f, 40f);
+                    new Color(0.012f, 0.009f, 0.016f, 0.99f));
 
-                EnsureText(template.transform, "RowTitleText", "Upgrade", 15,
-                    TextAlignmentOptions.MidlineLeft, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f),
-                    new Vector2(12f, -16f), new Vector2(280f, 16f));
-                EnsureText(template.transform, "RowLevelText", "LV 0/5", 13,
-                    TextAlignmentOptions.Center, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                    new Vector2(-40f, -14f), new Vector2(50f, 14f));
-                EnsureText(template.transform, "RowCostText", "150 SOULS", 13,
-                    TextAlignmentOptions.MidlineRight, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f),
-                    new Vector2(-260f, -14f), new Vector2(-110f, 14f));
-                var buy = EnsureButton(template.transform, "RowBuyButton",
-                    new Vector2(1f, 0.5f), new Vector2(-100f, -15f), new Vector2(-10f, 15f), out var buyText);
-                buyText.text = "BUY";
-                buyText.fontSize = 13;
-                var colors = buy.colors;
-                colors.normalColor = new Color(0.18f, 0.55f, 0.25f, 1f);
-                colors.disabledColor = new Color(0.3f, 0.32f, 0.35f, 0.6f);
-                buy.colors = colors;
-            }
+            Image rowImage = template.GetComponent<Image>();
+            rowImage.color = new Color(0.012f, 0.009f, 0.016f, 0.99f);
+            rowImage.raycastTarget = false;
+            ApplyRoundedSkin(rowImage, rounded, null, 2f);
+            var rowRect = (RectTransform)template.transform;
+            rowRect.sizeDelta = new Vector2(0f, 68f);
+
+            TMP_Text rowTitle = EnsureText(template.transform, "RowTitleText", "Upgrade", 16,
+                TextAlignmentOptions.MidlineLeft, new Vector2(0f, 0f), new Vector2(0f, 1f),
+                new Vector2(22f, 31f), new Vector2(560f, -5f));
+            rowTitle.fontStyle = FontStyles.Bold;
+            rowTitle.textWrappingMode = TextWrappingModes.NoWrap;
+            TMP_Text rowDescription = EnsureText(template.transform, "RowDescriptionText",
+                "Permanent benefit for the next run.", 11, TextAlignmentOptions.MidlineLeft,
+                new Vector2(0f, 0f), new Vector2(0f, 1f),
+                new Vector2(22f, 5f), new Vector2(600f, -35f));
+            rowDescription.color = new Color(0.59f, 0.62f, 0.69f, 1f);
+            rowDescription.textWrappingMode = TextWrappingModes.NoWrap;
+            TMP_Text rowLevel = EnsureText(template.transform, "RowLevelText", "LEVEL 0/5", 12,
+                TextAlignmentOptions.Center, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f),
+                new Vector2(-480f, -16f), new Vector2(-340f, 16f));
+            rowLevel.color = new Color(0.77f, 0.79f, 0.84f, 1f);
+            rowLevel.textWrappingMode = TextWrappingModes.NoWrap;
+            TMP_Text rowCost = EnsureText(template.transform, "RowCostText",
+                "150 " + presentation.ShortName, 12, TextAlignmentOptions.MidlineRight,
+                new Vector2(1f, 0.5f), new Vector2(1f, 0.5f),
+                new Vector2(-330f, -16f), new Vector2(-148f, 16f));
+            rowCost.color = presentation.CurrencyColor;
+            rowCost.fontStyle = FontStyles.Bold;
+            rowCost.textWrappingMode = TextWrappingModes.NoWrap;
+            var buy = EnsureButton(template.transform, "RowBuyButton",
+                new Vector2(1f, 0.5f), new Vector2(-132f, -22f), new Vector2(-16f, 22f),
+                out var buyText);
+            buyText.text = "BUY";
+            buyText.fontSize = 13;
+            buyText.fontStyle = FontStyles.Bold;
+            buyText.characterSpacing = 1.5f;
+            ApplyRoundedSkin(buy.GetComponent<Image>(), rounded, null, 2.2f);
+            var colors = buy.colors;
+            colors.normalColor = new Color(0.72f, 0.38f, 0.10f, 1f);
+            colors.highlightedColor = new Color(0.94f, 0.59f, 0.18f, 1f);
+            colors.pressedColor = new Color(0.55f, 0.25f, 0.07f, 1f);
+            colors.disabledColor = new Color(0.22f, 0.22f, 0.26f, 0.72f);
+            buy.colors = colors;
             var layoutElement = EnsureComponent<UnityEngine.UI.LayoutElement>(template);
-            layoutElement.preferredHeight = 40f;
-            layoutElement.minHeight = 40f;
+            layoutElement.preferredHeight = 68f;
+            layoutElement.minHeight = 68f;
+            layoutElement.flexibleWidth = 1f;
             template.SetActive(false);
             meta.MetaShopRowTemplate = template;
 
+            gameOver.RestartButton = EnsureButton(gameOverPanel.transform, "RestartButton",
+                new Vector2(0.5f, 0f), new Vector2(-190f, 24f), new Vector2(190f, 82f),
+                out TMP_Text restartText);
+            restartText.text = presentation.RestartLabel;
+            restartText.fontSize = 16f;
+            restartText.fontStyle = FontStyles.Bold;
+            restartText.characterSpacing = 1.5f;
+            ApplyRoundedSkin(gameOver.RestartButton.GetComponent<Image>(), rounded, null, 1.8f);
+            ColorBlock restartColors = gameOver.RestartButton.colors;
+            restartColors.normalColor = new Color(0.55f, 0.27f, 0.08f, 1f);
+            restartColors.highlightedColor = new Color(0.82f, 0.46f, 0.13f, 1f);
+            restartColors.pressedColor = new Color(0.39f, 0.17f, 0.05f, 1f);
+            gameOver.RestartButton.colors = restartColors;
+
             EditorUtility.SetDirty(meta);
+            EditorUtility.SetDirty(gameOver);
         }
 
         private static GameObject EnsureHudRoot(Transform canvasTransform)

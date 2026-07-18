@@ -39,7 +39,14 @@ namespace DeadWalls
             if (projectedSouls != _lastShown && CounterText != null)
             {
                 _lastShown = projectedSouls;
-                CounterText.text = $"<color=#B085F5>DEATH</color>  +{projectedSouls} SOULS";
+                MetaPresentationSettings presentation = gm.MetaCatalog != null
+                    ? gm.MetaCatalog.Presentation
+                    : null;
+                string currency = presentation != null
+                    ? presentation.ShortName
+                    : MetaProgression.CurrencyName;
+                CounterText.text =
+                    $"<color=#FFB33F>ON DEATH</color>  +{projectedSouls:N0} {currency}";
             }
         }
     }

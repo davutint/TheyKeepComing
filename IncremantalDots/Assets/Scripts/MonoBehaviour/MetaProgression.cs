@@ -76,8 +76,10 @@ namespace DeadWalls
     /// </summary>
     public static class MetaProgression
     {
-        // Owner karari (2026-07-08): kavram RUH, oyun dili INGILIZCE -> ekranda "SOULS"
-        public const string CurrencyName = "SOULS";
+        // Save alanlari yayinlanmis uyumluluk nedeniyle Souls adini korur. Player-facing
+        // kimlik MetaUpgradeCatalogSO.Presentation v2'de LAST EMBERS olarak catalog-owned'dir.
+        public const string CurrencyName = "LAST EMBERS";
+        public const string LegacyCurrencyName = "SOULS";
         // Yalniz v1 death receipt migration'i icin yayinlanmis eski sabit.
         public const int RecordBonusPerDay = MetaRewardCalculator.LegacyRecordBonusPerDay;
         private const int MaxRewardReceipts = 128;

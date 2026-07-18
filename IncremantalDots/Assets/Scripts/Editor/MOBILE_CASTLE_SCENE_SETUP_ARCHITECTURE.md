@@ -28,6 +28,13 @@ World visual tilemap'leri owner tarafindan yonetilir. Tool `Grid/outside` tilema
 
 `Assets/Prefabs/UI/Generated/MobileCastleHudRoot.prefab` varsa `MobileCastleHudRoot` bu prefabdan instancelanir. Prefab yoksa fallback HUD ayni runtime isimleriyle kurulur: economy text'leri, fallback `WaveText`, fallback `KillsText`, fallback `DefenseText`, `WaveRewardText`, `DamageFlashOverlay`, `ArcherDrawerPanel`, Basic/Rapid/Frost row buy alanlari ve `RepairButton`. Onayli prefabda `CyclePanel` varsa fallback `WaveText/KillsText` uretilmez ve varsa kapatilir. Castle Interior economy paneli icin fallback polish UI uretilmez; panel gerekirse dogrudan prefabda kurulur.
 
+`GameOverPanel` scene-owned kalır; HUD prefabının parçası değildir. Meta presentation v2 için
+`1120 x 880` rounded frame, Last Embers reward/balance ikonları, açıklamalı `68px` shop satırları,
+maskeli vertical `ScrollRect` ve ayrı `BEGIN NEXT RUN` CTA kullanır. Eski `680 x 640` sıkışık
+SOULS listesi `Window > DeadWalls > Repair Meta Identity Presentation` ile idempotent migrate
+edilir. Migration `MetaUpgradeCatalogSO.Presentation` alanını yeniler; legacy save bakiyesi ve
+upgrade Id/level state'ini değiştirmez.
+
 Generated prefabdaki dis root, `CanvasScaler` ile `1920 x 1080` referans ve `0.5`
 width/height match kullanir. Onun dogrudan altindaki ayni isimli gorsel
 `MobileCastleHudRoot` sabit piksel boyutu tasimaz; parent sanal canvas'ina dort yonden stretch

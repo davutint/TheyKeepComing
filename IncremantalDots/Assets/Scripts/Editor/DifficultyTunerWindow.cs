@@ -1030,13 +1030,13 @@ namespace DeadWalls
             EditorGUI.BeginChangeCheck();
             DrawRelativeProp(settings, "FirstKillBandLimit", "First kill band limit");
             DrawRelativeProp(settings, "SecondKillBandLimit", "Second kill band limit");
-            DrawRelativeProp(settings, "FirstBandSoulsPerKill", "First band Souls / kill");
-            DrawRelativeProp(settings, "SecondBandSoulsPerKill", "Second band Souls / kill");
-            DrawRelativeProp(settings, "OverflowSoulsPerKill", "Overflow Souls / kill");
-            DrawRelativeProp(settings, "SoulsPerDayReached", "Souls / day reached");
-            DrawRelativeProp(settings, "SoulsPerNightSurvived", "Souls / night survived");
-            DrawRelativeProp(settings, "SoulsPerPeakPopulation", "Souls / peak population");
-            DrawRelativeProp(settings, "NewRecordSoulsPerDay", "New-record Souls / day");
+            DrawRelativeProp(settings, "FirstBandSoulsPerKill", "First band Embers / kill");
+            DrawRelativeProp(settings, "SecondBandSoulsPerKill", "Second band Embers / kill");
+            DrawRelativeProp(settings, "OverflowSoulsPerKill", "Overflow Embers / kill");
+            DrawRelativeProp(settings, "SoulsPerDayReached", "Embers / day reached");
+            DrawRelativeProp(settings, "SoulsPerNightSurvived", "Embers / night survived");
+            DrawRelativeProp(settings, "SoulsPerPeakPopulation", "Embers / peak population");
+            DrawRelativeProp(settings, "NewRecordSoulsPerDay", "New-record Embers / day");
             bool changed = EditorGUI.EndChangeCheck();
             catalogSO.ApplyModifiedProperties();
             if (changed)
@@ -1107,7 +1107,7 @@ namespace DeadWalls
                     var upgradeSO = new SerializedObject(upgrade);
                     upgradeSO.Update();
                     EditorGUI.BeginChangeCheck();
-                    DrawDefinitionProp(upgradeSO, "BaseCost", "Base Souls cost");
+                    DrawDefinitionProp(upgradeSO, "BaseCost", "Base Last Embers cost");
                     DrawDefinitionProp(upgradeSO, "CostGrowthPerLevel", "Exponential growth / level");
                     DrawDefinitionProp(upgradeSO, "MaxLevel", "Max level (0 = unlimited)");
                     if (!MetaUpgradePolicy.IsContentUnlockEffect(upgrade.EffectType))
@@ -1122,7 +1122,8 @@ namespace DeadWalls
                         : _metaPreviewUpgradeLevel;
                     string nextCost = upgrade.IsMaxLevel(previewLevel)
                         ? "MAX"
-                        : $"{upgrade.GetCost(previewLevel):N0} SOULS";
+                        : $"{upgrade.GetCost(previewLevel):N0} "
+                          + $"{(catalog.Presentation != null ? catalog.Presentation.ShortName : MetaProgression.CurrencyName)}";
                     EditorGUILayout.LabelField("Preview level / next cost",
                         $"{previewLevel:N0} / {nextCost}");
                     EditorGUILayout.LabelField("Cumulative effect",
@@ -1139,7 +1140,7 @@ namespace DeadWalls
             MetaRuntimeTelemetry telemetry = gameManager.GetMetaRuntimeTelemetry();
             EditorGUILayout.Space(8);
             EditorGUILayout.LabelField("Live Meta Aggregate", EditorStyles.boldLabel);
-            EditorGUILayout.LabelField("Souls / lifetime earned",
+            EditorGUILayout.LabelField("Last Embers / lifetime earned",
                 $"{telemetry.Souls:N0} / {telemetry.TotalSoulsEarned:N0}");
             EditorGUILayout.LabelField("Best day / runs / lifetime kills",
                 $"{telemetry.BestDay:N0} / {telemetry.TotalRuns:N0} / {telemetry.TotalKillsAllTime:N0}");
@@ -1158,7 +1159,8 @@ namespace DeadWalls
 
         private static void DrawMetaRewardQuote(string label, MetaRewardQuote quote)
         {
-            EditorGUILayout.LabelField($"{label} total", $"{quote.TotalSouls:N0} SOULS");
+            EditorGUILayout.LabelField($"{label} total",
+                $"{quote.TotalSouls:N0} {MetaProgression.CurrencyName}");
             EditorGUILayout.LabelField("Kill / day / night / population / record",
                 $"{quote.KillSouls:N0} / {quote.DaySouls:N0} / {quote.NightSouls:N0} / "
                 + $"{quote.PopulationSouls:N0} / {quote.RecordSouls:N0}");

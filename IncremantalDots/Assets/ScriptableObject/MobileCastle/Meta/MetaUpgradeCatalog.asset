@@ -12,6 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7450186637e704428f1064bf439cbae, type: 3}
   m_Name: MetaUpgradeCatalog
   m_EditorClassIdentifier: DeadWalls::DeadWalls.MetaUpgradeCatalogSO
+  Presentation:
+    Version: 2
+    CurrencyId: last_embers
+    CurrencyName: LAST EMBERS
+    CurrencyShortName: EMBERS
+    CurrencyIcon: {fileID: 21300000, guid: 0dd280cb3ddfe8a4b93bf596c7775d26, type: 3}
+    CurrencyColor: {r: 1, g: 0.66, b: 0.2, a: 1}
+    DeathTitle: THE WALL HAS FALLEN
+    DeathSubtitle: THE RUN ENDS HERE. WHAT REMAINS WILL STRENGTHEN THE NEXT STAND.
+    NewRecordLabel: NEW LONGEST STAND
+    ShopTitle: FORTIFY THE NEXT STAND
+    ShopHint: PERMANENT UPGRADES APPLY TO YOUR NEXT RUN.
+    RestartLabel: BEGIN NEXT RUN
   RewardSettings:
     FirstKillBandLimit: 100
     SecondKillBandLimit: 1000

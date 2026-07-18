@@ -14,25 +14,37 @@ namespace DeadWalls
         {
             if (GameManager.Instance == null) return;
 
-            var gs = GameManager.Instance.GameState;
-            var ws = GameManager.Instance.WaveState;
-            var cycle = GameManager.Instance.ContinuousSiegeCycle;
+            var gm = GameManager.Instance;
+            var gs = gm.GameState;
+            var ws = gm.WaveState;
+            var cycle = gm.ContinuousSiegeCycle;
+            MetaPresentationSettings presentation = gm.MetaCatalog != null
+                ? gm.MetaCatalog.Presentation
+                : null;
 
             if (GameOverText != null)
-                GameOverText.text = "GAME OVER";
+                GameOverText.text = presentation != null
+                    ? presentation.DeathTitle
+                    : "THE WALL HAS FALLEN";
 
             if (StatsText != null)
             {
-                // Continuous siege dili: DAY sayaci (legacy Wave/Level yalniz eski modda)
                 StatsText.text = cycle.Enabled
-                    ? $"You survived {Mathf.Max(1, cycle.CycleIndex + 1)} days"
-                    : $"Wave: {ws.CurrentWave}\nLevel: {gs.Level}";
+                    ? presentation != null
+                        ? presentation.DeathSubtitle
+                        : "THE RUN ENDS HERE. WHAT REMAINS WILL STRENGTHEN THE NEXT STAND."
+                    : $"Wave: {ws.CurrentWave}  •  Level: {gs.Level}";
             }
 
             if (RestartButton != null)
             {
                 RestartButton.onClick.RemoveAllListeners();
                 RestartButton.onClick.AddListener(() => UIManager.Instance.OnRestart());
+                TMP_Text label = RestartButton.GetComponentInChildren<TMP_Text>(true);
+                if (label != null)
+                    label.text = presentation != null
+                        ? presentation.RestartLabel
+                        : "BEGIN NEXT RUN";
             }
         }
     }

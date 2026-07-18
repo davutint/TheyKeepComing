@@ -6,6 +6,11 @@ Meta v3 schema için Inspector, prefab veya scene alanı eklenmez. `MetaProgress
 sahibidir ve `persistentDataPath/meta_progress.json` kullanır. Aktif `NewGameScene`
 `GameManager` binding'i Unity MCP ile `MetaUpgradeCatalog.asset` yolunu göstermelidir.
 
+Player-facing presentation v2 aynı katalogda bulunur: stable Id `last_embers`, display adı
+`LAST EMBERS`, kısa ad `EMBERS` ve ikon
+`Assets/Art/Generated/Meta/last_embers_icon.png`. İkon Sprite/Single, alpha, Point filter,
+mipmap kapalı ve max size `256` import edilir.
+
 Unity MCP denetiminde aktif katalog şu exact sıradaki 11 run-graph-isolated upgrade'i taşır:
 `start_wood`, `start_stone`, `start_iron`, `start_food`, `start_archers`, `start_beds`, `wall_hp`,
 `production`, `arrow_efficiency`, `essence_gain`, `node_pool_unlock`.
@@ -16,7 +21,7 @@ için yeniden kullanılmaz. `node_pool_unlock` definition'ı `MaxLevel=1` ve sta
 `heart.approved_bonus_pool.v1` Id'si taşır; gerçek node/evolution content'i ayrı owner onayıyla
 bu pool'a bağlanır ve mevcut run graph'ına retroaktif enjekte edilemez.
 
-Kaynak/yatak definition'larında `MaxLevel=0` repeatable anlamına gelir. UI bunları `LV N` olarak
+Kaynak/yatak definition'larında `MaxLevel=0` repeatable anlamına gelir. UI bunları `LEVEL N` olarak
 gösterir; `MAX` yalnız pozitif hard cap'e ulaşıldığında görünür. Bütün fiyatlar assetteki
 `BaseCost` ve `CostGrowthPerLevel` üzerinden üstel hesaplanır.
 
@@ -29,6 +34,11 @@ Panel değerleri `DifficultyProfileSO`'ya kopyalamaz.
 Game Over `MetaProgressionUI`, satın alma için doğrudan `MetaProgression` çağırmaz;
 `GameManager.CanBuyMetaUpgrade/TryBuyMetaUpgrade` binding'ini kullanır. Yeni bir meta UI/prefab
 eklerken aynı API'yi kullan; yalnız paneli Game Over altında tutmak yeterli güvenlik değildir.
+
+Scene-owned paneli idempotent kurmak/migrate etmek için
+`Window > DeadWalls > Repair Meta Identity Presentation` kullanılır. Bu araç eski ikonsuz/SOULS
+presentation'ı Last Embers v2'ye taşır, 11 upgrade'i maskeli scroll listesine alır ve scene'i
+kaydeder; reward tuning ile mevcut meta save'e dokunmaz.
 
 ## Schema v3 alanları
 
@@ -78,6 +88,9 @@ Boundary kabulü için ayrıca:
   legacy numeric `3/5` reddi, üstel repeatable maliyet ve tek-seferlik pool contract denetimi.
 - EditMode `MetaTuningContractTests`: diminishing 10K quote, non-record breakdown, invalid band
   reddi, quoted idempotency ve production 11-definition maliyet/etki tablosunu denetler.
+- EditMode `MetaIdentityPresentationTests`: Last Embers catalog kimliği/ikon/copy kontratını,
+  legacy `Souls` save alanının korunmasını, scroll viewport'unu, açıklamalı `68px` satırı ve
+  Restart CTA ayrımını denetler.
 - PlayMode `ExactRunContinuePlayModeTests.MetaPurchase_ActiveRunRejectedAndDurableDeathAllowsCanonicalUpgrade`:
   aktif koşuda red, durable ölümden sonra canonical satın alma, atomik pool unlock ve aynı Id'li
   spoof asset reddi.

@@ -3,16 +3,18 @@
 ## Amaç
 
 Wall `0 HP` olduğunda koşu tamamen biter; koşu içi state Continue edilemez. O koşunun kill,
-ulaşılan day, tamamlanan gece ve peak population sonucu kalıcı Souls ilerlemesine bir kez
-aktarılır. Meta state yeni koşularda başlangıç ivmesi ve hafif kalıcı güç sağlar.
+ulaşılan day, tamamlanan gece ve peak population sonucu kalıcı **Last Embers** ilerlemesine bir
+kez aktarılır. Meta state yeni koşularda başlangıç ivmesi ve hafif kalıcı güç sağlar.
 
-Player-facing bütün metinler İngilizcedir. Kod tarafındaki para birimi otoritesi `MetaProgression.CurrencyName` sabitidir.
+Player-facing bütün metinler İngilizcedir. Kimlik, ikon, vurgu rengi ve ölüm ekranı copy'sinin
+otoritesi `MetaUpgradeCatalogSO.Presentation v2`dir. `MetaProgression.CurrencyName` yalnız katalog
+bulunamadığında kullanılan `LAST EMBERS` fallback'idir.
 
 ## Kalıcı state
 
 `MetaProgression.cs` içindeki `MetaProgressState v3`, `persistentDataPath/meta_progress.json` dosyasına yazılır:
 
-- Souls ve TotalSoulsEarned,
+- `Souls` ve `TotalSoulsEarned` legacy serialized alanları (player-facing Last Embers bakiyesi),
 - BestDay, TotalRuns ve TotalKillsAllTime,
 - `MetaUpgradeLevel` listesi,
 - Gelecekteki Heart/ability content olasılık havuzlarını açacak stable `UnlockedPoolIds`,
@@ -28,7 +30,7 @@ upgrade Id'leri silinmez; gelecekteki veya geçici catalog içeriğinin kalıcı
 ## Sürüm ve migration sözleşmesi
 
 - Güncel schema `v3`, desteklenen en eski schema `v1`dir.
-- `v1 -> v2`: Souls, istatistik ve upgrade seviyeleri korunur; bulunmayan reward receipt
+- `v1 -> v2`: legacy Souls bakiyesi, istatistik ve upgrade seviyeleri korunur; bulunmayan reward receipt
   geçmişi boş başlar.
 - `v2 -> v3`: mevcut bütün state korunur; pool unlock ve tutorial flag listeleri boş başlar.
 - Güncel sürümden büyük, minimumdan küçük veya bozuk JSON otomatik sıfırlanmaz.
@@ -63,7 +65,7 @@ sınırı aşağıdaki runtime sözleşmesiyle tamamlanmıştır.
 Yeni ölüm transaction'ının otoriter API'si `AddRunResult(string runId, MetaRewardQuote reward)`
 metodudur. `AddRunResult(string runId, int day, int kills)` yalnız v1 death receipt migration
 yoludur ve yayınlanmış eski `1 kill + new-record day x 50` sonucunu tamamlar. Boş veya daha önce
-ödüllendirilen RunId yeniden gelirse sonuç `AlreadyRewarded` olarak döner ve Souls/istatistik
+ödüllendirilen RunId yeniden gelirse sonuç `AlreadyRewarded` olarak döner ve bakiye/istatistik
 değişmez.
 
 Game Over akışı journal-first ilerler:
@@ -90,20 +92,39 @@ başarısızsa receipt silinmez ve sonraki açılış yeniden dener. Ayrıntıl�
 `MetaRewardCalculator`, production katalogdaki `MetaRewardSettings` alanlarını tek saf formülde
 uygular. Varsayılan V1 tuning'i:
 
-- İlk `100` kill: `1 Soul/kill`.
-- `101..1000`: `0.25 Soul/kill`.
-- `1000` üstü: `0.05 Soul/kill`.
-- Ulaşılan her day: `10 Soul`.
-- Tamamlanan her gece (`max(0, day - 1)`): `25 Soul`.
-- Peak population: kişi başı `0.2 Soul`.
-- Yeni day rekoru: `day x 50 Soul`.
+- İlk `100` kill: `1 Ember/kill`.
+- `101..1000`: `0.25 Ember/kill`.
+- `1000` üstü: `0.05 Ember/kill`.
+- Ulaşılan her day: `10 Ember`.
+- Tamamlanan her gece (`max(0, day - 1)`): `25 Ember`.
+- Peak population: kişi başı `0.2 Ember`.
+- Yeni day rekoru: `day x 50 Ember`.
 
 Her bileşen ayrı ayrı aşağı yuvarlanır, toplam `int.MaxValue` değerinde saturate olur. Kill
 bandlarının ağırlığı ilerleyen bantta artamaz; bütün eşikler ve ağırlıklar production catalog
 validation'ından geçer. Böylece erken kill'ler anlaşılır kalırken 2K/10K stres sürüleri meta
 ekonomisini doğrusal olarak patlatmaz. Sonuç ve breakdown `MetaRunResult.Reward` üzerinden okunur.
 Aktif sahnedeki mevcut `SoulCounterUI`, kill sayisini Souls diye yeniden etiketlemez; ayni
-`GameManager.GetMetaRuntimeTelemetry()` quote'undan `DEATH +N SOULS` projected reward'unu gosterir.
+`GameManager.GetMetaRuntimeTelemetry()` quote'undan `ON DEATH +N EMBERS` projected reward'unu gösterir.
+
+## Presentation v2 ve temiz katalog migration'ı
+
+Meta economy presentation'ı `last_embers` stable kimliği, `LAST EMBERS / EMBERS` display adı,
+`last_embers_icon.png`, amber vurgu rengi ve şu ölüm ekranı diliyle katalogda tutulur:
+
+- `THE WALL HAS FALLEN`
+- `THE RUN ENDS HERE. WHAT REMAINS WILL STRENGTHEN THE NEXT STAND.`
+- `FORTIFY THE NEXT STAND`
+- `PERMANENT UPGRADES APPLY TO YOUR NEXT RUN.`
+- `BEGIN NEXT RUN`
+
+`Window > DeadWalls > Repair Meta Identity Presentation`, eski `SOULS`/ikonsuz presentation'ı
+v2'ye taşır. Migration yalnız `MetaUpgradeCatalogSO.Presentation` ve scene-owned Game Over
+sunumunu değiştirir; reward settings, 11 upgrade asset referansı, `meta_progress.json` içindeki
+`Souls`, `Upgrades`, `UnlockedPoolIds`, receipt'ler ve stable Id'ler korunur.
+
+Game Over paneli `1120 x 880` tek karttır. 11 upgrade Restart CTA'nin üzerine taşmaz; maskeli
+`ScrollRect`, `68px` açıklamalı satırlar ve kalıcı-bakiye/reward için iki icon binding'i kullanır.
 
 ## Upgrade kataloğu ve koşu başı uygulama
 
@@ -144,7 +165,7 @@ yüzdeleri sınırlı level taşır; node-pool unlock tam bir kez alınabilir.
 `Window > DeadWalls > Difficulty Tuner > Meta Runtime Contract`, reward ağırlıklarını katalogdan
 ve her definition'ın `BaseCost`, exponential growth, `MaxLevel` ve `ValuePerLevel` alanlarını
 doğrudan gerçek asset sahibinden düzenler. Ortak level preview'u next cost ve cumulative effect'i
-aynı `GetCost/GetTotalEffect` runtime formülleriyle gösterir. Play Mode aggregate telemetry Souls,
+aynı `GetCost/GetTotalEffect` runtime formülleriyle gösterir. Play Mode aggregate telemetry Last Embers,
 lifetime istatistikler, current death quote breakdown ve uygulanan Wall/production/Arrow/Essence
 meta katkılarını read-only sunar; `DifficultyProfileSO` içinde ikinci meta state oluşturulmaz.
 
@@ -186,7 +207,7 @@ Keystone lock veya result state'ine retroaktif yazamaz.
 - Run save ile meta save ayrı otoritelerdir. Meta state hiçbir zaman canlı koşunun phase/timer/combat snapshot'ını taşımaz.
 - Meta write `AtomicJsonFile` üzerinden temp + flush + replace sözleşmesiyle yapılır; durable
   sonuç alınmadan death receipt temizlenmez.
-- Meta satın alımı disk write başarısızsa Souls/seviye/pool unlock değişikliğini birlikte geri alır.
+- Meta satın alımı disk write başarısızsa legacy `Souls` bakiyesi/seviye/pool unlock değişikliğini birlikte geri alır.
 - Aktif koşuda, reward durable değilken veya meta persistence fail-closed iken satın alma yoktur.
 - Pause Restart gizlidir; yaşayan save varken Main Menu New Run açılamaz. Game Over Restart yeni
   koşudur ve gönüllü prestige/reset sayılmaz.
