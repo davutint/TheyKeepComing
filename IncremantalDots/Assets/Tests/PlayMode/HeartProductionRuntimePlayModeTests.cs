@@ -61,6 +61,10 @@ namespace DeadWalls.Tests
             VisualElement root = toolkit.GetComponent<UIDocument>().rootVisualElement;
             Assert.That(root.Q<VisualElement>("heartScreen"), Is.Not.Null);
             Assert.That(root.Q<VisualElement>("heartGraphContent"), Is.Not.Null);
+            Assert.That(root.Q<Button>("heartZoomOut"), Is.Not.Null);
+            Assert.That(root.Q<Label>("heartZoomValue"), Is.Not.Null);
+            Assert.That(root.Q<Button>("heartZoomIn"), Is.Not.Null);
+            Assert.That(root.Q<Button>("heartZoomReset"), Is.Not.Null);
             Assert.That(root.Q<VisualElement>(className: "heart-legend"), Is.Null);
             Assert.That(root.Q<Button>("heartQuantityTen"), Is.Null);
             Assert.That(root.Q<Button>("heartQuantityMax"), Is.Null);

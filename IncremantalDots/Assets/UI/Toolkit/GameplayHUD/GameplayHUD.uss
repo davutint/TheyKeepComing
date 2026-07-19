@@ -480,6 +480,13 @@
 .graph-content { position: absolute; left: 0; top: 0; width: 1600px; height: 900px; transform-origin: 0 0; }
 .heart-graph { overflow: visible; }
 .heart-connector-layer { position: absolute; left: 0; top: 0; width: 1480px; height: 820px; }
+.heart-zoom-controls { height: 40px; margin-right: 12px; padding: 3px; flex-direction: row; align-items: center; background-color: rgba(7,9,9,0.92); border-width: 1px; border-color: rgba(216,185,135,0.22); }
+.heart-zoom-button { width: 34px; height: 34px; min-width: 0; min-height: 0; margin: 0; padding: 0; border-width: 0; border-radius: 1px; background-color: rgba(255,255,255,0.035); color: rgba(236,231,217,0.82); font-size: 15px; -unity-font-style: bold; -unity-text-align: middle-center; }
+.heart-zoom-button:hover, .heart-zoom-button:focus { background-color: rgba(207,155,80,0.15); color: white; }
+.heart-zoom-button:active { background-color: rgba(207,155,80,0.24); }
+.heart-zoom-button:disabled { opacity: 0.30; }
+.heart-zoom-value { width: 48px; margin: 0; padding: 0; color: var(--runtime-muted); font-size: 9px; letter-spacing: 0.6px; -unity-font-style: bold; -unity-text-align: middle-center; }
+.heart-zoom-reset { width: 42px; margin-left: 3px; border-left-width: 1px; border-left-color: rgba(216,185,135,0.16); font-size: 8px; letter-spacing: 0.7px; }
 .graph-inspector { position: absolute; right: 30px; top: 116px; bottom: 28px; width: 336px; padding: 22px; background-color: rgba(17,19,18,0.98); border-width: 1px; border-color: var(--runtime-line); }
 .heart-inspector { border-top-width: 2px; border-top-color: rgba(207,155,80,0.55); }
 .heart-inspector-heading { flex-direction: row; align-items: center; padding-bottom: 18px; border-bottom-width: 1px; border-bottom-color: rgba(225,213,190,0.10); }
@@ -700,6 +707,10 @@
 .input--touch .ability-name { font-size: 12px; }.input--touch .ability-state { font-size: 9px; }
 .input--touch .compact-action, .input--touch .surface-close, .input--touch .tool-button { min-height: 50px; font-size: 11px; }
 .input--touch .purchase-card, .input--touch .upgrade-card { min-height: 96px; }
+.input--touch .heart-zoom-controls { height: 52px; padding: 3px; }
+.input--touch .heart-zoom-button { width: 46px; height: 46px; font-size: 17px; }
+.input--touch .heart-zoom-value { width: 54px; font-size: 10px; }
+.input--touch .heart-zoom-reset { width: 50px; font-size: 9px; }
 
 .is-compact .economy-cluster { left: 14px; top: 14px; transform-origin: 0 0; scale: 0.88 0.88; }
 .is-compact .threat-cluster { right: 14px; top: 14px; transform-origin: 100% 0; scale: 0.88 0.88; }

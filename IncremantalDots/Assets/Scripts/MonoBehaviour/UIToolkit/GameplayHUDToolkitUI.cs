@@ -677,6 +677,7 @@ namespace DeadWalls
             _hudLayer.style.display = DisplayStyle.Flex;
             if (closingSurface == SurfaceKind.Heart)
             {
+                CancelHeartNavigationGestures();
                 ResolveRuntimeOwners();
                 _onboardingLegacy?.NotifyHeartSurfaceClosedByPlayer();
             }

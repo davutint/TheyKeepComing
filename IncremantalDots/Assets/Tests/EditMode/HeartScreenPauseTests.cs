@@ -158,6 +158,40 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void CastleHeartNavigation_ClampsZoomToSupportedRange()
+        {
+            Assert.That(
+                HeartGraphNavigationUtility.ClampZoomMultiplier(0.1f),
+                Is.EqualTo(HeartGraphNavigationUtility.MinimumZoomMultiplier));
+            Assert.That(
+                HeartGraphNavigationUtility.ClampZoomMultiplier(5f),
+                Is.EqualTo(HeartGraphNavigationUtility.MaximumZoomMultiplier));
+            Assert.That(HeartGraphNavigationUtility.ClampZoomMultiplier(1.4f), Is.EqualTo(1.4f));
+        }
+
+        [Test]
+        public void CastleHeartNavigation_ZoomKeepsGraphPointUnderRequestedAnchor()
+        {
+            Vector2 currentOffset = new Vector2(125f, -35f);
+            Vector2 anchorBefore = new Vector2(420f, 260f);
+            Vector2 anchorAfter = new Vector2(445f, 275f);
+            const float currentScale = 0.8f;
+            const float nextScale = 1.35f;
+            Vector2 graphPoint = (anchorBefore - currentOffset) / currentScale;
+
+            Vector2 nextOffset = HeartGraphNavigationUtility.CalculateAnchoredOffset(
+                currentOffset,
+                currentScale,
+                nextScale,
+                anchorBefore,
+                anchorAfter);
+
+            Assert.That(
+                Vector2.Distance(nextOffset + graphPoint * nextScale, anchorAfter),
+                Is.LessThan(0.001f));
+        }
+
+        [Test]
         public void ArrowEconomy_HeartBonusesAffectRuntimeButNotPaidUpgradeLevels()
         {
             var tuning = MobileEconomyPriceTuningUtility.Default;

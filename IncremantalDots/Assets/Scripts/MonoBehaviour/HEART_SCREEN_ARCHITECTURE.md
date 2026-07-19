@@ -48,6 +48,18 @@ yanlışlıkla sızmasını engeller.
 - Satın alma `HeartPurchaseQuantity.One` ile canonical `HeartPurchaseService` kapısından geçer.
 - Yetersiz Essence veya runtime blocker inspector state ve toast ile açıklanır.
 
+### Graph navigation
+
+- İlk açılış ve `FIT`, yalnız görünür node bounds'unu viewport'a otomatik sığdırır.
+- PC'de mouse wheel imlecin altındaki graph noktasını koruyarak zoom yapar.
+- Touch cihazlarda iki parmak pinch hem zoom hem midpoint pan üretir.
+- Mouse veya tek parmak, yalnız boş graph alanından başladığında pan yapar; teknoloji node'u ve kontrol
+  butonları click/tap sahipliğini korur.
+- Header'daki `- / yüzde / + / FIT` kontrolü pointer ve touch için aynı işlevi sunar. Yüzde, otomatik
+  fit ölçeğine göre `65% - 225%` aralığını gösterir.
+- Pan sınırı görünür node bounds'unu tamamen kaybettirmez. Reveal veya responsive relayout sırasında
+  kullanıcı zoom/pan durumu korunur; graph yeniden açılırken gereksiz kamera sıçraması oluşmaz.
+
 ## Bağlantı ve reveal polish'i
 
 `HeartConnectorLayer`, Unity UI Toolkit `Painter2D` ile bağlantıları çizer:
@@ -76,7 +88,7 @@ yeniler:
 - Compact/touch: graph üstte, yatay inspector altta.
 - Görünür node bounds'u ve kullanılabilir viewport ayrı hesaplandığı için gizli depth'ler ilk
   açılış zoom'unu küçültmez.
-- Touch modunda mevcut ortak minimum buton/hit-area kuralları korunur.
+- Touch modunda zoom kontrolü `46px` butonlara büyür; mevcut ortak minimum hit-area kuralları korunur.
 
 ## Doğrulama
 
@@ -84,6 +96,7 @@ yeniler:
 - `HeartPurchasePipelineTests`: Grave Essence transaction, normal ağaç, bağımsız eski Keystone
   node'ları ve direct continuation.
 - `GameplayHUDToolkitContractTests`: ikinci tech surface yok, branch legend/bulk controls yok,
-  inspector contract'ları var ve 37 icon onaylı paketten geliyor.
+  inspector/navigation contract'ları var ve 37 icon onaylı paketten geliyor.
+- `HeartScreenPauseTests`: zoom clamp ve anchored zoom matematiği.
 - Canlı Game View kontrolünde ilk açılışta `5` visual node (root + 4), bir başlangıç teknolojisi
   araştırıldıktan sonra `6` visual node ölçülmüştür.

@@ -233,6 +233,12 @@
             <ui:VisualElement class="fullscreen-header">
                 <ui:VisualElement><ui:Label text="CASTLE HEART" class="fullscreen-title" /><ui:Label text="Research a path to reveal what follows." class="fullscreen-subtitle" /></ui:VisualElement>
                 <ui:VisualElement class="fullscreen-tools">
+                    <ui:VisualElement name="heartZoomControls" class="heart-zoom-controls">
+                        <ui:Button name="heartZoomOut" text="-" tooltip="Zoom out" class="heart-zoom-button" />
+                        <ui:Label name="heartZoomValue" text="100%" class="heart-zoom-value" />
+                        <ui:Button name="heartZoomIn" text="+" tooltip="Zoom in" class="heart-zoom-button" />
+                        <ui:Button name="heartZoomReset" text="FIT" tooltip="Fit the visible tree" class="heart-zoom-button heart-zoom-reset" />
+                    </ui:VisualElement>
                     <ui:VisualElement class="heart-essence"><ui:VisualElement class="dw-icon dw-icon--souls heart-essence-icon" picking-mode="Ignore" /><ui:Label name="graveEssenceValue" text="0 ESSENCE" class="currency-value" /></ui:VisualElement>
                     <ui:Button name="heartClose" text="RETURN TO BATTLE" class="surface-close" />
                 </ui:VisualElement>

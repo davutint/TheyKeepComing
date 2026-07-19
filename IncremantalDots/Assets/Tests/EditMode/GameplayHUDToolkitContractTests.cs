@@ -29,6 +29,10 @@ namespace DeadWalls.Tests
 
             Assert.That(root.Q<VisualElement>("heartViewport"), Is.Not.Null);
             Assert.That(root.Q<VisualElement>("heartGraphContent"), Is.Not.Null);
+            Assert.That(root.Q<Button>("heartZoomOut"), Is.Not.Null);
+            Assert.That(root.Q<Label>("heartZoomValue"), Is.Not.Null);
+            Assert.That(root.Q<Button>("heartZoomIn"), Is.Not.Null);
+            Assert.That(root.Q<Button>("heartZoomReset"), Is.Not.Null);
             Assert.That(root.Q<VisualElement>("heartInspectorIcon"), Is.Not.Null);
             Assert.That(root.Q<Label>("heartInspectorMeta"), Is.Not.Null);
             Assert.That(root.Q<Label>("heartInspectorStatus"), Is.Not.Null);

@@ -69,11 +69,38 @@ namespace DeadWalls
         }
     }
 
+    public static class HeartGraphNavigationUtility
+    {
+        public const float MinimumZoomMultiplier = 0.65f;
+        public const float MaximumZoomMultiplier = 2.25f;
+
+        public static float ClampZoomMultiplier(float multiplier)
+        {
+            return Mathf.Clamp(multiplier, MinimumZoomMultiplier, MaximumZoomMultiplier);
+        }
+
+        public static Vector2 CalculateAnchoredOffset(
+            Vector2 currentOffset,
+            float currentScale,
+            float nextScale,
+            Vector2 anchorBefore,
+            Vector2 anchorAfter)
+        {
+            if (currentScale <= 0.001f || nextScale <= 0.001f)
+                return currentOffset;
+
+            Vector2 graphPoint = (anchorBefore - currentOffset) / currentScale;
+            return anchorAfter - graphPoint * nextScale;
+        }
+    }
+
     public sealed partial class GameplayHUDToolkitUI
     {
         private const float HeartCanvasWidth = 1480f;
         private const float HeartCanvasHeight = 820f;
         private const float HeartRevealDuration = 0.34f;
+        private const float HeartZoomStep = 1.16f;
+        private const float HeartNavigationMargin = 36f;
 
         private VisualElement _heartViewport;
         private VisualElement _heartGraphContent;
@@ -86,14 +113,33 @@ namespace DeadWalls
         private Label _heartInspectorStatus;
         private Label _heartInspectorCost;
         private Button _heartPurchaseButton;
+        private Button _heartZoomOutButton;
+        private Button _heartZoomResetButton;
+        private Button _heartZoomInButton;
+        private Label _heartZoomValue;
         private HeartGraphNodePresentation _selectedHeartNode;
         private HeartGraphPresentation _heartPresentation;
         private readonly Dictionary<string, Button> _heartNodeButtons = new Dictionary<string, Button>();
         private readonly Dictionary<string, Vector2> _heartNodeCenters = new Dictionary<string, Vector2>();
         private readonly HashSet<string> _heartPendingRevealNodeIds = new HashSet<string>(StringComparer.Ordinal);
         private readonly List<IVisualElementScheduledItem> _heartScheduledItems = new List<IVisualElementScheduledItem>();
+        private readonly Dictionary<int, Vector2> _heartTouchPointers = new Dictionary<int, Vector2>();
         private int _heartGraphSignature;
         private AudioSource _heartAudioSource;
+        private float _heartFitScale = 1f;
+        private float _heartZoomMultiplier = 1f;
+        private Vector2 _heartPanOffset;
+        private Vector2 _heartAppliedOffset;
+        private Vector2 _heartVisibleBoundsMin;
+        private Vector2 _heartVisibleBoundsMax;
+        private bool _heartLayoutReady;
+        private bool _heartDragging;
+        private int _heartDragPointer = -1;
+        private Vector2 _heartDragStart;
+        private Vector2 _heartPanStart;
+        private bool _heartPinching;
+        private float _heartPinchDistance;
+        private Vector2 _heartPinchMidpoint;
 
         private void BindCastleHeartActions()
         {
@@ -109,6 +155,21 @@ namespace DeadWalls
             _heartInspectorCost = Q<Label>("heartInspectorCost");
             _heartPurchaseButton = Q<Button>("heartPurchase");
             _heartPurchaseButton.clicked += PurchaseSelectedHeartNode;
+            _heartZoomOutButton = Q<Button>("heartZoomOut");
+            _heartZoomResetButton = Q<Button>("heartZoomReset");
+            _heartZoomInButton = Q<Button>("heartZoomIn");
+            _heartZoomValue = Q<Label>("heartZoomValue");
+
+            _heartZoomOutButton.clicked += () => ZoomHeartGraphBy(1f / HeartZoomStep);
+            _heartZoomResetButton.clicked += ResetHeartGraphView;
+            _heartZoomInButton.clicked += () => ZoomHeartGraphBy(HeartZoomStep);
+
+            _heartViewport.RegisterCallback<WheelEvent>(OnHeartWheel);
+            _heartViewport.RegisterCallback<PointerDownEvent>(OnHeartPointerDown, TrickleDown.TrickleDown);
+            _heartViewport.RegisterCallback<PointerMoveEvent>(OnHeartPointerMove, TrickleDown.TrickleDown);
+            _heartViewport.RegisterCallback<PointerUpEvent>(OnHeartPointerUp, TrickleDown.TrickleDown);
+            _heartViewport.RegisterCallback<PointerCancelEvent>(OnHeartPointerCancel, TrickleDown.TrickleDown);
+            UpdateHeartZoomControls();
         }
 
         private void RebuildHeartGraph(bool force)
@@ -574,6 +635,217 @@ namespace DeadWalls
             _heartScheduledItems.Clear();
         }
 
+        private void OnHeartWheel(WheelEvent evt)
+        {
+            if (Mathf.Approximately(evt.delta.y, 0f))
+                return;
+
+            Vector2 anchor = _heartViewport.WorldToLocal(evt.mousePosition);
+            float factor = evt.delta.y > 0f ? 1f / HeartZoomStep : HeartZoomStep;
+            SetHeartZoom(_heartZoomMultiplier * factor, anchor, anchor);
+            evt.StopPropagation();
+        }
+
+        private void ZoomHeartGraphBy(float factor)
+        {
+            if (!_heartLayoutReady)
+                return;
+
+            Vector2 anchor = GetHeartViewportCenter();
+            SetHeartZoom(_heartZoomMultiplier * factor, anchor, anchor);
+        }
+
+        private void ResetHeartGraphView()
+        {
+            _heartZoomMultiplier = 1f;
+            _heartPanOffset = Vector2.zero;
+            ApplyHeartGraphTransform();
+        }
+
+        private void SetHeartZoom(float multiplier, Vector2 anchorBefore, Vector2 anchorAfter)
+        {
+            if (!_heartLayoutReady)
+                return;
+
+            float nextMultiplier = HeartGraphNavigationUtility.ClampZoomMultiplier(multiplier);
+            float currentScale = _heartFitScale * _heartZoomMultiplier;
+            float nextScale = _heartFitScale * nextMultiplier;
+            Vector2 nextOffset = HeartGraphNavigationUtility.CalculateAnchoredOffset(
+                _heartAppliedOffset,
+                currentScale,
+                nextScale,
+                anchorBefore,
+                anchorAfter);
+
+            _heartZoomMultiplier = nextMultiplier;
+            _heartPanOffset = nextOffset - GetHeartCenteredOffset(nextScale);
+            ApplyHeartGraphTransform();
+        }
+
+        private void OnHeartPointerDown(PointerDownEvent evt)
+        {
+            Vector2 localPosition = _heartViewport.WorldToLocal(
+                new Vector2(evt.position.x, evt.position.y));
+            bool isTouch = string.Equals(
+                evt.pointerType,
+                UnityEngine.UIElements.PointerType.touch,
+                StringComparison.Ordinal);
+            if (isTouch)
+            {
+                _heartTouchPointers[evt.pointerId] = localPosition;
+                if (_heartTouchPointers.Count >= 2)
+                {
+                    BeginHeartPinch();
+                    evt.StopPropagation();
+                    return;
+                }
+            }
+
+            if ((evt.button != 0 && evt.button != 2)
+                || IsInsideButton(evt.target as VisualElement, _heartViewport))
+            {
+                return;
+            }
+
+            _heartDragging = true;
+            _heartDragPointer = evt.pointerId;
+            _heartDragStart = new Vector2(evt.position.x, evt.position.y);
+            _heartPanStart = _heartPanOffset;
+            _heartViewport.CapturePointer(evt.pointerId);
+            evt.StopPropagation();
+        }
+
+        private void OnHeartPointerMove(PointerMoveEvent evt)
+        {
+            bool isTouch = string.Equals(
+                evt.pointerType,
+                UnityEngine.UIElements.PointerType.touch,
+                StringComparison.Ordinal);
+            if (isTouch && _heartTouchPointers.ContainsKey(evt.pointerId))
+            {
+                _heartTouchPointers[evt.pointerId] = _heartViewport.WorldToLocal(
+                    new Vector2(evt.position.x, evt.position.y));
+                if (_heartPinching && TryGetHeartPinchPoints(out Vector2 first, out Vector2 second))
+                {
+                    float distance = Vector2.Distance(first, second);
+                    Vector2 midpoint = (first + second) * 0.5f;
+                    if (_heartPinchDistance > 1f && distance > 1f)
+                    {
+                        float ratio = distance / _heartPinchDistance;
+                        SetHeartZoom(
+                            _heartZoomMultiplier * ratio,
+                            _heartPinchMidpoint,
+                            midpoint);
+                    }
+                    _heartPinchDistance = distance;
+                    _heartPinchMidpoint = midpoint;
+                    evt.StopPropagation();
+                    return;
+                }
+            }
+
+            if (!_heartDragging || evt.pointerId != _heartDragPointer)
+                return;
+
+            Vector2 pointer = new Vector2(evt.position.x, evt.position.y);
+            _heartPanOffset = _heartPanStart + pointer - _heartDragStart;
+            ApplyHeartGraphTransform();
+            evt.StopPropagation();
+        }
+
+        private void OnHeartPointerUp(PointerUpEvent evt)
+        {
+            bool handled = _heartPinching || (_heartDragging && evt.pointerId == _heartDragPointer);
+            EndHeartDrag(evt.pointerId);
+            if (string.Equals(
+                    evt.pointerType,
+                    UnityEngine.UIElements.PointerType.touch,
+                    StringComparison.Ordinal))
+            {
+                _heartTouchPointers.Remove(evt.pointerId);
+                if (_heartTouchPointers.Count < 2)
+                    EndHeartPinch();
+            }
+
+            if (handled)
+                evt.StopPropagation();
+        }
+
+        private void OnHeartPointerCancel(PointerCancelEvent evt)
+        {
+            EndHeartDrag(evt.pointerId);
+            _heartTouchPointers.Remove(evt.pointerId);
+            if (_heartTouchPointers.Count < 2)
+                EndHeartPinch();
+        }
+
+        private void BeginHeartPinch()
+        {
+            EndHeartDrag(_heartDragPointer);
+            if (!TryGetHeartPinchPoints(out Vector2 first, out Vector2 second))
+                return;
+
+            _heartPinching = true;
+            _heartPinchDistance = Vector2.Distance(first, second);
+            _heartPinchMidpoint = (first + second) * 0.5f;
+            foreach (int pointerId in _heartTouchPointers.Keys)
+            {
+                if (!_heartViewport.HasPointerCapture(pointerId))
+                    _heartViewport.CapturePointer(pointerId);
+            }
+        }
+
+        private void EndHeartPinch()
+        {
+            if (!_heartPinching)
+                return;
+
+            _heartPinching = false;
+            _heartPinchDistance = 0f;
+            foreach (int pointerId in _heartTouchPointers.Keys)
+            {
+                if (_heartViewport.HasPointerCapture(pointerId))
+                    _heartViewport.ReleasePointer(pointerId);
+            }
+        }
+
+        private void EndHeartDrag(int pointerId)
+        {
+            if (!_heartDragging || pointerId != _heartDragPointer)
+                return;
+
+            if (_heartViewport.HasPointerCapture(pointerId))
+                _heartViewport.ReleasePointer(pointerId);
+            _heartDragging = false;
+            _heartDragPointer = -1;
+        }
+
+        private void CancelHeartNavigationGestures()
+        {
+            EndHeartDrag(_heartDragPointer);
+            EndHeartPinch();
+            _heartTouchPointers.Clear();
+        }
+
+        private bool TryGetHeartPinchPoints(out Vector2 first, out Vector2 second)
+        {
+            first = Vector2.zero;
+            second = Vector2.zero;
+            int index = 0;
+            foreach (Vector2 point in _heartTouchPointers.Values)
+            {
+                if (index == 0)
+                    first = point;
+                else if (index == 1)
+                {
+                    second = point;
+                    return true;
+                }
+                index++;
+            }
+            return false;
+        }
+
         private void RelayoutHeartGraph()
         {
             if (_heartViewport == null || _heartGraphContent == null)
@@ -598,13 +870,95 @@ namespace DeadWalls
 
             float visibleWidth = maxX - minX + 210f;
             float visibleHeight = maxY - minY + 190f;
-            float scale = Mathf.Min(viewportWidth / visibleWidth, viewportHeight / visibleHeight);
-            scale = Mathf.Clamp(scale, 0.48f, 1.22f);
-            float visibleCenterX = (minX + maxX) * 0.5f;
-            float visibleCenterY = (minY + maxY) * 0.5f;
+            _heartFitScale = Mathf.Min(viewportWidth / visibleWidth, viewportHeight / visibleHeight);
+            _heartFitScale = Mathf.Clamp(_heartFitScale, 0.48f, 1.22f);
+            _heartVisibleBoundsMin = new Vector2(minX - 105f, minY - 95f);
+            _heartVisibleBoundsMax = new Vector2(maxX + 105f, maxY + 95f);
+            _heartLayoutReady = true;
+            ApplyHeartGraphTransform();
+        }
+
+        private void ApplyHeartGraphTransform()
+        {
+            if (!_heartLayoutReady || _heartViewport == null || _heartGraphContent == null)
+                return;
+
+            float scale = _heartFitScale * _heartZoomMultiplier;
+            Vector2 offset = GetHeartCenteredOffset(scale) + _heartPanOffset;
+            offset = ClampHeartGraphOffset(offset, scale);
+            _heartPanOffset = offset - GetHeartCenteredOffset(scale);
+            _heartAppliedOffset = offset;
+
             _heartGraphContent.style.scale = new Scale(new Vector3(scale, scale, 1f));
-            _heartGraphContent.style.left = viewportWidth * 0.5f - visibleCenterX * scale;
-            _heartGraphContent.style.top = viewportHeight * 0.5f - visibleCenterY * scale;
+            _heartGraphContent.style.left = offset.x;
+            _heartGraphContent.style.top = offset.y;
+            UpdateHeartZoomControls();
+        }
+
+        private Vector2 GetHeartCenteredOffset(float scale)
+        {
+            Vector2 viewportSize = new Vector2(
+                _heartViewport.resolvedStyle.width,
+                _heartViewport.resolvedStyle.height);
+            Vector2 visibleCenter = (_heartVisibleBoundsMin + _heartVisibleBoundsMax) * 0.5f;
+            return viewportSize * 0.5f - visibleCenter * scale;
+        }
+
+        private Vector2 ClampHeartGraphOffset(Vector2 offset, float scale)
+        {
+            float viewportWidth = _heartViewport.resolvedStyle.width;
+            float viewportHeight = _heartViewport.resolvedStyle.height;
+            float scaledWidth = (_heartVisibleBoundsMax.x - _heartVisibleBoundsMin.x) * scale;
+            float scaledHeight = (_heartVisibleBoundsMax.y - _heartVisibleBoundsMin.y) * scale;
+
+            offset.x = ClampHeartAxis(
+                offset.x,
+                viewportWidth,
+                scaledWidth,
+                _heartVisibleBoundsMin.x * scale,
+                _heartVisibleBoundsMax.x * scale);
+            offset.y = ClampHeartAxis(
+                offset.y,
+                viewportHeight,
+                scaledHeight,
+                _heartVisibleBoundsMin.y * scale,
+                _heartVisibleBoundsMax.y * scale);
+            return offset;
+        }
+
+        private static float ClampHeartAxis(
+            float offset,
+            float viewportSize,
+            float scaledContentSize,
+            float scaledMinimum,
+            float scaledMaximum)
+        {
+            float centered = viewportSize * 0.5f - (scaledMinimum + scaledMaximum) * 0.5f;
+            if (scaledContentSize <= viewportSize - HeartNavigationMargin * 2f)
+                return centered;
+
+            float minimumOffset = HeartNavigationMargin - scaledMaximum;
+            float maximumOffset = viewportSize - HeartNavigationMargin - scaledMinimum;
+            if (minimumOffset > maximumOffset)
+                return centered;
+            return Mathf.Clamp(offset, minimumOffset, maximumOffset);
+        }
+
+        private Vector2 GetHeartViewportCenter()
+        {
+            return new Vector2(
+                _heartViewport.resolvedStyle.width * 0.5f,
+                _heartViewport.resolvedStyle.height * 0.5f);
+        }
+
+        private void UpdateHeartZoomControls()
+        {
+            if (_heartZoomValue != null)
+                _heartZoomValue.text = $"{Mathf.RoundToInt(_heartZoomMultiplier * 100f)}%";
+            _heartZoomOutButton?.SetEnabled(
+                _heartZoomMultiplier > HeartGraphNavigationUtility.MinimumZoomMultiplier + 0.001f);
+            _heartZoomInButton?.SetEnabled(
+                _heartZoomMultiplier < HeartGraphNavigationUtility.MaximumZoomMultiplier - 0.001f);
         }
 
         private sealed class HeartConnection

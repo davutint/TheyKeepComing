@@ -206,6 +206,7 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - [x] Noktalı-eğrisel bağlantı parent'tan child'a büyüyor; child icon opacity/scale ile ve çoklu child durumunda stagger ile beliriyor.
 - [x] Bütün 37 node görsel incelemeyle seçilmiş `RPG Icons Pixel Art` sprite'larına bağlandı; future catalog rebuild aynı map'i koruyor.
 - [x] PC right-inspector ve compact/touch bottom-inspector canlı Game View'da doğrulandı; simulation akmaya devam ediyor.
+- [x] Graph navigation; PC mouse-wheel, mobile pinch, boş alandan pan ve ortak `- / yüzde / + / FIT` kontrolleriyle görünür bounds güvenli biçimde yakınlaştırılıp uzaklaştırılabiliyor.
 - [x] Player-facing akış yalnız `RESEARCH / UPGRADE / RESEARCHED` kullanıyor; branch etiketi, `+10/MAX` ve eski Keystone jargon/lock davranışı yok.
 - [x] Targeted EditMode `32/32` ve PlayMode `2/2` geçti; Unity compilation ve Console hata vermedi; canlı başlangıç/purchase visual node ölçümü `5 -> 6` oldu.
 
@@ -340,3 +341,13 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - Owner yenilenen tam ağaç görünümünü canlı oyunda onayladı.
 - Targeted EditMode `23/23` ve PlayMode `4/4` geçti; Unity compilation, final Console ve `git diff --check` temiz kaldı.
 - Bu revizyon tamamlanmış P7 kapsamının polish devamıdır; ana görev paydası ve statüleri değişmedi. İlerleme `8/10 - %80`, P9 ve P10 açık.
+
+### 2026-07-19 - Castle Heart zoom ve pan navigation polish'i
+
+- İlk açılıştaki görünür-node auto-fit davranışı korunarak `65% - 225%` zoom aralığı eklendi.
+- PC mouse-wheel imleç altındaki graph noktasını korur; touch input iki parmak pinch/midpoint pan kullanır.
+- Mouse veya tek parmak yalnız boş graph alanından pan başlatır; node click/tap sahipliği değişmedi.
+- Header'a minimal `- / yüzde / + / FIT` kontrolü eklendi; touch modunda hit-area büyür ve kontroller graph node'larının üstünü kapatmaz.
+- Görünür bounds tabanlı clamp, pan/zoom sırasında ağacın tamamen kaybolmasını engeller; reveal ve responsive relayout kullanıcı görünümünü korur.
+- Targeted EditMode `19/19`, PlayMode `2/2`, canlı `100% -> 156% -> 100%` Game View kontrolü, Unity compilation ve final Console temiz geçti.
+- Bu çalışma tamamlanmış P7 kapsamının navigation polish devamıdır; ana görev paydası ve statüleri değişmedi. İlerleme `8/10 - %80`, P9 ve P10 açık.
