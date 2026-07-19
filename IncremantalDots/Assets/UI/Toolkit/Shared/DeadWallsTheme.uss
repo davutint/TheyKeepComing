@@ -1,0 +1,141 @@
+:root {
+    --dw-ink: rgb(235, 226, 204);
+    --dw-ink-muted: rgba(213, 201, 176, 0.70);
+    --dw-ink-dim: rgba(196, 182, 155, 0.48);
+    --dw-bronze: rgb(193, 137, 66);
+    --dw-bronze-bright: rgb(236, 184, 91);
+    --dw-bronze-dark: rgb(101, 65, 31);
+    --dw-ember: rgb(177, 68, 42);
+    --dw-night: rgb(14, 15, 17);
+    --dw-panel: rgba(18, 18, 17, 0.94);
+    --dw-panel-soft: rgba(24, 23, 20, 0.86);
+    --dw-line: rgba(195, 144, 76, 0.32);
+    --dw-line-soft: rgba(225, 205, 169, 0.12);
+    --dw-danger: rgb(194, 75, 52);
+    --dw-success: rgb(124, 166, 100);
+}
+
+.dw-screen {
+    color: var(--dw-ink);
+    font-size: 16px;
+}
+
+.dw-eyebrow {
+    color: var(--dw-bronze-bright);
+    font-size: 12px;
+    letter-spacing: 3px;
+    -unity-font-style: bold;
+}
+
+.dw-rule {
+    height: 1px;
+    background-color: var(--dw-line);
+}
+
+.dw-button {
+    min-height: 56px;
+    margin: 0 0 12px 0;
+    padding: 0 22px;
+    border-width: 1px;
+    border-color: var(--dw-line);
+    border-radius: 3px;
+    background-color: rgba(39, 37, 31, 0.88);
+    color: var(--dw-ink);
+    font-size: 15px;
+    letter-spacing: 1.8px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-left;
+    transition-property: background-color, border-color, color, translate;
+    transition-duration: 0.12s;
+    transition-timing-function: ease-out;
+}
+
+.dw-button:hover {
+    background-color: rgba(62, 53, 39, 0.96);
+    border-color: var(--dw-bronze-bright);
+    color: rgb(255, 245, 220);
+    translate: 3px 0;
+}
+
+.dw-button:active {
+    background-color: rgba(29, 28, 25, 0.98);
+    border-color: var(--dw-bronze-dark);
+    translate: 1px 1px;
+}
+
+.dw-button:focus {
+    border-width: 2px;
+    border-color: var(--dw-bronze-bright);
+    background-color: rgba(66, 55, 38, 0.98);
+    color: white;
+}
+
+.dw-button--primary {
+    min-height: 66px;
+    border-color: rgb(207, 151, 73);
+    background-color: rgb(122, 71, 37);
+    color: rgb(255, 242, 210);
+    font-size: 17px;
+}
+
+.dw-button--primary:hover,
+.dw-button--primary:focus {
+    background-color: rgb(157, 91, 43);
+    border-color: rgb(246, 198, 108);
+}
+
+.dw-button--quiet {
+    min-height: 48px;
+    background-color: rgba(22, 22, 20, 0.72);
+    color: var(--dw-ink-muted);
+}
+
+.dw-button--danger {
+    border-color: rgba(194, 75, 52, 0.55);
+    color: rgb(234, 177, 159);
+}
+
+.dw-slider {
+    height: 42px;
+    margin-top: 4px;
+}
+
+.dw-slider .unity-base-slider__tracker {
+    height: 5px;
+    border-radius: 3px;
+    background-color: rgba(230, 214, 183, 0.16);
+}
+
+.dw-slider .unity-base-slider__dragger {
+    width: 18px;
+    height: 18px;
+    border-width: 2px;
+    border-color: rgb(76, 48, 24);
+    border-radius: 9px;
+    background-color: var(--dw-bronze-bright);
+}
+
+.dw-slider:focus .unity-base-slider__dragger {
+    border-color: white;
+    background-color: rgb(255, 205, 112);
+}
+
+.input--touch .dw-button {
+    min-height: 64px;
+    font-size: 17px;
+}
+
+.input--touch .dw-button--primary {
+    min-height: 74px;
+}
+
+.input--touch .dw-slider {
+    height: 52px;
+}
+
+.input--touch .dw-slider .unity-base-slider__dragger {
+    width: 26px;
+    height: 26px;
+    border-radius: 13px;
+}
+

@@ -4,7 +4,7 @@
 
 1. `Assets/Scenes/NewGameScene.unity` sahnesini aç.
 2. Play Mode'a gir.
-3. Sağ üstteki `DEVELOPMENT TESTS` panelinde `UNLOCK TEST COMBAT + FREE BUY` seç.
+3. `F10` ile `DEVELOPMENT TESTS` panelini aç ve `UNLOCK TEST COMBAT + FREE BUY` seç.
 4. Alt ability barında Fireball'ın açık ve cooldown'un hazır olduğunu doğrula.
 5. `SPAWN 2K`, `SPAWN 5K` veya `SPAWN 10K` ile önceki hordenin yerine exact test
    hordesini anında kur.

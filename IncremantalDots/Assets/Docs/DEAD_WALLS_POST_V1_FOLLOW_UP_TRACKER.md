@@ -2,11 +2,11 @@
 
 > **Amaç:** V1 kapsamı tamamlandıktan sonra yapılacak mantık düzeltmelerini, oyuncuya görünen geri bildirimleri, UI/UX yeniden çalışmalarını, polish işlerini ve performans optimizasyonlarını tek otoriter takip belgesinde yürütmek.
 >
-> **Tracker sürümü:** 1.1  
-> **Oluşturulma tarihi:** 2026-07-18  
-> **Aktif paket:** P3 - Tüm Oyuncu UI/UX Denetimi  
-> **Aktif iş:** Oyuncunun gördüğü UI yüzeylerinin envanteri ve zamanı gelmiş referans araştırması  
-> **İlerleme:** `2 / 10` ana görev tamamlandı - `%20`
+> **Tracker sürümü:** 1.2
+> **Oluşturulma tarihi:** 2026-07-18
+> **Aktif paket:** P9 - Performans Profilleme ve Optimizasyon
+> **Aktif iş:** Hedef donanım ve ölçüm senaryolarının owner ile kesinleştirilmesi
+> **İlerleme:** `8 / 10` ana görev tamamlandı - `%80`
 
 ---
 
@@ -78,12 +78,12 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 |---:|---|---|:---:|---|
 | 1 | `DW-P1-LOGIC` | Mantık hatalarının tespiti ve düzeltilmesi | `[x]` | Owner bilinen mantık sorunu olmadığını kesinleştirdi; başlangıç regresyonu temiz |
 | 2 | `DW-P2-COMBAT-FEEDBACK` | Skeleton Soul ve düşman hasar geri bildirimleri | `[x]` | Kilitli davranışlar uygulandı; event doğruluğu ve tam regresyon geçti |
-| 3 | `DW-P3-UIUX-AUDIT` | Oyuncunun gördüğü bütün UI/UX yüzeylerinin uzman denetimi | `[?]` | Mevcut yüzey envanteri, zamanı gelince yapılacak referans araştırması ve onaylı yeniden çalışma planı tamamlandı |
-| 4 | `DW-P4-WORKERS` | Worker dağıtım arayüzünün yeniden çalışılması | `[?]` | Kontrol modeli owner ile kararlaştırıldı; yeni layout uygulanıp doğrulandı |
-| 5 | `DW-P5-ARROWS` | Arrow Supply arayüzünün yeniden çalışılması | `[?]` | Satın alma ve upgrade bilgi mimarisi kararlaştırıldı; yeni layout uygulanıp doğrulandı |
-| 6 | `DW-P6-TECH-TREE` | Teknoloji ağacının görsel ve kullanılabilirlik yeniden çalışması | `[?]` | Okunabilir graph, gezinme, node durumları ve görsel hiyerarşi onaylandı |
-| 7 | `DW-P7-CASTLE-HEART` | Castle Heart'ın ayrı kapsamda yeniden değerlendirilmesi | `[?]` | Ürün rolü, etkileşimleri ve sunumu ayrı kararlarla uygulanıp doğrulandı |
-| 8 | `DW-P8-UI-POLISH` | Genel UI efektleri, animasyonları ve etkileşim polish'i | `[?]` | Onaylı oyuncu eylemleri tutarlı görsel geri bildirim aldı; gereksiz veya eksik hareket kalmadı |
+| 3 | `DW-P3-UIUX-AUDIT` | Oyuncunun gördüğü bütün UI/UX yüzeylerinin uzman denetimi | `[x]` | Yüzey envanteri, bilimsel referans araştırması, karar PDF'i ve UI Toolkit uygulama planı tamamlandı |
+| 4 | `DW-P4-WORKERS` | Worker dağıtım arayüzünün yeniden çalışılması | `[x]` | Oran, mevcut durum, üretim etkisi, maliyet ve blocker hiyerarşisi uygulanıp doğrulandı |
+| 5 | `DW-P5-ARROWS` | Arrow Supply arayüzünün yeniden çalışılması | `[x]` | Stok, tüketim, refill paketleri ve kapasite/verimlilik bilgi mimarisi uygulanıp doğrulandı |
+| 6 | `DW-P6-TECH-TREE` | Teknoloji ağacının görsel ve kullanılabilirlik yeniden çalışması | `[x]` | Dynamic prerequisite graph, node durumları, pan/zoom/center ve inspector doğrulandı |
+| 7 | `DW-P7-CASTLE-HEART` | Castle Heart'ın ayrı kapsamda yeniden değerlendirilmesi | `[x]` | Ayrı ürün rolü, hidden-safe graph, satın alma akışı ve devam eden simulation doğrulandı |
+| 8 | `DW-P8-UI-POLISH` | Genel UI efektleri, animasyonları ve etkileşim polish'i | `[x]` | Durum odaklı hareket, input uyarlaması, feedback katmanları ve modal tutarlılığı doğrulandı |
 | 9 | `DW-P9-PERFORMANCE` | Performans profilleme ve optimizasyon | `[?]` | Ölçülmüş darboğazlar davranış bozulmadan giderildi ve hedef senaryolarda yeniden ölçüldü |
 | 10 | `DW-P10-FINAL-GATE` | Son kalite, tutarlılık ve regresyon kapısı | `[?]` | Bütün aktif kapsam birlikte test edildi; açık kritik hata ve doğrulanmamış ana görev kalmadı |
 
@@ -135,58 +135,80 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 ### `DW-P3-UIUX-AUDIT` - Tüm Oyuncu UI/UX Denetimi
 
 **Paket başlığı:** `DW-P3-UIUX-AUDIT: Player-Facing UI/UX Audit`  
-**Durum:** `[?]` Aktif sıradaki görev; araştırma henüz başlatılmadı.
+**Durum:** `[x]` Araştırma, karar sistemi, tam UI Toolkit uygulaması ve regresyon doğrulaması tamamlandı.
 
-- [?] Oyuncunun görebildiği bütün UI yüzeyleri envanterlenecek.
-- [?] Her yüzey amaç, sıklık, önem, ekran konumu ve etkileşim maliyeti açısından değerlendirilecek.
-- [?] Benzer oyunlar ve başarılı PC UI/UX örnekleri bu aşamada araştırılacak.
-- [?] Dead Walls için tek bir onaylı UI/UX yönü çıkarılacak.
-- [?] Global kurallar ile yüzeye özel yeniden çalışma maddeleri ayrıştırılacak.
+- [x] Oyuncunun görebildiği bütün UI yüzeyleri envanterlendi.
+- [x] Her yüzey amaç, sıklık, önem, ekran konumu ve etkileşim maliyeti açısından değerlendirildi.
+- [x] Benzer oyunlar ile başarılı PC/mobile UI/UX örnekleri araştırıldı.
+- [x] Dead Walls için minimal, okunabilir ve bilgi öncelikli UI Toolkit yönü owner tarafından onaylandı.
+- [x] Bilimsel yöntem, karşılaştırmalı sentez, bilgi mimarisi, erişilebilirlik ve runtime kararları `DEAD_WALLS_UI_UX_DECISION_SYSTEM.pdf` içinde kalıcılaştırıldı.
+
+#### Onaylı global yön
+
+- [x] Oyuncunun gördüğü bütün UI yüzeyleri UI Toolkit'e geçirildi; legacy UGUI yalnız davranış/veri köprüsü olarak tutuldu.
+- [x] PC ve mobile aynı sürümde desteklenecek; kontrol sunumu aktif cihaza göre otomatik uyarlanacak.
+- [x] Referans çalışma çözünürlüğü `1920x1080`; bütün player-facing metin ilk sürümde İngilizce.
+- [x] Fullscreen yönetim yüzeyleri açıkken simülasyon akmaya devam edecek.
+- [x] Görsel dil minimal, yüksek okunabilirlikli ve dekoratif hareketten arındırılmış olacak; animasyon yalnızca durum veya bilgi değişimini anlatacak.
+- [x] Technology Tree son ayrı UI rework yüzeyi olarak tamamlandı.
+
+#### Yüzey uygulama kaydı
+
+- [x] Main Menu UI Toolkit'e geçirildi; legacy Canvas render sahibi olmaktan çıkarıldı.
+- [x] Main Menu'de yalnızca `CONTINUE/NEW GAME` save durumuna göre gösteriliyor ve `SETTINGS` akışı korunuyor.
+- [x] Başlık çizgisi, buton yan çizgileri, day etiketi, input ipucu ve version etiketi kaldırıldı.
+- [x] Main Menu'nün tek sürekli hareketi `22s DAY / 8s DUSK / 22s NIGHT / 8s DAWN` arka plan döngüsü.
+- [x] Main Menu Unity compile, Console ve Play Mode görsel ağacında doğrulandı; owner tarafından onaylandı.
+- [x] Persistent HUD, Economy, Barracks, Arrow Supply, Castle Heart, War Doctrine, Council, Level Up, Pause, Settings ve Game Over/Meta Shop UI Toolkit ile sıfırdan kuruldu.
+- [x] `1920x1080` ana yüzey QA'sı ve `1280x720` touch-mode uyarlaması canlı Play Mode'da incelendi.
+- [x] Unity compile/Console temiz; EditMode `420/420`, PlayMode `91 pass + 2 explicit skip` geçti.
 
 ### `DW-P4-WORKERS` - Worker Dağıtım Arayüzü
 
-**Durum:** `[?]` Kontrol modeli ve layout owner ile henüz kararlaştırılmadı.
+**Durum:** `[x]` Economy drawer ve worker dağıtım akışı UI Toolkit ile yeniden kuruldu.
 
-- [?] Oyuncunun işçi dağıtırken görmesi gereken bilgiler belirlenecek.
-- [?] Dağıtım işleminin kontrol modeli birlikte kararlaştırılacak.
-- [?] Capacity ve Efficiency gibi farklı karar türlerinin konumu kararlaştırılacak.
-- [?] Onaylı layout uygulandıktan sonra okunabilirlik ve işlem sayısı doğrulanacak.
+- [x] Kaynak bakiyesi, üretim oranı, çalışan oranı ve mevcut/target dağılım aynı karar satırında okunur.
+- [x] Artırma/azaltma kontrolleri pointer, gamepad ve touch sunumuna uyarlanır.
+- [x] Eylem maliyeti, beklenen sonuç ve blocker nedeni eylemden önce gösterilir.
+- [x] Live runtime data ile okunabilirlik ve işlem akışı doğrulandı.
 
 ### `DW-P5-ARROWS` - Arrow Supply Arayüzü
 
-**Durum:** `[?]` Satın alma ve upgrade bilgi mimarisi owner ile henüz kararlaştırılmadı.
+**Durum:** `[x]` Arrow Supply drawer UI Toolkit ile yeniden kuruldu.
 
-- [?] Oyuncunun Arrow stoğu için ihtiyaç duyduğu bilgiler belirlenecek.
-- [?] Anlık satın alma seçeneklerinin gerekli kapsamı kararlaştırılacak.
-- [?] Capacity ve Efficiency upgrade sunumu ayrıca kararlaştırılacak.
-- [?] Onaylı layout uygulandıktan sonra okunabilirlik ve işlem akışı doğrulanacak.
+- [x] Mevcut stok, kapasite ve savaş tüketim baskısı üst hiyerarşide gösterilir.
+- [x] Refill paketleri cost/result/blocker kontratıyla sunulur.
+- [x] Capacity ve Efficiency kararları anlık satın alma seçeneklerinden ayrıştırıldı.
+- [x] Live satın alma davranışı ve görsel durumları doğrulandı.
 
 ### `DW-P6-TECH-TREE` - Teknoloji Ağacı
 
-**Durum:** `[?]` Görsel ve etkileşim yönü owner ile henüz kararlaştırılmadı.
+**Durum:** `[x]` War Doctrine teknoloji ağacı UI Toolkit ile sıfırdan yeniden kuruldu.
 
-- [?] Mevcut graph'ın okunabilirlik ve kullanılabilirlik sorunları görev aktif olduğunda çıkarılacak.
-- [?] Node hiyerarşisi, bağlantılar, kilit/açık/satın alınmış durumları kararlaştırılacak.
-- [?] Gezinme, odak, tooltip ve satın alma geri bildirimi kararlaştırılacak.
-- [?] Onaylı yön görsel ve runtime doğrulamadan geçirilecek.
+- [x] Graph mevcut statik görseli kopyalamaz; prerequisite verisinden runtime üretilir.
+- [x] Locked, available, affordable, maxed ve selected node durumları ayrıştırıldı.
+- [x] Pan, wheel zoom, Center ve gamepad focus akışları uygulandı.
+- [x] Inspector current state, effect, cost, blocker ve purchase sonucunu tek karar akışında gösterir.
+- [x] Küçük ve geniş graph'ların viewport merkezleme davranışı canlı doğrulandı.
 
 ### `DW-P7-CASTLE-HEART` - Ayrı Kapsam
 
-**Durum:** `[?]` Teknoloji ağacından ayrı görüşülecek.
+**Durum:** `[x]` Castle Heart ayrı progression rolüyle UI Toolkit içinde yeniden kuruldu.
 
-- [?] Castle Heart'ın oyuncuya görünen rolü ve bilgileri yeniden değerlendirilecek.
-- [?] Teknoloji ağacıyla ilişkisi ve ayrıldığı sınırlar açıkça yazılacak.
-- [?] Etkileşim, geri bildirim ve sunum kararları owner ile ayrı ayrı alınacak.
-- [?] Uygulama kendi kabul ve doğrulama kapısıyla tamamlanacak.
+- [x] Grave Essence progression rolü War Doctrine combat-tech rolünden görsel ve bilgi mimarisi olarak ayrıldı.
+- [x] Hidden-safe dynamic graph, branch kimliği, reveal/lock/owned durumları ve exact inspector uygulandı.
+- [x] `1 / 10 / MAX` repeatable satın alma akışı ve sonuç geri bildirimi korundu.
+- [x] Fullscreen Castle Heart açıkken simulation akmaya devam eder; onboarding bunu açıkça öğretir.
+- [x] 19-node runtime graph okunabilirlik ve çakışmasız layout açısından canlı doğrulandı.
 
 ### `DW-P8-UI-POLISH` - Genel UI Efekt ve Animasyonları
 
-**Durum:** `[?]` P3-P7 kararları tamamlandıktan sonra ele alınacak.
+**Durum:** `[x]` Bilgi odaklı UI polish sistemi bütün yeni yüzeylere uygulandı.
 
-- [?] Hangi oyuncu eylemlerinin anlık geri bildirim gerektirdiği çıkarılacak.
-- [?] Açılma, kapanma, hover, press, satın alma, kazanım, hata ve cooldown durumları değerlendirilecek.
-- [?] Hareket dili, süreler ve öncelik kuralları birlikte kararlaştırılacak.
-- [?] Efektlerin bilgi okunabilirliğini ve performansı bozmadığı doğrulanacak.
+- [x] Hover/focus/press, seçili durum, cooldown, satın alma başarısı ve blocker feedback'i ortak dil kullanır.
+- [x] Soul pickup uçuşu, sayaç varış pulse'ı, damage flash, critical banner, toast ve onboarding UI Toolkit katmanına taşındı.
+- [x] Gereksiz sürekli dekoratif hareket kaldırıldı; Main Menu'de yalnız day/dusk/night/dawn arka plan döngüsü kaldı.
+- [x] Modal hiyerarşi, scroll görünürlüğü, touch hit-area ve gamepad focus davranışı doğrulandı.
 
 ### `DW-P9-PERFORMANCE` - Ölçüm ve Optimizasyon
 
@@ -233,3 +255,23 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - Basic/Rapid/Frost Arrow ile Fireball Primary/SecondBlast/BurningGroundPulse gerçek uygulanan hasarı ortak event sözleşmesine bağlandı.
 - Aynı hedefe aynı frame'de ulaşan okların lost-update riski kaldırıldı; gösterilen overkill mevcut HP'ye clamp edildi.
 - Targeted EditMode `18/18`, targeted PlayMode `2/2`, tam EditMode `420/420` ve tam PlayMode `91 pass + 2 explicit skip` geçti.
+
+### 2026-07-18 - P3 UI Toolkit yönü ve Main Menu onayı
+
+- Benzer oyun ve PC/mobile UI/UX araştırması sonucunda bilgi öncelikli, minimal UI Toolkit yönü owner tarafından onaylandı.
+- Bütün player-facing UI yüzeylerinin UI Toolkit'e geçirileceği; `1920x1080`, English copy ve cihaza göre otomatik kontrol sunumu kullanılacağı kilitlendi.
+- Main Menu UI Toolkit runtime sahibiyle uygulandı; save-aware ana eylem ve Settings davranışı korundu.
+- Owner geri bildirimiyle dekoratif çizgiler, footer etiketleri ve bütün ornamental UI hareketleri kaldırıldı.
+- Yalnızca arka plan `DAY / DUSK / NIGHT / DAWN` döngüsü animasyonlu bırakıldı.
+- Unity compile ve Play Mode visual-tree doğrulaması tamamlandı; owner Main Menu'yü onayladı.
+- P3 ana görevi gameplay HUD çekirdeğiyle devam ediyor; ana görev paydası değişmedi ve toplam ilerleme `2/10 - %20` olarak kaldı.
+
+### 2026-07-18 - P3-P8 tam UI Toolkit rework tamamlandı
+
+- Bilimsel UI/UX araştırması, karşılaştırmalı oyun sentezi ve Dead Walls karar sistemi 14 sayfalık `DEAD_WALLS_UI_UX_DECISION_SYSTEM.pdf` belgesinde tamamlandı.
+- Eski UI görsel/layout referansı olarak kullanılmadan bütün player-facing runtime yüzeyleri UI Toolkit ile sıfırdan kuruldu; legacy UGUI yalnız davranış/veri köprüsü olarak tutuldu.
+- Persistent HUD, Economy, Barracks, Arrow Supply, Castle Heart, War Doctrine, Council, Level Up, Pause, Settings ve Game Over/Meta Shop canlı `1920x1080` QA'dan geçti; touch uyarlaması ayrıca `1280x720` doğrulandı.
+- Castle Heart ve War Doctrine runtime verisinden dynamic graph üretir; Castle Heart açıkken simulation akmaya devam eder.
+- Main Menu'de owner kararına uygun olarak yalnız day/dusk/night/dawn arka plan döngüsü sürekli animasyonlu kaldı.
+- Unity compilation ve temiz Console doğrulandı; tam EditMode `420/420`, tam PlayMode `91 pass + 2 explicit skip` geçti.
+- P3, P4, P5, P6, P7 ve P8 birlikte kapandı; ana görev paydası değişmedi ve ilerleme `8/10 - %80` oldu. P9 performans ve P10 final gate açık kaldı.

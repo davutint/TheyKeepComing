@@ -15,6 +15,12 @@ namespace DeadWalls
     /// </summary>
     public class SoulCounterUI : MonoBehaviour
     {
+        /// <summary>
+        /// UI Toolkit runtime shell'inin ayni production pickup event'inden sunum uretmesi icin
+        /// player-facing olmayan davranis koprusu. Gameplay odulu bu event'e bagli degildir.
+        /// </summary>
+        public static event System.Action<SoulPickupEvent> ToolkitSoulPickupRequested;
+
         public GameObject CounterPanel;
         public TMP_Text CounterText;
 
@@ -186,7 +192,10 @@ namespace DeadWalls
             using NativeArray<SoulPickupEvent> events =
                 _soulPickupQuery.ToComponentDataArray<SoulPickupEvent>(Allocator.Temp);
             for (int i = 0; i < events.Length; i++)
+            {
+                ToolkitSoulPickupRequested?.Invoke(events[i]);
                 PlaySoulPickup(events[i]);
+            }
 
             _entityManager.DestroyEntity(entities);
         }

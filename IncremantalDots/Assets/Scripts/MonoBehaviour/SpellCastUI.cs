@@ -87,6 +87,7 @@ namespace DeadWalls
         private Sprite _circleSprite;
         private Camera _camera;
         private bool _buttonsBound;
+        private bool _legacyAbilityPanelVisible = true;
 
         public bool IsTargeting => _targeting;
 
@@ -152,8 +153,9 @@ namespace DeadWalls
         {
             var gm = GameManager.Instance;
             bool visible = gm != null && !gm.GameState.IsGameOver;
-            if (SpellPanel != null && SpellPanel.activeSelf != visible)
-                SpellPanel.SetActive(visible);
+            bool panelVisible = visible && _legacyAbilityPanelVisible;
+            if (SpellPanel != null && SpellPanel.activeSelf != panelVisible)
+                SpellPanel.SetActive(panelVisible);
 
             UpdateProjectileVisual(gm);
             UpdateEvolutionVisuals();
@@ -180,7 +182,7 @@ namespace DeadWalls
                 return;
 
             _buttonsBound = true;
-            FireballButton?.onClick.AddListener(ToggleTargeting);
+            FireballButton?.onClick.AddListener(HandleFireballClicked);
             RallyButton?.onClick.AddListener(HandleRallyClicked);
             EmergencyRepairButton?.onClick.AddListener(HandleEmergencyRepairClicked);
         }
@@ -191,7 +193,7 @@ namespace DeadWalls
                 return;
 
             _buttonsBound = false;
-            FireballButton?.onClick.RemoveListener(ToggleTargeting);
+            FireballButton?.onClick.RemoveListener(HandleFireballClicked);
             RallyButton?.onClick.RemoveListener(HandleRallyClicked);
             EmergencyRepairButton?.onClick.RemoveListener(HandleEmergencyRepairClicked);
         }
@@ -250,10 +252,20 @@ namespace DeadWalls
             out RectTransform target)
         {
             target = button != null ? button.transform as RectTransform : null;
-            return ready && target != null && target.gameObject.activeInHierarchy;
+            // UI Toolkit owns the visible ability dock, but the legacy button remains the
+            // stable onboarding/action contract. Its GameObject can therefore be hidden.
+            return ready && target != null;
         }
 
         private bool TryActivateHotkey(AbilityHotkeySlot slot, GameManager gm)
+        {
+            return TryActivateAbility(slot, gm, true);
+        }
+
+        private bool TryActivateAbility(
+            AbilityHotkeySlot slot,
+            GameManager gm,
+            bool reportAcceptedTutorialInput)
         {
             if (gm == null)
                 return false;
@@ -283,10 +295,23 @@ namespace DeadWalls
             if (!accepted)
                 return false;
 
-            AbilityHotkeyAcceptedByPlayer?.Invoke(slot);
+            if (reportAcceptedTutorialInput)
+                AbilityHotkeyAcceptedByPlayer?.Invoke(slot);
             if (slot != AbilityHotkeySlot.Fireball)
                 UiSoundFeedback.Instance?.PlaySuccess();
             return true;
+        }
+
+        public bool TryActivateAbilityFromPlayer(AbilityHotkeySlot slot)
+        {
+            return TryActivateAbility(slot, GameManager.Instance, true);
+        }
+
+        public void SetLegacyAbilityPanelVisible(bool visible)
+        {
+            _legacyAbilityPanelVisible = visible;
+            if (!visible && SpellPanel != null)
+                SpellPanel.SetActive(false);
         }
 
         private static bool IsTypingInInputField()
@@ -798,18 +823,19 @@ namespace DeadWalls
             return remaining > 0f ? $"{Mathf.CeilToInt(remaining)}s" : "READY";
         }
 
+        private void HandleFireballClicked()
+        {
+            TryActivateAbility(AbilityHotkeySlot.Fireball, GameManager.Instance, false);
+        }
+
         private void HandleRallyClicked()
         {
-            CancelTargeting();
-            if (GameManager.Instance != null && GameManager.Instance.TryUseRally())
-                UiSoundFeedback.Instance?.PlaySuccess();
+            TryActivateAbility(AbilityHotkeySlot.Rally, GameManager.Instance, false);
         }
 
         private void HandleEmergencyRepairClicked()
         {
-            CancelTargeting();
-            if (GameManager.Instance != null && GameManager.Instance.TryUseEmergencyRepair())
-                UiSoundFeedback.Instance?.PlaySuccess();
+            TryActivateAbility(AbilityHotkeySlot.EmergencyRepair, GameManager.Instance, false);
         }
 
         private void ToggleTargeting()

@@ -285,7 +285,7 @@ namespace DeadWalls.Tests
                 "RECRUIT A BASIC ARCHER.",
                 "RESTOCK YOUR ARROWS.",
                 "OPEN THE CASTLE HEART.",
-                "THE CASTLE HEART FULLY PAUSES THE BATTLE.",
+                "THE BATTLE CONTINUES WHILE THE CASTLE HEART IS OPEN.",
                 "COMPARE BOTH EXACT OUTCOMES AND THEIR COSTS.",
                 "REPAIR THE WALL DURING THE DAY.",
                 "PRESS 1 TO TARGET FIREBALL.",

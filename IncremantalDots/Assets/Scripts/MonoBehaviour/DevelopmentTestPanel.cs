@@ -1,5 +1,6 @@
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace DeadWalls
 {
@@ -8,6 +9,7 @@ namespace DeadWalls
     {
         private const int WindowId = 0x445754;
         private Rect _windowRect;
+        private bool _visible;
         private bool _expanded = true;
         private string _status = "Ready. Start with UNLOCK TEST COMBAT.";
         private Texture2D _windowTexture;
@@ -36,8 +38,17 @@ namespace DeadWalls
                 Destroy(_windowTexture);
         }
 
+        private void Update()
+        {
+            if (Keyboard.current != null && Keyboard.current.f10Key.wasPressedThisFrame)
+                _visible = !_visible;
+        }
+
         private void OnGUI()
         {
+            if (!_visible)
+                return;
+
             EnsureStyles();
             if (!_expanded)
             {

@@ -1,0 +1,293 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <ui:Style src="project://database/Assets/UI/Toolkit/Shared/DeadWallsTheme.uss" />
+    <ui:Style src="project://database/Assets/UI/Toolkit/GameplayHUD/GameplayHUD.uss" />
+
+    <ui:VisualElement name="screen" class="dw-screen runtime-shell input--pointer phase--day">
+        <ui:VisualElement name="worldTint" class="world-tint" picking-mode="Ignore" />
+        <ui:VisualElement name="damageFlash" class="damage-flash" picking-mode="Ignore" />
+
+        <ui:VisualElement name="hudLayer" class="hud-layer">
+            <ui:VisualElement class="economy-cluster">
+                <ui:VisualElement class="cluster-heading">
+                    <ui:Label text="THE KEEP" class="cluster-kicker" />
+                    <ui:Label name="economyBalance" text="STABLE" class="cluster-state" />
+                </ui:VisualElement>
+                <ui:VisualElement class="resource-grid">
+                    <ui:VisualElement class="resource-readout resource--wood">
+                        <ui:VisualElement class="resource-mark" />
+                        <ui:Label text="WOOD" class="readout-label" />
+                        <ui:Label name="woodValue" text="0" class="readout-value" />
+                        <ui:Label name="woodRate" text="0/m" class="readout-rate" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="resource-readout resource--stone">
+                        <ui:VisualElement class="resource-mark" />
+                        <ui:Label text="STONE" class="readout-label" />
+                        <ui:Label name="stoneValue" text="0" class="readout-value" />
+                        <ui:Label name="stoneRate" text="0/m" class="readout-rate" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="resource-readout resource--iron">
+                        <ui:VisualElement class="resource-mark" />
+                        <ui:Label text="IRON" class="readout-label" />
+                        <ui:Label name="ironValue" text="0" class="readout-value" />
+                        <ui:Label name="ironRate" text="0/m" class="readout-rate" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="resource-readout resource--food">
+                        <ui:VisualElement class="resource-mark" />
+                        <ui:Label text="FOOD" class="readout-label" />
+                        <ui:Label name="foodValue" text="0" class="readout-value" />
+                        <ui:Label name="foodRate" text="0/m" class="readout-rate" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="population-line">
+                    <ui:Label name="populationValue" text="0 / 0 PEOPLE" class="population-main" />
+                    <ui:Label name="populationDetail" text="0 IDLE" class="population-detail" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement class="siege-clock">
+                <ui:VisualElement class="clock-copy">
+                    <ui:Label name="dayValue" text="DAY 1" class="clock-day" />
+                    <ui:VisualElement class="clock-phase-copy">
+                        <ui:Label name="phaseValue" text="DAYLIGHT" class="clock-phase" />
+                        <ui:Label name="phaseCountdown" text="02:00" class="clock-time" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="phase-segments">
+                    <ui:VisualElement name="phaseDay" class="phase-segment phase-segment--day is-active" />
+                    <ui:VisualElement name="phaseDusk" class="phase-segment phase-segment--dusk" />
+                    <ui:VisualElement name="phaseNight" class="phase-segment phase-segment--night" />
+                    <ui:VisualElement name="phaseDawn" class="phase-segment phase-segment--dawn" />
+                </ui:VisualElement>
+                <ui:Label name="cycleMessage" text="BUILD WHILE THE LIGHT HOLDS" class="clock-message" />
+            </ui:VisualElement>
+
+            <ui:VisualElement class="threat-cluster">
+                <ui:VisualElement class="threat-line">
+                    <ui:VisualElement>
+                        <ui:Label text="WALL INTEGRITY" class="readout-label" />
+                        <ui:Label name="wallValue" text="100%" class="wall-value" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="hostile-readout">
+                        <ui:Label text="HOSTILES" class="readout-label" />
+                        <ui:Label name="hostilesValue" text="0" class="hostile-value" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement name="defensePanel" class="wall-track">
+                    <ui:VisualElement name="wallProgress" class="wall-progress" />
+                </ui:VisualElement>
+                <ui:VisualElement class="supply-line">
+                    <ui:Label name="arrowValue" text="0 / 0 ARROWS" class="supply-value" />
+                    <ui:Label name="arrowDetail" text="SUPPLY READY" class="supply-state" />
+                </ui:VisualElement>
+                <ui:VisualElement name="soulAnchor" class="soul-readout">
+                    <ui:VisualElement class="soul-glyph" />
+                    <ui:Label name="soulValue" text="0" class="soul-value" />
+                    <ui:Label text="SOULS" class="soul-label" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement class="ability-dock">
+                <ui:Button name="fireballButton" class="ability-command">
+                    <ui:VisualElement name="fireballCooldown" class="ability-cooldown" picking-mode="Ignore" />
+                    <ui:Label text="1" class="ability-prompt" picking-mode="Ignore" />
+                    <ui:VisualElement class="ability-copy" picking-mode="Ignore">
+                        <ui:Label text="FIREBALL" class="ability-name" />
+                        <ui:Label name="fireballState" text="LOCKED" class="ability-state" />
+                    </ui:VisualElement>
+                </ui:Button>
+                <ui:Button name="rallyButton" class="ability-command">
+                    <ui:VisualElement name="rallyCooldown" class="ability-cooldown" picking-mode="Ignore" />
+                    <ui:Label text="2" class="ability-prompt" picking-mode="Ignore" />
+                    <ui:VisualElement class="ability-copy" picking-mode="Ignore">
+                        <ui:Label text="RALLY" class="ability-name" />
+                        <ui:Label name="rallyState" text="READY" class="ability-state" />
+                    </ui:VisualElement>
+                </ui:Button>
+                <ui:Button name="repairButton" class="ability-command">
+                    <ui:VisualElement name="repairCooldown" class="ability-cooldown" picking-mode="Ignore" />
+                    <ui:Label text="3" class="ability-prompt" picking-mode="Ignore" />
+                    <ui:VisualElement class="ability-copy" picking-mode="Ignore">
+                        <ui:Label text="EMERGENCY REPAIR" class="ability-name" />
+                        <ui:Label name="repairState" text="NIGHT ONLY" class="ability-state" />
+                    </ui:VisualElement>
+                </ui:Button>
+            </ui:VisualElement>
+
+            <ui:VisualElement class="command-rail">
+                <ui:Button name="economyButton" text="ECONOMY" class="command-button command-button--economy" />
+                <ui:Button name="barracksButton" text="BARRACKS" class="command-button" />
+                <ui:VisualElement class="command-spacer" />
+                <ui:Button name="arrowsButton" text="ARROW SUPPLY" class="command-button" />
+                <ui:Button name="heartButton" text="CASTLE HEART" class="command-button command-button--heart" />
+                <ui:Button name="techButton" text="TECHNOLOGY" class="command-button" />
+                <ui:Button name="pauseButton" text="II" class="command-button command-button--pause" />
+            </ui:VisualElement>
+
+            <ui:VisualElement name="criticalBanner" class="critical-banner">
+                <ui:Label name="criticalBannerTitle" text="THE WALL IS FAILING" class="critical-title" />
+                <ui:Label name="criticalBannerBody" text="Repair before the next breach." class="critical-body" />
+            </ui:VisualElement>
+            <ui:VisualElement name="onboardingHint" class="onboarding-hint">
+                <ui:VisualElement class="hint-marker" />
+                <ui:Label name="onboardingHintText" text="ADJUST A WORKER TARGET RATIO." class="hint-text" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="economyDrawer" class="surface drawer drawer--left economy-drawer">
+            <ui:VisualElement class="surface-header">
+                <ui:VisualElement>
+                    <ui:Label text="KEEP ECONOMY" class="surface-title" />
+                    <ui:Label text="Balance labour without leaving the battlefield." class="surface-subtitle" />
+                </ui:VisualElement>
+                <ui:Button name="economyClose" text="CLOSE" class="surface-close" />
+            </ui:VisualElement>
+            <ui:VisualElement class="economy-summary">
+                <ui:VisualElement class="summary-block"><ui:Label text="AVAILABLE" class="summary-label" /><ui:Label name="economyIdle" text="0" class="summary-value" /></ui:VisualElement>
+                <ui:VisualElement class="summary-block"><ui:Label text="WORKERS" class="summary-label" /><ui:Label name="economyWorkers" text="0" class="summary-value" /></ui:VisualElement>
+                <ui:VisualElement class="summary-block"><ui:Label text="HOUSING" class="summary-label" /><ui:Label name="economyHousing" text="0 / 0" class="summary-value" /></ui:VisualElement>
+            </ui:VisualElement>
+            <ui:ScrollView name="economyRows" class="surface-scroll economy-rows" mode="Vertical" />
+            <ui:VisualElement class="housing-card">
+                <ui:VisualElement class="housing-copy"><ui:Label text="EXPAND HOUSING" class="card-title" /><ui:Label name="housingCost" text="Cost pending" class="card-detail" /></ui:VisualElement>
+                <ui:Button name="housingOne" text="+1" class="compact-action" />
+                <ui:Button name="housingTen" text="+10" class="compact-action" />
+                <ui:Button name="housingHundred" text="+100" class="compact-action" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="barracksDrawer" class="surface drawer drawer--right barracks-drawer">
+            <ui:VisualElement class="surface-header">
+                <ui:VisualElement><ui:Label text="WALL GARRISON" class="surface-title" /><ui:Label text="Recruit for the fight already in progress." class="surface-subtitle" /></ui:VisualElement>
+                <ui:Button name="barracksClose" text="CLOSE" class="surface-close" />
+            </ui:VisualElement>
+            <ui:VisualElement class="barracks-summary">
+                <ui:Label name="archerCapacity" text="0 / 0 ARCHERS" class="summary-value" />
+                <ui:Label name="archerSummary" text="No formations deployed" class="card-detail" />
+            </ui:VisualElement>
+            <ui:ScrollView name="archerRows" class="surface-scroll archer-rows" mode="Vertical" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="arrowsDrawer" class="surface drawer drawer--right arrows-drawer">
+            <ui:VisualElement class="surface-header">
+                <ui:VisualElement><ui:Label text="ARROW SUPPLY" class="surface-title" /><ui:Label text="Restock now; improve the supply line for later." class="surface-subtitle" /></ui:VisualElement>
+                <ui:Button name="arrowsClose" text="CLOSE" class="surface-close" />
+            </ui:VisualElement>
+            <ui:VisualElement class="supply-hero">
+                <ui:Label name="supplyHeroValue" text="0 / 0" class="supply-hero-value" />
+                <ui:Label name="supplyHeroState" text="READY" class="supply-hero-state" />
+                <ui:VisualElement class="supply-hero-track"><ui:VisualElement name="supplyHeroProgress" class="supply-hero-progress" /></ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement class="purchase-stack">
+                <ui:Button name="arrowPackage" class="purchase-card"><ui:Label text="FIELD CRATE" class="card-title" /><ui:Label name="arrowPackageDetail" text="0 arrows" class="card-detail" /><ui:Label name="arrowPackageCost" text="0 WOOD" class="card-cost" /></ui:Button>
+                <ui:Button name="arrowLargePackage" class="purchase-card"><ui:Label text="SUPPLY WAGON" class="card-title" /><ui:Label name="arrowLargeDetail" text="0 arrows" class="card-detail" /><ui:Label name="arrowLargeCost" text="0 WOOD" class="card-cost" /></ui:Button>
+                <ui:Button name="arrowBuyMax" class="purchase-card purchase-card--primary"><ui:Label text="FILL RESERVES" class="card-title" /><ui:Label name="arrowMaxDetail" text="Fill remaining capacity" class="card-detail" /><ui:Label name="arrowMaxCost" text="0 WOOD" class="card-cost" /></ui:Button>
+            </ui:VisualElement>
+            <ui:VisualElement class="upgrade-stack">
+                <ui:Button name="arrowCapacityUpgrade" class="upgrade-card"><ui:Label text="CAPACITY" class="card-title" /><ui:Label name="arrowCapacityDetail" text="Level 0" class="card-detail" /><ui:Label name="arrowCapacityCost" text="0" class="card-cost" /></ui:Button>
+                <ui:Button name="arrowEfficiencyUpgrade" class="upgrade-card"><ui:Label text="EFFICIENCY" class="card-title" /><ui:Label name="arrowEfficiencyDetail" text="Level 0" class="card-detail" /><ui:Label name="arrowEfficiencyCost" text="0" class="card-cost" /></ui:Button>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="heartScreen" class="surface fullscreen heart-screen">
+            <ui:VisualElement class="fullscreen-header">
+                <ui:VisualElement><ui:Label text="CASTLE HEART" class="fullscreen-title" /><ui:Label text="Shape this run. Every commitment changes the keep." class="fullscreen-subtitle" /></ui:VisualElement>
+                <ui:VisualElement class="fullscreen-tools">
+                    <ui:Label name="graveEssenceValue" text="0 ESSENCE" class="currency-value" />
+                    <ui:Button name="heartQuantityOne" text="+1" class="tool-button is-selected" />
+                    <ui:Button name="heartQuantityTen" text="+10" class="tool-button" />
+                    <ui:Button name="heartQuantityMax" text="MAX" class="tool-button" />
+                    <ui:Button name="heartClose" text="RETURN TO BATTLE" class="surface-close" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement class="heart-legend">
+                <ui:Label text="ARMY" class="legend-item legend--army" /><ui:Label text="DEFENSE" class="legend-item legend--defense" /><ui:Label text="PRODUCTION" class="legend-item legend--production" /><ui:Label text="HEART MAGIC" class="legend-item legend--magic" />
+            </ui:VisualElement>
+            <ui:VisualElement name="heartViewport" class="graph-viewport">
+                <ui:VisualElement name="heartGraphContent" class="graph-content heart-graph" />
+            </ui:VisualElement>
+            <ui:VisualElement name="heartInspector" class="graph-inspector">
+                <ui:Label name="heartInspectorTitle" text="SELECT AN AWAKENED NODE" class="inspector-title" />
+                <ui:Label name="heartInspectorBody" text="Revealed choices explain their exact effect before purchase." class="inspector-body" />
+                <ui:Label name="heartInspectorCost" text="" class="inspector-cost" />
+                <ui:Button name="heartPurchase" text="AWAKEN" class="inspector-action" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="techScreen" class="surface fullscreen tech-screen">
+            <ui:VisualElement class="fullscreen-header">
+                <ui:VisualElement><ui:Label text="WAR DOCTRINE" class="fullscreen-title" /><ui:Label text="A living prerequisite graph for this run." class="fullscreen-subtitle" /></ui:VisualElement>
+                <ui:VisualElement class="fullscreen-tools"><ui:Button name="techZoomOut" text="-" class="tool-button" /><ui:Button name="techResetView" text="CENTER" class="tool-button" /><ui:Button name="techZoomIn" text="+" class="tool-button" /><ui:Button name="techClose" text="RETURN TO BATTLE" class="surface-close" /></ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="techAlert" class="fullscreen-alert"><ui:Label name="techAlertText" text="BATTLE CONTINUES BEHIND THIS SCREEN" /></ui:VisualElement>
+            <ui:VisualElement name="techViewport" class="graph-viewport tech-viewport">
+                <ui:VisualElement name="techGraphContent" class="graph-content tech-graph" />
+            </ui:VisualElement>
+            <ui:VisualElement name="techInspector" class="graph-inspector">
+                <ui:Label name="techInspectorTitle" text="SELECT A DOCTRINE" class="inspector-title" />
+                <ui:Label name="techInspectorLevel" text="" class="inspector-meta" />
+                <ui:Label name="techInspectorBody" text="Inspect cost, effect and prerequisites before committing." class="inspector-body" />
+                <ui:Label name="techInspectorCost" text="" class="inspector-cost" />
+                <ui:Label name="techInspectorStatus" text="" class="inspector-status" />
+                <ui:Button name="techPurchase" text="RESEARCH" class="inspector-action" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="modalShade" class="modal-shade">
+            <ui:VisualElement name="councilModal" class="modal council-modal">
+                <ui:Label text="THE COUNCIL DEMANDS AN ANSWER" class="modal-kicker" />
+                <ui:Label name="councilTitle" text="A Choice at the Gate" class="modal-title" />
+                <ui:Label name="councilBody" text="The situation requires an exact decision." class="modal-body" />
+                <ui:VisualElement class="decision-timer"><ui:VisualElement name="councilTimerProgress" class="decision-timer-progress" /><ui:Label name="councilTimerText" text="30s" class="decision-timer-text" /></ui:VisualElement>
+                <ui:VisualElement class="decision-options">
+                    <ui:Button name="councilOptionA" class="decision-card"><ui:Label text="OPTION A" class="decision-label" /><ui:Label name="councilOptionAText" text="Exact outcome" class="decision-copy" /></ui:Button>
+                    <ui:Button name="councilOptionB" class="decision-card"><ui:Label text="OPTION B" class="decision-label" /><ui:Label name="councilOptionBText" text="Exact outcome" class="decision-copy" /></ui:Button>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement name="levelUpModal" class="modal levelup-modal">
+                <ui:Label text="THE KEEP ENDURES" class="modal-kicker" />
+                <ui:Label name="levelUpTitle" text="Choose the next advantage" class="modal-title" />
+                <ui:VisualElement name="levelUpCards" class="levelup-cards" />
+            </ui:VisualElement>
+
+            <ui:VisualElement name="pauseModal" class="modal pause-modal">
+                <ui:Label text="BATTLE PAUSED" class="modal-kicker" />
+                <ui:Label text="DEAD WALLS" class="modal-title" />
+                <ui:Button name="resumeButton" text="RESUME" class="modal-action modal-action--primary" />
+                <ui:Button name="settingsButton" text="SETTINGS" class="modal-action" />
+                <ui:Button name="mainMenuButton" text="SAVE &amp; RETURN TO MENU" class="modal-action" />
+            </ui:VisualElement>
+
+            <ui:VisualElement name="settingsModal" class="modal settings-modal">
+                <ui:Label text="SETTINGS" class="modal-title" />
+                <ui:Label text="SOUND EFFECTS" class="setting-label" />
+                <ui:Slider name="sfxSlider" low-value="0" high-value="1" value="1" class="dw-slider" />
+                <ui:Label text="AMBIENCE" class="setting-label" />
+                <ui:Slider name="ambienceSlider" low-value="0" high-value="1" value="1" class="dw-slider" />
+                <ui:Button name="resetTutorialButton" text="RESET TUTORIAL" class="modal-action" />
+                <ui:Label name="resetTutorialStatus" text="" class="setting-status" />
+                <ui:Button name="settingsClose" text="BACK" class="modal-action modal-action--primary" />
+            </ui:VisualElement>
+
+            <ui:VisualElement name="gameOverModal" class="modal gameover-modal">
+                <ui:Label text="THE WALL HAS FALLEN" class="modal-kicker modal-kicker--danger" />
+                <ui:Label name="gameOverTitle" text="RUN ENDED" class="modal-title" />
+                <ui:Label name="gameOverStats" text="" class="gameover-stats" />
+                <ui:VisualElement class="meta-summary">
+                    <ui:Label name="metaSummary" text="" class="meta-summary-title" />
+                    <ui:Label name="metaRecord" text="" class="meta-summary-copy" />
+                    <ui:Label name="metaEarned" text="" class="meta-earned" />
+                    <ui:Label name="metaSouls" text="" class="meta-souls" />
+                </ui:VisualElement>
+                <ui:ScrollView name="metaShopRows" class="meta-shop" mode="Vertical" />
+                <ui:Button name="restartButton" text="BEGIN A NEW RUN" class="modal-action modal-action--primary" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="toastStack" class="toast-stack">
+            <ui:Label name="primaryToast" text="" class="toast toast--primary" />
+            <ui:Label name="secondaryToast" text="" class="toast toast--secondary" />
+        </ui:VisualElement>
+        <ui:VisualElement name="soulFlightLayer" class="soul-flight-layer" picking-mode="Ignore" />
+    </ui:VisualElement>
+</ui:UXML>

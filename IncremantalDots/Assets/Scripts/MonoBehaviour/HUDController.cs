@@ -90,6 +90,18 @@ namespace DeadWalls
         private const float RewardDisplayDuration = 3f;
         private const float DamageFlashDuration = 0.28f;
         private const float CelestialColorTransitionDuration = 0.25f;
+        private bool _legacyCorePresentationVisible = true;
+
+        public void SetLegacyCorePresentationVisible(bool visible)
+        {
+            _legacyCorePresentationVisible = visible;
+            if (visible)
+                return;
+
+            SetActiveIfChanged(CyclePanel, false);
+            SetActiveIfChanged(WaveText != null ? WaveText.gameObject : null, false);
+            SetActiveIfChanged(KillsText != null ? KillsText.gameObject : null, false);
+        }
 
         private void OnEnable()
         {
@@ -292,6 +304,14 @@ namespace DeadWalls
 
         private void UpdateContinuousSiegeHud(GameManager gm)
         {
+            if (!_legacyCorePresentationVisible)
+            {
+                SetActiveIfChanged(CyclePanel, false);
+                SetActiveIfChanged(WaveText != null ? WaveText.gameObject : null, false);
+                SetActiveIfChanged(KillsText != null ? KillsText.gameObject : null, false);
+                return;
+            }
+
             ContinuousSiegeCycleData cycle = gm.ContinuousSiegeCycle;
             bool active = CyclePanel != null
                 && !gm.WaveState.StressTestMode

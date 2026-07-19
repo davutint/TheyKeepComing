@@ -174,7 +174,7 @@ namespace DeadWalls
         public const int LowAmmoThresholdPercent = 25;
         public const string HeartEntryFlagId = "tutorial.v1.heart";
         public const string HeartEntryHint = "OPEN THE CASTLE HEART.";
-        public const string HeartPauseHint = "THE CASTLE HEART FULLY PAUSES THE BATTLE.";
+        public const string HeartPauseHint = "THE BATTLE CONTINUES WHILE THE CASTLE HEART IS OPEN.";
         public const int HeartPauseHintSortingOrder = 260;
         public const string CouncilExactFlagId = "tutorial.v1.council";
         public const string CouncilExactHint = "COMPARE BOTH EXACT OUTCOMES AND THEIR COSTS.";
@@ -229,6 +229,7 @@ namespace DeadWalls
         private RectTransform _activePulseTarget;
         private FirstRunOnboardingStep _activeStep;
         private bool _heartPauseTeachingActive;
+        private bool _heartSurfaceOpen;
         private bool _persistenceWarningLogged;
 
         public bool IsWorkerRatioStepVisible => _activeStep == FirstRunOnboardingStep.WorkerRatio;
@@ -274,6 +275,7 @@ namespace DeadWalls
             UnbindNormalRepair();
             UnbindAbilities();
             _heartPauseTeachingActive = false;
+            _heartSurfaceOpen = false;
             SetPresentation(FirstRunOnboardingStep.None, null);
         }
 
@@ -385,16 +387,15 @@ namespace DeadWalls
             RectTransform target = null;
             bool showPulse = true;
             string hintOverride = null;
-            bool heartPauseTeachingVisible = _heartPauseTeachingActive
-                && CastleHeart != null
-                && CastleHeart.IsOpen;
+            bool isHeartOpen = _heartSurfaceOpen || (CastleHeart != null && CastleHeart.IsOpen);
+            bool heartPauseTeachingVisible = _heartPauseTeachingActive && isHeartOpen;
             bool blockingPauseActive = SimulationPauseService.IsPaused
                 || Time.timeScale <= 0f;
             bool suppressForBlockingPause =
                 FirstRunOnboardingRules.ShouldSuppressForBlockingPause(
                     blockingPauseActive,
                     _heartPauseTeachingActive,
-                    CastleHeart != null && CastleHeart.IsOpen);
+                    isHeartOpen);
             if (heartPauseTeachingVisible)
             {
                 step = FirstRunOnboardingStep.HeartPause;
@@ -677,6 +678,7 @@ namespace DeadWalls
 
         private void HandleHeartOpenedByPlayer()
         {
+            _heartSurfaceOpen = true;
             if (MetaProgression.HasTutorialFlag(HeartEntryFlagId))
                 return;
 
@@ -684,8 +686,14 @@ namespace DeadWalls
             _heartPauseTeachingActive = true;
         }
 
+        public void NotifyHeartSurfaceOpenedByPlayer()
+        {
+            HandleHeartOpenedByPlayer();
+        }
+
         private void HandleHeartClosedByPlayer()
         {
+            _heartSurfaceOpen = false;
             if (!_heartPauseTeachingActive)
                 return;
 
@@ -704,6 +712,11 @@ namespace DeadWalls
 
             _persistenceWarningLogged = true;
             Debug.LogWarning("[FirstRunOnboardingUI] Castle Heart tutorial flag durable yazilamadi.");
+        }
+
+        public void NotifyHeartSurfaceClosedByPlayer()
+        {
+            HandleHeartClosedByPlayer();
         }
 
         private void HandleCouncilChoiceCommitted()

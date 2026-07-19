@@ -53,17 +53,17 @@ owner'larinin player-action event'lerini dinler; yalniz non-modal hint ve pulse 
   Heart bakiyesini gozlemler. Essence gain dengesi tracker'daki ayri balance isinin sahibidir.
 - Grave Essence runtime sorgusu yalniz onceki presentation adimlari uygun degilken ve Heart
   flag'i incomplete iken yapilir; durable completion sonrasinda per-frame Heart wallet okumasi yoktur.
-- Heart kapaliyken gercek `HeartScreenUI.HeartOpenButton` / `CastleHeartOpenButton` pulse olur;
-  panel oyuncu adina acilmaz.
+- Heart kapaliyken aktif sunum sahibinin Castle Heart komutu one cikar; panel oyuncu adina acilmaz.
+  Legacy `HeartScreenUI` yalniz davranis kontrati icin sahnede kalir.
 - Giris metni English'tir: `OPEN THE CASTLE HEART.`
-- Yalniz gercek Heart butonu `HeartOpenedByPlayer` event'ini yayar. Panel acilinca mevcut
-  `SimulationPauseService` lease'i simulation'i durdurur; pulse kapanir ve unscaled, tek satir
-`THE CASTLE HEART FULLY PAUSES THE BATTLE.` hint'i modal yuzeyin ustunde gosterilir.
-- Durable flag, oyuncu Heart'i close butonu veya Escape ile kapattiginda gelen
-  `HeartClosedByPlayer` event'inde yazilir. Programmatic open/close cagrilari tutorial'i
-  tamamlamaz; pause bilgisi gorulmeden flag yazilmaz.
+- UI Toolkit Castle Heart komutu acilis/kapanisi `NotifyHeartSurfaceOpenedByPlayer` ve
+  `NotifyHeartSurfaceClosedByPlayer` ile onboarding owner'ina iletir. Fullscreen Heart acikken
+  simulation akmaya devam eder; tek satir `THE BATTLE CONTINUES WHILE THE CASTLE HEART IS OPEN.`
+  hint'i gosterilir.
+- Durable flag, oyuncu Heart'i close butonu veya Escape ile kapattiginda yazilir. Programmatic
+  acma/kapama tutorial'i tamamlamaz; devam eden savas bilgisi gorulmeden flag yazilmaz.
 - Oyuncu Heart'i ilk Grave Essence prompt'i uygun olmadan once acarsa gercek player event'i
-  yine pause dersini baslatir; close sonrasinda durable flag yazilir ve Essence daha sonra
+  yine Heart dersini baslatir; close sonrasinda durable flag yazilir ve Essence daha sonra
   geldiginde giris prompt'i tekrar gosterilmez.
 
 ## Ilk Regular Council Exact Karar Adimi

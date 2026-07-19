@@ -68,6 +68,7 @@ namespace DeadWalls
         public void PlaySuccess() => Play(SuccessClip, SuccessVolume);
         public void PlayFail() => Play(FailClip, FailVolume);
         public void PlayDeathSting() => Play(DeathStingClip, StingVolume);
+        public void PlayClick() => Play(ClickClip, ClickVolume);
 
         private void Play(AudioClip clip, float volume)
         {

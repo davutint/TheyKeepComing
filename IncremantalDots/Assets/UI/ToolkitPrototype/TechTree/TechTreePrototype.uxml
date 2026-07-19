@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Style src="project://database/Assets/UI/ToolkitPrototype/TechTree/TechTreePrototype.uss" />
+    <ui:VisualElement name="prototype-root" class="prototype-root">
+        <ui:VisualElement class="ambient ambient--top" picking-mode="Ignore" />
+        <ui:VisualElement class="ambient ambient--bottom" picking-mode="Ignore" />
+
+        <ui:VisualElement name="prototype-frame" class="prototype-frame">
+            <ui:VisualElement class="ornament ornament--top" picking-mode="Ignore" />
+            <ui:VisualElement class="ornament ornament--bottom" picking-mode="Ignore" />
+
+            <ui:VisualElement class="top-bar">
+                <ui:VisualElement class="title-block">
+                    <ui:Label text="THE LAST CITADEL" class="overline" />
+                    <ui:VisualElement class="title-row">
+                        <ui:Label text="CASTLE DOCTRINE" class="screen-title" />
+                        <ui:Label text="PROTOTYPE" class="prototype-badge" />
+                    </ui:VisualElement>
+                    <ui:Label text="Shape the knowledge that survives each siege." class="screen-subtitle" />
+                </ui:VisualElement>
+
+                <ui:VisualElement class="run-status">
+                    <ui:VisualElement class="resource-chip">
+                        <ui:Label text="STONE" class="resource-label" />
+                        <ui:Label text="1,280" class="resource-value" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="resource-chip">
+                        <ui:Label text="IRON" class="resource-label" />
+                        <ui:Label text="460" class="resource-value" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="resource-chip resource-chip--knowledge">
+                        <ui:Label text="KNOWLEDGE" class="resource-label" />
+                        <ui:Label text="8" class="resource-value resource-value--gold" />
+                    </ui:VisualElement>
+                    <ui:Button name="close-button" text="CLOSE" class="close-button" tooltip="Prototype only - no game state is changed." />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement class="command-bar">
+                <ui:VisualElement name="filter-strip" class="filter-strip">
+                    <ui:Label text="DOCTRINE" class="filter-label" />
+                    <ui:Button name="filter-all" text="ALL" class="filter-button filter-button--active" />
+                    <ui:Button name="filter-defense" text="DEFENSE" class="filter-button" />
+                    <ui:Button name="filter-economy" text="ECONOMY" class="filter-button" />
+                    <ui:Button name="filter-archery" text="MARKSMEN" class="filter-button" />
+                    <ui:Button name="filter-command" text="COMMAND" class="filter-button" />
+                </ui:VisualElement>
+
+                <ui:VisualElement class="siege-status">
+                    <ui:VisualElement name="siege-pulse" class="siege-pulse" />
+                    <ui:Label text="SIEGE CONTINUES" class="siege-title" />
+                    <ui:VisualElement class="siege-divider" />
+                    <ui:Label text="NIGHT IN 01:42" class="siege-value" />
+                    <ui:VisualElement class="siege-divider" />
+                    <ui:Label text="WALL 73%" class="siege-value siege-value--warning" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement class="main-body">
+                <ui:VisualElement name="map-viewport" class="map-viewport" focusable="true" tooltip="Drag to pan. Use the mouse wheel to zoom.">
+                    <ui:VisualElement class="map-grid map-grid--large" picking-mode="Ignore" />
+                    <ui:VisualElement class="map-grid map-grid--fine" picking-mode="Ignore" />
+                    <ui:VisualElement class="map-vignette" picking-mode="Ignore" />
+
+                    <ui:VisualElement name="graph-content" class="graph-content">
+                        <ui:VisualElement name="edge-layer" class="edge-layer" picking-mode="Ignore" />
+                        <ui:VisualElement name="node-layer" class="node-layer" />
+                    </ui:VisualElement>
+
+                    <ui:VisualElement class="map-caption">
+                        <ui:Label text="DYNAMIC DOCTRINE MAP" class="map-caption-title" />
+                        <ui:Label text="13 NODES / 4 PATHS" class="map-caption-value" />
+                    </ui:VisualElement>
+
+                    <ui:VisualElement class="zoom-controls">
+                        <ui:Button name="zoom-out-button" text="-" class="zoom-button" tooltip="Zoom out" />
+                        <ui:Button name="zoom-reset-button" text="100%" class="zoom-reset" tooltip="Reset view" />
+                        <ui:Button name="zoom-in-button" text="+" class="zoom-button" tooltip="Zoom in" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <ui:VisualElement name="details-panel" class="details-panel">
+                    <ui:VisualElement class="details-accent" />
+                    <ui:VisualElement class="details-header">
+                        <ui:VisualElement name="detail-sigil" class="detail-sigil branch--defense">
+                            <ui:Label name="detail-sigil-letter" text="B" class="detail-sigil-letter" picking-mode="Ignore" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="details-heading-copy">
+                            <ui:Label name="detail-eyebrow" text="DEFENSE DOCTRINE" class="details-eyebrow" />
+                            <ui:Label name="detail-title" text="MASON'S OATH" class="details-title" />
+                            <ui:Label name="detail-tier" text="TIER I / AVAILABLE" class="details-tier" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <ui:VisualElement class="rule rule--bright" />
+
+                    <ui:Label name="detail-quote" text="Stone holds when every hand knows where to brace it." class="details-quote" />
+                    <ui:Label name="detail-description" text="Reinforce the outer wall with a shared defensive doctrine. This is a visual prototype and changes no gameplay data." class="details-description" />
+
+                    <ui:VisualElement class="impact-card">
+                        <ui:Label text="DOCTRINE IMPACT" class="section-label" />
+                        <ui:VisualElement class="impact-row">
+                            <ui:Label text="Wall integrity" class="impact-name" />
+                            <ui:Label name="impact-primary" text="+12%" class="impact-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="impact-row">
+                            <ui:Label text="Repair efficiency" class="impact-name" />
+                            <ui:Label name="impact-secondary" text="+8%" class="impact-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="impact-row impact-row--last">
+                            <ui:Label text="Night pressure" class="impact-name" />
+                            <ui:Label name="impact-tertiary" text="-4%" class="impact-value impact-value--muted" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <ui:VisualElement class="requirement-block">
+                        <ui:Label text="REQUIRES" class="section-label" />
+                        <ui:VisualElement class="requirement-row">
+                            <ui:VisualElement name="requirement-mark" class="requirement-mark requirement-mark--met" />
+                            <ui:Label name="detail-requirement" text="Castle Heart" class="requirement-text" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <ui:VisualElement class="details-spacer" />
+
+                    <ui:VisualElement class="cost-row">
+                        <ui:Label text="KNOWLEDGE COST" class="cost-label" />
+                        <ui:Label name="detail-cost" text="3" class="cost-value" />
+                    </ui:VisualElement>
+                    <ui:Button name="preview-unlock-button" text="PREVIEW UNLOCK" class="preview-button" tooltip="Visual feedback only. No gameplay state is changed." />
+                    <ui:Label text="Visual interaction only - no resources are spent." class="preview-disclaimer" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement class="footer-bar">
+                <ui:VisualElement class="hint-group">
+                    <ui:Label text="DRAG" class="input-key" />
+                    <ui:Label text="PAN" class="input-label" />
+                    <ui:Label text="WHEEL" class="input-key" />
+                    <ui:Label text="ZOOM" class="input-label" />
+                    <ui:Label text="CLICK" class="input-key" />
+                    <ui:Label text="INSPECT" class="input-label" />
+                </ui:VisualElement>
+                <ui:Label text="UI TOOLKIT INTERACTION PROTOTYPE / NO GAMEPLAY BINDINGS" class="footer-note" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="prototype-toast" class="prototype-toast">
+            <ui:VisualElement class="toast-mark" />
+            <ui:VisualElement class="toast-copy">
+                <ui:Label name="toast-title" text="DOCTRINE PREVIEWED" class="toast-title" />
+                <ui:Label name="toast-message" text="No gameplay state was changed." class="toast-message" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
