@@ -101,6 +101,14 @@ namespace DeadWalls.Tests
         [Explicit("Targeted 10K + canonical 1K Player allocation capture only; normal regression setinde calismaz.")]
         public IEnumerator HordeScale_10K_1K_CombinedProfilerCapture_ProducesLoadableRaw()
         {
+            if (Application.isEditor)
+            {
+                Assert.Ignore(
+                    "Target-hardware frame pacing sertifikasi Windows Player test runner'da " +
+                    "calistirilmalidir; Editor frame pacing sonucu kabul/reddet kaniti degildir.");
+                yield break;
+            }
+
             GameManager gameManager = GameManager.Instance;
             bool runtimeReady = false;
             for (int frame = 0; frame < 300; frame++)

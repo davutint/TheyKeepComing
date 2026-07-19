@@ -18,11 +18,18 @@ namespace DeadWalls.Tests
             _originalPreset = GameplayPerformanceSettings.CurrentZombieLimitPreset;
             GameplayPerformanceSettings.CurrentZombieLimitPreset = ZombieLimitPreset.Balanced;
             RunPersistence.Delete();
+            GameBootstrap.PendingAction = GameBootstrap.StartAction.None;
+
+            GameManager previousGameManager = GameManager.Instance;
             SceneManager.LoadScene("NewGameScene", LoadSceneMode.Single);
+            // Tam PlayMode paketinde onceki sahnenin static owner'i yukleme frame'i
+            // bitene kadar yasayabilir. Yeni sahnenin initialize olmus owner'ini bekle.
+            yield return null;
 
             for (int frame = 0; frame < 300; frame++)
             {
                 if (GameManager.Instance != null
+                    && !ReferenceEquals(GameManager.Instance, previousGameManager)
                     && GameManager.Instance.TryGetMobileCombatConfig(out _))
                 {
                     yield break;
@@ -31,7 +38,7 @@ namespace DeadWalls.Tests
                 yield return null;
             }
 
-            Assert.Fail("GameManager/MobileCastleCombatConfig 300 frame icinde hazir olmadi.");
+            Assert.Fail("Yeni sahnenin GameManager/MobileCastleCombatConfig owner'i 300 frame icinde hazir olmadi.");
         }
 
         [UnityTearDown]

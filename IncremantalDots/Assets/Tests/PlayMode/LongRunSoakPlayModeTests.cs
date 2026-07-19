@@ -33,20 +33,35 @@ namespace DeadWalls.Tests
 
         private string _runSavePath;
         private byte[] _originalRunSave;
+        private ZombieLimitPreset _originalZombieLimitPreset;
 
         [UnitySetUp]
         public IEnumerator SetUp()
         {
             _runSavePath = Path.Combine(Application.persistentDataPath, "run_save.json");
             _originalRunSave = File.Exists(_runSavePath) ? File.ReadAllBytes(_runSavePath) : null;
+            _originalZombieLimitPreset = GameplayPerformanceSettings.CurrentZombieLimitPreset;
+            GameplayPerformanceSettings.CurrentZombieLimitPreset = ZombieLimitPreset.Balanced;
             RunPersistence.Delete();
             GameBootstrap.PendingAction = GameBootstrap.StartAction.None;
 
+            GameManager previousGameManager = GameManager.Instance;
             SceneManager.LoadScene("NewGameScene", LoadSceneMode.Single);
-            for (int frame = 0; frame < 120 && GameManager.Instance == null; frame++)
+            yield return null;
+            for (int frame = 0; frame < 120; frame++)
+            {
+                if (GameManager.Instance != null
+                    && !ReferenceEquals(GameManager.Instance, previousGameManager))
+                {
+                    break;
+                }
+
                 yield return null;
+            }
 
             Assert.That(GameManager.Instance, Is.Not.Null, "NewGameScene GameManager olusturmadi.");
+            Assert.That(ReferenceEquals(GameManager.Instance, previousGameManager), Is.False,
+                "Soak onceki PlayMode testinden kalan GameManager owner'ini kullanmamali.");
             yield return null;
         }
 
@@ -54,6 +69,7 @@ namespace DeadWalls.Tests
         public IEnumerator TearDown()
         {
             Time.timeScale = 1f;
+            GameplayPerformanceSettings.CurrentZombieLimitPreset = _originalZombieLimitPreset;
             RunPersistence.Delete();
             if (_originalRunSave != null)
                 File.WriteAllBytes(_runSavePath, _originalRunSave);

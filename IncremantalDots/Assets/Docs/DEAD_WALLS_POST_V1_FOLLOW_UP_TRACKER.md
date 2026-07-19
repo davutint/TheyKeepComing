@@ -4,9 +4,9 @@
 >
 > **Tracker sürümü:** 1.3
 > **Oluşturulma tarihi:** 2026-07-18
-> **Aktif paket:** P10 - Son Kalite, Tutarlılık ve Regresyon Kapısı
-> **Aktif iş:** Tam regresyon matrisi, bütün UI yüzeyleri ve uzun süreli combat/save doğrulaması
-> **İlerleme:** `9 / 10` ana görev tamamlandı - `%90`
+> **Aktif paket:** Post-V1 takip paketi tamamlandı
+> **Aktif iş:** Açık ana görev yok; yeni kapsam owner kararıyla ayrı paket olarak açılacak
+> **İlerleme:** `10 / 10` ana görev tamamlandı - `%100`
 
 ---
 
@@ -85,7 +85,7 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 | 7 | `DW-P7-CASTLE-HEART` | Castle Heart'ın ayrı kapsamda yeniden değerlendirilmesi | `[x]` | UI Toolkit icon-tree, direct-child reveal, responsive inspector ve normal teknoloji ağacı davranışı uygulandı/doğrulandı |
 | 8 | `DW-P8-UI-POLISH` | Genel UI efektleri, animasyonları ve etkileşim polish'i | `[x]` | Durum odaklı hareket, input uyarlaması, feedback katmanları ve modal tutarlılığı doğrulandı |
 | 9 | `DW-P9-PERFORMANCE` | Performans profilleme ve optimizasyon | `[x]` | Player zombie-limit ayarı, yoğun feedback batching/pooling ve 10K + 1K yeniden ölçümü tamamlandı |
-| 10 | `DW-P10-FINAL-GATE` | Son kalite, tutarlılık ve regresyon kapısı | `[?]` | Bütün aktif kapsam birlikte test edildi; açık kritik hata ve doğrulanmamış ana görev kalmadı |
+| 10 | `DW-P10-FINAL-GATE` | Son kalite, tutarlılık ve regresyon kapısı | `[x]` | Bütün aktif kapsam birlikte test edildi; açık kritik hata ve doğrulanmamış ana görev kalmadı |
 
 ---
 
@@ -239,12 +239,14 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 
 ### `DW-P10-FINAL-GATE` - Son Kalite Kapısı
 
-**Durum:** `[?]` P1-P9 tamamlandı; final kalite kapısı aktif sıradaki iştir.
+**Durum:** `[x]` Tam regresyon, bütün player-facing UI yüzeyleri, ağır performans/soak ve exact Continue kapıları birlikte doğrulandı.
 
-- [?] Mantık düzeltmeleri için regresyon matrisi tamamlanacak.
-- [?] Oyuncunun gördüğü bütün UI yüzeyleri birlikte gözden geçirilecek.
-- [?] Yoğun combat, uzun süreli oyun ve save/continue senaryoları doğrulanacak.
-- [?] Açık kritik hata, geçici placeholder ve doğrulanmamış ana görev kalmadığı kanıtlanacak.
+- [x] Mantık düzeltmeleri için regresyon matrisi tamamlandı: final EditMode `440/440`, final PlayMode `95 pass + 2 explicit skip`, `0 fail`.
+- [x] Oyuncunun gördüğü Main Menu, Settings, gameplay HUD, Economy, Barracks, Arrow Supply, Castle Heart, Pause ve Game Over/Meta Shop yüzeyleri `1920x1080` PC ile compact/touch düzenlerinde birlikte gözden geçirildi.
+- [x] Yoğun combat, uzun süreli oyun ve save/continue senaryoları doğrulandı: explicit 3.600-frame soak `1/1`; 10K Zombie + 1K Archer benchmark, Fireball, pool, backlog ve çift Continue fingerprint testi `1/1` geçti.
+- [x] Temiz production boot Console'da `0 error` verdi; player-facing geçici placeholder veya ikinci teknoloji ağacı yüzeyi bulunmadı, aktif teknoloji sahipliği Castle Heart altında tek kaldı.
+- [x] Target-hardware profiler sertifikası yalnız Windows Player ortamını kabul edecek şekilde korumaya alındı; mevcut `1920x1080 / Ultra` WindowsPlayer raporları final kabul kanıtı olarak korundu.
+- [x] Son kapsam diff'i incelendi ve `git diff --check` temiz geçti.
 
 ---
 
@@ -375,3 +377,14 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - Fresh 10K enemy + 1K Archer Editor benchmark'ı geçti: main-thread average `13,12 ms`, frame P95 `17,83 ms`, draw-call average `591`, root GC average `84.626 B/frame`; 10K Fireball death peak `13.786 ms` baseline'dan `63,11 ms`ye düştü.
 - Targeted EditMode `19/19`, targeted PlayMode `6/6`, Unity compilation, Console ve `git diff --check` temiz geçti. Main Menu Settings daha önce canlı `1280x720` Game View'da taşma olmadan doğrulandı.
 - Ana görev paydası değişmedi; P9 kapatıldığı için doğrulanmış ilerleme `9/10 - %90` oldu. Yalnız P10 final kalite kapısı açık kaldı.
+
+### 2026-07-19 - P10 son kalite kapısı tamamlandı
+
+- Tam paket regresyonu final durumda EditMode `440/440`, PlayMode `95 pass + 2 explicit skip`, `0 fail` geçti.
+- Full-suite sahne geçişinde önceki testten kalan static `GameManager` owner'ının okunmasını engelleyen test fixture bekleme kontratı Zombie Limit ve Long-Run Soak testlerine eklendi.
+- Long-Run Soak fixture'ı kullanıcı tercihinden bağımsız release cap'i olan `Balanced 900` ile izole edildi; `3.600` frame, `11.219` exact demand/spawn, pool bütünlüğü ve backlog drain kapılarıyla `1/1` geçti.
+- 10K Zombie + 1K Archer yoğun combat testi `1/1` geçti; frame average `12,46 ms`, P95 `15,51 ms`, main-thread average `12,32 ms`, exact backlog ve iki deterministic Continue fingerprint'i doğrulandı.
+- Target-hardware profiler testi Editor pacing sonucunu kabul/reddet kanıtı saymayacak şekilde Windows Player ortamına kilitlendi; daha önce alınmış `1920x1080 / Ultra` WindowsPlayer kabul raporları korundu.
+- Main Menu, Settings, gameplay HUD, Economy, Barracks, Arrow Supply, Castle Heart, Pause ve Game Over/Meta Shop yüzeyleri PC ve compact/touch düzenlerinde canlı olarak incelendi; overlap, ikinci teknoloji ağacı veya player-facing geçici placeholder bulunmadı.
+- `NewGameScene` temiz production boot turunda Console `0 error` verdi; yalnız mevcut, kritik olmayan ECS update-order uyarısı raporlandı. `git diff --check` temiz geçti.
+- P10 kapatıldı; Post-V1 tracker kapsamı `10/10 - %100` tamamlandı.
