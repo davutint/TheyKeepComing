@@ -175,6 +175,7 @@ namespace DeadWalls
                 _inputMode.ModeChanged -= HandleInputModeChanged;
 
             CancelHeartAnimations();
+            ReleaseAllSoulFlights();
             ReleasePause();
             RestoreLegacyCanvas();
         }

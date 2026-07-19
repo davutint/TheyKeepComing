@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -49,6 +50,9 @@ namespace DeadWalls
 
         [Header("Damage Numbers")]
         public int DamageNumberInitialPoolSize = 256;
+        public int DamageNumberBatchCapacity = 512;
+        public int DamageNumberAggregationThreshold = 512;
+        public float DamageNumberAggregationCellSize = 0.6f;
         public float DamageNumberDuration = 0.72f;
         public float DamageNumberRiseDistance = 0.62f;
         public float DamageNumberHeadOffset = 0.56f;
@@ -103,10 +107,16 @@ namespace DeadWalls
         private readonly Queue<FlipbookVfx> _hitFlipbookPool = new Queue<FlipbookVfx>();
         private readonly List<FlipbookVfx> _activeHitFlipbooks = new List<FlipbookVfx>();
         private readonly List<AudioSource> _audioSources = new List<AudioSource>();
-        private readonly Queue<DamageNumberVisual> _damageNumberPool =
-            new Queue<DamageNumberVisual>();
-        private readonly List<ActiveDamageNumber> _activeDamageNumbers =
-            new List<ActiveDamageNumber>();
+        private readonly Queue<DamageNumberBatchVisual> _damageNumberBatchPool =
+            new Queue<DamageNumberBatchVisual>();
+        private readonly List<DamageNumberBatchVisual> _activeDamageNumberBatches =
+            new List<DamageNumberBatchVisual>();
+        private readonly Dictionary<DamageNumberAggregateKey, DamageNumberAggregate>
+            _damageNumberAggregates =
+                new Dictionary<DamageNumberAggregateKey, DamageNumberAggregate>(1024);
+        private readonly List<DamageNumberPresentation> _damageNumberPresentations =
+            new List<DamageNumberPresentation>(1024);
+        private int _activeDamageNumberCount;
         private Sprite _hitHierarchyRingSprite;
         // Boyut enum uzunlugundan buyuk tutulur (yeni SFX tipi eklerken tasma olmasin)
         private readonly float[] _lastSfxTimes = { -999f, -999f, -999f, -999f, -999f, -999f, -999f, -999f };
@@ -137,7 +147,12 @@ namespace DeadWalls
         public long TotalHitVfxPlayedCount { get; private set; }
         public long TotalHitVfxDroppedCount { get; private set; }
         public int ActiveHitFlipbookCount => _activeHitFlipbooks.Count;
-        public int ActiveDamageNumberCount => _activeDamageNumbers.Count;
+        public int ActiveDamageNumberCount => _activeDamageNumberCount;
+        public int ActiveDamageNumberBatchCount => _activeDamageNumberBatches.Count;
+        public int LastProcessedDamageNumberEventCount { get; private set; }
+        public int LastDamageNumberPresentationCount { get; private set; }
+        public double LastProcessedDamageNumberTotal { get; private set; }
+        public double LastPresentedDamageNumberTotal { get; private set; }
         public long TotalDamageNumbersPlayedCount { get; private set; }
 
         private World _world;
@@ -169,21 +184,79 @@ namespace DeadWalls
             public float Elapsed;
         }
 
-        private struct DamageNumberVisual
+        private struct DamageNumberBatchEntry
+        {
+            public int StartCharacterIndex;
+            public int CharacterLength;
+            public Vector3 StartPosition;
+            public Vector3 BaseCenter;
+            public Color32 BaseColor;
+        }
+
+        private readonly struct DamageNumberAggregateKey :
+            IEquatable<DamageNumberAggregateKey>
+        {
+            public readonly int X;
+            public readonly int Y;
+            public readonly PlayerDamageSourceType Source;
+
+            public DamageNumberAggregateKey(
+                int x,
+                int y,
+                PlayerDamageSourceType source)
+            {
+                X = x;
+                Y = y;
+                Source = source;
+            }
+
+            public bool Equals(DamageNumberAggregateKey other)
+            {
+                return X == other.X && Y == other.Y && Source == other.Source;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is DamageNumberAggregateKey other && Equals(other);
+            }
+
+            public override int GetHashCode()
+            {
+                unchecked
+                {
+                    int hash = X;
+                    hash = (hash * 397) ^ Y;
+                    return (hash * 397) ^ (int)Source;
+                }
+            }
+        }
+
+        private struct DamageNumberAggregate
+        {
+            public float3 PositionSum;
+            public float AppliedDamage;
+            public int EventCount;
+        }
+
+        private struct DamageNumberPresentation
+        {
+            public CombatDamageNumberEvent DamageEvent;
+            public int SourceEventCount;
+        }
+
+        private sealed class DamageNumberBatchVisual
         {
             public GameObject Instance;
             public TextMeshPro Text;
-        }
-
-        private struct ActiveDamageNumber
-        {
-            public DamageNumberVisual Visual;
-            public Vector3 StartPosition;
+            public readonly List<DamageNumberBatchEntry> Entries =
+                new List<DamageNumberBatchEntry>(512);
+            public readonly StringBuilder TextBuilder = new StringBuilder(4096);
+            public TMP_MeshInfo[] BaseMeshInfo;
             public float Elapsed;
             public float Duration;
             public float RiseDistance;
             public float BaseScale;
-            public Color BaseColor;
+            public int SourceEventCount;
         }
 
         private void Awake()
@@ -407,117 +480,227 @@ namespace DeadWalls
 
             using NativeArray<CombatDamageNumberEvent> events =
                 _damageNumberQuery.ToComponentDataArray<CombatDamageNumberEvent>(Allocator.Temp);
-            for (int i = 0; i < events.Length; i++)
-                PlayDamageNumber(events[i]);
+            BuildDamageNumberPresentations(events);
+            int capacity = Mathf.Max(1, DamageNumberBatchCapacity);
+            for (int start = 0;
+                 start < _damageNumberPresentations.Count;
+                 start += capacity)
+            {
+                int count = Mathf.Min(
+                    capacity,
+                    _damageNumberPresentations.Count - start);
+                PlayDamageNumberBatch(_damageNumberPresentations, start, count);
+            }
 
             _entityManager.DestroyEntity(entities);
         }
 
-        private void PlayDamageNumber(CombatDamageNumberEvent damageEvent)
+        private void BuildDamageNumberPresentations(
+            NativeArray<CombatDamageNumberEvent> events)
         {
-            if (damageEvent.AppliedDamage <= 0f)
-                return;
+            _damageNumberPresentations.Clear();
+            _damageNumberAggregates.Clear();
+            LastProcessedDamageNumberEventCount = 0;
+            LastDamageNumberPresentationCount = 0;
+            LastProcessedDamageNumberTotal = 0d;
+            LastPresentedDamageNumberTotal = 0d;
 
-            DamageNumberVisual visual = GetDamageNumberVisual();
-            if (visual.Instance == null || visual.Text == null)
-                return;
-
-            float baseScale = Mathf.Max(0.01f, DamageNumberWorldScale);
-            int lane = (int)(TotalDamageNumbersPlayedCount % 5L) - 2;
-            Vector3 startPosition = new Vector3(
-                damageEvent.Position.x + lane * 0.035f,
-                damageEvent.Position.y + Mathf.Max(0f, DamageNumberHeadOffset),
-                MobileCastleRenderDepth.ProjectileZ);
-            Color color = ResolveDamageNumberColor(damageEvent.Source);
-
-            visual.Text.text = FormatDamageNumber(damageEvent.AppliedDamage);
-            visual.Text.color = color;
-            visual.Instance.transform.position = startPosition;
-            visual.Instance.transform.localScale = Vector3.one * (baseScale * 0.72f);
-            visual.Instance.SetActive(true);
-
-            _activeDamageNumbers.Add(new ActiveDamageNumber
+            int threshold = Mathf.Max(1, DamageNumberAggregationThreshold);
+            if (events.Length <= threshold)
             {
-                Visual = visual,
-                StartPosition = startPosition,
-                Elapsed = 0f,
-                Duration = Mathf.Max(0.1f, DamageNumberDuration),
-                RiseDistance = Mathf.Max(0.05f, DamageNumberRiseDistance),
-                BaseScale = baseScale,
-                BaseColor = color
-            });
-            TotalDamageNumbersPlayedCount++;
+                for (int i = 0; i < events.Length; i++)
+                {
+                    CombatDamageNumberEvent damageEvent = events[i];
+                    if (damageEvent.AppliedDamage <= 0f)
+                        continue;
+
+                    _damageNumberPresentations.Add(new DamageNumberPresentation
+                    {
+                        DamageEvent = damageEvent,
+                        SourceEventCount = 1
+                    });
+                    LastProcessedDamageNumberEventCount++;
+                    LastProcessedDamageNumberTotal += damageEvent.AppliedDamage;
+                }
+
+                LastDamageNumberPresentationCount = _damageNumberPresentations.Count;
+                LastPresentedDamageNumberTotal = LastProcessedDamageNumberTotal;
+                return;
+            }
+
+            float cellSize = Mathf.Max(0.05f, DamageNumberAggregationCellSize);
+            for (int i = 0; i < events.Length; i++)
+            {
+                CombatDamageNumberEvent damageEvent = events[i];
+                if (damageEvent.AppliedDamage <= 0f)
+                    continue;
+
+                var key = new DamageNumberAggregateKey(
+                    Mathf.FloorToInt(damageEvent.Position.x / cellSize),
+                    Mathf.FloorToInt(damageEvent.Position.y / cellSize),
+                    damageEvent.Source);
+                _damageNumberAggregates.TryGetValue(
+                    key,
+                    out DamageNumberAggregate aggregate);
+                aggregate.PositionSum += damageEvent.Position;
+                aggregate.AppliedDamage += damageEvent.AppliedDamage;
+                aggregate.EventCount++;
+                _damageNumberAggregates[key] = aggregate;
+                LastProcessedDamageNumberEventCount++;
+                LastProcessedDamageNumberTotal += damageEvent.AppliedDamage;
+            }
+
+            foreach (KeyValuePair<DamageNumberAggregateKey, DamageNumberAggregate> pair
+                     in _damageNumberAggregates)
+            {
+                DamageNumberAggregate aggregate = pair.Value;
+                if (aggregate.EventCount <= 0)
+                    continue;
+
+                _damageNumberPresentations.Add(new DamageNumberPresentation
+                {
+                    DamageEvent = new CombatDamageNumberEvent
+                    {
+                        Position = aggregate.PositionSum / aggregate.EventCount,
+                        AppliedDamage = aggregate.AppliedDamage,
+                        Source = pair.Key.Source
+                    },
+                    SourceEventCount = aggregate.EventCount
+                });
+                LastPresentedDamageNumberTotal += aggregate.AppliedDamage;
+            }
+
+            LastDamageNumberPresentationCount = _damageNumberPresentations.Count;
+        }
+
+        private void PlayDamageNumberBatch(
+            List<DamageNumberPresentation> presentations,
+            int start,
+            int count)
+        {
+            DamageNumberBatchVisual batch = GetDamageNumberBatchVisual();
+            if (batch?.Instance == null || batch.Text == null)
+                return;
+
+            batch.Entries.Clear();
+            batch.TextBuilder.Clear();
+            batch.TextBuilder.EnsureCapacity(Mathf.Max(
+                batch.TextBuilder.Capacity,
+                count * 8));
+
+            long firstSequence = TotalDamageNumbersPlayedCount;
+            int sourceEventCount = 0;
+            for (int i = 0; i < count; i++)
+            {
+                DamageNumberPresentation presentation = presentations[start + i];
+                CombatDamageNumberEvent damageEvent = presentation.DamageEvent;
+                if (damageEvent.AppliedDamage <= 0f)
+                    continue;
+
+                string formattedDamage = FormatDamageNumber(damageEvent.AppliedDamage);
+                int lane = (int)((firstSequence + batch.Entries.Count) % 5L) - 2;
+                var entry = new DamageNumberBatchEntry
+                {
+                    StartCharacterIndex = batch.TextBuilder.Length,
+                    CharacterLength = formattedDamage.Length,
+                    StartPosition = new Vector3(
+                        damageEvent.Position.x + lane * 0.035f,
+                        damageEvent.Position.y + Mathf.Max(0f, DamageNumberHeadOffset),
+                        0f),
+                    BaseCenter = Vector3.zero,
+                    BaseColor = ResolveDamageNumberColor(damageEvent.Source)
+                };
+                batch.Entries.Add(entry);
+                batch.TextBuilder.Append(formattedDamage);
+                batch.TextBuilder.Append('\n');
+                sourceEventCount += Mathf.Max(1, presentation.SourceEventCount);
+            }
+
+            if (batch.Entries.Count == 0)
+            {
+                ReleaseDamageNumberBatchVisual(batch);
+                return;
+            }
+
+            batch.Elapsed = 0f;
+            batch.Duration = Mathf.Max(0.1f, DamageNumberDuration);
+            batch.RiseDistance = Mathf.Max(0.05f, DamageNumberRiseDistance);
+            batch.BaseScale = Mathf.Max(0.01f, DamageNumberWorldScale);
+            batch.SourceEventCount = sourceEventCount;
+            batch.Text.text = batch.TextBuilder.ToString();
+            batch.Instance.SetActive(true);
+            batch.Text.ForceMeshUpdate(true, true);
+            batch.BaseMeshInfo = batch.Text.textInfo.CopyMeshInfoVertexData();
+            ResolveDamageNumberBatchCenters(batch);
+            ApplyDamageNumberBatchAnimation(batch, 0f);
+
+            _activeDamageNumberBatches.Add(batch);
+            _activeDamageNumberCount += batch.SourceEventCount;
+            TotalDamageNumbersPlayedCount += batch.SourceEventCount;
         }
 
         private void UpdateActiveDamageNumbers(float dt)
         {
-            for (int i = _activeDamageNumbers.Count - 1; i >= 0; i--)
+            for (int i = _activeDamageNumberBatches.Count - 1; i >= 0; i--)
             {
-                ActiveDamageNumber active = _activeDamageNumbers[i];
-                if (active.Visual.Instance == null || active.Visual.Text == null)
+                DamageNumberBatchVisual batch = _activeDamageNumberBatches[i];
+                if (batch?.Instance == null || batch.Text == null)
                 {
-                    _activeDamageNumbers.RemoveAt(i);
+                    _activeDamageNumberCount -= batch?.SourceEventCount ?? 0;
+                    _activeDamageNumberBatches.RemoveAt(i);
                     continue;
                 }
 
-                active.Elapsed += Mathf.Max(0f, dt);
-                float progress01 = Mathf.Clamp01(active.Elapsed / active.Duration);
-                float easedRise = 1f - (1f - progress01) * (1f - progress01);
-                active.Visual.Instance.transform.position = active.StartPosition
-                    + Vector3.up * (active.RiseDistance * easedRise);
-
-                float scaleMultiplier = progress01 < 0.18f
-                    ? Mathf.Lerp(0.72f, 1.12f, progress01 / 0.18f)
-                    : Mathf.Lerp(1.12f, 1f, (progress01 - 0.18f) / 0.82f);
-                active.Visual.Instance.transform.localScale =
-                    Vector3.one * (active.BaseScale * scaleMultiplier);
-
-                float alpha = progress01 < 0.58f
-                    ? 1f
-                    : 1f - (progress01 - 0.58f) / 0.42f;
-                Color color = active.BaseColor;
-                color.a *= Mathf.Clamp01(alpha);
-                active.Visual.Text.color = color;
+                batch.Elapsed += Mathf.Max(0f, dt);
+                float progress01 = Mathf.Clamp01(batch.Elapsed / batch.Duration);
+                ApplyDamageNumberBatchAnimation(batch, progress01);
 
                 if (progress01 >= 1f)
                 {
-                    ReleaseDamageNumberVisual(active.Visual);
-                    _activeDamageNumbers.RemoveAt(i);
+                    _activeDamageNumberCount -= batch.SourceEventCount;
+                    _activeDamageNumberBatches.RemoveAt(i);
+                    ReleaseDamageNumberBatchVisual(batch);
                     continue;
                 }
-
-                _activeDamageNumbers[i] = active;
             }
         }
 
         private void EnsureDamageNumberPool()
         {
-            int targetSize = Mathf.Max(0, DamageNumberInitialPoolSize);
-            while (_damageNumberPool.Count + _activeDamageNumbers.Count < targetSize)
-                _damageNumberPool.Enqueue(CreateDamageNumberVisual(
-                    _damageNumberPool.Count + _activeDamageNumbers.Count));
+            int capacity = Mathf.Max(1, DamageNumberBatchCapacity);
+            int targetBatchCount = Mathf.CeilToInt(
+                Mathf.Max(0, DamageNumberInitialPoolSize) / (float)capacity);
+            while (_damageNumberBatchPool.Count + _activeDamageNumberBatches.Count
+                   < targetBatchCount)
+            {
+                _damageNumberBatchPool.Enqueue(CreateDamageNumberBatchVisual(
+                    _damageNumberBatchPool.Count + _activeDamageNumberBatches.Count));
+            }
         }
 
-        private DamageNumberVisual GetDamageNumberVisual()
+        private DamageNumberBatchVisual GetDamageNumberBatchVisual()
         {
-            if (_damageNumberPool.Count > 0)
-                return _damageNumberPool.Dequeue();
+            if (_damageNumberBatchPool.Count > 0)
+                return _damageNumberBatchPool.Dequeue();
 
-            return CreateDamageNumberVisual(
-                _damageNumberPool.Count + _activeDamageNumbers.Count);
+            return CreateDamageNumberBatchVisual(
+                _damageNumberBatchPool.Count + _activeDamageNumberBatches.Count);
         }
 
-        private DamageNumberVisual CreateDamageNumberVisual(int index)
+        private DamageNumberBatchVisual CreateDamageNumberBatchVisual(int index)
         {
-            var instance = new GameObject("DamageNumber_" + index);
+            var instance = new GameObject("DamageNumberBatch_" + index);
             instance.transform.SetParent(transform, false);
+            instance.transform.position = new Vector3(
+                0f, 0f, MobileCastleRenderDepth.ProjectileZ);
             var text = instance.AddComponent<TextMeshPro>();
             text.alignment = TextAlignmentOptions.Center;
             text.fontSize = 5f;
             text.fontStyle = FontStyles.Bold;
             text.enableWordWrapping = false;
+            text.overflowMode = TextOverflowModes.Overflow;
             text.raycastTarget = false;
-            text.rectTransform.sizeDelta = new Vector2(4f, 1.4f);
+            text.rectTransform.sizeDelta = new Vector2(8192f, 8192f);
             text.outlineWidth = 0.16f;
             text.outlineColor = new Color32(16, 10, 8, 225);
             MeshRenderer meshRenderer = text.GetComponent<MeshRenderer>();
@@ -528,7 +711,7 @@ namespace DeadWalls
             }
 
             instance.SetActive(false);
-            return new DamageNumberVisual
+            return new DamageNumberBatchVisual
             {
                 Instance = instance,
                 Text = text
@@ -537,19 +720,131 @@ namespace DeadWalls
 
         private void ReleaseAllActiveDamageNumbers()
         {
-            for (int i = _activeDamageNumbers.Count - 1; i >= 0; i--)
-                ReleaseDamageNumberVisual(_activeDamageNumbers[i].Visual);
+            for (int i = _activeDamageNumberBatches.Count - 1; i >= 0; i--)
+                ReleaseDamageNumberBatchVisual(_activeDamageNumberBatches[i]);
 
-            _activeDamageNumbers.Clear();
+            _activeDamageNumberBatches.Clear();
+            _activeDamageNumberCount = 0;
         }
 
-        private void ReleaseDamageNumberVisual(DamageNumberVisual visual)
+        private void ReleaseDamageNumberBatchVisual(DamageNumberBatchVisual batch)
         {
-            if (visual.Instance == null)
+            if (batch?.Instance == null)
                 return;
 
-            visual.Instance.SetActive(false);
-            _damageNumberPool.Enqueue(visual);
+            batch.Instance.SetActive(false);
+            batch.Text.text = string.Empty;
+            batch.Entries.Clear();
+            batch.BaseMeshInfo = null;
+            batch.SourceEventCount = 0;
+            _damageNumberBatchPool.Enqueue(batch);
+        }
+
+        private static void ResolveDamageNumberBatchCenters(DamageNumberBatchVisual batch)
+        {
+            TMP_TextInfo textInfo = batch.Text.textInfo;
+            for (int entryIndex = 0; entryIndex < batch.Entries.Count; entryIndex++)
+            {
+                DamageNumberBatchEntry entry = batch.Entries[entryIndex];
+                Vector3 min = new Vector3(float.PositiveInfinity, float.PositiveInfinity, 0f);
+                Vector3 max = new Vector3(float.NegativeInfinity, float.NegativeInfinity, 0f);
+                bool foundVisibleCharacter = false;
+                int end = Mathf.Min(
+                    textInfo.characterCount,
+                    entry.StartCharacterIndex + entry.CharacterLength);
+                for (int charIndex = entry.StartCharacterIndex;
+                     charIndex < end;
+                     charIndex++)
+                {
+                    TMP_CharacterInfo character = textInfo.characterInfo[charIndex];
+                    if (!character.isVisible)
+                        continue;
+
+                    int materialIndex = character.materialReferenceIndex;
+                    int vertexIndex = character.vertexIndex;
+                    Vector3[] vertices = batch.BaseMeshInfo[materialIndex].vertices;
+                    for (int corner = 0; corner < 4; corner++)
+                    {
+                        Vector3 vertex = vertices[vertexIndex + corner];
+                        min = Vector3.Min(min, vertex);
+                        max = Vector3.Max(max, vertex);
+                    }
+
+                    foundVisibleCharacter = true;
+                }
+
+                entry.BaseCenter = foundVisibleCharacter
+                    ? (min + max) * 0.5f
+                    : Vector3.zero;
+                batch.Entries[entryIndex] = entry;
+            }
+        }
+
+        private static void ApplyDamageNumberBatchAnimation(
+            DamageNumberBatchVisual batch,
+            float progress01)
+        {
+            if (batch.BaseMeshInfo == null)
+                return;
+
+            TMP_TextInfo textInfo = batch.Text.textInfo;
+            for (int materialIndex = 0;
+                 materialIndex < textInfo.meshInfo.Length
+                 && materialIndex < batch.BaseMeshInfo.Length;
+                 materialIndex++)
+            {
+                Vector3[] sourceVertices = batch.BaseMeshInfo[materialIndex].vertices;
+                Vector3[] targetVertices = textInfo.meshInfo[materialIndex].vertices;
+                Array.Copy(sourceVertices, targetVertices,
+                    Mathf.Min(sourceVertices.Length, targetVertices.Length));
+            }
+
+            float easedRise = 1f - (1f - progress01) * (1f - progress01);
+            float scaleMultiplier = progress01 < 0.18f
+                ? Mathf.Lerp(0.72f, 1.12f, progress01 / 0.18f)
+                : Mathf.Lerp(1.12f, 1f, (progress01 - 0.18f) / 0.82f);
+            float alpha = progress01 < 0.58f
+                ? 1f
+                : 1f - (progress01 - 0.58f) / 0.42f;
+            float scale = batch.BaseScale * scaleMultiplier;
+
+            for (int entryIndex = 0; entryIndex < batch.Entries.Count; entryIndex++)
+            {
+                DamageNumberBatchEntry entry = batch.Entries[entryIndex];
+                Vector3 targetCenter = entry.StartPosition
+                    + Vector3.up * (batch.RiseDistance * easedRise);
+                Color32 color = entry.BaseColor;
+                color.a = (byte)Mathf.RoundToInt(color.a * Mathf.Clamp01(alpha));
+                int end = Mathf.Min(
+                    textInfo.characterCount,
+                    entry.StartCharacterIndex + entry.CharacterLength);
+                for (int charIndex = entry.StartCharacterIndex;
+                     charIndex < end;
+                     charIndex++)
+                {
+                    TMP_CharacterInfo character = textInfo.characterInfo[charIndex];
+                    if (!character.isVisible)
+                        continue;
+
+                    int materialIndex = character.materialReferenceIndex;
+                    int vertexIndex = character.vertexIndex;
+                    Vector3[] sourceVertices = batch.BaseMeshInfo[materialIndex].vertices;
+                    Vector3[] targetVertices = textInfo.meshInfo[materialIndex].vertices;
+                    Color32[] targetColors = textInfo.meshInfo[materialIndex].colors32;
+                    for (int corner = 0; corner < 4; corner++)
+                    {
+                        int index = vertexIndex + corner;
+                        targetVertices[index] =
+                            (sourceVertices[index] - entry.BaseCenter) * scale
+                            + targetCenter;
+                        targetColors[index] = color;
+                    }
+                }
+            }
+
+            batch.Text.UpdateVertexData(
+                TMP_VertexDataUpdateFlags.Vertices
+                | TMP_VertexDataUpdateFlags.Colors32);
         }
 
         public static string FormatDamageNumber(float appliedDamage)

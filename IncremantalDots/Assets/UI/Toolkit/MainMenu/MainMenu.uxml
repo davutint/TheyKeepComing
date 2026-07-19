@@ -49,6 +49,19 @@
                     <ui:Slider name="ambienceSlider" low-value="0" high-value="1" value="1" class="dw-slider" />
                 </ui:VisualElement>
 
+                <ui:VisualElement class="settings-field settings-field--performance">
+                    <ui:VisualElement class="settings-field__heading">
+                        <ui:VisualElement class="settings-field__identity"><ui:VisualElement class="menu-setting-icon menu-setting-icon--horde" picking-mode="Ignore" /><ui:Label text="MAX ACTIVE ZOMBIES" class="settings-field__label" /></ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="settings-stepper">
+                        <ui:Button name="zombieLimitPrevious" text="-" class="settings-stepper__button" />
+                        <ui:Label name="zombieLimitValue" text="BALANCED  ·  900" class="settings-stepper__value" />
+                        <ui:Button name="zombieLimitNext" text="+" class="settings-stepper__button" />
+                    </ui:VisualElement>
+                    <ui:Label name="zombieLimitHint" text="RECOMMENDED DEFAULT FOR PERFORMANCE AND BATTLE READABILITY." class="settings-performance-hint" />
+                    <ui:Label text="LOWER LIMITS IMPROVE PERFORMANCE AND REDUCE BATTLEFIELD DENSITY. LIVING ZOMBIES ARE NEVER REMOVED." class="settings-performance-note" />
+                </ui:VisualElement>
+
                 <ui:VisualElement class="settings-separator" />
                 <ui:Button name="tutorialResetButton" class="settings-text-button settings-text-button--danger settings-button-with-icon"><ui:VisualElement class="menu-setting-icon menu-setting-icon--refresh" picking-mode="Ignore" /><ui:Label name="tutorialResetButtonLabel" text="RESET TUTORIAL" class="settings-button-label" picking-mode="Ignore" /></ui:Button>
                 <ui:Label name="tutorialStatusLabel" text="RESETS ONBOARDING ONLY. RUN AND UPGRADES STAY." class="settings-tutorial-status" />

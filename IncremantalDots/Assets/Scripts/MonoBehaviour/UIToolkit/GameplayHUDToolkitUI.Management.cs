@@ -312,8 +312,9 @@ namespace DeadWalls
 
             BuildArcherRows();
             int total = gm.GetTotalArcherCount();
-            int capacity = total + gm.GetRemainingArcherCapacity();
-            _archerCapacity.text = $"{total:N0} / {capacity:N0} ARCHERS";
+            _archerCapacity.text = gm.GetRemainingArcherCapacity() <= 0
+                ? "GARRISON FULL"
+                : $"{total:N0} ARCHERS DEPLOYED";
             _archerSummary.text = $"{gm.BasicArcherCount:N0} BASIC  ·  {gm.RapidArcherCount:N0} RAPID  ·  {gm.FrostArcherCount:N0} FROST";
 
             ArcherDefinitionSO[] definitions = gm.GetArcherDefinitions();

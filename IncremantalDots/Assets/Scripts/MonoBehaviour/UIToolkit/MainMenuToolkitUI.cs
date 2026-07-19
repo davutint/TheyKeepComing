@@ -36,6 +36,10 @@ namespace DeadWalls
         private Slider _ambienceSlider;
         private Label _sfxValueLabel;
         private Label _ambienceValueLabel;
+        private Button _zombieLimitPrevious;
+        private Button _zombieLimitNext;
+        private Label _zombieLimitValue;
+        private Label _zombieLimitHint;
         private Label _tutorialStatusLabel;
         private AudioSource _ambienceSource;
         private bool _tutorialResetArmed;
@@ -116,6 +120,10 @@ namespace DeadWalls
             _ambienceSlider = _root.Q<Slider>("ambienceSlider");
             _sfxValueLabel = _root.Q<Label>("sfxValueLabel");
             _ambienceValueLabel = _root.Q<Label>("ambienceValueLabel");
+            _zombieLimitPrevious = _root.Q<Button>("zombieLimitPrevious");
+            _zombieLimitNext = _root.Q<Button>("zombieLimitNext");
+            _zombieLimitValue = _root.Q<Label>("zombieLimitValue");
+            _zombieLimitHint = _root.Q<Label>("zombieLimitHint");
             _tutorialStatusLabel = _root.Q<Label>("tutorialStatusLabel");
 
             _continueButton.clicked += HandleContinueClicked;
@@ -123,6 +131,8 @@ namespace DeadWalls
             _settingsButton.clicked += HandleSettingsClicked;
             _tutorialResetButton.clicked += HandleTutorialResetClicked;
             _settingsCloseButton.clicked += HandleSettingsCloseClicked;
+            _zombieLimitPrevious.clicked += () => StepZombieLimit(-1);
+            _zombieLimitNext.clicked += () => StepZombieLimit(1);
             _sfxSlider.RegisterValueChangedCallback(evt =>
             {
                 SoundSettings.SfxVolume = evt.newValue;
@@ -224,6 +234,7 @@ namespace DeadWalls
             _sfxSlider.SetValueWithoutNotify(SoundSettings.SfxVolume);
             _ambienceSlider.SetValueWithoutNotify(SoundSettings.AmbienceVolume);
             UpdateVolumeLabels();
+            RefreshZombieLimitSetting();
             ResetTutorialConfirmation();
             _settingsOverlay.AddToClassList("is-open");
             _settingsCloseButton.schedule.Execute(() => _settingsCloseButton.Focus()).StartingIn(40);
@@ -275,6 +286,29 @@ namespace DeadWalls
         {
             _sfxValueLabel.text = $"{Mathf.RoundToInt(SoundSettings.SfxVolume * 100f)}%";
             _ambienceValueLabel.text = $"{Mathf.RoundToInt(SoundSettings.AmbienceVolume * 100f)}%";
+        }
+
+        private void StepZombieLimit(int direction)
+        {
+            ZombieLimitPreset current = GameplayPerformanceSettings.CurrentZombieLimitPreset;
+            ZombieLimitPreset next = GameplayPerformanceSettings.Step(current, direction);
+            if (next == current)
+                return;
+
+            UiSoundFeedback.Instance?.PlayClick();
+            GameplayPerformanceSettings.CurrentZombieLimitPreset = next;
+            RefreshZombieLimitSetting();
+        }
+
+        private void RefreshZombieLimitSetting()
+        {
+            ZombieLimitPreset preset = GameplayPerformanceSettings.CurrentZombieLimitPreset;
+            _zombieLimitValue.text = GameplayPerformanceSettings.GetDisplayName(preset);
+            _zombieLimitHint.text = GameplayPerformanceSettings.GetPerformanceHint(preset);
+            _zombieLimitPrevious.SetEnabled(
+                GameplayPerformanceSettings.CanStep(preset, -1));
+            _zombieLimitNext.SetEnabled(
+                GameplayPerformanceSettings.CanStep(preset, 1));
         }
 
         private void HandleInputModeChanged(UIInputMode mode)

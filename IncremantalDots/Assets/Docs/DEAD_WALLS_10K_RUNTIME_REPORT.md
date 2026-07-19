@@ -448,3 +448,53 @@ PNG audit'inde soğuk Night palette'i, Night tarafındaki celestial dial, sur ha
 Archer formasyonu, 10K horde alanı ve savaş alanındaki bounded ok temsilcileri aynı karede okunur
 kaldı. Test log'u exact sayaçları, phase'i, overlay/light değerlerini, çözünürlüğü ve capture yolunu
 `[DW-V1-10K-1K-NIGHT-VISUAL]` kaydıyla birlikte üretir.
+
+---
+
+## DW-P9 Player Limiti ve Yoğun Feedback Optimizasyonu - 2026-07-19
+
+### Player-facing limit sözleşmesi
+
+Main Menu ve Pause Settings içine aynı persistent zombie-limit seçicisi eklendi. Preset'ler mevcut
+ölçülmüş horde bantlarına dayanır: `BALANCED 900`, `HIGH 2.000`, `MASSIVE 5.000`,
+`EXTREME 10.000`. UI, düşük limitin performansı iyileştirirken battlefield density'yi azalttığını
+açıklar. Koşu sırasında limit düşürmek canlı zombileri silmez; yeni spawn'lar aktif sayı limitin
+altına düşene kadar mevcut exact backlog'da bekler.
+
+`10.000` burada teknik üst preset'tir; önerilen varsayılan `900` olarak kalır. Mobil cihazlar için
+ayrı target-hardware sertifikası üretilmedi. Ayar mobil/PC kullanıcıya koruma mekanizması sunar,
+fakat ölçülmemiş bir mobil performans garantisi olarak yorumlanmaz.
+
+### Kanıtlanmış darboğaz ve davranış-korumalı çözüm
+
+Güncel UI/feedback kapsamıyla alınan Editor baseline'ında 10K Fireball aynı karede yaklaşık 10.000
+TMP damage-number objesi, 10.000 legacy Soul GameObject'i ve 10.000 UI Toolkit Soul elementi
+üretiyordu. Steady-state main-thread ortalaması `25,47 ms`, P95 `48,00 ms`; toplu ölüm peak'i
+`13.786 ms` idi.
+
+- Hasar sayıları event başına GameObject yerine `512` presentation kapasiteli TMP mesh batch'lerine
+  taşındı. Yoğun burst'ler damage source + world-space hücre bazında toplanır; event sayısı ve toplam
+  uygulanan hasar telemetry/test ile exact korunur.
+- Soul event'leri `96`ya kadar birebir kalır. Yoğun aynı-frame ölümleri battlefield oranını koruyan
+  adaptif grid ile en fazla `96` uçuşa toplanır. Her uçuş `+N` miktarını gösterir; gameplay Soul
+  state'i ve toplam sunulan miktar kaybolmaz. UI Toolkit Soul elementleri ayrıca pool'lanır.
+
+### Aynı Editor benchmark sonucu
+
+| Metrik | P9 baseline | P9 final |
+|---|---:|---:|
+| Targeted PlayMode | `1/1 passed` | `1/1 passed` |
+| Enemy / canonical Archer | `10.000 / 1.000` | `10.000 / 1.000` |
+| Main thread average | `25,47 ms` | `13,12 ms` |
+| Frame P95 | `48,00 ms` | `17,83 ms` |
+| Draw calls average | yaklaşık `1.688` | `591` |
+| Editor root GC average | yaklaşık `205 KB/frame` | `84.626 B/frame` |
+| 10K Fireball death peak | `13.786 ms` | `63,11 ms` |
+
+Final run ayrıca `frame_avg=13,27 ms`, `main_max=41,93 ms`, exact pool return,
+deterministic rebuild, save/continue ve backlog kanıtlarını geçti. Death peak yaklaşık `%99,54`,
+main-thread average yaklaşık `%48,5` azaldı.
+
+Bu tablo Unity Editor + Test Runner karşılaştırmasıdır; release Player FPS sertifikası değildir.
+Target hardware için bu belgedeki instrumentation-kapalı `i5-14400F / Intel Arc B580 / 1080p Ultra`
+sonucu geçerliliğini korur: `7,665 ms` frame average ve `13,890 ms` P95 ile 10K + 1K kabul edilmiştir.

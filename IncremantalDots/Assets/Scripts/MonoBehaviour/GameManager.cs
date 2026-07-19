@@ -320,8 +320,36 @@ namespace DeadWalls
             if (!_techDefenseBaselineCaptured)
                 CaptureConfiguredWallBaseline();
             _initialized = true;
+            ApplyZombieLimitSetting();
             ApplyMobileInitialPrepIfNeeded();
             EnsureCurrentRunId();
+            return true;
+        }
+
+        public int ActiveZombieLimit
+        {
+            get
+            {
+                return TryGetMobileCombatConfig(out MobileCastleCombatConfig config)
+                    ? math.max(1, config.MaxAliveZombies)
+                    : GameplayPerformanceSettings.MaxAliveZombies;
+            }
+        }
+
+        /// <summary>
+        /// Oyuncunun cihaz-bazli aktif zombi limitini canli config'e uygular.
+        /// Mevcut zombileri silmez; WaveSpawnSystem cap altinda yer acilana kadar
+        /// yeni spawn backlog'unu bekletir.
+        /// </summary>
+        public bool ApplyZombieLimitSetting()
+        {
+            if (!TryGetMobileConfigEntity(out Entity configEntity))
+                return false;
+
+            MobileCastleCombatConfig config =
+                _entityManager.GetComponentData<MobileCastleCombatConfig>(configEntity);
+            config.MaxAliveZombies = GameplayPerformanceSettings.MaxAliveZombies;
+            _entityManager.SetComponentData(configEntity, config);
             return true;
         }
 

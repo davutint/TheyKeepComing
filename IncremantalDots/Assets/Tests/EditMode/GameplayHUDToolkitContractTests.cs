@@ -160,6 +160,22 @@ namespace DeadWalls.Tests
             Assert.That(root.Q<Label>("tutorialResetButtonLabel"), Is.Not.Null);
             Assert.That(root.Q<VisualElement>(className: "menu-setting-icon--sound"), Is.Not.Null);
             Assert.That(root.Q<VisualElement>(className: "menu-setting-icon--music"), Is.Not.Null);
+            Assert.That(root.Q<VisualElement>(className: "menu-setting-icon--horde"), Is.Not.Null);
+            Assert.That(root.Q<Button>("zombieLimitPrevious"), Is.Not.Null);
+            Assert.That(root.Q<Label>("zombieLimitValue"), Is.Not.Null);
+            Assert.That(root.Q<Button>("zombieLimitNext"), Is.Not.Null);
+        }
+
+        [Test]
+        public void ProductionSettings_ExposeSameZombieLimitContractAndHideBarracksHardCap()
+        {
+            TemplateContainer root = LoadHud().CloneTree();
+
+            Assert.That(root.Q<Button>("zombieLimitPrevious"), Is.Not.Null);
+            Assert.That(root.Q<Label>("zombieLimitValue"), Is.Not.Null);
+            Assert.That(root.Q<Label>("zombieLimitHint"), Is.Not.Null);
+            Assert.That(root.Q<Button>("zombieLimitNext"), Is.Not.Null);
+            Assert.That(root.Q<Label>("archerCapacity").text, Is.EqualTo("0 ARCHERS DEPLOYED"));
         }
 
         private static VisualTreeAsset LoadHud()

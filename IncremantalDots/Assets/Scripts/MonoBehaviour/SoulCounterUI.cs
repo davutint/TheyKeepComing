@@ -33,8 +33,16 @@ namespace DeadWalls
         public float CounterPulseScale = 1.14f;
         public Color SoulColor = new Color32(118, 224, 255, 255);
 
+        [Header("Dense Soul Burst Presentation")]
+        public int SoulPickupAggregationThreshold = 96;
+        public int MaxSoulPickupPresentationsPerBurst = 96;
+
         public int ActiveSoulVisualCount => _activeSoulVisuals.Count;
         public long TotalSoulVisualsPlayedCount { get; private set; }
+        public int LastProcessedSoulEventCount { get; private set; }
+        public int LastSoulPresentationCount { get; private set; }
+        public long LastProcessedSoulAmount { get; private set; }
+        public long LastPresentedSoulAmount { get; private set; }
 
         private const float CheckInterval = 0.25f;
         private float _checkTimer;
@@ -52,6 +60,10 @@ namespace DeadWalls
         private readonly Queue<SoulVisual> _soulVisualPool = new Queue<SoulVisual>();
         private readonly List<ActiveSoulVisual> _activeSoulVisuals =
             new List<ActiveSoulVisual>();
+        private readonly List<SoulPickupEvent> _soulPickupPresentations =
+            new List<SoulPickupEvent>();
+        private readonly Dictionary<SoulAggregateKey, SoulAggregate> _soulPickupAggregates =
+            new Dictionary<SoulAggregateKey, SoulAggregate>();
 
         private struct SoulVisual
         {
@@ -70,6 +82,29 @@ namespace DeadWalls
             public Vector2 Target;
             public float Elapsed;
             public float Duration;
+        }
+
+        private readonly struct SoulAggregateKey : IEquatable<SoulAggregateKey>
+        {
+            public readonly int X;
+            public readonly int Y;
+
+            public SoulAggregateKey(int x, int y)
+            {
+                X = x;
+                Y = y;
+            }
+
+            public bool Equals(SoulAggregateKey other) => X == other.X && Y == other.Y;
+            public override bool Equals(object obj) => obj is SoulAggregateKey other && Equals(other);
+            public override int GetHashCode() => HashCode.Combine(X, Y);
+        }
+
+        private struct SoulAggregate
+        {
+            public Vector3 PositionSum;
+            public long Amount;
+            public int EventCount;
         }
 
         private void Awake()
@@ -191,13 +226,118 @@ namespace DeadWalls
 
             using NativeArray<SoulPickupEvent> events =
                 _soulPickupQuery.ToComponentDataArray<SoulPickupEvent>(Allocator.Temp);
-            for (int i = 0; i < events.Length; i++)
+            BuildSoulPickupPresentations(events);
+            for (int i = 0; i < _soulPickupPresentations.Count; i++)
             {
-                ToolkitSoulPickupRequested?.Invoke(events[i]);
-                PlaySoulPickup(events[i]);
+                SoulPickupEvent presentation = _soulPickupPresentations[i];
+                ToolkitSoulPickupRequested?.Invoke(presentation);
+                PlaySoulPickup(presentation);
             }
 
             _entityManager.DestroyEntity(entities);
+        }
+
+        private void BuildSoulPickupPresentations(NativeArray<SoulPickupEvent> events)
+        {
+            _soulPickupPresentations.Clear();
+            _soulPickupAggregates.Clear();
+            LastProcessedSoulEventCount = 0;
+            LastSoulPresentationCount = 0;
+            LastProcessedSoulAmount = 0L;
+            LastPresentedSoulAmount = 0L;
+
+            Vector3 minimum = new Vector3(float.PositiveInfinity, float.PositiveInfinity, 0f);
+            Vector3 maximum = new Vector3(float.NegativeInfinity, float.NegativeInfinity, 0f);
+            for (int i = 0; i < events.Length; i++)
+            {
+                SoulPickupEvent soulEvent = events[i];
+                if (soulEvent.Amount <= 0)
+                    continue;
+
+                LastProcessedSoulEventCount++;
+                LastProcessedSoulAmount += soulEvent.Amount;
+                minimum.x = Mathf.Min(minimum.x, soulEvent.Position.x);
+                minimum.y = Mathf.Min(minimum.y, soulEvent.Position.y);
+                maximum.x = Mathf.Max(maximum.x, soulEvent.Position.x);
+                maximum.y = Mathf.Max(maximum.y, soulEvent.Position.y);
+            }
+
+            if (LastProcessedSoulEventCount <= 0)
+                return;
+
+            int threshold = Mathf.Max(1, SoulPickupAggregationThreshold);
+            if (LastProcessedSoulEventCount <= threshold)
+            {
+                for (int i = 0; i < events.Length; i++)
+                {
+                    if (events[i].Amount <= 0)
+                        continue;
+
+                    _soulPickupPresentations.Add(events[i]);
+                    LastPresentedSoulAmount += events[i].Amount;
+                }
+
+                LastSoulPresentationCount = _soulPickupPresentations.Count;
+                return;
+            }
+
+            int presentationLimit = Mathf.Max(1, MaxSoulPickupPresentationsPerBurst);
+            float extentX = Mathf.Max(0.01f, maximum.x - minimum.x);
+            float extentY = Mathf.Max(0.01f, maximum.y - minimum.y);
+            float aspect = Mathf.Clamp(extentX / extentY, 0.125f, 8f);
+            int gridX = Mathf.Clamp(
+                Mathf.CeilToInt(Mathf.Sqrt(presentationLimit * aspect)),
+                1,
+                presentationLimit);
+            int gridY = Mathf.Max(1, presentationLimit / gridX);
+
+            for (int i = 0; i < events.Length; i++)
+            {
+                SoulPickupEvent soulEvent = events[i];
+                if (soulEvent.Amount <= 0)
+                    continue;
+
+                int cellX = Mathf.Clamp(
+                    Mathf.FloorToInt((soulEvent.Position.x - minimum.x) / extentX * gridX),
+                    0,
+                    gridX - 1);
+                int cellY = Mathf.Clamp(
+                    Mathf.FloorToInt((soulEvent.Position.y - minimum.y) / extentY * gridY),
+                    0,
+                    gridY - 1);
+                var key = new SoulAggregateKey(cellX, cellY);
+                _soulPickupAggregates.TryGetValue(key, out SoulAggregate aggregate);
+                aggregate.PositionSum += new Vector3(
+                    soulEvent.Position.x,
+                    soulEvent.Position.y,
+                    soulEvent.Position.z);
+                aggregate.Amount += soulEvent.Amount;
+                aggregate.EventCount++;
+                _soulPickupAggregates[key] = aggregate;
+            }
+
+            foreach (KeyValuePair<SoulAggregateKey, SoulAggregate> pair in _soulPickupAggregates)
+            {
+                SoulAggregate aggregate = pair.Value;
+                if (aggregate.EventCount <= 0 || aggregate.Amount <= 0L)
+                    continue;
+
+                Vector3 averagePosition = aggregate.PositionSum / aggregate.EventCount;
+                int amount = aggregate.Amount >= int.MaxValue
+                    ? int.MaxValue
+                    : (int)aggregate.Amount;
+                _soulPickupPresentations.Add(new SoulPickupEvent
+                {
+                    Position = new Unity.Mathematics.float3(
+                        averagePosition.x,
+                        averagePosition.y,
+                        averagePosition.z),
+                    Amount = amount
+                });
+                LastPresentedSoulAmount += amount;
+            }
+
+            LastSoulPresentationCount = _soulPickupPresentations.Count;
         }
 
         private void PlaySoulPickup(SoulPickupEvent soulEvent)

@@ -260,6 +260,7 @@
 
 .menu-setting-icon--sound { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/sound_128_T.png"); }
 .menu-setting-icon--music { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/music_128_T.png"); }
+.menu-setting-icon--horde { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/skull_128_T.png"); }
 .menu-setting-icon--refresh { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/refresh_128_T.png"); }
 .menu-setting-icon--back { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/arrow_back_128_T.png"); }
 
@@ -273,6 +274,70 @@
 
 .settings-field__value {
     color: rgba(239, 236, 225, 0.88);
+}
+
+.settings-field--performance {
+    margin-top: 4px;
+    margin-bottom: 17px;
+}
+
+.settings-stepper {
+    height: 42px;
+    margin-top: 9px;
+    flex-direction: row;
+    align-items: stretch;
+    border-width: 1px;
+    border-color: rgba(224, 220, 207, 0.18);
+    background-color: rgba(255, 255, 255, 0.025);
+}
+
+.settings-stepper__button {
+    width: 48px;
+    margin: 0;
+    padding: 0;
+    border-width: 0;
+    border-radius: 0;
+    background-color: rgba(255, 255, 255, 0.025);
+    color: rgba(239, 236, 225, 0.78);
+    font-size: 18px;
+    -unity-font-style: bold;
+}
+
+.settings-stepper__button:hover,
+.settings-stepper__button:focus {
+    background-color: rgba(184, 88, 53, 0.20);
+    color: rgb(239, 235, 222);
+}
+
+.settings-stepper__button:disabled {
+    opacity: 0.24;
+}
+
+.settings-stepper__value {
+    flex-grow: 1;
+    margin: 0;
+    padding: 0;
+    color: rgb(235, 232, 222);
+    font-size: 11px;
+    letter-spacing: 1.2px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+}
+
+.settings-performance-hint {
+    margin: 8px 0 0 0;
+    color: rgba(225, 180, 110, 0.76);
+    font-size: 8px;
+    letter-spacing: 0.6px;
+    white-space: normal;
+}
+
+.settings-performance-note {
+    margin: 4px 0 0 0;
+    color: rgba(212, 209, 197, 0.36);
+    font-size: 7px;
+    letter-spacing: 0.45px;
+    white-space: normal;
 }
 
 .settings-modal .dw-slider .unity-base-slider__tracker {
@@ -355,6 +420,15 @@
     width: 330px;
     height: 56px;
     font-size: 16px;
+}
+
+.input--touch .settings-stepper {
+    height: 54px;
+}
+
+.input--touch .settings-stepper__button {
+    width: 64px;
+    font-size: 22px;
 }
 
 .input--touch .menu-primary-row {

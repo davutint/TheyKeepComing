@@ -53,3 +53,26 @@ olarak sınırlıdır. `MaxAliveZombies = 0` yalnız legacy “alive cap yok” 
 - `RunPersistenceTests`: JSON round-trip backlog ve telemetry alanlarını korur.
 - `ExactRunContinuePlayModeTests.Continue_RestoresSameCyclePhaseTimerResourcesAndSpawnRng`: Continue exact backlog'u geri getirir.
 - `ExactRunContinuePlayModeTests.ContinuousSpawnBudget_AccumulatesAtCap_AndDrainsWhenCapacityOpens`: gerçek `NewGameScene` içinde cap altında birikme ve kapasite açılınca spawn kanıtı.
+
+## Player Zombie Limiti (Post-V1 P9)
+
+`GameplayPerformanceSettings`, player-facing aktif zombi limitini tek persistent owner olarak
+`PlayerPrefs` içinde saklar. Main Menu ve Pause Settings aynı preset sözleşmesini kullanır:
+
+- `BALANCED`: `900` (önerilen),
+- `HIGH`: `2.000`,
+- `MASSIVE`: `5.000`,
+- `EXTREME`: `10.000`.
+
+`GameManager.ApplyZombieLimitSetting`, seçili değeri runtime `MobileCastleCombatConfig.MaxAliveZombies`
+alanına uygular. Limit koşu sırasında düşürülürse mevcut canlı zombiler despawn edilmez; aktif sayı
+yeni limitin altına inene kadar spawn budget backlog'u bekler. Böylece player seçimi yeni demand'in
+sahaya çıkışını sınırlar, canlı combat state'ini veya exact backlog muhasebesini silmez.
+
+UI açıkça düşük limitlerin performansı iyileştirdiğini fakat battlefield density'yi azalttığını
+belirtir. `10.000` teknik olarak doğrulanmış üst preset'tir; varsayılan ve önerilen değer `900`dür.
+
+Ek doğrulama:
+
+- `GameplayPerformanceSettingsTests`: preset sırası, limitler, metin ve persistence sözleşmesi.
+- `ZombieLimitSettingsPlayModeTests`: runtime uygulama ve düşürme sırasında no-despawn/backlog davranışı.

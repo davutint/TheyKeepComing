@@ -562,6 +562,16 @@
 .setting-heading { margin-top: 20px; }
 .setting-label { margin: 0; color: var(--runtime-muted); font-size: 9px; }
 .setting-status { margin-top: 8px; color: var(--runtime-muted); font-size: 9px; white-space: normal; }
+.setting-heading--performance { margin-top: 22px; }
+.setting-stepper { height: 42px; margin-top: 8px; flex-direction: row; align-items: stretch; border-width: 1px; border-color: var(--runtime-line); background-color: rgba(255,255,255,0.025); }
+.setting-stepper__button { width: 48px; margin: 0; padding: 0; border-width: 0; border-radius: 0; background-color: rgba(255,255,255,0.025); color: var(--runtime-ink); font-size: 18px; -unity-font-style: bold; }
+.setting-stepper__button:hover, .setting-stepper__button:focus { background-color: rgba(205,155,82,0.16); color: var(--runtime-gold-bright); }
+.setting-stepper__button:disabled { opacity: 0.24; }
+.setting-stepper__value { flex-grow: 1; margin: 0; padding: 0; color: var(--runtime-ink); font-size: 11px; letter-spacing: 1px; -unity-font-style: bold; -unity-text-align: middle-center; }
+.setting-performance-hint { margin: 8px 0 0 0; color: var(--runtime-gold-bright); font-size: 8px; letter-spacing: 0.45px; white-space: normal; }
+.setting-performance-note { margin: 4px 0 0 0; color: var(--runtime-faint); font-size: 7px; letter-spacing: 0.35px; white-space: normal; }
+.input--touch .setting-stepper { height: 54px; }
+.input--touch .setting-stepper__button { width: 64px; font-size: 22px; }
 .decision-timer { position: relative; height: 28px; margin-top: 22px; background-color: rgba(255,255,255,0.04); overflow: hidden; }
 .decision-timer-progress { position: absolute; left: 0; top: 0; bottom: 0; width: 100%; background-color: rgba(207,155,80,0.16); }
 .decision-timer-text { margin: 6px 0 0 0; padding: 0; color: var(--runtime-muted); font-size: 9px; -unity-text-align: middle-center; }
@@ -616,6 +626,7 @@
 .toast.is-visible { display: flex; }
 .toast--primary { border-color: rgba(205,155,82,0.40); }.toast--secondary { color: var(--runtime-muted); }
 .soul-flight { position: absolute; width: 18px; height: 18px; rotate: 45deg; background-color: var(--runtime-cyan); border-width: 2px; border-color: rgba(210,250,255,0.80); }
+.soul-flight__amount { position: absolute; left: 13px; top: -15px; min-width: 48px; height: 22px; padding: 2px 5px; rotate: -45deg; background-color: rgba(6,13,16,0.90); border-width: 1px; border-color: rgba(118,224,255,0.42); color: rgba(222,252,255,0.96); font-size: 10px; -unity-font-style: bold; -unity-text-align: middle-center; }
 
 /* Artsystack icon vocabulary: information-bearing only, never decorative filler. */
 .dw-icon {

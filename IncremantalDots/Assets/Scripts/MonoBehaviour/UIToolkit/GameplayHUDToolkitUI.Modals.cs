@@ -26,6 +26,10 @@ namespace DeadWalls
         private VisualElement _settingsModal;
         private Slider _sfxSlider;
         private Slider _ambienceSlider;
+        private Button _zombieLimitPrevious;
+        private Button _zombieLimitNext;
+        private Label _zombieLimitValue;
+        private Label _zombieLimitHint;
         private Button _resetTutorialButton;
         private Label _resetTutorialButtonLabel;
         private Label _resetTutorialStatus;
@@ -82,6 +86,13 @@ namespace DeadWalls
             _ambienceSlider.SetValueWithoutNotify(SoundSettings.AmbienceVolume);
             _sfxSlider.RegisterValueChangedCallback(evt => SoundSettings.SfxVolume = evt.newValue);
             _ambienceSlider.RegisterValueChangedCallback(evt => SoundSettings.AmbienceVolume = evt.newValue);
+            _zombieLimitPrevious = Q<Button>("zombieLimitPrevious");
+            _zombieLimitNext = Q<Button>("zombieLimitNext");
+            _zombieLimitValue = Q<Label>("zombieLimitValue");
+            _zombieLimitHint = Q<Label>("zombieLimitHint");
+            _zombieLimitPrevious.clicked += () => StepZombieLimit(-1);
+            _zombieLimitNext.clicked += () => StepZombieLimit(1);
+            RefreshZombieLimitSetting();
             _resetTutorialButton = Q<Button>("resetTutorialButton");
             _resetTutorialButtonLabel = Q<Label>("resetTutorialButtonLabel");
             _resetTutorialStatus = Q<Label>("resetTutorialStatus");
@@ -413,6 +424,7 @@ namespace DeadWalls
             _settingsOpen = true;
             _sfxSlider.SetValueWithoutNotify(SoundSettings.SfxVolume);
             _ambienceSlider.SetValueWithoutNotify(SoundSettings.AmbienceVolume);
+            RefreshZombieLimitSetting();
             ResetTutorialResetPresentation();
             if (_inputMode != null && _inputMode.CurrentMode == UIInputMode.Gamepad)
                 _sfxSlider.Focus();
@@ -423,6 +435,33 @@ namespace DeadWalls
             _settingsOpen = false;
             _pauseOpen = true;
             ResetTutorialResetPresentation();
+        }
+
+        private void StepZombieLimit(int direction)
+        {
+            ZombieLimitPreset current = GameplayPerformanceSettings.CurrentZombieLimitPreset;
+            ZombieLimitPreset next = GameplayPerformanceSettings.Step(current, direction);
+            if (next == current)
+                return;
+
+            UiSoundFeedback.Instance?.PlayClick();
+            GameplayPerformanceSettings.CurrentZombieLimitPreset = next;
+            GameManager.Instance?.ApplyZombieLimitSetting();
+            RefreshZombieLimitSetting();
+        }
+
+        private void RefreshZombieLimitSetting()
+        {
+            if (_zombieLimitValue == null || _zombieLimitHint == null)
+                return;
+
+            ZombieLimitPreset preset = GameplayPerformanceSettings.CurrentZombieLimitPreset;
+            _zombieLimitValue.text = GameplayPerformanceSettings.GetDisplayName(preset);
+            _zombieLimitHint.text = GameplayPerformanceSettings.GetPerformanceHint(preset);
+            _zombieLimitPrevious?.SetEnabled(
+                GameplayPerformanceSettings.CanStep(preset, -1));
+            _zombieLimitNext?.SetEnabled(
+                GameplayPerformanceSettings.CanStep(preset, 1));
         }
 
         private bool IsPauseOpen() => _pauseOpen;

@@ -202,7 +202,7 @@
                 <ui:Button name="barracksClose" text="CLOSE" class="surface-close" />
             </ui:VisualElement>
             <ui:VisualElement class="barracks-summary">
-                <ui:Label name="archerCapacity" text="0 / 0 ARCHERS" class="summary-value" />
+                <ui:Label name="archerCapacity" text="0 ARCHERS DEPLOYED" class="summary-value" />
                 <ui:Label name="archerSummary" text="No formations deployed" class="card-detail" />
             </ui:VisualElement>
             <ui:ScrollView name="archerRows" class="surface-scroll archer-rows" mode="Vertical" />
@@ -297,6 +297,14 @@
                 <ui:Slider name="sfxSlider" low-value="0" high-value="1" value="1" class="dw-slider" />
                 <ui:VisualElement class="setting-heading"><ui:VisualElement class="dw-icon dw-icon--micro dw-icon--music" picking-mode="Ignore" /><ui:Label text="AMBIENCE" class="setting-label" /></ui:VisualElement>
                 <ui:Slider name="ambienceSlider" low-value="0" high-value="1" value="1" class="dw-slider" />
+                <ui:VisualElement class="setting-heading setting-heading--performance"><ui:VisualElement class="dw-icon dw-icon--micro dw-icon--hostiles" picking-mode="Ignore" /><ui:Label text="MAX ACTIVE ZOMBIES" class="setting-label" /></ui:VisualElement>
+                <ui:VisualElement class="setting-stepper">
+                    <ui:Button name="zombieLimitPrevious" text="-" class="setting-stepper__button" />
+                    <ui:Label name="zombieLimitValue" text="BALANCED  ·  900" class="setting-stepper__value" />
+                    <ui:Button name="zombieLimitNext" text="+" class="setting-stepper__button" />
+                </ui:VisualElement>
+                <ui:Label name="zombieLimitHint" text="RECOMMENDED DEFAULT FOR PERFORMANCE AND BATTLE READABILITY." class="setting-performance-hint" />
+                <ui:Label text="LOWER LIMITS IMPROVE PERFORMANCE AND REDUCE BATTLEFIELD DENSITY. LIVING ZOMBIES ARE NEVER REMOVED." class="setting-performance-note" />
                 <ui:Button name="resetTutorialButton" class="modal-action modal-action--icon"><ui:VisualElement class="dw-icon dw-icon--modal-action dw-icon--refresh" picking-mode="Ignore" /><ui:Label name="resetTutorialButtonLabel" text="RESET TUTORIAL" class="modal-action-label" picking-mode="Ignore" /></ui:Button>
                 <ui:Label name="resetTutorialStatus" text="" class="setting-status" />
                 <ui:Button name="settingsClose" class="modal-action modal-action--primary modal-action--icon"><ui:VisualElement class="dw-icon dw-icon--modal-action dw-icon--back" picking-mode="Ignore" /><ui:Label text="BACK" class="modal-action-label" picking-mode="Ignore" /></ui:Button>

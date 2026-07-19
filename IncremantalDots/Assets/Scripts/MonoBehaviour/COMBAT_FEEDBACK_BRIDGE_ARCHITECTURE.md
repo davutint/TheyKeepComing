@@ -17,12 +17,14 @@
   kullanir ve event entity'sini siler.
 - SFX icin sabit AudioSource pool kullanir; bir frame'deki event'leri type bazinda aggregate eder,
   oncelik + frame budget + type rate-limit uygular ve event entity'lerini siler.
-- Hasar sayisi icin `TextMeshPro` world-space pool kullanir. Basic, Rapid, Frost, Fireball,
-  Echoing Detonation ve Burning Ground gercek uygulanan hasari ortak event sozlesmesine yazar.
-  Sayilar dusman basinin uzerinde punch + yukselme + fade ile oynar; VFX sampling budget'i
-  bu event'leri dusuremez.
-- Skeleton Soul yolculugu ayri `SoulCounterUI` sahibindedir. `SoulPickupEvent` olum
-  konumundan HUD sayacina gider ve varista sayaci pulse eder.
+- Hasar sayisi icin batched `TextMeshPro` world-space mesh pool kullanir. Basic, Rapid, Frost,
+  Fireball, Echoing Detonation ve Burning Ground gercek uygulanan hasari ortak event sozlesmesine
+  yazar. Kucuk burst'ler birebir sunulur; yogun burst'ler kaynak turu ve world-space hucre bazinda
+  toplanir. Toplam event sayisi ve gercek uygulanan hasar kaybolmaz.
+- Skeleton Soul yolculugu ayri `SoulCounterUI` sahibindedir. Kucuk olum gruplarinda her
+  `SoulPickupEvent` olum konumundan HUD sayacina birebir gider. Yogun ayni-frame olumlerinde
+  event'ler konumsal hucrelerde en fazla `96` sunuma toplanir; her ucus `+N` miktarini tasir,
+  toplam Soul miktari aynen korunur ve varista sayac pulse'i uretir.
 
 ## V1 Event Kaynaklari
 
@@ -71,8 +73,15 @@ castle impact prefab'i atayabilir (yalniz-bossa kurali onu korur).
 
 - Stress mode'da `DisableInStressMode = true` ise VFX/SFX event'leri temizlenir ama oynatilmaz.
   Gercek hasar sayilari player-facing dogruluk sozlesmesi oldugu icin bu guard tarafindan dusurulmez.
-- Hasar sayisi pool'u varsayilan `256` slotla baslar; eszamanli gercek hasar sayisi bunu
-  asarsa yeni slot buyur ve tamamlanan sayilar pool'a geri doner. Event atlama yoktur.
+- Hasar sayisi sunumu bir TMP GameObject'i event basina cogaltmaz. Varsayilan `512` presentation
+  tek mesh batch'inde oynar; tamamlanan batch pool'a doner.
+- `512` veya daha az hasar event'i birebir presentation olarak kalir. Daha yogun burst'lerde
+  ayni damage source ve `0.6` world-unit hucredeki event'ler toplanir. Public telemetry islenen
+  event sayisini, presentation sayisini ve iki taraftaki toplam hasari ayri tutar; event veya
+  damage kaybi kabul edilmez.
+- Soul sunumu `96` event'e kadar birebirdir. Daha yogun ayni-frame burst, battlefield oranini
+  koruyan adaptif grid ile en fazla `96` konumsal ucusa toplanir. Legacy Canvas objeleri ve UI
+  Toolkit elementleri pool'a geri doner; `+N` etiketi toplulastirilmis miktari gorunur tutar.
 - Hit flipbook pool varsayilan `128`; pool bosalirsa en eski aktif flipbook recycle edilir.
 - `ArrowHitSystem`, sabit `512` candidate map'i icinde ayni `0.75` world-unit hucredeki
   ayni hit turunu tek ornege indirir. Basic/Rapid ve Frost birlikteyse `24` VFX slotunun

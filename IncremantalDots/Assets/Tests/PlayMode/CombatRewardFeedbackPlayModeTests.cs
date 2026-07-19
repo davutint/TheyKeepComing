@@ -101,6 +101,95 @@ namespace DeadWalls.Tests
         }
 
         [UnityTest]
+        public IEnumerator DamageNumberBridge_DenseBurstAggregatesSpatiallyWithoutLosingEventsOrDamage()
+        {
+            const int eventCount = 2_000;
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            CombatFeedbackBridge bridge =
+                Object.FindFirstObjectByType<CombatFeedbackBridge>();
+            Assert.That(bridge, Is.Not.Null);
+
+            Time.timeScale = 0f;
+            long baseline = bridge.TotalDamageNumbersPlayedCount;
+            double expectedDamage = 0d;
+            for (int i = 0; i < eventCount; i++)
+            {
+                float damage = 10f + i % 3;
+                expectedDamage += damage;
+                Entity eventEntity = entityManager.CreateEntity();
+                entityManager.AddComponentData(eventEntity, new CombatDamageNumberEvent
+                {
+                    Position = new float3(
+                        6f + (i % 100) * 0.12f,
+                        -2f + (i / 100) * 0.13f,
+                        0f),
+                    AppliedDamage = damage,
+                    Source = i % 2 == 0
+                        ? PlayerDamageSourceType.Fireball
+                        : PlayerDamageSourceType.FireballSecondBlast
+                });
+            }
+
+            yield return null;
+
+            Assert.That(bridge.LastProcessedDamageNumberEventCount, Is.EqualTo(eventCount));
+            Assert.That(bridge.TotalDamageNumbersPlayedCount - baseline, Is.EqualTo(eventCount));
+            Assert.That(bridge.ActiveDamageNumberCount, Is.GreaterThanOrEqualTo(eventCount));
+            Assert.That(bridge.LastDamageNumberPresentationCount, Is.LessThan(eventCount));
+            Assert.That(bridge.ActiveDamageNumberBatchCount,
+                Is.LessThanOrEqualTo(
+                    Mathf.CeilToInt(
+                        bridge.LastDamageNumberPresentationCount
+                        / (float)Mathf.Max(1, bridge.DamageNumberBatchCapacity))));
+            Assert.That(bridge.LastProcessedDamageNumberTotal,
+                Is.EqualTo(expectedDamage).Within(0.01d));
+            Assert.That(bridge.LastPresentedDamageNumberTotal,
+                Is.EqualTo(expectedDamage).Within(0.01d));
+
+            using EntityQuery eventQuery = entityManager.CreateEntityQuery(
+                typeof(CombatDamageNumberEvent));
+            Assert.That(eventQuery.CalculateEntityCount(), Is.Zero);
+        }
+
+        [UnityTest]
+        public IEnumerator SoulCounter_DenseBurstAggregatesFlightsWithoutLosingEventsOrSoulAmount()
+        {
+            const int eventCount = 2_000;
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            SoulCounterUI soulCounter = Object.FindFirstObjectByType<SoulCounterUI>();
+            Assert.That(soulCounter, Is.Not.Null);
+
+            Time.timeScale = 0f;
+            for (int i = 0; i < eventCount; i++)
+            {
+                Entity eventEntity = entityManager.CreateEntity();
+                entityManager.AddComponentData(eventEntity, new SoulPickupEvent
+                {
+                    Position = new float3(
+                        3f + (i % 100) * 0.16f,
+                        -4f + (i / 100) * 0.22f,
+                        MobileCastleRenderDepth.UnitZ),
+                    Amount = 1
+                });
+            }
+
+            yield return null;
+
+            Assert.That(soulCounter.LastProcessedSoulEventCount, Is.EqualTo(eventCount));
+            Assert.That(soulCounter.LastSoulPresentationCount,
+                Is.LessThanOrEqualTo(
+                    Mathf.Max(1, soulCounter.MaxSoulPickupPresentationsPerBurst)));
+            Assert.That(soulCounter.LastSoulPresentationCount, Is.LessThan(eventCount));
+            Assert.That(soulCounter.LastProcessedSoulAmount, Is.EqualTo(eventCount));
+            Assert.That(soulCounter.LastPresentedSoulAmount, Is.EqualTo(eventCount));
+
+            using EntityQuery eventQuery = entityManager.CreateEntityQuery(
+                typeof(SoulPickupEvent));
+            Assert.That(eventQuery.CalculateEntityCount(), Is.Zero,
+                "Dense Soul presentation event'lerinin tamami tuketilmeli.");
+        }
+
+        [UnityTest]
         public IEnumerator SkeletonDeath_AwardsSoulAndConfiguredGraveEssenceDropImmediately()
         {
             EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;

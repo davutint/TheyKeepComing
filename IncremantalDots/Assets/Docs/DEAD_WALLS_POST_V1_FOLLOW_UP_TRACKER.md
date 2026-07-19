@@ -2,11 +2,11 @@
 
 > **Amaç:** V1 kapsamı tamamlandıktan sonra yapılacak mantık düzeltmelerini, oyuncuya görünen geri bildirimleri, UI/UX yeniden çalışmalarını, polish işlerini ve performans optimizasyonlarını tek otoriter takip belgesinde yürütmek.
 >
-> **Tracker sürümü:** 1.2
+> **Tracker sürümü:** 1.3
 > **Oluşturulma tarihi:** 2026-07-18
-> **Aktif paket:** P9 - Performans Profilleme ve Optimizasyon
-> **Aktif iş:** Hedef donanım ve ölçüm senaryolarının owner ile kesinleştirilmesi
-> **İlerleme:** `8 / 10` ana görev tamamlandı - `%80`
+> **Aktif paket:** P10 - Son Kalite, Tutarlılık ve Regresyon Kapısı
+> **Aktif iş:** Tam regresyon matrisi, bütün UI yüzeyleri ve uzun süreli combat/save doğrulaması
+> **İlerleme:** `9 / 10` ana görev tamamlandı - `%90`
 
 ---
 
@@ -84,7 +84,7 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 | 6 | `DW-P6-TECH-TREE` | Teknoloji ağacının görsel ve kullanılabilirlik yeniden çalışması | `[x]` | Ayrı War Doctrine yüzeyi kaldırıldı; player-facing teknoloji ağacı sahipliği Castle Heart altında tekilleştirildi |
 | 7 | `DW-P7-CASTLE-HEART` | Castle Heart'ın ayrı kapsamda yeniden değerlendirilmesi | `[x]` | UI Toolkit icon-tree, direct-child reveal, responsive inspector ve normal teknoloji ağacı davranışı uygulandı/doğrulandı |
 | 8 | `DW-P8-UI-POLISH` | Genel UI efektleri, animasyonları ve etkileşim polish'i | `[x]` | Durum odaklı hareket, input uyarlaması, feedback katmanları ve modal tutarlılığı doğrulandı |
-| 9 | `DW-P9-PERFORMANCE` | Performans profilleme ve optimizasyon | `[?]` | Ölçülmüş darboğazlar davranış bozulmadan giderildi ve hedef senaryolarda yeniden ölçüldü |
+| 9 | `DW-P9-PERFORMANCE` | Performans profilleme ve optimizasyon | `[x]` | Player zombie-limit ayarı, yoğun feedback batching/pooling ve 10K + 1K yeniden ölçümü tamamlandı |
 | 10 | `DW-P10-FINAL-GATE` | Son kalite, tutarlılık ve regresyon kapısı | `[?]` | Bütün aktif kapsam birlikte test edildi; açık kritik hata ve doğrulanmamış ana görev kalmadı |
 
 ---
@@ -225,16 +225,21 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 
 ### `DW-P9-PERFORMANCE` - Ölçüm ve Optimizasyon
 
-**Durum:** `[?]` Önceki oyuncu davranışları kesinleşip uygulandıktan sonra ele alınacak.
+**Durum:** `[x]` Ölçülmüş yoğun feedback darboğazları giderildi; player aktif-zombi limiti ve no-despawn backlog sözleşmesi uygulandı.
 
-- [?] Hedef donanım ve ölçüm senaryoları görev aktif olduğunda kesinleştirilecek.
-- [?] CPU, GPU, bellek, GC ve yoğun UI/combat senaryoları ölçülecek.
-- [?] Yalnızca kanıtlanmış darboğazlar optimize edilecek.
-- [?] Optimizasyonların gameplay ve oyuncuya görünen geri bildirimleri değiştirmediği doğrulanacak.
+- [x] PC hedef kanıtı `i5-14400F / Intel Arc B580 / 1080p Ultra` instrumentation-kapalı Player kabulü; fresh P9 ölçümü aynı 10K enemy + 1K Archer Editor benchmark'ıdır. Mobil için sahte target-hardware sertifikası yazılmadı.
+- [x] CPU/main-thread, frame pacing, draw calls, root GC, kullanılan bellek ve yoğun UI/combat ölümü yeniden ölçüldü; mevcut target-hardware Player sonucu ayrıca korundu.
+- [x] Event başına TMP, legacy Soul GameObject'i ve UI Toolkit Soul elementi üreten kanıtlanmış yoğun-burst darboğazları batched mesh, konumsal toplulaştırma ve element pooling ile giderildi.
+- [x] Küçük damage/Soul burst'leri birebir kaldı; yoğun burst'lerde event sayısı, damage toplamı, Soul toplamı, kaynak rengi ve konumsal temsil testlerle kayıpsız doğrulandı.
+- [x] Main Menu ve Pause Settings aynı persistent `900 / 2.000 / 5.000 / 10.000` zombie-limit preset'lerini sunar; düşük limitin performans/density trade-off'u player'a açıklanır.
+- [x] Koşu sırasında limit düşürmek yaşayan zombileri despawn etmez; yeni spawn demand'i aktif sayı limitin altına inene kadar exact backlog'da bekler.
+- [x] Barracks UI backend hard cap'i korurken `/ 1000` değerini player'a göstermez; deployed toplamı ve yalnız gerçek cap'te `GARRISON FULL` gösterir.
+- [x] 10K + 1K Editor benchmark'ında main-thread ortalaması `25,47 -> 13,12 ms`, frame P95 `48,00 -> 17,83 ms`, 10K Fireball death peak'i `13.786 -> 63,11 ms` oldu; test exact pool/Continue/backlog kanıtlarıyla geçti.
+- [x] Targeted EditMode `19/19`, targeted PlayMode `6/6`, Unity compilation, Console ve `git diff --check` temiz geçti.
 
 ### `DW-P10-FINAL-GATE` - Son Kalite Kapısı
 
-**Durum:** `[?]` P1-P9 tamamlandıktan sonra açılacak.
+**Durum:** `[?]` P1-P9 tamamlandı; final kalite kapısı aktif sıradaki iştir.
 
 - [?] Mantık düzeltmeleri için regresyon matrisi tamamlanacak.
 - [?] Oyuncunun gördüğü bütün UI yüzeyleri birlikte gözden geçirilecek.
@@ -358,3 +363,15 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - Canlı Play Mode doğrulamasında boş savaş alanı raycast sonucu `1 -> 0` oldu, Fireball butonu raycast sonucu `1` kaldı; hedefleme kabul edildi, Fireball cast'i projectile oluşturdu ve `45s` cooldown başlattı.
 - UI Toolkit kontrat regresyonu `9/9` geçti; Unity derlemesinde ve değişiklik kapsamındaki Console kontrolünde yeni hata oluşmadı.
 - Bu düzeltme tamamlanmış P3/P8 UI Toolkit kapsamının hata düzeltmesidir; ana görev paydası ve statüleri değişmedi. İlerleme `8/10 - %80`, P9 ve P10 açık.
+
+### 2026-07-19 - P9 performans profilleme ve player zombie limiti tamamlandı
+
+- Main Menu ve Pause Settings aynı persistent `BALANCED 900 / HIGH 2.000 / MASSIVE 5.000 / EXTREME 10.000` aktif-zombi ayarını kazandı; copy düşük limitin daha iyi performans fakat daha düşük battlefield density ürettiğini açıklar.
+- Runtime limit değişikliği `MobileCastleCombatConfig.MaxAliveZombies` owner'ına uygulanır. Limit düşürmek yaşayan zombileri silmez; spawn budget exact backlog'da bekler.
+- Barracks backend `1.000` hard cap'i korunurken player-facing `/ 1000` gösterimi kaldırıldı; normal durumda deployed toplamı, yalnız cap'te `GARRISON FULL` gösterilir.
+- 10K Fireball profili event başına TMP damage-number objesi ile çift legacy/UI Toolkit Soul allocation'ını kanıtlanmış darboğaz olarak gösterdi.
+- Damage feedback `512` presentation'lık TMP mesh batch'lerine taşındı. Dense damage event'leri source-aware spatial aggregate olur; event sayısı ve uygulanan toplam hasar public telemetry ile exact korunur.
+- Soul feedback `96` event'e kadar birebirdir; daha yoğun aynı-frame burst adaptif konumsal grid ile en fazla `96` `+N` uçuşuna toplanır. Toplam Soul miktarı korunur ve UI Toolkit elementleri pool'lanır.
+- Fresh 10K enemy + 1K Archer Editor benchmark'ı geçti: main-thread average `13,12 ms`, frame P95 `17,83 ms`, draw-call average `591`, root GC average `84.626 B/frame`; 10K Fireball death peak `13.786 ms` baseline'dan `63,11 ms`ye düştü.
+- Targeted EditMode `19/19`, targeted PlayMode `6/6`, Unity compilation, Console ve `git diff --check` temiz geçti. Main Menu Settings daha önce canlı `1280x720` Game View'da taşma olmadan doğrulandı.
+- Ana görev paydası değişmedi; P9 kapatıldığı için doğrulanmış ilerleme `9/10 - %90` oldu. Yalnız P10 final kalite kapısı açık kaldı.

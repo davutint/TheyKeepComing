@@ -9,6 +9,7 @@ namespace DeadWalls
         private sealed class SoulFlight
         {
             public VisualElement Element;
+            public Label AmountLabel;
             public Vector2 Start;
             public Vector2 Control;
             public Vector2 Target;
@@ -17,6 +18,7 @@ namespace DeadWalls
         }
 
         private readonly List<SoulFlight> _soulFlights = new List<SoulFlight>();
+        private readonly Stack<VisualElement> _soulFlightPool = new Stack<VisualElement>();
         private string _lastDawnToast = string.Empty;
         private string _lastNightToast = string.Empty;
         private string _lastWaveToast = string.Empty;
@@ -80,14 +82,16 @@ namespace DeadWalls
             float lateral = ((_soulFlights.Count % 5) - 2) * 18f;
             Vector2 control = (start + target) * 0.5f + Vector2.up * 120f + Vector2.right * lateral;
 
-            VisualElement element = new VisualElement();
-            element.AddToClassList("soul-flight");
+            VisualElement element = GetSoulFlightElement(out Label amountLabel);
             element.style.left = start.x - 9f;
             element.style.top = start.y - 9f;
+            amountLabel.text = pickup.Amount > 1 ? $"+{pickup.Amount:N0}" : string.Empty;
+            amountLabel.style.display = pickup.Amount > 1 ? DisplayStyle.Flex : DisplayStyle.None;
             _soulFlightLayer.Add(element);
             _soulFlights.Add(new SoulFlight
             {
                 Element = element,
+                AmountLabel = amountLabel,
                 Start = start,
                 Control = control,
                 Target = target,
@@ -115,7 +119,7 @@ namespace DeadWalls
 
                 if (t < 1f)
                     continue;
-                flight.Element.RemoveFromHierarchy();
+                ReleaseSoulFlightElement(flight.Element);
                 _soulFlights.RemoveAt(i);
                 if (_soulAnchor != null)
                 {
@@ -123,6 +127,42 @@ namespace DeadWalls
                     _soulAnchor.schedule.Execute(() => _soulAnchor.RemoveFromClassList("is-arriving")).StartingIn(180);
                 }
             }
+        }
+
+        private VisualElement GetSoulFlightElement(out Label amountLabel)
+        {
+            VisualElement element;
+            if (_soulFlightPool.Count > 0)
+            {
+                element = _soulFlightPool.Pop();
+                amountLabel = element.Q<Label>("amount");
+                return element;
+            }
+
+            element = new VisualElement();
+            element.AddToClassList("soul-flight");
+            amountLabel = new Label { name = "amount", pickingMode = PickingMode.Ignore };
+            amountLabel.AddToClassList("soul-flight__amount");
+            element.Add(amountLabel);
+            return element;
+        }
+
+        private void ReleaseSoulFlightElement(VisualElement element)
+        {
+            if (element == null)
+                return;
+
+            element.RemoveFromHierarchy();
+            element.style.opacity = 1f;
+            element.style.scale = new Scale(Vector3.one);
+            _soulFlightPool.Push(element);
+        }
+
+        private void ReleaseAllSoulFlights()
+        {
+            for (int i = _soulFlights.Count - 1; i >= 0; i--)
+                ReleaseSoulFlightElement(_soulFlights[i].Element);
+            _soulFlights.Clear();
         }
     }
 }
