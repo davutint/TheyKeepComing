@@ -351,3 +351,10 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - Görünür bounds tabanlı clamp, pan/zoom sırasında ağacın tamamen kaybolmasını engeller; reveal ve responsive relayout kullanıcı görünümünü korur.
 - Targeted EditMode `19/19`, PlayMode `2/2`, canlı `100% -> 156% -> 100%` Game View kontrolü, Unity compilation ve final Console temiz geçti.
 - Bu çalışma tamamlanmış P7 kapsamının navigation polish devamıdır; ana görev paydası ve statüleri değişmedi. İlerleme `8/10 - %80`, P9 ve P10 açık.
+
+### 2026-07-19 - Fireball hedef alanı UI Toolkit raycast düzeltmesi
+
+- Tam ekran `screen` ve `hudLayer` kapsayıcıları `PickingMode.Ignore` kullanacak şekilde düzenlendi; böylece boş savaş alanı tıklamaları `SpellCastUI` hedefleme akışına ulaşırken gerçek HUD butonları kendi raycast sahipliğini koruyor.
+- Canlı Play Mode doğrulamasında boş savaş alanı raycast sonucu `1 -> 0` oldu, Fireball butonu raycast sonucu `1` kaldı; hedefleme kabul edildi, Fireball cast'i projectile oluşturdu ve `45s` cooldown başlattı.
+- UI Toolkit kontrat regresyonu `9/9` geçti; Unity derlemesinde ve değişiklik kapsamındaki Console kontrolünde yeni hata oluşmadı.
+- Bu düzeltme tamamlanmış P3/P8 UI Toolkit kapsamının hata düzeltmesidir; ana görev paydası ve statüleri değişmedi. İlerleme `8/10 - %80`, P9 ve P10 açık.

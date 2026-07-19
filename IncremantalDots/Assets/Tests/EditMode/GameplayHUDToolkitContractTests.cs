@@ -108,6 +108,21 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void ProductionHud_AllowsBattlefieldPointerThroughHudLayer()
+        {
+            TemplateContainer root = LoadHud().CloneTree();
+            VisualElement screen = root.Q<VisualElement>("screen");
+            VisualElement hudLayer = root.Q<VisualElement>("hudLayer");
+
+            Assert.That(screen, Is.Not.Null);
+            Assert.That(screen.pickingMode, Is.EqualTo(PickingMode.Ignore));
+            Assert.That(hudLayer, Is.Not.Null);
+            Assert.That(hudLayer.pickingMode, Is.EqualTo(PickingMode.Ignore));
+            Assert.That(root.Q<Button>("fireballButton").pickingMode, Is.EqualTo(PickingMode.Position));
+            Assert.That(root.Q<Button>("economyButton").pickingMode, Is.EqualTo(PickingMode.Position));
+        }
+
+        [Test]
         public void ApprovedArtsystackIcons_AreImportedAndWorkerProductionDiffersFromRepair()
         {
             Texture2D workerProduction = AssetDatabase.LoadAssetAtPath<Texture2D>(

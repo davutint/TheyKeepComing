@@ -2,11 +2,11 @@
     <ui:Style src="project://database/Assets/UI/Toolkit/Shared/DeadWallsTheme.uss" />
     <ui:Style src="project://database/Assets/UI/Toolkit/GameplayHUD/GameplayHUD.uss" />
 
-    <ui:VisualElement name="screen" class="dw-screen runtime-shell input--pointer phase--day">
+    <ui:VisualElement name="screen" class="dw-screen runtime-shell input--pointer phase--day" picking-mode="Ignore">
         <ui:VisualElement name="worldTint" class="world-tint" picking-mode="Ignore" />
         <ui:VisualElement name="damageFlash" class="damage-flash" picking-mode="Ignore" />
 
-        <ui:VisualElement name="hudLayer" class="hud-layer">
+        <ui:VisualElement name="hudLayer" class="hud-layer" picking-mode="Ignore">
             <ui:VisualElement class="economy-cluster">
                 <ui:VisualElement class="cluster-heading">
                     <ui:Label text="THE KEEP" class="cluster-kicker" />
