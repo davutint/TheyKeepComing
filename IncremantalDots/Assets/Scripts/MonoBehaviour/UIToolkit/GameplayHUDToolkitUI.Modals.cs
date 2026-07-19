@@ -1,6 +1,3 @@
-using System;
-using System.Text;
-using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
@@ -38,13 +35,20 @@ namespace DeadWalls
 
         private VisualElement _gameOverModal;
         private Label _gameOverTitle;
-        private Label _gameOverStats;
-        private Label _metaSummary;
-        private Label _metaRecord;
-        private Label _metaEarned;
-        private Label _metaSouls;
+        private Label _gameOverSubtitle;
+        private Label _gameOverRecordBadge;
+        private Label _gameOverDay;
+        private Label _gameOverKills;
+        private Label _gameOverBest;
+        private Label _gameOverEarned;
+        private Label _gameOverBalance;
+        private Label _metaShopTitle;
+        private Label _metaShopHint;
+        private Label _metaWallet;
         private ScrollView _metaShopRows;
+        private Button _restartButton;
         private int _metaShopSignature = -1;
+        private bool _gameOverWasActive;
 
         private void BindModalActions()
         {
@@ -83,13 +87,21 @@ namespace DeadWalls
 
             _gameOverModal = Q<VisualElement>("gameOverModal");
             _gameOverTitle = Q<Label>("gameOverTitle");
-            _gameOverStats = Q<Label>("gameOverStats");
-            _metaSummary = Q<Label>("metaSummary");
-            _metaRecord = Q<Label>("metaRecord");
-            _metaEarned = Q<Label>("metaEarned");
-            _metaSouls = Q<Label>("metaSouls");
+            _gameOverSubtitle = Q<Label>("gameOverSubtitle");
+            _gameOverRecordBadge = Q<Label>("gameOverRecordBadge");
+            _gameOverDay = Q<Label>("gameOverDay");
+            _gameOverKills = Q<Label>("gameOverKills");
+            _gameOverBest = Q<Label>("gameOverBest");
+            _gameOverEarned = Q<Label>("gameOverEarned");
+            _gameOverBalance = Q<Label>("gameOverBalance");
+            _metaShopTitle = Q<Label>("metaShopTitle");
+            _metaShopHint = Q<Label>("metaShopHint");
+            _metaWallet = Q<Label>("metaWallet");
             _metaShopRows = Q<ScrollView>("metaShopRows");
-            Q<Button>("restartButton").clicked += RestartRun;
+            _restartButton = Q<Button>("restartButton");
+            _restartButton.clicked += RestartRun;
+            _metaShopSignature = -1;
+            _gameOverWasActive = false;
         }
 
         private void RefreshModalPresentation(GameManager gm)
@@ -98,6 +110,16 @@ namespace DeadWalls
             bool levelUp = _uiManager != null && _uiManager.LevelUpPanel != null && _uiManager.LevelUpPanel.activeSelf;
             bool council = gm.ActiveCouncilEvent != null;
 
+            if (gameOver && !_gameOverWasActive)
+            {
+                CloseSurface();
+                _pauseOpen = false;
+                _settingsOpen = false;
+                ReleasePause();
+                _metaShopSignature = -1;
+            }
+            _gameOverWasActive = gameOver;
+
             SetModalActive(_gameOverModal, gameOver);
             SetModalActive(_levelUpModal, !gameOver && levelUp);
             SetModalActive(_councilModal, !gameOver && !levelUp && council);
@@ -105,6 +127,7 @@ namespace DeadWalls
             SetModalActive(_pauseModal, !gameOver && !levelUp && !council && !_settingsOpen && _pauseOpen);
             bool any = gameOver || levelUp || council || _settingsOpen || _pauseOpen;
             _modalShade.EnableInClassList("has-modal", any);
+            _modalShade.EnableInClassList("has-gameover", gameOver);
 
             if (council)
                 RefreshCouncil(gm);
@@ -113,7 +136,7 @@ namespace DeadWalls
             else
                 _levelUpCardsBuilt = false;
             if (gameOver)
-                RefreshGameOver();
+                RefreshGameOver(gm);
 
             if (_tutorialResetArmed && Time.unscaledTime > _tutorialResetArmUntil)
                 ResetTutorialResetPresentation();
@@ -221,66 +244,133 @@ namespace DeadWalls
             ShowPrimaryToast("ADVANTAGE COMMITTED");
         }
 
-        private void RefreshGameOver()
+        private void RefreshGameOver(GameManager gm)
         {
-            if (_gameOverLegacy != null)
-            {
-                _gameOverTitle.text = _gameOverLegacy.GameOverText != null
-                    ? _gameOverLegacy.GameOverText.text
-                    : "RUN ENDED";
-                _gameOverStats.text = _gameOverLegacy.StatsText != null
-                    ? _gameOverLegacy.StatsText.text
-                    : string.Empty;
-            }
-            if (_metaLegacy != null)
-            {
-                _metaSummary.text = ReadText(_metaLegacy.MetaSummaryText);
-                _metaRecord.text = ReadText(_metaLegacy.MetaRecordText);
-                _metaEarned.text = ReadText(_metaLegacy.MetaEarnedText);
-                _metaSouls.text = ReadText(_metaLegacy.MetaSoulsText);
-                RebuildMetaShopRows();
-            }
+            MetaUpgradeCatalogSO catalog = gm.MetaCatalog;
+            MetaPresentationSettings presentation = catalog != null ? catalog.Presentation : null;
+            MetaProgressState state = MetaProgression.State;
+            MetaRunResult result = gm.LastRunResult;
+            string currency = presentation != null ? presentation.ShortName : MetaProgression.CurrencyName;
+
+            _gameOverTitle.text = presentation != null && !string.IsNullOrWhiteSpace(presentation.DeathTitle)
+                ? presentation.DeathTitle.ToUpperInvariant()
+                : "THE WALL HAS FALLEN";
+            _gameOverSubtitle.text = presentation != null && !string.IsNullOrWhiteSpace(presentation.DeathSubtitle)
+                ? presentation.DeathSubtitle
+                : "The run ends here. What remains will strengthen the next stand.";
+
+            int day = Mathf.Max(1, result.Day);
+            int kills = Mathf.Max(0, result.Kills);
+            int bestDay = state != null ? Mathf.Max(day, state.BestDay) : day;
+            int earned = Mathf.Max(0, result.SoulsEarned);
+            int balance = state != null ? Mathf.Max(0, state.Souls) : 0;
+            _gameOverDay.text = day.ToString("N0");
+            _gameOverKills.text = kills.ToString("N0");
+            _gameOverBest.text = bestDay.ToString("N0");
+            _gameOverEarned.text = "+" + earned.ToString("N0");
+            _gameOverBalance.text = balance.ToString("N0");
+
+            _gameOverRecordBadge.text = presentation != null && !string.IsNullOrWhiteSpace(presentation.NewRecordLabel)
+                ? presentation.NewRecordLabel.ToUpperInvariant()
+                : "NEW LONGEST STAND";
+            _gameOverRecordBadge.EnableInClassList("is-visible", result.NewRecord);
+            _metaShopTitle.text = presentation != null && !string.IsNullOrWhiteSpace(presentation.ShopTitle)
+                ? presentation.ShopTitle.ToUpperInvariant()
+                : "FORTIFY THE NEXT STAND";
+            _metaShopHint.text = presentation != null && !string.IsNullOrWhiteSpace(presentation.ShopHint)
+                ? presentation.ShopHint
+                : "Permanent upgrades apply to your next run.";
+            _metaWallet.text = $"{balance:N0} {currency.ToUpperInvariant()}";
+            _restartButton.text = presentation != null && !string.IsNullOrWhiteSpace(presentation.RestartLabel)
+                ? presentation.RestartLabel.ToUpperInvariant()
+                : "BEGIN NEXT RUN";
+
+            RebuildMetaShopRows(gm, currency);
         }
 
-        private void RebuildMetaShopRows()
+        private void RebuildMetaShopRows(GameManager gm, string currency)
         {
-            if (_metaLegacy?.MetaShopListRoot == null || _metaShopRows == null)
+            MetaUpgradeCatalogSO catalog = gm.MetaCatalog;
+            if (_metaShopRows == null || catalog == null || catalog.Upgrades == null)
                 return;
-            int signature = _metaLegacy.MetaShopListRoot.childCount;
-            for (int i = 0; i < _metaLegacy.MetaShopListRoot.childCount; i++)
-                signature = signature * 31 + _metaLegacy.MetaShopListRoot.GetChild(i).gameObject.activeSelf.GetHashCode();
+
+            MetaProgressState state = MetaProgression.State;
+            int signature = catalog.GetInstanceID();
+            unchecked
+            {
+                signature = signature * 31 + (state != null ? state.Souls : 0);
+                signature = signature * 31 + gm.IsMetaShopPurchaseAllowed.GetHashCode();
+                for (int i = 0; i < catalog.Upgrades.Length; i++)
+                {
+                    MetaUpgradeSO upgrade = catalog.Upgrades[i];
+                    if (upgrade == null)
+                        continue;
+                    signature = signature * 31 + upgrade.GetInstanceID();
+                    signature = signature * 31 + MetaProgression.GetUpgradeLevel(upgrade.Id);
+                }
+            }
             if (signature == _metaShopSignature)
                 return;
 
             _metaShopSignature = signature;
             _metaShopRows.Clear();
-            for (int i = 0; i < _metaLegacy.MetaShopListRoot.childCount; i++)
+            for (int i = 0; i < catalog.Upgrades.Length; i++)
             {
-                Transform row = _metaLegacy.MetaShopListRoot.GetChild(i);
-                if (!row.gameObject.activeSelf)
+                MetaUpgradeSO upgrade = catalog.Upgrades[i];
+                if (upgrade == null)
                     continue;
-                TMP_Text[] texts = row.GetComponentsInChildren<TMP_Text>(true);
-                var copy = new StringBuilder();
-                for (int t = 0; t < texts.Length; t++)
-                {
-                    string value = texts[t] != null ? texts[t].text : string.Empty;
-                    if (string.IsNullOrWhiteSpace(value))
-                        continue;
-                    if (copy.Length > 0)
-                        copy.Append("  ·  ");
-                    copy.Append(value.Replace("\n", " "));
-                }
-                UnityEngine.UI.Button legacyButton = row.GetComponentInChildren<UnityEngine.UI.Button>(true);
-                Button toolkitRow = new Button(() => legacyButton?.onClick.Invoke()) { text = copy.ToString() };
+
+                MetaUpgradeSO capturedUpgrade = upgrade;
+                int level = MetaProgression.GetUpgradeLevel(upgrade.Id);
+                bool maxed = upgrade.IsMaxLevel(level)
+                    || (MetaUpgradePolicy.IsContentUnlockEffect(upgrade.EffectType)
+                        && MetaProgression.HasPoolUnlock(upgrade.PoolContentId));
+                bool canBuy = !maxed && gm.CanBuyMetaUpgrade(upgrade);
+                int cost = maxed ? 0 : upgrade.GetCost(level);
+
+                Button toolkitRow = new Button(() => BuyMetaUpgrade(capturedUpgrade));
                 toolkitRow.AddToClassList("meta-shop-row");
-                toolkitRow.SetEnabled(legacyButton == null || legacyButton.interactable);
+                toolkitRow.EnableInClassList("is-affordable", canBuy);
+                toolkitRow.EnableInClassList("is-maxed", maxed);
+                toolkitRow.SetEnabled(canBuy);
+
+                VisualElement copy = new VisualElement();
+                copy.AddToClassList("meta-upgrade-copy");
+                Label title = new Label(upgrade.Title.ToUpperInvariant());
+                title.AddToClassList("meta-upgrade-title");
+                Label description = new Label(upgrade.Description);
+                description.AddToClassList("meta-upgrade-description");
+                copy.Add(title);
+                copy.Add(description);
+
+                VisualElement transaction = new VisualElement();
+                transaction.AddToClassList("meta-upgrade-transaction");
+                string levelText = upgrade.IsRepeatable
+                    ? $"LEVEL {level:N0}"
+                    : $"LEVEL {level:N0} / {upgrade.MaxLevel:N0}";
+                Label levelLabel = new Label(levelText);
+                levelLabel.AddToClassList("meta-upgrade-level");
+                Label price = new Label(maxed ? "COMPLETE" : $"{cost:N0} {currency.ToUpperInvariant()}");
+                price.AddToClassList("meta-upgrade-price");
+                transaction.Add(levelLabel);
+                transaction.Add(price);
+
+                toolkitRow.Add(copy);
+                toolkitRow.Add(transaction);
                 _metaShopRows.Add(toolkitRow);
             }
         }
 
-        private static string ReadText(TMP_Text text)
+        private void BuyMetaUpgrade(MetaUpgradeSO upgrade)
         {
-            return text != null ? text.text : string.Empty;
+            GameManager gm = GameManager.Instance;
+            bool purchased = gm != null && gm.TryBuyMetaUpgrade(upgrade);
+            ShowPrimaryToast(purchased
+                ? $"PERMANENT UPGRADE PURCHASED  ·  {upgrade.Title.ToUpperInvariant()}"
+                : "UPGRADE UNAVAILABLE  ·  CHECK EMBERS");
+            _metaShopSignature = -1;
+            if (gm != null)
+                RefreshGameOver(gm);
         }
 
         private void OpenPause()
@@ -354,6 +444,7 @@ namespace DeadWalls
         {
             _uiManager?.OnRestart();
             _metaShopSignature = -1;
+            _gameOverWasActive = false;
             ShowSecondaryToast("NEW RUN STARTED");
         }
 

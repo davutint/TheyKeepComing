@@ -119,7 +119,6 @@
                 <ui:VisualElement class="command-spacer" />
                 <ui:Button name="arrowsButton" text="ARROW SUPPLY" class="command-button" />
                 <ui:Button name="heartButton" text="CASTLE HEART" class="command-button command-button--heart" />
-                <ui:Button name="techButton" text="TECHNOLOGY" class="command-button" />
                 <ui:Button name="pauseButton" text="II" class="command-button command-button--pause" />
             </ui:VisualElement>
 
@@ -129,7 +128,7 @@
             </ui:VisualElement>
             <ui:VisualElement name="onboardingHint" class="onboarding-hint">
                 <ui:VisualElement class="hint-marker" />
-                <ui:Label name="onboardingHintText" text="ADJUST A WORKER TARGET RATIO." class="hint-text" />
+                <ui:Label name="onboardingHintText" text="ASSIGN IDLE PEOPLE TO A RESOURCE." class="hint-text" />
             </ui:VisualElement>
         </ui:VisualElement>
 
@@ -213,25 +212,6 @@
             </ui:VisualElement>
         </ui:VisualElement>
 
-        <ui:VisualElement name="techScreen" class="surface fullscreen tech-screen">
-            <ui:VisualElement class="fullscreen-header">
-                <ui:VisualElement><ui:Label text="WAR DOCTRINE" class="fullscreen-title" /><ui:Label text="A living prerequisite graph for this run." class="fullscreen-subtitle" /></ui:VisualElement>
-                <ui:VisualElement class="fullscreen-tools"><ui:Button name="techZoomOut" text="-" class="tool-button" /><ui:Button name="techResetView" text="CENTER" class="tool-button" /><ui:Button name="techZoomIn" text="+" class="tool-button" /><ui:Button name="techClose" text="RETURN TO BATTLE" class="surface-close" /></ui:VisualElement>
-            </ui:VisualElement>
-            <ui:VisualElement name="techAlert" class="fullscreen-alert"><ui:Label name="techAlertText" text="BATTLE CONTINUES BEHIND THIS SCREEN" /></ui:VisualElement>
-            <ui:VisualElement name="techViewport" class="graph-viewport tech-viewport">
-                <ui:VisualElement name="techGraphContent" class="graph-content tech-graph" />
-            </ui:VisualElement>
-            <ui:VisualElement name="techInspector" class="graph-inspector">
-                <ui:Label name="techInspectorTitle" text="SELECT A DOCTRINE" class="inspector-title" />
-                <ui:Label name="techInspectorLevel" text="" class="inspector-meta" />
-                <ui:Label name="techInspectorBody" text="Inspect cost, effect and prerequisites before committing." class="inspector-body" />
-                <ui:Label name="techInspectorCost" text="" class="inspector-cost" />
-                <ui:Label name="techInspectorStatus" text="" class="inspector-status" />
-                <ui:Button name="techPurchase" text="RESEARCH" class="inspector-action" />
-            </ui:VisualElement>
-        </ui:VisualElement>
-
         <ui:VisualElement name="modalShade" class="modal-shade">
             <ui:VisualElement name="councilModal" class="modal council-modal">
                 <ui:Label text="THE COUNCIL DEMANDS AN ANSWER" class="modal-kicker" />
@@ -270,17 +250,30 @@
             </ui:VisualElement>
 
             <ui:VisualElement name="gameOverModal" class="modal gameover-modal">
-                <ui:Label text="THE WALL HAS FALLEN" class="modal-kicker modal-kicker--danger" />
-                <ui:Label name="gameOverTitle" text="RUN ENDED" class="modal-title" />
-                <ui:Label name="gameOverStats" text="" class="gameover-stats" />
-                <ui:VisualElement class="meta-summary">
-                    <ui:Label name="metaSummary" text="" class="meta-summary-title" />
-                    <ui:Label name="metaRecord" text="" class="meta-summary-copy" />
-                    <ui:Label name="metaEarned" text="" class="meta-earned" />
-                    <ui:Label name="metaSouls" text="" class="meta-souls" />
+                <ui:VisualElement class="gameover-header">
+                    <ui:Label text="THE FINAL REPORT" class="modal-kicker modal-kicker--danger" />
+                    <ui:Label name="gameOverTitle" text="THE WALL HAS FALLEN" class="modal-title gameover-title" />
+                    <ui:Label name="gameOverSubtitle" text="The run ends here. What remains will strengthen the next stand." class="gameover-subtitle" />
+                </ui:VisualElement>
+
+                <ui:Label name="gameOverRecordBadge" text="NEW LONGEST STAND" class="gameover-record" />
+                <ui:VisualElement class="gameover-run-summary">
+                    <ui:VisualElement class="gameover-stat"><ui:Label text="DAY HELD" class="gameover-stat-label" /><ui:Label name="gameOverDay" text="1" class="gameover-stat-value" /></ui:VisualElement>
+                    <ui:VisualElement class="gameover-stat"><ui:Label text="ENEMIES SLAIN" class="gameover-stat-label" /><ui:Label name="gameOverKills" text="0" class="gameover-stat-value" /></ui:VisualElement>
+                    <ui:VisualElement class="gameover-stat"><ui:Label text="BEST STAND" class="gameover-stat-label" /><ui:Label name="gameOverBest" text="1" class="gameover-stat-value" /></ui:VisualElement>
+                    <ui:VisualElement class="gameover-stat gameover-stat--earned"><ui:Label text="LAST EMBERS EARNED" class="gameover-stat-label" /><ui:Label name="gameOverEarned" text="+0" class="gameover-stat-value" /></ui:VisualElement>
+                    <ui:VisualElement class="gameover-stat gameover-stat--balance"><ui:Label text="AVAILABLE" class="gameover-stat-label" /><ui:Label name="gameOverBalance" text="0" class="gameover-stat-value" /></ui:VisualElement>
+                </ui:VisualElement>
+
+                <ui:VisualElement class="meta-shop-header">
+                    <ui:VisualElement class="meta-shop-heading-copy">
+                        <ui:Label name="metaShopTitle" text="FORTIFY THE NEXT STAND" class="meta-shop-title" />
+                        <ui:Label name="metaShopHint" text="Permanent upgrades apply to your next run." class="meta-shop-hint" />
+                    </ui:VisualElement>
+                    <ui:Label name="metaWallet" text="0 EMBERS" class="meta-wallet" />
                 </ui:VisualElement>
                 <ui:ScrollView name="metaShopRows" class="meta-shop" mode="Vertical" />
-                <ui:Button name="restartButton" text="BEGIN A NEW RUN" class="modal-action modal-action--primary" />
+                <ui:Button name="restartButton" text="BEGIN NEXT RUN" class="modal-action modal-action--primary gameover-restart" />
             </ui:VisualElement>
         </ui:VisualElement>
 

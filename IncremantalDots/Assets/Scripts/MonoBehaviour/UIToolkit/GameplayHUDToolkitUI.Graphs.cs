@@ -45,7 +45,6 @@ namespace DeadWalls
         private void BindGraphActions()
         {
             Q<Button>("heartClose").clicked += CloseSurface;
-            Q<Button>("techClose").clicked += CloseSurface;
             _heartGraphContent = Q<VisualElement>("heartGraphContent");
             _graveEssenceValue = Q<Label>("graveEssenceValue");
             _heartInspectorTitle = Q<Label>("heartInspectorTitle");
@@ -59,28 +58,11 @@ namespace DeadWalls
             _heartQuantityOne.clicked += () => SetHeartQuantity(HeartPurchaseQuantity.One);
             _heartQuantityTen.clicked += () => SetHeartQuantity(HeartPurchaseQuantity.Ten);
             _heartQuantityMax.clicked += () => SetHeartQuantity(HeartPurchaseQuantity.BuyMax);
-
-            _techViewport = Q<VisualElement>("techViewport");
-            _techGraphContent = Q<VisualElement>("techGraphContent");
-            _techInspectorTitle = Q<Label>("techInspectorTitle");
-            _techInspectorLevel = Q<Label>("techInspectorLevel");
-            _techInspectorBody = Q<Label>("techInspectorBody");
-            _techInspectorCost = Q<Label>("techInspectorCost");
-            _techInspectorStatus = Q<Label>("techInspectorStatus");
-            _techPurchaseButton = Q<Button>("techPurchase");
-            _techPurchaseButton.clicked += PurchaseSelectedTechNode;
-            Q<Button>("techZoomOut").clicked += () => SetTechZoom(_techZoom - 0.1f, true);
-            Q<Button>("techZoomIn").clicked += () => SetTechZoom(_techZoom + 0.1f, true);
-            Q<Button>("techResetView").clicked += ResetTechView;
         }
 
         private void BindGraphManipulation()
         {
-            _techViewport?.RegisterCallback<WheelEvent>(OnTechWheel);
-            _techViewport?.RegisterCallback<PointerDownEvent>(OnTechPointerDown);
-            _techViewport?.RegisterCallback<PointerMoveEvent>(OnTechPointerMove);
-            _techViewport?.RegisterCallback<PointerUpEvent>(OnTechPointerUp);
-            _techViewport?.RegisterCallback<PointerCancelEvent>(OnTechPointerCancel);
+            // Kaldirilan ikinci teknoloji yuzeyi artik production input callback'i kaydetmez.
         }
 
         private void RebuildHeartGraph(bool force)

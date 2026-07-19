@@ -79,10 +79,10 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 | 1 | `DW-P1-LOGIC` | Mantık hatalarının tespiti ve düzeltilmesi | `[x]` | Owner bilinen mantık sorunu olmadığını kesinleştirdi; başlangıç regresyonu temiz |
 | 2 | `DW-P2-COMBAT-FEEDBACK` | Skeleton Soul ve düşman hasar geri bildirimleri | `[x]` | Kilitli davranışlar uygulandı; event doğruluğu ve tam regresyon geçti |
 | 3 | `DW-P3-UIUX-AUDIT` | Oyuncunun gördüğü bütün UI/UX yüzeylerinin uzman denetimi | `[x]` | Yüzey envanteri, bilimsel referans araştırması, karar PDF'i ve UI Toolkit uygulama planı tamamlandı |
-| 4 | `DW-P4-WORKERS` | Worker dağıtım arayüzünün yeniden çalışılması | `[x]` | Oran, mevcut durum, üretim etkisi, maliyet ve blocker hiyerarşisi uygulanıp doğrulandı |
+| 4 | `DW-P4-WORKERS` | Worker dağıtım arayüzünün yeniden çalışılması | `[x]` | Mevcut idle nüfusun doğrudan atanması, yeni nüfus hedefi, üretim etkisi ve blocker hiyerarşisi uygulanıp doğrulandı |
 | 5 | `DW-P5-ARROWS` | Arrow Supply arayüzünün yeniden çalışılması | `[x]` | Stok, tüketim, refill paketleri ve kapasite/verimlilik bilgi mimarisi uygulanıp doğrulandı |
-| 6 | `DW-P6-TECH-TREE` | Teknoloji ağacının görsel ve kullanılabilirlik yeniden çalışması | `[x]` | Dynamic prerequisite graph, node durumları, pan/zoom/center ve inspector doğrulandı |
-| 7 | `DW-P7-CASTLE-HEART` | Castle Heart'ın ayrı kapsamda yeniden değerlendirilmesi | `[x]` | Ayrı ürün rolü, hidden-safe graph, satın alma akışı ve devam eden simulation doğrulandı |
+| 6 | `DW-P6-TECH-TREE` | Teknoloji ağacının görsel ve kullanılabilirlik yeniden çalışması | `[x]` | Ayrı War Doctrine yüzeyi kaldırıldı; player-facing teknoloji ağacı sahipliği Castle Heart altında tekilleştirildi |
+| 7 | `DW-P7-CASTLE-HEART` | Castle Heart'ın ayrı kapsamda yeniden değerlendirilmesi | `[?]` | Owner kararıyla son UI işi olarak ele alınacak; mevcut ara sürüm final kabul edilmiyor |
 | 8 | `DW-P8-UI-POLISH` | Genel UI efektleri, animasyonları ve etkileşim polish'i | `[x]` | Durum odaklı hareket, input uyarlaması, feedback katmanları ve modal tutarlılığı doğrulandı |
 | 9 | `DW-P9-PERFORMANCE` | Performans profilleme ve optimizasyon | `[?]` | Ölçülmüş darboğazlar davranış bozulmadan giderildi ve hedef senaryolarda yeniden ölçüldü |
 | 10 | `DW-P10-FINAL-GATE` | Son kalite, tutarlılık ve regresyon kapısı | `[?]` | Bütün aktif kapsam birlikte test edildi; açık kritik hata ve doğrulanmamış ana görev kalmadı |
@@ -150,7 +150,8 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - [x] Referans çalışma çözünürlüğü `1920x1080`; bütün player-facing metin ilk sürümde İngilizce.
 - [x] Fullscreen yönetim yüzeyleri açıkken simülasyon akmaya devam edecek.
 - [x] Görsel dil minimal, yüksek okunabilirlikli ve dekoratif hareketten arındırılmış olacak; animasyon yalnızca durum veya bilgi değişimini anlatacak.
-- [x] Technology Tree son ayrı UI rework yüzeyi olarak tamamlandı.
+- [x] Ayrı `War Doctrine / Technology` yüzeyi kaldırıldı; player-facing teknoloji ağacı yalnız Castle Heart altında yaşayacak.
+- [?] Castle Heart görsel ve etkileşim rework'ü owner kararıyla son UI işi olarak ele alınacak.
 
 #### Yüzey uygulama kaydı
 
@@ -159,18 +160,20 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - [x] Başlık çizgisi, buton yan çizgileri, day etiketi, input ipucu ve version etiketi kaldırıldı.
 - [x] Main Menu'nün tek sürekli hareketi `22s DAY / 8s DUSK / 22s NIGHT / 8s DAWN` arka plan döngüsü.
 - [x] Main Menu Unity compile, Console ve Play Mode görsel ağacında doğrulandı; owner tarafından onaylandı.
-- [x] Persistent HUD, Economy, Barracks, Arrow Supply, Castle Heart, War Doctrine, Council, Level Up, Pause, Settings ve Game Over/Meta Shop UI Toolkit ile sıfırdan kuruldu.
+- [x] Persistent HUD, Economy, Barracks, Arrow Supply, Council, Level Up, Pause, Settings ve Game Over/Meta Shop UI Toolkit ile sıfırdan kuruldu.
+- [?] Castle Heart UI Toolkit ara sürümü production'da mevcut; final rework ve owner kabulü P7 kapsamında bekliyor.
 - [x] `1920x1080` ana yüzey QA'sı ve `1280x720` touch-mode uyarlaması canlı Play Mode'da incelendi.
-- [x] Unity compile/Console temiz; EditMode `420/420`, PlayMode `91 pass + 2 explicit skip` geçti.
+- [x] Unity compile/Console temiz; EditMode `422/422`, PlayMode `91 pass + 2 explicit skip` geçti.
 
 ### `DW-P4-WORKERS` - Worker Dağıtım Arayüzü
 
 **Durum:** `[x]` Economy drawer ve worker dağıtım akışı UI Toolkit ile yeniden kuruldu.
 
-- [x] Kaynak bakiyesi, üretim oranı, çalışan oranı ve mevcut/target dağılım aynı karar satırında okunur.
-- [x] Artırma/azaltma kontrolleri pointer, gamepad ve touch sunumuna uyarlanır.
-- [x] Eylem maliyeti, beklenen sonuç ve blocker nedeni eylemden önce gösterilir.
-- [x] Live runtime data ile okunabilirlik ve işlem akışı doğrulandı.
+- [x] Her kaynakta mevcut çalışan/cap, üretim oranı ve kalan idle nüfus birlikte okunur.
+- [x] Mevcut idle nüfus `-10 / -1 / +1 / +10 / FILL` ile doğrudan atanır; yeni gelen nüfusun otomatik dağılım hedefi ayrı kontrollerde tutulur.
+- [x] Capacity ve Efficiency geliştirmeleri doğrudan worker atama kararından görsel olarak ayrıştırıldı.
+- [x] Visual-tree yeniden kurulduğunda dört worker satırı ve bütün callback'ler yeniden oluşturulur.
+- [x] Live runtime işlem testi worker sayısını `20 -> 10 -> 20`, idle nüfusu `3 -> 13 -> 3` değiştirdi.
 
 ### `DW-P5-ARROWS` - Arrow Supply Arayüzü
 
@@ -183,23 +186,21 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 
 ### `DW-P6-TECH-TREE` - Teknoloji Ağacı
 
-**Durum:** `[x]` War Doctrine teknoloji ağacı UI Toolkit ile sıfırdan yeniden kuruldu.
+**Durum:** `[x]` Yanlış ürün ayrımı düzeltilerek ayrı War Doctrine teknoloji yüzeyi production UI'dan kaldırıldı.
 
-- [x] Graph mevcut statik görseli kopyalamaz; prerequisite verisinden runtime üretilir.
-- [x] Locked, available, affordable, maxed ve selected node durumları ayrıştırıldı.
-- [x] Pan, wheel zoom, Center ve gamepad focus akışları uygulandı.
-- [x] Inspector current state, effect, cost, blocker ve purchase sonucunu tek karar akışında gösterir.
-- [x] Küçük ve geniş graph'ların viewport merkezleme davranışı canlı doğrulandı.
+- [x] Command rail'deki `TECHNOLOGY` butonu ve `techScreen` production UXML'den kaldırıldı.
+- [x] Castle Heart dışında ikinci bir player-facing teknoloji ağacı kalmadığı canlı visual-tree üzerinde doğrulandı.
+- [x] Run-tech runtime data ve gameplay etkileri silinmedi; Castle Heart final rework'ünde kullanılmak üzere davranış katmanında korundu.
+- [x] Game Over açılırken açık drawer/fullscreen yüzey zorunlu kapanır; arkada teknoloji veya yönetim yüzeyi açık kalmaz.
 
 ### `DW-P7-CASTLE-HEART` - Ayrı Kapsam
 
-**Durum:** `[x]` Castle Heart ayrı progression rolüyle UI Toolkit içinde yeniden kuruldu.
+**Durum:** `[?]` Owner kararıyla son UI işi olarak bekliyor; bu düzeltme paketinde Castle Heart içeriğine dokunulmadı.
 
-- [x] Grave Essence progression rolü War Doctrine combat-tech rolünden görsel ve bilgi mimarisi olarak ayrıldı.
-- [x] Hidden-safe dynamic graph, branch kimliği, reveal/lock/owned durumları ve exact inspector uygulandı.
-- [x] `1 / 10 / MAX` repeatable satın alma akışı ve sonuç geri bildirimi korundu.
-- [x] Fullscreen Castle Heart açıkken simulation akmaya devam eder; onboarding bunu açıkça öğretir.
-- [x] 19-node runtime graph okunabilirlik ve çakışmasız layout açısından canlı doğrulandı.
+- [?] Castle Heart, oyunun tek player-facing teknoloji ağacı olacak şekilde bilgi mimarisi yeniden kararlaştırılacak.
+- [?] Hidden-safe graph, branch kimliği, reveal/lock/owned durumları ve inspector final görsel dilde yeniden çalışılacak.
+- [?] Satın alma akışı ve simülasyonun açıkken devam etmesi korunacak.
+- [?] Final runtime graph okunabilirlik, çakışma, pointer, gamepad ve touch açısından owner kabulüne sunulacak.
 
 ### `DW-P8-UI-POLISH` - Genel UI Efekt ve Animasyonları
 
@@ -275,3 +276,13 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - Main Menu'de owner kararına uygun olarak yalnız day/dusk/night/dawn arka plan döngüsü sürekli animasyonlu kaldı.
 - Unity compilation ve temiz Console doğrulandı; tam EditMode `420/420`, tam PlayMode `91 pass + 2 explicit skip` geçti.
 - P3, P4, P5, P6, P7 ve P8 birlikte kapandı; ana görev paydası değişmedi ve ilerleme `8/10 - %80` oldu. P9 performans ve P10 final gate açık kaldı.
+
+### 2026-07-19 - Game Over, worker atama ve duplicate teknoloji yüzeyi düzeltmesi
+
+- Game Over/Meta Shop legacy UGUI satır metinlerini aynalamayı bıraktı; run sonucu, bakiye ve 11 kalıcı yükseltme doğrudan production verisinden yapılandırılmış UI Toolkit kartlarıyla sunuluyor.
+- Game Over tam opak modal katman kullanır ve açılırken mevcut drawer/fullscreen yüzeyi kapatır.
+- Economy drawer mevcut idle nüfusu kaynaklara doğrudan atayan `-10 / -1 / +1 / +10 / FILL` kontrollerini kazandı; yeni nüfus otomatik hedefi ayrı kaldı.
+- Ayrı `TECHNOLOGY / War Doctrine` butonu ve ekranı production UI'dan kaldırıldı; gameplay tech verisi Castle Heart final rework'ü için davranış katmanında korundu.
+- Castle Heart owner kararıyla son UI işi olarak yeniden açıldı ve bu pakette içeriğine dokunulmadı.
+- UI kontrat testleri `2/2`, tam EditMode `422/422`, tam PlayMode `91 pass + 2 explicit skip` geçti; Unity compilation ve final Console temiz.
+- Ana görev paydası değişmedi; P7 yeniden açıldığı için doğrulanmış ilerleme `7/10 - %70` oldu. P7, P9 ve P10 açık kaldı.

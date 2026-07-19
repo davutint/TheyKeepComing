@@ -105,30 +105,62 @@ namespace DeadWalls
                 heading.AddToClassList("row-heading");
                 heading.Add(new Label(ResourceName(resource)) { name = "economyTitle" + resource });
                 heading[0].AddToClassList("row-title");
-                Label stat = new Label("0 WORKERS") { name = "economyStat" + resource };
+                Label stat = new Label("0 / 0") { name = "economyStat" + resource };
                 stat.AddToClassList("row-stat");
                 heading.Add(stat);
                 row.Add(heading);
 
-                Label detail = new Label("0/m  ·  TARGET 25%") { name = "economyDetail" + resource };
+                Label detail = new Label("0/m  ·  0 AVAILABLE") { name = "economyDetail" + resource };
                 detail.AddToClassList("row-detail");
                 row.Add(detail);
 
+                Label assignmentLabel = new Label("ASSIGN WORKERS");
+                assignmentLabel.AddToClassList("assignment-label");
+                row.Add(assignmentLabel);
+
+                VisualElement workerActions = new VisualElement();
+                workerActions.AddToClassList("row-actions");
+                workerActions.AddToClassList("worker-actions");
+                Button minusTen = CreateCompactButton("-10", () => ChangeResourceWorkers(resource, -10));
+                minusTen.name = "economyMinusTen" + resource;
+                Button minusOne = CreateCompactButton("-1", () => ChangeResourceWorkers(resource, -1));
+                minusOne.name = "economyMinusOne" + resource;
+                Button plusOne = CreateCompactButton("+1", () => ChangeResourceWorkers(resource, 1));
+                plusOne.name = "economyPlusOne" + resource;
+                plusOne.AddToClassList("compact-action--primary");
+                Button plusTen = CreateCompactButton("+10", () => ChangeResourceWorkers(resource, 10));
+                plusTen.name = "economyPlusTen" + resource;
+                plusTen.AddToClassList("compact-action--primary");
+                Button fill = CreateCompactButton("FILL", () => FillResourceWorkers(resource));
+                fill.name = "economyFill" + resource;
+                fill.AddToClassList("compact-action--primary");
+                workerActions.Add(minusTen);
+                workerActions.Add(minusOne);
+                workerActions.Add(plusOne);
+                workerActions.Add(plusTen);
+                workerActions.Add(fill);
+                row.Add(workerActions);
+
+                VisualElement targetActions = new VisualElement();
+                targetActions.AddToClassList("allocation-target-row");
+                Label targetLabel = new Label("NEW ARRIVALS 25%") { name = "economyTarget" + resource };
+                targetLabel.AddToClassList("allocation-target-label");
+                Button targetMinus = CreateCompactButton("AUTO -10%", () => AdjustWorkerTarget(resource, -10));
+                targetMinus.name = "economyTargetMinus" + resource;
+                Button targetPlus = CreateCompactButton("AUTO +10%", () => AdjustWorkerTarget(resource, 10));
+                targetPlus.name = "economyTargetPlus" + resource;
+                targetActions.Add(targetLabel);
+                targetActions.Add(targetMinus);
+                targetActions.Add(targetPlus);
+                row.Add(targetActions);
+
                 VisualElement actions = new VisualElement();
                 actions.AddToClassList("row-actions");
-                Button minus = CreateCompactButton("-10%", () => AdjustWorkerTarget(resource, -10));
-                minus.name = "economyMinus" + resource;
-                Button plus = CreateCompactButton("+10%", () => AdjustWorkerTarget(resource, 10));
-                plus.name = "economyPlus" + resource;
+                actions.AddToClassList("upgrade-actions");
                 Button capacity = CreateCompactButton("CAPACITY", () => BuyWorkerUpgrade(resource, WorkerBuildingUpgradeType.Capacity));
                 capacity.name = "economyCapacity" + resource;
                 Button efficiency = CreateCompactButton("EFFICIENCY", () => BuyWorkerUpgrade(resource, WorkerBuildingUpgradeType.Efficiency));
                 efficiency.name = "economyEfficiency" + resource;
-                actions.Add(minus);
-                actions.Add(plus);
-                VisualElement spacer = new VisualElement();
-                spacer.AddToClassList("row-spacer");
-                actions.Add(spacer);
                 actions.Add(capacity);
                 actions.Add(efficiency);
                 row.Add(actions);
@@ -236,9 +268,20 @@ namespace DeadWalls
                 EconomyFocusType resource = EconomyResources[i];
                 int workers = gm.GetResourceWorkers(resource);
                 int target = Mathf.RoundToInt(gm.GetWorkerTargetRatioBps(resource) / 100f);
+                int capacityValue = gm.GetMaxWorkersForResource(resource);
                 float rate = gm.GetWorkerProductionRate(resource);
-                Q<Label>("economyStat" + resource).text = $"{workers:N0} WORKERS";
-                Q<Label>("economyDetail" + resource).text = $"{rate:0.#}/m  ·  TARGET {target}%";
+                Q<Label>("economyStat" + resource).text = $"{workers:N0} / {capacityValue:N0}";
+                Q<Label>("economyDetail" + resource).text = $"+{rate:0.#}/m  ·  {gm.GetIdlePopulation():N0} AVAILABLE";
+                Q<Label>("economyTarget" + resource).text = $"NEW ARRIVALS  {target}%";
+
+                bool canAssign = gm.CanAssignResourceWorker(resource);
+                Q<Button>("economyMinusTen" + resource).SetEnabled(workers > 0);
+                Q<Button>("economyMinusOne" + resource).SetEnabled(workers > 0);
+                Q<Button>("economyPlusOne" + resource).SetEnabled(canAssign);
+                Q<Button>("economyPlusTen" + resource).SetEnabled(canAssign);
+                Q<Button>("economyFill" + resource).SetEnabled(canAssign);
+                Q<Button>("economyTargetMinus" + resource).SetEnabled(target > 0);
+                Q<Button>("economyTargetPlus" + resource).SetEnabled(target < 100);
 
                 int capacityLevel = gm.GetWorkerBuildingUpgradeLevel(resource, WorkerBuildingUpgradeType.Capacity);
                 int efficiencyLevel = gm.GetWorkerBuildingUpgradeLevel(resource, WorkerBuildingUpgradeType.Efficiency);
@@ -345,6 +388,37 @@ namespace DeadWalls
             ShowSecondaryToast(changed
                 ? $"{ResourceName(resource)} TARGET {gm.GetWorkerTargetRatioBps(resource) / 100f:0}%"
                 : "TARGET CHANGE BLOCKED");
+            RefreshEconomy(gm);
+        }
+
+        private void ChangeResourceWorkers(EconomyFocusType resource, int delta)
+        {
+            GameManager gm = GameManager.Instance;
+            if (gm == null)
+                return;
+
+            int previous = gm.GetResourceWorkers(resource);
+            bool changed = gm.SetResourceWorkers(resource, previous + delta);
+            int current = gm.GetResourceWorkers(resource);
+            ShowSecondaryToast(changed && current != previous
+                ? $"{ResourceName(resource)} WORKERS  {current:N0}"
+                : "WORKER ASSIGNMENT BLOCKED");
+            RefreshEconomy(gm);
+        }
+
+        private void FillResourceWorkers(EconomyFocusType resource)
+        {
+            GameManager gm = GameManager.Instance;
+            if (gm == null)
+                return;
+
+            int previous = gm.GetResourceWorkers(resource);
+            int requested = previous + gm.GetIdlePopulation();
+            bool changed = gm.SetResourceWorkers(resource, requested);
+            int current = gm.GetResourceWorkers(resource);
+            ShowSecondaryToast(changed && current != previous
+                ? $"{ResourceName(resource)} FILLED  ·  {current:N0} WORKERS"
+                : "NO AVAILABLE WORKER CAPACITY");
             RefreshEconomy(gm);
         }
 

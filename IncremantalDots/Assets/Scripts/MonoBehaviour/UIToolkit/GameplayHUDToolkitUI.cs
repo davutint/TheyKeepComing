@@ -40,8 +40,7 @@ namespace DeadWalls
             Economy,
             Barracks,
             Arrows,
-            Heart,
-            Tech
+            Heart
         }
 
         private UIDocument _document;
@@ -66,8 +65,6 @@ namespace DeadWalls
         private PauseMenuUI _pauseLegacy;
         private SettingsUI _settingsLegacy;
         private LevelUpUI _levelUpLegacy;
-        private GameOverUI _gameOverLegacy;
-        private MetaProgressionUI _metaLegacy;
         private UIManager _uiManager;
 
         private CanvasGroup _legacyCanvasGroup;
@@ -115,7 +112,6 @@ namespace DeadWalls
         private Button _barracksButton;
         private Button _arrowsButton;
         private Button _heartButton;
-        private Button _techButton;
         private Button _pauseButton;
 
         private VisualElement _criticalBanner;
@@ -159,7 +155,6 @@ namespace DeadWalls
             SuppressLegacyCanvas();
             BuildEconomyRows();
             BuildArcherRows();
-            RebuildTechGraph(true);
             RebuildHeartGraph(true);
             RefreshAll(true);
         }
@@ -212,9 +207,7 @@ namespace DeadWalls
             if (now >= _nextGraphRefresh)
             {
                 _nextGraphRefresh = now + GraphRefreshInterval;
-                if (_openSurface == SurfaceKind.Tech)
-                    RebuildTechGraph(false);
-                else if (_openSurface == SurfaceKind.Heart)
+                if (_openSurface == SurfaceKind.Heart)
                     RebuildHeartGraph(false);
             }
         }
@@ -279,7 +272,6 @@ namespace DeadWalls
             _barracksButton = Q<Button>("barracksButton");
             _arrowsButton = Q<Button>("arrowsButton");
             _heartButton = Q<Button>("heartButton");
-            _techButton = Q<Button>("techButton");
             _pauseButton = Q<Button>("pauseButton");
 
             _criticalBanner = Q<VisualElement>("criticalBanner");
@@ -296,6 +288,8 @@ namespace DeadWalls
             BindGraphActions();
             BindModalActions();
             BindGraphManipulation();
+            BuildEconomyRows();
+            BuildArcherRows();
             _root.RegisterCallback<GeometryChangedEvent>(HandleGeometryChanged);
             ApplyInputMode(_inputMode != null ? _inputMode.CurrentMode : UIInputMode.Pointer);
             _initialized = true;
@@ -310,7 +304,6 @@ namespace DeadWalls
             _barracksButton.clicked += () => ToggleSurface(SurfaceKind.Barracks);
             _arrowsButton.clicked += () => ToggleSurface(SurfaceKind.Arrows);
             _heartButton.clicked += () => ToggleSurface(SurfaceKind.Heart);
-            _techButton.clicked += () => ToggleSurface(SurfaceKind.Tech);
             _pauseButton.clicked += OpenPause;
         }
 
@@ -331,8 +324,6 @@ namespace DeadWalls
             _pauseLegacy ??= FindFirstObjectByType<PauseMenuUI>(FindObjectsInactive.Include);
             _settingsLegacy ??= FindFirstObjectByType<SettingsUI>(FindObjectsInactive.Include);
             _levelUpLegacy ??= FindFirstObjectByType<LevelUpUI>(FindObjectsInactive.Include);
-            _gameOverLegacy ??= FindFirstObjectByType<GameOverUI>(FindObjectsInactive.Include);
-            _metaLegacy ??= FindFirstObjectByType<MetaProgressionUI>(FindObjectsInactive.Include);
             _uiManager ??= FindFirstObjectByType<UIManager>(FindObjectsInactive.Include);
         }
 
@@ -512,10 +503,6 @@ namespace DeadWalls
             }
 
             _criticalBanner.EnableInClassList("is-visible", visible);
-            if (_openSurface == SurfaceKind.Tech && visible)
-                Q<Label>("techAlertText").text = _criticalBannerTitle.text + "  ·  " + _criticalBannerBody.text;
-            else if (_openSurface == SurfaceKind.Tech)
-                Q<Label>("techAlertText").text = $"BATTLE CONTINUES  ·  WALL {Mathf.RoundToInt(wallRatio * 100f)}%  ·  {gm.WaveState.ZombiesAlive:N0} HOSTILES";
         }
 
         private void MirrorLegacyOverlays()
@@ -548,7 +535,7 @@ namespace DeadWalls
             VisualElement element = GetSurfaceElement(surface);
             element?.AddToClassList("is-open");
             GetSurfaceButton(surface)?.AddToClassList("is-selected");
-            bool fullscreen = surface == SurfaceKind.Heart || surface == SurfaceKind.Tech;
+            bool fullscreen = surface == SurfaceKind.Heart;
             _hudLayer.style.display = fullscreen ? DisplayStyle.None : DisplayStyle.Flex;
 
             if (surface == SurfaceKind.Economy)
@@ -561,8 +548,6 @@ namespace DeadWalls
                 ResolveRuntimeOwners();
                 _onboardingLegacy?.NotifyHeartSurfaceOpenedByPlayer();
             }
-            else if (surface == SurfaceKind.Tech)
-                RebuildTechGraph(true);
 
             if (_inputMode != null && _inputMode.CurrentMode == UIInputMode.Gamepad)
                 FocusFirstAction(element);
@@ -596,7 +581,6 @@ namespace DeadWalls
                 SurfaceKind.Barracks => "surface--barracks",
                 SurfaceKind.Arrows => "surface--arrows",
                 SurfaceKind.Heart => "surface--heart",
-                SurfaceKind.Tech => "surface--tech",
                 _ => string.Empty
             };
         }
@@ -609,7 +593,6 @@ namespace DeadWalls
                 SurfaceKind.Barracks => Q<VisualElement>("barracksDrawer"),
                 SurfaceKind.Arrows => Q<VisualElement>("arrowsDrawer"),
                 SurfaceKind.Heart => Q<VisualElement>("heartScreen"),
-                SurfaceKind.Tech => Q<VisualElement>("techScreen"),
                 _ => null
             };
         }
@@ -622,7 +605,6 @@ namespace DeadWalls
                 SurfaceKind.Barracks => _barracksButton,
                 SurfaceKind.Arrows => _arrowsButton,
                 SurfaceKind.Heart => _heartButton,
-                SurfaceKind.Tech => _techButton,
                 _ => null
             };
         }
@@ -632,8 +614,6 @@ namespace DeadWalls
             RefreshManagement(gm, false);
             if (_openSurface == SurfaceKind.Heart)
                 RefreshHeartInspector(gm);
-            else if (_openSurface == SurfaceKind.Tech)
-                RefreshTechInspector(gm);
         }
 
         private void HandleGlobalInput()
@@ -674,6 +654,7 @@ namespace DeadWalls
             float width = evt.newRect.width;
             float height = evt.newRect.height;
             _root.EnableInClassList("is-compact", width < 1500f || width / Mathf.Max(1f, height) < 1.55f);
+            _root.EnableInClassList("is-short", height < 720f);
         }
 
         private static void FocusFirstAction(VisualElement root)
