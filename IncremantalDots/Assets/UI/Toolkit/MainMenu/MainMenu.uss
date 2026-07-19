@@ -223,8 +223,45 @@
 
 .settings-field__heading {
     flex-direction: row;
+    align-items: center;
     justify-content: space-between;
 }
+
+.settings-field__identity,
+.settings-button-with-icon {
+    flex-direction: row;
+    align-items: center;
+}
+
+.settings-button-with-icon {
+    justify-content: center;
+}
+
+.settings-text-button.settings-button-with-icon {
+    justify-content: flex-start;
+}
+
+.settings-button-label {
+    margin: 0;
+    padding: 0;
+    color: rgb(235, 232, 222);
+    font-size: inherit;
+    letter-spacing: inherit;
+    -unity-font-style: bold;
+}
+
+.menu-setting-icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 9px;
+    flex-shrink: 0;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.menu-setting-icon--sound { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/sound_128_T.png"); }
+.menu-setting-icon--music { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/music_128_T.png"); }
+.menu-setting-icon--refresh { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/refresh_128_T.png"); }
+.menu-setting-icon--back { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/arrow_back_128_T.png"); }
 
 .settings-field__label,
 .settings-field__value {

@@ -35,7 +35,7 @@
 
                 <ui:VisualElement class="settings-field">
                     <ui:VisualElement class="settings-field__heading">
-                        <ui:Label text="SOUND EFFECTS" class="settings-field__label" />
+                        <ui:VisualElement class="settings-field__identity"><ui:VisualElement class="menu-setting-icon menu-setting-icon--sound" picking-mode="Ignore" /><ui:Label text="SOUND EFFECTS" class="settings-field__label" /></ui:VisualElement>
                         <ui:Label name="sfxValueLabel" text="100%" class="settings-field__value" />
                     </ui:VisualElement>
                     <ui:Slider name="sfxSlider" low-value="0" high-value="1" value="1" class="dw-slider" />
@@ -43,16 +43,16 @@
 
                 <ui:VisualElement class="settings-field">
                     <ui:VisualElement class="settings-field__heading">
-                        <ui:Label text="AMBIENCE" class="settings-field__label" />
+                        <ui:VisualElement class="settings-field__identity"><ui:VisualElement class="menu-setting-icon menu-setting-icon--music" picking-mode="Ignore" /><ui:Label text="AMBIENCE" class="settings-field__label" /></ui:VisualElement>
                         <ui:Label name="ambienceValueLabel" text="100%" class="settings-field__value" />
                     </ui:VisualElement>
                     <ui:Slider name="ambienceSlider" low-value="0" high-value="1" value="1" class="dw-slider" />
                 </ui:VisualElement>
 
                 <ui:VisualElement class="settings-separator" />
-                <ui:Button name="tutorialResetButton" text="RESET TUTORIAL" class="settings-text-button settings-text-button--danger" />
+                <ui:Button name="tutorialResetButton" class="settings-text-button settings-text-button--danger settings-button-with-icon"><ui:VisualElement class="menu-setting-icon menu-setting-icon--refresh" picking-mode="Ignore" /><ui:Label name="tutorialResetButtonLabel" text="RESET TUTORIAL" class="settings-button-label" picking-mode="Ignore" /></ui:Button>
                 <ui:Label name="tutorialStatusLabel" text="RESETS ONBOARDING ONLY. RUN AND UPGRADES STAY." class="settings-tutorial-status" />
-                <ui:Button name="settingsCloseButton" text="BACK" class="settings-close" />
+                <ui:Button name="settingsCloseButton" class="settings-close settings-button-with-icon"><ui:VisualElement class="menu-setting-icon menu-setting-icon--back" picking-mode="Ignore" /><ui:Label text="BACK" class="settings-button-label" picking-mode="Ignore" /></ui:Button>
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

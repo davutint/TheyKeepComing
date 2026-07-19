@@ -34,6 +34,11 @@ namespace DeadWalls
             "phase--day", "phase--dusk", "phase--night", "phase--dawn"
         };
 
+        private static readonly string[] CycleIconClasses =
+        {
+            "dw-icon--day", "dw-icon--dusk", "dw-icon--night", "dw-icon--dawn"
+        };
+
         private enum SurfaceKind
         {
             None,
@@ -88,7 +93,11 @@ namespace DeadWalls
         private Label _phaseValue;
         private Label _phaseCountdown;
         private Label _cycleMessage;
+        private VisualElement _cycleArc;
+        private VisualElement _cycleCelestial;
+        private VisualElement _cycleCelestialMarker;
         private readonly VisualElement[] _phaseSegments = new VisualElement[4];
+        private readonly VisualElement[] _phaseProgressFills = new VisualElement[4];
         private Label _wallValue;
         private VisualElement _wallTrack;
         private VisualElement _wallProgress;
@@ -245,10 +254,17 @@ namespace DeadWalls
             _phaseValue = Q<Label>("phaseValue");
             _phaseCountdown = Q<Label>("phaseCountdown");
             _cycleMessage = Q<Label>("cycleMessage");
+            _cycleArc = Q<VisualElement>("cycleArc");
+            _cycleCelestial = Q<VisualElement>("cycleCelestial");
+            _cycleCelestialMarker = Q<VisualElement>("cycleCelestialMarker");
             _phaseSegments[0] = Q<VisualElement>("phaseDay");
             _phaseSegments[1] = Q<VisualElement>("phaseDusk");
             _phaseSegments[2] = Q<VisualElement>("phaseNight");
             _phaseSegments[3] = Q<VisualElement>("phaseDawn");
+            _phaseProgressFills[0] = Q<VisualElement>("phaseDayFill");
+            _phaseProgressFills[1] = Q<VisualElement>("phaseDuskFill");
+            _phaseProgressFills[2] = Q<VisualElement>("phaseNightFill");
+            _phaseProgressFills[3] = Q<VisualElement>("phaseDawnFill");
             _wallValue = Q<Label>("wallValue");
             _wallTrack = Q<VisualElement>("defensePanel");
             _wallProgress = Q<VisualElement>("wallProgress");
@@ -431,11 +447,16 @@ namespace DeadWalls
             _phaseCountdown.text = FormatClock(remaining);
             _cycleMessage.text = GetPhaseMessage(cycle);
             ApplyPhaseClass(cycle.Phase);
+            UpdateCycleDial(cycle.CycleProgress01, phaseIndex);
 
             for (int i = 0; i < _phaseSegments.Length; i++)
             {
                 _phaseSegments[i].EnableInClassList("is-active", i == phaseIndex);
                 _phaseSegments[i].EnableInClassList("is-passed", i < phaseIndex);
+                float fill01 = i < phaseIndex
+                    ? 1f
+                    : i == phaseIndex ? Mathf.Clamp01(cycle.PhaseProgress01) : 0f;
+                _phaseProgressFills[i].style.width = Length.Percent(fill01 * 100f);
             }
 
             float wallRatio = Mathf.Clamp01(gm.GetDefensePercent());
@@ -449,6 +470,93 @@ namespace DeadWalls
             SetCooldown(_repairCooldown, gm.EmergencyRepairCooldownRemaining, gm.EmergencyRepairCooldownDuration);
             RefreshCriticalBanner(gm, wallRatio);
             MirrorLegacyOverlays();
+        }
+
+        private void UpdateCycleDial(float cycleProgress01, int phaseIndex)
+        {
+            if (_cycleArc == null || _cycleCelestial == null || _cycleCelestialMarker == null)
+                return;
+
+            float arcWidth = _cycleArc.resolvedStyle.width;
+            if (float.IsNaN(arcWidth) || arcWidth < 64f)
+                arcWidth = 210f;
+
+            const float markerSize = 28f;
+            float ratio = Mathf.Clamp01(cycleProgress01);
+            float travel = Mathf.Max(1f, arcWidth - markerSize);
+            float arcLift = Mathf.Sin(ratio * Mathf.PI) * 27f;
+            _cycleCelestial.style.left = ratio * travel;
+            _cycleCelestial.style.top = 31f - arcLift;
+
+            for (int i = 0; i < CycleIconClasses.Length; i++)
+                _cycleCelestialMarker.EnableInClassList(CycleIconClasses[i], i == phaseIndex);
+        }
+
+        private static VisualElement CreateRoleIcon(string role, string sizeClass)
+        {
+            var icon = new VisualElement { pickingMode = PickingMode.Ignore };
+            icon.AddToClassList("dw-icon");
+            icon.AddToClassList(sizeClass);
+            icon.AddToClassList("dw-icon--" + role);
+            return icon;
+        }
+
+        private static string ResourceIconRole(EconomyFocusType resource)
+        {
+            return resource switch
+            {
+                EconomyFocusType.Wood => "wood",
+                EconomyFocusType.Stone => "stone",
+                EconomyFocusType.Iron => "iron",
+                EconomyFocusType.Food => "food",
+                _ => "workers"
+            };
+        }
+
+        private static string ArcherIconRole(ArcherType type)
+        {
+            return type switch
+            {
+                ArcherType.Rapid => "archer-rapid",
+                ArcherType.Frost => "archer-frost",
+                _ => "archer-basic"
+            };
+        }
+
+        private static string LevelUpIconRole(UpgradeType type)
+        {
+            return type switch
+            {
+                UpgradeType.AddBasicArcher => "archer-basic",
+                UpgradeType.AddRapidArcher => "archer-rapid",
+                UpgradeType.AddFrostArcher => "archer-frost",
+                UpgradeType.ArrowDamageUp => "arrow-damage",
+                UpgradeType.FireRateUp => "fire-rate",
+                UpgradeType.RepairGate => "repair",
+                _ => "trophy"
+            };
+        }
+
+        private static string MetaUpgradeIconRole(MetaUpgradeSO upgrade)
+        {
+            if (upgrade == null)
+                return "trophy";
+
+            return upgrade.Id switch
+            {
+                "start_wood" => "wood",
+                "start_stone" => "stone",
+                "start_iron" => "iron",
+                "start_food" => "food",
+                "start_beds" => "housing",
+                "start_archers" => "archer-basic",
+                "production" => "production",
+                "arrow_efficiency" => "efficiency",
+                "wall_hp" => "wall",
+                "essence_gain" => "souls",
+                "node_pool_unlock" => "heart",
+                _ => "trophy"
+            };
         }
 
         private void RefreshAbilityText(GameManager gm)
@@ -669,7 +777,9 @@ namespace DeadWalls
 
         private static void SetResource(Label valueLabel, Label rateLabel, int value, float rate)
         {
-            valueLabel.text = value.ToString("N0", CultureInfo.InvariantCulture);
+            string formattedValue = value.ToString("N0", CultureInfo.InvariantCulture);
+            valueLabel.text = formattedValue;
+            valueLabel.EnableInClassList("is-compact-number", formattedValue.Length >= 6);
             rateLabel.text = FormatRate(rate);
             rateLabel.EnableInClassList("is-positive", rate > 0.01f);
             rateLabel.EnableInClassList("is-negative", rate < -0.01f);

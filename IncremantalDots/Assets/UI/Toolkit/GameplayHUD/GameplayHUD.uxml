@@ -14,73 +14,109 @@
                 </ui:VisualElement>
                 <ui:VisualElement class="resource-grid">
                     <ui:VisualElement class="resource-readout resource--wood">
-                        <ui:VisualElement class="resource-mark" />
+                        <ui:VisualElement class="dw-icon dw-icon--resource dw-icon--wood" picking-mode="Ignore" />
                         <ui:Label text="WOOD" class="readout-label" />
-                        <ui:Label name="woodValue" text="0" class="readout-value" />
-                        <ui:Label name="woodRate" text="0/m" class="readout-rate" />
+                        <ui:VisualElement class="readout-number-stack">
+                            <ui:Label name="woodValue" text="0" class="readout-value" />
+                            <ui:Label name="woodRate" text="0/m" class="readout-rate" />
+                        </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:VisualElement class="resource-readout resource--stone">
-                        <ui:VisualElement class="resource-mark" />
+                        <ui:VisualElement class="dw-icon dw-icon--resource dw-icon--stone" picking-mode="Ignore" />
                         <ui:Label text="STONE" class="readout-label" />
-                        <ui:Label name="stoneValue" text="0" class="readout-value" />
-                        <ui:Label name="stoneRate" text="0/m" class="readout-rate" />
+                        <ui:VisualElement class="readout-number-stack">
+                            <ui:Label name="stoneValue" text="0" class="readout-value" />
+                            <ui:Label name="stoneRate" text="0/m" class="readout-rate" />
+                        </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:VisualElement class="resource-readout resource--iron">
-                        <ui:VisualElement class="resource-mark" />
+                        <ui:VisualElement class="dw-icon dw-icon--resource dw-icon--iron" picking-mode="Ignore" />
                         <ui:Label text="IRON" class="readout-label" />
-                        <ui:Label name="ironValue" text="0" class="readout-value" />
-                        <ui:Label name="ironRate" text="0/m" class="readout-rate" />
+                        <ui:VisualElement class="readout-number-stack">
+                            <ui:Label name="ironValue" text="0" class="readout-value" />
+                            <ui:Label name="ironRate" text="0/m" class="readout-rate" />
+                        </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:VisualElement class="resource-readout resource--food">
-                        <ui:VisualElement class="resource-mark" />
+                        <ui:VisualElement class="dw-icon dw-icon--resource dw-icon--food" picking-mode="Ignore" />
                         <ui:Label text="FOOD" class="readout-label" />
-                        <ui:Label name="foodValue" text="0" class="readout-value" />
-                        <ui:Label name="foodRate" text="0/m" class="readout-rate" />
+                        <ui:VisualElement class="readout-number-stack">
+                            <ui:Label name="foodValue" text="0" class="readout-value" />
+                            <ui:Label name="foodRate" text="0/m" class="readout-rate" />
+                        </ui:VisualElement>
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement class="population-line">
-                    <ui:Label name="populationValue" text="0 / 0 PEOPLE" class="population-main" />
+                    <ui:VisualElement class="population-copy">
+                        <ui:VisualElement class="dw-icon dw-icon--micro dw-icon--population" picking-mode="Ignore" />
+                        <ui:Label name="populationValue" text="0 / 0 PEOPLE" class="population-main" />
+                    </ui:VisualElement>
                     <ui:Label name="populationDetail" text="0 IDLE" class="population-detail" />
                 </ui:VisualElement>
             </ui:VisualElement>
 
             <ui:VisualElement class="siege-clock">
-                <ui:VisualElement class="clock-copy">
+                <ui:VisualElement class="clock-day-copy">
                     <ui:Label name="dayValue" text="DAY 1" class="clock-day" />
-                    <ui:VisualElement class="clock-phase-copy">
-                        <ui:Label name="phaseValue" text="DAYLIGHT" class="clock-phase" />
-                        <ui:Label name="phaseCountdown" text="02:00" class="clock-time" />
+                    <ui:Label name="cycleMessage" text="BUILD WHILE THE LIGHT HOLDS" class="clock-message" />
+                </ui:VisualElement>
+                <ui:VisualElement name="cycleOrbit" class="cycle-orbit" picking-mode="Ignore">
+                    <ui:VisualElement name="cycleArc" class="cycle-arc">
+                        <ui:VisualElement class="cycle-horizon" />
+                        <ui:VisualElement class="cycle-arc-line" />
+                        <ui:VisualElement name="cycleCelestial" class="cycle-celestial">
+                            <ui:VisualElement class="cycle-celestial-glow" />
+                            <ui:VisualElement name="cycleCelestialMarker" class="dw-icon cycle-celestial-marker dw-icon--day" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="phase-segments">
+                        <ui:VisualElement name="phaseDay" class="phase-segment phase-segment--day is-active">
+                            <ui:VisualElement name="phaseDayFill" class="phase-segment-fill" />
+                            <ui:VisualElement class="dw-icon dw-icon--phase-stop dw-icon--day" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="phaseDusk" class="phase-segment phase-segment--dusk">
+                            <ui:VisualElement name="phaseDuskFill" class="phase-segment-fill" />
+                            <ui:VisualElement class="dw-icon dw-icon--phase-stop dw-icon--dusk" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="phaseNight" class="phase-segment phase-segment--night">
+                            <ui:VisualElement name="phaseNightFill" class="phase-segment-fill" />
+                            <ui:VisualElement class="dw-icon dw-icon--phase-stop dw-icon--night" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="phaseDawn" class="phase-segment phase-segment--dawn">
+                            <ui:VisualElement name="phaseDawnFill" class="phase-segment-fill" />
+                            <ui:VisualElement class="dw-icon dw-icon--phase-stop dw-icon--dawn" />
+                        </ui:VisualElement>
                     </ui:VisualElement>
                 </ui:VisualElement>
-                <ui:VisualElement class="phase-segments">
-                    <ui:VisualElement name="phaseDay" class="phase-segment phase-segment--day is-active" />
-                    <ui:VisualElement name="phaseDusk" class="phase-segment phase-segment--dusk" />
-                    <ui:VisualElement name="phaseNight" class="phase-segment phase-segment--night" />
-                    <ui:VisualElement name="phaseDawn" class="phase-segment phase-segment--dawn" />
+                <ui:VisualElement class="clock-phase-copy">
+                    <ui:Label name="phaseValue" text="DAYLIGHT" class="clock-phase" />
+                    <ui:Label name="phaseCountdown" text="02:00" class="clock-time" />
                 </ui:VisualElement>
-                <ui:Label name="cycleMessage" text="BUILD WHILE THE LIGHT HOLDS" class="clock-message" />
             </ui:VisualElement>
 
             <ui:VisualElement class="threat-cluster">
                 <ui:VisualElement class="threat-line">
-                    <ui:VisualElement>
+                    <ui:VisualElement class="threat-metric">
+                        <ui:VisualElement class="dw-icon dw-icon--metric dw-icon--wall" picking-mode="Ignore" />
+                        <ui:VisualElement>
                         <ui:Label text="WALL INTEGRITY" class="readout-label" />
                         <ui:Label name="wallValue" text="100%" class="wall-value" />
+                        </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:VisualElement class="hostile-readout">
-                        <ui:Label text="HOSTILES" class="readout-label" />
-                        <ui:Label name="hostilesValue" text="0" class="hostile-value" />
+                        <ui:VisualElement class="dw-icon dw-icon--metric dw-icon--hostiles" picking-mode="Ignore" />
+                        <ui:VisualElement class="hostile-copy"><ui:Label text="HOSTILES" class="readout-label" /><ui:Label name="hostilesValue" text="0" class="hostile-value" /></ui:VisualElement>
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement name="defensePanel" class="wall-track">
                     <ui:VisualElement name="wallProgress" class="wall-progress" />
                 </ui:VisualElement>
                 <ui:VisualElement class="supply-line">
-                    <ui:Label name="arrowValue" text="0 / 0 ARROWS" class="supply-value" />
+                    <ui:VisualElement class="supply-copy"><ui:VisualElement class="dw-icon dw-icon--micro dw-icon--arrows" picking-mode="Ignore" /><ui:Label name="arrowValue" text="0 / 0 ARROWS" class="supply-value" /></ui:VisualElement>
                     <ui:Label name="arrowDetail" text="SUPPLY READY" class="supply-state" />
                 </ui:VisualElement>
                 <ui:VisualElement name="soulAnchor" class="soul-readout">
-                    <ui:VisualElement class="soul-glyph" />
+                    <ui:VisualElement class="dw-icon dw-icon--micro dw-icon--souls" picking-mode="Ignore" />
                     <ui:Label name="soulValue" text="0" class="soul-value" />
                     <ui:Label text="SOULS" class="soul-label" />
                 </ui:VisualElement>
@@ -90,6 +126,7 @@
                 <ui:Button name="fireballButton" class="ability-command">
                     <ui:VisualElement name="fireballCooldown" class="ability-cooldown" picking-mode="Ignore" />
                     <ui:Label text="1" class="ability-prompt" picking-mode="Ignore" />
+                    <ui:VisualElement class="dw-icon dw-icon--ability dw-icon--fireball" picking-mode="Ignore" />
                     <ui:VisualElement class="ability-copy" picking-mode="Ignore">
                         <ui:Label text="FIREBALL" class="ability-name" />
                         <ui:Label name="fireballState" text="LOCKED" class="ability-state" />
@@ -98,6 +135,7 @@
                 <ui:Button name="rallyButton" class="ability-command">
                     <ui:VisualElement name="rallyCooldown" class="ability-cooldown" picking-mode="Ignore" />
                     <ui:Label text="2" class="ability-prompt" picking-mode="Ignore" />
+                    <ui:VisualElement class="dw-icon dw-icon--ability dw-icon--rally" picking-mode="Ignore" />
                     <ui:VisualElement class="ability-copy" picking-mode="Ignore">
                         <ui:Label text="RALLY" class="ability-name" />
                         <ui:Label name="rallyState" text="READY" class="ability-state" />
@@ -106,6 +144,7 @@
                 <ui:Button name="repairButton" class="ability-command">
                     <ui:VisualElement name="repairCooldown" class="ability-cooldown" picking-mode="Ignore" />
                     <ui:Label text="3" class="ability-prompt" picking-mode="Ignore" />
+                    <ui:VisualElement class="dw-icon dw-icon--ability dw-icon--repair" picking-mode="Ignore" />
                     <ui:VisualElement class="ability-copy" picking-mode="Ignore">
                         <ui:Label text="EMERGENCY REPAIR" class="ability-name" />
                         <ui:Label name="repairState" text="NIGHT ONLY" class="ability-state" />
@@ -114,12 +153,12 @@
             </ui:VisualElement>
 
             <ui:VisualElement class="command-rail">
-                <ui:Button name="economyButton" text="ECONOMY" class="command-button command-button--economy" />
-                <ui:Button name="barracksButton" text="BARRACKS" class="command-button" />
+                <ui:Button name="economyButton" class="command-button command-button--economy"><ui:VisualElement class="dw-icon dw-icon--command dw-icon--economy" picking-mode="Ignore" /><ui:Label text="ECONOMY" class="command-label" picking-mode="Ignore" /></ui:Button>
+                <ui:Button name="barracksButton" class="command-button"><ui:VisualElement class="dw-icon dw-icon--command dw-icon--barracks" picking-mode="Ignore" /><ui:Label text="BARRACKS" class="command-label" picking-mode="Ignore" /></ui:Button>
                 <ui:VisualElement class="command-spacer" />
-                <ui:Button name="arrowsButton" text="ARROW SUPPLY" class="command-button" />
+                <ui:Button name="arrowsButton" class="command-button"><ui:VisualElement class="dw-icon dw-icon--command dw-icon--arrows" picking-mode="Ignore" /><ui:Label text="ARROW SUPPLY" class="command-label" picking-mode="Ignore" /></ui:Button>
                 <ui:Button name="heartButton" text="CASTLE HEART" class="command-button command-button--heart" />
-                <ui:Button name="pauseButton" text="II" class="command-button command-button--pause" />
+                <ui:Button name="pauseButton" class="command-button command-button--pause"><ui:VisualElement class="dw-icon dw-icon--command dw-icon--pause" picking-mode="Ignore" /></ui:Button>
             </ui:VisualElement>
 
             <ui:VisualElement name="criticalBanner" class="critical-banner">
@@ -133,6 +172,7 @@
         </ui:VisualElement>
 
         <ui:VisualElement name="economyDrawer" class="surface drawer drawer--left economy-drawer">
+            <ui:VisualElement class="surface-texture surface-texture--short" picking-mode="Ignore" />
             <ui:VisualElement class="surface-header">
                 <ui:VisualElement>
                     <ui:Label text="KEEP ECONOMY" class="surface-title" />
@@ -141,12 +181,13 @@
                 <ui:Button name="economyClose" text="CLOSE" class="surface-close" />
             </ui:VisualElement>
             <ui:VisualElement class="economy-summary">
-                <ui:VisualElement class="summary-block"><ui:Label text="AVAILABLE" class="summary-label" /><ui:Label name="economyIdle" text="0" class="summary-value" /></ui:VisualElement>
-                <ui:VisualElement class="summary-block"><ui:Label text="WORKERS" class="summary-label" /><ui:Label name="economyWorkers" text="0" class="summary-value" /></ui:VisualElement>
-                <ui:VisualElement class="summary-block"><ui:Label text="HOUSING" class="summary-label" /><ui:Label name="economyHousing" text="0 / 0" class="summary-value" /></ui:VisualElement>
+                <ui:VisualElement class="summary-block"><ui:VisualElement class="dw-icon dw-icon--summary dw-icon--population" picking-mode="Ignore" /><ui:VisualElement><ui:Label text="AVAILABLE" class="summary-label" /><ui:Label name="economyIdle" text="0" class="summary-value" /></ui:VisualElement></ui:VisualElement>
+                <ui:VisualElement class="summary-block"><ui:VisualElement class="dw-icon dw-icon--summary dw-icon--workers" picking-mode="Ignore" /><ui:VisualElement><ui:Label text="WORKERS" class="summary-label" /><ui:Label name="economyWorkers" text="0" class="summary-value" /></ui:VisualElement></ui:VisualElement>
+                <ui:VisualElement class="summary-block"><ui:VisualElement class="dw-icon dw-icon--summary dw-icon--housing" picking-mode="Ignore" /><ui:VisualElement><ui:Label text="HOUSING" class="summary-label" /><ui:Label name="economyHousing" text="0 / 0" class="summary-value" /></ui:VisualElement></ui:VisualElement>
             </ui:VisualElement>
             <ui:ScrollView name="economyRows" class="surface-scroll economy-rows" mode="Vertical" />
             <ui:VisualElement class="housing-card">
+                <ui:VisualElement class="dw-icon dw-icon--card dw-icon--housing" picking-mode="Ignore" />
                 <ui:VisualElement class="housing-copy"><ui:Label text="EXPAND HOUSING" class="card-title" /><ui:Label name="housingCost" text="Cost pending" class="card-detail" /></ui:VisualElement>
                 <ui:Button name="housingOne" text="+1" class="compact-action" />
                 <ui:Button name="housingTen" text="+10" class="compact-action" />
@@ -155,6 +196,7 @@
         </ui:VisualElement>
 
         <ui:VisualElement name="barracksDrawer" class="surface drawer drawer--right barracks-drawer">
+            <ui:VisualElement class="surface-texture surface-texture--short" picking-mode="Ignore" />
             <ui:VisualElement class="surface-header">
                 <ui:VisualElement><ui:Label text="WALL GARRISON" class="surface-title" /><ui:Label text="Recruit for the fight already in progress." class="surface-subtitle" /></ui:VisualElement>
                 <ui:Button name="barracksClose" text="CLOSE" class="surface-close" />
@@ -167,23 +209,23 @@
         </ui:VisualElement>
 
         <ui:VisualElement name="arrowsDrawer" class="surface drawer drawer--right arrows-drawer">
+            <ui:VisualElement class="surface-texture surface-texture--short" picking-mode="Ignore" />
             <ui:VisualElement class="surface-header">
-                <ui:VisualElement><ui:Label text="ARROW SUPPLY" class="surface-title" /><ui:Label text="Restock now; improve the supply line for later." class="surface-subtitle" /></ui:VisualElement>
+                <ui:VisualElement class="surface-heading-with-icon"><ui:VisualElement class="dw-icon dw-icon--header dw-icon--arrows" picking-mode="Ignore" /><ui:VisualElement><ui:Label text="ARROW SUPPLY" class="surface-title" /><ui:Label text="Restock now; improve the supply line for later." class="surface-subtitle" /></ui:VisualElement></ui:VisualElement>
                 <ui:Button name="arrowsClose" text="CLOSE" class="surface-close" />
             </ui:VisualElement>
             <ui:VisualElement class="supply-hero">
-                <ui:Label name="supplyHeroValue" text="0 / 0" class="supply-hero-value" />
-                <ui:Label name="supplyHeroState" text="READY" class="supply-hero-state" />
+                <ui:VisualElement class="supply-hero-copy"><ui:VisualElement class="dw-icon dw-icon--hero dw-icon--arrows" picking-mode="Ignore" /><ui:VisualElement><ui:Label name="supplyHeroValue" text="0 / 0" class="supply-hero-value" /><ui:Label name="supplyHeroState" text="READY" class="supply-hero-state" /></ui:VisualElement></ui:VisualElement>
                 <ui:VisualElement class="supply-hero-track"><ui:VisualElement name="supplyHeroProgress" class="supply-hero-progress" /></ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement class="purchase-stack">
-                <ui:Button name="arrowPackage" class="purchase-card"><ui:Label text="FIELD CRATE" class="card-title" /><ui:Label name="arrowPackageDetail" text="0 arrows" class="card-detail" /><ui:Label name="arrowPackageCost" text="0 WOOD" class="card-cost" /></ui:Button>
-                <ui:Button name="arrowLargePackage" class="purchase-card"><ui:Label text="SUPPLY WAGON" class="card-title" /><ui:Label name="arrowLargeDetail" text="0 arrows" class="card-detail" /><ui:Label name="arrowLargeCost" text="0 WOOD" class="card-cost" /></ui:Button>
-                <ui:Button name="arrowBuyMax" class="purchase-card purchase-card--primary"><ui:Label text="FILL RESERVES" class="card-title" /><ui:Label name="arrowMaxDetail" text="Fill remaining capacity" class="card-detail" /><ui:Label name="arrowMaxCost" text="0 WOOD" class="card-cost" /></ui:Button>
+                <ui:Button name="arrowPackage" class="purchase-card"><ui:VisualElement class="dw-icon dw-icon--card dw-icon--crate" picking-mode="Ignore" /><ui:VisualElement class="card-copy"><ui:Label text="FIELD CRATE" class="card-title" /><ui:Label name="arrowPackageDetail" text="0 arrows" class="card-detail" /><ui:Label name="arrowPackageCost" text="0 WOOD" class="card-cost" /></ui:VisualElement></ui:Button>
+                <ui:Button name="arrowLargePackage" class="purchase-card"><ui:VisualElement class="dw-icon dw-icon--card dw-icon--wagon" picking-mode="Ignore" /><ui:VisualElement class="card-copy"><ui:Label text="SUPPLY WAGON" class="card-title" /><ui:Label name="arrowLargeDetail" text="0 arrows" class="card-detail" /><ui:Label name="arrowLargeCost" text="0 WOOD" class="card-cost" /></ui:VisualElement></ui:Button>
+                <ui:Button name="arrowBuyMax" class="purchase-card purchase-card--primary"><ui:VisualElement class="dw-icon dw-icon--card dw-icon--fill" picking-mode="Ignore" /><ui:VisualElement class="card-copy"><ui:Label text="FILL RESERVES" class="card-title" /><ui:Label name="arrowMaxDetail" text="Fill remaining capacity" class="card-detail" /><ui:Label name="arrowMaxCost" text="0 WOOD" class="card-cost" /></ui:VisualElement></ui:Button>
             </ui:VisualElement>
             <ui:VisualElement class="upgrade-stack">
-                <ui:Button name="arrowCapacityUpgrade" class="upgrade-card"><ui:Label text="CAPACITY" class="card-title" /><ui:Label name="arrowCapacityDetail" text="Level 0" class="card-detail" /><ui:Label name="arrowCapacityCost" text="0" class="card-cost" /></ui:Button>
-                <ui:Button name="arrowEfficiencyUpgrade" class="upgrade-card"><ui:Label text="EFFICIENCY" class="card-title" /><ui:Label name="arrowEfficiencyDetail" text="Level 0" class="card-detail" /><ui:Label name="arrowEfficiencyCost" text="0" class="card-cost" /></ui:Button>
+                <ui:Button name="arrowCapacityUpgrade" class="upgrade-card"><ui:VisualElement class="dw-icon dw-icon--card dw-icon--capacity" picking-mode="Ignore" /><ui:VisualElement class="card-copy"><ui:Label text="CAPACITY" class="card-title" /><ui:Label name="arrowCapacityDetail" text="Level 0" class="card-detail" /><ui:Label name="arrowCapacityCost" text="0" class="card-cost" /></ui:VisualElement></ui:Button>
+                <ui:Button name="arrowEfficiencyUpgrade" class="upgrade-card"><ui:VisualElement class="dw-icon dw-icon--card dw-icon--efficiency" picking-mode="Ignore" /><ui:VisualElement class="card-copy"><ui:Label text="EFFICIENCY" class="card-title" /><ui:Label name="arrowEfficiencyDetail" text="Level 0" class="card-detail" /><ui:Label name="arrowEfficiencyCost" text="0" class="card-cost" /></ui:VisualElement></ui:Button>
             </ui:VisualElement>
         </ui:VisualElement>
 
@@ -214,6 +256,7 @@
 
         <ui:VisualElement name="modalShade" class="modal-shade">
             <ui:VisualElement name="councilModal" class="modal council-modal">
+                <ui:VisualElement class="surface-texture surface-texture--modal" picking-mode="Ignore" />
                 <ui:Label text="THE COUNCIL DEMANDS AN ANSWER" class="modal-kicker" />
                 <ui:Label name="councilTitle" text="A Choice at the Gate" class="modal-title" />
                 <ui:Label name="councilBody" text="The situation requires an exact decision." class="modal-body" />
@@ -225,31 +268,35 @@
             </ui:VisualElement>
 
             <ui:VisualElement name="levelUpModal" class="modal levelup-modal">
+                <ui:VisualElement class="surface-texture surface-texture--modal" picking-mode="Ignore" />
                 <ui:Label text="THE KEEP ENDURES" class="modal-kicker" />
                 <ui:Label name="levelUpTitle" text="Choose the next advantage" class="modal-title" />
                 <ui:VisualElement name="levelUpCards" class="levelup-cards" />
             </ui:VisualElement>
 
             <ui:VisualElement name="pauseModal" class="modal pause-modal">
+                <ui:VisualElement class="surface-texture surface-texture--modal" picking-mode="Ignore" />
                 <ui:Label text="BATTLE PAUSED" class="modal-kicker" />
                 <ui:Label text="DEAD WALLS" class="modal-title" />
-                <ui:Button name="resumeButton" text="RESUME" class="modal-action modal-action--primary" />
-                <ui:Button name="settingsButton" text="SETTINGS" class="modal-action" />
-                <ui:Button name="mainMenuButton" text="SAVE &amp; RETURN TO MENU" class="modal-action" />
+                <ui:Button name="resumeButton" class="modal-action modal-action--primary modal-action--icon"><ui:VisualElement class="dw-icon dw-icon--modal-action dw-icon--play" picking-mode="Ignore" /><ui:Label text="RESUME" class="modal-action-label" picking-mode="Ignore" /></ui:Button>
+                <ui:Button name="settingsButton" class="modal-action modal-action--icon"><ui:VisualElement class="dw-icon dw-icon--modal-action dw-icon--settings" picking-mode="Ignore" /><ui:Label text="SETTINGS" class="modal-action-label" picking-mode="Ignore" /></ui:Button>
+                <ui:Button name="mainMenuButton" class="modal-action modal-action--icon"><ui:VisualElement class="dw-icon dw-icon--modal-action dw-icon--housing" picking-mode="Ignore" /><ui:Label text="SAVE &amp; RETURN TO MENU" class="modal-action-label" picking-mode="Ignore" /></ui:Button>
             </ui:VisualElement>
 
             <ui:VisualElement name="settingsModal" class="modal settings-modal">
+                <ui:VisualElement class="surface-texture surface-texture--modal" picking-mode="Ignore" />
                 <ui:Label text="SETTINGS" class="modal-title" />
-                <ui:Label text="SOUND EFFECTS" class="setting-label" />
+                <ui:VisualElement class="setting-heading"><ui:VisualElement class="dw-icon dw-icon--micro dw-icon--sound" picking-mode="Ignore" /><ui:Label text="SOUND EFFECTS" class="setting-label" /></ui:VisualElement>
                 <ui:Slider name="sfxSlider" low-value="0" high-value="1" value="1" class="dw-slider" />
-                <ui:Label text="AMBIENCE" class="setting-label" />
+                <ui:VisualElement class="setting-heading"><ui:VisualElement class="dw-icon dw-icon--micro dw-icon--music" picking-mode="Ignore" /><ui:Label text="AMBIENCE" class="setting-label" /></ui:VisualElement>
                 <ui:Slider name="ambienceSlider" low-value="0" high-value="1" value="1" class="dw-slider" />
-                <ui:Button name="resetTutorialButton" text="RESET TUTORIAL" class="modal-action" />
+                <ui:Button name="resetTutorialButton" class="modal-action modal-action--icon"><ui:VisualElement class="dw-icon dw-icon--modal-action dw-icon--refresh" picking-mode="Ignore" /><ui:Label name="resetTutorialButtonLabel" text="RESET TUTORIAL" class="modal-action-label" picking-mode="Ignore" /></ui:Button>
                 <ui:Label name="resetTutorialStatus" text="" class="setting-status" />
-                <ui:Button name="settingsClose" text="BACK" class="modal-action modal-action--primary" />
+                <ui:Button name="settingsClose" class="modal-action modal-action--primary modal-action--icon"><ui:VisualElement class="dw-icon dw-icon--modal-action dw-icon--back" picking-mode="Ignore" /><ui:Label text="BACK" class="modal-action-label" picking-mode="Ignore" /></ui:Button>
             </ui:VisualElement>
 
             <ui:VisualElement name="gameOverModal" class="modal gameover-modal">
+                <ui:VisualElement class="surface-texture surface-texture--gameover" picking-mode="Ignore" />
                 <ui:VisualElement class="gameover-header">
                     <ui:Label text="THE FINAL REPORT" class="modal-kicker modal-kicker--danger" />
                     <ui:Label name="gameOverTitle" text="THE WALL HAS FALLEN" class="modal-title gameover-title" />
@@ -258,11 +305,11 @@
 
                 <ui:Label name="gameOverRecordBadge" text="NEW LONGEST STAND" class="gameover-record" />
                 <ui:VisualElement class="gameover-run-summary">
-                    <ui:VisualElement class="gameover-stat"><ui:Label text="DAY HELD" class="gameover-stat-label" /><ui:Label name="gameOverDay" text="1" class="gameover-stat-value" /></ui:VisualElement>
-                    <ui:VisualElement class="gameover-stat"><ui:Label text="ENEMIES SLAIN" class="gameover-stat-label" /><ui:Label name="gameOverKills" text="0" class="gameover-stat-value" /></ui:VisualElement>
-                    <ui:VisualElement class="gameover-stat"><ui:Label text="BEST STAND" class="gameover-stat-label" /><ui:Label name="gameOverBest" text="1" class="gameover-stat-value" /></ui:VisualElement>
-                    <ui:VisualElement class="gameover-stat gameover-stat--earned"><ui:Label text="LAST EMBERS EARNED" class="gameover-stat-label" /><ui:Label name="gameOverEarned" text="+0" class="gameover-stat-value" /></ui:VisualElement>
-                    <ui:VisualElement class="gameover-stat gameover-stat--balance"><ui:Label text="AVAILABLE" class="gameover-stat-label" /><ui:Label name="gameOverBalance" text="0" class="gameover-stat-value" /></ui:VisualElement>
+                    <ui:VisualElement class="gameover-stat"><ui:VisualElement class="dw-icon dw-icon--stat dw-icon--clock" picking-mode="Ignore" /><ui:Label text="DAY HELD" class="gameover-stat-label" /><ui:Label name="gameOverDay" text="1" class="gameover-stat-value" /></ui:VisualElement>
+                    <ui:VisualElement class="gameover-stat"><ui:VisualElement class="dw-icon dw-icon--stat dw-icon--hostiles" picking-mode="Ignore" /><ui:Label text="ENEMIES SLAIN" class="gameover-stat-label" /><ui:Label name="gameOverKills" text="0" class="gameover-stat-value" /></ui:VisualElement>
+                    <ui:VisualElement class="gameover-stat"><ui:VisualElement class="dw-icon dw-icon--stat dw-icon--trophy" picking-mode="Ignore" /><ui:Label text="BEST STAND" class="gameover-stat-label" /><ui:Label name="gameOverBest" text="1" class="gameover-stat-value" /></ui:VisualElement>
+                    <ui:VisualElement class="gameover-stat gameover-stat--earned"><ui:VisualElement class="dw-icon dw-icon--stat dw-icon--embers" picking-mode="Ignore" /><ui:Label text="LAST EMBERS EARNED" class="gameover-stat-label" /><ui:Label name="gameOverEarned" text="+0" class="gameover-stat-value" /></ui:VisualElement>
+                    <ui:VisualElement class="gameover-stat gameover-stat--balance"><ui:VisualElement class="dw-icon dw-icon--stat dw-icon--embers" picking-mode="Ignore" /><ui:Label text="AVAILABLE" class="gameover-stat-label" /><ui:Label name="gameOverBalance" text="0" class="gameover-stat-value" /></ui:VisualElement>
                 </ui:VisualElement>
 
                 <ui:VisualElement class="meta-shop-header">
@@ -270,7 +317,7 @@
                         <ui:Label name="metaShopTitle" text="FORTIFY THE NEXT STAND" class="meta-shop-title" />
                         <ui:Label name="metaShopHint" text="Permanent upgrades apply to your next run." class="meta-shop-hint" />
                     </ui:VisualElement>
-                    <ui:Label name="metaWallet" text="0 EMBERS" class="meta-wallet" />
+                    <ui:VisualElement class="meta-wallet-wrap"><ui:VisualElement class="dw-icon dw-icon--micro dw-icon--embers" picking-mode="Ignore" /><ui:Label name="metaWallet" text="0 EMBERS" class="meta-wallet" /></ui:VisualElement>
                 </ui:VisualElement>
                 <ui:ScrollView name="metaShopRows" class="meta-shop" mode="Vertical" />
                 <ui:Button name="restartButton" text="BEGIN NEXT RUN" class="modal-action modal-action--primary gameover-restart" />

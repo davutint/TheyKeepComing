@@ -27,6 +27,7 @@ namespace DeadWalls
         private Slider _sfxSlider;
         private Slider _ambienceSlider;
         private Button _resetTutorialButton;
+        private Label _resetTutorialButtonLabel;
         private Label _resetTutorialStatus;
         private bool _pauseOpen;
         private bool _settingsOpen;
@@ -82,6 +83,7 @@ namespace DeadWalls
             _sfxSlider.RegisterValueChangedCallback(evt => SoundSettings.SfxVolume = evt.newValue);
             _ambienceSlider.RegisterValueChangedCallback(evt => SoundSettings.AmbienceVolume = evt.newValue);
             _resetTutorialButton = Q<Button>("resetTutorialButton");
+            _resetTutorialButtonLabel = Q<Label>("resetTutorialButtonLabel");
             _resetTutorialStatus = Q<Label>("resetTutorialStatus");
             _resetTutorialButton.clicked += HandleTutorialReset;
 
@@ -221,6 +223,7 @@ namespace DeadWalls
                 Button cardButton = new Button(() => ChooseLevelUpUpgrade(capturedType));
                 cardButton.AddToClassList("levelup-card");
                 cardButton.SetEnabled(gm.CanApplyUpgrade(offer.Type));
+                cardButton.Add(CreateRoleIcon(LevelUpIconRole(offer.Type), "dw-icon--levelup"));
                 Label label = new Label($"{offer.Title.ToUpperInvariant()}\n\n{offer.Description}\n\nTIER {offer.Tier:N0}");
                 label.AddToClassList("levelup-card-copy");
                 cardButton.Add(label);
@@ -343,6 +346,11 @@ namespace DeadWalls
                 copy.Add(title);
                 copy.Add(description);
 
+                VisualElement main = new VisualElement();
+                main.AddToClassList("meta-upgrade-main");
+                main.Add(CreateRoleIcon(MetaUpgradeIconRole(upgrade), "dw-icon--meta"));
+                main.Add(copy);
+
                 VisualElement transaction = new VisualElement();
                 transaction.AddToClassList("meta-upgrade-transaction");
                 string levelText = upgrade.IsRepeatable
@@ -355,7 +363,7 @@ namespace DeadWalls
                 transaction.Add(levelLabel);
                 transaction.Add(price);
 
-                toolkitRow.Add(copy);
+                toolkitRow.Add(main);
                 toolkitRow.Add(transaction);
                 _metaShopRows.Add(toolkitRow);
             }
@@ -454,13 +462,13 @@ namespace DeadWalls
             {
                 _tutorialResetArmed = true;
                 _tutorialResetArmUntil = Time.unscaledTime + 4f;
-                _resetTutorialButton.text = "CONFIRM RESET";
+                _resetTutorialButtonLabel.text = "CONFIRM RESET";
                 _resetTutorialStatus.text = "Press again to erase tutorial progress.";
                 return;
             }
 
             bool reset = FirstRunOnboardingUI.ResetTutorialProgress();
-            _resetTutorialButton.text = reset ? "TUTORIAL RESET" : "RESET FAILED";
+            _resetTutorialButtonLabel.text = reset ? "TUTORIAL RESET" : "RESET FAILED";
             _resetTutorialStatus.text = reset
                 ? "Tutorial guidance will begin on the next eligible step."
                 : "Tutorial progress could not be reset.";
@@ -470,8 +478,8 @@ namespace DeadWalls
         private void ResetTutorialResetPresentation()
         {
             _tutorialResetArmed = false;
-            if (_resetTutorialButton != null)
-                _resetTutorialButton.text = "RESET TUTORIAL";
+            if (_resetTutorialButtonLabel != null)
+                _resetTutorialButtonLabel.text = "RESET TUTORIAL";
             if (_resetTutorialStatus != null)
                 _resetTutorialStatus.text = string.Empty;
         }

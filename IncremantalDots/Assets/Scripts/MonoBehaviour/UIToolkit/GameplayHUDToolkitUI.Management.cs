@@ -103,8 +103,13 @@ namespace DeadWalls
 
                 VisualElement heading = new VisualElement();
                 heading.AddToClassList("row-heading");
-                heading.Add(new Label(ResourceName(resource)) { name = "economyTitle" + resource });
-                heading[0].AddToClassList("row-title");
+                VisualElement headingCopy = new VisualElement();
+                headingCopy.AddToClassList("row-heading-copy");
+                headingCopy.Add(CreateRoleIcon(ResourceIconRole(resource), "dw-icon--row"));
+                Label title = new Label(ResourceName(resource)) { name = "economyTitle" + resource };
+                title.AddToClassList("row-title");
+                headingCopy.Add(title);
+                heading.Add(headingCopy);
                 Label stat = new Label("0 / 0") { name = "economyStat" + resource };
                 stat.AddToClassList("row-stat");
                 heading.Add(stat);
@@ -197,9 +202,13 @@ namespace DeadWalls
 
                 VisualElement heading = new VisualElement();
                 heading.AddToClassList("row-heading");
+                VisualElement headingCopy = new VisualElement();
+                headingCopy.AddToClassList("row-heading-copy");
+                headingCopy.Add(CreateRoleIcon(ArcherIconRole(type), "dw-icon--row"));
                 Label title = new Label(definition.DisplayName.ToUpperInvariant());
                 title.AddToClassList("row-title");
-                heading.Add(title);
+                headingCopy.Add(title);
+                heading.Add(headingCopy);
                 Label count = new Label("0 DEPLOYED") { name = "archerCount" + type };
                 count.AddToClassList("row-stat");
                 heading.Add(count);

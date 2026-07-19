@@ -60,7 +60,7 @@
 .economy-cluster {
     left: 26px;
     top: 22px;
-    width: 388px;
+    width: 420px;
     padding: 12px 14px 11px 14px;
     background-color: rgba(8, 11, 10, 0.86);
     border-left-width: 3px;
@@ -124,58 +124,56 @@
 .cluster-state.is-negative { color: var(--runtime-danger); }
 
 .resource-grid {
-    height: 48px;
+    height: 58px;
     margin-top: 8px;
     flex-direction: row;
 }
 
 .resource-readout {
     position: relative;
-    width: 90px;
-    height: 46px;
+    width: 94px;
+    height: 56px;
     margin-right: 3px;
-    padding: 5px 5px 4px 7px;
+    padding: 5px 5px 4px 5px;
     background-color: rgba(255, 255, 255, 0.025);
 }
 
-.resource-mark {
-    width: 4px;
-    height: 26px;
-    margin-right: 7px;
-    background-color: var(--runtime-gold);
-}
-
-.resource--stone .resource-mark { background-color: rgb(149, 154, 150); }
-.resource--iron .resource-mark { background-color: rgb(126, 153, 164); }
-.resource--food .resource-mark { background-color: rgb(150, 177, 112); }
-
 .readout-label {
     position: absolute;
-    left: 18px;
+    left: 34px;
     top: 5px;
     color: var(--runtime-faint);
     font-size: 8px;
 }
 
-.readout-value {
+.readout-number-stack {
     position: absolute;
-    left: 18px;
-    bottom: 4px;
+    left: 34px;
+    right: 5px;
+    top: 16px;
+    bottom: 3px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    overflow: hidden;
+}
+
+.readout-value {
     margin: 0;
     padding: 0;
     color: var(--runtime-ink);
     font-size: 17px;
     -unity-font-style: bold;
+    white-space: nowrap;
 }
 
+.readout-value.is-compact-number { font-size: 14px; }
+
 .readout-rate {
-    position: absolute;
-    right: 5px;
-    bottom: 5px;
-    margin: 0;
+    margin: -2px 0 0 0;
     padding: 0;
     color: var(--runtime-muted);
     font-size: 8px;
+    white-space: nowrap;
 }
 
 .readout-rate.is-positive { color: rgba(148, 192, 126, 0.90); }
@@ -188,35 +186,63 @@
     border-top-color: rgba(226, 214, 190, 0.11);
 }
 
+.population-copy,
+.supply-copy,
+.threat-metric,
+.hostile-readout,
+.surface-heading-with-icon,
+.supply-hero-copy,
+.setting-heading,
+.meta-wallet-wrap {
+    flex-direction: row;
+    align-items: center;
+}
+
 .population-main { margin: 0; padding: 0; font-size: 11px; letter-spacing: 1px; -unity-font-style: bold; }
 .population-detail { margin: 0; padding: 0; color: var(--runtime-muted); font-size: 9px; letter-spacing: 0.8px; }
 
 .siege-clock {
     left: 50%;
     top: 22px;
-    width: 322px;
-    min-height: 104px;
-    padding: 12px 16px 10px 16px;
+    width: 452px;
+    height: 108px;
+    padding: 10px 14px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
     translate: -50% 0;
-    background-color: rgba(8, 10, 11, 0.88);
+    background-color: rgba(7, 10, 11, 0.92);
     border-width: 1px;
     border-color: var(--runtime-line);
+    border-bottom-color: rgba(210, 158, 84, 0.28);
 }
 
-.clock-copy { flex-direction: row; align-items: flex-end; justify-content: space-between; }
+.clock-day-copy { width: 105px; align-items: flex-start; }
 .clock-day { margin: 0; padding: 0; color: var(--runtime-gold-bright); font-size: 12px; letter-spacing: 2px; -unity-font-style: bold; }
-.clock-phase-copy { align-items: flex-end; }
+.clock-phase-copy { width: 98px; align-items: flex-end; }
 .clock-phase { margin: 0; padding: 0; color: var(--runtime-ink); font-size: 15px; letter-spacing: 2.4px; -unity-font-style: bold; }
 .clock-time { margin: 1px 0 0 0; padding: 0; color: var(--runtime-muted); font-size: 10px; letter-spacing: 1px; }
 
-.phase-segments { height: 5px; margin-top: 12px; flex-direction: row; }
-.phase-segment { height: 5px; flex-grow: 1; margin-right: 4px; background-color: rgba(231, 222, 204, 0.12); }
-.phase-segment.is-passed { background-color: rgba(231, 222, 204, 0.28); }
-.phase-segment.is-active { background-color: var(--runtime-gold-bright); }
-.phase-segment--dusk.is-active { background-color: rgb(188, 121, 83); }
-.phase-segment--night.is-active { background-color: rgb(104, 143, 195); }
-.phase-segment--dawn.is-active { background-color: rgb(103, 184, 177); }
-.clock-message { margin: 8px 0 0 0; color: var(--runtime-faint); font-size: 8px; letter-spacing: 1.4px; -unity-text-align: middle-center; }
+.cycle-orbit { position: relative; width: 210px; height: 86px; margin: 0 8px; }
+.cycle-arc { position: relative; width: 210px; height: 60px; }
+.cycle-horizon { position: absolute; left: 4px; right: 4px; bottom: 7px; height: 1px; background-color: rgba(224, 202, 166, 0.18); }
+.cycle-arc-line { position: absolute; left: 7px; right: 7px; top: 6px; height: 47px; border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 0; border-color: rgba(224, 202, 166, 0.27); border-top-left-radius: 100px; border-top-right-radius: 100px; }
+.cycle-celestial { position: absolute; left: 0; top: 30px; width: 28px; height: 28px; transition-property: left, top; transition-duration: 0.08s; }
+.cycle-celestial-glow { position: absolute; left: -7px; top: -7px; width: 42px; height: 42px; border-radius: 21px; background-color: rgba(241, 194, 116, 0.16); }
+.cycle-celestial-marker { position: absolute; left: 3px; top: 3px; width: 22px; height: 22px; }
+.phase--dusk .cycle-celestial-glow { background-color: rgba(201, 124, 82, 0.18); }
+.phase--night .cycle-celestial-glow { background-color: rgba(111, 154, 196, 0.20); }
+.phase--dawn .cycle-celestial-glow { background-color: rgba(111, 213, 225, 0.18); }
+.phase-segments { position: absolute; left: 0; right: 0; bottom: 0; height: 23px; flex-direction: row; }
+.phase-segment { position: relative; width: 25%; height: 23px; align-items: center; justify-content: center; overflow: hidden; border-bottom-width: 2px; border-bottom-color: rgba(231, 222, 204, 0.08); }
+.phase-segment-fill { position: absolute; left: 0; bottom: 0; width: 0%; height: 2px; background-color: var(--runtime-gold-bright); transition-property: width; transition-duration: 0.10s; transition-timing-function: ease-out; }
+.phase-segment--dusk .phase-segment-fill { background-color: rgb(188, 121, 83); }
+.phase-segment--night .phase-segment-fill { background-color: rgb(104, 143, 195); }
+.phase-segment--dawn .phase-segment-fill { background-color: rgb(103, 184, 177); }
+.phase-segment .dw-icon { opacity: 0.26; transition-property: opacity, scale; transition-duration: 0.24s; transition-timing-function: ease-out; }
+.phase-segment.is-passed .dw-icon { opacity: 0.46; }
+.phase-segment.is-active .dw-icon { opacity: 1; scale: 1.12 1.12; }
+.clock-message { width: 105px; margin: 9px 0 0 0; color: var(--runtime-faint); font-size: 7px; letter-spacing: 1px; -unity-text-align: upper-left; white-space: normal; }
 
 .threat-cluster {
     right: 26px;
@@ -233,10 +259,12 @@
 }
 
 .wall-value { margin: 3px 0 0 0; padding: 0; font-size: 23px; -unity-font-style: bold; }
-.hostile-readout { width: 82px; align-items: flex-end; }
+.threat-metric .readout-label, .hostile-readout .readout-label { position: relative; left: auto; top: auto; }
+.hostile-readout { width: 106px; justify-content: flex-end; }
+.hostile-copy { align-items: flex-end; }
 .hostile-value { margin: 3px 0 0 0; padding: 0; color: rgb(231, 152, 125); font-size: 23px; -unity-font-style: bold; }
-.wall-track { height: 6px; margin-top: 9px; background-color: rgba(223, 216, 197, 0.12); overflow: hidden; }
-.wall-progress { height: 6px; width: 100%; background-color: var(--runtime-green); transition-property: width, background-color; transition-duration: 0.18s; }
+.wall-track { height: 8px; margin-top: 9px; background-color: rgba(223, 216, 197, 0.12); background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/components/progress_bar_bg.png"); -unity-background-scale-mode: stretch-to-fill; overflow: hidden; }
+.wall-progress { height: 8px; width: 100%; background-color: var(--runtime-green); background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/components/progress_bar_top.png"); -unity-background-scale-mode: stretch-to-fill; transition-property: width, background-color; transition-duration: 0.18s; }
 .wall-track.is-warning .wall-progress { background-color: var(--runtime-gold); }
 .wall-track.is-critical .wall-progress { background-color: var(--runtime-danger); }
 .supply-line { margin-top: 9px; }
@@ -246,7 +274,6 @@
 
 .soul-readout { position: absolute; right: 12px; bottom: -42px; padding: 7px 10px; background-color: rgba(7, 14, 16, 0.86); border-width: 1px; border-color: rgba(111, 213, 225, 0.26); }
 .soul-readout.is-arriving { scale: 1.08 1.08; border-color: rgba(154, 239, 247, 0.82); background-color: rgba(13, 43, 47, 0.96); }
-.soul-glyph { width: 10px; height: 10px; margin-right: 7px; rotate: 45deg; background-color: var(--runtime-cyan); }
 .soul-value { margin: 0 7px 0 0; padding: 0; color: rgb(185, 239, 244); font-size: 14px; -unity-font-style: bold; }
 .soul-label { color: rgba(185, 239, 244, 0.55); font-size: 8px; }
 
@@ -262,7 +289,7 @@
 
 .ability-command {
     position: relative;
-    width: 160px;
+    width: 176px;
     height: 68px;
     min-height: 0;
     margin: 0;
@@ -277,6 +304,7 @@
     transition-property: background-color, border-bottom-color;
     transition-duration: 0.10s;
 }
+#repairButton { width: 194px; }
 
 .ability-command:hover,
 .ability-command:focus { background-color: rgba(224, 176, 102, 0.09); border-bottom-width: 3px; border-bottom-color: var(--runtime-gold-bright); }
@@ -284,7 +312,7 @@
 .ability-command:disabled { opacity: 0.45; }
 .ability-command.is-targeting { background-color: rgba(177, 68, 42, 0.20); border-bottom-width: 3px; border-bottom-color: var(--runtime-rust); }
 .ability-cooldown { position: absolute; left: 0; bottom: 0; width: 0%; height: 3px; background-color: var(--runtime-rust); }
-.ability-prompt { width: 30px; height: 30px; margin: 0 11px 0 0; padding: 5px 0 0 0; border-width: 1px; border-color: rgba(228, 217, 194, 0.30); color: var(--runtime-muted); font-size: 11px; -unity-font-style: bold; -unity-text-align: middle-center; }
+.ability-prompt { width: 24px; height: 24px; margin: 0 8px 0 0; padding: 3px 0 0 0; border-width: 1px; border-color: rgba(228, 217, 194, 0.25); color: var(--runtime-muted); font-size: 9px; -unity-font-style: bold; -unity-text-align: middle-center; }
 .ability-copy { flex-grow: 1; }
 .ability-name { margin: 0; padding: 0; color: var(--runtime-ink); font-size: 10px; letter-spacing: 1px; -unity-font-style: bold; white-space: nowrap; }
 .ability-state { margin-top: 4px; color: var(--runtime-faint); font-size: 8px; }
@@ -299,6 +327,7 @@
 .command-button {
     height: 48px;
     min-height: 0;
+    min-width: 126px;
     margin: 0 6px 0 0;
     padding: 0 16px;
     border-width: 1px;
@@ -311,13 +340,21 @@
     -unity-font-style: bold;
     transition-property: background-color, border-color, color, translate;
     transition-duration: 0.10s;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
 }
+.command-label { margin: 0; padding: 0; color: rgba(236, 231, 217, 0.82); font-size: 9px; letter-spacing: 1.3px; -unity-font-style: bold; }
+.command-button:hover .command-label,
+.command-button:focus .command-label,
+.command-button.is-selected .command-label { color: white; }
 .command-button:hover, .command-button:focus { background-color: rgba(59, 48, 34, 0.95); border-color: var(--runtime-gold); color: white; translate: 0 -2px; }
 .command-button:active { translate: 0 0; }
 .command-button.is-selected { background-color: rgba(100, 69, 35, 0.94); border-color: var(--runtime-gold-bright); }
 .command-button--economy { border-left-width: 3px; border-left-color: var(--runtime-gold); }
 .command-button--heart { border-left-width: 3px; border-left-color: rgb(137, 81, 153); }
-.command-button--pause { width: 48px; padding: 0; -unity-text-align: middle-center; }
+.command-button--pause { width: 48px; min-width: 48px; padding: 0; -unity-text-align: middle-center; }
+#arrowsButton { min-width: 148px; }
 .command-spacer { flex-grow: 1; }
 
 .critical-banner {
@@ -367,7 +404,7 @@
 }
 .surface.is-open { visibility: visible; opacity: 1; translate: 0 0; }
 
-.drawer { top: 0; bottom: 0; width: 610px; padding: 28px 28px 24px 28px; border-color: var(--runtime-line-strong); background-color: rgba(12,14,14,0.985); }
+.drawer { top: 0; bottom: 0; width: 610px; padding: 28px 28px 24px 28px; border-color: var(--runtime-line-strong); background-color: rgba(12,14,14,0.985); overflow: hidden; }
 .drawer--left { left: 0; translate: -102% 0; border-right-width: 1px; }
 .drawer--right { right: 0; translate: 102% 0; border-left-width: 1px; }
 .arrows-drawer { width: 510px; }
@@ -380,12 +417,13 @@
 .surface-scroll .unity-scroll-view__vertical-scroller { width: 8px; }
 
 .economy-summary { height: 76px; margin-top: 18px; padding: 10px; background-color: rgba(255,255,255,0.025); }
-.summary-block { flex-grow: 1; padding: 0 12px; border-right-width: 1px; border-right-color: var(--runtime-line); }
+.summary-block { flex-grow: 1; padding: 0 12px; flex-direction: row; align-items: center; border-right-width: 1px; border-right-color: var(--runtime-line); }
 .summary-label { color: var(--runtime-faint); font-size: 8px; }
 .summary-value { margin: 5px 0 0 0; padding: 0; color: var(--runtime-ink); font-size: 18px; -unity-font-style: bold; }
 .economy-row, .archer-row { min-height: 110px; margin-bottom: 9px; padding: 13px 14px; background-color: rgba(255,255,255,0.028); border-width: 1px; border-color: rgba(229,213,181,0.10); }
 .economy-row { min-height: 204px; }
 .row-heading { flex-direction: row; align-items: center; justify-content: space-between; }
+.row-heading-copy { flex-direction: row; align-items: center; }
 .row-title { margin: 0; padding: 0; color: var(--runtime-ink); font-size: 12px; letter-spacing: 1.2px; -unity-font-style: bold; }
 .row-stat { margin: 0; padding: 0; color: var(--runtime-gold-bright); font-size: 12px; -unity-font-style: bold; }
 .row-detail { margin: 5px 0 0 0; padding: 0; color: var(--runtime-muted); font-size: 9px; }
@@ -403,7 +441,7 @@
 .compact-action--primary { background-color: rgba(122, 78, 38, 0.74); border-color: rgba(221, 168, 90, 0.48); }
 .row-spacer { flex-grow: 1; }
 .housing-card { min-height: 64px; margin-top: 12px; padding: 10px 12px; background-color: rgba(207,155,80,0.07); border-width: 1px; border-color: rgba(207,155,80,0.22); }
-.housing-copy { flex-grow: 1; }
+.housing-copy, .card-copy { flex-grow: 1; }
 .card-title { margin: 0; padding: 0; color: var(--runtime-ink); font-size: 11px; letter-spacing: 1.2px; -unity-font-style: bold; }
 .card-detail { margin-top: 4px; color: var(--runtime-muted); font-size: 8px; letter-spacing: 0.7px; }
 .card-cost { margin: 5px 0 0 0; padding: 0; color: var(--runtime-gold-bright); font-size: 10px; -unity-font-style: bold; }
@@ -413,12 +451,13 @@
 .archer-role { margin-top: 5px; color: var(--runtime-muted); font-size: 9px; white-space: normal; }
 
 .supply-hero { margin-top: 20px; padding: 18px; background-color: rgba(87, 118, 91, 0.08); border-width: 1px; border-color: rgba(139,178,122,0.22); }
+.supply-hero-copy { align-items: center; }
 .supply-hero-value { margin: 0; padding: 0; color: var(--runtime-ink); font-size: 30px; -unity-font-style: bold; }
 .supply-hero-state { margin: 5px 0 0 0; padding: 0; color: var(--runtime-green); font-size: 9px; letter-spacing: 1.4px; -unity-font-style: bold; }
-.supply-hero-track { height: 7px; margin-top: 15px; background-color: rgba(226,219,201,0.11); }
-.supply-hero-progress { width: 0%; height: 7px; background-color: var(--runtime-green); transition-property: width, background-color; transition-duration: 0.15s; }
+.supply-hero-track { height: 9px; margin-top: 15px; background-color: rgba(226,219,201,0.11); background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/components/progress_bar_bg.png"); -unity-background-scale-mode: stretch-to-fill; }
+.supply-hero-progress { width: 0%; height: 9px; background-color: var(--runtime-green); background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/components/progress_bar_top.png"); -unity-background-scale-mode: stretch-to-fill; transition-property: width, background-color; transition-duration: 0.15s; }
 .purchase-stack { margin-top: 16px; }
-.purchase-card, .upgrade-card { position: relative; min-height: 82px; margin-bottom: 8px; padding: 13px 14px; align-items: flex-start; border-width: 1px; border-color: rgba(225,212,188,0.13); border-radius: 2px; background-color: rgba(255,255,255,0.026); color: var(--runtime-ink); }
+.purchase-card, .upgrade-card { position: relative; min-height: 82px; margin-bottom: 8px; padding: 13px 14px; flex-direction: row; align-items: center; border-width: 1px; border-color: rgba(225,212,188,0.13); border-radius: 2px; background-color: rgba(255,255,255,0.026); color: var(--runtime-ink); }
 .purchase-card:hover, .purchase-card:focus, .upgrade-card:hover, .upgrade-card:focus { border-color: var(--runtime-gold); background-color: rgba(207,155,80,0.08); }
 .purchase-card:disabled, .upgrade-card:disabled { opacity: 0.42; }
 .purchase-card--primary { background-color: rgba(117,73,34,0.24); border-color: rgba(211,157,82,0.32); }
@@ -474,7 +513,7 @@
 .modal-shade { visibility: hidden; opacity: 0; align-items: center; justify-content: center; background-color: rgba(2,4,4,0.72); transition-property: opacity; transition-duration: 0.14s; }
 .modal-shade.has-modal { visibility: visible; opacity: 1; }
 .modal-shade.has-gameover { background-color: rgb(5,7,7); }
-.modal { display: none; width: 640px; max-height: 900px; padding: 30px; background-color: rgba(13,15,15,0.985); border-width: 1px; border-color: rgba(218,166,88,0.40); }
+.modal { display: none; width: 640px; max-height: 900px; padding: 30px; background-color: rgba(13,15,15,0.985); border-width: 1px; border-color: rgba(218,166,88,0.40); overflow: hidden; }
 .modal.is-active { display: flex; }
 .modal-kicker { color: var(--runtime-gold-bright); font-size: 9px; letter-spacing: 2px; -unity-text-align: middle-center; }
 .modal-kicker--danger { color: rgb(230,124,92); }
@@ -483,9 +522,12 @@
 .modal-action { min-height: 52px; margin-top: 10px; border-width: 1px; border-color: var(--runtime-line); border-radius: 2px; background-color: rgba(255,255,255,0.035); color: var(--runtime-ink); font-size: 10px; letter-spacing: 1.2px; -unity-font-style: bold; }
 .modal-action:hover, .modal-action:focus { border-color: var(--runtime-gold-bright); background-color: rgba(205,155,82,0.12); }
 .modal-action--primary { margin-top: 22px; background-color: rgba(115,73,35,0.82); border-color: var(--runtime-gold); }
+.modal-action--icon { flex-direction: row; align-items: center; justify-content: center; }
+.modal-action-label { margin: 0; padding: 0; color: inherit; font-size: inherit; letter-spacing: inherit; -unity-font-style: bold; }
 .pause-modal { width: 430px; }
 .settings-modal { width: 480px; }
-.setting-label { margin-top: 20px; color: var(--runtime-muted); font-size: 9px; }
+.setting-heading { margin-top: 20px; }
+.setting-label { margin: 0; color: var(--runtime-muted); font-size: 9px; }
 .setting-status { margin-top: 8px; color: var(--runtime-muted); font-size: 9px; white-space: normal; }
 .decision-timer { position: relative; height: 28px; margin-top: 22px; background-color: rgba(255,255,255,0.04); overflow: hidden; }
 .decision-timer-progress { position: absolute; left: 0; top: 0; bottom: 0; width: 100%; background-color: rgba(207,155,80,0.16); }
@@ -499,6 +541,7 @@
 .levelup-modal { width: 980px; }
 .levelup-cards { margin-top: 24px; flex-direction: row; justify-content: center; }
 .levelup-card { width: 282px; min-height: 230px; margin-right: 14px; padding: 22px; align-items: flex-start; border-width: 1px; border-color: var(--runtime-line); border-radius: 2px; background-color: rgba(255,255,255,0.025); color: var(--runtime-ink); }
+.levelup-card-heading { flex-direction: row; align-items: center; }
 .levelup-card:hover, .levelup-card:focus { border-color: var(--runtime-gold-bright); background-color: rgba(207,155,80,0.09); translate: 0 -3px; }
 .levelup-card-copy { color: var(--runtime-ink); font-size: 12px; white-space: normal; }
 .gameover-modal { width: 980px; max-height: 94%; padding: 24px 28px 20px 28px; border-color: rgba(198,112,74,0.42); background-color: rgb(11,13,13); }
@@ -508,7 +551,7 @@
 .gameover-record { display: none; align-self: center; margin-top: 12px; padding: 5px 12px; color: var(--runtime-gold-bright); background-color: rgba(205,155,82,0.09); border-width: 1px; border-color: rgba(205,155,82,0.30); font-size: 8px; letter-spacing: 1.2px; -unity-font-style: bold; }
 .gameover-record.is-visible { display: flex; }
 .gameover-run-summary { min-height: 88px; margin-top: 18px; flex-direction: row; align-items: stretch; background-color: rgba(255,255,255,0.022); border-top-width: 1px; border-bottom-width: 1px; border-color: rgba(229,213,181,0.10); }
-.gameover-stat { flex-grow: 1; min-width: 120px; padding: 14px 16px; justify-content: center; border-right-width: 1px; border-right-color: rgba(229,213,181,0.09); }
+.gameover-stat { flex-grow: 1; min-width: 120px; padding: 10px 16px; justify-content: center; border-right-width: 1px; border-right-color: rgba(229,213,181,0.09); }
 .gameover-stat-label { margin: 0; padding: 0; color: var(--runtime-faint); font-size: 8px; letter-spacing: 0.9px; -unity-font-style: bold; white-space: normal; }
 .gameover-stat-value { margin: 6px 0 0 0; padding: 0; color: var(--runtime-ink); font-size: 22px; -unity-font-style: bold; }
 .gameover-stat--earned .gameover-stat-value { color: var(--runtime-green); }
@@ -518,7 +561,8 @@
 .meta-shop-heading-copy { flex-grow: 1; }
 .meta-shop-title { margin: 0; padding: 0; color: var(--runtime-ink); font-size: 14px; letter-spacing: 1.5px; -unity-font-style: bold; }
 .meta-shop-hint { margin: 5px 0 0 0; padding: 0; color: var(--runtime-muted); font-size: 8px; letter-spacing: 0.7px; white-space: normal; }
-.meta-wallet { margin: 0 0 1px 18px; padding: 0; color: var(--runtime-cyan); font-size: 13px; letter-spacing: 0.7px; -unity-font-style: bold; }
+.meta-wallet-wrap { margin-left: 18px; }
+.meta-wallet { margin: 0 0 1px 0; padding: 0; color: var(--runtime-cyan); font-size: 13px; letter-spacing: 0.7px; -unity-font-style: bold; }
 .meta-shop { flex-grow: 1; min-height: 180px; max-height: 390px; margin-top: 10px; }
 .meta-shop-row { min-height: 74px; margin: 0 4px 7px 0; padding: 10px 14px; flex-direction: row; align-items: center; justify-content: space-between; border-width: 1px; border-color: var(--runtime-line); background-color: rgba(255,255,255,0.022); color: var(--runtime-ink); }
 .meta-shop-row:hover, .meta-shop-row:focus { border-color: var(--runtime-gold-bright); background-color: rgba(205,155,82,0.08); }
@@ -526,6 +570,7 @@
 .meta-shop-row:disabled { opacity: 0.54; }
 .meta-shop-row.is-maxed { opacity: 0.76; border-left-width: 3px; border-left-color: var(--runtime-green); }
 .meta-upgrade-copy { flex-grow: 1; min-width: 0; align-items: flex-start; }
+.meta-upgrade-main { flex-grow: 1; min-width: 0; flex-direction: row; align-items: center; }
 .meta-upgrade-title { margin: 0; padding: 0; color: var(--runtime-ink); font-size: 11px; letter-spacing: 1px; -unity-font-style: bold; }
 .meta-upgrade-description { margin: 5px 0 0 0; padding: 0; color: var(--runtime-muted); font-size: 9px; white-space: normal; }
 .meta-upgrade-transaction { width: 180px; margin-left: 18px; align-items: flex-end; }
@@ -539,11 +584,91 @@
 .toast--primary { border-color: rgba(205,155,82,0.40); }.toast--secondary { color: var(--runtime-muted); }
 .soul-flight { position: absolute; width: 18px; height: 18px; rotate: 45deg; background-color: var(--runtime-cyan); border-width: 2px; border-color: rgba(210,250,255,0.80); }
 
+/* Artsystack icon vocabulary: information-bearing only, never decorative filler. */
+.dw-icon {
+    flex-shrink: 0;
+    background-color: rgba(0, 0, 0, 0);
+    -unity-background-scale-mode: scale-to-fit;
+}
+.dw-icon--resource { width: 24px; height: 24px; margin-right: 5px; }
+.dw-icon--micro { width: 16px; height: 16px; margin-right: 7px; }
+.dw-icon--metric { width: 29px; height: 29px; margin-right: 8px; }
+.dw-icon--ability { width: 28px; height: 28px; margin-right: 9px; }
+.dw-icon--command { width: 21px; height: 21px; margin-right: 8px; }
+.command-button--pause .dw-icon--command { margin-right: 0; }
+.dw-icon--summary { width: 30px; height: 30px; margin-right: 9px; }
+.dw-icon--card { width: 42px; height: 42px; margin-right: 13px; padding: 5px; background-color: rgba(255,255,255,0.025); border-width: 1px; border-color: rgba(229,213,181,0.12); }
+.dw-icon--header { width: 40px; height: 40px; margin-right: 13px; }
+.dw-icon--hero { width: 52px; height: 52px; margin-right: 15px; }
+.dw-icon--modal-action { width: 22px; height: 22px; margin-right: 10px; }
+.dw-icon--stat { width: 26px; height: 26px; margin-bottom: 4px; opacity: 0.82; }
+.dw-icon--phase-stop { width: 15px; height: 15px; }
+.dw-icon--row { width: 30px; height: 30px; margin-right: 10px; }
+.dw-icon--levelup { width: 44px; height: 44px; margin: 0 0 16px 0; padding: 6px; background-color: rgba(205,155,82,0.07); border-width: 1px; border-color: rgba(205,155,82,0.22); }
+.dw-icon--meta { width: 40px; height: 40px; margin-right: 13px; padding: 5px; background-color: rgba(255,255,255,0.025); border-width: 1px; border-color: rgba(229,213,181,0.12); }
+
+.dw-icon--wood { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/wood_logs_128_T.png"); }
+.dw-icon--stone { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/mountain_1_128_T.png"); }
+.dw-icon--iron { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/steel_128_T.png"); }
+.dw-icon--food { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/carrot.png"); }
+.dw-icon--population,
+.dw-icon--workers { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/user_1_128_T.png"); }
+.dw-icon--wall { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/shield_2_128_T.png"); }
+.dw-icon--hostiles { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/skull_128_T.png"); }
+.dw-icon--arrows { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/quiver_128_T.png"); }
+.dw-icon--souls { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/diamond_128_T.png"); }
+.dw-icon--day { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/sun 1_128_T.png"); }
+.dw-icon--dusk { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/Moon 1_128_T.png"); }
+.dw-icon--night { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/star_and_moon_128_T.png"); }
+.dw-icon--dawn { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/sun_and_cloud_128_T.png"); }
+.dw-icon--fireball { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/flame_128_T.png"); }
+.dw-icon--rally { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/flag_1_128_T.png"); }
+.dw-icon--repair { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/tools_2_128_T.png"); }
+.dw-icon--economy { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/coin_128_T.png"); }
+.dw-icon--barracks,
+.dw-icon--archer-basic { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/archery_128_T.png"); }
+.dw-icon--archer-rapid { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/arrows_128_T.png"); }
+.dw-icon--archer-frost { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/snowflake_128_T.png"); }
+.dw-icon--pause { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/player_pause_128_T.png"); }
+.dw-icon--housing { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/home_1_128_T.png"); }
+.dw-icon--crate { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/chest_1_128_T.png"); }
+.dw-icon--wagon { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/cart_128_T.png"); }
+.dw-icon--fill { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/success_cart_128_T.png"); }
+.dw-icon--capacity { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/bag_1_128_T.png"); }
+.dw-icon--efficiency,
+.dw-icon--fire-rate { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/reload_128_T.png"); }
+.dw-icon--arrow-damage { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/arrow_128_T.png"); }
+.dw-icon--clock { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/clock_128_T.png"); }
+.dw-icon--trophy { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/trophy_128_T.png"); }
+.dw-icon--embers { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/flame_128_T.png"); }
+.dw-icon--production { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/fist_128_T.png"); }
+.dw-icon--play { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/player_play_128_T.png"); }
+.dw-icon--settings { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/setting_1_128_T.png"); }
+.dw-icon--sound { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/sound_128_T.png"); }
+.dw-icon--music { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/music_128_T.png"); }
+.dw-icon--refresh { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/refresh_128_T.png"); }
+.dw-icon--back { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/arrow_back_128_T.png"); }
+.dw-icon--heart { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/flaticon/textured/128/Heart_128_T.png"); }
+
+.surface-texture {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    opacity: 0.08;
+    -unity-background-scale-mode: stretch-to-fill;
+}
+.surface-texture--short { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/components/bg_layer_short_01.png"); }
+.surface-texture--modal { background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/components/bg_layer_01.png"); }
+.surface-texture--gameover { opacity: 0.11; background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/components/bg_layer_02.png"); }
+
 .input--touch .command-rail { height: 64px; bottom: 14px; }
 .input--touch .command-button { height: 62px; min-width: 118px; font-size: 11px; }
 .input--touch .command-button--pause { min-width: 62px; width: 62px; }
 .input--touch .ability-dock { bottom: 92px; height: 84px; }
 .input--touch .ability-command { width: 182px; height: 82px; justify-content: center; }
+.input--touch #repairButton { width: 206px; }
 .input--touch .ability-prompt, .input--gamepad .ability-prompt { display: none; }
 .input--touch .ability-copy { flex-grow: 0; min-width: 132px; }
 .input--touch .ability-name { font-size: 12px; }.input--touch .ability-state { font-size: 9px; }
@@ -552,7 +677,7 @@
 
 .is-compact .economy-cluster { left: 14px; top: 14px; transform-origin: 0 0; scale: 0.88 0.88; }
 .is-compact .threat-cluster { right: 14px; top: 14px; transform-origin: 100% 0; scale: 0.88 0.88; }
-.is-compact .siege-clock { top: 14px; width: 280px; }
+.is-compact .siege-clock { top: 14px; transform-origin: 50% 0; scale: 0.86 0.86; }
 .is-compact .drawer { width: 100%; max-width: 610px; }
 .is-compact .graph-viewport { right: 300px; }.is-compact .graph-inspector { width: 250px; }
 .is-compact .gameover-modal { width: 96%; padding: 18px 20px 16px 20px; }

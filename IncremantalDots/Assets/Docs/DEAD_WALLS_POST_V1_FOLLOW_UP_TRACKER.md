@@ -6,7 +6,7 @@
 > **Oluşturulma tarihi:** 2026-07-18
 > **Aktif paket:** P9 - Performans Profilleme ve Optimizasyon
 > **Aktif iş:** Hedef donanım ve ölçüm senaryolarının owner ile kesinleştirilmesi
-> **İlerleme:** `8 / 10` ana görev tamamlandı - `%80`
+> **İlerleme:** `7 / 10` ana görev tamamlandı - `%70`
 
 ---
 
@@ -161,9 +161,12 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - [x] Main Menu'nün tek sürekli hareketi `22s DAY / 8s DUSK / 22s NIGHT / 8s DAWN` arka plan döngüsü.
 - [x] Main Menu Unity compile, Console ve Play Mode görsel ağacında doğrulandı; owner tarafından onaylandı.
 - [x] Persistent HUD, Economy, Barracks, Arrow Supply, Council, Level Up, Pause, Settings ve Game Over/Meta Shop UI Toolkit ile sıfırdan kuruldu.
+- [x] Owner tarafından onaylanan Artsystack ikonları yeni UI Toolkit yüzeylerine semantik görevlerle giydirildi; `RPG Icons Pixel Art` paketi görsel dile uymadığı için kullanılmadı.
+- [x] `Worker Production` ve `Repair Gate` birbirinden ayrıldı: worker üretimi yumruk, kapı onarımı tools ikonunu kullanır.
+- [x] Gameplay gün döngüsü legacy celestial-arc davranışı referans alınarak UI Toolkit'te sıfırdan, gerçek cycle progress ve phase durumlarına bağlı daha polish bir sunumla kuruldu.
 - [?] Castle Heart UI Toolkit ara sürümü production'da mevcut; final rework ve owner kabulü P7 kapsamında bekliyor.
 - [x] `1920x1080` ana yüzey QA'sı ve `1280x720` touch-mode uyarlaması canlı Play Mode'da incelendi.
-- [x] Unity compile/Console temiz; EditMode `422/422`, PlayMode `91 pass + 2 explicit skip` geçti.
+- [x] Son ikon/celestial-arc revizyonunda Unity compile ve Console temiz; targeted UI kontratları `6/6`, tam EditMode `426/426` geçti.
 
 ### `DW-P4-WORKERS` - Worker Dağıtım Arayüzü
 
@@ -209,6 +212,10 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - [x] Hover/focus/press, seçili durum, cooldown, satın alma başarısı ve blocker feedback'i ortak dil kullanır.
 - [x] Soul pickup uçuşu, sayaç varış pulse'ı, damage flash, critical banner, toast ve onboarding UI Toolkit katmanına taşındı.
 - [x] Gereksiz sürekli dekoratif hareket kaldırıldı; Main Menu'de yalnız day/dusk/night/dawn arka plan döngüsü kaldı.
+- [x] Gameplay celestial arc, gerçek gün progress'ini izleyen hareketli gök cismi, dört phase işareti ve gün/gece durum renkleriyle yeniden polish edildi.
+- [x] Alt day/dusk/night/dawn rail'i aktif faz boyunca gerçek `PhaseProgress01` ile sürekli dolar; ikon opacity/scale değişimleri yumuşak geçiş kullanır.
+- [x] Persistent HUD resource toplamları ile `/m` üretim oranları ayrı dikey bantlara alınarak üç haneli değerlerdeki overlap kaldırıldı.
+- [x] Onaylı Artsystack ikonları kaynak, population, combat, drawer, ability, pause/settings ve Game Over/Meta Shop yüzeylerine işlevsel hiyerarşiyi güçlendirecek şekilde uygulandı.
 - [x] Modal hiyerarşi, scroll görünürlüğü, touch hit-area ve gamepad focus davranışı doğrulandı.
 
 ### `DW-P9-PERFORMANCE` - Ölçüm ve Optimizasyon
@@ -286,3 +293,15 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - Castle Heart owner kararıyla son UI işi olarak yeniden açıldı ve bu pakette içeriğine dokunulmadı.
 - UI kontrat testleri `2/2`, tam EditMode `422/422`, tam PlayMode `91 pass + 2 explicit skip` geçti; Unity compilation ve final Console temiz.
 - Ana görev paydası değişmedi; P7 yeniden açıldığı için doğrulanmış ilerleme `7/10 - %70` oldu. P7, P9 ve P10 açık kaldı.
+
+### 2026-07-19 - Artsystack ikon giydirme ve celestial-arc gün döngüsü polish'i
+
+- Owner tarafından onaylanan Artsystack ikon seti Castle Heart dışındaki yeni UI Toolkit yüzeylerine uygulandı; RPG Icons Pixel Art paketi bilinçli olarak kullanılmadı.
+- `Worker Production` için `fist_128_T`, `Repair Gate` için `tools_2_128_T` kullanılarak iki eylemin görsel kimliği ayrıştırıldı.
+- Eski HUD'ın celestial-arc davranışı referans alınarak gerçek `CycleProgress01` değerini takip eden day/dusk/night/dawn arc sunumu UI Toolkit'te yeniden kuruldu.
+- `1920x1080` ana HUD, Economy, Game Over/Meta Shop ve `1280x720` touch/compact yüzeyleri canlı Play Mode'da doğrulandı; Castle Heart içeriğine dokunulmadı.
+- Resource kartlarında toplam ve `/m` oranı ayrı dikey sayı bloğuna alındı; `230 / +100/m`, `67 / +39.2/m` gibi gerçek runtime değerlerinde overlap olmadığı `1920x1080` canlı görüntüde doğrulandı.
+- Alt phase rail'i `PhaseProgress01` tabanlı continuous fill kazandı; canlı ölçümde Dawn `%11.8`, sonraki Day `%19 -> %66.2` ilerledi ve çevrim reset'i doğrulandı.
+- Targeted UI kontratları `6/6`, tam EditMode `426/426` geçti; Unity compilation ve Console'da hata yok.
+- Tam PlayMode turunda UI kapsamı dışındaki `FirstDayWorkerRatioOnboarding_PulsesRealControlAndCompletesOnPlayerAction` testi, bir frame'lik normal üretim tick'i nedeniyle Wood değerini `160` yerine `161` görerek başarısız oldu; izole tekrar aynı sonucu verdi ve ilgili gameplay/test dosyaları bu pakette değiştirilmedi.
+- Ana görev paydası ve statüleri değişmedi; P7, P9 ve P10 açık kaldığı için doğrulanmış ilerleme `7/10 - %70` olarak korundu.

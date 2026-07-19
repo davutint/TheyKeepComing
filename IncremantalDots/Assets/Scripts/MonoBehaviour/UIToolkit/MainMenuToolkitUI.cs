@@ -30,6 +30,7 @@ namespace DeadWalls
         private Button _newRunButton;
         private Button _settingsButton;
         private Button _tutorialResetButton;
+        private Label _tutorialResetButtonLabel;
         private Button _settingsCloseButton;
         private Slider _sfxSlider;
         private Slider _ambienceSlider;
@@ -109,6 +110,7 @@ namespace DeadWalls
             _settingsButton = _root.Q<Button>("settingsButton");
             _settingsOverlay = _root.Q<VisualElement>("settingsOverlay");
             _tutorialResetButton = _root.Q<Button>("tutorialResetButton");
+            _tutorialResetButtonLabel = _root.Q<Label>("tutorialResetButtonLabel");
             _settingsCloseButton = _root.Q<Button>("settingsCloseButton");
             _sfxSlider = _root.Q<Slider>("sfxSlider");
             _ambienceSlider = _root.Q<Slider>("ambienceSlider");
@@ -241,7 +243,7 @@ namespace DeadWalls
             if (!_tutorialResetArmed)
             {
                 _tutorialResetArmed = true;
-                _tutorialResetButton.text = SettingsUI.TutorialResetConfirmLabel;
+                _tutorialResetButtonLabel.text = SettingsUI.TutorialResetConfirmLabel;
                 _tutorialStatusLabel.text = SettingsUI.TutorialResetConfirmStatus;
                 return;
             }
@@ -249,13 +251,13 @@ namespace DeadWalls
             _tutorialResetArmed = false;
             if (FirstRunOnboardingUI.ResetTutorialProgress())
             {
-                _tutorialResetButton.text = SettingsUI.TutorialResetDefaultLabel;
+                _tutorialResetButtonLabel.text = SettingsUI.TutorialResetDefaultLabel;
                 _tutorialStatusLabel.text = SettingsUI.TutorialResetSuccessStatus;
                 UiSoundFeedback.Instance?.PlaySuccess();
                 return;
             }
 
-            _tutorialResetButton.text = SettingsUI.TutorialResetDefaultLabel;
+            _tutorialResetButtonLabel.text = SettingsUI.TutorialResetDefaultLabel;
             _tutorialStatusLabel.text = SettingsUI.TutorialResetFailureStatus;
             UiSoundFeedback.Instance?.PlayFail();
         }
@@ -263,8 +265,8 @@ namespace DeadWalls
         private void ResetTutorialConfirmation()
         {
             _tutorialResetArmed = false;
-            if (_tutorialResetButton != null)
-                _tutorialResetButton.text = SettingsUI.TutorialResetDefaultLabel;
+            if (_tutorialResetButtonLabel != null)
+                _tutorialResetButtonLabel.text = SettingsUI.TutorialResetDefaultLabel;
             if (_tutorialStatusLabel != null)
                 _tutorialStatusLabel.text = SettingsUI.TutorialResetDefaultStatus;
         }
