@@ -49,14 +49,14 @@ karistirilmaz.
 
 Runtime transaction siniri `GameManager` uzerindedir:
 
-- `GrantGraveEssence(amount)`: gelecekteki drop owner'i icin pozitif, saturating kazanc.
+- `GrantGraveEssence(amount)`: production enemy-death drop event'leri icin pozitif, saturating kazanc.
 - `TrySpendGraveEssenceAtHeart(cost)`: Heart satin alimlarinin tek harcama kapisi.
 - `GraveEssenceAmount`: guncel bakiye.
 
-Bu paket Essence drop kaynagi veya oran uydurmaz. Blueprint `Essence drop` ve ilk kill/Essence
-yonunu tanimlar ancak miktar/cadence kesinlestirmez; production kodunda `GrantGraveEssence`
-cagiran kill/drop owner'i halen yoktur. `Difficulty Tuner > Heart Runtime Contract` bunu
-`UNCONFIGURED` owner gate olarak gosterir. `HeartPurchaseService`,
+Production enemy-death owner'i gercek, stress-test disi olumlerde `%10` ihtimalle `1` taban
+Essence event'i uretir. `Difficulty Tuner > Heart Runtime Contract`, Difficulty Profile'daki chance,
+miktar ve beklenen cadence'i gosterir. Event'ler `GrantGraveEssence` kapisinda otomatik toplanir;
+Meta gain ve exact fractional remainder burada uygulanir. `HeartPurchaseService`,
 `IHeartGraveEssenceWallet` uzerinden yalniz Heart harcama kapisini kullanir. Production Heart
 catalog content'i henuz atanmadigi icin mevcut `TryBuyTechNode` yalniz dormant legacy catalog'un
 ResourceCost owner'idir; aktif Heart UI veya tuning yuzeyi bu yolu kullanmaz.

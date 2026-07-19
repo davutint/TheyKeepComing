@@ -1,33 +1,41 @@
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
+using UnityEngine.UIElements;
 
 namespace DeadWalls.Tests
 {
     public sealed class HeartProductionRuntimePlayModeTests
     {
         [UnityTest]
-        public IEnumerator NewGameScene_UsesGeneratedValidatedProductionHeart()
+        public IEnumerator NewGameScene_UsesGeneratedValidatedProductionHeartAndReviewedIcons()
         {
             SceneManager.LoadScene("NewGameScene", LoadSceneMode.Single);
 
             GameManager manager = null;
-            for (int frame = 0; frame < 180 && manager == null; frame++)
+            GameplayHUDToolkitUI toolkit = null;
+            for (int frame = 0; frame < 180 && (manager == null || toolkit == null); frame++)
             {
                 manager = GameManager.Instance;
+                toolkit = Object.FindFirstObjectByType<GameplayHUDToolkitUI>(FindObjectsInactive.Include);
                 yield return null;
             }
 
             Assert.That(manager, Is.Not.Null);
+            Assert.That(toolkit, Is.Not.Null);
             Assert.That(manager.HeartCatalog, Is.Not.Null);
             Assert.That(manager.HeartCatalog.CatalogVersion, Is.EqualTo(2));
             Assert.That(manager.HeartCatalog.Nodes, Has.Length.EqualTo(37));
+            Assert.That(manager.HeartCatalog.Nodes, Has.All.Matches<HeartNodeDefinitionSO>(node =>
+                node != null && node.Icon != null));
 
             HeartGraphPresentation presentation = null;
-            System.Collections.Generic.IReadOnlyList<string> errors = null;
+            IReadOnlyList<string> errors = null;
             bool built = false;
             for (int frame = 0; frame < 300 && !built; frame++)
             {
@@ -35,10 +43,13 @@ namespace DeadWalls.Tests
                 if (!built)
                     yield return null;
             }
-            Assert.That(built, Is.True,
-                errors == null ? string.Empty : string.Join(" | ", errors));
+
+            Assert.That(built, Is.True, errors == null ? string.Empty : string.Join(" | ", errors));
             Assert.That(errors, Is.Empty);
             Assert.That(presentation.Nodes.Count, Is.InRange(17, 21));
+            Assert.That(presentation.Nodes.Count(node => node.IsExactContentVisible), Is.EqualTo(5));
+            Assert.That(presentation.Nodes.Count(node => node.IsExactContentVisible && node.IsRoot), Is.EqualTo(1));
+            Assert.That(presentation.Nodes.Count(node => node.IsExactContentVisible && node.Depth == 1), Is.EqualTo(4));
 
             HeartRuntimeTuningTelemetry telemetry = manager.GetHeartRuntimeTuningTelemetry();
             Assert.That(telemetry.HasCatalog, Is.True);
@@ -47,28 +58,31 @@ namespace DeadWalls.Tests
             Assert.That(telemetry.CatalogVersion, Is.EqualTo(2));
             Assert.That(telemetry.NodeCount, Is.EqualTo(presentation.Nodes.Count));
 
-            HeartScreenUI screen = Object.FindFirstObjectByType<HeartScreenUI>();
-            Assert.That(screen, Is.Not.Null);
-            Assert.That(screen.NodeSize, Is.EqualTo(new Vector2(264f, 156f)));
-            Assert.That(screen.IconSlotSize, Is.EqualTo(new Vector2(52f, 52f)));
-            Assert.That(screen.ShowAuthoredNodeIcons, Is.False,
-                "Owner ikonlari hazir olmadan Castle Heart gecici sprite veya glyph gostermemeli.");
+            VisualElement root = toolkit.GetComponent<UIDocument>().rootVisualElement;
+            Assert.That(root.Q<VisualElement>("heartScreen"), Is.Not.Null);
+            Assert.That(root.Q<VisualElement>("heartGraphContent"), Is.Not.Null);
+            Assert.That(root.Q<VisualElement>(className: "heart-legend"), Is.Null);
+            Assert.That(root.Q<Button>("heartQuantityTen"), Is.Null);
+            Assert.That(root.Q<Button>("heartQuantityMax"), Is.Null);
         }
 
         [UnityTest]
-        public IEnumerator NewGameScene_PresentsKeystoneAsARealTwoCardCommitment()
+        public IEnumerator NewGameScene_RendersOnlyVisibleToolkitNodesAndDirectReveal()
         {
             SceneManager.LoadScene("NewGameScene", LoadSceneMode.Single);
-            yield return null;
 
             GameManager manager = null;
-            for (int frame = 0; frame < 180 && manager == null; frame++)
+            GameplayHUDToolkitUI toolkit = null;
+            for (int frame = 0; frame < 180 && (manager == null || toolkit == null); frame++)
             {
                 manager = GameManager.Instance;
+                toolkit = Object.FindFirstObjectByType<GameplayHUDToolkitUI>(FindObjectsInactive.Include);
                 yield return null;
             }
 
             Assert.That(manager, Is.Not.Null);
+            Assert.That(toolkit, Is.Not.Null);
+
             bool granted = false;
             for (int frame = 0; frame < 300 && !granted; frame++)
             {
@@ -78,132 +92,94 @@ namespace DeadWalls.Tests
             }
             Assert.That(granted, Is.True, "Grave Essence ECS owner'i hazir olmadi.");
 
-            HeartGraphPresentation presentation = null;
-            HeartGraphNodePresentation first = null;
-            HeartGraphNodePresentation second = null;
-            for (int pass = 0; pass < 48 && first == null; pass++)
-            {
-                Assert.That(manager.TryBuildHeartPresentation(
-                        out presentation,
-                        out System.Collections.Generic.IReadOnlyList<string> errors),
-                    Is.True,
-                    errors == null ? string.Empty : string.Join(" | ", errors));
-
-                first = presentation.Nodes.FirstOrDefault(node =>
-                    node.IsExactContentVisible
-                    && node.Type == HeartNodeType.Keystone
-                    && node.Level == 0
-                    && node.LockState == HeartNodeLockState.Available
-                    && node.KeystoneConflict != null
-                    && node.KeystoneConflict.ConflictingChoiceIsRevealed);
-                if (first != null)
-                {
-                    second = presentation.Nodes.Single(node =>
-                        node.SlotId == first.KeystoneConflict.ConflictingChoiceSlotId);
-                    break;
-                }
-
-                HeartGraphNodePresentation[] candidates = presentation.Nodes
-                    .Where(node =>
-                        node.IsExactContentVisible
-                        && !node.IsRoot
-                        && node.Level == 0
-                        && node.LockState == HeartNodeLockState.Available
-                        && node.Type != HeartNodeType.Keystone)
-                    .ToArray();
-                Assert.That(candidates, Is.Not.Empty,
-                    "Keystone ciftine ilerleyecek acik Heart node'u kalmadi.");
-
-                bool progressed = false;
-                for (int i = 0; i < candidates.Length; i++)
-                {
-                    HeartPurchaseResult purchase = manager.TryPurchaseHeartNode(
-                        candidates[i].ExactNodeId,
-                        HeartPurchaseQuantity.One);
-                    progressed |= purchase != null && purchase.Succeeded;
-                }
-                Assert.That(progressed, Is.True, "Heart graph ilerlemesi satin alim uretemedi.");
-                yield return null;
-            }
-
-            Assert.That(first, Is.Not.Null, "Production graph'ta gorunur Keystone cifti bulunamadi.");
-            Assert.That(second, Is.Not.Null);
-            Assert.That(second.IsExactContentVisible, Is.True);
-            Assert.That(second.Type, Is.EqualTo(HeartNodeType.Keystone));
-            Assert.That(second.Branch, Is.EqualTo(first.Branch));
-            Assert.That(second.KeystoneConflict, Is.Not.Null);
-            Assert.That(second.KeystoneConflict.ConflictingChoiceSlotId, Is.EqualTo(first.SlotId));
-
-            HeartScreenUI screen = Object.FindFirstObjectByType<HeartScreenUI>();
-            Assert.That(screen, Is.Not.Null);
-            screen.OpenPanel();
-            yield return null;
-
-            RectTransform firstCard = screen.HeartContent.Find(
-                "HeartNode_" + first.SlotId.Replace(':', '_')) as RectTransform;
-            RectTransform secondCard = screen.HeartContent.Find(
-                "HeartNode_" + second.SlotId.Replace(':', '_')) as RectTransform;
-            Assert.That(firstCard, Is.Not.Null);
-            Assert.That(secondCard, Is.Not.Null);
-            RectTransform iconSocket = firstCard.Find("HeartNodeIconSocket") as RectTransform;
-            Assert.That(iconSocket, Is.Not.Null);
-            Assert.That(iconSocket.sizeDelta, Is.EqualTo(screen.IconSlotSize));
-            Transform iconImage = firstCard.Find("HeartNodeIconImage");
-            Assert.That(iconImage, Is.Not.Null);
-            Assert.That(iconImage.gameObject.activeSelf, Is.False,
-                "Authored icon surface owner onayina kadar bos kalmali.");
-            TMPro.TMP_Text iconFallback = firstCard
-                .GetComponentsInChildren<TMPro.TMP_Text>(true)
-                .Single(text => text.name == "HeartNodeIconFallbackText");
-            Assert.That(iconFallback.gameObject.activeSelf, Is.False);
-            Assert.That(iconFallback.text, Is.Empty);
-            Assert.That(screen.HeartContent.Cast<Transform>().Any(child =>
-                child.name.StartsWith("HeartAxis_", System.StringComparison.Ordinal)), Is.False,
-                "Sert pusula ekseni yerine yalniz gercek graph damarlarinin cizilmesi gerekiyor.");
-            bool horizontalBranch = first.Branch == HeartNodeBranch.Army
-                                    || first.Branch == HeartNodeBranch.Defense;
-            if (horizontalBranch)
-            {
-                Assert.That(Mathf.Abs(firstCard.anchoredPosition.y - secondCard.anchoredPosition.y),
-                    Is.GreaterThan(screen.NodeSize.y));
-                Assert.That(firstCard.anchoredPosition.x,
-                    Is.EqualTo(secondCard.anchoredPosition.x).Within(0.1f));
-            }
-            else
-            {
-                Assert.That(Mathf.Abs(firstCard.anchoredPosition.x - secondCard.anchoredPosition.x),
-                    Is.GreaterThan(screen.NodeSize.x));
-                Assert.That(firstCard.anchoredPosition.y,
-                    Is.EqualTo(secondCard.anchoredPosition.y).Within(0.1f));
-            }
-            Assert.That(screen.HeartContent.Cast<Transform>().Any(child =>
-                child.name.StartsWith("HeartKeystoneChoice_", System.StringComparison.Ordinal)), Is.True);
-
-            string chosenId = first.ExactNodeId;
-            string lockedId = second.ExactNodeId;
-            HeartPurchaseResult result = manager.TryPurchaseHeartNode(
-                chosenId,
-                HeartPurchaseQuantity.One);
-            Assert.That(result.Succeeded, Is.True, result.Message);
-            Assert.That(result.KeystoneConflictApplied, Is.True);
             Assert.That(manager.TryBuildHeartPresentation(
-                    out HeartGraphPresentation afterPurchase,
-                    out System.Collections.Generic.IReadOnlyList<string> afterErrors),
+                    out HeartGraphPresentation before,
+                    out IReadOnlyList<string> beforeErrors),
                 Is.True,
-                afterErrors == null ? string.Empty : string.Join(" | ", afterErrors));
-            HeartGraphNodePresentation chosen = afterPurchase.Nodes.Single(node =>
-                node.ExactNodeId == chosenId);
-            HeartGraphNodePresentation locked = afterPurchase.Nodes.Single(node =>
-                node.ExactNodeId == lockedId);
-            Assert.That(chosen.Level, Is.EqualTo(1));
-            Assert.That(locked.LockState, Is.EqualTo(HeartNodeLockState.KeystoneConflict));
-            Assert.That(locked.KeystoneConflict.SourceIsLockedByConflictingChoice, Is.True);
-            screen.ClosePanel();
+                beforeErrors == null ? string.Empty : string.Join(" | ", beforeErrors));
+
+            HeartGraphNodePresentation candidate = before.Nodes.First(node =>
+                node.IsExactContentVisible && !node.IsRoot && node.Level == 0);
+            HashSet<string> hiddenDirectTargetSlots = before.Edges
+                .Where(edge => edge.FromSlotId == candidate.SlotId)
+                .Select(edge => edge.ToSlotId)
+                .Where(slot => before.Nodes.Any(node => node.SlotId == slot && !node.IsExactContentVisible))
+                .ToHashSet();
+            Assert.That(hiddenDirectTargetSlots, Is.Not.Empty);
+
+            OpenHeartToolkit(toolkit);
             yield return null;
+
+            VisualElement root = toolkit.GetComponent<UIDocument>().rootVisualElement;
+            VisualElement graphContent = root.Q<VisualElement>("heartGraphContent");
+            Assert.That(graphContent.Query<Button>(className: "heart-tech-node").ToList(), Has.Count.EqualTo(5));
             Assert.That(SimulationPauseService.ActiveLeaseCount, Is.Zero);
             Assert.That(SimulationPauseService.IsPaused, Is.False);
-            Assert.That(screen.HasActiveOwnedTweens, Is.False,
-                "Heart kapanisinda owned UI tween'leri yasamaya devam etmemeli.");
+
+            HeartPurchaseResult result = manager.TryPurchaseHeartNode(
+                candidate.ExactNodeId,
+                HeartPurchaseQuantity.One);
+            Assert.That(result.Succeeded, Is.True, result.Message);
+            Assert.That(result.KeystoneConflictApplied, Is.False);
+            Assert.That(result.NewlyRevealedNodeIds, Is.Not.Empty);
+
+            RebuildHeartToolkit(toolkit);
+            yield return null;
+
+            Assert.That(manager.TryBuildHeartPresentation(
+                    out HeartGraphPresentation after,
+                    out IReadOnlyList<string> afterErrors),
+                Is.True,
+                afterErrors == null ? string.Empty : string.Join(" | ", afterErrors));
+            HashSet<string> actualNewSlots = after.Nodes
+                .Where(node => !string.IsNullOrWhiteSpace(node.ExactNodeId)
+                               && result.NewlyRevealedNodeIds.Contains(node.ExactNodeId))
+                .Select(node => node.SlotId)
+                .ToHashSet();
+            Assert.That(actualNewSlots, Is.EquivalentTo(hiddenDirectTargetSlots));
+
+            int visibleCount = after.Nodes.Count(node => node.IsExactContentVisible);
+            Assert.That(
+                graphContent.Query<Button>(className: "heart-tech-node").ToList(),
+                Has.Count.EqualTo(visibleCount));
+            foreach (HeartGraphNodePresentation hidden in after.Nodes.Where(node => !node.IsExactContentVisible))
+            {
+                Assert.That(
+                    graphContent.Q<Button>("heartNode-" + hidden.SlotId.Replace(':', '-')),
+                    Is.Null,
+                    $"Hidden slot visual tree'ye sizdi: {hidden.SlotId}");
+            }
+
+            yield return new WaitForSecondsRealtime(0.7f);
+            foreach (string revealedSlot in actualNewSlots)
+            {
+                Button revealed = graphContent.Q<Button>("heartNode-" + revealedSlot.Replace(':', '-'));
+                Assert.That(revealed, Is.Not.Null);
+                Assert.That(revealed.ClassListContains("is-revealing"), Is.False);
+            }
+            Assert.That(SimulationPauseService.ActiveLeaseCount, Is.Zero);
+            Assert.That(SimulationPauseService.IsPaused, Is.False);
+        }
+
+        private static void OpenHeartToolkit(GameplayHUDToolkitUI toolkit)
+        {
+            System.Type type = typeof(GameplayHUDToolkitUI);
+            System.Type surfaceType = type.GetNestedType("SurfaceKind", BindingFlags.NonPublic);
+            MethodInfo toggle = type.GetMethod(
+                "ToggleSurface",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.That(surfaceType, Is.Not.Null);
+            Assert.That(toggle, Is.Not.Null);
+            toggle.Invoke(toolkit, new[] { System.Enum.Parse(surfaceType, "Heart") });
+        }
+
+        private static void RebuildHeartToolkit(GameplayHUDToolkitUI toolkit)
+        {
+            MethodInfo rebuild = typeof(GameplayHUDToolkitUI).GetMethod(
+                "RebuildHeartGraph",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.That(rebuild, Is.Not.Null);
+            rebuild.Invoke(toolkit, new object[] { true });
         }
     }
 }

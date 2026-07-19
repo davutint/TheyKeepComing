@@ -10,6 +10,7 @@ namespace DeadWalls
         public const int Horde2K = 2_000;
         public const int Horde5K = 5_000;
         public const int Horde10K = 10_000;
+        public const long HeartEssenceGrant = 1_000_000L;
         public const float HorizontalSpacing = 0.12f;
         public const float VerticalSpacing = 0.13f;
 
@@ -45,9 +46,57 @@ namespace DeadWalls
         private float _developmentOriginalFireballCooldown;
         private float _developmentOriginalRallyCooldown;
         private float _developmentOriginalRepairCooldown;
+        private bool _developmentGraveEssenceCaptured;
+        private GraveEssence _developmentOriginalGraveEssence;
 
         public bool DevelopmentTestSessionActive => _developmentTestSessionActive;
         public int DevelopmentTestHordeTarget => _developmentTestHordeTarget;
+
+        public bool TryGrantDevelopmentGraveEssence(long amount, out string message)
+        {
+            if (amount <= 0L)
+            {
+                message = "Grave Essence grant must be positive.";
+                return false;
+            }
+
+            if (!TryInitialize()
+                || !_entityManager.Exists(_gameStateEntity)
+                || !TryGetGraveEssence(out _, out GraveEssence current))
+            {
+                message = "GameManager/Grave Essence wallet is not ready yet.";
+                return false;
+            }
+
+            GameStateData gameState = _entityManager.GetComponentData<GameStateData>(
+                _gameStateEntity);
+            if (gameState.IsGameOver)
+            {
+                message = "Start a living run before testing the Castle Heart.";
+                return false;
+            }
+
+            if (!_developmentGraveEssenceCaptured)
+            {
+                _developmentOriginalGraveEssence = current;
+                _developmentGraveEssenceCaptured = true;
+            }
+
+            bool previousSessionState = _developmentTestSessionActive;
+            _developmentTestSessionActive = true;
+            long before = GraveEssenceAmount;
+            if (!GrantGraveEssence(amount))
+            {
+                _developmentTestSessionActive = previousSessionState;
+                message = "Grave Essence transaction was rejected.";
+                return false;
+            }
+
+            long after = GraveEssenceAmount;
+            long granted = after >= before ? after - before : 0L;
+            message = $"Granted {granted:N0} Grave Essence. Open Castle Heart and research nodes one by one.";
+            return true;
+        }
 
         public bool TryEnableDevelopmentCombat(out string message)
         {
@@ -272,6 +321,15 @@ namespace DeadWalls
                 _emergencyRepairCooldownRemaining = _developmentOriginalRepairCooldown;
             }
             _developmentFreeEconomyCaptured = false;
+
+            if (_developmentGraveEssenceCaptured
+                && TryGetGraveEssence(out Entity essenceEntity, out _))
+            {
+                _entityManager.SetComponentData(essenceEntity, _developmentOriginalGraveEssence);
+                HeartEssence = _developmentOriginalGraveEssence;
+            }
+            _developmentGraveEssenceCaptured = false;
+            _developmentOriginalGraveEssence = default;
             OnGameStateChanged?.Invoke();
             return true;
         }

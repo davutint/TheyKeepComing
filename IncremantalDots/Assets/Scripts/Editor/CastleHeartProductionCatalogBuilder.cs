@@ -23,30 +23,6 @@ namespace DeadWalls
             "Assets/Prefabs/UI/Generated/MobileCastleHudRoot.prefab";
 
         private const int CatalogVersion = 2;
-        private const string ArmyIconPath =
-            "Assets/Sprites/UI/Generated/mobile_castle_hud/arrow_basic.png";
-        private const string RapidIconPath =
-            "Assets/Sprites/UI/Generated/mobile_castle_hud/archer_rapid_portrait_v4.png";
-        private const string FrostIconPath =
-            "Assets/Sprites/UI/Generated/mobile_castle_hud/archer_frost_portrait_v4.png";
-        private const string DefenseIconPath =
-            "Assets/Sprites/UI/Generated/mobile_castle_hud/defense_shield_icon_v1.png";
-        private const string RepairIconPath =
-            "Assets/Sprites/UI/Generated/mobile_castle_hud/castle_yard_repair_icon_v1.png";
-        private const string ArrowStockIconPath =
-            "Assets/Sprites/UI/Generated/mobile_castle_hud/arrow_stock_v4.png";
-        private const string ProductionIconPath =
-            "Assets/Sprites/UI/Generated/mobile_castle_hud/wood_icon.png";
-        private const string StoneIconPath =
-            "Assets/Sprites/UI/Generated/mobile_castle_hud/stone_icon.png";
-        private const string IronIconPath =
-            "Assets/Sprites/UI/Generated/mobile_castle_hud/iron_icon.png";
-        private const string FoodIconPath =
-            "Assets/Sprites/UI/Generated/mobile_castle_hud/food_icon.png";
-        private const string PopulationIconPath =
-            "Assets/Sprites/UI/Generated/mobile_castle_hud/population_people_v4.png";
-        private const string MagicIconPath = "Assets/3x/EXTRAS/Projectiles/Fireball.png";
-
         private sealed class NodeSeed
         {
             public string Id;
@@ -78,6 +54,34 @@ namespace DeadWalls
                 + $"{catalog.Nodes.Length} canonical nodes. NewGameScene binding: {sceneBound}; "
                 + $"presentation polish: {presentationPolished}.",
                 catalog);
+        }
+
+        [MenuItem("Window/DeadWalls/Apply Castle Heart Pixel Icon Map")]
+        public static void ApplyPixelIconMap()
+        {
+            HeartNodeCatalogSO catalog = AssetDatabase.LoadAssetAtPath<HeartNodeCatalogSO>(CatalogPath);
+            if (catalog == null)
+                throw new InvalidOperationException("Castle Heart production catalog bulunamadi.");
+
+            HeartNodeDefinitionSO[] nodes = catalog.Nodes ?? Array.Empty<HeartNodeDefinitionSO>();
+            for (int i = 0; i < nodes.Length; i++)
+            {
+                HeartNodeDefinitionSO node = nodes[i];
+                if (node == null)
+                    continue;
+
+                string iconPath = GetIconPath(node.Id);
+                Sprite icon = LoadSprite(iconPath);
+                if (icon == null)
+                    throw new InvalidOperationException($"Heart icon yuklenemedi: {node.Id} -> {iconPath}");
+
+                Undo.RecordObject(node, "Apply Castle Heart Pixel Icon Map");
+                node.Icon = icon;
+                EditorUtility.SetDirty(node);
+            }
+
+            AssetDatabase.SaveAssets();
+            Debug.Log($"[CastleHeartCatalog] {nodes.Length} node icin RPG Pixel icon map uygulandi.", catalog);
         }
 
         public static HeartNodeCatalogSO EnsureProductionCatalog()
@@ -204,7 +208,7 @@ namespace DeadWalls
             node.Id = seed.Id;
             node.Title = seed.Title;
             node.Description = seed.Description;
-            node.Icon = LoadSprite(GetIconPath(seed));
+            node.Icon = LoadSprite(GetIconPath(seed.Id));
             node.Tags = seed.Tags ?? Array.Empty<string>();
             node.LegacySourceNodeIds = GetLegacySourceNodeIds(seed.Id);
             node.Type = seed.Type;
@@ -237,45 +241,52 @@ namespace DeadWalls
             return null;
         }
 
-        private static string GetIconPath(NodeSeed seed)
+        private static string GetIconPath(string nodeId)
         {
-            switch (seed.Id)
+            const string root = "Assets/RPG Icons Pixel Art/";
+            return nodeId switch
             {
-                case "rapid_archer_unlock":
-                case "rapid_drill":
-                case "storm_cadence":
-                    return RapidIconPath;
-                case "frost_archer_unlock":
-                case "frostbite_tips":
-                    return FrostIconPath;
-                case "repair_efficiency":
-                case "salvage_doctrine":
-                    return RepairIconPath;
-                case "arrow_vault":
-                case "fletchers_measure":
-                case "arrow_workshop":
-                case "reserve_stacks":
-                    return ArrowStockIconPath;
-                case "stone_guild":
-                    return StoneIconPath;
-                case "iron_foundry":
-                    return IronIconPath;
-                case "harvest_ledger":
-                    return FoodIconPath;
-                case "worker_camp":
-                case "dawn_housing":
-                case "deep_stores":
-                case "relentless_shifts":
-                    return PopulationIconPath;
-            }
+                "rapid_archer_unlock" => root + "Bows/PNG/Transperent/Icon31.png",
+                "frost_archer_unlock" => root + "Bows/PNG/Transperent/Icon32.png",
+                "volley_mastery" => root + "Arrow/PNG/Transperent/Icon17.png",
+                "bow_mastery" => root + "Bows/PNG/Transperent/Icon18.png",
+                "rapid_drill" => root + "Arrow/PNG/Transperent/Icon24.png",
+                "frostbite_tips" => root + "Arrow/PNG/Transperent/Icon31.png",
+                "longbow_geometry" => root + "Bows/PNG/Transperent/Icon24.png",
+                "heavy_draw" => root + "Bows/PNG/Transperent/Icon35.png",
+                "storm_cadence" => root + "Arrow/PNG/Transperent/Icon48.png",
 
-            return seed.Branch switch
-            {
-                HeartNodeBranch.Army => ArmyIconPath,
-                HeartNodeBranch.Defense => DefenseIconPath,
-                HeartNodeBranch.Production => ProductionIconPath,
-                HeartNodeBranch.HeartMagic => MagicIconPath,
-                _ => string.Empty
+                "arrow_vault" => root + "Engineering skills pack/PNG/Icon29.png",
+                "living_ramparts" => root + "Shields/PNG/Transperent/Icon11.png",
+                "stone_memory" => root + "Runes/PNG/Transperent/runes+bricks+effects/Icon41.png",
+                "layered_masonry" => root + "Minerals/PNG/Transperent/Icon47.png",
+                "repair_efficiency" => root + "Craft_materials1/PNG/Transperent/Icon25.png",
+                "fletchers_measure" => root + "Arrow/PNG/Transperent/Icon35.png",
+                "bastion_doctrine" => root + "Shields/PNG/Transperent/Icon17.png",
+                "salvage_doctrine" => root + "Mining/PNG/Transperent/Icon45.png",
+
+                "harvest_ledger" => root + "Books/PNG/Transperent/Icon14.png",
+                "iron_foundry" => root + "Minerals/PNG/Transperent/Icon19.png",
+                "stone_guild" => root + "Mining/PNG/Transperent/Icon27.png",
+                "lumber_covenant" => root + "Farming/PNG/Transperent/Icon4.png",
+                "worker_camp" => root + "Civilian Avatar Icons/PNG/Transperent/Icon43.png",
+                "arrow_workshop" => root + "Axes/PNG/Transperent/Icon19.png",
+                "dawn_housing" => root + "Engineering skills pack/PNG/Icon21.png",
+                "reserve_stacks" => root + "Farming/PNG/Transperent/Icon31.png",
+                "deep_stores" => root + "Farming/PNG/Transperent/Icon33.png",
+                "relentless_shifts" => root + "Civilian Avatar Icons/PNG/Transperent/Icon36.png",
+
+                "fireball_unlock" => root + "Artefacts/PNG/Transperent/Icon1.png",
+                "ember_reservoir" => root + "Artefacts/PNG/Transperent/Icon11.png",
+                "searing_flames" => root + "Pyromanser/PNG/Icon15.png",
+                "blazing_core" => root + "Artefacts/PNG/Transperent/Icon19.png",
+                "greater_blast" => root + "Pyromanser/PNG/Icon16.png",
+                "arcane_focus" => root + "Runes/PNG/Transperent/runes+bricks+effects/Icon30.png",
+                "echoing_detonation" => root + "Pyromanser/PNG/Icon36.png",
+                "scorched_earth" => root + "Pyromanser/PNG/Icon24.png",
+                "inferno_heart" => root + "Pyromanser/PNG/Icon45.png",
+                "chronomancer_heart" => root + "Runes/PNG/Transperent/runes+bricks+effects/Icon47.png",
+                _ => throw new InvalidOperationException($"Heart icon map'te node yok: {nodeId}")
             };
         }
 

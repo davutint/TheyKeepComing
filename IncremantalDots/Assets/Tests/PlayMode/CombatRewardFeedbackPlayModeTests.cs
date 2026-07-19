@@ -101,7 +101,7 @@ namespace DeadWalls.Tests
         }
 
         [UnityTest]
-        public IEnumerator SkeletonDeath_AwardsOneSoulImmediatelyAndStartsHudTravel()
+        public IEnumerator SkeletonDeath_AwardsSoulAndConfiguredGraveEssenceDropImmediately()
         {
             EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             using EntityQuery poolQuery = entityManager.CreateEntityQuery(
@@ -150,6 +150,17 @@ namespace DeadWalls.Tests
             wave.StressTestMode = false;
             entityManager.SetComponentData(waveEntity, wave);
 
+            Entity configEntity = entityManager.CreateEntityQuery(
+                typeof(MobileCastleCombatConfig)).GetSingletonEntity();
+            MobileCastleCombatConfig config =
+                entityManager.GetComponentData<MobileCastleCombatConfig>(configEntity);
+            config.GraveEssenceDropChance = 1f;
+            config.GraveEssencePerDrop = 1;
+            config.GraveEssenceDropSeed = 91273u;
+            entityManager.SetComponentData(configEntity, config);
+
+            long baselineEssence = GameManager.Instance.GraveEssenceAmount;
+
             SoulCounterUI soulCounter = Object.FindFirstObjectByType<SoulCounterUI>();
             Assert.That(soulCounter, Is.Not.Null);
             long baselineVisuals = soulCounter.TotalSoulVisualsPlayedCount;
@@ -165,11 +176,46 @@ namespace DeadWalls.Tests
                 soulCounter.TotalSoulVisualsPlayedCount - baselineVisuals,
                 Is.EqualTo(1),
                 "Ayni olum HUD'a giden tam bir Soul gorseli baslatmali.");
+            Assert.That(GameManager.Instance.GraveEssenceAmount,
+                Is.GreaterThanOrEqualTo(baselineEssence + 1L),
+                "%100 test roll'u canonical GrantGraveEssence kapisindan en az +1 vermeli.");
 
             using EntityQuery soulEventQuery = entityManager.CreateEntityQuery(
                 typeof(SoulPickupEvent));
             Assert.That(soulEventQuery.CalculateEntityCount(), Is.Zero,
                 "Soul presentation event'i bridge tarafindan tuketilmeli.");
+            using EntityQuery essenceEventQuery = entityManager.CreateEntityQuery(
+                typeof(GraveEssenceDropEvent));
+            Assert.That(essenceEventQuery.CalculateEntityCount(), Is.Zero,
+                "Grave Essence drop event'i GameManager transaction bridge tarafindan tuketilmeli.");
+
+            Assert.That(EnemyPoolRuntimeUtility.TryRent(
+                entityManager,
+                poolEntity,
+                out Entity stressSkeleton), Is.True);
+            ZombieStats stressStats = entityManager.GetComponentData<ZombieStats>(stressSkeleton);
+            stressStats.CurrentHP = 0f;
+            stressStats.MaxHP = Mathf.Max(1f, stressStats.MaxHP);
+            entityManager.SetComponentData(stressSkeleton, stressStats);
+            entityManager.SetComponentData(stressSkeleton,
+                new ZombieState { Value = ZombieStateType.Moving });
+            entityManager.SetComponentData(stressSkeleton,
+                LocalTransform.FromPositionRotationScale(
+                    new float3(9f, 0f, MobileCastleRenderDepth.UnitZ),
+                    quaternion.identity,
+                    1f));
+
+            wave = entityManager.GetComponentData<WaveStateData>(waveEntity);
+            wave.ZombiesAlive++;
+            wave.StressTestMode = true;
+            entityManager.SetComponentData(waveEntity, wave);
+            long beforeStressDeath = GameManager.Instance.GraveEssenceAmount;
+
+            for (int frame = 0; frame < 8; frame++)
+                yield return null;
+
+            Assert.That(GameManager.Instance.GraveEssenceAmount, Is.EqualTo(beforeStressDeath),
+                "Stress-test olumleri chance %100 olsa bile Grave Essence uretmemeli.");
         }
     }
 }

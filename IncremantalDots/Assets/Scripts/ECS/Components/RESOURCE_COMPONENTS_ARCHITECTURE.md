@@ -49,6 +49,8 @@ Inspector/player-facing paid level'i yalniz
 - `Current` (`long`) — Yalniz mevcut run icindeki Castle Heart bakiyesi
 - `MetaGainAccumulator` (`double`) — Meta Essence gain yüzdesinin 1'in altındaki exact run payı
 - `ResourceData`'dan ayri tutulur; Wood/Stone/Iron/Food transaction'ina girmez
+- Gercek, stress-test disi dusman olumleri production `%10` roll ile `1` taban Essence event'i uretebilir
+- Event, `GameManager.GrantGraveEssence()` kapisinda otomatik toplanir; Meta gain ve fractional remainder burada uygulanir
 - Yalniz `GameManager.TrySpendGraveEssenceAtHeart()` harcama kapisindan azalir
 - Exact save v13'te bakiye ve meta remainder generated Heart graph ile birlikte korunur; Restart ve Game Over sonrasi `0` olur
 - Meta progression state'ine yazilmaz
@@ -75,4 +77,5 @@ GameManager.HeartRuntime         → Heart CAP/EFF additive bonus ────�
 Tumu GameStateAuthoring Baker'i tarafindan ayni entity'ye eklenir.
 Ek entity veya query olusturmaya gerek yok — `SystemAPI.GetSingletonRW<ResourceData>()` ile erisim.
 ArrowSupply da ayni entity uzerinde — `SystemAPI.GetSingletonRW<ArrowSupply>()` ile erisim.
-GraveEssence da ayni entity uzerindedir; kazanc kaynagi sonraki Heart/runtime paketine aittir.
+GraveEssence da ayni entity uzerindedir; kazanc `ZombieDeathSystem -> GraveEssenceDropEvent -> GameManager`
+zincirinden gelir ve Difficulty Profile uzerinden tune edilir.

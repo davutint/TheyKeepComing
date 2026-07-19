@@ -23,6 +23,43 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void CastleHeart_UsesSingleResearchFlowWithoutVisibleBranchLegendOrBulkControls()
+        {
+            TemplateContainer root = LoadHud().CloneTree();
+
+            Assert.That(root.Q<VisualElement>("heartViewport"), Is.Not.Null);
+            Assert.That(root.Q<VisualElement>("heartGraphContent"), Is.Not.Null);
+            Assert.That(root.Q<VisualElement>("heartInspectorIcon"), Is.Not.Null);
+            Assert.That(root.Q<Label>("heartInspectorMeta"), Is.Not.Null);
+            Assert.That(root.Q<Label>("heartInspectorStatus"), Is.Not.Null);
+            Assert.That(root.Q<Button>("heartPurchase"), Is.Not.Null);
+            Assert.That(root.Q<VisualElement>(className: "heart-legend"), Is.Null);
+            Assert.That(root.Q<Button>("heartQuantityOne"), Is.Null);
+            Assert.That(root.Q<Button>("heartQuantityTen"), Is.Null);
+            Assert.That(root.Q<Button>("heartQuantityMax"), Is.Null);
+        }
+
+        [Test]
+        public void CastleHeart_AllProductionNodesUseReviewedRpgPixelIcons()
+        {
+            HeartNodeCatalogSO catalog = AssetDatabase.LoadAssetAtPath<HeartNodeCatalogSO>(
+                "Assets/ScriptableObject/MobileCastle/CastleHeart/HeartNodeCatalog.asset");
+
+            Assert.That(catalog, Is.Not.Null);
+            Assert.That(catalog.Nodes, Has.Length.EqualTo(37));
+            for (int i = 0; i < catalog.Nodes.Length; i++)
+            {
+                HeartNodeDefinitionSO node = catalog.Nodes[i];
+                Assert.That(node, Is.Not.Null);
+                Assert.That(node.Icon, Is.Not.Null, $"Icon eksik: {node.Id}");
+                Assert.That(
+                    AssetDatabase.GetAssetPath(node.Icon),
+                    Does.StartWith("Assets/RPG Icons Pixel Art/"),
+                    $"Onayli paket disi icon: {node.Id}");
+            }
+        }
+
+        [Test]
         public void ProductionHud_ContainsWorkerAndStructuredGameOverContracts()
         {
             TemplateContainer root = LoadHud().CloneTree();

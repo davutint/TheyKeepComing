@@ -64,7 +64,7 @@ namespace DeadWalls.Tests
         }
 
         [Test]
-        public void FirstPurchase_WithCatalog_RevealsSequentialKeystonePairTogether()
+        public void FirstPurchase_WithCatalog_RevealsOnlyDirectChild()
         {
             var graph = new GeneratedRunGraph
             {
@@ -106,18 +106,17 @@ namespace DeadWalls.Tests
                 0);
 
             Assert.That(result.Succeeded, Is.True, string.Join(" | ", result.Errors));
-            Assert.That(result.NewlyRevealedNodeIds,
-                Is.EquivalentTo(new[] { "heavy_draw", "storm_cadence" }));
+            Assert.That(result.NewlyRevealedNodeIds, Is.EqualTo(new[] { "heavy_draw" }));
             Assert.That(FindNode(graph, "heavy_draw").Visibility,
                 Is.EqualTo(HeartNodeVisibility.Revealed));
             Assert.That(FindNode(graph, "storm_cadence").Visibility,
-                Is.EqualTo(HeartNodeVisibility.Revealed));
+                Is.EqualTo(HeartNodeVisibility.Hidden));
             Assert.That(FindNode(graph, "army_after").Visibility,
                 Is.EqualTo(HeartNodeVisibility.Hidden));
         }
 
         [Test]
-        public void NormalizeKeystonePairVisibility_RepairsOldExactSaveWithoutMutatingRunState()
+        public void NormalizeKeystonePairVisibility_ClearsLegacyLockWithoutRevealingHiddenNode()
         {
             GeneratedRunGraph graph = CreateGraph();
             HeartNodeCatalogSO catalog = CreateCatalog();
@@ -126,6 +125,8 @@ namespace DeadWalls.Tests
             source.Visibility = HeartNodeVisibility.Revealed;
             source.Level = 0;
             partner.Visibility = HeartNodeVisibility.Hidden;
+            partner.LockState = HeartNodeLockState.KeystoneConflict;
+            partner.LockedByNodeId = source.NodeId;
             int edgeCount = graph.Edges.Count;
             uint seed = graph.Seed;
 
@@ -133,11 +134,12 @@ namespace DeadWalls.Tests
                 HeartGraphRevealService.NormalizeKeystonePairVisibility(graph, catalog);
 
             Assert.That(result.Succeeded, Is.True, string.Join(" | ", result.Errors));
-            Assert.That(result.NewlyRevealedNodeIds, Is.EqualTo(new[] { partner.NodeId }));
-            Assert.That(partner.Visibility, Is.EqualTo(HeartNodeVisibility.Revealed));
+            Assert.That(result.NewlyRevealedNodeIds, Is.Empty);
+            Assert.That(partner.Visibility, Is.EqualTo(HeartNodeVisibility.Hidden));
             Assert.That(source.Level, Is.Zero);
             Assert.That(source.LockState, Is.EqualTo(HeartNodeLockState.Available));
             Assert.That(partner.LockState, Is.EqualTo(HeartNodeLockState.Available));
+            Assert.That(partner.LockedByNodeId, Is.Empty);
             Assert.That(graph.Edges, Has.Count.EqualTo(edgeCount));
             Assert.That(graph.Seed, Is.EqualTo(seed));
         }
@@ -237,7 +239,7 @@ namespace DeadWalls.Tests
         }
 
         [Test]
-        public void VisibleKeystone_MarksOpposingSafeSlotWithoutLeakingHiddenPartnerId()
+        public void VisibleKeystone_DoesNotExposeOrMarkHiddenPartner()
         {
             GeneratedRunGraph graph = CreateGraph();
             HeartNodeCatalogSO catalog = CreateCatalog();
@@ -256,51 +258,10 @@ namespace DeadWalls.Tests
             HeartGraphNodePresentation hiddenPartner = presentation.Nodes.Single(node =>
                 node.SlotId == "defense:2");
 
-            Assert.That(visibleKeystone.KeystoneConflict, Is.Not.Null);
-            Assert.That(
-                visibleKeystone.KeystoneConflict.ConflictingChoiceSlotId,
-                Is.EqualTo(hiddenPartner.SlotId));
-            Assert.That(
-                visibleKeystone.KeystoneConflict.ConflictingChoiceTitle,
-                Is.EqualTo("Stone Doctrine"));
-            Assert.That(visibleKeystone.KeystoneConflict.ConflictingChoiceIsRevealed, Is.False);
-            Assert.That(visibleKeystone.KeystoneConflict.WillLockOnPurchase, Is.True);
-            Assert.That(visibleKeystone.KeystoneConflict.IsAlreadyLockedByThisChoice, Is.False);
-            Assert.That(visibleKeystone.KeystoneConflict.SourceIsLockedByConflictingChoice, Is.False);
-            Assert.That(hiddenPartner.IsKeystoneConflictTarget, Is.True);
+            Assert.That(visibleKeystone.KeystoneConflict, Is.Null);
+            Assert.That(hiddenPartner.IsKeystoneConflictTarget, Is.False);
             Assert.That(hiddenPartner.ExactNodeId, Is.Null);
             Assert.That(hiddenPartner.Title, Is.Empty);
-        }
-
-        [Test]
-        public void PurchasedKeystone_MarksPartnerAsAlreadyLockedWithoutExposingLockedById()
-        {
-            GeneratedRunGraph graph = CreateGraph();
-            HeartNodeCatalogSO catalog = CreateCatalog();
-            GeneratedHeartNodeState source = FindNode(graph, "keystone_army");
-            GeneratedHeartNodeState partner = FindNode(graph, "keystone_defense");
-            source.Visibility = HeartNodeVisibility.Revealed;
-            source.Level = 1;
-            partner.LockState = HeartNodeLockState.KeystoneConflict;
-            partner.LockedByNodeId = source.NodeId;
-
-            bool built = HeartGraphPresentationBuilder.TryBuild(
-                graph,
-                catalog,
-                null,
-                out HeartGraphPresentation presentation,
-                out List<string> errors);
-
-            Assert.That(built, Is.True, string.Join(" | ", errors));
-            HeartGraphNodePresentation visibleKeystone = presentation.Nodes.Single(node =>
-                node.ExactNodeId == "keystone_army");
-            HeartGraphNodePresentation hiddenPartner = presentation.Nodes.Single(node =>
-                node.SlotId == "defense:2");
-
-            Assert.That(visibleKeystone.KeystoneConflict.WillLockOnPurchase, Is.False);
-            Assert.That(visibleKeystone.KeystoneConflict.IsAlreadyLockedByThisChoice, Is.True);
-            Assert.That(hiddenPartner.ExactNodeId, Is.Null);
-            Assert.That(hiddenPartner.LockState, Is.EqualTo(HeartNodeLockState.Available));
         }
 
         [Test]

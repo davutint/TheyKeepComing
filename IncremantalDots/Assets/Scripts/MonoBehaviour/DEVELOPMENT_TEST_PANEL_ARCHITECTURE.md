@@ -15,6 +15,9 @@ GameObject veya UI üretmez.
   alınabilir. Shipping fiyatları ve incremental eğriler değişmez.
 - Test oturumu aktifken `SaveRunSnapshot` açıkça reddedilir. Böylece geçici unlock, ücretsiz
   alım veya test hordesi exact run save'e yazılamaz.
+- Ayrı `GRANT 1M HEART ESSENCE` aksiyonu combat tech unlock etmeden ve graph state'ini
+  değiştirmeden yalnız canonical Grave Essence wallet'ını fonlar. Oyuncu her node'u normal
+  `RESEARCH/UPGRADE`, cost, direct-child reveal ve animasyon akışı üzerinden tek tek alır.
 - `2K / 5K / 10K` butonları yalnız bu exact preset'leri kabul eder. Mevcut aktif zombiler
   pool'a döner, tek aktif enemy catalog entry'si aynı `EnemyPoolRuntimeUtility` üzerinden
   yeniden rent edilir.
@@ -30,6 +33,7 @@ GameObject veya UI üretmez.
 `DontSave` bir GameObject üretir. Game View sağ üstündeki panel:
 
 - combat tech + free-buy hazırlığı,
+- Castle Heart için graph'i atlamayan `1M` Grave Essence grant'i,
 - exact `2K / 5K / 10K` horde,
 - cooldown reset,
 - horde clear

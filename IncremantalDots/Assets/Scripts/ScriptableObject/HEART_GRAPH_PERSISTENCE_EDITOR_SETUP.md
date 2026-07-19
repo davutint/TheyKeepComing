@@ -9,7 +9,7 @@ Su degisikliklerden herhangi biri yapildiginda version artirilir:
 - node ekleme/silme veya Id degisikligi;
 - branch, type, rarity, depth veya tag degisikligi;
 - effect, cost, growth veya soft-cap degisikligi;
-- Keystone partneri;
+- Eski save compatibility alanı olarak Keystone partner/lock state'i;
 - player-facing title/description/icon icerigi.
 
 Eski run'i yeni catalog'a otomatik map eden Editor araci kullanilmaz. Bilincli migration
@@ -30,8 +30,8 @@ olarak unavailable kalir. Onaysiz test catalog'u scene/prefab asset'ine yazilmaz
 ## Dogrulama
 
 - EditMode: `HeartGraphGeneratorTests` persistence/version/replay testleri.
-- EditMode: `HeartGraphRevealTests.NormalizeKeystonePairVisibility...` eski exact save'in yalnız
-  partner görünürlüğünü tamamladığını ve seed/edge/level/lock state'ini koruduğunu kanıtlar.
+- EditMode: `HeartGraphRevealTests.NormalizeKeystonePairVisibility...` eski conflict lock'unu
+  temizlerken hidden visibility, seed, edge ve level state'ini koruduğunu kanıtlar.
 - EditMode: `RunPersistenceTests` guncel v11 JSON ve v9/v10 migration testleri.
 - PlayMode: `HeartGraphContinuePlayModeTests.Continue_ReplaysExactSavedHeartGraphWithoutReroll`.
 - Full EditMode ve PlayMode regression.

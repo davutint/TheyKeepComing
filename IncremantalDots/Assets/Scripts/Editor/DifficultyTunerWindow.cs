@@ -701,7 +701,7 @@ namespace DeadWalls
                         typeof(HeartNodeCatalogSO), false);
                 }
 
-                DrawHeartEssenceGainContract(gameManager);
+                DrawHeartEssenceGainContract(gameManager, _profileSO);
                 DrawHeartGraphSettingsEditor(gameManager);
 
                 HeartNodeCatalogSO catalog = gameManager.HeartCatalog;
@@ -1309,19 +1309,41 @@ namespace DeadWalls
             }
         }
 
-        private static void DrawHeartEssenceGainContract(GameManager gameManager)
+        private static void DrawHeartEssenceGainContract(
+            GameManager gameManager,
+            SerializedObject profileOwner)
         {
             EditorGUILayout.LabelField("Grave Essence Gain", EditorStyles.boldLabel);
             EditorGUILayout.LabelField("Run wallet / spending owner",
                 "GraveEssence ECS + GameManager.TrySpendGraveEssenceAtHeart");
             EditorGUILayout.LabelField("Positive grant gate",
                 "GameManager.GrantGraveEssence(long)");
-            EditorGUILayout.LabelField("Production drop source", "UNCONFIGURED");
+            EditorGUILayout.LabelField("Production drop source",
+                "ZombieDeathSystem -> GraveEssenceDropEvent -> GameManager");
+            DrawDefinitionProp(profileOwner, "GraveEssenceDropChance",
+                "Enemy death drop chance");
+            DrawDefinitionProp(profileOwner, "GraveEssencePerDrop",
+                "Base Essence per successful drop");
+
+            SerializedProperty chanceProperty = profileOwner.FindProperty(
+                "GraveEssenceDropChance");
+            SerializedProperty amountProperty = profileOwner.FindProperty(
+                "GraveEssencePerDrop");
+            float chance = chanceProperty != null
+                ? Mathf.Clamp01(chanceProperty.floatValue)
+                : 0f;
+            int amount = amountProperty != null
+                ? Mathf.Max(1, amountProperty.intValue)
+                : 1;
+            EditorGUILayout.LabelField("Expected baseline cadence",
+                chance > 0f
+                    ? $"1 drop / {1f / chance:0.##} kills  |  +{amount:N0} base Essence"
+                    : "DISABLED");
             EditorGUILayout.HelpBox(
-                "Blueprint Essence drop ve ilk kill/Essence yonunu tanimliyor; fakat drop ihtimali, "
-                + "miktari veya cadence sayisi onayli degil. Runtime'da GrantGraveEssence kullanan "
-                + "production kill/drop owner'i yoktur. Tuner burada sahte bir per-kill deger uretmez.",
-                MessageType.Warning);
+                "Yalniz gercek, stress-test disi dusman olumleri roll atar. Basarili drop otomatik "
+                + "toplanir; Meta Essence Gain yuzdesi canonical GrantGraveEssence transaction'inda "
+                + "exact fractional accumulator ile uygulanir.",
+                MessageType.Info);
 
             if (!Application.isPlaying)
                 return;

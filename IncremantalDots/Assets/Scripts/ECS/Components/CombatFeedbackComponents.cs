@@ -123,6 +123,16 @@ namespace DeadWalls
         public int Amount;
     }
 
+    /// <summary>
+    /// Gercek bir dusman olumundeki basarili Grave Essence roll'unu Mono transaction
+    /// sahibine tasir. Amount meta bonusundan onceki taban drop miktaridir.
+    /// </summary>
+    public struct GraveEssenceDropEvent : IComponentData
+    {
+        public float3 Position;
+        public int Amount;
+    }
+
     public struct CombatHitFeedbackCandidate
     {
         public float3 Position;

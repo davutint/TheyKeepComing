@@ -30,6 +30,9 @@ namespace DeadWalls
         public float KillRewardIron;
         public float KillRewardFood;
         public float KillRewardWaveScale;
+        public float GraveEssenceDropChance;
+        public int GraveEssencePerDrop;
+        public uint GraveEssenceDropSeed;
         public int WaveClearWoodBase;
         public int WaveClearStoneBase;
         public int WaveClearIronBase;

@@ -65,6 +65,10 @@ namespace DeadWalls
         public float KillRewardIron = 0.15f;
         [Tooltip("0 = kill odulu cycle ile BUYUMEZ (gelir/zorluk ayrismasi). Ana gelir worker ekonomisidir.")]
         public float KillRewardWaveScale = 0f;
+        [Range(0f, 1f)] public float GraveEssenceDropChance = 0.10f;
+        [Min(1)] public int GraveEssencePerDrop = 1;
+        [Tooltip("Drop roll stream'inin sabit tuzu; 0 kullanilirsa production fallback seed uygulanir.")]
+        public uint GraveEssenceDropSeed = 0x6E624EB7u;
         public int WaveClearWoodBase = 20;
         public int WaveClearFoodBase = 15;
         public int WaveClearStoneBase = 10;
@@ -210,6 +214,11 @@ namespace DeadWalls
                     KillRewardIron = math.max(0f, authoring.KillRewardIron),
                     KillRewardFood = math.max(0f, authoring.KillRewardFood),
                     KillRewardWaveScale = math.max(0f, authoring.KillRewardWaveScale),
+                    GraveEssenceDropChance = math.saturate(authoring.GraveEssenceDropChance),
+                    GraveEssencePerDrop = math.max(1, authoring.GraveEssencePerDrop),
+                    GraveEssenceDropSeed = authoring.GraveEssenceDropSeed == 0u
+                        ? 0x6E624EB7u
+                        : authoring.GraveEssenceDropSeed,
                     WaveClearWoodBase = math.max(0, authoring.WaveClearWoodBase),
                     WaveClearStoneBase = math.max(0, authoring.WaveClearStoneBase),
                     WaveClearIronBase = math.max(0, authoring.WaveClearIronBase),

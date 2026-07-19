@@ -157,12 +157,6 @@ namespace DeadWalls
             }
 
             BuildSafeEdges(graph, nodesById, slotsByNodeId, presentation, errors);
-            BuildVisibleKeystoneConflicts(
-                catalog,
-                nodesById,
-                slotsByNodeId,
-                presentationsBySlot,
-                errors);
             return errors.Count == 0;
         }
 
@@ -355,66 +349,5 @@ namespace DeadWalls
             }
         }
 
-        private static void BuildVisibleKeystoneConflicts(
-            HeartNodeCatalogSO catalog,
-            Dictionary<string, GeneratedHeartNodeState> nodesById,
-            Dictionary<string, string> slotsByNodeId,
-            Dictionary<string, HeartGraphNodePresentation> presentationsBySlot,
-            List<string> errors)
-        {
-            foreach (KeyValuePair<string, GeneratedHeartNodeState> pair in nodesById)
-            {
-                GeneratedHeartNodeState node = pair.Value;
-                if (node.Visibility != HeartNodeVisibility.Revealed)
-                    continue;
-
-                HeartNodeDefinitionSO definition = catalog.GetNode(node.NodeId);
-                if (definition == null || definition.Type != HeartNodeType.Keystone)
-                    continue;
-
-                string[] conflictIds = definition.ConflictNodeIds ?? Array.Empty<string>();
-                if (conflictIds.Length != 1
-                    || !nodesById.TryGetValue(conflictIds[0], out GeneratedHeartNodeState conflictNode)
-                    || !slotsByNodeId.TryGetValue(conflictNode.NodeId, out string conflictSlotId)
-                    || !slotsByNodeId.TryGetValue(node.NodeId, out string sourceSlotId)
-                    || !presentationsBySlot.TryGetValue(sourceSlotId, out HeartGraphNodePresentation sourcePresentation)
-                    || !presentationsBySlot.TryGetValue(conflictSlotId, out HeartGraphNodePresentation conflictPresentation))
-                {
-                    errors.Add($"Visible Keystone '{node.NodeId}' graph'ta gecerli conflict slotu bulamadi.");
-                    continue;
-                }
-
-                HeartNodeDefinitionSO conflictDefinition = catalog.GetNode(conflictNode.NodeId);
-                if (conflictDefinition == null || conflictDefinition.Type != HeartNodeType.Keystone)
-                {
-                    errors.Add($"Visible Keystone '{node.NodeId}' conflict definition'i gecersiz.");
-                    continue;
-                }
-
-                // Keystone, remote exact-node gizliliginin Blueprint'teki tek acik istisnasidir:
-                // karsi secimin basligi ve kapanacak safe slot gosterilir; internal Id disari verilmez.
-                sourcePresentation.KeystoneConflict = new HeartKeystoneConflictPresentation
-                {
-                    ConflictingChoiceSlotId = conflictSlotId,
-                    ConflictingChoiceTitle = conflictDefinition.Title,
-                    ConflictingChoiceIsRevealed = conflictNode.Visibility == HeartNodeVisibility.Revealed,
-                    WillLockOnPurchase = node.Level == 0
-                                         && node.LockState == HeartNodeLockState.Available,
-                    IsAlreadyLockedByThisChoice =
-                        conflictNode.LockState == HeartNodeLockState.KeystoneConflict
-                        && string.Equals(
-                            conflictNode.LockedByNodeId,
-                            node.NodeId,
-                            StringComparison.Ordinal),
-                    SourceIsLockedByConflictingChoice =
-                        node.LockState == HeartNodeLockState.KeystoneConflict
-                        && string.Equals(
-                            node.LockedByNodeId,
-                            conflictNode.NodeId,
-                            StringComparison.Ordinal)
-                };
-                conflictPresentation.IsKeystoneConflictTarget = true;
-            }
-        }
     }
 }

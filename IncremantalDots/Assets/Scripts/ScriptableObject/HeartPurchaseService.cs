@@ -181,8 +181,8 @@ namespace DeadWalls
     }
 
     /// <summary>
-    /// Generated Heart graph uzerindeki quote, Grave Essence spend, level, effect, reveal
-    /// ve Keystone lock gecislerinin tek transaction owner'idir.
+    /// Generated Heart graph uzerindeki quote, Grave Essence spend, level, effect ve
+    /// dogrudan-child reveal gecislerinin tek transaction owner'idir.
     /// </summary>
     public static class HeartPurchaseService
     {
@@ -264,11 +264,6 @@ namespace DeadWalls
 
             // Preflight'tan sonra bu adimlar fail etmez. Boylece harcama sonrasi yarim state kalmaz.
             plan.Node.Level = plan.Quote.NewLevel;
-            if (plan.KeystonePartner != null)
-            {
-                plan.KeystonePartner.LockState = HeartNodeLockState.KeystoneConflict;
-                plan.KeystonePartner.LockedByNodeId = plan.Node.NodeId;
-            }
             preparedEffects.Commit();
 
             var result = new HeartPurchaseResult
@@ -276,7 +271,7 @@ namespace DeadWalls
                 Quote = plan.Quote,
                 NodeDepth = plan.Node.Depth,
                 FailureReason = HeartPurchaseFailureReason.None,
-                KeystoneConflictApplied = plan.KeystonePartner != null
+                KeystoneConflictApplied = false
             };
             for (int i = 0; i < plan.RevealTargets.Count; i++)
             {
@@ -368,13 +363,6 @@ namespace DeadWalls
                     evaluation,
                     HeartPurchaseFailureReason.Hidden,
                     "Hidden Heart node satin alinamaz.");
-            }
-            if (node.LockState != HeartNodeLockState.Available)
-            {
-                return FailEvaluation(
-                    evaluation,
-                    HeartPurchaseFailureReason.KeystoneLocked,
-                    "Heart node karsi Keystone tarafindan kilitli.");
             }
             if (node.Level < 0)
             {
@@ -475,56 +463,25 @@ namespace DeadWalls
                     $"{totalCost} Grave Essence gerekiyor.");
             }
 
-            GeneratedHeartNodeState keystonePartner = null;
-            if (definition.Type == HeartNodeType.Keystone
-                && !TryGetKeystonePartner(
-                    definition,
-                    catalog,
-                    nodesById,
-                    out keystonePartner,
-                    out string keystoneError))
-            {
-                return FailEvaluation(
-                    evaluation,
-                    HeartPurchaseFailureReason.InvalidCatalog,
-                    keystoneError);
-            }
-
             var revealTargets = new List<GeneratedHeartNodeState>();
             if (node.Level == 0)
             {
                 var seenTargets = new HashSet<string>(StringComparer.Ordinal);
-                AddCoupledRevealTargets(
+                AddDirectRevealTargets(
                     graph,
-                    catalog,
                     nodesById,
                     nodeId,
                     revealTargets,
                     seenTargets);
-
-                // Generated v1 graph pairleri compatibility icin branch spine'inda ardisik
-                // tutulur. Keystone secimi iki tarafin da outgoing hedeflerini acar; boylece
-                // hangi doctrine secilirse secilsin partner disinda ayni dal devam eder.
-                if (keystonePartner != null)
-                {
-                    AddCoupledRevealTargets(
-                        graph,
-                        catalog,
-                        nodesById,
-                        keystonePartner.NodeId,
-                        revealTargets,
-                        seenTargets);
-                }
             }
 
-            plan = new PurchasePlan(definition, node, quote, keystonePartner, revealTargets);
+            plan = new PurchasePlan(definition, node, quote, revealTargets);
             evaluation.FailureReason = HeartPurchaseFailureReason.None;
             return true;
         }
 
-        private static void AddCoupledRevealTargets(
+        private static void AddDirectRevealTargets(
             GeneratedRunGraph graph,
-            HeartNodeCatalogSO catalog,
             Dictionary<string, GeneratedHeartNodeState> nodesById,
             string sourceNodeId,
             List<GeneratedHeartNodeState> revealTargets,
@@ -541,17 +498,6 @@ namespace DeadWalls
                 }
 
                 AddRevealTarget(target, revealTargets, seenTargets);
-
-                HeartNodeDefinitionSO targetDefinition = catalog.GetNode(target.NodeId);
-                if (targetDefinition == null || targetDefinition.Type != HeartNodeType.Keystone)
-                    continue;
-
-                string[] conflictIds = targetDefinition.ConflictNodeIds ?? Array.Empty<string>();
-                if (conflictIds.Length == 1
-                    && nodesById.TryGetValue(conflictIds[0], out GeneratedHeartNodeState partner))
-                {
-                    AddRevealTarget(partner, revealTargets, seenTargets);
-                }
             }
         }
 
@@ -615,43 +561,6 @@ namespace DeadWalls
             return true;
         }
 
-        private static bool TryGetKeystonePartner(
-            HeartNodeDefinitionSO definition,
-            HeartNodeCatalogSO catalog,
-            Dictionary<string, GeneratedHeartNodeState> nodesById,
-            out GeneratedHeartNodeState partnerNode,
-            out string error)
-        {
-            partnerNode = null;
-            error = string.Empty;
-            string[] conflictIds = definition.ConflictNodeIds ?? Array.Empty<string>();
-            if (conflictIds.Length != 1
-                || !nodesById.TryGetValue(conflictIds[0], out partnerNode)
-                || catalog.GetNode(conflictIds[0]) is not HeartNodeDefinitionSO partnerDefinition
-                || partnerDefinition.Type != HeartNodeType.Keystone
-                || partnerDefinition.ConflictNodeIds == null
-                || partnerDefinition.ConflictNodeIds.Length != 1
-                || !string.Equals(
-                    partnerDefinition.ConflictNodeIds[0], definition.Id, StringComparison.Ordinal))
-            {
-                error = $"Keystone '{definition.Id}' exact ve simetrik partner tasimiyor.";
-                return false;
-            }
-            if (partnerNode.Level > 0)
-            {
-                error = $"Keystone partner '{partnerDefinition.Id}' zaten satin alinmis.";
-                return false;
-            }
-            if (partnerNode.LockState != HeartNodeLockState.Available
-                || !string.IsNullOrEmpty(partnerNode.LockedByNodeId))
-            {
-                error = $"Keystone partner '{partnerDefinition.Id}' satin alim oncesi available olmali.";
-                return false;
-            }
-
-            return true;
-        }
-
         private static HeartPurchaseQuote BuildQuote(
             string nodeId,
             HeartPurchaseQuantity quantity,
@@ -703,20 +612,17 @@ namespace DeadWalls
             public readonly HeartNodeDefinitionSO Definition;
             public readonly GeneratedHeartNodeState Node;
             public readonly HeartPurchaseQuote Quote;
-            public readonly GeneratedHeartNodeState KeystonePartner;
             public readonly List<GeneratedHeartNodeState> RevealTargets;
 
             public PurchasePlan(
                 HeartNodeDefinitionSO definition,
                 GeneratedHeartNodeState node,
                 HeartPurchaseQuote quote,
-                GeneratedHeartNodeState keystonePartner,
                 List<GeneratedHeartNodeState> revealTargets)
             {
                 Definition = definition;
                 Node = node;
                 Quote = quote;
-                KeystonePartner = keystonePartner;
                 RevealTargets = revealTargets;
             }
         }

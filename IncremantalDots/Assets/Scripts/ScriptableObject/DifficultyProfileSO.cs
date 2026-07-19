@@ -77,6 +77,12 @@ namespace DeadWalls
         public float NightIntensity = 1.65f;
         public float DawnIntensity = 0.15f;
 
+        [Header("Castle Heart Grave Essence Drops")]
+        [Tooltip("Her gercek dusman olumunun 1 Grave Essence drop etme ihtimali. 0.10 = %10.")]
+        [Range(0f, 1f)] public float GraveEssenceDropChance = 0.10f;
+        [Tooltip("Basarili bir drop'un GrantGraveEssence kapisina verdigi taban miktar.")]
+        [Min(1)] public int GraveEssencePerDrop = 1;
+
         [Header("Wall Defense (config'e yazilir)")]
         [Tooltip("Tech, meta ve Heart yuzde carpanlarindan onceki Wall MaxHP baseline degeri.")]
         [Min(1f)] public float WallBaseHp = 350f;

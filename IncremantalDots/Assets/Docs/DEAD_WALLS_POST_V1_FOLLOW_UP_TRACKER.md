@@ -6,7 +6,7 @@
 > **Oluşturulma tarihi:** 2026-07-18
 > **Aktif paket:** P9 - Performans Profilleme ve Optimizasyon
 > **Aktif iş:** Hedef donanım ve ölçüm senaryolarının owner ile kesinleştirilmesi
-> **İlerleme:** `7 / 10` ana görev tamamlandı - `%70`
+> **İlerleme:** `8 / 10` ana görev tamamlandı - `%80`
 
 ---
 
@@ -82,7 +82,7 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 | 4 | `DW-P4-WORKERS` | Worker dağıtım arayüzünün yeniden çalışılması | `[x]` | Mevcut idle nüfusun doğrudan atanması, yeni nüfus hedefi, üretim etkisi ve blocker hiyerarşisi uygulanıp doğrulandı |
 | 5 | `DW-P5-ARROWS` | Arrow Supply arayüzünün yeniden çalışılması | `[x]` | Stok, tüketim, refill paketleri ve kapasite/verimlilik bilgi mimarisi uygulanıp doğrulandı |
 | 6 | `DW-P6-TECH-TREE` | Teknoloji ağacının görsel ve kullanılabilirlik yeniden çalışması | `[x]` | Ayrı War Doctrine yüzeyi kaldırıldı; player-facing teknoloji ağacı sahipliği Castle Heart altında tekilleştirildi |
-| 7 | `DW-P7-CASTLE-HEART` | Castle Heart'ın ayrı kapsamda yeniden değerlendirilmesi | `[?]` | Owner kararıyla son UI işi olarak ele alınacak; mevcut ara sürüm final kabul edilmiyor |
+| 7 | `DW-P7-CASTLE-HEART` | Castle Heart'ın ayrı kapsamda yeniden değerlendirilmesi | `[x]` | UI Toolkit icon-tree, direct-child reveal, responsive inspector ve normal teknoloji ağacı davranışı uygulandı/doğrulandı |
 | 8 | `DW-P8-UI-POLISH` | Genel UI efektleri, animasyonları ve etkileşim polish'i | `[x]` | Durum odaklı hareket, input uyarlaması, feedback katmanları ve modal tutarlılığı doğrulandı |
 | 9 | `DW-P9-PERFORMANCE` | Performans profilleme ve optimizasyon | `[?]` | Ölçülmüş darboğazlar davranış bozulmadan giderildi ve hedef senaryolarda yeniden ölçüldü |
 | 10 | `DW-P10-FINAL-GATE` | Son kalite, tutarlılık ve regresyon kapısı | `[?]` | Bütün aktif kapsam birlikte test edildi; açık kritik hata ve doğrulanmamış ana görev kalmadı |
@@ -151,7 +151,7 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - [x] Fullscreen yönetim yüzeyleri açıkken simülasyon akmaya devam edecek.
 - [x] Görsel dil minimal, yüksek okunabilirlikli ve dekoratif hareketten arındırılmış olacak; animasyon yalnızca durum veya bilgi değişimini anlatacak.
 - [x] Ayrı `War Doctrine / Technology` yüzeyi kaldırıldı; player-facing teknoloji ağacı yalnız Castle Heart altında yaşayacak.
-- [?] Castle Heart görsel ve etkileşim rework'ü owner kararıyla son UI işi olarak ele alınacak.
+- [x] Castle Heart görsel ve etkileşim rework'ü oyunun tek player-facing teknoloji ağacı olarak tamamlandı.
 
 #### Yüzey uygulama kaydı
 
@@ -161,10 +161,10 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - [x] Main Menu'nün tek sürekli hareketi `22s DAY / 8s DUSK / 22s NIGHT / 8s DAWN` arka plan döngüsü.
 - [x] Main Menu Unity compile, Console ve Play Mode görsel ağacında doğrulandı; owner tarafından onaylandı.
 - [x] Persistent HUD, Economy, Barracks, Arrow Supply, Council, Level Up, Pause, Settings ve Game Over/Meta Shop UI Toolkit ile sıfırdan kuruldu.
-- [x] Owner tarafından onaylanan Artsystack ikonları yeni UI Toolkit yüzeylerine semantik görevlerle giydirildi; `RPG Icons Pixel Art` paketi görsel dile uymadığı için kullanılmadı.
+- [x] Artsystack ikonları genel HUD/yönetim yüzeylerinde; görsel olarak incelenen `RPG Icons Pixel Art` seçkisi yalnız Castle Heart'ın 37 teknoloji node'unda kullanıldı.
 - [x] `Worker Production` ve `Repair Gate` birbirinden ayrıldı: worker üretimi yumruk, kapı onarımı tools ikonunu kullanır.
 - [x] Gameplay gün döngüsü legacy celestial-arc davranışı referans alınarak UI Toolkit'te sıfırdan, gerçek cycle progress ve phase durumlarına bağlı daha polish bir sunumla kuruldu.
-- [?] Castle Heart UI Toolkit ara sürümü production'da mevcut; final rework ve owner kabulü P7 kapsamında bekliyor.
+- [x] Castle Heart UI Toolkit final rework'ü; dört başlangıç node'u, hidden-node yokluğu, direct-child reveal ve responsive inspector ile production'a alındı.
 - [x] `1920x1080` ana yüzey QA'sı ve `1280x720` touch-mode uyarlaması canlı Play Mode'da incelendi.
 - [x] Son ikon/celestial-arc revizyonunda Unity compile ve Console temiz; targeted UI kontratları `6/6`, tam EditMode `426/426` geçti.
 
@@ -198,12 +198,16 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 
 ### `DW-P7-CASTLE-HEART` - Ayrı Kapsam
 
-**Durum:** `[?]` Owner kararıyla son UI işi olarak bekliyor; bu düzeltme paketinde Castle Heart içeriğine dokunulmadı.
+**Durum:** `[x]` UI Toolkit final rework tamamlandı ve runtime davranışı doğrulandı.
 
-- [?] Castle Heart, oyunun tek player-facing teknoloji ağacı olacak şekilde bilgi mimarisi yeniden kararlaştırılacak.
-- [?] Hidden-safe graph, branch kimliği, reveal/lock/owned durumları ve inspector final görsel dilde yeniden çalışılacak.
-- [?] Satın alma akışı ve simülasyonun açıkken devam etmesi korunacak.
-- [?] Final runtime graph okunabilirlik, çakışma, pointer, gamepad ve touch açısından owner kabulüne sunulacak.
+- [x] Castle Heart oyunun tek player-facing teknoloji ağacı; ikinci War Doctrine yüzeyi yok.
+- [x] Merkez Heart ve tam dört başlangıç teknolojisi dışında hidden node/placeholder/silhouette çizilmiyor.
+- [x] Satın alma yalnız doğrudan outgoing child/child'ları reveal ediyor; sibling lock veya cascade yok.
+- [x] Noktalı-eğrisel bağlantı parent'tan child'a büyüyor; child icon opacity/scale ile ve çoklu child durumunda stagger ile beliriyor.
+- [x] Bütün 37 node görsel incelemeyle seçilmiş `RPG Icons Pixel Art` sprite'larına bağlandı; future catalog rebuild aynı map'i koruyor.
+- [x] PC right-inspector ve compact/touch bottom-inspector canlı Game View'da doğrulandı; simulation akmaya devam ediyor.
+- [x] Player-facing akış yalnız `RESEARCH / UPGRADE / RESEARCHED` kullanıyor; branch etiketi, `+10/MAX` ve eski Keystone jargon/lock davranışı yok.
+- [x] Targeted EditMode `32/32` ve PlayMode `2/2` geçti; Unity compilation ve Console hata vermedi; canlı başlangıç/purchase visual node ölçümü `5 -> 6` oldu.
 
 ### `DW-P8-UI-POLISH` - Genel UI Efekt ve Animasyonları
 
@@ -305,3 +309,34 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - Targeted UI kontratları `6/6`, tam EditMode `426/426` geçti; Unity compilation ve Console'da hata yok.
 - Tam PlayMode turunda UI kapsamı dışındaki `FirstDayWorkerRatioOnboarding_PulsesRealControlAndCompletesOnPlayerAction` testi, bir frame'lik normal üretim tick'i nedeniyle Wood değerini `160` yerine `161` görerek başarısız oldu; izole tekrar aynı sonucu verdi ve ilgili gameplay/test dosyaları bu pakette değiştirilmedi.
 - Ana görev paydası ve statüleri değişmedi; P7, P9 ve P10 açık kaldığı için doğrulanmış ilerleme `7/10 - %70` olarak korundu.
+
+### 2026-07-19 - P7 Castle Heart UI Toolkit final rework tamamlandı
+
+- Eski kart tabanlı ara görünüm kaldırıldı; merkez Heart, icon-first node'lar ve etiketsiz dört yönlü progression dili kuruldu.
+- İlk durumda yalnız root + dört başlangıç teknolojisi çiziliyor; hidden node'lar visual tree'ye hiç eklenmiyor.
+- Reveal ve purchase servisleri yalnız satın alınan node'un direct outgoing hedeflerini açıyor; eski Keystone pair reveal/lock kuralı ve hidden partner metadata'sı kaldırıldı.
+- `Painter2D` tabanlı noktalı-eğrisel connector parent'tan child'a büyüyor; child node kısa opacity/scale transition ve çoklu child stagger ile beliriyor.
+- 37 production node'u incelenmiş `RPG Icons Pixel Art` sprite'larına bağlandı ve mapping catalog builder'ın kalıcı source-of-truth'u yapıldı.
+- PC right-inspector ile compact/touch bottom-inspector Game View'da doğrulandı; canlı purchase ölçümü node sayısını `5 -> 6` değiştirdi.
+- Targeted EditMode `32/32` ve PlayMode `2/2` geçti; Unity compilation ve Console temiz kaldı.
+- Ana görev paydası değişmedi; P7 kapatıldığı için doğrulanmış ilerleme `8/10 - %80` oldu. P9 ve P10 açık kaldı.
+
+### 2026-07-19 - Grave Essence üretim kaynağı ve Castle Heart test hibesi
+
+- Gerçek düşman ölümleri varsayılan `%10` olasılıkla `1 Grave Essence` üretir; stress-test ölümleri ödül üretmez ve kazanım doğrudan kanonik Grave Essence bakiyesine eklenir.
+- Düşme olasılığı ile miktarı `DifficultyProfileSO` ve Difficulty Tuner üzerinden ayarlanabilir hale getirildi.
+- F10 Development Tests paneline `GRANT 1M HEART ESSENCE` eylemi eklendi; bu eylem yalnız bakiyeyi artırır, hiçbir teknolojiyi açmaz veya satın almaz.
+- Test hibesiyle Castle Heart teknolojileri normal `RESEARCH / UPGRADE` akışında tek tek alınabilir; direct-child reveal, connector ve node animasyonları gerçek davranışlarıyla çalışır.
+- Development test oturumu run snapshot yazımını engeller; test hibesi normal kayıt dosyasına taşınmaz.
+- Targeted EditMode `6/6` ve PlayMode `2/2` geçti; Unity compilation ve Console temiz kaldı.
+- Bu çalışma P7 için destekleyici doğrulama aracıdır; ana görev paydası ve statüleri değişmedi. İlerleme `8/10 - %80`, P9 ve P10 açık.
+
+### 2026-07-19 - Castle Heart organik conquest-map yerleşim revizyonu
+
+- Owner geri bildirimi ve Zero Stress King conquest-map referansı doğrultusunda dört doğrusal radyal kol, deterministic asimetrik waypoint kümelerine dönüştürüldü.
+- Her teknoloji yolu eşit aralıklı düz ray yerine yön değiştiren küçük node adaları oluşturur; mevcut hidden-safe direct-child reveal davranışı değişmedi.
+- Connector koordinatları button merkezinden gerçek dairesel socket merkezine taşındı ve yollar socket sınırında başlayıp bitecek şekilde kırpıldı.
+- Ana parent yolları yüksek kontrast branch-tint ve koyu halo ile güçlendirildi; cross-link'ler daha geniş cubic kavis ve ayrı nokta ritmiyle ayrıştırıldı.
+- Owner yenilenen tam ağaç görünümünü canlı oyunda onayladı.
+- Targeted EditMode `23/23` ve PlayMode `4/4` geçti; Unity compilation, final Console ve `git diff --check` temiz kaldı.
+- Bu revizyon tamamlanmış P7 kapsamının polish devamıdır; ana görev paydası ve statüleri değişmedi. İlerleme `8/10 - %80`, P9 ve P10 açık.

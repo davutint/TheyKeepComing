@@ -24,6 +24,14 @@ namespace DeadWalls
             if (currentGameState.IsGameOver || currentGameState.IsLevelUpPending)
                 return;
 
+            bool hasWaveState = SystemAPI.TryGetSingleton(out WaveStateData waveState);
+            bool hasMobileConfig = SystemAPI.TryGetSingleton(out MobileCastleCombatConfig mobileConfig);
+            bool graveEssenceDropsEnabled = hasWaveState
+                && hasMobileConfig
+                && !waveState.StressTestMode
+                && mobileConfig.GraveEssenceDropChance > 0f
+                && mobileConfig.GraveEssencePerDrop > 0;
+
             var deathPositions = new NativeQueue<float3>(Allocator.TempJob);
             var ecb = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>()
                 .CreateCommandBuffer(state.WorldUnmanaged);
@@ -38,6 +46,19 @@ namespace DeadWalls
                 DeathPositions = deathPositions,
                 GameStateEntity = SystemAPI.GetSingletonEntity<GameStateData>(),
                 GameStateLookup = SystemAPI.GetComponentLookup<GameStateData>(false),
+                GraveEssenceDropsEnabled = graveEssenceDropsEnabled,
+                GraveEssenceDropChance = graveEssenceDropsEnabled
+                    ? math.saturate(mobileConfig.GraveEssenceDropChance)
+                    : 0f,
+                GraveEssencePerDrop = graveEssenceDropsEnabled
+                    ? math.max(1, mobileConfig.GraveEssencePerDrop)
+                    : 0,
+                GraveEssenceDropSeed = graveEssenceDropsEnabled
+                    ? mobileConfig.GraveEssenceDropSeed
+                    : 0u,
+                SpawnRandomState = graveEssenceDropsEnabled
+                    ? waveState.SpawnRandomState
+                    : 0u,
                 ECB = ecb
             }.Schedule(deathHandle);
 
@@ -67,12 +88,19 @@ namespace DeadWalls
             public NativeQueue<float3> DeathPositions;
             public Entity GameStateEntity;
             public ComponentLookup<GameStateData> GameStateLookup;
+            public bool GraveEssenceDropsEnabled;
+            public float GraveEssenceDropChance;
+            public int GraveEssencePerDrop;
+            public uint GraveEssenceDropSeed;
+            public uint SpawnRandomState;
             public EntityCommandBuffer ECB;
 
             public void Execute()
             {
                 int deathCount = 0;
                 float3 representativePosition = float3.zero;
+                GameStateData gameState = GameStateLookup[GameStateEntity];
+                int baseKills = math.max(0, gameState.TotalKills);
                 while (DeathPositions.TryDequeue(out float3 position))
                 {
                     if (deathCount == 0)
@@ -85,13 +113,31 @@ namespace DeadWalls
                         Position = position,
                         Amount = 1
                     });
+
+                    long ordinalLong = (long)baseKills + deathCount;
+                    int killOrdinal = ordinalLong >= int.MaxValue
+                        ? int.MaxValue
+                        : (int)ordinalLong;
+                    if (GraveEssenceDropsEnabled
+                        && GraveEssenceDropUtility.ShouldDrop(
+                            GraveEssenceDropChance,
+                            GraveEssenceDropSeed,
+                            SpawnRandomState,
+                            killOrdinal))
+                    {
+                        Entity essenceEvent = ECB.CreateEntity();
+                        ECB.AddComponent(essenceEvent, new GraveEssenceDropEvent
+                        {
+                            Position = position,
+                            Amount = GraveEssencePerDrop
+                        });
+                    }
                 }
 
                 if (deathCount <= 0)
                     return;
 
-                GameStateData gameState = GameStateLookup[GameStateEntity];
-                long totalKills = (long)math.max(0, gameState.TotalKills) + deathCount;
+                long totalKills = (long)baseKills + deathCount;
                 gameState.TotalKills = totalKills >= int.MaxValue
                     ? int.MaxValue
                     : (int)totalKills;

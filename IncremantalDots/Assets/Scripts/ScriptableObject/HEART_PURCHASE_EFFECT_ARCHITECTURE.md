@@ -9,8 +9,8 @@ contract'ini kurar. Blueprint'teki su kurallari uygular:
 - Unlock, Evolution ve Keystone tek sefer satin alinir.
 - Repeatable node `+1`, `+10` ve `Buy Max` destekler.
 - Ilk satin alim, `0 -> 10` gibi bulk gecis dahil, outgoing komsulari reveal eder.
-- Keystone yalnız exact eş Keystone'u kilitler; hangi taraf seçilirse seçilsin çiftin birleşik
-  outgoing hedefleri aynı branch devamını reveal eder.
+- Eski Keystone sınıfındaki node'lar dahil hiçbir teknoloji başka bir yolu kilitlemez.
+- İlk satın alma yalnız satın alınan node'un doğrudan outgoing hedeflerini reveal eder.
 - Numeric effect'in player-facing degeri ile runtime'a uygulanacak deger ayni hesap owner'indan gelir.
 
 Bu paket production node katalogu, Grave Essence drop orani veya denge sayisi uretmez.
@@ -21,11 +21,11 @@ save/restore ve deterministic effect replay E6'da tamamlanmistir.
 
 `HeartPurchaseService` quote ve commit'in tek owner'idir. Sirasi:
 
-1. Graph, catalog, visibility, lock, node tipi ve quantity preflight'i.
+1. Graph, catalog, visibility, node tipi ve quantity preflight'i.
 2. Exact Grave Essence maliyet quote'u.
 3. Effect pipeline'in fail edebilen butun baseline/policy preflight'i.
 4. `IHeartGraveEssenceWallet.TrySpendGraveEssenceAtHeart` ile tek currency harcamasi.
-5. Graph level, exact Keystone partner lock, prepared effect commit ve first-purchase reveal.
+5. Graph level, prepared effect commit ve direct-child first-purchase reveal.
 
 Harcama oncesindeki herhangi bir hata graph level'ini, visibility'yi, lock state'ini veya
 effect runtime'ini degistirmez. Harcamadan sonraki adimlar preflight edilmis ve fail etmeyen
@@ -72,12 +72,11 @@ icerigidir.
 | Unlock | `0 -> 1` | Authored sistemi acar, outgoing komsular reveal olur |
 | Repeatable | `0 -> N`, sonra `N -> N+M` | Her level stat raw investment'ini buyutur; yalniz ilk transaction reveal eder |
 | Evolution | `0 -> 1` | Split Shot, Burning Ground veya Second Blast gibi authored behavior flag'i acar |
-| Keystone | `0 -> 1` | Yalnız simetrik catalog partner'ini `KeystoneConflict` ile kilitler; iki tarafın outgoing birleşimi branch devamını açar |
+| Keystone | `0 -> 1` | Eski catalog sınıflandırmasıdır; normal tek-seferlik node gibi yalnız kendi outgoing hedeflerini açar |
 
-Partner dışındaki başka Keystone mutate edilmez. Çiftin authored outgoing hedeflerindeki normal
-node'lar reveal edilebilir; bu birleşim serialized v1 topolojiyi değiştirmeden iki seçeneği aynı
-devam noktasına bağlar. Hidden, kilitli veya
-tek seferlik sahipli node satin alinamaz.
+Hiçbir sibling/partner kilitlenmez veya dolaylı olarak reveal edilmez. Hidden veya tek seferlik
+sahipli node satın alınamaz. Eski save'den kalan conflict lock alanları reveal normalization
+aşamasında temizlenir.
 
 ## Effect pipeline
 
@@ -140,9 +139,9 @@ Production catalog yalniz owner tarafindan onaylanan behavior'lari kullanir.
 
 E5 tamamlandiginda `GameManager.HeartRuntime` generated graph'i run id'sinin stable seed'iyle
 kurar, reveal/presentation/purchase servislerini tek runtime icinde birlestirir ve bu dosyadaki
-baseline/sink contract'larini canli owner'lara baglar. `HeartScreenUI` yalniz
-`HeartPurchaseService` quote/failure contract'ini tuketir; prefab uzerinde `+1/+10/MAX`,
-Essence ve resolved effect satirlari vardir. Aktif scene HUD instance'inda legacy
+baseline/sink contract'larini canli owner'lara baglar. Player-facing
+`GameplayHUDToolkitUI.CastleHeart` yalnız `HeartPurchaseService` quote/failure contract'ini
+tüketir; ekranda tek-adım `RESEARCH/UPGRADE`, Grave Essence ve resolved effect satırları vardır. Aktif scene HUD instance'inda legacy
 `TechTreeUI` bulunmaz ve archer upgrade/direct unlock yuzeyleri player-facing kapatilmistir.
 
 Production `HeartNodeCatalogSO` halen owner icerik onayi bekler. Null catalog acik hata verir;
@@ -167,7 +166,7 @@ E6 runtime:
 - Yetersiz bakiye/missing baseline/overflow durumunda sifir mutation.
 - Tek seferlik node quantity ve tekrar satin alma guard'i.
 - Evolution behavior.
-- Exact Keystone pair exclusion ve iki seçimden de aynı branch continuation reveal'i.
+- Eski Keystone çiftlerinin birbirini kilitlemeden bağımsız alınabilmesi ve yalnız direct-child reveal.
 - Soft-cap actual delta'nin pozitif fakat azalan olmasi.
 - Range, Frost slow, cooldown ve Arrow numeric hedefleri.
 

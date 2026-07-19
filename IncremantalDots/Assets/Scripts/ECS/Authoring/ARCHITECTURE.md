@@ -32,6 +32,8 @@ Baker class'lari authoring degerlerini okuyarak entity'lere IComponentData ekler
 - Ayni GameState entity'sine `RunTelemetryData` ile `RunWallDamageTelemetryElement` buffer'ini
   bake eder; bunlar peak enemy ve day/phase Wall damage accumulator'laridir, ayri owner degildir
 - Initial wave sayisi, HP, damage, spawn interval, initial arrow ve test Grave Essence degerleri Inspector'dan ayarlanabilir; normal run Essence `0` baslar
+- `MobileCastleCombatAuthoring`, fallback Grave Essence drop ihtimali/miktari/seed degerlerini bake eder;
+  production chance ve miktar `DifficultyProfileSO` tarafindan `%10` / `1` olarak override edilir
 - NewGameScene setup tool mobile default kaynaklari yazar: Wood `150`, Stone `80`, Iron `45`, Food `150`, Arrows `200`
 - Mobile passive income degerleri ayni authoring uzerinden bake edilir: Wood `+90/min`, Stone `+50/min`, Iron `+30/min`, Food `+75/min`
 

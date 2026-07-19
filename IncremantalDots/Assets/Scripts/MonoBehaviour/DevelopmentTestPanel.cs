@@ -60,7 +60,7 @@ namespace DeadWalls
                 return;
             }
 
-            _windowRect = new Rect(Mathf.Max(12f, Screen.width - 354f), 58f, 342f, 282f);
+            _windowRect = new Rect(Mathf.Max(12f, Screen.width - 354f), 58f, 342f, 326f);
             _windowRect = GUI.Window(WindowId, _windowRect, DrawWindow, GUIContent.none, _windowStyle);
         }
 
@@ -79,6 +79,10 @@ namespace DeadWalls
             GUI.backgroundColor = new Color(0.96f, 0.62f, 0.16f);
             if (GUILayout.Button("UNLOCK TEST COMBAT + FREE BUY", GUILayout.Height(34f)))
                 EnableCombat();
+
+            GUI.backgroundColor = new Color(0.60f, 0.38f, 0.88f);
+            if (GUILayout.Button("GRANT 1M HEART ESSENCE", GUILayout.Height(34f)))
+                GrantHeartEssence();
 
             GUI.backgroundColor = new Color(0.22f, 0.70f, 0.46f);
             GUILayout.BeginHorizontal();
@@ -127,6 +131,20 @@ namespace DeadWalls
             }
 
             gameManager.TryResetDevelopmentCooldowns(out _status);
+        }
+
+        private void GrantHeartEssence()
+        {
+            GameManager gameManager = GameManager.Instance;
+            if (gameManager == null)
+            {
+                _status = "GameManager is not ready yet.";
+                return;
+            }
+
+            gameManager.TryGrantDevelopmentGraveEssence(
+                DevelopmentTestRules.HeartEssenceGrant,
+                out _status);
         }
 
         private void Spawn(int count)

@@ -51,6 +51,47 @@ namespace DeadWalls.Tests
         }
 
         [UnityTest]
+        public IEnumerator HeartEssenceGrant_FundsNormalTreeWithoutChangingGraphState()
+        {
+            GameManager gameManager = null;
+            HeartRuntimeTuningTelemetry before = default;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                gameManager = GameManager.Instance;
+                if (gameManager != null)
+                {
+                    before = gameManager.GetHeartRuntimeTuningTelemetry();
+                    if (gameManager.IsMobileMode && before.RuntimeReady)
+                        break;
+                }
+                yield return null;
+            }
+
+            Assert.That(gameManager, Is.Not.Null);
+            Assert.That(before.RuntimeReady, Is.True, before.RuntimeError);
+            long originalEssence = gameManager.GraveEssenceAmount;
+
+            Assert.That(gameManager.TryGrantDevelopmentGraveEssence(
+                DevelopmentTestRules.HeartEssenceGrant,
+                out string message), Is.True, message);
+
+            HeartRuntimeTuningTelemetry after = gameManager.GetHeartRuntimeTuningTelemetry();
+            Assert.That(gameManager.GraveEssenceAmount,
+                Is.GreaterThanOrEqualTo(originalEssence + DevelopmentTestRules.HeartEssenceGrant));
+            Assert.That(after.RevealedNodeCount, Is.EqualTo(before.RevealedNodeCount),
+                "Essence grant hidden technology reveal etmemeli.");
+            Assert.That(after.PurchasedNodeCount, Is.EqualTo(before.PurchasedNodeCount),
+                "Essence grant teknoloji satin almamali.");
+            Assert.That(gameManager.DevelopmentTestSessionActive, Is.True);
+            Assert.That(gameManager.SaveRunSnapshot(), Is.False,
+                "Heart test bakiyesi exact run save'e yazilmamali.");
+
+            Assert.That(gameManager.CompleteDevelopmentTestSession(), Is.True);
+            Assert.That(gameManager.GraveEssenceAmount, Is.EqualTo(originalEssence));
+            Assert.That(gameManager.DevelopmentTestSessionActive, Is.False);
+        }
+
+        [UnityTest]
         public IEnumerator DevelopmentControls_UnlockCombatAndSpawnExact2K5K10K()
         {
             GameManager gameManager = null;

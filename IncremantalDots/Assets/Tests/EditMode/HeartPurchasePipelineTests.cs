@@ -251,7 +251,7 @@ namespace DeadWalls.Tests
         }
 
         [Test]
-        public void KeystonePurchase_LocksOnlyExactPartner()
+        public void FormerKeystonePair_RemainsIndependentlyResearchable()
         {
             HeartNodeDefinitionSO first = CreateDefinition(
                 "keystone_arrow", HeartNodeBranch.Army, HeartNodeType.Keystone);
@@ -278,19 +278,21 @@ namespace DeadWalls.Tests
                 graph, catalog, second.Id, HeartPurchaseQuantity.One, wallet, null);
 
             Assert.That(firstResult.Succeeded, Is.True, firstResult.Message);
-            Assert.That(firstResult.KeystoneConflictApplied, Is.True);
+            Assert.That(partnerResult.Succeeded, Is.True, partnerResult.Message);
+            Assert.That(firstResult.KeystoneConflictApplied, Is.False);
+            Assert.That(partnerResult.KeystoneConflictApplied, Is.False);
             Assert.That(FindNode(graph, second.Id).LockState,
-                Is.EqualTo(HeartNodeLockState.KeystoneConflict));
-            Assert.That(FindNode(graph, second.Id).LockedByNodeId, Is.EqualTo(first.Id));
+                Is.EqualTo(HeartNodeLockState.Available));
+            Assert.That(FindNode(graph, second.Id).LockedByNodeId, Is.Empty);
             Assert.That(FindNode(graph, normal.Id).LockState, Is.EqualTo(HeartNodeLockState.Available));
             Assert.That(FindNode(graph, normal.Id).Visibility, Is.EqualTo(HeartNodeVisibility.Revealed));
-            Assert.That(firstResult.NewlyRevealedNodeIds, Does.Contain(normal.Id));
-            Assert.That(partnerResult.FailureReason, Is.EqualTo(HeartPurchaseFailureReason.KeystoneLocked));
-            Assert.That(wallet.GraveEssenceAmount, Is.EqualTo(afterFirstPurchase));
+            Assert.That(firstResult.NewlyRevealedNodeIds, Is.Empty);
+            Assert.That(partnerResult.NewlyRevealedNodeIds, Is.EqualTo(new[] { normal.Id }));
+            Assert.That(wallet.GraveEssenceAmount, Is.LessThan(afterFirstPurchase));
         }
 
         [Test]
-        public void KeystonePurchase_EitherChoiceRevealsTheSameBranchContinuation()
+        public void FormerKeystonePurchase_RevealsOnlyItsDirectContinuation()
         {
             HeartNodeDefinitionSO first = CreateDefinition(
                 "keystone_arrow", HeartNodeBranch.Army, HeartNodeType.Keystone);
@@ -318,10 +320,10 @@ namespace DeadWalls.Tests
                 null);
 
             Assert.That(result.Succeeded, Is.True, result.Message);
-            Assert.That(result.KeystoneConflictApplied, Is.True);
+            Assert.That(result.KeystoneConflictApplied, Is.False);
             Assert.That(FindNode(graph, first.Id).LockState,
-                Is.EqualTo(HeartNodeLockState.KeystoneConflict));
-            Assert.That(FindNode(graph, first.Id).LockedByNodeId, Is.EqualTo(second.Id));
+                Is.EqualTo(HeartNodeLockState.Available));
+            Assert.That(FindNode(graph, first.Id).LockedByNodeId, Is.Empty);
             Assert.That(FindNode(graph, continuation.Id).Visibility,
                 Is.EqualTo(HeartNodeVisibility.Revealed));
             Assert.That(result.NewlyRevealedNodeIds, Does.Contain(continuation.Id));

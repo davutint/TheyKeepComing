@@ -38,7 +38,7 @@ Deger adi ezberleme — asagidaki tablodan hissini bul, hangi ayara dokunacagini
 | "Meta ilerleme cok yavas / hizli" | Meta Runtime Contract > **day/night/peak population/record weights** ve definition cost/growth | Reward ile fiyatlari ayni panelde karsilastir; pending death receipt'in eski quote'unu degistirmeyecegini unutma |
 | "Heart graph cok kisa / uzun" | Heart Runtime Contract > **Minimum / Maximum branch depth** | Yalniz yeni run graph'larini etkiler; aktif run reroll edilmez |
 | "Rare node cok sik / seyrek" | Heart Runtime Contract > **Standard / Rare rarity weight** | Agirlik oranini degistir; generator preview'u valid graph'i ayni ekranda dogrular |
-| "Essence cok yavas / hizli geliyor" | Heart Runtime Contract > **Production drop source** | Su an owner gate acik; onayli drop miktari/cadence'i olmadan deger uydurma |
+| "Essence cok yavas / hizli geliyor" | Heart Runtime Contract > **Enemy death drop chance / Base Essence per successful drop** | `%10` ihtimali veya drop basina `1` taban miktari ayarla; ortalama cadence preview'unu kontrol et |
 | "Council sonuclari cok kucuk / buyuk" | Council Runtime Contract > **Small/Fair/Generous multiplier + weight** | Production katalogdaki etki olcegini veya cikma agirligini ayarla |
 | "Ayni Council kartlari cok sik tekrar ediyor" | Council Runtime Contract > **Recent template memory** | Hafizayi artir; alternatif varsa son N template tamamen dislanir |
 
@@ -131,10 +131,11 @@ her `HeartNodeDefinitionSO` icin base Grave Essence maliyeti, linear level growt
 depth araligi ayni panelde dogrudan asset owner'inda duzenlenir. Preview, oyunla ayni
 `HeartPurchasePricing` ve `HeartGraphGenerator` hesaplarini kullanir.
 
-Su an production Heart catalog ve kill/drop gain owner'i owner onayi bekliyor. `GrantGraveEssence`
-pozitif kazanc transaction kapisidir ama production kodunda onu cagiran kill/drop kaynagi yoktur.
-Panel bu durumu `UNCONFIGURED` olarak gosterir; legacy Tech Tree fiyatini veya rastgele `1 Essence / kill`
-varsayimini otomatik uretmez. Catalog ve drop sayilari onaylandiginda bu ayni yuzeyden tune edilir.
+Production Grave Essence kaynagi gercek dusman olumudur. Her olum `DifficultyProfileSO`
+`GraveEssenceDropChance` degeriyle deterministic bir roll atar; production baslangici `%10` ve basarili
+drop miktari `1`dir. Stress-test olumleri roll atmaz. Basarili event otomatik toplanir ve yalniz
+`GameManager.GrantGraveEssence` transaction kapisinda Meta Essence Gain yuzdesiyle birlestirilir.
+Difficulty Tuner ayni alanlari ve beklenen ortalama oldurme/drop cadence'ini gosterir.
 
 ### Council Runtime Contract
 

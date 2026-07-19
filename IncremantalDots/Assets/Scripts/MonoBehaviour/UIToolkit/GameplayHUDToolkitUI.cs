@@ -174,6 +174,7 @@ namespace DeadWalls
             if (_inputMode != null)
                 _inputMode.ModeChanged -= HandleInputModeChanged;
 
+            CancelHeartAnimations();
             ReleasePause();
             RestoreLegacyCanvas();
         }
@@ -763,6 +764,7 @@ namespace DeadWalls
             float height = evt.newRect.height;
             _root.EnableInClassList("is-compact", width < 1500f || width / Mathf.Max(1f, height) < 1.55f);
             _root.EnableInClassList("is-short", height < 720f);
+            RelayoutHeartGraph();
         }
 
         private static void FocusFirstAction(VisualElement root)

@@ -120,6 +120,44 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void CastleHeartConquestLayout_UsesReadableAsymmetricClustersInsideCanvas()
+        {
+            Vector2 center = new Vector2(740f, 410f);
+            var positions = new Vector2[20];
+            int index = 0;
+
+            foreach (HeartNodeBranch branch in Enum.GetValues(typeof(HeartNodeBranch)))
+            {
+                Vector2 first = HeartConquestLayoutUtility.GetPosition(branch, 1, center);
+                Vector2 second = HeartConquestLayoutUtility.GetPosition(branch, 2, center);
+                Vector2 third = HeartConquestLayoutUtility.GetPosition(branch, 3, center);
+                Vector2 firstSegment = second - first;
+                Vector2 secondSegment = third - second;
+                float cross = firstSegment.x * secondSegment.y - firstSegment.y * secondSegment.x;
+                Assert.That(Mathf.Abs(cross), Is.GreaterThan(1000f),
+                    $"{branch} ilk uc node'da duz bir raya donmemeli.");
+
+                for (int depth = 1; depth <= 5; depth++)
+                {
+                    Vector2 position = HeartConquestLayoutUtility.GetPosition(branch, depth, center);
+                    Assert.That(position.x, Is.InRange(70f, 1410f), $"{branch}:{depth} X canvas disinda.");
+                    Assert.That(position.y, Is.InRange(90f, 730f), $"{branch}:{depth} Y canvas disinda.");
+                    positions[index++] = position;
+                }
+            }
+
+            for (int left = 0; left < positions.Length; left++)
+            {
+                Assert.That(Vector2.Distance(center, positions[left]), Is.GreaterThan(140f));
+                for (int right = left + 1; right < positions.Length; right++)
+                {
+                    Assert.That(Vector2.Distance(positions[left], positions[right]), Is.GreaterThan(120f),
+                        $"Node merkezleri fazla yakin: {left} ve {right}.");
+                }
+            }
+        }
+
+        [Test]
         public void ArrowEconomy_HeartBonusesAffectRuntimeButNotPaidUpgradeLevels()
         {
             var tuning = MobileEconomyPriceTuningUtility.Default;

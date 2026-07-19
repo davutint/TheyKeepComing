@@ -12,7 +12,7 @@ mutating or deleting the legacy `TechTreeCatalogSO` assets.
 - Runtime graph owner: `HeartGraphGenerator` + `HeartGraphValidator`
 - Purchase/effect owner: `HeartPurchaseService` + `HeartEffectPipeline`
 - Scene binding: serialized `GameManager.heartCatalog`
-- Player-facing presentation: `HeartScreenUI`
+- Player-facing presentation: `GameplayHUDToolkitUI.CastleHeart`
 
 The generated root remains system-owned as `castle_heart`; no authored asset may reuse that Id.
 Basic Archer and dormant Moat routes are deliberately excluded. All purchase costs are Grave
@@ -28,3 +28,11 @@ Catalog version changes are compatibility boundaries. Increment `CatalogVersion`
 intentional launch-catalog change should reject an older exact graph instead of silently mapping it.
 Presentation copy and provenance-only edits do not require a version bump when node Id, effect,
 cost, conflict and generator eligibility remain identical.
+
+## Pixel icon ownership
+
+`GetIconPath(nodeId)` is the persistent icon source of truth for all 37 production nodes. Paths
+are selected from `Assets/RPG Icons Pixel Art` by inspected visual family and actual image content,
+not by filename guesswork. Both full catalog rebuild and the narrow
+**Apply Castle Heart Pixel Icon Map** command use the same mapping, so a future rebuild cannot
+silently restore the retired generated HUD icons.

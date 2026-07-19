@@ -6,7 +6,7 @@
 gecislerini ve UI'nin tuketecegi hidden-safe presentation contract'ini kurar. Yeni node
 secmez, graph edge'i uretmez ve hicbir reveal aksiyonunda RNG kullanmaz.
 
-Production runtime `HeartNodeCatalog.asset` ve `HeartScreenUI` ile bu servisi doğrudan kullanır;
+Production runtime `HeartNodeCatalog.asset` ve `GameplayHUDToolkitUI.CastleHeart` ile bu servisi doğrudan kullanır;
 legacy `TechTreeUI` progression sahibi değildir.
 
 ## Visibility owner'i
@@ -18,10 +18,10 @@ legacy `TechTreeUI` progression sahibi değildir.
 - `RevealAfterFirstPurchase`: source node'un gorunur ve satin alinmis oldugunu dogrular;
   `previousLevel == 0` iken outgoing komsulari reveal eder. `0 -> 10` gibi bulk ilk
   alimlar da ayni kurala dahildir.
-- Catalog-aware overload, açılan hedef Keystone ise exact ve simetrik partnerini aynı
-  transaction'da reveal eder. Böylece oyuncu karar anında iki tarafı birlikte görür.
-- `NormalizeKeystonePairVisibility`, eski exact save'de tek tarafı reveal edilmiş çiftin yalnız
-  partner visibility'sini deterministic tamamlar; seed, edge, level ve lock state'ine dokunmaz.
+- Catalog-aware overload da aynı direct-child kuralını kullanır; node tipi reveal kapsamını
+  genişletmez.
+- `NormalizeKeystonePairVisibility`, eski exact save'lerden kalan `KeystoneConflict` kilitlerini
+  temizler; hiçbir hidden node'u reveal etmez ve seed/edge/level state'ine dokunmaz.
 - Repeatable node'un `previousLevel > 0` olan sonraki transaction'lari yeni node reveal etmez.
 - Hidden veya level `0` node reveal kaynagi olamaz.
 - Cross-link, generator tarafindan onceden uretilmis normal bir outgoing edge oldugu icin
@@ -47,7 +47,6 @@ Hidden node presentation'i yalniz su bilgileri tasir:
 - Branch.
 - Depth.
 - Damar/edge topology'si.
-- Gorunur bir Keystone tarafindan hedefleniyorsa conflict marker.
 
 Hidden node'da internal node Id, title, description, icon, type, rarity, level, lock ve
 effect listesi bos/null kalir. Presentation edge'leri de internal node Id yerine yalniz
@@ -82,29 +81,20 @@ Unlock/Evolution davranis effect'leri numeric soft-cap gerektirmedigi icin contr
 tarafindan dogrudan cozulur: archer unlock, spellcasting unlock, split shot ve burning
 ground.
 
-## Keystone presentation istisnasi
+## Normal teknoloji ağacı semantiği
 
-Remote exact-node gizliliginin Blueprint'teki acik istisnasi gorunur Keystone'dur.
-Gorunur Keystone presentation'i:
-
-- Karsi secimin player-facing basligini.
-- Kapanacak safe slot'u.
-- Karsi secimin su anda revealed olup olmadigini.
-- Satin alimda lock uygulanacagini veya secim yapildiysa hedefin zaten bu Keystone
-  tarafindan kilitlendigini.
-- Gorunur source Keystone'un karsi secim tarafindan kilitlenmis olup olmadigini.
-
-tasir. Internal partner node Id'si presentation'a verilmez. Production runtime'da exact
-Keystone çifti birlikte revealed olur; `IsKeystoneConflictTarget` hidden-safe eski graph
-okumaları için korunur. Gerçek lock mutation'i E4 purchase pipeline'inin sorumluluğudur.
+`Keystone` catalog sınıflandırması eski içerik uyumluluğu için korunur; production progression
+mutually-exclusive değildir. Bir teknoloji yalnız authored outgoing edge hedeflerini açar. Uzak
+eş başlığı, conflict marker veya kapanacak yol presentation'a taşınmaz. Böylece bütün yollar
+önkoşulları ve Grave Essence maliyetleri karşılandığında aynı run içinde geliştirilebilir.
 
 ## Persistence ve UI siniri
 
 - Graph node listesi ve hidden icerik E2'de run basinda kesinlesir.
 - E3 reveal servisinde yeni RNG yoktur.
 - `GeneratedRunGraph` exact save/load baglantisi guncel schema v11 ile aktiftir. Continue node,
-  edge, seed, level ve lock state'ini exact kurar; yalnız eski tek-taraf-visible Keystone
-  snapshot'ını çift görünürlüğü contract'ına normalize eder.
+  edge, seed ve level state'ini exact kurar; eski `KeystoneConflict` lock alanları normal ağaç
+  semantiğine normalize edilir.
 - Numeric effect'in effective runtime hesabini E4 resolver'i saglar; production runtime
   adapter binding'i E5'te tamamlanir.
 - Prefabda branch damari, hidden slot, tooltip ve Keystone conflict cizimi E5 Heart UI
@@ -120,10 +110,10 @@ baglidir.
 - Initial root komsulari reveal, remote node'lar hidden.
 - Initialization idempotency.
 - Ilk satin alimda, bulk `0 -> N` dahil, yalniz outgoing komsular ve controlled cross-link reveal.
-- Catalog-aware ilk reveal'da exact Keystone partnerinin aynı anda görünmesi.
-- Eski exact save görünürlüğü normalize edilirken seed/edge/level/lock state'inin korunması.
+- Catalog-aware ilk reveal'da da yalnız direct child görünmesi.
+- Eski exact save kilidi temizlenirken hidden visibility, seed, edge ve level state'inin korunması.
 - Sonraki repeatable level'da reveal yok.
 - Hidden node Id/title/effect redaction ve safe-slot edge topology.
 - Numeric resolver yoksa fail-closed; resolver varsa gercek current/after/delta satiri.
-- Gorunur Keystone'un partner basligi, safe conflict slotu ve pre/post-purchase lock durumu.
+- Gorunur eski Keystone sinifinin hidden partner bilgisi veya conflict metadata'si tasimamasi.
 - Hidden veya satin alinmamis node'un reveal kaynagi olamamasi.

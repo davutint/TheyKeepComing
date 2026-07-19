@@ -171,6 +171,7 @@ namespace DeadWalls
         public event System.Action OnWaveCompleted;
         public event System.Action OnWaveChanged;
         public event System.Action OnGameStateChanged;
+        public event System.Action<GraveEssenceDropEvent> OnGraveEssenceDropped;
 
         public bool CanBuyMetaUpgrade(MetaUpgradeSO upgrade)
         {
@@ -238,6 +239,7 @@ namespace DeadWalls
 
             EnsureHeartRuntime();
             ReadECSData();
+            ConsumeGraveEssenceDropEvents();
             TryEmitRunStartedTelemetry();
             TryEmitPhaseChangedTelemetry();
             TickAbilityCooldowns();
@@ -961,8 +963,8 @@ namespace DeadWalls
         }
 
         /// <summary>
-        /// Gelecekteki enemy drop owner'inin kullanacagi run-ici kazanc kapisi.
-        /// Bu paket herhangi bir drop kaynagi veya oran uydurmaz.
+        /// ZombieDeathSystem drop event'lerinin kullandigi canonical run-ici kazanc kapisi.
+        /// Meta Essence gain yuzdesi ve fractional remainder burada tek kez uygulanir.
         /// </summary>
         public bool GrantGraveEssence(long amount)
         {
@@ -1017,6 +1019,42 @@ namespace DeadWalls
             HeartEssence = essence;
             OnGameStateChanged?.Invoke();
             return true;
+        }
+
+        private void ConsumeGraveEssenceDropEvents()
+        {
+            if (!CanAccessEntityManager())
+                return;
+
+            using EntityQuery query = _entityManager.CreateEntityQuery(
+                ComponentType.ReadOnly<GraveEssenceDropEvent>());
+            if (query.IsEmpty)
+                return;
+
+            using NativeArray<GraveEssenceDropEvent> drops =
+                query.ToComponentDataArray<GraveEssenceDropEvent>(Allocator.Temp);
+            _entityManager.DestroyEntity(query);
+
+            long totalBaseAmount = 0L;
+            for (int i = 0; i < drops.Length; i++)
+            {
+                int amount = drops[i].Amount;
+                if (amount <= 0)
+                    continue;
+
+                totalBaseAmount = totalBaseAmount > long.MaxValue - amount
+                    ? long.MaxValue
+                    : totalBaseAmount + amount;
+            }
+
+            if (totalBaseAmount <= 0L || !GrantGraveEssence(totalBaseAmount))
+                return;
+
+            for (int i = 0; i < drops.Length; i++)
+            {
+                if (drops[i].Amount > 0)
+                    OnGraveEssenceDropped?.Invoke(drops[i]);
+            }
         }
 
         private bool TryGetGraveEssence(out Entity entity, out GraveEssence essence)
