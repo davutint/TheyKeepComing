@@ -388,3 +388,46 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - Main Menu, Settings, gameplay HUD, Economy, Barracks, Arrow Supply, Castle Heart, Pause ve Game Over/Meta Shop yüzeyleri PC ve compact/touch düzenlerinde canlı olarak incelendi; overlap, ikinci teknoloji ağacı veya player-facing geçici placeholder bulunmadı.
 - `NewGameScene` temiz production boot turunda Console `0 error` verdi; yalnız mevcut, kritik olmayan ECS update-order uyarısı raporlandı. `git diff --check` temiz geçti.
 - P10 kapatıldı; Post-V1 tracker kapsamı `10/10 - %100` tamamlandı.
+
+### 2026-07-20 - Early-run balance cohort harness ve 10+10 policy smoke audit'i
+
+- Legacy TechCatalog satin alan eski long-run botu current Castle Heart/Grave Essence,
+  finite Arrow, housing, worker investment, archer ve combat ability kontratlarina tasindi.
+- `Balanced / Economy / Defense` policy'leri, otomatik fresh-meta restart state machine'i,
+  run-bazli detay CSV'leri ve tek cohort summary CSV'si eklendi.
+- Economy policy ileri `15` yatak hedefini ve Wood/uretim allocation'ini; Defense policy
+  okcu/Arrow/Stone surekliligini ve savas odakli Heart secimini uygular. Defense, yuksek
+  oncelikli node icin Grave Essence biriktirir ve Fireball acildiginda canli hedefe kullanir.
+- Ayni release fingerprint'i ile Economy `10/10` ve duzeltilmis Defense `10/10` fresh run
+  tamamlandi: combined median `Day 7`, dagilim `18x Day 7 + 2x Day 8`, Day 3/6 erisimi
+  `%100`, Day 12 erisimi `%0` oldu. Economy ortalama Food `720`, Defense `632,4` verdi.
+- Launch authority minimumu `100` fresh run oldugu icin bu `20` run yalniz smoke/discovery
+  kanitidir; `DefaultDifficulty` veya diger production tuning asset'leri otomatik degistirilmedi.
+- Unity compilation ve final Console `0 error` gecti; kullanici meta kaydi SHA-256 eslesmesiyle
+  test oncesi haline geri yuklendi.
+- Bu audit tamamlanmis P10 kapsaminin post-closure olcum aracidir; ana gorev paydasi ve
+  statuleri degismedi. Post-V1 tracker `10/10 - %100` tamamlanmis olarak korunur.
+
+### 2026-07-20 - 100-run simulator proxy cohort ve production ramp revizyonu
+
+- Ayni pre-tuning fingerprint'te `50 Economy + 50 Defense` fresh-meta bot run'i tamamlandi.
+  Combined median `Day 7`; dagilim `2x Day 6 + 67x Day 7 + 31x Day 8`, Reach Day 3/6 `%100`
+  ve Reach Day 12 `%0` oldu. Economy median `Day 7`, Defense median `Day 8` verdi.
+- Kaynak davranisi policy farkini dogruladi: Economy ortalama Food `717,32`, Archer `6`, Repair
+  `5,68`; Defense Food `690,52`, Archer `7`, Repair `10,08`, Fireball `3,54` verdi.
+- Median hedef araliginda olmasina ragmen tum sonuclarin Day 6-8'e yigilmasi nedeniyle yalniz
+  production night/cycle rampi revize edildi: Night curve `(1,.60) (3,.75) (5,.86) (7,.95)
+  (60,.95)`, `SpawnBatchGrowthPerCycle .15 -> .10`. HP, damage, ekonomi, phase sureleri ve
+  base intensity'ler aynen korundu.
+- Post-tuning directional smoke ayni yeni fingerprint'te `10 Economy + 10 Defense` tamamlandi:
+  Economy `10x Day 8`, Defense `6x Day 8 + 4x Day 9`. Day 9+ upper-tail acildi ve policy farki
+  korundu.
+- Bot kohortu tuning proxy kanitidir; provider-independent Reach Day hedeflerinin kabulu gercek
+  player `fresh completed` telemetry minimumlariyla yapilacaktir. Bot sonucu launch telemetry
+  kabulu olarak yazilmadi.
+- Exact production contract, setup default'u, tuning kilavuzu ve test beklentileri yeni baseline'a
+  senkronlandi. Bu post-closure tuning calismasi ana gorev paydasini degistirmez; Post-V1 tracker
+  `10/10 - %100` tamamlanmis olarak korunur.
+- Targeted EditMode tuning kontratlari `9/9`, tam EditMode `440/440`, tam PlayMode
+  `95 pass + 2 explicit skip` ve `0 fail` gecti. Unity Console `0 error`; kullanici meta kaydi
+  test oncesi SHA-256 ile birebir geri yuklendi ve zombie-limit tercihi `Balanced 900` korundu.

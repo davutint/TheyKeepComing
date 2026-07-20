@@ -26,11 +26,11 @@ namespace DeadWalls.Tests
 
             Assert.That(profile, Is.Not.Null);
             AssertCurve(profile.NightIntensityByDay,
-                new Vector2(1f, 0.5f),
-                new Vector2(3f, 0.7f),
-                new Vector2(5f, 0.85f),
-                new Vector2(7f, 1f),
-                new Vector2(60f, 1f));
+                new Vector2(1f, 0.6f),
+                new Vector2(3f, 0.75f),
+                new Vector2(5f, 0.86f),
+                new Vector2(7f, 0.95f),
+                new Vector2(60f, 0.95f));
             AssertCurve(profile.ZombieHpMultByDay,
                 new Vector2(1f, 1f), new Vector2(60f, 1f));
             AssertCurve(profile.SpawnBatchMultByDay,
@@ -42,7 +42,7 @@ namespace DeadWalls.Tests
             Assert.That(profile.ZombieBaseDamage, Is.EqualTo(5f));
             Assert.That(profile.ZombieDamagePerCycle, Is.Zero);
             Assert.That(profile.SpawnBatchSize, Is.EqualTo(2));
-            Assert.That(profile.SpawnBatchGrowthPerCycle, Is.EqualTo(0.15f));
+            Assert.That(profile.SpawnBatchGrowthPerCycle, Is.EqualTo(0.10f));
             Assert.That(profile.MaxSpawnBatch, Is.EqualTo(16));
             Assert.That(profile.MaxAliveZombies, Is.EqualTo(900));
             Assert.That(profile.BaseSpawnInterval, Is.EqualTo(0.95f));

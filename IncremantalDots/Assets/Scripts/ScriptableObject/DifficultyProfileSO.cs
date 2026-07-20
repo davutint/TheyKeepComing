@@ -62,7 +62,7 @@ namespace DeadWalls
         public float ZombieBaseDamage = 5f;
         public float ZombieDamagePerCycle = 0f;
         public int SpawnBatchSize = 2;
-        public float SpawnBatchGrowthPerCycle = 0.15f;
+        public float SpawnBatchGrowthPerCycle = 0.10f;
         [Tooltip("Bir frame'de backlog'dan sahaya aktarilabilecek ve tek intervalde talep edilebilecek quantity tavani.")]
         public int MaxSpawnBatch = 16;
         [Tooltip("Normal run active zombie tavani. Cap doluyken yeni talep silinmez; PendingEnemies backlog'unda korunur.")]

@@ -760,7 +760,7 @@ namespace DeadWalls.Tests
             var samples = entityManager.GetBuffer<DifficultyDaySample>(configEntity);
 
             Assert.That(config.ZombieHpGrowthPerCycle, Is.Zero);
-            Assert.That(config.SpawnBatchGrowthPerCycle, Is.EqualTo(0.15f));
+            Assert.That(config.SpawnBatchGrowthPerCycle, Is.EqualTo(0.10f));
             Assert.That(config.MaxSpawnBatch, Is.EqualTo(16));
             Assert.That(config.WallBaseHp, Is.EqualTo(350f));
             Assert.That(config.RepairBaseStoneCost, Is.EqualTo(50));
@@ -804,7 +804,7 @@ namespace DeadWalls.Tests
             Assert.That(economyPriceTuning.WorkerEfficiencyPercentPerLevel,
                 Is.EqualTo(0.10f));
             Assert.That(samples.Length, Is.EqualTo(60));
-            Assert.That(samples[0].NightIntensityMult, Is.EqualTo(0.5f));
+            Assert.That(samples[0].NightIntensityMult, Is.EqualTo(0.6f));
             Assert.That(samples[4].BloodMoonIntensityMult, Is.EqualTo(1f));
 
             Entity enemyCatalogEntity = entityManager.CreateEntityQuery(

@@ -27,7 +27,7 @@ Production telemetry target fingerprint:
 
 | Eğri | Exact key'ler |
 |---|---|
-| Night intensity | `(1, 0.50)`, `(3, 0.70)`, `(5, 0.85)`, `(7, 1.00)`, `(60, 1.00)` |
+| Night intensity | `(1, 0.60)`, `(3, 0.75)`, `(5, 0.86)`, `(7, 0.95)`, `(60, 0.95)` |
 | Zombie HP | `(1, 1.00)`, `(60, 1.00)`; V1 quantity-only, stat scaling yok |
 | Spawn batch | `(1, 1.00)`, `(60, 1.00)` |
 
@@ -39,7 +39,7 @@ Production telemetry target fingerprint:
 |---|---:|
 | Zombie base HP / damage | `20 / 5` |
 | HP / damage cycle growth | `0 / 0` |
-| Base batch / cycle growth | `2 / 0.15` |
+| Base batch / cycle growth | `2 / 0.10` |
 | Frame drain ve batch üst sınırı | `16` |
 | Active enemy cap | `900` |
 | Base / minimum interval | `0.95s / 0.35s` |
@@ -48,6 +48,24 @@ Production telemetry target fingerprint:
 Demand, base batch × phase intensity × cycle growth × day batch multiplier ile üretilir. Active
 cap dolduğunda talep silinmez; `PendingEnemies` backlog'unda korunur ve boşalan kapasiteye frame
 başına en fazla `16` entity ile akar. Boss, elite veya ikinci enemy type yoktur.
+
+### 2026-07-20 simulator proxy review
+
+Bot kohortlari player telemetry kabulunun yerine gecmez; yalniz ayni build icinde tuning yonunu
+ve policy ayrimini tekrar edilebilir bicimde sinamak icin kullanilir.
+
+- Degisiklik oncesi ayni fingerprint'te `50 Economy + 50 Defense` fresh-meta run tamamlandi:
+  combined median `Day 7`, dagilim `2x Day 6 + 67x Day 7 + 31x Day 8`, Reach Day 3/6 `%100`,
+  Reach Day 12 `%0`. Economy median `Day 7`, Defense median `Day 8` oldu.
+- Bu dar `Day 7-8` duvarini genisletmek icin Day 1 night carpani `0.50 -> 0.60` ile erken risk
+  artirildi; Day 7+ night carpani `1.00 -> 0.95` ve cycle batch growth `0.15 -> 0.10` ile guclu
+  run'larin gec rampi yumusatildi. HP, damage, ekonomi, phase sureleri ve base intensity'ler
+  degistirilmedi.
+- Degisiklik sonrasi `10 Economy + 10 Defense` directional smoke: Economy `10x Day 8`, Defense
+  `6x Day 8 + 4x Day 9`. Eski sample'daki `Day 9+ = %0` duvari kirildi ve savunma politikasinin
+  avantaji daha okunur hale geldi.
+- Provider-independent hedef tablosundaki kabul oranlari yine gercek `fresh completed` player
+  telemetry kohortuna aittir. Bot smoke sonucu bu oranlari gecmis saymaz.
 
 ## Economy ve Wall
 

@@ -2150,17 +2150,18 @@ namespace DeadWalls
                 return profile;
 
             profile = ScriptableObject.CreateInstance<DifficultyProfileSO>();
-            // Erken olum kamburu duzeltmesi (M-A): ilk geceler kademeli siddet rampi
+            // 100-run launch kohortu: erken risk + Day 7 sonrasi yumusatilmis night rampi.
             profile.NightIntensityByDay = new AnimationCurve(
-                new Keyframe(1f, 0.60f), new Keyframe(2f, 0.80f),
-                new Keyframe(3f, 1.00f), new Keyframe(60f, 1.00f));
+                new Keyframe(1f, 0.60f), new Keyframe(3f, 0.75f),
+                new Keyframe(5f, 0.86f), new Keyframe(7f, 0.95f),
+                new Keyframe(60f, 0.95f));
             profile.ZombieHpMultByDay = AnimationCurve.Constant(1f, 60f, 1f);
             profile.SpawnBatchMultByDay = AnimationCurve.Constant(1f, 60f, 1f);
             profile.SampleDays = 60;
             // V1 quantity-only difficulty: stat growth yok, baski kalabaliktan gelir.
             profile.ZombieHpGrowthPerCycle = 0f;
             profile.ZombieDamagePerCycle = 0f;
-            profile.SpawnBatchGrowthPerCycle = 0.15f;
+            profile.SpawnBatchGrowthPerCycle = 0.10f;
             profile.MaxSpawnBatch = 16;
             // Erken kurtulus yolu: repair'in stone bagimliligi dusuruldu
             profile.WallBaseHp = 350f;

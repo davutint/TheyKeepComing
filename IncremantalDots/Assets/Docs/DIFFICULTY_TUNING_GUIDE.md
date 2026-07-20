@@ -50,9 +50,9 @@ Deger adi ezberleme — asagidaki tablodan hissini bul, hangi ayara dokunacagini
 - **Dikey eksen = CARPAN**: `1.0 = etkisiz`, `0.5 = o gun yari siddet`, `1.5 = o gun %50 daha sert`.
 - Egri uzerine **cift tikla** = yeni nokta (keyframe); noktayi surukle = degeri degistir;
   noktaya sag tik = silme/teget secenekleri.
-- Ornek (su anki default Gece Siddeti): `(gun1, 0.5) (gun3, 0.7) (gun5, 0.85) (gun7, 1.0)`
-  -> ilk hafta kademeli isinma, sonra tam siddet. "Olum bandini" DAY 2-3'ten DAY 6+'ya
-  tasiyan degisiklik BUYDU (kod degil, bu dort nokta).
+- Ornek (su anki default Gece Siddeti): `(gun1, 0.60) (gun3, 0.75) (gun5, 0.86) (gun7, 0.95)`
+  -> ilk gecede gercek risk verir, Day 7 sonrasinda ise night temposunu `0.95`te tutarak
+  guclu run'larin tek bir sert esige yigilmasini azaltir.
 - Iki aktif spawn egrisi var: **Gece Siddeti** (Night/Dusk-end temposu) ve
   **Spawn Batch** (gunun quantity carpani). **Zombi HP** egrisi V1 quantity-only runtime'da
   dormant legacy alandir; oyunu degistirmez.
@@ -66,7 +66,7 @@ Deger adi ezberleme — asagidaki tablodan hissini bul, hangi ayara dokunacagini
 | ZombieHpGrowthPerCycle | V1 quantity-only runtime'da dormant legacy alan | 0 | Degistirme |
 | ZombieBaseDamage / DamagePerCycle | Base damage Enemy Definition owner'indadir; gunluk artis dormant | 5 / 0 | Definition uzerinden tune et |
 | SpawnBatchSize | Tek seferde dogan zombi (taban) | 2 | 1-4 |
-| SpawnBatchGrowthPerCycle | Kalabaligin gunluk buyumesi (0.15 = gun basi +%15) | 0.15 | 0.05-0.25 |
+| SpawnBatchGrowthPerCycle | Kalabaligin gunluk buyumesi (0.10 = gun basi +%10) | 0.10 | 0.05-0.25 |
 | MaxSpawnBatch | Tek dogumda ust sinir | 16 | 8-24 |
 | MaxAliveZombies | Sahadaki toplam zombi tavani (PC performans sigortasi) | 900 | Player capture + soak kanitina gore |
 | BaseSpawnInterval / MinSpawnInterval | Dogumlar arasi sure (taban / taban asagi kirpma) | 0.95 / 0.35 | - |
@@ -226,14 +226,26 @@ Council state'ini yeni bir owner yaratmadan aggregate olarak okur.
 
 ## 5. Olcum botu nasil yorumlanir?
 
-1. Play'e gir -> RUN BOT (profili uygular, temiz kosu baslatir, 3x hizda oynar).
-2. Kosular bitince "Yenile" -> histogram:
+1. Play'e gir -> RUN BOT veya `Window/DeadWalls/Long Run Simulator` icinden policy/cohort sec.
+2. Bot current run kontratini kullanir: worker ve yatak yonetir, finite Arrow stogunu refill
+   eder, surdurulebilir okcu alir, gorunur Castle Heart node'larini Grave Essence ile acar,
+   repair/Council ve acilan combat ability'lerini kullanir. Legacy TechCatalog satin almaz.
+3. `Economy`, Wood/uretim ve 15 kisilik ileri yatak hazirligini; `Defense`, okcu/Arrow/Stone
+   surekliligini ve savas etkili Heart node'larini onceler. Defense, yuksek oncelikli node icin
+   Grave Essence biriktirir; sirf ucuz diye alakasiz node satin almaz.
+4. Her fresh run ayri `longrun_*` CSV'sine, final karsilastirma satiri tek `cohort_*` CSV'sine
+   yazilir. Her safaktaki detay CSV; kaynak/uretim, population/yatak, okcu, Heart/Grave Essence,
+   Arrow, canli zombi, wall, ability ve tam harcama sayaclarini birlikte raporlar.
+5. Kosular bitince "Yenile" -> histogram:
    - **KIRMIZI cubuklar** = olum gunleri (nerede yigilmis?)
    - **YESIL serit** = olmeden ulasilan en yuksek gun
-3. HEDEF: olumler **DAY 8-15** bandinda yigilsin (1x hizda ~8-15 dakikalik kosu, C1 kriteri).
+6. Launch tuning kaynagindaki HEDEF: fresh-run median olum **DAY 6-12** bandinda olsun.
    - Kirmizilar solda yigildiysa -> erken oyun cok sert (rampi uzat/dusur)
    - Hic kirmizi yoksa ve yesil hep 20'deyse -> gec oyun cok kolay (BatchGrowth/MaxBatch artir)
-4. Bot "ortalama oyuncu"dur, optimal degil — senin elle oynayisin 2-4 gun daha uzun gidebilir.
+7. Tek bot kosusu veya 10+10 policy smoke sample'i tuning karari degildir. Farkli fingerprint
+   sonuclari ayni kohorta karistirilmaz; simulator tuning karari en az 100 ayni-build fresh-meta
+   bot run'i ister. Launch telemetry hedeflerinin kabulu ise botla yapilmaz; target asset'teki
+   `MinimumSamples` kadar gercek `fresh completed` player telemetry kohortu gerekir.
 
 ## 6. Bilinmesi gereken iki tuzak
 
