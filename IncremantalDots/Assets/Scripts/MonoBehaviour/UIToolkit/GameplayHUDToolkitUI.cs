@@ -663,6 +663,7 @@ namespace DeadWalls
             {
                 RebuildHeartGraph(true);
                 ResolveRuntimeOwners();
+                PlayHeartPanelOpenSfx();
                 _onboardingLegacy?.NotifyHeartSurfaceOpenedByPlayer();
             }
 

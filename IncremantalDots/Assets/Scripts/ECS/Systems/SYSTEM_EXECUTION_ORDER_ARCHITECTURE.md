@@ -202,9 +202,10 @@ Presentation tarafinda `SpriteAnimationSystem` UV rect hesaplarini yapar.
 
 - `CurrentHP <= 0` ile ilk kez Dead'e gecen her Skeleton ayni frame `GameStateData.TotalKills`
   degerini tam bir artirir ve `Amount=1` `SoulPickupEvent` uretir.
-- Ayni frame olenlerin SFX'i tek aggregate event'te `Multiplicity` ile tasinir; ayri ses yigilmaz.
+- Owner karariyla Skeleton olumu bireysel veya aggregate SFX uretmez. Isitsel odul feedback'i
+  Soul/Essence UI ucusunun kendi HUD anchor'ina varisinda sunum katmaninda verilir.
 - Death animasyonuna geciste enableable `DeathTimer` job icinde dogrudan yazilip acilir;
-  ECB yalniz Soul presentation event'lerini Simulation sonunda yayimlamak icin kullanilir.
+  ECB Soul ve basarili roll varsa Grave Essence presentation event'lerini Simulation sonunda yayimlar.
 
 ### DamageCleanupSystem
 

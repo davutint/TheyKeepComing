@@ -1,0 +1,72 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28d22dfba688b0a498c08ced4707fb54, type: 3}
+  m_Name: DeadWallsAudioProfile
+  m_EditorClassIdentifier: DeadWalls::DeadWalls.DeadWallsAudioProfileSO
+  OverrideCombat: 1
+  OverrideInterface: 1
+  OverrideCastleHeart: 1
+  OverrideAmbience: 0
+  OverrideMenuMusic: 0
+  EnableCurrencyArrival: 1
+  ArrowShootClips:
+  - {fileID: 8300000, guid: 15bd2dcd1864f254d8e5b03caeccfefc, type: 3}
+  - {fileID: 8300000, guid: 997e82f83bde33147bcda568b4adbdea, type: 3}
+  - {fileID: 8300000, guid: 77c8da351a2175e4ca0dbcb72c9df06b, type: 3}
+  - {fileID: 8300000, guid: 089831ea992387d449dd5da4b6a276e1, type: 3}
+  ArrowHitClip: {fileID: 8300000, guid: 8edc45c5002444e509e47fecb336aae9, type: 3}
+  FrostHitClip: {fileID: 8300000, guid: 07121959d141245fdb59a0f76ddfd68c, type: 3}
+  WallHitClips:
+  - {fileID: 8300000, guid: ddf01e3419c067c4bb7fe73f894a26ac, type: 3}
+  - {fileID: 8300000, guid: 388c8c5fb89d17f44a5b73a543cdc5fc, type: 3}
+  - {fileID: 8300000, guid: 38ce89c7c4e044141afb31e7817ec587, type: 3}
+  FireballBlastClip: {fileID: 8300000, guid: e5b8a067c8733714aad88da09472bfe6, type: 3}
+  FireballCastCandidate: {fileID: 8300000, guid: 2912a67ca72961948b5d819dba9396a3, type: 3}
+  FireballBurnTailCandidate: {fileID: 8300000, guid: 7a89f0ecd040d60448c5f64bee9bb55b, type: 3}
+  EmergencyRepairCandidate: {fileID: 8300000, guid: aba92af5c0552024fa7b5aad36b90236, type: 3}
+  RallyCandidate: {fileID: 8300000, guid: c224c42290f046f4dac79f3a52f41dd7, type: 3}
+  UiClickClip: {fileID: 8300000, guid: 627a0b7a34fb1424fa77d4d4902f4a62, type: 3}
+  UiSuccessClip: {fileID: 8300000, guid: bc63d040170f3c4438b7a8090724f094, type: 3}
+  UiFailClip: {fileID: 8300000, guid: 488f41c562b1c1c4fb8cb4e30ba4f9ea, type: 3}
+  DeathStingClip: {fileID: 8300000, guid: 70f9d3223a2f54990959c06e1d6d513c, type: 3}
+  UiClickVolume: 0.3
+  UiSuccessVolume: 0.44
+  UiFailVolume: 0.38
+  DeathStingVolume: 0.7
+  HeartResearchClip: {fileID: 8300000, guid: 4a85286005489c04e8dcb378c921367c, type: 3}
+  HeartRevealClip: {fileID: 8300000, guid: 29b56f80cda21401f89a9ee4b159ff92, type: 3}
+  HeartDeniedClip: {fileID: 8300000, guid: 925ed7778ac2f43dcbc21c28843a0163, type: 3}
+  HeartPanelOpenClip: {fileID: 8300000, guid: 9f2f8e892180d4b18a7aaf8b689712d5, type: 3}
+  HeartResearchVolume: 0.66
+  HeartRevealVolume: 0.58
+  HeartDeniedVolume: 0.62
+  HeartPanelOpenVolume: 0.5
+  SoulArrivalClip: {fileID: 8300000, guid: b2a0ee1c9b5f0ab49b83128090495e1f, type: 3}
+  EssenceArrivalClip: {fileID: 8300000, guid: 94a2b23b027747347af62c36ace7f8ee, type: 3}
+  SoulArrivalVolume: 0.22
+  EssenceArrivalVolume: 0.3
+  CurrencyArrivalMinInterval: 0.12
+  CurrencyAmountVolumeGain: 0.055
+  CurrencyAmountPitchGain: 0.012
+  NightLoop: {fileID: 8300000, guid: 1105612c71178474b849857051a7a30c, type: 3}
+  DuskRiser: {fileID: 8300000, guid: 15b621ee2b9194227ae94db04fd4493f, type: 3}
+  DawnCue: {fileID: 8300000, guid: 585d79d005a51440a8068220a52159ca, type: 3}
+  NightHordeLoop: {fileID: 8300000, guid: 77b9c069e763b4452948d42109394d2d, type: 3}
+  WorkerFoleyClips:
+  - {fileID: 8300000, guid: 162a90fc55b3548fdb611e6a86eee576, type: 3}
+  - {fileID: 8300000, guid: dce27cee2edec49ba93a792fae4c105c, type: 3}
+  - {fileID: 8300000, guid: a15e7d4332542433a8c8d71540cd0c6f, type: 3}
+  - {fileID: 8300000, guid: 0dd2569d1b69449e0ae35fab72a5e5b0, type: 3}
+  MenuMusic: {fileID: 8300000, guid: ddd1c2aac932f9642a2e6cab4aff6c2b, type: 3}
+  DayMusicCandidate: {fileID: 8300000, guid: 0125b69cce519114691fff9575beb36b, type: 3}
+  NightMusicCandidate: {fileID: 8300000, guid: 137d908b34d545546bf6f6e96a392637, type: 3}
+  IntenseNightMusicCandidate: {fileID: 8300000, guid: c0b49fc6441d7534282775e23c5c6763, type: 3}

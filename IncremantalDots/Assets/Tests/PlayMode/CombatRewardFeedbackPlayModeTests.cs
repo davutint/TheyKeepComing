@@ -256,6 +256,11 @@ namespace DeadWalls.Tests
             GameplayHUDToolkitUI toolkit = Object.FindFirstObjectByType<GameplayHUDToolkitUI>();
             Assert.That(toolkit, Is.Not.Null);
             long baselineEssenceFlights = toolkit.TotalGraveEssenceFlightsStartedCount;
+            long baselineCurrencyArrivalSfx = toolkit.TotalCurrencyArrivalSfxPlayedCount;
+            CombatFeedbackBridge combatFeedback =
+                Object.FindFirstObjectByType<CombatFeedbackBridge>();
+            Assert.That(combatFeedback, Is.Not.Null);
+            long baselineCombatSfx = combatFeedback.TotalSfxPlayedCount;
             Time.timeScale = 0f;
 
             for (int frame = 0; frame < 8; frame++)
@@ -275,6 +280,20 @@ namespace DeadWalls.Tests
                 toolkit.TotalGraveEssenceFlightsStartedCount - baselineEssenceFlights,
                 Is.EqualTo(1L),
                 "Basarili Grave Essence drop'u olum konumundan HUD sayacina bir UI Toolkit ucusu baslatmali.");
+            Assert.That(combatFeedback.TotalSfxPlayedCount, Is.EqualTo(baselineCombatSfx),
+                "Skeleton olumu bireysel/aggregate death SFX uretmemeli.");
+
+            for (int frame = 0;
+                 frame < 180
+                 && toolkit.TotalCurrencyArrivalSfxPlayedCount - baselineCurrencyArrivalSfx < 2L;
+                 frame++)
+            {
+                yield return null;
+            }
+            Assert.That(
+                toolkit.TotalCurrencyArrivalSfxPlayedCount - baselineCurrencyArrivalSfx,
+                Is.EqualTo(2L),
+                "Soul ve Essence gameplay odul aninda degil, kendi HUD ucuslari tamamlandiginda birer bounded ses uretmeli.");
 
             using EntityQuery soulEventQuery = entityManager.CreateEntityQuery(
                 typeof(SoulPickupEvent));

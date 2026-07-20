@@ -28,7 +28,9 @@
 - Grave Essence kazanimi `ZombieDeathSystem -> GraveEssenceDropEvent -> GameManager` hattini
   kullanir. Yalniz basarili gercek-dusman drop'u, olum konumundan production UI Toolkit
   `graveEssenceAnchor` sayacina mor flight baslatir; development grant'leri sahte drop gorseli
-  uretmez. HUD sayisi kanonik `GameManager.GraveEssenceAmount` bakiyesinden okunur.
+  uretmez. HUD sayisi kanonik `GameManager.GraveEssenceAmount` bakiyesinden okunur. Soul ve
+  Essence sesleri gameplay odulu yazilirken veya world'de dogarken degil, ilgili flight HUD
+  anchor'ina vardiginda oynar; ayni penceredeki miktar tek bounded cue'ya toplanir.
 
 ## V1 Event Kaynaklari
 
@@ -40,17 +42,17 @@
 - `ArrowHitSystem`: her gercek Basic/Rapid/Frost isabeti icin ayrica tam uygulanan hasari
   tasiyan bir `CombatDamageNumberEvent` uretir.
 - `DamageApplySystem`: savunma hasari alindiginda `CastleHit`.
-- `ZombieDeathSystem` (M-D): olum aninda `ZombieDeath` aggregate SFX ve Skeleton basina
-  tam bir `SoulPickupEvent` uretir. Ayrica ayarlanmis olasilik basariliysa olum pozisyonunu
-  tasiyan `GraveEssenceDropEvent` uretir; stress-test olumleri bu odulu uretmez.
+- `ZombieDeathSystem`: Skeleton basina tam bir `SoulPickupEvent` uretir. Ayrica ayarlanmis
+  olasilik basariliysa olum pozisyonunu tasiyan `GraveEssenceDropEvent` uretir; stress-test
+  olumleri bu odulu uretmez. Owner karariyla bireysel veya aggregate death SFX uretmez.
 - `FireballStrikeSystem` (M-D): patlama aninda `FireballBlast` SFX (gorsel SpellCastUI'da)
   ve Primary/SecondBlast/BurningGroundPulse basina gercek uygulanan hasar event'i uretir.
 
 ## M-D His Katmani (2026-07-08)
 
-- **SFX clip'leri** "RPG Magic Sound Effects Pack 3 [ELEMENTAL]" paketinden setup tool ile
-  YALNIZ-BOSSA atanir (owner atamasi korunur): ZombieDeathClips (MONSTER_Hurt 1-2, random),
-  FireballBlastClip (FireMagic_Explosion02), ArrowHitClip, FrostHitClip.
+- **SFX clip'leri** eski scene alanlarini fallback olarak korur. `DeadWallsAudioProfileSO`
+  ilgili kategori override'i aciksa ArrowShoot, Arrow/Frost impact, Wall impact ve Fireball
+  blast secimini merkezi profilden yapar. Zombie death klibi veya runtime route'u yoktur.
 - **Kale hasar hissi:** `PlaySfx` icinde rate-limit'ten GECEN her CastleHit,
   `CameraShaker.Instance.AddTrauma` (trauma^2 Perlin offset, base pozisyon cache) +
   `DamageFlashUI.Instance.Flash` (tam-ekran kirmizi vuru; Canvas'in son sibling'i) tetikler.
@@ -101,7 +103,7 @@ castle impact prefab'i atayabilir (yalniz-bossa kurali onu korur).
   played ve dropped hit VFX telemetrisini public read-only property'lerle sunar.
 - ParticleSystem pool type basina varsayilan `24`, frame basi maksimum particle oynatma `24`.
 - SFX playback frame basi en fazla `4` cue ile sinirlidir. Oncelik Fireball, Castle, Frost,
-  ArrowShoot, ZombieDeath ve ArrowHit sirasidir; kritik cue'lar kalabalikta kaybolmaz.
+  ArrowShoot ve ArrowHit sirasidir; kritik cue'lar kalabalikta kaybolmaz.
 - Bir frame'deki butun `ArrowShoot` event'leri ortalama world position'da tek salvo cue'ya
   donusturulur. Logaritmik gain `0.62` tavanda kalir; pitch en fazla `%8` alcalir.
 - Shoot rate-limit Day/Dusk/Dawn icin `0.075s`, Night icin `0.12s` alt siniridir.

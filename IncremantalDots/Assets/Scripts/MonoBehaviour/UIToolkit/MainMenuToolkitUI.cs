@@ -219,7 +219,17 @@ namespace DeadWalls
         {
             GameObject ambienceObject = GameObject.Find("MenuAmbience");
             _ambienceSource = ambienceObject != null ? ambienceObject.GetComponent<AudioSource>() : null;
-            if (_ambienceSource == null || _ambienceSource.clip == null)
+            if (_ambienceSource == null)
+                return;
+
+            DeadWallsAudioProfileSO audioProfile = DeadWallsAudioProfileSO.LoadDefault();
+            if (audioProfile != null
+                && audioProfile.OverrideMenuMusic
+                && audioProfile.MenuMusic != null)
+            {
+                _ambienceSource.clip = audioProfile.MenuMusic;
+            }
+            if (_ambienceSource.clip == null)
                 return;
 
             _ambienceSource.loop = true;

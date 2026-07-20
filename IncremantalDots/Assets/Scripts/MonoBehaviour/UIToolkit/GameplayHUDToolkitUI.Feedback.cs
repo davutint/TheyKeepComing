@@ -14,6 +14,8 @@ namespace DeadWalls
             public Vector2 Control;
             public Vector2 Target;
             public VisualElement TargetAnchor;
+            public int Amount;
+            public bool IsEssence;
             public float Elapsed;
             public float Duration;
         }
@@ -25,6 +27,15 @@ namespace DeadWalls
         private string _lastWaveToast = string.Empty;
 
         public long TotalGraveEssenceFlightsStartedCount { get; private set; }
+        public long TotalCurrencyArrivalSfxPlayedCount { get; private set; }
+        public int LastCurrencyArrivalSfxAmount { get; private set; }
+
+        private AudioSource _soulArrivalAudioSource;
+        private AudioSource _essenceArrivalAudioSource;
+        private int _pendingSoulArrivalAmount;
+        private int _pendingEssenceArrivalAmount;
+        private float _nextSoulArrivalSfxAt;
+        private float _nextEssenceArrivalSfxAt;
 
         private void RefreshFeedbackPresentation()
         {
@@ -125,6 +136,8 @@ namespace DeadWalls
                 Control = control,
                 Target = target,
                 TargetAnchor = targetAnchor,
+                Amount = amount,
+                IsEssence = isEssence,
                 Elapsed = 0f,
                 Duration = 0.82f
             });
@@ -159,7 +172,97 @@ namespace DeadWalls
                     arrivalAnchor.schedule.Execute(
                         () => arrivalAnchor.RemoveFromClassList("is-arriving")).StartingIn(180);
                 }
+                QueueCurrencyArrival(flight.IsEssence, flight.Amount);
             }
+
+            FlushCurrencyArrivalAudio();
+        }
+
+        private void QueueCurrencyArrival(bool isEssence, int amount)
+        {
+            if (amount <= 0)
+                return;
+
+            if (isEssence)
+                _pendingEssenceArrivalAmount = SaturatingAdd(_pendingEssenceArrivalAmount, amount);
+            else
+                _pendingSoulArrivalAmount = SaturatingAdd(_pendingSoulArrivalAmount, amount);
+        }
+
+        private void FlushCurrencyArrivalAudio()
+        {
+            DeadWallsAudioProfileSO profile = DeadWallsAudioProfileSO.LoadDefault();
+            if (profile == null || !profile.EnableCurrencyArrival)
+            {
+                _pendingSoulArrivalAmount = 0;
+                _pendingEssenceArrivalAmount = 0;
+                return;
+            }
+
+            float now = Time.unscaledTime;
+            TryPlayCurrencyArrival(
+                profile.EssenceArrivalClip,
+                ref _pendingEssenceArrivalAmount,
+                profile.EssenceArrivalVolume,
+                profile,
+                now,
+                ref _nextEssenceArrivalSfxAt,
+                ref _essenceArrivalAudioSource,
+                "EssenceArrivalAudio");
+            TryPlayCurrencyArrival(
+                profile.SoulArrivalClip,
+                ref _pendingSoulArrivalAmount,
+                profile.SoulArrivalVolume,
+                profile,
+                now,
+                ref _nextSoulArrivalSfxAt,
+                ref _soulArrivalAudioSource,
+                "SoulArrivalAudio");
+        }
+
+        private void TryPlayCurrencyArrival(
+            AudioClip clip,
+            ref int pendingAmount,
+            float baseVolume,
+            DeadWallsAudioProfileSO profile,
+            float now,
+            ref float nextAllowedTime,
+            ref AudioSource source,
+            string sourceName)
+        {
+            if (clip == null || pendingAmount <= 0 || now < nextAllowedTime)
+                return;
+
+            int amount = pendingAmount;
+            pendingAmount = 0;
+            nextAllowedTime = now + Mathf.Max(0.02f, profile.CurrencyArrivalMinInterval);
+
+            if (source == null)
+            {
+                var sourceObject = new GameObject(sourceName);
+                sourceObject.transform.SetParent(transform, false);
+                source = sourceObject.AddComponent<AudioSource>();
+                source.playOnAwake = false;
+                source.loop = false;
+                source.spatialBlend = 0f;
+            }
+
+            source.pitch = CurrencyArrivalAudioPolicy.ResolvePitch(
+                amount,
+                profile.CurrencyAmountPitchGain);
+            float volume = CurrencyArrivalAudioPolicy.ResolveVolume(
+                amount,
+                baseVolume,
+                profile.CurrencyAmountVolumeGain);
+            source.PlayOneShot(clip, volume * SoundSettings.SfxVolume);
+            TotalCurrencyArrivalSfxPlayedCount++;
+            LastCurrencyArrivalSfxAmount = amount;
+        }
+
+        private static int SaturatingAdd(int current, int amount)
+        {
+            long total = (long)Mathf.Max(0, current) + Mathf.Max(0, amount);
+            return total >= int.MaxValue ? int.MaxValue : (int)total;
         }
 
         private VisualElement GetSoulFlightElement(out Label amountLabel)
@@ -197,6 +300,12 @@ namespace DeadWalls
             for (int i = _soulFlights.Count - 1; i >= 0; i--)
                 ReleaseSoulFlightElement(_soulFlights[i].Element);
             _soulFlights.Clear();
+            _pendingSoulArrivalAmount = 0;
+            _pendingEssenceArrivalAmount = 0;
+            if (_soulArrivalAudioSource != null)
+                _soulArrivalAudioSource.Stop();
+            if (_essenceArrivalAudioSource != null)
+                _essenceArrivalAudioSource.Stop();
         }
     }
 }

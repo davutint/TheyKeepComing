@@ -86,3 +86,6 @@ ServerData
 # DeadWalls imported GUI source PSD files; runtime uses exported sprite assets.
 IncremantalDots/Assets/Artsystack - Fantasy RPG GUI/PSD File/
 IncremantalDots/Assets/Artsystack - Fantasy RPG GUI/PSD File.meta
+
+# DeadWalls local audio libraries; curated profile clips are force-tracked explicitly.
+IncremantalDots/Assets/Sounds/**

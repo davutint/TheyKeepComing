@@ -16,9 +16,14 @@
 4. `GameManager` event'leri tek frame'de toplar ve toplam taban miktari yalniz
    `GrantGraveEssence(long)` kapisina verir.
 5. Meta Essence Gain yuzdesi ve exact fractional accumulator canonical grant transaction'inda uygulanir.
+6. UI Toolkit flight'i olum pozisyonundan Essence HUD anchor'ina gider. Ses varsa yalniz
+   varista oynar; drop roll'u veya wallet transaction'i ses playback'ine bagli degildir.
 
 Bu ayrim, Burst ECS death path'ini Mono wallet/meta owner'indan ayirir. Soul her olumde `1` kalirken
 Grave Essence yalniz basarili roll'larda uretilir.
+
+Skeleton olumu kendi basina SFX uretmez. Soul ve Grave Essence farkli HUD hedeflerine
+ulastiklarinda farkli, miktara gore logaritmik fakat bounded arrival cue'lari kullanir.
 
 ## Determinizm ve Guvenlik
 

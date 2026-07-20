@@ -15,6 +15,9 @@ namespace DeadWalls
     /// </summary>
     public class AmbientAudioController : MonoBehaviour
     {
+        [Header("Central Audio Profile")]
+        public DeadWallsAudioProfileSO AudioProfile;
+
         [Header("Clips (setup atar)")]
         public AudioClip NightLoop;
         public AudioClip DuskRiser;
@@ -141,6 +144,10 @@ namespace DeadWalls
             }
 
             var cycle = gm.ContinuousSiegeCycle;
+            AudioClip resolvedNightLoop = ResolveProfileClip(p => p.NightLoop, NightLoop);
+            AudioClip resolvedDuskRiser = ResolveProfileClip(p => p.DuskRiser, DuskRiser);
+            AudioClip resolvedDawnCue = ResolveProfileClip(p => p.DawnCue, DawnCue);
+            AudioClip resolvedNightHordeLoop = ResolveProfileClip(p => p.NightHordeLoop, NightHordeLoop);
             bool nightSide = cycle.Phase == SiegeCyclePhase.Dusk || cycle.Phase == SiegeCyclePhase.Night;
             NightHordeActivity01 = ResolveNightHordeActivity01(
                 cycle.Phase,
@@ -148,17 +155,17 @@ namespace DeadWalls
                 gm.WaveState.ZombiesAlive);
             bool nightHordeEligible = cycle.Phase == SiegeCyclePhase.Night
                 && NightHordeActivity01 > 0f
-                && NightHordeLoop != null
+                && resolvedNightHordeLoop != null
                 && !gm.GameState.IsGameOver;
             _targetNightHordeVolume = nightHordeEligible
                 ? NightHordeVolume * NightHordeActivity01 * SoundSettings.AmbienceVolume
                 : 0f;
             if (nightHordeEligible && _nightHordeSource != null)
             {
-                if (_nightHordeSource.clip != NightHordeLoop)
+                if (_nightHordeSource.clip != resolvedNightHordeLoop)
                 {
                     _nightHordeSource.Stop();
-                    _nightHordeSource.clip = NightHordeLoop;
+                    _nightHordeSource.clip = resolvedNightHordeLoop;
                 }
                 if (!_nightHordeSource.isPlaying)
                     _nightHordeSource.Play();
@@ -189,23 +196,23 @@ namespace DeadWalls
 
             bool phaseChanged = _hasObservedPhase && cycle.Phase != _lastPhase;
             if (phaseChanged && cycle.Phase == SiegeCyclePhase.Dusk
-                && DuskRiser != null && _phaseTransitionSource != null
+                && resolvedDuskRiser != null && _phaseTransitionSource != null
                 && !gm.GameState.IsGameOver)
             {
                 _phaseTransitionSource.pitch = DuskRiserPitch;
                 _phaseTransitionSource.PlayOneShot(
-                    DuskRiser,
+                    resolvedDuskRiser,
                     DuskRiserVolume * SoundSettings.AmbienceVolume);
                 DuskRiserPlayCount++;
             }
 
             if (phaseChanged && cycle.Phase == SiegeCyclePhase.Dawn
-                && DawnCue != null && _phaseTransitionSource != null
+                && resolvedDawnCue != null && _phaseTransitionSource != null
                 && !gm.GameState.IsGameOver)
             {
                 _phaseTransitionSource.pitch = DawnCuePitch;
                 _phaseTransitionSource.PlayOneShot(
-                    DawnCue,
+                    resolvedDawnCue,
                     DawnCueVolume * SoundSettings.AmbienceVolume);
                 DawnCuePlayCount++;
             }
@@ -217,7 +224,7 @@ namespace DeadWalls
             float targetVolume = 0f;
             if (nightSide && !gm.GameState.IsGameOver)
             {
-                targetClip = NightLoop;
+                targetClip = resolvedNightLoop;
                 targetVolume = NightVolume;
             }
 
@@ -273,14 +280,15 @@ namespace DeadWalls
 
         private void UpdateWorkerFoley()
         {
-            if (!_workerFoleyEligible || !HasWorkerFoleyClip())
+            AudioClip[] clips = ResolveWorkerFoleyClips();
+            if (!_workerFoleyEligible || !HasWorkerFoleyClip(clips))
                 return;
 
             _workerFoleyTimer -= Time.unscaledDeltaTime;
             if (_workerFoleyTimer > 0f)
                 return;
 
-            PlayNextWorkerFoley();
+            PlayNextWorkerFoley(clips);
             float interval = ResolveWorkerFoleyInterval(
                 GameManager.Instance != null
                     ? GameManager.Instance.GetResourceWorkers(EconomyFocusType.Balanced)
@@ -291,33 +299,33 @@ namespace DeadWalls
             _workerFoleyTimer = interval * cadenceVariation;
         }
 
-        private bool HasWorkerFoleyClip()
+        private static bool HasWorkerFoleyClip(AudioClip[] clips)
         {
-            if (WorkerFoleyClips == null)
+            if (clips == null)
                 return false;
 
-            for (int i = 0; i < WorkerFoleyClips.Length; i++)
+            for (int i = 0; i < clips.Length; i++)
             {
-                if (WorkerFoleyClips[i] != null)
+                if (clips[i] != null)
                     return true;
             }
             return false;
         }
 
-        private void PlayNextWorkerFoley()
+        private void PlayNextWorkerFoley(AudioClip[] clips)
         {
-            if (_workerFoleySource == null || WorkerFoleyClips == null || WorkerFoleyClips.Length == 0)
+            if (_workerFoleySource == null || clips == null || clips.Length == 0)
                 return;
 
             AudioClip clip = null;
-            for (int attempt = 0; attempt < WorkerFoleyClips.Length; attempt++)
+            for (int attempt = 0; attempt < clips.Length; attempt++)
             {
-                int index = (_workerClipCursor + attempt) % WorkerFoleyClips.Length;
-                if (WorkerFoleyClips[index] == null)
+                int index = (_workerClipCursor + attempt) % clips.Length;
+                if (clips[index] == null)
                     continue;
 
-                clip = WorkerFoleyClips[index];
-                _workerClipCursor = (index + 1) % WorkerFoleyClips.Length;
+                clip = clips[index];
+                _workerClipCursor = (index + 1) % clips.Length;
                 break;
             }
 
@@ -331,6 +339,33 @@ namespace DeadWalls
                 * SoundSettings.AmbienceVolume;
             _workerFoleySource.PlayOneShot(clip, volume);
             WorkerFoleyPlayCount++;
+        }
+
+        private AudioClip ResolveProfileClip(
+            System.Func<DeadWallsAudioProfileSO, AudioClip> selector,
+            AudioClip fallback)
+        {
+            DeadWallsAudioProfileSO profile = AudioProfile != null
+                ? AudioProfile
+                : DeadWallsAudioProfileSO.LoadDefault();
+            if (profile == null || !profile.OverrideAmbience)
+                return fallback;
+
+            AudioClip selected = selector(profile);
+            return selected != null ? selected : fallback;
+        }
+
+        private AudioClip[] ResolveWorkerFoleyClips()
+        {
+            DeadWallsAudioProfileSO profile = AudioProfile != null
+                ? AudioProfile
+                : DeadWallsAudioProfileSO.LoadDefault();
+            return profile != null
+                   && profile.OverrideAmbience
+                   && profile.WorkerFoleyClips != null
+                   && profile.WorkerFoleyClips.Length > 0
+                ? profile.WorkerFoleyClips
+                : WorkerFoleyClips;
         }
     }
 }

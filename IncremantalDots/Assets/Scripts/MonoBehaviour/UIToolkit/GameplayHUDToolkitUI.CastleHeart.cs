@@ -556,7 +556,7 @@ namespace DeadWalls
             if (result == null || !result.Succeeded)
             {
                 ResolveRuntimeOwners();
-                PlayHeartSfx(_heartLegacy != null ? _heartLegacy.DeniedClip : null, 0.82f);
+                PlayHeartDeniedSfx();
                 ShowPrimaryToast(result?.Message ?? "HEART RESEARCH BLOCKED");
                 RefreshHeartInspector(gm);
                 return;
@@ -566,9 +566,9 @@ namespace DeadWalls
                 _heartPendingRevealNodeIds.Add(result.NewlyRevealedNodeIds[i]);
 
             ResolveRuntimeOwners();
-            PlayHeartSfx(_heartLegacy != null ? _heartLegacy.BuyClip : null, 0.88f);
+            PlayHeartResearchSfx();
             if (result.NewlyRevealedNodeIds.Count > 0)
-                PlayHeartSfx(_heartLegacy != null ? _heartLegacy.RevealClip : null, 0.68f);
+                PlayHeartRevealSfx();
 
             ShowPrimaryToast(node.Level > 0
                 ? $"TECHNOLOGY UPGRADED  ·  LEVEL {result.Quote.NewLevel:N0}"
@@ -590,6 +590,50 @@ namespace DeadWalls
                 _heartAudioSource.playOnAwake = false;
             }
             _heartAudioSource.PlayOneShot(clip, volume * SoundSettings.SfxVolume);
+        }
+
+        private void PlayHeartResearchSfx()
+        {
+            DeadWallsAudioProfileSO profile = DeadWallsAudioProfileSO.LoadDefault();
+            bool useProfile = profile != null && profile.OverrideCastleHeart;
+            PlayHeartSfx(
+                useProfile && profile.HeartResearchClip != null
+                    ? profile.HeartResearchClip
+                    : _heartLegacy != null ? _heartLegacy.BuyClip : null,
+                useProfile ? profile.HeartResearchVolume : 0.88f);
+        }
+
+        private void PlayHeartRevealSfx()
+        {
+            DeadWallsAudioProfileSO profile = DeadWallsAudioProfileSO.LoadDefault();
+            bool useProfile = profile != null && profile.OverrideCastleHeart;
+            PlayHeartSfx(
+                useProfile && profile.HeartRevealClip != null
+                    ? profile.HeartRevealClip
+                    : _heartLegacy != null ? _heartLegacy.RevealClip : null,
+                useProfile ? profile.HeartRevealVolume : 0.68f);
+        }
+
+        private void PlayHeartDeniedSfx()
+        {
+            DeadWallsAudioProfileSO profile = DeadWallsAudioProfileSO.LoadDefault();
+            bool useProfile = profile != null && profile.OverrideCastleHeart;
+            PlayHeartSfx(
+                useProfile && profile.HeartDeniedClip != null
+                    ? profile.HeartDeniedClip
+                    : _heartLegacy != null ? _heartLegacy.DeniedClip : null,
+                useProfile ? profile.HeartDeniedVolume : 0.82f);
+        }
+
+        private void PlayHeartPanelOpenSfx()
+        {
+            DeadWallsAudioProfileSO profile = DeadWallsAudioProfileSO.LoadDefault();
+            bool useProfile = profile != null && profile.OverrideCastleHeart;
+            PlayHeartSfx(
+                useProfile && profile.HeartPanelOpenClip != null
+                    ? profile.HeartPanelOpenClip
+                    : _heartLegacy != null ? _heartLegacy.PanelOpenClip : null,
+                useProfile ? profile.HeartPanelOpenVolume : 0.52f);
         }
 
         private void ScheduleHeartRevealSequence(HashSet<string> revealSlots)

@@ -17,6 +17,9 @@ namespace DeadWalls
     {
         public static UiSoundFeedback Instance { get; private set; }
 
+        [Header("Central Audio Profile")]
+        public DeadWallsAudioProfileSO AudioProfile;
+
         [Header("Clips (setup tool yalniz-bossa atar)")]
         public AudioClip ClickClip;
         public AudioClip SuccessClip;
@@ -48,7 +51,7 @@ namespace DeadWalls
 
         private void Update()
         {
-            if (!Input.GetMouseButtonDown(0) || ClickClip == null || EventSystem.current == null)
+            if (!Input.GetMouseButtonDown(0) || EventSystem.current == null)
                 return;
 
             var pointer = new PointerEventData(EventSystem.current) { position = Input.mousePosition };
@@ -59,16 +62,60 @@ namespace DeadWalls
                 var button = result.gameObject.GetComponentInParent<Button>();
                 if (button != null && button.interactable)
                 {
-                    Play(ClickClip, ClickVolume);
+                    PlayClick();
                     return;
                 }
             }
         }
 
-        public void PlaySuccess() => Play(SuccessClip, SuccessVolume);
-        public void PlayFail() => Play(FailClip, FailVolume);
-        public void PlayDeathSting() => Play(DeathStingClip, StingVolume);
-        public void PlayClick() => Play(ClickClip, ClickVolume);
+        public void PlaySuccess()
+        {
+            DeadWallsAudioProfileSO profile = ResolveAudioProfile();
+            Play(profile != null && profile.OverrideInterface && profile.UiSuccessClip != null
+                    ? profile.UiSuccessClip
+                    : SuccessClip,
+                profile != null && profile.OverrideInterface
+                    ? profile.UiSuccessVolume
+                    : SuccessVolume);
+        }
+
+        public void PlayFail()
+        {
+            DeadWallsAudioProfileSO profile = ResolveAudioProfile();
+            Play(profile != null && profile.OverrideInterface && profile.UiFailClip != null
+                    ? profile.UiFailClip
+                    : FailClip,
+                profile != null && profile.OverrideInterface
+                    ? profile.UiFailVolume
+                    : FailVolume);
+        }
+
+        public void PlayDeathSting()
+        {
+            DeadWallsAudioProfileSO profile = ResolveAudioProfile();
+            Play(profile != null && profile.OverrideInterface && profile.DeathStingClip != null
+                    ? profile.DeathStingClip
+                    : DeathStingClip,
+                profile != null && profile.OverrideInterface
+                    ? profile.DeathStingVolume
+                    : StingVolume);
+        }
+
+        public void PlayClick()
+        {
+            DeadWallsAudioProfileSO profile = ResolveAudioProfile();
+            Play(profile != null && profile.OverrideInterface && profile.UiClickClip != null
+                    ? profile.UiClickClip
+                    : ClickClip,
+                profile != null && profile.OverrideInterface
+                    ? profile.UiClickVolume
+                    : ClickVolume);
+        }
+
+        private DeadWallsAudioProfileSO ResolveAudioProfile()
+        {
+            return AudioProfile != null ? AudioProfile : DeadWallsAudioProfileSO.LoadDefault();
+        }
 
         private void Play(AudioClip clip, float volume)
         {

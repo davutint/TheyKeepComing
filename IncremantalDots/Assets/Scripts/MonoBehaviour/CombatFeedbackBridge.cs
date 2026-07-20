@@ -12,6 +12,9 @@ namespace DeadWalls
 {
     public class CombatFeedbackBridge : MonoBehaviour
     {
+        [Header("Central Audio Profile")]
+        public DeadWallsAudioProfileSO AudioProfile;
+
         [Header("VFX Prefabs")]
         public GameObject ArrowMuzzlePrefab;
         public GameObject ArrowHitPrefab;
@@ -24,7 +27,6 @@ namespace DeadWalls
         public AudioClip ArrowHitClip;
         public AudioClip FrostHitClip;
         public AudioClip CastleHitClip;
-        public AudioClip[] ZombieDeathClips;
         public AudioClip FireballBlastClip;
 
         [Header("Hit Flipbook")]
@@ -84,7 +86,6 @@ namespace DeadWalls
         public float NightShootSfxMinInterval = 0.12f;
         public float HitSfxMinInterval = 0.08f;
         public float CastleHitSfxMinInterval = 0.18f;
-        public float ZombieDeathSfxMinInterval = 0.09f;
         public float FireballBlastSfxMinInterval = 0.2f;
         [Range(0f, 1f)] public float MaxArcherSalvoVolume = 0.62f;
         [Range(0f, 0.2f)] public float ArcherSalvoPitchDepth = 0.08f;
@@ -131,7 +132,6 @@ namespace DeadWalls
             CombatSfxType.CastleHit,
             CombatSfxType.FrostHit,
             CombatSfxType.ArrowShoot,
-            CombatSfxType.ZombieDeath,
             CombatSfxType.ArrowHit
         };
 
@@ -1399,15 +1399,28 @@ namespace DeadWalls
             if (type == CombatSfxType.ArrowShoot)
                 return GetRandomArrowShootClip();
 
+            // Owner karari: Skeleton/zombie olumleri bireysel ses uretmez. Enum degeri
+            // serialized event uyumlulugu icin korunur fakat runtime'da daima sessizdir.
             if (type == CombatSfxType.ZombieDeath)
-                return GetRandomClip(ZombieDeathClips);
+                return null;
+
+            DeadWallsAudioProfileSO profile = ResolveAudioProfile();
+            bool useProfile = profile != null && profile.OverrideCombat;
 
             return type switch
             {
-                CombatSfxType.ArrowHit => ArrowHitClip,
-                CombatSfxType.FrostHit => FrostHitClip,
-                CombatSfxType.CastleHit => CastleHitClip,
-                CombatSfxType.FireballBlast => FireballBlastClip,
+                CombatSfxType.ArrowHit => useProfile && profile.ArrowHitClip != null
+                    ? profile.ArrowHitClip
+                    : ArrowHitClip,
+                CombatSfxType.FrostHit => useProfile && profile.FrostHitClip != null
+                    ? profile.FrostHitClip
+                    : FrostHitClip,
+                CombatSfxType.CastleHit => useProfile
+                    ? GetRandomClip(profile.WallHitClips) ?? CastleHitClip
+                    : CastleHitClip,
+                CombatSfxType.FireballBlast => useProfile && profile.FireballBlastClip != null
+                    ? profile.FireballBlastClip
+                    : FireballBlastClip,
                 _ => null
             };
         }
@@ -1430,6 +1443,14 @@ namespace DeadWalls
 
         private AudioClip GetRandomArrowShootClip()
         {
+            DeadWallsAudioProfileSO profile = ResolveAudioProfile();
+            if (profile != null && profile.OverrideCombat)
+            {
+                AudioClip profiled = GetRandomClip(profile.ArrowShootClips);
+                if (profiled != null)
+                    return profiled;
+            }
+
             if (ArrowShootClips != null && ArrowShootClips.Length > 0)
             {
                 int startIndex = UnityEngine.Random.Range(0, ArrowShootClips.Length);
@@ -1442,6 +1463,11 @@ namespace DeadWalls
             }
 
             return ArrowShootClip;
+        }
+
+        private DeadWallsAudioProfileSO ResolveAudioProfile()
+        {
+            return AudioProfile != null ? AudioProfile : DeadWallsAudioProfileSO.LoadDefault();
         }
 
         private static bool IsHitFlipbookType(CombatVfxType type)
@@ -1474,7 +1500,6 @@ namespace DeadWalls
                 CombatSfxType.ArrowHit => HitSfxMinInterval,
                 CombatSfxType.FrostHit => HitSfxMinInterval,
                 CombatSfxType.CastleHit => CastleHitSfxMinInterval,
-                CombatSfxType.ZombieDeath => ZombieDeathSfxMinInterval,
                 CombatSfxType.FireballBlast => FireballBlastSfxMinInterval,
                 _ => 0.05f
             };

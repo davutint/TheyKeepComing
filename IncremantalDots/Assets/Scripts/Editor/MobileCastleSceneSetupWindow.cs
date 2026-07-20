@@ -2911,15 +2911,8 @@ namespace DeadWalls
             bridge.VfxSortingLayer = "Wall";
             bridge.VfxSortingOrder = 12;
 
-            // M-D his katmani: yeni SFX clip'leri (RPG Magic ELEMENTAL paketi; yalniz-bossa ata)
-            if (bridge.ZombieDeathClips == null || bridge.ZombieDeathClips.Length == 0)
-            {
-                bridge.ZombieDeathClips = new[]
-                {
-                    LoadSfx("UI, Pads, Enchantments and Misc/RPG3_MONSTER_Hurt01.wav"),
-                    LoadSfx("UI, Pads, Enchantments and Misc/RPG3_MONSTER_Hurt02.wav"),
-                };
-            }
+            // Skeleton olumleri owner karariyla sessizdir. Odul geri bildirimi Soul/Essence
+            // ucusunun HUD'a varisinda merkezi audio profili tarafindan verilir.
             if (bridge.FireballBlastClip == null)
                 bridge.FireballBlastClip = LoadSfx("Fire Magic/RPG3_FireMagic_Explosion02.wav");
             if (bridge.ArrowHitClip == null)

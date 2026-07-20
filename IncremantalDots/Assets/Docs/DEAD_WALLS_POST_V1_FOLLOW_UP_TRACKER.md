@@ -451,3 +451,24 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
   Essence flight sayaci runtime'da dogrulandi. Unity Console `0 error`, `git diff --check` temizdir.
 - Bu post-closure UI polish calismasi ana gorev paydasini degistirmez; Post-V1 tracker
   `10/10 - %100` tamamlanmis olarak korunur.
+
+### 2026-07-20 - Merkezi Audio Director ve currency-arrival ses polish'i
+
+- `Assets/Resources/DeadWallsAudioProfile.asset`, Combat, Interface, Castle Heart, Currency,
+  Ambience ve audition-only music/ability adaylarinin tek merkezi ses profili olarak eklendi.
+- `Tools > Dead Walls > Audio Director`; kategori override, clip/array atama, preview/stop ve
+  curated-default kurulumuyla scene/prefab kopyasi gerektirmeyen A/B akisi saglar.
+- Gamemaster paketinden uyumlu bow, wall, Fireball, UI ve currency aileleri profile secildi;
+  mevcut Arrow/Frost impact, Heart book/reveal/lock ve game-over sting spesifik fallback'leri
+  korundu. Biug menu/day/night parcalari audition adayi olarak hazirlandi fakat music/ambience
+  override'lari owner oyun icinde dinleyene kadar varsayilan kapali tutuldu.
+- Owner karariyla `ZombieDeathSystem` artik bireysel veya aggregate Skeleton death SFX event'i
+  uretmez; bridge'de serialized enum uyumlulugu korunurken bu tip daima sessizdir.
+- Soul ve Grave Essence sesi gameplay transaction/drop aninda degil, UI Toolkit flight'i kendi
+  HUD anchor'ina vardiginda oynar. Ayni penceredeki miktar logaritmik volume/pitch ve kesin tavanla
+  tek cue'ya toplanir; Soul ve Essence ayri rate-limit/source kullanir.
+- Audio Director profile kurulumunda eksik asset raporlamadi; Editor preview/stop komutlari ve
+  Unity compilation Console `0 error` ile calisti. Targeted EditMode `19/19`, targeted PlayMode
+  `5/5` gecti; death-SFX yoklugu ile iki currency'nin varis aninda ses uretmesi canli test edildi.
+- Bu post-closure audio polish calismasi ana gorev paydasini degistirmez; Post-V1 tracker
+  `10/10 - %100` tamamlanmis olarak korunur.

@@ -98,13 +98,10 @@ namespace DeadWalls
             public void Execute()
             {
                 int deathCount = 0;
-                float3 representativePosition = float3.zero;
                 GameStateData gameState = GameStateLookup[GameStateEntity];
                 int baseKills = math.max(0, gameState.TotalKills);
                 while (DeathPositions.TryDequeue(out float3 position))
                 {
-                    if (deathCount == 0)
-                        representativePosition = position;
                     deathCount++;
 
                     Entity soulEvent = ECB.CreateEntity();
@@ -142,16 +139,6 @@ namespace DeadWalls
                     ? int.MaxValue
                     : (int)totalKills;
                 GameStateLookup[GameStateEntity] = gameState;
-
-                Entity sfxEvent = ECB.CreateEntity();
-                ECB.AddComponent(sfxEvent, new CombatSfxEvent
-                {
-                    Position = representativePosition,
-                    Type = CombatSfxType.ZombieDeath,
-                    Volume = 0.35f,
-                    Pitch = 1f,
-                    Multiplicity = deathCount
-                });
             }
         }
     }
