@@ -253,6 +253,9 @@ namespace DeadWalls.Tests
             SoulCounterUI soulCounter = Object.FindFirstObjectByType<SoulCounterUI>();
             Assert.That(soulCounter, Is.Not.Null);
             long baselineVisuals = soulCounter.TotalSoulVisualsPlayedCount;
+            GameplayHUDToolkitUI toolkit = Object.FindFirstObjectByType<GameplayHUDToolkitUI>();
+            Assert.That(toolkit, Is.Not.Null);
+            long baselineEssenceFlights = toolkit.TotalGraveEssenceFlightsStartedCount;
             Time.timeScale = 0f;
 
             for (int frame = 0; frame < 8; frame++)
@@ -268,6 +271,10 @@ namespace DeadWalls.Tests
             Assert.That(GameManager.Instance.GraveEssenceAmount,
                 Is.GreaterThanOrEqualTo(baselineEssence + 1L),
                 "%100 test roll'u canonical GrantGraveEssence kapisindan en az +1 vermeli.");
+            Assert.That(
+                toolkit.TotalGraveEssenceFlightsStartedCount - baselineEssenceFlights,
+                Is.EqualTo(1L),
+                "Basarili Grave Essence drop'u olum konumundan HUD sayacina bir UI Toolkit ucusu baslatmali.");
 
             using EntityQuery soulEventQuery = entityManager.CreateEntityQuery(
                 typeof(SoulPickupEvent));

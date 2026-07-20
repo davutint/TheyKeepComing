@@ -25,6 +25,10 @@
   `SoulPickupEvent` olum konumundan HUD sayacina birebir gider. Yogun ayni-frame olumlerinde
   event'ler konumsal hucrelerde en fazla `96` sunuma toplanir; her ucus `+N` miktarini tasir,
   toplam Soul miktari aynen korunur ve varista sayac pulse'i uretir.
+- Grave Essence kazanimi `ZombieDeathSystem -> GraveEssenceDropEvent -> GameManager` hattini
+  kullanir. Yalniz basarili gercek-dusman drop'u, olum konumundan production UI Toolkit
+  `graveEssenceAnchor` sayacina mor flight baslatir; development grant'leri sahte drop gorseli
+  uretmez. HUD sayisi kanonik `GameManager.GraveEssenceAmount` bakiyesinden okunur.
 
 ## V1 Event Kaynaklari
 
@@ -37,7 +41,8 @@
   tasiyan bir `CombatDamageNumberEvent` uretir.
 - `DamageApplySystem`: savunma hasari alindiginda `CastleHit`.
 - `ZombieDeathSystem` (M-D): olum aninda `ZombieDeath` aggregate SFX ve Skeleton basina
-  tam bir `SoulPickupEvent` uretir.
+  tam bir `SoulPickupEvent` uretir. Ayrica ayarlanmis olasilik basariliysa olum pozisyonunu
+  tasiyan `GraveEssenceDropEvent` uretir; stress-test olumleri bu odulu uretmez.
 - `FireballStrikeSystem` (M-D): patlama aninda `FireballBlast` SFX (gorsel SpellCastUI'da)
   ve Primary/SecondBlast/BurningGroundPulse basina gercek uygulanan hasar event'i uretir.
 

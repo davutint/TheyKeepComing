@@ -96,14 +96,15 @@ namespace DeadWalls
         private VisualElement _cycleArc;
         private VisualElement _cycleCelestial;
         private VisualElement _cycleCelestialMarker;
-        private readonly VisualElement[] _phaseSegments = new VisualElement[4];
-        private readonly VisualElement[] _phaseProgressFills = new VisualElement[4];
         private Label _wallValue;
         private VisualElement _wallTrack;
         private VisualElement _wallProgress;
         private Label _hostilesValue;
         private Label _arrowValue;
         private Label _arrowDetail;
+        private Label _arrowDockValue;
+        private Label _graveEssenceHudValue;
+        private VisualElement _graveEssenceAnchor;
         private Label _soulValue;
         private VisualElement _soulAnchor;
 
@@ -138,6 +139,7 @@ namespace DeadWalls
         private float _primaryToastUntil;
         private float _secondaryToastUntil;
         private IDisposable _pauseLease;
+        private GameManager _graveEssenceDropOwner;
         private bool _initialized;
 
         private void Awake()
@@ -171,6 +173,7 @@ namespace DeadWalls
         private void OnDisable()
         {
             SoulCounterUI.ToolkitSoulPickupRequested -= HandleSoulPickupRequested;
+            BindGraveEssenceDropOwner(null);
             if (_inputMode != null)
                 _inputMode.ModeChanged -= HandleInputModeChanged;
 
@@ -199,6 +202,7 @@ namespace DeadWalls
             GameManager gm = GameManager.Instance;
             if (gm == null)
                 return;
+            BindGraveEssenceDropOwner(gm);
 
             float now = Time.unscaledTime;
             if (now >= _nextTextRefresh)
@@ -259,20 +263,15 @@ namespace DeadWalls
             _cycleArc = Q<VisualElement>("cycleArc");
             _cycleCelestial = Q<VisualElement>("cycleCelestial");
             _cycleCelestialMarker = Q<VisualElement>("cycleCelestialMarker");
-            _phaseSegments[0] = Q<VisualElement>("phaseDay");
-            _phaseSegments[1] = Q<VisualElement>("phaseDusk");
-            _phaseSegments[2] = Q<VisualElement>("phaseNight");
-            _phaseSegments[3] = Q<VisualElement>("phaseDawn");
-            _phaseProgressFills[0] = Q<VisualElement>("phaseDayFill");
-            _phaseProgressFills[1] = Q<VisualElement>("phaseDuskFill");
-            _phaseProgressFills[2] = Q<VisualElement>("phaseNightFill");
-            _phaseProgressFills[3] = Q<VisualElement>("phaseDawnFill");
             _wallValue = Q<Label>("wallValue");
             _wallTrack = Q<VisualElement>("defensePanel");
             _wallProgress = Q<VisualElement>("wallProgress");
             _hostilesValue = Q<Label>("hostilesValue");
             _arrowValue = Q<Label>("arrowValue");
             _arrowDetail = Q<Label>("arrowDetail");
+            _arrowDockValue = Q<Label>("arrowDockValue");
+            _graveEssenceHudValue = Q<Label>("graveEssenceHudValue");
+            _graveEssenceAnchor = Q<VisualElement>("graveEssenceAnchor");
             _soulValue = Q<Label>("soulValue");
             _soulAnchor = Q<VisualElement>("soulAnchor");
 
@@ -345,6 +344,19 @@ namespace DeadWalls
             _uiManager ??= FindFirstObjectByType<UIManager>(FindObjectsInactive.Include);
         }
 
+        private void BindGraveEssenceDropOwner(GameManager owner)
+        {
+            if (ReferenceEquals(_graveEssenceDropOwner, owner))
+                return;
+
+            if (!ReferenceEquals(_graveEssenceDropOwner, null))
+                _graveEssenceDropOwner.OnGraveEssenceDropped -= HandleGraveEssenceDropped;
+
+            _graveEssenceDropOwner = owner;
+            if (_graveEssenceDropOwner != null)
+                _graveEssenceDropOwner.OnGraveEssenceDropped += HandleGraveEssenceDropped;
+        }
+
         private void SuppressLegacyCanvas()
         {
             if (_legacySuppressed || _legacyHud == null)
@@ -392,6 +404,7 @@ namespace DeadWalls
             GameManager gm = GameManager.Instance;
             if (gm == null)
                 return;
+            BindGraveEssenceDropOwner(gm);
 
             RefreshHudText(gm);
             RefreshHudContinuous(gm);
@@ -428,7 +441,11 @@ namespace DeadWalls
             _arrowValue.text = $"{arrows:N0} / {capacity:N0} ARROWS";
             _arrowDetail.text = arrowRatio <= 0.25f ? "LOW SUPPLY" : "SUPPLY READY";
             _arrowDetail.EnableInClassList("is-negative", arrowRatio <= 0.25f);
+            _arrowDockValue.text = $"{arrows:N0} / {capacity:N0}";
+            _arrowDockValue.EnableInClassList("is-negative", arrowRatio <= 0.25f);
             _hostilesValue.text = gm.WaveState.ZombiesAlive.ToString("N0", CultureInfo.InvariantCulture);
+
+            _graveEssenceHudValue.text = gm.GraveEssenceAmount.ToString("N0", CultureInfo.InvariantCulture);
 
             MetaRuntimeTelemetry meta = gm.GetMetaRuntimeTelemetry();
             _soulValue.text = meta.HasCurrentRewardQuote
@@ -450,16 +467,6 @@ namespace DeadWalls
             _cycleMessage.text = GetPhaseMessage(cycle);
             ApplyPhaseClass(cycle.Phase);
             UpdateCycleDial(cycle.CycleProgress01, phaseIndex);
-
-            for (int i = 0; i < _phaseSegments.Length; i++)
-            {
-                _phaseSegments[i].EnableInClassList("is-active", i == phaseIndex);
-                _phaseSegments[i].EnableInClassList("is-passed", i < phaseIndex);
-                float fill01 = i < phaseIndex
-                    ? 1f
-                    : i == phaseIndex ? Mathf.Clamp01(cycle.PhaseProgress01) : 0f;
-                _phaseProgressFills[i].style.width = Length.Percent(fill01 * 100f);
-            }
 
             float wallRatio = Mathf.Clamp01(gm.GetDefensePercent());
             _wallValue.text = $"{Mathf.RoundToInt(wallRatio * 100f)}%";

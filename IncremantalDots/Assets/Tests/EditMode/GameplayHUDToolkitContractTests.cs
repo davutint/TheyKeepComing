@@ -86,13 +86,41 @@ namespace DeadWalls.Tests
             Assert.That(root.Q<VisualElement>("cycleArc"), Is.Not.Null);
             Assert.That(root.Q<VisualElement>("cycleCelestial"), Is.Not.Null);
             Assert.That(root.Q<VisualElement>("cycleCelestialMarker"), Is.Not.Null);
-            Assert.That(root.Q<VisualElement>("phaseDayFill"), Is.Not.Null);
-            Assert.That(root.Q<VisualElement>("phaseDuskFill"), Is.Not.Null);
-            Assert.That(root.Q<VisualElement>("phaseNightFill"), Is.Not.Null);
-            Assert.That(root.Q<VisualElement>("phaseDawnFill"), Is.Not.Null);
+            Assert.That(root.Q<VisualElement>("phaseDayFill"), Is.Null);
+            Assert.That(root.Q<VisualElement>("phaseDuskFill"), Is.Null);
+            Assert.That(root.Q<VisualElement>("phaseNightFill"), Is.Null);
+            Assert.That(root.Q<VisualElement>("phaseDawnFill"), Is.Null);
             Assert.That(root.Q<VisualElement>(className: "dw-icon--wood"), Is.Not.Null);
             Assert.That(root.Q<VisualElement>(className: "dw-icon--repair"), Is.Not.Null);
             Assert.That(root.Q<VisualElement>(className: "dw-icon--arrows"), Is.Not.Null);
+        }
+
+        [Test]
+        public void ProductionHud_ExposesRunCurrenciesAndArrowReserveWithoutOpeningDrawers()
+        {
+            TemplateContainer root = LoadHud().CloneTree();
+
+            Assert.That(root.Q<VisualElement>("graveEssenceAnchor"), Is.Not.Null);
+            Assert.That(root.Q<Label>("graveEssenceHudValue"), Is.Not.Null);
+            Assert.That(root.Q<VisualElement>(className: "dw-icon--essence"), Is.Not.Null);
+            Assert.That(root.Q<VisualElement>("soulAnchor"), Is.Not.Null);
+            Assert.That(root.Q<Label>("soulValue"), Is.Not.Null);
+            Assert.That(root.Q<Button>("arrowsButton"), Is.Not.Null);
+            Assert.That(root.Q<Label>("arrowDockValue"), Is.Not.Null);
+
+            Label heartEssence = root.Q<Label>("graveEssenceValue");
+            Assert.That(heartEssence, Is.Not.Null);
+            Assert.That(heartEssence.text, Is.EqualTo("0 ESSENCE"));
+            Assert.That(heartEssence.parent.ClassListContains("heart-essence"), Is.True);
+            Assert.That(
+                heartEssence.parent.Q<VisualElement>(className: "dw-icon--essence"),
+                Is.Not.Null);
+
+            MethodInfo formatter = typeof(GameplayHUDToolkitUI).GetMethod(
+                "FormatHeartEssenceCost",
+                BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(formatter, Is.Not.Null);
+            Assert.That(formatter.Invoke(null, new object[] { 13L }), Is.EqualTo("13 ESSENCE"));
         }
 
         [Test]

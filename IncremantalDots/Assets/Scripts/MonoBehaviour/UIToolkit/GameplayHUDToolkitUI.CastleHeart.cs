@@ -488,12 +488,19 @@ namespace DeadWalls
 
             _heartInspectorStatus.text = evaluation != null && evaluation.CanPurchase
                 ? node.Level > 0 ? "UPGRADE AVAILABLE" : "AVAILABLE TO RESEARCH"
-                : evaluation?.Message?.ToUpperInvariant() ?? "UNAVAILABLE";
+                : evaluation?.FailureReason == HeartPurchaseFailureReason.InsufficientGraveEssence
+                    ? "INSUFFICIENT ESSENCE"
+                    : evaluation?.Message?.ToUpperInvariant() ?? "UNAVAILABLE";
             _heartInspectorCost.text = evaluation?.Quote != null
-                ? $"{evaluation.Quote.TotalGraveEssenceCost:N0} GRAVE ESSENCE"
+                ? FormatHeartEssenceCost(evaluation.Quote.TotalGraveEssenceCost)
                 : "COST UNAVAILABLE";
             _heartPurchaseButton.text = repeatable && node.Level > 0 ? "UPGRADE" : "RESEARCH";
             _heartPurchaseButton.SetEnabled(evaluation != null && evaluation.CanPurchase);
+        }
+
+        private static string FormatHeartEssenceCost(long totalCost)
+        {
+            return $"{Math.Max(0L, totalCost):N0} ESSENCE";
         }
 
         private void SetHeartInspectorIcon(Sprite icon, bool isRoot)

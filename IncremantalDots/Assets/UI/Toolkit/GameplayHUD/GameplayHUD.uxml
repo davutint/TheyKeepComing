@@ -69,24 +69,6 @@
                             <ui:VisualElement name="cycleCelestialMarker" class="dw-icon cycle-celestial-marker dw-icon--day" />
                         </ui:VisualElement>
                     </ui:VisualElement>
-                    <ui:VisualElement class="phase-segments">
-                        <ui:VisualElement name="phaseDay" class="phase-segment phase-segment--day is-active">
-                            <ui:VisualElement name="phaseDayFill" class="phase-segment-fill" />
-                            <ui:VisualElement class="dw-icon dw-icon--phase-stop dw-icon--day" />
-                        </ui:VisualElement>
-                        <ui:VisualElement name="phaseDusk" class="phase-segment phase-segment--dusk">
-                            <ui:VisualElement name="phaseDuskFill" class="phase-segment-fill" />
-                            <ui:VisualElement class="dw-icon dw-icon--phase-stop dw-icon--dusk" />
-                        </ui:VisualElement>
-                        <ui:VisualElement name="phaseNight" class="phase-segment phase-segment--night">
-                            <ui:VisualElement name="phaseNightFill" class="phase-segment-fill" />
-                            <ui:VisualElement class="dw-icon dw-icon--phase-stop dw-icon--night" />
-                        </ui:VisualElement>
-                        <ui:VisualElement name="phaseDawn" class="phase-segment phase-segment--dawn">
-                            <ui:VisualElement name="phaseDawnFill" class="phase-segment-fill" />
-                            <ui:VisualElement class="dw-icon dw-icon--phase-stop dw-icon--dawn" />
-                        </ui:VisualElement>
-                    </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement class="clock-phase-copy">
                     <ui:Label name="phaseValue" text="DAYLIGHT" class="clock-phase" />
@@ -115,10 +97,17 @@
                     <ui:VisualElement class="supply-copy"><ui:VisualElement class="dw-icon dw-icon--micro dw-icon--arrows" picking-mode="Ignore" /><ui:Label name="arrowValue" text="0 / 0 ARROWS" class="supply-value" /></ui:VisualElement>
                     <ui:Label name="arrowDetail" text="SUPPLY READY" class="supply-state" />
                 </ui:VisualElement>
-                <ui:VisualElement name="soulAnchor" class="soul-readout">
-                    <ui:VisualElement class="dw-icon dw-icon--micro dw-icon--souls" picking-mode="Ignore" />
-                    <ui:Label name="soulValue" text="0" class="soul-value" />
-                    <ui:Label text="SOULS" class="soul-label" />
+                <ui:VisualElement class="currency-readouts">
+                    <ui:VisualElement name="graveEssenceAnchor" class="currency-readout essence-readout">
+                        <ui:VisualElement class="dw-icon dw-icon--micro dw-icon--essence" picking-mode="Ignore" />
+                        <ui:Label name="graveEssenceHudValue" text="0" class="currency-hud-value essence-value" />
+                        <ui:Label text="ESSENCE" class="currency-hud-label essence-label" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="soulAnchor" class="currency-readout soul-readout">
+                        <ui:VisualElement class="dw-icon dw-icon--micro dw-icon--souls" picking-mode="Ignore" />
+                        <ui:Label name="soulValue" text="0" class="currency-hud-value soul-value" />
+                        <ui:Label text="SOULS" class="currency-hud-label soul-label" />
+                    </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
 
@@ -156,7 +145,7 @@
                 <ui:Button name="economyButton" class="command-button command-button--economy"><ui:VisualElement class="dw-icon dw-icon--command dw-icon--economy" picking-mode="Ignore" /><ui:Label text="ECONOMY" class="command-label" picking-mode="Ignore" /></ui:Button>
                 <ui:Button name="barracksButton" class="command-button"><ui:VisualElement class="dw-icon dw-icon--command dw-icon--barracks" picking-mode="Ignore" /><ui:Label text="BARRACKS" class="command-label" picking-mode="Ignore" /></ui:Button>
                 <ui:VisualElement class="command-spacer" />
-                <ui:Button name="arrowsButton" class="command-button"><ui:VisualElement class="dw-icon dw-icon--command dw-icon--arrows" picking-mode="Ignore" /><ui:Label text="ARROW SUPPLY" class="command-label" picking-mode="Ignore" /></ui:Button>
+                <ui:Button name="arrowsButton" class="command-button"><ui:VisualElement class="dw-icon dw-icon--command dw-icon--arrows" picking-mode="Ignore" /><ui:VisualElement class="command-copy" picking-mode="Ignore"><ui:Label text="ARROW SUPPLY" class="command-label" picking-mode="Ignore" /><ui:Label name="arrowDockValue" text="0 / 0" class="command-detail" picking-mode="Ignore" /></ui:VisualElement></ui:Button>
                 <ui:Button name="heartButton" text="CASTLE HEART" class="command-button command-button--heart" />
                 <ui:Button name="pauseButton" class="command-button command-button--pause"><ui:VisualElement class="dw-icon dw-icon--command dw-icon--pause" picking-mode="Ignore" /></ui:Button>
             </ui:VisualElement>
@@ -239,7 +228,7 @@
                         <ui:Button name="heartZoomIn" text="+" tooltip="Zoom in" class="heart-zoom-button" />
                         <ui:Button name="heartZoomReset" text="FIT" tooltip="Fit the visible tree" class="heart-zoom-button heart-zoom-reset" />
                     </ui:VisualElement>
-                    <ui:VisualElement class="heart-essence"><ui:VisualElement class="dw-icon dw-icon--souls heart-essence-icon" picking-mode="Ignore" /><ui:Label name="graveEssenceValue" text="0 ESSENCE" class="currency-value" /></ui:VisualElement>
+                    <ui:VisualElement class="heart-essence"><ui:VisualElement class="dw-icon dw-icon--essence heart-essence-icon" picking-mode="Ignore" /><ui:Label name="graveEssenceValue" text="0 ESSENCE" class="currency-value" /></ui:VisualElement>
                     <ui:Button name="heartClose" text="RETURN TO BATTLE" class="surface-close" />
                 </ui:VisualElement>
             </ui:VisualElement>

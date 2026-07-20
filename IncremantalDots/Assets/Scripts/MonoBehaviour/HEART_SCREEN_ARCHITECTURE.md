@@ -36,7 +36,9 @@ yanlışlıkla sızmasını engeller.
 - Görünür ağacın bounds'u ölçülür; ilk halka okunaklı yakın görünür, ağaç büyüdükçe otomatik
   olarak viewport'a sığacak şekilde uzaklaşır.
 - PC'de inspector sağda, compact/touch düzende altta yaşar.
-- Inspector title, description, gerçek resolved effect, state ve Grave Essence maliyetini gösterir.
+- Inspector title, description, gerçek resolved effect, state ve Essence maliyetini gösterir.
+  Kod/veri owner'ı `GraveEssence` adını korur; player-facing Castle Heart copy'si yalnız `ESSENCE`
+  kullanır ve header HUD ile aynı mor renk/icon kimliğini taşır.
   Branch adı veya internal `Unlock/Evolution/Keystone` sınıfı göstermez.
 
 ## Etkileşim

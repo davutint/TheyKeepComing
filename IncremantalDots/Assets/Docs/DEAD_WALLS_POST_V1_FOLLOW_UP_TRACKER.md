@@ -431,3 +431,23 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - Targeted EditMode tuning kontratlari `9/9`, tam EditMode `440/440`, tam PlayMode
   `95 pass + 2 explicit skip` ve `0 fail` gecti. Unity Console `0 error`; kullanici meta kaydi
   test oncesi SHA-256 ile birebir geri yuklendi ve zombie-limit tercihi `Balanced 900` korundu.
+
+### 2026-07-20 - Runtime HUD currency, arrow reserve ve cycle sadelestirme polish'i
+
+- Sag ust HUD'a kanonik run-ici `Grave Essence` bakiyesi, Souls'tan ayri mor kimlik ve
+  Castle Heart ile ortak crystal icon sozluguyle eklendi.
+- Castle Heart header'i HUD Essence readout'uyla ayni mor palette tasindi; teknoloji inspector'i
+  player-facing copy'de `GRAVE ESSENCE` yerine yalniz `ESSENCE` kullanir.
+- Basarili gercek-dusman Grave Essence drop'u, mevcut pooled currency-flight katmaninda olum
+  konumundan yeni HUD sayacina gider ve varista sayaci pulse eder. Development grant'leri bu
+  player-facing drop gorselini tetiklemez.
+- Alt `ARROW SUPPLY` komutu drawer acilmadan `current / capacity` rezervini gosterir; dusuk stok
+  state'i ayni esik ve danger rengiyle okunur.
+- Day/night HUD'daki tekrar eden dortlu alt faz rayi kaldirildi; gercek cycle progress'i izleyen
+  celestial arc, phase adi ve geri sayim tek bilgi sahibi olarak korundu.
+- UI Toolkit kontratlari `11/11`, gercek Skeleton Soul + Grave Essence drop PlayMode testi `1/1`
+  gecti. Canli `1920x1080` kontrolde Essence/Souls readout'lari ve Arrow Supply rezervi overlap
+  olmadan goruldu; old phase rail bulunmazken canonical Essence/arrow label binding'leri ve
+  Essence flight sayaci runtime'da dogrulandi. Unity Console `0 error`, `git diff --check` temizdir.
+- Bu post-closure UI polish calismasi ana gorev paydasini degistirmez; Post-V1 tracker
+  `10/10 - %100` tamamlanmis olarak korunur.

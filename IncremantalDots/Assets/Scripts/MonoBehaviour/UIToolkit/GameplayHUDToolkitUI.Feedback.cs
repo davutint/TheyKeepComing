@@ -13,6 +13,7 @@ namespace DeadWalls
             public Vector2 Start;
             public Vector2 Control;
             public Vector2 Target;
+            public VisualElement TargetAnchor;
             public float Elapsed;
             public float Duration;
         }
@@ -22,6 +23,8 @@ namespace DeadWalls
         private string _lastDawnToast = string.Empty;
         private string _lastNightToast = string.Empty;
         private string _lastWaveToast = string.Empty;
+
+        public long TotalGraveEssenceFlightsStartedCount { get; private set; }
 
         private void RefreshFeedbackPresentation()
         {
@@ -68,25 +71,51 @@ namespace DeadWalls
 
         private void HandleSoulPickupRequested(SoulPickupEvent pickup)
         {
-            if (_root?.panel == null || _soulFlightLayer == null || pickup.Amount <= 0)
-                return;
+            StartCurrencyFlight(
+                new Vector3(pickup.Position.x, pickup.Position.y + 0.45f, pickup.Position.z),
+                pickup.Amount,
+                _soulAnchor,
+                false);
+        }
+
+        private void HandleGraveEssenceDropped(GraveEssenceDropEvent drop)
+        {
+            if (StartCurrencyFlight(
+                    new Vector3(drop.Position.x, drop.Position.y + 0.45f, drop.Position.z),
+                    drop.Amount,
+                    _graveEssenceAnchor,
+                    true))
+            {
+                TotalGraveEssenceFlightsStartedCount++;
+            }
+        }
+
+        private bool StartCurrencyFlight(
+            Vector3 world,
+            int amount,
+            VisualElement targetAnchor,
+            bool isEssence)
+        {
+            if (_root?.panel == null || _soulFlightLayer == null || amount <= 0)
+                return false;
+
+            if (targetAnchor == null)
+                return false;
 
             Camera camera = Camera.main;
-            Vector3 world = new Vector3(pickup.Position.x, pickup.Position.y + 0.45f, pickup.Position.z);
             Vector2 start = camera != null
                 ? RuntimePanelUtils.CameraTransformWorldToPanel(_root.panel, world, camera)
                 : new Vector2(_root.resolvedStyle.width * 0.5f, _root.resolvedStyle.height * 0.5f);
-            Vector2 target = _soulAnchor != null
-                ? _soulAnchor.worldBound.center
-                : new Vector2(_root.resolvedStyle.width - 90f, 160f);
+            Vector2 target = targetAnchor.worldBound.center;
             float lateral = ((_soulFlights.Count % 5) - 2) * 18f;
             Vector2 control = (start + target) * 0.5f + Vector2.up * 120f + Vector2.right * lateral;
 
             VisualElement element = GetSoulFlightElement(out Label amountLabel);
+            element.EnableInClassList("soul-flight--essence", isEssence);
             element.style.left = start.x - 9f;
             element.style.top = start.y - 9f;
-            amountLabel.text = pickup.Amount > 1 ? $"+{pickup.Amount:N0}" : string.Empty;
-            amountLabel.style.display = pickup.Amount > 1 ? DisplayStyle.Flex : DisplayStyle.None;
+            amountLabel.text = amount > 1 ? $"+{amount:N0}" : string.Empty;
+            amountLabel.style.display = amount > 1 ? DisplayStyle.Flex : DisplayStyle.None;
             _soulFlightLayer.Add(element);
             _soulFlights.Add(new SoulFlight
             {
@@ -95,9 +124,11 @@ namespace DeadWalls
                 Start = start,
                 Control = control,
                 Target = target,
+                TargetAnchor = targetAnchor,
                 Elapsed = 0f,
                 Duration = 0.82f
             });
+            return true;
         }
 
         private void UpdateSoulFlights(float deltaTime)
@@ -121,10 +152,12 @@ namespace DeadWalls
                     continue;
                 ReleaseSoulFlightElement(flight.Element);
                 _soulFlights.RemoveAt(i);
-                if (_soulAnchor != null)
+                if (flight.TargetAnchor != null)
                 {
-                    _soulAnchor.AddToClassList("is-arriving");
-                    _soulAnchor.schedule.Execute(() => _soulAnchor.RemoveFromClassList("is-arriving")).StartingIn(180);
+                    VisualElement arrivalAnchor = flight.TargetAnchor;
+                    arrivalAnchor.AddToClassList("is-arriving");
+                    arrivalAnchor.schedule.Execute(
+                        () => arrivalAnchor.RemoveFromClassList("is-arriving")).StartingIn(180);
                 }
             }
         }
@@ -153,6 +186,7 @@ namespace DeadWalls
                 return;
 
             element.RemoveFromHierarchy();
+            element.RemoveFromClassList("soul-flight--essence");
             element.style.opacity = 1f;
             element.style.scale = new Scale(Vector3.one);
             _soulFlightPool.Push(element);
