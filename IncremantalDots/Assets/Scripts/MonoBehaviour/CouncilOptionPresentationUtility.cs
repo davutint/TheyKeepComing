@@ -17,7 +17,7 @@ namespace DeadWalls
         public int TotalBedCapacity;
         public int FoodCostPerArrival;
         public int TotalArchers;
-        public int IdlePopulation;
+        public int AvailableWorkers;
         public float WallCurrentHp;
         public float WallMaxHp;
     }
@@ -64,7 +64,7 @@ namespace DeadWalls
             ResourceData resources = context.Resources;
             int population = Mathf.Max(0, context.CurrentPopulation);
             int totalArchers = Mathf.Max(0, context.TotalArchers);
-            int idlePopulation = Mathf.Max(0, context.IdlePopulation);
+            int availableWorkers = Mathf.Max(0, context.AvailableWorkers);
             float wallCurrentHp = Mathf.Max(0f, context.WallCurrentHp);
             float wallMaxHp = Mathf.Max(0f, context.WallMaxHp);
             bool canApplyExactly = context.RuntimeReady;
@@ -154,7 +154,7 @@ namespace DeadWalls
                             {
                                 population += amount;
                                 resources.Food = Mathf.Max(0, resources.Food - requiredFood);
-                                idlePopulation += amount;
+                                availableWorkers += amount;
                             }
                             break;
                         }
@@ -162,23 +162,23 @@ namespace DeadWalls
                         case CouncilEffectKind.GainFreeArchers:
                         {
                             parts.Add(Gain(amount == 1 ? "+1 BASIC ARCHER" : $"+{amount} BASIC ARCHERS"));
-                            parts.Add(Cost(amount == 1 ? "-1 IDLE PERSON" : $"-{amount} IDLE PEOPLE"));
+                            parts.Add(Cost(amount == 1 ? "-1 RESOURCE WORKER" : $"-{amount} RESOURCE WORKERS"));
                             int allowed = CouncilEffectGuardUtility.GetAllowedFreeArcherGain(
                                 amount,
                                 totalArchers,
-                                idlePopulation);
+                                availableWorkers);
                             if (allowed != amount)
                             {
                                 int remainingCapacity = ArcherCapacityUtility.GetRemainingCapacity(totalArchers);
-                                string reason = idlePopulation < amount
-                                    ? $"NEED {amount - idlePopulation} MORE IDLE"
+                                string reason = availableWorkers < amount
+                                    ? $"NEED {amount - availableWorkers} MORE WORKERS"
                                     : $"NEED {amount - remainingCapacity} MORE ARMY SLOTS";
                                 MarkUnavailable(ref canApplyExactly, ref unavailableReason, reason);
                             }
                             else
                             {
                                 totalArchers += amount;
-                                idlePopulation -= amount;
+                                availableWorkers -= amount;
                             }
                             break;
                         }

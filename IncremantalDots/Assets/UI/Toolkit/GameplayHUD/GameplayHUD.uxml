@@ -51,7 +51,7 @@
                         <ui:VisualElement class="dw-icon dw-icon--micro dw-icon--population" picking-mode="Ignore" />
                         <ui:Label name="populationValue" text="0 / 0 PEOPLE" class="population-main" />
                     </ui:VisualElement>
-                    <ui:Label name="populationDetail" text="0 IDLE" class="population-detail" />
+                    <ui:Label name="populationDetail" text="0 UNASSIGNED" class="population-detail" />
                 </ui:VisualElement>
             </ui:VisualElement>
 
@@ -156,7 +156,7 @@
             </ui:VisualElement>
             <ui:VisualElement name="onboardingHint" class="onboarding-hint">
                 <ui:VisualElement class="hint-marker" />
-                <ui:Label name="onboardingHintText" text="ASSIGN IDLE PEOPLE TO A RESOURCE." class="hint-text" />
+                <ui:Label name="onboardingHintText" text="DRAG A WORKER SHARE SLIDER." class="hint-text" />
             </ui:VisualElement>
         </ui:VisualElement>
 
@@ -165,14 +165,14 @@
             <ui:VisualElement class="surface-header">
                 <ui:VisualElement>
                     <ui:Label text="KEEP ECONOMY" class="surface-title" />
-                    <ui:Label text="Drag a resource share to rebalance all assigned workers instantly." class="surface-subtitle" />
+                    <ui:Label text="Set target shares. Everyone works; capacity overflow moves to the next resource." class="surface-subtitle" />
                 </ui:VisualElement>
                 <ui:Button name="economyClose" text="CLOSE" class="surface-close" />
             </ui:VisualElement>
             <ui:VisualElement class="economy-summary">
-                <ui:VisualElement class="summary-block"><ui:VisualElement class="dw-icon dw-icon--summary dw-icon--population" picking-mode="Ignore" /><ui:VisualElement><ui:Label name="economyIdleLabel" text="IDLE PEOPLE" class="summary-label" /><ui:Label name="economyIdle" text="0" class="summary-value" /></ui:VisualElement></ui:VisualElement>
+                <ui:VisualElement class="summary-block"><ui:VisualElement class="dw-icon dw-icon--summary dw-icon--population" picking-mode="Ignore" /><ui:VisualElement><ui:Label name="economyIdleLabel" text="UNASSIGNED" class="summary-label" /><ui:Label name="economyIdle" text="0" class="summary-value" /></ui:VisualElement></ui:VisualElement>
                 <ui:VisualElement class="summary-block"><ui:VisualElement class="dw-icon dw-icon--summary dw-icon--workers" picking-mode="Ignore" /><ui:VisualElement><ui:Label text="WORKERS" class="summary-label" /><ui:Label name="economyWorkers" text="0" class="summary-value" /></ui:VisualElement></ui:VisualElement>
-                <ui:VisualElement class="summary-block"><ui:VisualElement class="dw-icon dw-icon--summary dw-icon--housing" picking-mode="Ignore" /><ui:VisualElement><ui:Label text="HOUSING" class="summary-label" /><ui:Label name="economyHousing" text="0 / 0" class="summary-value" /></ui:VisualElement></ui:VisualElement>
+                <ui:VisualElement class="summary-block"><ui:VisualElement class="dw-icon dw-icon--summary dw-icon--housing" picking-mode="Ignore" /><ui:VisualElement><ui:Label text="PEOPLE / BEDS" class="summary-label" /><ui:Label name="economyHousing" text="0 / 0" class="summary-value" /></ui:VisualElement></ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="housingCard" class="housing-card">
                 <ui:VisualElement class="housing-heading">

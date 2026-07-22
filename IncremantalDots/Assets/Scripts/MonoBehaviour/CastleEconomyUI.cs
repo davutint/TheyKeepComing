@@ -149,7 +149,7 @@ namespace DeadWalls
             int workerBudget = Mathf.Max(0, population.Total - population.Archers);
 
             SetText(PopulationTotalText, $"Total {population.Total}");
-            SetText(PopulationIdleText, $"Idle {idle}");
+            SetText(PopulationIdleText, $"Unassigned {idle}");
             SetText(PopulationArchersText, $"Archers {population.Archers}");
             SetText(PopulationGrowthText, $"+{GetPopulationGrowth(gm)} / wave");
             SetText(WorkerBudgetText, $"Workers {totalWorkers} / {workerBudget}");
@@ -164,7 +164,7 @@ namespace DeadWalls
             RefreshAssignButton(EconomyFocusType.Food, FoodAssignButton, "Food", gm);
 
             if (totalWorkers + idle + population.Archers > population.Total && PopulationIdleText != null)
-                PopulationIdleText.text = "Idle 0";
+                PopulationIdleText.text = "Unassigned 0";
 
             RefreshProjectedGain(gm);
             RefreshRepair(gm);
@@ -206,7 +206,7 @@ namespace DeadWalls
             button.interactable = gm.CanAssignResourceWorker(resource);
             SetButtonText(button, gm.GetIdlePopulation() > 0 || gm.IsFreeEconomyTestMode
                 ? $"{label} +Worker"
-                : "NEED POP");
+                : "AUTO ASSIGNED");
         }
 
         private void RefreshEvent(GameManager gm)

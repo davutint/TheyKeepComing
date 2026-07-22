@@ -56,7 +56,7 @@
    Tuner'da decision window read-only olarak `SiegeDawnDuration + SiegeDayDuration` gorunmelidir;
    production baseline `5 + 30 = 35s`'dir ve ayri Council timer alani yoktur.
 3. Iki butonun ikinci satirinda exact sonuc gorunur: population `+N PEOPLE -M FOOD`, free
-   archer `+N BASIC ARCHERS -N IDLE PEOPLE`, Wall heal gercek uygulanacak HP ve gece etkisi
+   archer `+N BASIC ARCHERS -N RESOURCE WORKERS`, Wall heal gercek uygulanacak HP ve gece etkisi
    exact count yuzdesi. Karsilanamayan exact sonuc butonu pasif yapar ve eksigi yazar.
    Ilk incomplete Council tutorial'inda pulse iki butondan birini degil tum `CouncilEventPanel`
    rect'ini kapsar; `COMPARE BOTH EXACT OUTCOMES AND THEIR COSTS.` hint'i gorunur ve oyun durmaz.
@@ -108,7 +108,7 @@ Friend. Var olan custom chain girdilerini silmez; yeni chain veya anlati uretmez
 - Population karti exact miktar icin yeterli bos yatak + Food yoksa pasif olmalidir.
 - Uygulanan her Council population kazanimi kabul edilen kisi basina Food'u yalniz bir kez
   harcamali; yatak capacity'sini buyutmemelidir.
-- Ucretsiz okcu karti exact miktar icin yeterli idle population + ortak `1000` cap yoksa pasif
+- Ucretsiz okcu karti exact miktar icin yeterli sivil worker + ortak `1000` cap yoksa pasif
   olmali; her gelen okcu bir idle kisiyi kullanmalidir.
 - `CouncilEffectGuardPlayModeTests`, Wall heal sirasinda legacy Gate/Core degerlerinin
   degismedigini ve gece etkisinin zombie HP/damage/speed yerine yalniz count multiplier

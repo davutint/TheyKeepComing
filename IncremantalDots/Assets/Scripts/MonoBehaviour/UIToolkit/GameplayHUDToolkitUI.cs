@@ -433,7 +433,7 @@ namespace DeadWalls
 
             PopulationState population = gm.Population;
             _populationValue.text = $"{population.Total:N0} / {population.Capacity:N0} PEOPLE";
-            _populationDetail.text = $"{gm.GetIdlePopulation():N0} IDLE  ·  {population.Archers:N0} ARCHERS";
+            _populationDetail.text = $"{gm.GetIdlePopulation():N0} UNASSIGNED  ·  {population.Archers:N0} ARCHERS";
 
             int capacity = gm.GetArrowCapacity();
             int arrows = gm.ArrowSupply.Current;

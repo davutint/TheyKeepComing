@@ -2,7 +2,7 @@
 
 > **Amaç:** V1 kapsamı tamamlandıktan sonra yapılacak mantık düzeltmelerini, oyuncuya görünen geri bildirimleri, UI/UX yeniden çalışmalarını, polish işlerini ve performans optimizasyonlarını tek otoriter takip belgesinde yürütmek.
 >
-> **Tracker sürümü:** 1.7
+> **Tracker sürümü:** 1.8
 > **Oluşturulma tarihi:** 2026-07-18
 > **Aktif paket:** `-` (açık paket yok)
 > **Aktif iş:** `-`
@@ -292,13 +292,17 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - [x] Kaynak oranı, worker hedefi, archer damage, run-only upgrade, Castle Heart araştırması ve Last Embers projection metinleri player-facing jargon/kısaltma bırakmayacak şekilde güncellendi.
 - [x] Rally hazır durumu görünür biçimde `BOOST FIRE RATE` der; üç ability düğmesi doğru davranış tooltip'i taşır.
 - [x] Economy drawer'daki `-10/-1/+1/+10/FILL` worker komutları kaldırıldı; dört kaynak `0-100%` share slider'ı üzerinden mevcut worker'ları ve yeni arrival hedefini tek işlemde yeniden dağıtır.
-- [x] Bir share slider'ı `%100` olduğunda diğer üç kaynak target ve worker sayısı `0` olur; seçilen kaynak kapasitesi taşan worker'lar kaybolmadan `IDLE PEOPLE` havuzuna döner.
+- [x] Bir share slider'ı `%100` olduğunda diğer üç kaynak target'ı `0` olur; archer olmayan bütün nüfus işe atanır, seçilen resource cap'e çarparsa overflow worker Wood -> Stone -> Iron -> Food sırasındaki ilk boş kapasiteye taşınır.
+- [x] Ayrı asker rezervi tutulmaz. Basic/Rapid/Frost satın alımı ve Council free-archer sonucu gerekli kişiyi Wood -> Stone -> Iron -> Food sırasıyla resource worker havuzundan Archer'a çevirir.
+- [x] Player-facing `IDLE PEOPLE` yerine `UNASSIGNED` kullanılır; değer yalnız dört resource'un toplam kapasitesi tamamen doluysa pozitif kalır ve resource satırlarında küresel sayı olarak tekrarlanmaz.
 - [x] Housing CTA resource listesinin üstüne taşındı, full-capacity durumu güçlendirildi ve `ADD 1/10/100 BEDS` paketlerinin her biri tam maliyetini gösterir.
 - [x] Toolkit maliyetleri `150W 100I` gibi kısaltmalar yerine `150 WOOD · 100 IRON` biçiminde açık kaynak adları kullanır.
 - [x] Targeted EditMode `39/39` (`GameplayHUDToolkitContractTests` + `WorkerAllocationUtilityTests` + `FirstRunOnboardingTests`) ve targeted PlayMode worker-slider entegrasyonu `1/1` geçti.
 - [x] Unity asset import/domain reload tamamlandı; değişiklik kapsamındaki final Console `0 error / 0 warning` ve `git diff --check` temizdir.
 - [x] `NewGameScene` üzerinde `1920x1080` normal ve zorlanmış compact/touch canlı Game View kontrollerinde worker slider, housing paketleri, tam kaynak adları, overlap ve clipping doğrulandı.
-- [x] `%100 WOOD` runtime kontrolünde Wood `40/40`, diğer üç kaynak `0 worker / 0% share` ve taşan nüfus `16 IDLE PEOPLE` olarak canlı UI'da doğrulandı.
+- [x] Post-acceptance workforce düzeltmesi targeted EditMode `36/36`, targeted PlayMode `7/7`, exact Continue, archer cap ve telemetry regresyonlarıyla geçti.
+- [x] Canlı runtime başlangıcında `60 total = 4 archers + 56 workers + 0 unassigned`; `%100 WOOD` sonucunda Wood `40/40`, Stone `16/30 CAPACITY OVERFLOW`, Iron/Food `0` ve `0 unassigned` doğrulandı.
+- [x] Canlı Basic Archer alımında `4 -> 5 archers`, `56 -> 55 workers`, Wood `40 -> 39` ve Unassigned `0 -> 0` oldu.
 - [x] Canlı kabul Play Mode içindeki geçici `NewGameScene` yüklemesiyle yapıldı; çıkışta aktif `HandMadeTiles` sahnesi geri yüklendi ve owner sahne dosyaları değiştirilmedi.
 
 ---
@@ -566,3 +570,13 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - Targeted EditMode `39/39`, targeted PlayMode `1/1`, Unity Console `0 error / 0 warning` ve `git diff --check` temiz geçti. Aktif `HandMadeTiles` sahnesi PlayMode testinden sonra geri yüklendi ve repo sahne dosyalarına dokunulmadı.
 - `NewGameScene` canlı `1920x1080` normal ve zorlanmış compact/touch görsel kabulünde housing paketleri taşmadan göründü; `%100 WOOD` runtime kontrolü diğer üç kaynak slider/worker değerlerini `0` yaptı ve `16` taşan worker idle havuzuna döndü.
 - P12 bütün zorunlu kapıları geçti; tracker `12/12 - %100` olarak kapatıldı.
+
+### 2026-07-22 - P12 post-acceptance workforce ve asker kaynağı düzeltmesi
+
+- Owner, Idle'ın asker rezervi olmadığını ve asker üretiminin resource worker havuzundan kişi çekmesi gerektiğini kesinleştirdi.
+- `WorkerAllocationUtility` bütün archer-dışı nüfusu işe atar; target kapasitesi dolduğunda overflow worker'lar Wood -> Stone -> Iron -> Food sırasındaki ilk boş kapasiteye geçer. Unassigned yalnız toplam job kapasitesi yetersizse kalır.
+- `GameManager` slider değişikliğinde yalnız önceden atanmış worker'ları değil bütün sivil havuzu yeniden dağıtır. Archer buy ve Council free-archer akışları aynı sabit sırayla resource worker eksiltir; Market/Council copy'si `NEED WORKER` ve `RESOURCE WORKER` kullanır.
+- Economy drawer küresel Idle tekrarlarını kaldırdı; üst özet `UNASSIGNED`, slider satırları `% TARGET`, kapasite nedeniyle sıfır hedefli resource'a giden kişi `CAPACITY OVERFLOW` olarak görünür.
+- Targeted EditMode `36/36`; worker, Council, exact Continue, archer cap ve telemetry targeted PlayMode toplam `7/7` geçti.
+- Canlı `NewGameScene` kontrolünde başlangıç `4 archers + 56 workers + 0 unassigned`; `%100 WOOD` sonrası `40 Wood + 16 Stone overflow + 0 unassigned`; bir Basic Archer sonrası `5 archers + 55 workers + 0 unassigned` doğrulandı.
+- P12 kabulü yeni workforce sözleşmesiyle düzeltildi; ana görev paydası değişmedi ve tracker `12/12 - %100` kaldı.

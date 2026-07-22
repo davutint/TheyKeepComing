@@ -43,9 +43,11 @@ Butonlar `GameManager.AssignResourceWorker(resource)` API'sini kullanir. Tap pro
 2. `CastleWorkerHub` delivery marker'larini kale merkezi/depo alanina yerlestir.
 3. Resource site pickup marker'larini sahnede istedigin sol ekonomi alanina tasi.
 4. Play'e bas.
-5. UI assign butonlari varsa Wood/Stone/Iron/Food'a tikla.
-6. Idle population varsa ilgili resource worker sayisi artmali; villager kaynak yapisindan
-   cikip sagdaki acik koridoru kullanarak hub'a gitmeli ve yuksek yapi/bitki piksellerinin
-   ustune cizilmemelidir.
+5. Economy target slider'ını değiştir.
+6. Archer olmayan bütün population boş kapasitelere otomatik dağılmalı; villager kaynak yapısından
+   çıkıp sağdaki açık koridoru kullanarak hub'a gitmeli ve yüksek yapı/bitki piksellerinin
+   üstüne çizilmemelidir.
 
-Idle population yoksa button `NEED POP` veya disabled state'e dusmelidir. Free economy test mode aciksa assignment debug amacli devam edebilir.
+Unassigned yalnız bütün resource cap'leri doluysa görünmelidir. Yeni kapasite açıldığında kişi
+aynı frame otomatik işe dönmelidir. Legacy assignment button normal durumda `AUTO ASSIGNED` veya
+disabled state'tedir; Free Economy Test Mode yalnız debug akışıdır.

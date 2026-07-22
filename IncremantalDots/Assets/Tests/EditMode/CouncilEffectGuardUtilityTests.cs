@@ -29,20 +29,20 @@ namespace DeadWalls.Tests
         }
 
         [Test]
-        public void FreeArcherGain_UsesIdlePopulationAndCommonCap()
+        public void FreeArcherGain_UsesAvailableWorkersAndCommonCap()
         {
             Assert.That(CouncilEffectGuardUtility.GetAllowedFreeArcherGain(
                 requestedArchers: 10,
                 currentTotalArchers: 998,
-                idlePopulation: 1), Is.EqualTo(1));
+                availableWorkers: 1), Is.EqualTo(1));
             Assert.That(CouncilEffectGuardUtility.GetAllowedFreeArcherGain(
                 requestedArchers: 10,
                 currentTotalArchers: 1000,
-                idlePopulation: 100), Is.Zero);
+                availableWorkers: 100), Is.Zero);
             Assert.That(CouncilEffectGuardUtility.GetAllowedFreeArcherGain(
                 requestedArchers: int.MaxValue,
                 currentTotalArchers: 999,
-                idlePopulation: int.MaxValue), Is.EqualTo(1));
+                availableWorkers: int.MaxValue), Is.EqualTo(1));
         }
 
         [Test]

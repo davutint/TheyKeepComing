@@ -207,6 +207,12 @@ namespace DeadWalls
                 EvaluateCandidate(3, allocation.FoodWorkers, allocation.FoodWorkerCapacity,
                     allocation.FoodTargetRatioBps, totalAfterAssignment, ref best, ref bestScore);
 
+                // Hedeflenen resource'lar dolduysa kimseyi asker rezervi olarak bos birakma.
+                // Kalan kisi ilk musait resource'a sabit Wood -> Stone -> Iron -> Food
+                // sirasiyla overflow worker olarak atanir.
+                if (best < 0)
+                    best = FindFirstAvailableResource(allocation);
+
                 if (best < 0)
                     break;
 
@@ -223,14 +229,31 @@ namespace DeadWalls
             return assigned;
         }
 
-        public static int RebalanceAssignedWorkers(ref MobilePopulationAllocation allocation)
+        public static int RebalanceAvailableWorkers(
+            ref MobilePopulationAllocation allocation,
+            int populationTotal,
+            int archerCount)
         {
-            int assignedWorkers = TotalWorkers(allocation);
+            int availableWorkers = math.max(
+                0,
+                math.max(0, populationTotal) - math.max(0, archerCount));
             allocation.WoodWorkers = 0;
             allocation.StoneWorkers = 0;
             allocation.IronWorkers = 0;
             allocation.FoodWorkers = 0;
-            return AutoAssignNewPopulation(ref allocation, assignedWorkers);
+            return AutoAssignNewPopulation(ref allocation, availableWorkers);
+        }
+
+        public static int RemoveWorkersInResourceOrder(
+            ref MobilePopulationAllocation allocation,
+            int amount)
+        {
+            int remaining = math.max(0, amount);
+            Remove(ref allocation.WoodWorkers, ref remaining);
+            Remove(ref allocation.StoneWorkers, ref remaining);
+            Remove(ref allocation.IronWorkers, ref remaining);
+            Remove(ref allocation.FoodWorkers, ref remaining);
+            return math.max(0, amount) - remaining;
         }
 
         private static void EvaluateCandidate(int index, int workers, int capacity, int ratio,
@@ -245,6 +268,30 @@ namespace DeadWalls
 
             best = index;
             bestScore = score;
+        }
+
+        private static int FindFirstAvailableResource(MobilePopulationAllocation allocation)
+        {
+            if (HasCapacity(allocation.WoodWorkers, allocation.WoodWorkerCapacity)) return 0;
+            if (HasCapacity(allocation.StoneWorkers, allocation.StoneWorkerCapacity)) return 1;
+            if (HasCapacity(allocation.IronWorkers, allocation.IronWorkerCapacity)) return 2;
+            if (HasCapacity(allocation.FoodWorkers, allocation.FoodWorkerCapacity)) return 3;
+            return -1;
+        }
+
+        private static bool HasCapacity(int workers, int capacity)
+        {
+            return capacity <= 0 || math.max(0, workers) < capacity;
+        }
+
+        private static void Remove(ref int workers, ref int remaining)
+        {
+            if (remaining <= 0 || workers <= 0)
+                return;
+
+            int removed = math.min(workers, remaining);
+            workers -= removed;
+            remaining -= removed;
         }
 
         private static void SelectRemainderCandidate(int index, int excludedIndex, long remainder,

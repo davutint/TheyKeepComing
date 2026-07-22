@@ -150,7 +150,7 @@ otoritesi yalniz `GameManager` transaction'lari ve mevcut ECS effect owner'larin
   #E08A7A, risk #E5B963).
 - **Canli exact quote:** `CouncilOptionPresentationUtility`, composer label'ini oyuncuya dogrudan
   basmaz. Authored verb'i korur; canli state'ten population icin tek seferlik Food, free Basic
-  archer icin idle population, Wall icin gercek clamp edilmis HP ve count-only gece yuzdesini
+  archer icin mevcut sivil worker, Wall icin gercek clamp edilmis HP ve count-only gece yuzdesini
   yeniden hesaplar. Kilit sebebi ayni satirda gorunur; `GameManager.CanAffordCouncilOption`
   ayni quote sonucunu kullanir.
 - Testler cozulmemis token kalmadigini garanti eder (300 uretimde `{` taramasi).
@@ -219,8 +219,9 @@ transaction'ina cevirir.
   Kabul edilen kisi sayisi bos yatak ve Food ile sinirlanir; kabul edilen her kisi Food'u tam
   bir kez harcar. Council population kazanimi `PopulationState.Capacity/BaseCapacity` degerini
   buyutemez.
-- `GainFreeArchers`, Basic/Rapid/Frost ortak `1000` cap'i ile gercek idle population'in minimumu
-  kadar calisir ve her spawn icin bir idle kisiyi `PopulationState.Archers` havuzuna tasir.
+- `GainFreeArchers`, Basic/Rapid/Frost ortak `1000` cap'i ile mevcut sivil worker sayisinin minimumu
+  kadar calisir ve her spawn icin Wood -> Stone -> Iron -> Food sirasiyla bir resource worker'i
+  `PopulationState.Archers` havuzuna tasir.
   Free Economy Test Mode bu urun guard'ini bypass etmez.
 - Kartin yazdigi exact population/archer sonucunun tamami uygulanamiyorsa
   `CanAffordCouncilOption` secenegi kilitler. Private effect uygulayiciya bozuk/stale payload

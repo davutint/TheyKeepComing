@@ -31,7 +31,7 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - Dawn survivor görsel köprüsü: yeni persistent growth marker'ını ve gerçek accepted count'u gözler; mevcut `VillagerWorker` prefabından en fazla `15` transient arrival entity'si üretir, resource worker/logistics component'lerini kaldırır ve hareketi `SurvivorArrivalVisualSystem`'a bırakır. Population/Food transaction'ını tekrar yazmaz
 - Economy focus API'leri legacy olarak kalir; worker economy aktifken setup tool focus UI'yi gizler
 - Legacy level-up API'leri durur, fakat mobile castle loop'ta XP level-up pause tetiklemez
-- Mobile castle mode'da drawer economy tarafindan satin alinan Basic/Rapid/Frost okculari `Grid/outside` tilemap hucrelerine spawn eder ve `1` idle population kullanir
+- Mobile castle mode'da drawer economy tarafindan satin alinan Basic/Rapid/Frost okculari `Grid/outside` tilemap hucrelerine spawn eder ve Wood -> Stone -> Iron -> Food sirasiyla `1` resource worker'i Archer havuzuna tasir
 - Mevcut `ArcherUnit` entity'lerinden Basic/Rapid/Frost sayilarini okur
 - Bütün aktif spawn yollarini `SpawnArcher` merkezinde `ArcherCapacityUtility` ile sınırlar; 1001. entity oluşmaz
 - Spawn edilen okcuya type-specific `SpriteTint` yazar
@@ -91,7 +91,7 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - Template yoksa legacy Basic/Rapid/Frost row'larinda yalnizca `Buy` aksiyonunu `GameManager.BuyArcher()` API'sine baglar
 - Upgrade butonlari, Rapid/Frost tech unlock butonlari ve `ArrowTechPanel` player-facing olarak gizlenir
 - Basic baslangicta aciktir; Rapid/Frost Castle Heart unlock node'larina kadar kilitli satirlar olarak kalir
-- Row `CostText` alanlarinda mevcut cost ile beraber eksik kaynak varsa `NEED ...`, idle population yoksa `NEED POP` yazar
+- Row `CostText` alanlarinda mevcut cost ile beraber eksik kaynak varsa `NEED ...`, sivil worker yoksa `NEED WORKER` yazar
 - `GameManager.Free Economy Test Mode` acikken cost satirlari `FREE` gosterir; kaynak ve population yetersizligi player-facing aksiyonlari bloklamaz
 - Free Economy Test Mode ortak `1000` cap'i bypass etmez; cap'te row `ARMY CAP 1000/1000` ve `MAX` gosterir
 - Rapid/Frost unlock olduktan sonra `RETRAIN`, bir Basic entity'yi yerinde dönüştürür; toplam garnizon/population değişmez ve cap doluyken de çalışır
@@ -224,12 +224,12 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 
 - Sol ust resource bar altindaki worker drawer'i yonetir.
 - `WorkerDrawerToggleButton` ile drawer panelini acip kapatir.
-- Idle pop, total worker, archer count ve resource worker rate alanlarini gunceller.
-- Wood/Stone/Iron/Food `+1% / +10% / +100% / direct input` kontrollerini target ratio API'lerine baglar.
+- Unassigned, total worker, archer count ve resource worker rate alanlarini gunceller.
+- Wood/Stone/Iron/Food `0-100%` slider kontrollerini target ratio API'lerine baglar.
 - Basarili target-ratio player action'inda `WorkerTargetRatioChangedByPlayer` event'i yayar; onboarding bu event'i dinler, drawer transaction sahibi degismez.
 - Her resource satirindaki `CAP` ve `EFF` butonlarini bagimsiz worker bina yatirim API'lerine baglar; level ve bir sonraki Wood + Iron maliyetini butonda gosterir.
 - Secilen exact hedef korunurken diger uc hedef deterministik yeniden dagilir; toplam `%100` kalir.
-- Mevcut actual worker'lari aninda tasimaz; hedef yalniz sonraki yeni population dagitimini yonlendirir.
+- Mevcut archer olmayan bütün nüfusu anında kapasite-aware yeniden dağıtır; hedef cap'e çarparsa overflow sıradaki resource'a gider.
 - DayPrep sartina bagli degildir; worker hedefi her zaman degistirilebilir.
 
 ### CastleInteriorClickTarget.cs

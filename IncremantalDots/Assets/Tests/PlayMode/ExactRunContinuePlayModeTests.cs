@@ -291,7 +291,7 @@ namespace DeadWalls.Tests
             const int stoneWorkers = 17;
             const int ironWorkers = 11;
             const int foodWorkers = 25;
-            const int savedIdle = 17;
+            const int savedIdle = 0;
             int savedWorkers = woodWorkers + stoneWorkers + ironWorkers + foodWorkers;
             int savedTotal = savedWorkers + savedArchers + savedIdle;
             int savedBedBase = savedTotal;

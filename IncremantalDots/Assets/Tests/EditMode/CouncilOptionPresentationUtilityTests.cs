@@ -47,7 +47,7 @@ namespace DeadWalls.Tests
         }
 
         [Test]
-        public void FreeArcherQuote_ShowsIdlePopulationCostAndCommonCapShortfall()
+        public void FreeArcherQuote_ShowsResourceWorkerCostAndCommonCapShortfall()
         {
             ComposedCouncilOption option = MakeOption("Arm them",
                 new ComposedCouncilEffect
@@ -57,13 +57,13 @@ namespace DeadWalls.Tests
                 });
             CouncilOptionPresentationContext context = MakeContext();
             context.TotalArchers = 998;
-            context.IdlePopulation = 10;
+            context.AvailableWorkers = 10;
 
             CouncilOptionPresentation quote = CouncilOptionPresentationUtility.Build(option, context);
 
             Assert.That(quote.CanApplyExactly, Is.False);
             StringAssert.Contains("+3 BASIC ARCHERS", quote.RichText);
-            StringAssert.Contains("-3 IDLE PEOPLE", quote.RichText);
+            StringAssert.Contains("-3 RESOURCE WORKERS", quote.RichText);
             Assert.That(quote.UnavailableReason, Is.EqualTo("NEED 1 MORE ARMY SLOTS"));
         }
 
@@ -165,7 +165,7 @@ namespace DeadWalls.Tests
                 TotalBedCapacity = 20,
                 FoodCostPerArrival = 2,
                 TotalArchers = 4,
-                IdlePopulation = 6,
+                AvailableWorkers = 6,
                 WallCurrentHp = 50f,
                 WallMaxHp = 100f,
             };

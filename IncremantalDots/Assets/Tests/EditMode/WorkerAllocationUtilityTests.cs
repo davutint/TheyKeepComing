@@ -82,7 +82,7 @@ namespace DeadWalls.Tests
         }
 
         [Test]
-        public void AutoAssignNewPopulation_WhenPositiveTargetIsFull_LeavesOverflowUnassigned()
+        public void AutoAssignNewPopulation_WhenPositiveTargetIsFull_UsesNextAvailableResource()
         {
             var allocation = new MobilePopulationAllocation
             {
@@ -96,8 +96,10 @@ namespace DeadWalls.Tests
 
             int assigned = WorkerAllocationUtility.AutoAssignNewPopulation(ref allocation, 5);
 
-            Assert.That(assigned, Is.Zero);
-            Assert.That(WorkerAllocationUtility.TotalWorkers(allocation), Is.EqualTo(1));
+            Assert.That(assigned, Is.EqualTo(5));
+            Assert.That(WorkerAllocationUtility.TotalWorkers(allocation), Is.EqualTo(6));
+            Assert.That(allocation.WoodWorkers, Is.EqualTo(1));
+            Assert.That(allocation.StoneWorkers, Is.EqualTo(5));
         }
 
         [Test]
@@ -150,13 +152,16 @@ namespace DeadWalls.Tests
         }
 
         [Test]
-        public void RebalanceAssignedWorkers_PreservesAssignedTotalWhenTargetsFitCapacities()
+        public void RebalanceAvailableWorkers_AssignsEveryCivilianWhenTargetsFitCapacities()
         {
             var allocation = CreateInitialAllocation();
             WorkerAllocationUtility.InitializeTargetsFromCurrent(ref allocation);
             WorkerAllocationUtility.SetTargetRatioBps(ref allocation, 0, 5000);
 
-            int rebalanced = WorkerAllocationUtility.RebalanceAssignedWorkers(ref allocation);
+            int rebalanced = WorkerAllocationUtility.RebalanceAvailableWorkers(
+                ref allocation,
+                populationTotal: 57,
+                archerCount: 4);
 
             Assert.That(rebalanced, Is.EqualTo(53));
             Assert.That(WorkerAllocationUtility.TotalWorkers(allocation), Is.EqualTo(53));
@@ -166,20 +171,45 @@ namespace DeadWalls.Tests
         }
 
         [Test]
-        public void RebalanceAssignedWorkers_AtMaximumClearsOtherWorkersAndLeavesCapOverflowIdle()
+        public void RebalanceAvailableWorkers_AtMaximumSpillsCapacityOverflowToNextResource()
         {
             var allocation = CreateInitialAllocation();
             WorkerAllocationUtility.InitializeTargetsFromCurrent(ref allocation);
             WorkerAllocationUtility.SetTargetRatioBps(ref allocation, 2,
                 WorkerAllocationUtility.RatioScale);
 
-            int rebalanced = WorkerAllocationUtility.RebalanceAssignedWorkers(ref allocation);
+            int rebalanced = WorkerAllocationUtility.RebalanceAvailableWorkers(
+                ref allocation,
+                populationTotal: 57,
+                archerCount: 4);
 
-            Assert.That(rebalanced, Is.EqualTo(allocation.IronWorkerCapacity));
-            Assert.That(allocation.WoodWorkers, Is.Zero);
+            Assert.That(rebalanced, Is.EqualTo(53));
+            Assert.That(allocation.WoodWorkers, Is.EqualTo(29));
             Assert.That(allocation.StoneWorkers, Is.Zero);
             Assert.That(allocation.IronWorkers, Is.EqualTo(allocation.IronWorkerCapacity));
             Assert.That(allocation.FoodWorkers, Is.Zero);
+        }
+
+        [Test]
+        public void RemoveWorkersInResourceOrder_ConsumesWoodThenStoneThenIronThenFood()
+        {
+            var allocation = new MobilePopulationAllocation
+            {
+                WoodWorkers = 2,
+                StoneWorkers = 3,
+                IronWorkers = 4,
+                FoodWorkers = 5
+            };
+
+            int removed = WorkerAllocationUtility.RemoveWorkersInResourceOrder(
+                ref allocation,
+                amount: 7);
+
+            Assert.That(removed, Is.EqualTo(7));
+            Assert.That(allocation.WoodWorkers, Is.Zero);
+            Assert.That(allocation.StoneWorkers, Is.Zero);
+            Assert.That(allocation.IronWorkers, Is.EqualTo(2));
+            Assert.That(allocation.FoodWorkers, Is.EqualTo(5));
         }
 
         private static MobilePopulationAllocation CreateInitialAllocation()

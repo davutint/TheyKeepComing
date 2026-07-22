@@ -348,9 +348,9 @@ namespace DeadWalls
                         && unlocked
                         && gm.IsMobilePopulationEconomyEnabled()
                         && buyCost.CanAfford(resources)
-                        && gm.GetIdlePopulation() <= 0)
+                        && gm.GetAvailablePopulation() <= 0)
                     {
-                        buyCostLabel = $"{buyCostLabel} NEED POP";
+                        buyCostLabel = $"{buyCostLabel} NEED WORKER";
                     }
 
                     costText.text = unlocked
@@ -722,9 +722,9 @@ namespace DeadWalls
             if (!gm.IsFreeEconomyTestMode
                 && gm.IsMobilePopulationEconomyEnabled()
                 && buyCost.CanAfford(gm.Resources)
-                && gm.GetIdlePopulation() < definition.PopulationCost)
+                && gm.GetAvailablePopulation() < definition.PopulationCost)
             {
-                label = $"{label} NEED POP";
+                label = $"{label} NEED WORKER";
             }
 
             return label;
@@ -808,8 +808,8 @@ namespace DeadWalls
             if (!string.IsNullOrEmpty(need))
                 return need;
 
-            if (gm.IsMobilePopulationEconomyEnabled() && gm.GetIdlePopulation() < definition.PopulationCost)
-                return "NEED POP";
+            if (gm.IsMobilePopulationEconomyEnabled() && gm.GetAvailablePopulation() < definition.PopulationCost)
+                return "NEED WORKER";
 
             return "WAIT";
         }

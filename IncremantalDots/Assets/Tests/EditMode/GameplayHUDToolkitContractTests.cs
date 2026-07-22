@@ -148,7 +148,7 @@ namespace DeadWalls.Tests
             Assert.That(root.Q<Label>("woodRate").text, Is.EqualTo("0/MIN"));
             Assert.That(root.Q<Label>("enemyLabel").text, Is.EqualTo("ENEMIES"));
             Assert.That(root.Q<Label>("projectedEmbersLabel").text, Is.EqualTo("EMBERS ON DEATH"));
-            Assert.That(root.Q<Label>("economyIdleLabel").text, Is.EqualTo("IDLE PEOPLE"));
+            Assert.That(root.Q<Label>("economyIdleLabel").text, Is.EqualTo("UNASSIGNED"));
             Assert.That(root.Q<Label>("gameOverBalanceLabel").text, Is.EqualTo("EMBERS AVAILABLE"));
             Assert.That(root.Q<Button>("rallyButton").tooltip, Does.Contain("fire rate"));
 
@@ -190,6 +190,8 @@ namespace DeadWalls.Tests
                 Is.LessThan(uxml.IndexOf("name=\"economyRows\"", System.StringComparison.Ordinal)));
             Assert.That(managementSource, Does.Contain("new SliderInt"));
             Assert.That(managementSource, Does.Contain("SetWorkerAllocationSharePercent"));
+            Assert.That(managementSource, Does.Contain("CAPACITY OVERFLOW"));
+            Assert.That(managementSource, Does.Not.Contain("IDLE PEOPLE"));
             Assert.That(managementSource, Does.Contain("NotifyWorkerTargetRatioChangedByPlayer"));
             Assert.That(managementSource, Does.Not.Contain("economyPlusOne"));
             Assert.That(managementSource, Does.Not.Contain("TARGET -10%"));

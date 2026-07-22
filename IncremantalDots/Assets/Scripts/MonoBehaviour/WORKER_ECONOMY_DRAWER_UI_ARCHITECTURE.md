@@ -43,7 +43,7 @@ hedef kabul eder. Hedef degisikligi mevcut worker sayilarini aninda hareket etti
 
 ## Guncellenen Alanlar
 
-- Idle population
+- Unassigned population; yalnız bütün resource kapasiteleri doluysa pozitif olur ve asker rezervi değildir
 - Total worker count
 - Archer population count
 - Housing current population / total bed capacity, bos yatak ve run icinde satin alinmis yatak miktari

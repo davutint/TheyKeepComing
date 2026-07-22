@@ -119,7 +119,7 @@ namespace DeadWalls
                 heading.Add(stat);
                 row.Add(heading);
 
-                Label detail = new Label("0/MIN  ·  0 IDLE PEOPLE") { name = "economyDetail" + resource };
+                Label detail = new Label("0/MIN") { name = "economyDetail" + resource };
                 detail.AddToClassList("row-detail");
                 row.Add(detail);
 
@@ -282,8 +282,10 @@ namespace DeadWalls
                 int capacityValue = gm.GetMaxWorkersForResource(resource);
                 float rate = gm.GetWorkerProductionRate(resource);
                 Q<Label>("economyStat" + resource).text = $"{workers:N0} WORKERS  ·  {capacityValue:N0} CAPACITY";
-                Q<Label>("economyDetail" + resource).text = $"+{rate:0.#}/MIN  ·  {gm.GetIdlePopulation():N0} IDLE PEOPLE";
-                Q<Label>("economyAllocationValue" + resource).text = $"{target}% SHARE  ·  {workers:N0} WORKERS";
+                Q<Label>("economyDetail" + resource).text = $"+{rate:0.#}/MIN";
+                Q<Label>("economyAllocationValue" + resource).text = target == 0 && workers > 0
+                    ? $"0% TARGET  ·  {workers:N0} WORKERS  ·  CAPACITY OVERFLOW"
+                    : $"{target}% TARGET  ·  {workers:N0} WORKERS";
                 Q<SliderInt>("economyAllocationSlider" + resource).SetValueWithoutNotify(target);
 
                 int capacityLevel = gm.GetWorkerBuildingUpgradeLevel(resource, WorkerBuildingUpgradeType.Capacity);

@@ -7,8 +7,8 @@
 - `MobilePopulationAllocation` icindeki Wood/Stone/Iron/Food worker sayilarini population ve resource cap'lerine gore clamp eder.
 - Etkin resource cap'lerini `MobileCastleCombatConfig`'ten allocation state'e aynalar.
 - Mobile `PopulationState.BaseCapacity/Capacity` değerlerini `MobileBedCapacityState` toplamından senkronlar.
-- Kalici target ratio'lari normalize eder ve yalniz yeni gelen population'i bu hedeflere gore deterministik dagitir.
-- Pozitif target'larin cap'i doldugunda dagitilamayan kisileri Idle Population'da birakir.
+- Kalıcı target ratio'ları normalize eder ve archer olmayan bütün nüfusu bu hedeflere göre deterministik dağıtır.
+- Pozitif target'ların cap'i dolduğunda kalan kişileri sıradaki boş resource kapasitesine overflow olarak atar.
 - `PopulationState.Workers` ve `PopulationState.Idle` degerlerini allocation + archer sayisina gore gunceller; idle sonucu `WorkerAllocationUtility.ResolveIdlePopulation` ile `GameManager` player API'siyle ayni owner'dan gelir.
 - `ResourceProductionRate` degerlerini worker sayisi x worker production tuning olarak yazar.
 - Etkin worker cap ve kisi basi production tuning'ini `GameManager`in profile base + Tech +
@@ -39,11 +39,11 @@ Stress mode'da calismaz. Legacy/non-mobile sahnelerde `MobileCastleCombatConfig`
 - `RequiredFood = accepted × FoodCostPerArrival` aynı işlemde `ResourceData.Food` stokundan düşülür.
 - Persistent `LastPopulationGrowthCycle/LastPopulationGrowthWave` marker'ları aynı Dawn'da ve exact Continue sonrasında çift population/harcama yapılmasını engeller.
 - Target ratio toplami `10.000` basis point'tir.
-- İlk runtime gözlemi mevcut population'i baseline kabul eder; önceden var olan idle nüfusu dağıtmaz.
-- Sonraki pozitif population farkı `WorkerAllocationUtility` ile Wood/Stone/Iron/Food hedeflerine atanır.
-- Hedef oranı `0` olan resource otomatik worker almaz.
-- Pozitif hedeflerin cap'i doluysa overflow idle kalır.
-- Target ratio değişikliği gerçek worker count'u anında yeniden dağıtmaz; yalnız sonraki arrival'ların yönünü değiştirir.
+- İlk runtime gözleminden itibaren archer olmayan bütün nüfus işe atanır; ayrı asker rezervi tutulmaz.
+- Sonraki pozitif population farkı aynı frame `WorkerAllocationUtility` ile hedeflere atanır.
+- Hedef oranı `0` olan resource, pozitif hedeflerin cap'i dolduğunda capacity overflow worker alabilir.
+- Unassigned yalnız dört resource'un toplam kapasitesi tamamen dolduğunda kalır.
+- Target ratio değişikliği bütün mevcut sivil worker havuzunu anında yeniden dağıtır.
 
 ## Arrival Görsel Tüketicisi
 
@@ -60,9 +60,9 @@ Eventler legacy normal mobile `DayPrep` basinda roll edilir:
 
 V1 eventleri geneldir: resource stash, quarry crew, refugee cart. UI metinleri `GameManager` tarafinda verilir.
 
-## Bu Alt Pakette Bilerek Yapilmayanlar
+## Bu Alt Pakette Bilerek Yapılmayanlar
 
-- Mevcut worker'ları target ratio değişince zorla retrain/redistribute etmez.
+- Target ratio resource cap'ini bypass etmez; overflow sıradaki resource'a gider.
 - Worker world representation actual count'tan ayridir; `WorkerVisualRepresentationUtility` Low/Medium/High egriyle resource basina en fazla `32` temsili visual uretir.
 - Event popup/polish bu sistemde degil, `CastleEconomyUI` tarafindadir.
 

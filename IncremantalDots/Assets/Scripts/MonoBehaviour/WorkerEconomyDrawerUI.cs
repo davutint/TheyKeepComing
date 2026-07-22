@@ -257,7 +257,7 @@ namespace DeadWalls
             int idle = gm.GetIdlePopulation();
 
             SetText(WorkerDrawerTitleText, "WORKERS + HOUSING");
-            SetText(WorkerIdlePopulationText, $"IDLE {idle}");
+            SetText(WorkerIdlePopulationText, $"UNASSIGNED {idle}");
             SetText(WorkerTotalText, $"WORKERS {totalWorkers}/{gm.GetAvailablePopulation()}");
             SetText(WorkerArcherPopulationText, $"ARCHERS {population.Archers}");
 

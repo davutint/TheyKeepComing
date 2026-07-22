@@ -59,12 +59,17 @@ namespace DeadWalls
 
             SyncWorkerCapacities(ref allocationRW.ValueRW, config);
             NormalizeAllocation(ref allocationRW.ValueRW, ref populationRW.ValueRW);
-            int addedPopulation = WorkerAllocationUtility.BeginPopulationUpdate(
+            WorkerAllocationUtility.BeginPopulationUpdate(
                 ref allocationRW.ValueRW, populationRW.ValueRO.Total);
-            if (addedPopulation > 0)
+            int unassignedPopulation = WorkerAllocationUtility.ResolveIdlePopulation(
+                allocationRW.ValueRO,
+                populationRW.ValueRO.Total,
+                populationRW.ValueRO.Archers);
+            if (unassignedPopulation > 0)
             {
-                int assignable = math.min(addedPopulation, populationRW.ValueRO.Idle);
-                WorkerAllocationUtility.AutoAssignNewPopulation(ref allocationRW.ValueRW, assignable);
+                WorkerAllocationUtility.AutoAssignNewPopulation(
+                    ref allocationRW.ValueRW,
+                    unassignedPopulation);
                 NormalizeAllocation(ref allocationRW.ValueRW, ref populationRW.ValueRW);
             }
             SyncBedCapacity(ref populationRW.ValueRW, bedCapacity);
@@ -239,12 +244,7 @@ namespace DeadWalls
             int totalWorkers = allocation.WoodWorkers + allocation.StoneWorkers + allocation.IronWorkers + allocation.FoodWorkers;
             int overflow = totalWorkers - availableForWorkers;
             if (overflow > 0)
-            {
-                Reduce(ref allocation.IronWorkers, ref overflow);
-                Reduce(ref allocation.StoneWorkers, ref overflow);
-                Reduce(ref allocation.WoodWorkers, ref overflow);
-                Reduce(ref allocation.FoodWorkers, ref overflow);
-            }
+                WorkerAllocationUtility.RemoveWorkersInResourceOrder(ref allocation, overflow);
 
             totalWorkers = allocation.WoodWorkers + allocation.StoneWorkers + allocation.IronWorkers + allocation.FoodWorkers;
             population.Workers = totalWorkers;
@@ -259,16 +259,6 @@ namespace DeadWalls
         {
             value = math.max(0, value);
             return cap > 0 ? math.min(value, cap) : value;
-        }
-
-        private static void Reduce(ref int value, ref int overflow)
-        {
-            if (overflow <= 0 || value <= 0)
-                return;
-
-            int amount = math.min(value, overflow);
-            value -= amount;
-            overflow -= amount;
         }
 
         private static void WriteProductionRates(ref ResourceProductionRate production,

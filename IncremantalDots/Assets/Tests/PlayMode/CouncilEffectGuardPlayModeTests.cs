@@ -166,9 +166,9 @@ namespace DeadWalls.Tests
                 gameManager.GetCouncilOptionPresentation(archerOption);
             Assert.That(archerQuote.CanApplyExactly, Is.False);
             StringAssert.Contains("+10 BASIC ARCHERS", archerQuote.RichText);
-            StringAssert.Contains("-10 IDLE PEOPLE", archerQuote.RichText);
+            StringAssert.Contains("-10 RESOURCE WORKERS", archerQuote.RichText);
             Assert.That(gameManager.CanAffordCouncilOption(archerOption), Is.False,
-                "Kart, exact +10 sonucu idle population karsilamiyorken secilebilir olmamali.");
+                "Kart, exact +10 sonucu available worker karsilamiyorken secilebilir olmamali.");
 
             applyEffects.Invoke(gameManager, new object[] { archerOption.Effects });
             population = entityManager.GetComponentData<PopulationState>(gameStateEntity);

@@ -28,7 +28,7 @@ namespace DeadWalls
         /// <summary>Aninda nufus kazanci.</summary>
         GainPopulation = 6,
 
-        /// <summary>Aninda Basic okcu; her okcu bir idle population kullanir ve ortak 1000 cap'e tabidir.</summary>
+        /// <summary>Aninda Basic okcu; her okcu bir resource worker'i Archer'a cevirir ve ortak 1000 cap'e tabidir.</summary>
         GainFreeArchers = 7,
 
         /// <summary>Yalniz Wall Max HP yuzdesi kadar, eksik HP ile sinirli iyilestirme.</summary>

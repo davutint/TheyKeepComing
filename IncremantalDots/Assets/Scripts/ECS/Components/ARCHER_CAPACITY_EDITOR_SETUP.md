@@ -15,9 +15,8 @@ cap bir balance slider'ı değil, V1 ürün guardrail'idir ve
 2. Basic/Rapid/Frost toplamını `1000` değerine getir.
 3. Recruitment drawer'da bütün buy butonlarının `MAX` olduğunu ve
    `ARMY CAP 1000/1000` metnini doğrula.
-4. 1001. satın almayı dene; kaynak, idle population ve entity sayısı değişmemeli.
+4. 1001. satın almayı dene; kaynak, resource worker ve entity sayısı değişmemeli.
 5. Free Economy Test Mode açıkken de 1001. okçunun alınamadığını doğrula.
 
 Otomatik kanıt için `ArcherCapacityUtilityTests` ve `ArcherCapacityPlayModeTests`
 çalıştırılır.
-

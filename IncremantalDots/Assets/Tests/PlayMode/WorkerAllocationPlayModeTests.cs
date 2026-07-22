@@ -219,6 +219,13 @@ namespace DeadWalls.Tests
                 Is.SameAs(basicBuyButton.GetComponent<RectTransform>()));
 
             int countBefore = gameManager.GetArcherTypeCount(ArcherType.Basic);
+            using EntityQuery allocationQuery = entityManager.CreateEntityQuery(
+                typeof(MobileCastleCombatConfig), typeof(MobilePopulationAllocation));
+            Entity allocationEntity = allocationQuery.GetSingletonEntity();
+            MobilePopulationAllocation allocationBeforePurchase =
+                entityManager.GetComponentData<MobilePopulationAllocation>(allocationEntity);
+            int workersBeforePurchase = WorkerAllocationUtility.TotalWorkers(allocationBeforePurchase);
+            int woodBeforePurchase = allocationBeforePurchase.WoodWorkers;
             ResourceCost cost = gameManager.GetArcherBuyCost(ArcherType.Basic);
             ResourceData resourcesBeforePurchase =
                 entityManager.GetComponentData<ResourceData>(resourceEntity);
@@ -229,6 +236,12 @@ namespace DeadWalls.Tests
             Assert.That(resourcesAfter.Stone, Is.EqualTo(resourcesBeforePurchase.Stone - cost.Stone));
             Assert.That(resourcesAfter.Iron, Is.EqualTo(resourcesBeforePurchase.Iron - cost.Iron));
             Assert.That(resourcesAfter.Food, Is.EqualTo(resourcesBeforePurchase.Food - cost.Food));
+            MobilePopulationAllocation allocationAfterPurchase =
+                entityManager.GetComponentData<MobilePopulationAllocation>(allocationEntity);
+            Assert.That(WorkerAllocationUtility.TotalWorkers(allocationAfterPurchase),
+                Is.EqualTo(workersBeforePurchase - 1));
+            Assert.That(allocationAfterPurchase.WoodWorkers,
+                Is.EqualTo(Mathf.Max(0, woodBeforePurchase - 1)));
             yield return null;
 
             Assert.That(MetaProgression.HasTutorialFlag(
@@ -1227,7 +1240,7 @@ namespace DeadWalls.Tests
         }
 
         [UnityTest]
-        public IEnumerator PopulationIncrease_AssignsOnlyNewPeopleToTarget_AndLeavesCapOverflowIdle()
+        public IEnumerator PopulationIncrease_AssignsEveryoneAndSpillsPastTargetCapacity()
         {
             EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             using EntityQuery allocationQuery = entityManager.CreateEntityQuery(
@@ -1243,7 +1256,6 @@ namespace DeadWalls.Tests
             int initialStone = allocation.StoneWorkers;
             int initialIron = allocation.IronWorkers;
             int initialFood = allocation.FoodWorkers;
-            int initialIdle = population.Idle;
 
             config.FoodWorkerCap = initialFood + 5;
             entityManager.SetComponentData(allocationEntity, config);
@@ -1268,7 +1280,7 @@ namespace DeadWalls.Tests
             Assert.That(allocation.FoodWorkers, Is.EqualTo(initialFood + 5));
             Assert.That(population.Workers,
                 Is.EqualTo(initialWood + initialStone + initialIron + initialFood + 5));
-            Assert.That(population.Idle, Is.EqualTo(initialIdle));
+            Assert.That(population.Idle, Is.Zero);
 
             config = entityManager.GetComponentData<MobileCastleCombatConfig>(allocationEntity);
             config.FoodWorkerCap = allocation.FoodWorkers;
@@ -1284,8 +1296,9 @@ namespace DeadWalls.Tests
             var cappedAllocation = entityManager.GetComponentData<MobilePopulationAllocation>(allocationEntity);
             var cappedPopulation = entityManager.GetComponentData<PopulationState>(populationEntity);
             Assert.That(cappedAllocation.FoodWorkers, Is.EqualTo(allocation.FoodWorkers));
-            Assert.That(cappedPopulation.Workers, Is.EqualTo(population.Workers));
-            Assert.That(cappedPopulation.Idle, Is.EqualTo(population.Idle + 3));
+            Assert.That(cappedAllocation.WoodWorkers, Is.EqualTo(allocation.WoodWorkers + 3));
+            Assert.That(cappedPopulation.Workers, Is.EqualTo(population.Workers + 3));
+            Assert.That(cappedPopulation.Idle, Is.Zero);
         }
 
         [UnityTest]
@@ -1300,10 +1313,19 @@ namespace DeadWalls.Tests
             Entity allocationEntity = allocationQuery.GetSingletonEntity();
             MobilePopulationAllocation before =
                 entityManager.GetComponentData<MobilePopulationAllocation>(allocationEntity);
-            int assignedBefore = WorkerAllocationUtility.TotalWorkers(before);
+            int availableWorkers = gameManager.GetAvailablePopulation();
             int expectedWoodWorkers = Mathf.Min(
-                assignedBefore,
+                availableWorkers,
                 gameManager.GetMaxWorkersForResource(EconomyFocusType.Wood));
+            int expectedStoneWorkers = Mathf.Min(
+                Mathf.Max(0, availableWorkers - expectedWoodWorkers),
+                gameManager.GetMaxWorkersForResource(EconomyFocusType.Stone));
+            int expectedIronWorkers = Mathf.Min(
+                Mathf.Max(0, availableWorkers - expectedWoodWorkers - expectedStoneWorkers),
+                gameManager.GetMaxWorkersForResource(EconomyFocusType.Iron));
+            int expectedFoodWorkers = Mathf.Min(
+                Mathf.Max(0, availableWorkers - expectedWoodWorkers - expectedStoneWorkers - expectedIronWorkers),
+                gameManager.GetMaxWorkersForResource(EconomyFocusType.Food));
 
             bool changed = gameManager.SetWorkerAllocationSharePercent(
                 EconomyFocusType.Wood,
@@ -1317,13 +1339,17 @@ namespace DeadWalls.Tests
             Assert.That(after.IronTargetRatioBps, Is.Zero);
             Assert.That(after.FoodTargetRatioBps, Is.Zero);
             Assert.That(after.WoodWorkers, Is.EqualTo(expectedWoodWorkers));
-            Assert.That(after.StoneWorkers, Is.Zero);
-            Assert.That(after.IronWorkers, Is.Zero);
-            Assert.That(after.FoodWorkers, Is.Zero);
+            Assert.That(after.StoneWorkers, Is.EqualTo(expectedStoneWorkers));
+            Assert.That(after.IronWorkers, Is.EqualTo(expectedIronWorkers));
+            Assert.That(after.FoodWorkers, Is.EqualTo(expectedFoodWorkers));
 
             yield return null;
             Assert.That(gameManager.GetIdlePopulation(),
-                Is.EqualTo(gameManager.GetAvailablePopulation() - expectedWoodWorkers));
+                Is.EqualTo(Mathf.Max(0, availableWorkers
+                    - expectedWoodWorkers
+                    - expectedStoneWorkers
+                    - expectedIronWorkers
+                    - expectedFoodWorkers)));
         }
 
         [UnityTest]

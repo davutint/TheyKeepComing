@@ -29,12 +29,12 @@ namespace DeadWalls
         public static int GetAllowedFreeArcherGain(
             int requestedArchers,
             int currentTotalArchers,
-            int idlePopulation)
+            int availableWorkers)
         {
             int capacityAllowed = ArcherCapacityUtility.GetAllowedAdditionalCount(
                 currentTotalArchers,
                 requestedArchers);
-            return math.min(capacityAllowed, math.max(0, idlePopulation));
+            return math.min(capacityAllowed, math.max(0, availableWorkers));
         }
 
         public static float ResolveNightCountMultiplier(float rateDelta)

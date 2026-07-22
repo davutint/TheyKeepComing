@@ -428,24 +428,15 @@ namespace DeadWalls
                 _fireballCasts++;
 
             // 6-7) Defense once okcuyu, Economy once ileri yatak hazirligini ele alir.
-            bool reserveIdleForArcher;
             if (_policy == LongRunBotPolicy.Defense)
             {
-                reserveIdleForArcher = TryRecruitArcherForPolicy(gm);
+                TryRecruitArcherForPolicy(gm);
                 TryPrepareHousing(gm);
             }
             else
             {
                 TryPrepareHousing(gm);
-                reserveIdleForArcher = TryRecruitArcherForPolicy(gm);
-            }
-
-            // 8) Satin alma icin bekletilmeyen idle population policy agirliklarina atanir.
-            for (int i = 0; !reserveIdleForArcher && i < 4 && gm.GetIdlePopulation() > 0; i++)
-            {
-                var target = PickWorkerResource(gm);
-                if (target == EconomyFocusType.Balanced || !gm.AssignResourceWorker(target))
-                    break;
+                TryRecruitArcherForPolicy(gm);
             }
 
             // 9) Fazla ekonomi tamponu olusunca Wood/Arrow efficiency'yi dengeli ilerlet.
@@ -498,26 +489,20 @@ namespace DeadWalls
             _totalHousingCost = Add(_totalHousingCost, housingCost);
         }
 
-        /// <summary>
-        /// true donerse mevcut idle, policy hedefindeki bir sonraki okcu icin korunur.
-        /// </summary>
-        private bool TryRecruitArcherForPolicy(GameManager gm)
+        private void TryRecruitArcherForPolicy(GameManager gm)
         {
             int currentArchers = CountArchers();
             int desiredArchers = GetDesiredArcherCount(gm.Population.Total);
             if (currentArchers >= Mathf.Min(MaxArchers, desiredArchers)
-                || gm.GetIdlePopulation() <= 0)
+                || gm.GetAvailablePopulation() <= 0)
             {
-                return false;
+                return;
             }
 
             if (!HasSustainableArrowBudget(gm))
-                return false;
+                return;
 
-            bool bought = TryBuyArcherPreferred(gm);
-            int afterPurchase = bought ? currentArchers + 1 : currentArchers;
-            return afterPurchase < Mathf.Min(MaxArchers, desiredArchers)
-                   && gm.GetIdlePopulation() > 0;
+            TryBuyArcherPreferred(gm);
         }
 
         private int GetDesiredArcherCount(int population)
@@ -821,71 +806,6 @@ namespace DeadWalls
             }
 
             return false;
-        }
-
-        private EconomyFocusType PickWorkerResource(GameManager gm)
-        {
-            var resources = new[] { EconomyFocusType.Wood, EconomyFocusType.Stone, EconomyFocusType.Iron, EconomyFocusType.Food };
-            EconomyFocusType best = EconomyFocusType.Balanced;
-            float bestFill = float.MaxValue;
-            foreach (var r in resources)
-            {
-                if (!gm.CanAssignResourceWorker(r))
-                    continue;
-                float denominator = _policy == LongRunBotPolicy.Balanced
-                    ? Mathf.Max(1, GetCap(gm, r))
-                    : Mathf.Max(0.01f, GetWorkerPolicyWeight(r));
-                float fill = gm.GetResourceWorkers(r) / denominator;
-                if (fill < bestFill) { bestFill = fill; best = r; }
-            }
-            return best;
-        }
-
-        private float GetWorkerPolicyWeight(EconomyFocusType resource)
-        {
-            if (_policy == LongRunBotPolicy.Economy)
-            {
-                switch (resource)
-                {
-                    case EconomyFocusType.Wood: return 0.49f;
-                    case EconomyFocusType.Stone: return 0.19f;
-                    case EconomyFocusType.Iron: return 0.19f;
-                    case EconomyFocusType.Food: return 0.13f;
-                }
-            }
-            else if (_policy == LongRunBotPolicy.Defense)
-            {
-                switch (resource)
-                {
-                    case EconomyFocusType.Wood: return 0.51f;
-                    case EconomyFocusType.Stone: return 0.25f;
-                    case EconomyFocusType.Iron: return 0.15f;
-                    case EconomyFocusType.Food: return 0.09f;
-                }
-            }
-
-            return 0.25f;
-        }
-
-        private static int GetCap(GameManager gm, EconomyFocusType resource)
-        {
-            var world = World.DefaultGameObjectInjectionWorld;
-            if (world == null) return 1;
-            var q = world.EntityManager.CreateEntityQuery(typeof(MobileCastleCombatConfig));
-            if (q.CalculateEntityCount() == 0)
-            {
-                q.Dispose();
-                return 1;
-            }
-            var cfg = q.GetSingleton<MobileCastleCombatConfig>();
-            q.Dispose();
-            switch (resource)
-            {
-                case EconomyFocusType.Stone: return cfg.StoneWorkerCap;
-                case EconomyFocusType.Iron: return cfg.IronWorkerCap;
-                case EconomyFocusType.Food: return cfg.FoodWorkerCap;
-                default: return cfg.WoodWorkerCap;
-            }
         }
 
         // ---------------------------------------------------------------

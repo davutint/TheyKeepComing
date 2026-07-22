@@ -265,7 +265,7 @@ Mobile normal mode'da `DamageCleanupSystem`, death timer biten zombiler icin kil
 - `PopulationGrowthPerDayPrep` legacy DayPrep akisi icin isimlendirilmis eski config alanidir;
   continuous siege varsayilaninda her Dawn request miktari olarak kullanilir. Aktif baseline
   `DifficultyProfileSO`dan resolver ile gelir; authoring alani profile yoksa fallback'tir.
-- Okcu satin almak `1` idle population kullanir; idle yoksa buy disabled olur ve drawer `NEED POP` yazar.
+- Okcu satin almak Wood -> Stone -> Iron -> Food sirasiyla `1` resource worker'i Archer'a cevirir; sivil worker yoksa buy disabled olur ve drawer `NEED WORKER` yazar.
 - Editor testleri icin `GameManager.Free Economy Test Mode` acilirsa okcu satin alma population harcamaz ve resource/population eksigi aksiyonlari bloklamaz.
 - Nadir eventler `MobileEconomyEventState` ile tutulur; secilmezse gece baslarken expire eder.
 
@@ -280,7 +280,7 @@ Mobile normal mode'da `DamageCleanupSystem`, death timer biten zombiler icin kil
 - Basic Buy: `45W + 20F`.
 - Rapid Buy: `55W + 35I + 20F`.
 - Frost Buy: `45W + 55S + 25I`.
-- Yetersiz kaynak varsa row `CostText` mevcut cost yanina `NEED ...` ekler; idle population yoksa buy cost yanina `NEED POP` ekler. Locked tiplerde row `LOCKED BY TECH` gosterir. Yeni UI elemani gerekmez.
+- Yetersiz kaynak varsa row `CostText` mevcut cost yanina `NEED ...` ekler; sivil worker yoksa buy cost yanina `NEED WORKER` ekler. Locked tiplerde row `LOCKED BY TECH` gosterir. Yeni UI elemani gerekmez.
 - `Free Economy Test Mode` sadece lokal test kolayligi icindir; acikken UI costlari `FREE` gosterir ve satin alma kaynak/population eksiginden bloklanmaz.
 
 Type level ve upgrade API'leri kodda korunur, fakat player-facing sahibi sag drawer degildir. Ileride Tech Tree node'lari ayni tip mevcut ve future okculara su scaling'i uygulayabilir:

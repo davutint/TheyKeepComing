@@ -1536,7 +1536,10 @@ namespace DeadWalls
                 ref allocation,
                 GetWorkerResourceIndex(resource),
                 targetRatioBps);
-            WorkerAllocationUtility.RebalanceAssignedWorkers(ref allocation);
+            WorkerAllocationUtility.RebalanceAvailableWorkers(
+                ref allocation,
+                Population.Total,
+                Population.Archers);
 
             _entityManager.SetComponentData(mobileConfigEntity, allocation);
             PopulationAllocation = allocation;
@@ -2969,7 +2972,7 @@ namespace DeadWalls
             context.Resources = resources;
             context.CurrentPopulation = population.Total;
             context.TotalArchers = GetArcherCount();
-            context.IdlePopulation = GetIdlePopulation();
+            context.AvailableWorkers = GetAvailablePopulation();
 
             if (_entityManager.Exists(_castleEntity)
                 && _entityManager.HasComponent<WallSegment>(_castleEntity))
@@ -3172,7 +3175,7 @@ namespace DeadWalls
             int allowed = CouncilEffectGuardUtility.GetAllowedFreeArcherGain(
                 requestedArchers,
                 GetArcherCount(),
-                GetIdlePopulation());
+                GetAvailablePopulation());
             int spawned = 0;
             for (int i = 0; i < allowed; i++)
             {
@@ -3193,28 +3196,7 @@ namespace DeadWalls
 
         private bool ConsumePopulationForCouncilArcher()
         {
-            if (!IsMobilePopulationEconomyEnabled()
-                || !CanAccessEntityManager()
-                || !_entityManager.Exists(_gameStateEntity))
-            {
-                return false;
-            }
-
-            var population = _entityManager.GetComponentData<PopulationState>(_gameStateEntity);
-            int workers = PopulationAllocation.WoodWorkers
-                + PopulationAllocation.StoneWorkers
-                + PopulationAllocation.IronWorkers
-                + PopulationAllocation.FoodWorkers;
-            int idle = math.max(0, population.Total - population.Archers - workers);
-            if (idle <= 0)
-                return false;
-
-            population.Workers = workers;
-            population.Archers = math.min(population.Total, population.Archers + 1);
-            population.Idle = math.max(0, population.Total - population.Workers - population.Archers);
-            _entityManager.SetComponentData(_gameStateEntity, population);
-            Population = population;
-            return true;
+            return TryConvertWorkersToArchers(1);
         }
 
         private static ResourceCost BuildSingleResourceCost(EconomyFocusType resource, int amount)
@@ -4941,7 +4923,7 @@ namespace DeadWalls
 
             return populationCost <= 0
                 || !IsMobilePopulationEconomyEnabled()
-                || GetIdlePopulation() >= populationCost;
+                || GetAvailablePopulation() >= populationCost;
         }
 
         private void ConsumePopulationForNewArcher(int populationCost = 1)
@@ -4952,14 +4934,53 @@ namespace DeadWalls
             if (populationCost <= 0)
                 return;
 
-            if (!IsMobilePopulationEconomyEnabled() || !CanAccessEntityManager() || !_entityManager.Exists(_gameStateEntity))
-                return;
+            if (!TryConvertWorkersToArchers(populationCost))
+                Debug.LogError("[GameManager] Archer spawn resource worker conversion olmadan tamamlandi.");
+        }
+
+        private bool TryConvertWorkersToArchers(int populationCost)
+        {
+            if (populationCost <= 0 || !IsMobilePopulationEconomyEnabled())
+                return true;
+
+            if (!CanAccessEntityManager()
+                || !_entityManager.Exists(_gameStateEntity)
+                || !TryGetMobileConfigEntity(out Entity configEntity)
+                || !_entityManager.HasComponent<MobilePopulationAllocation>(configEntity))
+            {
+                return false;
+            }
 
             var population = _entityManager.GetComponentData<PopulationState>(_gameStateEntity);
+            int availableWorkers = Mathf.Max(0, population.Total - population.Archers);
+            if (availableWorkers < populationCost)
+                return false;
+
+            var allocation = _entityManager.GetComponentData<MobilePopulationAllocation>(configEntity);
+            int unassigned = WorkerAllocationUtility.ResolveIdlePopulation(
+                allocation,
+                population.Total,
+                population.Archers);
+            int assignedWorkersToConsume = Mathf.Max(0, populationCost - unassigned);
+            int removedWorkers = WorkerAllocationUtility.RemoveWorkersInResourceOrder(
+                ref allocation,
+                assignedWorkersToConsume);
+            if (removedWorkers != assignedWorkersToConsume)
+                return false;
+
             population.Archers = Mathf.Min(population.Total, population.Archers + populationCost);
-            population.Idle = Mathf.Max(0, population.Total - population.Workers - population.Archers);
+            population.Workers = WorkerAllocationUtility.TotalWorkers(allocation);
+            population.Idle = WorkerAllocationUtility.ResolveIdlePopulation(
+                allocation,
+                population.Total,
+                population.Archers);
+
+            _entityManager.SetComponentData(configEntity, allocation);
             _entityManager.SetComponentData(_gameStateEntity, population);
+            PopulationAllocation = allocation;
             Population = population;
+            SyncWorkerVisualsToAllocation();
+            return true;
         }
 
         private ArcherStats GetScaledArcherStats(ArcherType type)
