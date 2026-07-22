@@ -46,6 +46,20 @@ Unity Test Framework is installed. Add EditMode tests under `Assets/Tests/EditMo
 
 Recent local commit titles use short summaries such as `Map Create System Added` or `M1.7 Worker Assignment UI + Building Detail Panel`. If the owner explicitly asks for commit text, mention the affected feature and changed systems/assets.
 
+### Mandatory Codex Commit Message Format
+
+Every development commit created by Codex in this repository must use the following format. Do not improvise or translate the section responsibilities.
+
+1. The commit subject must be English and use `DW-<PACKAGE>: <English summary>`.
+2. The body must contain `### Summary` followed by the same English package line in backticks.
+3. The body must contain `### Açıklama` with a detailed Turkish explanation of the complete committed scope.
+4. The Turkish explanation must name every materially changed script. If no script changed, state `Script değişikliği: Yok.` explicitly.
+5. The body must contain `### Test` with only actually verified compilation, Console, test, diff-check, commit, and push facts.
+6. Before reporting success, inspect `git log -1 --pretty=fuller` and verify the final message, commit scope, and hash.
+7. Before committing, verify `core.hooksPath`; if it is missing, set it to the absolute path of this repository's `.githooks` directory.
+
+The repository-local commit hook at `.githooks/commit-msg` is the mechanical guard for Codex `DW-...` commits. If it rejects a message, fix the message; never bypass the hook with `--no-verify`.
+
 Do not create pull requests, issues, releases, remote branches, or any GitHub-facing artifact. Do not push, publish, upload, sync, or send repository files to GitHub or any remote service.
 
 ## Agent-Specific Instructions

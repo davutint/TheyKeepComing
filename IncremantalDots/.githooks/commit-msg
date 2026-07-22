@@ -1,0 +1,63 @@
+#!/bin/sh
+
+message_file="$1"
+
+if [ ! -r "$message_file" ]; then
+  printf 'Commit message rejected: message file is not readable: %s\n' "$message_file" >&2
+  exit 1
+fi
+
+subject=$(sed -n '1p' "$message_file" | tr -d '\r')
+
+case "$subject" in
+  DW-*) ;;
+  *) exit 0 ;;
+esac
+
+failures=""
+
+if ! printf '%s\n' "$subject" | LC_ALL=C grep -Eq '^DW-[A-Z0-9][A-Z0-9-]*: [ -~]+$'; then
+  failures="${failures}\n- Subject must use ASCII English: DW-<PACKAGE>: <English summary>."
+fi
+
+if printf '%s\n' "$subject" | grep -Eiq '(^|[ :+/-])(Asker|Isci|Rezervsiz|Donusum|Gucu|Sistemi|Duzeltme|Eklendi|Kaldirildi|Guncelleme|icin|ile|ve)([ :+/-]|$)'; then
+  failures="${failures}\n- Subject appears to contain Turkish words; Summary must be English."
+fi
+
+if ! grep -Fqx '### Summary' "$message_file"; then
+  failures="${failures}\n- Missing exact heading: ### Summary"
+fi
+
+if ! grep -Fqx '### Açıklama' "$message_file"; then
+  failures="${failures}\n- Missing exact heading: ### Açıklama"
+fi
+
+if ! grep -Fqx '### Test' "$message_file"; then
+  failures="${failures}\n- Missing exact heading: ### Test"
+fi
+
+description=$(awk '/^### Açıklama\r?$/{capture=1; next} /^### /{if (capture) exit} capture{print}' "$message_file")
+description_length=$(printf '%s' "$description" | tr -d '[:space:]' | wc -c | tr -d ' ')
+if [ "$description_length" -lt 160 ]; then
+  failures="${failures}\n- Turkish Açıklama is too short; describe the committed scope in detail."
+fi
+
+if ! printf '%s\n' "$description" | grep -q '[çğıöşüÇĞİÖŞÜ]'; then
+  failures="${failures}\n- Açıklama must be written in Turkish."
+fi
+
+expected_summary="\`$subject\`"
+if ! grep -Fqx "$expected_summary" "$message_file"; then
+  failures="${failures}\n- Summary body must repeat the English subject in backticks."
+fi
+
+if ! grep -Eq '\.cs([^[:alnum:]_]|$)|Script değişikliği: Yok\.' "$message_file"; then
+  failures="${failures}\n- Turkish explanation must name changed .cs scripts or state: Script değişikliği: Yok."
+fi
+
+if [ -n "$failures" ]; then
+  printf 'Commit message rejected by Dead Walls format guard:%b\n' "$failures" >&2
+  exit 1
+fi
+
+exit 0
