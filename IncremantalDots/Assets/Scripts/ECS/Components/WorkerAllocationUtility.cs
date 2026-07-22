@@ -223,6 +223,16 @@ namespace DeadWalls
             return assigned;
         }
 
+        public static int RebalanceAssignedWorkers(ref MobilePopulationAllocation allocation)
+        {
+            int assignedWorkers = TotalWorkers(allocation);
+            allocation.WoodWorkers = 0;
+            allocation.StoneWorkers = 0;
+            allocation.IronWorkers = 0;
+            allocation.FoodWorkers = 0;
+            return AutoAssignNewPopulation(ref allocation, assignedWorkers);
+        }
+
         private static void EvaluateCandidate(int index, int workers, int capacity, int ratio,
             int totalAfterAssignment, ref int best, ref long bestScore)
         {

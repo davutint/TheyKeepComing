@@ -1520,6 +1520,31 @@ namespace DeadWalls
             return SetWorkerTargetRatioBps(resource, targetRatioBps);
         }
 
+        public bool SetWorkerAllocationSharePercent(EconomyFocusType resource, float targetPercent)
+        {
+            resource = EconomyFocusUtility.Normalize(resource);
+            if (resource == EconomyFocusType.Balanced
+                || !IsMobilePopulationEconomyEnabled()
+                || !TryGetMobileConfigEntity(out var mobileConfigEntity))
+            {
+                return false;
+            }
+
+            var allocation = _entityManager.GetComponentData<MobilePopulationAllocation>(mobileConfigEntity);
+            int targetRatioBps = Mathf.RoundToInt(Mathf.Clamp(targetPercent, 0f, 100f) * 100f);
+            WorkerAllocationUtility.SetTargetRatioBps(
+                ref allocation,
+                GetWorkerResourceIndex(resource),
+                targetRatioBps);
+            WorkerAllocationUtility.RebalanceAssignedWorkers(ref allocation);
+
+            _entityManager.SetComponentData(mobileConfigEntity, allocation);
+            PopulationAllocation = allocation;
+            SyncWorkerVisualsToAllocation();
+            OnGameStateChanged?.Invoke();
+            return true;
+        }
+
         public bool AdjustWorkerTargetRatioPercent(EconomyFocusType resource, int deltaPercent)
         {
             int currentRatioBps = GetWorkerTargetRatioBps(resource);

@@ -468,7 +468,7 @@ namespace DeadWalls
             {
                 long enemiesLeft = Math.Max(0L, gm.ContinuousSpawnBudget.PendingEnemies)
                     + Math.Max(0, gm.WaveState.ZombiesAlive);
-                _phaseCountdown.text = $"{enemiesLeft:N0} LEFT";
+                _phaseCountdown.text = $"{enemiesLeft:N0} ENEMIES LEFT";
             }
             else
             {
@@ -589,7 +589,11 @@ namespace DeadWalls
 
             _rallyState.text = !gm.RallyUnlocked
                 ? "LOCKED"
-                : gm.RallyActive ? $"ACTIVE {Mathf.CeilToInt(gm.RallyActiveRemaining)}s" : FormatCooldownState(gm.RallyCooldownRemaining);
+                : gm.RallyActive
+                    ? $"ACTIVE {Mathf.CeilToInt(gm.RallyActiveRemaining)}s"
+                    : gm.RallyCooldownRemaining > 0f
+                        ? FormatCooldownState(gm.RallyCooldownRemaining)
+                        : "BOOST FIRE RATE";
             _rallyButton.SetEnabled(gm.RallyReady);
 
             if (!gm.EmergencyRepairUnlocked)
@@ -810,8 +814,8 @@ namespace DeadWalls
         private static string FormatRate(float value)
         {
             if (Mathf.Abs(value) < 0.01f)
-                return "0/m";
-            return (value > 0f ? "+" : string.Empty) + value.ToString("0.#", CultureInfo.InvariantCulture) + "/m";
+                return "0/MIN";
+            return (value > 0f ? "+" : string.Empty) + value.ToString("0.#", CultureInfo.InvariantCulture) + "/MIN";
         }
 
         private static string FormatCooldownState(float remaining)
@@ -861,7 +865,7 @@ namespace DeadWalls
         private static string GetPhaseMessage(ContinuousSiegeCycleData cycle)
         {
             if (ContinuousSpawnBudgetUtility.IsNightClearance(cycle))
-                return "CLEAR THE REMAINING HORDE";
+                return "CLEAR ENEMIES TO REACH DAWN";
             if (cycle.IsBloodMoonNight && cycle.Phase != SiegeCyclePhase.Night)
                 return "BLOOD MOON APPROACHING";
             return cycle.Phase switch
@@ -887,8 +891,12 @@ namespace DeadWalls
 
         private static string FormatCost(ResourceCost cost)
         {
-            string value = cost.ToDisplayString();
-            return string.IsNullOrWhiteSpace(value) ? "FREE" : value.ToUpperInvariant();
+            var parts = new List<string>(4);
+            if (cost.Wood > 0) parts.Add($"{cost.Wood:N0} WOOD");
+            if (cost.Stone > 0) parts.Add($"{cost.Stone:N0} STONE");
+            if (cost.Iron > 0) parts.Add($"{cost.Iron:N0} IRON");
+            if (cost.Food > 0) parts.Add($"{cost.Food:N0} FOOD");
+            return parts.Count == 0 ? "FREE" : string.Join("  ·  ", parts);
         }
 
         private void ShowPrimaryToast(string text)

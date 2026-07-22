@@ -166,7 +166,7 @@ namespace DeadWalls
     public sealed class FirstRunOnboardingUI : MonoBehaviour
     {
         public const string WorkerRatioFlagId = "tutorial.v1.worker_ratio";
-        public const string WorkerRatioHint = "ADJUST A WORKER TARGET RATIO.";
+        public const string WorkerRatioHint = "DRAG A WORKER SHARE SLIDER.";
         public const string BasicArcherFlagId = "tutorial.v1.basic_archer";
         public const string BasicArcherHint = "RECRUIT A BASIC ARCHER.";
         public const string LowAmmoFlagId = "tutorial.v1.low_ammo";
@@ -635,6 +635,11 @@ namespace DeadWalls
 
             _persistenceWarningLogged = true;
             Debug.LogWarning("[FirstRunOnboardingUI] Worker ratio tutorial flag durable yazilamadi.");
+        }
+
+        public void NotifyWorkerTargetRatioChangedByPlayer(EconomyFocusType resource)
+        {
+            HandleWorkerTargetRatioChanged(resource);
         }
 
         private void HandleArcherPurchased(ArcherType type)

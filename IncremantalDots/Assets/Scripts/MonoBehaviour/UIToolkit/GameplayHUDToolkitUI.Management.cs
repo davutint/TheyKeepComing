@@ -12,6 +12,8 @@ namespace DeadWalls
         private Label _economyIdle;
         private Label _economyWorkers;
         private Label _economyHousing;
+        private VisualElement _housingCard;
+        private Label _housingStatus;
         private Label _housingCost;
         private Button _housingOne;
         private Button _housingTen;
@@ -52,6 +54,8 @@ namespace DeadWalls
             _economyIdle = Q<Label>("economyIdle");
             _economyWorkers = Q<Label>("economyWorkers");
             _economyHousing = Q<Label>("economyHousing");
+            _housingCard = Q<VisualElement>("housingCard");
+            _housingStatus = Q<Label>("housingStatus");
             _housingCost = Q<Label>("housingCost");
             _housingOne = Q<Button>("housingOne");
             _housingTen = Q<Button>("housingTen");
@@ -115,49 +119,38 @@ namespace DeadWalls
                 heading.Add(stat);
                 row.Add(heading);
 
-                Label detail = new Label("0/m  ·  0 AVAILABLE") { name = "economyDetail" + resource };
+                Label detail = new Label("0/MIN  ·  0 IDLE PEOPLE") { name = "economyDetail" + resource };
                 detail.AddToClassList("row-detail");
                 row.Add(detail);
 
-                Label assignmentLabel = new Label("ASSIGN WORKERS");
+                VisualElement allocationControl = new VisualElement();
+                allocationControl.AddToClassList("worker-allocation-control");
+                VisualElement allocationHeader = new VisualElement();
+                allocationHeader.AddToClassList("worker-allocation-header");
+                Label assignmentLabel = new Label("WORKER SHARE");
                 assignmentLabel.AddToClassList("assignment-label");
-                row.Add(assignmentLabel);
+                Label allocationValue = new Label("25% SHARE")
+                {
+                    name = "economyAllocationValue" + resource
+                };
+                allocationValue.AddToClassList("worker-allocation-value");
+                allocationHeader.Add(assignmentLabel);
+                allocationHeader.Add(allocationValue);
+                allocationControl.Add(allocationHeader);
 
-                VisualElement workerActions = new VisualElement();
-                workerActions.AddToClassList("row-actions");
-                workerActions.AddToClassList("worker-actions");
-                Button minusTen = CreateCompactButton("-10", () => ChangeResourceWorkers(resource, -10));
-                minusTen.name = "economyMinusTen" + resource;
-                Button minusOne = CreateCompactButton("-1", () => ChangeResourceWorkers(resource, -1));
-                minusOne.name = "economyMinusOne" + resource;
-                Button plusOne = CreateCompactButton("+1", () => ChangeResourceWorkers(resource, 1));
-                plusOne.name = "economyPlusOne" + resource;
-                plusOne.AddToClassList("compact-action--primary");
-                Button plusTen = CreateCompactButton("+10", () => ChangeResourceWorkers(resource, 10));
-                plusTen.name = "economyPlusTen" + resource;
-                plusTen.AddToClassList("compact-action--primary");
-                Button fill = CreateCompactButton("FILL", () => FillResourceWorkers(resource));
-                fill.name = "economyFill" + resource;
-                fill.AddToClassList("compact-action--primary");
-                workerActions.Add(minusTen);
-                workerActions.Add(minusOne);
-                workerActions.Add(plusOne);
-                workerActions.Add(plusTen);
-                workerActions.Add(fill);
-                row.Add(workerActions);
-
-                VisualElement targetActions = new VisualElement();
-                targetActions.AddToClassList("allocation-target-row");
-                Label targetLabel = new Label("NEW ARRIVALS 25%") { name = "economyTarget" + resource };
-                targetLabel.AddToClassList("allocation-target-label");
-                Button targetMinus = CreateCompactButton("AUTO -10%", () => AdjustWorkerTarget(resource, -10));
-                targetMinus.name = "economyTargetMinus" + resource;
-                Button targetPlus = CreateCompactButton("AUTO +10%", () => AdjustWorkerTarget(resource, 10));
-                targetPlus.name = "economyTargetPlus" + resource;
-                targetActions.Add(targetLabel);
-                targetActions.Add(targetMinus);
-                targetActions.Add(targetPlus);
-                row.Add(targetActions);
+                SliderInt allocationSlider = new SliderInt
+                {
+                    name = "economyAllocationSlider" + resource,
+                    lowValue = 0,
+                    highValue = 100,
+                    pageSize = 5,
+                    showInputField = false
+                };
+                allocationSlider.AddToClassList("worker-allocation-slider");
+                allocationSlider.RegisterValueChangedCallback(evt =>
+                    SetWorkerAllocationShare(resource, evt.newValue));
+                allocationControl.Add(allocationSlider);
+                row.Add(allocationControl);
 
                 VisualElement actions = new VisualElement();
                 actions.AddToClassList("row-actions");
@@ -217,7 +210,7 @@ namespace DeadWalls
                 Label role = new Label(definition.Description) { name = "archerRole" + type };
                 role.AddToClassList("archer-role");
                 row.Add(role);
-                Label detail = new Label("0 DPS") { name = "archerDetail" + type };
+                Label detail = new Label("0 DAMAGE / SEC") { name = "archerDetail" + type };
                 detail.AddToClassList("row-detail");
                 row.Add(detail);
 
@@ -264,10 +257,19 @@ namespace DeadWalls
                 return;
 
             _economyIdle.text = gm.GetIdlePopulation().ToString("N0", CultureInfo.InvariantCulture);
-            _economyWorkers.text = gm.Population.Workers.ToString("N0", CultureInfo.InvariantCulture);
-            _economyHousing.text = $"{gm.Population.Total:N0} / {gm.GetTotalBedCapacity():N0}";
-            ResourceCost costOne = gm.GetBedCapacityPurchaseCost(1);
-            _housingCost.text = $"CURRENT CAPACITY {gm.GetTotalBedCapacity():N0}  ·  NEXT {FormatCost(costOne)}";
+            _economyWorkers.text = gm.GetResourceWorkers(EconomyFocusType.Balanced)
+                .ToString("N0", CultureInfo.InvariantCulture);
+            int bedCapacity = gm.GetTotalBedCapacity();
+            int availableBeds = Mathf.Max(0, bedCapacity - gm.Population.Total);
+            _economyHousing.text = $"{gm.Population.Total:N0} / {bedCapacity:N0}";
+            _housingCard.EnableInClassList("is-full", availableBeds <= 0);
+            _housingStatus.text = availableBeds <= 0
+                ? "HOUSING FULL — ADD BEDS BEFORE MORE PEOPLE ARRIVE"
+                : $"{availableBeds:N0} BEDS AVAILABLE";
+            _housingCost.text = "Choose a package. Beds raise your population capacity.";
+            _housingOne.text = $"ADD 1 BED\nCOST: {FormatCost(gm.GetBedCapacityPurchaseCost(1))}";
+            _housingTen.text = $"ADD 10 BEDS\nCOST: {FormatCost(gm.GetBedCapacityPurchaseCost(10))}";
+            _housingHundred.text = $"ADD 100 BEDS\nCOST: {FormatCost(gm.GetBedCapacityPurchaseCost(100))}";
             _housingOne.SetEnabled(gm.CanBuyBedCapacity(1));
             _housingTen.SetEnabled(gm.CanBuyBedCapacity(10));
             _housingHundred.SetEnabled(gm.CanBuyBedCapacity(100));
@@ -279,18 +281,10 @@ namespace DeadWalls
                 int target = Mathf.RoundToInt(gm.GetWorkerTargetRatioBps(resource) / 100f);
                 int capacityValue = gm.GetMaxWorkersForResource(resource);
                 float rate = gm.GetWorkerProductionRate(resource);
-                Q<Label>("economyStat" + resource).text = $"{workers:N0} / {capacityValue:N0}";
-                Q<Label>("economyDetail" + resource).text = $"+{rate:0.#}/m  ·  {gm.GetIdlePopulation():N0} AVAILABLE";
-                Q<Label>("economyTarget" + resource).text = $"NEW ARRIVALS  {target}%";
-
-                bool canAssign = gm.CanAssignResourceWorker(resource);
-                Q<Button>("economyMinusTen" + resource).SetEnabled(workers > 0);
-                Q<Button>("economyMinusOne" + resource).SetEnabled(workers > 0);
-                Q<Button>("economyPlusOne" + resource).SetEnabled(canAssign);
-                Q<Button>("economyPlusTen" + resource).SetEnabled(canAssign);
-                Q<Button>("economyFill" + resource).SetEnabled(canAssign);
-                Q<Button>("economyTargetMinus" + resource).SetEnabled(target > 0);
-                Q<Button>("economyTargetPlus" + resource).SetEnabled(target < 100);
+                Q<Label>("economyStat" + resource).text = $"{workers:N0} WORKERS  ·  {capacityValue:N0} CAPACITY";
+                Q<Label>("economyDetail" + resource).text = $"+{rate:0.#}/MIN  ·  {gm.GetIdlePopulation():N0} IDLE PEOPLE";
+                Q<Label>("economyAllocationValue" + resource).text = $"{target}% SHARE  ·  {workers:N0} WORKERS";
+                Q<SliderInt>("economyAllocationSlider" + resource).SetValueWithoutNotify(target);
 
                 int capacityLevel = gm.GetWorkerBuildingUpgradeLevel(resource, WorkerBuildingUpgradeType.Capacity);
                 int efficiencyLevel = gm.GetWorkerBuildingUpgradeLevel(resource, WorkerBuildingUpgradeType.Efficiency);
@@ -298,8 +292,8 @@ namespace DeadWalls
                 ResourceCost efficiencyCost = gm.GetWorkerBuildingUpgradeCost(resource, WorkerBuildingUpgradeType.Efficiency);
                 Button capacity = Q<Button>("economyCapacity" + resource);
                 Button efficiency = Q<Button>("economyEfficiency" + resource);
-                capacity.text = $"CAPACITY L{capacityLevel}  ·  {FormatCost(capacityCost)}";
-                efficiency.text = $"EFFICIENCY L{efficiencyLevel}  ·  {FormatCost(efficiencyCost)}";
+                capacity.text = $"CAPACITY  ·  LEVEL {capacityLevel}\nCOST: {FormatCost(capacityCost)}";
+                efficiency.text = $"EFFICIENCY  ·  LEVEL {efficiencyLevel}\nCOST: {FormatCost(efficiencyCost)}";
                 capacity.SetEnabled(gm.CanBuyWorkerBuildingUpgrade(resource, WorkerBuildingUpgradeType.Capacity));
                 efficiency.SetEnabled(gm.CanBuyWorkerBuildingUpgrade(resource, WorkerBuildingUpgradeType.Efficiency));
             }
@@ -330,8 +324,8 @@ namespace DeadWalls
                 bool unlocked = gm.IsArcherTypeUnlocked(type);
                 Q<Label>("archerCount" + type).text = unlocked ? $"{count:N0} DEPLOYED" : "LOCKED";
                 Q<Label>("archerDetail" + type).text = unlocked
-                    ? $"{gm.GetArcherTypeDps(type):0.#} DPS  ·  {FormatCost(gm.GetArcherBuyCost(definition))}"
-                    : "REQUIRES DOCTRINE RESEARCH";
+                    ? $"{gm.GetArcherTypeDps(type):0.#} DAMAGE / SEC  ·  {FormatCost(gm.GetArcherBuyCost(definition))}"
+                    : "RESEARCH IN CASTLE HEART";
                 Button buy = Q<Button>("archerBuy" + type);
                 buy.text = unlocked ? $"RECRUIT  ·  {FormatCost(gm.GetArcherBuyCost(definition))}" : "LOCKED";
                 buy.SetEnabled(gm.CanBuyArcher(definition));
@@ -384,51 +378,23 @@ namespace DeadWalls
         {
             int level = gm.GetArrowUpgradeLevel(type);
             ResourceCost next = gm.GetArrowUpgradeCost(type);
-            detail.text = $"LEVEL {level:N0}  ·  PERMANENT RUN UPGRADE";
+            detail.text = $"LEVEL {level:N0}  ·  LASTS THIS RUN";
             cost.text = FormatCost(next);
             button.SetEnabled(gm.CanBuyArrowUpgrade(type));
         }
 
-        private void AdjustWorkerTarget(EconomyFocusType resource, int delta)
+        private void SetWorkerAllocationShare(EconomyFocusType resource, int targetPercent)
         {
             GameManager gm = GameManager.Instance;
             if (gm == null)
                 return;
-            bool changed = gm.AdjustWorkerTargetRatioPercent(resource, delta);
+
+            bool changed = gm.SetWorkerAllocationSharePercent(resource, targetPercent);
+            if (changed)
+                _onboardingLegacy?.NotifyWorkerTargetRatioChangedByPlayer(resource);
             ShowSecondaryToast(changed
-                ? $"{ResourceName(resource)} TARGET {gm.GetWorkerTargetRatioBps(resource) / 100f:0}%"
-                : "TARGET CHANGE BLOCKED");
-            RefreshEconomy(gm);
-        }
-
-        private void ChangeResourceWorkers(EconomyFocusType resource, int delta)
-        {
-            GameManager gm = GameManager.Instance;
-            if (gm == null)
-                return;
-
-            int previous = gm.GetResourceWorkers(resource);
-            bool changed = gm.SetResourceWorkers(resource, previous + delta);
-            int current = gm.GetResourceWorkers(resource);
-            ShowSecondaryToast(changed && current != previous
-                ? $"{ResourceName(resource)} WORKERS  {current:N0}"
-                : "WORKER ASSIGNMENT BLOCKED");
-            RefreshEconomy(gm);
-        }
-
-        private void FillResourceWorkers(EconomyFocusType resource)
-        {
-            GameManager gm = GameManager.Instance;
-            if (gm == null)
-                return;
-
-            int previous = gm.GetResourceWorkers(resource);
-            int requested = previous + gm.GetIdlePopulation();
-            bool changed = gm.SetResourceWorkers(resource, requested);
-            int current = gm.GetResourceWorkers(resource);
-            ShowSecondaryToast(changed && current != previous
-                ? $"{ResourceName(resource)} FILLED  ·  {current:N0} WORKERS"
-                : "NO AVAILABLE WORKER CAPACITY");
+                ? $"{ResourceName(resource)} SHARE  {gm.GetWorkerTargetRatioBps(resource) / 100f:0}%"
+                : "WORKER REDISTRIBUTION BLOCKED");
             RefreshEconomy(gm);
         }
 

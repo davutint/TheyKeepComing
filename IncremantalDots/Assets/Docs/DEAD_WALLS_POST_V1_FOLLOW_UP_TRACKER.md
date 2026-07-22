@@ -2,11 +2,11 @@
 
 > **Amaç:** V1 kapsamı tamamlandıktan sonra yapılacak mantık düzeltmelerini, oyuncuya görünen geri bildirimleri, UI/UX yeniden çalışmalarını, polish işlerini ve performans optimizasyonlarını tek otoriter takip belgesinde yürütmek.
 >
-> **Tracker sürümü:** 1.4
+> **Tracker sürümü:** 1.7
 > **Oluşturulma tarihi:** 2026-07-18
-> **Aktif paket:** `DW-P11-NIGHT-RHYTHM` tamamlandı
-> **Aktif iş:** Açık ana görev yok; yeni kapsam owner kararıyla ayrı paket olarak açılacak
-> **İlerleme:** `11 / 11` ana görev tamamlandı - `%100`
+> **Aktif paket:** `-` (açık paket yok)
+> **Aktif iş:** `-`
+> **İlerleme:** `12 / 12` ana görev tamamlandı - `%100`
 
 ---
 
@@ -36,7 +36,7 @@ Bu belge, tamamlanmış V1 tracker'ından sonraki geliştirme döneminin aktif t
 
 ### İlerleme hesabı
 
-İlerleme, Bölüm 3'teki 11 ana görev üzerinden hesaplanır. Alt maddeler kanıt ve kabul kapsamını gösterir; ayrıca paydayı büyütmez. Ana görevler yalnızca bütün zorunlu alt kapıları tamamlandığında kapanır. Owner onaylı `DW-P11-NIGHT-RHYTHM` yeni kapsamı nedeniyle payda `10 -> 11` değişmiştir.
+İlerleme, Bölüm 3'teki 12 ana görev üzerinden hesaplanır. Alt maddeler kanıt ve kabul kapsamını gösterir; ayrıca paydayı büyütmez. Ana görevler yalnızca bütün zorunlu alt kapıları tamamlandığında kapanır. Owner onaylı `DW-P12-UI-READABILITY` yeni kapsamı nedeniyle payda `11 -> 12` değişmiştir.
 
 ---
 
@@ -79,6 +79,14 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - Her günün Dawn başlangıcında mevcut Council sistemiyle tam bir regular kart açılır; aynı gün ikinci kez açılmaz.
 - İlk günlük kart Day 1'de desteklenir; event içeriği mevcut deterministic composer, context, flag, chain ve exact effect sahipliğini korur.
 
+### UI okunabilirliği ve player-facing terminoloji
+
+- Gameplay HUD USS içinde player-facing yazı boyutu tabanı referans çözünürlükte `10px`tir; kritik phase mesajı `11px` ve yüksek kontrastlıdır.
+- Kaynak üretim oranı `/MIN`, archer performansı `DAMAGE / SEC` olarak açık yazılır; worker hedef düğmeleri neyi değiştirdiğini `TARGET` ile belirtir.
+- Night clearance, kalan sayıyı `N ENEMIES LEFT` ve kapıyı `CLEAR ENEMIES TO REACH DAWN` ile açıklar.
+- Run HUD meta ödülü legacy `SOULS` adıyla sunulmaz; ölüm anındaki tahmini kısa kimlik `EMBERS ON DEATH`tir.
+- Kaldırılmış Doctrine yüzeyine yönlendiren metin kullanılmaz; kilitli archer araştırması oyuncuyu `CASTLE HEART`a yönlendirir.
+
 ---
 
 ## 3. Ana Görev Sırası
@@ -96,6 +104,7 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 | 9 | `DW-P9-PERFORMANCE` | Performans profilleme ve optimizasyon | `[x]` | Player zombie-limit ayarı, yoğun feedback batching/pooling ve 10K + 1K yeniden ölçümü tamamlandı |
 | 10 | `DW-P10-FINAL-GATE` | Son kalite, tutarlılık ve regresyon kapısı | `[x]` | Bütün aktif kapsam birlikte test edildi; açık kritik hata ve doğrulanmamış ana görev kalmadı |
 | 11 | `DW-P11-NIGHT-RHYTHM` | Night-only saldırı, clear gate ve günlük Council ritmi | `[x]` | Night spawn/clearance, günlük event, HUD, exact Continue ve tam regresyon doğrulandı |
+| 12 | `DW-P12-UI-READABILITY` | Gameplay HUD okunabilirlik, worker slider ve terminoloji düzeltmesi | `[x]` | UXML/USS/C# kontratı, runtime yeniden dağıtım, onboarding ve canlı Game View doğrulandı |
 
 ---
 
@@ -266,12 +275,31 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - [x] Day, Dusk ve Dawn yeni düşman talebi üretmez; Night timed bölümü mevcut quantity/intensity sistemini kullanır.
 - [x] Timed Night bitince yeni talep durur; pending Night backlog'u clearance sırasında kapasite açıldıkça sahaya aktarılır.
 - [x] `PendingEnemies` veya `ZombiesAlive` sıfırdan büyükken cycle Night sonunda tutulur; ikisi de sıfır olduğunda Dawn'a geçer.
-- [x] UI Toolkit HUD clearance sırasında normal `NIGHT SIEGE` başlığını korur; `N LEFT` ve `CLEAR THE REMAINING HORDE` ile temizlenme durumunu gösterir.
+- [x] UI Toolkit HUD clearance sırasında normal `NIGHT SIEGE` başlığını korur; `N ENEMIES LEFT` ve `CLEAR ENEMIES TO REACH DAWN` ile temizlenme durumunu gösterir.
 - [x] Regular Council Day 1'den başlayarak her Dawn'da tam bir kez açılır; chance/pity/cooldown ve Emergency Council yolu eklenmedi.
 - [x] Day 1 için temel ekonomi template'leri eligible oldu; diğer template'lerin `MinDay`, flag, curated chain ve deterministic composer kuralları korundu.
 - [x] Exact save/Continue, clearance anındaki sıfır intensity'yi ve pending backlog'u değiştirmeden geri yükler.
 - [x] Targeted EditMode `63/63`, targeted PlayMode `10/10`, full EditMode `447/447`, full PlayMode `96 pass + 2 explicit skip / 0 fail` geçti.
 - [x] `NewGameScene` validation `0` issue, final Unity Console `0 error / 0 warning` ve `git diff --check` temiz geçti.
+
+### `DW-P12-UI-READABILITY` - Gameplay HUD Readability + Terminology
+
+**Paket başlığı:** `DW-P12-UI-READABILITY: Gameplay HUD Readability + Explicit Terminology`
+**Durum:** `[x]` Uygulama, otomatik kontrat, runtime davranış ve canlı Game View görsel kabulü tamamlandı.
+
+- [x] Gameplay HUD stilinde `7px`, `8px` veya `9px` player-facing font tanımı bırakılmadı; USS kontratı authored `10px` tabanını kilitler.
+- [x] Night clearance mesajı `11px`, yüksek kontrast ve daha açık copy ile güncellendi; phase sayacı kalan nesnenin düşman olduğunu açıkça söyler.
+- [x] Kaynak oranı, worker hedefi, archer damage, run-only upgrade, Castle Heart araştırması ve Last Embers projection metinleri player-facing jargon/kısaltma bırakmayacak şekilde güncellendi.
+- [x] Rally hazır durumu görünür biçimde `BOOST FIRE RATE` der; üç ability düğmesi doğru davranış tooltip'i taşır.
+- [x] Economy drawer'daki `-10/-1/+1/+10/FILL` worker komutları kaldırıldı; dört kaynak `0-100%` share slider'ı üzerinden mevcut worker'ları ve yeni arrival hedefini tek işlemde yeniden dağıtır.
+- [x] Bir share slider'ı `%100` olduğunda diğer üç kaynak target ve worker sayısı `0` olur; seçilen kaynak kapasitesi taşan worker'lar kaybolmadan `IDLE PEOPLE` havuzuna döner.
+- [x] Housing CTA resource listesinin üstüne taşındı, full-capacity durumu güçlendirildi ve `ADD 1/10/100 BEDS` paketlerinin her biri tam maliyetini gösterir.
+- [x] Toolkit maliyetleri `150W 100I` gibi kısaltmalar yerine `150 WOOD · 100 IRON` biçiminde açık kaynak adları kullanır.
+- [x] Targeted EditMode `39/39` (`GameplayHUDToolkitContractTests` + `WorkerAllocationUtilityTests` + `FirstRunOnboardingTests`) ve targeted PlayMode worker-slider entegrasyonu `1/1` geçti.
+- [x] Unity asset import/domain reload tamamlandı; değişiklik kapsamındaki final Console `0 error / 0 warning` ve `git diff --check` temizdir.
+- [x] `NewGameScene` üzerinde `1920x1080` normal ve zorlanmış compact/touch canlı Game View kontrollerinde worker slider, housing paketleri, tam kaynak adları, overlap ve clipping doğrulandı.
+- [x] `%100 WOOD` runtime kontrolünde Wood `40/40`, diğer üç kaynak `0 worker / 0% share` ve taşan nüfus `16 IDLE PEOPLE` olarak canlı UI'da doğrulandı.
+- [x] Canlı kabul Play Mode içindeki geçici `NewGameScene` yüklemesiyle yapıldı; çıkışta aktif `HandMadeTiles` sahnesi geri yüklendi ve owner sahne dosyaları değiştirilmedi.
 
 ---
 
@@ -518,3 +546,23 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
   `NIGHT SIEGE` olarak kalırken `N LEFT` sayacı ve temizleme mesajı korundu.
 - Güncel HUD kontratı targeted EditMode `12/12`, Unity Console `0 error` ve `git diff --check`
   ile doğrulandı; tracker paydası değişmedi.
+
+### 2026-07-22 - Gameplay HUD okunabilirlik ve terminoloji uygulaması
+
+- Owner kararıyla `DW-P12-UI-READABILITY` ayrı ana görev olarak açıldı; tracker paydası `11 -> 12` değişti.
+- Gameplay HUD authored font tabanı `10px`e çıkarıldı; Night clearance mesajı `11px` ve yüksek kontrast oldu. Touch/compact tipografi override'ları aynı tabanla hizalandı.
+- `/m`, `DPS`, `L1`, `AUTO`, belirsiz `AVAILABLE`, legacy `SOULS`, kaldırılmış `DOCTRINE` ve çelişkili `PERMANENT RUN UPGRADE` copy'leri açık player-facing karşılıklarla değiştirildi.
+- Clearance copy'si `N ENEMIES LEFT` ve `CLEAR ENEMIES TO REACH DAWN` oldu; Rally hazır durumu etkisini `BOOST FIRE RATE` olarak açıklar.
+- Targeted EditMode HUD kontratı `14/14` geçti; Unity domain reload tamamlandı, final Console `0 error / 0 warning` ve `git diff --check` temizdir.
+- Aktif ve kaydedilmemiş `HandMadeTiles` sahnesi korunarak sahne değişimi yapılmadı. Canlı `NewGameScene` Game View görsel kontrolü tamamlanmadığı için P12 `[~]`, tracker ilerlemesi `11/12 - %91,7` olarak bırakıldı.
+
+### 2026-07-22 - Economy worker slider ve housing CTA yenilemesi
+
+- Owner kararıyla worker atamasındaki beş ayrı artır/azalt/fill komutu, dört kaynağın toplam `%100` share kontratını paylaşan dinamik slider'larla değiştirildi.
+- Slider değişikliği hem yeni arrival target'ını hem mevcut worker dağılımını aynı transaction içinde günceller; `%100` share diğer üç kaynağı sıfırlar, kapasite taşması idle havuzuna döner.
+- Housing CTA resource scroll'unun üstüne taşındı; full-capacity uyarısı ve `1/10/100 bed` paketlerinin açık maliyetleri aynı kartta görünür oldu.
+- Toolkit `ResourceCost` sunumu tam kaynak adlarına geçirildi; örnek kontrat `150 WOOD · 100 IRON` olarak kilitlendi.
+- Slider etkileşimi mevcut first-run onboarding'i de tamamlar; player hint'i `DRAG A WORKER SHARE SLIDER.` olarak güncellendi.
+- Targeted EditMode `39/39`, targeted PlayMode `1/1`, Unity Console `0 error / 0 warning` ve `git diff --check` temiz geçti. Aktif `HandMadeTiles` sahnesi PlayMode testinden sonra geri yüklendi ve repo sahne dosyalarına dokunulmadı.
+- `NewGameScene` canlı `1920x1080` normal ve zorlanmış compact/touch görsel kabulünde housing paketleri taşmadan göründü; `%100 WOOD` runtime kontrolü diğer üç kaynak slider/worker değerlerini `0` yaptı ve `16` taşan worker idle havuzuna döndü.
+- P12 bütün zorunlu kapıları geçti; tracker `12/12 - %100` olarak kapatıldı.

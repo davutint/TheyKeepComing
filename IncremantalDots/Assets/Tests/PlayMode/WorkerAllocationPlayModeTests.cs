@@ -1289,6 +1289,44 @@ namespace DeadWalls.Tests
         }
 
         [UnityTest]
+        public IEnumerator WorkerAllocationShareSlider_RebalancesImmediatelyAndMaximumClearsOthers()
+        {
+            GameManager gameManager = GameManager.Instance;
+            Assert.That(gameManager, Is.Not.Null);
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            using EntityQuery allocationQuery = entityManager.CreateEntityQuery(
+                typeof(MobileCastleCombatConfig), typeof(MobilePopulationAllocation));
+            Entity allocationEntity = allocationQuery.GetSingletonEntity();
+            MobilePopulationAllocation before =
+                entityManager.GetComponentData<MobilePopulationAllocation>(allocationEntity);
+            int assignedBefore = WorkerAllocationUtility.TotalWorkers(before);
+            int expectedWoodWorkers = Mathf.Min(
+                assignedBefore,
+                gameManager.GetMaxWorkersForResource(EconomyFocusType.Wood));
+
+            bool changed = gameManager.SetWorkerAllocationSharePercent(
+                EconomyFocusType.Wood,
+                100f);
+
+            Assert.That(changed, Is.True);
+            MobilePopulationAllocation after =
+                entityManager.GetComponentData<MobilePopulationAllocation>(allocationEntity);
+            Assert.That(after.WoodTargetRatioBps, Is.EqualTo(WorkerAllocationUtility.RatioScale));
+            Assert.That(after.StoneTargetRatioBps, Is.Zero);
+            Assert.That(after.IronTargetRatioBps, Is.Zero);
+            Assert.That(after.FoodTargetRatioBps, Is.Zero);
+            Assert.That(after.WoodWorkers, Is.EqualTo(expectedWoodWorkers));
+            Assert.That(after.StoneWorkers, Is.Zero);
+            Assert.That(after.IronWorkers, Is.Zero);
+            Assert.That(after.FoodWorkers, Is.Zero);
+
+            yield return null;
+            Assert.That(gameManager.GetIdlePopulation(),
+                Is.EqualTo(gameManager.GetAvailablePopulation() - expectedWoodWorkers));
+        }
+
+        [UnityTest]
         public IEnumerator DawnArrivalTransaction_SpendsFoodOnceForAcceptedSurvivors()
         {
             DawnRewardToastUI dawnPresentation =

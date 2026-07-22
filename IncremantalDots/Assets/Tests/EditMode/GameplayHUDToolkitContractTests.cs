@@ -1,4 +1,6 @@
+using System.IO;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
@@ -9,6 +11,9 @@ namespace DeadWalls.Tests
     public class GameplayHUDToolkitContractTests
     {
         private const string HudPath = "Assets/UI/Toolkit/GameplayHUD/GameplayHUD.uxml";
+        private const string HudStylePath = "Assets/UI/Toolkit/GameplayHUD/GameplayHUD.uss";
+        private const string HudManagementSourcePath =
+            "Assets/Scripts/MonoBehaviour/UIToolkit/GameplayHUDToolkitUI.Management.cs";
         private const string MainMenuPath = "Assets/UI/Toolkit/MainMenu/MainMenu.uxml";
 
         [Test]
@@ -136,6 +141,69 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void ProductionHud_UsesExplicitPlayerFacingTerminology()
+        {
+            TemplateContainer root = LoadHud().CloneTree();
+
+            Assert.That(root.Q<Label>("woodRate").text, Is.EqualTo("0/MIN"));
+            Assert.That(root.Q<Label>("enemyLabel").text, Is.EqualTo("ENEMIES"));
+            Assert.That(root.Q<Label>("projectedEmbersLabel").text, Is.EqualTo("EMBERS ON DEATH"));
+            Assert.That(root.Q<Label>("economyIdleLabel").text, Is.EqualTo("IDLE PEOPLE"));
+            Assert.That(root.Q<Label>("gameOverBalanceLabel").text, Is.EqualTo("EMBERS AVAILABLE"));
+            Assert.That(root.Q<Button>("rallyButton").tooltip, Does.Contain("fire rate"));
+
+            MethodInfo rateFormatter = typeof(GameplayHUDToolkitUI).GetMethod(
+                "FormatRate", BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(rateFormatter, Is.Not.Null);
+            Assert.That(rateFormatter.Invoke(null, new object[] { 0f }), Is.EqualTo("0/MIN"));
+            Assert.That(rateFormatter.Invoke(null, new object[] { 39.2f }), Is.EqualTo("+39.2/MIN"));
+        }
+
+        [Test]
+        public void ProductionHud_PlayerFacingTypographyHasTenPixelFloor()
+        {
+            string stylesheet = File.ReadAllText(HudStylePath);
+            MatchCollection sizes = Regex.Matches(stylesheet, @"font-size:\s*(\d+)px");
+
+            Assert.That(sizes.Count, Is.GreaterThan(0));
+            foreach (Match size in sizes)
+            {
+                Assert.That(int.Parse(size.Groups[1].Value), Is.GreaterThanOrEqualTo(10),
+                    $"Gameplay HUD'da 10px altinda player-facing font kalmamali: {size.Value}");
+            }
+
+            Assert.That(stylesheet, Does.Contain(".clock-message"));
+            Assert.That(stylesheet, Does.Contain("color: rgba(240,235,222,0.82)"));
+        }
+
+        [Test]
+        public void ProductionHud_WorkerAllocationUsesDynamicSlidersAndExplicitResourceCosts()
+        {
+            TemplateContainer root = LoadHud().CloneTree();
+            string uxml = File.ReadAllText(HudPath);
+            string managementSource = File.ReadAllText(HudManagementSourcePath);
+
+            Assert.That(root.Q<VisualElement>("housingCard"), Is.Not.Null);
+            Assert.That(root.Q<Label>("housingStatus"), Is.Not.Null);
+            Assert.That(root.Q<Button>("housingOne").text, Is.EqualTo("ADD 1 BED"));
+            Assert.That(uxml.IndexOf("name=\"housingCard\"", System.StringComparison.Ordinal),
+                Is.LessThan(uxml.IndexOf("name=\"economyRows\"", System.StringComparison.Ordinal)));
+            Assert.That(managementSource, Does.Contain("new SliderInt"));
+            Assert.That(managementSource, Does.Contain("SetWorkerAllocationSharePercent"));
+            Assert.That(managementSource, Does.Contain("NotifyWorkerTargetRatioChangedByPlayer"));
+            Assert.That(managementSource, Does.Not.Contain("economyPlusOne"));
+            Assert.That(managementSource, Does.Not.Contain("TARGET -10%"));
+
+            MethodInfo costFormatter = typeof(GameplayHUDToolkitUI).GetMethod(
+                "FormatCost", BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(costFormatter, Is.Not.Null);
+            Assert.That(costFormatter.Invoke(null, new object[]
+            {
+                new ResourceCost(150, 0, 100, 0)
+            }), Is.EqualTo("150 WOOD  ·  100 IRON"));
+        }
+
+        [Test]
         public void ProductionHud_AllowsBattlefieldPointerThroughHudLayer()
         {
             TemplateContainer root = LoadHud().CloneTree();
@@ -197,7 +265,7 @@ namespace DeadWalls.Tests
             Assert.That(phaseName.Invoke(null, new object[] { clearance }),
                 Is.EqualTo("NIGHT SIEGE"));
             Assert.That(phaseMessage.Invoke(null, new object[] { clearance }),
-                Is.EqualTo("CLEAR THE REMAINING HORDE"));
+                Is.EqualTo("CLEAR ENEMIES TO REACH DAWN"));
         }
 
         [Test]

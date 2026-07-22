@@ -281,7 +281,7 @@ namespace DeadWalls.Tests
             };
             string[] approvedEnglishCopy =
             {
-                "ADJUST A WORKER TARGET RATIO.",
+                "DRAG A WORKER SHARE SLIDER.",
                 "RECRUIT A BASIC ARCHER.",
                 "RESTOCK YOUR ARROWS.",
                 "OPEN THE CASTLE HEART.",

@@ -149,6 +149,39 @@ namespace DeadWalls.Tests
             Assert.That(allocation.FoodTargetRatioBps, Is.Zero);
         }
 
+        [Test]
+        public void RebalanceAssignedWorkers_PreservesAssignedTotalWhenTargetsFitCapacities()
+        {
+            var allocation = CreateInitialAllocation();
+            WorkerAllocationUtility.InitializeTargetsFromCurrent(ref allocation);
+            WorkerAllocationUtility.SetTargetRatioBps(ref allocation, 0, 5000);
+
+            int rebalanced = WorkerAllocationUtility.RebalanceAssignedWorkers(ref allocation);
+
+            Assert.That(rebalanced, Is.EqualTo(53));
+            Assert.That(WorkerAllocationUtility.TotalWorkers(allocation), Is.EqualTo(53));
+            Assert.That(allocation.WoodWorkers, Is.EqualTo(27));
+            Assert.That(allocation.StoneWorkers + allocation.IronWorkers + allocation.FoodWorkers,
+                Is.EqualTo(26));
+        }
+
+        [Test]
+        public void RebalanceAssignedWorkers_AtMaximumClearsOtherWorkersAndLeavesCapOverflowIdle()
+        {
+            var allocation = CreateInitialAllocation();
+            WorkerAllocationUtility.InitializeTargetsFromCurrent(ref allocation);
+            WorkerAllocationUtility.SetTargetRatioBps(ref allocation, 2,
+                WorkerAllocationUtility.RatioScale);
+
+            int rebalanced = WorkerAllocationUtility.RebalanceAssignedWorkers(ref allocation);
+
+            Assert.That(rebalanced, Is.EqualTo(allocation.IronWorkerCapacity));
+            Assert.That(allocation.WoodWorkers, Is.Zero);
+            Assert.That(allocation.StoneWorkers, Is.Zero);
+            Assert.That(allocation.IronWorkers, Is.EqualTo(allocation.IronWorkerCapacity));
+            Assert.That(allocation.FoodWorkers, Is.Zero);
+        }
+
         private static MobilePopulationAllocation CreateInitialAllocation()
         {
             return new MobilePopulationAllocation
