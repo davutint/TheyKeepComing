@@ -2,11 +2,11 @@
 
 > **Amaç:** V1 kapsamı tamamlandıktan sonra yapılacak mantık düzeltmelerini, oyuncuya görünen geri bildirimleri, UI/UX yeniden çalışmalarını, polish işlerini ve performans optimizasyonlarını tek otoriter takip belgesinde yürütmek.
 >
-> **Tracker sürümü:** 2.3
+> **Tracker sürümü:** 2.5
 > **Oluşturulma tarihi:** 2026-07-18
-> **Aktif paket:** `DW-P16-GUIDED-ONBOARDING`
-> **Aktif iş:** Owner onaylı UI Toolkit guided onboarding zincirinin uygulanması
-> **İlerleme:** `15 / 16` ana görev tamamlandı - `%93,75`
+> **Aktif paket:** `-`
+> **Aktif iş:** `-`
+> **İlerleme:** `16 / 16` ana görev tamamlandı - `%100`
 
 ---
 
@@ -110,8 +110,8 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 
 - Oyuncuya oyun, yeni UI Toolkit yüzeyindeki gerçek kontroller üzerinden adım adım öğretilecektir;
   gizli legacy Canvas kontrolüne bağlı pulse tek başına kabul edilmez.
-- İlk zorunlu zincir `ECONOMY -> worker-share slider -> BARRACKS -> BASIC ARCHER -> 2X` sırasıdır.
-- İlk beş adımda ekran hedef dışı bölgelerde kararır ve yalnız gerçek hedef kontrol etkileşim alır;
+- İlk zorunlu zincir `ECONOMY -> worker-share slider -> CLOSE -> BARRACKS -> BASIC ARCHER -> 2X` sırasıdır.
+- İlk altı adımda ekran hedef dışı bölgelerde kararır ve yalnız gerçek hedef kontrol etkileşim alır;
   zincir yalnız başarıyla tamamlanan player action'ıyla ilerler.
 - First Night `RALLY`, first Council exact choice, low-arrow refill, first post-combat Essence ile
   `CASTLE HEART`, dolu population kapasitesinde housing ve ilk wall damage repair adımları
@@ -150,7 +150,7 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 | 13 | `DW-P13-GAME-FLOW-CONTROLS` | 1X/2X/3X oyun hızı, Council pause ve toast altyapısı | `[x]` | Merkezi speed/pause owner, bounded toast kuyruğu, testler ve canlı Game View doğrulandı |
 | 14 | `DW-P14-ACTION-FEEDBACK` | Game Over meta açıklığı ve exact action-failure toast'ları | `[x]` | Exact effect progression, açıklanabilir action state, hedefli test ve canlı Game View doğrulandı |
 | 15 | `DW-P15-TOAST-AUDIO-POLISH` | Süreli toast stack'i ve UI Toolkit button sesleri | `[x]` | Üç kartlık tekrar korunumu, otomatik dismiss, merkezi click audio ve hedefli runtime testleri doğrulandı |
-| 16 | `DW-P16-GUIDED-ONBOARDING` | UI Toolkit gerçek kontrolleriyle adım adım first-run öğretimi | `[~]` | Exact core/contextual sıra ve interaction policy owner tarafından onaylandı; uygulama bekliyor |
+| 16 | `DW-P16-GUIDED-ONBOARDING` | UI Toolkit gerçek kontrolleriyle adım adım first-run öğretimi | `[x]` | Gerçek-control spotlight/input gate, durable sıra, contextual tip'ler ve hedefli regresyon doğrulandı |
 
 ---
 
@@ -413,7 +413,7 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 ### `DW-P16-GUIDED-ONBOARDING` - UI Toolkit Guided First Run
 
 **Paket başlığı:** `DW-P16-GUIDED-ONBOARDING: Real-Control First-Run Guidance`
-**Durum:** `[~]` Exact öğretim sırası ve interaction policy owner tarafından onaylandı; uygulama bekliyor.
+**Durum:** `[x]` Owner onaylı exact sıra uygulandı ve gerçek UI Toolkit action zinciriyle doğrulandı.
 
 - [x] Mevcut owner zinciri çıkarıldı: `FirstRunOnboardingUI` yedi condition-driven adımı yönetiyor,
   fakat yeni UI Toolkit yalnız gizli Canvas hint metnini aynalıyor; pulse hedefleri legacy kontrollerde kalıyor.
@@ -421,15 +421,28 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
   UI Toolkit HUD'dan ayrıldı. Gerçek Archer satın alımının durable tutorial flag'i yazması korunur.
 - [x] Dar düzeltme hedefli EditMode `1/1`, gerçek ilk-gün onboarding PlayMode `1/1` ve Unity compile
   `0 error` ile doğrulandı.
-- [x] İlk zorunlu click zinciri `ECONOMY -> worker-share slider -> BARRACKS -> BASIC ARCHER -> 2X`
+- [x] İlk zorunlu click zinciri `ECONOMY -> worker-share slider -> CLOSE -> BARRACKS -> BASIC ARCHER -> 2X`
   olarak owner tarafından kesinleştirildi.
-- [x] İlk beş core adımda yalnız hedef kontrol etkileşim alacak; ekran hedef dışında kararacak ve
+- [x] İlk altı core adımda yalnız hedef kontrol etkileşim alacak; ekran hedef dışında kararacak ve
   zincir yalnız gerçek başarılı player action'ıyla ilerleyecek.
 - [x] First Night Rally, first Council exact choice, low-arrow refill, first post-combat Essence
   Castle Heart, population-full housing ve first wall-damage repair contextual adımlar olarak
   kesinleştirildi; unrelated kontrol kilitlemeyecekler.
-- [ ] UI Toolkit gerçek control spotlight/input gate presenter'ı ve durable ilerleme uygulanacak.
-- [ ] Hedefli EditMode/PlayMode regresyonu, canlı UI/raycast doğrulaması ve final Console kapısı geçilecek.
+- [x] `GuidedOnboardingProgress` exact core/contextual kuralları, English copy ve ayrı
+  `tutorial.v2.*` durable flag'leri taşır. Settings reset v1 ve v2 flag'lerini aynı işlemde temizler;
+  tamamlanmış v1 save yeni tutorial'i zorla yeniden açmaz.
+- [x] UI Toolkit presenter dört dim rect, real-control focus ve bilgi kartını üretir. Core adımda
+  root trickle-down input gate yalnız gerçek hedef subtree'sini geçirir; contextual tip unrelated
+  action'ları kilitlemez ve overlay elementlerinin tamamı raycast dışıdır.
+- [x] Drawer open completion yalnız player callback wrapper'ından; slider, Archer, speed, Rally,
+  Council, Arrow, Castle Heart, housing ve repair completion yalnız authoritative başarılı işlem
+  sonucundan yazılır. Programmatic drawer açma ve başarısız action progress üretmez.
+- [x] Worker slider sonrasında ayrı durable `tutorial.v2.economy_close` adımı gerçek `economyClose`
+  butonunu hedefler. Economy açıkken Barracks input'u kesilir; Barracks adımı yalnız drawer gerçek
+  player Close action'ıyla kapandıktan sonra başlar.
+- [x] Hedefli EditMode `45/45`; gerçek core/raycast zinciri, P15 Archer toast regresyonları,
+  Settings reset ve ikinci-run suppression dahil hedefli PlayMode `5/5` geçti. Unity compile
+  `0 error`, final Console ve `git diff --check` temiz doğrulandı.
 
 ---
 
@@ -787,3 +800,33 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
   bağlı contextual adımlar olarak onaylandı; unrelated kontrolleri kilitlemeyecek.
 - P16 `[?] -> [~]` durumuna taşındı. Uygulama ve test tamamlanmadığı için ilerleme
   `15/16 - %93,75` olarak kaldı.
+
+### 2026-07-22 - P16 gerçek-control guided onboarding tamamlandı
+
+- Aktif UI Toolkit HUD'a core zincir için hedef dışı ekran karartması, real-control focus kartı ve
+  yalnız hedef subtree'sini geçiren input gate eklendi.
+- Exact `ECONOMY -> Wood slider -> BARRACKS -> BASIC ARCHER -> 2X` zinciri yalnız gerçek başarılı
+  player action'larıyla ilerler; programmatic drawer açma durable completion yazmaz.
+- Rally, Council, low-arrow refill, Castle Heart, housing ve Wall repair öğretimleri koşullu,
+  tek-seferlik ve unrelated input'u kilitlemeyen contextual tip'ler olarak bağlandı.
+- Stable `tutorial.v2.*` ilerlemesi, v1 tamamlanmış-save uyumluluğu ve Settings'in iki nesli birlikte
+  temizleyen reset sözleşmesi eklendi. Legacy Canvas hint/pulse sunumu yeni HUD'dan ayrıldı.
+- Hedefli EditMode `45/45`; core/raycast, P15 Archer toast, Settings reset ve ikinci-run dahil
+  hedefli PlayMode `5/5` geçti. Unity compile `0 error`, final Console ve `git diff --check` temizdi.
+- P16 kapanışıyla payda değişmeden Post-V1 ilerleme `16/16 - %100` oldu.
+
+### 2026-07-22 - P16 post-acceptance Economy Close sıra düzeltmesi
+
+- Owner canlı kontrolde worker slider sonrasında Economy drawer kapatılmadan tutorial'in doğrudan
+  Barracks'a geçtiğini bildirdi ve önce gerçek `CLOSE` adımının öğretilmesini kesinleştirdi.
+- Kök neden core sırada drawer-close adımı/flag'i bulunmaması ve spotlight dönüşümünde nested
+  target'ın `localBound` layout ofsetinin iki kez sayılmasıydı. Canlı örnekte Close `x=515` iken
+  focus yanlışlıkla `x=994` konumuna gidiyordu.
+- Exact core sıra `ECONOMY -> worker-share slider -> CLOSE -> BARRACKS -> BASIC ARCHER -> 2X`
+  olarak düzeltildi. `economyClose` yalnız gerçek player callback'inden durable completion yazar;
+  programmatic `CloseSurface()` tutorial progress üretmez.
+- Spotlight artık hedef boyutunu sıfır-orijinli local rect olarak root koordinatına dönüştürür;
+  drawer içindeki Close/slider/purchase kontrollerinde layout ofseti ikinci kez eklenmez.
+- Hedefli EditMode `37/37`, gerçek Close zorunluluğu ve spotlight overlap kontrolünü içeren PlayMode
+  `1/1`, Unity compile `0 error` ve final Console `0 error` geçti.
+- P16 doğrulanmış durumda kaldı; payda değişmedi ve Post-V1 ilerleme `16/16 - %100` olarak korundu.

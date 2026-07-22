@@ -151,6 +151,7 @@ namespace DeadWalls
                 _inputMode.ModeChanged += HandleInputModeChanged;
 
             InitializeVisualTree();
+            RegisterGuidedOnboardingInputGate();
             SoulCounterUI.ToolkitSoulPickupRequested += HandleSoulPickupRequested;
         }
 
@@ -176,6 +177,8 @@ namespace DeadWalls
             ReleasePause();
             ReleaseCouncilPause();
             ResetToastPresentation(true);
+            UnregisterGuidedOnboardingInputGate();
+            ResetGuidedOnboardingPresentation();
             RestoreLegacyCanvas();
         }
 
@@ -215,6 +218,7 @@ namespace DeadWalls
             RefreshHudContinuous(gm);
             RefreshModalContinuous(gm);
             RefreshGameFlowControls();
+            UpdateGuidedOnboarding(gm);
             UpdateSoulFlights(Time.unscaledDeltaTime);
 
             if (now >= _nextGraphRefresh)
@@ -302,11 +306,13 @@ namespace DeadWalls
             BindGraphActions();
             BindModalActions();
             BindGraphManipulation();
+            BindGuidedOnboardingElements();
             BuildEconomyRows();
             BuildArcherRows();
             _root.RegisterCallback<GeometryChangedEvent>(HandleGeometryChanged);
             ApplyInputMode(_inputMode != null ? _inputMode.CurrentMode : UIInputMode.Pointer);
             _initialized = true;
+            RegisterGuidedOnboardingInputGate();
         }
 
         private void BindCoreActions()
@@ -314,10 +320,10 @@ namespace DeadWalls
             _fireballButton.clicked += () => ActivateAbility(AbilityHotkeySlot.Fireball);
             _rallyButton.clicked += () => ActivateAbility(AbilityHotkeySlot.Rally);
             _repairButton.clicked += () => ActivateAbility(AbilityHotkeySlot.EmergencyRepair);
-            _economyButton.clicked += () => ToggleSurface(SurfaceKind.Economy);
-            _barracksButton.clicked += () => ToggleSurface(SurfaceKind.Barracks);
-            _arrowsButton.clicked += () => ToggleSurface(SurfaceKind.Arrows);
-            _heartButton.clicked += () => ToggleSurface(SurfaceKind.Heart);
+            _economyButton.clicked += () => ToggleSurfaceFromPlayer(SurfaceKind.Economy);
+            _barracksButton.clicked += () => ToggleSurfaceFromPlayer(SurfaceKind.Barracks);
+            _arrowsButton.clicked += () => ToggleSurfaceFromPlayer(SurfaceKind.Arrows);
+            _heartButton.clicked += () => ToggleSurfaceFromPlayer(SurfaceKind.Heart);
             _pauseButton.clicked += OpenPause;
         }
 
@@ -644,7 +650,51 @@ namespace DeadWalls
         private void ActivateAbility(AbilityHotkeySlot slot)
         {
             ResolveRuntimeOwners();
-            _spellCast?.TryActivateAbilityFromPlayer(slot);
+            bool accepted = _spellCast != null && _spellCast.TryActivateAbilityFromPlayer(slot);
+            if (!accepted)
+                return;
+
+            if (slot == AbilityHotkeySlot.Rally)
+            {
+                MarkGuidedOnboardingStepFromSuccessfulAction(GuidedOnboardingStep.Rally);
+            }
+            else if (slot == AbilityHotkeySlot.EmergencyRepair)
+            {
+                MarkGuidedOnboardingStepFromSuccessfulAction(GuidedOnboardingStep.WallRepair);
+            }
+        }
+
+        private void ToggleSurfaceFromPlayer(SurfaceKind surface)
+        {
+            ToggleSurface(surface);
+            if (_openSurface != surface)
+                return;
+
+            if (surface == SurfaceKind.Economy)
+            {
+                MarkGuidedOnboardingStepFromSuccessfulAction(GuidedOnboardingStep.EconomyOpen);
+            }
+            else if (surface == SurfaceKind.Barracks)
+            {
+                MarkGuidedOnboardingStepFromSuccessfulAction(GuidedOnboardingStep.BarracksOpen);
+            }
+            else if (surface == SurfaceKind.Heart)
+            {
+                MarkGuidedOnboardingStepFromSuccessfulAction(GuidedOnboardingStep.CastleHeart);
+            }
+        }
+
+        private void CloseEconomySurfaceFromPlayer()
+        {
+            if (_openSurface != SurfaceKind.Economy)
+                return;
+
+            CloseSurface();
+            if (_openSurface == SurfaceKind.None)
+            {
+                MarkGuidedOnboardingStepFromSuccessfulAction(
+                    GuidedOnboardingStep.EconomyClose);
+            }
         }
 
         private void ToggleSurface(SurfaceKind surface)
@@ -748,6 +798,9 @@ namespace DeadWalls
 
         private void HandleGlobalInput()
         {
+            if (_guidedCoreInputLocked)
+                return;
+
             bool cancel = Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame;
             bool menu = Gamepad.current != null && Gamepad.current.startButton.wasPressedThisFrame;
             if (!cancel && !menu)

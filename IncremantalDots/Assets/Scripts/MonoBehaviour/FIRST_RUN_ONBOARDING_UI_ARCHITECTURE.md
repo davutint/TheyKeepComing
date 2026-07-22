@@ -1,5 +1,9 @@
 # First Run Onboarding UI - Mimari
 
+> P16 ile aktif player-facing first-run sahibi UI Toolkit `GuidedOnboardingProgress` ve
+> `GameplayHUDToolkitUI.Onboarding` zincirine tasindi. Bu belge legacy v1 davranis ve save
+> uyumlulugu icin korunur; gizli Canvas hint/pulse'u yeni HUD'a aynalanmaz.
+
 ## Sorumluluk
 
 `FirstRunOnboardingUI`, Package I ilk-kosu ogretiminin scene-owned sunum sahibidir. Gameplay

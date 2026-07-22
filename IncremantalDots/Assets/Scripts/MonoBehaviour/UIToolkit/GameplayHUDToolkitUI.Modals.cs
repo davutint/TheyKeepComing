@@ -208,7 +208,11 @@ namespace DeadWalls
             GameManager gm = GameManager.Instance;
             bool chosen = gm != null && gm.ChooseCouncilOption(optionA);
             if (chosen)
+            {
                 SyncCouncilPause(false);
+                MarkGuidedOnboardingStepFromSuccessfulAction(
+                    GuidedOnboardingStep.CouncilChoice);
+            }
             ShowPrimaryToast(chosen ? "COUNCIL DECISION COMMITTED" : "COUNCIL OPTION UNAVAILABLE");
             if (gm != null)
                 RefreshModalPresentation(gm);

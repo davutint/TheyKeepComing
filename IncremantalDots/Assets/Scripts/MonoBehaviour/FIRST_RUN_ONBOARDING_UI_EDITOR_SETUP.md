@@ -1,5 +1,9 @@
 # First Run Onboarding UI - Editor Setup
 
+> Bu setup legacy v1 controller kontratini belgeler. Aktif UI Toolkit P16 kurulumu icin
+> `GUIDED_ONBOARDING_EDITOR_SETUP.md` otoritedir; yeni spotlight hedefleri gizli Canvas'a
+> baglanmaz.
+
 ## Aktif Sahne
 
 `NewGameScene/Canvas/MobileCastleHudRoot` scene instance'inda tek

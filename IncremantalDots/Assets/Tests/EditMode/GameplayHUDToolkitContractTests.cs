@@ -157,9 +157,57 @@ namespace DeadWalls.Tests
         [Test]
         public void ProductionHud_DoesNotMirrorLegacyBasicArcherAffordabilityHint()
         {
-            Assert.That(GameplayHUDToolkitUI.ShouldMirrorLegacyOnboardingHint(true, false), Is.True);
-            Assert.That(GameplayHUDToolkitUI.ShouldMirrorLegacyOnboardingHint(true, true), Is.False);
-            Assert.That(GameplayHUDToolkitUI.ShouldMirrorLegacyOnboardingHint(false, false), Is.False);
+            Assert.That(GameplayHUDToolkitUI.ShouldMirrorLegacyOnboardingHint(
+                true, false, false), Is.True);
+            Assert.That(GameplayHUDToolkitUI.ShouldMirrorLegacyOnboardingHint(
+                true, true, false), Is.False);
+            Assert.That(GameplayHUDToolkitUI.ShouldMirrorLegacyOnboardingHint(
+                true, false, true), Is.False);
+            Assert.That(GameplayHUDToolkitUI.ShouldMirrorLegacyOnboardingHint(
+                false, false, false), Is.False);
+        }
+
+        [Test]
+        public void ProductionHud_GuidedOnboardingOwnsSpotlightCopyAndCoreInputGate()
+        {
+            TemplateContainer root = LoadHud().CloneTree();
+            string onboardingSource = File.ReadAllText(
+                "Assets/Scripts/MonoBehaviour/UIToolkit/GameplayHUDToolkitUI.Onboarding.cs");
+            string hudSource = File.ReadAllText(
+                "Assets/Scripts/MonoBehaviour/UIToolkit/GameplayHUDToolkitUI.cs");
+            string managementSource = File.ReadAllText(HudManagementSourcePath);
+            string gameFlowSource = File.ReadAllText(
+                "Assets/Scripts/MonoBehaviour/UIToolkit/GameplayHUDToolkitUI.GameFlow.cs");
+            string modalSource = File.ReadAllText(
+                "Assets/Scripts/MonoBehaviour/UIToolkit/GameplayHUDToolkitUI.Modals.cs");
+            string hudStyle = File.ReadAllText(HudStylePath);
+
+            Assert.That(root.Q<VisualElement>("guidedTutorialLayer"), Is.Not.Null);
+            Assert.That(root.Q<VisualElement>("guidedDimTop"), Is.Not.Null);
+            Assert.That(root.Q<VisualElement>("guidedDimBottom"), Is.Not.Null);
+            Assert.That(root.Q<VisualElement>("guidedDimLeft"), Is.Not.Null);
+            Assert.That(root.Q<VisualElement>("guidedDimRight"), Is.Not.Null);
+            Assert.That(root.Q<VisualElement>("guidedFocus"), Is.Not.Null);
+            Assert.That(root.Q<VisualElement>("guidedCard"), Is.Not.Null);
+            Assert.That(root.Q<Label>("guidedTitle").text, Is.EqualTo("OPEN THE ECONOMY"));
+            Assert.That(root.Q<Label>("guidedBody").text,
+                Is.EqualTo("Manage how your people produce resources."));
+            Assert.That(root.Q<Label>("guidedStepLabel").text, Does.Contain("1 OF 6"));
+            Assert.That(onboardingSource, Does.Contain("TrickleDown.TrickleDown"));
+            Assert.That(onboardingSource, Does.Contain("StopImmediatePropagation"));
+            Assert.That(onboardingSource, Does.Contain("ChangeCoordinatesTo"));
+            Assert.That(hudSource, Does.Contain("GuidedOnboardingStep.Rally"));
+            Assert.That(hudSource, Does.Contain("GuidedOnboardingStep.WallRepair"));
+            Assert.That(hudSource, Does.Contain("GuidedOnboardingStep.CastleHeart"));
+            Assert.That(managementSource, Does.Contain("GuidedOnboardingStep.BasicArcher"));
+            Assert.That(managementSource, Does.Contain("CloseEconomySurfaceFromPlayer"));
+            Assert.That(hudSource, Does.Contain("GuidedOnboardingStep.EconomyClose"));
+            Assert.That(managementSource, Does.Contain("GuidedOnboardingStep.ArrowRefill"));
+            Assert.That(managementSource, Does.Contain("GuidedOnboardingStep.Housing"));
+            Assert.That(gameFlowSource, Does.Contain("GuidedOnboardingStep.SpeedTwo"));
+            Assert.That(modalSource, Does.Contain("GuidedOnboardingStep.CouncilChoice"));
+            Assert.That(hudStyle, Does.Contain(".guided-tutorial-layer.is-contextual"));
+            Assert.That(hudStyle, Does.Contain("pointer-events: none"));
         }
 
         [Test]

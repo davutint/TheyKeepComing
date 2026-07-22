@@ -18,6 +18,7 @@ using ToolkitDocument = UnityEngine.UIElements.UIDocument;
 using ToolkitLabel = UnityEngine.UIElements.Label;
 using ToolkitNavigationSubmitEvent = UnityEngine.UIElements.NavigationSubmitEvent;
 using ToolkitQuery = UnityEngine.UIElements.UQueryExtensions;
+using ToolkitSliderInt = UnityEngine.UIElements.SliderInt;
 using ToolkitVisualElement = UnityEngine.UIElements.VisualElement;
 
 namespace DeadWalls.Tests
@@ -104,6 +105,10 @@ namespace DeadWalls.Tests
         [UnityTest]
         public IEnumerator ToolkitBarracks_InsufficientArcherResources_RemainsClickableAndShowsExactToast()
         {
+            Assert.That(MetaProgression.SetTutorialFlag(
+                FirstRunOnboardingUI.TutorialCompleteFlagId, true), Is.True);
+            yield return null;
+
             GameManager gameManager = GameManager.Instance;
             ArcherDefinitionSO basic = gameManager.GetArcherDefinition(ArcherType.Basic);
             Assert.That(basic, Is.Not.Null);
@@ -137,6 +142,10 @@ namespace DeadWalls.Tests
 
             GameplayHUDToolkitUI hud = Object.FindFirstObjectByType<GameplayHUDToolkitUI>();
             Assert.That(hud, Is.Not.Null);
+            for (int frame = 0; frame < 60 && hud.IsGuidedOnboardingInputLocked; frame++)
+                yield return null;
+            Assert.That(hud.IsGuidedOnboardingInputLocked, Is.False,
+                "Legacy tamamlanmis tutorial bayragi P15 toast regresyonunu kilitlememeli.");
             ToolkitDocument document = hud.GetComponent<ToolkitDocument>();
             Assert.That(document, Is.Not.Null);
 
@@ -144,10 +153,20 @@ namespace DeadWalls.Tests
                 document.rootVisualElement, "barracksButton");
             Assert.That(barracksButton, Is.Not.Null);
             SendNavigationSubmit(barracksButton);
-            yield return new WaitForSecondsRealtime(0.25f);
 
-            ToolkitButton recruitButton = ToolkitQuery.Q<ToolkitButton>(
-                document.rootVisualElement, "archerBuyBasic");
+            ToolkitButton recruitButton = null;
+            for (int frame = 0; frame < 120; frame++)
+            {
+                recruitButton = ToolkitQuery.Q<ToolkitButton>(
+                    document.rootVisualElement, "archerBuyBasic");
+                if (recruitButton != null
+                    && recruitButton.ClassListContains("is-action-unavailable"))
+                {
+                    break;
+                }
+
+                yield return null;
+            }
             Assert.That(recruitButton, Is.Not.Null);
             Assert.That(recruitButton.enabledSelf, Is.True,
                 "Kaynak yetersizligi aciklama alinabilecek action'i tamamen disable etmemeli.");
@@ -291,6 +310,177 @@ namespace DeadWalls.Tests
             using ToolkitNavigationSubmitEvent submit = ToolkitNavigationSubmitEvent.GetPooled();
             submit.target = target;
             target.SendEvent(submit);
+        }
+
+        [UnityTest]
+        public IEnumerator GuidedOnboarding_CoreSequenceLocksOutsideInputAndAdvancesOnRealActions()
+        {
+            GameManager gameManager = GameManager.Instance;
+            GameplayHUDToolkitUI hud = Object.FindFirstObjectByType<GameplayHUDToolkitUI>();
+            Assert.That(gameManager, Is.Not.Null);
+            Assert.That(hud, Is.Not.Null);
+
+            ToolkitDocument document = hud.GetComponent<ToolkitDocument>();
+            Assert.That(document, Is.Not.Null);
+            ToolkitVisualElement root = document.rootVisualElement;
+            ToolkitVisualElement guidedLayer = ToolkitQuery.Q<ToolkitVisualElement>(
+                root, "guidedTutorialLayer");
+            ToolkitButton economyButton = ToolkitQuery.Q<ToolkitButton>(root, "economyButton");
+            ToolkitButton economyClose = ToolkitQuery.Q<ToolkitButton>(root, "economyClose");
+            ToolkitButton barracksButton = ToolkitQuery.Q<ToolkitButton>(root, "barracksButton");
+            Assert.That(guidedLayer, Is.Not.Null);
+            Assert.That(economyButton, Is.Not.Null);
+            Assert.That(economyClose, Is.Not.Null);
+            Assert.That(barracksButton, Is.Not.Null);
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            using (EntityQuery resourceQuery = entityManager.CreateEntityQuery(typeof(ResourceData)))
+            {
+                Entity resourceEntity = resourceQuery.GetSingletonEntity();
+                ResourceData resources = entityManager.GetComponentData<ResourceData>(resourceEntity);
+                resources.Wood = 1_000_000;
+                resources.Stone = 1_000_000;
+                resources.Iron = 1_000_000;
+                resources.Food = 1_000_000;
+                entityManager.SetComponentData(resourceEntity, resources);
+            }
+
+            for (int frame = 0; frame < 90
+                 && hud.ActiveGuidedOnboardingStep != GuidedOnboardingStep.EconomyOpen;
+                 frame++)
+            {
+                yield return null;
+            }
+
+            Assert.That(hud.ActiveGuidedOnboardingStep,
+                Is.EqualTo(GuidedOnboardingStep.EconomyOpen));
+            Assert.That(hud.ActiveGuidedOnboardingTarget, Is.SameAs(economyButton));
+            Assert.That(hud.IsGuidedOnboardingInputLocked, Is.True);
+            Assert.That(guidedLayer.ClassListContains("is-core"), Is.True);
+            ToolkitVisualElement guidedFocus = ToolkitQuery.Q<ToolkitVisualElement>(
+                root, "guidedFocus");
+            Assert.That(guidedFocus, Is.Not.Null);
+            Assert.That(guidedFocus.worldBound.Overlaps(economyButton.worldBound), Is.True,
+                "Spotlight frame gercek Economy target'ini sarmalidir.");
+            Assert.That(guidedLayer.pickingMode,
+                Is.EqualTo(UnityEngine.UIElements.PickingMode.Ignore));
+
+            SendNavigationSubmit(barracksButton);
+            yield return null;
+            Assert.That(MetaProgression.HasTutorialFlag(
+                GuidedOnboardingProgress.BarracksOpenFlagId), Is.False);
+            Assert.That(ToolkitQuery.Q<ToolkitVisualElement>(root, "barracksDrawer")
+                .ClassListContains("is-open"), Is.False,
+                "Core tutorial hedef disi Barracks submit'ini engellemelidir.");
+
+            SendNavigationSubmit(economyButton);
+            for (int frame = 0; frame < 60
+                 && hud.ActiveGuidedOnboardingStep != GuidedOnboardingStep.WorkerShare;
+                 frame++)
+            {
+                yield return null;
+            }
+            Assert.That(MetaProgression.HasTutorialFlag(
+                GuidedOnboardingProgress.EconomyOpenFlagId), Is.True);
+
+            ToolkitSliderInt woodSlider = ToolkitQuery.Q<ToolkitSliderInt>(
+                root, "economyAllocationSlider" + EconomyFocusType.Wood);
+            Assert.That(woodSlider, Is.Not.Null);
+            Assert.That(hud.ActiveGuidedOnboardingTarget, Is.SameAs(woodSlider));
+            woodSlider.value = woodSlider.value == 60 ? 65 : 60;
+            for (int frame = 0; frame < 60
+                 && hud.ActiveGuidedOnboardingStep != GuidedOnboardingStep.EconomyClose;
+                 frame++)
+            {
+                yield return null;
+            }
+            Assert.That(MetaProgression.HasTutorialFlag(
+                GuidedOnboardingProgress.WorkerShareFlagId), Is.True);
+            Assert.That(hud.ActiveGuidedOnboardingTarget, Is.SameAs(economyClose));
+            for (int frame = 0; frame < 30
+                 && !guidedFocus.worldBound.Overlaps(economyClose.worldBound);
+                 frame++)
+            {
+                yield return null;
+            }
+            Assert.That(guidedFocus.worldBound.Overlaps(economyClose.worldBound), Is.True,
+                $"Slider sonrasi spotlight gercek Economy Close target'ini sarmalidir. "
+                + $"Focus={guidedFocus.worldBound}, Close={economyClose.worldBound}");
+
+            SendNavigationSubmit(barracksButton);
+            yield return null;
+            Assert.That(MetaProgression.HasTutorialFlag(
+                GuidedOnboardingProgress.BarracksOpenFlagId), Is.False,
+                "Economy kapanmadan Barracks adimi tamamlanmamalidir.");
+            Assert.That(ToolkitQuery.Q<ToolkitVisualElement>(root, "economyDrawer")
+                .ClassListContains("is-open"), Is.True,
+                "Tutorial once gercek Economy Close aksiyonunu istemelidir.");
+
+            SendNavigationSubmit(economyClose);
+            for (int frame = 0; frame < 60
+                 && hud.ActiveGuidedOnboardingStep != GuidedOnboardingStep.BarracksOpen;
+                 frame++)
+            {
+                yield return null;
+            }
+            Assert.That(MetaProgression.HasTutorialFlag(
+                GuidedOnboardingProgress.EconomyCloseFlagId), Is.True);
+            Assert.That(ToolkitQuery.Q<ToolkitVisualElement>(root, "economyDrawer")
+                .ClassListContains("is-open"), Is.False);
+
+            SendNavigationSubmit(barracksButton);
+            for (int frame = 0; frame < 60
+                 && hud.ActiveGuidedOnboardingStep != GuidedOnboardingStep.BasicArcher;
+                 frame++)
+            {
+                yield return null;
+            }
+            Assert.That(MetaProgression.HasTutorialFlag(
+                GuidedOnboardingProgress.BarracksOpenFlagId), Is.True);
+
+            ToolkitButton basicArcherButton = ToolkitQuery.Q<ToolkitButton>(
+                root, "archerBuy" + ArcherType.Basic);
+            Assert.That(basicArcherButton, Is.Not.Null);
+            int basicBefore = gameManager.BasicArcherCount;
+            SendNavigationSubmit(basicArcherButton);
+            for (int frame = 0; frame < 90
+                 && hud.ActiveGuidedOnboardingStep != GuidedOnboardingStep.SpeedTwo;
+                 frame++)
+            {
+                yield return null;
+            }
+            Assert.That(gameManager.BasicArcherCount, Is.EqualTo(basicBefore + 1));
+            Assert.That(MetaProgression.HasTutorialFlag(
+                GuidedOnboardingProgress.BasicArcherFlagId), Is.True);
+
+            ToolkitButton speedTwo = ToolkitQuery.Q<ToolkitButton>(root, "timeSpeedTwo");
+            Assert.That(speedTwo, Is.Not.Null);
+            SendNavigationSubmit(speedTwo);
+            for (int frame = 0; frame < 60
+                 && !MetaProgression.HasTutorialFlag(GuidedOnboardingProgress.SpeedTwoFlagId);
+                 frame++)
+            {
+                yield return null;
+            }
+
+            Assert.That(MetaProgression.HasTutorialFlag(
+                GuidedOnboardingProgress.SpeedTwoFlagId), Is.True);
+            Assert.That(GuidedOnboardingProgress.IsCoreComplete(), Is.True);
+            Assert.That(SimulationPauseService.RunningTimeScale,
+                Is.EqualTo(SimulationSpeedUtility.Fast));
+            Assert.That(hud.IsGuidedOnboardingInputLocked, Is.False);
+            for (int frame = 0; frame < 60
+                 && hud.ActiveGuidedOnboardingStep != GuidedOnboardingStep.Housing;
+                 frame++)
+            {
+                yield return null;
+            }
+            Assert.That(hud.ActiveGuidedOnboardingStep,
+                Is.EqualTo(GuidedOnboardingStep.Housing),
+                "Baslangic population kapasitesi dolu oldugu icin ilk uygun contextual adim Housing olmali.");
+            Assert.That(hud.IsGuidedOnboardingInputLocked, Is.False,
+                "Contextual adim unrelated UI input'unu kilitlememelidir.");
+            Assert.That(guidedLayer.ClassListContains("is-contextual"), Is.True);
         }
 
         private static int CountToastMessages(ToolkitVisualElement toastStack, string text)

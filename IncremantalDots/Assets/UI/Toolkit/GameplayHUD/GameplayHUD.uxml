@@ -348,5 +348,17 @@
 
         <ui:VisualElement name="toastStack" class="toast-stack" picking-mode="Ignore" />
         <ui:VisualElement name="soulFlightLayer" class="soul-flight-layer" picking-mode="Ignore" />
+        <ui:VisualElement name="guidedTutorialLayer" class="guided-tutorial-layer" picking-mode="Ignore">
+            <ui:VisualElement name="guidedDimTop" class="guided-tutorial-dim" picking-mode="Ignore" />
+            <ui:VisualElement name="guidedDimBottom" class="guided-tutorial-dim" picking-mode="Ignore" />
+            <ui:VisualElement name="guidedDimLeft" class="guided-tutorial-dim" picking-mode="Ignore" />
+            <ui:VisualElement name="guidedDimRight" class="guided-tutorial-dim" picking-mode="Ignore" />
+            <ui:VisualElement name="guidedFocus" class="guided-tutorial-focus" picking-mode="Ignore" />
+            <ui:VisualElement name="guidedCard" class="guided-tutorial-card" picking-mode="Ignore">
+                <ui:Label name="guidedStepLabel" text="FIRST RUN  ·  1 OF 6" class="guided-tutorial-step" picking-mode="Ignore" />
+                <ui:Label name="guidedTitle" text="OPEN THE ECONOMY" class="guided-tutorial-title" picking-mode="Ignore" />
+                <ui:Label name="guidedBody" text="Manage how your people produce resources." class="guided-tutorial-body" picking-mode="Ignore" />
+            </ui:VisualElement>
+        </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

@@ -76,7 +76,11 @@ namespace DeadWalls
             if (IsBlockingModalOpen())
                 return;
 
-            SimulationPauseService.TrySetRunningTimeScale(timeScale);
+            bool changed = SimulationPauseService.TrySetRunningTimeScale(timeScale);
+            if (changed && Mathf.Approximately(timeScale, SimulationSpeedUtility.Fast))
+            {
+                MarkGuidedOnboardingStepFromSuccessfulAction(GuidedOnboardingStep.SpeedTwo);
+            }
             RefreshGameFlowControls();
         }
 

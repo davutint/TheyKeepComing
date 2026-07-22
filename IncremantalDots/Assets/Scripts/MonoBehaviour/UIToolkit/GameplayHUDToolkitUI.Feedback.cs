@@ -46,7 +46,8 @@ namespace DeadWalls
                                  && !string.IsNullOrWhiteSpace(_onboardingLegacy.HintText.text);
             bool hintVisible = ShouldMirrorLegacyOnboardingHint(
                 hasLegacyHint,
-                _onboardingLegacy != null && _onboardingLegacy.IsBasicArcherStepVisible);
+                _onboardingLegacy != null && _onboardingLegacy.IsBasicArcherStepVisible,
+                HasGuidedOnboardingPresentationOwner);
             _onboardingHint.EnableInClassList("is-visible", hintVisible);
             if (hintVisible)
             {
@@ -71,9 +72,12 @@ namespace DeadWalls
 
         internal static bool ShouldMirrorLegacyOnboardingHint(
             bool hasLegacyHint,
-            bool isBasicArcherAffordabilityStep)
+            bool isBasicArcherAffordabilityStep,
+            bool hasGuidedOnboardingOwner)
         {
-            return hasLegacyHint && !isBasicArcherAffordabilityStep;
+            return hasLegacyHint
+                && !isBasicArcherAffordabilityStep
+                && !hasGuidedOnboardingOwner;
         }
 
         private void MirrorToast(TMPro.TMP_Text source, ref string cache, bool primary)

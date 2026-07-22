@@ -679,6 +679,72 @@
 .toast.toast-tone--critical { border-color: rgba(215,93,66,0.80); }
 .toast.toast-tone--critical .toast__marker { background-color: rgb(215,93,66); }
 .toast.toast-tone--critical .toast__message { color: rgb(250,181,151); }
+
+.guided-tutorial-layer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: none;
+    pointer-events: none;
+}
+.guided-tutorial-layer.is-visible { display: flex; }
+.guided-tutorial-dim {
+    position: absolute;
+    background-color: rgba(4, 6, 7, 0.72);
+}
+.guided-tutorial-layer.is-contextual .guided-tutorial-dim { display: none; }
+.guided-tutorial-focus {
+    position: absolute;
+    border-width: 2px;
+    border-color: var(--runtime-gold-bright);
+    border-radius: 4px;
+    background-color: rgba(241, 194, 116, 0.08);
+    opacity: 0.96;
+}
+.guided-tutorial-layer.is-contextual .guided-tutorial-focus {
+    border-color: var(--runtime-cyan);
+    background-color: rgba(111, 213, 225, 0.07);
+}
+.guided-tutorial-card {
+    position: absolute;
+    min-height: 112px;
+    padding: 14px 16px;
+    border-width: 1px;
+    border-left-width: 4px;
+    border-color: var(--runtime-line-strong);
+    border-left-color: var(--runtime-gold-bright);
+    background-color: rgba(10, 12, 12, 0.985);
+}
+.guided-tutorial-layer.is-contextual .guided-tutorial-card {
+    border-left-color: var(--runtime-cyan);
+}
+.guided-tutorial-step {
+    margin: 0 0 6px 0;
+    padding: 0;
+    color: var(--runtime-gold-bright);
+    font-size: 10px;
+    letter-spacing: 1.4px;
+    -unity-font-style: bold;
+}
+.guided-tutorial-layer.is-contextual .guided-tutorial-step { color: var(--runtime-cyan); }
+.guided-tutorial-title {
+    margin: 0 0 7px 0;
+    padding: 0;
+    color: var(--runtime-ink);
+    font-size: 14px;
+    letter-spacing: 1px;
+    -unity-font-style: bold;
+    white-space: normal;
+}
+.guided-tutorial-body {
+    margin: 0;
+    padding: 0;
+    color: var(--runtime-muted);
+    font-size: 11px;
+    white-space: normal;
+}
 .soul-flight { position: absolute; width: 18px; height: 18px; rotate: 45deg; background-color: var(--runtime-cyan); border-width: 2px; border-color: rgba(210,250,255,0.80); }
 .soul-flight__amount { position: absolute; left: 13px; top: -15px; min-width: 48px; height: 22px; padding: 2px 5px; rotate: -45deg; background-color: rgba(6,13,16,0.90); border-width: 1px; border-color: rgba(118,224,255,0.42); color: rgba(222,252,255,0.96); font-size: 10px; -unity-font-style: bold; -unity-text-align: middle-center; }
 .soul-flight--essence { background-color: rgb(177, 104, 216); border-color: rgba(239, 205, 255, 0.88); }

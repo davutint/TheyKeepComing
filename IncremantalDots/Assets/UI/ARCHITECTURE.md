@@ -45,9 +45,11 @@ tamamlanmis tek-seferlik satin alim gibi terminal durumlar gercek disabled state
 - Feedback: critical banner, onboarding hint, en fazla uc gorunen kartlik sureli action-feedback
   toast stack'i, merkezi UI button click sesi, damage flash, day/night tint, soul pickup flight ve
   gercek dusman olumundeki basarili Grave Essence drop flight'i.
-- Legacy `FirstRunOnboardingUI` Basic Archer affordability cue'su yeni HUD'a aynalanmaz. Yeni first-run
-  onboarding, UI Toolkit'teki gercek kontrol hedefleri ve owner-onayli exact adim sirasi uzerinden
-  `DW-P16-GUIDED-ONBOARDING` kapsaminda yeniden kurulacaktir.
+- Legacy `FirstRunOnboardingUI` hint/pulse sunumu yeni HUD'a aynalanmaz. Aktif first-run sahibi
+  UI Toolkit'teki gercek kontrolleri izleyen `GameplayHUDToolkitUI.Onboarding`dir. Zorunlu
+  `ECONOMY -> Wood slider -> CLOSE -> BARRACKS -> BASIC ARCHER -> 2X` zinciri hedef disi input'u kilitler;
+  kosullu Rally, Council, Arrow, Castle Heart, housing ve repair tip'leri unrelated kontrolleri
+  kilitlemez.
 
 Castle Heart ve Technology acikken simulasyon akmaya devam eder. Pause, level-up ve game-over
 kendi mevcut duraklatma sozlesmelerini korur. Council secim yapilana kadar merkezi pause lease'i

@@ -222,7 +222,20 @@ namespace DeadWalls.Tests
                 FirstRunOnboardingUI.CouncilExactFlagId,
                 FirstRunOnboardingUI.DaytimeRepairFlagId,
                 FirstRunOnboardingUI.NightAbilityKeyFlagId,
-                FirstRunOnboardingUI.TutorialCompleteFlagId
+                FirstRunOnboardingUI.TutorialCompleteFlagId,
+                GuidedOnboardingProgress.EconomyOpenFlagId,
+                GuidedOnboardingProgress.WorkerShareFlagId,
+                GuidedOnboardingProgress.EconomyCloseFlagId,
+                GuidedOnboardingProgress.BarracksOpenFlagId,
+                GuidedOnboardingProgress.BasicArcherFlagId,
+                GuidedOnboardingProgress.SpeedTwoFlagId,
+                GuidedOnboardingProgress.RallyFlagId,
+                GuidedOnboardingProgress.CouncilChoiceFlagId,
+                GuidedOnboardingProgress.ArrowRefillFlagId,
+                GuidedOnboardingProgress.CastleHeartFlagId,
+                GuidedOnboardingProgress.HousingFlagId,
+                GuidedOnboardingProgress.WallRepairFlagId,
+                GuidedOnboardingProgress.CompleteFlagId
             };
 
             string[] actualFlags = FirstRunOnboardingUI.GetTutorialProgressFlagIds();

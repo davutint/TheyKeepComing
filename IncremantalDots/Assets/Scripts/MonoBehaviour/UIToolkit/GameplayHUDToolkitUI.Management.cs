@@ -46,7 +46,7 @@ namespace DeadWalls
 
         private void BindManagementActions()
         {
-            Q<Button>("economyClose").clicked += CloseSurface;
+            Q<Button>("economyClose").clicked += CloseEconomySurfaceFromPlayer;
             Q<Button>("barracksClose").clicked += CloseSurface;
             Q<Button>("arrowsClose").clicked += CloseSurface;
 
@@ -409,7 +409,10 @@ namespace DeadWalls
 
             bool changed = gm.SetWorkerAllocationSharePercent(resource, targetPercent);
             if (changed)
+            {
                 _onboardingLegacy?.NotifyWorkerTargetRatioChangedByPlayer(resource);
+                MarkGuidedOnboardingStepFromSuccessfulAction(GuidedOnboardingStep.WorkerShare);
+            }
             ShowSecondaryToast(changed
                 ? $"{ResourceName(resource)} SHARE  {gm.GetWorkerTargetRatioBps(resource) / 100f:0}%"
                 : "WORKER REDISTRIBUTION BLOCKED");
@@ -447,7 +450,10 @@ namespace DeadWalls
             GameManager gm = GameManager.Instance;
             bool purchased = gm != null && gm.TryBuyBedCapacity(amount);
             if (purchased)
+            {
                 ShowPrimaryToast($"HOUSING EXPANDED  ·  +{amount:N0} BEDS");
+                MarkGuidedOnboardingStepFromSuccessfulAction(GuidedOnboardingStep.Housing);
+            }
             else
                 ShowWarningToast(gm == null
                     ? "HOUSING UNAVAILABLE  ·  GAME STATE NOT READY"
@@ -466,6 +472,11 @@ namespace DeadWalls
             if (purchased)
             {
                 ShowPrimaryToast($"{type.ToString().ToUpperInvariant()} ARCHER RECRUITED");
+                if (type == ArcherType.Basic)
+                {
+                    MarkGuidedOnboardingStepFromSuccessfulAction(
+                        GuidedOnboardingStep.BasicArcher);
+                }
             }
             else if (gm == null)
             {
@@ -513,7 +524,10 @@ namespace DeadWalls
             GameManager gm = GameManager.Instance;
             bool purchased = gm != null && gm.TryBuyArrowRefill(packages);
             if (purchased)
+            {
                 ShowPrimaryToast("ARROW RESERVE RESTOCKED");
+                MarkGuidedOnboardingStepFromSuccessfulAction(GuidedOnboardingStep.ArrowRefill);
+            }
             else
                 ShowWarningToast(gm == null
                     ? "ARROW RESTOCK UNAVAILABLE  ·  GAME STATE NOT READY"
@@ -532,6 +546,7 @@ namespace DeadWalls
             if (purchased)
             {
                 ShowPrimaryToast("ARROW RESERVE FILLED");
+                MarkGuidedOnboardingStepFromSuccessfulAction(GuidedOnboardingStep.ArrowRefill);
             }
             else if (gm == null)
             {
