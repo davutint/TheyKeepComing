@@ -169,16 +169,18 @@ namespace DeadWalls.Tests
         }
 
         [Test]
-        public void BlockingPauseRule_AllowsOnlyActiveHeartPauseTeaching()
+        public void BlockingPauseRule_AllowsHeartAndCouncilPauseTeaching()
         {
             Assert.That(FirstRunOnboardingRules.ShouldSuppressForBlockingPause(
-                false, false, false), Is.False);
+                false, false, false, false), Is.False);
             Assert.That(FirstRunOnboardingRules.ShouldSuppressForBlockingPause(
-                true, false, false), Is.True);
+                true, false, false, false), Is.True);
             Assert.That(FirstRunOnboardingRules.ShouldSuppressForBlockingPause(
-                true, true, false), Is.True);
+                true, true, false, false), Is.True);
             Assert.That(FirstRunOnboardingRules.ShouldSuppressForBlockingPause(
-                true, true, true), Is.False);
+                true, true, true, false), Is.False);
+            Assert.That(FirstRunOnboardingRules.ShouldSuppressForBlockingPause(
+                true, false, false, true), Is.False);
         }
 
         [Test]

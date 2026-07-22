@@ -51,15 +51,16 @@
 
 1. Play'e gir; Day 1 Dawn'dan baslayarak her gun kartin kesin acildigini ve ayni Dawn'da ikinci
    kez acilmadigini kontrol et.
-2. Kart sol-alt bolgede belirir (odul toast'undan ~1.2s sonra); sure seridi ve `DECIDE Ns`
-   sayaci kalan Dawn+Day penceresini gosterir; DUSK girisinde secilmediyse kaybolur.
-   Tuner'da decision window read-only olarak `SiegeDawnDuration + SiegeDayDuration` gorunmelidir;
-   production baseline `5 + 30 = 35s`'dir ve ayri Council timer alani yoktur.
+2. Kart acildiginda simulation durur; sure seridi dolu kalir ve
+   `GAME PAUSED - CHOOSE TO CONTINUE` metni gorunur. `1X/2X/3X` hiz butonlari pause boyunca
+   kilitlidir. Uygulanabilir bir secenek commit edildiginde kart kapanir ve kart oncesindeki
+   hiz aynen geri gelir; uygulanamayan secenek pause'u birakmaz. Tuner'daki Dawn + Day decision
+   window degeri yalniz tarihsel telemetry/save uyumlulugudur, player-facing geri sayim degildir.
 3. Iki butonun ikinci satirinda exact sonuc gorunur: population `+N PEOPLE -M FOOD`, free
    archer `+N BASIC ARCHERS -N RESOURCE WORKERS`, Wall heal gercek uygulanacak HP ve gece etkisi
    exact count yuzdesi. Karsilanamayan exact sonuc butonu pasif yapar ve eksigi yazar.
    Ilk incomplete Council tutorial'inda pulse iki butondan birini degil tum `CouncilEventPanel`
-   rect'ini kapsar; `COMPARE BOTH EXACT OUTCOMES AND THEIR COSTS.` hint'i gorunur ve oyun durmaz.
+   rect'ini kapsar; `COMPARE BOTH EXACT OUTCOMES AND THEIR COSTS.` hint'i pause altinda gorunur.
 4. `refugees_at_gate`'te A sec -> catalog'daki exact curated link sayesinde 2+ gun sonra
    `AMONG THE REFUGEES` zinciri cikabilir (OneShot). Link allowlist'ten cikarilirsa context'te
    flag bulunsa bile target fail-closed acilmaz. A secildikten sonra source event kosu icin

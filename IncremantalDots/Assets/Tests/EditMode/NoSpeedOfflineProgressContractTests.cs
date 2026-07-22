@@ -37,7 +37,7 @@ namespace DeadWalls.Tests
             RegexOptions.Compiled);
 
         [Test]
-        public void ProductionRuntime_HasNoPlayerAccelerationOrWallClockProgression()
+        public void ProductionRuntime_UsesOnlyApprovedSpeedOwnerAndNoWallClockProgression()
         {
             string scriptsRoot = Path.Combine(Application.dataPath, "Scripts");
             string editorSegment = $"{Path.DirectorySeparatorChar}Editor{Path.DirectorySeparatorChar}";
@@ -80,14 +80,14 @@ namespace DeadWalls.Tests
             }
 
             Assert.That(violations, Is.Empty,
-                "Production runtime oyuncuya x2/x4 hizlandirma veya wall-clock/offline ilerleme eklememeli.");
+                "Production runtime yalniz merkezi 1X/2X/3X hiz owner'ini kullanmali; wall-clock/offline ilerleme eklememeli.");
             Assert.That(timeScaleWriterFiles.OrderBy(path => path), Is.EqualTo(new[]
             {
                 "MonoBehaviour/MainMenuSceneUI.cs",
                 "MonoBehaviour/RunBootstrap.cs",
                 "MonoBehaviour/SimulationPauseService.cs",
                 "MonoBehaviour/UIManager.cs"
-            }), "Time scale sahipligi yalniz normal hiz, merkezi pause ve olum sunumu sinirinda kalmali.");
+            }), "Time scale sahipligi yalniz bootstrap, merkezi speed/pause ve olum sunumu sinirinda kalmali.");
         }
 
         [Test]
@@ -115,7 +115,7 @@ namespace DeadWalls.Tests
         }
 
         [Test]
-        public void ProductionScene_ExposesPauseButNoPlayerSpeedControl()
+        public void ProductionScene_KeepsLegacyCanvasFreeOfDuplicateSpeedControls()
         {
             Scene scene = GetOrOpenScene(MainScenePath, out bool openedByTest);
             try
@@ -137,7 +137,7 @@ namespace DeadWalls.Tests
                     .ToArray();
 
                 Assert.That(forbiddenControls, Is.Empty,
-                    "Production scene pause sunabilir fakat player-facing x2/x4 kontrolu sunmamali.");
+                    "Player speed kontrolu yalniz production UI Toolkit HUD'da olmali; legacy Canvas kopya sunmamali.");
             }
             finally
             {

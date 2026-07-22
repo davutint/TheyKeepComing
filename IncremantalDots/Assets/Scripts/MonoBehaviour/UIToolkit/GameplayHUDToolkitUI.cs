@@ -19,8 +19,6 @@ namespace DeadWalls
     {
         private const float TextRefreshInterval = 0.10f;
         private const float GraphRefreshInterval = 0.25f;
-        private const float ToastDuration = 2.4f;
-
         private static readonly EconomyFocusType[] EconomyResources =
         {
             EconomyFocusType.Wood,
@@ -136,8 +134,6 @@ namespace DeadWalls
         private SurfaceKind _openSurface;
         private float _nextTextRefresh;
         private float _nextGraphRefresh;
-        private float _primaryToastUntil;
-        private float _secondaryToastUntil;
         private IDisposable _pauseLease;
         private GameManager _graveEssenceDropOwner;
         private bool _initialized;
@@ -180,6 +176,8 @@ namespace DeadWalls
             CancelHeartAnimations();
             ReleaseAllSoulFlights();
             ReleasePause();
+            ReleaseCouncilPause();
+            ResetToastPresentation(true);
             RestoreLegacyCanvas();
         }
 
@@ -216,6 +214,7 @@ namespace DeadWalls
 
             RefreshHudContinuous(gm);
             RefreshModalContinuous(gm);
+            RefreshGameFlowControls();
             UpdateSoulFlights(Time.unscaledDeltaTime);
             UpdateToastVisibility(now);
 
@@ -301,6 +300,7 @@ namespace DeadWalls
             _soulFlightLayer = Q<VisualElement>("soulFlightLayer");
 
             BindCoreActions();
+            BindGameFlowControls();
             BindManagementActions();
             BindGraphActions();
             BindModalActions();
@@ -899,26 +899,5 @@ namespace DeadWalls
             return parts.Count == 0 ? "FREE" : string.Join("  ·  ", parts);
         }
 
-        private void ShowPrimaryToast(string text)
-        {
-            _primaryToast.text = text;
-            _primaryToastUntil = Time.unscaledTime + ToastDuration;
-            _primaryToast.AddToClassList("is-visible");
-        }
-
-        private void ShowSecondaryToast(string text)
-        {
-            _secondaryToast.text = text;
-            _secondaryToastUntil = Time.unscaledTime + ToastDuration;
-            _secondaryToast.AddToClassList("is-visible");
-        }
-
-        private void UpdateToastVisibility(float now)
-        {
-            if (now >= _primaryToastUntil)
-                _primaryToast.RemoveFromClassList("is-visible");
-            if (now >= _secondaryToastUntil)
-                _secondaryToast.RemoveFromClassList("is-visible");
-        }
     }
 }

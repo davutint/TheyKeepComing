@@ -13,7 +13,9 @@ namespace DeadWalls
     /// gecikmeli), DAY boyunca acik kalir, DUSK girisinde secilmemisse expire olur.
     /// Secimden sonra kart kapanmaz: 3 saniyeligine SONUC metnine donusur (promise -> choice
     /// -> consequence dongusunun son halkasi). Sureli etkiler HUD rozetinde gorunur; riskli
-    /// gece secimi, gece baslarken toast'la hatirlatilir. Oyun HICBIR zaman durmaz.
+    /// gece secimi, gece baslarken legacy toast'la hatirlatilir. Production UI Toolkit modal'i
+    /// aktif karar boyunca merkezi SimulationPauseService lease'i tutar; bu legacy presenter
+    /// ayrica pause sahiplenmez.
     /// </summary>
     public class CouncilEventUI : MonoBehaviour
     {

@@ -8,7 +8,7 @@ using Unity.Entities;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
-using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 namespace DeadWalls.Tests
 {
@@ -96,6 +96,14 @@ namespace DeadWalls.Tests
                 _resetCouncilState?.Invoke(GameManager.Instance, null);
             }
 
+            // Production HUD Council lease'ini Update'ta birakir. Bir frame bekleyerek
+            // sonraki teste pause veya secili hiz sizmasini engelle.
+            yield return null;
+            Assert.That(SimulationPauseService.IsPaused, Is.False,
+                "Council pause lease'i test teardown'unda serbest kalmadi.");
+            Assert.That(SimulationPauseService.TrySetRunningTimeScale(
+                SimulationSpeedUtility.Normal), Is.True);
+
             for (int i = _createdObjects.Count - 1; i >= 0; i--)
                 Object.Destroy(_createdObjects[i]);
             _createdObjects.Clear();
@@ -108,6 +116,49 @@ namespace DeadWalls.Tests
             RestoreIfNeeded(_metaTempPath, _hadMetaTemp, _originalMetaTemp);
             MetaProgression.Load();
             yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator ActiveCouncil_PausesAndChoiceRestoresSelectedSpeed()
+        {
+            GameManager gameManager = GameManager.Instance;
+            GameplayHUDToolkitUI hud = Object.FindFirstObjectByType<GameplayHUDToolkitUI>();
+            Assert.That(hud, Is.Not.Null, "Production UI Toolkit HUD bulunamadi.");
+            Assert.That(SimulationPauseService.TrySetRunningTimeScale(
+                SimulationSpeedUtility.VeryFast), Is.True);
+            Assert.That(Time.timeScale, Is.EqualTo(SimulationSpeedUtility.VeryFast)
+                .Within(0.001f));
+
+            SetCycle(gameManager, 3, SiegeCyclePhase.Dawn, 2.25f);
+            Assert.That(gameManager.TryOpenRegularCouncilEvent(), Is.True);
+
+            float pauseDeadline = Time.realtimeSinceStartup + 3f;
+            while (!SimulationPauseService.IsPaused
+                   && Time.realtimeSinceStartup < pauseDeadline)
+                yield return null;
+
+            Assert.That(SimulationPauseService.IsPaused, Is.True,
+                "Aktif Council karari simulation pause lease'i almadi.");
+            Assert.That(Time.timeScale, Is.Zero.Within(0.001f));
+            Assert.That(SimulationPauseService.RunningTimeScale,
+                Is.EqualTo(SimulationSpeedUtility.VeryFast).Within(0.001f));
+
+            UnityEngine.UIElements.UIDocument document =
+                hud.GetComponent<UnityEngine.UIElements.UIDocument>();
+            Assert.That(document, Is.Not.Null);
+            UnityEngine.UIElements.Label speedState =
+                document.rootVisualElement.Q<UnityEngine.UIElements.Label>("timeSpeedState");
+            Assert.That(speedState, Is.Not.Null);
+            Assert.That(speedState.text, Is.EqualTo("PAUSED - 3X"));
+
+            Assert.That(gameManager.ChooseCouncilOption(true), Is.True,
+                "Test catalog Option A exact uygulanamadi.");
+            yield return null;
+
+            Assert.That(gameManager.ActiveCouncilEvent, Is.Null);
+            Assert.That(SimulationPauseService.IsPaused, Is.False);
+            Assert.That(Time.timeScale, Is.EqualTo(SimulationSpeedUtility.VeryFast)
+                .Within(0.001f), "Council secimi onceki 3X hizini geri yuklemedi.");
         }
 
         [UnityTest]
@@ -292,7 +343,7 @@ namespace DeadWalls.Tests
             Assert.That(gameManager.ActiveCouncilEvent, Is.SameAs(active),
                 "Onboarding oyuncu adina Council secimi yapmamali.");
 
-            Button chosenButton = council.CouncilOptionAButton;
+            UnityEngine.UI.Button chosenButton = council.CouncilOptionAButton;
             chosenButton.onClick.Invoke();
             yield return null;
 

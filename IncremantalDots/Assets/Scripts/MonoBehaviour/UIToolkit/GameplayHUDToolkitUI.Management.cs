@@ -270,9 +270,9 @@ namespace DeadWalls
             _housingOne.text = $"ADD 1 BED\nCOST: {FormatCost(gm.GetBedCapacityPurchaseCost(1))}";
             _housingTen.text = $"ADD 10 BEDS\nCOST: {FormatCost(gm.GetBedCapacityPurchaseCost(10))}";
             _housingHundred.text = $"ADD 100 BEDS\nCOST: {FormatCost(gm.GetBedCapacityPurchaseCost(100))}";
-            _housingOne.SetEnabled(gm.CanBuyBedCapacity(1));
-            _housingTen.SetEnabled(gm.CanBuyBedCapacity(10));
-            _housingHundred.SetEnabled(gm.CanBuyBedCapacity(100));
+            SetExplainedActionState(_housingOne, gm.CanBuyBedCapacity(1));
+            SetExplainedActionState(_housingTen, gm.CanBuyBedCapacity(10));
+            SetExplainedActionState(_housingHundred, gm.CanBuyBedCapacity(100));
 
             for (int i = 0; i < EconomyResources.Length; i++)
             {
@@ -296,8 +296,14 @@ namespace DeadWalls
                 Button efficiency = Q<Button>("economyEfficiency" + resource);
                 capacity.text = $"CAPACITY  ·  LEVEL {capacityLevel}\nCOST: {FormatCost(capacityCost)}";
                 efficiency.text = $"EFFICIENCY  ·  LEVEL {efficiencyLevel}\nCOST: {FormatCost(efficiencyCost)}";
-                capacity.SetEnabled(gm.CanBuyWorkerBuildingUpgrade(resource, WorkerBuildingUpgradeType.Capacity));
-                efficiency.SetEnabled(gm.CanBuyWorkerBuildingUpgrade(resource, WorkerBuildingUpgradeType.Efficiency));
+                SetExplainedActionState(
+                    capacity,
+                    gm.CanBuyWorkerBuildingUpgrade(resource, WorkerBuildingUpgradeType.Capacity),
+                    HasResourceCost(capacityCost));
+                SetExplainedActionState(
+                    efficiency,
+                    gm.CanBuyWorkerBuildingUpgrade(resource, WorkerBuildingUpgradeType.Efficiency),
+                    HasResourceCost(efficiencyCost));
             }
         }
 
@@ -330,12 +336,22 @@ namespace DeadWalls
                     : "RESEARCH IN CASTLE HEART";
                 Button buy = Q<Button>("archerBuy" + type);
                 buy.text = unlocked ? $"RECRUIT  ·  {FormatCost(gm.GetArcherBuyCost(definition))}" : "LOCKED";
-                buy.SetEnabled(gm.CanBuyArcher(definition));
+                SetExplainedActionState(
+                    buy,
+                    gm.CanBuyArcher(definition),
+                    GameplayActionFeedbackUtility.CanExplainArcherRecruitmentFailure(
+                        unlocked,
+                        gm.GetRemainingArcherCapacity()));
                 Button retrain = Q<Button>("archerRetrain" + type);
                 if (retrain != null)
                 {
                     retrain.text = $"RETRAIN  ·  {FormatCost(gm.GetArcherRetrainCost(type))}";
-                    retrain.SetEnabled(gm.CanRetrainBasicArcher(type));
+                    SetExplainedActionState(
+                        retrain,
+                        gm.CanRetrainBasicArcher(type),
+                        GameplayActionFeedbackUtility.CanExplainArcherRetrainingFailure(
+                            unlocked,
+                            gm.BasicArcherCount));
                 }
             }
         }
@@ -362,9 +378,9 @@ namespace DeadWalls
             SetArrowQuote(_arrowPackageDetail, _arrowPackageCost, package);
             SetArrowQuote(_arrowLargeDetail, _arrowLargeCost, large);
             SetArrowQuote(_arrowMaxDetail, _arrowMaxCost, max);
-            _arrowPackageButton.SetEnabled(gm.CanBuyArrowRefill(1));
-            _arrowLargeButton.SetEnabled(gm.CanBuyArrowRefill(5));
-            _arrowMaxButton.SetEnabled(gm.CanBuyMaxArrowRefill());
+            SetExplainedActionState(_arrowPackageButton, gm.CanBuyArrowRefill(1));
+            SetExplainedActionState(_arrowLargeButton, gm.CanBuyArrowRefill(5));
+            SetExplainedActionState(_arrowMaxButton, gm.CanBuyMaxArrowRefill());
 
             RefreshArrowUpgrade(gm, ArrowUpgradeType.Capacity, _arrowCapacityButton, _arrowCapacityDetail, _arrowCapacityCost);
             RefreshArrowUpgrade(gm, ArrowUpgradeType.Efficiency, _arrowEfficiencyButton, _arrowEfficiencyDetail, _arrowEfficiencyCost);
@@ -382,7 +398,7 @@ namespace DeadWalls
             ResourceCost next = gm.GetArrowUpgradeCost(type);
             detail.text = $"LEVEL {level:N0}  ·  LASTS THIS RUN";
             cost.text = FormatCost(next);
-            button.SetEnabled(gm.CanBuyArrowUpgrade(type));
+            SetExplainedActionState(button, gm.CanBuyArrowUpgrade(type), HasResourceCost(next));
         }
 
         private void SetWorkerAllocationShare(EconomyFocusType resource, int targetPercent)
@@ -404,9 +420,24 @@ namespace DeadWalls
         {
             GameManager gm = GameManager.Instance;
             bool purchased = gm != null && gm.TryBuyWorkerBuildingUpgrade(resource, type);
-            ShowPrimaryToast(purchased
-                ? $"{ResourceName(resource)} {type.ToString().ToUpperInvariant()} IMPROVED"
-                : "UPGRADE BLOCKED  ·  CHECK COST");
+            if (purchased)
+            {
+                ShowPrimaryToast($"{ResourceName(resource)} {type.ToString().ToUpperInvariant()} IMPROVED");
+            }
+            else
+            {
+                ResourceCost cost = gm != null
+                    ? gm.GetWorkerBuildingUpgradeCost(resource, type)
+                    : ResourceCost.Zero;
+                ShowWarningToast(gm == null
+                    ? "UPGRADE UNAVAILABLE  ·  GAME STATE NOT READY"
+                    : GameplayActionFeedbackUtility.BuildResourcePurchaseFailure(
+                        cost,
+                        gm.Resources,
+                        HasResourceCost(cost)
+                            ? "UPGRADE FAILED  ·  TRY AGAIN"
+                            : "UPGRADE COMPLETE  ·  MAXIMUM LEVEL REACHED"));
+            }
             if (gm != null)
                 RefreshEconomy(gm);
         }
@@ -415,7 +446,15 @@ namespace DeadWalls
         {
             GameManager gm = GameManager.Instance;
             bool purchased = gm != null && gm.TryBuyBedCapacity(amount);
-            ShowPrimaryToast(purchased ? $"HOUSING EXPANDED  ·  +{amount:N0}" : "HOUSING PURCHASE BLOCKED");
+            if (purchased)
+                ShowPrimaryToast($"HOUSING EXPANDED  ·  +{amount:N0} BEDS");
+            else
+                ShowWarningToast(gm == null
+                    ? "HOUSING UNAVAILABLE  ·  GAME STATE NOT READY"
+                    : GameplayActionFeedbackUtility.BuildResourcePurchaseFailure(
+                        gm.GetBedCapacityPurchaseCost(amount),
+                        gm.Resources,
+                        "HOUSING PURCHASE FAILED  ·  TRY AGAIN"));
             if (gm != null)
                 RefreshEconomy(gm);
         }
@@ -424,7 +463,29 @@ namespace DeadWalls
         {
             GameManager gm = GameManager.Instance;
             bool purchased = gm != null && gm.BuyArcher(type);
-            ShowPrimaryToast(purchased ? $"{type.ToString().ToUpperInvariant()} ARCHER RECRUITED" : "RECRUITMENT BLOCKED");
+            if (purchased)
+            {
+                ShowPrimaryToast($"{type.ToString().ToUpperInvariant()} ARCHER RECRUITED");
+            }
+            else if (gm == null)
+            {
+                ShowWarningToast("RECRUITMENT UNAVAILABLE  ·  GAME STATE NOT READY");
+            }
+            else
+            {
+                ArcherDefinitionSO definition = gm.GetArcherDefinition(type);
+                int populationCost = definition != null ? definition.PopulationCost : 1;
+                ResourceCost cost = definition != null
+                    ? gm.GetArcherBuyCost(definition)
+                    : gm.GetArcherBuyCost(type);
+                ShowWarningToast(GameplayActionFeedbackUtility.BuildArcherRecruitmentFailure(
+                    gm.IsArcherTypeUnlocked(type),
+                    gm.GetRemainingArcherCapacity(),
+                    gm.GetAvailablePopulation(),
+                    populationCost,
+                    cost,
+                    gm.Resources));
+            }
             if (gm != null)
                 RefreshBarracks(gm);
         }
@@ -433,7 +494,16 @@ namespace DeadWalls
         {
             GameManager gm = GameManager.Instance;
             bool purchased = gm != null && gm.RetrainBasicArcher(type);
-            ShowPrimaryToast(purchased ? $"ARCHER RETRAINED  ·  {type.ToString().ToUpperInvariant()}" : "RETRAINING BLOCKED");
+            if (purchased)
+                ShowPrimaryToast($"ARCHER RETRAINED  ·  {type.ToString().ToUpperInvariant()}");
+            else
+                ShowWarningToast(gm == null
+                    ? "RETRAINING UNAVAILABLE  ·  GAME STATE NOT READY"
+                    : GameplayActionFeedbackUtility.BuildArcherRetrainingFailure(
+                        gm.IsArcherTypeUnlocked(type),
+                        gm.BasicArcherCount,
+                        gm.GetArcherRetrainCost(type),
+                        gm.Resources));
             if (gm != null)
                 RefreshBarracks(gm);
         }
@@ -442,7 +512,15 @@ namespace DeadWalls
         {
             GameManager gm = GameManager.Instance;
             bool purchased = gm != null && gm.TryBuyArrowRefill(packages);
-            ShowPrimaryToast(purchased ? "ARROW RESERVE RESTOCKED" : "RESTOCK BLOCKED  ·  CHECK WOOD AND CAPACITY");
+            if (purchased)
+                ShowPrimaryToast("ARROW RESERVE RESTOCKED");
+            else
+                ShowWarningToast(gm == null
+                    ? "ARROW RESTOCK UNAVAILABLE  ·  GAME STATE NOT READY"
+                    : GameplayActionFeedbackUtility.BuildArrowRefillFailure(
+                        gm.ArrowSupply.Current >= gm.GetArrowCapacity(),
+                        gm.GetArrowRefillQuote(packages),
+                        gm.Resources));
             if (gm != null)
                 RefreshArrowSupply(gm);
         }
@@ -451,7 +529,24 @@ namespace DeadWalls
         {
             GameManager gm = GameManager.Instance;
             bool purchased = gm != null && gm.TryBuyMaxArrowRefill();
-            ShowPrimaryToast(purchased ? "ARROW RESERVE FILLED" : "FILL RESERVES BLOCKED");
+            if (purchased)
+            {
+                ShowPrimaryToast("ARROW RESERVE FILLED");
+            }
+            else if (gm == null)
+            {
+                ShowWarningToast("ARROW RESTOCK UNAVAILABLE  ·  GAME STATE NOT READY");
+            }
+            else
+            {
+                ArrowRefillQuote quote = gm.GetArrowBuyMaxQuote();
+                if (!quote.IsValid)
+                    quote = gm.GetArrowRefillQuote(1);
+                ShowWarningToast(GameplayActionFeedbackUtility.BuildArrowRefillFailure(
+                    gm.ArrowSupply.Current >= gm.GetArrowCapacity(),
+                    quote,
+                    gm.Resources));
+            }
             if (gm != null)
                 RefreshArrowSupply(gm);
         }
@@ -460,9 +555,41 @@ namespace DeadWalls
         {
             GameManager gm = GameManager.Instance;
             bool purchased = gm != null && gm.TryBuyArrowUpgrade(type);
-            ShowPrimaryToast(purchased ? $"ARROW {type.ToString().ToUpperInvariant()} IMPROVED" : "SUPPLY UPGRADE BLOCKED");
+            if (purchased)
+            {
+                ShowPrimaryToast($"ARROW {type.ToString().ToUpperInvariant()} IMPROVED");
+            }
+            else
+            {
+                ResourceCost cost = gm != null ? gm.GetArrowUpgradeCost(type) : ResourceCost.Zero;
+                ShowWarningToast(gm == null
+                    ? "SUPPLY UPGRADE UNAVAILABLE  ·  GAME STATE NOT READY"
+                    : GameplayActionFeedbackUtility.BuildResourcePurchaseFailure(
+                        cost,
+                        gm.Resources,
+                        HasResourceCost(cost)
+                            ? "SUPPLY UPGRADE FAILED  ·  TRY AGAIN"
+                            : "SUPPLY UPGRADE COMPLETE  ·  MAXIMUM LEVEL REACHED"));
+            }
             if (gm != null)
                 RefreshArrowSupply(gm);
+        }
+
+        private static bool HasResourceCost(ResourceCost cost)
+        {
+            return cost.Wood > 0 || cost.Stone > 0 || cost.Iron > 0 || cost.Food > 0;
+        }
+
+        private static void SetExplainedActionState(
+            Button button,
+            bool canPerform,
+            bool canExplainFailure = true)
+        {
+            if (button == null)
+                return;
+
+            button.SetEnabled(canPerform || canExplainFailure);
+            button.EnableInClassList("is-action-unavailable", !canPerform && canExplainFailure);
         }
     }
 }

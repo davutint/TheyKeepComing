@@ -75,6 +75,15 @@
                     <ui:Label name="phaseCountdown" text="02:00" class="clock-time" />
                 </ui:VisualElement>
             </ui:VisualElement>
+            <ui:VisualElement name="timeSpeedControls" class="time-speed-controls">
+                <ui:Label text="GAME SPEED" class="time-speed-label" />
+                <ui:VisualElement class="time-speed-buttons">
+                    <ui:Button name="timeSpeedOne" text="1X" class="time-speed-button is-selected" />
+                    <ui:Button name="timeSpeedTwo" text="2X" class="time-speed-button" />
+                    <ui:Button name="timeSpeedThree" text="3X" class="time-speed-button" />
+                </ui:VisualElement>
+                <ui:Label name="timeSpeedState" text="1X ACTIVE" class="time-speed-state" />
+            </ui:VisualElement>
 
             <ui:VisualElement class="threat-cluster">
                 <ui:VisualElement class="threat-line">
@@ -265,7 +274,7 @@
                 <ui:Label text="THE COUNCIL DEMANDS AN ANSWER" class="modal-kicker" />
                 <ui:Label name="councilTitle" text="A Choice at the Gate" class="modal-title" />
                 <ui:Label name="councilBody" text="The situation requires an exact decision." class="modal-body" />
-                <ui:VisualElement class="decision-timer"><ui:VisualElement name="councilTimerProgress" class="decision-timer-progress" /><ui:Label name="councilTimerText" text="30s" class="decision-timer-text" /></ui:VisualElement>
+                <ui:VisualElement class="decision-timer"><ui:VisualElement name="councilTimerProgress" class="decision-timer-progress" /><ui:Label name="councilTimerText" text="GAME PAUSED · CHOOSE TO CONTINUE" class="decision-timer-text" /></ui:VisualElement>
                 <ui:VisualElement class="decision-options">
                     <ui:Button name="councilOptionA" class="decision-card"><ui:Label text="OPTION A" class="decision-label" /><ui:Label name="councilOptionAText" text="Exact outcome" class="decision-copy" /></ui:Button>
                     <ui:Button name="councilOptionB" class="decision-card"><ui:Label text="OPTION B" class="decision-label" /><ui:Label name="councilOptionBText" text="Exact outcome" class="decision-copy" /></ui:Button>
@@ -337,7 +346,7 @@
             </ui:VisualElement>
         </ui:VisualElement>
 
-        <ui:VisualElement name="toastStack" class="toast-stack">
+        <ui:VisualElement name="toastStack" class="toast-stack" picking-mode="Ignore">
             <ui:Label name="primaryToast" text="" class="toast toast--primary" />
             <ui:Label name="secondaryToast" text="" class="toast toast--secondary" />
         </ui:VisualElement>

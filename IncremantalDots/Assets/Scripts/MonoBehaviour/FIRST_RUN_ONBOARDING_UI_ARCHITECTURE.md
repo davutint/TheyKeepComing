@@ -72,8 +72,8 @@ owner'larinin player-action event'lerini dinler; yalniz non-modal hint ve pulse 
 - Gorunme kapisi: mobile worker economy aktif, oyun bitmemis ve regular Council karti oyuncu
   secimine gercekten acik. Ilk kosuda bu durum Day 1 Dawn'daki ilk regular toplantidir;
   tutorial sonradan resetlenmisse bir sonraki aktif regular kart ayni kontrati ogretebilir.
-- Council karar penceresi sureli oldugu icin Heart pause adimi disindaki onceki opportunistic
-  prompt'lari gecici olarak sunum onceliginde ezer. Onceki adimlarin durable state'i degismez.
+- Council karar penceresi blocking pause oldugu icin onceki opportunistic prompt'lari gecici
+  olarak sunum onceliginde ezer. Onceki adimlarin durable state'i degismez.
 - Pulse tek bir secenegi gostermek yerine `CouncilEventPanel` kartinin tamamini kapsar; tutorial
   Option A/B arasinda yonlendirme yapmaz.
 - Tek player-facing metin English'tir: `COMPARE BOTH EXACT OUTCOMES AND THEIR COSTS.` Karttaki iki
@@ -246,10 +246,13 @@ ani, oyuncunun gercek `HeartOpenButton` aksiyonuyla actigi ilk Castle Heart ekra
 - Player Heart'i kapattiginda `HeartScreenUI` kendi tek lease'ini birakir. Active lease sayisi sifira,
   `Time.timeScale` onceki degerine doner; sonraki uygun adim yeni modal acmadan non-modal cue olarak
   devam eder.
-- Regular Council compact karttir ve simulation pause sahibi degildir.
+- Regular Council production UI Toolkit tarafinda kendi `CouncilDecision` simulation pause
+  lease'inin sahibidir; onboarding bu lease'i almaz veya birakmaz.
 
-Pure `ShouldSuppressForBlockingPause` kurali ve PlayMode Heart -> Day repair gecis testi bu siniri
-kilitler. Source guard ayrica pause lease/enforce ve modal open cagrilarini controller'da yasaklar.
+Pure `ShouldSuppressForBlockingPause` kurali yalniz aktif Heart pause dersi ile aktif Council
+exact-choice dersini blocking pause altinda gorunur birakir; diger cue'lar bastirilir. PlayMode
+Heart -> Day repair gecis testi ve Council exact-choice testi bu siniri kilitler. Source guard
+ayrica pause lease/enforce ve modal open cagrilarini controller'da yasaklar.
 
 ## Sunum Siniri
 

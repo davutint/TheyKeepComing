@@ -68,8 +68,10 @@ Workers/Housing, Archer Recruitment ve Arrow Supply acilislarini exclusive tutar
 presentation kaynagi olarak runtime component tasimaz.
 
 Council karti generated prefabda `CouncilEventPanel` presentation'i olarak kalir. Setup tool,
-scene root'taki tek `CouncilEventUI` owner'ini iki option rich-text yuzeyi, `DECIDE Ns` sayaci ve
-Filled/Horizontal/Left azalan sure seridine baglar; regular kart Day 1'den itibaren her Dawn'da tam bir kez acilir.
+scene root'taki tek `CouncilEventUI` owner'ini iki option rich-text yuzeyine baglar; production
+UI Toolkit modal'i kart acikken `CouncilDecision` pause lease'ini tutar ve player-facing serit
+`GAME PAUSED - CHOOSE TO CONTINUE` yazar. Regular kart Day 1'den itibaren her Dawn'da tam bir
+kez acilir.
 
 First-run onboarding sunumu generated prefabda raycast kapali
 `OnboardingHintPanel` ve `OnboardingPulseFrame` olarak kalir. Runtime state prefab assetine

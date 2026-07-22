@@ -490,12 +490,20 @@ namespace DeadWalls
                 ? node.Level > 0 ? "UPGRADE AVAILABLE" : "AVAILABLE TO RESEARCH"
                 : evaluation?.FailureReason == HeartPurchaseFailureReason.InsufficientGraveEssence
                     ? "INSUFFICIENT ESSENCE"
-                    : evaluation?.Message?.ToUpperInvariant() ?? "UNAVAILABLE";
+                    : evaluation != null
+                        ? GameplayActionFeedbackUtility.BuildHeartPurchaseFailure(
+                            evaluation.FailureReason,
+                            evaluation.Quote,
+                            gm.GraveEssenceAmount)
+                        : "UNAVAILABLE";
             _heartInspectorCost.text = evaluation?.Quote != null
                 ? FormatHeartEssenceCost(evaluation.Quote.TotalGraveEssenceCost)
                 : "COST UNAVAILABLE";
             _heartPurchaseButton.text = repeatable && node.Level > 0 ? "UPGRADE" : "RESEARCH";
-            _heartPurchaseButton.SetEnabled(evaluation != null && evaluation.CanPurchase);
+            _heartPurchaseButton.SetEnabled(evaluation != null);
+            _heartPurchaseButton.EnableInClassList(
+                "is-action-unavailable",
+                evaluation != null && !evaluation.CanPurchase);
         }
 
         private static string FormatHeartEssenceCost(long totalCost)
@@ -557,7 +565,12 @@ namespace DeadWalls
             {
                 ResolveRuntimeOwners();
                 PlayHeartDeniedSfx();
-                ShowPrimaryToast(result?.Message ?? "HEART RESEARCH BLOCKED");
+                ShowWarningToast(result != null
+                    ? GameplayActionFeedbackUtility.BuildHeartPurchaseFailure(
+                        result.FailureReason,
+                        result.Quote,
+                        gm.GraveEssenceAmount)
+                    : "HEART RESEARCH BLOCKED  ·  TRY AGAIN");
                 RefreshHeartInspector(gm);
                 return;
             }

@@ -103,6 +103,44 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void PauseCoordinator_PlayerSpeedSupportsOnlyOneTwoAndThreeTimes()
+        {
+            var backend = new FakeBackend
+            {
+                TimeScale = 1f,
+                SimulationEnabled = true
+            };
+            var coordinator = new SimulationPauseCoordinator(backend);
+
+            Assert.That(coordinator.TrySetRunningTimeScale(2f), Is.True);
+            Assert.That(backend.TimeScale, Is.EqualTo(2f));
+            Assert.That(coordinator.TrySetRunningTimeScale(3f), Is.True);
+            Assert.That(backend.TimeScale, Is.EqualTo(3f));
+            Assert.That(coordinator.TrySetRunningTimeScale(4f), Is.False);
+            Assert.That(backend.TimeScale, Is.EqualTo(3f));
+        }
+
+        [Test]
+        public void PauseCoordinator_CouncilStyleLeaseRestoresSelectedSpeedExactly()
+        {
+            var backend = new FakeBackend
+            {
+                TimeScale = 1f,
+                SimulationEnabled = true
+            };
+            var coordinator = new SimulationPauseCoordinator(backend);
+            Assert.That(coordinator.TrySetRunningTimeScale(3f), Is.True);
+
+            IDisposable council = coordinator.Acquire("CouncilDecision");
+
+            Assert.That(backend.TimeScale, Is.Zero);
+            Assert.That(coordinator.RunningTimeScale, Is.EqualTo(3f));
+            council.Dispose();
+            Assert.That(backend.TimeScale, Is.EqualTo(3f));
+            Assert.That(backend.SimulationEnabled, Is.True);
+        }
+
+        [Test]
         public void HeartGraphLayout_UsesFourDeterministicCompassDirections()
         {
             Assert.That(

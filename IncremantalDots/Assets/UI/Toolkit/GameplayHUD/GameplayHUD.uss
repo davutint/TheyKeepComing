@@ -49,6 +49,7 @@
 
 .economy-cluster,
 .siege-clock,
+.time-speed-controls,
 .threat-cluster,
 .ability-dock,
 .command-rail,
@@ -235,6 +236,31 @@
 .phase--dawn .cycle-celestial-glow { background-color: rgba(111, 213, 225, 0.18); }
 .clock-message { width: 125px; margin: 6px 0 0 0; color: rgba(240,235,222,0.82); font-size: 11px; letter-spacing: 0.55px; -unity-text-align: upper-left; white-space: normal; }
 
+.time-speed-controls {
+    left: 50%;
+    top: 124px;
+    width: 304px;
+    height: 36px;
+    padding: 3px 6px;
+    translate: -50% 0;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    background-color: rgba(7, 10, 11, 0.92);
+    border-width: 1px;
+    border-color: var(--runtime-line);
+    border-top-color: rgba(210, 158, 84, 0.34);
+}
+.time-speed-label { width: 72px; margin: 0; padding: 0; color: var(--runtime-muted); font-size: 10px; letter-spacing: 1px; -unity-font-style: bold; }
+.time-speed-buttons { height: 28px; flex-direction: row; align-items: center; }
+.time-speed-button { width: 36px; min-width: 36px; height: 28px; min-height: 28px; margin: 0 2px; padding: 0; border-width: 1px; border-color: var(--runtime-line); border-radius: 2px; background-color: rgba(255,255,255,0.035); color: var(--runtime-muted); font-size: 10px; -unity-font-style: bold; -unity-text-align: middle-center; }
+.time-speed-button:hover, .time-speed-button:focus { border-color: var(--runtime-gold-bright); color: var(--runtime-ink); }
+.time-speed-button.is-selected { border-color: rgba(241, 194, 116, 0.72); background-color: rgba(155, 101, 43, 0.72); color: rgb(255, 233, 194); }
+.time-speed-button:disabled { opacity: 0.48; }
+.time-speed-state { width: 82px; margin: 0 0 0 6px; padding: 0; color: var(--runtime-green); font-size: 10px; letter-spacing: 0.5px; -unity-font-style: bold; -unity-text-align: middle-right; }
+.time-speed-controls.is-paused { border-color: rgba(111, 154, 196, 0.55); }
+.time-speed-controls.is-paused .time-speed-state { color: var(--runtime-blue); }
+
 .threat-cluster {
     right: 26px;
     top: 22px;
@@ -361,7 +387,7 @@
 
 .critical-banner {
     left: 50%;
-    top: 142px;
+    top: 168px;
     width: 340px;
     padding: 10px 14px;
     translate: -50% -14px;
@@ -626,19 +652,24 @@
 .meta-shop-row.is-affordable { border-left-width: 3px; border-left-color: var(--runtime-gold-bright); }
 .meta-shop-row:disabled { opacity: 0.54; }
 .meta-shop-row.is-maxed { opacity: 0.76; border-left-width: 3px; border-left-color: var(--runtime-green); }
+.is-action-unavailable { opacity: 0.72; border-color: rgba(210,158,84,0.44); }
+.is-action-unavailable:hover, .is-action-unavailable:focus { opacity: 1; border-color: var(--runtime-gold-bright); }
 .meta-upgrade-copy { flex-grow: 1; min-width: 0; align-items: flex-start; }
 .meta-upgrade-main { flex-grow: 1; min-width: 0; flex-direction: row; align-items: center; }
 .meta-upgrade-title { margin: 0; padding: 0; color: var(--runtime-ink); font-size: 11px; letter-spacing: 1px; -unity-font-style: bold; }
 .meta-upgrade-description { margin: 5px 0 0 0; padding: 0; color: var(--runtime-muted); font-size: 10px; white-space: normal; }
+.meta-upgrade-effect { margin: 7px 0 0 0; padding: 0; color: var(--runtime-gold-bright); font-size: 10px; letter-spacing: 0.35px; -unity-font-style: bold; white-space: normal; }
 .meta-upgrade-transaction { width: 180px; margin-left: 18px; align-items: flex-end; }
 .meta-upgrade-level { margin: 0; padding: 0; color: var(--runtime-muted); font-size: 10px; letter-spacing: 0.6px; }
 .meta-upgrade-price { margin: 6px 0 0 0; padding: 0; color: var(--runtime-gold-bright); font-size: 11px; -unity-font-style: bold; }
 .gameover-restart { min-height: 48px; margin-top: 10px; }
 
-.toast-stack { position: absolute; left: 50%; bottom: 166px; width: 480px; translate: -50% 0; align-items: center; }
+.toast-stack { position: absolute; left: 50%; bottom: 166px; width: 480px; translate: -50% 0; align-items: center; pointer-events: none; }
 .toast { display: none; margin-top: 6px; padding: 9px 14px; border-width: 1px; border-color: var(--runtime-line); background-color: rgba(10,12,12,0.94); color: var(--runtime-ink); font-size: 10px; letter-spacing: 0.8px; -unity-text-align: middle-center; white-space: normal; }
 .toast.is-visible { display: flex; }
 .toast--primary { border-color: rgba(205,155,82,0.40); }.toast--secondary { color: var(--runtime-muted); }
+.toast.toast-tone--warning { border-color: rgba(210,158,84,0.70); color: var(--runtime-gold-bright); }
+.toast.toast-tone--critical { border-color: rgba(215,93,66,0.78); color: rgb(250,181,151); }
 .soul-flight { position: absolute; width: 18px; height: 18px; rotate: 45deg; background-color: var(--runtime-cyan); border-width: 2px; border-color: rgba(210,250,255,0.80); }
 .soul-flight__amount { position: absolute; left: 13px; top: -15px; min-width: 48px; height: 22px; padding: 2px 5px; rotate: -45deg; background-color: rgba(6,13,16,0.90); border-width: 1px; border-color: rgba(118,224,255,0.42); color: rgba(222,252,255,0.96); font-size: 10px; -unity-font-style: bold; -unity-text-align: middle-center; }
 .soul-flight--essence { background-color: rgb(177, 104, 216); border-color: rgba(239, 205, 255, 0.88); }
@@ -725,6 +756,9 @@
 .surface-texture--gameover { opacity: 0.11; background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/components/bg_layer_02.png"); }
 
 .input--touch .command-rail { height: 64px; bottom: 14px; }
+.input--touch .time-speed-controls { height: 44px; width: 344px; }
+.input--touch .time-speed-buttons { height: 36px; }
+.input--touch .time-speed-button { width: 46px; min-width: 46px; height: 36px; min-height: 36px; font-size: 11px; }
 .input--touch .command-button { height: 62px; min-width: 118px; font-size: 11px; }
 .input--touch .command-label, .input--touch .command-detail { font-size: 11px; }
 .input--touch .command-button--pause { min-width: 62px; width: 62px; }
@@ -744,6 +778,8 @@
 .is-compact .economy-cluster { left: 14px; top: 14px; transform-origin: 0 0; scale: 0.90 0.90; }
 .is-compact .threat-cluster { right: 14px; top: 14px; transform-origin: 100% 0; scale: 0.90 0.90; }
 .is-compact .siege-clock { top: 14px; transform-origin: 50% 0; scale: 0.90 0.90; }
+.is-compact .time-speed-controls { top: 106px; transform-origin: 50% 0; scale: 0.90 0.90; }
+.is-compact .critical-banner { top: 150px; }
 .is-compact .drawer { width: 100%; max-width: 610px; }
 .is-compact .heart-screen { padding-left: 18px; padding-right: 18px; padding-bottom: 18px; }
 .is-compact .heart-screen .fullscreen-header { height: 72px; }

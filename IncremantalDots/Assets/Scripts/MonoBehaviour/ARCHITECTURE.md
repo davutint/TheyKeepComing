@@ -154,13 +154,24 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 
 ### CouncilComposer.cs + CouncilEventUI.cs
 
-- Safak meclisi event'leri: kart DAWN'da belirir, DAY boyunca yasar, DUSK'ta expire; oyun durmaz
+- Safak meclisi event'leri: kart DAWN'da belirir ve production UI Toolkit `CouncilDecision`
+  lease'iyle simulation'i durdurur; basarili secim onceki `1X/2X/3X` hizini geri yukler
 - Event'ler asset degil — `CouncilComposer` (pure static, EditMode testli) sablon x atom x baglam x olcek carpimindan uretir; deterministik (seed = hash(ECS RandomSeed, gun))
 - Director: kit kaynak/dusuk savunma/bolluk baglamina gore atom-sablon agirliklari; hafiza: flag'ler + zincir sablonlari (RequiredFlags/ChainDelayDays/OneShot); butce: A/B secenekleri "dakika-degeri" cinsinden dengelenir
 - Regular schedule tek owner'i `CouncilRegularSchedule`: Day 1'den itibaren her Dawn'da tam bir kez; chance/pity/cooldown regular akis disinda. Council regular-only'dir ve ikinci emergency meeting yolu yoktur. GameManager API: `TryOpenRegularCouncilEvent`, `ChooseCouncilOption`, `ExpireCouncilEvent`, `CanAffordCouncilOption`
-- `CouncilOptionPresentationUtility` iki secenegi canli state'ten exact quote eder; `CouncilDecisionWindowUtility` kalan Dawn + Day suresini `DECIDE Ns` ve azalan Filled/Horizontal seride verir
+- `CouncilOptionPresentationUtility` iki secenegi canli state'ten exact quote eder;
+  player-facing karar seridi pause altinda dolu kalir ve secim yapilmasini ister
 - Exact save v17 `LastRegularCouncilDay`, non-zero Council run salt, `HasActiveCouncilEvent` ve resolved effect state'ini korur; v10 chance fail'i migration'da scheduled gunu tuketmez
 - Otoriter dok: `COUNCIL_EVENTS_ARCHITECTURE.md`
+
+### SimulationPauseService.cs + GameplayToastService.cs
+
+- `SimulationPauseService`, player-facing `1X/2X/3X` kosu hizinin ve modal pause lease'lerinin
+  tek runtime owner'idir; son lease kapaninca yakalanan ECS state'i ve kosu hizi exact doner
+- `GameplayToastService`, mevcut HUD feedback cagrilarini bounded FIFO kuyrugunda tasir; yeni
+  gameplay toast trigger'i owner onayi olmadan eklenmez
+- Otoriter doklar: `SIMULATION_SPEED_AND_PAUSE_ARCHITECTURE.md` ve
+  `GAMEPLAY_TOAST_SERVICE_ARCHITECTURE.md`
 
 ### DefenseRepairUI.cs
 

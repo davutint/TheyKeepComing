@@ -247,9 +247,17 @@ namespace DeadWalls
             _techInspectorLevel.text = $"LEVEL {level:N0} / {node.MaxLevel:N0}";
             _techInspectorBody.text = node.Description;
             _techInspectorCost.text = maxed ? "DOCTRINE MASTERED" : FormatCost(gm.GetTechNodeCost(node));
-            _techInspectorStatus.text = maxed ? "All available ranks acquired." : canBuy ? "Requirements met." : reason;
+            _techInspectorStatus.text = maxed
+                ? "All available ranks acquired."
+                : canBuy
+                    ? "Requirements met."
+                    : GameplayActionFeedbackUtility.BuildTechResearchFailure(
+                        reason,
+                        gm.GetTechNodeCost(node),
+                        gm.Resources);
             _techPurchaseButton.text = maxed ? "MASTERED" : "RESEARCH";
-            _techPurchaseButton.SetEnabled(canBuy && !maxed);
+            _techPurchaseButton.SetEnabled(!maxed);
+            _techPurchaseButton.EnableInClassList("is-action-unavailable", !canBuy && !maxed);
         }
 
         private void PurchaseSelectedTechNode()
@@ -258,7 +266,18 @@ namespace DeadWalls
             if (gm == null || _selectedTechNode == null)
                 return;
             bool purchased = gm.TryBuyTechNode(_selectedTechNode);
-            ShowPrimaryToast(purchased ? $"DOCTRINE RESEARCHED  ·  {_selectedTechNode.Title.ToUpperInvariant()}" : "RESEARCH BLOCKED");
+            if (purchased)
+            {
+                ShowPrimaryToast($"DOCTRINE RESEARCHED  ·  {_selectedTechNode.Title.ToUpperInvariant()}");
+            }
+            else
+            {
+                gm.CanBuyTechNode(_selectedTechNode, out string reason);
+                ShowWarningToast(GameplayActionFeedbackUtility.BuildTechResearchFailure(
+                    reason,
+                    gm.GetTechNodeCost(_selectedTechNode),
+                    gm.Resources));
+            }
             _techGraphSignature = 0;
             RebuildTechGraph(true);
         }

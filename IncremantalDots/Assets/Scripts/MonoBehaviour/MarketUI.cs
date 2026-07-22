@@ -361,7 +361,10 @@ namespace DeadWalls
 
             if (buyButton != null)
             {
-                buyButton.interactable = gm.CanBuyArcher(type);
+                buyButton.interactable = gm.CanBuyArcher(type)
+                    || GameplayActionFeedbackUtility.CanExplainArcherRecruitmentFailure(
+                        unlocked,
+                        gm.GetRemainingArcherCapacity());
                 SetButtonText(buyButton, !unlocked ? "Locked" : capReached ? "Max" : "Buy");
             }
 
@@ -369,7 +372,11 @@ namespace DeadWalls
             {
                 bool retrainTarget = type != ArcherType.Basic;
                 upgradeButton.gameObject.SetActive(retrainTarget);
-                upgradeButton.interactable = retrainTarget && gm.CanRetrainBasicArcher(type);
+                upgradeButton.interactable = retrainTarget
+                    && (gm.CanRetrainBasicArcher(type)
+                        || GameplayActionFeedbackUtility.CanExplainArcherRetrainingFailure(
+                            unlocked,
+                            gm.BasicArcherCount));
                 if (retrainTarget)
                 {
                     ResourceCost retrainCost = gm.GetArcherRetrainCost(type);
@@ -507,23 +514,79 @@ namespace DeadWalls
         private void BuyArcher(ArcherType type)
         {
             GameManager gm = GameManager.Instance;
-            if (gm != null && gm.BuyArcher(type))
+            if (gm == null)
+            {
+                EnqueueWarning("RECRUITMENT UNAVAILABLE  ·  GAME STATE NOT READY");
+                return;
+            }
+
+            if (gm.BuyArcher(type))
                 ArcherPurchasedByPlayer?.Invoke(type);
+            else
+                EnqueueArcherRecruitmentFailure(gm, gm.GetArcherDefinition(type), type);
             Refresh();
         }
 
         private void BuyArcher(ArcherDefinitionSO definition)
         {
             GameManager gm = GameManager.Instance;
-            if (gm != null && gm.BuyArcher(definition))
+            if (gm == null || definition == null)
+            {
+                EnqueueWarning("RECRUITMENT UNAVAILABLE  ·  GAME STATE NOT READY");
+                return;
+            }
+
+            if (gm.BuyArcher(definition))
                 ArcherPurchasedByPlayer?.Invoke(definition.Type);
+            else
+                EnqueueArcherRecruitmentFailure(gm, definition, definition.Type);
             Refresh();
         }
 
         private void RetrainBasicArcher(ArcherType targetType)
         {
-            GameManager.Instance?.RetrainBasicArcher(targetType);
+            GameManager gm = GameManager.Instance;
+            if (gm == null)
+            {
+                EnqueueWarning("RETRAINING UNAVAILABLE  ·  GAME STATE NOT READY");
+                return;
+            }
+
+            if (!gm.RetrainBasicArcher(targetType))
+            {
+                EnqueueWarning(GameplayActionFeedbackUtility.BuildArcherRetrainingFailure(
+                    gm.IsArcherTypeUnlocked(targetType),
+                    gm.BasicArcherCount,
+                    gm.GetArcherRetrainCost(targetType),
+                    gm.Resources));
+            }
             Refresh();
+        }
+
+        private static void EnqueueArcherRecruitmentFailure(
+            GameManager gm,
+            ArcherDefinitionSO definition,
+            ArcherType type)
+        {
+            int populationCost = definition != null ? definition.PopulationCost : 1;
+            ResourceCost cost = definition != null
+                ? gm.GetArcherBuyCost(definition)
+                : gm.GetArcherBuyCost(type);
+            EnqueueWarning(GameplayActionFeedbackUtility.BuildArcherRecruitmentFailure(
+                gm.IsArcherTypeUnlocked(type),
+                gm.GetRemainingArcherCapacity(),
+                gm.GetAvailablePopulation(),
+                populationCost,
+                cost,
+                gm.Resources));
+        }
+
+        private static void EnqueueWarning(string message)
+        {
+            GameplayToastService.TryEnqueue(
+                message,
+                GameplayToastTone.Warning,
+                3.2f);
         }
 
         private void EnsureDrawerPositions()
@@ -702,7 +765,10 @@ namespace DeadWalls
 
             if (row.BuyButton != null)
             {
-                row.BuyButton.interactable = canBuy;
+                row.BuyButton.interactable = canBuy
+                    || GameplayActionFeedbackUtility.CanExplainArcherRecruitmentFailure(
+                        unlocked,
+                        gm.GetRemainingArcherCapacity());
                 SetText(row.BuyButtonText, !unlocked ? "LOCKED" : capReached ? "MAX" : "BUY");
             }
 
@@ -710,7 +776,10 @@ namespace DeadWalls
             if (row.RetrainButton != null)
             {
                 row.RetrainButton.gameObject.SetActive(retrainTarget);
-                row.RetrainButton.interactable = canRetrain;
+                row.RetrainButton.interactable = canRetrain
+                    || GameplayActionFeedbackUtility.CanExplainArcherRetrainingFailure(
+                        unlocked,
+                        gm.BasicArcherCount);
                 SetText(row.RetrainButtonText, !unlocked ? "LOCKED" : "RETRAIN");
             }
         }

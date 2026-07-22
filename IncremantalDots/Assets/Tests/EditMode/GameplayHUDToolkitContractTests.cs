@@ -101,6 +101,73 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void ProductionHud_ExposesOneTwoThreeTimesSpeedAndPausedCouncilContract()
+        {
+            TemplateContainer root = LoadHud().CloneTree();
+            string uxml = File.ReadAllText(HudPath);
+            string gameFlowSource = File.ReadAllText(
+                "Assets/Scripts/MonoBehaviour/UIToolkit/GameplayHUDToolkitUI.GameFlow.cs");
+            string modalSource = File.ReadAllText(
+                "Assets/Scripts/MonoBehaviour/UIToolkit/GameplayHUDToolkitUI.Modals.cs");
+
+            Assert.That(root.Q<VisualElement>("timeSpeedControls"), Is.Not.Null);
+            Assert.That(root.Q<Button>("timeSpeedOne").text, Is.EqualTo("1X"));
+            Assert.That(root.Q<Button>("timeSpeedTwo").text, Is.EqualTo("2X"));
+            Assert.That(root.Q<Button>("timeSpeedThree").text, Is.EqualTo("3X"));
+            Assert.That(root.Q<Label>("timeSpeedState").text, Is.EqualTo("1X ACTIVE"));
+            Assert.That(root.Q<Label>("councilTimerText").text,
+                Is.EqualTo("GAME PAUSED · CHOOSE TO CONTINUE"));
+            Assert.That(uxml, Does.Not.Contain("30s"));
+            Assert.That(gameFlowSource, Does.Contain("SimulationPauseService.TrySetRunningTimeScale"));
+            Assert.That(modalSource, Does.Contain("SimulationPauseService.Acquire(\"CouncilDecision\")"));
+            Assert.That(modalSource, Does.Contain("SyncCouncilPause(false)"));
+        }
+
+        [Test]
+        public void ProductionHud_UsesBoundedToastQueueForApprovedActionFailureReasons()
+        {
+            TemplateContainer root = LoadHud().CloneTree();
+            string gameFlowSource = File.ReadAllText(
+                "Assets/Scripts/MonoBehaviour/UIToolkit/GameplayHUDToolkitUI.GameFlow.cs");
+            string managementSource = File.ReadAllText(
+                "Assets/Scripts/MonoBehaviour/UIToolkit/GameplayHUDToolkitUI.Management.cs");
+            string modalSource = File.ReadAllText(
+                "Assets/Scripts/MonoBehaviour/UIToolkit/GameplayHUDToolkitUI.Modals.cs");
+
+            Assert.That(root.Q<VisualElement>("toastStack"), Is.Not.Null);
+            Assert.That(root.Q<Label>("primaryToast"), Is.Not.Null);
+            Assert.That(root.Q<Label>("secondaryToast"), Is.Not.Null);
+            Assert.That(gameFlowSource, Does.Contain("GameplayToastService.TryEnqueue"));
+            Assert.That(gameFlowSource, Does.Contain("GameplayToastService.TryDequeue"));
+            Assert.That(gameFlowSource, Does.Contain("GameplayToastTone.Warning"));
+            Assert.That(managementSource, Does.Contain("GameplayActionFeedbackUtility"));
+            Assert.That(managementSource, Does.Contain("SetExplainedActionState"));
+            Assert.That(modalSource, Does.Contain("MetaUpgradePresentationUtility.BuildEffectProgression"));
+            Assert.That(GameplayToastService.MaximumPendingMessages, Is.EqualTo(8));
+        }
+
+        [Test]
+        public void ActionFailureSurfaces_UseEnglishPresentationInsteadOfRawInternalMessages()
+        {
+            string marketSource = File.ReadAllText(
+                "Assets/Scripts/MonoBehaviour/MarketUI.cs");
+            string graphSource = File.ReadAllText(
+                "Assets/Scripts/MonoBehaviour/UIToolkit/GameplayHUDToolkitUI.Graphs.cs");
+            string heartToolkitSource = File.ReadAllText(
+                "Assets/Scripts/MonoBehaviour/UIToolkit/GameplayHUDToolkitUI.CastleHeart.cs");
+            string heartLegacySource = File.ReadAllText(
+                "Assets/Scripts/MonoBehaviour/HeartScreenUI.cs");
+
+            Assert.That(marketSource, Does.Contain("CanExplainArcherRecruitmentFailure"));
+            Assert.That(marketSource, Does.Contain("BuildArcherRecruitmentFailure"));
+            Assert.That(graphSource, Does.Contain("BuildTechResearchFailure"));
+            Assert.That(heartToolkitSource, Does.Contain("BuildHeartPurchaseFailure"));
+            Assert.That(heartLegacySource, Does.Contain("BuildHeartPurchaseFailure"));
+            Assert.That(heartToolkitSource, Does.Not.Contain("result?.Message?.ToUpperInvariant()"));
+            Assert.That(heartLegacySource, Does.Not.Contain("ShowToast(result?.Message"));
+        }
+
+        [Test]
         public void ProductionHud_ExposesRunCurrenciesAndArrowReserveWithoutOpeningDrawers()
         {
             TemplateContainer root = LoadHud().CloneTree();

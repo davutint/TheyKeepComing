@@ -12,6 +12,12 @@ using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using Object = UnityEngine.Object;
 using UnityEngine.UI;
+using ToolkitButton = UnityEngine.UIElements.Button;
+using ToolkitDocument = UnityEngine.UIElements.UIDocument;
+using ToolkitLabel = UnityEngine.UIElements.Label;
+using ToolkitNavigationSubmitEvent = UnityEngine.UIElements.NavigationSubmitEvent;
+using ToolkitQuery = UnityEngine.UIElements.UQueryExtensions;
+using ToolkitVisualElement = UnityEngine.UIElements.VisualElement;
 
 namespace DeadWalls.Tests
 {
@@ -78,6 +84,7 @@ namespace DeadWalls.Tests
         public IEnumerator TearDown()
         {
             Time.timeScale = 1f;
+            GameplayToastService.Clear();
             RunPersistence.Delete();
             if (_originalRunSave != null)
                 File.WriteAllBytes(_runSavePath, _originalRunSave);
@@ -87,6 +94,160 @@ namespace DeadWalls.Tests
             RestoreIfNeeded(_metaTempPath, _hadMetaTemp, _originalMetaTemp);
             MetaProgression.Load();
             yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator ToolkitBarracks_InsufficientArcherResources_RemainsClickableAndShowsExactToast()
+        {
+            GameManager gameManager = GameManager.Instance;
+            ArcherDefinitionSO basic = gameManager.GetArcherDefinition(ArcherType.Basic);
+            Assert.That(basic, Is.Not.Null);
+            ResourceCost cost = gameManager.GetArcherBuyCost(basic);
+            Assert.That(cost.Wood, Is.GreaterThan(0), "Basic Archer testinin Wood acigi uretebilmesi gerekir.");
+
+            Time.timeScale = 0f;
+            var insufficientResources = new ResourceData
+            {
+                Wood = cost.Wood - 1,
+                Stone = cost.Stone,
+                Iron = cost.Iron,
+                Food = cost.Food
+            };
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            using (EntityQuery resourceQuery = entityManager.CreateEntityQuery(typeof(ResourceData)))
+            {
+                Entity resourceEntity = resourceQuery.GetSingletonEntity();
+                entityManager.SetComponentData(resourceEntity, insufficientResources);
+            }
+
+            PropertyInfo resourcesProperty = typeof(GameManager).GetProperty(
+                "Resources",
+                BindingFlags.Instance | BindingFlags.Public);
+            MethodInfo resourcesSetter = resourcesProperty?.GetSetMethod(true);
+            Assert.That(resourcesSetter, Is.Not.Null);
+            resourcesSetter.Invoke(gameManager, new object[] { insufficientResources });
+            Assert.That(gameManager.Resources.Wood, Is.EqualTo(cost.Wood - 1));
+            Assert.That(gameManager.GetAvailablePopulation(), Is.GreaterThanOrEqualTo(basic.PopulationCost));
+            Assert.That(gameManager.CanBuyArcher(basic), Is.False);
+
+            GameplayHUDToolkitUI hud = Object.FindFirstObjectByType<GameplayHUDToolkitUI>();
+            Assert.That(hud, Is.Not.Null);
+            ToolkitDocument document = hud.GetComponent<ToolkitDocument>();
+            Assert.That(document, Is.Not.Null);
+
+            ToolkitButton barracksButton = ToolkitQuery.Q<ToolkitButton>(
+                document.rootVisualElement, "barracksButton");
+            Assert.That(barracksButton, Is.Not.Null);
+            SendNavigationSubmit(barracksButton);
+            yield return new WaitForSecondsRealtime(0.25f);
+
+            ToolkitButton recruitButton = ToolkitQuery.Q<ToolkitButton>(
+                document.rootVisualElement, "archerBuyBasic");
+            Assert.That(recruitButton, Is.Not.Null);
+            Assert.That(recruitButton.enabledSelf, Is.True,
+                "Kaynak yetersizligi aciklama alinabilecek action'i tamamen disable etmemeli.");
+            Assert.That(recruitButton.ClassListContains("is-action-unavailable"), Is.True);
+
+            MethodInfo resetToastPresentation = typeof(GameplayHUDToolkitUI).GetMethod(
+                "ResetToastPresentation",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.That(resetToastPresentation, Is.Not.Null);
+            resetToastPresentation.Invoke(hud, new object[] { true });
+            SendNavigationSubmit(recruitButton);
+
+            ToolkitLabel toast = ToolkitQuery.Q<ToolkitLabel>(
+                document.rootVisualElement, "primaryToast");
+            const string ExpectedToast = "NOT ENOUGH RESOURCES  ·  NEED 1 MORE WOOD";
+            for (int frame = 0; frame < 30
+                 && (!toast.ClassListContains("is-visible")
+                     || !toast.ClassListContains("toast-tone--warning")
+                     || toast.text != ExpectedToast);
+                 frame++)
+            {
+                yield return null;
+            }
+
+            Assert.That(toast.ClassListContains("is-visible"), Is.True);
+            Assert.That(toast.ClassListContains("toast-tone--warning"), Is.True);
+            Assert.That(toast.text, Is.EqualTo(ExpectedToast));
+        }
+
+        [UnityTest]
+        public IEnumerator LegacyArcherMarket_InsufficientResources_RemainsInteractableAndShowsEnglishToast()
+        {
+            GameManager gameManager = GameManager.Instance;
+            ArcherDefinitionSO basic = gameManager.GetArcherDefinition(ArcherType.Basic);
+            Assert.That(basic, Is.Not.Null);
+            ResourceCost cost = gameManager.GetArcherBuyCost(basic);
+            Assert.That(cost.Wood, Is.GreaterThan(0));
+
+            Time.timeScale = 0f;
+            var insufficientResources = new ResourceData
+            {
+                Wood = cost.Wood - 1,
+                Stone = cost.Stone,
+                Iron = cost.Iron,
+                Food = cost.Food
+            };
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            using (EntityQuery resourceQuery = entityManager.CreateEntityQuery(typeof(ResourceData)))
+            {
+                entityManager.SetComponentData(
+                    resourceQuery.GetSingletonEntity(),
+                    insufficientResources);
+            }
+
+            PropertyInfo resourcesProperty = typeof(GameManager).GetProperty(
+                "Resources",
+                BindingFlags.Instance | BindingFlags.Public);
+            MethodInfo resourcesSetter = resourcesProperty?.GetSetMethod(true);
+            Assert.That(resourcesSetter, Is.Not.Null);
+            resourcesSetter.Invoke(gameManager, new object[] { insufficientResources });
+            Assert.That(gameManager.CanBuyArcher(basic), Is.False);
+
+            MarketUI market = Object.FindFirstObjectByType<MarketUI>();
+            Assert.That(market, Is.Not.Null);
+            market.SetDrawerOpen(true, true);
+            market.Refresh();
+            Button recruitButton = market.GetArcherBuyButton(ArcherType.Basic);
+            Assert.That(recruitButton, Is.Not.Null);
+            Assert.That(recruitButton.interactable, Is.True,
+                "Insufficient resources must not disable an explainable Archer action.");
+
+            GameplayHUDToolkitUI hud = Object.FindFirstObjectByType<GameplayHUDToolkitUI>();
+            Assert.That(hud, Is.Not.Null);
+            ToolkitDocument document = hud.GetComponent<ToolkitDocument>();
+            Assert.That(document, Is.Not.Null);
+            MethodInfo resetToastPresentation = typeof(GameplayHUDToolkitUI).GetMethod(
+                "ResetToastPresentation",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.That(resetToastPresentation, Is.Not.Null);
+            resetToastPresentation.Invoke(hud, new object[] { true });
+
+            recruitButton.onClick.Invoke();
+
+            ToolkitLabel toast = ToolkitQuery.Q<ToolkitLabel>(
+                document.rootVisualElement, "primaryToast");
+            const string ExpectedToast = "NOT ENOUGH RESOURCES  ·  NEED 1 MORE WOOD";
+            for (int frame = 0; frame < 30
+                 && (!toast.ClassListContains("is-visible")
+                     || !toast.ClassListContains("toast-tone--warning")
+                     || toast.text != ExpectedToast);
+                 frame++)
+            {
+                yield return null;
+            }
+
+            Assert.That(toast.ClassListContains("is-visible"), Is.True);
+            Assert.That(toast.ClassListContains("toast-tone--warning"), Is.True);
+            Assert.That(toast.text, Is.EqualTo(ExpectedToast));
+        }
+
+        private static void SendNavigationSubmit(ToolkitVisualElement target)
+        {
+            using ToolkitNavigationSubmitEvent submit = ToolkitNavigationSubmitEvent.GetPooled();
+            submit.target = target;
+            target.SendEvent(submit);
         }
 
         [UnityTest]

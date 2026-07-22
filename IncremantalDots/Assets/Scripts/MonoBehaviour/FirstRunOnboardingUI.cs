@@ -131,10 +131,12 @@ namespace DeadWalls
         public static bool ShouldSuppressForBlockingPause(
             bool blockingPauseActive,
             bool heartPauseTeachingActive,
-            bool heartOpen)
+            bool heartOpen,
+            bool councilExactTeachingActive)
         {
             return blockingPauseActive
-                && !(heartPauseTeachingActive && heartOpen);
+                && !(heartPauseTeachingActive && heartOpen)
+                && !councilExactTeachingActive;
         }
 
         public static bool ShouldPersistTutorialComplete(
@@ -395,7 +397,8 @@ namespace DeadWalls
                 FirstRunOnboardingRules.ShouldSuppressForBlockingPause(
                     blockingPauseActive,
                     _heartPauseTeachingActive,
-                    isHeartOpen);
+                    isHeartOpen,
+                    shouldShowCouncilExact);
             if (heartPauseTeachingVisible)
             {
                 step = FirstRunOnboardingStep.HeartPause;

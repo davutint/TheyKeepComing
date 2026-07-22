@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
@@ -16,6 +17,7 @@ namespace DeadWalls
         private Button _councilOptionB;
         private VisualElement _councilTimerProgress;
         private Label _councilTimerText;
+        private IDisposable _councilPauseLease;
 
         private VisualElement _levelUpModal;
         private Label _levelUpTitle;
@@ -122,6 +124,7 @@ namespace DeadWalls
             bool gameOver = _uiManager != null && _uiManager.GameOverPanel != null && _uiManager.GameOverPanel.activeSelf;
             bool levelUp = _uiManager != null && _uiManager.LevelUpPanel != null && _uiManager.LevelUpPanel.activeSelf;
             bool council = gm.ActiveCouncilEvent != null;
+            SyncCouncilPause(council && !gameOver);
 
             if (gameOver && !_gameOverWasActive)
             {
@@ -157,17 +160,14 @@ namespace DeadWalls
 
         private void RefreshModalContinuous(GameManager gm)
         {
-            if (_pauseLease != null)
+            SyncCouncilPause(gm.ActiveCouncilEvent != null && !gm.GameState.IsGameOver);
+            if (_pauseLease != null || _councilPauseLease != null)
                 SimulationPauseService.EnforcePausedState();
 
             if (gm.ActiveCouncilEvent != null)
             {
-                CouncilRuntimeTuningTelemetry telemetry = gm.GetCouncilRuntimeTuningTelemetry();
-                float ratio = telemetry.TotalDecisionSeconds > 0.01f
-                    ? Mathf.Clamp01(telemetry.RemainingDecisionSeconds / telemetry.TotalDecisionSeconds)
-                    : 0f;
-                _councilTimerProgress.style.width = Length.Percent(ratio * 100f);
-                _councilTimerText.text = $"{Mathf.CeilToInt(telemetry.RemainingDecisionSeconds)}s TO DECIDE";
+                _councilTimerProgress.style.width = Length.Percent(100f);
+                _councilTimerText.text = "GAME PAUSED · CHOOSE TO CONTINUE";
             }
         }
 
@@ -207,6 +207,8 @@ namespace DeadWalls
         {
             GameManager gm = GameManager.Instance;
             bool chosen = gm != null && gm.ChooseCouncilOption(optionA);
+            if (chosen)
+                SyncCouncilPause(false);
             ShowPrimaryToast(chosen ? "COUNCIL DECISION COMMITTED" : "COUNCIL OPTION UNAVAILABLE");
             if (gm != null)
                 RefreshModalPresentation(gm);
@@ -346,7 +348,8 @@ namespace DeadWalls
                 toolkitRow.AddToClassList("meta-shop-row");
                 toolkitRow.EnableInClassList("is-affordable", canBuy);
                 toolkitRow.EnableInClassList("is-maxed", maxed);
-                toolkitRow.SetEnabled(canBuy);
+                toolkitRow.SetEnabled(!maxed);
+                toolkitRow.EnableInClassList("is-action-unavailable", !canBuy && !maxed);
 
                 VisualElement copy = new VisualElement();
                 copy.AddToClassList("meta-upgrade-copy");
@@ -354,8 +357,11 @@ namespace DeadWalls
                 title.AddToClassList("meta-upgrade-title");
                 Label description = new Label(upgrade.Description);
                 description.AddToClassList("meta-upgrade-description");
+                Label effect = new Label(MetaUpgradePresentationUtility.BuildEffectProgression(upgrade, level));
+                effect.AddToClassList("meta-upgrade-effect");
                 copy.Add(title);
                 copy.Add(description);
+                copy.Add(effect);
 
                 VisualElement main = new VisualElement();
                 main.AddToClassList("meta-upgrade-main");
@@ -364,12 +370,12 @@ namespace DeadWalls
 
                 VisualElement transaction = new VisualElement();
                 transaction.AddToClassList("meta-upgrade-transaction");
-                string levelText = upgrade.IsRepeatable
-                    ? $"LEVEL {level:N0}"
-                    : $"LEVEL {level:N0} / {upgrade.MaxLevel:N0}";
+                string levelText = maxed
+                    ? $"LEVEL {level:N0} / {upgrade.MaxLevel:N0}"
+                    : $"LEVEL {level:N0}  →  {level + 1:N0}";
                 Label levelLabel = new Label(levelText);
                 levelLabel.AddToClassList("meta-upgrade-level");
-                Label price = new Label(maxed ? "COMPLETE" : $"{cost:N0} {currency.ToUpperInvariant()}");
+                Label price = new Label(maxed ? "COMPLETE" : $"BUY  ·  {cost:N0} {currency.ToUpperInvariant()}");
                 price.AddToClassList("meta-upgrade-price");
                 transaction.Add(levelLabel);
                 transaction.Add(price);
@@ -384,9 +390,33 @@ namespace DeadWalls
         {
             GameManager gm = GameManager.Instance;
             bool purchased = gm != null && gm.TryBuyMetaUpgrade(upgrade);
-            ShowPrimaryToast(purchased
-                ? $"PERMANENT UPGRADE PURCHASED  ·  {upgrade.Title.ToUpperInvariant()}"
-                : "UPGRADE UNAVAILABLE  ·  CHECK EMBERS");
+            if (purchased)
+            {
+                ShowPrimaryToast($"PERMANENT UPGRADE PURCHASED  ·  {upgrade.Title.ToUpperInvariant()}");
+            }
+            else if (gm == null || upgrade == null)
+            {
+                ShowWarningToast("META UPGRADE UNAVAILABLE  ·  GAME STATE NOT READY");
+            }
+            else
+            {
+                int level = MetaProgression.GetUpgradeLevel(upgrade.Id);
+                bool maxed = upgrade.IsMaxLevel(level)
+                    || (MetaUpgradePolicy.IsContentUnlockEffect(upgrade.EffectType)
+                        && MetaProgression.HasPoolUnlock(upgrade.PoolContentId));
+                MetaPresentationSettings presentation = gm.MetaCatalog != null
+                    ? gm.MetaCatalog.Presentation
+                    : null;
+                string currency = presentation != null && !string.IsNullOrWhiteSpace(presentation.ShortName)
+                    ? presentation.ShortName
+                    : MetaProgression.CurrencyName;
+                ShowWarningToast(GameplayActionFeedbackUtility.BuildMetaUpgradeFailure(
+                    gm.IsMetaShopPurchaseAllowed,
+                    maxed,
+                    maxed ? 0 : upgrade.GetCost(level),
+                    MetaProgression.State != null ? MetaProgression.State.Souls : 0,
+                    currency));
+            }
             _metaShopSignature = -1;
             if (gm != null)
                 RefreshGameOver(gm);
@@ -416,6 +446,23 @@ namespace DeadWalls
         {
             _pauseLease?.Dispose();
             _pauseLease = null;
+        }
+
+        private void SyncCouncilPause(bool shouldPause)
+        {
+            if (shouldPause)
+            {
+                _councilPauseLease ??= SimulationPauseService.Acquire("CouncilDecision");
+                return;
+            }
+
+            ReleaseCouncilPause();
+        }
+
+        private void ReleaseCouncilPause()
+        {
+            _councilPauseLease?.Dispose();
+            _councilPauseLease = null;
         }
 
         private void OpenSettings()

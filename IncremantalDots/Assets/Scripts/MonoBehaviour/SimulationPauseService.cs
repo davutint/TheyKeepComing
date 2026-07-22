@@ -5,6 +5,20 @@ using UnityEngine;
 
 namespace DeadWalls
 {
+    public static class SimulationSpeedUtility
+    {
+        public const float Normal = 1f;
+        public const float Fast = 2f;
+        public const float VeryFast = 3f;
+
+        public static bool IsSupported(float timeScale)
+        {
+            return Mathf.Approximately(timeScale, Normal)
+                   || Mathf.Approximately(timeScale, Fast)
+                   || Mathf.Approximately(timeScale, VeryFast);
+        }
+    }
+
     public interface ISimulationPauseBackend
     {
         float TimeScale { get; set; }
@@ -32,6 +46,19 @@ namespace DeadWalls
 
         public bool IsPaused => _activeLeases.Count > 0;
         public int ActiveLeaseCount => _activeLeases.Count;
+        public float RunningTimeScale => IsPaused ? _previousTimeScale : _backend.TimeScale;
+
+        public bool TrySetRunningTimeScale(float timeScale)
+        {
+            if (!SimulationSpeedUtility.IsSupported(timeScale))
+                return false;
+
+            if (IsPaused)
+                _previousTimeScale = timeScale;
+            else
+                _backend.TimeScale = timeScale;
+            return true;
+        }
 
         public IDisposable Acquire(string owner)
         {
@@ -100,6 +127,12 @@ namespace DeadWalls
 
         public static bool IsPaused => _coordinator.IsPaused;
         public static int ActiveLeaseCount => _coordinator.ActiveLeaseCount;
+        public static float RunningTimeScale => _coordinator.RunningTimeScale;
+
+        public static bool TrySetRunningTimeScale(float timeScale)
+        {
+            return _coordinator.TrySetRunningTimeScale(timeScale);
+        }
 
         public static IDisposable Acquire(string owner)
         {

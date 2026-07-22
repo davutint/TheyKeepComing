@@ -643,7 +643,12 @@ namespace DeadWalls
             }
             else
             {
-                SetText(view.Cost, evaluation?.Message ?? string.Empty);
+                SetText(view.Cost, evaluation != null
+                    ? GameplayActionFeedbackUtility.BuildHeartPurchaseFailure(
+                        evaluation.FailureReason,
+                        evaluation.Quote,
+                        runtime.GraveEssenceAmount)
+                    : "RESEARCH UNAVAILABLE");
             }
 
             string status = BuildNodeStatus(node);
@@ -659,10 +664,10 @@ namespace DeadWalls
             SetButton(
                 view,
                 true,
-                canPurchase,
+                evaluation != null,
                 alreadyOwned
                     ? node.Type == HeartNodeType.Keystone ? "COMMITTED" : "AWAKENED"
-                    : canPurchase ? GetPurchaseAction(node.Type) : "UNAVAILABLE");
+                    : canPurchase ? GetPurchaseAction(node.Type) : "SHOW REASON");
             SetBackground(view, Color.Lerp(HiddenColor, branchColor, node.Level > 0 ? 0.24f : 0.10f));
             SetNodeChrome(view, branchColor, node.Rarity == HeartNodeRarity.Rare,
                 node.Level > 0 ? new Color(0.70f, 0.54f, 0.31f, 0.78f) : branchColor,
@@ -687,7 +692,12 @@ namespace DeadWalls
             if (result == null || !result.Succeeded)
             {
                 PlaySfx(DeniedClip, 0.85f);
-                ShowToast(result?.Message ?? "PURCHASE REJECTED", false);
+                ShowToast(result != null
+                    ? GameplayActionFeedbackUtility.BuildHeartPurchaseFailure(
+                        result.FailureReason,
+                        result.Quote,
+                        Runtime.GraveEssenceAmount)
+                    : "PURCHASE REJECTED  ·  TRY AGAIN", false);
                 return;
             }
 

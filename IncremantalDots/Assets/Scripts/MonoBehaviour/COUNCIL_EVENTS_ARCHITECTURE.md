@@ -3,8 +3,8 @@
 ## Amac
 
 Dusuk frekansli, iki secenekli mikro kararlar: kart DAWN'da belirir (dongunun en sakin ani,
-konsey safakta toplanir), DAY boyunca yasar, DUSK girisinde secilmemisse "konsey dagilir".
-Oyun HICBIR zaman durmaz. Event'ler ASSET DEGILDIR — CouncilComposer sablon x atom x
+konsey safakta toplanir) ve oyuncu exact seceneklerden birini commit edene kadar simulation
+pause lease'i alir. Event'ler ASSET DEGILDIR — CouncilComposer sablon x atom x
 baglam x olcek carpiminden runtime'da uretir. Production katalog 9 launch sablonu ve 11
 serialized atom tasir; `cap_bonus` yalniz legacy uyumluluk icin dormant kalir ve hicbir launch
 recetesi tarafindan kabul edilmez. Diger 10 atom authored tariflerde kullanilir.
@@ -34,12 +34,12 @@ recetesi tarafindan kabul edilmez. Diger 10 atom authored tariflerde kullanilir.
    `ExpireCouncilEvent`. Flag'ler `Dictionary<string,int>` (flag -> setlendigi gun; zincir
    gecikmeleri icin). `ChooseCouncilOption` composed payload'i catalog template/contrast/branch
    recetesiyle yeniden dogrulamadan effect veya flag uygulamaz. Restart sifirlar.
-4. **UI (`CouncilEventUI.cs`):** faz gecislerini 0.2s poll ile izler (Dawn -> scheduled open,
-   Dusk -> expire); kart DOTween slide+fade ile belirir (Dawn odul toast'undan 1.2s gecikmeli),
-   sure seridi + `DECIDE Ns` sayaci authoritative cycle state'inden kalan Dawn+Day penceresini
-    gosterir; iki buton `CouncilOptionPresentationUtility` canli quote'unu rich text olarak basar;
-    sure seridi Filled/Horizontal/Left contract'inda sayacla birlikte azalir. Secim punch +
-    Card Place SFX, belirme Book Handle SFX.
+4. **UI (`CouncilEventUI.cs` + `GameplayHUDToolkitUI.Modals.cs`):** legacy controller faz
+   gecislerini izleyip scheduled karti acar; production UI Toolkit modal'i aktif kart boyunca
+   `CouncilDecision` pause lease'ini tutar. Player-facing sure seridi dolu kalir ve
+   `GAME PAUSED - CHOOSE TO CONTINUE` yazar. Iki buton `CouncilOptionPresentationUtility` canli
+   quote'unu rich text olarak basar. Basarili secim lease'i birakir ve onceki `1X/2X/3X` hizi
+   aynen geri yukler; reddedilen secenek karti ve pause'u acik tutar.
 5. **Ilk-kosu ogretimi (`FirstRunOnboardingUI.cs`):** Council karti gercek secime acildiginda
    `CouncilEventPanel` tam kartini non-modal pulse eder ve iki exact sonuc/bedelin okunmasini
    ister. Tek bir branch'i isaretlemez; karti acmaz, secim yapmaz, timer/pause/resource state'ine
@@ -86,9 +86,9 @@ otoritesi yalniz `GameManager` transaction'lari ve mevcut ECS effect owner'larin
   katalog validation'i ve runtime compose'u fail-closed durdurur.
 - Memory degeri canli azaltildiginda `GameManager`, eski recent listeyi bir sonraki scheduled
   compose'dan once yeni limite indirir ve secilen kart eklendikten sonra ayni limiti tekrar uygular.
-- Karar timer'inin ayri tuning/state owner'i yoktur. `CouncilDecisionWindowUtility`, toplam pencereyi
-  active `ContinuousSiegeCycleData.DawnDuration + DayDuration` olarak turetir; kalan sure faz
-  progress'inden gelir ve Dusk'ta sifirlanir.
+- Karar timer'inin ayri tuning/state owner'i yoktur. `CouncilDecisionWindowUtility` tarihsel
+  telemetry/save uyumlulugu icin Dawn + Day penceresini turetmeye devam eder; production modal
+  simulation'i durdurdugu icin player-facing karar suresi akmaz ve sayac gosterilmez.
 - `GameManager.GetCouncilRuntimeTuningTelemetry`, katalog validasyonu, memory/flag/one-shot sayilari,
   active kart butceleri ve production/next-night expiry'lerini aggregate verir; yeni gameplay state'i
   kurmaz veya gizli secenek icerigi uretmez.

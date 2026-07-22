@@ -2,11 +2,11 @@
 
 > **Amaç:** V1 kapsamı tamamlandıktan sonra yapılacak mantık düzeltmelerini, oyuncuya görünen geri bildirimleri, UI/UX yeniden çalışmalarını, polish işlerini ve performans optimizasyonlarını tek otoriter takip belgesinde yürütmek.
 >
-> **Tracker sürümü:** 1.8
+> **Tracker sürümü:** 2.1
 > **Oluşturulma tarihi:** 2026-07-18
 > **Aktif paket:** `-` (açık paket yok)
 > **Aktif iş:** `-`
-> **İlerleme:** `12 / 12` ana görev tamamlandı - `%100`
+> **İlerleme:** `14 / 14` ana görev tamamlandı - `%100`
 
 ---
 
@@ -36,7 +36,7 @@ Bu belge, tamamlanmış V1 tracker'ından sonraki geliştirme döneminin aktif t
 
 ### İlerleme hesabı
 
-İlerleme, Bölüm 3'teki 12 ana görev üzerinden hesaplanır. Alt maddeler kanıt ve kabul kapsamını gösterir; ayrıca paydayı büyütmez. Ana görevler yalnızca bütün zorunlu alt kapıları tamamlandığında kapanır. Owner onaylı `DW-P12-UI-READABILITY` yeni kapsamı nedeniyle payda `11 -> 12` değişmiştir.
+İlerleme, Bölüm 3'teki 14 ana görev üzerinden hesaplanır. Alt maddeler kanıt ve kabul kapsamını gösterir; ayrıca paydayı büyütmez. Ana görevler yalnızca bütün zorunlu alt kapıları tamamlandığında kapanır. Owner onaylı `DW-P14-ACTION-FEEDBACK` yeni kapsamı nedeniyle payda `13 -> 14` değişmiştir.
 
 ---
 
@@ -79,6 +79,23 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - Her günün Dawn başlangıcında mevcut Council sistemiyle tam bir regular kart açılır; aynı gün ikinci kez açılmaz.
 - İlk günlük kart Day 1'de desteklenir; event içeriği mevcut deterministic composer, context, flag, chain ve exact effect sahipliğini korur.
 
+### Oyun hızı, Council pause ve toast sınırı
+
+- Gün döngüsü panelinin altında `1X`, `2X` ve `3X` oyun hızı kontrolleri bulunur.
+- Council karar kartı açıkken simulation durur; geçerli seçim commit edilince karttan önceki hız aynen geri gelir.
+- Toast altyapısı eklenir, fakat yeni gameplay olaylarının toast üretmesi owner onayı olmadan bağlanmaz.
+
+### Game Over yükseltme açıklığı ve eylem reddi toast'ları
+
+- Game Over kalıcı yükseltme kartı yalnız ad/fiyat göstermez; mevcut kalıcı toplamı ve satın alma
+  sonrası exact toplamı oyuncuya açıkça karşılaştırır.
+- Oyuncunun bilinçli olarak bastığı purchase/research düğmesi kaynak, worker, kapasite, prerequisite,
+  kilit veya maximum level nedeniyle reddedilirse exact neden warning toast olarak gösterilir.
+- Kaynak açığı `NEED 14 MORE WOOD` gibi tam kaynak adı ve miktarla söylenir; genel `BLOCKED` copy'si
+  bu kapsamdaki player action'lar için yeterli değildir.
+- Otomatik phase, pasif kaynak dolması, savunma alarmı ve oyuncu tıklaması olmayan event'ler bu
+  onayın dışında kalır.
+
 ### UI okunabilirliği ve player-facing terminoloji
 
 - Gameplay HUD USS içinde player-facing yazı boyutu tabanı referans çözünürlükte `10px`tir; kritik phase mesajı `11px` ve yüksek kontrastlıdır.
@@ -105,6 +122,8 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 | 10 | `DW-P10-FINAL-GATE` | Son kalite, tutarlılık ve regresyon kapısı | `[x]` | Bütün aktif kapsam birlikte test edildi; açık kritik hata ve doğrulanmamış ana görev kalmadı |
 | 11 | `DW-P11-NIGHT-RHYTHM` | Night-only saldırı, clear gate ve günlük Council ritmi | `[x]` | Night spawn/clearance, günlük event, HUD, exact Continue ve tam regresyon doğrulandı |
 | 12 | `DW-P12-UI-READABILITY` | Gameplay HUD okunabilirlik, worker slider ve terminoloji düzeltmesi | `[x]` | UXML/USS/C# kontratı, runtime yeniden dağıtım, onboarding ve canlı Game View doğrulandı |
+| 13 | `DW-P13-GAME-FLOW-CONTROLS` | 1X/2X/3X oyun hızı, Council pause ve toast altyapısı | `[x]` | Merkezi speed/pause owner, bounded toast kuyruğu, testler ve canlı Game View doğrulandı |
+| 14 | `DW-P14-ACTION-FEEDBACK` | Game Over meta açıklığı ve exact action-failure toast'ları | `[x]` | Exact effect progression, açıklanabilir action state, hedefli test ve canlı Game View doğrulandı |
 
 ---
 
@@ -304,6 +323,47 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - [x] Canlı runtime başlangıcında `60 total = 4 archers + 56 workers + 0 unassigned`; `%100 WOOD` sonucunda Wood `40/40`, Stone `16/30 CAPACITY OVERFLOW`, Iron/Food `0` ve `0 unassigned` doğrulandı.
 - [x] Canlı Basic Archer alımında `4 -> 5 archers`, `56 -> 55 workers`, Wood `40 -> 39` ve Unassigned `0 -> 0` oldu.
 - [x] Canlı kabul Play Mode içindeki geçici `NewGameScene` yüklemesiyle yapıldı; çıkışta aktif `HandMadeTiles` sahnesi geri yüklendi ve owner sahne dosyaları değiştirilmedi.
+
+### `DW-P13-GAME-FLOW-CONTROLS` - Game Speed + Council Pause + Toast Infrastructure
+
+**Paket başlığı:** `DW-P13-GAME-FLOW-CONTROLS: 1X/2X/3X Speed + Council Pause + Toast Queue`
+**Durum:** `[x]` Uygulama, targeted regresyon ve canlı Game View doğrulaması tamamlandı.
+
+- [x] Gün döngüsü panelinin altına, aynı görsel dilde ve açık aktif-state metniyle `1X/2X/3X` kontrolleri eklendi.
+- [x] Player-facing hız yazımı `SimulationPauseService` altında merkezileştirildi; desteklenmeyen hız reddedilir ve legacy Canvas ikinci bir kontrol yüzeyi taşımaz.
+- [x] Pause lease'i seçili koşu hızını ve ECS simulation state'ini birlikte yakalar; nested lease'lerde yalnız son release exact state'i geri yükler.
+- [x] Aktif Council kararı `CouncilDecision` lease'i alır. Geçerli seçim kartı kapatıp önceki hızı geri yükler; uygulanamayan seçim kartı ve pause'u açık tutar.
+- [x] Pause altında donacak geri sayım kaldırıldı; karar şeridi `GAME PAUSED · CHOOSE TO CONTINUE` metniyle dolu kalır.
+- [x] İlk Council exact-choice onboarding hint'i blocking Council pause altında görünür kalır; tutorial pause lease sahipliği almaz.
+- [x] `GameplayToastService` en fazla sekiz mesajlık FIFO, süre clamp'i ve dört ton metadata'sıyla eklendi; presenter unscaled zamanda çalışır.
+- [x] Mevcut UI aksiyon feedback çağrıları ve legacy feedback mirror'ları kuyruğa taşındı. Yeni otomatik gameplay toast trigger'i eklenmedi; sonraki kaynaklar owner kararı bekler.
+- [x] Targeted EditMode `50/50`, Council PlayMode `9/9`, `NewGameScene` validation `0` issue ve final Console `0 error / 0 warning` geçti.
+- [x] Canlı `1920x1080` Game View'da `3X ACTIVE`, Council sırasında `PAUSED - 3X`, seçim sonrası yeniden `3X` ve pause altında geçici toast preview doğrulandı; aktif `HandMadeTiles` sahnesi geri yüklendi.
+
+### `DW-P14-ACTION-FEEDBACK` - Meta Upgrade Clarity + Exact Failure Toasts
+
+**Paket başlığı:** `DW-P14-ACTION-FEEDBACK: Meta Benefit Progression + Exact Failure Toasts`
+**Durum:** `[x]` Uygulama, hedefli regresyon ve canlı Game View doğrulaması tamamlandı.
+
+- [x] Game Over meta kartları katalog açıklamasının yanında exact `CURRENT → NEXT` kalıcı faydayı,
+  `LEVEL N → N+1` transaction'ını ve açık `BUY · N EMBERS` maliyetini gösterir.
+- [x] Maximum seviyedeki kart olmayan bir sonraki faydayı vaat etmez; mevcut toplamı
+  `MAXIMUM ACTIVE` olarak gösterir. Heart content unlock internal pool dili yerine gelecekteki
+  Castle Heart seçeneklerini açtığını söyler.
+- [x] Economy bina/housing, Archer recruit/retrain, Arrow refill/upgrade, War Doctrine, Castle Heart
+  ve Game Over meta purchase reddi exact warning toast kapsamına bağlandı.
+- [x] Terminal olmayan yetersiz action'lar sessizce disable edilmez; `is-action-unavailable`
+  sunumuyla tıklanabilir kalır. Tamamlanmış/maxed action'lar terminal disabled state'ini korur.
+- [x] Aynı sahnede bulunan UI Toolkit Barracks ve legacy `MarketUI` Archer callback'leri aynı
+  açıklanabilir-action sözleşmesini kullanır; kaynak/worker eksikliği iki yüzeyde de butonu disable etmez.
+- [x] Kaynak, worker, garrison capacity, locked type, full reserve, prerequisite, maximum level ve
+  durable meta save engelleri ayrı nedenlerdir; tam kaynak adları ve exact eksik miktarlar kullanılır.
+- [x] Player-facing action-failure toast'ları yalnız İngilizce presentation copy'si kullanır;
+  Castle Heart/War Doctrine internal transaction veya reason mesajlarını doğrudan göstermez.
+- [x] Hedefli EditMode `23/23` ve hem UI Toolkit hem legacy Market Basic Archer düğmelerini kullanan
+  hedefli PlayMode `2/2` geçti. İlgili compile/Console kontrolünde `0 error` görüldü.
+- [x] Canlı `1920x1080` Game Over/Meta Shop kontrolünde beş satırlık görünür alanda açıklama,
+  exact fayda, level ve maliyet taşmadan okundu; aktif `HandMadeTiles` sahnesi geri yüklendi.
 
 ---
 
@@ -580,3 +640,47 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - Targeted EditMode `36/36`; worker, Council, exact Continue, archer cap ve telemetry targeted PlayMode toplam `7/7` geçti.
 - Canlı `NewGameScene` kontrolünde başlangıç `4 archers + 56 workers + 0 unassigned`; `%100 WOOD` sonrası `40 Wood + 16 Stone overflow + 0 unassigned`; bir Basic Archer sonrası `5 archers + 55 workers + 0 unassigned` doğrulandı.
 - P12 kabulü yeni workforce sözleşmesiyle düzeltildi; ana görev paydası değişmedi ve tracker `12/12 - %100` kaldı.
+
+### 2026-07-22 - Oyun hızı, Council pause ve toast altyapısı
+
+- Owner kararıyla `DW-P13-GAME-FLOW-CONTROLS` açıldı; tracker paydası `12 -> 13` değişti.
+- UI Toolkit HUD'da celestial day-cycle panelinin altına `1X/2X/3X` kontrol rayı eklendi. Aktif hız hem seçili düğme hem `NX ACTIVE` metniyle gösterilir.
+- Merkezi pause koordinatörü koşu hızını koruyacak şekilde genişletildi. Council kartı açıldığında simulation `0` olur; valid seçim sonrası önceki `1X/2X/3X` exact geri gelir.
+- Council'ın pause altında ilerlemeyen eski decision countdown sunumu, açık `GAME PAUSED · CHOOSE TO CONTINUE` copy'siyle değiştirildi. İlk-kosu exact-choice hint'i bu blocking pause'un allowlist istisnası oldu.
+- Sekiz mesajlık bounded FIFO toast servisi ve unscaled UI Toolkit presenter eklendi. Mevcut action feedback kaynakları korundu; owner onayı olmayan yeni bir otomatik toast olayı bağlanmadı.
+- Targeted EditMode `50/50` ve Council PlayMode `9/9` geçti. Canlı `1920x1080` doğrulamada `3X -> Council pause -> 3X restore`, sıkışmayan hız rail'i ve pause sırasında geçici toast preview görüldü.
+- `NewGameScene` validation `0` issue, final Console `0 error / 0 warning` ve `git diff --check` temiz geçti; owner `AGENTS.md` ile `HandMadeTiles` dosyalarına dokunulmadı.
+- P13 kapanışıyla Post-V1 ilerleme `13/13 - %100` oldu.
+
+### 2026-07-22 - Game Over meta açıklığı ve exact action-failure toast'ları
+
+- Owner, Game Over'da seçilen kalıcı yükseltmenin ne olduğunu ve ne vereceğini açık görme; kaynak
+  veya benzer requirement yetersizliğinde exact neden toast'ı alma kararını kesinleştirdi.
+- Meta kartları katalog effect owner'ından mevcut ve satın alma sonrası toplamı üretir; kaynak,
+  Archer, yatak, Wall HP, worker production, arrow efficiency, Grave Essence ve future Heart
+  option unlock semantikleri player-facing adlarla ayrıldı.
+- Purchase/research düğmeleri terminal olmayan reddedilebilir durumda tıklanabilir kaldı;
+  `GameplayActionFeedbackUtility` canlı maliyet, kaynak, worker, capacity ve meta bakiye snapshot'ını
+  `NEED N MORE RESOURCE` warning copy'sine dönüştürür.
+- Hedefli EditMode `21/21`, gerçek Basic Archer button-submit PlayMode `1/1`, Unity compile
+  `0 error` ve `1920x1080` Game Over görsel kontrolü geçti.
+- Geniş `WorkerAllocationPlayModeTests` taraması bu paketle ilgisiz iki mevcut phase/presentation
+  testinde (`DawnArrivalTransaction...`, `DayPresentation...`) bağımsız hata göstermeye devam etti;
+  P14'ün yeni button/toast testi izole kabulde geçti ve bu iki eski test bu pakette değiştirilmedi.
+- Owner onaylı yeni ana görev nedeniyle payda `13 -> 14` değişti; P14 kapanışıyla Post-V1 ilerleme
+  `14/14 - %100` oldu.
+
+### 2026-07-22 - P14 Archer interactable ve İngilizce toast post-acceptance düzeltmesi
+
+- Owner canlı kullanımda Archer düğmesinin kaynak yetersizliğinde hâlâ disabled kaldığını ve
+  player-facing Türkçe toast kabul edilmediğini bildirdi.
+- Kök neden aynı sahnedeki iki UI owner'ından yalnız UI Toolkit Barracks yolunun önceki kabulde
+  düzeltilmiş olmasıydı; legacy `MarketUI` hâlâ `CanBuyArcher == false` sonucunu doğrudan
+  `Button.interactable = false` yapıyordu.
+- Legacy ve Toolkit Archer yolları ortak `GameplayActionFeedbackUtility` sözleşmesine bağlandı.
+  Kaynak/worker eksikliği tıklanabilir warning state'i korur; locked/max terminal durumları kapalı kalır.
+- Castle Heart ve War Doctrine action-failure yüzeyleri internal Türkçe transaction/reason mesajını
+  doğrudan taşımak yerine İngilizce presentation mapping kullanır. Oyunun bütün player-facing metin
+  dili için İngilizce sınırı yeniden kilitlendi.
+- Hedefli EditMode `23/23`, gerçek UI Toolkit + legacy Market Archer PlayMode `2/2` ve Unity compile
+  `0 error` geçti. Ana görev paydası değişmedi; tracker `14/14 - %100` kaldı.

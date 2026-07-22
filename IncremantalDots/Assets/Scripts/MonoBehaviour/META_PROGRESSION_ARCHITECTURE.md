@@ -123,6 +123,13 @@ sunumunu değiştirir; reward settings, 11 upgrade asset referansı, `meta_progr
 
 Game Over paneli `1120 x 880` tek karttır. 11 upgrade Restart CTA'nin üzerine taşmaz; maskeli
 `ScrollRect`, `68px` açıklamalı satırlar ve kalıcı-bakiye/reward için iki icon binding'i kullanır.
+Aktif UI Toolkit Game Over kartlari katalogdaki title/description'a ek olarak
+`MetaUpgradePresentationUtility` ile exact mevcut toplam etkiyi ve satin alim sonrasi toplam
+etkiyi `CURRENT -> NEXT` biciminde gosterir. Ornegin Starting Wood `+0 -> +75`, Wall Max HP
+`+5% -> +10%` olarak okunur; internal `NodePoolUnlock` dili oyuncuya gosterilmez, gelecekteki
+Castle Heart option'larini actigi aciklanir. Satin alinabilir olmayan fakat tamamlanmamis kart
+tiklanabilir kalir ve exact eksik Ember miktarini warning toast ile bildirir; tamamlanmis kart
+terminal olarak kilitlidir.
 
 ## Upgrade kataloğu ve koşu başı uygulama
 
