@@ -1,17 +1,17 @@
 namespace DeadWalls
 {
     /// <summary>
-    /// V1 Council takviminin tek owner'i. Regular kartlar ilk kez Day 3'te ve
-    /// sonrasinda her uc gunde bir acilir; ayni scheduled gun yalniz bir kez islenir.
+    /// Council takviminin tek owner'i. Her Dawn'da bir regular kart acilir;
+    /// ayni gun save/Continue veya tekrar cagrida yalniz bir kez islenir.
     /// </summary>
     public static class CouncilRegularSchedule
     {
-        public const int FirstRegularDay = 3;
-        public const int IntervalDays = 3;
+        public const int FirstRegularDay = 1;
+        public const int IntervalDays = 1;
 
         public static bool IsRegularDay(int day)
         {
-            return day >= FirstRegularDay && day % IntervalDays == 0;
+            return day >= FirstRegularDay;
         }
 
         public static bool ShouldOpen(

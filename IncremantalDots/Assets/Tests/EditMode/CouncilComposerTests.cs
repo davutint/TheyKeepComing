@@ -438,9 +438,9 @@ namespace DeadWalls.Tests
             CouncilEventCatalogSO production = AssetDatabase.LoadAssetAtPath<CouncilEventCatalogSO>(path);
             var expectedDays = new Dictionary<string, int>
             {
-                { "abandoned_cache", 3 },
-                { "merchant_caravan", 3 },
-                { "quarry_crew", 3 },
+                { "abandoned_cache", 1 },
+                { "merchant_caravan", 1 },
+                { "quarry_crew", 1 },
                 { "refugees_at_gate", 6 },
                 { "wandering_veterans", 6 },
                 { "cold_snap", 6 },
@@ -464,7 +464,7 @@ namespace DeadWalls.Tests
             CouncilEventCatalogSO production = AssetDatabase.LoadAssetAtPath<CouncilEventCatalogSO>(path);
             Assert.That(production, Is.Not.Null);
 
-            int[] sampleDays = { 3, 12, 30 };
+            int[] sampleDays = { 1, 3, 12, 30 };
             foreach (CouncilTemplateSO template in production.Templates)
             {
                 Assert.That(template.BodyVariants, Has.Length.GreaterThanOrEqualTo(2),
@@ -472,6 +472,8 @@ namespace DeadWalls.Tests
                 foreach (int sampleDay in sampleDays)
                 {
                     int day = Mathf.Max(template.MinDay, sampleDay);
+                    if (template.RequiredFlags != null && template.RequiredFlags.Length > 0)
+                        day = Mathf.Max(day, 1 + template.ChainDelayDays);
                     for (uint seed = 1; seed <= 200; seed++)
                     {
                         CouncilContext context = MakeContext(day);
@@ -512,6 +514,28 @@ namespace DeadWalls.Tests
                         Assert.That(CouncilContentPolicy.TryValidateComposedEvent(
                             production, composed, out string problem), Is.True, problem);
                     }
+                }
+            }
+        }
+
+        [Test]
+        public void ProductionCatalog_EveryDayHasAtLeastOneValidCard()
+        {
+            const string path = "Assets/ScriptableObject/MobileCastle/Council/CouncilEventCatalog.asset";
+            CouncilEventCatalogSO production = AssetDatabase.LoadAssetAtPath<CouncilEventCatalogSO>(path);
+            Assert.That(production, Is.Not.Null);
+
+            for (int day = 1; day <= 30; day++)
+            {
+                for (uint seed = 1; seed <= 64; seed++)
+                {
+                    ComposedCouncilEvent composed = CouncilComposer.Compose(
+                        production,
+                        Unity.Mathematics.math.hash(new Unity.Mathematics.uint2(seed, (uint)day)),
+                        MakeContext(day));
+                    Assert.That(composed, Is.Not.Null, $"Day {day}, seed {seed}: daily Council null.");
+                    Assert.That(CouncilContentPolicy.TryValidateComposedEvent(
+                        production, composed, out string problem), Is.True, problem);
                 }
             }
         }

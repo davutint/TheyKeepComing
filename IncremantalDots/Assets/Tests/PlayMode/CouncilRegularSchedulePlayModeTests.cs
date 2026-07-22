@@ -140,7 +140,7 @@ namespace DeadWalls.Tests
         }
 
         [UnityTest]
-        public IEnumerator RegularCouncil_OpensExactlyOnThreeSixNineCadence_OncePerDay()
+        public IEnumerator RegularCouncil_OpensEveryDawn_OncePerDay()
         {
             GameManager gameManager = GameManager.Instance;
 
@@ -150,7 +150,7 @@ namespace DeadWalls.Tests
             offPhaseCycle.Phase = SiegeCyclePhase.Night;
             _cycleSetter.Invoke(gameManager, new object[] { offPhaseCycle });
             Assert.That(gameManager.TryOpenRegularCouncilEvent(), Is.False,
-                "Day 3 Night fazinda regular Council acilmamali.");
+                "Council Night fazinda acilmamali.");
 
             for (int day = 1; day <= 12; day++)
             {

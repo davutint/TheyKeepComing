@@ -54,8 +54,8 @@ Savunma sonucu için tek runtime owner `WallSegment`tir. Gate/Core component ve 
 - `EnemyCatalogRuntimeData` + `EnemyCatalogEntryData`: aktif enemy index'ini; prefab, base stats, scale, XP ve pool metadata'sini tutar. V1'de buffer tek kayittir.
 - `EnemyPoolRuntimeData` + `EnemyPoolAvailable`: prewarm/expand rezervini ve rent/return telemetry'sini tutar.
 - `ArrowPoolRuntimeData` + `ArrowPoolAvailable`: ok prewarm/expand rezervini ve rent/return telemetry'sini tutar.
-- `ContinuousSiegeCycleData`: player-facing `DAY / DUSK / NIGHT` fazini, 60s cycle progress'ini, spawn intensity multiplier'i ve horde pressure degerini tutar.
-- `ContinuousSpawnBudgetData`: day tabanı ile phase multiplier'ını ayrı tutar; pending enemy backlog'u ve demanded/spawned runtime telemetry sayaçlarını taşır.
+- `ContinuousSiegeCycleData`: player-facing `DAY / DUSK / NIGHT / DAWN` fazini, 60s timed cycle progress'ini, spawn intensity multiplier'i ve horde pressure degerini tutar. Night suresi dolup horde temizlenmediyse timer Night sonunda sabitlenir.
+- `ContinuousSpawnBudgetData`: gun tabani ile phase multiplier'ini ayri tutar; yalniz Night'ta uretilen pending enemy backlog'unu ve demanded/spawned runtime telemetry sayaclarini tasir.
 - `WaveStateData.Phase`: mobile continuous modda uyumluluk icin `NightCombat` aktif tutulur. Eski DayPrep akisi component seviyesinde kalir ama `ContinuousSiegeCycleData.Enabled` true iken player-facing akisi yonetmez.
 - `EconomyFocusState`: eski focus akisi icin korunur. Worker economy aktifken player-facing UI bunu kullanmaz.
 - `WaveClearRewardData`: son wave clear bonusunu HUD toast'i icin saklar.
@@ -91,7 +91,7 @@ Varsayilan mobile degerleri:
 - Worker economy reward multiplier: `0.25`
 - Economy event chance `15%`, cooldown `2` waves
 - Continuous siege cycle: total `60s`, Day `30s`, Dusk `5s`, Night `20s`, Dawn `5s`
-- Continuous siege intensity: Day `0.55`, Dusk `1.00 -> 1.35`, Night `1.65`
+- Continuous siege intensity: yalniz Night `1.65`; Day/Dusk/Dawn runtime spawn intensity'si `0`
 - Initial/day prep duration fields legacy/debug akis icin korunur
 - Day overlay alpha: `0`
 - Night overlay alpha: `0.50`
@@ -104,11 +104,12 @@ Varsayilan mobile degerleri:
 
 Mobile normal mode artik player-facing wave clear veya `Start Next Wave` beklemez:
 
-1. `ContinuousSiegeCycleSystem`, 60 saniyelik cycle timer'i ilerletir.
-2. UI fazi sadece `DAY`, `DUSK`, `NIGHT` olarak gosterilir; `DAY 03` gibi wave numarasi yazilmaz.
-3. Day fazinda spawn dusuk tempo akar, Dusk fazinda kararir ve tempo yukselir, Night fazinda baski yuksek kalir.
-4. `WaveStateData.WaveActive = true` tutulur; eski market/prep dur-kalk akisi tetiklenmez.
-5. `WaveSpawnSystem`, continuous cycle intensity degerine gore interval ve batch size ayarlar.
+1. `ContinuousSiegeCycleSystem`, normalde 60 saniyelik cycle timer'i ilerletir.
+2. Day, Dusk ve Dawn yeni dusman talebi uretmez; pending backlog bu hazirlik fazlarinda sahaya akmaz.
+3. Night boyunca gunluk quantity ve Night intensity'siyle dusman talebi uretilir ve backlog kapasite acildikca sahaya aktarilir.
+4. Timed Night bittiginde pending backlog veya yasayan dusman varsa timer Night sonunda durur. Bu Night clearance durumunda yeni talep uretilmez, fakat mevcut backlog sahaya akmaya devam eder.
+5. Yalniz `PendingEnemies == 0` ve `ZombiesAlive == 0` birlikte saglandiginda Dawn'a gecilir ve normal dongu devam eder.
+6. `WaveStateData.WaveActive = true` tutulur; eski market/prep dur-kalk akisi tetiklenmez.
 
 Stress mode bu akisi atlar; stress spawn davranisi korunur.
 
@@ -120,7 +121,7 @@ Mobile castle render sirasi shader degistirilerek degil, world z bandlariyla coz
 
 ### WaveSpawnSystem
 
-Continuous siege aktifken `WaveSpawnSystem`, wave clear kontrolüne girmez. `ContinuousSpawnBudgetUtility` günlük count/batch/interval tabanını phase multiplier'dan ayrı hesaplar. Alive cap doluysa geçen interval talebi `ContinuousSpawnBudgetData.PendingEnemies` içinde korunur; kapasite açılınca frame başına `MaxSpawnBatch` sınırıyla sahaya aktarılır. Spawn prefabı ve entity base statları aktif `EnemyCatalogEntryData` kaydından gelir; entity `EnemyPoolRuntimeUtility.TryRent` ile alınır ve rezerv boşsa definition batch değeriyle genişler. Enemy tipine özel dal yoktur. İç tarafta `CurrentWave` cycle index olarak tutulur; `MobileWaveUtility.ConfigureMobileWave()` count ve base interval'i günceller, enemy HP/damage/speed'i sabit tutar. UI wave veya backlog sayısını player-facing olarak göstermez.
+Continuous siege aktifken `WaveSpawnSystem`, eski wave-clear odul akisina girmez. `ContinuousSpawnBudgetUtility` gunluk count/batch/interval tabanini phase multiplier'dan ayri hesaplar. Yeni talep yalniz timed Night'ta uretilir. Alive cap doluysa gecen Night interval talebi `ContinuousSpawnBudgetData.PendingEnemies` icinde korunur; Night clearance sirasinda kapasite acilinca frame basina `MaxSpawnBatch` siniriyla sahaya aktarilir. Day/Dusk/Dawn bu backlog'u drain etmez. Spawn prefabi ve entity base statlari aktif `EnemyCatalogEntryData` kaydindan gelir; entity `EnemyPoolRuntimeUtility.TryRent` ile alinir ve rezerv bossa definition batch degeriyle genisler. Enemy tipine ozel dal yoktur. Ic tarafta `CurrentWave` cycle index olarak tutulur; `MobileWaveUtility.ConfigureMobileWave()` count ve base interval'i gunceller, enemy HP/damage/speed'i sabit tutar. HUD clearance sirasinda faz basligini `NIGHT SIEGE` olarak korur ve kalan backlog + yasayan dusman toplamını `N LEFT` olarak gosterir.
 
 Legacy mobile wave director akisi `ContinuousSiegeCycleData.Enabled` false yapilirsa hala calisabilir: opening/mid/final fazlari `ZombiesSpawned / ZombiesToSpawn` oranindan hesaplanir ve wave temizlenince DayPrep'e doner. Varsayilan NewGameScene akisi continuous siege'dir. Stress mode aciksa mobile config'teki stress batch/interval/cap kullanilir, reward verilmez ve continuous/legacy wave director fazlari calismaz.
 
@@ -210,7 +211,7 @@ Archer count bilgisi sag drawer row'larinda okunur. `ArcherTypeText` eski HUD pl
 
 Yeni imported HUD varsa cycle paneli player-facing zaman bilgisini gosterir:
 
-- `CyclePhaseText`: `DAY`, `DUSK` veya `NIGHT`
+- `CyclePhaseText`: `DAY`, `DUSK`, `NIGHT` veya `DAWN`; Night clearance sirasinda normal `NIGHT SIEGE` basligi korunur
 - `CycleDayLabelText`, `CycleDuskLabelText`, `CycleNightLabelText`: segment label'lari
 - `CycleProgressFill` ve `CycleProgressMarker`: 60s dongu progress'i
 - Forecast/pressure surface: aktif prefab ve `HUDController` binding sozlesmesinde bulunmaz; `HordePressure01` spawn/gameplay sinyali olarak korunur

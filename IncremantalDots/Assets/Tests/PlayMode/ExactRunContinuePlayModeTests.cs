@@ -1045,7 +1045,7 @@ namespace DeadWalls.Tests
         }
 
         [UnityTest]
-        public IEnumerator ContinuousCycle_UsesExactFourPhaseSixtySecondContract_AndWrapsWithoutPrepGap()
+        public IEnumerator ContinuousCycle_AttacksOnlyAtNight_HoldsUntilClear_AndWrapsWithoutPrepGap()
         {
             var gameManager = GameManager.Instance;
             bool runtimeReady = false;
@@ -1062,7 +1062,8 @@ namespace DeadWalls.Tests
 
             EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             Entity configEntity = entityManager.CreateEntityQuery(
-                typeof(MobileCastleCombatConfig), typeof(ContinuousSiegeCycleData)).GetSingletonEntity();
+                typeof(MobileCastleCombatConfig), typeof(ContinuousSiegeCycleData),
+                typeof(ContinuousSpawnBudgetData)).GetSingletonEntity();
             Entity waveEntity = entityManager.CreateEntityQuery(typeof(WaveStateData)).GetSingletonEntity();
             var config = entityManager.GetComponentData<MobileCastleCombatConfig>(configEntity);
 
@@ -1074,13 +1075,13 @@ namespace DeadWalls.Tests
             Assert.That(config.SiegeDayDuration + config.SiegeDuskDuration
                 + config.SiegeNightDuration + config.SiegeDawnDuration, Is.EqualTo(60f));
 
-            float[] timers = { 1f, 31f, 40f, 57f };
+            float[] timers = { 1f, 31f, 57f, 40f };
             SiegeCyclePhase[] phases =
             {
                 SiegeCyclePhase.Day,
                 SiegeCyclePhase.Dusk,
-                SiegeCyclePhase.Night,
-                SiegeCyclePhase.Dawn
+                SiegeCyclePhase.Dawn,
+                SiegeCyclePhase.Night
             };
 
             for (int i = 0; i < timers.Length; i++)
@@ -1092,8 +1093,43 @@ namespace DeadWalls.Tests
 
                 cycle = entityManager.GetComponentData<ContinuousSiegeCycleData>(configEntity);
                 Assert.That(cycle.Phase, Is.EqualTo(phases[i]));
-                Assert.That(cycle.SpawnIntensityMultiplier, Is.GreaterThan(0f));
+                if (cycle.Phase == SiegeCyclePhase.Night)
+                    Assert.That(cycle.SpawnIntensityMultiplier, Is.GreaterThan(0f));
+                else
+                    Assert.That(cycle.SpawnIntensityMultiplier, Is.Zero,
+                        $"{cycle.Phase} fazinda yeni dusman talebi uretilmemeli.");
             }
+
+            float nightEnd = config.SiegeDayDuration + config.SiegeDuskDuration
+                + config.SiegeNightDuration;
+            var heldCycle = entityManager.GetComponentData<ContinuousSiegeCycleData>(configEntity);
+            heldCycle.Phase = SiegeCyclePhase.Night;
+            heldCycle.CycleTimer = nightEnd + 0.25f;
+            entityManager.SetComponentData(configEntity, heldCycle);
+            var heldWave = entityManager.GetComponentData<WaveStateData>(waveEntity);
+            heldWave.ZombiesAlive = 1;
+            entityManager.SetComponentData(waveEntity, heldWave);
+            var heldBudget = entityManager.GetComponentData<ContinuousSpawnBudgetData>(configEntity);
+            heldBudget.PendingEnemies = 0L;
+            entityManager.SetComponentData(configEntity, heldBudget);
+
+            yield return null;
+
+            heldCycle = entityManager.GetComponentData<ContinuousSiegeCycleData>(configEntity);
+            Assert.That(heldCycle.Phase, Is.EqualTo(SiegeCyclePhase.Night));
+            Assert.That(heldCycle.CycleTimer, Is.EqualTo(nightEnd).Within(0.001f));
+            Assert.That(heldCycle.PhaseProgress01, Is.EqualTo(1f).Within(0.001f));
+            Assert.That(heldCycle.SpawnIntensityMultiplier, Is.Zero,
+                "Clearance yeni spawn demand uretmemeli.");
+
+            heldWave = entityManager.GetComponentData<WaveStateData>(waveEntity);
+            heldWave.ZombiesAlive = 0;
+            entityManager.SetComponentData(waveEntity, heldWave);
+            yield return null;
+
+            heldCycle = entityManager.GetComponentData<ContinuousSiegeCycleData>(configEntity);
+            Assert.That(heldCycle.Phase, Is.EqualTo(SiegeCyclePhase.Dawn),
+                "Backlog ve alive sifirlaninca cycle Dawn'a devam etmeli.");
 
             var wrappingCycle = entityManager.GetComponentData<ContinuousSiegeCycleData>(configEntity);
             int previousCycleIndex = wrappingCycle.CycleIndex;
@@ -1116,13 +1152,75 @@ namespace DeadWalls.Tests
             Assert.That(wrappingCycle.CycleTimer, Is.GreaterThanOrEqualTo(0f));
             Assert.That(wrappingCycle.CycleTimer, Is.LessThan(1f));
             Assert.That(wrappingCycle.Phase, Is.EqualTo(SiegeCyclePhase.Day));
-            Assert.That(wrappingCycle.SpawnIntensityMultiplier, Is.GreaterThan(0f));
+            Assert.That(wrappingCycle.SpawnIntensityMultiplier, Is.Zero);
             Assert.That(wrappingWave.CurrentWave, Is.EqualTo(wrappingCycle.CycleIndex + 1));
             Assert.That(wrappingWave.WaveActive, Is.True);
             Assert.That(wrappingWave.Phase, Is.EqualTo(RunPhaseType.NightCombat));
             Assert.That(wrappingWave.PrepTimer, Is.Zero);
             Assert.That(wrappingWave.PrepDuration, Is.Zero);
             Assert.That(wrappingWave.WaveStartTimer, Is.Zero);
+        }
+
+        [UnityTest]
+        public IEnumerator NightClearanceSnapshot_RestoresZeroIntensityAndPendingHordeExactly()
+        {
+            var gameManager = GameManager.Instance;
+            bool runtimeReady = false;
+            for (int frame = 0; frame < 300; frame++)
+            {
+                if (gameManager.SaveRunSnapshot())
+                {
+                    runtimeReady = true;
+                    break;
+                }
+                yield return null;
+            }
+            Assert.That(runtimeReady, Is.True);
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            Entity configEntity = entityManager.CreateEntityQuery(
+                typeof(MobileCastleCombatConfig), typeof(ContinuousSiegeCycleData),
+                typeof(ContinuousSpawnBudgetData)).GetSingletonEntity();
+            var config = entityManager.GetComponentData<MobileCastleCombatConfig>(configEntity);
+            float nightEnd = config.SiegeDayDuration + config.SiegeDuskDuration
+                + config.SiegeNightDuration;
+
+            var cycle = entityManager.GetComponentData<ContinuousSiegeCycleData>(configEntity);
+            cycle.CycleTimer = nightEnd;
+            cycle.Phase = SiegeCyclePhase.Night;
+            cycle.PhaseProgress01 = 1f;
+            cycle.SpawnIntensityMultiplier = 0f;
+            entityManager.SetComponentData(configEntity, cycle);
+
+            var budget = entityManager.GetComponentData<ContinuousSpawnBudgetData>(configEntity);
+            budget.PendingEnemies = 7L;
+            budget.PhaseIntensityMultiplier = 0f;
+            entityManager.SetComponentData(configEntity, budget);
+            Assert.That(gameManager.SaveRunSnapshot(), Is.True);
+
+            cycle.CycleTimer = 0f;
+            cycle.Phase = SiegeCyclePhase.Day;
+            cycle.PhaseProgress01 = 0f;
+            cycle.SpawnIntensityMultiplier = 3f;
+            entityManager.SetComponentData(configEntity, cycle);
+            budget.PendingEnemies = 0L;
+            budget.PhaseIntensityMultiplier = 3f;
+            entityManager.SetComponentData(configEntity, budget);
+
+            Assert.That(gameManager.TryRestoreRunFromCheckpoint(), Is.True);
+            configEntity = entityManager.CreateEntityQuery(
+                typeof(MobileCastleCombatConfig), typeof(ContinuousSiegeCycleData),
+                typeof(ContinuousSpawnBudgetData)).GetSingletonEntity();
+            cycle = entityManager.GetComponentData<ContinuousSiegeCycleData>(configEntity);
+            budget = entityManager.GetComponentData<ContinuousSpawnBudgetData>(configEntity);
+
+            Assert.That(cycle.Phase, Is.EqualTo(SiegeCyclePhase.Night));
+            Assert.That(cycle.CycleTimer, Is.EqualTo(nightEnd).Within(0.001f));
+            Assert.That(cycle.PhaseProgress01, Is.EqualTo(1f).Within(0.001f));
+            Assert.That(cycle.SpawnIntensityMultiplier, Is.Zero);
+            Assert.That(budget.PendingEnemies, Is.EqualTo(7L));
+            Assert.That(budget.PhaseIntensityMultiplier, Is.Zero);
+            yield return null;
         }
 
         [UnityTest]
@@ -1256,6 +1354,13 @@ namespace DeadWalls.Tests
             config.MaxSpawnBatch = 4;
             config.MinSpawnInterval = 0.05f;
             entityManager.SetComponentData(configEntity, config);
+
+            var cycle = entityManager.GetComponentData<ContinuousSiegeCycleData>(configEntity);
+            cycle.Phase = SiegeCyclePhase.Night;
+            cycle.CycleTimer = config.SiegeDayDuration + config.SiegeDuskDuration + 0.5f;
+            cycle.PhaseProgress01 = 0.025f;
+            cycle.SpawnIntensityMultiplier = config.SiegeNightIntensityMultiplier;
+            entityManager.SetComponentData(configEntity, cycle);
 
             var wave = entityManager.GetComponentData<WaveStateData>(waveEntity);
             wave.ZombiesAlive = 1;

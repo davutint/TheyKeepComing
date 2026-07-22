@@ -33,7 +33,7 @@ MonoBehaviour:
   OptionAVerb: Make the trade
   OptionBVerb: Take the sample
   BaseWeight: 1
-  MinDay: 3
+  MinDay: 1
   RequiredFlags: []
   ForbiddenFlags:
   - traded_with_merchant

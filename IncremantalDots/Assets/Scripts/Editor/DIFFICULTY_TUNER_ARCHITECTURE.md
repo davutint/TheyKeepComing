@@ -75,7 +75,7 @@ tek profil iterasyonuyla, KOD YAZMADAN tasindi).
    - **Council Runtime Contract** foldout'u canonical `GameManager` ile production
      `CouncilEventCatalogSO` owner'ini birlestirir. Small/Fair/Generous multiplier ve weight'leri,
      A/B budget tolerance ile `RecentTemplateMemory` dogrudan katalog asset'inde duzenlenir;
-     `DifficultyProfileSO` kopyasi yaratmaz. Day `3/6/9...` regular cadence read-only ve sabittir;
+     `DifficultyProfileSO` kopyasi yaratmaz. Her gun Dawn'da bir regular kart cadence'i read-only ve sabittir;
      Emergency Council yoktur. Decision timer ayri bir alan degil, active cycle'in Dawn+Day
      surelerinden turetilen read-only kontrattir. Play Mode aggregate telemetry handled day,
      recent/flag/one-shot sayilari, active card butceleri ve sureli effect/expiry state'ini gosterir.
@@ -96,7 +96,7 @@ tek profil iterasyonuyla, KOD YAZMADAN tasindi).
    - **Run Bot**: profili canli uygular, RestartGame + Long Run Simulator'u baslatir
      (OpenAndStart koprusu). **Son Olcumu Ozetle**: en yeni CSV'den olum gunleri +
      ortalama + ulasilan en yuksek gun.
-   - **Spawn Runtime Contract**: secilen gun icin BaseSpawn quantity ve Night/Dusk-end
+   - **Spawn Runtime Contract**: secilen gun icin BaseSpawn quantity ve Night
      day-curve carpanlarini; profile-owned phase, MaxSpawnBatch ve MaxAlive baseline'larini
      tek panelde ozetler. Play Mode'da phase/day, alive/cap, exact Pending backlog,
      last/total demand-spawn ve effective interval telemetrisini canli gosterir.

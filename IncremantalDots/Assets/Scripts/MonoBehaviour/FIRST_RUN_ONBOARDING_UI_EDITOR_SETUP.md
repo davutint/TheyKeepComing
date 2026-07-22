@@ -23,7 +23,7 @@ scene setup tool tarafindan scene owner'ina eklenir ve isimle baglanir.
 - Heart pause hint: panel gercek oyuncu aksiyonuyla acikken top-center gorunur; pulse kapali,
   hint raycast kapali ve nested Canvas yalniz bu adimda `overrideSorting = true`,
   `sortingOrder = 260` kullanir (`CastleHeartPanel = 200`).
-- Council exact target: Day 3'te oyuncu secimine acilan `CouncilEventPanel` kartinin tamami;
+- Council exact target: Day 1 Dawn'da oyuncu secimine acilan `CouncilEventPanel` kartinin tamami;
   `OnboardingHintPanel` bottom-left `24,226` konumuna tasinir, iki option butonundan hicbiri
   ayricalikli pulse edilmez ve Council karti tutorial tarafindan acilmaz.
 - Daytime repair target: Day sirasinda yasayan Wall `%99,5` altina dustugunde
@@ -73,7 +73,7 @@ Idempotent iki-sahne onarimi icin `NewGameScene` aktifken
   Heart butonunu pulse etmeyi, panelin oyuncu aksiyonuyla acilmasini, full-pause hint'inin
   `Time.timeScale = 0` iken gorunmesini ve flag'in yalniz player close sonrasinda yazilmasini
   dogrular.
-- Council PlayMode testi regular Day 3 kartinin interaktif olduktan sonra tam kart pulse hedefi
+- Council PlayMode testi Day 1 Dawn'daki regular kartin interaktif olduktan sonra tam kart pulse hedefi
   olmasini, iki option metninin authoritative live exact quote'larla ayni kalmasini, tutorial'in
   secim yapmamasini ve `tutorial.v1.council` flag'inin yalniz basarili player button commit'inde
   yazilmasini dogrular.

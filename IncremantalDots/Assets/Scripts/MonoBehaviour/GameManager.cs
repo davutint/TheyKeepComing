@@ -102,7 +102,7 @@ namespace DeadWalls
         private bool _techDefenseBaselineCaptured;
         private float _baseWallMaxHp;
 
-        // Council event run-state. V1 yalniz exact 3/6/9... regular schedule'i kullanir.
+        // Council event run-state. Her Dawn'da exact bir regular kart acilir.
         private readonly Dictionary<string, int> _councilFlags = new Dictionary<string, int>();
         private readonly List<string> _recentCouncilTemplates = new List<string>();
         private readonly HashSet<string> _usedOneShotCouncils = new HashSet<string>();
@@ -2842,8 +2842,8 @@ namespace DeadWalls
             && councilCatalog.Atoms != null && councilCatalog.Atoms.Length > 0;
 
         /// <summary>
-        /// UI tarafindan Dawn kenarinda cagrilir. Yalniz Day 3,6,9,12... gunlerinde bir kez
-        /// regular kart acar. Chance/pity/cooldown yoktur; seed run icinde deterministiktir.
+        /// UI tarafindan Dawn kenarinda cagrilir. Her gun bir kez regular kart acar.
+        /// Chance/pity/cooldown yoktur; seed run icinde deterministiktir.
         /// </summary>
         public bool TryOpenRegularCouncilEvent()
         {
@@ -4086,7 +4086,7 @@ namespace DeadWalls
             cycle.CycleTimer = Mathf.Clamp(save.CycleTimer, 0f, Mathf.Max(0f, cycle.CycleDuration - 0.0001f));
             cycle.CycleProgress01 = Mathf.Clamp01(save.CycleProgress01);
             cycle.PhaseProgress01 = Mathf.Clamp01(save.PhaseProgress01);
-            cycle.SpawnIntensityMultiplier = Mathf.Max(0.01f, save.SpawnIntensityMultiplier);
+            cycle.SpawnIntensityMultiplier = Mathf.Max(0f, save.SpawnIntensityMultiplier);
             cycle.HordePressure01 = Mathf.Clamp01(save.HordePressure01);
             cycle.Phase = (SiegeCyclePhase)save.CyclePhase;
             cycle.IsBloodMoonNight = false;
@@ -4104,7 +4104,7 @@ namespace DeadWalls
                     LastSpawnedEnemies = Mathf.Max(0, save.LastBudgetSpawnedEnemies),
                     DayQuantityMultiplier = Mathf.Max(0.01f, save.DayQuantityMultiplier),
                     DayBaseSpawnInterval = Mathf.Max(0.001f, save.DayBaseSpawnInterval),
-                    PhaseIntensityMultiplier = Mathf.Max(0.01f, save.PhaseIntensityMultiplier),
+                    PhaseIntensityMultiplier = Mathf.Max(0f, save.PhaseIntensityMultiplier),
                     EffectiveSpawnInterval = Mathf.Max(0.001f, save.EffectiveSpawnInterval)
                 };
                 _entityManager.SetComponentData(mobileConfigEntity, spawnBudget);
@@ -6275,7 +6275,7 @@ namespace DeadWalls
                 cycle.NightDuration = Mathf.Max(0.1f, mobileConfig.SiegeNightDuration);
                 cycle.CycleProgress01 = 0f;
                 cycle.PhaseProgress01 = 0f;
-                cycle.SpawnIntensityMultiplier = Mathf.Max(0.01f, mobileConfig.SiegeDayIntensityMultiplier);
+                cycle.SpawnIntensityMultiplier = 0f;
                 cycle.HordePressure01 = 0f;
                 cycle.CycleIndex = 0;
                 cycle.Phase = SiegeCyclePhase.Day;
@@ -6294,9 +6294,9 @@ namespace DeadWalls
                     LastSpawnedEnemies = 0,
                     DayQuantityMultiplier = 1f,
                     DayBaseSpawnInterval = Mathf.Max(mobileConfig.MinSpawnInterval, mobileConfig.BaseSpawnInterval),
-                    PhaseIntensityMultiplier = Mathf.Max(0.01f, mobileConfig.SiegeDayIntensityMultiplier),
+                    PhaseIntensityMultiplier = 0f,
                     EffectiveSpawnInterval = Mathf.Max(mobileConfig.MinSpawnInterval,
-                        mobileConfig.BaseSpawnInterval / Mathf.Max(0.01f, mobileConfig.SiegeDayIntensityMultiplier))
+                        mobileConfig.BaseSpawnInterval)
                 };
                 _entityManager.SetComponentData(mobileConfigEntity, spawnBudget);
                 ContinuousSpawnBudget = spawnBudget;

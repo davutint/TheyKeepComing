@@ -26,8 +26,7 @@ Deger adi ezberleme — asagidaki tablodan hissini bul, hangi ayara dokunacagini
 | "Her Dawn cok az / cok fazla insan geliyor" | Population Runtime Contract > **PopulationGrowthPerDayPrep** | Istenen survivor sayisini ARTIR / DUSUR; gercek kabul yatak ve Food ile sinirlanir |
 | "Yeni nufus Food'u cok hizli / cok yavas eritiyor" | **FoodCostPerArrival** | Yalniz kabul edilen her survivor icin tek seferlik maliyeti ayarla |
 | "Yataklar cok ucuz / cok cabuk ulasilmaz oluyor" | **BedBaseWoodCost** ve **BedCostGrowthCapacityInterval** | Ilk fiyati veya quadratic egrinin buyume hizini ayarla |
-| "Gunduz cok sakin / cok yogun" | Faz Yogunluklari > **DayIntensity** | 0.55 taban; artir/azalt |
-| "Gece yeterince korkutucu degil" | **NightIntensity** | ARTIR (1.65 taban) |
+| "Gece yeterince kalabalik degil / fazla yogun" | Faz Yogunluklari > **NightIntensity** | ARTIR / DUSUR; saldiri talebi yalniz Night'ta uretilir |
 | "Belirli bir GUN cok sert/yumusak" | Ilgili egriye o gune keyframe ekle | Egri = gun bazli ince ayar |
 | "Okcular zayif / fazla guclu" | Archer Runtime Contract > ilgili definition **Damage / FireRate / Range** | Base combat'i ayarla; Heart/Tech/Meta katmanlari bunun ustune biner |
 | "Yeni okcu veya retrain cok ucuz / pahali" | Ilgili definition **BuyCost / RetrainCost / GrowthInterval / GrowthExponent** | Base maliyeti veya hedef-tur sayisiyla buyume egrisini ayarla |
@@ -53,7 +52,7 @@ Deger adi ezberleme — asagidaki tablodan hissini bul, hangi ayara dokunacagini
 - Ornek (su anki default Gece Siddeti): `(gun1, 0.60) (gun3, 0.75) (gun5, 0.86) (gun7, 0.95)`
   -> ilk gecede gercek risk verir, Day 7 sonrasinda ise night temposunu `0.95`te tutarak
   guclu run'larin tek bir sert esige yigilmasini azaltir.
-- Iki aktif spawn egrisi var: **Gece Siddeti** (Night/Dusk-end temposu) ve
+- Iki aktif spawn egrisi var: **Gece Siddeti** (Night temposu) ve
   **Spawn Batch** (gunun quantity carpani). **Zombi HP** egrisi V1 quantity-only runtime'da
   dormant legacy alandir; oyunu degistirmez.
 
@@ -72,8 +71,11 @@ Deger adi ezberleme — asagidaki tablodan hissini bul, hangi ayara dokunacagini
 | BaseSpawnInterval / MinSpawnInterval | Dogumlar arasi sure (taban / taban asagi kirpma) | 0.95 / 0.35 | - |
 
 ### Faz Yogunluklari (gunun ritmi)
-DAY 0.55 -> DUSK 1.0->1.35 -> NIGHT 1.65 -> DAWN 0.15. Buyuk sayi = sik dogum.
-Gece Siddeti EGRISI bu degerlerin USTUNE gun carpani olarak biner (Night ve Dusk-sonu).
+Continuous runtime'da DAY `0` -> DUSK `0` -> NIGHT `1.65` -> DAWN `0` uygulanir. Yeni dusman
+talebi yalniz Night'ta uretilir. Timed Night bittiginde yeni talep durur; pending backlog ve
+yasayan dusmanlar sifirlanana kadar Night clearance devam eder. Day/Dusk/Dawn intensity alanlari
+legacy uyumluluk icin asset'te korunur. Gece Siddeti EGRISI Night degerinin ustune gun carpani
+olarak biner.
 
 ### Wall Defense
 
@@ -139,7 +141,7 @@ Difficulty Tuner ayni alanlari ve beklenen ortalama oldurme/drop cadence'ini gos
 
 ### Council Runtime Contract
 
-Council takvimi tune edilmez: regular kart yalniz Dawn'da Day `3/6/9...` gunlerinde bir kez
+Council takvimi tune edilmez: regular kart Day 1'den itibaren her Dawn'da tam bir kez
 acilir; Emergency Council yoktur. Production `CouncilEventCatalogSO` icindeki Small/Fair/Generous
 multiplier ve weight alanlari sonuclarin olcegini/dagilimini, Budget Tolerance A/B dengeleme esigini,
 `RecentTemplateMemory` ise hard anti-tekrar penceresini belirler. Varsayilanlar mevcut davranisi

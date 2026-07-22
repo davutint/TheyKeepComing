@@ -110,7 +110,7 @@ namespace DeadWalls
         public CouncilEffectBandSettings EffectBands = new CouncilEffectBandSettings();
 
         // v10 ve daha eski authored asset uyumlulugu icin serialized tutulur. V1 Council
-        // schedule'i bunlari kullanmaz; exact 3/6/9 takviminin tek owner'i
+        // schedule'i bunlari kullanmaz; exact daily takvimin tek owner'i
         // CouncilRegularSchedule'dir.
         [HideInInspector]
         [Range(0f, 1f)] public float DailyEventChance = 0.30f;

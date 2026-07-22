@@ -2569,6 +2569,24 @@ namespace DeadWalls.Tests
             Assert.That(atmosphere.CurrentEmissionRate,
                 Is.EqualTo(atmosphere.NightEmissionRate).Within(0.01f));
 
+            // Dawn artik yalniz Night backlog'u ve yasayan horde tamamen temizlendikten sonra
+            // legaldir. Bu presentation testi combat'i degil phase gecis gorselini izole eder.
+            using (EntityQuery poolQuery = entityManager.CreateEntityQuery(typeof(EnemyPoolRuntimeData)))
+            {
+                EnemyPoolRuntimeUtility.ReturnAllActive(entityManager, poolQuery.GetSingletonEntity());
+            }
+            using (EntityQuery waveQuery = entityManager.CreateEntityQuery(typeof(WaveStateData)))
+            {
+                Entity waveEntity = waveQuery.GetSingletonEntity();
+                WaveStateData wave = entityManager.GetComponentData<WaveStateData>(waveEntity);
+                wave.ZombiesAlive = 0;
+                entityManager.SetComponentData(waveEntity, wave);
+            }
+            ContinuousSpawnBudgetData budget =
+                entityManager.GetComponentData<ContinuousSpawnBudgetData>(cycleEntity);
+            budget.PendingEnemies = 0L;
+            entityManager.SetComponentData(cycleEntity, budget);
+
             SetOnboardingCycle(
                 entityManager,
                 cycleEntity,

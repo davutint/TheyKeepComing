@@ -69,5 +69,48 @@ namespace DeadWalls.Tests
                 maxAliveZombies: 100,
                 maxDrainPerFrame: 16), Is.EqualTo(16));
         }
+
+        [Test]
+        public void NightClearance_HoldsForEitherBacklogOrLivingEnemy()
+        {
+            const float nightEnd = 55f;
+
+            Assert.That(ContinuousSpawnBudgetUtility.ShouldHoldAtNightEnd(
+                SiegeCyclePhase.Night, 55f, nightEnd, 1L, 0), Is.True);
+            Assert.That(ContinuousSpawnBudgetUtility.ShouldHoldAtNightEnd(
+                SiegeCyclePhase.Night, 58f, nightEnd, 0L, 1), Is.True);
+            Assert.That(ContinuousSpawnBudgetUtility.ShouldHoldAtNightEnd(
+                SiegeCyclePhase.Night, 58f, nightEnd, 0L, 0), Is.False);
+            Assert.That(ContinuousSpawnBudgetUtility.ShouldHoldAtNightEnd(
+                SiegeCyclePhase.Day, 2f, nightEnd, 3L, 0), Is.True,
+                "Legacy non-night backlog Night clearance'a alinmali.");
+        }
+
+        [Test]
+        public void SpawnDemand_IsGeneratedOnlyDuringTimedNight_ButClearanceCanDrain()
+        {
+            var day = new ContinuousSiegeCycleData
+            {
+                Enabled = true,
+                Phase = SiegeCyclePhase.Day,
+                PhaseProgress01 = 0.5f,
+                SpawnIntensityMultiplier = 0f
+            };
+            var night = day;
+            night.Phase = SiegeCyclePhase.Night;
+            night.PhaseProgress01 = 0.5f;
+            night.SpawnIntensityMultiplier = 1f;
+            var clearance = night;
+            clearance.PhaseProgress01 = 1f;
+            clearance.SpawnIntensityMultiplier = 0f;
+
+            Assert.That(ContinuousSpawnBudgetUtility.CanGenerateDemand(day), Is.False);
+            Assert.That(ContinuousSpawnBudgetUtility.CanDrainPending(day), Is.False);
+            Assert.That(ContinuousSpawnBudgetUtility.CanGenerateDemand(night), Is.True);
+            Assert.That(ContinuousSpawnBudgetUtility.CanDrainPending(night), Is.True);
+            Assert.That(ContinuousSpawnBudgetUtility.CanGenerateDemand(clearance), Is.False);
+            Assert.That(ContinuousSpawnBudgetUtility.CanDrainPending(clearance), Is.True);
+            Assert.That(ContinuousSpawnBudgetUtility.IsNightClearance(clearance), Is.True);
+        }
     }
 }

@@ -37,10 +37,10 @@
   Small/Fair/Generous multiplier ve weight'leri, A/B budget tolerance ile recent memory'yi dogrudan
   duzenler. Varsayilan `0.7/1.0/1.4`, `%35/%50/%15`, `1.25`, memory `3` mevcut davranisi korur.
   Weight toplam sifir, multiplier sirasi gecersiz veya tolerance `<1` olursa catalog fail-closed'dur.
-  Regular takvim asset-tunable degildir: `CouncilRegularSchedule` sabit Day `3,6,9,12...`
-  owner'idir.
-- Launch staging sabittir: Day 3 temel ekonomi; Day 6 population/savunma; Day 9 gece riski.
-  `MinDay=1/2` verip tum karmasik event'leri ilk Council'a yigmak production testini bozar.
+  Regular takvim asset-tunable degildir: `CouncilRegularSchedule` her gun Dawn'da tam bir kez
+  acilan regular kartin owner'idir.
+- Day 1 temel ekonomi sablonlariyla baslar. Diger sablonlarin mevcut `MinDay`, flag ve chain
+  kosullari korunur; butun karmasik event'leri ilk Council'a yigmak production testini bozar.
 - Legacy `DailyEventChance/PityDays/CooldownDays` serialized uyumluluk icin saklanir ve
   Inspector'da gizlidir; regular Council'i etkilemez.
 - `ValidateCatalog`, yalniz Id/ref kontrolu yapmaz: atom kind'inin Council-owned allowlist'te
@@ -49,8 +49,8 @@
 
 ## Test Adimlari
 
-1. Play'e gir; Day 1 ve Day 2 Dawn'da kart acilmadigini, Day 3 Dawn'da kartin kesin
-   acildigini kontrol et. Ayni duzen Day 6/9/12'de devam eder.
+1. Play'e gir; Day 1 Dawn'dan baslayarak her gun kartin kesin acildigini ve ayni Dawn'da ikinci
+   kez acilmadigini kontrol et.
 2. Kart sol-alt bolgede belirir (odul toast'undan ~1.2s sonra); sure seridi ve `DECIDE Ns`
    sayaci kalan Dawn+Day penceresini gosterir; DUSK girisinde secilmediyse kaybolur.
    Tuner'da decision window read-only olarak `SiegeDawnDuration + SiegeDayDuration` gorunmelidir;

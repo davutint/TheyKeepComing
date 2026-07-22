@@ -254,10 +254,13 @@ namespace DeadWalls
             wave.PrepDuration = 0f;
             wave.WaveStartTimer = 0f;
 
-            float phaseIntensity = math.max(0.01f, cycle.SpawnIntensityMultiplier);
+            bool canGenerateDemand = ContinuousSpawnBudgetUtility.CanGenerateDemand(cycle);
+            float phaseIntensity = canGenerateDemand
+                ? math.max(0.01f, cycle.SpawnIntensityMultiplier)
+                : 0f;
 
             // Council risk atomu: "sonraki gece" carpani yalniz NIGHT fazinda uygulanir
-            if (cycle.Phase == SiegeCyclePhase.Night
+            if (canGenerateDemand
                 && SystemAPI.HasSingleton<MobileEconomyEventState>())
             {
                 float nightMult = SystemAPI.GetSingleton<MobileEconomyEventState>().NextNightSpawnMultiplier;
@@ -278,15 +281,19 @@ namespace DeadWalls
             float dayBaseInterval = wave.SpawnInterval > 0f
                 ? wave.SpawnInterval
                 : math.max(mobileConfig.MinSpawnInterval, mobileConfig.BaseSpawnInterval);
-            float effectiveInterval = ContinuousSpawnBudgetUtility.ResolveEffectiveInterval(
-                dayBaseInterval, phaseIntensity, mobileConfig.MinSpawnInterval);
-            int demandPerInterval = ContinuousSpawnBudgetUtility.ResolveDemandPerInterval(
-                mobileConfig.SpawnBatchSize,
-                mobileConfig.SpawnBatchGrowthPerCycle,
-                wave.CurrentWave,
-                dayQuantityMultiplier,
-                phaseIntensity,
-                mobileConfig.MaxSpawnBatch);
+            float effectiveInterval = canGenerateDemand
+                ? ContinuousSpawnBudgetUtility.ResolveEffectiveInterval(
+                    dayBaseInterval, phaseIntensity, mobileConfig.MinSpawnInterval)
+                : dayBaseInterval;
+            int demandPerInterval = canGenerateDemand
+                ? ContinuousSpawnBudgetUtility.ResolveDemandPerInterval(
+                    mobileConfig.SpawnBatchSize,
+                    mobileConfig.SpawnBatchGrowthPerCycle,
+                    wave.CurrentWave,
+                    dayQuantityMultiplier,
+                    phaseIntensity,
+                    mobileConfig.MaxSpawnBatch)
+                : 0;
 
             budget.DayQuantityMultiplier = dayQuantityMultiplier;
             budget.DayBaseSpawnInterval = dayBaseInterval;
@@ -296,21 +303,29 @@ namespace DeadWalls
             budget.LastDemandedEnemies = 0;
             budget.LastSpawnedEnemies = 0;
 
-            wave.SpawnTimer -= dt;
-            int elapsedIntervals = ContinuousSpawnBudgetUtility.CountElapsedIntervals(
-                wave.SpawnTimer, effectiveInterval);
-            if (elapsedIntervals > 0)
+            if (canGenerateDemand)
             {
-                long pendingBefore = budget.PendingEnemies;
-                budget.PendingEnemies = ContinuousSpawnBudgetUtility.AddDemand(
-                    budget.PendingEnemies, demandPerInterval, elapsedIntervals);
-                long demanded = budget.PendingEnemies - math.max(0L, pendingBefore);
-                budget.LastDemandedEnemies = (int)math.min(int.MaxValue, demanded);
-                budget.TotalDemandedEnemies = ContinuousSpawnBudgetUtility.AddTelemetry(
-                    budget.TotalDemandedEnemies, demanded);
-                wave.SpawnTimer = ContinuousSpawnBudgetUtility.AdvanceTimer(
-                    wave.SpawnTimer, effectiveInterval, elapsedIntervals);
+                wave.SpawnTimer -= dt;
+                int elapsedIntervals = ContinuousSpawnBudgetUtility.CountElapsedIntervals(
+                    wave.SpawnTimer, effectiveInterval);
+                if (elapsedIntervals > 0)
+                {
+                    long pendingBefore = budget.PendingEnemies;
+                    budget.PendingEnemies = ContinuousSpawnBudgetUtility.AddDemand(
+                        budget.PendingEnemies, demandPerInterval, elapsedIntervals);
+                    long demanded = budget.PendingEnemies - math.max(0L, pendingBefore);
+                    budget.LastDemandedEnemies = (int)math.min(int.MaxValue, demanded);
+                    budget.TotalDemandedEnemies = ContinuousSpawnBudgetUtility.AddTelemetry(
+                        budget.TotalDemandedEnemies, demanded);
+                    wave.SpawnTimer = ContinuousSpawnBudgetUtility.AdvanceTimer(
+                        wave.SpawnTimer, effectiveInterval, elapsedIntervals);
+                }
             }
+
+            // Day/Dusk/Dawn'da backlog sahaya akmaz. Night timer'i dolduktan sonraki
+            // clearance penceresi ise ayni gecenin onceden talep edilmis dusmanlarini drain eder.
+            if (!ContinuousSpawnBudgetUtility.CanDrainPending(cycle))
+                return;
 
             int maxDrainPerFrame = mobileConfig.MaxSpawnBatch > 0
                 ? mobileConfig.MaxSpawnBatch

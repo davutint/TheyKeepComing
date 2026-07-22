@@ -2,11 +2,11 @@
 
 > **Amaç:** V1 kapsamı tamamlandıktan sonra yapılacak mantık düzeltmelerini, oyuncuya görünen geri bildirimleri, UI/UX yeniden çalışmalarını, polish işlerini ve performans optimizasyonlarını tek otoriter takip belgesinde yürütmek.
 >
-> **Tracker sürümü:** 1.3
+> **Tracker sürümü:** 1.4
 > **Oluşturulma tarihi:** 2026-07-18
-> **Aktif paket:** Post-V1 takip paketi tamamlandı
+> **Aktif paket:** `DW-P11-NIGHT-RHYTHM` tamamlandı
 > **Aktif iş:** Açık ana görev yok; yeni kapsam owner kararıyla ayrı paket olarak açılacak
-> **İlerleme:** `10 / 10` ana görev tamamlandı - `%100`
+> **İlerleme:** `11 / 11` ana görev tamamlandı - `%100`
 
 ---
 
@@ -36,7 +36,7 @@ Bu belge, tamamlanmış V1 tracker'ından sonraki geliştirme döneminin aktif t
 
 ### İlerleme hesabı
 
-İlerleme, Bölüm 3'teki 10 ana görev üzerinden hesaplanır. Alt maddeler kanıt ve kabul kapsamını gösterir; ayrıca paydayı büyütmez. Ana görevler yalnızca bütün zorunlu alt kapıları tamamlandığında kapanır.
+İlerleme, Bölüm 3'teki 11 ana görev üzerinden hesaplanır. Alt maddeler kanıt ve kabul kapsamını gösterir; ayrıca paydayı büyütmez. Ana görevler yalnızca bütün zorunlu alt kapıları tamamlandığında kapanır. Owner onaylı `DW-P11-NIGHT-RHYTHM` yeni kapsamı nedeniyle payda `10 -> 11` değişmiştir.
 
 ---
 
@@ -70,6 +70,15 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - Benzer oyun ve UI/UX araştırması şimdi değil, P3 aktif olduğunda yapılacaktır.
 - Henüz konuşulmamış layout, kontrol modeli, stil, animasyon ve efekt kararları bu belgede kesinleştirilmiş sayılmaz.
 
+### Gece saldırısı ve günlük Council ritmi
+
+- Düşman saldırısı ve yeni spawn talebi yalnız Night fazında gerçekleşir.
+- Timed Night bittiğinde pending backlog veya yaşayan düşman varsa cycle Dawn'a geçmez.
+- Clearance sırasında yeni talep üretilmez; mevcut Night backlog'u sahaya akmaya devam eder.
+- Dawn yalnız `PendingEnemies == 0` ve `ZombiesAlive == 0` birlikte sağlandığında başlar.
+- Her günün Dawn başlangıcında mevcut Council sistemiyle tam bir regular kart açılır; aynı gün ikinci kez açılmaz.
+- İlk günlük kart Day 1'de desteklenir; event içeriği mevcut deterministic composer, context, flag, chain ve exact effect sahipliğini korur.
+
 ---
 
 ## 3. Ana Görev Sırası
@@ -86,6 +95,7 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 | 8 | `DW-P8-UI-POLISH` | Genel UI efektleri, animasyonları ve etkileşim polish'i | `[x]` | Durum odaklı hareket, input uyarlaması, feedback katmanları ve modal tutarlılığı doğrulandı |
 | 9 | `DW-P9-PERFORMANCE` | Performans profilleme ve optimizasyon | `[x]` | Player zombie-limit ayarı, yoğun feedback batching/pooling ve 10K + 1K yeniden ölçümü tamamlandı |
 | 10 | `DW-P10-FINAL-GATE` | Son kalite, tutarlılık ve regresyon kapısı | `[x]` | Bütün aktif kapsam birlikte test edildi; açık kritik hata ve doğrulanmamış ana görev kalmadı |
+| 11 | `DW-P11-NIGHT-RHYTHM` | Night-only saldırı, clear gate ve günlük Council ritmi | `[x]` | Night spawn/clearance, günlük event, HUD, exact Continue ve tam regresyon doğrulandı |
 
 ---
 
@@ -247,6 +257,21 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - [x] Temiz production boot Console'da `0 error` verdi; player-facing geçici placeholder veya ikinci teknoloji ağacı yüzeyi bulunmadı, aktif teknoloji sahipliği Castle Heart altında tek kaldı.
 - [x] Target-hardware profiler sertifikası yalnız Windows Player ortamını kabul edecek şekilde korumaya alındı; mevcut `1920x1080 / Ultra` WindowsPlayer raporları final kabul kanıtı olarak korundu.
 - [x] Son kapsam diff'i incelendi ve `git diff --check` temiz geçti.
+
+### `DW-P11-NIGHT-RHYTHM` - Night-Only Assault + Clear Gate + Daily Council
+
+**Paket başlığı:** `DW-P11-NIGHT-RHYTHM: Night-Only Assault + Clear Gate + Daily Council`
+**Durum:** `[x]` Uygulandı, exact save/Continue ve tam regresyonla doğrulandı.
+
+- [x] Day, Dusk ve Dawn yeni düşman talebi üretmez; Night timed bölümü mevcut quantity/intensity sistemini kullanır.
+- [x] Timed Night bitince yeni talep durur; pending Night backlog'u clearance sırasında kapasite açıldıkça sahaya aktarılır.
+- [x] `PendingEnemies` veya `ZombiesAlive` sıfırdan büyükken cycle Night sonunda tutulur; ikisi de sıfır olduğunda Dawn'a geçer.
+- [x] UI Toolkit HUD clearance sırasında normal `NIGHT SIEGE` başlığını korur; `N LEFT` ve `CLEAR THE REMAINING HORDE` ile temizlenme durumunu gösterir.
+- [x] Regular Council Day 1'den başlayarak her Dawn'da tam bir kez açılır; chance/pity/cooldown ve Emergency Council yolu eklenmedi.
+- [x] Day 1 için temel ekonomi template'leri eligible oldu; diğer template'lerin `MinDay`, flag, curated chain ve deterministic composer kuralları korundu.
+- [x] Exact save/Continue, clearance anındaki sıfır intensity'yi ve pending backlog'u değiştirmeden geri yükler.
+- [x] Targeted EditMode `63/63`, targeted PlayMode `10/10`, full EditMode `447/447`, full PlayMode `96 pass + 2 explicit skip / 0 fail` geçti.
+- [x] `NewGameScene` validation `0` issue, final Unity Console `0 error / 0 warning` ve `git diff --check` temiz geçti.
 
 ---
 
@@ -472,3 +497,24 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
   `5/5` gecti; death-SFX yoklugu ile iki currency'nin varis aninda ses uretmesi canli test edildi.
 - Bu post-closure audio polish calismasi ana gorev paydasini degistirmez; Post-V1 tracker
   `10/10 - %100` tamamlanmis olarak korunur.
+
+### 2026-07-22 - Night-only saldırı, clear gate ve günlük Council
+
+- Owner kararıyla saldırı ritmi Night-only yapıldı. Day/Dusk/Dawn intensity'si runtime'da sıfır;
+  spawn demand ve backlog drain yalnız Night sözleşmesinde çalışır.
+- Timed Night sonuna Night clearance kapısı eklendi. Yeni demand durur; pending backlog
+  sahaya akıp son yaşayan düşman öldükten sonra Dawn başlar.
+- Council occurrence Day 1'den itibaren her Dawn'da tam bir kez olacak şekilde mevcut regular
+  schedule owner'ında değiştirildi. Mevcut composer, UI, effect, flag, chain ve save sahipliği korundu.
+- Day 1 temel event havuzu production catalog testleriyle kilitlendi; her gün için en az bir valid
+  kart olduğu Day 1-30 ve çoklu seed örnekleminde doğrulandı.
+- Clearance HUD copy'si ve exact save/Continue için ayrı regression testleri eklendi.
+- Targeted EditMode `63/63`, targeted PlayMode `10/10`, full EditMode `447/447`, full PlayMode
+  `96 pass + 2 explicit skip / 0 fail` geçti. `NewGameScene` validation `0` issue, final Console
+  `0 error / 0 warning` ve `git diff --check` temizdir.
+- Owner onaylı yeni ana görev eklendiği için tracker paydası `10 -> 11` değişti;
+  `DW-P11-NIGHT-RHYTHM` kapanışıyla Post-V1 ilerleme `11/11 - %100` oldu.
+- Owner görsel kontrolü sonrası clearance faz başlığındaki `LAST STAND` kaldırıldı; başlık normal
+  `NIGHT SIEGE` olarak kalırken `N LEFT` sayacı ve temizleme mesajı korundu.
+- Güncel HUD kontratı targeted EditMode `12/12`, Unity Console `0 error` ve `git diff --check`
+  ile doğrulandı; tracker paydası değişmedi.

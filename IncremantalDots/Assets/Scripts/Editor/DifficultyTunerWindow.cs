@@ -299,7 +299,7 @@ namespace DeadWalls
 
         private void DrawIntensitySection()
         {
-            _foldIntensity = DrawSectionHeader(_foldIntensity, "Faz Yogunluklari", "DAY / DUSK / NIGHT / DAWN");
+            _foldIntensity = DrawSectionHeader(_foldIntensity, "Faz Yogunluklari", "NIGHT attack / legacy non-Night fields");
             if (!_foldIntensity)
                 return;
 
@@ -310,6 +310,10 @@ namespace DeadWalls
                 DrawProp("DuskEndIntensity");
                 DrawProp("NightIntensity");
                 DrawProp("DawnIntensity");
+                EditorGUILayout.HelpBox(
+                    "Continuous runtime yalniz NIGHT intensity ile yeni dusman talebi uretir. "
+                    + "DAY / DUSK / DAWN intensity alanlari legacy uyumluluk icin korunur.",
+                    MessageType.None);
             }
         }
 
@@ -330,18 +334,19 @@ namespace DeadWalls
                     _profile, _spawnPreviewDay);
                 EditorGUILayout.LabelField("BaseSpawn day curve",
                     $"x{sample.SpawnBatchMult:0.###} quantity");
-                EditorGUILayout.LabelField("Night/Dusk-end day curve",
+                EditorGUILayout.LabelField("Night day curve",
                     $"x{sample.NightIntensityMult:0.###} intensity");
-                EditorGUILayout.LabelField("Phase multipliers",
-                    $"DAY x{_profile.DayIntensity:0.###}  |  DUSK x{_profile.DuskStartIntensity:0.###}->x{_profile.DuskEndIntensity:0.###}  |  NIGHT x{_profile.NightIntensity:0.###}  |  DAWN x{_profile.DawnIntensity:0.###}");
+                EditorGUILayout.LabelField("Phase multipliers (continuous)",
+                    $"DAY x0  |  DUSK x0  |  NIGHT x{_profile.NightIntensity:0.###}  |  DAWN x0");
                 EditorGUILayout.LabelField("Demand / drain",
                     $"batch {_profile.SpawnBatchSize}, cycle +{_profile.SpawnBatchGrowthPerCycle:P0}, max {_profile.MaxSpawnBatch}/frame");
                 EditorGUILayout.LabelField("Active cap", _profile.MaxAliveZombies.ToString("N0"));
 
                 EditorGUILayout.HelpBox(
-                    "Backlog bir designer secenegi degildir: V1 PreserveDemand politikasi cap "
-                    + "doluyken talebi PendingEnemies icinde exact korur. MaxAliveZombies sahadaki "
-                    + "active tavani, MaxSpawnBatch ise kapasite acilinca frame basina drain tavanidir.",
+                    "Backlog bir designer secenegi degildir: Night'ta cap doluyken talep "
+                    + "PendingEnemies icinde exact korunur. Timed Night bittikten sonra yeni talep "
+                    + "uretilmez; backlog ve yasayan horde sifirlanana kadar Night clearance surer. "
+                    + "MaxAliveZombies active tavani, MaxSpawnBatch frame basi drain tavanidir.",
                     MessageType.Info);
 
                 DrawSpawnRuntimeTelemetry();
@@ -746,7 +751,7 @@ namespace DeadWalls
                 }
 
                 EditorGUILayout.HelpBox(
-                    "V1 takvimi sabittir: regular Council yalniz Dawn'da Day 3/6/9... gunlerinde bir kez acilir. "
+                    "Takvim sabittir: regular Council Day 1'den itibaren her Dawn'da tam bir kez acilir. "
                     + "Emergency Council yoktur; legacy chance, pity ve cooldown alanlari runtime'da dormantdadir.",
                     MessageType.None);
 

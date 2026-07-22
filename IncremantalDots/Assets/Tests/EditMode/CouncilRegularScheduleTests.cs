@@ -1,3 +1,4 @@
+using System.Linq;
 using NUnit.Framework;
 
 namespace DeadWalls.Tests
@@ -6,17 +7,17 @@ namespace DeadWalls.Tests
     {
         [TestCase(-3, false)]
         [TestCase(0, false)]
-        [TestCase(1, false)]
-        [TestCase(2, false)]
+        [TestCase(1, true)]
+        [TestCase(2, true)]
         [TestCase(3, true)]
-        [TestCase(4, false)]
-        [TestCase(5, false)]
+        [TestCase(4, true)]
+        [TestCase(5, true)]
         [TestCase(6, true)]
         [TestCase(9, true)]
         [TestCase(12, true)]
         [TestCase(99, true)]
-        [TestCase(100, false)]
-        public void IsRegularDay_OnlyMatchesExactThreeDayCadence(int day, bool expected)
+        [TestCase(100, true)]
+        public void IsRegularDay_MatchesEveryPositiveDay(int day, bool expected)
         {
             Assert.That(CouncilRegularSchedule.IsRegularDay(day), Is.EqualTo(expected));
         }
@@ -27,7 +28,7 @@ namespace DeadWalls.Tests
             Assert.That(CouncilRegularSchedule.ShouldOpen(6, -1, SiegeCyclePhase.Dawn), Is.True);
             Assert.That(CouncilRegularSchedule.ShouldOpen(6, 3, SiegeCyclePhase.Dawn), Is.True);
             Assert.That(CouncilRegularSchedule.ShouldOpen(6, 6, SiegeCyclePhase.Dawn), Is.False);
-            Assert.That(CouncilRegularSchedule.ShouldOpen(7, 6, SiegeCyclePhase.Dawn), Is.False);
+            Assert.That(CouncilRegularSchedule.ShouldOpen(7, 6, SiegeCyclePhase.Dawn), Is.True);
         }
 
         [TestCase(SiegeCyclePhase.Day)]
@@ -39,9 +40,9 @@ namespace DeadWalls.Tests
         }
 
         [Test]
-        public void FirstThirtyDays_ProduceOnlyThreeSixNineCadence()
+        public void FirstThirtyDays_ProduceOneMeetingPerDay()
         {
-            int[] expected = { 3, 6, 9, 12, 15, 18, 21, 24, 27, 30 };
+            int[] expected = System.Linq.Enumerable.Range(1, 30).ToArray();
             var actual = new System.Collections.Generic.List<int>();
 
             for (int day = 1; day <= 30; day++)
@@ -81,7 +82,7 @@ namespace DeadWalls.Tests
         }
 
         [Test]
-        public void LegacyMigration_UnscheduledRollNeverMovesRegularIndex()
+        public void LegacyMigration_ProvenEventOnAnyPositiveDayPreservesHandledIndex()
         {
             int migrated = CouncilRegularSchedule.MigrateLegacyHandledDay(
                 currentDay: 5,
@@ -89,7 +90,7 @@ namespace DeadWalls.Tests
                 legacyDaysSinceEvent: 0,
                 hasActiveEvent: true);
 
-            Assert.That(migrated, Is.EqualTo(-1));
+            Assert.That(migrated, Is.EqualTo(5));
         }
     }
 }

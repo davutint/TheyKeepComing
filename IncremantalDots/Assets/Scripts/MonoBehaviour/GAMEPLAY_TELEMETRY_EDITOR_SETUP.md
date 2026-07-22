@@ -33,7 +33,7 @@ sinifinin parcasidir; `GameplayTelemetry.cs` ayni `DeadWalls` runtime assembly's
     cost ile yeni reveal edilen child sayisini vermelidir.
 15. Ayni non-repeatable node tekrar alindiginda veya hidden/locked/yetersiz Essence node denendiginde
     yeni `heart_node_bought` kaydi gelmemelidir.
-16. Day `3/6/9...` regular Council'da Option A veya B secilir; Console'daki `council_resolved`
+16. Day 1'den itibaren her Dawn'daki regular Council'da Option A veya B secilir; Console'daki `council_resolved`
     kaydi exact day/template, `option_a/option_b`, concrete effect listesi ve guardlanmis
     `NextNightDelta` degerini vermelidir.
 17. Regular Council Dusk'a secilmeden tasinir; tek `expired` kaydi gelmeli, `Effects` bos ve

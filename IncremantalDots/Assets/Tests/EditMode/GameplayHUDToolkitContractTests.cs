@@ -177,6 +177,30 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void NightClearance_KeepsNightSiegeTitleAndShowsClearanceMessage()
+        {
+            MethodInfo phaseName = typeof(GameplayHUDToolkitUI).GetMethod(
+                "GetPhaseDisplayName", BindingFlags.NonPublic | BindingFlags.Static);
+            MethodInfo phaseMessage = typeof(GameplayHUDToolkitUI).GetMethod(
+                "GetPhaseMessage", BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(phaseName, Is.Not.Null);
+            Assert.That(phaseMessage, Is.Not.Null);
+
+            var clearance = new ContinuousSiegeCycleData
+            {
+                Enabled = true,
+                Phase = SiegeCyclePhase.Night,
+                PhaseProgress01 = 1f,
+                SpawnIntensityMultiplier = 0f
+            };
+
+            Assert.That(phaseName.Invoke(null, new object[] { clearance }),
+                Is.EqualTo("NIGHT SIEGE"));
+            Assert.That(phaseMessage.Invoke(null, new object[] { clearance }),
+                Is.EqualTo("CLEAR THE REMAINING HORDE"));
+        }
+
+        [Test]
         public void MainMenu_RemainsMinimalWhileSettingsUseApprovedSemanticIcons()
         {
             VisualTreeAsset asset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(MainMenuPath);

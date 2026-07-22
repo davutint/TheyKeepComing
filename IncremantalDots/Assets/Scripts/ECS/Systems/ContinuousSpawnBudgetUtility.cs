@@ -7,6 +7,47 @@ namespace DeadWalls
     /// </summary>
     public static class ContinuousSpawnBudgetUtility
     {
+        public static bool HasNightEnemiesRemaining(long pendingEnemies, int zombiesAlive)
+        {
+            return pendingEnemies > 0L || zombiesAlive > 0;
+        }
+
+        public static bool ShouldHoldAtNightEnd(
+            SiegeCyclePhase previousPhase,
+            float timer,
+            float nightEnd,
+            long pendingEnemies,
+            int zombiesAlive)
+        {
+            if (!HasNightEnemiesRemaining(pendingEnemies, zombiesAlive))
+                return false;
+
+            // Eski continuous-save'lerde Day/Dusk/Dawn sirasinda canli veya backlog dusman
+            // bulunabilir. Yeni night-only sozlesmesinde bunlar gunduz savasamaz; ilk frame'de
+            // ayni dusmanlari kaybetmeden Night clearance kapisina tasinir.
+            return previousPhase != SiegeCyclePhase.Night || timer >= nightEnd;
+        }
+
+        public static bool CanGenerateDemand(ContinuousSiegeCycleData cycle)
+        {
+            return cycle.Phase == SiegeCyclePhase.Night
+                && cycle.SpawnIntensityMultiplier > 0f
+                && cycle.PhaseProgress01 < 1f;
+        }
+
+        public static bool CanDrainPending(ContinuousSiegeCycleData cycle)
+        {
+            return cycle.Phase == SiegeCyclePhase.Night;
+        }
+
+        public static bool IsNightClearance(ContinuousSiegeCycleData cycle)
+        {
+            return cycle.Enabled
+                && cycle.Phase == SiegeCyclePhase.Night
+                && cycle.PhaseProgress01 >= 0.999f
+                && cycle.SpawnIntensityMultiplier <= 0f;
+        }
+
         public static int ResolveDemandPerInterval(
             int baseBatch,
             float growthPerCycle,

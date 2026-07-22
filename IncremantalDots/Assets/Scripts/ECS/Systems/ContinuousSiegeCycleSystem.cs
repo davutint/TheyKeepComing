@@ -9,6 +9,8 @@ namespace DeadWalls
     [UpdateBefore(typeof(DayNightPrepSystem))]
     public partial struct ContinuousSiegeCycleSystem : ISystem
     {
+        private EntityQuery _difficultySampleQuery;
+
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
@@ -16,6 +18,9 @@ namespace DeadWalls
             state.RequireForUpdate<WaveStateData>();
             state.RequireForUpdate<MobileCastleCombatConfig>();
             state.RequireForUpdate<ContinuousSiegeCycleData>();
+            state.RequireForUpdate<ContinuousSpawnBudgetData>();
+            _difficultySampleQuery = state.GetEntityQuery(
+                ComponentType.ReadOnly<DifficultyDaySample>());
         }
 
         [BurstCompile]
@@ -25,6 +30,7 @@ namespace DeadWalls
             var wave = SystemAPI.GetSingletonRW<WaveStateData>();
             var config = SystemAPI.GetSingleton<MobileCastleCombatConfig>();
             var cycle = SystemAPI.GetSingletonRW<ContinuousSiegeCycleData>();
+            var budget = SystemAPI.GetSingleton<ContinuousSpawnBudgetData>();
 
             if (!cycle.ValueRO.Enabled || gameState.IsGameOver || gameState.IsLevelUpPending || wave.ValueRO.StressTestMode)
                 return;
@@ -45,11 +51,27 @@ namespace DeadWalls
             dawnDuration *= durationScale;
 
             float timer = cycle.ValueRO.CycleTimer + SystemAPI.Time.DeltaTime;
+            float nightEnd = dayDuration + duskDuration + nightDuration;
+            bool nightClearance = ContinuousSpawnBudgetUtility.ShouldHoldAtNightEnd(
+                cycle.ValueRO.Phase,
+                timer,
+                nightEnd,
+                budget.PendingEnemies,
+                wave.ValueRO.ZombiesAlive);
             int wrappedCycles = 0;
-            while (timer >= cycleDuration)
+            if (nightClearance)
             {
-                timer -= cycleDuration;
-                wrappedCycles++;
+                // Night suresi bitti; yeni demand uretilmez. Backlog sahaya akip son dusman
+                // olene kadar timer Dawn'a gecemez.
+                timer = nightEnd;
+            }
+            else
+            {
+                while (timer >= cycleDuration)
+                {
+                    timer -= cycleDuration;
+                    wrappedCycles++;
+                }
             }
 
             if (timer < 0f)
@@ -59,11 +81,15 @@ namespace DeadWalls
             // siddetini gunun orneklemiyle carpar. Buffer yok/bos = 1 (geriye uyumlu).
             int currentCycleIndex = math.max(0, cycle.ValueRO.CycleIndex);
             float dayNightMult = 1f;
-            if (SystemAPI.TryGetSingletonBuffer<DifficultyDaySample>(out var difficultySamples, true)
-                && difficultySamples.Length > 0)
+            if (!_difficultySampleQuery.IsEmptyIgnoreFilter)
             {
-                var sample = difficultySamples[math.min(currentCycleIndex, difficultySamples.Length - 1)];
-                dayNightMult = math.max(0.01f, sample.NightIntensityMult);
+                var difficultySamples = _difficultySampleQuery
+                    .GetSingletonBuffer<DifficultyDaySample>(true);
+                if (difficultySamples.Length > 0)
+                {
+                    var sample = difficultySamples[math.min(currentCycleIndex, difficultySamples.Length - 1)];
+                    dayNightMult = math.max(0.01f, sample.NightIntensityMult);
+                }
             }
 
             SiegeCyclePhase phase;
@@ -73,28 +99,27 @@ namespace DeadWalls
             {
                 phase = SiegeCyclePhase.Day;
                 phaseProgress = math.saturate(timer / math.max(0.01f, dayDuration));
-                intensity = math.max(0.01f, config.SiegeDayIntensityMultiplier);
+                intensity = 0f;
             }
             else if (timer < dayDuration + duskDuration)
             {
                 phase = SiegeCyclePhase.Dusk;
                 phaseProgress = math.saturate((timer - dayDuration) / math.max(0.01f, duskDuration));
-                intensity = math.lerp(
-                    math.max(0.01f, config.SiegeDuskStartIntensityMultiplier),
-                    math.max(0.01f, config.SiegeDuskEndIntensityMultiplier) * dayNightMult,
-                    phaseProgress);
+                intensity = 0f;
             }
-            else if (timer < dayDuration + duskDuration + nightDuration || dawnDuration <= 0f)
+            else if (timer < nightEnd || nightClearance || dawnDuration <= 0f)
             {
                 phase = SiegeCyclePhase.Night;
                 phaseProgress = math.saturate((timer - dayDuration - duskDuration) / math.max(0.01f, nightDuration));
-                intensity = math.max(0.01f, config.SiegeNightIntensityMultiplier * dayNightMult);
+                intensity = nightClearance
+                    ? 0f
+                    : math.max(0.01f, config.SiegeNightIntensityMultiplier * dayNightMult);
             }
             else
             {
                 phase = SiegeCyclePhase.Dawn;
                 phaseProgress = math.saturate((timer - dayDuration - duskDuration - nightDuration) / math.max(0.01f, dawnDuration));
-                intensity = math.max(0.01f, config.SiegeDawnIntensityMultiplier > 0f ? config.SiegeDawnIntensityMultiplier : 0.15f);
+                intensity = 0f;
             }
 
             int cycleIndex = math.max(0, cycle.ValueRO.CycleIndex + wrappedCycles);
@@ -115,6 +140,8 @@ namespace DeadWalls
 
             wave.ValueRW.CurrentWave = math.max(1, cycleIndex + 1);
             MobileWaveUtility.ConfigureMobileWave(ref wave.ValueRW, config);
+            if (phase == SiegeCyclePhase.Night && cycle.ValueRO.Phase != SiegeCyclePhase.Night)
+                wave.ValueRW.SpawnTimer = 0f;
             wave.ValueRW.WaveActive = true;
             wave.ValueRW.Phase = RunPhaseType.NightCombat;
             wave.ValueRW.PrepTimer = 0f;
@@ -124,6 +151,9 @@ namespace DeadWalls
 
         private static float ResolvePressure01(float intensity, MobileCastleCombatConfig config)
         {
+            if (intensity <= 0f)
+                return 0f;
+
             float minIntensity = math.max(0.01f, config.SiegeDayIntensityMultiplier);
             float maxIntensity = math.max(config.SiegeNightIntensityMultiplier,
                 math.max(config.SiegeDuskEndIntensityMultiplier, config.SiegeDuskStartIntensityMultiplier));

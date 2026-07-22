@@ -70,7 +70,7 @@ owner'larinin player-action event'lerini dinler; yalniz non-modal hint ve pulse 
 
 - Stable meta flag: `tutorial.v1.council`.
 - Gorunme kapisi: mobile worker economy aktif, oyun bitmemis ve regular Council karti oyuncu
-  secimine gercekten acik. Ilk kosuda bu durum regular takvimin ilk toplantisi olan Day 3'tur;
+  secimine gercekten acik. Ilk kosuda bu durum Day 1 Dawn'daki ilk regular toplantidir;
   tutorial sonradan resetlenmisse bir sonraki aktif regular kart ayni kontrati ogretebilir.
 - Council karar penceresi sureli oldugu icin Heart pause adimi disindaki onceki opportunistic
   prompt'lari gecici olarak sunum onceliginde ezer. Onceki adimlarin durable state'i degismez.

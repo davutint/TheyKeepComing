@@ -460,10 +460,20 @@ namespace DeadWalls
             ContinuousSiegeCycleData cycle = gm.ContinuousSiegeCycle;
             int phaseIndex = Mathf.Clamp((int)cycle.Phase, 0, 3);
             _dayValue.text = $"DAY {Mathf.Max(1, cycle.CycleIndex + 1)}";
-            _phaseValue.text = GetPhaseDisplayName(cycle.Phase, cycle.IsBloodMoonNight);
+            bool nightClearance = ContinuousSpawnBudgetUtility.IsNightClearance(cycle);
+            _phaseValue.text = GetPhaseDisplayName(cycle);
             float duration = GetPhaseDuration(cycle);
             float remaining = Mathf.Max(0f, duration * (1f - Mathf.Clamp01(cycle.PhaseProgress01)));
-            _phaseCountdown.text = FormatClock(remaining);
+            if (nightClearance)
+            {
+                long enemiesLeft = Math.Max(0L, gm.ContinuousSpawnBudget.PendingEnemies)
+                    + Math.Max(0, gm.WaveState.ZombiesAlive);
+                _phaseCountdown.text = $"{enemiesLeft:N0} LEFT";
+            }
+            else
+            {
+                _phaseCountdown.text = FormatClock(remaining);
+            }
             _cycleMessage.text = GetPhaseMessage(cycle);
             ApplyPhaseClass(cycle.Phase);
             UpdateCycleDial(cycle.CycleProgress01, phaseIndex);
@@ -834,22 +844,24 @@ namespace DeadWalls
             };
         }
 
-        private static string GetPhaseDisplayName(SiegeCyclePhase phase, bool bloodMoon)
+        private static string GetPhaseDisplayName(ContinuousSiegeCycleData cycle)
         {
-            if (phase == SiegeCyclePhase.Night && bloodMoon)
+            if (cycle.Phase == SiegeCyclePhase.Night && cycle.IsBloodMoonNight)
                 return "BLOOD MOON";
-            return phase switch
+            return cycle.Phase switch
             {
                 SiegeCyclePhase.Day => "DAYLIGHT",
                 SiegeCyclePhase.Dusk => "LAST LIGHT",
                 SiegeCyclePhase.Night => "NIGHT SIEGE",
                 SiegeCyclePhase.Dawn => "DAWN",
-                _ => phase.ToString().ToUpperInvariant()
+                _ => cycle.Phase.ToString().ToUpperInvariant()
             };
         }
 
         private static string GetPhaseMessage(ContinuousSiegeCycleData cycle)
         {
+            if (ContinuousSpawnBudgetUtility.IsNightClearance(cycle))
+                return "CLEAR THE REMAINING HORDE";
             if (cycle.IsBloodMoonNight && cycle.Phase != SiegeCyclePhase.Night)
                 return "BLOOD MOON APPROACHING";
             return cycle.Phase switch

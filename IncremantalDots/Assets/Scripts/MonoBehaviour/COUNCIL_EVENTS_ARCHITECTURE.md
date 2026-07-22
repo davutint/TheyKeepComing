@@ -28,7 +28,7 @@ recetesi tarafindan kabul edilmez. Diger 10 atom authored tariflerde kullanilir.
    "dakika-degeri" dengelemesi. Composer bu degerleri sabit koddan degil katalogdan okur.
    DETERMINISTIK: ayni seed + ayni context = ayni event (EditMode testli). Rng warm-up
    ardisik-seed korelasyonunu kirar.
-3. **Runtime state (GameManager):** `TryOpenRegularCouncilEvent` (yalniz Day 3/6/9...;
+3. **Runtime state (GameManager):** `TryOpenRegularCouncilEvent` (her gun Dawn'da tam bir kez;
    seed = hash(ECS RandomSeed, run salt, gun)), `ChooseCouncilOption` (efekt uygulama + flag yazimi:
    otomatik `council_{template}_{a|b}` + yalniz catalog allowlist'indeki SetsFlagOnA/B),
    `ExpireCouncilEvent`. Flag'ler `Dictionary<string,int>` (flag -> setlendigi gun; zincir
@@ -65,17 +65,16 @@ otoritesi yalniz `GameManager` transaction'lari ve mevcut ECS effect owner'larin
 
 ## Regular Schedule
 
-- Tek takvim owner'i `CouncilRegularSchedule`'dir: ilk regular gun `3`, interval `3`.
-- Day `1/2/4/5...` hicbir chance roll yapmaz; pity ve cooldown regular akisa dahil degildir.
+- Tek takvim owner'i `CouncilRegularSchedule`'dir: ilk regular gun `1`, interval `1`.
+- Her gun Dawn'da bir regular kart compose edilir; occurrence icin chance roll, pity veya cooldown yoktur.
 - `_lastRegularCouncilDay` ayni Dawn'da ikinci karti engeller; alan v11'de eklenmistir ve
   guncel exact save v14'te korunur.
 - Compose gecersiz catalog nedeniyle null donerse scheduled gun fail-closed islenir; ayni gun
   hot-reload veya tekrar cagri ile farkli kart reroll edilmez.
-- V1 Council regular-only'dir; Day `3/6/9...` disinda ikinci bir meeting type veya trigger
-  yolu yoktur.
-- Launch staging: Day 3 yalniz temel ekonomi (`abandoned_cache`, `merchant_caravan`,
-  `quarry_crew`); Day 6 population/savunma (`refugees_at_gate`, `wandering_veterans`,
-  `cold_snap`); Day 9 gece riski (`strange_bonfires`). Follow-up'lar flag + gecikme ile acilir.
+- Council regular-only'dir; ikinci bir meeting type veya emergency trigger yolu yoktur.
+- Day 1 havuzunda temel ekonomi (`abandoned_cache`, `merchant_caravan`, `quarry_crew`) vardir.
+  Diger sablonlar kendi `MinDay`, flag ve chain gecikme kosullariyla ilerleyen gunlerde havuza
+  katilir; kart icerigi seed + context ile deterministik secilir.
 
 ## Tuning ve Telemetry Contract'i
 
@@ -108,14 +107,14 @@ otoritesi yalniz `GameManager` transaction'lari ve mevcut ECS effect owner'larin
 - `HasActiveCouncilEvent` otoritedir; `JsonUtility` null nested class'i bos nesne yaptigi icin
   discriminator false ise payload ignore edilip null'a normalize edilir.
 - v10 chance/pity state'i migrate edilirken yalniz mevcut regular gunde aktif/gecerli kart veya
-  `CouncilDaysSinceEvent == 0` kaniti varsa gun handled sayilir. Chance fail'i Day 3/6/9 kartini
+  `CouncilDaysSinceEvent == 0` kaniti varsa gun handled sayilir. Chance fail'i mevcut gunun kartini
   sessizce yutmaz.
 - Continue active Council payload'ini `CouncilContentPolicy` ile production catalog'a karsi
   preflight eder. Catalog disi template, authored flag uyusmazligi, bilinmeyen role veya option
   recetesi disi effect varsa kosu restart edilmeden restore fail-closed reddedilir.
 - Cozulmus secimin otomatik/curated flag'leri ile temp-production ve next-night effect
   multiplier/expiry alanlari ayni snapshot'ta korunur. Continue cozulmus karti yeniden acmaz,
-  aktif karti yeniden compose etmez ve future `3/6/9...` regular schedule'i engellemez.
+  aktif karti yeniden compose etmez ve sonraki gunlerin regular schedule'ini engellemez.
 
 ## Karsitlik Receteleri (composer'in gramerleri)
 

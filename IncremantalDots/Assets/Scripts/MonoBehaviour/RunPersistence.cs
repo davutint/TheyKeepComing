@@ -541,7 +541,7 @@ namespace DeadWalls
             if (state.Version == 10)
             {
                 // v10 regular Council'i chance/pity/cooldown ile her Dawn roll ediyordu.
-                // Yalniz mevcut 3/6/9 gununde gercekten uretilmis bir kart kanitlanabiliyorsa
+                // Yalniz mevcut gunde gercekten uretilmis bir kart kanitlanabiliyorsa
                 // o gun handled sayilir; eski chance fail'i yeni exact karti yutamaz.
                 int currentDay = Math.Max(1, state.CycleIndex + 1);
                 bool legacyHasActiveEvent = IsValidCouncilEventPayload(state.ActiveCouncilEvent);

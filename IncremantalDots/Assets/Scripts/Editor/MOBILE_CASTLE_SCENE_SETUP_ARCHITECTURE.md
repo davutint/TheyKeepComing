@@ -69,7 +69,7 @@ presentation kaynagi olarak runtime component tasimaz.
 
 Council karti generated prefabda `CouncilEventPanel` presentation'i olarak kalir. Setup tool,
 scene root'taki tek `CouncilEventUI` owner'ini iki option rich-text yuzeyi, `DECIDE Ns` sayaci ve
-Filled/Horizontal/Left azalan sure seridine baglar; V1'de yalniz regular Day `3/6/9...` akisi vardir.
+Filled/Horizontal/Left azalan sure seridine baglar; regular kart Day 1'den itibaren her Dawn'da tam bir kez acilir.
 
 First-run onboarding sunumu generated prefabda raycast kapali
 `OnboardingHintPanel` ve `OnboardingPulseFrame` olarak kalir. Runtime state prefab assetine
