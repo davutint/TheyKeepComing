@@ -127,8 +127,6 @@ namespace DeadWalls
         private Label _criticalBannerBody;
         private VisualElement _onboardingHint;
         private Label _onboardingHintText;
-        private Label _primaryToast;
-        private Label _secondaryToast;
         private VisualElement _soulFlightLayer;
 
         private SurfaceKind _openSurface;
@@ -197,12 +195,14 @@ namespace DeadWalls
             SuppressLegacyCanvas();
             HandleGlobalInput();
 
+            float now = Time.unscaledTime;
+            UpdateToastPresentation(now);
+
             GameManager gm = GameManager.Instance;
             if (gm == null)
                 return;
             BindGraveEssenceDropOwner(gm);
 
-            float now = Time.unscaledTime;
             if (now >= _nextTextRefresh)
             {
                 _nextTextRefresh = now + TextRefreshInterval;
@@ -216,7 +216,6 @@ namespace DeadWalls
             RefreshModalContinuous(gm);
             RefreshGameFlowControls();
             UpdateSoulFlights(Time.unscaledDeltaTime);
-            UpdateToastVisibility(now);
 
             if (now >= _nextGraphRefresh)
             {
@@ -295,8 +294,6 @@ namespace DeadWalls
             _criticalBannerBody = Q<Label>("criticalBannerBody");
             _onboardingHint = Q<VisualElement>("onboardingHint");
             _onboardingHintText = Q<Label>("onboardingHintText");
-            _primaryToast = Q<Label>("primaryToast");
-            _secondaryToast = Q<Label>("secondaryToast");
             _soulFlightLayer = Q<VisualElement>("soulFlightLayer");
 
             BindCoreActions();

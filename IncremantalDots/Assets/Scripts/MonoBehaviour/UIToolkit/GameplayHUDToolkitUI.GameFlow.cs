@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -27,13 +28,22 @@ namespace DeadWalls
             "PAUSED - 3X"
         };
 
+        private sealed class ActiveToastPresentation
+        {
+            public VisualElement Element;
+            public float ExpiresAt;
+            public float RemoveAt;
+            public bool IsExiting;
+        }
+
         private VisualElement _timeSpeedControls;
         private Button _timeSpeedOne;
         private Button _timeSpeedTwo;
         private Button _timeSpeedThree;
         private Label _timeSpeedState;
-        private Label _activeToastLabel;
-        private float _activeToastUntil;
+        private VisualElement _toastStack;
+        private readonly List<ActiveToastPresentation> _activeToasts =
+            new List<ActiveToastPresentation>(GameplayToastService.MaximumVisibleMessages);
 
         private void BindGameFlowControls()
         {
@@ -42,11 +52,23 @@ namespace DeadWalls
             _timeSpeedTwo = Q<Button>("timeSpeedTwo");
             _timeSpeedThree = Q<Button>("timeSpeedThree");
             _timeSpeedState = Q<Label>("timeSpeedState");
+            _toastStack = Q<VisualElement>("toastStack");
 
             _timeSpeedOne.clicked += () => SetRunningTimeScale(SimulationSpeedUtility.Normal);
             _timeSpeedTwo.clicked += () => SetRunningTimeScale(SimulationSpeedUtility.Fast);
             _timeSpeedThree.clicked += () => SetRunningTimeScale(SimulationSpeedUtility.VeryFast);
+            _root.RegisterCallback<ClickEvent>(HandleToolkitButtonClick);
             RefreshGameFlowControls();
+        }
+
+        private static void HandleToolkitButtonClick(ClickEvent evt)
+        {
+            VisualElement target = evt.target as VisualElement;
+            Button button = target as Button ?? target?.GetFirstAncestorOfType<Button>();
+            if (button == null || !button.enabledInHierarchy)
+                return;
+
+            UiSoundFeedback.Instance?.PlayClick();
         }
 
         private void SetRunningTimeScale(float timeScale)
@@ -115,46 +137,99 @@ namespace DeadWalls
             GameplayToastService.TryEnqueue(text, GameplayToastTone.Warning, 3.2f);
         }
 
-        private void UpdateToastVisibility(float now)
+        private void UpdateToastPresentation(float now)
         {
-            if (_activeToastLabel != null && now < _activeToastUntil)
+            if (_toastStack == null)
                 return;
 
-            HideActiveToast();
-            if (!GameplayToastService.TryDequeue(out GameplayToastMessage message))
+            UpdateActiveToastLifetimes(now);
+            while (GameplayToastService.TryDequeue(out GameplayToastMessage message))
+                PresentToast(message, now);
+        }
+
+        private void UpdateActiveToastLifetimes(float now)
+        {
+            for (int i = _activeToasts.Count - 1; i >= 0; i--)
+            {
+                ActiveToastPresentation active = _activeToasts[i];
+                if (!active.IsExiting)
+                {
+                    if (now < active.ExpiresAt)
+                        continue;
+
+                    active.IsExiting = true;
+                    active.RemoveAt = now + GameplayToastService.ExitAnimationSeconds;
+                    active.Element.RemoveFromClassList("is-visible");
+                    active.Element.AddToClassList("is-exiting");
+                    continue;
+                }
+
+                if (now >= active.RemoveAt)
+                    RemoveToastAt(i);
+            }
+        }
+
+        private void PresentToast(GameplayToastMessage message, float now)
+        {
+            while (_activeToasts.Count >= GameplayToastService.MaximumVisibleMessages)
+                RemoveToastAt(0);
+
+            var card = new VisualElement
+            {
+                pickingMode = PickingMode.Ignore
+            };
+            card.AddToClassList("toast");
+            ApplyToastTone(card, message.Tone);
+
+            var marker = new VisualElement
+            {
+                pickingMode = PickingMode.Ignore
+            };
+            marker.AddToClassList("toast__marker");
+
+            var label = new Label(message.Text)
+            {
+                pickingMode = PickingMode.Ignore
+            };
+            label.AddToClassList("toast__message");
+            card.Add(marker);
+            card.Add(label);
+            _toastStack.Add(card);
+
+            var active = new ActiveToastPresentation
+            {
+                Element = card,
+                ExpiresAt = now + message.DurationSeconds
+            };
+            _activeToasts.Add(active);
+
+            card.schedule.Execute(() =>
+            {
+                if (card.panel != null && !active.IsExiting)
+                    card.AddToClassList("is-visible");
+            }).StartingIn(16);
+        }
+
+        private void RemoveToastAt(int index)
+        {
+            if (index < 0 || index >= _activeToasts.Count)
                 return;
 
-            Label target = message.Tone == GameplayToastTone.Secondary
-                ? _secondaryToast
-                : _primaryToast;
-            if (target == null)
-                return;
-
-            target.text = message.Text;
-            ApplyToastTone(target, message.Tone);
-            target.AddToClassList("is-visible");
-            _activeToastLabel = target;
-            _activeToastUntil = now + message.DurationSeconds;
+            ActiveToastPresentation active = _activeToasts[index];
+            active.Element.RemoveFromHierarchy();
+            _activeToasts.RemoveAt(index);
         }
 
         private void ResetToastPresentation(bool clearQueue)
         {
-            HideActiveToast();
-            _primaryToast?.RemoveFromClassList("is-visible");
-            _secondaryToast?.RemoveFromClassList("is-visible");
+            for (int i = _activeToasts.Count - 1; i >= 0; i--)
+                RemoveToastAt(i);
+            _toastStack?.Clear();
             if (clearQueue)
                 GameplayToastService.Clear();
         }
 
-        private void HideActiveToast()
-        {
-            if (_activeToastLabel != null)
-                _activeToastLabel.RemoveFromClassList("is-visible");
-            _activeToastLabel = null;
-            _activeToastUntil = 0f;
-        }
-
-        private static void ApplyToastTone(Label target, GameplayToastTone tone)
+        private static void ApplyToastTone(VisualElement target, GameplayToastTone tone)
         {
             for (int i = 0; i < ToastToneClasses.Length; i++)
                 target.EnableInClassList(ToastToneClasses[i], i == (int)tone);

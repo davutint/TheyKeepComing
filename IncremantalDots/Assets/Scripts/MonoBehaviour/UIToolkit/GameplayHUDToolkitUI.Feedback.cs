@@ -39,11 +39,14 @@ namespace DeadWalls
 
         private void RefreshFeedbackPresentation()
         {
-            bool hintVisible = _onboardingLegacy != null
-                               && _onboardingLegacy.HintPanel != null
-                               && _onboardingLegacy.HintPanel.activeInHierarchy
-                               && _onboardingLegacy.HintText != null
-                               && !string.IsNullOrWhiteSpace(_onboardingLegacy.HintText.text);
+            bool hasLegacyHint = _onboardingLegacy != null
+                                 && _onboardingLegacy.HintPanel != null
+                                 && _onboardingLegacy.HintPanel.activeInHierarchy
+                                 && _onboardingLegacy.HintText != null
+                                 && !string.IsNullOrWhiteSpace(_onboardingLegacy.HintText.text);
+            bool hintVisible = ShouldMirrorLegacyOnboardingHint(
+                hasLegacyHint,
+                _onboardingLegacy != null && _onboardingLegacy.IsBasicArcherStepVisible);
             _onboardingHint.EnableInClassList("is-visible", hintVisible);
             if (hintVisible)
             {
@@ -64,6 +67,13 @@ namespace DeadWalls
                 ref _lastNightToast, false);
             MirrorToast(_legacyHud != null ? _legacyHud.WaveRewardText : null,
                 ref _lastWaveToast, true);
+        }
+
+        internal static bool ShouldMirrorLegacyOnboardingHint(
+            bool hasLegacyHint,
+            bool isBasicArcherAffordabilityStep)
+        {
+            return hasLegacyHint && !isBasicArcherAffordabilityStep;
         }
 
         private void MirrorToast(TMPro.TMP_Text source, ref string cache, bool primary)

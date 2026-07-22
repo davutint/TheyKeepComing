@@ -32,9 +32,11 @@ namespace DeadWalls
     public static class GameplayToastService
     {
         public const int MaximumPendingMessages = 8;
+        public const int MaximumVisibleMessages = 3;
         public const float DefaultDurationSeconds = 2.4f;
         public const float MinimumDurationSeconds = 0.8f;
         public const float MaximumDurationSeconds = 6f;
+        public const float ExitAnimationSeconds = 0.18f;
 
         private static readonly Queue<GameplayToastMessage> Pending =
             new Queue<GameplayToastMessage>(MaximumPendingMessages);

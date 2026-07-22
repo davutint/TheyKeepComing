@@ -133,17 +133,33 @@ namespace DeadWalls.Tests
                 "Assets/Scripts/MonoBehaviour/UIToolkit/GameplayHUDToolkitUI.Management.cs");
             string modalSource = File.ReadAllText(
                 "Assets/Scripts/MonoBehaviour/UIToolkit/GameplayHUDToolkitUI.Modals.cs");
+            string hudStyle = File.ReadAllText(HudStylePath);
 
-            Assert.That(root.Q<VisualElement>("toastStack"), Is.Not.Null);
-            Assert.That(root.Q<Label>("primaryToast"), Is.Not.Null);
-            Assert.That(root.Q<Label>("secondaryToast"), Is.Not.Null);
+            VisualElement toastStack = root.Q<VisualElement>("toastStack");
+            Assert.That(toastStack, Is.Not.Null);
+            Assert.That(toastStack.childCount, Is.EqualTo(0));
             Assert.That(gameFlowSource, Does.Contain("GameplayToastService.TryEnqueue"));
             Assert.That(gameFlowSource, Does.Contain("GameplayToastService.TryDequeue"));
             Assert.That(gameFlowSource, Does.Contain("GameplayToastTone.Warning"));
+            Assert.That(gameFlowSource, Does.Contain("MaximumVisibleMessages"));
+            Assert.That(gameFlowSource, Does.Contain("UpdateActiveToastLifetimes"));
+            Assert.That(gameFlowSource, Does.Contain("HandleToolkitButtonClick"));
+            Assert.That(gameFlowSource, Does.Contain("UiSoundFeedback.Instance?.PlayClick()"));
+            Assert.That(hudStyle, Does.Contain(".toast.is-exiting"));
+            Assert.That(hudStyle, Does.Contain(".toast__message"));
             Assert.That(managementSource, Does.Contain("GameplayActionFeedbackUtility"));
             Assert.That(managementSource, Does.Contain("SetExplainedActionState"));
             Assert.That(modalSource, Does.Contain("MetaUpgradePresentationUtility.BuildEffectProgression"));
             Assert.That(GameplayToastService.MaximumPendingMessages, Is.EqualTo(8));
+            Assert.That(GameplayToastService.MaximumVisibleMessages, Is.EqualTo(3));
+        }
+
+        [Test]
+        public void ProductionHud_DoesNotMirrorLegacyBasicArcherAffordabilityHint()
+        {
+            Assert.That(GameplayHUDToolkitUI.ShouldMirrorLegacyOnboardingHint(true, false), Is.True);
+            Assert.That(GameplayHUDToolkitUI.ShouldMirrorLegacyOnboardingHint(true, true), Is.False);
+            Assert.That(GameplayHUDToolkitUI.ShouldMirrorLegacyOnboardingHint(false, false), Is.False);
         }
 
         [Test]

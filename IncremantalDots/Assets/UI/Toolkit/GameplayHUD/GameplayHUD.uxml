@@ -346,10 +346,7 @@
             </ui:VisualElement>
         </ui:VisualElement>
 
-        <ui:VisualElement name="toastStack" class="toast-stack" picking-mode="Ignore">
-            <ui:Label name="primaryToast" text="" class="toast toast--primary" />
-            <ui:Label name="secondaryToast" text="" class="toast toast--secondary" />
-        </ui:VisualElement>
+        <ui:VisualElement name="toastStack" class="toast-stack" picking-mode="Ignore" />
         <ui:VisualElement name="soulFlightLayer" class="soul-flight-layer" picking-mode="Ignore" />
     </ui:VisualElement>
 </ui:UXML>

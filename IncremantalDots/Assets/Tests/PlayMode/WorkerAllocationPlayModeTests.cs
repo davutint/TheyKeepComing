@@ -13,6 +13,7 @@ using UnityEngine.TestTools;
 using Object = UnityEngine.Object;
 using UnityEngine.UI;
 using ToolkitButton = UnityEngine.UIElements.Button;
+using ToolkitClickEvent = UnityEngine.UIElements.ClickEvent;
 using ToolkitDocument = UnityEngine.UIElements.UIDocument;
 using ToolkitLabel = UnityEngine.UIElements.Label;
 using ToolkitNavigationSubmitEvent = UnityEngine.UIElements.NavigationSubmitEvent;
@@ -31,6 +32,7 @@ namespace DeadWalls.Tests
         private byte[] _originalMetaTemp;
         private bool _hadMeta;
         private bool _hadMetaTemp;
+        private float _originalSfxVolume;
 
         [UnitySetUp]
         public IEnumerator SetUp()
@@ -43,6 +45,8 @@ namespace DeadWalls.Tests
             _hadMetaTemp = File.Exists(_metaTempPath);
             _originalMeta = _hadMeta ? File.ReadAllBytes(_metaPath) : null;
             _originalMetaTemp = _hadMetaTemp ? File.ReadAllBytes(_metaTempPath) : null;
+            _originalSfxVolume = SoundSettings.SfxVolume;
+            SoundSettings.SfxVolume = 1f;
             DeleteIfExists(_metaPath);
             DeleteIfExists(_metaTempPath);
             MetaProgression.Load();
@@ -92,6 +96,7 @@ namespace DeadWalls.Tests
             DeleteIfExists(_metaTempPath);
             RestoreIfNeeded(_metaPath, _hadMeta, _originalMeta);
             RestoreIfNeeded(_metaTempPath, _hadMetaTemp, _originalMetaTemp);
+            SoundSettings.SfxVolume = _originalSfxVolume;
             MetaProgression.Load();
             yield return null;
         }
@@ -153,23 +158,56 @@ namespace DeadWalls.Tests
                 BindingFlags.Instance | BindingFlags.NonPublic);
             Assert.That(resetToastPresentation, Is.Not.Null);
             resetToastPresentation.Invoke(hud, new object[] { true });
-            SendNavigationSubmit(recruitButton);
+            ToolkitVisualElement toastStack = ToolkitQuery.Q<ToolkitVisualElement>(
+                document.rootVisualElement, "toastStack");
+            Assert.That(toastStack, Is.Not.Null);
 
-            ToolkitLabel toast = ToolkitQuery.Q<ToolkitLabel>(
-                document.rootVisualElement, "primaryToast");
+            UiSoundFeedback uiSound = UiSoundFeedback.Instance;
+            Assert.That(uiSound, Is.Not.Null);
+            DeadWallsAudioProfileSO audioProfile = DeadWallsAudioProfileSO.LoadDefault();
+            Assert.That(audioProfile, Is.Not.Null);
+            Assert.That(audioProfile.UiClickClip, Is.Not.Null);
+            AudioSource uiAudioSource = uiSound.GetComponent<AudioSource>();
+            Assert.That(uiAudioSource, Is.Not.Null);
+            uiAudioSource.Stop();
+
+            SendToolkitClick(recruitButton);
+            yield return null;
+            Assert.That(uiAudioSource.isPlaying, Is.True,
+                "UI Toolkit Button ClickEvent merkezi UI click sesini caldirmadi.");
+
+            for (int click = 0; click < GameplayToastService.MaximumVisibleMessages; click++)
+            {
+                SendNavigationSubmit(recruitButton);
+                yield return null;
+            }
+
             const string ExpectedToast = "NOT ENOUGH RESOURCES  ·  NEED 1 MORE WOOD";
-            for (int frame = 0; frame < 30
-                 && (!toast.ClassListContains("is-visible")
-                     || !toast.ClassListContains("toast-tone--warning")
-                     || toast.text != ExpectedToast);
+            for (int frame = 0; frame < 60
+                 && CountToastMessages(toastStack, ExpectedToast)
+                    < GameplayToastService.MaximumVisibleMessages;
                  frame++)
             {
                 yield return null;
             }
 
-            Assert.That(toast.ClassListContains("is-visible"), Is.True);
-            Assert.That(toast.ClassListContains("toast-tone--warning"), Is.True);
-            Assert.That(toast.text, Is.EqualTo(ExpectedToast));
+            Assert.That(CountToastMessages(toastStack, ExpectedToast),
+                Is.EqualTo(GameplayToastService.MaximumVisibleMessages),
+                "Her reddedilen Button action'i ayri bir toast karti uretmeli.");
+            for (int frame = 0; frame < 30 && !AreAllToastCardsVisible(toastStack); frame++)
+                yield return null;
+            for (int i = 0; i < toastStack.childCount; i++)
+            {
+                ToolkitVisualElement card = toastStack.ElementAt(i);
+                Assert.That(card.ClassListContains("is-visible"), Is.True);
+                Assert.That(card.ClassListContains("toast-tone--warning"), Is.True);
+            }
+
+            yield return new WaitForSecondsRealtime(3.65f);
+            for (int frame = 0; frame < 30 && toastStack.childCount > 0; frame++)
+                yield return null;
+            Assert.That(toastStack.childCount, Is.EqualTo(0),
+                "Toast kartlari unscaled sureleri dolunca otomatik kaldirilmali.");
         }
 
         [UnityTest]
@@ -226,21 +264,26 @@ namespace DeadWalls.Tests
 
             recruitButton.onClick.Invoke();
 
-            ToolkitLabel toast = ToolkitQuery.Q<ToolkitLabel>(
-                document.rootVisualElement, "primaryToast");
             const string ExpectedToast = "NOT ENOUGH RESOURCES  ·  NEED 1 MORE WOOD";
+            ToolkitLabel toast = null;
             for (int frame = 0; frame < 30
-                 && (!toast.ClassListContains("is-visible")
-                     || !toast.ClassListContains("toast-tone--warning")
-                     || toast.text != ExpectedToast);
+                 && (toast == null || !toast.parent.ClassListContains("is-visible"));
                  frame++)
             {
+                toast = FindToastMessage(document.rootVisualElement, ExpectedToast);
                 yield return null;
             }
 
-            Assert.That(toast.ClassListContains("is-visible"), Is.True);
-            Assert.That(toast.ClassListContains("toast-tone--warning"), Is.True);
-            Assert.That(toast.text, Is.EqualTo(ExpectedToast));
+            Assert.That(toast, Is.Not.Null);
+            Assert.That(toast.parent.ClassListContains("is-visible"), Is.True);
+            Assert.That(toast.parent.ClassListContains("toast-tone--warning"), Is.True);
+        }
+
+        private static void SendToolkitClick(ToolkitVisualElement target)
+        {
+            using ToolkitClickEvent click = ToolkitClickEvent.GetPooled();
+            click.target = target;
+            target.SendEvent(click);
         }
 
         private static void SendNavigationSubmit(ToolkitVisualElement target)
@@ -248,6 +291,49 @@ namespace DeadWalls.Tests
             using ToolkitNavigationSubmitEvent submit = ToolkitNavigationSubmitEvent.GetPooled();
             submit.target = target;
             target.SendEvent(submit);
+        }
+
+        private static int CountToastMessages(ToolkitVisualElement toastStack, string text)
+        {
+            int count = 0;
+            for (int i = 0; i < toastStack.childCount; i++)
+            {
+                ToolkitLabel label = ToolkitQuery.Q<ToolkitLabel>(
+                    toastStack.ElementAt(i), className: "toast__message");
+                if (label != null && label.text == text)
+                    count++;
+            }
+            return count;
+        }
+
+        private static bool AreAllToastCardsVisible(ToolkitVisualElement toastStack)
+        {
+            if (toastStack.childCount == 0)
+                return false;
+
+            for (int i = 0; i < toastStack.childCount; i++)
+            {
+                if (!toastStack.ElementAt(i).ClassListContains("is-visible"))
+                    return false;
+            }
+
+            return true;
+        }
+
+        private static ToolkitLabel FindToastMessage(ToolkitVisualElement root, string text)
+        {
+            ToolkitVisualElement toastStack = ToolkitQuery.Q<ToolkitVisualElement>(root, "toastStack");
+            if (toastStack == null)
+                return null;
+
+            for (int i = 0; i < toastStack.childCount; i++)
+            {
+                ToolkitLabel label = ToolkitQuery.Q<ToolkitLabel>(
+                    toastStack.ElementAt(i), className: "toast__message");
+                if (label != null && label.text == text)
+                    return label;
+            }
+            return null;
         }
 
         [UnityTest]
@@ -312,6 +398,18 @@ namespace DeadWalls.Tests
                 Is.EqualTo(FirstRunOnboardingUI.BasicArcherHint));
             Assert.That(onboarding.ActivePulseTarget,
                 Is.SameAs(market.DrawerToggleButton.GetComponent<RectTransform>()));
+
+            GameplayHUDToolkitUI toolkitHud = Object.FindFirstObjectByType<GameplayHUDToolkitUI>();
+            Assert.That(toolkitHud, Is.Not.Null);
+            ToolkitDocument toolkitDocument = toolkitHud.GetComponent<ToolkitDocument>();
+            Assert.That(toolkitDocument, Is.Not.Null);
+            ToolkitVisualElement toolkitHint = ToolkitQuery.Q<ToolkitVisualElement>(
+                toolkitDocument.rootVisualElement, "onboardingHint");
+            Assert.That(toolkitHint, Is.Not.Null);
+            for (int frame = 0; frame < 60 && toolkitHint.ClassListContains("is-visible"); frame++)
+                yield return null;
+            Assert.That(toolkitHint.ClassListContains("is-visible"), Is.False,
+                "Legacy Basic Archer affordability cue yeni UI Toolkit HUD'da surekli gorunmemeli.");
         }
 
         [UnityTest]

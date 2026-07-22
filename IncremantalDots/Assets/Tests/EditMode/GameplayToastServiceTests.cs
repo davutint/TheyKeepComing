@@ -61,5 +61,20 @@ namespace DeadWalls.Tests
             Assert.That(longMessage.DurationSeconds,
                 Is.EqualTo(GameplayToastService.MaximumDurationSeconds));
         }
+
+        [Test]
+        public void Queue_PreservesRepeatedMessagesAsSeparatePlayerActions()
+        {
+            Assert.That(GameplayToastService.TryEnqueue("SAME ACTION"), Is.True);
+            Assert.That(GameplayToastService.TryEnqueue("SAME ACTION"), Is.True);
+            Assert.That(GameplayToastService.TryEnqueue("SAME ACTION"), Is.True);
+
+            Assert.That(GameplayToastService.PendingCount, Is.EqualTo(3));
+            for (int i = 0; i < 3; i++)
+            {
+                Assert.That(GameplayToastService.TryDequeue(out GameplayToastMessage message), Is.True);
+                Assert.That(message.Text, Is.EqualTo("SAME ACTION"));
+            }
+        }
     }
 }

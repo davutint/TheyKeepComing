@@ -11,7 +11,9 @@ clip'lerini yalniz fallback olarak korur.
 
 - `CombatFeedbackBridge`: Arrow shoot ailesi, Arrow/Frost impact, Wall impact ailesi ve
   Fireball blast.
-- `UiSoundFeedback`: click, confirm, denied ve game-over sting.
+- `UiSoundFeedback`: click, confirm, denied ve game-over sting. Legacy uGUI dugmeleri pointer
+  raycast'iyle; UI Toolkit dugmeleri document root'undaki `ClickEvent` route'uyla ayni merkezi
+  `UiClickClip` ve SFX volume ayarini kullanir.
 - `GameplayHUDToolkitUI`: Castle Heart research/reveal/denied/open ve Soul/Essence HUD varisi.
 - `AmbientAudioController`: ambience override acilirsa night, dusk, dawn, horde ve worker foley.
 - `MainMenuToolkitUI`: menu-music override acilirsa profil menu klibi.

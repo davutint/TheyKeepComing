@@ -42,8 +42,12 @@ tamamlanmis tek-seferlik satin alim gibi terminal durumlar gercek disabled state
 - Pause, Settings, Game Over ve Meta Shop: ayni Toolkit modal sistemi. Meta kartlari katalog
   aciklamasinin yaninda exact mevcut -> sonraki kalici faydayi ve `LEVEL N -> N+1` transaction'ini
   gosterir.
-- Feedback: critical banner, onboarding hint, bounded FIFO toast, damage flash, day/night tint,
-  soul pickup flight ve gercek dusman olumundeki basarili Grave Essence drop flight'i.
+- Feedback: critical banner, onboarding hint, en fazla uc gorunen kartlik sureli action-feedback
+  toast stack'i, merkezi UI button click sesi, damage flash, day/night tint, soul pickup flight ve
+  gercek dusman olumundeki basarili Grave Essence drop flight'i.
+- Legacy `FirstRunOnboardingUI` Basic Archer affordability cue'su yeni HUD'a aynalanmaz. Yeni first-run
+  onboarding, UI Toolkit'teki gercek kontrol hedefleri ve owner-onayli exact adim sirasi uzerinden
+  `DW-P16-GUIDED-ONBOARDING` kapsaminda yeniden kurulacaktir.
 
 Castle Heart ve Technology acikken simulasyon akmaya devam eder. Pause, level-up ve game-over
 kendi mevcut duraklatma sozlesmelerini korur. Council secim yapilana kadar merkezi pause lease'i

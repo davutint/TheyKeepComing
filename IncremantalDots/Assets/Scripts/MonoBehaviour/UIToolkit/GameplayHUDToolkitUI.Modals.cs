@@ -491,7 +491,6 @@ namespace DeadWalls
             if (next == current)
                 return;
 
-            UiSoundFeedback.Instance?.PlayClick();
             GameplayPerformanceSettings.CurrentZombieLimitPreset = next;
             GameManager.Instance?.ApplyZombieLimitSetting();
             RefreshZombieLimitSetting();

@@ -2,11 +2,11 @@
 
 > **Amaç:** V1 kapsamı tamamlandıktan sonra yapılacak mantık düzeltmelerini, oyuncuya görünen geri bildirimleri, UI/UX yeniden çalışmalarını, polish işlerini ve performans optimizasyonlarını tek otoriter takip belgesinde yürütmek.
 >
-> **Tracker sürümü:** 2.1
+> **Tracker sürümü:** 2.3
 > **Oluşturulma tarihi:** 2026-07-18
-> **Aktif paket:** `-` (açık paket yok)
-> **Aktif iş:** `-`
-> **İlerleme:** `14 / 14` ana görev tamamlandı - `%100`
+> **Aktif paket:** `DW-P16-GUIDED-ONBOARDING`
+> **Aktif iş:** Owner onaylı UI Toolkit guided onboarding zincirinin uygulanması
+> **İlerleme:** `15 / 16` ana görev tamamlandı - `%93,75`
 
 ---
 
@@ -36,7 +36,7 @@ Bu belge, tamamlanmış V1 tracker'ından sonraki geliştirme döneminin aktif t
 
 ### İlerleme hesabı
 
-İlerleme, Bölüm 3'teki 14 ana görev üzerinden hesaplanır. Alt maddeler kanıt ve kabul kapsamını gösterir; ayrıca paydayı büyütmez. Ana görevler yalnızca bütün zorunlu alt kapıları tamamlandığında kapanır. Owner onaylı `DW-P14-ACTION-FEEDBACK` yeni kapsamı nedeniyle payda `13 -> 14` değişmiştir.
+İlerleme, Bölüm 3'teki 16 ana görev üzerinden hesaplanır. Alt maddeler kanıt ve kabul kapsamını gösterir; ayrıca paydayı büyütmez. Ana görevler yalnızca bütün zorunlu alt kapıları tamamlandığında kapanır. Owner'ın adım adım yeni UI öğretim isteğiyle açılan `DW-P16-GUIDED-ONBOARDING` nedeniyle payda `15 -> 16` değişmiştir.
 
 ---
 
@@ -96,6 +96,31 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - Otomatik phase, pasif kaynak dolması, savunma alarmı ve oyuncu tıklaması olmayan event'ler bu
   onayın dışında kalır.
 
+### Toast sunumu ve button audio polish'i
+
+- Her bilinçli player action'ı ayrı toast kartı üretir; aynı mesaj art arda gelse bile tek karta
+  birleştirilmez veya mevcut kartın süresi yenilenmez.
+- Ekranda aynı anda en fazla üç toast kartı görünür. Yeni kart altta belirir, eskiler yukarı taşınır;
+  dördüncü kart geldiğinde en eski görünen kart kaldırılır.
+- Toast'lar unscaled süreyle otomatik kaybolur ve HUD etkileşimini engellemez.
+- UI Toolkit button'ları legacy uGUI raycast'ine bağlı kalmadan merkezi UI click sesini çalar.
+- Yeni otomatik gameplay toast trigger'i eklenmez; P14'ün owner onaylı action-failure kapsamı korunur.
+
+### Guided onboarding yeniden çalışma sınırı
+
+- Oyuncuya oyun, yeni UI Toolkit yüzeyindeki gerçek kontroller üzerinden adım adım öğretilecektir;
+  gizli legacy Canvas kontrolüne bağlı pulse tek başına kabul edilmez.
+- İlk zorunlu zincir `ECONOMY -> worker-share slider -> BARRACKS -> BASIC ARCHER -> 2X` sırasıdır.
+- İlk beş adımda ekran hedef dışı bölgelerde kararır ve yalnız gerçek hedef kontrol etkileşim alır;
+  zincir yalnız başarıyla tamamlanan player action'ıyla ilerler.
+- First Night `RALLY`, first Council exact choice, low-arrow refill, first post-combat Essence ile
+  `CASTLE HEART`, dolu population kapasitesinde housing ve ilk wall damage repair adımları
+  koşul oluştuğunda contextual gösterilir; unrelated kontrolleri kilitlemez.
+- Council kendi mevcut pause sözleşmesini kullanır; tutorial oyuncu adına otomatik action yapmaz.
+- Her adım durable kaydedilir ve Settings içindeki `RESET TUTORIAL` yolu korunur.
+- Kaynak yeterli olduğu sürece sürekli görünen legacy `RECRUIT A BASIC ARCHER.` affordability hint'i
+  yeni HUD'dan kaldırılmıştır; bu geçici temizlik yeni tutorial sırası kararı değildir.
+
 ### UI okunabilirliği ve player-facing terminoloji
 
 - Gameplay HUD USS içinde player-facing yazı boyutu tabanı referans çözünürlükte `10px`tir; kritik phase mesajı `11px` ve yüksek kontrastlıdır.
@@ -124,6 +149,8 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 | 12 | `DW-P12-UI-READABILITY` | Gameplay HUD okunabilirlik, worker slider ve terminoloji düzeltmesi | `[x]` | UXML/USS/C# kontratı, runtime yeniden dağıtım, onboarding ve canlı Game View doğrulandı |
 | 13 | `DW-P13-GAME-FLOW-CONTROLS` | 1X/2X/3X oyun hızı, Council pause ve toast altyapısı | `[x]` | Merkezi speed/pause owner, bounded toast kuyruğu, testler ve canlı Game View doğrulandı |
 | 14 | `DW-P14-ACTION-FEEDBACK` | Game Over meta açıklığı ve exact action-failure toast'ları | `[x]` | Exact effect progression, açıklanabilir action state, hedefli test ve canlı Game View doğrulandı |
+| 15 | `DW-P15-TOAST-AUDIO-POLISH` | Süreli toast stack'i ve UI Toolkit button sesleri | `[x]` | Üç kartlık tekrar korunumu, otomatik dismiss, merkezi click audio ve hedefli runtime testleri doğrulandı |
+| 16 | `DW-P16-GUIDED-ONBOARDING` | UI Toolkit gerçek kontrolleriyle adım adım first-run öğretimi | `[~]` | Exact core/contextual sıra ve interaction policy owner tarafından onaylandı; uygulama bekliyor |
 
 ---
 
@@ -364,6 +391,45 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
   hedefli PlayMode `2/2` geçti. İlgili compile/Console kontrolünde `0 error` görüldü.
 - [x] Canlı `1920x1080` Game Over/Meta Shop kontrolünde beş satırlık görünür alanda açıklama,
   exact fayda, level ve maliyet taşmadan okundu; aktif `HandMadeTiles` sahnesi geri yüklendi.
+
+### `DW-P15-TOAST-AUDIO-POLISH` - Timed Toast Stack + UI Toolkit Button Audio
+
+**Paket başlığı:** `DW-P15-TOAST-AUDIO-POLISH: Timed Action Stack + Toolkit Click Audio`
+**Durum:** `[x]` Uygulama ve hedefli Unity regresyonu tamamlandı.
+
+- [x] Tek-label presenter kaldırıldı; aynı anda en fazla üç dinamik toast kartı sunan bounded stack
+  eklendi. Yeni kart altta görünür, eski kartlar yukarı taşınır ve dördüncü kart en eskiyi düşürür.
+- [x] Tekrarlanan aynı mesajlar ayrı player action'ları olarak korunur. Varsayılan kart `2.4`, warning
+  kartı `3.2` saniye görünür; `180 ms` exit transition'i sonunda hierarchy'den kaldırılır.
+- [x] Toast lifecycle'ı unscaled zamanda çalışır ve stack pointer/raycast almaz.
+- [x] UI Toolkit root `ClickEvent` route'u gerçek Button hedeflerini merkezi `UiSoundFeedback` click
+  kanalına bağlar. Modal içindeki eski tekil çağrı kaldırılarak çift ses engellendi.
+- [x] Yeni otomatik gameplay toast trigger'i eklenmedi; P14 action-failure kaynakları ve İngilizce
+  player-facing copy sınırı korundu.
+- [x] Hedefli EditMode `22/22`; UI Toolkit + legacy Archer runtime senaryolarını kullanan hedefli
+  PlayMode `2/2` geçti. Runtime test üç ayrı warning kartını, görünür state'i, otomatik kaldırmayı ve
+  gerçek UI AudioSource playback'ini doğruladı.
+
+### `DW-P16-GUIDED-ONBOARDING` - UI Toolkit Guided First Run
+
+**Paket başlığı:** `DW-P16-GUIDED-ONBOARDING: Real-Control First-Run Guidance`
+**Durum:** `[~]` Exact öğretim sırası ve interaction policy owner tarafından onaylandı; uygulama bekliyor.
+
+- [x] Mevcut owner zinciri çıkarıldı: `FirstRunOnboardingUI` yedi condition-driven adımı yönetiyor,
+  fakat yeni UI Toolkit yalnız gizli Canvas hint metnini aynalıyor; pulse hedefleri legacy kontrollerde kalıyor.
+- [x] Basic Archer alınabilir olduğunda flag tamamlanana kadar açık kalan legacy affordability cue'su
+  UI Toolkit HUD'dan ayrıldı. Gerçek Archer satın alımının durable tutorial flag'i yazması korunur.
+- [x] Dar düzeltme hedefli EditMode `1/1`, gerçek ilk-gün onboarding PlayMode `1/1` ve Unity compile
+  `0 error` ile doğrulandı.
+- [x] İlk zorunlu click zinciri `ECONOMY -> worker-share slider -> BARRACKS -> BASIC ARCHER -> 2X`
+  olarak owner tarafından kesinleştirildi.
+- [x] İlk beş core adımda yalnız hedef kontrol etkileşim alacak; ekran hedef dışında kararacak ve
+  zincir yalnız gerçek başarılı player action'ıyla ilerleyecek.
+- [x] First Night Rally, first Council exact choice, low-arrow refill, first post-combat Essence
+  Castle Heart, population-full housing ve first wall-damage repair contextual adımlar olarak
+  kesinleştirildi; unrelated kontrol kilitlemeyecekler.
+- [ ] UI Toolkit gerçek control spotlight/input gate presenter'ı ve durable ilerleme uygulanacak.
+- [ ] Hedefli EditMode/PlayMode regresyonu, canlı UI/raycast doğrulaması ve final Console kapısı geçilecek.
 
 ---
 
@@ -684,3 +750,40 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
   dili için İngilizce sınırı yeniden kilitlendi.
 - Hedefli EditMode `23/23`, gerçek UI Toolkit + legacy Market Archer PlayMode `2/2` ve Unity compile
   `0 error` geçti. Ana görev paydası değişmedi; tracker `14/14 - %100` kaldı.
+
+### 2026-07-22 - Süreli toast stack'i ve UI Toolkit button sesleri
+
+- Owner, toast'ın kalıcı görünmemesini, her tıklamanın ayrı kart üretmesini, kartların üst üste
+  kontrollü biçimde dizilmesini ve button seslerinin çalışmasını istedi.
+- Kök neden tek aktif label'ın kuyruktaki tekrarları kesintisiz yeniliyor gibi göstermesi ve
+  `UiSoundFeedback` pointer kontrolünün yalnız legacy uGUI `Button` raycast'ini tanımasıydı.
+- Presenter üç aktif kartlık dinamik stack'e geçirildi; duplicate action'lar korunur, yeni kart alta
+  eklenir, warning kartları `3.2` saniye sonra `180 ms` exit ile kaldırılır ve dördüncü kart en eskiyi düşürür.
+- UI Toolkit document root'u `ClickEvent` ile gerçek Button hedeflerini merkezi audio profile click
+  kanalına bağlar. Yeni otomatik toast kaynağı eklenmedi.
+- Hedefli EditMode `22/22`, hedefli PlayMode `2/2`, Unity compile `0 error` ve `git diff --check`
+  temiz geçti. Owner'a ait `AGENTS.md` ile `HandMadeTiles` dosyalarına dokunulmadı.
+- Owner onaylı yeni ana görev nedeniyle payda `14 -> 15` değişti; P15 kapanışıyla Post-V1 ilerleme
+  `15/15 - %100` oldu.
+
+### 2026-07-22 - Guided onboarding görüşmesi ve legacy Archer hint temizliği
+
+- Owner, eski Canvas tutorial fikrinin yeni UI Toolkit gerçek kontrolleriyle adım adım yeniden
+  düşünülmesini; exact click sırasının uygulamadan önce konuşulmasını istedi.
+- Mevcut sistemin strict bir sıra olmadığı doğrulandı: yedi condition-driven hint'i legacy Canvas
+  target'larına pulse ederken UI Toolkit yalnız metni aynalıyordu.
+- `RECRUIT A BASIC ARCHER.` yazısının kaynak uyarısı değil, Basic Archer alınabilir olduğunda purchase
+  flag'i yazılana kadar açık kalan legacy onboarding cue'su olduğu doğrulandı.
+- Bu cue yeni UI Toolkit HUD'da aynalanmayacak şekilde kaldırıldı; gerçek satın alım ve durable flag
+  davranışı değiştirilmedi. Hedefli EditMode `1/1`, PlayMode `1/1` ve Unity compile `0 error` geçti.
+- Yeni P16 kapsamı owner kararı beklediği için `[?]` açıldı; payda `15 -> 16`, ilerleme
+  `15/16 - %93,75` oldu.
+
+### 2026-07-22 - Guided onboarding sırası owner tarafından onaylandı
+
+- Owner, ilk zorunlu zinciri `ECONOMY -> worker-share slider -> BARRACKS -> BASIC ARCHER -> 2X`
+  olarak onayladı. İlk beş adım hedef dışı input'u kilitleyecek ve yalnız gerçek action ile ilerleyecek.
+- Rally, Council exact choice, low-arrow refill, Castle Heart, housing ve repair öğretimleri koşula
+  bağlı contextual adımlar olarak onaylandı; unrelated kontrolleri kilitlemeyecek.
+- P16 `[?] -> [~]` durumuna taşındı. Uygulama ve test tamamlanmadığı için ilerleme
+  `15/16 - %93,75` olarak kaldı.
