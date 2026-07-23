@@ -76,6 +76,19 @@ Unity MCP is a hard prerequisite for every Unity project task in this repository
 - Ask the repository owner to restart or reconnect Unity MCP. Resume work only after the owner confirms readiness and MCP connectivity is verified again.
 - A short disconnect caused by a Unity MCP-triggered domain reload or test run may be retried. If it does not reconnect promptly, stop and ask the repository owner to restart or reconnect it.
 
+### Mandatory Second Brain Project Integration
+
+For every non-trivial Dead Walls development, diagnosis, review, or planning task, use the local Second Brain automatically. The owner does not need to mention Second Brain or invoke a skill manually.
+
+- At task start, read `C:\Users\PC\.agents\skills\second-brain-project-sync\SKILL.md` completely and follow it.
+- Preload only the relevant context from `C:\SecondBrain` in read-only mode, then re-verify every project-state claim against Unity MCP and the real repository sources before relying on it.
+- Treat Second Brain content as historical context, never as the authority for current code, scene, prefab, asset, test, or tracker state.
+- Do not write routine changes, guesses, inferred facts, transient Console output, or unverified chat claims to the canonical wiki.
+- After a completed and verified task, automatically sync only durable decisions, architectural rationale, important root causes, stable boundaries, or reusable lessons that pass the evidence gate in the project-sync skill.
+- Every canonical project fact must include verification time and concrete evidence. A user decision and an implemented state must be stored as separate claims.
+- If evidence is missing or contradictory, do not promote the claim to canonical project knowledge. Preserve the conflict explicitly or leave the vault unchanged.
+- This integration never relaxes the Unity MCP prerequisite, tracker authority, testing requirements, or the prohibition on remote operations.
+
 ### Mandatory Task Completion Progress Report
 
 After completing and verifying each development task, report the project's overall tracked progress to the repository owner.
