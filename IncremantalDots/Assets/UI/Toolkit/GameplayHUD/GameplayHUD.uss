@@ -437,9 +437,12 @@
 .drawer--right { right: 0; translate: 102% 0; border-left-width: 1px; }
 .arrows-drawer { width: 510px; }
 .surface-header { min-height: 64px; padding-bottom: 18px; border-bottom-width: 1px; border-bottom-color: var(--runtime-line); }
+.surface-header-copy, .surface-header-copy__text { flex-grow: 1; flex-shrink: 1; min-width: 0; }
 .surface-title, .fullscreen-title { margin: 0; padding: 0; color: var(--runtime-ink); font-size: 22px; letter-spacing: 2.2px; -unity-font-style: bold; }
 .surface-subtitle, .fullscreen-subtitle { margin-top: 6px; color: var(--runtime-muted); font-size: 11px; letter-spacing: 0.8px; }
+.surface-header-copy .surface-subtitle { white-space: normal; }
 .surface-close, .tool-button { min-height: 40px; margin: 0 0 0 8px; padding: 0 14px; border-width: 1px; border-color: var(--runtime-line); border-radius: 2px; background-color: rgba(255,255,255,0.035); color: var(--runtime-muted); font-size: 10px; letter-spacing: 0.9px; -unity-font-style: bold; }
+.surface-header > .surface-close { flex-shrink: 0; align-self: flex-start; }
 .surface-close:hover, .surface-close:focus, .tool-button:hover, .tool-button:focus { border-color: var(--runtime-gold-bright); background-color: rgba(207, 155, 80, 0.12); color: white; }
 .surface-scroll { flex-grow: 1; margin-top: 16px; }
 .surface-scroll .unity-scroll-view__vertical-scroller { width: 8px; }
@@ -700,8 +703,8 @@
     border-width: 2px;
     border-color: var(--runtime-gold-bright);
     border-radius: 4px;
-    background-color: rgba(241, 194, 116, 0.08);
-    opacity: 0.96;
+    background-color: rgba(241, 194, 116, 0.13);
+    opacity: 0.82;
 }
 .guided-tutorial-layer.is-contextual .guided-tutorial-focus {
     border-color: var(--runtime-cyan);
@@ -709,8 +712,8 @@
 }
 .guided-tutorial-card {
     position: absolute;
-    min-height: 112px;
-    padding: 14px 16px;
+    min-height: 146px;
+    padding: 16px 18px;
     border-width: 1px;
     border-left-width: 4px;
     border-color: var(--runtime-line-strong);
@@ -730,10 +733,10 @@
 }
 .guided-tutorial-layer.is-contextual .guided-tutorial-step { color: var(--runtime-cyan); }
 .guided-tutorial-title {
-    margin: 0 0 7px 0;
+    margin: 0 0 9px 0;
     padding: 0;
     color: var(--runtime-ink);
-    font-size: 14px;
+    font-size: 15px;
     letter-spacing: 1px;
     -unity-font-style: bold;
     white-space: normal;
@@ -742,9 +745,22 @@
     margin: 0;
     padding: 0;
     color: var(--runtime-muted);
-    font-size: 11px;
+    font-size: 12px;
+    letter-spacing: 0.25px;
     white-space: normal;
 }
+.guided-tutorial-action {
+    margin: 13px 0 0 0;
+    padding: 9px 0 0 0;
+    border-top-width: 1px;
+    border-top-color: rgba(229, 213, 181, 0.14);
+    color: var(--runtime-gold-bright);
+    font-size: 10px;
+    letter-spacing: 0.9px;
+    -unity-font-style: bold;
+    white-space: normal;
+}
+.guided-tutorial-layer.is-contextual .guided-tutorial-action { color: var(--runtime-cyan); }
 .soul-flight { position: absolute; width: 18px; height: 18px; rotate: 45deg; background-color: var(--runtime-cyan); border-width: 2px; border-color: rgba(210,250,255,0.80); }
 .soul-flight__amount { position: absolute; left: 13px; top: -15px; min-width: 48px; height: 22px; padding: 2px 5px; rotate: -45deg; background-color: rgba(6,13,16,0.90); border-width: 1px; border-color: rgba(118,224,255,0.42); color: rgba(222,252,255,0.96); font-size: 10px; -unity-font-style: bold; -unity-text-align: middle-center; }
 .soul-flight--essence { background-color: rgb(177, 104, 216); border-color: rgba(239, 205, 255, 0.88); }

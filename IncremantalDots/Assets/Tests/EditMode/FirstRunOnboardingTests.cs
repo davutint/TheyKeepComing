@@ -186,16 +186,16 @@ namespace DeadWalls.Tests
         [Test]
         public void TutorialCompleteRule_RequiresEveryRequiredStepExactlyOnce()
         {
-            Assert.That(FirstRunOnboardingRules.ShouldPersistTutorialComplete(
+            Assert.That(FirstRunOnboardingRules.ShouldRecordTutorialComplete(
                 false, true, true, true, true, true, true, true), Is.True);
-            Assert.That(FirstRunOnboardingRules.ShouldPersistTutorialComplete(
+            Assert.That(FirstRunOnboardingRules.ShouldRecordTutorialComplete(
                 true, true, true, true, true, true, true, true), Is.False);
 
             for (int missingIndex = 0; missingIndex < 7; missingIndex++)
             {
                 bool[] steps = { true, true, true, true, true, true, true };
                 steps[missingIndex] = false;
-                Assert.That(FirstRunOnboardingRules.ShouldPersistTutorialComplete(
+                Assert.That(FirstRunOnboardingRules.ShouldRecordTutorialComplete(
                     false,
                     steps[0],
                     steps[1],
@@ -346,7 +346,7 @@ namespace DeadWalls.Tests
             }
 
             Assert.That(source, Does.Contain("MetaProgression.SetTutorialFlag"),
-                "Controller yalniz tutorial completion persistence'i yazabilmelidir.");
+                "Controller yalniz session-scoped tutorial completion facade'ini yazabilmelidir.");
         }
 
         [Test]

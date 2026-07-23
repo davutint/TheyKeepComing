@@ -28,6 +28,7 @@ namespace DeadWalls.Tests
 
             DeleteIfExists(_metaPath);
             DeleteIfExists(_tempPath);
+            TutorialSessionProgress.BeginNewPlaySession();
             MetaProgression.Load();
         }
 
@@ -38,6 +39,7 @@ namespace DeadWalls.Tests
             DeleteIfExists(_tempPath);
             RestoreIfNeeded(_metaPath, _hadMeta, _originalMeta);
             RestoreIfNeeded(_tempPath, _hadTemp, _originalTemp);
+            TutorialSessionProgress.BeginNewPlaySession();
             MetaProgression.Load();
         }
 
@@ -135,7 +137,8 @@ namespace DeadWalls.Tests
             Assert.That(MetaProgression.CanPersist, Is.False);
             Assert.That(MetaProgression.State.Souls, Is.Zero);
             Assert.That(MetaProgression.ResetTutorialFlags(
-                FirstRunOnboardingUI.GetTutorialProgressFlagIds()), Is.False);
+                FirstRunOnboardingUI.GetTutorialProgressFlagIds()), Is.True,
+                "Tutorial session reset'i meta save yazma durumundan bagimsizdir.");
             LogAssert.Expect(LogType.Error, new Regex("Save reddedildi; load status: UnsupportedVersion"));
             Assert.That(MetaProgression.Save(), Is.False);
             Assert.That(File.ReadAllText(_metaPath), Is.EqualTo(futureJson));
@@ -153,7 +156,8 @@ namespace DeadWalls.Tests
             Assert.That(MetaProgression.LoadStatus, Is.EqualTo(MetaProgressLoadStatus.Corrupt));
             Assert.That(MetaProgression.CanPersist, Is.False);
             Assert.That(MetaProgression.ResetTutorialFlags(
-                FirstRunOnboardingUI.GetTutorialProgressFlagIds()), Is.False);
+                FirstRunOnboardingUI.GetTutorialProgressFlagIds()), Is.True,
+                "Tutorial session reset'i corrupt meta save'den bagimsizdir.");
             LogAssert.Expect(LogType.Error, new Regex("Save reddedildi; load status: Corrupt"));
             Assert.That(MetaProgression.Save(), Is.False);
             Assert.That(File.ReadAllText(_metaPath), Is.EqualTo(corruptJson));
@@ -189,14 +193,15 @@ namespace DeadWalls.Tests
             Assert.That(MetaProgression.GetUpgradeLevel("invalid"), Is.Zero);
             Assert.That(MetaProgression.State.Upgrades, Has.Count.EqualTo(1));
             Assert.That(MetaProgression.State.UnlockedPoolIds, Is.EqualTo(new[] { "spell_pool", "node_pool" }));
-            Assert.That(MetaProgression.State.TutorialFlags, Is.EqualTo(new[] { "tutorial.complete" }));
+            Assert.That(MetaProgression.State.TutorialFlags, Is.Empty,
+                "Legacy tutorial flags meta JSON'dan yuklenmemelidir.");
             Assert.That(MetaProgression.State.RewardedRunIds, Has.Count.EqualTo(128));
             Assert.That(MetaProgression.State.RewardedRunIds[0], Is.EqualTo("run-002"));
             Assert.That(MetaProgression.State.RewardedRunIds[127], Is.EqualTo("run-129"));
         }
 
         [Test]
-        public void PoolUnlockAndTutorialFlag_RoundTripThroughCanonicalSave()
+        public void PoolUnlockPersistsWhileTutorialProgressResetsWithPlaySession()
         {
             Assert.That(MetaProgression.TryUnlockPoolContent("future_spell_pool"), Is.True);
             Assert.That(MetaProgression.SetTutorialFlag("tutorial.complete", true), Is.True);
@@ -206,15 +211,16 @@ namespace DeadWalls.Tests
             Assert.That(MetaProgression.LoadStatus, Is.EqualTo(MetaProgressLoadStatus.Loaded));
             Assert.That(MetaProgression.HasPoolUnlock("future_spell_pool"), Is.True);
             Assert.That(MetaProgression.HasTutorialFlag("tutorial.complete"), Is.True);
+            Assert.That(File.ReadAllText(_metaPath), Does.Not.Contain("TutorialFlags"));
 
-            Assert.That(MetaProgression.SetTutorialFlag("tutorial.complete", false), Is.True);
+            TutorialSessionProgress.BeginNewPlaySession();
             MetaProgression.Load();
             Assert.That(MetaProgression.HasTutorialFlag("tutorial.complete"), Is.False);
             Assert.That(MetaProgression.HasPoolUnlock("future_spell_pool"), Is.True);
         }
 
         [Test]
-        public void TutorialReset_ClearsExactOnboardingSetAndPreservesOtherMetaState()
+        public void TutorialSessionReset_ClearsExactSetAndPreservesOtherMetaState()
         {
             string[] tutorialFlags = FirstRunOnboardingUI.GetTutorialProgressFlagIds();
             foreach (string flagId in tutorialFlags)
@@ -225,6 +231,7 @@ namespace DeadWalls.Tests
             Assert.That(MetaProgression.TryUnlockPoolContent("future_spell_pool"), Is.True);
             MetaProgression.State.Souls = 321;
             Assert.That(MetaProgression.Save(), Is.True);
+            Assert.That(File.ReadAllText(_metaPath), Does.Not.Contain("TutorialFlags"));
 
             Assert.That(MetaProgression.ResetTutorialFlags(tutorialFlags), Is.True);
             foreach (string flagId in tutorialFlags)

@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using UnityEngine;
 
 namespace DeadWalls.Tests
 {
@@ -65,7 +67,7 @@ namespace DeadWalls.Tests
         }
 
         [Test]
-        public void CopyAndResetContract_AreEnglishDurableAndUnique()
+        public void CopyAndResetContract_AreEnglishSessionScopedAndUnique()
         {
             GuidedOnboardingStep[] steps =
             {
@@ -89,7 +91,13 @@ namespace DeadWalls.Tests
                 Assert.That(copy.Title, Is.Not.Empty, step.ToString());
                 Assert.That(copy.Body, Is.Not.Empty, step.ToString());
                 Assert.That(copy.Title, Does.Match("^[A-Z0-9 ]+$"), step.ToString());
+                Assert.That(copy.Body.Length, Is.GreaterThanOrEqualTo(70), step.ToString());
             }
+
+            Assert.That(GuidedOnboardingProgress.GetCopy(GuidedOnboardingStep.SpeedTwo).Body,
+                Does.Contain("paused simulation will resume"));
+            Assert.That(GuidedOnboardingProgress.GetCopy(GuidedOnboardingStep.Housing).Body,
+                Does.Contain("no new people can arrive"));
 
             string[] guidedFlags = GuidedOnboardingProgress.GetProgressFlagIds();
             Assert.That(guidedFlags, Has.Length.EqualTo(13));
@@ -98,6 +106,63 @@ namespace DeadWalls.Tests
                 Is.SupersetOf(guidedFlags));
             Assert.That(GuidedOnboardingProgress.IsCoreStep(GuidedOnboardingStep.SpeedTwo), Is.True);
             Assert.That(GuidedOnboardingProgress.IsCoreStep(GuidedOnboardingStep.Rally), Is.False);
+        }
+
+        [Test]
+        public void TutorialProgress_EveryPlaySessionStartsFromTheFirstStepWithoutSaveData()
+        {
+            TutorialSessionProgress.BeginNewPlaySession();
+            string[] allFlags = FirstRunOnboardingUI.GetTutorialProgressFlagIds();
+            foreach (string flagId in allFlags)
+                Assert.That(MetaProgression.SetTutorialFlag(flagId, true), Is.True, flagId);
+
+            Assert.That(TutorialSessionProgress.CompletedFlagCount,
+                Is.EqualTo(allFlags.Distinct().Count()));
+            Assert.That(GuidedOnboardingProgress.IsCoreComplete(), Is.True);
+
+            var legacySchema = new MetaProgressState
+            {
+                TutorialFlags = new List<string> { GuidedOnboardingProgress.CompleteFlagId }
+            };
+            string serializedMeta = JsonUtility.ToJson(legacySchema);
+            Assert.That(serializedMeta, Does.Not.Contain("TutorialFlags"),
+                "Tutorial progress meta save'e serialize edilmemelidir.");
+
+            TutorialSessionProgress.BeginNewPlaySession();
+
+            Assert.That(TutorialSessionProgress.CompletedFlagCount, Is.Zero);
+            foreach (string flagId in allFlags)
+                Assert.That(MetaProgression.HasTutorialFlag(flagId), Is.False, flagId);
+            Assert.That(GuidedOnboardingProgress.IsCoreComplete(), Is.False);
+            Assert.That(GuidedOnboardingProgress.ResolveCoreStep(
+                    false, false, false, false, false, false, false),
+                Is.EqualTo(GuidedOnboardingStep.EconomyOpen));
+        }
+
+        [Test]
+        public void TutorialProgress_NewPlayResetIsRegisteredForSubsystemInitialization()
+        {
+            var method = typeof(TutorialSessionProgress).GetMethod(
+                nameof(TutorialSessionProgress.BeginNewPlaySession));
+            Assert.That(method, Is.Not.Null);
+
+            var attribute = System.Attribute.GetCustomAttribute(method,
+                typeof(RuntimeInitializeOnLoadMethodAttribute))
+                as RuntimeInitializeOnLoadMethodAttribute;
+            Assert.That(attribute, Is.Not.Null);
+            Assert.That(attribute.loadType,
+                Is.EqualTo(RuntimeInitializeLoadType.SubsystemRegistration));
+        }
+
+        [Test]
+        public void FocusPulse_UsesUnscaledTimeAndBreathesAcrossFullRange()
+        {
+            float start = GameplayHUDToolkitUI.EvaluateGuidedFocusPulse(0f);
+            float peakTime = 0.5f / 1.15f;
+            float peak = GameplayHUDToolkitUI.EvaluateGuidedFocusPulse(peakTime);
+
+            Assert.That(start, Is.EqualTo(0f).Within(0.0001f));
+            Assert.That(peak, Is.EqualTo(1f).Within(0.0001f));
         }
 
         private static GuidedOnboardingStep ResolveCore(

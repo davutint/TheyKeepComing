@@ -12,7 +12,7 @@ owner'larinin player-action event'lerini dinler; yalniz non-modal hint ve pulse 
 
 ## Ilk Day Worker Ratio Adimi
 
-- Stable meta flag: `tutorial.v1.worker_ratio`.
+- Stable session flag: `tutorial.v1.worker_ratio`.
 - Gorunme kapisi: mobile worker economy aktif, oyun bitmemis, continuous cycle Day 1 / Day.
 - Drawer kapaliyken `WorkerDrawerToggleButton`, acikken `WoodWorkerTargetPlus10Button` pulse olur.
 - Tek player-facing metin English'tir: `ADJUST A WORKER TARGET RATIO.`
@@ -23,7 +23,7 @@ owner'larinin player-action event'lerini dinler; yalniz non-modal hint ve pulse 
 
 ## Ilk Basic Archer Affordability Adimi
 
-- Stable meta flag: `tutorial.v1.basic_archer`.
+- Stable session flag: `tutorial.v1.basic_archer`.
 - Gorunme kapisi: mobile worker economy aktif, oyun bitmemis ve authoritative
   `GameManager.CanBuyArcher(Basic)` sonucu true.
 - Worker ratio adimi ayni anda gorunuyorsa worker adimi sunum onceligini korur; Basic satin alma
@@ -36,7 +36,7 @@ owner'larinin player-action event'lerini dinler; yalniz non-modal hint ve pulse 
 
 ## Ilk Dusuk Ammo Adimi
 
-- Stable meta flag: `tutorial.v1.low_ammo`.
+- Stable session flag: `tutorial.v1.low_ammo`.
 - Gorunme kapisi: mobile worker economy aktif, oyun bitmemis ve finite Arrow stoku effective
   kapasitenin inclusive `%25` veya altinda.
 - Worker ratio ve Basic Archer adimlari ayni anda uygunsa onceki adimlar sunum onceligini korur;
@@ -50,13 +50,13 @@ owner'larinin player-action event'lerini dinler; yalniz non-modal hint ve pulse 
 
 ## Ilk Grave Essence / Castle Heart Adimi
 
-- Stable meta flag: `tutorial.v1.heart`.
+- Stable session flag: `tutorial.v1.heart`.
 - Gorunme kapisi: mobile worker economy aktif, oyun bitmemis ve authoritative
   `GameManager.GraveEssenceAmount > 0`.
 - Bu adim kill basina Essence miktari veya drop orani tanimlamaz; yalniz ilk gercek pozitif
   Heart bakiyesini gozlemler. Essence gain dengesi tracker'daki ayri balance isinin sahibidir.
 - Grave Essence runtime sorgusu yalniz onceki presentation adimlari uygun degilken ve Heart
-  flag'i incomplete iken yapilir; durable completion sonrasinda per-frame Heart wallet okumasi yoktur.
+  flag'i incomplete iken yapilir; session completion sonrasinda per-frame Heart wallet okumasi yoktur.
 - Heart kapaliyken aktif sunum sahibinin Castle Heart komutu one cikar; panel oyuncu adina acilmaz.
   Legacy `HeartScreenUI` yalniz davranis kontrati icin sahnede kalir.
 - Giris metni English'tir: `OPEN THE CASTLE HEART.`
@@ -67,17 +67,17 @@ owner'larinin player-action event'lerini dinler; yalniz non-modal hint ve pulse 
 - Durable flag, oyuncu Heart'i close butonu veya Escape ile kapattiginda yazilir. Programmatic
   acma/kapama tutorial'i tamamlamaz; devam eden savas bilgisi gorulmeden flag yazilmaz.
 - Oyuncu Heart'i ilk Grave Essence prompt'i uygun olmadan once acarsa gercek player event'i
-  yine Heart dersini baslatir; close sonrasinda durable flag yazilir ve Essence daha sonra
+  yine Heart dersini baslatir; close sonrasinda session flag yazilir ve Essence daha sonra
   geldiginde giris prompt'i tekrar gosterilmez.
 
 ## Ilk Regular Council Exact Karar Adimi
 
-- Stable meta flag: `tutorial.v1.council`.
+- Stable session flag: `tutorial.v1.council`.
 - Gorunme kapisi: mobile worker economy aktif, oyun bitmemis ve regular Council karti oyuncu
   secimine gercekten acik. Ilk kosuda bu durum Day 1 Dawn'daki ilk regular toplantidir;
   tutorial sonradan resetlenmisse bir sonraki aktif regular kart ayni kontrati ogretebilir.
 - Council karar penceresi blocking pause oldugu icin onceki opportunistic prompt'lari gecici
-  olarak sunum onceliginde ezer. Onceki adimlarin durable state'i degismez.
+  olarak sunum onceliginde ezer. Onceki adimlarin session state'i degismez.
 - Pulse tek bir secenegi gostermek yerine `CouncilEventPanel` kartinin tamamini kapsar; tutorial
   Option A/B arasinda yonlendirme yapmaz.
 - Tek player-facing metin English'tir: `COMPARE BOTH EXACT OUTCOMES AND THEIR COSTS.` Karttaki iki
@@ -91,7 +91,7 @@ owner'larinin player-action event'lerini dinler; yalniz non-modal hint ve pulse 
 
 ## Ilk Daytime Wall Repair Adimi
 
-- Stable meta flag: `tutorial.v1.repair`.
+- Stable session flag: `tutorial.v1.repair`.
 - Gorunme kapisi: mobile worker economy aktif, oyun bitmemis, continuous cycle gercek `Day`
   phase'inde ve yasayan Wall `%99,5` altinda hasarli. Normal repair gameplay olarak Dusk'ta da
   kullanilabilir; onboarding ise ilk guvenli management penceresini ogretmek icin yalniz Day'de
@@ -102,7 +102,7 @@ owner'larinin player-action event'lerini dinler; yalniz non-modal hint ve pulse 
 - Tek player-facing metin English'tir: `REPAIR THE WALL DURING THE DAY.` Hint top-center savunma
   panelinin altinda `0,-294` konumuna tasinir ve gercek repair kontrolu disinda hedef uretmez.
 - Yalniz `DefenseRepairUI` butonundan baslayip `GameManager.RepairDefenseFull()` tarafindan
-  basariyla commit edilen islem `NormalRepairCommittedByPlayer` event'ini yayar ve durable flag'i
+  basariyla commit edilen islem `NormalRepairCommittedByPlayer` event'ini yayar ve session flag'i
   yazar. Basarisiz/afford edilemeyen deneme, Wall'in yalniz hasar almasi veya baska bir gameplay
   owner'inin programmatic repair cagrisi tamamlanma sayilmaz.
 - Tutorial Wall HP, Stone, phase veya button state'i yazmaz; repair miktari, exact Stone maliyeti
@@ -110,7 +110,7 @@ owner'larinin player-action event'lerini dinler; yalniz non-modal hint ve pulse 
 
 ## Ilk Night Ability Key Adimi
 
-- Stable meta flag: `tutorial.v1.ability_key`.
+- Stable session flag: `tutorial.v1.ability_key`.
 - Gorunme kapisi: mobile worker economy aktif, oyun bitmemis, continuous cycle ilk kosunun
   `CycleIndex = 0` Night phase'inde ve en az bir aktif ability gercekten hazir.
 - Hedef secimi gercek ability barinda sabit oncelikle yapilir: hazirsa `[1] Fireball`, degilse
@@ -120,7 +120,7 @@ owner'larinin player-action event'lerini dinler; yalniz non-modal hint ve pulse 
   `PRESS 3 TO REPAIR THE WALL.` olur. Hint bottom-center ability barinin ustunde `0,170`
   konumlanir; pulse gercek slot `RectTransform`unu izler.
 - Yalniz `SpellCastUI` icindeki kabul edilmis `1/2/3` keyboard yolu
-  `AbilityHotkeyAcceptedByPlayer` event'ini yayar ve durable flag'i yazar. Locked/cooldown/
+  `AbilityHotkeyAcceptedByPlayer` event'ini yayar ve session flag'i yazar. Locked/cooldown/
   phase tarafindan reddedilen tus, ability butonuna mouse click veya programmatic gameplay
   cagrisi key-hint ogretimini tamamlamaz.
 - Kabul edilmis hotkey prompt gorunmeden once kullanilmissa adim tekrar gosterilmez. Tutorial
@@ -131,7 +131,7 @@ owner'larinin player-action event'lerini dinler; yalniz non-modal hint ve pulse 
 
 Prompt uygunlugu ve aktif sunum adimi completion kapisi degildir. Tutorial controller'i `Update`
 icindeki cue secimini yalniz sunum icin kullanir; kabul edilmis player-action event handler'lari
-`_activeStep`, hint veya pulse gorunurlugunu sorgulamadan ilgili durable flag'i yazar.
+`_activeStep`, hint veya pulse gorunurlugunu sorgulamadan ilgili session flag'i yazar.
 
 - Worker ratio, Basic Archer, Arrow refill, regular Council secimi, normal repair ve ability
   hotkey adimlari owner'larinin yalniz basarili transaction sonrasinda yaydigi event ile tamamlanir.
@@ -149,56 +149,32 @@ hedefli PlayMode testinde ayrica korunur.
 
 ## Global Tutorial Complete Flag
 
-- Stable meta flag: `tutorial.v1.complete`.
-- Global flag yeni bir serialized schema alani degildir; mevcut `MetaProgressState v3`
-  `TutorialFlags` listesinde diger stable onboarding flag'leriyle ayni atomik JSON save sahibini
-  kullanir.
-- Yedi zorunlu flag'in tamami durable oldugunda controller global flag'i yazar. Son accepted
-  player action ayni frame'de completion kontrolunu tetikler.
-- Eski save'de yedi alt flag mevcut fakat global flag yoksa `Update` ayni kosulu tekrar
-  degerlendirip global flag'i durable backfill eder; meta schema version bump gerekmez.
+- Stable session flag: `tutorial.v1.complete`.
+- Yedi zorunlu flag'in tamami mevcut Play oturumunda tamamlandiginda controller global flag'i
+  ayni session'a yazar. Son accepted player action ayni frame'de completion kontrolunu tetikler.
 - Global flag mevcutsa onboarding controller'i step eligibility veya gameplay wallet sorgularina
   girmeden shared hint/pulse sunumunu kapali tutar.
-- Global flag tek basina alt flag'leri uretmez. Yalniz yedi stable flag'in tamaminin kanitindan
-  turetilir; Settings reset global ve yedi alt flag'i ayni durable transaction'da birlikte temizler.
+- Global flag tek basina alt flag'leri uretmez; yedi stable session flag'inin tamaminin kanitindan
+  turetilir.
 
-Pure completion kurali yedi zorunlu flag'in her birini ayri ayri gerektirir. PlayMode final-action
-ve legacy-backfill testleri `meta_progress.json` reload sonrasinda `tutorial.v1.complete` flag'inin
-durable kaldigini dogrular.
+## Play Oturumu Sozlesmesi
 
-## Ikinci Run Suppression Sozlesmesi
-
-- Tamamlanmis tutorial state'i run snapshot'inin parcasi degildir; `MetaProgression` icindeki
-  stable sekiz flag, Game Over ile biten ilk kosudan ve yeni run identity'sinden bagimsiz kalir.
-- Gercek ikinci run yolu `UIManager.OnRestart()` -> `GameManager.RestartGame()` zinciridir. Ilk
-  run'in lethal save islemi durable death receipt'ini tamamlar, living Continue snapshot'ini siler
-  ve restart yeni bir `CurrentRunId` uretir; tutorial flag'leri bu transaction'da temizlenmez.
-- `tutorial.v1.complete` ikinci run baslangicinda yeniden yuklendiginde controller, normalde uygun
-  olan ilk Day worker cue'su dahil butun step eligibility sorgularini kisa devre eder. Shared hint,
-  pulse target ve sekiz onboarding presentation state'i kapali kalir.
-- Tutorial'i yeniden acan tek oyuncu tercihi Settings icindeki iki-onayli `RESET TUTORIAL`
-  islemidir. New Run, Game Over restart veya run save silme tutorial reset sayilmaz.
-
-PlayMode ikinci-run regresyonu ilk run'a gercek snapshot ve lethal ECS state'i kurar, durable death
-transaction'ini tamamlar, gercek Restart butonu owner'ini cagirir ve yeni run kimligi ile Day 1
-state'ini kanitlar. Ardindan meta save'i yeniden yukleyip sekiz flag'in korundugunu ve 120 frame
-boyunca hint/pulse ile butun cue durumlarinin kapali kaldigini dogrular.
+- Tutorial ilerlemesi run snapshot veya `meta_progress.json` parcasi degildir.
+- `TutorialSessionProgress.BeginNewPlaySession`, Unity `SubsystemRegistration` asamasinda butun
+  tutorial flag'lerini temizler. Domain reload kapali olsa da her Stop -> Play dongusu temizdir.
+- Ayni Play icindeki `UIManager.OnRestart()` yeni run identity uretir fakat yeni Play oturumu
+  baslatmaz; tamamlanmis tutorial ayni test oturumunda kapali kalir.
+- Editor'da Stop ardindan Play yapildiginda core ve contextual tutorial yeniden Economy adimindan
+  baslar. Eski save'deki `TutorialFlags` okunmaz ve yeni flag'ler diske yazilmaz.
 
 ## Settings Tutorial Reset
 
 - `NewGameScene` pause Settings ve `MainMenuScene` Settings ayni `SettingsUI` kontrolunu kullanir.
-- `RESET TUTORIAL` ilk tiklamada yalniz `CONFIRM RESET` durumuna gecer. Ikinci tiklama olmadan
-  hiçbir meta state degismez; modal veya ek pause lease uretilmez.
-- Onayli reset `FirstRunOnboardingUI.GetTutorialProgressFlagIds()` listesindeki yedi adim flag'i
-  ile `tutorial.v1.complete` flag'ini `MetaProgression.ResetTutorialFlags` uzerinden tek atomik
-  save'de temizler.
-- Reset yalniz onboarding state'ine dokunur. Run save, Souls, meta upgrade, pool unlock ve ileride
-  eklenecek listede olmayan tutorial flag'leri korunur.
+- `RESET TUTORIAL` ilk tiklamada yalniz `CONFIRM RESET` durumuna gecer. Ikinci tiklama mevcut
+  session'daki canonical tutorial flag listesini temizler; meta veya run save'e dokunmaz.
+- Normal development akisi bu butonu gerektirmez; her yeni Play otomatik temiz session baslatir.
 - Reset oyun sahnesinde pause altinda yapilirsa onboarding cue'su pause kapanana kadar gizli kalir;
-  Resume sonrasinda ilk gercek uygun adim yeniden sunulur. Ana menude yapilirsa sonraki oyunda
-  ayni davranis baslar.
-- Meta save fail-closed veya disk write basarisizsa onceki tutorial listesi geri yuklenir ve UI
-  `RESET FAILED. META SAVE WAS NOT CHANGED.` bildirimi verir.
+  Resume sonrasinda ilk gercek uygun adim yeniden sunulur.
 
 ## Player-Facing English Copy Contract
 
@@ -270,5 +246,5 @@ mevcut full-pause davranisini aciklar. `OnboardingHintPanel` nested `Canvas`i no
 parent siralamasini kullanir; yalniz Heart pause adiminda `overrideSorting = true / 260` olur ve
 Heart modalinin `200` sorting order'i ustunde okunur.
 
-Ability key adimi da ayni scene-owned controller ve stable meta flag sinirini kullanir; hicbir
+Ability key adimi da ayni scene-owned controller ve stable session flag sinirini kullanir; hicbir
 tekil adim final tutorial complete flag'i yerine gecmez.

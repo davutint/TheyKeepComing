@@ -45,7 +45,7 @@ component'ine; `FirstRunOnboardingUI.NormalRepair` referansi ayni root'taki tek
 `DefenseRepairUI` component'ine; `FirstRunOnboardingUI.Abilities` referansi ayni root'taki tek
 `SpellCastUI` component'ine bagli olmalidir.
 
-Idempotent onarim: `Window -> DeadWalls -> Repair First Run Onboarding`.
+Idempotent onarim: `Tools -> Dead Walls -> Setup & Repair -> Repair First Run Onboarding`.
 
 ## Settings Tutorial Reset Binding
 
@@ -58,21 +58,21 @@ Idempotent onarim: `Window -> DeadWalls -> Repair First Run Onboarding`.
 Her iki sahnedeki `SettingsUI`, button/label/status referanslarini tasir. Panel ilk durumda
 `RESET TUTORIAL` ve `RESETS ONBOARDING ONLY. RUN AND UPGRADES STAY.` metinlerini gosterir.
 Idempotent iki-sahne onarimi icin `NewGameScene` aktifken
-`Window -> DeadWalls -> Repair Tutorial Reset Setting` calistirilir.
+`Tools -> Dead Walls -> Setup & Repair -> Repair Tutorial Reset Setting` calistirilir.
 
 ## Dogrulama
 
 - EditMode presentation/rule testleri prefab isim, geometri, English copy, raycast, Day 1 ve
   Basic affordability kapilarini dogrular.
 - PlayMode testi gercek `NewGameScene` icinde hint/pulse gorunurlugunu, drawer acilinca hedef
-  degisimini, player ratio action'inin meta flag yazmasini ve tutorial'in resource/actual worker
+  degisimini, player ratio action'inin session flag yazmasini ve tutorial'in resource/actual worker
   state'ini kendi basina degistirmedigini dogrular.
 - Basic Archer PlayMode testi, yetersiz kaynaktan ilk affordability'ye gecisi, kapali/acik drawer
   hedeflerini ve yalniz basarili satin almanin `tutorial.v1.basic_archer` flag'ini yazdigini dogrular.
 - Low Ammo PlayMode testi `%25` inclusive esigi, kapali panelde gercek `ARROW SUPPLY` dock hedefi,
   panelin oyuncu tiklamasina kadar kapali kalmasi, acilis sonrasi gercek `AmmoPackageButton`
   hedefi, basarisiz refill'in flag yazmamasi ve yalniz basarili refill'in
-  `tutorial.v1.low_ammo` flag'ini durable yazmasini dogrular.
+  `tutorial.v1.low_ammo` flag'ini session'a yazmasini dogrular.
 - Heart PlayMode testi sifir bakiyede sessiz kalmayi, ilk pozitif Grave Essence bakiyesinde gercek
   Heart butonunu pulse etmeyi, panelin oyuncu aksiyonuyla acilmasini, full-pause hint'inin
   `Time.timeScale = 0` iken gorunmesini ve flag'in yalniz player close sonrasinda yazilmasini
@@ -86,11 +86,11 @@ Idempotent iki-sahne onarimi icin `NewGameScene` aktifken
   basarili player repair'in exact Stone harcayip `tutorial.v1.repair` flag'ini yazmasini dogrular.
 - First Night ability-key PlayMode testi ilk Night'ta ilk hazir gercek slotu ve dynamic English
   copy'yi, locked hotkey reddini, mouse button kullaniminin flag yazmamasini, kabul edilmis `[2]`
-  hotkey'inin `tutorial.v1.ability_key` flag'ini durable yazmasini ve tutorial'in resource
+  hotkey'inin `tutorial.v1.ability_key` flag'ini session'a yazmasini ve tutorial'in resource
   state'ine dokunmamasini dogrular.
 - Global transaction-free EditMode guard'i controller source'unda Archer/Ammo/Heart/Council/
   repair/ability transaction'i, worker assignment, ECS write, programmatic panel open ve button
-  invoke cagrilarini yasaklar; `MetaProgression.SetTutorialFlag` izinli tek persistence yazimidir.
+  invoke cagrilarini yasaklar; `MetaProgression.SetTutorialFlag` yalniz session facade'i olarak izinlidir.
 - Global transaction-free PlayMode testi yedi cue'yu action cagirilmadan sirayla gorunur yapar;
   her cue boyunca Wood/Stone/Iron/Food, Arrow, Grave Essence, population, actual worker dagilimi,
   target ratio, bed ve worker-building state'lerinin exact ayni kaldigini dogrular.
@@ -108,18 +108,18 @@ Idempotent iki-sahne onarimi icin `NewGameScene` aktifken
   dogrular.
 - Global completion EditMode kurali yedi zorunlu alt flag'in tamamini gerektirir ve stable
   `tutorial.v1.complete` Id'sini kilitler.
-- Final-action PlayMode testi son eksik adim tamamlandiginda global flag'in ayni run'da yazildigini;
-  legacy-backfill testi yedi alt flag tasiyan eski meta save'in global flag'i ureterek iki durumda
-  da `MetaProgression.Load()` sonrasinda durable kaldigini dogrular.
-- Second-run suppression PlayMode testi ilk run'i gercek lethal save/death receipt yoluyla bitirir,
+- Final-action PlayMode testi son eksik adim tamamlandiginda global flag'in ayni Play session'inda
+  yazildigini dogrular.
+- Same-session restart PlayMode testi ilk run'i gercek lethal save/death receipt yoluyla bitirir,
   `UIManager.OnRestart()` ile farkli `CurrentRunId` tasiyan Day 1 kosusunu baslatir ve sekiz tutorial
-  flag'inin meta reload sonrasinda korundugunu dogrular.
+  flag'inin ayni Play oturumunda korundugunu dogrular.
 - Ayni test, ikinci run'da normal ilk-worker eligibility'si aktifken 120 frame boyunca shared hint,
-  pulse target ve sekiz onboarding cue state'inin tamamini kapali kilitler. Yalniz Settings icindeki
-  onayli reset bu kontrati opt-in olarak yeniden acar.
+  pulse target ve sekiz onboarding cue state'inin tamamini kapali kilitler.
 - Tutorial reset EditMode testleri canonical sekiz flag listesini, listenin consumer tarafindan
   mutate edilememesini, iki sahnede tek ve eksiksiz Settings binding'ini ve hedefli resetin diger
-  meta state'i koruyarak reload sonrasi durable kalmasini dogrular.
+  meta state'ine dokunmadan yalniz session state'ini temizledigini dogrular.
+- Yeni Play session testi tamamlanmis butun core/contextual flag'leri sifirlar, Economy adimini
+  yeniden acar ve `meta_progress.json` icerigini byte-for-byte degistirmez.
 - Tutorial reset PlayMode testi ilk tiklamanin yalniz confirmation kurdugunu, ikinci tiklamanin
   sekiz flag'i temizledigini, bilinmeyen future tutorial flag'ini korudugunu ve Pause Resume
   sonrasinda ilk uygun onboarding cue'sunun yeniden basladigini dogrular.

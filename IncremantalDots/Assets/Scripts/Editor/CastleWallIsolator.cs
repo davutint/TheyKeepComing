@@ -22,7 +22,7 @@ namespace DeadWalls
         // (owner: duvar bitkilerini silme dedi). Tileset'te "Wall" ile baslayan sadece Wall + WallFlora var.
         private const string KeepPrefix = "Wall";
 
-        [MenuItem("Window/DeadWalls/Castle Isolate - Keep Only Wall Tiles")]
+        [MenuItem(DeadWallsEditorMenuPaths.Maps + "Castle Isolate - Keep Only Wall Tiles")]
         public static void KeepOnlyWallTiles()
         {
             // GUVENLIK: yalnizca AKTIF sahne islenir. Baska sahne(ler) ayni anda acik olsa bile dokunulmaz.

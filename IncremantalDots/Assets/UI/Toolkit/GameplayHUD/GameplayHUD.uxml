@@ -172,9 +172,9 @@
         <ui:VisualElement name="economyDrawer" class="surface drawer drawer--left economy-drawer">
             <ui:VisualElement class="surface-texture surface-texture--short" picking-mode="Ignore" />
             <ui:VisualElement class="surface-header">
-                <ui:VisualElement>
+                <ui:VisualElement name="economyHeaderCopy" class="surface-header-copy">
                     <ui:Label text="KEEP ECONOMY" class="surface-title" />
-                    <ui:Label text="Set target shares. Everyone works; capacity overflow moves to the next resource." class="surface-subtitle" />
+                    <ui:Label name="economySubtitle" text="Set target shares. Everyone works; capacity overflow moves to the next resource." class="surface-subtitle" />
                 </ui:VisualElement>
                 <ui:Button name="economyClose" text="CLOSE" class="surface-close" />
             </ui:VisualElement>
@@ -205,7 +205,7 @@
         <ui:VisualElement name="barracksDrawer" class="surface drawer drawer--right barracks-drawer">
             <ui:VisualElement class="surface-texture surface-texture--short" picking-mode="Ignore" />
             <ui:VisualElement class="surface-header">
-                <ui:VisualElement><ui:Label text="WALL GARRISON" class="surface-title" /><ui:Label text="Recruit for the fight already in progress." class="surface-subtitle" /></ui:VisualElement>
+                <ui:VisualElement name="barracksHeaderCopy" class="surface-header-copy"><ui:Label text="WALL GARRISON" class="surface-title" /><ui:Label text="Recruit for the fight already in progress." class="surface-subtitle" /></ui:VisualElement>
                 <ui:Button name="barracksClose" text="CLOSE" class="surface-close" />
             </ui:VisualElement>
             <ui:VisualElement class="barracks-summary">
@@ -218,7 +218,7 @@
         <ui:VisualElement name="arrowsDrawer" class="surface drawer drawer--right arrows-drawer">
             <ui:VisualElement class="surface-texture surface-texture--short" picking-mode="Ignore" />
             <ui:VisualElement class="surface-header">
-                <ui:VisualElement class="surface-heading-with-icon"><ui:VisualElement class="dw-icon dw-icon--header dw-icon--arrows" picking-mode="Ignore" /><ui:VisualElement><ui:Label text="ARROW SUPPLY" class="surface-title" /><ui:Label text="Restock now; improve the supply line for later." class="surface-subtitle" /></ui:VisualElement></ui:VisualElement>
+                <ui:VisualElement name="arrowsHeaderCopy" class="surface-heading-with-icon surface-header-copy"><ui:VisualElement class="dw-icon dw-icon--header dw-icon--arrows" picking-mode="Ignore" /><ui:VisualElement class="surface-header-copy__text"><ui:Label text="ARROW SUPPLY" class="surface-title" /><ui:Label text="Restock now; improve the supply line for later." class="surface-subtitle" /></ui:VisualElement></ui:VisualElement>
                 <ui:Button name="arrowsClose" text="CLOSE" class="surface-close" />
             </ui:VisualElement>
             <ui:VisualElement class="supply-hero">
@@ -355,9 +355,10 @@
             <ui:VisualElement name="guidedDimRight" class="guided-tutorial-dim" picking-mode="Ignore" />
             <ui:VisualElement name="guidedFocus" class="guided-tutorial-focus" picking-mode="Ignore" />
             <ui:VisualElement name="guidedCard" class="guided-tutorial-card" picking-mode="Ignore">
-                <ui:Label name="guidedStepLabel" text="FIRST RUN  ·  1 OF 6" class="guided-tutorial-step" picking-mode="Ignore" />
+                <ui:Label name="guidedStepLabel" text="TUTORIAL PAUSED  ·  STEP 1 OF 6" class="guided-tutorial-step" picking-mode="Ignore" />
                 <ui:Label name="guidedTitle" text="OPEN THE ECONOMY" class="guided-tutorial-title" picking-mode="Ignore" />
-                <ui:Label name="guidedBody" text="Manage how your people produce resources." class="guided-tutorial-body" picking-mode="Ignore" />
+                <ui:Label name="guidedBody" text="Your people gather Wood, Stone, Iron, and Food here. Open Economy to inspect and rebalance the workforce." class="guided-tutorial-body" picking-mode="Ignore" />
+                <ui:Label name="guidedAction" text="COMPLETE THE HIGHLIGHTED ACTION TO CONTINUE" class="guided-tutorial-action" picking-mode="Ignore" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

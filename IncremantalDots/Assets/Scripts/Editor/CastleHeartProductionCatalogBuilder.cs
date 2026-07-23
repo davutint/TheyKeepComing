@@ -40,7 +40,7 @@ namespace DeadWalls
             public HeartNodeEffect[] Effects;
         }
 
-        [MenuItem("Window/DeadWalls/Rebuild Castle Heart Production Catalog")]
+        [MenuItem(DeadWallsEditorMenuPaths.Content + "Rebuild Castle Heart Production Catalog")]
         public static void RebuildProductionCatalogAndBind()
         {
             HeartNodeCatalogSO catalog = EnsureProductionCatalog();
@@ -56,7 +56,7 @@ namespace DeadWalls
                 catalog);
         }
 
-        [MenuItem("Window/DeadWalls/Apply Castle Heart Pixel Icon Map")]
+        [MenuItem(DeadWallsEditorMenuPaths.Content + "Apply Castle Heart Pixel Icon Map")]
         public static void ApplyPixelIconMap()
         {
             HeartNodeCatalogSO catalog = AssetDatabase.LoadAssetAtPath<HeartNodeCatalogSO>(CatalogPath);

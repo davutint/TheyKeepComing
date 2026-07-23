@@ -38,7 +38,7 @@ namespace DeadWalls
         private string status = "Reference Scene analizi bekleniyor.";
         private MessageType statusType = MessageType.Info;
 
-        [MenuItem("Window/DeadWalls/Fantasy Kingdom Scene Painter")]
+        [MenuItem(DeadWallsEditorMenuPaths.Maps + "Fantasy Kingdom/Scene Painter")]
         public static void ShowWindow()
         {
             var window = GetWindow<FantasyKingdomScenePainterWindow>("Fantasy Kingdom Painter");

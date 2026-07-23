@@ -13,7 +13,7 @@ namespace DeadWalls.Editor
         private static readonly Color GroundColor = new Color(0.03f, 0.045f, 0.065f, 1f);
         private static readonly Vector4 GroundContact = new Vector4(0.50f, 0.30f, 0.075f, 0.025f);
 
-        [MenuItem("Window/DeadWalls/Repair Horde Readability")]
+        [MenuItem(DeadWallsEditorMenuPaths.SetupAndRepair + "Repair Horde Readability")]
         public static void Repair()
         {
             Material material = AssetDatabase.LoadAssetAtPath<Material>(MaterialPath);

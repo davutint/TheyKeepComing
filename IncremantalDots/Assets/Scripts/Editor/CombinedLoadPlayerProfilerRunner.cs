@@ -20,7 +20,6 @@ namespace DeadWalls.Editor
             "HordeScale_10K_1K_CombinedProfilerCapture_ProducesLoadableRaw";
         private const string CapturePrefix = "DW_V1_PLAYER_COMBINED_";
         private const string FramePacingPrefix = "DW_V1_TARGET_HARDWARE_FRAME_PACING_";
-        private const string MenuRoot = "Tools/DeadWalls/";
 
         private static TestRunnerApi _testRunnerApi;
         private static PlayerCallbacks _callbacks;
@@ -43,7 +42,7 @@ namespace DeadWalls.Editor
             public string error;
         }
 
-        [MenuItem(MenuRoot + "Run Combined 10K + 1K Player Profile")]
+        [MenuItem(DeadWallsEditorMenuPaths.Profiling + "Run Combined 10K + 1K Player Profile")]
         public static void RunCombinedPlayerProfile()
         {
             if (EditorApplication.isCompiling || EditorApplication.isPlayingOrWillChangePlaymode)
@@ -107,7 +106,7 @@ namespace DeadWalls.Editor
             }
         }
 
-        [MenuItem(MenuRoot + "Analyze Latest Combined Player Profile")]
+        [MenuItem(DeadWallsEditorMenuPaths.Profiling + "Analyze Latest Combined Player Profile")]
         public static void AnalyzeLatestCombinedPlayerProfile()
         {
             string rawPath = FindLatestRaw(0L);

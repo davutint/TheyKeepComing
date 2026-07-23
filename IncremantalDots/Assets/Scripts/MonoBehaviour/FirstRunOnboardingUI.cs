@@ -139,7 +139,7 @@ namespace DeadWalls
                 && !councilExactTeachingActive;
         }
 
-        public static bool ShouldPersistTutorialComplete(
+        public static bool ShouldRecordTutorialComplete(
             bool alreadyComplete,
             bool workerRatioComplete,
             bool basicArcherComplete,
@@ -245,7 +245,7 @@ namespace DeadWalls
         private FirstRunOnboardingStep _activeStep;
         private bool _heartPauseTeachingActive;
         private bool _heartSurfaceOpen;
-        private bool _persistenceWarningLogged;
+        private bool _progressWarningLogged;
 
         public bool IsWorkerRatioStepVisible => _activeStep == FirstRunOnboardingStep.WorkerRatio;
         public bool IsBasicArcherStepVisible => _activeStep == FirstRunOnboardingStep.BasicArcher;
@@ -310,7 +310,7 @@ namespace DeadWalls
                 BindAbilities();
             }
 
-            if (EnsureTutorialCompletionPersisted())
+            if (EnsureTutorialCompletionRecorded())
             {
                 SetPresentation(FirstRunOnboardingStep.None, null);
                 return;
@@ -640,17 +640,17 @@ namespace DeadWalls
             if (MetaProgression.HasTutorialFlag(WorkerRatioFlagId)
                 || MetaProgression.SetTutorialFlag(WorkerRatioFlagId, true))
             {
-                _persistenceWarningLogged = false;
-                EnsureTutorialCompletionPersisted();
+                _progressWarningLogged = false;
+                EnsureTutorialCompletionRecorded();
                 SetPresentation(FirstRunOnboardingStep.None, null);
                 return;
             }
 
-            if (_persistenceWarningLogged)
+            if (_progressWarningLogged)
                 return;
 
-            _persistenceWarningLogged = true;
-            Debug.LogWarning("[FirstRunOnboardingUI] Worker ratio tutorial flag durable yazilamadi.");
+            _progressWarningLogged = true;
+            Debug.LogWarning("[FirstRunOnboardingUI] Worker ratio tutorial flag session'a yazilamadi.");
         }
 
         public void NotifyWorkerTargetRatioChangedByPlayer(EconomyFocusType resource)
@@ -666,17 +666,17 @@ namespace DeadWalls
             if (MetaProgression.HasTutorialFlag(BasicArcherFlagId)
                 || MetaProgression.SetTutorialFlag(BasicArcherFlagId, true))
             {
-                _persistenceWarningLogged = false;
-                EnsureTutorialCompletionPersisted();
+                _progressWarningLogged = false;
+                EnsureTutorialCompletionRecorded();
                 SetPresentation(FirstRunOnboardingStep.None, null);
                 return;
             }
 
-            if (_persistenceWarningLogged)
+            if (_progressWarningLogged)
                 return;
 
-            _persistenceWarningLogged = true;
-            Debug.LogWarning("[FirstRunOnboardingUI] Basic Archer tutorial flag durable yazilamadi.");
+            _progressWarningLogged = true;
+            Debug.LogWarning("[FirstRunOnboardingUI] Basic Archer tutorial flag session'a yazilamadi.");
         }
 
         private void HandleArrowRefillPurchased()
@@ -684,17 +684,17 @@ namespace DeadWalls
             if (MetaProgression.HasTutorialFlag(LowAmmoFlagId)
                 || MetaProgression.SetTutorialFlag(LowAmmoFlagId, true))
             {
-                _persistenceWarningLogged = false;
-                EnsureTutorialCompletionPersisted();
+                _progressWarningLogged = false;
+                EnsureTutorialCompletionRecorded();
                 SetPresentation(FirstRunOnboardingStep.None, null);
                 return;
             }
 
-            if (_persistenceWarningLogged)
+            if (_progressWarningLogged)
                 return;
 
-            _persistenceWarningLogged = true;
-            Debug.LogWarning("[FirstRunOnboardingUI] Low ammo tutorial flag durable yazilamadi.");
+            _progressWarningLogged = true;
+            Debug.LogWarning("[FirstRunOnboardingUI] Low ammo tutorial flag session'a yazilamadi.");
         }
 
         private void HandleHeartOpenedByPlayer()
@@ -722,17 +722,17 @@ namespace DeadWalls
             if (MetaProgression.HasTutorialFlag(HeartEntryFlagId)
                 || MetaProgression.SetTutorialFlag(HeartEntryFlagId, true))
             {
-                _persistenceWarningLogged = false;
-                EnsureTutorialCompletionPersisted();
+                _progressWarningLogged = false;
+                EnsureTutorialCompletionRecorded();
                 SetPresentation(FirstRunOnboardingStep.None, null);
                 return;
             }
 
-            if (_persistenceWarningLogged)
+            if (_progressWarningLogged)
                 return;
 
-            _persistenceWarningLogged = true;
-            Debug.LogWarning("[FirstRunOnboardingUI] Castle Heart tutorial flag durable yazilamadi.");
+            _progressWarningLogged = true;
+            Debug.LogWarning("[FirstRunOnboardingUI] Castle Heart tutorial flag session'a yazilamadi.");
         }
 
         public void NotifyHeartSurfaceClosedByPlayer()
@@ -745,17 +745,17 @@ namespace DeadWalls
             if (MetaProgression.HasTutorialFlag(CouncilExactFlagId)
                 || MetaProgression.SetTutorialFlag(CouncilExactFlagId, true))
             {
-                _persistenceWarningLogged = false;
-                EnsureTutorialCompletionPersisted();
+                _progressWarningLogged = false;
+                EnsureTutorialCompletionRecorded();
                 SetPresentation(FirstRunOnboardingStep.None, null);
                 return;
             }
 
-            if (_persistenceWarningLogged)
+            if (_progressWarningLogged)
                 return;
 
-            _persistenceWarningLogged = true;
-            Debug.LogWarning("[FirstRunOnboardingUI] Council tutorial flag durable yazilamadi.");
+            _progressWarningLogged = true;
+            Debug.LogWarning("[FirstRunOnboardingUI] Council tutorial flag session'a yazilamadi.");
         }
 
         private void HandleNormalRepairCommitted()
@@ -763,17 +763,17 @@ namespace DeadWalls
             if (MetaProgression.HasTutorialFlag(DaytimeRepairFlagId)
                 || MetaProgression.SetTutorialFlag(DaytimeRepairFlagId, true))
             {
-                _persistenceWarningLogged = false;
-                EnsureTutorialCompletionPersisted();
+                _progressWarningLogged = false;
+                EnsureTutorialCompletionRecorded();
                 SetPresentation(FirstRunOnboardingStep.None, null);
                 return;
             }
 
-            if (_persistenceWarningLogged)
+            if (_progressWarningLogged)
                 return;
 
-            _persistenceWarningLogged = true;
-            Debug.LogWarning("[FirstRunOnboardingUI] Daytime repair tutorial flag durable yazilamadi.");
+            _progressWarningLogged = true;
+            Debug.LogWarning("[FirstRunOnboardingUI] Daytime repair tutorial flag session'a yazilamadi.");
         }
 
         private void HandleAbilityHotkeyAccepted(AbilityHotkeySlot slot)
@@ -781,26 +781,26 @@ namespace DeadWalls
             if (MetaProgression.HasTutorialFlag(NightAbilityKeyFlagId)
                 || MetaProgression.SetTutorialFlag(NightAbilityKeyFlagId, true))
             {
-                _persistenceWarningLogged = false;
-                EnsureTutorialCompletionPersisted();
+                _progressWarningLogged = false;
+                EnsureTutorialCompletionRecorded();
                 SetPresentation(FirstRunOnboardingStep.None, null);
                 return;
             }
 
-            if (_persistenceWarningLogged)
+            if (_progressWarningLogged)
                 return;
 
-            _persistenceWarningLogged = true;
-            Debug.LogWarning("[FirstRunOnboardingUI] Ability key tutorial flag durable yazilamadi.");
+            _progressWarningLogged = true;
+            Debug.LogWarning("[FirstRunOnboardingUI] Ability key tutorial flag session'a yazilamadi.");
         }
 
-        private bool EnsureTutorialCompletionPersisted()
+        private bool EnsureTutorialCompletionRecorded()
         {
             bool alreadyComplete = MetaProgression.HasTutorialFlag(TutorialCompleteFlagId);
             if (alreadyComplete)
                 return true;
 
-            bool shouldPersist = FirstRunOnboardingRules.ShouldPersistTutorialComplete(
+            bool shouldRecord = FirstRunOnboardingRules.ShouldRecordTutorialComplete(
                 alreadyComplete,
                 MetaProgression.HasTutorialFlag(WorkerRatioFlagId),
                 MetaProgression.HasTutorialFlag(BasicArcherFlagId),
@@ -809,20 +809,20 @@ namespace DeadWalls
                 MetaProgression.HasTutorialFlag(CouncilExactFlagId),
                 MetaProgression.HasTutorialFlag(DaytimeRepairFlagId),
                 MetaProgression.HasTutorialFlag(NightAbilityKeyFlagId));
-            if (!shouldPersist)
+            if (!shouldRecord)
                 return false;
 
             if (MetaProgression.SetTutorialFlag(TutorialCompleteFlagId, true))
             {
-                _persistenceWarningLogged = false;
+                _progressWarningLogged = false;
                 return true;
             }
 
-            if (!_persistenceWarningLogged)
+            if (!_progressWarningLogged)
             {
-                _persistenceWarningLogged = true;
+                _progressWarningLogged = true;
                 Debug.LogWarning(
-                    "[FirstRunOnboardingUI] Global tutorial complete flag durable yazilamadi.");
+                    "[FirstRunOnboardingUI] Global tutorial complete flag session'a yazilamadi.");
             }
             return false;
         }

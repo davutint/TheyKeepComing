@@ -162,7 +162,7 @@ Layout placement origin'i transform kaydirarak degil, her zaman
 
 ### `FantasyKingdomFullMapComposerWindow`
 
-- `Window/DeadWalls/Fantasy Kingdom Full Map Composer` menusunden acilir.
+- `Tools/Dead Walls/Maps/Fantasy Kingdom/Full Map Composer` menusunden acilir.
 - Layout asseti ve aktif kok Grid'i birlikte gosterir.
 - `CREATE / UPDATE FULL PREVIEW`, `ANALYZE ONLY` ve `CLEAR FULL PREVIEW` sunar.
 - Scene View'da settlement, wall clearance, frontline, moat, battlefield, spawn ve
@@ -258,9 +258,9 @@ Guncel assetler:
 
 - Layout: `Assets/Editor/FantasyKingdomPainter/Layouts/FK_NewGameScene_FullMap_V3_RetouchPreview.asset`
 - Stable stamp set: `Assets/Editor/FantasyKingdomPainter/Stamps/V3`
-- Builder menu: `Window/DeadWalls/Fantasy Kingdom/Rebuild V3 Retouch Preview Assets`
-- Preview menu: `Window/DeadWalls/Fantasy Kingdom/Create V3 Retouch Preview`
-- Occlusion proof: `Window/DeadWalls/Fantasy Kingdom/Create Zombie Forest Occlusion Probe`
+- Builder menu: `Tools/Dead Walls/Maps/Fantasy Kingdom/Rebuild V3 Retouch Preview Assets`
+- Preview menu: `Tools/Dead Walls/Maps/Fantasy Kingdom/Create V3 Retouch Preview`
+- Occlusion proof: `Tools/Dead Walls/Maps/Fantasy Kingdom/Create Zombie Forest Occlusion Probe`
 
 ## Faz 6: owner-onayli kalici V3 snapshot apply
 
@@ -296,9 +296,9 @@ component allowlist, source stamp tile/matrix/color, renderer material/mode/sort
 protected `Grass/outside*` fingerprint'i ve marker world pozisyonlarini kontrol eder.
 
 Kalici apply menusu:
-`Window/DeadWalls/Fantasy Kingdom/APPLY APPROVED V3 TO NEW GAME SCENE`.
+`Tools/Dead Walls/Maps/Fantasy Kingdom/APPLY APPROVED V3 TO NEW GAME SCENE`.
 Post-apply yapisal kontrol menusu:
-`Window/DeadWalls/Fantasy Kingdom/Validate Persistent V3 Map`.
+`Tools/Dead Walls/Maps/Fantasy Kingdom/Validate Persistent V3 Map`.
 
 Legacy source tile'lari temizlendikten sonra builder, managed V3 root'u ve sifir legacy
 snapshot'i algilar. Wood/Stone/Iron/Food icin mevcut stabil V3 stamp assetlerini exact

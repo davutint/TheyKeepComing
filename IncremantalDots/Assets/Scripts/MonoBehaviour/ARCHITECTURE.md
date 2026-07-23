@@ -135,10 +135,11 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
   pulse eder; ammo panelini otomatik acmaz
 - Ilk pozitif Grave Essence bakiyesinde gercek `CASTLE HEART` butonunu pulse eder; oyuncu paneli acinca mevcut full pause'u English hint ile ogretir ve flag'i player close sonrasinda yazar
 - Gameplay transaction'i, otomatik drawer acma, resource harcama veya worker dagitma yapmaz
-- Basarili gercek player ratio action'ini `WorkerEconomyDrawerUI` event'inden alir ve `tutorial.v1.worker_ratio` stable flag'ini canonical `MetaProgression` API'siyle durable yazar
-- Basarili gercek Basic Archer satin alimini `MarketUI` event'inden alir ve `tutorial.v1.basic_archer` stable flag'ini durable yazar
-- Basarili gercek Arrow refill satin alimini `ArrowSupplyUI` event'inden alir ve `tutorial.v1.low_ammo` stable flag'ini durable yazar
-- Gercek Heart open/close event'lerini `HeartScreenUI`dan alir ve `tutorial.v1.heart` stable flag'ini durable yazar; Essence drop miktari uretmez
+- Basarili gercek player ratio, Basic Archer, Arrow refill ve Heart open/close action'larini ilgili
+  gameplay event'lerinden alir; stable `tutorial.v1.*` flag'lerini yalniz mevcut Play oturumunda
+  `TutorialSessionProgress` uzerinden kaydeder
+- Tutorial flag'leri meta veya run save'e yazilmaz; her yeni Play oturumu butun adimlari temizler
+- Gercek Heart open/close event'i Essence drop miktari uretmez
 - Otoriter dok: `FIRST_RUN_ONBOARDING_UI_ARCHITECTURE.md`
 
 ### TechTreeUI.cs

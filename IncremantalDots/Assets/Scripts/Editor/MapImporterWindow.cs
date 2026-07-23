@@ -107,7 +107,7 @@ namespace DeadWalls
         // ─── EditorPrefs key prefix ─────────────────────
         private const string KeyPrefix = "DeadWalls_MapImporter_";
 
-        [MenuItem("Window/DeadWalls/Map Importer")]
+        [MenuItem(DeadWallsEditorMenuPaths.Maps + "Map Importer")]
         public static void ShowWindow()
         {
             var window = GetWindow<MapImporterWindow>("Map Importer");

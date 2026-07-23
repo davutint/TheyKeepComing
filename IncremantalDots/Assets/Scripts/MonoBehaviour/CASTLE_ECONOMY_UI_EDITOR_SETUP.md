@@ -38,7 +38,7 @@ Bu panel mobile continuous worker drawer akisi icin legacy/debug kabul edilir. P
 
 ## Scene Setup
 
-`Window/DeadWalls/Mobile Castle Scene Setup` calistirilinca:
+`Tools/Dead Walls/Setup & Repair/Mobile Castle Scene Setup` calistirilinca:
 
 - `CastleEconomyUI` component'i `MobileCastleHudRoot` uzerine eklenir.
 - Yukaridaki alanlar isimle aranip baglanir.

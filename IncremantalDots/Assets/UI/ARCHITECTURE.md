@@ -35,6 +35,9 @@ tamamlanmis tek-seferlik satin alim gibi terminal durumlar gercek disabled state
 - Economy drawer: worker hedef oranlari, capacity/efficiency, housing.
 - Barracks drawer: archer katalogu, recruit ve retrain.
 - Arrow Supply drawer: saha kasasi, wagon, fill reserve, capacity ve efficiency.
+- Drawer header kontrati: baslik/aciklama kolonu `surface-header-copy` ile daralir ve uzun subtitle'i
+  satir kirarak tam gosterir; `surface-close` daralmaz ve kendi alanini korur. Economy, Barracks ve
+  Arrow Supply ayni no-overlap kontratini kullanir.
 - Castle Heart: hidden-safe runtime presentation'dan uretilen dort kollu graph ve exact-effect inspector.
 - War Doctrine: prerequisite depth'lerinden uretilen dinamik tech graph, pan, zoom ve inspector.
 - Council: iki exact option sonucu; kart acikken pause ve secim sonrasi onceki hiz restore'u.
@@ -47,7 +50,11 @@ tamamlanmis tek-seferlik satin alim gibi terminal durumlar gercek disabled state
   gercek dusman olumundeki basarili Grave Essence drop flight'i.
 - Legacy `FirstRunOnboardingUI` hint/pulse sunumu yeni HUD'a aynalanmaz. Aktif first-run sahibi
   UI Toolkit'teki gercek kontrolleri izleyen `GameplayHUDToolkitUI.Onboarding`dir. Zorunlu
-  `ECONOMY -> Wood slider -> CLOSE -> BARRACKS -> BASIC ARCHER -> 2X` zinciri hedef disi input'u kilitler;
+  `ECONOMY -> Wood slider -> CLOSE -> BARRACKS -> BASIC ARCHER -> 2X` zinciri hedef disi input'u
+  kilitler ve `SimulationPauseService` lease'iyle oyunu durdurur. Son 2X action'i tutorial lease'ini
+  birakip simulation'i secilen 2X running speed'de devam ettirir. Gorunur contextual field tipleri
+  de action tamamlanana kadar oyunu durdurur fakat unrelated UI input'unu kilitlemez. Spotlight
+  `Time.unscaledTime` ile padding/opacity/border nefes pulse'i uygular;
   kosullu Rally, Council, Arrow, Castle Heart, housing ve repair tip'leri unrelated kontrolleri
   kilitlemez.
 

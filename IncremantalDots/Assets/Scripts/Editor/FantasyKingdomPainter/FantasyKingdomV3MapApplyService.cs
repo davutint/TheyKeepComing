@@ -101,7 +101,7 @@ namespace DeadWalls
 
         public static FantasyKingdomV3ApplyReport LastApplyReport { get; private set; }
 
-        [MenuItem("Window/DeadWalls/Fantasy Kingdom/APPLY APPROVED V3 TO NEW GAME SCENE")]
+        [MenuItem(DeadWallsEditorMenuPaths.Maps + "Fantasy Kingdom/APPLY APPROVED V3 TO NEW GAME SCENE")]
         private static void ApplyApprovedV3FromMenu()
         {
             try
@@ -117,7 +117,7 @@ namespace DeadWalls
             }
         }
 
-        [MenuItem("Window/DeadWalls/Fantasy Kingdom/Validate Persistent V3 Map")]
+        [MenuItem(DeadWallsEditorMenuPaths.Maps + "Fantasy Kingdom/Validate Persistent V3 Map")]
         private static void ValidatePersistentV3FromMenu()
         {
             Scene scene = SceneManager.GetActiveScene();

@@ -358,7 +358,7 @@ public class ProfilerDataAnalyzer : EditorWindow
     // MENU & WINDOW
     // ═══════════════════════════════════════════════════════════
 
-    [MenuItem("Tools/Analyze Profiler Data")]
+    [MenuItem(DeadWalls.DeadWallsEditorMenuPaths.Profiling + "Analyze Profiler Data")]
     public static void ShowWindow()
     {
         var window = GetWindow<ProfilerDataAnalyzer>("Profiler Analyzer");

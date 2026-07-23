@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -6,9 +7,11 @@ namespace DeadWalls
     public sealed partial class GameplayHUDToolkitUI
     {
         private const float GuidedFocusPadding = 8f;
-        private const float GuidedCardWidth = 330f;
-        private const float GuidedCardFallbackHeight = 118f;
+        private const float GuidedCardWidth = 410f;
+        private const float GuidedCardFallbackHeight = 154f;
         private const float GuidedCardGap = 16f;
+        private const float GuidedFocusPulseExpansion = 5f;
+        private const float GuidedFocusPulseCyclesPerSecond = 1.15f;
 
         private VisualElement _guidedTutorialLayer;
         private VisualElement _guidedDimTop;
@@ -20,8 +23,10 @@ namespace DeadWalls
         private Label _guidedStepLabel;
         private Label _guidedTitle;
         private Label _guidedBody;
+        private Label _guidedAction;
         private GuidedOnboardingStep _activeGuidedStep;
         private VisualElement _activeGuidedTarget;
+        private IDisposable _guidedPauseLease;
         private bool _guidedInputGateRegistered;
         private bool _guidedCoreInputLocked;
         private bool _guidedPersistenceWarningLogged;
@@ -43,6 +48,7 @@ namespace DeadWalls
             _guidedStepLabel = Q<Label>("guidedStepLabel");
             _guidedTitle = Q<Label>("guidedTitle");
             _guidedBody = Q<Label>("guidedBody");
+            _guidedAction = Q<Label>("guidedAction");
         }
 
         private void RegisterGuidedOnboardingInputGate()
@@ -119,9 +125,13 @@ namespace DeadWalls
         private void UpdateGuidedOnboarding(GameManager gm)
         {
             if (_guidedTutorialLayer == null || gm == null)
+            {
+                ReleaseGuidedOnboardingPause();
                 return;
+            }
 
             GuidedOnboardingStep step = ResolveGuidedOnboardingStep(gm);
+            SyncGuidedOnboardingPause(step != GuidedOnboardingStep.None);
             VisualElement target = ResolveGuidedOnboardingTarget(step);
             bool targetReady = IsGuidedTargetReady(target);
             if (step == GuidedOnboardingStep.None || !targetReady)
@@ -145,6 +155,24 @@ namespace DeadWalls
             _guidedTutorialLayer.EnableInClassList("is-core", coreStep);
             _guidedTutorialLayer.EnableInClassList("is-contextual", !coreStep);
             UpdateGuidedOnboardingGeometry(target, coreStep);
+        }
+
+        private void SyncGuidedOnboardingPause(bool shouldPause)
+        {
+            if (shouldPause)
+            {
+                _guidedPauseLease ??= SimulationPauseService.Acquire("GuidedOnboarding");
+                SimulationPauseService.EnforcePausedState();
+                return;
+            }
+
+            ReleaseGuidedOnboardingPause();
+        }
+
+        private void ReleaseGuidedOnboardingPause()
+        {
+            _guidedPauseLease?.Dispose();
+            _guidedPauseLease = null;
         }
 
         private GuidedOnboardingStep ResolveGuidedOnboardingStep(GameManager gm)
@@ -179,7 +207,8 @@ namespace DeadWalls
             int arrowCurrent = Mathf.Clamp(gm.ArrowSupply.Current, 0, arrowCapacity);
             bool arrowRefillEligible = arrowCapacity > 0
                 && (long)arrowCurrent * 100L
-                    <= (long)arrowCapacity * FirstRunOnboardingUI.LowAmmoThresholdPercent;
+                    <= (long)arrowCapacity * FirstRunOnboardingUI.LowAmmoThresholdPercent
+                && gm.CanBuyArrowRefill(1);
             bool rallyEligible = cycle.CycleIndex == 0
                 && cycle.Phase == SiegeCyclePhase.Night
                 && gm.RallyReady;
@@ -191,7 +220,8 @@ namespace DeadWalls
             bool castleHeartEligible = postCombatPhase
                 && gm.GraveEssenceAmount > 0L
                 && _openSurface != SurfaceKind.Heart;
-            bool housingEligible = gm.Population.Total >= gm.GetTotalBedCapacity();
+            bool housingEligible = gm.Population.Total >= gm.GetTotalBedCapacity()
+                && gm.CanBuyBedCapacity(1);
 
             return GuidedOnboardingProgress.ResolveContextualStep(
                 suppressTutorial,
@@ -267,25 +297,38 @@ namespace DeadWalls
         private void ApplyGuidedOnboardingCopy(GuidedOnboardingStep step)
         {
             GuidedOnboardingCopy copy = GuidedOnboardingProgress.GetCopy(step);
-            _guidedStepLabel.text = GuidedOnboardingProgress.IsCoreStep(step)
-                ? $"FIRST RUN  ·  {GuidedOnboardingProgress.GetCoreStepNumber(step)} OF 6"
-                : "FIELD TIP";
+            bool coreStep = GuidedOnboardingProgress.IsCoreStep(step);
+            _guidedStepLabel.text = coreStep
+                ? $"TUTORIAL PAUSED  ·  STEP {GuidedOnboardingProgress.GetCoreStepNumber(step)} OF 6"
+                : "FIELD TIP  ·  GAME PAUSED";
             _guidedTitle.text = copy.Title;
             _guidedBody.text = copy.Body;
+            _guidedAction.text = coreStep
+                ? "COMPLETE THE HIGHLIGHTED ACTION TO CONTINUE"
+                : "COMPLETE THE HIGHLIGHTED ACTION TO RESUME";
         }
 
         private void UpdateGuidedOnboardingGeometry(VisualElement target, bool coreStep)
         {
+            float pulse = EvaluateGuidedFocusPulse(Time.unscaledTime);
+            float focusPadding = GuidedFocusPadding
+                + GuidedFocusPulseExpansion * pulse;
             Rect targetLocalRect = new Rect(Vector2.zero, target.localBound.size);
             Rect focusRect = target.ChangeCoordinatesTo(_root, targetLocalRect);
             float rootWidth = Mathf.Max(1f, _root.contentRect.width);
             float rootHeight = Mathf.Max(1f, _root.contentRect.height);
-            focusRect.xMin = Mathf.Clamp(focusRect.xMin - GuidedFocusPadding, 0f, rootWidth);
-            focusRect.yMin = Mathf.Clamp(focusRect.yMin - GuidedFocusPadding, 0f, rootHeight);
-            focusRect.xMax = Mathf.Clamp(focusRect.xMax + GuidedFocusPadding, 0f, rootWidth);
-            focusRect.yMax = Mathf.Clamp(focusRect.yMax + GuidedFocusPadding, 0f, rootHeight);
+            focusRect.xMin = Mathf.Clamp(focusRect.xMin - focusPadding, 0f, rootWidth);
+            focusRect.yMin = Mathf.Clamp(focusRect.yMin - focusPadding, 0f, rootHeight);
+            focusRect.xMax = Mathf.Clamp(focusRect.xMax + focusPadding, 0f, rootWidth);
+            focusRect.yMax = Mathf.Clamp(focusRect.yMax + focusPadding, 0f, rootHeight);
 
             SetGuidedRect(_guidedFocus, focusRect.x, focusRect.y, focusRect.width, focusRect.height);
+            _guidedFocus.style.opacity = Mathf.Lerp(0.58f, 1f, pulse);
+            float borderWidth = Mathf.Lerp(2f, 3.5f, pulse);
+            _guidedFocus.style.borderTopWidth = borderWidth;
+            _guidedFocus.style.borderRightWidth = borderWidth;
+            _guidedFocus.style.borderBottomWidth = borderWidth;
+            _guidedFocus.style.borderLeftWidth = borderWidth;
             if (coreStep)
             {
                 SetGuidedRect(_guidedDimTop, 0f, 0f, rootWidth, focusRect.yMin);
@@ -324,6 +367,15 @@ namespace DeadWalls
             SetGuidedRect(_guidedCard, cardLeft, cardTop, cardWidth, cardHeight);
         }
 
+        internal static float EvaluateGuidedFocusPulse(float unscaledTime)
+        {
+            float radians = Mathf.Max(0f, unscaledTime)
+                * GuidedFocusPulseCyclesPerSecond
+                * Mathf.PI
+                * 2f;
+            return 0.5f + 0.5f * Mathf.Sin(radians - Mathf.PI * 0.5f);
+        }
+
         private static void SetGuidedRect(
             VisualElement element,
             float left,
@@ -352,6 +404,7 @@ namespace DeadWalls
 
         private void ResetGuidedOnboardingPresentation()
         {
+            ReleaseGuidedOnboardingPause();
             HideGuidedOnboardingPresentation();
             _guidedPersistenceWarningLogged = false;
         }
@@ -364,6 +417,11 @@ namespace DeadWalls
             if (GuidedOnboardingProgress.TryComplete(step))
             {
                 _guidedPersistenceWarningLogged = false;
+                if (!GuidedOnboardingProgress.IsCoreStep(step)
+                    || GuidedOnboardingProgress.IsCoreComplete())
+                {
+                    ReleaseGuidedOnboardingPause();
+                }
                 HideGuidedOnboardingPresentation();
                 return true;
             }

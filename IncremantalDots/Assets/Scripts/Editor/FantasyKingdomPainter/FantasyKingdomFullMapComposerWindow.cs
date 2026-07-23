@@ -24,7 +24,7 @@ namespace DeadWalls
         private string status = "V3 render-band replacement preview hazir.";
         private MessageType statusType = MessageType.Info;
 
-        [MenuItem("Window/DeadWalls/Fantasy Kingdom Full Map Composer")]
+        [MenuItem(DeadWallsEditorMenuPaths.Maps + "Fantasy Kingdom/Full Map Composer")]
         public static void Open()
         {
             GetWindow<FantasyKingdomFullMapComposerWindow>(

@@ -168,6 +168,31 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void ProductionHud_DrawerHeadersReserveSpaceForCloseButtons()
+        {
+            TemplateContainer root = LoadHud().CloneTree();
+            string hudStyle = File.ReadAllText(HudStylePath);
+
+            VisualElement economyHeaderCopy = root.Q<VisualElement>("economyHeaderCopy");
+            Label economySubtitle = root.Q<Label>("economySubtitle");
+            Assert.That(economyHeaderCopy, Is.Not.Null);
+            Assert.That(economyHeaderCopy.ClassListContains("surface-header-copy"), Is.True);
+            Assert.That(economySubtitle, Is.Not.Null);
+            Assert.That(economySubtitle.text, Is.EqualTo(
+                "Set target shares. Everyone works; capacity overflow moves to the next resource."));
+            Assert.That(root.Q<VisualElement>("barracksHeaderCopy")
+                .ClassListContains("surface-header-copy"), Is.True);
+            Assert.That(root.Q<VisualElement>("arrowsHeaderCopy")
+                .ClassListContains("surface-header-copy"), Is.True);
+            Assert.That(hudStyle, Does.Contain(
+                ".surface-header-copy, .surface-header-copy__text { flex-grow: 1; flex-shrink: 1; min-width: 0; }"));
+            Assert.That(hudStyle, Does.Contain(
+                ".surface-header > .surface-close { flex-shrink: 0; align-self: flex-start; }"));
+            Assert.That(hudStyle, Does.Contain(
+                ".surface-header-copy .surface-subtitle { white-space: normal; }"));
+        }
+
+        [Test]
         public void ProductionHud_GuidedOnboardingOwnsSpotlightCopyAndCoreInputGate()
         {
             TemplateContainer root = LoadHud().CloneTree();
@@ -189,13 +214,22 @@ namespace DeadWalls.Tests
             Assert.That(root.Q<VisualElement>("guidedDimRight"), Is.Not.Null);
             Assert.That(root.Q<VisualElement>("guidedFocus"), Is.Not.Null);
             Assert.That(root.Q<VisualElement>("guidedCard"), Is.Not.Null);
+            Assert.That(root.Q<Label>("guidedAction"), Is.Not.Null);
             Assert.That(root.Q<Label>("guidedTitle").text, Is.EqualTo("OPEN THE ECONOMY"));
             Assert.That(root.Q<Label>("guidedBody").text,
-                Is.EqualTo("Manage how your people produce resources."));
-            Assert.That(root.Q<Label>("guidedStepLabel").text, Does.Contain("1 OF 6"));
+                Does.Contain("Wood, Stone, Iron, and Food"));
+            Assert.That(root.Q<Label>("guidedStepLabel").text,
+                Does.Contain("TUTORIAL PAUSED"));
+            Assert.That(root.Q<Label>("guidedAction").text,
+                Does.Contain("HIGHLIGHTED ACTION"));
             Assert.That(onboardingSource, Does.Contain("TrickleDown.TrickleDown"));
             Assert.That(onboardingSource, Does.Contain("StopImmediatePropagation"));
             Assert.That(onboardingSource, Does.Contain("ChangeCoordinatesTo"));
+            Assert.That(onboardingSource,
+                Does.Contain("SimulationPauseService.Acquire(\"GuidedOnboarding\")"));
+            Assert.That(onboardingSource,
+                Does.Contain("SimulationPauseService.EnforcePausedState"));
+            Assert.That(onboardingSource, Does.Contain("Time.unscaledTime"));
             Assert.That(hudSource, Does.Contain("GuidedOnboardingStep.Rally"));
             Assert.That(hudSource, Does.Contain("GuidedOnboardingStep.WallRepair"));
             Assert.That(hudSource, Does.Contain("GuidedOnboardingStep.CastleHeart"));
@@ -205,8 +239,10 @@ namespace DeadWalls.Tests
             Assert.That(managementSource, Does.Contain("GuidedOnboardingStep.ArrowRefill"));
             Assert.That(managementSource, Does.Contain("GuidedOnboardingStep.Housing"));
             Assert.That(gameFlowSource, Does.Contain("GuidedOnboardingStep.SpeedTwo"));
+            Assert.That(gameFlowSource, Does.Contain("guidedSpeedSelection"));
             Assert.That(modalSource, Does.Contain("GuidedOnboardingStep.CouncilChoice"));
             Assert.That(hudStyle, Does.Contain(".guided-tutorial-layer.is-contextual"));
+            Assert.That(hudStyle, Does.Contain(".guided-tutorial-action"));
             Assert.That(hudStyle, Does.Contain("pointer-events: none"));
         }
 

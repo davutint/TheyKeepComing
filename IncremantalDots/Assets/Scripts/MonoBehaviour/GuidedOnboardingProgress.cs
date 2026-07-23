@@ -32,8 +32,8 @@ namespace DeadWalls
     }
 
     /// <summary>
-    /// Yeni UI Toolkit first-run akışının durable flag ve saf sıra kurallarıdır. Gameplay
-    /// transaction'i yapmaz; yalnız başarıyla tamamlanan gerçek player action'ını kaydeder.
+    /// Yeni UI Toolkit tutorial akışının Play-oturumu flag ve saf sıra kurallarıdır. Gameplay
+    /// transaction'i yapmaz; yalnız başarıyla tamamlanan gerçek player action'ını bu oturumda kaydeder.
     /// </summary>
     public static class GuidedOnboardingProgress
     {
@@ -149,40 +149,40 @@ namespace DeadWalls
             {
                 GuidedOnboardingStep.EconomyOpen => new GuidedOnboardingCopy(
                     "OPEN THE ECONOMY",
-                    "Manage how your people produce resources."),
+                    "Your people gather Wood, Stone, Iron, and Food here. Open Economy to inspect and rebalance the workforce."),
                 GuidedOnboardingStep.WorkerShare => new GuidedOnboardingCopy(
                     "SET A WORKER SHARE",
-                    "Drag the Wood slider to change the workforce target."),
+                    "Drag the Wood share slider. Worker shares decide where your available people produce resources."),
                 GuidedOnboardingStep.EconomyClose => new GuidedOnboardingCopy(
                     "CLOSE THE ECONOMY",
-                    "Return to the command rail before opening the Barracks."),
+                    "Close Economy to return to the command rail. The Barracks is opened from there."),
                 GuidedOnboardingStep.BarracksOpen => new GuidedOnboardingCopy(
                     "OPEN THE BARRACKS",
-                    "Recruit defenders before night falls."),
+                    "The Barracks turns resource workers into wall defenders. Open it to inspect recruitment."),
                 GuidedOnboardingStep.BasicArcher => new GuidedOnboardingCopy(
                     "RECRUIT A BASIC ARCHER",
-                    "Buy one Basic Archer to strengthen the wall."),
+                    "Recruit one Basic Archer. It costs resources and moves one worker from production to the wall."),
                 GuidedOnboardingStep.SpeedTwo => new GuidedOnboardingCopy(
                     "SET GAME SPEED TO 2X",
-                    "Use 2X while preparing. You can change speed later."),
+                    "Set the game to 2X. The tutorial will end and the paused simulation will resume at this speed."),
                 GuidedOnboardingStep.Rally => new GuidedOnboardingCopy(
                     "USE RALLY",
-                    "Press 2 or tap Rally to boost archer fire rate."),
+                    "Rally temporarily increases your archers' fire rate. Press 2 or select the highlighted command."),
                 GuidedOnboardingStep.CouncilChoice => new GuidedOnboardingCopy(
                     "CHOOSE A COUNCIL OUTCOME",
-                    "Compare both exact outcomes, then choose one."),
+                    "Council decisions change the current run. Compare both exact outcomes and costs before choosing one."),
                 GuidedOnboardingStep.ArrowRefill => new GuidedOnboardingCopy(
                     "RESTOCK YOUR ARROWS",
-                    "Open Arrow Supply and buy any refill package."),
+                    "Archers stop firing when the reserve is empty. Open Arrow Supply and buy a refill package."),
                 GuidedOnboardingStep.CastleHeart => new GuidedOnboardingCopy(
                     "OPEN THE CASTLE HEART",
-                    "Inspect permanent run upgrades after the battle."),
+                    "Essence earned in battle unlocks run upgrades here. Open the Castle Heart to inspect them."),
                 GuidedOnboardingStep.Housing => new GuidedOnboardingCopy(
                     "EXPAND HOUSING",
-                    "Add beds when your population reaches capacity."),
+                    "Your population has reached its bed limit, so no new people can arrive. Open Economy and add at least one bed."),
                 GuidedOnboardingStep.WallRepair => new GuidedOnboardingCopy(
                     "REPAIR THE WALL",
-                    "Use Emergency Repair when the wall is damaged at night."),
+                    "A damaged wall leaves the Keep exposed. Use Emergency Repair during the night to restore its integrity."),
                 _ => new GuidedOnboardingCopy(string.Empty, string.Empty)
             };
         }
@@ -203,13 +203,13 @@ namespace DeadWalls
             if (string.IsNullOrEmpty(flagId))
                 return false;
 
-            bool persisted = HasFlag(flagId) || MetaProgression.SetTutorialFlag(flagId, true);
-            if (persisted)
-                EnsureGlobalCompletionPersisted();
-            return persisted;
+            bool recorded = HasFlag(flagId) || MetaProgression.SetTutorialFlag(flagId, true);
+            if (recorded)
+                EnsureGlobalCompletionRecorded();
+            return recorded;
         }
 
-        public static bool EnsureGlobalCompletionPersisted()
+        public static bool EnsureGlobalCompletionRecorded()
         {
             if (HasFlag(CompleteFlagId))
                 return true;

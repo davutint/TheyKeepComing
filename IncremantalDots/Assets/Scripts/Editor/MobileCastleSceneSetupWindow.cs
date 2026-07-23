@@ -79,14 +79,14 @@ namespace DeadWalls
 
         private string _status = "Hazir.";
 
-        [MenuItem("Window/DeadWalls/Mobile Castle Scene Setup")]
+        [MenuItem(DeadWallsEditorMenuPaths.SetupAndRepair + "Mobile Castle Scene Setup")]
         public static void ShowWindow()
         {
             var window = GetWindow<MobileCastleSceneSetupWindow>("Mobile Castle Setup");
             window.minSize = new Vector2(390f, 220f);
         }
 
-        [MenuItem("Window/DeadWalls/Repair Worker Drawer Target Controls")]
+        [MenuItem(DeadWallsEditorMenuPaths.SetupAndRepair + "Repair Worker Drawer Target Controls")]
         public static void RepairWorkerDrawerTargetControls()
         {
             EnsureWorkerDrawerTargetControlsInPrefab();
@@ -119,7 +119,7 @@ namespace DeadWalls
                 : "[MobileCastleSceneSetup] Worker drawer controls prefabda onarildi; NewGameScene aktif olmadigi icin sahne degismedi.");
         }
 
-        [MenuItem("Window/DeadWalls/Repair First Run Onboarding")]
+        [MenuItem(DeadWallsEditorMenuPaths.SetupAndRepair + "Repair First Run Onboarding")]
         public static void RepairFirstRunOnboarding()
         {
             EnsureFirstRunOnboardingInPrefab();
@@ -153,7 +153,7 @@ namespace DeadWalls
                 : "[MobileCastleSceneSetup] First-run onboarding prefabda onarildi; NewGameScene aktif degildi.");
         }
 
-        [MenuItem("Window/DeadWalls/Repair Meta Identity Presentation")]
+        [MenuItem(DeadWallsEditorMenuPaths.SetupAndRepair + "Repair Meta Identity Presentation")]
         public static void RepairMetaIdentityPresentation()
         {
             MetaUpgradeCatalogSO catalog = EnsureDefaultMetaUpgradeCatalog();
@@ -194,7 +194,7 @@ namespace DeadWalls
                 catalog);
         }
 
-        [MenuItem("Window/DeadWalls/Repair Narrative Opening Copy")]
+        [MenuItem(DeadWallsEditorMenuPaths.SetupAndRepair + "Repair Narrative Opening Copy")]
         public static void RepairNarrativeOpeningCopy()
         {
             Scene menuScene = SceneManager.GetSceneByPath(MainMenuScenePath);
@@ -233,7 +233,7 @@ namespace DeadWalls
                 "[MobileCastleSceneSetup] V1 narrative opening copy MainMenuScene'e uygulandi.");
         }
 
-        [MenuItem("Window/DeadWalls/Repair Tutorial Reset Setting")]
+        [MenuItem(DeadWallsEditorMenuPaths.SetupAndRepair + "Repair Tutorial Reset Setting")]
         public static void RepairTutorialResetSetting()
         {
             Scene activeScene = SceneManager.GetActiveScene();
@@ -262,7 +262,7 @@ namespace DeadWalls
                 "[MobileCastleSceneSetup] Tutorial reset Settings kontrolu NewGameScene ve MainMenuScene icin onarildi.");
         }
 
-        [MenuItem("Window/DeadWalls/Repair Day Presentation")]
+        [MenuItem(DeadWallsEditorMenuPaths.SetupAndRepair + "Repair Day Presentation")]
         public static void RepairDayPresentation()
         {
             RepairPhasePresentation(
@@ -270,7 +270,7 @@ namespace DeadWalls
                 "Warm Day light, production readability ve worker ambience NewGameScene icin onarildi.");
         }
 
-        [MenuItem("Window/DeadWalls/Repair Dusk Presentation")]
+        [MenuItem(DeadWallsEditorMenuPaths.SetupAndRepair + "Repair Dusk Presentation")]
         public static void RepairDuskPresentation()
         {
             RepairPhasePresentation(
@@ -278,7 +278,7 @@ namespace DeadWalls
                 "Amber-indigo Dusk light, worker lantern ve tek-sefer tension riser NewGameScene icin onarildi.");
         }
 
-        [MenuItem("Window/DeadWalls/Repair Night Presentation")]
+        [MenuItem(DeadWallsEditorMenuPaths.SetupAndRepair + "Repair Night Presentation")]
         public static void RepairNightPresentation()
         {
             RepairPhasePresentation(
@@ -287,7 +287,7 @@ namespace DeadWalls
                 true);
         }
 
-        [MenuItem("Window/DeadWalls/Repair Dawn Presentation")]
+        [MenuItem(DeadWallsEditorMenuPaths.SetupAndRepair + "Repair Dawn Presentation")]
         public static void RepairDawnPresentation()
         {
             RepairPhasePresentation(
@@ -297,7 +297,7 @@ namespace DeadWalls
                 true);
         }
 
-        [MenuItem("Window/DeadWalls/Repair Phase World Readability")]
+        [MenuItem(DeadWallsEditorMenuPaths.SetupAndRepair + "Repair Phase World Readability")]
         public static void RepairPhaseWorldReadability()
         {
             RepairPhasePresentation(
@@ -380,7 +380,7 @@ namespace DeadWalls
             EditorUtility.SetDirty(settings);
         }
 
-        [MenuItem("Window/DeadWalls/Repair Archer Retrain Control")]
+        [MenuItem(DeadWallsEditorMenuPaths.SetupAndRepair + "Repair Archer Retrain Control")]
         public static void RepairArcherRetrainControl()
         {
             EnsureArcherRetrainControlInPrefab();
@@ -388,7 +388,7 @@ namespace DeadWalls
             Debug.Log("[MobileCastleSceneSetup] Archer retrain kontrolu HUD prefabinda onarildi.");
         }
 
-        [MenuItem("Window/DeadWalls/Repair Finite Arrow Ammo Panel")]
+        [MenuItem(DeadWallsEditorMenuPaths.SetupAndRepair + "Repair Finite Arrow Ammo Panel")]
         public static void RepairFiniteArrowAmmoPanel()
         {
             EnsureArrowAmmoPanelInPrefab();
@@ -422,7 +422,7 @@ namespace DeadWalls
                 : "[MobileCastleSceneSetup] Finite Arrow ammo paneli prefabda onarildi; NewGameScene aktif degildi.");
         }
 
-        [MenuItem("Window/DeadWalls/Repair Council Exact Decision UI")]
+        [MenuItem(DeadWallsEditorMenuPaths.SetupAndRepair + "Repair Council Exact Decision UI")]
         public static void RepairCouncilExactDecisionUI()
         {
             EnsureCouncilDecisionUIInPrefab();
@@ -455,7 +455,7 @@ namespace DeadWalls
                 : "[MobileCastleSceneSetup] Council exact karar UI prefabda onarildi; NewGameScene aktif degildi.");
         }
 
-        [MenuItem("Window/DeadWalls/Repair Unified Ability Bar")]
+        [MenuItem(DeadWallsEditorMenuPaths.SetupAndRepair + "Repair Unified Ability Bar")]
         public static void RepairUnifiedAbilityBar()
         {
             EnsureUnifiedAbilityBarInPrefab();
@@ -502,7 +502,7 @@ namespace DeadWalls
                 : "[MobileCastleSceneSetup] Unified ability bar prefabda onarildi; NewGameScene aktif degildi.");
         }
 
-        [MenuItem("Window/DeadWalls/Repair Council Curated Context Contract")]
+        [MenuItem(DeadWallsEditorMenuPaths.SetupAndRepair + "Repair Council Curated Context Contract")]
         public static void RepairCouncilCuratedContextContract()
         {
             EnsureDefaultCouncilCatalog();
@@ -511,7 +511,7 @@ namespace DeadWalls
             Debug.Log("[MobileCastleSceneSetup] Council context memory ve curated chain contract'i onarildi.");
         }
 
-        [MenuItem("Window/DeadWalls/Repair Archer Formation V1")]
+        [MenuItem(DeadWallsEditorMenuPaths.SetupAndRepair + "Repair Archer Formation V1")]
         public static void RepairArcherFormationV1()
         {
             Scene scene = SceneManager.GetActiveScene();

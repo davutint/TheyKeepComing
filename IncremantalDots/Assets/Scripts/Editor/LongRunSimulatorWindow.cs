@@ -66,7 +66,7 @@ namespace DeadWalls
 
         private string _status = "hazir";
 
-        [MenuItem("Window/DeadWalls/Long Run Simulator")]
+        [MenuItem(DeadWallsEditorMenuPaths.Balancing + "Long Run Simulator")]
         public static void ShowWindow()
         {
             GetWindow<LongRunSimulatorWindow>("Long Run Sim");

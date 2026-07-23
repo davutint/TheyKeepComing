@@ -87,7 +87,7 @@ namespace DeadWalls
         private static readonly Color BarDeath = new Color(0.85f, 0.35f, 0.30f);
         private static readonly Color BarSurvive = new Color(0.35f, 0.70f, 0.40f);
 
-        [MenuItem("Window/DeadWalls/Difficulty Tuner")]
+        [MenuItem(DeadWallsEditorMenuPaths.Balancing + "Difficulty Tuner")]
         public static void ShowWindow()
         {
             var win = GetWindow<DifficultyTunerWindow>("Difficulty Tuner");

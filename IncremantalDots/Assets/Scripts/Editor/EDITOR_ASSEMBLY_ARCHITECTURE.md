@@ -13,6 +13,13 @@
 
 Yeni Editor aracı `Assets/Scripts/Editor` altında tutulmalıdır. Runtime tarafından kullanılacak kod bu klasöre konmamalıdır.
 
+## Menü Hiyerarşisi
+
+- Bütün Dead Walls Editor araçları `Tools/Dead Walls` kökünün altında bulunur.
+- Alt kategoriler `Audio`, `Balancing`, `Content`, `Maps`, `Profiling` ve `Setup & Repair` olarak sabittir.
+- Yeni bir `[MenuItem]` yolu elle yazılmaz; `DeadWallsEditorMenuPaths` sabitlerinden oluşturulur.
+- `Window/DeadWalls`, `Tools/DeadWalls` veya genel `Tools` altında ikinci bir proje köküne izin verilmez.
+
 ## Doğrulama
 
 - Unity Editor script compilation: sıfır error.

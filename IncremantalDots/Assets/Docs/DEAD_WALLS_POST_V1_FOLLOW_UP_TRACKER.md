@@ -2,7 +2,7 @@
 
 > **Amaç:** V1 kapsamı tamamlandıktan sonra yapılacak mantık düzeltmelerini, oyuncuya görünen geri bildirimleri, UI/UX yeniden çalışmalarını, polish işlerini ve performans optimizasyonlarını tek otoriter takip belgesinde yürütmek.
 >
-> **Tracker sürümü:** 2.5
+> **Tracker sürümü:** 2.9
 > **Oluşturulma tarihi:** 2026-07-18
 > **Aktif paket:** `-`
 > **Aktif iş:** `-`
@@ -113,6 +113,12 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - İlk zorunlu zincir `ECONOMY -> worker-share slider -> CLOSE -> BARRACKS -> BASIC ARCHER -> 2X` sırasıdır.
 - İlk altı adımda ekran hedef dışı bölgelerde kararır ve yalnız gerçek hedef kontrol etkileşim alır;
   zincir yalnız başarıyla tamamlanan player action'ıyla ilerler.
+- Görünür tutorial/core veya contextual field tip boyunca simulation durur. Core zincir pause lease'ini
+  adımlar arasında kesintisiz korur; son `2X` aksiyonu tamamlanınca seçilen hızla oyun devam eder.
+- Contextual field tip unrelated UI input'unu kilitlemez; Housing ve Arrow tipleri pause altında
+  kaynak bekleme soft-lock'i yaratmamak için yalnız ilgili satın alım affordable iken açılır.
+- Gerçek hedef çerçevesi unscaled zamanda nefes alan padding/opacity/border pulse'i kullanır; kart
+  sistemin neden önemli olduğunu açıklayan English body ve açık pause/action yönlendirmesi taşır.
 - First Night `RALLY`, first Council exact choice, low-arrow refill, first post-combat Essence ile
   `CASTLE HEART`, dolu population kapasitesinde housing ve ilk wall damage repair adımları
   koşul oluştuğunda contextual gösterilir; unrelated kontrolleri kilitlemez.
@@ -150,7 +156,7 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 | 13 | `DW-P13-GAME-FLOW-CONTROLS` | 1X/2X/3X oyun hızı, Council pause ve toast altyapısı | `[x]` | Merkezi speed/pause owner, bounded toast kuyruğu, testler ve canlı Game View doğrulandı |
 | 14 | `DW-P14-ACTION-FEEDBACK` | Game Over meta açıklığı ve exact action-failure toast'ları | `[x]` | Exact effect progression, açıklanabilir action state, hedefli test ve canlı Game View doğrulandı |
 | 15 | `DW-P15-TOAST-AUDIO-POLISH` | Süreli toast stack'i ve UI Toolkit button sesleri | `[x]` | Üç kartlık tekrar korunumu, otomatik dismiss, merkezi click audio ve hedefli runtime testleri doğrulandı |
-| 16 | `DW-P16-GUIDED-ONBOARDING` | UI Toolkit gerçek kontrolleriyle adım adım first-run öğretimi | `[x]` | Gerçek-control spotlight/input gate, durable sıra, contextual tip'ler ve hedefli regresyon doğrulandı |
+| 16 | `DW-P16-GUIDED-ONBOARDING` | UI Toolkit gerçek kontrolleriyle adım adım first-run öğretimi | `[x]` | Gerçek-control spotlight/input gate, Play-session sıra, contextual tip'ler ve hedefli regresyon doğrulandı |
 
 ---
 
@@ -418,7 +424,7 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - [x] Mevcut owner zinciri çıkarıldı: `FirstRunOnboardingUI` yedi condition-driven adımı yönetiyor,
   fakat yeni UI Toolkit yalnız gizli Canvas hint metnini aynalıyor; pulse hedefleri legacy kontrollerde kalıyor.
 - [x] Basic Archer alınabilir olduğunda flag tamamlanana kadar açık kalan legacy affordability cue'su
-  UI Toolkit HUD'dan ayrıldı. Gerçek Archer satın alımının durable tutorial flag'i yazması korunur.
+  UI Toolkit HUD'dan ayrıldı. Gerçek Archer satın alımı tutorial flag'ini yalnız mevcut Play oturumuna yazar.
 - [x] Dar düzeltme hedefli EditMode `1/1`, gerçek ilk-gün onboarding PlayMode `1/1` ve Unity compile
   `0 error` ile doğrulandı.
 - [x] İlk zorunlu click zinciri `ECONOMY -> worker-share slider -> CLOSE -> BARRACKS -> BASIC ARCHER -> 2X`
@@ -429,15 +435,22 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
   Castle Heart, population-full housing ve first wall-damage repair contextual adımlar olarak
   kesinleştirildi; unrelated kontrol kilitlemeyecekler.
 - [x] `GuidedOnboardingProgress` exact core/contextual kuralları, English copy ve ayrı
-  `tutorial.v2.*` durable flag'leri taşır. Settings reset v1 ve v2 flag'lerini aynı işlemde temizler;
-  tamamlanmış v1 save yeni tutorial'i zorla yeniden açmaz.
+  `tutorial.v2.*` session flag'lerini taşır. Settings reset v1 ve v2 flag'lerini yalnız mevcut
+  Play oturumunda aynı işlemde temizler; eski save içindeki tutorial flag'leri okunmaz.
 - [x] UI Toolkit presenter dört dim rect, real-control focus ve bilgi kartını üretir. Core adımda
   root trickle-down input gate yalnız gerçek hedef subtree'sini geçirir; contextual tip unrelated
   action'ları kilitlemez ve overlay elementlerinin tamamı raycast dışıdır.
+- [x] Görünür core/contextual guided adım merkezi `SimulationPauseService` üzerinden ayrı lease alır.
+  Core lease Economy'den 2X completion'a kadar kesintisiz kalır; son adım seçilen `2X` running speed'i
+  ile resume eder. Contextual action tamamlanınca önceki running speed geri gelir.
+- [x] Housing ve Arrow contextual eligibility'si gerçek satın alınabilirlik ile sınırlandı; pause
+  altında resource accumulation bekleyen görünmez soft-lock yolu kapatıldı.
+- [x] Focus rect `Time.unscaledTime` ile padding, opacity ve border width nefes pulse'i uygular.
+  Kart genişletildi; pause durumu, sonraki action ve sistem gerekçesi English copy ile açıklaştırıldı.
 - [x] Drawer open completion yalnız player callback wrapper'ından; slider, Archer, speed, Rally,
   Council, Arrow, Castle Heart, housing ve repair completion yalnız authoritative başarılı işlem
   sonucundan yazılır. Programmatic drawer açma ve başarısız action progress üretmez.
-- [x] Worker slider sonrasında ayrı durable `tutorial.v2.economy_close` adımı gerçek `economyClose`
+- [x] Worker slider sonrasında ayrı session-scoped `tutorial.v2.economy_close` adımı gerçek `economyClose`
   butonunu hedefler. Economy açıkken Barracks input'u kesilir; Barracks adımı yalnız drawer gerçek
   player Close action'ıyla kapandıktan sonra başlar.
 - [x] Hedefli EditMode `45/45`; gerçek core/raycast zinciri, P15 Archer toast regresyonları,
@@ -830,3 +843,64 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - Hedefli EditMode `37/37`, gerçek Close zorunluluğu ve spotlight overlap kontrolünü içeren PlayMode
   `1/1`, Unity compile `0 error` ve final Console `0 error` geçti.
 - P16 doğrulanmış durumda kaldı; payda değişmedi ve Post-V1 ilerleme `16/16 - %100` olarak korundu.
+
+### 2026-07-22 - P16 post-acceptance pause, copy ve spotlight polish'i
+
+- Owner canlı kontrolde guided kart görünürken oyunun akmaya devam ettiğini, açıklama metinlerinin
+  yavan kaldığını ve hedef çerçevesinin görsel yönlendirme üretmediğini bildirdi.
+- Kök neden guided presenter'ın yalnız UI input gate uygulaması, `SimulationPauseService` lease'i
+  almaması ve focus rect'in tamamen statik olmasıydı.
+- Görünür core ve contextual adımlar `GuidedOnboarding` pause lease'i alır. Core lease Economy'den
+  son `2X` aksiyonuna kadar korunur; `2X` pause altında running speed olarak seçilir ve durable core
+  completion sonrası simulation aynı action frame'inde `2X` ile devam eder.
+- Contextual adımlar unrelated UI input'unu kilitlemeden oyunu durdurur; Housing ve Arrow refill
+  yalnız bir action gerçekten affordable olduğunda gösterilerek pause soft-lock'i engellenir.
+- Player-facing kartlar `TUTORIAL PAUSED / FIELD TIP - GAME PAUSED` state'i, açık continue/resume
+  footer'ı ve sistem gerekçesini anlatan daha ayrıntılı English copy taşır. Focus rect unscaled
+  padding/opacity/border pulse'iyle nefes alır.
+- Hedefli EditMode `24/24`; core pause, 2X exact resume, Housing contextual pause/resume ve gerçek
+  action zincirini kapsayan PlayMode `1/1` geçti. Unity compile `0 error` ve final Console `0 error`
+  doğrulandı.
+- P16 kapalı kalır; payda değişmedi ve Post-V1 ilerleme `16/16 - %100` olarak korundu.
+
+### 2026-07-23 - P16 post-acceptance drawer header okunabilirlik düzeltmesi
+
+- Owner canlı kontrolde Economy açıklamasının `CLOSE` butonunun altında kaldığını ve son `resource`
+  kelimesinin görünmediğini bildirdi.
+- Kök neden header copy kolonunun daralabilir bir flex alanı olarak tanımlanmaması ve Close butonu için
+  sabit yer ayrılmamasıydı.
+- Economy, Barracks ve Arrow Supply drawer header'ları ortak `surface-header-copy` kontratına alındı.
+  Copy alanı daralabilir ve satır kırabilir; Close butonu daralmaz ve header'ın üstünde kendi alanını korur.
+- Hedefli EditMode `5/5`; tam core tutorial akışını ve gerçek Economy subtitle/Close bounds ayrımını
+  kapsayan PlayMode `1/1` geçti. Unity compile `0 error` ve `git diff --check` temiz doğrulandı.
+- P16 kapalı kalır; payda değişmedi ve Post-V1 ilerleme `16/16 - %100` olarak korundu.
+
+### 2026-07-23 - Post-acceptance Editor araç menüsü konsolidasyonu
+
+- Owner, Unity `Tools` menüsü altında görünen iki farklı Dead Walls kökünün tek çatı altında
+  toplanmasını istedi. Canlı menü denetimi ayrıca eski araçların `Window/DeadWalls` köküne de
+  dağıldığını doğruladı.
+- Toplam `46` proje Editor aracı tek `Tools/Dead Walls` köküne taşındı; hiyerarşi `Audio`,
+  `Balancing`, `Content`, `Maps`, `Profiling` ve `Setup & Repair` kategorilerine ayrıldı.
+- Bütün `[MenuItem]` tanımları `DeadWallsEditorMenuPaths` merkezi sabitlerini kullanır. Eski
+  `Tools/DeadWalls`, `Window/DeadWalls` ve genel `Tools/Analyze Profiler Data` yolları kaldırıldı.
+- Canlı Unity menu-items kaynağı yalnız `Tools/Dead Walls` kökünü ve `46/46` aracı gösterdi.
+  `EditorMenuHierarchyTests` hedefli EditMode doğrulaması `1/1` geçti; Unity compile `0 error`.
+- Ana görev paydası değişmedi; Post-V1 ilerleme `16/16 - %100` olarak korundu.
+
+### 2026-07-23 - P16 post-acceptance development tutorial save kaldırma
+
+- Owner, aktif geliştirme boyunca tutorial'in tekrar tekrar test edilebilmesi için bütün core ve
+  contextual adımların her yeni Unity Play oturumunda otomatik olarak sıfırdan başlamasını kesinleştirdi.
+- Kök neden tutorial flag'lerinin `meta_progress.json` içinde kalıcı tutulmasıydı; bir kez tamamlanan
+  adımlar sonraki Play girişlerinde yeniden açılmıyordu.
+- Yeni `TutorialSessionProgress`, bütün tutorial flag'lerinin tek oturumluk sahibidir. Unity
+  `SubsystemRegistration` aşamasında flag havuzunu temizler; bu davranış domain reload kapalıyken de geçerlidir.
+- `MetaProgressState.TutorialFlags` legacy şema uyumluluğu için bellekte bırakıldı ancak serialize edilmez;
+  eski JSON flag'leri yüklenmez ve yeni save'lere tutorial ilerlemesi yazılmaz. Diğer meta progression korunur.
+- Aynı Play oturumundaki Game Over restart tamamlanmış adımları yeniden açmaz; Stop -> Play bütün tutorial'i
+  `ECONOMY` ilk adımından başlatır. Kalıcı one-time onboarding/save ve UGS entegrasyonu yayın öncesine ertelendi.
+- Tutorial/meta sözleşmesini ve `SubsystemRegistration` otomatik reset kaydını kapsayan hedefli EditMode `49/49`; core zincir, aynı-oturum restart ve yeni-Play
+  reset senaryoları PlayMode `3/3`, Settings session reset regresyonu ayrı PlayMode `1/1` geçti. Unity compile
+  `0 error` ve `git diff --check` temiz doğrulandı.
+- P16 kapalı kalır; ana görev paydası değişmedi ve Post-V1 ilerleme `16/16 - %100` olarak korundu.

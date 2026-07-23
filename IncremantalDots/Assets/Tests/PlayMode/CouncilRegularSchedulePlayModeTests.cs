@@ -41,6 +41,7 @@ namespace DeadWalls.Tests
             _originalMetaTemp = _hadMetaTemp ? File.ReadAllBytes(_metaTempPath) : null;
             DeleteIfExists(_metaPath);
             DeleteIfExists(_metaTempPath);
+            TutorialSessionProgress.BeginNewPlaySession();
             MetaProgression.Load();
             RunPersistence.Delete();
             GameBootstrap.PendingAction = GameBootstrap.StartAction.None;
@@ -114,6 +115,7 @@ namespace DeadWalls.Tests
             DeleteIfExists(_metaTempPath);
             RestoreIfNeeded(_metaPath, _hadMeta, _originalMeta);
             RestoreIfNeeded(_metaTempPath, _hadMetaTemp, _originalMetaTemp);
+            TutorialSessionProgress.BeginNewPlaySession();
             MetaProgression.Load();
             yield return null;
         }

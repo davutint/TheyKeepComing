@@ -50,6 +50,7 @@ namespace DeadWalls.Tests
             SoundSettings.SfxVolume = 1f;
             DeleteIfExists(_metaPath);
             DeleteIfExists(_metaTempPath);
+            TutorialSessionProgress.BeginNewPlaySession();
             MetaProgression.Load();
             RunPersistence.Delete();
             GameBootstrap.PendingAction = GameBootstrap.StartAction.None;
@@ -98,6 +99,7 @@ namespace DeadWalls.Tests
             RestoreIfNeeded(_metaPath, _hadMeta, _originalMeta);
             RestoreIfNeeded(_metaTempPath, _hadMetaTemp, _originalMetaTemp);
             SoundSettings.SfxVolume = _originalSfxVolume;
+            TutorialSessionProgress.BeginNewPlaySession();
             MetaProgression.Load();
             yield return null;
         }
@@ -327,10 +329,12 @@ namespace DeadWalls.Tests
                 root, "guidedTutorialLayer");
             ToolkitButton economyButton = ToolkitQuery.Q<ToolkitButton>(root, "economyButton");
             ToolkitButton economyClose = ToolkitQuery.Q<ToolkitButton>(root, "economyClose");
+            ToolkitLabel economySubtitle = ToolkitQuery.Q<ToolkitLabel>(root, "economySubtitle");
             ToolkitButton barracksButton = ToolkitQuery.Q<ToolkitButton>(root, "barracksButton");
             Assert.That(guidedLayer, Is.Not.Null);
             Assert.That(economyButton, Is.Not.Null);
             Assert.That(economyClose, Is.Not.Null);
+            Assert.That(economySubtitle, Is.Not.Null);
             Assert.That(barracksButton, Is.Not.Null);
 
             EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
@@ -357,6 +361,11 @@ namespace DeadWalls.Tests
             Assert.That(hud.ActiveGuidedOnboardingTarget, Is.SameAs(economyButton));
             Assert.That(hud.IsGuidedOnboardingInputLocked, Is.True);
             Assert.That(guidedLayer.ClassListContains("is-core"), Is.True);
+            Assert.That(SimulationPauseService.IsPaused, Is.True,
+                "Aktif core tutorial simulation'i durdurmalidir.");
+            Assert.That(Time.timeScale, Is.Zero);
+            Assert.That(ToolkitQuery.Q<ToolkitLabel>(root, "guidedStepLabel").text,
+                Does.Contain("TUTORIAL PAUSED"));
             ToolkitVisualElement guidedFocus = ToolkitQuery.Q<ToolkitVisualElement>(
                 root, "guidedFocus");
             Assert.That(guidedFocus, Is.Not.Null);
@@ -382,6 +391,10 @@ namespace DeadWalls.Tests
             }
             Assert.That(MetaProgression.HasTutorialFlag(
                 GuidedOnboardingProgress.EconomyOpenFlagId), Is.True);
+            Assert.That(economySubtitle.text, Does.EndWith("next resource."));
+            Assert.That(economySubtitle.worldBound.Overlaps(economyClose.worldBound), Is.False,
+                $"Economy aciklamasi Close butonunun altina girmemelidir. "
+                + $"Subtitle={economySubtitle.worldBound}, Close={economyClose.worldBound}");
 
             ToolkitSliderInt woodSlider = ToolkitQuery.Q<ToolkitSliderInt>(
                 root, "economyAllocationSlider" + EconomyFocusType.Wood);
@@ -468,6 +481,9 @@ namespace DeadWalls.Tests
             Assert.That(GuidedOnboardingProgress.IsCoreComplete(), Is.True);
             Assert.That(SimulationPauseService.RunningTimeScale,
                 Is.EqualTo(SimulationSpeedUtility.Fast));
+            Assert.That(SimulationPauseService.IsPaused, Is.False,
+                "Son core adim tamamlaninca tutorial pause lease'i birakilmalidir.");
+            Assert.That(Time.timeScale, Is.EqualTo(SimulationSpeedUtility.Fast));
             Assert.That(hud.IsGuidedOnboardingInputLocked, Is.False);
             for (int frame = 0; frame < 60
                  && hud.ActiveGuidedOnboardingStep != GuidedOnboardingStep.Housing;
@@ -481,6 +497,31 @@ namespace DeadWalls.Tests
             Assert.That(hud.IsGuidedOnboardingInputLocked, Is.False,
                 "Contextual adim unrelated UI input'unu kilitlememelidir.");
             Assert.That(guidedLayer.ClassListContains("is-contextual"), Is.True);
+            Assert.That(SimulationPauseService.IsPaused, Is.True,
+                "Aktif contextual field tip de oyuncu aksiyonu tamamlanana kadar oyunu durdurmalidir.");
+            Assert.That(Time.timeScale, Is.Zero);
+
+            SendNavigationSubmit(economyButton);
+            ToolkitButton housingOne = ToolkitQuery.Q<ToolkitButton>(root, "housingOne");
+            for (int frame = 0; frame < 60
+                 && !ReferenceEquals(hud.ActiveGuidedOnboardingTarget, housingOne);
+                 frame++)
+            {
+                yield return null;
+            }
+            Assert.That(hud.ActiveGuidedOnboardingTarget, Is.SameAs(housingOne));
+            SendNavigationSubmit(housingOne);
+            for (int frame = 0; frame < 60
+                 && !MetaProgression.HasTutorialFlag(GuidedOnboardingProgress.HousingFlagId);
+                 frame++)
+            {
+                yield return null;
+            }
+            Assert.That(MetaProgression.HasTutorialFlag(
+                GuidedOnboardingProgress.HousingFlagId), Is.True);
+            Assert.That(SimulationPauseService.IsPaused, Is.False,
+                "Contextual aksiyon tamamlaninca oyun onceki 2X hizinda devam etmelidir.");
+            Assert.That(Time.timeScale, Is.EqualTo(SimulationSpeedUtility.Fast));
         }
 
         private static int CountToastMessages(ToolkitVisualElement toastStack, string text)
@@ -961,7 +1002,7 @@ namespace DeadWalls.Tests
 
             Assert.That(MetaProgression.HasTutorialFlag(
                 FirstRunOnboardingUI.TutorialCompleteFlagId), Is.False,
-                "Legacy meta save global complete flag'ini tasimiyor olmali.");
+                "Aktif Play oturumu global complete flag'ini henuz tasimiyor olmali.");
             for (int frame = 0; frame < 30 && !MetaProgression.HasTutorialFlag(
                     FirstRunOnboardingUI.TutorialCompleteFlagId); frame++)
             {
@@ -975,11 +1016,11 @@ namespace DeadWalls.Tests
             MetaProgression.Load();
             Assert.That(MetaProgression.HasTutorialFlag(
                 FirstRunOnboardingUI.TutorialCompleteFlagId), Is.True,
-                "Backfill edilen global flag meta save reload sonrasinda kalmalidir.");
+                "Kaydedilen global flag ayni Play oturumundaki meta reload'dan etkilenmemelidir.");
         }
 
         [UnityTest]
-        public IEnumerator SettingsTutorialReset_ConfirmsThenRestartsOnboardingDurably()
+        public IEnumerator SettingsTutorialReset_ConfirmsThenRestartsCurrentSessionOnboarding()
         {
             FirstRunOnboardingUI onboarding =
                 Object.FindFirstObjectByType<FirstRunOnboardingUI>();
@@ -1037,16 +1078,21 @@ namespace DeadWalls.Tests
 
             settings.CloseButton.onClick.Invoke();
             pauseMenu.ResumeButton.onClick.Invoke();
-            for (int frame = 0; frame < 90 && !onboarding.IsWorkerRatioStepVisible; frame++)
+            GameplayHUDToolkitUI hud = Object.FindFirstObjectByType<GameplayHUDToolkitUI>();
+            Assert.That(hud, Is.Not.Null);
+            for (int frame = 0; frame < 90
+                 && hud.ActiveGuidedOnboardingStep != GuidedOnboardingStep.EconomyOpen; frame++)
                 yield return null;
 
-            Assert.That(SimulationPauseService.IsPaused, Is.False);
-            Assert.That(onboarding.IsWorkerRatioStepVisible, Is.True,
-                "Reset sonrasinda ilk uygun onboarding adimi yeniden baslamalidir.");
+            Assert.That(hud.ActiveGuidedOnboardingStep,
+                Is.EqualTo(GuidedOnboardingStep.EconomyOpen),
+                "Reset sonrasinda tum tutorial ilk zorunlu adimdan yeniden baslamalidir.");
+            Assert.That(SimulationPauseService.IsPaused, Is.True,
+                "Ilk zorunlu tutorial adimi tamamlanana kadar oyun durmalidir.");
         }
 
         [UnityTest]
-        public IEnumerator CompletedTutorial_RealSecondRunRestartKeepsEveryCueClosed()
+        public IEnumerator CompletedTutorial_SamePlaySessionRestartKeepsEveryCueClosed()
         {
             GameManager gameManager = GameManager.Instance;
             UIManager uiManager = UIManager.Instance;
@@ -1121,6 +1167,41 @@ namespace DeadWalls.Tests
             Assert.That(onboarding.IsCouncilExactStepVisible, Is.False);
             Assert.That(onboarding.IsDaytimeRepairStepVisible, Is.False);
             Assert.That(onboarding.IsNightAbilityKeyStepVisible, Is.False);
+        }
+
+        [UnityTest]
+        public IEnumerator NewPlaySessionReset_ReopensWholeTutorialWithoutChangingMetaSave()
+        {
+            GameplayHUDToolkitUI hud =
+                Object.FindFirstObjectByType<GameplayHUDToolkitUI>();
+            Assert.That(hud, Is.Not.Null);
+
+            string[] tutorialFlags = FirstRunOnboardingUI.GetTutorialProgressFlagIds();
+            foreach (string flagId in tutorialFlags)
+                Assert.That(MetaProgression.SetTutorialFlag(flagId, true), Is.True, flagId);
+
+            Assert.That(MetaProgression.TryUnlockPoolContent("tutorial-session-test-pool"), Is.True);
+            Assert.That(File.Exists(_metaPath), Is.True);
+            string metaBeforeNewSession = File.ReadAllText(_metaPath);
+            Assert.That(metaBeforeNewSession, Does.Not.Contain("TutorialFlags"));
+
+            yield return null;
+            Assert.That(hud.ActiveGuidedOnboardingStep, Is.EqualTo(GuidedOnboardingStep.None));
+
+            TutorialSessionProgress.BeginNewPlaySession();
+            for (int frame = 0; frame < 120
+                 && hud.ActiveGuidedOnboardingStep != GuidedOnboardingStep.EconomyOpen; frame++)
+            {
+                yield return null;
+            }
+
+            Assert.That(hud.ActiveGuidedOnboardingStep,
+                Is.EqualTo(GuidedOnboardingStep.EconomyOpen));
+            Assert.That(TutorialSessionProgress.CompletedFlagCount, Is.Zero);
+            foreach (string flagId in tutorialFlags)
+                Assert.That(MetaProgression.HasTutorialFlag(flagId), Is.False, flagId);
+            Assert.That(File.ReadAllText(_metaPath), Is.EqualTo(metaBeforeNewSession),
+                "Yeni Play tutorial reset'i meta save dosyasina dokunmamalidir.");
         }
 
         [UnityTest]

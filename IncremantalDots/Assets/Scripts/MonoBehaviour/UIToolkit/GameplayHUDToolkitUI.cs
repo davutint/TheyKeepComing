@@ -217,8 +217,8 @@ namespace DeadWalls
 
             RefreshHudContinuous(gm);
             RefreshModalContinuous(gm);
-            RefreshGameFlowControls();
             UpdateGuidedOnboarding(gm);
+            RefreshGameFlowControls();
             UpdateSoulFlights(Time.unscaledDeltaTime);
 
             if (now >= _nextGraphRefresh)

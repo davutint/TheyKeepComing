@@ -93,7 +93,7 @@ namespace DeadWalls
         private GUIStyle _cellLabelStyle;
         private GUIStyle _dirHintStyle;
 
-        [MenuItem("Window/DeadWalls/Building Tile Composer")]
+        [MenuItem(DeadWallsEditorMenuPaths.Maps + "Building Tile Composer")]
         public static void ShowWindow()
         {
             var window = GetWindow<BuildingTileComposerWindow>("Building Tile Composer");

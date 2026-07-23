@@ -31,7 +31,9 @@ namespace DeadWalls
         public List<MetaUpgradeLevel> Upgrades = new List<MetaUpgradeLevel>();
         // Meta yalniz olasi content havuzunu genisletir; aktif run graph'ini degistirmez.
         public List<string> UnlockedPoolIds = new List<string>();
-        // Package I onboarding adimlari kendi stable flag Id'lerini bu listede saklar.
+        // Legacy schema uyumlulugu icin bellekte tutulur; JsonUtility bu alani serialize etmez.
+        // Aktif tutorial progress sahibi TutorialSessionProgress'tir.
+        [NonSerialized]
         public List<string> TutorialFlags = new List<string>();
         // Death journal recovery ayni kosuya ikinci kez odul yazamasin.
         public List<string> RewardedRunIds = new List<string>();
@@ -528,70 +530,21 @@ namespace DeadWalls
 
         public static bool HasTutorialFlag(string flagId)
         {
-            return ContainsId(State.TutorialFlags, flagId);
+            return TutorialSessionProgress.HasFlag(flagId);
         }
 
         public static bool SetTutorialFlag(string flagId, bool enabled)
         {
-            string id = flagId?.Trim();
-            if (string.IsNullOrEmpty(id) || !CanPersist)
-                return false;
-
-            bool current = ContainsId(State.TutorialFlags, id);
-            if (current == enabled)
-                return true;
-
-            if (enabled)
-                State.TutorialFlags.Add(id);
-            else
-                State.TutorialFlags.Remove(id);
-
-            if (Save())
-                return true;
-
-            if (enabled)
-                State.TutorialFlags.Remove(id);
-            else
-                State.TutorialFlags.Add(id);
-            return false;
+            return TutorialSessionProgress.SetFlag(flagId, enabled);
         }
 
         /// <summary>
-        /// Verilen tutorial flag grubunu tek durable save icinde temizler. Save basarisizsa
-        /// onceki listeyi geri yukler; diger tutorial/content/meta state'ine dokunmaz.
+        /// Verilen tutorial flag grubunu yalniz mevcut Play oturumundan temizler.
+        /// Meta save, diger content ve progression state'ine dokunmaz.
         /// </summary>
         public static bool ResetTutorialFlags(IEnumerable<string> flagIds)
         {
-            if (flagIds == null)
-                return false;
-
-            MetaProgressState state = State;
-            if (!CanPersist || state?.TutorialFlags == null)
-                return false;
-
-            var normalizedIds = new HashSet<string>(StringComparer.Ordinal);
-            foreach (string flagId in flagIds)
-            {
-                string id = flagId?.Trim();
-                if (!string.IsNullOrEmpty(id))
-                    normalizedIds.Add(id);
-            }
-
-            if (normalizedIds.Count == 0)
-                return false;
-
-            var previousFlags = new List<string>(state.TutorialFlags);
-            int removedCount = state.TutorialFlags.RemoveAll(
-                flag => !string.IsNullOrWhiteSpace(flag)
-                    && normalizedIds.Contains(flag.Trim()));
-            if (removedCount == 0)
-                return true;
-
-            if (Save())
-                return true;
-
-            state.TutorialFlags = previousFlags;
-            return false;
+            return TutorialSessionProgress.ResetFlags(flagIds);
         }
 
         private static bool ContainsId(List<string> source, string id)

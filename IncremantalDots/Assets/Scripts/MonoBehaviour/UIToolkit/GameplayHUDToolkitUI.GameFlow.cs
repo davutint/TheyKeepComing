@@ -91,7 +91,9 @@ namespace DeadWalls
 
             float runningTimeScale = SimulationPauseService.RunningTimeScale;
             bool paused = SimulationPauseService.IsPaused;
-            bool blocked = paused || IsBlockingModalOpen();
+            bool guidedSpeedSelection = _activeGuidedStep == GuidedOnboardingStep.SpeedTwo
+                && _guidedPauseLease != null;
+            bool blocked = (paused && !guidedSpeedSelection) || IsBlockingModalOpen();
             SetSpeedButtonState(_timeSpeedOne, runningTimeScale, SimulationSpeedUtility.Normal, blocked);
             SetSpeedButtonState(_timeSpeedTwo, runningTimeScale, SimulationSpeedUtility.Fast, blocked);
             SetSpeedButtonState(_timeSpeedThree, runningTimeScale, SimulationSpeedUtility.VeryFast, blocked);

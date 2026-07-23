@@ -19,13 +19,13 @@ namespace DeadWalls.Editor
         private Vector2 _scroll;
         private readonly List<string> _missingPaths = new List<string>();
 
-        [MenuItem("Tools/Dead Walls/Audio Director")]
+        [MenuItem(DeadWallsEditorMenuPaths.Audio + "Audio Director")]
         public static void Open()
         {
             GetWindow<DeadWallsAudioDirectorWindow>("Audio Director");
         }
 
-        [MenuItem("Tools/Dead Walls/Audio/Install Curated Profile")]
+        [MenuItem(DeadWallsEditorMenuPaths.Audio + "Install Curated Profile")]
         public static void InstallCuratedProfileMenu()
         {
             DeadWallsAudioProfileSO profile = LoadOrCreateDefaultProfile();
@@ -34,14 +34,14 @@ namespace DeadWalls.Editor
             EditorGUIUtility.PingObject(profile);
         }
 
-        [MenuItem("Tools/Dead Walls/Audio/Preview Soul Arrival")]
+        [MenuItem(DeadWallsEditorMenuPaths.Audio + "Preview Soul Arrival")]
         public static void PreviewSoulArrivalMenu()
         {
             DeadWallsAudioProfileSO profile = LoadOrCreateDefaultProfile();
             AudioPreview.Play(profile != null ? profile.SoulArrivalClip : null);
         }
 
-        [MenuItem("Tools/Dead Walls/Audio/Stop Preview")]
+        [MenuItem(DeadWallsEditorMenuPaths.Audio + "Stop Preview")]
         public static void StopPreviewMenu()
         {
             AudioPreview.StopAll();

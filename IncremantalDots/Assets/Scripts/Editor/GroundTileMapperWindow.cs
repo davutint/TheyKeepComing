@@ -36,7 +36,7 @@ namespace DeadWalls
             "Assets/SmallScaleInt/Fantasy kingdom Tileset/Environment/Tiles";
 
 
-        [MenuItem("Window/DeadWalls/Ground Tile Mapper")]
+        [MenuItem(DeadWallsEditorMenuPaths.Maps + "Ground Tile Mapper")]
         public static void ShowWindow()
         {
             var window = GetWindow<GroundTileMapperWindow>("Ground Tile Mapper");

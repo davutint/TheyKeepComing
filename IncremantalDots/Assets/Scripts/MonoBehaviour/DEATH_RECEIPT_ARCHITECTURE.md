@@ -12,10 +12,12 @@ Bu sözleşme üç ayrı disk sahibine bölünür:
 |---|---|---|
 | `run_save.json` | `RunPersistence` | Yalnız yaşayan koşunun exact-critical + deterministic-combat v14 snapshot'ı |
 | `run_death_receipt.json` | `RunPersistence` | Kapanmakta olan koşunun v2 `{ RunId, Day, Kills, PeakPopulation, Reward }` transaction journal'ı |
-| `meta_progress.json` | `MetaProgression` | v3 Souls/istatistik, upgrade seviyeleri, pool unlocks, tutorial flags ve son 128 `RewardedRunIds` |
+| `meta_progress.json` | `MetaProgression` | v3 Souls/istatistik, upgrade seviyeleri, pool unlocks ve son 128 `RewardedRunIds` |
 
 Run save ile meta save birbirinin alanlarını taşımaz. Death receipt gameplay state değildir;
 iki ayrı save otoritesi arasındaki işlemi tamamlayan küçük ve geçici bir journal'dır.
+Tutorial ilerlemesi bu disk sahiplerinden biri değildir; `TutorialSessionProgress` ile yalnız
+mevcut Play oturumunda yaşar.
 
 ## Journal-first işlem sırası
 

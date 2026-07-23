@@ -237,7 +237,7 @@ namespace DeadWalls
             return BuildAnalysis(layout, targetGrid, out unused);
         }
 
-        [MenuItem("Window/DeadWalls/Fantasy Kingdom/Create Default V3 Preview")]
+        [MenuItem(DeadWallsEditorMenuPaths.Maps + "Fantasy Kingdom/Create Default V3 Preview")]
         private static void CreateDefaultV3PreviewFromMenu()
         {
             Scene scene = SceneManager.GetActiveScene();
@@ -255,7 +255,7 @@ namespace DeadWalls
             }
         }
 
-        [MenuItem("Window/DeadWalls/Fantasy Kingdom/Create V3 Retouch Preview")]
+        [MenuItem(DeadWallsEditorMenuPaths.Maps + "Fantasy Kingdom/Create V3 Retouch Preview")]
         private static void CreateV3RetouchPreviewFromMenu()
         {
             Scene scene = SceneManager.GetActiveScene();
@@ -279,7 +279,7 @@ namespace DeadWalls
             }
         }
 
-        [MenuItem("Window/DeadWalls/Fantasy Kingdom/Clear Full Map Preview")]
+        [MenuItem(DeadWallsEditorMenuPaths.Maps + "Fantasy Kingdom/Clear Full Map Preview")]
         private static void ClearDefaultPreviewFromMenu()
         {
             Grid grid = FantasyKingdomStampPreviewService.FindDefaultTargetGrid(
@@ -287,7 +287,7 @@ namespace DeadWalls
             ClearPreview(grid);
         }
 
-        [MenuItem("Window/DeadWalls/Fantasy Kingdom/Create Zombie Forest Occlusion Probe")]
+        [MenuItem(DeadWallsEditorMenuPaths.Maps + "Fantasy Kingdom/Create Zombie Forest Occlusion Probe")]
         private static void CreateZombieForestOcclusionProbeFromMenu()
         {
             Scene scene = SceneManager.GetActiveScene();
@@ -388,7 +388,7 @@ namespace DeadWalls
             return best;
         }
 
-        [MenuItem("Window/DeadWalls/Fantasy Kingdom/Clear Zombie Forest Occlusion Probe")]
+        [MenuItem(DeadWallsEditorMenuPaths.Maps + "Fantasy Kingdom/Clear Zombie Forest Occlusion Probe")]
         private static void ClearZombieForestOcclusionProbeFromMenu()
         {
             ClearOcclusionProbe(SceneManager.GetActiveScene());

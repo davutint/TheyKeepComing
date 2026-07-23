@@ -31,7 +31,7 @@ namespace DeadWalls
 
         Vector2 scrollPos;
 
-        [MenuItem("Window/DeadWalls/Sprite Atlas Generator")]
+        [MenuItem(DeadWallsEditorMenuPaths.Content + "Sprite Atlas Generator")]
         static void ShowWindow()
         {
             var w = GetWindow<SpriteAtlasGenerator>("Atlas Generator");

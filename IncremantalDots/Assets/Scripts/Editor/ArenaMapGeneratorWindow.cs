@@ -88,7 +88,7 @@ namespace DeadWalls
         private Dictionary<string, TileBase> _byName;
         private Dictionary<string, List<TileBase>> _byCategory;
 
-        [MenuItem("Window/DeadWalls/Arena Map Generator")]
+        [MenuItem(DeadWallsEditorMenuPaths.Maps + "Arena Map Generator")]
         public static void ShowWindow()
         {
             var window = GetWindow<ArenaMapGeneratorWindow>("Arena Map Gen");

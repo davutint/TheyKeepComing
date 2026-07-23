@@ -36,7 +36,7 @@ Game Over `MetaProgressionUI`, satın alma için doğrudan `MetaProgression` ça
 eklerken aynı API'yi kullan; yalnız paneli Game Over altında tutmak yeterli güvenlik değildir.
 
 Scene-owned paneli idempotent kurmak/migrate etmek için
-`Window > DeadWalls > Repair Meta Identity Presentation` kullanılır. Bu araç eski ikonsuz/SOULS
+`Tools > Dead Walls > Setup & Repair > Repair Meta Identity Presentation` kullanılır. Bu araç eski ikonsuz/SOULS
 presentation'ı Last Embers v2'ye taşır, 11 upgrade'i maskeli scroll listesine alır ve scene'i
 kaydeder; reward tuning ile mevcut meta save'e dokunmaz.
 
@@ -46,14 +46,16 @@ kaydeder; reward tuning ile mevcut meta save'e dokunmaz.
 - `BestDay`, `TotalRuns`, `TotalKillsAllTime`
 - `Upgrades`
 - `UnlockedPoolIds`
-- `TutorialFlags`
 - `RewardedRunIds`
 
-Package I consumer flag'leri `tutorial.v1.worker_ratio`, `tutorial.v1.basic_archer`,
+`TutorialFlags` aktif schema alanı değildir. Legacy model alanı `[NonSerialized]`dir; tutorial
+ilerlemesi `TutorialSessionProgress` ile her Play oturumunda yeniden başlar.
+
+Session-scoped consumer flag'leri `tutorial.v1.worker_ratio`, `tutorial.v1.basic_archer`,
 `tutorial.v1.low_ammo`, `tutorial.v1.heart`, `tutorial.v1.council`, `tutorial.v1.repair`,
 `tutorial.v1.ability_key` ve turetilmis `tutorial.v1.complete` flag'idir. Id'ler yayınlandıktan
 sonra yeniden adlandırılmaz; `FirstRunOnboardingUI` yalniz basarili ilgili player action'inda
-adim flag'ini yazar. Settings reset canonical sekizliyi birlikte temizler.
+adim flag'ini mevcut session'a yazar. Her yeni Play canonical listeyi otomatik temizler.
 
 Inspector'dan elle JSON üretme. Stable Id'lerde case ve yazım değişikliği yeni kimlik sayılır;
 upgrade/pool/tutorial içerik sahibi Id'yi yayımlandıktan sonra değiştirmemelidir.

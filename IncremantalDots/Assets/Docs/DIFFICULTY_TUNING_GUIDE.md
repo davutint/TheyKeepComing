@@ -228,7 +228,7 @@ Council state'ini yeni bir owner yaratmadan aggregate olarak okur.
 
 ## 5. Olcum botu nasil yorumlanir?
 
-1. Play'e gir -> RUN BOT veya `Window/DeadWalls/Long Run Simulator` icinden policy/cohort sec.
+1. Play'e gir -> RUN BOT veya `Tools/Dead Walls/Balancing/Long Run Simulator` icinden policy/cohort sec.
 2. Bot current run kontratini kullanir: worker ve yatak yonetir, finite Arrow stogunu refill
    eder, surdurulebilir okcu alir, gorunur Castle Heart node'larini Grave Essence ile acar,
    repair/Council ve acilan combat ability'lerini kullanir. Legacy TechCatalog satin almaz.

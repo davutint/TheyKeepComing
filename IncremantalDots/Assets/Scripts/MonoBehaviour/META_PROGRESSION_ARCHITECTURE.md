@@ -18,8 +18,11 @@ bulunamadığında kullanılan `LAST EMBERS` fallback'idir.
 - BestDay, TotalRuns ve TotalKillsAllTime,
 - `MetaUpgradeLevel` listesi,
 - Gelecekteki Heart/ability content olasılık havuzlarını açacak stable `UnlockedPoolIds`,
-- Package I onboarding sahibinin kullandığı stable `TutorialFlags`,
 - Aynı koşunun iki kez ödüllendirilmesini önleyen sınırlı `RewardedRunIds` listesi.
+
+`TutorialFlags` eski JSON uyumluluğu için modelde `[NonSerialized]` legacy alan olarak kalır;
+meta save'e yazılmaz ve eski dosyadan okunmaz. Aktif tutorial state'i `TutorialSessionProgress`
+tarafından yalnız mevcut Play oturumunda tutulur.
 
 JsonUtility dictionary serialize etmediği için upgrade ve kimlik state'leri list olarak tutulur.
 Load/Save normalizasyonu boş kimlikleri temizler, duplicate kimlikleri tekilleştirir, duplicate
@@ -44,20 +47,21 @@ upgrade Id'leri silinmez; gelecekteki veya geçici catalog içeriğinin kalıcı
 Migration başarılıysa v3 state atomik biçimde hemen durable yazılır. `TryDeserializeState()`
 saf schema/migration test sahibidir; Player-facing kod doğrudan çağırmaz.
 
-## Pool unlock ve tutorial flag API'si
+## Pool unlock ve tutorial session API'si
 
 - `HasPoolUnlock` / `TryUnlockPoolContent`: yalnız stable content-pool Id'sini saklar. Bu state
   mevcut run'ın generated graph node/edge/Keystone sonucuna zorla içerik enjekte etmez.
-- `HasTutorialFlag` / `SetTutorialFlag`: onboarding tamamlanma/reset state'inin canonical disk
-  sınırıdır; tutorial davranışının kendisi Package I sahibinde kalır.
-- `ResetTutorialFlags`: Package I'in verdigi exact flag grubunu tek durable save'de temizler;
-  listede olmayan tutorial flag'leriyle pool/unlock/currency/upgrade state'ine dokunmaz.
-- Mutation API'leri atomik save başarısızsa in-memory değişikliği geri alır.
+- `HasTutorialFlag` / `SetTutorialFlag`: compatibility facade olarak `TutorialSessionProgress`e
+  delege eder; disk okuma veya yazma yapmaz.
+- `ResetTutorialFlags`: verilen exact flag grubunu yalnız mevcut Play oturumundan temizler;
+  pool/unlock/currency/upgrade state'ine dokunmaz.
+- `BeginNewPlaySession`, `SubsystemRegistration` asamasinda butun tutorial flag'lerini temizler;
+  domain reload kapali olsa da her Play tutorial bastan baslar.
 
 Aktif consumer `FirstRunOnboardingUI`, yedi stable adim flag'ini yalniz ilgili gercek accepted
-player action'larindan sonra yazar ve tamaminda `tutorial.v1.complete` flag'ini turetir. Settings
-reset ayni yedi flag ile global flag'i exact sekizli olarak tek `ResetTutorialFlags` cagrisiyle
-temizler. Pool unlock consumer'ı owner onaylı content işini bekler. Satın alma ve graph izolasyon
+player action'larindan sonra session'a yazar ve tamaminda `tutorial.v1.complete` flag'ini turetir.
+Settings reset ayni yedi flag ile global flag'i exact sekizli olarak mevcut session'dan temizler.
+Pool unlock consumer'ı owner onaylı content işini bekler. Satın alma ve graph izolasyon
 sınırı aşağıdaki runtime sözleşmesiyle tamamlanmıştır.
 
 ## Koşu sonucu transaction'ı

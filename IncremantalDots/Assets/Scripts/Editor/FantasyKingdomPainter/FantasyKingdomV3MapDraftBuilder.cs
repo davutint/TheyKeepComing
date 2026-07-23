@@ -67,7 +67,7 @@ namespace DeadWalls
                 { "FK_V3_Food_Field_Hedge", "417F587A7D75EDAA718F12374D5F5EF95189BB7169A26A80793BE5C3B2DA560C" }
             };
 
-        [MenuItem("Window/DeadWalls/Fantasy Kingdom/Rebuild V3 Draft Assets")]
+        [MenuItem(DeadWallsEditorMenuPaths.Maps + "Fantasy Kingdom/Rebuild V3 Draft Assets")]
         private static void RebuildFromMenu()
         {
             try
@@ -87,7 +87,7 @@ namespace DeadWalls
             }
         }
 
-        [MenuItem("Window/DeadWalls/Fantasy Kingdom/Rebuild V3 Retouch Preview Assets")]
+        [MenuItem(DeadWallsEditorMenuPaths.Maps + "Fantasy Kingdom/Rebuild V3 Retouch Preview Assets")]
         private static void RebuildRetouchPreviewFromMenu()
         {
             try

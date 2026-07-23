@@ -24,7 +24,7 @@ Normal Wall repair:
 Aktif player-facing owner `DefenseRepairUI`'dir. Gercek `DefenseRepairButton` tiklamasi
 `GameManager.RepairDefenseFull()` ile basariyla commit edilirse
 `NormalRepairCommittedByPlayer` event'i yayilir. Event gameplay transaction'ini tekrar etmez;
-first-run onboarding yalniz bu basari sinyalini durable `tutorial.v1.repair` flag'ine cevirir.
+first-run onboarding yalniz bu basari sinyalini session-scoped `tutorial.v1.repair` flag'ine cevirir.
 Afford edilemeyen tik, programmatic GameManager cagrisi veya Wall hasari event yaymaz.
 
 ## Legacy/data notu
