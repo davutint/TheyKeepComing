@@ -6,7 +6,7 @@ namespace DeadWalls
 {
     /// <summary>
     /// Alt-sag ARROW SUPPLY management dock girisinden acilan finite ammo paneli.
-    /// Refill anliktir; production queue veya Fletcher baglantisi yoktur.
+    /// Refill satin alimi Wood'u aninda harcar; oklar uc saniye sonunda stoga birlikte gelir.
     /// </summary>
     public sealed class ArrowSupplyUI : MonoBehaviour
     {
@@ -84,13 +84,21 @@ namespace DeadWalls
             int capacity = gm.GetArrowCapacity();
             int current = Mathf.Clamp(gm.ArrowSupply.Current, 0, capacity);
             int rate = gm.GetArrowsPerWood();
-            SetText(StockText, $"ARROWS  {current:N0} / {capacity:N0}");
+            SetText(
+                StockText,
+                gm.IsArrowRefillDeliveryActive
+                    ? $"ARROWS  {current:N0} / {capacity:N0}  ·  DELIVERING {gm.ArrowRefillDeliveryRemainingSeconds:0.0}S"
+                    : $"ARROWS  {current:N0} / {capacity:N0}");
             SetText(EfficiencyText, $"{rate:N0} / WOOD");
 
             ArrowRefillQuote package = gm.GetArrowRefillQuote(1);
             ArrowRefillQuote largePackage = gm.GetArrowRefillQuote(5);
             ArrowRefillQuote buyMax = gm.GetArrowBuyMaxQuote();
-            string unavailable = current >= capacity ? "FULL" : "WAIT";
+            string unavailable = gm.IsArrowRefillDeliveryActive
+                ? "DELIVERING"
+                : current >= capacity
+                    ? "FULL"
+                    : "WAIT";
             RefreshRefillButton(PackageButton, package, "BUY", gm.CanBuyArrowRefill(1),
                 unavailable, gm);
             RefreshRefillButton(LargePackageButton, largePackage, "BUY x5",

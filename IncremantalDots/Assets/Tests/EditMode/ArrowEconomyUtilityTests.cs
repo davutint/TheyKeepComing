@@ -122,5 +122,29 @@ namespace DeadWalls.Tests
             Assert.That(ArrowEconomyUtility.TryGetUpgradeCost(
                 supply, ArrowUpgradeType.Capacity, tuning, out _), Is.False);
         }
+
+        [Test]
+        public void RefillDelivery_ProgressReachesOneOnlyAtThreeSeconds()
+        {
+            Assert.That(ArrowEconomyUtility.RefillDeliveryDurationSeconds, Is.EqualTo(3f));
+            Assert.That(
+                ArrowEconomyUtility.GetDeliveryProgress01(0f),
+                Is.EqualTo(0f));
+            Assert.That(
+                ArrowEconomyUtility.GetDeliveryProgress01(0.75f),
+                Is.EqualTo(0.25f).Within(0.0001f));
+            Assert.That(
+                ArrowEconomyUtility.GetDeliveryProgress01(1.5f),
+                Is.EqualTo(0.5f).Within(0.0001f));
+            Assert.That(
+                ArrowEconomyUtility.GetDeliveryProgress01(2.25f),
+                Is.EqualTo(0.75f).Within(0.0001f));
+            Assert.That(
+                ArrowEconomyUtility.GetDeliveryProgress01(3f),
+                Is.EqualTo(1f));
+            Assert.That(
+                ArrowEconomyUtility.GetDeliveryProgress01(30f),
+                Is.EqualTo(1f));
+        }
     }
 }

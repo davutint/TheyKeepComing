@@ -99,7 +99,9 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - Basarili player-facing buy action'i `ArcherPurchasedByPlayer` event'ini yayar; onboarding gibi presentation consumer'lari transaction'i tekrar etmeden bu event'i dinler
 - Worker economy aktifken `Repair`, `Fortify` ve `Rally` player-facing drawer'da gizlenir; drawer archer recruitment paneli olarak kalir
 - Legacy `Arrow Refill` kontrolü gizlenir; resource chip'leri pasif kalır ve ayrı alt-sağ
-  `ARROW SUPPLY` butonu scene-owned `ArrowSupplyUI` tek satır panelini açar
+  `ARROW SUPPLY` butonu güncel UI Toolkit supply drawer'ını açar; `GameManager.ArrowDelivery`
+  ödemesi alınan refill'i 3 simulation saniyesi kullanılamaz tutar ve süre sonunda gerçek
+  ECS stokuna atomik olarak ekler
 - Basarili player-facing `+1`, `+5` veya `Buy Max` refill
   `ArrowRefillPurchasedByPlayer` event'ini yayar; CAP/EFF yatirimi bu event'i yaymaz
 - Mobile continuous siege loop'ta `Start Next Wave` player-facing UI'da gizlenir; oyun durmadan `DAY / DUSK / NIGHT` cycle'i akar

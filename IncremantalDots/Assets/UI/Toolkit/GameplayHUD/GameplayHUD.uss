@@ -497,6 +497,7 @@
 .supply-hero-copy { align-items: center; }
 .supply-hero-value { margin: 0; padding: 0; color: var(--runtime-ink); font-size: 30px; -unity-font-style: bold; }
 .supply-hero-state { margin: 5px 0 0 0; padding: 0; color: var(--runtime-green); font-size: 10px; letter-spacing: 1.1px; -unity-font-style: bold; }
+.supply-hero-state.is-delivering { color: var(--runtime-gold); }
 .supply-hero-track { height: 9px; margin-top: 15px; background-color: rgba(226,219,201,0.11); background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/components/progress_bar_bg.png"); -unity-background-scale-mode: stretch-to-fill; }
 .supply-hero-progress { width: 0%; height: 9px; background-color: var(--runtime-green); background-image: url("project://database/Assets/Artsystack - Fantasy RPG GUI/Resources/Sprites/components/progress_bar_top.png"); -unity-background-scale-mode: stretch-to-fill; transition-property: width, background-color; transition-duration: 0.15s; }
 .purchase-stack { margin-top: 16px; }

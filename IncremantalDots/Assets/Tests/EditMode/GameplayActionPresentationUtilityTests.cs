@@ -52,6 +52,19 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void ArrowRefillFailure_ExplainsActiveDeliveryBeforeOtherBlockers()
+        {
+            Assert.That(
+                GameplayActionFeedbackUtility.BuildArrowRefillFailure(
+                    true,
+                    2.36f,
+                    false,
+                    new ArrowRefillQuote(100, 25, 1),
+                    new ResourceData { Wood = 0 }),
+                Is.EqualTo("SUPPLY DELIVERY IN PROGRESS  ·  2.4S REMAINING"));
+        }
+
+        [Test]
         public void ResearchFailures_TranslateInternalReasonsIntoEnglishPlayerCopy()
         {
             var cost = new ResourceCost(100, 0, 25, 0);

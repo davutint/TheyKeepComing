@@ -910,11 +910,17 @@ namespace DeadWalls.Tests
             Assert.That(onboarding, Is.Not.Null);
             Assert.That(ammoSupply, Is.Not.Null);
             Assert.That(MetaProgression.SetTutorialFlag(
-                FirstRunOnboardingUI.WorkerRatioFlagId, true), Is.True);
+                FirstRunOnboardingUI.WorkerRatioFlagId, true), Is.True,
+                "Worker tutorial on kosulu yazilamadi.");
             Assert.That(MetaProgression.SetTutorialFlag(
-                FirstRunOnboardingUI.BasicArcherFlagId, true), Is.True);
+                FirstRunOnboardingUI.BasicArcherFlagId, true), Is.True,
+                "Basic Archer tutorial on kosulu yazilamadi.");
+            Assert.That(MetaProgression.SetTutorialFlag(
+                GuidedOnboardingProgress.CompleteFlagId, true), Is.True,
+                "Legacy low-ammo testi icin UI Toolkit guided tutorial izole edilemedi.");
             Assert.That(MetaProgression.HasTutorialFlag(
-                FirstRunOnboardingUI.LowAmmoFlagId), Is.False);
+                FirstRunOnboardingUI.LowAmmoFlagId), Is.False,
+                "Low-ammo tutorial flag test basinda tamamlanmis olmamali.");
 
             bool runtimeReady = false;
             for (int frame = 0; frame < 300; frame++)
@@ -942,15 +948,18 @@ namespace DeadWalls.Tests
             ammoSupply.SetOpen(false);
             yield return null;
 
-            Assert.That(onboarding.IsLowAmmoStepVisible, Is.False);
-            Assert.That(ammoSupply.IsOpen, Is.False);
+            Assert.That(onboarding.IsLowAmmoStepVisible, Is.False,
+                "Threshold ustundeki stok low-ammo tutorial'ini acmamali.");
+            Assert.That(ammoSupply.IsOpen, Is.False,
+                "Threshold ustundeki stok Arrow Supply panelini acmamali.");
 
             supply.Current = threshold;
             entityManager.SetComponentData(gameStateEntity, supply);
             for (int frame = 0; frame < 60 && !onboarding.IsLowAmmoStepVisible; frame++)
                 yield return null;
 
-            Assert.That(onboarding.IsLowAmmoStepVisible, Is.True);
+            Assert.That(onboarding.IsLowAmmoStepVisible, Is.True,
+                "Low-ammo threshold tutorial adimini gorunur yapmadi.");
             Assert.That(onboarding.HintText.text,
                 Is.EqualTo(FirstRunOnboardingUI.LowAmmoHint));
             Assert.That(onboarding.ActivePulseTarget,
@@ -961,7 +970,8 @@ namespace DeadWalls.Tests
             ammoSupply.ToggleButton.onClick.Invoke();
             yield return null;
 
-            Assert.That(ammoSupply.IsOpen, Is.True);
+            Assert.That(ammoSupply.IsOpen, Is.True,
+                "Arrow Supply dock click legacy bridge panelini acmadi.");
             Assert.That(onboarding.ActivePulseTarget,
                 Is.SameAs(ammoSupply.PackageButton.GetComponent<RectTransform>()));
 
@@ -982,24 +992,57 @@ namespace DeadWalls.Tests
             entityManager.SetComponentData(gameStateEntity, resources);
             yield return null;
             ArrowRefillQuote quote = gameManager.GetArrowRefillQuote(1);
-            Assert.That(quote.IsValid, Is.True);
+            Assert.That(quote.IsValid, Is.True,
+                "Low-ammo test stogunda +1 package quote uretilmedi.");
             ammoSupply.Refresh();
-            Assert.That(ammoSupply.PackageButton.interactable, Is.True);
+            Assert.That(ammoSupply.PackageButton.interactable, Is.True,
+                "Yeterli Wood ve eksik stok varken legacy bridge package button aktif olmadi.");
             ResourceData resourcesBeforeRefill =
                 entityManager.GetComponentData<ResourceData>(gameStateEntity);
             ammoSupply.PackageButton.onClick.Invoke();
             Assert.That(entityManager.GetComponentData<ArrowSupply>(gameStateEntity).Current,
-                Is.EqualTo(threshold + quote.ArrowAmount));
+                Is.EqualTo(threshold),
+                "Basarili refill transaction frame'inde Arrow stoku aninda artmamalidir.");
+            Assert.That(gameManager.IsArrowRefillDeliveryActive, Is.True,
+                "Basarili package click 3 saniyelik teslimati baslatmadi.");
             Assert.That(entityManager.GetComponentData<ResourceData>(gameStateEntity).Wood,
                 Is.EqualTo(resourcesBeforeRefill.Wood - quote.WoodCost));
             yield return null;
 
             Assert.That(MetaProgression.HasTutorialFlag(
-                FirstRunOnboardingUI.LowAmmoFlagId), Is.True);
+                FirstRunOnboardingUI.LowAmmoFlagId), Is.True,
+                "Basarili refill transaction'i low-ammo tutorial adimini tamamlamadi.");
             Assert.That(onboarding.IsLowAmmoStepVisible, Is.False);
             Assert.That(onboarding.HintPanel.activeSelf, Is.False);
             Assert.That(onboarding.PulseFrame.gameObject.activeSelf, Is.False);
-            Assert.That(ammoSupply.IsOpen, Is.True);
+            Assert.That(ammoSupply.IsOpen, Is.True,
+                "Basarili refill sonrasi Arrow Supply paneli acik kalmadi.");
+
+            float previousCaptureDeltaTime = Time.captureDeltaTime;
+            Time.captureDeltaTime = 1f / 60f;
+            Time.timeScale = 1f;
+            for (int frame = 0; frame < 90; frame++)
+                yield return null;
+
+            Assert.That(gameManager.IsArrowRefillDeliveryActive, Is.True,
+                "Low-ammo refill 3 simulation saniyesi dolmadan tamamlanmamalidir.");
+            Assert.That(entityManager.GetComponentData<ArrowSupply>(gameStateEntity).Current,
+                Is.EqualTo(threshold),
+                "Tutorial refill siparisi teslimat surerken kullanilabilir stoga eklenmemelidir.");
+
+            for (int frame = 0;
+                 frame < 240 && gameManager.IsArrowRefillDeliveryActive;
+                 frame++)
+            {
+                yield return null;
+            }
+            Time.timeScale = 1f;
+            Time.captureDeltaTime = previousCaptureDeltaTime;
+
+            Assert.That(gameManager.IsArrowRefillDeliveryActive, Is.False,
+                "3 simulation saniyelik refill teslimati tamamlanmadi.");
+            Assert.That(entityManager.GetComponentData<ArrowSupply>(gameStateEntity).Current,
+                Is.EqualTo(threshold + quote.ArrowAmount));
         }
 
         [UnityTest]

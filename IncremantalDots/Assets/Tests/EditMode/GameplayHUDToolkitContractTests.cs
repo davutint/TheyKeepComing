@@ -193,6 +193,27 @@ namespace DeadWalls.Tests
         }
 
         [Test]
+        public void ArrowSupply_ExposesThreeSecondDeliveryStateAndAnimatedReserveBar()
+        {
+            string managementSource = File.ReadAllText(HudManagementSourcePath);
+            string hudStyle = File.ReadAllText(HudStylePath);
+            TemplateContainer root = LoadHud().CloneTree();
+
+            Assert.That(managementSource, Does.Contain("SUPPLY DELIVERY STARTED  ·  3S"));
+            Assert.That(managementSource, Does.Contain("ArrowRefillDeliveryRemainingSeconds"));
+            Assert.That(managementSource, Does.Contain("PendingArrowRefillDeliveryAmount"));
+            Assert.That(managementSource, Does.Contain("ArrowRefillDeliveryProgress01"));
+            Assert.That(managementSource, Does.Contain("Mathf.Lerp("));
+            Assert.That(managementSource, Does.Contain("\"is-delivering\""));
+            Assert.That(root.Q<VisualElement>("arrowsHeaderCopy")
+                .Q<Label>(className: "surface-subtitle").text,
+                Is.EqualTo("Order supplies; deliveries arrive over 3 seconds."));
+            Assert.That(hudStyle, Does.Contain(".supply-hero-state.is-delivering"));
+            Assert.That(hudStyle, Does.Contain(
+                "transition-property: width, background-color"));
+        }
+
+        [Test]
         public void ProductionHud_GuidedOnboardingOwnsSpotlightCopyAndCoreInputGate()
         {
             TemplateContainer root = LoadHud().CloneTree();

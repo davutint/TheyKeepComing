@@ -43,6 +43,8 @@ namespace DeadWalls
     /// </summary>
     public static class ArrowEconomyUtility
     {
+        public const float RefillDeliveryDurationSeconds = 3f;
+
         public static int GetCapacity(in ArrowSupply supply, in MobileEconomyPriceTuning tuning)
         {
             MobileEconomyPriceTuning safe = MobileEconomyPriceTuningUtility.Sanitize(tuning);
@@ -125,6 +127,18 @@ namespace DeadWalls
             supply.Current = (int)math.min((long)capacity, next);
             supply.Accumulator = 0f;
             return supply.Current > current;
+        }
+
+        public static float GetDeliveryProgress01(
+            float elapsedSeconds,
+            float durationSeconds = RefillDeliveryDurationSeconds)
+        {
+            if (elapsedSeconds <= 0f)
+                return 0f;
+            if (durationSeconds <= 0f || elapsedSeconds >= durationSeconds)
+                return 1f;
+
+            return math.saturate(elapsedSeconds / durationSeconds);
         }
 
         public static int GetUpgradeLevel(in ArrowSupply supply, ArrowUpgradeType type)

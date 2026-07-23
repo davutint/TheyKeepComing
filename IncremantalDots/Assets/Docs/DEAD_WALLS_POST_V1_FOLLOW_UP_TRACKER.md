@@ -2,11 +2,11 @@
 
 > **Amaç:** V1 kapsamı tamamlandıktan sonra yapılacak mantık düzeltmelerini, oyuncuya görünen geri bildirimleri, UI/UX yeniden çalışmalarını, polish işlerini ve performans optimizasyonlarını tek otoriter takip belgesinde yürütmek.
 >
-> **Tracker sürümü:** 3.0
+> **Tracker sürümü:** 3.2
 > **Oluşturulma tarihi:** 2026-07-18
 > **Aktif paket:** `-`
 > **Aktif iş:** `-`
-> **İlerleme:** `16 / 16` ana görev tamamlandı - `%100`
+> **İlerleme:** `17 / 17` ana görev tamamlandı - `%100`
 
 ---
 
@@ -36,7 +36,7 @@ Bu belge, tamamlanmış V1 tracker'ından sonraki geliştirme döneminin aktif t
 
 ### İlerleme hesabı
 
-İlerleme, Bölüm 3'teki 16 ana görev üzerinden hesaplanır. Alt maddeler kanıt ve kabul kapsamını gösterir; ayrıca paydayı büyütmez. Ana görevler yalnızca bütün zorunlu alt kapıları tamamlandığında kapanır. Owner'ın adım adım yeni UI öğretim isteğiyle açılan `DW-P16-GUIDED-ONBOARDING` nedeniyle payda `15 -> 16` değişmiştir.
+İlerleme, Bölüm 3'teki 17 ana görev üzerinden hesaplanır. Alt maddeler kanıt ve kabul kapsamını gösterir; ayrıca paydayı büyütmez. Ana görevler yalnızca bütün zorunlu alt kapıları tamamlandığında kapanır. Owner'ın Arrow refill'i anlık transaction yerine okunabilir bir teslimat sürecine çevirme kararıyla açılan `DW-P17-ARROW-DELIVERY` nedeniyle payda `16 -> 17` değişmiştir.
 
 ---
 
@@ -133,6 +133,23 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - Kaynak yeterli olduğu sürece sürekli görünen legacy `RECRUIT A BASIC ARCHER.` affordability hint'i
   yeni HUD'dan kaldırılmıştır; bu geçici temizlik yeni tutorial sırası kararı değildir.
 
+### Arrow refill teslimat ritmi
+
+- Refill satın alındığında Wood transaction anında harcanır; Arrow stoku anında dolmaz.
+- Satın alınan Arrow miktarı `3` simulation saniyesi boyunca pending ve kullanılamaz kalır;
+  gerçek `ArrowSupply.Current` stokuna ancak süre tamamlandığında tek seferde eklenir.
+- Kullanılabilir stok `0` ise okçular teslimatın tamamı boyunca ateş etmez; ilk atış yalnız
+  atomik stok gelişinden sonraki ECS tick'inde gerçekleşebilir.
+- Pause teslimatı durdurur; `2X/3X` hızları diğer simülasyon işleri gibi teslimatı hızlandırır.
+- Supply drawer teslimat sırasında `DELIVERING · Ns` durumunu gösterir. Sayısal
+  `Current / Capacity` yalnız kullanılabilir stoğu, bar ise mevcut oran ile sipariş sonrası
+  oran arasındaki teslimat ilerlemesini gösterir.
+- Aynı anda yalnız bir refill teslimatı yürür; ikinci deneme yeni ödeme almadan exact İngilizce
+  `SUPPLY DELIVERY IN PROGRESS · Ns REMAINING` uyarısıyla reddedilir.
+- Yeni otomatik completion toast'ı eklenmez; yalnız owner onaylı player-action toast sınırı korunur.
+- Snapshot alınırken ödemesi yapılmış bekleyen miktar önce stoka uygulanır; save şemasında
+  teslim edilmemiş Arrow kaybı oluşmaz.
+
 ### UI okunabilirliği ve player-facing terminoloji
 
 - Gameplay HUD USS içinde player-facing yazı boyutu tabanı referans çözünürlükte `10px`tir; kritik phase mesajı `11px` ve yüksek kontrastlıdır.
@@ -163,6 +180,7 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 | 14 | `DW-P14-ACTION-FEEDBACK` | Game Over meta açıklığı ve exact action-failure toast'ları | `[x]` | Exact effect progression, açıklanabilir action state, hedefli test ve canlı Game View doğrulandı |
 | 15 | `DW-P15-TOAST-AUDIO-POLISH` | Süreli toast stack'i ve UI Toolkit button sesleri | `[x]` | Üç kartlık tekrar korunumu, otomatik dismiss, merkezi click audio ve hedefli runtime testleri doğrulandı |
 | 16 | `DW-P16-GUIDED-ONBOARDING` | UI Toolkit gerçek kontrolleriyle adım adım first-run öğretimi | `[x]` | Gerçek-control spotlight/input gate, Play-session sıra, contextual tip'ler ve hedefli regresyon doğrulandı |
+| 17 | `DW-P17-ARROW-DELIVERY` | Üç saniyelik Arrow teslimatı ve canlı stok barı | `[x]` | Sipariş 3 saniye kullanılamaz kaldı, süre sonunda atomik geldi; pause, save, tutorial, 1K Archer ve UI sözleşmesi doğrulandı |
 
 ---
 
@@ -462,6 +480,29 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - [x] Hedefli EditMode `45/45`; gerçek core/raycast zinciri, P15 Archer toast regresyonları,
   Settings reset ve ikinci-run suppression dahil hedefli PlayMode `5/5` geçti. Unity compile
   `0 error`, final Console ve `git diff --check` temiz doğrulandı.
+
+### `DW-P17-ARROW-DELIVERY` - Three-Second Supply Delivery + Live Reserve Bar
+
+**Paket başlığı:** `DW-P17-ARROW-DELIVERY: Three-Second Supply Delivery + Live Reserve Bar`
+**Durum:** `[x]` Owner onaylı 3 saniyelik pending + atomik stok teslimatı uygulandı ve hedefli regresyonla doğrulandı.
+
+- [x] `GameManager.ArrowDelivery`, tek aktif refill'in toplam miktarını ve geçen simulation
+  süresini taşır. Süre boyunca canlı ECS `ArrowSupply.Current` değerine yazmaz; tamamlanınca
+  siparişin tamamını o andaki stoğa atomik ekleyerek eşzamanlı mevcut-stok tüketimini ezmez.
+- [x] Wood başarılı purchase transaction'ında hemen düşer; satın alınan Arrow miktarı
+  `ArrowEconomyUtility.RefillDeliveryDurationSeconds = 3` süresince kullanılamaz kalır.
+- [x] Pause altında teslimat ilerlemez. Oyun hızı scaled `Time.deltaTime` üzerinden teslimata
+  uygulanır; `2X/3X` seçimleri teslimatı aynı oranda hızlandırır.
+- [x] UI Toolkit supply drawer sayısal gerçek stoğu değiştirmeden gösterir; teslimatta altın bar,
+  mevcut oran ile sipariş sonrası oran arasında ilerler, `DELIVERING · Ns` state'i ve `0,15s`
+  width transition'i kullanır.
+- [x] Aktif teslimat sırasında yeni package/Buy Max transaction'ı reddedilir ve
+  `SUPPLY DELIVERY IN PROGRESS · Ns REMAINING` warning toast'ı gösterilir.
+- [x] Snapshot aktif teslimatı önce stoka flush eder; Wood harcanıp kalan Arrow'un save dışında
+  kaybolması engellenir. Restart bekleyen teslimat state'ini temizler.
+- [x] Hedefli EditMode, birleşik kritik PlayMode ve tam `ArrowAmmoPlayModeTests` sonuçları
+  atomik teslimat regresyonlarıyla yeniden doğrulandı. Güncel sayılar aşağıdaki journal
+  girdisindedir.
 
 ---
 
@@ -927,3 +968,35 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
   `1/1` ve saf guided onboarding EditMode paketi `6/6` geçti. Unity compile ve final Console `0 error`;
   `git diff --check` temiz doğrulandı.
 - P16 kapalı kalır; ana görev paydası değişmedi ve Post-V1 ilerleme `16/16 - %100` olarak korundu.
+
+### 2026-07-23 - P17 üç saniyelik Arrow teslimatı tamamlandı
+
+- Owner, Arrow refill düğmesinin stoku anında doldurması yerine teslimatın `3` saniye sürmesini ve
+  stok barının aynı süreçte kademeli dolmasını kesinleştirdi.
+- `GameManager.ArrowDelivery`, ödemesi yapılmış tek aktif siparişi gerçek ECS stokuna simulation
+  zamanında kademeli ekler. Pause ilerlemeyi durdurur; oyun hızı teslimat süresini ölçekler.
+- UI Toolkit Arrow Supply drawer'ı `DELIVERING · Ns` state'i, altın renk ve gerçek stok oranına
+  bağlı width transition'i kullanır. İkinci sipariş exact İngilizce uyarıyla reddedilir.
+- Save snapshot bekleyen teslimatı önce stoka flush eder; restart pending state'i temizler.
+- Hedefli EditMode `36/36`, birleşik kritik PlayMode `4/4` ve tam Arrow ammo PlayMode `5/5`
+  geçti. Unity compile `0 error`; `git diff --check` temizdir.
+- Yeni owner-onaylı ana görev nedeniyle payda `16 -> 17` değişti; P17 kapanışıyla Post-V1
+  ilerleme `17/17 - %100` oldu.
+
+### 2026-07-23 - P17 post-acceptance atomik teslimat düzeltmesi
+
+- Owner, refill düğmesine basıldığı anda okçuların yeniden ateş etmemesini; satın alınan
+  Arrow'ların `3` simulation saniyesi boyunca tamamen yolda ve kullanılamaz kalmasını,
+  siparişin tamamının yalnız süre sonunda stoğa gelmesini kesinleştirdi.
+- Kök neden önceki teslimat state'inin her frame küçük deltaları canlı `ArrowSupply.Current`
+  değerine eklemesiydi. Stok `0` iken gelen ilk delta bile `ArcherShootSystem` tarafından
+  kullanılabildiği için okçular üç saniye dolmadan ateşe başlıyordu.
+- `GameManager.ArrowDelivery` artık bekleme sırasında canlı stoğa hiç yazmaz; süre dolduğunda
+  siparişin tamamını o andaki stoğa tek seferde ekler. Snapshot flush aynı atomik yolu kullanır.
+- Supply drawer sayısal `Current / Capacity` değerini gerçek kullanılabilir stokta tutar;
+  altın bar mevcut oran ile sipariş sonrası oran arasında yalnız teslimat ilerlemesini gösterir.
+- Hedefli EditMode `36/36` geçti. Tam `ArrowAmmoPlayModeTests` `5/5` ve low-ammo tutorial
+  refill regresyonuyla birlikte hedefli PlayMode `6/6` geçti. Sıfır stokta tek okçu ve
+  `1.000` okçu için teslimat tamamlanmadan stok/rent oluşmadığı doğrulandı.
+- Unity compile ve final Console `0 error`; `git diff --check` temizdir. Tracker `v3.2`
+  oldu; P17 kapalı kaldı ve ana görev paydası değişmeden `17/17 - %100` korundu.

@@ -363,14 +363,38 @@ namespace DeadWalls
 
             int capacity = gm.GetArrowCapacity();
             int current = gm.ArrowSupply.Current;
-            float ratio = capacity > 0 ? current / (float)capacity : 0f;
+            float actualRatio = capacity > 0 ? current / (float)capacity : 0f;
+            bool deliveryActive = gm.IsArrowRefillDeliveryActive;
+            int projectedCurrent = Mathf.Min(
+                capacity,
+                current + gm.PendingArrowRefillDeliveryAmount);
+            float projectedRatio = capacity > 0
+                ? projectedCurrent / (float)capacity
+                : 0f;
+            float displayRatio = deliveryActive
+                ? Mathf.Lerp(
+                    actualRatio,
+                    projectedRatio,
+                    gm.ArrowRefillDeliveryProgress01)
+                : actualRatio;
             _supplyHeroValue.text = $"{current:N0} / {capacity:N0}";
-            _supplyHeroState.text = ratio <= 0.25f ? "LOW SUPPLY" : ratio >= 0.995f ? "RESERVE FULL" : "SUPPLY READY";
-            _supplyHeroState.EnableInClassList("is-negative", ratio <= 0.25f);
-            _supplyHeroProgress.style.width = Length.Percent(ratio * 100f);
-            _supplyHeroProgress.style.backgroundColor = ratio <= 0.25f
-                ? new Color(0.84f, 0.36f, 0.25f, 1f)
-                : new Color(0.55f, 0.70f, 0.48f, 1f);
+            _supplyHeroState.text = deliveryActive
+                ? $"DELIVERING  ·  {gm.ArrowRefillDeliveryRemainingSeconds:0.0}S"
+                : actualRatio <= 0.25f
+                    ? "LOW SUPPLY"
+                    : actualRatio >= 0.995f
+                        ? "RESERVE FULL"
+                        : "SUPPLY READY";
+            _supplyHeroState.EnableInClassList(
+                "is-negative",
+                !deliveryActive && actualRatio <= 0.25f);
+            _supplyHeroState.EnableInClassList("is-delivering", deliveryActive);
+            _supplyHeroProgress.style.width = Length.Percent(displayRatio * 100f);
+            _supplyHeroProgress.style.backgroundColor = deliveryActive
+                ? new Color(0.84f, 0.60f, 0.25f, 1f)
+                : actualRatio <= 0.25f
+                    ? new Color(0.84f, 0.36f, 0.25f, 1f)
+                    : new Color(0.55f, 0.70f, 0.48f, 1f);
 
             ArrowRefillQuote package = gm.GetArrowRefillQuote(1);
             ArrowRefillQuote large = gm.GetArrowRefillQuote(5);
@@ -525,13 +549,15 @@ namespace DeadWalls
             bool purchased = gm != null && gm.TryBuyArrowRefill(packages);
             if (purchased)
             {
-                ShowPrimaryToast("ARROW RESERVE RESTOCKED");
+                ShowPrimaryToast("SUPPLY DELIVERY STARTED  ·  3S");
                 MarkGuidedOnboardingStepFromSuccessfulAction(GuidedOnboardingStep.ArrowRefill);
             }
             else
                 ShowWarningToast(gm == null
                     ? "ARROW RESTOCK UNAVAILABLE  ·  GAME STATE NOT READY"
                     : GameplayActionFeedbackUtility.BuildArrowRefillFailure(
+                        gm.IsArrowRefillDeliveryActive,
+                        gm.ArrowRefillDeliveryRemainingSeconds,
                         gm.ArrowSupply.Current >= gm.GetArrowCapacity(),
                         gm.GetArrowRefillQuote(packages),
                         gm.Resources));
@@ -545,7 +571,7 @@ namespace DeadWalls
             bool purchased = gm != null && gm.TryBuyMaxArrowRefill();
             if (purchased)
             {
-                ShowPrimaryToast("ARROW RESERVE FILLED");
+                ShowPrimaryToast("SUPPLY DELIVERY STARTED  ·  3S");
                 MarkGuidedOnboardingStepFromSuccessfulAction(GuidedOnboardingStep.ArrowRefill);
             }
             else if (gm == null)
@@ -558,6 +584,8 @@ namespace DeadWalls
                 if (!quote.IsValid)
                     quote = gm.GetArrowRefillQuote(1);
                 ShowWarningToast(GameplayActionFeedbackUtility.BuildArrowRefillFailure(
+                    gm.IsArrowRefillDeliveryActive,
+                    gm.ArrowRefillDeliveryRemainingSeconds,
                     gm.ArrowSupply.Current >= gm.GetArrowCapacity(),
                     quote,
                     gm.Resources));

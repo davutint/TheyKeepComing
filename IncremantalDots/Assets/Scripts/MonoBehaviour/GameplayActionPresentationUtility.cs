@@ -91,10 +91,18 @@ namespace DeadWalls
         }
 
         public static string BuildArrowRefillFailure(
+            bool deliveryInProgress,
+            float deliveryRemainingSeconds,
             bool reserveFull,
             ArrowRefillQuote quote,
             ResourceData available)
         {
+            if (deliveryInProgress)
+            {
+                string remaining = Math.Max(0d, deliveryRemainingSeconds)
+                    .ToString("0.0", CultureInfo.InvariantCulture);
+                return $"SUPPLY DELIVERY IN PROGRESS  ·  {remaining}S REMAINING";
+            }
             if (reserveFull)
                 return "ARROW RESERVE FULL  ·  NO FREE CAPACITY";
             if (!quote.IsValid)

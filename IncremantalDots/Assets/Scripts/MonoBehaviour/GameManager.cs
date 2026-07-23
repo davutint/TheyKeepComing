@@ -238,6 +238,7 @@ namespace DeadWalls
                 return;
 
             EnsureHeartRuntime();
+            TickArrowRefillDelivery();
             ReadECSData();
             ConsumeGraveEssenceDropEvents();
             TryEmitRunStartedTelemetry();
@@ -1136,6 +1137,7 @@ namespace DeadWalls
         {
             ArrowRefillQuote quote = GetArrowRefillQuote(packageCount);
             return _initialized && !GameState.IsGameOver && !GameState.IsLevelUpPending
+                && !IsArrowRefillDeliveryActive
                 && quote.IsValid
                 && CanAfford(new ResourceCost(quote.WoodCost, 0, 0, 0));
         }
@@ -1144,6 +1146,7 @@ namespace DeadWalls
         {
             ArrowRefillQuote quote = GetArrowBuyMaxQuote();
             return _initialized && !GameState.IsGameOver && !GameState.IsLevelUpPending
+                && !IsArrowRefillDeliveryActive
                 && quote.IsValid
                 && CanAfford(new ResourceCost(quote.WoodCost, 0, 0, 0));
         }
@@ -1151,7 +1154,7 @@ namespace DeadWalls
         public bool TryBuyArrowRefill(int packageCount)
         {
             if (!CanBuyArrowRefill(packageCount)
-                || !TryGetArrowSupply(out Entity entity, out var supply))
+                || !TryGetArrowSupply(out _, out var supply))
             {
                 return false;
             }
@@ -1167,8 +1170,7 @@ namespace DeadWalls
                 return false;
             }
 
-            _entityManager.SetComponentData(entity, next);
-            ArrowSupply = next;
+            BeginArrowRefillDelivery(quote.ArrowAmount);
             TryEmitResourceSpentTelemetry(
                 new ResourceCost(quote.WoodCost, 0, 0, 0),
                 ResourceSpentTelemetryContract.ArrowRefill,
@@ -1181,7 +1183,7 @@ namespace DeadWalls
         public bool TryBuyMaxArrowRefill()
         {
             if (!CanBuyMaxArrowRefill()
-                || !TryGetArrowSupply(out Entity entity, out var supply))
+                || !TryGetArrowSupply(out _, out var supply))
             {
                 return false;
             }
@@ -1198,8 +1200,7 @@ namespace DeadWalls
                 return false;
             }
 
-            _entityManager.SetComponentData(entity, next);
-            ArrowSupply = next;
+            BeginArrowRefillDelivery(quote.ArrowAmount);
             TryEmitResourceSpentTelemetry(
                 new ResourceCost(quote.WoodCost, 0, 0, 0),
                 ResourceSpentTelemetryContract.ArrowRefill,
@@ -3557,6 +3558,7 @@ namespace DeadWalls
             if (!TryInitialize() || !TryGetMobileConfigEntity(out var mobileConfigEntity))
                 return false;
 
+            CompleteArrowRefillDeliveryImmediately();
             ReadECSData();
             // ReadECSData ECS truth'ini yeni okur. Lethal state bu cagri icinde tespit
             // edilmisse death transaction snapshot'tan once kazanir; canli save yazilamaz.
@@ -6121,6 +6123,7 @@ namespace DeadWalls
 
         public void RestartGame()
         {
+            ResetArrowRefillDelivery();
             if (!CanAccessEntityManager() || !_entityManager.Exists(_gameStateEntity) || !_entityManager.Exists(_castleEntity))
             {
                 _initialized = false;

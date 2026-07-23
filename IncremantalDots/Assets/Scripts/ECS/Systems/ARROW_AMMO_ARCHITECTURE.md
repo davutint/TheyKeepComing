@@ -1,11 +1,15 @@
-# Finite Arrow Supply + Instant Refill - Mimari
+# Finite Arrow Supply + Timed Delivery - Mimari
 
 ## Otorite ve oyuncu sözleşmesi
 
 V1'de Arrow tek sürekli tüketilen kaynaktır. Her başarılı ok atışı tam `1 Arrow`
 harcar. Stok `0` olduğunda okçular hedef seçse bile projectile rent etmez; Wood ile
-satın alınan refill aynı transaction içinde stoka yazılır ve takip eden simulation
-tick'inde atış yeniden başlar. Fletcher, üretim kuyruğu, worker veya bekleme süresi yoktur.
+satın alınan refill için ödeme transaction anında alınır; Arrow'lar takip eden
+`3` simulation saniyesi boyunca yolda ve kullanılamaz kalır. Süre tamamlandığında siparişin
+tamamı gerçek `ArrowSupply.Current` stokuna tek seferde eklenir; bu ana kadar stok `0` ise
+okçular ateş edemez.
+Pause teslimatı durdurur, `2X/3X` oyun hızı ise diğer simülasyon işleri gibi teslimatı
+hızlandırır. Fletcher, üretim kuyruğu veya worker gereksinimi yoktur.
 
 ## Veri ve sahiplik
 
@@ -19,7 +23,11 @@ tick'inde atış yeniden başlar. Fletcher, üretim kuyruğu, worker veya beklem
 - `ArrowEconomyUtility`: kapasite, sabit oranlı paket, kısmi dolum, Buy Max ve yatırım
   maliyeti matematiğinin saf sahibidir.
 - `GameManager`: oyuncu transaction'larının tek owner'ıdır; fiyat okur, kaynak harcar,
-  `ArrowSupply` yazar ve UI event'i yayınlar.
+  teslimatı başlatır ve UI event'i yayınlar.
+- `GameManager.ArrowDelivery`: tek aktif refill teslimatının toplam miktarını ve geçen
+  simulation süresini tutar. Bekleme sırasında canlı ECS stoğuna yazmaz; süre dolduğunda
+  siparişin tamamını o andaki kullanılabilir stoğa atomik ekler. Böylece mevcut stoktan
+  gerçekleşen eşzamanlı okçu tüketimini ezmez ve sipariş erken kullanıma açılmaz.
 - `ArrowSupplyUI`: yalniz basarili player-facing refill sonrasinda
   `ArrowRefillPurchasedByPlayer` event'ini yayar; onboarding transaction'i tekrar etmeden dinler.
 - `ArcherShootSystem`: yalnız gerçek projectile pool rent'i başarılı olduktan sonra
@@ -46,11 +54,16 @@ ve her satın alım hem Wood hem Iron harcar.
 ## UI sözleşmesi
 
 Üst HUD Arrow chip'i `Current / Capacity` gösterir; `INF` modu yoktur ve diğer resource
-chip'leri gibi pasif bilgi yüzeyidir. Alt-sağ management dock'taki ayrı `ARROW SUPPLY`
-butonu tek satırlık `AmmoPurchasePanel` yüzeyini açar. Panel mevcut stok/verim, `+1 paket`, `+5 paket`,
+chip'leri gibi pasif bilgi yüzeyidir. Alt-sağ management dock'taki `ARROW SUPPLY`
+butonu güncel UI Toolkit supply drawer'ını açar. Drawer mevcut stok/verim, paketler,
 `Buy Max`, Capacity ve Efficiency yatırımlarını görünür fiyatlarıyla gösterir.
-Kaynak yetersizliği butonu kapatır fakat fiyatı gizlemez; yalnız dolu stok `FULL`,
-Wood ile hiçbir Arrow alınamayan Buy Max durumu `NEED WOOD` yazar.
+
+Teslimat sürerken durum metni `DELIVERING · Ns`, supply barı ise altın durum rengini
+kullanır. Sayısal `Current / Capacity` yalnız gerçekten kullanılabilir stoğu gösterir;
+bar ise mevcut oran ile sipariş teslim edildiğinde oluşacak oran arasında zaman ilerlemesini
+görselleştirir. Bu projeksiyon oynanabilir stok değildir. Aynı anda yalnız bir refill
+teslimatı olabilir. İkinci satın alma denemesi player-facing
+`SUPPLY DELIVERY IN PROGRESS · Ns REMAINING` uyarısıyla reddedilir.
 
 Ilk-kosu onboarding'i finite stok effective kapasitenin inclusive `%25` veya altina indiginde
 panel kapaliyken `ARROW SUPPLY` dock butonunu pulse eder. Paneli otomatik acmaz; oyuncu paneli
@@ -59,11 +72,13 @@ ammo tutorial flag'ini tamamlar; CAP/EFF yatirimi tamamlamaz.
 
 ## Save ve migration
 
-Run save güncel şema `v14`'tür. `ArrowCurrent`, `ArrowCapacityLevel` ve
+Run save güncel şema `v17`'dir. `ArrowCurrent`, `ArrowCapacityLevel` ve
 `ArrowEfficiencyLevel` exact Continue kapsamında tutulur. `v3-v13` kayıtları sıralı
 migration ile güncel şemaya yükseltilir; eski kayıtlarda iki yatırım seviyesi `0` başlar. Restore edilen
 stok, data-driven kapasiteye clamp edilir. Restart seviyeleri sıfırlar ve base
-kapasiteyi doldurur.
+kapasiteyi doldurur. Ayrı bir teslimat save şeması yoktur: snapshot alınırken ödemesi
+yapılmış aktif teslimat önce eksiksiz biçimde stoka uygulanır, ardından `ArrowCurrent`
+kaydedilir. Böylece Wood harcanıp teslim edilmemiş Arrow kaybı oluşmaz.
 
 ## Difficulty Tuner yuzeyi
 
@@ -76,25 +91,26 @@ pool gating nedeniyle bu tavandan dusuk olabilir.
 
 ## Performans ve test sınırı
 
-Refill bir UI/ECS singleton transaction'ıdır; archer başına üretim entity'si veya queue
+Refill tek bir GameManager teslimat state'idir; archer başına üretim entity'si veya queue
 oluşturmaz. `Rapid` yüksek fire rate nedeniyle aynı sürede Basic'ten daha fazla Arrow
-tüketir. 1.000 archer refill sonrası mevcut pooled projectile yolunu kullanmaya devam eder.
+tüketir. Üç saniyelik bekleme boyunca singleton stok değişmez; süre sonunda sipariş tek
+bir singleton write ile eklenir ve mevcut pooled projectile yolu değiştirilmez.
 
 1.000 hazır Basic Archer + stok `0` kabul koşusunda gerçek
-`GameManager.TryBuyArrowRefill(10)` transaction'ı `1.000 Arrow / 250 Wood` yazar. Takip eden
-tek simulation tick'i tam `1.000` gameplay projectile rent eder, stoku tekrar `0` yapar ve
-prewarm pool'u genişletmez. İki temiz Editor örneklemi refill transaction için
-`0,010-0,600 ms`, restart frame'i için `22,210-23,158 ms` main thread /
-`24,327-50,327 ms` wall-frame ve bütün Editor test frame'i için `29.622-30.094 B` GC gösterdi.
-Guard bütçesi main thread `< 50 ms`, wall-frame `< 100 ms`'dir. GC
-örneklemi test runner dahil tüm Editor frame'ine aittir; izole Player system-allocation kabulü
-yerine geçmez.
+`GameManager.TryBuyArrowRefill(10)` transaction'ı `1.000 Arrow / 250 Wood` sipariş eder.
+Pause durumunda stok ve rent sayısı değişmez. Simülasyon yeniden akınca 1.000 Arrow,
+3 simulation saniyesi boyunca kullanılamaz kalır ve projectile rent oluşmaz. Süre sonunda
+stok atomik olarak `1.000` artar; takip eden ECS tick'inde hazır okçular stoğu tüketir ve
+toplam projectile rent sayısı tam `1.000` artar. Prewarm pool genişlemez.
 
 Doğrulama sahipleri:
 
 - `ArrowEconomyUtilityTests`: sabit birim fiyat, kısmi dolum, Buy Max, efficiency,
-  exponential yatırım ve overflow sınırları.
-- `ArrowAmmoPlayModeTests`: stok `0` iken atışın durması, instant refill sonrası yeniden
-  başlaması, 1.000 Archer bulk-refill restart ölçümü, projectile başına `1` tüketim, ana
-  kaynakların combat tick'inde azalmaması ve Rapid tüketim farkı.
-- `RunPersistenceTests`: şema `v8`, eski kayıt migration'ı ve yatırım seviyeleri.
+  exponential yatırım, overflow sınırları ve 3 saniyelik teslimat ilerleme matematiği.
+- `ArrowAmmoPlayModeTests`: stok `0` iken atışın durması, teslimatın tamamı boyunca stok/rent
+  oluşmaması, süre sonunda atomik gelişle atışın yeniden başlaması, pause sözleşmesi,
+  1.000 Archer bulk delivery, snapshot sırasında bekleyen teslimatın kaybolmaması,
+  projectile başına `1` tüketim ve Rapid tüketim farkı.
+- `GameplayHUDToolkitContractTests`: İngilizce teslimat metinleri, durum sınıfı ve bar
+  transition sözleşmesi.
+- `RunPersistenceTests`: şema `v17`, eski kayıt migration'ı ve yatırım seviyeleri.

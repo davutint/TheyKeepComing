@@ -4,7 +4,6 @@ using NUnit.Framework;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
-using Unity.Profiling;
 using Unity.Transforms;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -17,6 +16,7 @@ namespace DeadWalls.Tests
         private string _runSavePath;
         private byte[] _originalRunSave;
         private float _originalCaptureDeltaTime;
+        private float _originalTimeScale;
 
         [UnitySetUp]
         public IEnumerator SetUp()
@@ -24,7 +24,14 @@ namespace DeadWalls.Tests
             _runSavePath = Path.Combine(Application.persistentDataPath, "run_save.json");
             _originalRunSave = File.Exists(_runSavePath) ? File.ReadAllBytes(_runSavePath) : null;
             _originalCaptureDeltaTime = Time.captureDeltaTime;
+            _originalTimeScale = Time.timeScale;
             Time.captureDeltaTime = 1f / 60f;
+            Time.timeScale = 1f;
+            TutorialSessionProgress.BeginNewPlaySession();
+            Assert.That(MetaProgression.SetTutorialFlag(
+                FirstRunOnboardingUI.TutorialCompleteFlagId,
+                true), Is.True,
+                "Arrow ammo fixture guided tutorial pause'undan izole edilemedi.");
             RunPersistence.Delete();
             GameBootstrap.PendingAction = GameBootstrap.StartAction.None;
 
@@ -39,6 +46,7 @@ namespace DeadWalls.Tests
         [UnityTearDown]
         public IEnumerator TearDown()
         {
+            Time.timeScale = _originalTimeScale;
             Time.captureDeltaTime = _originalCaptureDeltaTime;
             RunPersistence.Delete();
             if (_originalRunSave != null)
@@ -47,7 +55,7 @@ namespace DeadWalls.Tests
         }
 
         [UnityTest]
-        public IEnumerator ZeroSupply_StopsShot_AndInstantRefillResumesOnNextSimulationTick()
+        public IEnumerator ZeroSupply_HoldsFireForFullDelivery_ThenResumesAfterAtomicArrival()
         {
             yield return WaitForRuntime();
             EntityManager em = World.DefaultGameObjectInjectionWorld.EntityManager;
@@ -74,14 +82,45 @@ namespace DeadWalls.Tests
             em.SetComponentData(gameStateEntity, resources);
             yield return null;
 
+            ArrowRefillQuote quote = GameManager.Instance.GetArrowRefillQuote(1);
+            Assert.That(quote.IsValid, Is.True);
             Assert.That(GameManager.Instance.TryBuyArrowRefill(1), Is.True);
-            Assert.That(em.GetComponentData<ArrowSupply>(gameStateEntity).Current, Is.EqualTo(100));
+            Assert.That(GameManager.Instance.IsArrowRefillDeliveryActive, Is.True);
+            Assert.That(em.GetComponentData<ArrowSupply>(gameStateEntity).Current, Is.Zero,
+                "Arrow stoku transaction frame'inde aninda dolmamalidir.");
+
+            Time.timeScale = 1f;
+            for (int frame = 0; frame < 90; frame++)
+                yield return null;
+
+            Assert.That(GameManager.Instance.IsArrowRefillDeliveryActive, Is.True,
+                "Siparis 3 simulation saniyesi dolmadan tamamlanmamalidir.");
+            Assert.That(em.GetComponentData<ArrowSupply>(gameStateEntity).Current, Is.Zero,
+                "Teslimat surerken siparisten tek bir Arrow bile kullanilabilir stoga girmemelidir.");
+            Assert.That(em.GetComponentData<ArrowPoolRuntimeData>(
+                arrowPoolEntity).TotalRentCount, Is.EqualTo(stopped.TotalRentCount),
+                "Okcular teslimat tamamlanmadan projectile rent etmemelidir.");
+            Assert.That(GameManager.Instance.ArrowRefillDeliveryProgress01,
+                Is.InRange(0.4f, 0.6f));
+
+            for (int frame = 0;
+                 frame < 240 && GameManager.Instance.IsArrowRefillDeliveryActive;
+                 frame++)
+            {
+                yield return null;
+            }
             yield return null;
 
+            Assert.That(GameManager.Instance.IsArrowRefillDeliveryActive, Is.False,
+                "3 simulation saniyelik teslimat 240 test frame'i icinde tamamlanmadi.");
             ArrowPoolRuntimeData resumed = em.GetComponentData<ArrowPoolRuntimeData>(arrowPoolEntity);
-            Assert.That(resumed.TotalRentCount - stopped.TotalRentCount, Is.EqualTo(1));
-            Assert.That(em.GetComponentData<ArrowSupply>(gameStateEntity).Current, Is.EqualTo(99),
-                "Gercek pooled projectile basina tam 1 Arrow dusmeli.");
+            long deliveredShotCount = resumed.TotalRentCount - stopped.TotalRentCount;
+            ArrowSupply deliveredSupply = em.GetComponentData<ArrowSupply>(gameStateEntity);
+            Assert.That(deliveredShotCount, Is.GreaterThan(0),
+                "Arrow siparisi tamamen teslim edildikten sonra okcular atisa devam etmelidir.");
+            Assert.That(deliveredSupply.Current + deliveredShotCount,
+                Is.EqualTo(quote.ArrowAmount),
+                "Atomik teslim edilen stok ile gercek pooled projectile tuketimi birlikte alinan pakete esit olmalidir.");
 
             Cleanup(em, waveEntity, enemyPoolEntity, arrowPoolEntity, target, archer);
         }
@@ -157,7 +196,7 @@ namespace DeadWalls.Tests
         }
 
         [UnityTest]
-        public IEnumerator ThousandArchers_ZeroSupplyThenBulkRefill_RestartsPooledSalvoNextTick()
+        public IEnumerator ThousandArchers_HoldFireUntilAtomicBulkDeliveryCompletes()
         {
             const int archerCount = 1_000;
             const int refillPackageCount = 10;
@@ -223,65 +262,54 @@ namespace DeadWalls.Tests
             Assert.That(quote.ArrowAmount, Is.EqualTo(archerCount));
             int woodBefore = em.GetComponentData<ResourceData>(gameStateEntity).Wood;
 
-            double refillTransactionMs;
-            double restartMainThreadMs;
-            double restartWallFrameMs;
-            long restartGcBytes;
-            using (var mainThread = ProfilerRecorder.StartNew(
-                       ProfilerCategory.Internal, "Main Thread", 1))
-            using (var gcAllocated = ProfilerRecorder.StartNew(
-                       ProfilerCategory.Memory, "GC Allocated In Frame", 1))
+            Assert.That(GameManager.Instance.TryBuyArrowRefill(refillPackageCount), Is.True);
+            Assert.That(GameManager.Instance.IsArrowRefillDeliveryActive, Is.True);
+            Assert.That(em.GetComponentData<ArrowSupply>(gameStateEntity).Current, Is.Zero);
+            Assert.That(em.GetComponentData<ResourceData>(gameStateEntity).Wood,
+                Is.EqualTo(woodBefore - quote.WoodCost));
+
+            for (int frame = 0; frame < 3; frame++)
+                yield return null;
+            Assert.That(em.GetComponentData<ArrowSupply>(gameStateEntity).Current, Is.Zero,
+                "Pause durumunda teslimat ilerlememelidir.");
+            Assert.That(em.GetComponentData<ArrowPoolRuntimeData>(
+                arrowPoolEntity).TotalRentCount, Is.EqualTo(stoppedRentCount));
+
+            Time.timeScale = 1f;
+            for (int frame = 0; frame < 90; frame++)
+                yield return null;
+
+            Assert.That(GameManager.Instance.IsArrowRefillDeliveryActive, Is.True);
+            Assert.That(em.GetComponentData<ArrowSupply>(gameStateEntity).Current, Is.Zero,
+                "1K Arrow siparisi teslimat surerken kullanilabilir stoga sizmamalidir.");
+            Assert.That(em.GetComponentData<ArrowPoolRuntimeData>(
+                arrowPoolEntity).TotalRentCount, Is.EqualTo(stoppedRentCount),
+                "1K okcu 3 saniyelik teslimat tamamlanmadan ates etmemelidir.");
+
+            int deliveryFrames = 0;
+            while (deliveryFrames < 240 && GameManager.Instance.IsArrowRefillDeliveryActive)
             {
-                Assert.That(mainThread.Valid, Is.True);
-                Assert.That(gcAllocated.Valid, Is.True);
-
-                // Recorder'in ilk sample'ini sifir stoklu frame ile isit; refill ve 1K salvo
-                // takip eden tek kayitli frame'de birlikte olculur.
+                deliveryFrames++;
                 yield return null;
-                Assert.That(em.GetComponentData<ArrowPoolRuntimeData>(
-                    arrowPoolEntity).TotalRentCount, Is.EqualTo(stoppedRentCount));
-
-                double refillStarted = Time.realtimeSinceStartupAsDouble;
-                Assert.That(GameManager.Instance.TryBuyArrowRefill(refillPackageCount), Is.True);
-                refillTransactionMs =
-                    (Time.realtimeSinceStartupAsDouble - refillStarted) * 1000.0;
-                Assert.That(em.GetComponentData<ArrowSupply>(gameStateEntity).Current,
-                    Is.EqualTo(archerCount));
-                Assert.That(em.GetComponentData<ResourceData>(gameStateEntity).Wood,
-                    Is.EqualTo(woodBefore - quote.WoodCost));
-
-                double restartFrameStarted = Time.realtimeSinceStartupAsDouble;
-                yield return null;
-                restartWallFrameMs =
-                    (Time.realtimeSinceStartupAsDouble - restartFrameStarted) * 1000.0;
-                restartMainThreadMs = mainThread.LastValue / 1_000_000.0;
-                restartGcBytes = gcAllocated.LastValue;
             }
+            // GameManager siparisin tamamini MonoBehaviour Update'te atomik ekler; ECS shoot
+            // sistemi yeni stogu takip eden simulation tick'inde tuketebilir.
+            yield return null;
 
             ArrowPoolRuntimeData poolAfter = em.GetComponentData<ArrowPoolRuntimeData>(arrowPoolEntity);
-            using EntityQuery projectileQuery = em.CreateEntityQuery(
-                typeof(ArrowTag), typeof(ArrowProjectile), typeof(LocalTransform));
+            Assert.That(GameManager.Instance.IsArrowRefillDeliveryActive, Is.False,
+                "3 simulation saniyelik teslimat tamamlanmadi.");
             Assert.That(poolAfter.TotalRentCount - stoppedRentCount, Is.EqualTo(archerCount),
-                "Refill sonrasi ilk simulation tick'i 1K pooled gameplay projectile uretmeli.");
-            Assert.That(poolAfter.ActiveCount, Is.EqualTo(archerCount));
-            Assert.That(projectileQuery.CalculateEntityCount(), Is.EqualTo(archerCount));
+                "Atomik teslim edilen 1K Arrow sonunda tam 1K pooled gameplay projectile uretmelidir.");
             Assert.That(poolAfter.TotalCreated, Is.EqualTo(poolBefore.TotalCreated),
-                "1K refill restart frame'i prewarm pool'u genisletmemeli.");
+                "1K atomik teslimat prewarm pool'u genisletmemeli.");
             Assert.That(poolAfter.ExpansionCount, Is.EqualTo(poolBefore.ExpansionCount));
             Assert.That(em.GetComponentData<ArrowSupply>(gameStateEntity).Current, Is.Zero,
                 "1K gercek projectile tam 1K Arrow tuketmeli.");
-            Assert.That(restartMainThreadMs, Is.GreaterThan(0.0),
-                "Main Thread profiler sample'i olculebilir olmali.");
-            Assert.That(restartMainThreadMs, Is.LessThan(50.0),
-                $"1K refill restart Editor main-thread safety budget'ini asti: {restartMainThreadMs:F2} ms.");
-            Assert.That(restartWallFrameMs, Is.LessThan(100.0),
-                $"1K refill restart wall-frame safety budget'ini asti: {restartWallFrameMs:F2} ms.");
 
             Debug.Log(
-                $"[DW-V1-ARROW-REFILL-1K] archers={archerCount}; refill_arrows={quote.ArrowAmount}; " +
-                $"wood_cost={quote.WoodCost}; refill_transaction_ms={refillTransactionMs:F3}; " +
-                $"restart_main_ms={restartMainThreadMs:F3}; " +
-                $"restart_wall_frame_ms={restartWallFrameMs:F3}; restart_gc_bytes={restartGcBytes}; " +
+                $"[DW-P17-ARROW-DELIVERY-1K] archers={archerCount}; refill_arrows={quote.ArrowAmount}; " +
+                $"wood_cost={quote.WoodCost}; delivery_frames={deliveryFrames}; " +
                 $"rents={poolAfter.TotalRentCount - stoppedRentCount}; " +
                 $"pool_expansions={poolAfter.ExpansionCount - poolBefore.ExpansionCount}");
 
@@ -295,6 +323,39 @@ namespace DeadWalls.Tests
             wave.StressTestMode = false;
             wave.ZombiesAlive = 0;
             em.SetComponentData(waveEntity, wave);
+        }
+
+        [UnityTest]
+        public IEnumerator PendingDelivery_SaveSnapshotFlushesPurchasedArrowsWithoutLoss()
+        {
+            yield return WaitForRuntime();
+            EntityManager em = World.DefaultGameObjectInjectionWorld.EntityManager;
+            Entity gameStateEntity = em.CreateEntityQuery(
+                typeof(ArrowSupply), typeof(ResourceData)).GetSingletonEntity();
+
+            ArrowSupply supply = em.GetComponentData<ArrowSupply>(gameStateEntity);
+            supply.Current = 0;
+            em.SetComponentData(gameStateEntity, supply);
+            ResourceData resources = em.GetComponentData<ResourceData>(gameStateEntity);
+            resources.Wood = 1_000;
+            em.SetComponentData(gameStateEntity, resources);
+            yield return null;
+
+            ArrowRefillQuote quote = GameManager.Instance.GetArrowRefillQuote(1);
+            Assert.That(quote.IsValid, Is.True);
+            Assert.That(GameManager.Instance.TryBuyArrowRefill(1), Is.True);
+            Assert.That(GameManager.Instance.IsArrowRefillDeliveryActive, Is.True);
+            Assert.That(em.GetComponentData<ArrowSupply>(gameStateEntity).Current, Is.Zero);
+
+            Assert.That(GameManager.Instance.SaveRunSnapshot(), Is.True);
+            Assert.That(GameManager.Instance.IsArrowRefillDeliveryActive, Is.False);
+            Assert.That(em.GetComponentData<ArrowSupply>(gameStateEntity).Current,
+                Is.EqualTo(quote.ArrowAmount));
+
+            RunSaveState saved = RunPersistence.TryLoad();
+            Assert.That(saved, Is.Not.Null);
+            Assert.That(saved.ArrowCurrent, Is.EqualTo(quote.ArrowAmount),
+                "Snapshot alinirken odemesi yapilmis bekleyen teslimat kaybolmamalidir.");
         }
 
         [UnityTest]

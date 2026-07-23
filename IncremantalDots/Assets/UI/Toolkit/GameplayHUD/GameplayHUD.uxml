@@ -218,7 +218,7 @@
         <ui:VisualElement name="arrowsDrawer" class="surface drawer drawer--right arrows-drawer">
             <ui:VisualElement class="surface-texture surface-texture--short" picking-mode="Ignore" />
             <ui:VisualElement class="surface-header">
-                <ui:VisualElement name="arrowsHeaderCopy" class="surface-heading-with-icon surface-header-copy"><ui:VisualElement class="dw-icon dw-icon--header dw-icon--arrows" picking-mode="Ignore" /><ui:VisualElement class="surface-header-copy__text"><ui:Label text="ARROW SUPPLY" class="surface-title" /><ui:Label text="Restock now; improve the supply line for later." class="surface-subtitle" /></ui:VisualElement></ui:VisualElement>
+                <ui:VisualElement name="arrowsHeaderCopy" class="surface-heading-with-icon surface-header-copy"><ui:VisualElement class="dw-icon dw-icon--header dw-icon--arrows" picking-mode="Ignore" /><ui:VisualElement class="surface-header-copy__text"><ui:Label text="ARROW SUPPLY" class="surface-title" /><ui:Label text="Order supplies; deliveries arrive over 3 seconds." class="surface-subtitle" /></ui:VisualElement></ui:VisualElement>
                 <ui:Button name="arrowsClose" text="CLOSE" class="surface-close" />
             </ui:VisualElement>
             <ui:VisualElement class="supply-hero">
