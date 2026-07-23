@@ -524,6 +524,165 @@ namespace DeadWalls.Tests
             Assert.That(Time.timeScale, Is.EqualTo(SimulationSpeedUtility.Fast));
         }
 
+        [UnityTest]
+        public IEnumerator GuidedOnboarding_PausedAbilityTargetsExecuteAndResumePreviousSpeed()
+        {
+            string[] completedBeforeAbilityTips =
+            {
+                GuidedOnboardingProgress.EconomyOpenFlagId,
+                GuidedOnboardingProgress.WorkerShareFlagId,
+                GuidedOnboardingProgress.EconomyCloseFlagId,
+                GuidedOnboardingProgress.BarracksOpenFlagId,
+                GuidedOnboardingProgress.BasicArcherFlagId,
+                GuidedOnboardingProgress.SpeedTwoFlagId,
+                GuidedOnboardingProgress.CouncilChoiceFlagId,
+                GuidedOnboardingProgress.ArrowRefillFlagId,
+                GuidedOnboardingProgress.CastleHeartFlagId,
+                GuidedOnboardingProgress.HousingFlagId
+            };
+            foreach (string flagId in completedBeforeAbilityTips)
+            {
+                Assert.That(MetaProgression.SetTutorialFlag(flagId, true), Is.True, flagId);
+            }
+
+            GameManager gameManager = GameManager.Instance;
+            GameplayHUDToolkitUI hud = Object.FindFirstObjectByType<GameplayHUDToolkitUI>();
+            Assert.That(gameManager, Is.Not.Null);
+            Assert.That(hud, Is.Not.Null);
+            ToolkitDocument document = hud.GetComponent<ToolkitDocument>();
+            Assert.That(document, Is.Not.Null);
+            ToolkitButton rallyButton = ToolkitQuery.Q<ToolkitButton>(
+                document.rootVisualElement, "rallyButton");
+            ToolkitButton repairButton = ToolkitQuery.Q<ToolkitButton>(
+                document.rootVisualElement, "repairButton");
+            Assert.That(rallyButton, Is.Not.Null);
+            Assert.That(repairButton, Is.Not.Null);
+
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            using EntityQuery cycleQuery = entityManager.CreateEntityQuery(
+                typeof(ContinuousSiegeCycleData));
+            using EntityQuery prepQuery = entityManager.CreateEntityQuery(
+                typeof(CastleYardPrepState));
+            using EntityQuery wallQuery = entityManager.CreateEntityQuery(typeof(WallSegment));
+            Entity cycleEntity = cycleQuery.GetSingletonEntity();
+            Entity prepEntity = prepQuery.GetSingletonEntity();
+            Entity wallEntity = wallQuery.GetSingletonEntity();
+
+            PropertyInfo cycleProperty = typeof(GameManager).GetProperty(
+                "ContinuousSiegeCycle",
+                BindingFlags.Instance | BindingFlags.Public);
+            MethodInfo cycleSetter = cycleProperty?.GetSetMethod(true);
+            PropertyInfo prepProperty = typeof(GameManager).GetProperty(
+                "CastleYardPrep",
+                BindingFlags.Instance | BindingFlags.Public);
+            MethodInfo prepSetter = prepProperty?.GetSetMethod(true);
+            PropertyInfo wallProperty = typeof(GameManager).GetProperty(
+                "Wall",
+                BindingFlags.Instance | BindingFlags.Public);
+            MethodInfo wallSetter = wallProperty?.GetSetMethod(true);
+            FieldInfo rallyCooldownField = typeof(GameManager).GetField(
+                "_rallyCooldownRemaining",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            FieldInfo repairCooldownField = typeof(GameManager).GetField(
+                "_emergencyRepairCooldownRemaining",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.That(cycleSetter, Is.Not.Null);
+            Assert.That(prepSetter, Is.Not.Null);
+            Assert.That(wallSetter, Is.Not.Null);
+            Assert.That(rallyCooldownField, Is.Not.Null);
+            Assert.That(repairCooldownField, Is.Not.Null);
+
+            Assert.That(SimulationPauseService.TrySetRunningTimeScale(
+                SimulationSpeedUtility.Fast), Is.True);
+            SetOnboardingCycle(
+                entityManager,
+                cycleEntity,
+                gameManager,
+                cycleSetter,
+                0,
+                SiegeCyclePhase.Night);
+            CastleYardPrepState prep =
+                entityManager.GetComponentData<CastleYardPrepState>(prepEntity);
+            prep.RallyTimer = 0f;
+            entityManager.SetComponentData(prepEntity, prep);
+            prepSetter.Invoke(gameManager, new object[] { prep });
+            rallyCooldownField.SetValue(gameManager, 0f);
+
+            for (int frame = 0; frame < 120
+                 && hud.ActiveGuidedOnboardingStep != GuidedOnboardingStep.Rally;
+                 frame++)
+            {
+                yield return null;
+            }
+
+            Assert.That(hud.ActiveGuidedOnboardingStep,
+                Is.EqualTo(GuidedOnboardingStep.Rally));
+            Assert.That(SimulationPauseService.IsPaused, Is.True);
+            Assert.That(Time.timeScale, Is.Zero);
+            Assert.That(rallyButton.enabledSelf, Is.True,
+                "Guided pause kendi Rally hedefini disable etmemelidir.");
+
+            SendNavigationSubmit(rallyButton);
+            for (int frame = 0; frame < 60
+                 && !MetaProgression.HasTutorialFlag(GuidedOnboardingProgress.RallyFlagId);
+                 frame++)
+            {
+                yield return null;
+            }
+
+            Assert.That(gameManager.RallyActive, Is.True,
+                "Rally tutorial'i gercek ability transaction'ini calistirmalidir.");
+            Assert.That(MetaProgression.HasTutorialFlag(
+                GuidedOnboardingProgress.RallyFlagId), Is.True);
+            Assert.That(SimulationPauseService.IsPaused, Is.False);
+            Assert.That(Time.timeScale, Is.EqualTo(SimulationSpeedUtility.Fast));
+
+            SetOnboardingCycle(
+                entityManager,
+                cycleEntity,
+                gameManager,
+                cycleSetter,
+                1,
+                SiegeCyclePhase.Night);
+            WallSegment wall = entityManager.GetComponentData<WallSegment>(wallEntity);
+            wall.CurrentHP = wall.MaxHP * 0.5f;
+            entityManager.SetComponentData(wallEntity, wall);
+            wallSetter.Invoke(gameManager, new object[] { wall });
+            repairCooldownField.SetValue(gameManager, 0f);
+
+            for (int frame = 0; frame < 120
+                 && hud.ActiveGuidedOnboardingStep != GuidedOnboardingStep.WallRepair;
+                 frame++)
+            {
+                yield return null;
+            }
+
+            Assert.That(hud.ActiveGuidedOnboardingStep,
+                Is.EqualTo(GuidedOnboardingStep.WallRepair));
+            Assert.That(SimulationPauseService.IsPaused, Is.True);
+            Assert.That(Time.timeScale, Is.Zero);
+            Assert.That(repairButton.enabledSelf, Is.True,
+                "Guided pause kendi Emergency Repair hedefini disable etmemelidir.");
+            float wallHpBeforeRepair = entityManager
+                .GetComponentData<WallSegment>(wallEntity).CurrentHP;
+
+            SendNavigationSubmit(repairButton);
+            for (int frame = 0; frame < 60
+                 && !MetaProgression.HasTutorialFlag(GuidedOnboardingProgress.WallRepairFlagId);
+                 frame++)
+            {
+                yield return null;
+            }
+
+            Assert.That(entityManager.GetComponentData<WallSegment>(wallEntity).CurrentHP,
+                Is.GreaterThan(wallHpBeforeRepair),
+                "Emergency Repair tutorial'i gercek wall heal transaction'ini calistirmalidir.");
+            Assert.That(MetaProgression.HasTutorialFlag(
+                GuidedOnboardingProgress.WallRepairFlagId), Is.True);
+            Assert.That(SimulationPauseService.IsPaused, Is.False);
+            Assert.That(Time.timeScale, Is.EqualTo(SimulationSpeedUtility.Fast));
+        }
+
         private static int CountToastMessages(ToolkitVisualElement toastStack, string text)
         {
             int count = 0;

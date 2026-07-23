@@ -150,6 +150,12 @@ namespace DeadWalls
                     target.Focus();
             }
 
+            if (step == GuidedOnboardingStep.Rally
+                || step == GuidedOnboardingStep.WallRepair)
+            {
+                target.SetEnabled(true);
+            }
+
             _guidedCoreInputLocked = coreStep;
             _guidedTutorialLayer.EnableInClassList("is-visible", true);
             _guidedTutorialLayer.EnableInClassList("is-core", coreStep);
@@ -173,6 +179,52 @@ namespace DeadWalls
         {
             _guidedPauseLease?.Dispose();
             _guidedPauseLease = null;
+        }
+
+        private bool IsActiveGuidedAbilityTarget(AbilityHotkeySlot slot)
+        {
+            return _guidedPauseLease != null
+                && _activeGuidedStep == GetGuidedAbilityStep(slot);
+        }
+
+        private bool ReleaseGuidedPauseForAbilityAttempt(AbilityHotkeySlot slot)
+        {
+            if (!IsActiveGuidedAbilityTarget(slot))
+                return false;
+
+            ReleaseGuidedOnboardingPause();
+            return true;
+        }
+
+        private bool TryHandleGuidedAbilityHotkey()
+        {
+            if (_activeGuidedStep == GuidedOnboardingStep.Rally
+                && (Input.GetKeyDown(KeyCode.Alpha2)
+                    || Input.GetKeyDown(KeyCode.Keypad2)))
+            {
+                ActivateAbility(AbilityHotkeySlot.Rally);
+                return true;
+            }
+
+            if (_activeGuidedStep == GuidedOnboardingStep.WallRepair
+                && (Input.GetKeyDown(KeyCode.Alpha3)
+                    || Input.GetKeyDown(KeyCode.Keypad3)))
+            {
+                ActivateAbility(AbilityHotkeySlot.EmergencyRepair);
+                return true;
+            }
+
+            return false;
+        }
+
+        private static GuidedOnboardingStep GetGuidedAbilityStep(AbilityHotkeySlot slot)
+        {
+            return slot switch
+            {
+                AbilityHotkeySlot.Rally => GuidedOnboardingStep.Rally,
+                AbilityHotkeySlot.EmergencyRepair => GuidedOnboardingStep.WallRepair,
+                _ => GuidedOnboardingStep.None
+            };
         }
 
         private GuidedOnboardingStep ResolveGuidedOnboardingStep(GameManager gm)

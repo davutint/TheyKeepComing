@@ -2,7 +2,7 @@
 
 > **Amaç:** V1 kapsamı tamamlandıktan sonra yapılacak mantık düzeltmelerini, oyuncuya görünen geri bildirimleri, UI/UX yeniden çalışmalarını, polish işlerini ve performans optimizasyonlarını tek otoriter takip belgesinde yürütmek.
 >
-> **Tracker sürümü:** 2.9
+> **Tracker sürümü:** 3.0
 > **Oluşturulma tarihi:** 2026-07-18
 > **Aktif paket:** `-`
 > **Aktif iş:** `-`
@@ -122,8 +122,14 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - First Night `RALLY`, first Council exact choice, low-arrow refill, first post-combat Essence ile
   `CASTLE HEART`, dolu population kapasitesinde housing ve ilk wall damage repair adımları
   koşul oluştuğunda contextual gösterilir; unrelated kontrolleri kilitlemez.
+- `RALLY` ve `EMERGENCY REPAIR` contextual hedefleri guided pause yüzünden disabled kalmaz. Gerçek
+  player action'ı yalnız `GuidedOnboarding` lease'ini kontrollü biçimde bırakıp transaction'ı çalıştırır;
+  başarısız denemede pause geri alınır, başarıda önceki oyun hızı aynen geri gelir. Diğer pause owner'ları
+  yetenek kullanımını açmaz.
 - Council kendi mevcut pause sözleşmesini kullanır; tutorial oyuncu adına otomatik action yapmaz.
-- Her adım durable kaydedilir ve Settings içindeki `RESET TUTORIAL` yolu korunur.
+- Her adım yalnız mevcut Play oturumunda kaydedilir; Stop -> Play bütün tutorial'i ilk adımdan yeniden
+  başlatır. Kalıcı save/UGS sahipliği yayın öncesine ertelenmiştir; Settings içindeki manuel reset yolu
+  aynı oturumluk test kolaylığı olarak korunur.
 - Kaynak yeterli olduğu sürece sürekli görünen legacy `RECRUIT A BASIC ARCHER.` affordability hint'i
   yeni HUD'dan kaldırılmıştır; bu geçici temizlik yeni tutorial sırası kararı değildir.
 
@@ -903,4 +909,21 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - Tutorial/meta sözleşmesini ve `SubsystemRegistration` otomatik reset kaydını kapsayan hedefli EditMode `49/49`; core zincir, aynı-oturum restart ve yeni-Play
   reset senaryoları PlayMode `3/3`, Settings session reset regresyonu ayrı PlayMode `1/1` geçti. Unity compile
   `0 error` ve `git diff --check` temiz doğrulandı.
+- P16 kapalı kalır; ana görev paydası değişmedi ve Post-V1 ilerleme `16/16 - %100` olarak korundu.
+
+### 2026-07-23 - P16 post-acceptance paused ability hedefi düzeltmesi
+
+- Owner canlı kontrolde `RALLY` ve `EMERGENCY REPAIR` contextual tutorial hedeflerine tıklandığında
+  aksiyonların çalışmadığını ve oyunun tutorial pause'unda takılı kaldığını bildirdi.
+- Kök neden guided presenter'ın `Time.timeScale = 0` yapması, iki ability owner'ının da paused durumda
+  gerçek transaction'ı reddetmesi ve periyodik HUD refresh'inin hedef butonu disabled bırakabilmesiydi.
+- Yalnız aktif guided ability hedefi için tutorial lease'i transaction öncesi kontrollü bırakılır;
+  reddedilen aksiyonda aynı pause anında geri alınır. Rally `2`, Emergency Repair `3` kısayolu da aynı
+  güvenli callback yolunu kullanır; normal pause/Council yetenek kullanım sınırı değişmez.
+- Aktif contextual ability hedefi tutorial'ın açıldığı ilk frame dahil interactable tutulur. Başarılı
+  action gerçek Rally cast/duvar heal işlemini yapar, ilgili session flag'ini yazar ve önceki `1X/2X/3X`
+  hızını geri yükler.
+- Yeni Rally + Emergency Repair PlayMode regresyonu `1/1`, mevcut core tutorial PlayMode regresyonu
+  `1/1` ve saf guided onboarding EditMode paketi `6/6` geçti. Unity compile ve final Console `0 error`;
+  `git diff --check` temiz doğrulandı.
 - P16 kapalı kalır; ana görev paydası değişmedi ve Post-V1 ilerleme `16/16 - %100` olarak korundu.

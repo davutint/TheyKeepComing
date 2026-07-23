@@ -597,7 +597,8 @@ namespace DeadWalls
                     : gm.RallyCooldownRemaining > 0f
                         ? FormatCooldownState(gm.RallyCooldownRemaining)
                         : "BOOST FIRE RATE";
-            _rallyButton.SetEnabled(gm.RallyReady);
+            _rallyButton.SetEnabled(
+                gm.RallyReady || IsActiveGuidedAbilityTarget(AbilityHotkeySlot.Rally));
 
             if (!gm.EmergencyRepairUnlocked)
                 _repairState.text = "LOCKED";
@@ -609,7 +610,9 @@ namespace DeadWalls
                 _repairState.text = "WALL FULL";
             else
                 _repairState.text = "READY";
-            _repairButton.SetEnabled(gm.EmergencyRepairReady);
+            _repairButton.SetEnabled(
+                gm.EmergencyRepairReady
+                || IsActiveGuidedAbilityTarget(AbilityHotkeySlot.EmergencyRepair));
         }
 
         private void RefreshCriticalBanner(GameManager gm, float wallRatio)
@@ -650,9 +653,14 @@ namespace DeadWalls
         private void ActivateAbility(AbilityHotkeySlot slot)
         {
             ResolveRuntimeOwners();
+            bool releasedGuidedPause = ReleaseGuidedPauseForAbilityAttempt(slot);
             bool accepted = _spellCast != null && _spellCast.TryActivateAbilityFromPlayer(slot);
             if (!accepted)
+            {
+                if (releasedGuidedPause)
+                    SyncGuidedOnboardingPause(true);
                 return;
+            }
 
             if (slot == AbilityHotkeySlot.Rally)
             {
@@ -798,6 +806,9 @@ namespace DeadWalls
 
         private void HandleGlobalInput()
         {
+            if (TryHandleGuidedAbilityHotkey())
+                return;
+
             if (_guidedCoreInputLocked)
                 return;
 
