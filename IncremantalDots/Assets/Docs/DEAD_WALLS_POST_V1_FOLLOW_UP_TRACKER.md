@@ -2,11 +2,11 @@
 
 > **Amaç:** V1 kapsamı tamamlandıktan sonra yapılacak mantık düzeltmelerini, oyuncuya görünen geri bildirimleri, UI/UX yeniden çalışmalarını, polish işlerini ve performans optimizasyonlarını tek otoriter takip belgesinde yürütmek.
 >
-> **Tracker sürümü:** 3.2
+> **Tracker sürümü:** 3.3
 > **Oluşturulma tarihi:** 2026-07-18
-> **Aktif paket:** `-`
-> **Aktif iş:** `-`
-> **İlerleme:** `17 / 17` ana görev tamamlandı - `%100`
+> **Aktif paket:** `DW-P18-IOS-DISTRIBUTION`
+> **Aktif iş:** Internal TestFlight kurulumu ve fiziksel iPhone Game Center doğrulaması
+> **İlerleme:** `17 / 18` ana görev tamamlandı - `%94,44`
 
 ---
 
@@ -36,7 +36,7 @@ Bu belge, tamamlanmış V1 tracker'ından sonraki geliştirme döneminin aktif t
 
 ### İlerleme hesabı
 
-İlerleme, Bölüm 3'teki 17 ana görev üzerinden hesaplanır. Alt maddeler kanıt ve kabul kapsamını gösterir; ayrıca paydayı büyütmez. Ana görevler yalnızca bütün zorunlu alt kapıları tamamlandığında kapanır. Owner'ın Arrow refill'i anlık transaction yerine okunabilir bir teslimat sürecine çevirme kararıyla açılan `DW-P17-ARROW-DELIVERY` nedeniyle payda `16 -> 17` değişmiştir.
+İlerleme, Bölüm 3'teki 18 ana görev üzerinden hesaplanır. Alt maddeler kanıt ve kabul kapsamını gösterir; ayrıca paydayı büyütmez. Ana görevler yalnızca bütün zorunlu alt kapıları tamamlandığında kapanır. Owner'ın Arrow refill'i anlık transaction yerine okunabilir bir teslimat sürecine çevirme kararıyla açılan `DW-P17-ARROW-DELIVERY` paydayı `16 -> 17`; iOS Game Center ve TestFlight hazırlığıyla açılan `DW-P18-IOS-DISTRIBUTION` ise `17 -> 18` değiştirmiştir.
 
 ---
 
@@ -158,6 +158,17 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - Run HUD meta ödülü legacy `SOULS` adıyla sunulmaz; ölüm anındaki tahmini kısa kimlik `EMBERS ON DEATH`tir.
 - Kaldırılmış Doctrine yüzeyine yönlendiren metin kullanılmaz; kilitli archer araştırması oyuncuyu `CASTLE HEART`a yönlendirir.
 
+### iOS kimliği, Game Center ve dağıtım hazırlığı
+
+- iOS Bundle ID kalıcı ve küçük harfli `com.pixicorp.zombiecastle` değeridir.
+- Apple Developer Team ID `7JVZGHB5S5`; Unity iOS automatic signing açıktır.
+- `GameCenterService`, iOS Player açılışında local player authentication başlatan tek runtime
+  owner'dır; başarısız kimlik doğrulama oyunun açılmasını engellemez.
+- Game Center native yolu yalnız `UNITY_IOS && !UNITY_EDITOR` altında derlenir; Editor ve diğer
+  platformlar no-op kalır.
+- Leaderboard ve achievement kimlikleri bu authentication-only paketin kapsamı değildir.
+- TestFlight/App Store upload dış servis durumudur; repo implementasyonundan ayrı kanıtlanır.
+
 ---
 
 ## 3. Ana Görev Sırası
@@ -181,6 +192,7 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 | 15 | `DW-P15-TOAST-AUDIO-POLISH` | Süreli toast stack'i ve UI Toolkit button sesleri | `[x]` | Üç kartlık tekrar korunumu, otomatik dismiss, merkezi click audio ve hedefli runtime testleri doğrulandı |
 | 16 | `DW-P16-GUIDED-ONBOARDING` | UI Toolkit gerçek kontrolleriyle adım adım first-run öğretimi | `[x]` | Gerçek-control spotlight/input gate, Play-session sıra, contextual tip'ler ve hedefli regresyon doğrulandı |
 | 17 | `DW-P17-ARROW-DELIVERY` | Üç saniyelik Arrow teslimatı ve canlı stok barı | `[x]` | Sipariş 3 saniye kullanılamaz kaldı, süre sonunda atomik geldi; pause, save, tutorial, 1K Archer ve UI sözleşmesi doğrulandı |
+| 18 | `DW-P18-IOS-DISTRIBUTION` | Game Center, iOS imzalama, App Store ikonu ve TestFlight hazırlığı | `[~]` | Repo entegrasyonu ve owner-beyanlı TestFlight upload mevcut; internal kurulum ile fiziksel cihaz Game Center testi bekliyor |
 
 ---
 
@@ -503,6 +515,37 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - [x] Hedefli EditMode, birleşik kritik PlayMode ve tam `ArrowAmmoPlayModeTests` sonuçları
   atomik teslimat regresyonlarıyla yeniden doğrulandı. Güncel sayılar aşağıdaki journal
   girdisindedir.
+
+### `DW-P18-IOS-DISTRIBUTION` - Game Center + TestFlight Hazırlığı
+
+**Paket başlığı:** `DW-P18-IOS-DISTRIBUTION: Game Center + iOS Distribution Readiness`
+**Durum:** `[~]` Repo entegrasyonu ve Mac dağıtım zinciri kayıtlı; internal TestFlight kurulumu
+ile fiziksel cihaz Game Center doğrulaması bekliyor.
+
+- [x] Apple Core `3.2.0` ve Apple GameKit `4.0.1` local tarball paketleri projede bulunur;
+  canlı Unity MCP her iki paketi de aynı sürümlerle `LocalTarball` kaynağından çözüyor.
+- [x] `GameCenterService`, scene-independent `BeforeSceneLoad` başlangıcında iOS local player
+  authentication çağrısını yapar; authentication state/event yüzeyini ve native dashboard
+  açma API'sini tek owner olarak sunar.
+- [x] `GameCenterService` native GameKit kodunu yalnız `UNITY_IOS && !UNITY_EDITOR` altında
+  derler; Editor ve Apple dışı platformlarda no-op kalır.
+- [x] `DeadWalls.asmdef`, `Apple.Core` ve `Apple.GameKit` assembly referanslarını taşır.
+- [x] `DefaultAppleBuildProfile.asset`, Apple GameKit build step'ini ve otomatik entitlement
+  üretimini etkin tutar; macOS App Sandbox entitlement'ı kapalıdır.
+- [x] Unity Project Settings içinde şirket `PixiCorp`, ürün `Zombie Castle`, Bundle ID
+  `com.pixicorp.zombiecastle`, Team ID `7JVZGHB5S5`, sürüm `1.0` ve iOS ikon slotları
+  serialize edilmiştir.
+- [x] `ZombieCastleAppIcon-1024.png` marketing icon asset'i repoda bulunur.
+- [x] Mac commit `e8389c048` imzalı iOS archive, App Store Connect upload ve TestFlight
+  `1.0 (1)` kaydını bildirir. Owner 2026-07-24 konuşmasında build'i TestFlight'a
+  gönderdiğini yeniden teyit etti; bu dış servis durumu bu Windows oturumunda bağımsız
+  olarak açılıp doğrulanmadı.
+- [ ] Build internal TestFlight tester akışıyla fiziksel iPhone'a kurulacak.
+- [ ] Gerçek cihazda Game Center authentication sonucu, welcome/banner veya local player
+  durumu ve `ShowDashboardAsync()` davranışı doğrulanacak.
+
+Leaderboard ve achievement tanımları P18 kapanış kapısı değildir; ileride owner tarafından
+ayrı ürün kapsamı olarak açılmalıdır.
 
 ---
 
@@ -1000,3 +1043,21 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
   `1.000` okçu için teslimat tamamlanmadan stok/rent oluşmadığı doğrulandı.
 - Unity compile ve final Console `0 error`; `git diff --check` temizdir. Tracker `v3.2`
   oldu; P17 kapalı kaldı ve ana görev paydası değişmeden `17/17 - %100` korundu.
+
+### 2026-07-24 - P18 Game Center ve TestFlight dokümantasyon kurtarması
+
+- Mac üzerinde oluşturulan `e8389c048` commit'i Apple Core/GameKit paketlerini, iOS
+  authentication servisini, build profilini, Project Settings kimliğini, App Store ikonunu
+  ve Game Center entegrasyon dokümanını ekledi.
+- Mac branch'i güncel P17 Arrow paketini içermediği için iOS işini stale `DW-P17` adıyla
+  kaydetmişti. `f22ade045` merge commit'i runtime/paket/Project Settings değişikliklerini
+  korurken tracker'ın iOS bölümünü mevcut `v3.2` tarafıyla değiştirdi.
+- Otoriter sıra yeniden uzlaştırıldı: Arrow teslimatı `DW-P17-ARROW-DELIVERY` olarak kapalı
+  kalır; Apple dağıtım işi `DW-P18-IOS-DISTRIBUTION` kimliğine taşındı.
+- Windows canlı Unity MCP, Apple Core `3.2.0` ve Apple GameKit `4.0.1` paketlerinin
+  çözüldüğünü, Unity `6000.3.10f1` Editor'ün compile beklemediğini ve `NewGameScene` üzerinde
+  idle olduğunu doğruladı. Bu dokümantasyon geçişinde Unity Test Framework çalıştırılmadı.
+- Owner build'i TestFlight'a gönderdiğini teyit etti; Mac commit'i ayrıca App Store Connect
+  upload ve `Ready to Submit` kaydını bildiriyor. Internal install ve fiziksel cihaz Game Center
+  davranışı görülmediği için P18 `[~]` bırakıldı.
+- Tracker `v3.3` oldu; payda `17 -> 18` değişti ve ilerleme `17/18 - %94,44` olarak güncellendi.

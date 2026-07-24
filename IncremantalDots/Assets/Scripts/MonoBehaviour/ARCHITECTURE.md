@@ -39,6 +39,21 @@ MonoBehaviour'lar ECS ile Unity UI arasinda kopru gorevi gorur. `World.DefaultGa
 - Heart damage/fire-rate/range/Frost slow effect'leri mevcut okculari aninda rebase eder; daha sonra spawn/retrain edilen okcular ayni effective state'i alir. Continue saved Heart level'larini replay eder ve bonusu compound etmez
 - `RestartGame()` ile oyunu sifirlar
 
+### GameCenterService.cs
+
+- iOS Game Center authentication lifecycle'inin tek scene-independent runtime owner'idir
+- `BeforeSceneLoad` sırasında iOS local player authentication başlatır; authentication hatası
+  oyunun açılmasını engellemez
+- `IsAvailable`, `IsAuthenticated`, `PlayerDisplayName`, authentication event'leri,
+  `AuthenticateAsync()` ve `ShowDashboardAsync()` yüzeylerini sunar
+- Native `Apple.Core` / `Apple.GameKit` kodu yalnız `UNITY_IOS && !UNITY_EDITOR` altında
+  derlenir; Editor ve Apple dışı Player'lar no-op kalır
+- Player-facing dashboard butonu henüz bağlı değildir; leaderboard ve achievement tanımları
+  bu authentication-only paketin kapsamında değildir
+- Apple Core `3.2.0` ve Apple GameKit `4.0.1` local tarball paketleri, Game Center entitlement
+  üreten build profile ve iOS dağıtım doğrulama sınırı `Assets/Docs/GAME_CENTER_INTEGRATION.md`
+  belgesinde tutulur
+
 ### HUDController.cs
 
 - HP, XP, continuous cycle, zombie alive/max, resource, population ve arrow text'lerini gunceller
