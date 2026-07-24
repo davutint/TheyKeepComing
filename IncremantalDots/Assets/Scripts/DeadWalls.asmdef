@@ -15,7 +15,9 @@
         "ProjectDawn.Navigation",
         "ProjectDawn.Navigation.Hybrid",
         "DOTween.Modules",
-        "Unity.InputSystem"
+        "Unity.InputSystem",
+        "Apple.Core",
+        "Apple.GameKit"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

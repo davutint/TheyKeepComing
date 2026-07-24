@@ -4,9 +4,9 @@
 >
 > **Tracker sürümü:** 3.0
 > **Oluşturulma tarihi:** 2026-07-18
-> **Aktif paket:** `-`
-> **Aktif iş:** `-`
-> **İlerleme:** `16 / 16` ana görev tamamlandı - `%100`
+> **Aktif paket:** `DW-P17-IOS-DISTRIBUTION`
+> **Aktif iş:** Internal TestFlight kurulumu ve fiziksel iPhone Game Center doğrulaması
+> **İlerleme:** `16 / 17` ana görev tamamlandı - `%94,12`
 
 ---
 
@@ -36,7 +36,7 @@ Bu belge, tamamlanmış V1 tracker'ından sonraki geliştirme döneminin aktif t
 
 ### İlerleme hesabı
 
-İlerleme, Bölüm 3'teki 16 ana görev üzerinden hesaplanır. Alt maddeler kanıt ve kabul kapsamını gösterir; ayrıca paydayı büyütmez. Ana görevler yalnızca bütün zorunlu alt kapıları tamamlandığında kapanır. Owner'ın adım adım yeni UI öğretim isteğiyle açılan `DW-P16-GUIDED-ONBOARDING` nedeniyle payda `15 -> 16` değişmiştir.
+İlerleme, Bölüm 3'teki 17 ana görev üzerinden hesaplanır. Alt maddeler kanıt ve kabul kapsamını gösterir; ayrıca paydayı büyütmez. Ana görevler yalnızca bütün zorunlu alt kapıları tamamlandığında kapanır. Owner'ın iOS Game Center ve TestFlight hazırlığı isteğiyle açılan `DW-P17-IOS-DISTRIBUTION` nedeniyle payda `16 -> 17` değişmiştir.
 
 ---
 
@@ -141,6 +141,14 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - Run HUD meta ödülü legacy `SOULS` adıyla sunulmaz; ölüm anındaki tahmini kısa kimlik `EMBERS ON DEATH`tir.
 - Kaldırılmış Doctrine yüzeyine yönlendiren metin kullanılmaz; kilitli archer araştırması oyuncuyu `CASTLE HEART`a yönlendirir.
 
+### iOS kimliği, Game Center ve dağıtım hazırlığı
+
+- iOS Bundle ID kalıcı ve küçük harfli `com.pixicorp.zombiecastle` değeridir.
+- Apple Developer Team ID `7JVZGHB5S5`; Unity iOS automatic signing açıktır.
+- Game Center yeteneği App ID ve uygulama entitlement'ında aktiftir.
+- TestFlight/App Store için kullanılan marketing ikon yazısız, alpha kanalsız ve `1024x1024` PNG'dir.
+- App Store Connect'e upload ve yayınlama owner'ın ayrıca onaylayacağı ayrı dış işlemlerdir.
+
 ---
 
 ## 3. Ana Görev Sırası
@@ -163,6 +171,7 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 | 14 | `DW-P14-ACTION-FEEDBACK` | Game Over meta açıklığı ve exact action-failure toast'ları | `[x]` | Exact effect progression, açıklanabilir action state, hedefli test ve canlı Game View doğrulandı |
 | 15 | `DW-P15-TOAST-AUDIO-POLISH` | Süreli toast stack'i ve UI Toolkit button sesleri | `[x]` | Üç kartlık tekrar korunumu, otomatik dismiss, merkezi click audio ve hedefli runtime testleri doğrulandı |
 | 16 | `DW-P16-GUIDED-ONBOARDING` | UI Toolkit gerçek kontrolleriyle adım adım first-run öğretimi | `[x]` | Gerçek-control spotlight/input gate, Play-session sıra, contextual tip'ler ve hedefli regresyon doğrulandı |
+| 17 | `DW-P17-IOS-DISTRIBUTION` | Game Center, iOS imzalama, App Store ikonu ve TestFlight hazırlığı | `[~]` | Unity/Xcode build, signed archive, upload ve TestFlight build validation doğrulandı; internal kurulum ile fiziksel cihaz Game Center testi bekliyor |
 
 ---
 
@@ -462,6 +471,32 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - [x] Hedefli EditMode `45/45`; gerçek core/raycast zinciri, P15 Archer toast regresyonları,
   Settings reset ve ikinci-run suppression dahil hedefli PlayMode `5/5` geçti. Unity compile
   `0 error`, final Console ve `git diff --check` temiz doğrulandı.
+
+### `DW-P17-IOS-DISTRIBUTION` - Game Center + TestFlight Hazırlığı
+
+**Paket başlığı:** `DW-P17-IOS-DISTRIBUTION: Game Center + iOS Distribution Readiness`
+**Durum:** `[~]` Uygulama, yerel build zinciri ve TestFlight build'i hazır; internal kurulum ile fiziksel cihaz doğrulaması bekliyor.
+
+- [x] Apple Core `3.2.0` ve Apple GameKit `4.0.1` paketleri projeye eklendi.
+- [x] `GameCenterService` iOS player açılışında local player authentication başlatır; hata oyunu
+  engellemez ve Game Center dashboard API'sini tek servis sınırından sunar.
+- [x] `DeadWalls.asmdef`, `Apple.Core` ve `Apple.GameKit` assembly referanslarını taşır.
+- [x] Apple build profili `com.apple.developer.game-center` entitlement'ını ve gerekli native
+  framework'leri üretir; iOS için geçersiz macOS App Sandbox entitlement'ı kapatıldı.
+- [x] Bundle ID `com.pixicorp.zombiecastle`, Team ID `7JVZGHB5S5` ve automatic signing Unity
+  Project Settings'e kalıcı yazıldı.
+- [x] Yazısız ve alpha kanalsız `1024x1024` marketing ikon üretildi; Unity'nin 19 iOS ikon slotuna
+  atandı. Üretilen Xcode katalogunda `Icon-Store-1024.png` exact `1024x1024`, `ios-marketing`,
+  `1x` ve alpha'sız doğrulandı.
+- [x] Son Unity iOS build `0 error` ile tamamlandı. İkonlu `ZombieCastle-WithIcon.xcarchive`
+  Bundle ID, Team ID, Game Center entitlement'ı, app icon kayıtları ve embedded Apple framework'leriyle
+  `codesign --verify --deep --strict` doğrulamasını geçti; 1024 ikon uyarısı tekrarlanmadı.
+- [x] Owner onayıyla ikonlu archive'ın sürüm `1.0`, build `1` paketi App Store Connect'e yüklendi;
+  Xcode `Upload succeeded` ve `Uploaded package is processing` sonucunu verdi.
+- [x] App Store Connect processing tamamlandı; TestFlight sürüm `1.0`, build `1` için
+  `Ready to Submit` durumu owner ekran görüntüsüyle doğrulandı.
+- [ ] Internal tester grubu üzerinden build iPhone'a kurulacak; Game Center authentication ve
+  dashboard davranışı fiziksel cihazda doğrulanacak.
 
 ---
 
@@ -910,6 +945,31 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
   reset senaryoları PlayMode `3/3`, Settings session reset regresyonu ayrı PlayMode `1/1` geçti. Unity compile
   `0 error` ve `git diff --check` temiz doğrulandı.
 - P16 kapalı kalır; ana görev paydası değişmedi ve Post-V1 ilerleme `16/16 - %100` olarak korundu.
+
+### 2026-07-24 - P17 iOS Game Center, signing ve App Store ikonu hazırlığı
+
+- Owner iOS Game Center entegrasyonu ve TestFlight hazırlığının bu Mac üzerinde tamamlanmasını istedi.
+- Apple Core/GameKit entegrasyonu, scene-independent authentication servisi, bundle/team/signing
+  ayarları ve Game Center entitlement üretimi tamamlandı.
+- Unity iOS build, imzasız native Xcode build ve imzalı local archive başarılı oldu; archive
+  `com.pixicorp.zombiecastle`, Team `7JVZGHB5S5`, Game Center entitlement ve embedded
+  `AppleCoreNative`/`GameKitWrapper` framework'leriyle doğrulandı.
+- Apple plugin profilinin iOS'a eklediği macOS `com.apple.security.app-sandbox` entitlement'ı
+  kapatıldı; üretilen entitlement yalnız Game Center yetkisini taşıdı.
+- Built-in image generation ile yazısız zombie-castle ikonu üretildi, exact `1024x1024` PNG'ye
+  dönüştürüldü ve 19 iOS ikon slotuna atandı. Son Unity build `0 error`; Xcode `ios-marketing`
+  çıktısı exact `1024x1024` ve alpha'sız doğrulandı.
+- İkonlu `ZombieCastle-WithIcon.xcarchive` ayrı dosya olarak üretildi. Archive arm64, sürüm `1.0`,
+  build `1`, Bundle ID `com.pixicorp.zombiecastle`, Team `7JVZGHB5S5`, geçerli code signature,
+  Game Center entitlement ve iPhone/iPad primary AppIcon kayıtlarıyla doğrulandı; Xcode asset
+  compilation artık eksik 1024 App Store ikonu uyarısı vermedi.
+- Owner'ın açık onayıyla ikonlu archive App Store Connect'e yüklendi. Xcode `Upload succeeded`,
+  `Uploaded package is processing` ve `** EXPORT SUCCEEDED **` sonuçlarını verdi. AppleCoreNative ve
+  GameKitWrapper için eksik dSYM uyarıları upload'ı engellemedi.
+- App Store Connect processing tamamlandı; owner ekran görüntüsünde TestFlight sürüm `1.0`,
+  build `1` ve `Ready to Submit` durumu doğrulandı.
+- Internal TestFlight kurulumu ve fiziksel cihaz Game Center testi tamamlanmadığı için P17 `[~]`
+  bırakıldı. Payda `16 -> 17`; Post-V1 ilerleme `16/17 - %94,12` olarak korundu.
 
 ### 2026-07-23 - P16 post-acceptance paused ability hedefi düzeltmesi
 
