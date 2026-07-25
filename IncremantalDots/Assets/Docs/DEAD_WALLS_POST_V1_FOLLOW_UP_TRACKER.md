@@ -2,11 +2,11 @@
 
 > **Amaç:** V1 kapsamı tamamlandıktan sonra yapılacak mantık düzeltmelerini, oyuncuya görünen geri bildirimleri, UI/UX yeniden çalışmalarını, polish işlerini ve performans optimizasyonlarını tek otoriter takip belgesinde yürütmek.
 >
-> **Tracker sürümü:** 3.3
+> **Tracker sürümü:** 3.4
 > **Oluşturulma tarihi:** 2026-07-18
-> **Aktif paket:** `DW-P18-IOS-DISTRIBUTION`
-> **Aktif iş:** Internal TestFlight kurulumu ve fiziksel iPhone Game Center doğrulaması
-> **İlerleme:** `17 / 18` ana görev tamamlandı - `%94,44`
+> **Aktif paket:** `DW-P19-ADS`
+> **Aktif iş:** AdMob UMP cihaz doğrulaması, rewarded teklif/buff akışı ve Remove Ads IAP
+> **İlerleme:** `17 / 19` ana görev tamamlandı - `%89,47`
 
 ---
 
@@ -36,7 +36,7 @@ Bu belge, tamamlanmış V1 tracker'ından sonraki geliştirme döneminin aktif t
 
 ### İlerleme hesabı
 
-İlerleme, Bölüm 3'teki 18 ana görev üzerinden hesaplanır. Alt maddeler kanıt ve kabul kapsamını gösterir; ayrıca paydayı büyütmez. Ana görevler yalnızca bütün zorunlu alt kapıları tamamlandığında kapanır. Owner'ın Arrow refill'i anlık transaction yerine okunabilir bir teslimat sürecine çevirme kararıyla açılan `DW-P17-ARROW-DELIVERY` paydayı `16 -> 17`; iOS Game Center ve TestFlight hazırlığıyla açılan `DW-P18-IOS-DISTRIBUTION` ise `17 -> 18` değiştirmiştir.
+İlerleme, Bölüm 3'teki 19 ana görev üzerinden hesaplanır. Alt maddeler kanıt ve kabul kapsamını gösterir; ayrıca paydayı büyütmez. Ana görevler yalnızca bütün zorunlu alt kapıları tamamlandığında kapanır. Owner'ın Arrow refill'i anlık transaction yerine okunabilir bir teslimat sürecine çevirme kararıyla açılan `DW-P17-ARROW-DELIVERY` paydayı `16 -> 17`; iOS Game Center ve TestFlight hazırlığıyla açılan `DW-P18-IOS-DISTRIBUTION` `17 -> 18`; AdMob rewarded reklam, UMP rıza ve Remove Ads IAP hazırlığıyla açılan `DW-P19-ADS` ise `18 -> 19` değiştirmiştir.
 
 ---
 
@@ -169,6 +169,26 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 - Leaderboard ve achievement kimlikleri bu authentication-only paketin kapsamı değildir.
 - TestFlight/App Store upload dış servis durumudur; repo implementasyonundan ayrı kanıtlanır.
 
+### Rewarded reklam, buff ve Remove Ads sınırı
+
+- Oyun ücretsizdir; mevcut yayın kapsamındaki tek reklam biçimi oyuncunun bilinçli olarak seçtiği
+  rewarded reklamdır. Interstitial reklam bu kapsamda yoktur; ileride eklenmesi yeni owner kararı ister.
+- Rewarded teklif kartı rahatsız etmeyen, sınırlı süreli bir HUD fırsatıdır. Kart `12` saniye görünür,
+  oyuncuya kalan tıklama süresini sayaçla gösterir ve süre bitince kaybolur.
+- Rewarded sonuçları worker verimliliği veya Archer hasarı gibi süreli buff'lar olabilir. Birden fazla
+  farklı buff aynı anda aktif olabilir; exact buff süreleri ve tuning değerleri uygulama öncesinde
+  ayrıca kesinleştirilecektir.
+- Aktif buff'lar oyun hızı panelinin altında minimal kartlar olarak gösterilir; her kart exact kalan
+  buff süresini taşır.
+- Tek IAP ürünü Remove Ads'tir. Bu ürüne sahip oyuncu rewarded ödülünü reklam izlemeden alır.
+  Ürün kimliği, fiyatı ve restore davranışının store doğrulaması kapanış kapısıdır.
+- Google AdMob reklam sağlayıcısıdır. UMP rıza durumu reklam isteğinden önce güncellenir; gerekli
+  bölgelerde consent form gösterilir ve gerekli olduğunda gizlilik seçenekleri yeniden açılabilir.
+- Oyun `13` yaş altı çocuklara yönelik değildir. Development Build'lerde production gösterim
+  üretmemek için Google test reklamları kullanılır.
+- Yayınlanmış gizlilik politikası `https://sites.google.com/view/pixicorp-privacy-policy`
+  adresindedir; iletişim e-postası `davutinat@gmail.com` ve işletmeci Davut İnat / PixiCorp'tur.
+
 ---
 
 ## 3. Ana Görev Sırası
@@ -193,6 +213,7 @@ Bu bölüm yalnızca owner tarafından açıkça kesinleştirilmiş kararları i
 | 16 | `DW-P16-GUIDED-ONBOARDING` | UI Toolkit gerçek kontrolleriyle adım adım first-run öğretimi | `[x]` | Gerçek-control spotlight/input gate, Play-session sıra, contextual tip'ler ve hedefli regresyon doğrulandı |
 | 17 | `DW-P17-ARROW-DELIVERY` | Üç saniyelik Arrow teslimatı ve canlı stok barı | `[x]` | Sipariş 3 saniye kullanılamaz kaldı, süre sonunda atomik geldi; pause, save, tutorial, 1K Archer ve UI sözleşmesi doğrulandı |
 | 18 | `DW-P18-IOS-DISTRIBUTION` | Game Center, iOS imzalama, App Store ikonu ve TestFlight hazırlığı | `[~]` | Repo entegrasyonu ve owner-beyanlı TestFlight upload mevcut; internal kurulum ile fiziksel cihaz Game Center testi bekliyor |
+| 19 | `DW-P19-ADS` | AdMob UMP, rewarded teklif/buff akışı ve Remove Ads IAP | `[~]` | Consent cihaz testi, rewarded load/show, teklif ve buff UI, IAP purchase/restore ve store doğrulaması bekliyor |
 
 ---
 
@@ -546,6 +567,37 @@ ile fiziksel cihaz Game Center doğrulaması bekliyor.
 
 Leaderboard ve achievement tanımları P18 kapanış kapısı değildir; ileride owner tarafından
 ayrı ürün kapsamı olarak açılmalıdır.
+
+### `DW-P19-ADS` - AdMob Rewarded + Remove Ads Hazırlığı
+
+**Paket başlığı:** `DW-P19-ADS: AdMob Rewarded + Consent + Remove Ads`
+**Durum:** `[~]` Paket, production kimliği, UMP başlangıç servisi, gizlilik politikası ve fiziksel
+iPhone Development Build mevcut; rewarded runtime, buff UI ve IAP henüz uygulanmadı.
+
+- [x] Google Mobile Ads `11.3.0` ile External Dependency Manager `1.2.187`, OpenUPM scoped
+  registry üzerinden projeye eklendi.
+- [x] iOS AdMob App ID, production rewarded Ad Unit ID ve Development Build test-ad güvenlik
+  seçeneği proje assetlerinde kayıtlıdır. Android kimlikleri Android entegrasyonuna kadar boştur.
+- [x] `MobileAdsService`, UMP consent bilgisini günceller, gerekiyorsa formu açar, reklam isteğine
+  izin verilmeden SDK'yı başlatmaz ve gerekli durumda privacy options form API'sini sunar.
+- [x] `RewardedAdsSettingsSO`, platform rewarded kimliklerini ve development test-ad sınırını
+  tek Resources profili üzerinden sunar.
+- [x] AdMob European regulations mesajı owner tarafından yayınlandı; gizlilik politikası
+  Google Sites üzerinde halka açık URL'ye taşındı.
+- [x] Unity iOS Development Build `0` build hatasıyla üretildi; CocoaPods Google Mobile Ads ve
+  UMP frameworkleri workspace'e bağlandı ve owner fiziksel iPhone'da uygulamanın açıldığını doğruladı.
+- [ ] Fiziksel iPhone UMP test-device kimliği alınacak, Development Build'de EEA debug geography
+  zorlanacak ve consent kabul/ret/privacy-options yolları doğrulanacak.
+- [ ] Rewarded reklam preload, availability, show, completion-only reward, hata/retry ve lifecycle
+  runtime owner'ı uygulanacak.
+- [ ] `12` saniyelik teklif kartı, görünür sayaç, unscaled giriş/çıkış polish'i ve rahatsız etmeyen
+  gösterim sıklığı uygulanıp gerçek HUD üzerinde doğrulanacak.
+- [ ] Aynı anda aktif olabilen buff state'leri, gameplay etkileri, oyun hızı paneli altındaki minimal
+  kalan-süre kartları ve save/pause/time-scale sözleşmesi kesinleştirilip uygulanacak.
+- [ ] Remove Ads IAP ürün kimliği, satın alma, doğrulama, restore ve reklam izlemeden rewarded ödül
+  alma davranışı uygulanacak.
+- [ ] App Store privacy beyanları, IAP metadata, consent/reklam cihaz matrisi ve production release
+  build kapanış doğrulaması tamamlanacak.
 
 ---
 
@@ -1061,3 +1113,23 @@ ayrı ürün kapsamı olarak açılmalıdır.
   upload ve `Ready to Submit` kaydını bildiriyor. Internal install ve fiziksel cihaz Game Center
   davranışı görülmediği için P18 `[~]` bırakıldı.
 - Tracker `v3.3` oldu; payda `17 -> 18` değişti ve ilerleme `17/18 - %94,44` olarak güncellendi.
+
+### 2026-07-25 - P19 AdMob/UMP foundation ve fiziksel iPhone Development Build
+
+- Owner, launch kapsamını ücretsiz oyun, yalnız opt-in rewarded reklam ve tek Remove Ads IAP olarak
+  kesinleştirdi. Remove Ads sahibi rewarded ödülleri reklam izlemeden alacaktır.
+- Rewarded teklifinin `12` saniyelik görünür sayaçla kaybolması, farklı buff'ların aynı anda aktif
+  olabilmesi ve aktif buff kartlarının oyun hızı paneli altında kalan süre göstermesi kilitlendi.
+- Google Mobile Ads `11.3.0`, External Dependency Manager ve OpenUPM registry projeye eklendi.
+  `MobileAdsService` UMP-before-ads başlangıç akışını; `RewardedAdsSettingsSO` platform kimliği ile
+  development test-ad sınırını ekledi.
+- Owner European regulations consent mesajını AdMob'da yayınladı. Davut İnat / PixiCorp işletmeci
+  bilgisi, `davutinat@gmail.com` iletişimi ve oyunun `13` yaş altına yönelik olmadığı sınırıyla
+  gizlilik politikası Google Sites üzerinde yayınlandı.
+- Unity iOS Development Build `0` hatayla tamamlandı; CocoaPods workspace Google Mobile Ads ve UMP
+  bağımlılıklarını içerdi. Generated Pods target'larında Xcode User Script Sandboxing ayarı yerel
+  cihaz çalıştırması için kapatıldı; bu ayarın gelecek buildlerde otomasyonu henüz kalıcı değildir.
+- Owner fiziksel iPhone'da uygulamanın açıldığını doğruladı. UMP test-device kaydı, EEA debug testi,
+  rewarded runtime/UI/buff akışı ve Remove Ads IAP açık kaldı.
+- Yeni ana görev nedeniyle payda `18 -> 19` değişti; P19 `[~]` açıldı ve Post-V1 ilerleme
+  `17/19 - %89,47` oldu.
