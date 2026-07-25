@@ -621,6 +621,40 @@ namespace DeadWalls.Tests
             Assert.That(Time.timeScale, Is.Zero);
             Assert.That(rallyButton.enabledSelf, Is.True,
                 "Guided pause kendi Rally hedefini disable etmemelidir.");
+            ToolkitVisualElement guidedFocus = ToolkitQuery.Q<ToolkitVisualElement>(
+                document.rootVisualElement, "guidedFocus");
+            ToolkitVisualElement guidedCard = ToolkitQuery.Q<ToolkitVisualElement>(
+                document.rootVisualElement, "guidedCard");
+            Assert.That(guidedFocus, Is.Not.Null);
+            Assert.That(guidedCard, Is.Not.Null);
+            for (int frame = 0; frame < 60
+                && (guidedFocus.worldBound.width <= 1f
+                    || guidedCard.worldBound.width <= 1f); frame++)
+                yield return null;
+            Assert.That(guidedFocus.worldBound.width, Is.GreaterThan(1f),
+                "Rally focus layout'u olusmalidir.");
+            Assert.That(guidedCard.worldBound.width, Is.GreaterThan(1f),
+                "Rally card layout'u olusmalidir.");
+            yield return null;
+            Rect rallyButtonBounds = rallyButton.worldBound;
+            Rect rallyFocusBounds = guidedFocus.worldBound;
+            Rect rallyCardBounds = guidedCard.worldBound;
+            for (int frame = 0; frame < 60; frame++)
+            {
+                yield return null;
+                AssertStableTutorialRect(
+                    rallyButtonBounds,
+                    rallyButton.worldBound,
+                    "Rally button");
+                AssertStableTutorialRect(
+                    rallyFocusBounds,
+                    guidedFocus.worldBound,
+                    "Rally focus");
+                AssertStableTutorialRect(
+                    rallyCardBounds,
+                    guidedCard.worldBound,
+                    "Rally card");
+            }
 
             SendNavigationSubmit(rallyButton);
             for (int frame = 0; frame < 60
@@ -663,6 +697,34 @@ namespace DeadWalls.Tests
             Assert.That(Time.timeScale, Is.Zero);
             Assert.That(repairButton.enabledSelf, Is.True,
                 "Guided pause kendi Emergency Repair hedefini disable etmemelidir.");
+            for (int frame = 0; frame < 60
+                && (guidedFocus.worldBound.width <= 1f
+                    || guidedCard.worldBound.width <= 1f); frame++)
+                yield return null;
+            Assert.That(guidedFocus.worldBound.width, Is.GreaterThan(1f),
+                "Emergency Repair focus layout'u olusmalidir.");
+            Assert.That(guidedCard.worldBound.width, Is.GreaterThan(1f),
+                "Emergency Repair card layout'u olusmalidir.");
+            yield return null;
+            Rect repairButtonBounds = repairButton.worldBound;
+            Rect repairFocusBounds = guidedFocus.worldBound;
+            Rect repairCardBounds = guidedCard.worldBound;
+            for (int frame = 0; frame < 60; frame++)
+            {
+                yield return null;
+                AssertStableTutorialRect(
+                    repairButtonBounds,
+                    repairButton.worldBound,
+                    "Emergency Repair button");
+                AssertStableTutorialRect(
+                    repairFocusBounds,
+                    guidedFocus.worldBound,
+                    "Emergency Repair focus");
+                AssertStableTutorialRect(
+                    repairCardBounds,
+                    guidedCard.worldBound,
+                    "Emergency Repair card");
+            }
             float wallHpBeforeRepair = entityManager
                 .GetComponentData<WallSegment>(wallEntity).CurrentHP;
 
@@ -681,6 +743,18 @@ namespace DeadWalls.Tests
                 GuidedOnboardingProgress.WallRepairFlagId), Is.True);
             Assert.That(SimulationPauseService.IsPaused, Is.False);
             Assert.That(Time.timeScale, Is.EqualTo(SimulationSpeedUtility.Fast));
+        }
+
+        private static void AssertStableTutorialRect(
+            Rect expected,
+            Rect actual,
+            string label)
+        {
+            const float tolerance = 0.1f;
+            Assert.That(actual.x, Is.EqualTo(expected.x).Within(tolerance), label + " x");
+            Assert.That(actual.y, Is.EqualTo(expected.y).Within(tolerance), label + " y");
+            Assert.That(actual.width, Is.EqualTo(expected.width).Within(tolerance), label + " width");
+            Assert.That(actual.height, Is.EqualTo(expected.height).Within(tolerance), label + " height");
         }
 
         private static int CountToastMessages(ToolkitVisualElement toastStack, string text)

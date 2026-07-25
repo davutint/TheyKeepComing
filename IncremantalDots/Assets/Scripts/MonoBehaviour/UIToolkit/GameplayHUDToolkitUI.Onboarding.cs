@@ -24,6 +24,10 @@ namespace DeadWalls
         private Label _guidedTitle;
         private Label _guidedBody;
         private Label _guidedAction;
+        private Rect _lastGuidedFocusRect;
+        private Rect _lastGuidedCardRect;
+        private bool _hasGuidedFocusRect;
+        private bool _hasGuidedCardRect;
         private GuidedOnboardingStep _activeGuidedStep;
         private VisualElement _activeGuidedTarget;
         private IDisposable _guidedPauseLease;
@@ -49,6 +53,8 @@ namespace DeadWalls
             _guidedTitle = Q<Label>("guidedTitle");
             _guidedBody = Q<Label>("guidedBody");
             _guidedAction = Q<Label>("guidedAction");
+            _hasGuidedFocusRect = false;
+            _hasGuidedCardRect = false;
         }
 
         private void RegisterGuidedOnboardingInputGate()
@@ -160,7 +166,7 @@ namespace DeadWalls
             _guidedTutorialLayer.EnableInClassList("is-visible", true);
             _guidedTutorialLayer.EnableInClassList("is-core", coreStep);
             _guidedTutorialLayer.EnableInClassList("is-contextual", !coreStep);
-            UpdateGuidedOnboardingGeometry(target, coreStep);
+            UpdateGuidedOnboardingGeometry(target, coreStep, step);
         }
 
         private void SyncGuidedOnboardingPause(bool shouldPause)
@@ -263,9 +269,11 @@ namespace DeadWalls
                 && gm.CanBuyArrowRefill(1);
             bool rallyEligible = cycle.CycleIndex == 0
                 && cycle.Phase == SiegeCyclePhase.Night
-                && gm.RallyReady;
+                && (gm.RallyReady
+                    || IsActiveGuidedAbilityTarget(AbilityHotkeySlot.Rally));
             bool repairEligible = cycle.Phase == SiegeCyclePhase.Night
-                && gm.EmergencyRepairReady
+                && (gm.EmergencyRepairReady
+                    || IsActiveGuidedAbilityTarget(AbilityHotkeySlot.EmergencyRepair))
                 && gm.GetDefensePercent() < 0.995f;
             bool postCombatPhase = cycle.Phase == SiegeCyclePhase.Day
                 || cycle.Phase == SiegeCyclePhase.Dawn;
@@ -360,11 +368,14 @@ namespace DeadWalls
                 : "COMPLETE THE HIGHLIGHTED ACTION TO RESUME";
         }
 
-        private void UpdateGuidedOnboardingGeometry(VisualElement target, bool coreStep)
+        private void UpdateGuidedOnboardingGeometry(
+            VisualElement target,
+            bool coreStep,
+            GuidedOnboardingStep step)
         {
             float pulse = EvaluateGuidedFocusPulse(Time.unscaledTime);
             float focusPadding = GuidedFocusPadding
-                + GuidedFocusPulseExpansion * pulse;
+                + EvaluateGuidedFocusExpansion(step, pulse);
             Rect targetLocalRect = new Rect(Vector2.zero, target.localBound.size);
             Rect focusRect = target.ChangeCoordinatesTo(_root, targetLocalRect);
             float rootWidth = Mathf.Max(1f, _root.contentRect.width);
@@ -374,7 +385,11 @@ namespace DeadWalls
             focusRect.xMax = Mathf.Clamp(focusRect.xMax + focusPadding, 0f, rootWidth);
             focusRect.yMax = Mathf.Clamp(focusRect.yMax + focusPadding, 0f, rootHeight);
 
-            SetGuidedRect(_guidedFocus, focusRect.x, focusRect.y, focusRect.width, focusRect.height);
+            SetGuidedRectIfChanged(
+                _guidedFocus,
+                focusRect,
+                ref _lastGuidedFocusRect,
+                ref _hasGuidedFocusRect);
             _guidedFocus.style.opacity = Mathf.Lerp(0.58f, 1f, pulse);
             float borderWidth = Mathf.Lerp(2f, 3.5f, pulse);
             _guidedFocus.style.borderTopWidth = borderWidth;
@@ -416,7 +431,11 @@ namespace DeadWalls
             float cardTop = placeBelow
                 ? focusRect.yMax + GuidedCardGap
                 : Mathf.Max(16f, focusRect.yMin - GuidedCardGap - cardHeight);
-            SetGuidedRect(_guidedCard, cardLeft, cardTop, cardWidth, cardHeight);
+            SetGuidedRectIfChanged(
+                _guidedCard,
+                new Rect(cardLeft, cardTop, cardWidth, cardHeight),
+                ref _lastGuidedCardRect,
+                ref _hasGuidedCardRect);
         }
 
         internal static float EvaluateGuidedFocusPulse(float unscaledTime)
@@ -426,6 +445,17 @@ namespace DeadWalls
                 * Mathf.PI
                 * 2f;
             return 0.5f + 0.5f * Mathf.Sin(radians - Mathf.PI * 0.5f);
+        }
+
+        internal static float EvaluateGuidedFocusExpansion(
+            GuidedOnboardingStep step,
+            float pulse)
+        {
+            bool stableAbilityGeometry = step == GuidedOnboardingStep.Rally
+                || step == GuidedOnboardingStep.WallRepair;
+            return stableAbilityGeometry
+                ? 0f
+                : GuidedFocusPulseExpansion * Mathf.Clamp01(pulse);
         }
 
         private static void SetGuidedRect(
@@ -442,6 +472,42 @@ namespace DeadWalls
             element.style.top = top;
             element.style.width = Mathf.Max(0f, width);
             element.style.height = Mathf.Max(0f, height);
+        }
+
+        private static void SetGuidedRectIfChanged(
+            VisualElement element,
+            Rect rect,
+            ref Rect lastRect,
+            ref bool hasLastRect)
+        {
+            if (element == null)
+                return;
+
+            Rect sanitized = new Rect(
+                rect.x,
+                rect.y,
+                Mathf.Max(0f, rect.width),
+                Mathf.Max(0f, rect.height));
+            if (hasLastRect && RectApproximatelyEqual(lastRect, sanitized))
+                return;
+
+            SetGuidedRect(
+                element,
+                sanitized.x,
+                sanitized.y,
+                sanitized.width,
+                sanitized.height);
+            lastRect = sanitized;
+            hasLastRect = true;
+        }
+
+        internal static bool RectApproximatelyEqual(Rect left, Rect right)
+        {
+            const float tolerance = 0.01f;
+            return Mathf.Abs(left.x - right.x) <= tolerance
+                && Mathf.Abs(left.y - right.y) <= tolerance
+                && Mathf.Abs(left.width - right.width) <= tolerance
+                && Mathf.Abs(left.height - right.height) <= tolerance;
         }
 
         private void HideGuidedOnboardingPresentation()

@@ -165,6 +165,40 @@ namespace DeadWalls.Tests
             Assert.That(peak, Is.EqualTo(1f).Within(0.0001f));
         }
 
+        [Test]
+        public void AbilityFocusGeometry_RemainsStableWhileOtherTargetsCanExpand()
+        {
+            const float peakPulse = 1f;
+
+            Assert.That(GameplayHUDToolkitUI.EvaluateGuidedFocusExpansion(
+                    GuidedOnboardingStep.Rally,
+                    peakPulse),
+                Is.Zero);
+            Assert.That(GameplayHUDToolkitUI.EvaluateGuidedFocusExpansion(
+                    GuidedOnboardingStep.WallRepair,
+                    peakPulse),
+                Is.Zero);
+            Assert.That(GameplayHUDToolkitUI.EvaluateGuidedFocusExpansion(
+                    GuidedOnboardingStep.SpeedTwo,
+                    peakPulse),
+                Is.GreaterThan(0f));
+        }
+
+        [Test]
+        public void GuidedRectCache_SkipsEquivalentGeometryButDetectsLayoutChanges()
+        {
+            Rect baseline = new Rect(14f, 28f, 192f, 84f);
+
+            Assert.That(GameplayHUDToolkitUI.RectApproximatelyEqual(
+                    baseline,
+                    new Rect(14.005f, 27.995f, 192.005f, 83.995f)),
+                Is.True);
+            Assert.That(GameplayHUDToolkitUI.RectApproximatelyEqual(
+                    baseline,
+                    new Rect(14f, 28f, 193f, 84f)),
+                Is.False);
+        }
+
         private static GuidedOnboardingStep ResolveCore(
             bool economy,
             bool worker,

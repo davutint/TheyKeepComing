@@ -2,7 +2,7 @@
 
 > **Amaç:** V1 kapsamı tamamlandıktan sonra yapılacak mantık düzeltmelerini, oyuncuya görünen geri bildirimleri, UI/UX yeniden çalışmalarını, polish işlerini ve performans optimizasyonlarını tek otoriter takip belgesinde yürütmek.
 >
-> **Tracker sürümü:** 3.4
+> **Tracker sürümü:** 3.5
 > **Oluşturulma tarihi:** 2026-07-18
 > **Aktif paket:** `DW-P19-ADS`
 > **Aktif iş:** AdMob UMP cihaz doğrulaması, rewarded teklif/buff akışı ve Remove Ads IAP
@@ -1133,3 +1133,20 @@ iPhone Development Build mevcut; rewarded runtime, buff UI ve IAP henüz uygulan
   rewarded runtime/UI/buff akışı ve Remove Ads IAP açık kaldı.
 - Yeni ana görev nedeniyle payda `18 -> 19` değişti; P19 `[~]` açıldı ve Post-V1 ilerleme
   `17/19 - %89,47` oldu.
+
+### 2026-07-25 - P16 post-acceptance Rally/Emergency tutorial titreme düzeltmesi
+
+- Owner fiziksel iPhone Development Build'de Rally ve Emergency Repair contextual tutorial'ları
+  açıldığında hedef butonların anormal biçimde titrediğini bildirdi.
+- Kök neden `GameManager.RallyReady` ve `GameManager.EmergencyRepairReady` gate'lerinin
+  `Time.timeScale == 0` altında `false` dönmesiydi. Guided presenter önce ability adımını açıp pause
+  alıyor, sonraki karede eligibility kaybolduğu için adımı gizleyip pause'u bırakıyor ve bunu
+  `ability -> None -> ability` döngüsü halinde tekrarlıyordu.
+- Aktif Rally/Emergency tutorial eligibility'si kendi guided pause lease'i boyunca latched tutuldu.
+  Bu iki hedefte focus/card geometrik pulse'i kaldırıldı; aynı dikdörtgen değerlerinin UI Toolkit
+  style'ına her kare yeniden yazılması da cache ile engellendi. Opacity/border nefesi korunmuştur.
+- `GuidedOnboardingTests` EditMode `8/8` geçti. Rally ve Emergency Repair için buton, focus ve kart
+  dikdörtgenlerini ayrı ayrı `60` kare izleyen; gerçek ability transaction'ını ve önceki hızın geri
+  dönüşünü doğrulayan PlayMode regresyonu `1/1` geçti.
+- Unity compile ve final Console `0 error`; `git diff --check` temiz doğrulandı. P16 kapalı,
+  aktif P19 `[~]` ve ana görev paydası değişmeden Post-V1 ilerleme `17/19 - %89,47` olarak korundu.

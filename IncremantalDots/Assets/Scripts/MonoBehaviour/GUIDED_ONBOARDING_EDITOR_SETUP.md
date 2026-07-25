@@ -58,7 +58,9 @@ tabaninin altina dusurulmez.
 7. `2X` secilince core karartma/input kilidi kapanir ve simulation ayni action sonrasinda `2X`
    olarak devam eder.
 8. Focus rect'in pause altinda dahi yavasca genisleyip daraldigi ve opacity/border'inin nefes
-   aldigi gorulur.
+   aldigi gorulur. Rally ve Emergency Repair hedeflerinde focus/card geometrisi sabit kalirken
+   yalniz opacity/border nefesi devam etmelidir. Bu iki contextual adim pause altinda kesintisiz
+   gorunmeli; tutorial katmani veya hedef buton bir kare dahi acilip kapanmamalidir.
 9. Uygun gameplay kosulunda contextual tip acilir; simulation durur fakat unrelated UI input'u
    kilitlenmez. Action tamamlaninca onceki running speed geri gelir.
 10. Housing ve Arrow field tiplerinin ilgili satin alim affordable degilken pause soft-lock'i

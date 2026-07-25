@@ -119,7 +119,14 @@ Runtime internal Turkce validation/debug mesajlarini dogrudan UI'ya basmaz. Copy
 `GuidedOnboardingProgress.GetCopy` icindeki stable presentation sozlesmesinden gelir.
 
 Focus rect `Time.unscaledTime` ile 1.15 cycle/s hizinda padding, opacity ve border width pulse'i
-uygular. Animation simulation pause altinda da calisir; gameplay timeScale'ine bagli degildir.
+uygular. `GameManager.RallyReady` ve `GameManager.EmergencyRepairReady` pause altinda bilincli
+olarak `false` dondugu icin aktif ability tutorial uygunlugu yalniz bu runtime gate'lerine
+baglanmaz. Rally/Emergency adimi pause lease boyunca latched kalir; aksi halde adim her kare
+`ability -> None -> ability` dongusune girip katmani ve buton durumunu titretebilir. Bu iki
+ability hedefinde focus/card koordinatlari da sabit kalir; yalniz opacity ve border width nefesi
+devam eder. Ayni focus/card dikdortgeni her kare yeniden style'a yazilmaz; son talep edilen
+geometri cache'lenerek UI Toolkit layout invalidation'i engellenir. Animation simulation pause
+altinda da calisir; gameplay timeScale'ine bagli degildir.
 
 ## Dogrulama Kapilari
 
